@@ -936,6 +936,8 @@ class Submission < ActiveRecord::Base
   # This method pulls data from the OriginalityReport table
   # Preload OriginalityReport before using this method in a collection of submissions
   def originality_data
+    return {} if assignment.cpf_migrated?
+
     data = originality_reports_for_display.each_with_object({}) do |originality_report, hash|
       hash[originality_report.asset_key] = {
         similarity_score: originality_report.originality_score&.round(2),

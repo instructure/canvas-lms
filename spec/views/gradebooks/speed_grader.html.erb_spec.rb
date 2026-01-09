@@ -141,9 +141,27 @@ describe "gradebooks/speed_grader" do
   end
 
   it "renders the plagiarism resubmit button if the assignment has a plagiarism tool" do
-    allow_any_instance_of(Assignment).to receive(:assignment_configuration_tool_lookup_ids) { [1] }
+    @assignment.assignment_configuration_tool_lookups.create!(
+      tool_product_code: "turnitin-lti",
+      tool_vendor_code: "turnitin.com",
+      tool_resource_type_code: "resource-type-code",
+      tool_type: "Lti::MessageHandler"
+    )
+
     render(template: "gradebooks/speed_grader", locals:)
     expect(rendered).to include "<div id='plagiarism_platform_info_container'>"
+  end
+
+  it "does not render the plagiarism resubmit button when CPF has been migrated" do
+    @assignment.assignment_configuration_tool_lookups.create!(
+      tool_product_code: "turnitin-lti",
+      tool_vendor_code: "turnitin.com",
+      tool_resource_type_code: "resource-type-code",
+      tool_type: "Lti::MessageHandler"
+    )
+    allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(true)
+    render(template: "gradebooks/speed_grader", locals:)
+    expect(rendered).not_to include "<div id='plagiarism_platform_info_container'>"
   end
 
   describe "submission comments form" do

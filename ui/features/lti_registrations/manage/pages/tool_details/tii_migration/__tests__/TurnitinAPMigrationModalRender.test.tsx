@@ -233,4 +233,25 @@ describe('TurnitinAPMigrationModal Render', () => {
       ).toBeInTheDocument()
     })
   })
+
+  it('should display SpeedGrader visibility warning in info alert', async () => {
+    server.use(
+      http.get(
+        `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+        () => {
+          return HttpResponse.json(mockMigrations)
+        },
+      ),
+    )
+
+    render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /Once you click the button to start the migration, reports will not be visible in SpeedGrader until they have been migrated/,
+        ),
+      ).toBeInTheDocument()
+    })
+  })
 })

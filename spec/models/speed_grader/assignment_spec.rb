@@ -1798,7 +1798,7 @@ describe SpeedGrader::Assignment do
     include_context "lti2_spec_helper"
 
     let_once(:test_course) do
-      test_course = course_factory(active_course: true)
+      test_course = course_factory(active_course: true, account:)
       test_course.enroll_teacher(test_teacher, enrollment_state: "active")
       test_course.enroll_student(test_student, enrollment_state: "active")
       test_course
@@ -1882,6 +1882,26 @@ describe SpeedGrader::Assignment do
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       has_tool = json["submissions"].first["submission_history"].first["submission"]["has_plagiarism_tool"]
       expect(has_tool).to be_truthy
+    end
+
+    it 'excludes "has_plagiarism_tool" if the CPF has been migrated' do
+      submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
+      submission.update_attribute(:turnitin_data, { blah: {} })
+
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool_vendor_code: product_family.vendor_code,
+        tool_product_code: product_family.product_code,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        tool_type: "Lti::MessageHandler"
+      )
+
+      # Mark as migrated
+      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(true)
+
+      json = SpeedGrader::Assignment.new(assignment, test_teacher).json
+      has_tool = json["submissions"].first["submission_history"].first["submission"]["has_plagiarism_tool"]
+      expect(has_tool).to be_falsey
     end
 
     it 'includes "has_originality_score" if the originality report includes an originality score' do
