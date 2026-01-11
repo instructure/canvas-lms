@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-// @ts-expect-error
 import Reactour from '@instructure/reactour/dist/reactour.cjs'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import tourPubSub from '@canvas/tour-pubsub'
@@ -92,8 +91,7 @@ const Tour = ({roles}: ITour) => {
   }, [open])
 
   const handleSoftClose = React.useCallback(
-    async (options = {}) => {
-      // @ts-expect-error
+    async (options: {forceClose?: boolean} = {}) => {
       const {forceClose} = options
       setHasOpened(true)
       if (softClose || forceClose) {

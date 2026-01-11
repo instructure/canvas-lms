@@ -31,12 +31,20 @@ import {
   TEACHER,
 } from '../utils/constants'
 import {
-  GraphQLResult,
   ModuleActionEventDetail,
   ModuleItem,
   ModulesResponse,
   PaginatedNavigationResponse,
 } from '../utils/types'
+
+interface ModuleItemTitlesGraphQLResult {
+  legacyNode?: {
+    moduleItemsConnection?: {
+      edges: Array<{node: Partial<ModuleItem>}>
+    }
+  }
+  errors?: Array<{message: string}>
+}
 import {queryClient} from '@canvas/query'
 import {handleOpeningModuleUpdateTray, handleOpeningEditItemModal} from './modulePageActionHandlers'
 import {handleDelete} from './moduleActionHandlers'
@@ -50,14 +58,13 @@ const getModuleItemTitles = async ({queryKey}: {queryKey: any}): Promise<Partial
   const persistedQuery = MODULE_ITEMS_QUERY_MAP[MODULE_ITEM_TITLES]
   const itemsQuery = gql`${persistedQuery}`
   try {
-    const result = await executeQuery<GraphQLResult>(itemsQuery, {
+    const result = await executeQuery<ModuleItemTitlesGraphQLResult>(itemsQuery, {
       moduleId,
     })
     if (result.errors) {
       throw new Error(result.errors.map((err: {message: string}) => err.message).join(', '))
     }
-    //@ts-expect-error
-    return result.legacyNode?.moduleItemsConnection?.edges.map((edge: any) => edge.node) || []
+    return result.legacyNode?.moduleItemsConnection?.edges.map(edge => edge.node) || []
   } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     showFlashError(I18n.t('Failed to load module items: %{error}', {error: errorMessage}))

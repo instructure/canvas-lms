@@ -147,17 +147,14 @@ export default function HighContrastModeToggle({isMobile}: HighContrastModeToggl
     const newState = enabled ? 'off' : 'on'
     setLoading(true)
     try {
-      const {json} = await doFetchApi({
+      const {json} = await doFetchApi<{feature: string; state: string}>({
         path,
         method: 'PUT',
         body: {feature: 'high_contrast', state: newState},
       })
-      // @ts-expect-error
-      if (json.feature !== 'high_contrast') throw new Error('Unexpected response from API call')
-      // @ts-expect-error
+      if (json?.feature !== 'high_contrast') throw new Error('Unexpected response from API call')
       setEnabled(json.state === 'on')
-      // @ts-expect-error
-      ENV.use_high_contrast = json.state === 'on'
+      ;(ENV as {use_high_contrast: boolean}).use_high_contrast = json.state === 'on'
     } catch (err) {
       if (err instanceof Error) {
         showFlashAlert({

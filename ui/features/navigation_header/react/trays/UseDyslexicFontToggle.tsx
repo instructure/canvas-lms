@@ -131,17 +131,15 @@ export default function DyslexicFontToggle({isMobile}: DyslexicFontToggleProps) 
     const newState = enabled ? 'off' : 'on'
     setLoading(true)
     try {
-      const {json} = await doFetchApi({
+      const {json} = await doFetchApi<{feature: string; state: string}>({
         path,
         method: 'PUT',
         body: {feature: 'use_dyslexic_font', state: newState},
       })
-      // @ts-expect-error
-      if (json.feature !== 'use_dyslexic_font') throw new Error('Unexpected response from API call')
-      // @ts-expect-error
+      if (json?.feature !== 'use_dyslexic_font')
+        throw new Error('Unexpected response from API call')
       setEnabled(json.state === 'on')
-      // @ts-expect-error
-      ENV.use_dyslexic_font = json.state === 'on'
+      ;(ENV as {use_dyslexic_font: boolean}).use_dyslexic_font = json.state === 'on'
     } catch (err) {
       if (err instanceof Error) {
         showFlashAlert({

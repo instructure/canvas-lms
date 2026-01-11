@@ -41,8 +41,7 @@ describe('GlobalNavigation', () => {
     window.ENV.current_user_id = '10'
     window.ENV.current_user_disabled_inbox = false
     window.ENV.CAN_VIEW_CONTENT_SHARES = true
-    // @ts-expect-error
-    window.ENV.SETTINGS = {release_notes_badge_disabled: false}
+    window.ENV.SETTINGS = {release_notes_badge_disabled: false} as typeof window.ENV.SETTINGS
     window.ENV.FEATURES = {embedded_release_notes: true}
 
     server.use(

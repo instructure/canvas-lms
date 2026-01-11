@@ -32,11 +32,28 @@ import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
 
 const I18n = createI18nScope('new_nav')
 
-const fetchHistory = async (context: QueryFunctionContext<string[], string>) => {
+type HistoryEntry = {
+  asset_code: string
+  asset_name: string
+  asset_icon: string
+  asset_readable_category: string
+  context_name: string
+  visited_url: string
+  visited_at: string
+}
+
+type HistoryPage = {
+  json: HistoryEntry[]
+  nextPage: string | null
+}
+
+const fetchHistory = async (
+  context: QueryFunctionContext<string[], string>,
+): Promise<HistoryPage> => {
   const {pageParam = '/api/v1/users/self/history'} = context
-  const {json, link} = await doFetchApi({path: pageParam})
+  const {json, link} = await doFetchApi<HistoryEntry[]>({path: pageParam})
   const nextPage = link?.next ? link.next.url : null
-  return {json, nextPage}
+  return {json: json ?? [], nextPage}
 }
 
 function EmptyState(): React.JSX.Element {
@@ -71,18 +88,14 @@ export default function HistoryList() {
     },
   )
 
-  // @ts-expect-error
-  const combineHistoryEntries = pages => {
+  const combineHistoryEntries = (pages: HistoryPage[] | undefined): HistoryEntry[] => {
     if (pages != null) {
       // combine all entries into one array
-      // @ts-expect-error
-      const allEntries = pages.reduce((accumulator, page) => {
+      const allEntries = pages.reduce<HistoryEntry[]>((accumulator, page) => {
         return [...accumulator, ...page.json]
       }, [])
       // iterate over all entries and combine based on asset_code
-      // @ts-expect-error
-      const historyEntries = allEntries.reduce((accumulator, historyItem) => {
-        // @ts-expect-error
+      const historyEntries = allEntries.reduce<HistoryEntry[]>((accumulator, historyItem) => {
         const alreadyAdded = accumulator.some(entry => historyItem.asset_code === entry.asset_code)
         if (!alreadyAdded) {
           accumulator.push(historyItem)
@@ -129,7 +142,6 @@ export default function HistoryList() {
     return (
       <>
         <List isUnstyled={true} margin="small 0" itemSpacing="small">
-          {/* @ts-expect-error */}
           {historyEntries.map(entry => {
             return (
               <List.Item key={entry.asset_code}>

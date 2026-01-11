@@ -34,7 +34,6 @@ import type {
 import useStore from './stores'
 import {Badge} from '@instructure/ui-badge'
 import {Link} from '@instructure/ui-link'
-// @ts-expect-error
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import sanitizeHtml from 'sanitize-html-with-tinymce'

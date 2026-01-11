@@ -28,7 +28,6 @@ import {useAUPContent} from '../hooks/useAUPContent'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 
-// @ts-expect-error
 import styles from './AcceptableUsePolicy.module.css'
 
 const I18n = createI18nScope('acceptable_use_policy')

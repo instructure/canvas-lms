@@ -24,7 +24,6 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {useMedia} from 'react-use'
 
-// @ts-expect-error
 import styles from './ImmersiveViewBackButton.module.css'
 
 const I18n = createI18nScope('media_immersive_view')

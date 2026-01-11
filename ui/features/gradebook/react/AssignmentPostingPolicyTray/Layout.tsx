@@ -112,8 +112,7 @@ export default function Layout(props: LayoutProps) {
     </View>
   )
 
-  // @ts-expect-error
-  const handlePostPolicyChanged = event => {
+  const handlePostPolicyChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     props.onPostPolicyChanged({postManually: event.target.value === MANUAL_POST})
   }
 

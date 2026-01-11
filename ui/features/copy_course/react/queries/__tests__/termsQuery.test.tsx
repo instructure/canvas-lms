@@ -183,17 +183,17 @@ describe('getTermsNextPage', () => {
   const next = {page: '2', per_page: '10', url: 'test', rel: 'next'}
 
   it('should return the next page link if it exists', () => {
-    const expectedNext = {page: '2', per_page: '10', url: 'test', rel: 'next'}
     const lastPage: DoFetchApiResults<EnrollmentTerms> = {
       json: {
         enrollment_terms: [exampleTerm],
       },
       response: new Response(),
       text: '',
-      link: {next: expectedNext},
+      link: {next: {page: '2', per_page: '10', url: 'test', rel: 'next'}},
     }
     const result = getTermsNextPage(lastPage)
-    expect(result).toEqual(expectedNext)
+    // Only page and per_page are returned (NextPageTerms type)
+    expect(result).toEqual({page: '2', per_page: '10'})
   })
 
   it('should return undefined if there is no next page link', () => {

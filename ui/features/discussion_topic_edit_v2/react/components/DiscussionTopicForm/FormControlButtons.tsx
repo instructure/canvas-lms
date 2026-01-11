@@ -61,8 +61,8 @@ export const FormControlButtons = ({
         margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
         data-testid="announcement-cancel-button"
         onClick={() => {
-          // @ts-expect-error
-          assignLocation(ENV?.CANCEL_TO)
+          const cancelTo = (ENV as {CANCEL_TO?: string}).CANCEL_TO
+          if (cancelTo) assignLocation(cancelTo)
         }}
         disabled={isSubmitting}
       >
@@ -105,8 +105,12 @@ export const FormControlButtons = ({
           // students will always save as published while for moderators in this case they
           // can save as unpublished
           onClick={() =>
-            // @ts-expect-error
-            submitForm(isEditing ? published : !ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE)
+            submitForm(
+              isEditing
+                ? published
+                : !(ENV as {DISCUSSION_TOPIC?: {PERMISSIONS?: {CAN_MODERATE?: boolean}}})
+                    .DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE,
+            )
           }
           color="primary"
           margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}

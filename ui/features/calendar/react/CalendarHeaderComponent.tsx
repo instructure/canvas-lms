@@ -50,8 +50,7 @@ const RenderAddEventButton = ({size}: {size: string}) => {
   }
 
   return (
-    // @ts-expect-error
-    <Button id="create_new_event_link" renderIcon={IconAddLine} display="block">
+    <Button id="create_new_event_link" renderIcon={<IconAddLine />} display="block">
       {I18n.t('Add Event')}
     </Button>
   )

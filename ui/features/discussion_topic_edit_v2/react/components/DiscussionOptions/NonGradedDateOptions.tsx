@@ -89,18 +89,14 @@ export const NonGradedDateOptions = ({
             nextMonthLabel={I18n.t('next')}
             value={availableFrom}
             onChange={(_event, newAvailableFrom = '') => {
-              if (newAvailableFrom === '') {
-                // @ts-expect-error
-                newAvailableFrom = null
-              }
+              const value = newAvailableFrom === '' ? null : newAvailableFrom
               validateAvailability(
-                newAvailableFrom,
+                value,
                 availableUntil,
                 isGraded,
                 setAvailabilityValidationMessages,
               )
-              // @ts-expect-error
-              setAvailableFrom(newAvailableFrom)
+              setAvailableFrom(value)
             }}
             datePlaceholder={I18n.t('Select Date')}
             invalidDateTimeMessage={I18n.t('Invalid date and time')}
@@ -163,18 +159,14 @@ export const NonGradedDateOptions = ({
             nextMonthLabel={I18n.t('next')}
             value={availableUntil}
             onChange={(_event, newAvailableUntil = '') => {
-              if (newAvailableUntil === '') {
-                // @ts-expect-error
-                newAvailableUntil = null
-              }
+              const value = newAvailableUntil === '' ? null : newAvailableUntil
               validateAvailability(
                 availableFrom,
-                newAvailableUntil,
+                value,
                 isGraded,
                 setAvailabilityValidationMessages,
               )
-              // @ts-expect-error
-              setAvailableUntil(newAvailableUntil)
+              setAvailableUntil(value)
             }}
             datePlaceholder={I18n.t('Select Date')}
             invalidDateTimeMessage={I18n.t('Invalid date and time')}
