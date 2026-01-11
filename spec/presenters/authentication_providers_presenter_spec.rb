@@ -182,6 +182,21 @@ describe AuthenticationProvidersPresenter do
     end
   end
 
+  describe "#native_discovery_enabled?" do
+    it "returns true when account.native_discovery_enabled? is true" do
+      account = Account.create!(name: "Test")
+      account.native_discovery_enabled = true
+      presenter = described_class.new(account)
+      expect(presenter.native_discovery_enabled?).to be(true)
+    end
+
+    it "returns false when account.native_discovery_enabled? is false" do
+      account = Account.create!(name: "Test")
+      presenter = described_class.new(account)
+      expect(presenter.native_discovery_enabled?).to be(false)
+    end
+  end
+
   describe "#ldap_configs" do
     it "selects out all ldap configs" do
       config = AuthenticationProvider::LDAP.new

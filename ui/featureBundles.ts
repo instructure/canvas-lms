@@ -157,6 +157,7 @@ const featureBundles: {
   module_sequence_footer: () => import('./features/module_sequence_footer/index'),
   module_student_view_peer_reviews: () =>
     import('./features/module_student_view_peer_reviews/index'),
+  native_discovery_page: () => import('./features/native_discovery_page/index'),
   nav_tourpoints: () => import('./features/nav_tourpoints/index'),
   navigation_header: () => import('./features/navigation_header/index'),
   new_quizzes: () => import('./features/new_quizzes/index'),

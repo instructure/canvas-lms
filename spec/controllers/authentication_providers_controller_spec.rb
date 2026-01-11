@@ -435,4 +435,59 @@ describe AuthenticationProvidersController do
       end
     end
   end
+
+  describe "native_discovery_enabled SSO setting" do
+    before do
+      Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
+    end
+
+    it "includes native_discovery_enabled in the sso_settings response when feature flag is enabled" do
+      account.update!(native_discovery_enabled: true)
+      get :show_sso_settings, params: { account_id: account.id }, format: :json
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json["sso_settings"]["native_discovery_enabled"]).to be(true)
+    end
+
+    it "does not include native_discovery_enabled when feature flag is disabled" do
+      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+      account.update!(native_discovery_enabled: true)
+      get :show_sso_settings, params: { account_id: account.id }, format: :json
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json["sso_settings"]).not_to have_key("native_discovery_enabled")
+    end
+
+    it "updates native_discovery_enabled via update_sso_settings when feature flag is enabled" do
+      put :update_sso_settings, params: {
+        account_id: account.id,
+        sso_settings: { native_discovery_enabled: true }
+      }
+      expect(response).to be_redirect
+      account.reload
+      expect(account.native_discovery_enabled?).to be(true)
+    end
+
+    it "ignores native_discovery_enabled parameter when feature flag is disabled" do
+      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+      put :update_sso_settings, params: {
+        account_id: account.id,
+        sso_settings: { native_discovery_enabled: true }
+      }
+      expect(response).to be_redirect
+      account.reload
+      expect(account.native_discovery_enabled?).to be(false)
+    end
+
+    it "can disable native_discovery_enabled when feature flag is enabled" do
+      account.update!(native_discovery_enabled: true)
+      put :update_sso_settings, params: {
+        account_id: account.id,
+        sso_settings: { native_discovery_enabled: false }
+      }
+      expect(response).to be_redirect
+      account.reload
+      expect(account.native_discovery_enabled?).to be(false)
+    end
+  end
 end
