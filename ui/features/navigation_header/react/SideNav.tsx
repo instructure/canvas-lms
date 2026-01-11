@@ -108,8 +108,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     })
   }
 
-  // @ts-expect-error
-  const handleActiveTray = useCallback((tray, showActiveTray = false) => {
+  const handleActiveTray = useCallback((tray: string | null, showActiveTray = false) => {
     if (showActiveTray) {
       dispatch({type: 'SET_ACTIVE_TRAY', payload: tray})
     }

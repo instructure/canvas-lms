@@ -46,8 +46,7 @@ const releaseNotes = [
 describe('ReleaseNotesList', () => {
   beforeEach(() => {
     ENV.FEATURES.embedded_release_notes = true
-    // @ts-expect-error
-    ENV.SETTINGS = {}
+    ENV.SETTINGS = {} as typeof ENV.SETTINGS
     queryClient.setQueryData(['settings', 'release_notes_badge_disabled'], false)
     queryClient.setQueryData(['releaseNotes'], releaseNotes)
   })

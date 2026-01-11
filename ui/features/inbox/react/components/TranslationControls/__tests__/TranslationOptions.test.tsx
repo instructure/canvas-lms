@@ -29,8 +29,7 @@ const translateBody = vi.fn()
 
 describe('TranslationOptions', () => {
   beforeAll(() => {
-    // @ts-expect-error
-    global.ENV = {
+    ;(global as typeof globalThis & {ENV: unknown}).ENV = {
       inbox_translation_languages: [
         {id: 'en', name: 'English'},
         {id: 'es', name: 'Spanish'},

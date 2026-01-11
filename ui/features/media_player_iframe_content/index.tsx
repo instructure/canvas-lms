@@ -162,7 +162,7 @@ ready(() => {
   } else {
     root.render(
       <CanvasMediaPlayer
-        media_id={media_id}
+        media_id={media_id || ''}
         media_sources={href_source || media_object.media_sources}
         media_tracks={mediaTracks}
         type={is_video ? 'video' : 'audio'}

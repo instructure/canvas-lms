@@ -61,22 +61,16 @@ export default abstract class SubmissionCommentForm extends React.Component<Prop
 
   constructor(props: Props) {
     super(props)
-    const methodsToBind = [
-      'bindTextarea',
-      'focusTextarea',
-      'handleCancel',
-      'handleCommentChange',
-      'handlePublishComment',
-      'handleRCEFocus',
-      'initRCE',
-      'insertEmoji',
-      'isRceLiteEnabled',
-      'mapCommentValueToInputValue',
-    ]
-    methodsToBind.forEach(method => {
-      // @ts-expect-error
-      this[method] = this[method].bind(this)
-    })
+    this.bindTextarea = this.bindTextarea.bind(this)
+    this.focusTextarea = this.focusTextarea.bind(this)
+    this.handleCancel = this.handleCancel.bind(this)
+    this.handleCommentChange = this.handleCommentChange.bind(this)
+    this.handlePublishComment = this.handlePublishComment.bind(this)
+    this.handleRCEFocus = this.handleRCEFocus.bind(this)
+    this.initRCE = this.initRCE.bind(this)
+    this.insertEmoji = this.insertEmoji.bind(this)
+    this.isRceLiteEnabled = this.isRceLiteEnabled.bind(this)
+    this.mapCommentValueToInputValue = this.mapCommentValueToInputValue.bind(this)
 
     // RCE input has to be rerendered if state update happens from outside
     this.state = {comment: this.mapCommentValueToInputValue(props.comment || ''), rceKey: 0}

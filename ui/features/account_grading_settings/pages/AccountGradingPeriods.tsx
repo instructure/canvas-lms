@@ -27,8 +27,7 @@ export function Component() {
   }
   const accountId = pathMatch.params.accountId
   const rootAccountId = ENV.DOMAIN_ROOT_ACCOUNT_ID
-  // @ts-expect-error
-  const isRootAccount = ENV.IS_ROOT_ACCOUNT
+  const isRootAccount = (ENV as {IS_ROOT_ACCOUNT?: boolean}).IS_ROOT_ACCOUNT ?? false
 
   // Note: these env vars are required downstream in api callers used by the grading periods management page,
   // in addition to being required to be passed in to this component itself as props

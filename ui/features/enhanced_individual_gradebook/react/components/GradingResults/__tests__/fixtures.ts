@@ -24,7 +24,6 @@ import {
   GradebookSortOrder,
 } from '../../../../types'
 
-// @ts-expect-error
 export const defaultStudentSubmissions: GradebookUserSubmissionDetails = {
   grade: '95',
   id: '1',
@@ -47,6 +46,7 @@ export const defaultStudentSubmissions: GradebookUserSubmissionDetails = {
   enteredGrade: '95',
   gradeMatchesCurrentSubmission: true,
   customGradeStatus: '',
+  sticker: null,
 }
 
 export const defaultAssignment: AssignmentConnection = {

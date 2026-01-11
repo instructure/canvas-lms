@@ -234,8 +234,7 @@ export default function GlobalSettings({
               data-testid="upload-button"
               href={`${gradebookOptions.contextUrl}/gradebook_upload/new`}
               color="secondary"
-              // @ts-expect-error
-              renderIcon={IconUploadLine}
+              renderIcon={<IconUploadLine />}
               id="upload"
             >
               {I18n.t('Upload Scores (.csv)')}

@@ -31,8 +31,12 @@ export const getTermsNextPage = (
   if (isResultEmpty) {
     return
   }
-  // @ts-expect-error
-  return lastPage.link?.next
+  const nextLink = lastPage.link?.next
+  if (!nextLink) return undefined
+  return {
+    page: nextLink.page,
+    per_page: nextLink.per_page,
+  }
 }
 
 export const termsQuery = async ({

@@ -38,8 +38,9 @@ interface Props {
 }
 
 const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
-  // @ts-expect-error
-  const languages = useRef<Language[]>(ENV?.inbox_translation_languages ?? [])
+  const languages = useRef<Language[]>(
+    (ENV as {inbox_translation_languages?: Language[]})?.inbox_translation_languages ?? [],
+  )
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
   const inputRef = useRef<HTMLInputElement>()
 
