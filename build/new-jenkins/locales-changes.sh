@@ -11,7 +11,7 @@ locales="$(git show --pretty=""  --name-only HEAD^..HEAD | grep "config/locales/
 IFS=', ' read -r -a localesArray <<< "$locales"
 
 # diff the two arrays, save any unique to diffArray
-diffArray="$(`echo ${localesArray[@]} ${changesArray[@]} | tr ' ' '\n' | sort | uniq -u `)"
+diffArray="$(echo "${localesArray[@]}" "${changesArray[@]}" | tr ' ' '\n' | sort | uniq -u)"
 
 # if any diff, there is more than locales changes
 # if no diff, there are only config/locales changes

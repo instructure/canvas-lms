@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,184 +16,255 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def nodeRequirementsTemplate() {
-  def baseTestContainer = [
-    image: env.LINTERS_RUNNER_IMAGE,
-    command: 'cat',
-    envVars: [
-      GERGICH_DB_PATH: '/home/docker/gergich',
-      GERGICH_GIT_PATH: env.DOCKER_WORKDIR,
-    ]
-  ]
-
-  def containers = ['bundle', 'gergichLinters', 'ESLint', 'TypeScript', 'Biome', 'miscJsChecks', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn', 'graphqlSchema'].collect { containerName ->
-    baseTestContainer + [name: containerName]
-  }
-
-  return [
-    containers: containers,
-    volumes: [
-      baseTestContainer.envVars.GERGICH_DB_PATH,
-    ]
-  ]
-}
-
-def tearDownNode() {
-  { ->
-    container('gergichLinters') {
-      sh './build/new-jenkins/linters/run-gergich-publish.sh'
-    }
+private def runLinterCommand(String stageName, Closure scriptBlock) {
+  def startTime = System.currentTimeMillis()
+  try {
+    scriptBlock()
+  } finally {
+    buildSummaryReport.trackStage(stageName, startTime)
   }
 }
 
-def gergichLintersStage(stages) {
-  { ->
-    def codeEnvVars = [
-      "PRIVATE_PLUGINS=${commitMessageFlag('canvas-lms-private-plugins') as String}",
-    ]
+def provisionDocker() {
+  // Pull the linters image from registry and tag it locally
+  credentials.withStarlordCredentials {
+    sh """
+      set -ex
 
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'gergichLinters',
-      envVars: codeEnvVars,
-      command: './build/new-jenkins/linters/run-gergich-linters.sh'
-    )
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $LINTERS_RUNNER_IMAGE
+      docker tag $LINTERS_RUNNER_IMAGE local/linters-runner
+      echo "Linters runner image pulled and tagged locally."
+    """
   }
 }
 
-def miscJsChecksStage(stages, buildConfig) {
-  { ->
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'miscJsChecks',
-      command: './build/new-jenkins/linters/run-misc-js-checks.sh',
-      // JS files for obvious reasons, yarn files in case dependencies are changed.
-      required: filesChangedStage.hasYarnFiles(buildConfig) || filesChangedStage.hasJsFiles(buildConfig)
-    )
-  }
-}
+def runLintersInline() {
+  def hasBundleFiles = env.HAS_BUNDLE_FILES == 'true'
+  def hasYarnFiles = env.HAS_YARN_FILES == 'true'
+  def hasJsFiles = env.HAS_JS_FILES == 'true'
+  def hasGraphqlFiles = env.HAS_GRAPHQL_FILES == 'true'
+  def hasGroovyFiles = env.HAS_GROOVY_FILES == 'true'
+  def isMerged = configuration.isChangeMerged()
 
-def typescriptStage(stages, buildConfig) {
-  { ->
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'TypeScript',
-      command: './build/new-jenkins/linters/run-ts-type-check.sh',
-      // We include all JS files to be safe, GraphQL because we use GraphQL codegen which generates TS files,
-      // and yarn files in case dependencies were added/removed that affect types or we update TS itself.
-      required: env.GERRIT_PROJECT == 'canvas-lms' && (filesChangedStage.hasJsFiles(buildConfig) || filesChangedStage.hasGraphqlFiles(buildConfig) || filesChangedStage.hasYarnFiles(buildConfig))
-    )
-  }
-}
+  withEnv([
+    "COMPOSE_FILE=docker-compose.new-jenkins-linters.yml",
+    "GERGICH_REVIEW_LABEL=Lint-Review"
+  ]) {
+    // Run all linter stages in parallel
+    def linterStages = [:]
 
-def eslintStage(stages, buildConfig) {
-  { ->
-    def codeEnvVars = [
-      "SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}",
-    ]
+    // Pre-merge linters (only run on unmerged changes)
+    if (!isMerged) {
+      linterStages['Linters - Gergich'] = {
+        runGergichLinters()
+      }
 
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'ESLint',
-      envVars: codeEnvVars,
-      command: './build/new-jenkins/linters/run-eslint.sh',
-      // JS files for obvious reasons, yarn files in case dependencies were added/removed that affect linting or we update ESLint itself.
-      required: filesChangedStage.hasJsFiles(buildConfig) || filesChangedStage.hasYarnFiles(buildConfig)
-    )
-  }
-}
-
-def biomeStage(stages, buildConfig) {
-  { ->
-    def codeEnvVars = [
-      "SKIP_BIOME=${commitMessageFlag('skip-biome') as Boolean}",
-    ]
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'Biome',
-      envVars: codeEnvVars,
-      command: './build/new-jenkins/linters/run-gergich-biome.sh',
-      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasJsFiles(buildConfig),
-    )
-  }
-}
-
-def masterBouncerStage(stages) {
-  { ->
-    credentials.withMasterBouncerCredentials {
-      def masterBouncerEnvVars = [
-        'GERGICH_REVIEW_LABEL=Lint-Review',
-        "MASTER_BOUNCER_KEY=$MASTER_BOUNCER_KEY",
-      ]
-
-      callableWithDelegate(queueTestStage())(stages,
-        name: 'master-bouncer',
-        envVars: masterBouncerEnvVars,
-        required: env.MASTER_BOUNCER_RUN == '1',
-        command: 'master_bouncer check'
-      )
-    }
-  }
-}
-
-def bundleStage(stages, buildConfig) {
-  { ->
-    def bundleEnvVars = [
-      "PLUGINS_LIST=${commitMessageFlag('canvas-lms-plugins') as String}"
-    ]
-
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'bundle',
-      envVars: bundleEnvVars,
-      required: filesChangedStage.hasBundleFiles(buildConfig),
-      command: './build/new-jenkins/linters/run-gergich-bundle.sh',
-    )
-  }
-}
-
-def yarnStage(stages, buildConfig) {
-  { ->
-    def yarnEnvVars = [
-      "PLUGINS_LIST=${commitMessageFlag('canvas-lms-plugins') as String}"
-    ]
-
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'yarn',
-      envVars: yarnEnvVars,
-      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasYarnFiles(buildConfig),
-      command: './build/new-jenkins/linters/run-gergich-yarn.sh',
-    )
-  }
-}
-
-def groovyStage(stages, buildConfig) {
-  { ->
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'groovy',
-      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGroovyFiles(buildConfig),
-      command: 'npx npm-groovy-lint --path \".\" --ignorepattern \"**/node_modules/**\" --files \"**/*.groovy,**/Jenkinsfile*\" --config \".groovylintrc.json\" --loglevel info --failon warning',
-    )
-  }
-}
-
-def graphqlSchemaStage(stages, buildConfig) {
-  { ->
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'graphqlSchema',
-      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGraphqlFiles(buildConfig),
-      command: './build/new-jenkins/linters/run-gergich-graphql-schema.sh',
-    )
-  }
-}
-
-def queueTestStage() {
-  { opts, stages ->
-    extendedStage("Linters - ${opts.name}")
-      .envVars(opts.containsKey('envVars') ? opts.envVars : [])
-      .hooks(buildSummaryReportHooks.call())
-      .nodeRequirements(container: opts.name)
-      .required(opts.containsKey('required') ? opts.required : true)
-      .queue(stages) {
-        sh(opts.command)
-
-        if (commitMessageFlag('force-failure-linters') as Boolean) {
-          error 'lintersStage: force failing due to flag'
+      if (hasBundleFiles) {
+        linterStages['Linters - Bundle Check'] = {
+          runBundleCheck()
         }
       }
+
+      if (env.GERRIT_PROJECT == 'canvas-lms' && hasYarnFiles) {
+        linterStages['Linters - Yarn Check'] = {
+          runYarnCheck()
+        }
+      }
+
+      if (hasYarnFiles || hasJsFiles) {
+        linterStages['Linters - Misc JS Checks'] = {
+          runMiscJsChecks()
+        }
+
+        linterStages['Linters - ESLint'] = {
+          runEslint()
+        }
+      }
+
+      if (env.GERRIT_PROJECT == 'canvas-lms' && hasJsFiles) {
+        linterStages['Linters - Biome'] = {
+          runBiome()
+        }
+      }
+
+      if (env.GERRIT_PROJECT == 'canvas-lms' && (hasJsFiles || hasGraphqlFiles || hasYarnFiles)) {
+        linterStages['Linters - TypeScript'] = {
+          runTypeScript()
+        }
+      }
+
+      if (env.GERRIT_PROJECT == 'canvas-lms' && hasGraphqlFiles) {
+        linterStages['Linters - GraphQL Schema'] = {
+          runGraphqlSchema()
+        }
+      }
+
+      if (env.GERRIT_PROJECT == 'canvas-lms' && hasGroovyFiles) {
+        linterStages['Linters - Groovy'] = {
+          runGroovyLint()
+        }
+      }
+
+      if (env.MASTER_BOUNCER_RUN == '1') {
+        linterStages['Linters - Master Bouncer'] = {
+          runMasterBouncer()
+        }
+      }
+    }
+
+    // Post-merge security scan (only run on merged builds)
+    if (isMerged) {
+      linterStages['Linters - Snyk Security Scan'] = {
+        runSnykScan()
+      }
+    }
+
+    parallel(linterStages)
+
+    // Publish Gergich results after all linters complete (pre-merge only)
+    if (!isMerged) {
+      publishGergichResults()
+    }
+
+    // Check for force failure
+    if (commitMessageFlag('force-failure-linters') as Boolean) {
+      error 'Linters: force failing due to [force-failure-linters] flag'
+    }
   }
 }
+
+def runGergichLinters() {
+  runLinterCommand('Linters - Gergich') {
+    withEnv(["PRIVATE_PLUGINS=${commitMessageFlag('canvas-lms-private-plugins') as String}"]) {
+      sh '''
+        set -ex
+        docker compose run --rm linters ./build/new-jenkins/linters/run-gergich-linters.sh
+      '''
+    }
+  }
+}
+
+def runBundleCheck() {
+  runLinterCommand('Linters - Bundle Check') {
+    withEnv(["PLUGINS_LIST=${commitMessageFlag('canvas-lms-plugins') as String}"]) {
+      sh '''
+        set -ex
+        docker compose run --rm linters ./build/new-jenkins/linters/run-gergich-bundle.sh
+      '''
+    }
+  }
+}
+
+def runYarnCheck() {
+  runLinterCommand('Linters - Yarn Check') {
+    withEnv(["PLUGINS_LIST=${commitMessageFlag('canvas-lms-plugins') as String}"]) {
+      sh '''
+        set -ex
+        docker compose run --rm linters ./build/new-jenkins/linters/run-gergich-yarn.sh
+      '''
+    }
+  }
+}
+
+def runMiscJsChecks() {
+  runLinterCommand('Linters - Misc JS Checks') {
+    sh '''
+      set -ex
+      docker compose run --rm linters ./build/new-jenkins/linters/run-misc-js-checks.sh
+    '''
+  }
+}
+
+def runEslint() {
+  runLinterCommand('Linters - ESLint') {
+    withEnv(["SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}"]) {
+      sh '''
+        set -ex
+        docker compose run --rm linters ./build/new-jenkins/linters/run-eslint.sh
+      '''
+    }
+  }
+}
+
+def runBiome() {
+  runLinterCommand('Linters - Biome') {
+    withEnv(["SKIP_BIOME=${commitMessageFlag('skip-biome') as Boolean}"]) {
+      sh '''
+        set -ex
+        docker compose run --rm linters ./build/new-jenkins/linters/run-gergich-biome.sh
+      '''
+    }
+  }
+}
+
+def runTypeScript() {
+  runLinterCommand('Linters - TypeScript') {
+    sh '''
+      set -ex
+      docker compose run --rm linters ./build/new-jenkins/linters/run-ts-type-check.sh
+    '''
+  }
+}
+
+def runGraphqlSchema() {
+  runLinterCommand('Linters - GraphQL Schema') {
+    sh '''
+      set -ex
+      docker compose run --rm linters ./build/new-jenkins/linters/run-gergich-graphql-schema.sh
+    '''
+  }
+}
+
+def runGroovyLint() {
+  runLinterCommand('Linters - Groovy') {
+    sh '''
+      set -ex
+      docker compose run --rm linters \
+        npx npm-groovy-lint \
+          --path "." \
+          --ignorepattern "**/node_modules/**" \
+          --files "**/*.groovy,**/Jenkinsfile*" \
+          --config ".groovylintrc.json" \
+          --loglevel info \
+          --failon warning
+    '''
+  }
+}
+
+def runMasterBouncer() {
+  runLinterCommand('Linters - Master Bouncer') {
+    credentials.withMasterBouncerCredentials {
+      sh '''
+        set -ex
+        docker compose run --rm \
+          -e MASTER_BOUNCER_KEY=$MASTER_BOUNCER_KEY \
+          -e GERRIT_HOST=$GERRIT_HOST \
+          linters master_bouncer check
+      '''
+    }
+  }
+}
+
+def runSnykScan() {
+  runLinterCommand('Linters - Snyk Security Scan') {
+    credentials.withSnykCredentials {
+      sh '''
+        set -ex
+        docker compose run --rm \
+          -e SNYK_TOKEN=$SNYK_TOKEN \
+          linters ./build/new-jenkins/linters/run-snyk.sh
+      '''
+    }
+  }
+}
+
+def publishGergichResults() {
+  runLinterCommand('Linters - Publish Gergich Results') {
+    sh '''
+      set -ex
+      docker compose run --rm linters ./build/new-jenkins/linters/run-gergich-publish.sh
+    '''
+  }
+}
+
+return this

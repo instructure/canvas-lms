@@ -1,0 +1,27 @@
+services:
+  linters:
+    image: local/linters-runner
+    working_dir: /usr/src/app
+    environment:
+      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+      RAILS_ENV: test
+      GERGICH_DB_PATH: /home/docker/gergich
+      GERGICH_GIT_PATH: /usr/src/app
+      GERGICH_KEY:
+      GERGICH_PUBLISH:
+      GERRIT_PROJECT:
+      GERRIT_REFSPEC:
+      GERRIT_BRANCH:
+      GERRIT_CHANGE_ID:
+      GERRIT_PATCHSET_REVISION:
+      GERRIT_HOST:
+      GERGICH_REVIEW_LABEL:
+      PRIVATE_PLUGINS:
+      PLUGINS_LIST:
+      SKIP_ESLINT:
+      SKIP_BIOME:
+      SKIP_YARN:
+      MASTER_BOUNCER_RUN:
+      MASTER_BOUNCER_KEY:
+    command: sleep infinity
+    init: true
