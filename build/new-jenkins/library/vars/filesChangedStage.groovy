@@ -17,47 +17,35 @@
  */
 
 import groovy.transform.Field
+import instructure.FilesChangedDetector
 
-@Field final static STAGE_NAME = 'Detect Files Changed (Pre-Build)'
-@Field final static STAGE_NAME_POST_BUILD = 'Detect Files Changed (Post-Build)'
+// Singleton instance that persists across stages
+@Field static FilesChangedDetector detector = null
 
-def hasBundleFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('bundleFiles')
+// Get or create the singleton instance
+def getDetector() {
+  if (detector == null) {
+    detector = new FilesChangedDetector()
+  }
+  return detector
 }
 
-def hasDockerDevFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('dockerDevFiles')
+// Reset the detector instance (call at the start of each pipeline run)
+def reset() {
+  detector = null
 }
 
-def hasGroovyFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('groovyFiles')
-}
+// Direct accessor methods
+def hasBundleFiles() { return getDetector().hasBundleFiles() }
+def hasDockerDevFiles() { return getDetector().hasDockerDevFiles() }
+def hasGroovyFiles() { return getDetector().hasGroovyFiles() }
+def hasSpecFiles() { return getDetector().hasSpecFiles() }
+def hasYarnFiles() { return getDetector().hasYarnFiles() }
+def hasGraphqlFiles() { return getDetector().hasGraphqlFiles() }
+def hasErbFiles() { return getDetector().hasErbFiles() }
+def hasJsFiles() { return getDetector().hasJsFiles() }
 
-def hasSpecFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('specFiles')
-}
-
-def hasYarnFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('yarnFiles')
-}
-
-def hasGraphqlFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('graphqlFiles')
-}
-
-def hasErbFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('erbFiles')
-}
-
-def hasJsFiles(buildConfig) {
-  return buildConfig[STAGE_NAME_POST_BUILD].value('jsFiles')
-}
-
-def hasNewDeletedSpecFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('addedOrDeletedSpecFiles')
-}
-
-def preBuild(stageConfig) {
+def preBuild() {
   def dockerDevFiles = [
     '^docker-compose/',
     '^script/common/',
@@ -68,18 +56,40 @@ def preBuild(stageConfig) {
     'Jenkinsfile.docker-smoke'
   ]
 
-  stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
-  stageConfig.value('featureFlagFiles', git.changedFiles(['config/feature_flags'], 'HEAD^'))
-  stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy', 'Jenkinsfile.*'], 'HEAD^'))
-  stageConfig.value('yarnFiles', git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
-  stageConfig.value('graphqlFiles', git.changedFiles(['app/graphql', 'schema.graphql'], 'HEAD^'))
-  stageConfig.value('erbFiles', git.changedFiles(['.erb'], 'HEAD^'))
-  stageConfig.value('addedOrDeletedSpecFiles', sh(script: 'git diff --name-only --diff-filter=AD HEAD^..HEAD | grep "_spec.rb"', returnStatus: true) == 0)
+  def d = getDetector()
 
-  dir(env.LOCAL_WORKDIR) {
-    stageConfig.value('bundleFiles', sh(script: 'git diff --name-only HEAD^..HEAD | grep -E "Gemfile|gemspec"', returnStatus: true) == 0)
-    stageConfig.value('specFiles', sh(script: "${WORKSPACE}/build/new-jenkins/spec-changes.sh", returnStatus: true) == 0)
+  // Run independent git operations in parallel for better performance
+  def parallelChecks = [:]
+
+  parallelChecks['dockerDevFiles'] = {
+    d.setDockerDevFiles(git.changedFiles(dockerDevFiles, 'HEAD^'))
   }
+
+  parallelChecks['groovyFiles'] = {
+    d.setGroovyFiles(git.changedFiles(['.*.groovy', 'Jenkinsfile.*'], 'HEAD^'))
+  }
+
+  parallelChecks['yarnFiles'] = {
+    d.setYarnFiles(git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
+  }
+
+  parallelChecks['graphqlFiles'] = {
+    d.setGraphqlFiles(git.changedFiles(['app/graphql', 'schema.graphql'], 'HEAD^'))
+  }
+
+  parallelChecks['erbFiles'] = {
+    d.setErbFiles(git.changedFiles(['.erb'], 'HEAD^'))
+  }
+
+  parallelChecks['workdirChecks'] = {
+    dir(env.LOCAL_WORKDIR) {
+      d.setBundleFiles(sh(script: 'git diff --name-only HEAD^..HEAD | grep -E "Gemfile|gemspec"', returnStatus: true) == 0)
+      d.setSpecFiles(sh(script: "${WORKSPACE}/build/new-jenkins/spec-changes.sh", returnStatus: true) == 0)
+    }
+  }
+
+  // Execute all checks in parallel
+  parallel parallelChecks
 
   // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
   // https://issues.jenkins.io/browse/JENKINS-52750
@@ -88,9 +98,11 @@ def preBuild(stageConfig) {
   }
 }
 
-def postBuild(stageConfig) {
+def postBuild() {
+  def d = getDetector()
+
   dir(env.LOCAL_WORKDIR) {
-    stageConfig.value('jsFiles', sh(script: "${WORKSPACE}/build/new-jenkins/js-changes.sh", returnStatus: true) == 0)
+    d.setJsFiles(sh(script: "${WORKSPACE}/build/new-jenkins/js-changes.sh", returnStatus: true) == 0)
   }
 
   // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
