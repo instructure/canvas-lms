@@ -156,4 +156,6 @@ class AuthenticationProvidersPresenter
     suf += "_#{aac.id}" unless aac.new_record?
     suf
   end
+
+  delegate :native_discovery_enabled?, to: :account
 end

@@ -2535,6 +2535,35 @@ describe Account do
     end
   end
 
+  describe "native_discovery_enabled setting" do
+    let(:account) { Account.create!(name: "Test", workflow_state: "active") }
+
+    it "defaults native_discovery_enabled to false" do
+      expect(account.native_discovery_enabled?).to be(false)
+      expect(account.native_discovery_route_active?).to be(false)
+    end
+
+    it "can enable native_discovery_enabled" do
+      account.native_discovery_enabled = true
+      expect(account.native_discovery_enabled?).to be(true)
+      expect(account.native_discovery_route_active?).to be(true)
+    end
+
+    it "can disable native_discovery_enabled" do
+      account.native_discovery_enabled = true
+      account.native_discovery_enabled = false
+      expect(account.native_discovery_enabled?).to be(false)
+      expect(account.native_discovery_route_active?).to be(false)
+    end
+
+    it "coerces string values to boolean" do
+      account.native_discovery_enabled = "true"
+      expect(account.native_discovery_enabled?).to be(true)
+      account.native_discovery_enabled = "false"
+      expect(account.native_discovery_enabled?).to be(false)
+    end
+  end
+
   describe "#multi_parent_sub_accounts_recursive" do
     subject { Account.multi_parent_sub_accounts_recursive(parent_account_ids) }
 
