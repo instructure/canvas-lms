@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {z} from 'zod'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -133,9 +133,7 @@ export function renderToElements<T extends z.ZodType | undefined>({
           elem = <QueryClientProvider client={queryClient}>{elem}</QueryClientProvider>
         }
 
-        createRoot(container).render(
-          <FlashErrorBoundary title={flashErrorTitle}>{elem}</FlashErrorBoundary>,
-        )
+        render(<FlashErrorBoundary title={flashErrorTitle}>{elem}</FlashErrorBoundary>, container)
 
         count++
       }
