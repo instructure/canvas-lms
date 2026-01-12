@@ -75,6 +75,7 @@ export type GradebookSettings = {
   student_column_secondary_info: string
   view_ungraded_as_zero: 'false' | 'true'
   view_hidden_grades_indicator: 'false' | 'true'
+  view_status_for_colorblindness: 'false' | 'true'
   colors?: StatusColors
 }
 
@@ -203,6 +204,7 @@ export type GradebookViewOptions = {
   statusColors: StatusColors
   viewUngradedAsZero: boolean
   viewHiddenGradesIndicator: boolean
+  viewStatusForColorblindness: boolean
 }
 
 export type LatePolicy = {

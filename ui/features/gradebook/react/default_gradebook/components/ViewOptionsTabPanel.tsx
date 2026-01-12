@@ -135,6 +135,7 @@ interface ViewOptionsTabPanelProps {
   }
   viewUngradedAsZero: CheckboxSetting & {allowed: boolean}
   viewHiddenGradesIndicator: CheckboxSetting
+  viewStatusForColorblindness: CheckboxSetting
 }
 
 export default function ViewOptionsTabPanel({
@@ -148,6 +149,7 @@ export default function ViewOptionsTabPanel({
   statusColors,
   viewUngradedAsZero,
   viewHiddenGradesIndicator,
+  viewStatusForColorblindness,
 }: ViewOptionsTabPanelProps) {
   const sortOptions = buildAssignmentSortOptions(columnSort.modulesEnabled)
   const selectedSortKey =
@@ -223,6 +225,11 @@ export default function ViewOptionsTabPanel({
               I18n.t('View hidden grades indicator'),
               'viewHiddenGradesIndicator',
             )}
+            {renderCheckbox(
+              viewStatusForColorblindness,
+              I18n.t('View status for colorblindness'),
+              'viewStatusForColorblindness',
+            )}
           </FormFieldGroup>
         </View>
 
@@ -278,6 +285,10 @@ ViewOptionsTabPanel.propTypes = {
     onChange: func.isRequired,
   }).isRequired,
   viewHiddenGradesIndicator: shape({
+    checked: bool.isRequired,
+    onChange: func.isRequired,
+  }).isRequired,
+  viewStatusForColorblindness: shape({
     checked: bool.isRequired,
     onChange: func.isRequired,
   }).isRequired,

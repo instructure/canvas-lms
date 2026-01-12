@@ -102,6 +102,7 @@ export const defaultGradebookEnv = {
   speed_grader_enabled: true,
   student_groups: {},
   viewHiddenGradesIndicator: false,
+  viewStatusForColorblindness: false,
 }
 
 export const defaultGradebookProps: GradebookProps = {

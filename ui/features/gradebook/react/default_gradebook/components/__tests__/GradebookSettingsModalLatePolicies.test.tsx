@@ -48,6 +48,7 @@ describe('GradebookSettingsModal Late Policies', () => {
       statusColors: statusColors(),
       viewUngradedAsZero: false,
       viewHiddenGradesIndicator: false,
+      viewStatusForColorblindness: false,
     })
 
     props = {
@@ -74,9 +75,7 @@ describe('GradebookSettingsModal Late Policies', () => {
 
     latePolicyUrl = `/api/v1/courses/${props.courseId}/late_policy`
     // If a course hasn't yet created a late policy, this returns a 404 and the front-end handles it.
-    server.use(
-      http.get(latePolicyUrl, () => new HttpResponse(null, {status: 404}))
-    )
+    server.use(http.get(latePolicyUrl, () => new HttpResponse(null, {status: 404})))
   })
 
   afterEach(() => {
@@ -106,7 +105,7 @@ describe('GradebookSettingsModal Late Policies', () => {
       http.post(latePolicyUrl, async ({request}) => {
         capturedBody = await request.json()
         return HttpResponse.json(response)
-      })
+      }),
     )
 
     const {findByTestId, findByLabelText, getByTestId} = render(
@@ -163,7 +162,7 @@ describe('GradebookSettingsModal Late Policies', () => {
       http.patch(latePolicyUrl, async ({request}) => {
         capturedBody = await request.json()
         return new HttpResponse(null, {status: 204})
-      })
+      }),
     )
 
     const {findByTestId, findByLabelText, getByTestId} = render(

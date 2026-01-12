@@ -71,6 +71,10 @@ describe('ViewOptionsTabPanel', () => {
         checked: false,
         onChange: vi.fn(),
       },
+      viewStatusForColorblindness: {
+        checked: false,
+        onChange: jest.fn(),
+      },
     }
   })
 
@@ -332,6 +336,32 @@ describe('ViewOptionsTabPanel', () => {
       })
 
       fireEvent.click(getByLabelText('View hidden grades indicator'))
+      expect(onChange).toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe('.viewStatusForColorblindness', () => {
+    it('is checked if .checked is true', () => {
+      const {getByLabelText} = renderPanel({
+        viewStatusForColorblindness: {checked: true, onChange: () => {}},
+      })
+      expect(getByLabelText('View status for colorblindness')).toBeChecked()
+    })
+
+    it('is unchecked if .checked is false', () => {
+      const {getByLabelText} = renderPanel({
+        viewStatusForColorblindness: {checked: false, onChange: () => {}},
+      })
+      expect(getByLabelText('View status for colorblindness')).not.toBeChecked()
+    })
+
+    it('calls .onChange when the user toggles the item', () => {
+      const onChange = jest.fn()
+      const {getByLabelText} = renderPanel({
+        viewStatusForColorblindness: {checked: false, onChange},
+      })
+
+      fireEvent.click(getByLabelText('View status for colorblindness'))
       expect(onChange).toHaveBeenCalledWith(true)
     })
   })
