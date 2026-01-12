@@ -70,13 +70,12 @@ describe('AddWidgetModal', () => {
   it('displays all available widgets from registry', () => {
     render(<AddWidgetModal {...defaultProps} />)
 
-    expect(screen.getByTestId('widget-card-course_work_summary')).toBeInTheDocument()
-    expect(screen.getByTestId('widget-card-course_work')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-course_work_combined')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-course_grades')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-announcements')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-people')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-todo_list')).toBeInTheDocument()
+    expect(screen.getByTestId('widget-card-recent_grades')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-progress_overview')).toBeInTheDocument()
     expect(screen.getByTestId('widget-card-inbox')).toBeInTheDocument()
   })
@@ -84,17 +83,17 @@ describe('AddWidgetModal', () => {
   it('displays correct widget display names', () => {
     render(<AddWidgetModal {...defaultProps} />)
 
-    expect(screen.getByText("Today's course work")).toBeInTheDocument()
-    expect(screen.getByText('Course work')).toBeInTheDocument()
     expect(screen.getByText('Course grades')).toBeInTheDocument()
     expect(screen.getByText('Announcements')).toBeInTheDocument()
+    expect(screen.getByText('People')).toBeInTheDocument()
+    expect(screen.getByText('To-do list')).toBeInTheDocument()
   })
 
   it('displays correct widget descriptions', () => {
     render(<AddWidgetModal {...defaultProps} />)
 
     expect(
-      screen.getByText('Shows summary of upcoming assignments and course work'),
+      screen.getByText('View course work statistics and assignments in one comprehensive view'),
     ).toBeInTheDocument()
     expect(
       screen.getByText('Track your grades and academic progress across all courses'),
@@ -105,7 +104,7 @@ describe('AddWidgetModal', () => {
     render(<AddWidgetModal {...defaultProps} />)
 
     const addButtons = screen.getAllByRole('button', {name: 'Add'})
-    expect(addButtons).toHaveLength(10)
+    expect(addButtons).toHaveLength(8)
   })
 
   it('calls addWidget with correct parameters when Add button is clicked', async () => {
@@ -155,10 +154,10 @@ describe('AddWidgetModal', () => {
       config: {
         widgets: [
           {
-            id: 'course_work_summary-widget-1',
-            type: 'course_work_summary',
+            id: 'course_work_combined-widget-1',
+            type: 'course_work_combined',
             position: {col: 1, row: 1, relative: 1},
-            title: "Today's course work",
+            title: 'Course work combined',
           },
         ],
       },
@@ -180,10 +179,10 @@ describe('AddWidgetModal', () => {
       config: {
         widgets: [
           {
-            id: 'course_work_summary-widget-1',
-            type: 'course_work_summary',
+            id: 'course_work_combined-widget-1',
+            type: 'course_work_combined',
             position: {col: 1, row: 1, relative: 1},
-            title: "Today's course work",
+            title: 'Course work combined',
           },
         ],
       },
@@ -207,10 +206,10 @@ describe('AddWidgetModal', () => {
       config: {
         widgets: [
           {
-            id: 'course_work_summary-widget-1',
-            type: 'course_work_summary',
+            id: 'course_work_combined-widget-1',
+            type: 'course_work_combined',
             position: {col: 1, row: 1, relative: 1},
-            title: "Today's course work",
+            title: 'Course work combined',
           },
         ],
       },

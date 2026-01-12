@@ -18,8 +18,6 @@
 
 import type {WidgetRegistry, WidgetRenderer} from '../types'
 import {WIDGET_TYPES} from '../constants'
-import CourseWorkSummaryWidget from './widgets/CourseWorkSummaryWidget/CourseWorkSummaryWidget'
-import CourseWorkWidget from './widgets/CourseWorkWidget/CourseWorkWidget'
 import CourseWorkCombinedWidget from './widgets/CourseWorkCombinedWidget/CourseWorkCombinedWidget'
 import CourseGradesWidget from './widgets/CourseGradesWidget/CourseGradesWidget'
 import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidget'
@@ -30,19 +28,9 @@ import ProgressOverviewWidget from './widgets/ProgressOverviewWidget/ProgressOve
 import InboxWidget from './widgets/InboxWidget/InboxWidget'
 
 const widgetRegistry: WidgetRegistry = {
-  [WIDGET_TYPES.COURSE_WORK_SUMMARY]: {
-    component: CourseWorkSummaryWidget,
-    displayName: "Today's course work",
-    description: 'Shows summary of upcoming assignments and course work',
-  },
-  [WIDGET_TYPES.COURSE_WORK]: {
-    component: CourseWorkWidget,
-    displayName: 'Course work',
-    description: 'View and manage all your course assignments and tasks',
-  },
   [WIDGET_TYPES.COURSE_WORK_COMBINED]: {
     component: CourseWorkCombinedWidget,
-    displayName: 'Course work combined',
+    displayName: 'Course work',
     description: 'View course work statistics and assignments in one comprehensive view',
   },
   [WIDGET_TYPES.COURSE_GRADES]: {
