@@ -247,6 +247,13 @@ module Api::V1::Quiz
     quiz
   end
 
+  def quiz_client_ip
+    return request.remote_ip unless Account.site_admin.feature_enabled?(:use_client_ip_in_classic_quizzes)
+
+    Rails.logger.info("Using Client-Ip for Classic Quizzes")
+    request.headers["Client-Ip"]
+  end
+
   protected
 
   # nil, "null" => nil
