@@ -223,6 +223,103 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
+    context "selective content tag export" do
+      before :once do
+        @course.account.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+
+        @cm = @course.context_modules.create!(name: "Test Module")
+        @assignment1 = @course.assignments.create!(title: "Assignment 1")
+        @assignment2 = @course.assignments.create!(title: "Assignment 2")
+        @ct1 = @cm.add_item(type: "assignment", id: @assignment1.id)
+        @ct2 = @cm.add_item(type: "assignment", id: @assignment2.id)
+        @ct3 = @cm.add_item(type: "external_url", title: "External", url: "https://example.com")
+
+        @cm.completion_requirements = [
+          { id: @ct1.id, type: "must_submit" },
+          { id: @ct2.id, type: "must_view" },
+          { id: @ct3.id, type: "must_view" }
+        ]
+        @cm.save!
+      end
+
+      it "exports all module items when selective_content_tag_export is not enabled" do
+        @ce.selected_content = {
+          context_modules: { mig_id(@cm) => "1" },
+          content_tags: { mig_id(@ct1) => "1" }
+        }
+
+        run_export
+
+        doc = Nokogiri::XML.parse(@zip_file.read("course_settings/module_meta.xml"))
+        module_node = doc.at_css("module[identifier='#{mig_id(@cm)}']")
+
+        expect(module_node.css("item").count).to eq 3
+        expect(module_node.css("completionRequirement").count).to eq 3
+      end
+
+      it "exports only selected content tags when selective_content_tag_export is enabled" do
+        Account.site_admin.enable_feature!(:selective_content_tag_export)
+
+        @ce.settings[:selective_content_tag_export] = true
+        @ce.selected_content = {
+          context_modules: { mig_id(@cm) => "1" },
+          content_tags: { mig_id(@ct1) => "1" }
+        }
+
+        run_export
+
+        doc = Nokogiri::XML.parse(@zip_file.read("course_settings/module_meta.xml"))
+        module_node = doc.at_css("module[identifier='#{mig_id(@cm)}']")
+
+        # Only ct1 should be exported
+        expect(module_node.css("item").count).to eq 1
+        expect(module_node.css("item").first["identifier"]).to eq mig_id(@ct1)
+
+        # Only ct1's completion requirement should be exported
+        expect(module_node.css("completionRequirement").count).to eq 1
+        expect(module_node.at_css("completionRequirement identifierref").text).to eq mig_id(@ct1)
+      end
+
+      it "exports multiple selected content tags" do
+        Account.site_admin.enable_feature!(:selective_content_tag_export)
+
+        @ce.settings[:selective_content_tag_export] = true
+        @ce.selected_content = {
+          context_modules: { mig_id(@cm) => "1" },
+          content_tags: {
+            mig_id(@ct1) => "1",
+            mig_id(@ct3) => "1"
+          }
+        }
+
+        run_export
+
+        doc = Nokogiri::XML.parse(@zip_file.read("course_settings/module_meta.xml"))
+        module_node = doc.at_css("module[identifier='#{mig_id(@cm)}']")
+
+        expect(module_node.css("item").count).to eq 2
+        expect(module_node.css("completionRequirement").count).to eq 2
+      end
+
+      it "still exports referenced content objects" do
+        Account.site_admin.enable_feature!(:selective_content_tag_export)
+
+        @ce.settings[:selective_content_tag_export] = true
+        @ce.selected_content = {
+          context_modules: { mig_id(@cm) => "1" },
+          content_tags: { mig_id(@ct1) => "1" }
+        }
+
+        run_export
+
+        # Assignment 1 should still be exported as a resource
+        check_resource_node(@assignment1, CC::CCHelper::LOR, true)
+        # Assignment 2 should NOT be exported (its content tag wasn't selected)
+        check_resource_node(@assignment2, CC::CCHelper::LOR, false)
+      end
+    end
+
     it "uses instfs to host export files if it is enabled" do
       uuid = "1234-abcd"
       allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
