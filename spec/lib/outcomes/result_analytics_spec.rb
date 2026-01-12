@@ -1078,5 +1078,55 @@ describe Outcomes::ResultAnalytics do
       score = rollups.first.scores.first
       expect(score.title).to be_nil
     end
+
+    it "populates hide_points from the rollup record when true" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        hide_points: true,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      score = rollups.first.scores.first
+      expect(score.hide_points).to be true
+    end
+
+    it "populates hide_points from the rollup record when false" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        hide_points: false,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      score = rollups.first.scores.first
+      expect(score.hide_points).to be false
+    end
+
+    it "defaults hide_points to false when not set in rollup record" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      score = rollups.first.scores.first
+      expect(score.hide_points).to be false
+    end
   end
 end

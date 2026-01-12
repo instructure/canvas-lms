@@ -1415,7 +1415,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     let(:outcome2) { outcome_model(context: course) }
 
     # Helper to create a RollupScore using a LearningOutcomeResult objects
-    def create_rollup_score(outcome, score_value, calculation_method = "average", submission_time = nil)
+    def create_rollup_score(outcome, score_value, calculation_method = "average", submission_time = nil, hide_points_value: false)
       # Set up the outcome with proper calculation method
       outcome.calculation_method = calculation_method
       outcome.rubric_criterion = {
@@ -1440,7 +1440,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
         score: score_value,
         possible: 5,
         title: "#{course.name}, #{assignment.title}",
-        submitted_at:
+        submitted_at:,
+        hide_points: hide_points_value
       )
 
       RollupScore.new(outcome_results: [result])
@@ -1708,6 +1709,204 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       expect(existing.reload.title).not_to eq("Old Assignment Title")
       expect(existing.title).to be_present
       expect(existing.aggregate_score).to eq(4.5)
+    end
+
+    it "persists hide_points from the rollup score" do
+      rollup_score = create_rollup_score(outcome1, 4.0, "highest", nil, hide_points_value: true)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.hide_points).to be true
+    end
+
+    it "defaults hide_points to false when not provided" do
+      rollup_score = create_rollup_score(outcome1, 4.0, "highest", nil, hide_points_value: false)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.hide_points).to be false
+    end
+
+    it "updates hide_points when updating an existing rollup" do
+      # Create existing rollup with hide_points false
+      existing = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "highest",
+        aggregate_score: 3.0,
+        hide_points: false,
+        last_calculated_at: 1.hour.ago
+      )
+
+      # Update with new result with hide_points true
+      rollup_score = create_rollup_score(outcome1, 4.5, "highest", nil, hide_points_value: true)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      subject.send(:store_rollups, [rollup_collection])
+
+      # Verify hide_points was updated
+      expect(existing.reload.hide_points).to be true
+      expect(existing.aggregate_score).to eq(4.5)
+    end
+
+    it "sets hide_points to true when all results have hide_points true" do
+      outcome1.calculation_method = "average"
+      outcome1.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome1.save!
+
+      assignment = assignment_model(context: course)
+      alignment = outcome1.align(assignment, course)
+
+      # Create two results both with hide_points: true
+      result1 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 2.days.ago,
+        hide_points: true
+      )
+      result2 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 4.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 1.day.ago,
+        hide_points: true
+      )
+
+      rollup_score = RollupScore.new(outcome_results: [result1, result2])
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.hide_points).to be true
+    end
+
+    it "sets hide_points to false when all results have hide_points false" do
+      outcome1.calculation_method = "average"
+      outcome1.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome1.save!
+
+      assignment = assignment_model(context: course)
+      alignment = outcome1.align(assignment, course)
+
+      # Create two results both with hide_points: false
+      result1 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 2.days.ago,
+        hide_points: false
+      )
+      result2 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 4.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 1.day.ago,
+        hide_points: false
+      )
+
+      rollup_score = RollupScore.new(outcome_results: [result1, result2])
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.hide_points).to be false
+    end
+
+    it "sets hide_points to false when results have mixed hide_points values" do
+      outcome1.calculation_method = "average"
+      outcome1.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome1.save!
+
+      assignment = assignment_model(context: course)
+      alignment = outcome1.align(assignment, course)
+
+      # Create two results: one with hide_points true, one false
+      # With average calculation, ALL results are considered, so .all?(&:hide_points) will be false
+      result1 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 2.days.ago,
+        hide_points: false
+      )
+      result2 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 4.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 1.day.ago,
+        hide_points: true
+      )
+
+      rollup_score = RollupScore.new(outcome_results: [result1, result2])
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      # With average calculation, all results are considered, so mixed values result in false
+      expect(stored_rollup.hide_points).to be false
     end
   end
 end
