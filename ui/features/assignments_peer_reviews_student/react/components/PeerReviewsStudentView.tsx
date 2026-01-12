@@ -130,7 +130,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     setShouldNavigateToNext(true)
   }
 
-  const handleCommentSubmitted = () => {
+  const handlePeerReviewSubmitted = () => {
     queryClient.invalidateQueries({queryKey: ['peerReviewAssignment', assignmentId]})
   }
 
@@ -245,11 +245,14 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
                   assessmentRequestsForCurrentUser[selectedAssessmentIndex].workflowState ===
                   'completed'
                 }
+                rubricAssessment={
+                  assessmentRequestsForCurrentUser[selectedAssessmentIndex].rubricAssessment
+                }
                 assignment={data.assignment}
                 reviewerSubmission={reviewerSubmission}
                 isMobile={isMobile}
                 handleNextPeerReview={handleNextPeerReview}
-                onCommentSubmitted={handleCommentSubmitted}
+                onPeerReviewSubmitted={handlePeerReviewSubmitted}
                 hasSeenPeerReviewModal={hasSeenPeerReviewModal}
               />
             )}
