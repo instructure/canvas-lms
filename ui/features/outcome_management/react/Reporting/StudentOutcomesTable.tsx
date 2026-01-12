@@ -27,6 +27,7 @@ import {IconInfoLine, IconArrowOpenDownLine, IconArrowOpenEndLine} from '@instru
 import {Tooltip} from '@instructure/ui-tooltip'
 import type {Outcome, SortColumn} from './types'
 import MasteryBadge from './MasteryBadge'
+import OutcomesTableRowExpansion from './OutcomesTableRowExpansion'
 
 const I18n = createI18nScope('outcome_management')
 
@@ -155,9 +156,7 @@ const OutcomesTableRow = ({outcome, isExpanded, onToggleRowExpansion}: OutcomesT
       {isExpanded && (
         <Table.Row>
           <Table.Cell colSpan={3}>
-            <View as="div" padding="small 0">
-              <Text>{description}</Text>
-            </View>
+            <OutcomesTableRowExpansion outcomeId={id} />
           </Table.Cell>
         </Table.Row>
       )}
