@@ -62,3 +62,10 @@ export function render(
   )
   return root
 }
+
+export function legacyUnmountComponentAtNode(container: Element | null) {
+  if (!(container instanceof HTMLElement)) {
+    return false
+  }
+  return ReactDOM.unmountComponentAtNode(container)
+}
