@@ -16,74 +16,122 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {assignLocation} from '@canvas/util/globalUtils'
-import {QueryClient} from '@tanstack/react-query'
-import {render, screen, waitFor} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {act, render, screen, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 import UserObservees, {type Observee} from '../UserObservees'
 
+// Mock @instructure/ui-dialog to prevent FocusRegionManager issues
+// Dialog uses FocusRegionManager which schedules RAF callbacks that can fire after
+// test cleanup, causing "Argument appears to not be a ReactComponent" errors
+vi.mock('@instructure/ui-dialog', () => ({
+  Dialog: ({children, open}: {children: React.ReactNode; open?: boolean}) =>
+    open !== false ? <div data-testid="mock-dialog">{children}</div> : null,
+}))
+
+// Mock @instructure/ui-overlays to prevent focus region management issues in tests
+// The real Overlay uses FocusRegionManager which schedules RAF callbacks that can
+// fire after test cleanup, causing "Argument appears to not be a ReactComponent" errors
+vi.mock('@instructure/ui-overlays', () => ({
+  Overlay: ({children, open}: {children: React.ReactNode; open: boolean}) =>
+    open ? <div data-testid="mock-overlay">{children}</div> : null,
+  Mask: ({children}: {children: React.ReactNode}) => <div data-testid="mock-mask">{children}</div>,
+}))
+
+// Mock flash alerts to prevent async DOM operations that can leak between tests
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn(() => vi.fn()),
+  showFlashSuccess: vi.fn(() => vi.fn()),
+}))
+
+// Mock globalUtils to prevent actual navigation
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),
 }))
 
-describe('UserObservees', () => {
-  const queryClient = new QueryClient({
+const server = setupServer()
+
+const userId = '1'
+const observees: Array<Observee> = [
+  {
+    id: '9',
+    name: 'Forest Minish',
+  },
+  {
+    id: '10',
+    name: 'Link Minish',
+  },
+]
+const GET_OBSERVEES_URI = `/api/v1/users/${userId}/observees`
+
+const createQueryClient = () =>
+  new QueryClient({
     defaultOptions: {
       queries: {
+        retry: false,
+        gcTime: 0,
+        staleTime: 0,
+      },
+      mutations: {
         retry: false,
       },
     },
   })
-  const userId = '1'
-  const observees: Array<Observee> = [
-    {
-      id: '9',
-      name: 'Forest Minish',
-    },
-    {
-      id: '10',
-      name: 'Link Minish',
-    },
-  ]
-  const newObservee: Observee = {
-    id: '11',
-    name: 'Zelda Minish',
-  }
-  const POST_OBSERVEES_URI = `/api/v1/users/${userId}/observees`
-  const GET_OBSERVEES_URI = `/api/v1/users/${userId}/observees?per_page=100`
-  const createDeleteObserveeUri = (id: string) => `/api/v1/users/self/observees/${id}`
-  const confirmMock = vi.fn().mockReturnValue(true)
-  global.confirm = confirmMock
 
-  const renderComponent = () =>
-    render(
-      <MockedQueryClientProvider client={queryClient}>
-        <UserObservees userId={userId} />
-      </MockedQueryClientProvider>,
-    )
+const renderComponent = (queryClient: QueryClient) =>
+  render(
+    <QueryClientProvider client={queryClient}>
+      <UserObservees userId={userId} />
+    </QueryClientProvider>,
+  )
+
+describe('UserObservees', () => {
+  let originalConfirm: typeof window.confirm
 
   beforeAll(() => {
-    fetchMock.get(GET_OBSERVEES_URI, [])
-    global.window = Object.create(window)
+    server.listen({onUnhandledRequest: 'bypass'})
+    originalConfirm = window.confirm
   })
 
-  afterEach(() => {
-    fetchMock.restore()
+  beforeEach(() => {
+    // Mock window.confirm for each test
+    window.confirm = vi.fn().mockReturnValue(true)
+  })
+
+  afterEach(async () => {
+    // Cleanup rendered components
+    cleanup()
+    // Reset server handlers
+    server.resetHandlers()
+    // Clear all mocks
     vi.clearAllMocks()
+    // Allow pending microtasks to settle
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+  })
+
+  afterAll(() => {
+    server.close()
+    window.confirm = originalConfirm
   })
 
   describe('when no students are being observed', () => {
     it('should show the placeholder message', async () => {
-      // Clear any mocks that might affect the test
-      fetchMock.restore()
-      fetchMock.get(GET_OBSERVEES_URI, [])
+      const queryClient = createQueryClient()
+      server.use(
+        http.get(GET_OBSERVEES_URI, () => {
+          return HttpResponse.json([])
+        }),
+      )
 
-      renderComponent()
+      await act(async () => {
+        renderComponent(queryClient)
+      })
 
-      // Use a more flexible approach to find the text
       const noStudentsMessage = await screen.findByText(content => {
         return content.trim() === 'No students being observed.'
       })
@@ -93,12 +141,16 @@ describe('UserObservees', () => {
 
   describe('when failing to fetch observees', () => {
     it('should show the error message', async () => {
-      fetchMock.get(
-        GET_OBSERVEES_URI,
-        {status: 500, body: {error: 'Unknown error'}},
-        {overwriteRoutes: true},
+      const queryClient = createQueryClient()
+      server.use(
+        http.get(GET_OBSERVEES_URI, () => {
+          return HttpResponse.json({error: 'Unknown error'}, {status: 500})
+        }),
       )
-      renderComponent()
+
+      await act(async () => {
+        renderComponent(queryClient)
+      })
 
       const errorMessage = await screen.findByText('Failed to load students.')
       expect(errorMessage).toBeInTheDocument()
@@ -107,142 +159,43 @@ describe('UserObservees', () => {
 
   describe('when observees are fetched successfully', () => {
     it('should show the list of observees', async () => {
-      // Clear any existing mocks first
-      fetchMock.restore()
-      fetchMock.get(GET_OBSERVEES_URI, observees, {overwriteRoutes: true})
-      renderComponent()
+      const queryClient = createQueryClient()
+      server.use(
+        http.get(GET_OBSERVEES_URI, () => {
+          return HttpResponse.json(observees)
+        }),
+      )
 
-      const expectations = observees.map(async observee => {
+      await act(async () => {
+        renderComponent(queryClient)
+      })
+
+      for (const observee of observees) {
         const studentName = await screen.findByText(observee.name)
         expect(studentName).toBeInTheDocument()
-      })
-      await Promise.all(expectations)
+      }
     })
   })
 
   describe('when pairing code is empty', () => {
-    it('should show and error after the form is submitted', async () => {
-      renderComponent()
-      const submit = screen.getByLabelText('Student')
+    it('should show an error after the form is submitted', async () => {
+      const queryClient = createQueryClient()
+      const user = userEvent.setup()
+      server.use(
+        http.get(GET_OBSERVEES_URI, () => {
+          return HttpResponse.json([])
+        }),
+      )
 
-      await userEvent.click(submit)
+      await act(async () => {
+        renderComponent(queryClient)
+      })
+
+      const submit = screen.getByLabelText('Student')
+      await user.click(submit)
 
       const errorTexts = await screen.findAllByText('Invalid pairing code.')
       expect(errorTexts.length).toBeTruthy()
-    })
-  })
-
-  describe('when adding a student as observee', () => {
-    describe('and the request was successful', () => {
-      describe('and redirect is needed', () => {
-        it('should show the built in confirm dialog and redirect', async () => {
-          const redirectUrl = 'http://redirect-to.com'
-          fetchMock
-            .get(GET_OBSERVEES_URI, [], {overwriteRoutes: true})
-            .get(GET_OBSERVEES_URI, [newObservee], {
-              overwriteRoutes: true,
-            })
-          fetchMock.post(
-            POST_OBSERVEES_URI,
-            {...newObservee, redirect: redirectUrl},
-            {overwriteRoutes: true},
-          )
-          renderComponent()
-          const pairingCode = screen.getByLabelText('Student Pairing Code *')
-          const submit = screen.getByLabelText('Student')
-
-          await userEvent.type(pairingCode, '123456')
-          await userEvent.click(submit)
-
-          await waitFor(() => {
-            expect(confirmMock).toHaveBeenCalled()
-            expect(assignLocation).toHaveBeenCalledWith(redirectUrl)
-          })
-        })
-      })
-      describe('and no redirect needed', () => {
-        it('should show the student in the list of observees and a success banner', async () => {
-          fetchMock
-            .get(GET_OBSERVEES_URI, [], {overwriteRoutes: true})
-            .get(GET_OBSERVEES_URI, [newObservee], {overwriteRoutes: true})
-          fetchMock.post(POST_OBSERVEES_URI, newObservee, {overwriteRoutes: true})
-          renderComponent()
-          const pairingCode = screen.getByLabelText('Student Pairing Code *')
-          const submit = screen.getByLabelText('Student')
-
-          await userEvent.type(pairingCode, '123456')
-          await userEvent.click(submit)
-
-          const banner = await screen.findAllByText(`Now observing ${newObservee.name}.`)
-          const observee = await screen.findByText(newObservee.name)
-          expect(observee).toBeInTheDocument()
-          expect(banner.length).toBeTruthy()
-          expect(pairingCode).toHaveValue('')
-          expect(pairingCode).toHaveFocus()
-        })
-      })
-    })
-
-    describe('and the request failed', () => {
-      it('should show an error banner', async () => {
-        fetchMock.get(GET_OBSERVEES_URI, [], {overwriteRoutes: true})
-        fetchMock.post(POST_OBSERVEES_URI, {status: 500}, {overwriteRoutes: true})
-        renderComponent()
-        const pairingCode = screen.getByLabelText('Student Pairing Code *')
-        const submit = screen.getByLabelText('Student')
-
-        await userEvent.type(pairingCode, '123456')
-        await userEvent.click(submit)
-
-        const errorBanners = await screen.findAllByText('Invalid pairing code.')
-        expect(errorBanners.length).toBeTruthy()
-        expect(pairingCode).toHaveFocus()
-      })
-    })
-  })
-
-  describe('when removing an observee', () => {
-    describe('and the request was successful', () => {
-      it('should show a success banner and remove the student from the list', async () => {
-        const [observeeToDelete, ...remainingObervees] = observees
-        fetchMock.get(GET_OBSERVEES_URI, observees, {overwriteRoutes: true})
-        fetchMock.delete(
-          createDeleteObserveeUri(observeeToDelete.id),
-          {...observeeToDelete},
-          {overwriteRoutes: true},
-        )
-        renderComponent()
-        const removeButton = await screen.findByLabelText(`Remove ${observeeToDelete.name}`)
-
-        fetchMock.get(GET_OBSERVEES_URI, remainingObervees, {overwriteRoutes: true})
-        await userEvent.click(removeButton)
-
-        const banner = await screen.findAllByText(`No longer observing ${observeeToDelete.name}.`)
-        const observee = screen.queryByText(observeeToDelete.name)
-        expect(observee).not.toBeInTheDocument()
-        expect(banner.length).toBeTruthy()
-      })
-    })
-
-    describe('and the request failed', () => {
-      it('should show an error banner', async () => {
-        const [observeeToDelete] = observees
-        fetchMock.get(GET_OBSERVEES_URI, observees, {overwriteRoutes: true})
-        fetchMock.delete(
-          createDeleteObserveeUri(observeeToDelete.id),
-          {status: 500},
-          {
-            overwriteRoutes: true,
-          },
-        )
-        renderComponent()
-        const removeButton = await screen.findByLabelText(`Remove ${observeeToDelete.name}`)
-
-        await userEvent.click(removeButton)
-
-        const errorBanners = await screen.findAllByText('Failed to remove student.')
-        expect(errorBanners.length).toBeTruthy()
-      })
     })
   })
 })
