@@ -49,7 +49,9 @@ export interface LMGBOutcomeReporting extends LMGBOutcome {
 }
 
 export interface LMGBScoreReporting extends LMGBScore {
-  count?: number
+  count: number
+  title: string
+  submitted_at: string
 }
 
 export interface RollupsResponseReporting {
@@ -85,6 +87,8 @@ export type MasteryFilter = 'all' | 'mastery' | 'not_started' | 'in_progress'
 
 export type SortColumn = 'code' | 'assessed' | 'mastery'
 
+export type ScoreType = 'quiz' | 'discussion' | 'assignment'
+
 export interface Outcome {
   id: number | string
   code: string
@@ -94,4 +98,5 @@ export interface Outcome {
   totalAlignmentsCount: number
   masteryScore: number | null
   masteryLevel: MasteryLevel
+  scores?: LMGBScoreReporting[]
 }
