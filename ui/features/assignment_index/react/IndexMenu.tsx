@@ -24,7 +24,7 @@ import {Flex, FlexItem} from '@instructure/ui-flex'
 import {IconAddSolid} from '@instructure/ui-icons'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import Actions from './actions/IndexMenuActions'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode, legacyRender} from '@canvas/react'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import type {SelectableItem} from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
@@ -201,7 +201,7 @@ export default class IndexMenu extends React.Component<Props, State> {
       },
     ]
 
-    ReactDOM.render(
+    legacyRender(
       <ContentTypeExternalToolTray
         tool={tool}
         placement="assignment_index_menu"
@@ -221,7 +221,7 @@ export default class IndexMenu extends React.Component<Props, State> {
     // unmount tray component and clear its postMessage handler
     const mountPointDomElement = document.getElementById('external-tool-mount-point')
     if (mountPointDomElement) {
-      ReactDOM.unmountComponentAtNode(mountPointDomElement)
+      legacyUnmountComponentAtNode(mountPointDomElement)
     }
   }
 

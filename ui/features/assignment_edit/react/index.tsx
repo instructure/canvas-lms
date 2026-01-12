@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {ApolloClient, ApolloProvider} from '@apollo/client'
 import TeacherEditQuery from './components/TeacherEditQuery'
 import TeacherCreateQuery from './components/TeacherCreateQuery'
@@ -32,8 +32,7 @@ export default function renderEditAssignmentsApp(elt: HTMLElement | null) {
     throw new Error('element is required for renderEditAssignmentsApp')
   }
 
-  const root = createRoot(elt)
-  root.render(
+  render(
     <QueryClientProvider client={queryClient}>
       <ApolloProvider client={client}>
         {ENV.ASSIGNMENT_ID ? (
@@ -45,5 +44,6 @@ export default function renderEditAssignmentsApp(elt: HTMLElement | null) {
         )}
       </ApolloProvider>
     </QueryClientProvider>,
+    elt,
   )
 }
