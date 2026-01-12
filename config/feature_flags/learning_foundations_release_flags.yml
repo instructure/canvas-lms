@@ -276,3 +276,9 @@ assign_to_in_edit_pages_rewrite:
       state: allowed_on
     ci:
       state: allowed_on
+
+platform_ui_unified_widgets_dashboard:
+  state: hidden
+  display_name: Platform UI - Unified Widgets Dashboard
+  description: Use dashboard imported from Platform UI.
+  applies_to: SiteAdmin
