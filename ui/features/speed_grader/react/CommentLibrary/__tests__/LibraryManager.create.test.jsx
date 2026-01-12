@@ -19,7 +19,7 @@
 import {vi} from 'vitest'
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
+import {act, cleanup, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo-v3'
 import {commentBankItemMocks, makeCreateMutationMock} from './mocks'
 import LibraryManager from '../LibraryManager'
@@ -51,6 +51,7 @@ describe('LibraryManager - create', () => {
   })
 
   afterEach(() => {
+    cleanup()
     vi.clearAllMocks()
     vi.useRealTimers()
     fakeEnv.teardown()

@@ -19,7 +19,7 @@
 import {vi} from 'vitest'
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
+import {act, cleanup, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo-v3'
 import {commentBankItemMocks, makeDeleteCommentMutation} from './mocks'
 import {DELETE_COMMENT_MUTATION} from '../graphql/Mutations'
@@ -56,6 +56,7 @@ describe('LibraryManager - delete', () => {
   })
 
   afterEach(() => {
+    cleanup()
     vi.clearAllMocks()
     window.confirm = oldWindowConfirm
     window.ENV = {}
