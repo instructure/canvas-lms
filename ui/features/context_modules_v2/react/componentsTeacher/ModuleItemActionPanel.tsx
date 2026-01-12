@@ -340,20 +340,22 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         'module_item',
       ].includes(content?.type?.toLowerCase() || '') && (
         <>
-          <DirectShareUserModal
-            id={moduleId}
-            open={isDirectShareOpen}
-            sourceCourseId={courseId}
-            courseId={courseId}
-            contentShare={{
-              content_type: mapContentTypeForSharing(content?.type || ''),
-              content_id: content?._id,
-            }}
-            onDismiss={() => {
-              setIsDirectShareOpen(false)
-            }}
-          />
-          {content?._id && (
+          {isDirectShareOpen && (
+            <DirectShareUserModal
+              id={moduleId}
+              open={isDirectShareOpen}
+              sourceCourseId={courseId}
+              courseId={courseId}
+              contentShare={{
+                content_type: mapContentTypeForSharing(content?.type || ''),
+                content_id: content?._id,
+              }}
+              onDismiss={() => {
+                setIsDirectShareOpen(false)
+              }}
+            />
+          )}
+          {isDirectShareCourseOpen && content?._id && (
             <DirectShareCourseTray
               open={isDirectShareCourseOpen}
               sourceCourseId={courseId}

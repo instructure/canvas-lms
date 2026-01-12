@@ -18,7 +18,8 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ContextModulesPublishIcon from '../react/ContextModulesPublishIcon'
@@ -311,24 +312,35 @@ export function renderContextModulesPublishIcon(
       `module${moduleId}`
     let root = publishIcon.reactRoot
     if (root === undefined) {
-      root = ReactDOM.createRoot(publishIcon)
+      root = render(
+        <ContextModulesPublishIcon
+          courseId={courseId}
+          moduleId={moduleId}
+          moduleName={moduleName}
+          isPublishing={isPublishing}
+          published={published}
+          loadingMessage={loadingMessage}
+        />,
+        publishIcon,
+      )
       publishIcon.reactRoot = root
+    } else {
+      root.render(
+        <ContextModulesPublishIcon
+          courseId={courseId}
+          moduleId={moduleId}
+          moduleName={moduleName}
+          isPublishing={isPublishing}
+          published={published}
+          loadingMessage={loadingMessage}
+        />,
+      )
     }
-    root?.render(
-      <ContextModulesPublishIcon
-        courseId={courseId}
-        moduleId={moduleId}
-        moduleName={moduleName}
-        isPublishing={isPublishing}
-        published={published}
-        loadingMessage={loadingMessage}
-      />,
-    )
   }
 }
 
 type PublishIcon = {
-  reactRoot?: ReactDOM.Root
+  reactRoot?: Root
 } & Element
 
 function findModulePublishIcon(moduleId: CanvasId): PublishIcon | null {
