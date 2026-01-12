@@ -21,6 +21,7 @@ import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentSubmission from '../AssignmentSubmission'
 import {Submission} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 vi.mock('@canvas/util/jquery/apiUserContent', () => ({
   default: {
@@ -29,6 +30,9 @@ vi.mock('@canvas/util/jquery/apiUserContent', () => ({
 }))
 
 let mockOnSuccessfulPeerReview: (() => void) | null = null
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
+}))
 
 vi.mock('../CommentsTrayContentWithApollo', () => {
   const MockedCommentsTray = (props: any) => {
@@ -53,10 +57,40 @@ vi.mock('../CommentsTrayContentWithApollo', () => {
   }
 })
 
+vi.mock('@canvas/rubrics/react/RubricAssessment', () => ({
+  RubricAssessmentContainerWrapper: (props: any) => (
+    <div data-testid="mocked-rubric-assessment" data-props={JSON.stringify(props)}>
+      Mocked Rubric Assessment
+      <button
+        data-testid="mocked-rubric-submit"
+        onClick={() => props.onSubmit([{id: '1', points: 4, criterionId: '1', comments: ''}])}
+      >
+        Submit Assessment
+      </button>
+    </div>
+  ),
+}))
+
+vi.mock('../../hooks/useSavePeerReviewRubricAssessment', () => ({
+  useSavePeerReviewRubricAssessment: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+  }),
+}))
+
+vi.mock('@canvas/local-storage', () => ({
+  default: () => ['vertical', vi.fn()],
+}))
+
+vi.mock('@canvas/rubrics/react/RubricAssessment/constants', () => ({
+  RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY: () => 'rubric_view_mode',
+}))
+
 describe('AssignmentSubmission', () => {
   afterEach(() => {
     cleanup()
     mockOnSuccessfulPeerReview = null
+    vi.clearAllMocks()
   })
 
   const createSubmission = (overrides = {}): Submission => ({
@@ -64,6 +98,69 @@ describe('AssignmentSubmission', () => {
     attempt: 1,
     body: '<p>This is a test submission</p>',
     submissionType: 'online_text_entry',
+    ...overrides,
+  })
+
+  const createRubric = (overrides = {}) => ({
+    _id: '3',
+    title: 'Test Rubric',
+    criteria: [
+      {
+        _id: '1',
+        description: 'Quality',
+        long_description: 'Quality of work',
+        points: 4,
+        criterion_use_range: false,
+        ratings: [
+          {
+            _id: 'rating-1',
+            description: 'Excellent',
+            long_description: '',
+            points: 4,
+          },
+          {
+            _id: 'rating-2',
+            description: 'Good',
+            long_description: '',
+            points: 3,
+          },
+          {
+            _id: 'rating-3',
+            description: 'Fair',
+            long_description: '',
+            points: 2,
+          },
+        ],
+        ignore_for_scoring: false,
+      },
+    ],
+    free_form_criterion_comments: false,
+    hide_score_total: false,
+    points_possible: 4,
+    ratingOrder: 'descending',
+    button_display: 'numeric',
+    ...overrides,
+  })
+
+  const createRubricAssociation = (overrides = {}) => ({
+    _id: '1',
+    hide_points: false,
+    hide_score_total: false,
+    use_for_grading: true,
+    ...overrides,
+  })
+
+  const createRubricAssessment = (overrides = {}) => ({
+    _id: 'assessment-1',
+    assessmentRatings: [
+      {
+        _id: 'assessment-rating-1',
+        criterion: {_id: '1'},
+        comments: 'Great work',
+        description: 'Excellent',
+        points: 4,
+      },
+    ],
     ...overrides,
   })
 
@@ -103,7 +200,7 @@ describe('AssignmentSubmission', () => {
     reviewerSubmission: createReviewerSubmission(),
     isPeerReviewCompleted: false,
     handleNextPeerReview: jest.fn(),
-    onCommentSubmitted: jest.fn(),
+    onPeerReviewSubmitted: jest.fn(),
     hasSeenPeerReviewModal: false,
     isMobile: false,
     ...overrides,
@@ -558,15 +655,15 @@ describe('AssignmentSubmission', () => {
     })
   })
 
-  describe('onCommentSubmitted callback', () => {
-    it('calls onCommentSubmitted when comment is successfully submitted', async () => {
-      const onCommentSubmitted = jest.fn()
+  describe('onPeerReviewSubmitted callback', () => {
+    it('calls onPeerReviewSubmitted when comment is successfully submitted', async () => {
+      const onPeerReviewSubmitted = jest.fn()
       const user = userEvent.setup()
 
       render(
         <AssignmentSubmission
           {...createDefaultProps({
-            onCommentSubmitted,
+            onPeerReviewSubmitted,
           })}
         />,
       )
@@ -575,7 +672,7 @@ describe('AssignmentSubmission', () => {
 
       expect(mockOnSuccessfulPeerReview).toBeTruthy()
       mockOnSuccessfulPeerReview!()
-      expect(onCommentSubmitted).toHaveBeenCalledTimes(1)
+      expect(onPeerReviewSubmitted).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -655,6 +752,274 @@ describe('AssignmentSubmission', () => {
       // re-renders with updated isPeerReviewCompleted
       rerender(<AssignmentSubmission {...props} isPeerReviewCompleted={true} />)
       expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
+    })
+  })
+
+  describe('rubric functionality', () => {
+    const createAssignmentWithRubric = () =>
+      createAssignment({
+        rubric: createRubric(),
+        rubricAssociation: createRubricAssociation(),
+      })
+
+    it('does not render rubric button when assignment has no rubric', () => {
+      render(<AssignmentSubmission {...createDefaultProps()} />)
+
+      expect(screen.queryByTestId('toggle-rubric-button')).not.toBeInTheDocument()
+    })
+
+    it('renders rubric button when assignment has rubric', () => {
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+        />,
+      )
+
+      expect(screen.getByTestId('toggle-rubric-button')).toBeInTheDocument()
+      expect(screen.getByTestId('toggle-rubric-button')).toHaveTextContent('Show Rubric')
+    })
+
+    it('shows rubric panel when rubric button is clicked', async () => {
+      const user = userEvent.setup()
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+        />,
+      )
+
+      const toggleButton = screen.getByTestId('toggle-rubric-button')
+      expect(screen.queryByTestId('mocked-rubric-assessment')).not.toBeInTheDocument()
+
+      await user.click(toggleButton)
+
+      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
+      expect(toggleButton).toHaveTextContent('Hide Rubric')
+    })
+
+    it('hides rubric panel when rubric button is clicked again', async () => {
+      const user = userEvent.setup()
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+        />,
+      )
+
+      const toggleButton = screen.getByTestId('toggle-rubric-button')
+      await user.click(toggleButton)
+      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
+
+      await user.click(toggleButton)
+      expect(screen.queryByTestId('mocked-rubric-assessment')).not.toBeInTheDocument()
+      expect(toggleButton).toHaveTextContent('Show Rubric')
+    })
+
+    it('renders Peer Review Rubric heading when rubric is shown', async () => {
+      const user = userEvent.setup()
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+        />,
+      )
+
+      await user.click(screen.getByTestId('toggle-rubric-button'))
+
+      expect(screen.getByText('Peer Review Rubric')).toBeInTheDocument()
+    })
+
+    it('closes comments when rubric is opened', async () => {
+      const user = userEvent.setup()
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+        />,
+      )
+
+      await user.click(screen.getByTestId('toggle-comments-button'))
+      expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
+
+      await user.click(screen.getByTestId('toggle-rubric-button'))
+      expect(screen.queryByTestId('mocked-comments-tray')).not.toBeInTheDocument()
+      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
+    })
+
+    it('closes rubric when comments are opened', async () => {
+      const user = userEvent.setup()
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+        />,
+      )
+
+      await user.click(screen.getByTestId('toggle-rubric-button'))
+      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
+
+      await user.click(screen.getByTestId('toggle-comments-button'))
+      expect(screen.queryByTestId('mocked-rubric-assessment')).not.toBeInTheDocument()
+      expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
+    })
+
+    it('passes correct props to RubricAssessmentContainerWrapper', async () => {
+      const user = userEvent.setup()
+      const assignment = createAssignmentWithRubric()
+      render(<AssignmentSubmission {...createDefaultProps({assignment})} />)
+
+      await user.click(screen.getByTestId('toggle-rubric-button'))
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.rubricTitle).toBe('Test Rubric')
+      expect(props.pointsPossible).toBe(4)
+      expect(props.isPeerReview).toBe(true)
+      expect(props.criteria).toHaveLength(1)
+      expect(props.criteria[0].id).toBe('1')
+    })
+
+    it('sets rubric to preview mode when peer review is completed', async () => {
+      const user = userEvent.setup()
+      const assignment = createAssignmentWithRubric()
+      render(
+        <AssignmentSubmission {...createDefaultProps({assignment, isPeerReviewCompleted: true})} />,
+      )
+
+      await user.click(screen.getByTestId('toggle-rubric-button'))
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.isPreviewMode).toBe(true)
+    })
+  })
+
+  describe('peer review submission with rubric', () => {
+    const createAssignmentWithRubric = () =>
+      createAssignment({
+        rubric: createRubric(),
+        rubricAssociation: createRubricAssociation(),
+      })
+
+    it('does not call handleNext when submitting peer review without completing rubric', async () => {
+      const user = userEvent.setup()
+      const mockHandleNext = vi.fn()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            assignment: createAssignmentWithRubric(),
+            handleNextPeerReview: mockHandleNext,
+          })}
+        />,
+      )
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+      expect(mockHandleNext).not.toHaveBeenCalled()
+    })
+
+    it('allows submission when rubric is completed', async () => {
+      const user = userEvent.setup()
+      const mockHandleNext = vi.fn()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            assignment: createAssignmentWithRubric(),
+            rubricAssessment: createRubricAssessment(),
+            handleNextPeerReview: mockHandleNext,
+          })}
+        />,
+      )
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+      expect(mockHandleNext).toHaveBeenCalled()
+    })
+  })
+
+  describe('error alerts', () => {
+    const createAssignmentWithRubric = () =>
+      createAssignment({
+        rubric: createRubric(),
+        rubricAssociation: createRubricAssociation(),
+      })
+
+    it('shows error alert when submitting with rubric but rubric not completed', async () => {
+      const user = userEvent.setup()
+      const mockHandleNext = vi.fn()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            assignment: createAssignmentWithRubric(),
+            handleNextPeerReview: mockHandleNext,
+          })}
+        />,
+      )
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
+        message: 'You must fill out the rubric in order to submit your peer review.',
+        type: 'error',
+      })
+      expect(mockHandleNext).not.toHaveBeenCalled()
+    })
+
+    it('does not show error alert when rubric is completed', async () => {
+      const user = userEvent.setup()
+      const mockHandleNext = vi.fn()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            assignment: createAssignmentWithRubric(),
+            rubricAssessment: createRubricAssessment(),
+            handleNextPeerReview: mockHandleNext,
+          })}
+        />,
+      )
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
+      expect(mockHandleNext).toHaveBeenCalled()
+    })
+
+    it('shows error alert when submitting without rubric and no comment completed', async () => {
+      const user = userEvent.setup()
+      const mockHandleNext = vi.fn()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            assignment: createAssignment(),
+            handleNextPeerReview: mockHandleNext,
+          })}
+        />,
+      )
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
+        message: 'Before you can submit this peer review, you must leave a comment for your peer.',
+        type: 'error',
+      })
+      expect(mockHandleNext).not.toHaveBeenCalled()
+    })
+
+    it('does not show error alert when peer review is already completed', async () => {
+      const user = userEvent.setup()
+      const mockHandleNext = vi.fn()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            assignment: createAssignment(),
+            isPeerReviewCompleted: true,
+            handleNextPeerReview: mockHandleNext,
+          })}
+        />,
+      )
+
+      expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
     })
   })
 })
