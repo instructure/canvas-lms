@@ -1055,7 +1055,7 @@ class Quizzes::QuizzesController < ApplicationController
                                                      quiz: @quiz,
                                                      user: @current_user,
                                                      session:,
-                                                     remote_ip: request.remote_ip,
+                                                     remote_ip: quiz_client_ip,
                                                      access_code: params[:access_code])
 
     if params[:take]
