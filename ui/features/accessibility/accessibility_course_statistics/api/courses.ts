@@ -18,16 +18,19 @@
 
 import axios from '@canvas/axios'
 import type {Course, CoursesResponse} from '../types/course'
+import type {SortOrder} from '../react/components/SortableTableHeader'
 
 const COURSES_PER_PAGE = 15
 const TEACHER_LIMIT = 25
 
 interface FetchCoursesParams {
   accountId: string
+  sort: string
+  order: SortOrder
 }
 
 export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesResponse> => {
-  const {accountId} = params
+  const {accountId, sort, order} = params
 
   const queryParams: Record<string, any> = {
     include: [
@@ -41,6 +44,9 @@ export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesR
     per_page: COURSES_PER_PAGE,
     no_avatar_fallback: 1,
   }
+
+  queryParams.sort = sort
+  queryParams.order = order
 
   const response = await axios.get<Course[]>(`/api/v1/accounts/${accountId}/courses`, {
     params: queryParams,

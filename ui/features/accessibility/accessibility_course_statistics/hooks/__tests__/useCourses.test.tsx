@@ -52,6 +52,10 @@ describe('useCourses', () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 
+  const renderUseCourses = (sort = 'sis_course_id', order: 'asc' | 'desc' = 'asc') => {
+    return renderHook(() => useCourses({accountId, sort, order}), {wrapper})
+  }
+
   it('fetches courses successfully', async () => {
     const mockCourses = createMockCourses(2)
     server.use(
@@ -60,7 +64,7 @@ describe('useCourses', () => {
       }),
     )
 
-    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+    const {result} = renderUseCourses()
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
@@ -79,7 +83,7 @@ describe('useCourses', () => {
       }),
     )
 
-    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+    const {result} = renderUseCourses('course_name', 'desc')
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
@@ -92,6 +96,29 @@ describe('useCourses', () => {
     expect(requestParams?.get('teacher_limit')).toBe('25')
     expect(requestParams?.get('per_page')).toBe('15')
     expect(requestParams?.get('no_avatar_fallback')).toBe('1')
+    expect(requestParams?.get('sort')).toBe('course_name')
+    expect(requestParams?.get('order')).toBe('desc')
+  })
+
+  it('includes sort and order in query key for proper caching', async () => {
+    const mockCourses = createMockCourses(1)
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/courses`, () => {
+        return HttpResponse.json(mockCourses)
+      }),
+    )
+
+    const {result} = renderUseCourses('a11y_active_issue_count', 'asc')
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    const cachedData = queryClient.getQueryData([
+      'accessibility-courses',
+      accountId,
+      'a11y_active_issue_count',
+      'asc',
+    ])
+    expect(cachedData).toBeTruthy()
   })
 
   it('handles API errors gracefully', async () => {
@@ -101,7 +128,7 @@ describe('useCourses', () => {
       }),
     )
 
-    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+    const {result} = renderUseCourses()
 
     await waitFor(() => expect(result.current.isError).toBe(true))
 
@@ -118,7 +145,7 @@ describe('useCourses', () => {
       }),
     )
 
-    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+    const {result} = renderUseCourses()
 
     expect(result.current.isLoading).toBe(true)
     expect(result.current.data).toBeUndefined()
@@ -131,7 +158,7 @@ describe('useCourses', () => {
       }),
     )
 
-    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+    const {result} = renderUseCourses()
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
@@ -147,11 +174,16 @@ describe('useCourses', () => {
       }),
     )
 
-    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+    const {result} = renderUseCourses()
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    const cachedData = queryClient.getQueryData(['accessibility-courses', accountId])
+    const cachedData = queryClient.getQueryData([
+      'accessibility-courses',
+      accountId,
+      'sis_course_id',
+      'asc',
+    ])
     expect(cachedData).toBeTruthy()
   })
 
@@ -163,7 +195,7 @@ describe('useCourses', () => {
       }),
     )
 
-    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+    const {result} = renderUseCourses()
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
@@ -182,7 +214,7 @@ describe('useCourses', () => {
       }),
     )
 
-    const {result} = renderHook(() => useCourses({accountId}), {wrapper})
+    const {result} = renderUseCourses()
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 

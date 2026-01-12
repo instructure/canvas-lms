@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {MemoryRouter} from 'react-router-dom'
 import {AccessibilityCoursesPage} from '../AccessibilityCoursesPage'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
@@ -53,9 +54,11 @@ describe('AccessibilityCoursesPage', () => {
 
   const renderPage = () =>
     render(
-      <QueryClientProvider client={queryClient}>
-        <AccessibilityCoursesPage />
-      </QueryClientProvider>,
+      <MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+          <AccessibilityCoursesPage />
+        </QueryClientProvider>
+      </MemoryRouter>,
     )
 
   it('renders the page heading', () => {
@@ -137,6 +140,7 @@ describe('AccessibilityCoursesPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Course')).toBeInTheDocument()
+      expect(screen.getByText('Issues')).toBeInTheDocument()
       expect(screen.getByText('Term')).toBeInTheDocument()
       expect(screen.getByText('Teacher')).toBeInTheDocument()
       expect(screen.getByText('Sub-Account')).toBeInTheDocument()
