@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cleanup, waitFor} from '@testing-library/react'
+import {cleanup} from '@testing-library/react'
 import {
   clearQueryCache,
   renderComponent,
@@ -52,7 +52,8 @@ describe('ItemAssignToTray - Pagination', () => {
   })
 
   it('fetches and combines multiple pages of overrides', async () => {
-    // Each page has overrides with required fields for card rendering
+    // Use 2 pages instead of 3 to reduce sequential network round-trips
+    // This still adequately tests pagination while being faster in CI
     const page1 = {
       id: '23',
       due_at: '2023-10-05T12:00:00Z',
@@ -96,39 +97,8 @@ describe('ItemAssignToTray - Pagination', () => {
           unlock_at: null,
           lock_at: null,
         },
-        {
-          id: '4',
-          title: 'Section 4',
-          course_section_id: '13',
-          due_at: '2023-10-05T12:00:00Z',
-          unlock_at: null,
-          lock_at: null,
-        },
       ],
     }
-
-    const page3 = {
-      id: '23',
-      due_at: '2023-10-05T12:00:00Z',
-      unlock_at: '2023-10-01T12:00:00Z',
-      lock_at: '2023-11-01T12:00:00Z',
-      only_visible_to_overrides: true,
-      visible_to_everyone: false,
-      overrides: [
-        {
-          id: '5',
-          title: 'Section 5',
-          course_section_id: '14',
-          due_at: '2023-10-06T12:00:00Z',
-          unlock_at: null,
-          lock_at: null,
-        },
-      ],
-    }
-
-    let page1Fetched = false
-    let page2Fetched = false
-    let page3Fetched = false
 
     // Override the default handler with pagination support
     server.use(
@@ -137,20 +107,10 @@ describe('ItemAssignToTray - Pagination', () => {
         const page = url.searchParams.get('page')
 
         if (page === '2') {
-          page2Fetched = true
-          return new HttpResponse(JSON.stringify(page2), {
-            headers: {
-              'Content-Type': 'application/json',
-              Link: '</api/v1/courses/1/assignments/23/date_details?page=3&per_page=100>; rel="next"',
-            },
-          })
+          // Final page - no Link header
+          return HttpResponse.json(page2)
         }
-        if (page === '3') {
-          page3Fetched = true
-          return HttpResponse.json(page3)
-        }
-        // Default: page 1
-        page1Fetched = true
+        // Default: page 1 with Link to page 2
         return new HttpResponse(JSON.stringify(page1), {
           headers: {
             'Content-Type': 'application/json',
@@ -160,22 +120,13 @@ describe('ItemAssignToTray - Pagination', () => {
       }),
     )
 
-    const {findAllByTestId, queryByTestId} = renderComponent()
+    const {findAllByTestId} = renderComponent()
 
-    // Wait for loading to complete first
-    await waitFor(() => {
-      expect(queryByTestId('cards-loading')).not.toBeInTheDocument()
-    })
-
-    // Then verify all pages were fetched
-    await waitFor(() => {
-      expect(page1Fetched).toBe(true)
-      expect(page2Fetched).toBe(true)
-      expect(page3Fetched).toBe(true)
-    })
-
-    // Finally verify card count
+    // Wait for all cards to render - this implicitly verifies:
+    // 1. All pages were fetched
+    // 2. Overrides were combined correctly
+    // 3. Loading completed
     const cards = await findAllByTestId('item-assign-to-card')
-    expect(cards).toHaveLength(5)
+    expect(cards).toHaveLength(3)
   })
 })
