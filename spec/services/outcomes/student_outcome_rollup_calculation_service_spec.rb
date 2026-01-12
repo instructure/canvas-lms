@@ -1673,5 +1673,41 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       expect(existing.reload.submitted_at).to be_within(1.second).of(new_time)
       expect(existing.aggregate_score).to eq(4.5)
     end
+
+    it "persists title from the rollup score" do
+      rollup_score = create_rollup_score(outcome1, 4.0, "highest")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.title).to be_present
+    end
+
+    it "updates title when updating an existing rollup" do
+      # Create existing rollup with old title
+      existing = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "highest",
+        aggregate_score: 3.0,
+        title: "Old Assignment Title",
+        last_calculated_at: 1.hour.ago
+      )
+
+      # Update with new result (which will have a new title from create_rollup_score)
+      rollup_score = create_rollup_score(outcome1, 4.5, "highest")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      subject.send(:store_rollups, [rollup_collection])
+
+      # Verify title was updated
+      expect(existing.reload.title).not_to eq("Old Assignment Title")
+      expect(existing.title).to be_present
+      expect(existing.aggregate_score).to eq(4.5)
+    end
   end
 end

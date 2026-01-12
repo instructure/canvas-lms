@@ -132,6 +132,7 @@ describe Outcomes::CourseOutcomeRollupCalculationService do
           expect(rollup.aggregate_score).to eq(2.0 + i)
           expect(rollup.calculation_method).to eq(outcome.calculation_method)
           expect(rollup.submitted_at).to be_present
+          expect(rollup.title).to be_present
         end
       end
 
