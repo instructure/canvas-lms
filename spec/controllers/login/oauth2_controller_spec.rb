@@ -60,10 +60,12 @@ describe Login::OAuth2Controller do
     it "checks the OAuth2 CSRF token" do
       session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "different")
+      allow(controller.logger).to receive(:error).and_call_original
       get :create, params: { code: "abc", state: jwt }
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
       expect(response).to_not be_successful
       expect(response).to_not be_redirect
+      expect(controller.logger).to have_received(:error).with("Nonce mismatch - JWT nonce: 'different', Popped nonce: 'bob'")
     end
 
     it "rejects logins that take more than 10 minutes" do
