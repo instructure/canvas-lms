@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {act, render as rtlRender, waitFor} from '@testing-library/react'
+import {act, cleanup, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo-v3'
 import {commentBankItemMocksV2} from './mocks'
 import LibraryManager from '../LibraryManager'
@@ -45,6 +45,7 @@ describe('LibraryManager - query with v2 mocks', () => {
   })
 
   afterEach(() => {
+    cleanup()
     vi.clearAllMocks()
     window.ENV = {}
   })
