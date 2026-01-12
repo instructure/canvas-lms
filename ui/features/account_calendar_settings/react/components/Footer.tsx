@@ -99,9 +99,9 @@ export const Footer = ({
       >
         {I18n.t('Apply Changes')}
       </Button>
-      {showConfirmation && (
+      {showConfirmation && isModalOpen && (
         <ConfirmationModal
-          isOpen={isModalOpen}
+          isOpen={true}
           onCancel={() => setIsModalOpen(false)}
           onConfirm={onApplyClicked}
         />

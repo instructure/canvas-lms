@@ -18,7 +18,7 @@
 
 import ready from '@instructure/ready'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {AIExperiencesShow} from './react'
 
 ready(() => {
@@ -30,14 +30,15 @@ ready(() => {
 
   const container = document.getElementById('ai_experiences_show')
   if (container) {
-    const root = createRoot(container)
-
     // Get AI experience data from ENV
     const aiExperience = ENV.AI_EXPERIENCE
     const navbarHeight = ENV.NAVBAR_HEIGHT || 0
 
     if (aiExperience) {
-      root.render(<AIExperiencesShow aiExperience={aiExperience} navbarHeight={navbarHeight} />)
+      render(
+        <AIExperiencesShow aiExperience={aiExperience} navbarHeight={navbarHeight} />,
+        container,
+      )
     }
   }
 })
