@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor, fireEvent} from '@testing-library/react'
+import {cleanup, render, waitFor, fireEvent} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import EditSectionsModal from '../EditSectionsModal'
 import type {ExistingSectionEnrollment} from '../SectionSelector'
@@ -60,6 +60,7 @@ describe('EditSectionsModal', () => {
   })
 
   afterEach(() => {
+    cleanup()
     fetchMock.restore()
   })
 

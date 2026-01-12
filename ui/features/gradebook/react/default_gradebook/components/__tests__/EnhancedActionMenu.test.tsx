@@ -19,7 +19,7 @@
  */
 
 import {assignLocation} from '@canvas/util/globalUtils'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, cleanup, fireEvent, render, waitFor} from '@testing-library/react'
 import {assign} from 'es-toolkit/compat'
 import React from 'react'
 import PostGradesApp from '../../../SISGradePassback/PostGradesApp'
@@ -110,6 +110,7 @@ describe('EnhancedActionMenu', () => {
   })
 
   afterEach(() => {
+    cleanup()
     fakeENV.teardown()
     vi.clearAllMocks()
     vi.restoreAllMocks()
