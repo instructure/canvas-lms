@@ -3502,6 +3502,7 @@ type CustomGradeStatus implements LegacyIDInterface & Node {
   """
   _id: ID!
   color: String!
+  icon: String
   id: ID!
   name: String!
 }
