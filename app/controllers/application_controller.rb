@@ -500,7 +500,6 @@ class ApplicationController < ActionController::Base
     disable_iframe_sandbox_file_show
     extended_submission_state
     file_verifiers_for_quiz_links
-    increased_top_nav_pane_size
     instui_nav
     login_registration_ui_identity
     lti_apps_page_ai_translation

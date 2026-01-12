@@ -162,17 +162,6 @@ import_numeric_lti_custom_params_as_string:
       state: allowed_on
     ci:
       state: allowed_on
-increased_top_nav_pane_size:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Increased Top Navigation Pane Size
-  description: When enabled, the default size of the Top Navigation pane is larger, and tools can optionally set a parameter to enable expanding the pane to full size.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_target_link_uri_for_assignment_edit_view:
   state: hidden
   shadow: true
