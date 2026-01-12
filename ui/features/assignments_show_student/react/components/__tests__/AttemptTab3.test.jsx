@@ -78,11 +78,20 @@ describe('ContentTabs', () => {
     window.INST = window.INST || {}
     window.INST.editorButtons = []
 
-    // Mock URL.createObjectURL for file handling
-    vi.stubGlobal('URL', {
-      ...window.URL,
-      createObjectURL: vi.fn(blob => `blob:mock-url-${blob?.name || 'unnamed'}`),
-    })
+    // Mock URL.createObjectURL for file handling if not already mocked
+    // IMPORTANT: Do not use vi.stubGlobal for URL as it breaks the URL constructor
+    // which is needed by tough-cookie/jsdom for cookie handling
+    if (typeof URL.createObjectURL !== 'function') {
+      try {
+        Object.defineProperty(URL, 'createObjectURL', {
+          value: vi.fn(blob => `blob:mock-url-${blob?.name || 'unnamed'}`),
+          writable: true,
+          configurable: true,
+        })
+      } catch {
+        // Property may already be defined and non-configurable
+      }
+    }
 
     // Mock Blob.prototype.slice for file handling
     if (!Blob.prototype.slice) {
@@ -108,7 +117,6 @@ describe('ContentTabs', () => {
 
   afterAll(() => {
     server.close()
-    vi.unstubAllGlobals()
   })
 
   const renderAttemptTab = async props => {
@@ -179,6 +187,15 @@ describe('ContentTabs', () => {
         expect(tinymce.get('textentry_text')).toBeDefined()
       })
       unmount()
+    })
+
+    afterAll(() => {
+      // Clean up the flash_screenreader_holder added in beforeAll
+      $('#flash_screenreader_holder').remove()
+      // Clean up any remaining TinyMCE instances
+      if (typeof tinymce !== 'undefined') {
+        tinymce.editors.forEach(editor => editor.remove())
+      }
     })
 
     describe('uploading a text draft', () => {
