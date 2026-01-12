@@ -24,13 +24,42 @@ import {extractDataTurnitin} from '@canvas/grading/Turnitin'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {extractSimilarityInfo, isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
+import {statusesTitleMap} from '../../constants/statuses'
 import type Gradebook from '../../Gradebook'
 import type {PendingGradeInfo} from '../../gradebook.d'
 import type {SubmissionData, SubmissionWithOriginalityReport} from '@canvas/grading/grading.d'
 import type {GradingStandard} from '@instructure/grading-utils'
 import type {Assignment, Student, Submission} from '../../../../../../api.d'
+import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
+import statusLateUrl from '../icons/late.svg'
+import statusMissingUrl from '../icons/missing.svg'
+import statusResubmittedUrl from '../icons/resubmitted.svg'
+import statusDroppedUrl from '../icons/dropped.svg'
+import statusExcusedUrl from '../icons/excused.svg'
+import statusExtendedUrl from '../icons/extended.svg'
+import statusCustom1Url from '../icons/custom-1.svg'
+import statusCustom2Url from '../icons/custom-2.svg'
+import statusCustom3Url from '../icons/custom-3.svg'
 
 const I18n = createI18nScope('gradebook')
+
+// Status to icon mapping for colorblindness accessibility
+const STATUS_ICONS: Record<string, string> = {
+  late: statusLateUrl,
+  missing: statusMissingUrl,
+  resubmitted: statusResubmittedUrl,
+  dropped: statusDroppedUrl,
+  excused: statusExcusedUrl,
+  extended: statusExtendedUrl,
+  'custom-1': statusCustom1Url,
+  'custom-2': statusCustom2Url,
+  'custom-3': statusCustom3Url,
+}
+
+type StatusIconInfo = {
+  iconUrl: string
+  title: string
+}
 
 type Options = {
   classNames?: string[]
@@ -41,6 +70,7 @@ type Options = {
   showUnpostedIndicator?: boolean
   turnitinState?: ReturnType<typeof getTurnitinState>
   similarityData?: ReturnType<typeof extractSimilarityInfo>
+  statusIcon?: StatusIconInfo
 }
 
 type Getters = {
@@ -59,6 +89,7 @@ type Getters = {
   ): ReturnType<Gradebook['submissionStateMap']['getSubmissionState']>
   showUpdatedSimilarityScore(): boolean
   getViewHiddenGradesIndicator(): boolean
+  getViewStatusForColorblindness(): boolean
 }
 
 function getTurnitinState(submission: SubmissionWithOriginalityReport) {
@@ -104,12 +135,60 @@ function formatGrade(
   return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions)
 }
 
+function getStatusIcon(
+  submissionData: SubmissionData,
+  customGradeStatuses: GradeStatusUnderscore[] = [],
+): StatusIconInfo | undefined {
+  if (submissionData.dropped) {
+    return {iconUrl: STATUS_ICONS.dropped, title: statusesTitleMap.dropped}
+  }
+  if (submissionData.excused) {
+    return {iconUrl: STATUS_ICONS.excused, title: statusesTitleMap.excused}
+  }
+  if (submissionData.extended) {
+    return {iconUrl: STATUS_ICONS.extended, title: statusesTitleMap.extended}
+  }
+  if (submissionData.late) {
+    return {iconUrl: STATUS_ICONS.late, title: statusesTitleMap.late}
+  }
+  if (submissionData.resubmitted) {
+    return {iconUrl: STATUS_ICONS.resubmitted, title: statusesTitleMap.resubmitted}
+  }
+  if (submissionData.missing) {
+    return {iconUrl: STATUS_ICONS.missing, title: statusesTitleMap.missing}
+  }
+  if (submissionData.customGradeStatusId) {
+    const customStatusesForSubmissions = customGradeStatuses.filter(
+      status => status.applies_to_submissions,
+    )
+    const customStatus = customStatusesForSubmissions.find(
+      status => status.id === submissionData.customGradeStatusId,
+    )
+
+    if (customStatus?.icon) {
+      return {
+        iconUrl: STATUS_ICONS[customStatus.icon],
+        title: customStatus.name,
+      }
+    }
+  }
+  return undefined
+}
+
 function renderStartContainer(options: {
   showUnpostedIndicator?: boolean
   invalid?: boolean
   similarityData?: ReturnType<typeof extractSimilarityInfo>
+  statusIcon?: StatusIconInfo
 }) {
   let content = ''
+
+  if (options.statusIcon) {
+    const title = htmlEscape(options.statusIcon.title)
+    // xsslint safeString.identifier title
+    // xsslint safeString.property statusIcon.iconUrl
+    content += `<div class="Grid__GradeCell__StatusIcon"><img src="${options.statusIcon.iconUrl}" alt="" title="${title}" /></div>`
+  }
 
   if (options.showUnpostedIndicator) {
     content += '<div class="Grid__GradeCell__UnpostedGrade"></div>'
@@ -168,6 +247,8 @@ export default class AssignmentCellFormatter {
 
   customGradeStatusesEnabled: boolean
 
+  customGradeStatuses: GradeStatusUnderscore[]
+
   constructor(gradebook: Gradebook) {
     this.options = {
       getAssignment(assignmentId: string) {
@@ -200,8 +281,12 @@ export default class AssignmentCellFormatter {
       getViewHiddenGradesIndicator() {
         return gradebook.gridDisplaySettings.viewHiddenGradesIndicator
       },
+      getViewStatusForColorblindness() {
+        return gradebook.gridDisplaySettings.viewStatusForColorblindness
+      },
     }
     this.customGradeStatusesEnabled = gradebook.options.custom_grade_statuses_enabled
+    this.customGradeStatuses = gradebook.options.custom_grade_statuses || []
   }
 
   render = (
@@ -262,6 +347,11 @@ export default class AssignmentCellFormatter {
         this.options.getViewHiddenGradesIndicator()) &&
       isPostable(submission)
 
+    // Determine status icon for colorblindness accessibility
+    const statusIcon = this.options.getViewStatusForColorblindness()
+      ? getStatusIcon(submissionData, this.customGradeStatuses)
+      : undefined
+
     const options: Options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),
       dimmed: student.isInactive || student.isConcluded || submissionState.locked,
@@ -269,6 +359,7 @@ export default class AssignmentCellFormatter {
       hidden: submissionState.hideGrade,
       invalid: !!pendingGradeInfo && !pendingGradeInfo.valid,
       showUnpostedIndicator,
+      statusIcon,
     }
 
     if (this.options.showUpdatedSimilarityScore()) {
