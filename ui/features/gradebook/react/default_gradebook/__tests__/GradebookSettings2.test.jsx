@@ -296,6 +296,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         statusColors: gradebook.state.gridColors,
         viewUngradedAsZero: false,
         viewHiddenGradesIndicator: false,
+        viewStatusForColorblindness: false,
         ...overrides,
       })
 
@@ -306,6 +307,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
             statusColors: {...gradebook.state.gridColors, dropped: '#000000'},
             viewUngradedAsZero: true,
             viewHiddenGradesIndicator: true,
+            viewStatusForColorblindness: true,
           }),
         )
 
@@ -316,6 +318,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         expect(params.show_unpublished_assignments).toBe('true')
         expect(params.view_ungraded_as_zero).toBe('true')
         expect(params.view_hidden_grades_indicator).toBe('true')
+        expect(params.view_status_for_colorblindness).toBe('true')
       })
 
       test('does not call saveUserSettings if no value has changed', async () => {
@@ -446,6 +449,24 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           ).rejects.toThrow('STILL NO')
           expect(gradebook.updateAllTotalColumns).not.toHaveBeenCalled()
           expect(gradebook.gridDisplaySettings.viewHiddenGradesIndicator).toBe(false)
+        })
+      })
+
+      describe('updating view status for colorblindness', () => {
+        test('makes updates to the grid when the request completes', async () => {
+          await gradebook.handleViewOptionsUpdated(
+            updateParams({viewStatusForColorblindness: true}),
+          )
+          expect(gradebook.gridDisplaySettings.viewStatusForColorblindness).toBe(true)
+        })
+
+        test('does not make updates to grid if the request fails', async () => {
+          GradebookApi.saveUserSettings.mockRejectedValue(new Error('STILL NO'))
+          await expect(
+            gradebook.handleViewOptionsUpdated({viewStatusForColorblindness: true}),
+          ).rejects.toThrow('STILL NO')
+          expect(gradebook.updateAllTotalColumns).not.toHaveBeenCalled()
+          expect(gradebook.gridDisplaySettings.viewStatusForColorblindness).toBe(false)
         })
       })
 
@@ -785,6 +806,60 @@ describe('Gradebook#toggleViewHiddenGradesIndicator', () => {
 
     expect(gradebook.saveSettings).toHaveBeenCalledWith({
       viewHiddenGradesIndicator: true,
+    })
+  })
+})
+
+describe('Gradebook#toggleViewStatusForColorblindness', () => {
+  let gradebook
+  let $fixtures
+
+  beforeEach(() => {
+    $fixtures = document.createElement('div')
+    $fixtures.id = 'fixtures'
+    document.body.appendChild($fixtures)
+
+    setFixtureHtml($fixtures)
+    gradebook = createGradebook({
+      grid: {
+        getColumns: () => [],
+        updateCell: jest.fn(),
+      },
+    })
+
+    jest.spyOn(gradebook, 'saveSettings').mockResolvedValue()
+  })
+
+  afterEach(() => {
+    ReactDOM.unmountComponentAtNode($fixtures)
+    document.body.removeChild($fixtures)
+    jest.restoreAllMocks()
+  })
+
+  test('toggles viewStatusForColorblindness to true when false', () => {
+    gradebook.gridDisplaySettings.viewStatusForColorblindness = false
+    // jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleViewStatusForColorblindness()
+
+    expect(gradebook.gridDisplaySettings.viewStatusForColorblindness).toBe(true)
+  })
+
+  test('toggles viewStatusForColorblindness to false when true', () => {
+    gradebook.gridDisplaySettings.viewStatusForColorblindness = true
+    // jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleViewStatusForColorblindness()
+
+    expect(gradebook.gridDisplaySettings.viewStatusForColorblindness).toBe(false)
+  })
+
+  test('calls saveSettings with the new value of the setting', () => {
+    gradebook.gridDisplaySettings.viewStatusForColorblindness = false
+    jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+
+    gradebook.toggleViewStatusForColorblindness()
+
+    expect(gradebook.saveSettings).toHaveBeenCalledWith({
+      viewStatusForColorblindness: true,
     })
   })
 })

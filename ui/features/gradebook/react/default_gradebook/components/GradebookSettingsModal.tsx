@@ -413,6 +413,12 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
                       setViewOptions({...viewOptions, viewHiddenGradesIndicator: value})
                     },
                   }}
+                  viewStatusForColorblindness={{
+                    checked: viewOptions.viewStatusForColorblindness,
+                    onChange: (value: GradebookViewOptions['viewStatusForColorblindness']) => {
+                      setViewOptions({...viewOptions, viewStatusForColorblindness: value})
+                    },
+                  }}
                 />
               </Tabs.Panel>
             )}
