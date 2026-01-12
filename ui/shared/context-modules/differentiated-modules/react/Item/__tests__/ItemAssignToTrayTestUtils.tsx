@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
@@ -136,18 +137,25 @@ export function setupBaseMocks() {
 }
 
 export function setupEnv() {
-  // @ts-expect-error - window.ENV is a Canvas global not in TS types
-  window.ENV ||= {}
-  ENV.VALID_DATE_RANGE = {
-    start_at: {date: '2023-08-20T12:00:00Z', date_context: 'course'},
-    end_at: {date: '2023-12-30T12:00:00Z', date_context: 'course'},
-  }
-  ENV.HAS_GRADING_PERIODS = false
-  // @ts-expect-error - ENV.SECTION_LIST type mismatch
-  ENV.SECTION_LIST = [{id: '4'}, {id: '5'}]
-  ENV.POST_TO_SIS = false
-  ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
-  ENV.MASTER_COURSE_DATA = undefined
+  fakeENV.setup({
+    VALID_DATE_RANGE: {
+      start_at: {date: '2023-08-20T12:00:00Z', date_context: 'course'},
+      end_at: {date: '2023-12-30T12:00:00Z', date_context: 'course'},
+    },
+    HAS_GRADING_PERIODS: false,
+    SECTION_LIST: [{id: '4'}, {id: '5'}],
+    POST_TO_SIS: false,
+    DUE_DATE_REQUIRED_FOR_ACCOUNT: false,
+    MASTER_COURSE_DATA: undefined,
+  })
+}
+
+export function teardownEnv() {
+  fakeENV.teardown()
+}
+
+export function clearQueryCache() {
+  queryClient.clear()
 }
 
 export function setupFlashHolder() {
