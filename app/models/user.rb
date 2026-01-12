@@ -2970,28 +2970,25 @@ class User < ActiveRecord::Base
   # given user, i.e. courses and sections
   def appointment_context_codes(include_observers: false)
     @appointment_context_codes ||= {}
-    @appointment_context_codes[[Shard.current, include_observers]] ||= Rails.cache.fetch([self, "cached_appointment_codes", ApplicationController.region, Shard.current, include_observers].cache_key, expires_in: 1.day) do
+    @appointment_context_codes[include_observers] ||= Rails.cache.fetch([self, "cached_appointment_codes", ApplicationController.region, include_observers].cache_key, expires_in: 1.day) do
       ret = { primary: [], secondary: [] }
       cached_currentish_enrollments(preload_dates: true).each do |e|
         next unless (e.student? || (include_observers && e.observer?)) && e.active?
-        next unless e.shard == Shard.current
 
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
       end
-      ret[:secondary].concat(groups.shard(Shard.current).map { |g| "group_category_#{g.group_category_id}" })
+      ret[:secondary].concat(groups.map { |g| "group_category_#{g.group_category_id}" })
       ret
     end
   end
 
   def manageable_appointment_context_codes
-    @manageable_appointment_context_codes ||= {}
-    cache_key = [self, "cached_manageable_appointment_codes", ApplicationController.region, Shard.current].cache_key
-    @manageable_appointment_context_codes[Shard.current] ||= Rails.cache.fetch(cache_key, expires_in: 1.day) do
+    cache_key = [self, "cached_manageable_appointment_codes", ApplicationController.region].cache_key
+    @manageable_appointment_context_codes ||= Rails.cache.fetch(cache_key, expires_in: 1.day) do
       ret = { full: [], limited: [], secondary: [] }
       limited_sections = {}
       manageable_enrollments_by_permission(:manage_calendar, cached_currentish_enrollments).each do |e|
-        next unless e.shard == Shard.current
         next if ret[:full].include?("course_#{e.course_id}")
 
         if e.limit_privileges_to_course_section

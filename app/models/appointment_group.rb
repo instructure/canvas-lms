@@ -418,22 +418,19 @@ class AppointmentGroup < ActiveRecord::Base
     @participant_for ||= {}
     return @participant_for[user.global_id] if @participant_for.key?(user.global_id)
 
-    participant = user.shard.activate do
-      if participant_type == "User"
-        user
-      else
-        # can't have more than one group_category
-        group_categories = sub_contexts.find_all { |sc| sc.instance_of? GroupCategory }
-        raise "inconsistent appointment group: #{id} #{group_categories}" if group_categories.length > 1
+    @participant_for[user.global_id] = begin
+      participant = if participant_type == "User"
+                      user
+                    else
+                      # can't have more than one group_category
+                      group_categories = sub_contexts.find_all { |sc| sc.instance_of? GroupCategory }
+                      raise "inconsistent appointment group: #{id} #{group_categories}" if group_categories.length > 1
 
-        group_category_id = group_categories.first.id
-        user.current_groups.detect { |g| g.group_category_id == group_category_id }
-      end
+                      group_category_id = group_categories.first.id
+                      user.current_groups.detect { |g| g.group_category_id == group_category_id }
+                    end
+      participant if participant && eligible_participant?(participant)
     end
-
-    @participant_for[user.global_id] = if participant && shard.activate { eligible_participant?(participant) }
-                                         participant
-                                       end
   end
 
   def reservations_for(participant)
