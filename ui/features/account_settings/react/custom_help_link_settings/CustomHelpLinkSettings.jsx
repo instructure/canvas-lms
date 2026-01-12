@@ -28,9 +28,11 @@ import CustomHelpLinkMenu from './CustomHelpLinkMenu'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 
 const I18n = createI18nScope('custom_help_link')
+const allowedCareerDefaultLinkIds = ['report_a_problem', 'training_services_portal']
 
 export default class CustomHelpLinkSettings extends React.Component {
   static propTypes = {
+    isCareerAccount: PropTypes.bool,
     name: PropTypes.string,
     links: PropTypes.arrayOf(CustomHelpLinkPropTypes.link),
     defaultLinks: PropTypes.arrayOf(CustomHelpLinkPropTypes.link),
@@ -38,6 +40,7 @@ export default class CustomHelpLinkSettings extends React.Component {
   }
 
   static defaultProps = {
+    isCareerAccount: false,
     name: I18n.t('Help'),
     icon: 'questionMark',
     defaultLinks: [],
@@ -47,14 +50,21 @@ export default class CustomHelpLinkSettings extends React.Component {
   constructor(props) {
     super(props)
     let nextIndex = this.nextLinkIndex(props.links)
-    const links = props.links.map(link => {
-      return {
-        ...link,
-        id: link.id || `link${nextIndex++}`,
-        available_to: link.available_to || [],
-        state: link.state || 'active',
-      }
-    })
+    const links = props.links
+      .filter(
+        link =>
+          !this.props.isCareerAccount ||
+          link.type === 'custom' ||
+          allowedCareerDefaultLinkIds.includes(link.id),
+      )
+      .map(link => {
+        return {
+          ...link,
+          id: link.id || `link${nextIndex++}`,
+          available_to: link.available_to || [],
+          state: link.state || 'active',
+        }
+      })
 
     this.state = {
       links,
@@ -66,10 +76,12 @@ export default class CustomHelpLinkSettings extends React.Component {
   getDefaultLinks = () => {
     const linkTexts = this.state.links.map(link => link.text)
 
-    return this.props.defaultLinks.map(link => ({
-      ...link,
-      is_disabled: linkTexts.indexOf(link.text) > -1,
-    }))
+    return this.props.defaultLinks
+      .filter(link => !this.props.isCareerAccount || allowedCareerDefaultLinkIds.includes(link.id))
+      .map(link => ({
+        ...link,
+        is_disabled: linkTexts.indexOf(link.text) > -1,
+      }))
   }
 
   nextLinkIndex = links => {
@@ -158,9 +170,13 @@ export default class CustomHelpLinkSettings extends React.Component {
   }
 
   focusPreviousComponent = () => {
-    $(
+    const element = $(
       '#custom_help_link_settings input[name="account[settings][help_link_icon]"]:checked',
-    )[0].focus()
+    )[0]
+
+    if (element) {
+      element.focus()
+    }
   }
 
   cancelEdit = link => {
@@ -320,6 +336,7 @@ export default class CustomHelpLinkSettings extends React.Component {
       link={link}
       onSave={this.handleFormSave}
       onCancel={this.handleFormCancel}
+      isCareerAccount={this.props.isCareerAccount}
     />
   )
 
@@ -337,6 +354,7 @@ export default class CustomHelpLinkSettings extends React.Component {
         }}
         key={id}
         link={link}
+        isCareerAccount={this.props.isCareerAccount}
         onMoveUp={canMoveUp ? this.handleMoveUp : null}
         onMoveDown={canMoveDown ? this.handleMoveDown : null}
         onRemove={this.handleRemove}
@@ -346,7 +364,7 @@ export default class CustomHelpLinkSettings extends React.Component {
   }
 
   render() {
-    const {name, icon} = this.props
+    const {name, icon, isCareerAccount} = this.props
 
     this.links = {}
 
@@ -355,7 +373,11 @@ export default class CustomHelpLinkSettings extends React.Component {
         <h2 className="screenreader-only">{I18n.t('Help menu options')}</h2>
         <legend>{I18n.t('Help menu options')}</legend>
         <div className="ic-Form-group ic-Form-group--horizontal">
-          <label className="ic-Form-control" htmlFor="account_settings_custom_help_link_name">
+          <label
+            className="ic-Form-control"
+            htmlFor="account_settings_custom_help_link_name"
+            {...(isCareerAccount ? {style: {display: 'none'}} : {})}
+          >
             <span className="ic-Label">{I18n.t('Name')}</span>
             <input
               id="account_settings_custom_help_link_name"
@@ -370,7 +392,7 @@ export default class CustomHelpLinkSettings extends React.Component {
               onInput={this.validateName}
             />
           </label>
-          <CustomHelpLinkIcons defaultValue={icon} />
+          <CustomHelpLinkIcons defaultValue={icon} isCareerAccount={isCareerAccount} />
           <div className="ic-Form-control ic-Form-control--top-align-label">
             <span className="ic-Label">{I18n.t('Help menu links')}</span>
             <div className="ic-Forms-component">
