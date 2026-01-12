@@ -67,7 +67,7 @@ export function TempEnrollSearch(props: Props) {
     setSearchType(value)
   }
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     if (event.target !== null) {
       const searchValue = event.target.value
       setSearch(searchValue)
@@ -282,7 +282,6 @@ export function TempEnrollSearch(props: Props) {
             height="9em"
             value={search}
             placeholder={exampleText}
-            // @ts-expect-error
             onChange={handleSearchChange}
             onBlur={handleSearchBlur}
             ref={ref => (textAreaRef.current = ref)}

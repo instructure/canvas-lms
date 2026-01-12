@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-// @ts-expect-error
-import type {Card, ActivityStreamSummary} from './types'
+import type {Card, ActivityStreamSummary} from '../types.d'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -70,7 +69,7 @@ export function mapDashboardResponseToCard(data: any): Card[] {
           longName: card.longName,
         }
       })
-      .filter((card: any) => card !== null)
+      .filter((card): card is Card => card !== null)
   }
 
   // Handle REST API response structure (array of cards)

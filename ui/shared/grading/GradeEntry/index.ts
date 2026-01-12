@@ -44,7 +44,6 @@ export default class GradeEntry {
   }
 
   get restrictToTwoDigitsAfterSeparator() {
-    // @ts-expect-error
     return !!this.options.restrictPointsBasedInput && !!this.gradingScheme?.pointsBased
   }
 
@@ -58,8 +57,11 @@ export default class GradeEntry {
     return null
   }
 
-  // @ts-expect-error
-  hasGradeChanged(_assignedGradeInfo, _currentGradeInfo, _previousGradeInfo) {
+  hasGradeChanged(
+    _assignedGradeInfo: GradeOverrideInfo | null,
+    _currentGradeInfo: GradeOverrideInfo | null,
+    _previousGradeInfo: GradeOverrideInfo | null,
+  ): boolean {
     return false
   }
 

@@ -22,6 +22,7 @@ import {generateModalTitle, TempEnrollModal} from '../TempEnrollModal'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import userEvent from '@testing-library/user-event'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   type DuplicateUser,
   type EnrollmentType,
@@ -148,8 +149,7 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
 describe('TempEnrollModal', () => {
   beforeAll(() => {
     server.listen()
-    // @ts-expect-error
-    window.ENV = {ACCOUNT_ID: '1'}
+    fakeENV.setup({ACCOUNT_ID: '1'})
   })
 
   beforeEach(() => {
@@ -165,8 +165,7 @@ describe('TempEnrollModal', () => {
 
   afterAll(() => {
     server.close()
-    // @ts-expect-error
-    window.ENV = {}
+    fakeENV.teardown()
   })
 
   it('displays the modal upon clicking the child element', async () => {

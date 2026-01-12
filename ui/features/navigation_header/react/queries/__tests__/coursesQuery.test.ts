@@ -18,30 +18,32 @@
 
 import {getFirstPageUrl, hideHomeroomCourseIfK5Student} from '../coursesQuery'
 import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('getFirstPageUrl', () => {
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {}
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   it('returns the default url when the user is not an observer', () => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       current_user_roles: ['student'],
       current_user_id: '1',
-    }
+    })
     expect(getFirstPageUrl()).toEqual(
       '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname',
     )
   })
 
   it('returns the default url with the observed_user_id query param', () => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       current_user_roles: ['user', 'observer'],
       current_user_id: '1',
-    }
+    })
     document.cookie = `${OBSERVER_COOKIE_PREFIX}${ENV.current_user_id}=17`
     expect(getFirstPageUrl()).toEqual(
       '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=17',
@@ -49,11 +51,10 @@ describe('getFirstPageUrl', () => {
   })
 
   it('observed_user_id changes when observee changes', () => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       current_user_roles: ['user', 'observer'],
       current_user_id: '1',
-    }
+    })
     document.cookie = `${OBSERVER_COOKIE_PREFIX}${ENV.current_user_id}=17`
     expect(getFirstPageUrl()).toEqual(
       '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=17',
@@ -67,30 +68,31 @@ describe('getFirstPageUrl', () => {
 })
 
 describe('hideHomeroomCourseIfK5Student', () => {
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('returns true when the user is not a K5 student', () => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       K5_USER: false,
       current_user_roles: ['student'],
-    }
+    })
     expect(hideHomeroomCourseIfK5Student({homeroom_course: true})).toEqual(true)
   })
 
   it('returns true when the user is a K5 student but the course is not a homeroom course', () => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       K5_USER: true,
       current_user_roles: ['student'],
-    }
+    })
     expect(hideHomeroomCourseIfK5Student({homeroom_course: false})).toEqual(true)
   })
 
   it('returns false when the user is a K5 student and the course is a homeroom course', () => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       K5_USER: true,
       current_user_roles: ['student'],
-    }
+    })
     expect(hideHomeroomCourseIfK5Student({homeroom_course: true})).toEqual(false)
   })
 })

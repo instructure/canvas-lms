@@ -39,7 +39,7 @@ export const useGradingSchemeSummaries = (): {
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      assignmentId = null,
+      assignmentId: string | null = null,
     ): Promise<GradingSchemeSummary[]> => {
       setLoadGradingSchemeSummariesStatus(ApiCallStatus.NOT_STARTED)
 
@@ -68,7 +68,6 @@ export const useGradingSchemeSummaries = (): {
   )
 
   return {
-    // @ts-expect-error
     loadGradingSchemeSummaries,
     loadGradingSchemeSummariesStatus,
   }

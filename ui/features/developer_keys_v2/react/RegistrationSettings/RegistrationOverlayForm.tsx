@@ -81,8 +81,7 @@ export const RegistrationOverlayForm = (props: {
         </Flex.Item>
         <Flex.Item>
           <Button
-            // @ts-expect-error
-            renderIcon={IconResetLine}
+            renderIcon={<IconResetLine />}
             margin="0 0 0 small"
             onClick={() => {
               resetOverlays(configuration)

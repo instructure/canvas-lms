@@ -34,7 +34,7 @@ export type LtiFilterTrayProps = {
   isTrayOpen: boolean
   setIsTrayOpen: (isOpen: boolean) => void
   filterValues: LtiFilters
-  lpFilterValues: [LpFilters] | []
+  lpFilterValues?: [LpFilters] | []
   setQueryParams: (params: Partial<DiscoverParams>) => void
   queryParams: DiscoverParams
 }

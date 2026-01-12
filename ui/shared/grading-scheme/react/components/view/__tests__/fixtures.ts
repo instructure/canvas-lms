@@ -18,7 +18,6 @@
 
 import type {GradingScheme} from '../../../../gradingSchemeApiModel'
 
-// @ts-expect-error
 export const MOCK_COURSE_GRADING_SCHEME: GradingScheme = {
   assessed_assignment: false,
   context_id: '5',
@@ -37,9 +36,9 @@ export const MOCK_COURSE_GRADING_SCHEME: GradingScheme = {
   id: '30',
   points_based: false,
   scaling_factor: 1.0,
+  used_as_default: false,
 }
 
-// @ts-expect-error
 export const MOCK_DEFAULT_GRADING_SCHEME: GradingScheme = {
   id: '',
   context_id: '2',
@@ -58,4 +57,5 @@ export const MOCK_DEFAULT_GRADING_SCHEME: GradingScheme = {
   title: 'A Grading Scheme',
   points_based: false,
   scaling_factor: 1.0,
+  used_as_default: false,
 }

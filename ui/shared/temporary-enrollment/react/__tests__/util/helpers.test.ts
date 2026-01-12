@@ -214,12 +214,11 @@ describe('helpers.ts', () => {
       })
 
       it('returns error message if wrongOrder', () => {
-        // @ts-expect-error
-        window.ENV = {
+        fakeENV.setup({
           CONTEXT_TIMEZONE: 'Asia/Brunei',
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
-        }
+        })
         const dateTime = {value: date, isInvalid: false, wrongOrder: true}
         const messages = generateDateTimeMessage(dateTime)
         const messageText = messages.map(function (msg) {

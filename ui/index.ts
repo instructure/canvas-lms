@@ -31,7 +31,6 @@ import {Capabilities as C, up} from '@canvas/engine'
 import {loadReactRouter} from './boot/initializers/router'
 import loadLocale from './loadLocale'
 import featureBundles from './featureBundles'
-// @ts-expect-error
 import pluginBundles from 'plugin-bundles-generated'
 
 // these are all things that either define global $.whatever or $.fn.blah

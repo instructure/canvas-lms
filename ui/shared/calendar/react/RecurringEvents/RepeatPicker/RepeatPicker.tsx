@@ -151,8 +151,14 @@ export default function RepeatPicker({
   }, [freq])
 
   const fireOnChange = useCallback(
-    // @ts-expect-error
-    (i, f, w, md, m, p) => {
+    (
+      i: number,
+      f: FrequencyValue,
+      w: SelectedDaysArray | undefined,
+      md: number | undefined,
+      m: number | undefined,
+      p: number | undefined,
+    ) => {
       if (f === 'YEARLY') {
         onChange({
           interval: i,
@@ -188,8 +194,7 @@ export default function RepeatPicker({
   )
 
   const handleChangeMonthlyMode = useCallback(
-    // @ts-expect-error
-    (_event, {value}) => {
+    (_event: React.SyntheticEvent, {value}: {value?: string | number; id?: string}) => {
       const newMonthlyMode = value as MonthlyModeValue
 
       setCurrMonthlyMode(newMonthlyMode)
@@ -235,19 +240,20 @@ export default function RepeatPicker({
   )
 
   const handleFreqChange = useCallback(
-    // @ts-expect-error
-    (_event, {value}) => {
+    (_event: React.SyntheticEvent, {value}: {value?: string | number; id?: string}) => {
+      if (!value) return
+      const freqValue = value as FrequencyValue
       activeElement.current = document.activeElement as HTMLElement
 
-      setCurrFreq(value)
-      if (value === 'YEARLY') {
+      setCurrFreq(freqValue)
+      if (freqValue === 'YEARLY') {
         const monthdate = eventStart.date()
         const month = eventStart.month() + 1
-        fireOnChange(currInterval, value, undefined, monthdate, month, undefined)
-      } else if (value === 'MONTHLY') {
+        fireOnChange(currInterval, freqValue, undefined, monthdate, month, undefined)
+      } else if (freqValue === 'MONTHLY') {
         handleChangeMonthlyMode(_event, {value: currMonthlyMode})
       } else {
-        fireOnChange(currInterval, value, currWeekDays, undefined, undefined, undefined)
+        fireOnChange(currInterval, freqValue, currWeekDays, undefined, undefined, undefined)
       }
     },
     [
@@ -325,7 +331,6 @@ export default function RepeatPicker({
               assistiveText={I18n.t('Use arrow keys to navigate options.')}
               value={freq}
               width={freqPickerWidth}
-              // @ts-expect-error
               onChange={handleFreqChange}
             >
               <SimpleSelectOption id="DAILY" value="DAILY">
@@ -363,7 +368,6 @@ export default function RepeatPicker({
                 assistiveText={I18n.t('Use arrow keys to navigate options.')}
                 value={currMonthlyMode}
                 width={monthlyOptionsWidth}
-                // @ts-expect-error
                 onChange={handleChangeMonthlyMode}
               >
                 <SimpleSelectOption id="BYMONTHDATE" value="BYMONTHDATE">

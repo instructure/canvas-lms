@@ -20,8 +20,13 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
 import type {CamelizedGradingPeriod, SerializedGradingPeriod} from '../grading.d'
 
-// @ts-expect-error
-const batchUpdateUrl = (id: string) => replaceTags(ENV.GRADING_PERIODS_UPDATE_URL, 'set_id', id)
+const batchUpdateUrl = (id: string) => {
+  const url = ENV.GRADING_PERIODS_UPDATE_URL
+  if (!url) {
+    throw new Error('GRADING_PERIODS_UPDATE_URL is not configured')
+  }
+  return replaceTags(url, 'set_id', id)
+}
 
 const serializePeriods = (periods?: CamelizedGradingPeriod[]) => {
   const serialized = (periods || []).map(period => ({
