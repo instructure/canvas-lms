@@ -133,19 +133,26 @@ describe "assignment groups" do
     # edit group grading rules
     f("#ag_#{assignment_group.id}_manage_link").click
     fj(".edit_group:visible:first").click
+    wait_for_ajaximations
     # change the name
-    f("#ag_#{assignment_group.id}_name").clear
-    f("#ag_#{assignment_group.id}_name").send_keys("name change")
+    replace_content(f("#ag_#{assignment_group.id}_name"), "name change")
     # set number of lowest scores to drop
-    f("#ag_#{assignment_group.id}_drop_lowest").clear
-    f("#ag_#{assignment_group.id}_drop_lowest").send_keys("1")
+    replace_content(f("#ag_#{assignment_group.id}_drop_lowest"), "1")
     # set number of highest scores to drop
-    f("#ag_#{assignment_group.id}_drop_highest").clear
-    f("#ag_#{assignment_group.id}_drop_highest").send_keys("2")
+    replace_content(f("#ag_#{assignment_group.id}_drop_highest"), "2")
     # set assignment to never drop
     fj(".add_never_drop:visible").click
-    expect(f(".never_drop_rule select")).to be
-    click_option(".never_drop_rule select", assignment.title)
+    select = f(".never_drop_rule select")
+    expect(select).to be
+    # Use JavaScript to set the value and trigger change event for React controlled component
+    driver.execute_script(<<~JS, select, assignment.id.to_s)
+      var select = arguments[0];
+      var value = arguments[1];
+      select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    JS
+    # Wait for debounced re-render (100ms) to propagate the change through React/Backbone
+    sleep 0.15
     # save it
     fj(".create_group:visible").click
     wait_for_ajaximations
