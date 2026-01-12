@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import axios from '@canvas/axios'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import splitAssetString from '@canvas/util/splitAssetString'
@@ -80,19 +80,18 @@ class WebZipExportApp extends React.Component {
   }
 
   loadExistingExports(courseId, newExportId = null) {
-    axios
-      .get(`/api/v1/courses/${courseId}/web_zip_exports`)
-      .then(response => {
+    doFetchApi({path: `/api/v1/courses/${courseId}/web_zip_exports`})
+      .then(({json}) => {
         this.setState({
           loaded: true,
-          exports: WebZipExportApp.webZipFormat(response.data, newExportId),
+          exports: WebZipExportApp.webZipFormat(json, newExportId),
           errors: [],
         })
       })
-      .catch(response => {
+      .catch(error => {
         this.setState({
           exports: [],
-          errors: [response],
+          errors: [error],
           loaded: true,
         })
       })
