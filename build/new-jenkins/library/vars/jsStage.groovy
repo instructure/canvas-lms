@@ -120,6 +120,7 @@ def queueJestDistribution(index) {
     def jestEnvVars = [
       "CI_NODE_INDEX=${index.toInteger() + 1}",
       "CI_NODE_TOTAL=${JEST_NODE_COUNT}",
+      "NODE_OPTIONS=--max-old-space-size=6144",
     ]
 
     callableWithDelegate(queueTestStage())(stages, "jest-${index}", jestEnvVars, 'yarn test:jest:build')
