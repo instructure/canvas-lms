@@ -25,6 +25,11 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     "application/x-docx"
   ].freeze
 
+  MAX_ASSIGNMENT_DESCRIPTION_LENGTH = 13_500
+  MAX_ESSAY_LENGTH = 13_500
+  MAX_RUBRIC_CRITERION_DESCRIPTION_LENGTH = 1_000
+  MAX_RUBRIC_CATEGORY_NAME_LENGTH = 1_000
+
   NO_SUBMISSION_MSG               = -> { I18n.t("No essay submission found.") }
   IMAGE_UPLOAD_MSG                = -> { I18n.t("Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission.") }
   INVALID_FILE_MSG                = -> { I18n.t("Only PDF and DOCX files are supported.") }
@@ -35,6 +40,10 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   GRADING_ASSISTANCE_DISABLED_MSG = -> { I18n.t("Grading assistance is not available right now.") }
   NO_RUBRIC_MSG                   = -> { I18n.t("No rubric is attached to this assignment.") }
   RATING_DESCRIPTION_MISSING_MSG  = -> { I18n.t("Rubric is missing rating description.") }
+  ASSIGNMENT_DESCRIPTION_TOO_LONG_MSG = -> { I18n.t("Assignment description exceeds maximum length of %{max} characters.", max: MAX_ASSIGNMENT_DESCRIPTION_LENGTH) }
+  RUBRIC_CATEGORY_NAME_TOO_LONG_MSG = -> { I18n.t("Rubric category name exceeds maximum length of %{max} characters.", max: MAX_RUBRIC_CATEGORY_NAME_LENGTH) }
+  RUBRIC_CRITERION_DESCRIPTION_TOO_LONG_MSG = -> { I18n.t("Rubric criterion description exceeds maximum length of %{max} characters.", max: MAX_RUBRIC_CRITERION_DESCRIPTION_LENGTH) }
+  ESSAY_TOO_LONG_MSG = -> { I18n.t("Submission text exceeds maximum length of %{max} characters.", max: MAX_ESSAY_LENGTH) }
 
   def self.missing_rubric?(assignment)
     assignment&.rubric.nil?
@@ -53,10 +62,37 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     !CedarClient.enabled?
   end
 
+  def self.assignment_description_too_long?(assignment)
+    return false if assignment&.description.blank?
+
+    assignment.description.length > MAX_ASSIGNMENT_DESCRIPTION_LENGTH
+  end
+
+  def self.rubric_category_name_too_long?(assignment)
+    rubric = assignment&.rubric
+    return false unless rubric
+
+    rubric.data.any? do |criterion|
+      criterion[:description].to_s.length > MAX_RUBRIC_CATEGORY_NAME_LENGTH
+    end
+  end
+
+  def self.rubric_criterion_description_too_long?(assignment)
+    rubric = assignment&.rubric
+    return false unless rubric
+
+    rubric.data.any? do |criterion|
+      criterion[:ratings]&.any? { |rating| rating[:long_description].to_s.length > MAX_RUBRIC_CRITERION_DESCRIPTION_LENGTH }
+    end
+  end
+
   ASSIGNMENT_CHECKS = [
-    { level: "error", message: GRADING_ASSISTANCE_DISABLED_MSG, check: ->(_) { grading_assistance_disabled? } },
-    { level: "error", message: NO_RUBRIC_MSG,                   check: ->(a) { missing_rubric?(a) } },
-    { level: "error", message: RATING_DESCRIPTION_MISSING_MSG,  check: ->(a) { rubric_missing_ratings?(a) } }
+    { level: "error", message: GRADING_ASSISTANCE_DISABLED_MSG,                 check: ->(_) { grading_assistance_disabled? } },
+    { level: "error", message: NO_RUBRIC_MSG,                                   check: ->(a) { missing_rubric?(a) } },
+    { level: "error", message: RATING_DESCRIPTION_MISSING_MSG,                  check: ->(a) { rubric_missing_ratings?(a) } },
+    { level: "error", message: ASSIGNMENT_DESCRIPTION_TOO_LONG_MSG,             check: ->(a) { assignment_description_too_long?(a) } },
+    { level: "error", message: RUBRIC_CATEGORY_NAME_TOO_LONG_MSG,               check: ->(a) { rubric_category_name_too_long?(a) } },
+    { level: "error", message: RUBRIC_CRITERION_DESCRIPTION_TOO_LONG_MSG,       check: ->(a) { rubric_criterion_description_too_long?(a) } }
   ].freeze
 
   def self.validate_assignment(assignment:)
@@ -100,13 +136,21 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
       !Account.site_admin.feature_enabled?(:grading_assistance_file_uploads)
   end
 
+  def self.essay_too_long?(submission)
+    return false if submission.blank?
+
+    text = AutoGradeOrchestrationService.extract_essay_text(submission)
+    text.length > MAX_ESSAY_LENGTH
+  end
+
   SUBMISSION_CHECKS = [
     { level: "error", message: NO_SUBMISSION_MSG,          check: ->(s) { no_submission?(s) } },
     { level: "error", message: INVALID_TYPE_MSG,           check: ->(s) { invalid_type?(s) } },
     { level: "error", message: FILE_UPLOADS_DISABLED_MSG,  check: ->(s) { file_uploads_feature_disabled?(s) } },
     { level: "error", message: INVALID_FILE_MSG,           check: ->(s) { invalid_file?(s) } },
     { level: "warning", message: IMAGE_UPLOAD_MSG,         check: ->(s) { contains_images?(s) } },
-    { level: "error", message: SHORT_ESSAY_MSG,            check: ->(s) { short_essay?(s) } }
+    { level: "error", message: SHORT_ESSAY_MSG,            check: ->(s) { short_essay?(s) } },
+    { level: "error", message: ESSAY_TOO_LONG_MSG,         check: ->(s) { essay_too_long?(s) } }
   ].freeze
 
   def self.validate_submission(submission:)

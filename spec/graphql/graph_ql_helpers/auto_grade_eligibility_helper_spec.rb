@@ -66,11 +66,8 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
       end
     end
 
-    context "when a rating is missing long_description" do
-      it "returns a rating description error" do
-        rubric.data[0][:ratings][0][:long_description] = nil
-        rubric.save!
-
+    context "with rubric" do
+      before do
         ra = rubric_association_model(
           association: assignment,
           rubric:,
@@ -79,13 +76,54 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         )
         ra.save!
         assignment.reload
-
         allow(CedarClient).to receive(:enabled?).and_return(true)
-        expect(assignment.rubric_association).to be_present
-        expect(assignment.rubric_association.rubric).to eq(rubric)
+      end
 
-        issues = described_class.validate_assignment(assignment:)
-        expect(issues).to eq({ level: "error", message: "Rubric is missing rating description." })
+      context "when a rating is missing long_description" do
+        it "returns a rating description error" do
+          rubric.data[0][:ratings][0][:long_description] = nil
+          rubric.save!
+          assignment.reload
+
+          expect(assignment.rubric_association).to be_present
+          expect(assignment.rubric_association.rubric).to eq(rubric)
+
+          issues = described_class.validate_assignment(assignment:)
+          expect(issues).to eq({ level: "error", message: "Rubric is missing rating description." })
+        end
+      end
+
+      context "when assignment description is too long" do
+        it "returns assignment description too long error" do
+          assignment.description = "a" * 13_501
+          assignment.save!
+          assignment.reload
+
+          issues = described_class.validate_assignment(assignment:)
+          expect(issues).to eq({ level: "error", message: "Assignment description exceeds maximum length of 13,500 characters." })
+        end
+      end
+
+      context "when rubric category name is too long" do
+        it "returns rubric category name too long error" do
+          rubric.data[0][:description] = "a" * 1_001
+          rubric.save!
+          assignment.reload
+
+          issues = described_class.validate_assignment(assignment:)
+          expect(issues).to eq({ level: "error", message: "Rubric category name exceeds maximum length of 1,000 characters." })
+        end
+      end
+
+      context "when rubric criterion description is too long" do
+        it "returns rubric criterion description too long error" do
+          rubric.data[0][:ratings][0][:long_description] = "a" * 1_001
+          rubric.save!
+          assignment.reload
+
+          issues = described_class.validate_assignment(assignment:)
+          expect(issues).to eq({ level: "error", message: "Rubric criterion description exceeds maximum length of 1,000 characters." })
+        end
       end
     end
   end
@@ -256,7 +294,8 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         attachment = instance_double(Attachment, mimetype: "application/pdf")
         allow(submission).to receive_messages(
           attachments: [attachment],
-          extract_text_from_upload?: true
+          extract_text_from_upload?: true,
+          extracted_text: ""
         )
 
         allow(submission).to receive(:read_extracted_text).and_return({ text: "", contains_images: false })
@@ -292,6 +331,45 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
             message: "Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission."
           }
         )
+      end
+    end
+
+    context "when essay text is too long for text entry" do
+      it "returns essay too long error" do
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          body: "a b c d e " + ("a" * 13_495),
+          submission_type: "online_text_entry",
+          attachments: []
+        )
+
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to eq({ level: "error", message: "Submission text exceeds maximum length of 13,500 characters." })
+      end
+    end
+
+    context "when essay text is too long for file upload" do
+      it "returns essay too long error" do
+        Account.site_admin.enable_feature!(:grading_assistance_file_uploads)
+
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          submission_type: "online_upload",
+          attachments: []
+        )
+
+        attachment = instance_double(Attachment, mimetype: "application/pdf")
+        allow(submission).to receive_messages(
+          attachments: [attachment],
+          extract_text_from_upload?: true,
+          word_count: 10_000,
+          extracted_text: "a" * 13_501
+        )
+
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to eq({ level: "error", message: "Submission text exceeds maximum length of 13,500 characters." })
       end
     end
   end

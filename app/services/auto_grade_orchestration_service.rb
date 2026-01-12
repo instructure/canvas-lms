@@ -26,6 +26,11 @@ class AutoGradeOrchestrationService
     @current_user = current_user
   end
 
+  def self.extract_essay_text(submission)
+    essay_source = submission.extract_text_from_upload? ? submission.extracted_text : submission.body
+    ActionView::Base.full_sanitizer.sanitize(essay_source || "")
+  end
+
   def auto_grade_in_background(submission:)
     user = submission.user
 
@@ -63,8 +68,7 @@ class AutoGradeOrchestrationService
   end
 
   def get_grade_data(assignment_text:, root_account_uuid:, submission:, progress:)
-    essay_source = submission.extract_text_from_upload? ? submission.extracted_text : submission.body
-    essay = ActionView::Base.full_sanitizer.sanitize(essay_source || "")
+    essay = self.class.extract_essay_text(submission)
 
     rubric = submission.assignment.rubric_association&.rubric
     raise StandardError, "Missing rubric" unless rubric&.data
