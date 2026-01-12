@@ -152,7 +152,9 @@ class Login::OAuth2Controller < Login::OAuthBaseController
         redirect_to login_url
         return false
       end
-      if jwt["nonce"] != pop_nonce
+      popped_nonce = pop_nonce
+      if jwt["nonce"] != popped_nonce
+        logger.error("Nonce mismatch - JWT nonce: '#{jwt["nonce"]}', Popped nonce: '#{popped_nonce}'")
         increment_statsd(:failure, reason: :invalid_nonce)
         raise ActionController::InvalidAuthenticityToken
       end
