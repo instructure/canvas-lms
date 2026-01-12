@@ -22,7 +22,7 @@ import {IconStudentViewLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from 'axios'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {TopNavPortalBase, type WithProps, type Crumb, getMountPoint} from './TopNavPortalBase'
 import type {ItemChild} from '@instructure/ui-top-nav-bar/types/TopNavBar/props'
 
@@ -150,8 +150,7 @@ export const addCrumbs = (newCrumbs: Crumb[], oldCrumbs?: Crumb[]): Crumb[] => {
 export const initializeTopNavPortalWithDefaults = (props?: WithProps): void => {
   const mountPoint = getMountPoint()
   if (mountPoint) {
-    const root = createRoot(mountPoint)
-    root.render(<TopNavPortalWithDefaults {...props} />)
+    render(<TopNavPortalWithDefaults {...props} />, mountPoint)
   }
 }
 export default TopNavPortalWithDefaults

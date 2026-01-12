@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {createRoot} from 'react-dom/client' // Updated import
+import {render} from '@canvas/react'
 import SideNav from './react/SideNav'
 import Navigation from './react/OldSideNav'
 import MobileNavigation from './react/MobileNavigation'
@@ -78,42 +78,42 @@ ready(() => {
   if (showInstUiNavbar) {
     const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
     if (mobileContextNavContainer) {
-      const sideNavRoot = createRoot(mobileContextNavContainer)
-      sideNavRoot.render(
+      render(
         <QueryClientProvider client={queryClient}>
           <SideNav externalTools={getExternalTools()} />
         </QueryClientProvider>,
+        mobileContextNavContainer,
       )
 
       // Render MobileNavigation after SideNav
-      const mobileNavRoot = createRoot(mobileContextNavContainer)
-      mobileNavRoot.render(
+      render(
         <QueryClientProvider client={queryClient}>
           <AlertManager breakpoints={{}}>
             <MobileNavigation navIsOpen={globalNavIsOpen} />
           </AlertManager>
         </QueryClientProvider>,
+        mobileContextNavContainer,
       )
     }
   } else {
     const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
     if (globalNavTrayContainer) {
-      const navigationRoot = createRoot(globalNavTrayContainer)
-      navigationRoot.render(
+      render(
         <QueryClientProvider client={queryClient}>
           <Navigation />
         </QueryClientProvider>,
+        globalNavTrayContainer,
       )
 
       const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
       if (mobileContextNavContainer) {
-        const mobileNavRoot = createRoot(mobileContextNavContainer)
-        mobileNavRoot.render(
+        render(
           <QueryClientProvider client={queryClient}>
             <AlertManager breakpoints={{}}>
               <MobileNavigation />
             </AlertManager>
           </QueryClientProvider>,
+          mobileContextNavContainer,
         )
       }
     }
@@ -134,8 +134,7 @@ ready(() => {
   const newTabContainers = document.getElementsByClassName('new-tab-indicator')
   Array.from(newTabContainers).forEach(newTabContainer => {
     if (newTabContainer instanceof HTMLElement && newTabContainer.dataset.tabname) {
-      const newTabRoot = createRoot(newTabContainer)
-      newTabRoot.render(<NewTabIndicator tabName={newTabContainer.dataset.tabname} />)
+      render(<NewTabIndicator tabName={newTabContainer.dataset.tabname} />, newTabContainer)
     }
   })
 })
