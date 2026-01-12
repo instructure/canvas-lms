@@ -27,7 +27,7 @@ import {Pill} from '@instructure/ui-pill'
 import type JQuery from 'jquery'
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode, legacyRender} from '@canvas/react'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
@@ -236,9 +236,9 @@ export function renderStatusMenu(component: React.ReactElement | null, mountPoin
       ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
       : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
 
-  ReactDOM.render(<></>, document.getElementById(unmountPoint))
+  legacyRender(<></>, document.getElementById(unmountPoint))
 
-  ReactDOM.render(component || <></>, mountPoint)
+  legacyRender(component || <></>, mountPoint)
 }
 
 export function plagiarismResubmitButton(hasOriginalityScore: boolean, buttonContainer: JQuery) {
@@ -259,20 +259,20 @@ export function anonymousName(student: StudentWithSubmission): string {
 export function unmountCommentTextArea() {
   const node = document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   if (!node) throw new Error('comment textarea mount point not found')
-  ReactDOM.unmountComponentAtNode(node)
+  legacyUnmountComponentAtNode(node)
 }
 
 export function teardownSettingsMenu() {
   const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
   if (!mountPoint) throw new Error('could not find mount point for settings menu')
-  ReactDOM.unmountComponentAtNode(mountPoint)
+  legacyUnmountComponentAtNode(mountPoint)
 }
 
 export function tearDownAssessmentAuditTray(EG: SpeedGrader) {
   const mount1 = document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT)
-  if (mount1) ReactDOM.unmountComponentAtNode(mount1)
+  if (mount1) legacyUnmountComponentAtNode(mount1)
   const mount2 = document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT)
-  if (mount2) ReactDOM.unmountComponentAtNode(mount2)
+  if (mount2) legacyUnmountComponentAtNode(mount2)
   EG.assessmentAuditTray = null
 }
 
@@ -314,7 +314,7 @@ export function renderPostGradesMenu(EG: SpeedGrader) {
     onPostGrades,
   }
 
-  ReactDOM.render(
+  legacyRender(
     <SpeedGraderPostGradesMenu {...props} />,
     document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT),
   )
@@ -329,14 +329,14 @@ export function renderHiddenSubmissionPill(submission: Submission) {
   if (!mountPoint) throw new Error('hidden submission pill mount point not found')
 
   if (isPostable(submission)) {
-    ReactDOM.render(
+    legacyRender(
       <Pill color="warning" margin="0 0 small">
         {I18n.t('Hidden')}
       </Pill>,
       mountPoint,
     )
   } else {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   }
 }
 
@@ -459,7 +459,7 @@ export function renderSettingsMenu(header) {
 
   const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
 
-  ReactDOM.render(<SpeedGraderSettingsMenu {...props} />, mountPoint)
+  legacyRender(<SpeedGraderSettingsMenu {...props} />, mountPoint)
 }
 
 export function speedGraderJSONErrorFn(
@@ -474,7 +474,7 @@ export function speedGraderJSONErrorFn(
       dismissible: false,
     }
 
-    ReactDOM.render(
+    legacyRender(
       <Alert {...alertProps}>
         <span dangerouslySetInnerHTML={buildAlertMessage()} />
       </Alert>,

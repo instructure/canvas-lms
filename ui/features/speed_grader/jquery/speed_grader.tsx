@@ -50,7 +50,7 @@ import $ from 'jquery'
 import {isEqual, keyBy, filter, find, includes, map, reject, some, values} from 'es-toolkit/compat'
 import qs from 'qs'
 import React, {useRef} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode, legacyRender, render} from '@canvas/react'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import QuizzesNextSpeedGrading from '../QuizzesNextSpeedGrading'
 import {
@@ -156,7 +156,7 @@ import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import {windowAlert} from '@canvas/util/globalUtils'
 import replaceTags from '@canvas/util/replaceTags'
 import {isPreviewable} from '@instructure/canvas-rce/es/rce/plugins/shared/Previewable'
-import {createRoot} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
 import {AmsLoader} from '@canvas/ams/react/AmsLoader'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
@@ -237,7 +237,7 @@ let $add_attachment: JQuery
 let $submissions_container: JQuery
 let $iframe_holder: JQuery
 let $ams_grading_container: JQuery
-let amsGradingRoot: ReturnType<typeof createRoot> | null = null
+let amsGradingRoot: Root | null = null
 let $avatar_image: JQuery
 let $x_of_x_students: JQuery
 let $grded_so_far: JQuery
@@ -1006,7 +1006,7 @@ function renderProgressIcon(attachment: Attachment) {
   }
 
   if (attachment.upload_status === 'success') {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   } else {
     const {icon, tip} = iconAndTipMap[attachment.upload_status] || iconAndTipMap.default
     const tooltip = (
@@ -1019,7 +1019,7 @@ function renderProgressIcon(attachment: Attachment) {
         />
       </Tooltip>
     )
-    ReactDOM.render(tooltip, mountPoint)
+    legacyRender(tooltip, mountPoint)
   }
 }
 
@@ -1028,14 +1028,14 @@ function renderHiddenSubmissionPill(submission: Submission) {
   if (!mountPoint) throw new Error('hidden submission pill mount point not found')
 
   if (isPostable(submission)) {
-    ReactDOM.render(
+    legacyRender(
       <Pill color="warning" margin="0 0 small">
         {I18n.t('Hidden')}
       </Pill>,
       mountPoint,
     )
   } else {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   }
 }
 
@@ -1075,16 +1075,16 @@ export function renderLtiAssetReports(
       displayName: attachment.display_name,
     }))
     const props = {...student, assignmentId, attachments, attempt, submissionType}
-    ReactDOM.render(<LtiAssetReportsForSpeedgraderWrapper {...props} />, mountPoint)
+    legacyRender(<LtiAssetReportsForSpeedgraderWrapper {...props} />, mountPoint)
   } else {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   }
 }
 
 function renderCheckpoints(submission: Submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_CHECKPOINTS_MOUNT_POINT)
   if (mountPoint) {
-    ReactDOM.render(
+    legacyRender(
       <SpeedGraderCheckpointsWrapper
         EG={EG}
         courseId={ENV.course_id}
@@ -1102,7 +1102,7 @@ function renderRubricsCheckpointsInfo() {
   const mountPoint = document.getElementById('rubrics_checkpoints_info')
 
   if (mountPoint) {
-    ReactDOM.render(
+    legacyRender(
       <Alert variant="info" margin="medium none">
         {I18n.t('Rubrics do not auto-populate grades for checkpoints.')}
       </Alert>,
@@ -1129,7 +1129,7 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
     } else if (temporaryDiscussionContextView === 'discussion_view_with_context' && mountPoint) {
       const currentUrl = new URL(window.location.href)
       const params = new URLSearchParams(currentUrl.search)
-      ReactDOM.render(
+      legacyRender(
         <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
         mountPoint,
       )
@@ -1138,7 +1138,7 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
   } else if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
     const currentUrl = new URL(window.location.href)
     const params = new URLSearchParams(currentUrl.search)
-    ReactDOM.render(
+    legacyRender(
       <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
       mountPoint,
     )
@@ -1152,7 +1152,7 @@ function clearDiscussionsNavigation() {
   const mountPoint = document.getElementById(SPEED_GRADER_DISCUSSIONS_NAVIGATION_MOUNT_POINT)
 
   if (mountPoint) {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   }
 }
 
@@ -1175,7 +1175,7 @@ function renderCommentTextArea(readOnly = false) {
 
   const currentText = $add_a_comment_textarea.data('textarea')
 
-  ReactDOM.render(
+  legacyRender(
     <CommentArea
       getTextAreaRef={getTextAreaRef}
       courseId={ENV.course_id}
@@ -1750,7 +1750,7 @@ EG = {
     } else {
       // unmount spinner
       const spinnerMount = document.getElementById('speed_grader_loading')
-      if (spinnerMount) ReactDOM.unmountComponentAtNode(spinnerMount)
+      if (spinnerMount) legacyUnmountComponentAtNode(spinnerMount)
       $('#speed_grader_loading').hide()
       $('#gradebook_header, #full_width_container').show()
       initDropdown()
@@ -1799,9 +1799,9 @@ EG = {
   },
 
   setupGradeLoadingSpinner() {
-    const root = createRoot(document.getElementById('grades-loading-spinner')!)
-    root.render(
+    render(
       <GradeLoadingSpinner onLoadingChange={loading => toggleGradeVisibility(!loading)} />,
+      document.getElementById('grades-loading-spinner')!,
     )
   },
 
@@ -2339,7 +2339,7 @@ EG = {
     }
 
     const tray = <AssessmentAuditTray ref={bindRef} />
-    ReactDOM.render(tray, document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
+    legacyRender(tray, document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
 
     const onClick = () => {
       const {submission} = this.currentStudent
@@ -2359,11 +2359,11 @@ EG = {
     }
 
     const button = <AssessmentAuditButton onClick={onClick} />
-    ReactDOM.render(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
+    legacyRender(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
   },
 
   setUpRubricAssessmentContainerWrapper() {
-    ReactDOM.render(
+    legacyRender(
       <RubricAssessmentWrapper
         currentUserId={ENV.current_user_id ?? ''}
         rubric={ENV.rubric as RubricUnderscoreType}
@@ -3416,8 +3416,7 @@ EG = {
       })
     }
 
-    amsGradingRoot = createRoot(container)
-    amsGradingRoot.render(
+    amsGradingRoot = render(
       <AmsLoader
         containerId="ams_grading_container"
         gradingContext={{
@@ -3428,6 +3427,7 @@ EG = {
         }}
         onSubmissionUpdate={handleAmsSubmissionUpdate}
       />,
+      container,
     )
 
     $ams_grading_container.show()
@@ -4530,7 +4530,7 @@ EG = {
     const screenCaptureMountPoint = document.getElementById(SCREEN_CAPTURE_ICON_MOUNT_POINT)
     if (screenCaptureMountPoint) {
       const screen_capture_icon = <ScreenCaptureIcon />
-      ReactDOM.render(screen_capture_icon, screenCaptureMountPoint)
+      legacyRender(screen_capture_icon, screenCaptureMountPoint)
     }
   },
 
@@ -4826,7 +4826,7 @@ EG = {
       this.renderSticker()
     }
 
-    ReactDOM.render(
+    legacyRender(
       <SubmissionSticker
         confetti={false}
         editable={isMostRecentAttempt}
@@ -4847,7 +4847,7 @@ EG = {
     // Only show the selector if the current student has at least one grade from
     // a provisional grader (i.e., not the moderator).
     if (!provisionalGrades.some(grade => grade.readonly)) {
-      ReactDOM.unmountComponentAtNode(mountPoint)
+      legacyUnmountComponentAtNode(mountPoint)
       return
     }
 
@@ -4874,7 +4874,7 @@ EG = {
     }
 
     const gradeSelector = <SpeedGraderProvisionalGradeSelector {...props} />
-    ReactDOM.render(gradeSelector, mountPoint)
+    legacyRender(gradeSelector, mountPoint)
   },
 
   changeToSection(sectionId: string | string[] | 'all') {

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode} from '@canvas/react'
 import {renderLtiAssetReports} from '../speed_grader'
 import {Attachment, HistoricalSubmission, Submission} from '../speed_grader.d'
 import {LtiAssetReportsForSpeedgraderProps} from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportsForSpeedgrader'
@@ -51,7 +51,7 @@ describe('renderLtiAssetReports', () => {
   })
 
   afterEach(() => {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
     document.body.removeChild(mountPoint)
   })
 
