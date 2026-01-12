@@ -23,7 +23,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import TodoListWidget from '../TodoListWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
-import {plannerItemsHandlers, plannerNoteHandlers} from './mocks/handlers'
+import {plannerItemsHandlers, plannerNoteHandlers, widgetConfigHandlers} from './mocks/handlers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
@@ -44,7 +44,7 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
   }
 }
 
-const server = setupServer(...plannerItemsHandlers, ...plannerNoteHandlers)
+const server = setupServer(...plannerItemsHandlers, ...plannerNoteHandlers, ...widgetConfigHandlers)
 
 const mockSharedCourseData = [
   {
