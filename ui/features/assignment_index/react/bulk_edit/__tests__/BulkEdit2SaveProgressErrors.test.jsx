@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {cleanup, render, fireEvent, waitFor, screen} from '@testing-library/react'
+import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import {vi} from 'vitest'
 import tz from 'timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
@@ -69,7 +69,7 @@ function changeAndBlurInput(input, newValue) {
   fireEvent.blur(input)
 }
 
-describe('Assignment Bulk Edit Dates - Save Progress Polling', () => {
+describe('Assignment Bulk Edit Dates - Save Progress Errors', () => {
   let progressCallCount = 0
   let progressResponses = []
 
@@ -110,17 +110,15 @@ describe('Assignment Bulk Edit Dates - Save Progress Polling', () => {
   })
 
   afterEach(() => {
-    cleanup()
     server.resetHandlers()
     fakeENV.teardown()
     tzInTest.restore()
   })
 
-  it('polls for progress and updates a progress bar', async () => {
+  it('displays an error if the progress fetch fails', async () => {
     progressResponses = [
       {url: '/progress', workflow_state: 'queued', completion: 0},
-      {url: '/progress', workflow_state: 'running', completion: 42},
-      {url: '/progress', workflow_state: 'complete', completion: 100},
+      {body: {errors: [{message: 'could not get progress'}]}, status: 401},
     ]
 
     const {getByText, getAllByLabelText, findAllByLabelText} = renderBulkEdit()
@@ -130,23 +128,54 @@ describe('Assignment Bulk Edit Dates - Save Progress Polling', () => {
     changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-01')
     fireEvent.click(getByText('Save'))
 
-    // Wait for initial progress showing 0%
+    // Wait for initial poll showing progress text with 0%
     await waitFor(() => {
       expect(screen.getByText(/progress.*0%/i)).toBeInTheDocument()
     })
 
-    // Wait for 42% (polling happens quickly with short interval)
+    // Wait for error message from the failed request
     await waitFor(() => {
-      expect(screen.getByText(/progress.*42%/i)).toBeInTheDocument()
+      expect(screen.getByText(/could not get progress/)).toBeInTheDocument()
     })
 
-    // Wait for completion
+    // Verify save button is re-enabled after error
     await waitFor(() => {
-      expect(screen.getByText(/saved successfully/)).toBeInTheDocument()
-      expect(getByText('Close')).toBeInTheDocument()
+      expect(getByText('Save').closest('button').disabled).toBe(false)
+    })
+  })
+
+  it('displays an error if the job fails', async () => {
+    progressResponses = [
+      {url: '/progress', workflow_state: 'queued', completion: 0},
+      {
+        completion: 42,
+        workflow_state: 'failed',
+        results: [{assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}}],
+      },
+    ]
+
+    const {getByText, getAllByLabelText, findAllByLabelText} = renderBulkEdit()
+
+    await findAllByLabelText('Due At')
+
+    changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-01')
+    fireEvent.click(getByText('Save'))
+
+    // Wait for initial poll showing progress text with 0%
+    await waitFor(() => {
+      expect(screen.getByText(/progress.*0%/i)).toBeInTheDocument()
     })
 
-    // Verify progress was polled multiple times
-    expect(progressCallCount).toBeGreaterThanOrEqual(3)
+    // Wait for error message from the failed job
+    await waitFor(() => {
+      expect(screen.getByText(/some bad dates/)).toBeInTheDocument()
+    })
+
+    // Save button is disabled due to error in assignment
+    expect(getByText('Save').closest('button').disabled).toBe(true)
+
+    // Fix the error by changing the date and save should be re-enabled
+    changeAndBlurInput(getAllByLabelText(/Due At/)[0], '2020-04-04')
+    expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 })
