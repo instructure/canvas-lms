@@ -23,10 +23,12 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Billboard} from '@instructure/ui-billboard'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useCourses} from '../../hooks/useCourses'
+import {useSortParams} from '../../hooks/useSortParams'
 import {CoursesTable} from './CoursesTable'
 import {AccessibilityGenericErrorPage} from './AccessibilityGenericErrorPage'
 import EmptyDesert from '@canvas/images/react/EmptyDesert'
 import type {CoursesResponse} from '../../types/course'
+import type {SortOrder} from './SortableTableHeader'
 
 const I18n = createI18nScope('accessibility_course_statistics')
 
@@ -53,7 +55,10 @@ const CoursesContent: React.FC<{
   isLoading: boolean
   isError: boolean
   data: CoursesResponse | undefined
-}> = ({isLoading, isError, data}) => {
+  sort: string
+  order: SortOrder
+  onChangeSort: (columnId: string) => void
+}> = ({isLoading, isError, data, sort, order, onChangeSort}) => {
   if (isError) {
     return <AccessibilityGenericErrorPage />
   }
@@ -66,12 +71,18 @@ const CoursesContent: React.FC<{
     return <EmptyState />
   }
 
-  return <CoursesTable courses={data.courses} />
+  return (
+    <CoursesTable courses={data.courses} sort={sort} order={order} onChangeSort={onChangeSort} />
+  )
 }
 
 export const AccessibilityCoursesPage: React.FC = () => {
   const accountId = getAccountId()
-  const {data, isLoading, isError} = useCourses({accountId})
+  const {sort, order, handleChangeSort} = useSortParams({
+    defaultSort: 'course_name',
+    defaultOrder: 'asc',
+  })
+  const {data, isLoading, isError} = useCourses({accountId, sort, order})
 
   return (
     <View as="div">
@@ -79,7 +90,14 @@ export const AccessibilityCoursesPage: React.FC = () => {
         {I18n.t('Accessibility report')}
       </Heading>
 
-      <CoursesContent isLoading={isLoading} isError={isError} data={data} />
+      <CoursesContent
+        isLoading={isLoading}
+        isError={isError}
+        data={data}
+        sort={sort}
+        order={order}
+        onChangeSort={handleChangeSort}
+      />
     </View>
   )
 }

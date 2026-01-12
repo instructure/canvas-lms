@@ -809,6 +809,32 @@ class AccountsController < ApplicationController
               "(SELECT #{EnrollmentTerm.best_unicode_collation_key("enrollment_terms.name")}
                 FROM #{EnrollmentTerm.quoted_table_name}
                 WHERE enrollment_terms.id = courses.enrollment_term_id)"
+            when "a11y_active_issue_count"
+              if @account.can_see_accessibility_tab?(@current_user)
+                workflow_state_part = "(SELECT
+                  CASE
+                    WHEN acs.workflow_state = 'active' THEN 1
+                    WHEN acs.workflow_state = 'in_progress' THEN 2
+                    WHEN acs.workflow_state = 'queued' THEN 3
+                    WHEN acs.workflow_state = 'failed' THEN 4
+                    ELSE 5
+                  END
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+                issue_count_part = "(SELECT COALESCE(acs.active_issue_count, 0)
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state = 'active'
+                  LIMIT 1)"
+
+                # Active courses always first (workflow_state ASC keeps priority 1 first)
+                # Framework appends direction (DESC/ASC) and id to the last column
+                "#{workflow_state_part}, #{issue_count_part}"
+              else
+                "id"
+              end
             else
               "id"
             end
