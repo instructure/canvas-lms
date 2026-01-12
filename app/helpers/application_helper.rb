@@ -1015,7 +1015,7 @@ module ApplicationHelper
   def default_csp_logging_directives(include_script_src: true)
     if include_default_source_csp_directives?
       # Use default-src as comprehensive fallback
-      directives = "default-src 'self' 'unsafe-inline' data: #{allow_list_domains};"
+      directives = "default-src 'self' 'unsafe-inline' data: blob: #{allow_list_domains};"
 
       if include_script_src
         directives << "script-src 'self' 'unsafe-inline' 'unsafe-eval' #{allow_list_domains};"
