@@ -1044,5 +1044,39 @@ describe Outcomes::ResultAnalytics do
       score = rollups.first.scores.first
       expect(score.submitted_at).to be_nil
     end
+
+    it "populates title from the rollup record" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        title: "Math Quiz",
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      score = rollups.first.scores.first
+      expect(score.title).to eq("Math Quiz")
+    end
+
+    it "handles nil title gracefully" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        title: nil,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      score = rollups.first.scores.first
+      expect(score.title).to be_nil
+    end
   end
 end
