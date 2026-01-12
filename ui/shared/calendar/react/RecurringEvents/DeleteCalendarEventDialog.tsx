@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import authenticity_token from '@canvas/authenticity-token'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
@@ -223,7 +223,7 @@ const DeleteCalendarEventDialog = ({
 }
 
 function renderDeleteCalendarEventDialog(element: Element, props: Props): void {
-  ReactDOM.render(<DeleteCalendarEventDialog {...props} />, element)
+  legacyRender(<DeleteCalendarEventDialog {...props} />, element)
 }
 
 export {DeleteCalendarEventDialog, renderDeleteCalendarEventDialog}

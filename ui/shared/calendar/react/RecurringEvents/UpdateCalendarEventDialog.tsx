@@ -17,7 +17,8 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import ReactDOM from 'react-dom'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Button} from '@instructure/ui-buttons'
@@ -112,16 +113,18 @@ const renderUpdateCalendarEventDialog = (selectedEvent: CalendarEvent) => {
   }
 
   const whichPromise = new Promise(resolve => {
-    ReactDOM.render(
+    let root: Root | null = null
+
+    root = render(
       <UpdateCalendarEventDialog
         event={selectedEvent}
         isOpen={true}
         onCancel={() => {
-          ReactDOM.unmountComponentAtNode(modalContainer as HTMLElement)
+          root?.unmount()
           resolve(undefined)
         }}
         onUpdate={which => {
-          ReactDOM.unmountComponentAtNode(modalContainer as HTMLElement)
+          root?.unmount()
           resolve(which)
         }}
       />,

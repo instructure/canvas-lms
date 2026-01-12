@@ -17,7 +17,8 @@
  */
 
 import {act, fireEvent, screen, waitFor} from '@testing-library/react'
-import {createRoot, Root} from 'react-dom/client'
+import {render} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import WikiPage from '../../../../shared/wiki/backbone/models/WikiPage'
 import renderWikiPageIndexEditModal, {WikiPageIndexEditModalProps} from '../WikiPageIndexEditModal'
 import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
@@ -45,7 +46,7 @@ describe('renderWikiPageTitle', () => {
   beforeEach(() => {
     container = document.createElement('div')
     document.body.appendChild(container)
-    root = createRoot(container)
+    root = render(<></>, container)
   })
 
   afterEach(() => {
