@@ -282,7 +282,7 @@ describe "course pace page" do
       click_remove_pace_button
       click_remove_pace_modal_cancel
 
-      expect(element_exists?(remove_pace_modal_selector(:section))).to be_falsey
+      wait_for_no_such_element { f(remove_pace_modal_selector(:section)) }
       expect(publish_status.text).to eq("No pending changes")
     end
 
@@ -297,7 +297,7 @@ describe "course pace page" do
       click_remove_pace_button
       click_remove_pace_modal_x
 
-      expect(element_exists?(remove_pace_modal_selector(:student))).to be_falsey
+      wait_for_no_such_element { f(remove_pace_modal_selector(:student)) }
       expect(publish_status.text).to eq("No pending changes")
     end
 

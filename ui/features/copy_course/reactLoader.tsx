@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import App from './react/App'
 
@@ -39,7 +39,7 @@ ready(() => {
       throw Error('Account id is not provided!')
     }
 
-    ReactDOM.createRoot(root).render(
+    render(
       <App
         courseId={courseId}
         rootAccountId={rootAccountId}
@@ -48,6 +48,7 @@ ready(() => {
         courseTimeZone={courseTimeZone}
         canImportAsNewQuizzes={canImportAsNewQuizzes}
       />,
+      root,
     )
   }
 })

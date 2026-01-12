@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Provider} from 'react-redux'
 import ready from '@instructure/ready'
 
@@ -35,6 +35,5 @@ ready(() => {
   if (!container) {
     throw new Error('Failed to find the root element')
   }
-  const root = createRoot(container)
-  root.render(<CoursePage />)
+  render(<CoursePage />, container)
 })
