@@ -19,22 +19,28 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import ManageThreadedRepliesAlert from '../ManageThreadedRepliesAlert'
 import {useManageThreadedRepliesStore} from '../../../hooks/useManageThreadedRepliesStore'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-// Mock ENV global variable
-declare const ENV: {AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS?: string}
 vi.mock('../../../hooks/useManageThreadedRepliesStore', () => ({
   useManageThreadedRepliesStore: vi.fn(),
 }))
 
-const mockUseManageThreadedRepliesStore = useManageThreadedRepliesStore as unknown as ReturnType<typeof vi.fn>
+const mockUseManageThreadedRepliesStore = useManageThreadedRepliesStore as unknown as ReturnType<
+  typeof vi.fn
+>
 
 describe('ManageThreadedRepliesAlert', () => {
   beforeEach(() => {
+    fakeENV.setup()
     vi.clearAllMocks()
   })
 
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('does not render when AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS is 0', () => {
-    ENV.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS = '0'
+    window.ENV.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS = '0'
     mockUseManageThreadedRepliesStore.mockReturnValue(false)
 
     render(<ManageThreadedRepliesAlert onOpen={vi.fn()} />)
@@ -43,13 +49,30 @@ describe('ManageThreadedRepliesAlert', () => {
   })
 
   it('renders correctly when AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS is greater than 0 and showAlert is true', () => {
-    const count = Math.floor(Math.random() * 1000) + 1
-    ENV.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS = count.toString()
+    window.ENV.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS = '5'
     mockUseManageThreadedRepliesStore.mockReturnValue(true)
 
     render(<ManageThreadedRepliesAlert onOpen={vi.fn()} />)
 
-    expect(screen.getByText(`${count} ${count > 1 ? 'decisions' : 'decision'}`)).toBeInTheDocument()
+    expect(screen.getByText('5 decisions')).toBeInTheDocument()
     expect(screen.getByTestId('manage-threaded-discussions')).toBeInTheDocument()
+  })
+
+  it('renders singular "decision" when count is 1', () => {
+    window.ENV.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS = '1'
+    mockUseManageThreadedRepliesStore.mockReturnValue(true)
+
+    render(<ManageThreadedRepliesAlert onOpen={vi.fn()} />)
+
+    expect(screen.getByText('1 decision')).toBeInTheDocument()
+  })
+
+  it('does not render when showAlert is false', () => {
+    window.ENV.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS = '5'
+    mockUseManageThreadedRepliesStore.mockReturnValue(false)
+
+    render(<ManageThreadedRepliesAlert onOpen={vi.fn()} />)
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 })
