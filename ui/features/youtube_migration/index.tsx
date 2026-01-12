@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
@@ -41,8 +41,7 @@ ready(() => {
   }
 
   if (container) {
-    const root = createRoot(container)
-    root.render(
+    render(
       <ErrorBoundary
         errorComponent={
           <GenericErrorPage
@@ -55,6 +54,7 @@ ready(() => {
           <App courseId={ENV.COURSE_ID} />
         </QueryClientProvider>
       </ErrorBoundary>,
+      container,
     )
   }
 })

@@ -28,7 +28,8 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
-import {createRoot} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {ChooseEditorModalProps, EditorPrefEnv, EditorTypes} from './types'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv'
@@ -197,17 +198,17 @@ const renderChooseEditorModal = (e: React.SyntheticEvent, createPageAction: () =
   }
   const editorFeature = ENV.EDITOR_FEATURE
 
-  const rootElement = document.querySelector('#choose-editor-mount-point')
+  const rootElement = document.querySelector('#choose-editor-mount-point') as HTMLElement
   if (rootElement) {
-    const root = createRoot(rootElement)
+    let root: Root | null = null
     const editorModal = (
       <ChooseEditorModal
         editorFeature={editorFeature}
         createPageAction={createPageAction}
-        onClose={() => root.unmount()}
+        onClose={() => root?.unmount()}
       />
     )
-    root.render(editorModal)
+    root = render(editorModal, rootElement)
     return editorModal
   }
 }

@@ -35,7 +35,8 @@ import FileRenameForm from '../FilesHeader/UploadButton/FileRenameForm'
 import {sendMoveRequests} from './MoveModal/utils'
 import {queryClient} from '@canvas/query'
 import $ from 'jquery'
-import {createRoot, Root} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import DragFeedback from '@canvas/files/react/components/DragFeedback'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import {getFilesEnv} from '../../../utils/filesEnvUtils'
@@ -96,11 +97,15 @@ const TableBody: React.FC<TableBodyProps> = ({
       dragHolderRef.current = $('<div>').appendTo(document.body)
     }
     if (!dragRootRef.current) {
-      dragRootRef.current = createRoot(dragHolderRef.current[0])
+      dragRootRef.current = render(
+        <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={itemsToDrag()} />,
+        dragHolderRef.current[0],
+      )
+    } else {
+      dragRootRef.current.render(
+        <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={itemsToDrag()} />,
+      )
     }
-    dragRootRef.current.render(
-      <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={itemsToDrag()} />,
-    )
   }
 
   const removeDragFeedback = () => {

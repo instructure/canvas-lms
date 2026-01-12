@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 // TODO: use URL() in browser to parse URL
 // eslint-disable-next-line import/no-nodejs-modules
 import {parse} from 'url'
@@ -46,7 +46,6 @@ const isStandalone = () => {
 
 ready(() => {
   const container = document.getElementById('player_container')
-  const root = createRoot(container!)
   // get the media_id from something like
   //  `http://canvas.example.com/media_objects_iframe/m-48jGWTHdvcV5YPdZ9CKsqbtRzu1jURgu?type=video`
   // or
@@ -128,7 +127,7 @@ ready(() => {
 
   const aria_label = !media_object.title ? undefined : media_object.title
   if (ENV.FEATURES?.consolidated_media_player_iframe) {
-    root.render(
+    render(
       <CanvasStudioPlayer
         media_id={media_id || ''}
         media_sources={href_source || media_object.media_sources}
@@ -158,9 +157,10 @@ ready(() => {
             : []
         }
       />,
+      container,
     )
   } else {
-    root.render(
+    render(
       <CanvasMediaPlayer
         media_id={media_id || ''}
         media_sources={href_source || media_object.media_sources}
@@ -170,6 +170,7 @@ ready(() => {
         is_attachment={is_attachment}
         attachment_id={attachment_id}
       />,
+      container,
     )
   }
 })
