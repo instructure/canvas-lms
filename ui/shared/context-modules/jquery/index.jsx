@@ -2183,6 +2183,25 @@ function initContextModuleItems(moduleId) {
     initNewItemMoveHandler($(this))
   })
 
+  const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
+  $module.find('.external_url_link').each(function () {
+    const $link = $(this)
+    const isNewTab = $link.attr('target') === '_blank'
+
+    if (seamlessRedirectEnabled && isNewTab) {
+      let url = $link.attr('data-item-href')
+      if (url) {
+        url += url.includes('?') ? '&follow_redirect=1' : '?follow_redirect=1'
+        $link.attr('href', url)
+      }
+    } else {
+      $link.click(function (event) {
+        Helper.externalUrlLinkClick(event, $(this))
+      })
+    }
+  })
+
   if (ENV.FEATURE_MODULES_PERF) {
     addShowAllOrLess(moduleId)
   }
@@ -2316,8 +2335,23 @@ function initContextModules() {
   // I cannot find anywhere that these classname is added to the modules dom
   // Skipping this when lazy loading items
   if (!ENV.FEATURE_MODULES_PERF) {
-    $('.external_url_link').click(function (event) {
-      Helper.externalUrlLinkClick(event, $(this))
+    const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
+    $('.external_url_link').each(function () {
+      const $link = $(this)
+      const isNewTab = $link.attr('target') === '_blank'
+
+      if (seamlessRedirectEnabled && isNewTab) {
+        let url = $link.attr('data-item-href')
+        if (url) {
+          url += url.includes('?') ? '&follow_redirect=1' : '?follow_redirect=1'
+          $link.attr('href', url)
+        }
+      } else {
+        $link.click(function (event) {
+          Helper.externalUrlLinkClick(event, $(this))
+        })
+      }
     })
 
     renderDatetimeField($('.datetime_field'))

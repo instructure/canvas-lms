@@ -26,7 +26,8 @@ Helper.setWindowLocation = function (url) {
 
 Helper.externalUrlLinkClick = function (event, $elt) {
   event.preventDefault()
-  this.setWindowLocation(sanitizeUrl($elt.attr('data-item-href')))
+  const url = $elt.attr('data-item-href')
+  this.setWindowLocation(sanitizeUrl(url))
 }.bind(Helper)
 
 export default Helper

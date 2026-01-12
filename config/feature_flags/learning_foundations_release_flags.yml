@@ -186,6 +186,20 @@ modules_page_rewrite_student_view:
     If enabled, the modules page will use the new modules page rewrite on student view.
   applies_to: Course
 
+module_external_url_seamless_redirect:
+  state: hidden
+  display_name: Seamless External URL Redirect for Modules
+  description: |-
+    When enabled, external URL module items set to "Load in New Tab" will open
+    seamlessly in a new tab. The Canvas intermediate page (which tracks progression)
+    will automatically redirect to the external URL using native browser navigation.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed
+    ci:
+      state: allowed
+
 create_external_apps_side_tray_overrides:
   state: hidden
   display_name: Enable External Apps Side Tray
