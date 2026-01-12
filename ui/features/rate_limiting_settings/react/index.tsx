@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import RateLimitingSettingsApp from './RateLimitingSettingsApp'
 
 ready(() => {
   const container = document.getElementById('rate_limiting_settings_mount')
   if (container) {
-    createRoot(container).render(<RateLimitingSettingsApp />)
+    render(<RateLimitingSettingsApp />, container)
   }
 })

@@ -19,15 +19,14 @@
 import React from 'react'
 import TermsOfServiceModal from './react/TermsOfServiceModal'
 import ready from '@instructure/ready'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 const renderTermsModal = (
   container: Element | null,
   opts = {preview: false, footerLink: false},
 ) => {
   if (container instanceof HTMLElement) {
-    const root = createRoot(container)
-    root.render(<TermsOfServiceModal preview={opts.preview} footerLink={opts.footerLink} />)
+    render(<TermsOfServiceModal preview={opts.preview} footerLink={opts.footerLink} />, container)
   }
 }
 

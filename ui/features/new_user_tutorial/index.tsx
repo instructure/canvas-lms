@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import axios from '@canvas/axios'
 import NewUserTutorialToggleButton from './react/NewUserTutorialToggleButton'
 import TutorialTray from './react/trays/TutorialTray'
@@ -55,7 +55,7 @@ const initializeNewUserTutorials = () => {
       const renderTray = () => {
         const Tray = trayObj.component
 
-        ReactDOM.render(
+        legacyRender(
           <TutorialTray store={store} returnFocusToFunc={getReturnFocus} label={trayObj.label}>
             <Tray />
           </TutorialTray>,
@@ -63,7 +63,7 @@ const initializeNewUserTutorials = () => {
         )
       }
 
-      ReactDOM.render(
+      legacyRender(
         <NewUserTutorialToggleButton
           ref={(c: NewUserTutorialToggleButton | null) => {
             onPageToggleButton = c
@@ -71,8 +71,8 @@ const initializeNewUserTutorials = () => {
           store={store}
         />,
         document.querySelector('.TutorialToggleHolder'),
-        () => renderTray(),
       )
+      renderTray()
     })
   }
 }

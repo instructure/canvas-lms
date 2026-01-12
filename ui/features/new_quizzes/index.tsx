@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import {NewQuizzesApp} from './app/NewQuizzesApp'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
@@ -42,6 +42,5 @@ const router = createBrowserRouter([
 
 // Start the initialization process
 ready(() => {
-  const root = createRoot(document.getElementById(NEW_QUIZZES_CONTAINER_ID)!)
-  root.render(<RouterProvider router={router} />)
+  render(<RouterProvider router={router} />, document.getElementById(NEW_QUIZZES_CONTAINER_ID))
 })

@@ -22,7 +22,7 @@ import {
 } from '@canvas/student_view_peer_reviews/react/StudentViewPeerReviews'
 import ready from '@instructure/ready'
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import {render} from '@canvas/react'
 import {getAssignments, formatGraphqlModuleNodes} from './utils/helper'
 
 ready(async () => {
@@ -40,9 +40,9 @@ ready(async () => {
   formattedAssignments.forEach(([_key, data]) => {
     Object.entries(data).forEach(([_, value]) => {
       if (value.container) {
-        const root = ReactDOM.createRoot(value.container)
-        root.render(
+        render(
           <StudentViewPeerReviews assignment={value.assignment as AssignmentPeerReview} />,
+          value.container,
         )
       }
     })
