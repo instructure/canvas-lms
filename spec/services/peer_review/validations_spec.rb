@@ -723,6 +723,35 @@ RSpec.describe PeerReview::Validations do
     end
   end
 
+  describe "#validate_course_exists" do
+    let(:mock_course) { double("course") }
+
+    it "does not raise an error when course is present" do
+      expect { service.validate_course_exists(mock_course) }.not_to raise_error
+    end
+
+    it "raises an error when course is nil" do
+      expect { service.validate_course_exists(nil) }.to raise_error(
+        PeerReview::CourseNotFoundError,
+        "Course does not exist"
+      )
+    end
+
+    it "raises an error when course is false" do
+      expect { service.validate_course_exists(false) }.to raise_error(
+        PeerReview::CourseNotFoundError,
+        "Course does not exist"
+      )
+    end
+
+    it "raises an error when course is empty string" do
+      expect { service.validate_course_exists("") }.to raise_error(
+        PeerReview::CourseNotFoundError,
+        "Course does not exist"
+      )
+    end
+  end
+
   describe "#validate_student_ids_required" do
     it "does not raise an error when student_ids is a non-empty array" do
       expect { service.validate_student_ids_required([1, 2, 3]) }.not_to raise_error
@@ -757,6 +786,37 @@ RSpec.describe PeerReview::Validations do
       expect { service.validate_student_ids_required("   ") }.to raise_error(
         PeerReview::StudentIdsRequiredError,
         "Student ids are required"
+      )
+    end
+  end
+
+  describe "#validate_student_ids_in_course" do
+    it "does not raise an error when student_ids is present" do
+      expect { service.validate_student_ids_in_course([1, 2, 3]) }.not_to raise_error
+    end
+
+    it "does not raise an error when student_ids is a non-empty array" do
+      expect { service.validate_student_ids_in_course([123]) }.not_to raise_error
+    end
+
+    it "raises an error when student_ids is nil" do
+      expect { service.validate_student_ids_in_course(nil) }.to raise_error(
+        PeerReview::StudentIdsNotInCourseError,
+        "Student ids are not in course"
+      )
+    end
+
+    it "raises an error when student_ids is empty array" do
+      expect { service.validate_student_ids_in_course([]) }.to raise_error(
+        PeerReview::StudentIdsNotInCourseError,
+        "Student ids are not in course"
+      )
+    end
+
+    it "raises an error when student_ids is empty string" do
+      expect { service.validate_student_ids_in_course("") }.to raise_error(
+        PeerReview::StudentIdsNotInCourseError,
+        "Student ids are not in course"
       )
     end
   end
@@ -1042,6 +1102,8 @@ RSpec.describe PeerReview::Validations do
         "parent_override",
         unlock_at: 1.day.from_now,
         unlock_at_overridden: true,
+        due_at: nil,
+        due_at_overridden: false,
         lock_at: 2.weeks.from_now,
         lock_at_overridden: true,
         assignment: parent_assignment
@@ -1119,6 +1181,8 @@ RSpec.describe PeerReview::Validations do
           "parent_override",
           unlock_at: nil,
           unlock_at_overridden: false,
+          due_at: nil,
+          due_at_overridden: false,
           lock_at: 2.weeks.from_now,
           lock_at_overridden: true,
           assignment: parent_assignment_no_unlock
@@ -1151,6 +1215,8 @@ RSpec.describe PeerReview::Validations do
           "parent_override",
           unlock_at: 1.day.from_now,
           unlock_at_overridden: true,
+          due_at: nil,
+          due_at_overridden: false,
           lock_at: nil,
           lock_at_overridden: false,
           assignment: parent_assignment_no_lock
@@ -1234,6 +1300,8 @@ RSpec.describe PeerReview::Validations do
           "parent_override",
           unlock_at: base_time + 1.day,
           unlock_at_overridden: true,
+          due_at: nil,
+          due_at_overridden: false,
           lock_at: base_time + 2.weeks,
           lock_at_overridden: true,
           assignment: parent_assignment
@@ -1417,6 +1485,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: base_time,
             unlock_at_overridden: true,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: base_time + 2.weeks,
             lock_at_overridden: true,
             assignment: parent_assignment
@@ -1484,6 +1554,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: base_time,
             unlock_at_overridden: true,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: base_time + 2.weeks,
             lock_at_overridden: true,
             assignment: parent_assignment
@@ -1513,6 +1585,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: base_time + 1.week,
             unlock_at_overridden: true,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: base_time + 3.weeks,
             lock_at_overridden: true,
             assignment: parent_assignment
@@ -1535,6 +1609,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: base_time,
             unlock_at_overridden: true,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: base_time + 2.weeks,
             lock_at_overridden: true,
             assignment: parent_assignment
@@ -1589,6 +1665,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: base_time,
             unlock_at_overridden: true,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: parent_lock_time,
             lock_at_overridden: true,
             assignment: parent_assignment
@@ -1611,6 +1689,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: base_time,
             unlock_at_overridden: true,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: base_time + 1.week,
             lock_at_overridden: true,
             assignment: parent_assignment
@@ -1657,6 +1737,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: utc_time,
             unlock_at_overridden: true,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: utc_time + 2.weeks,
             lock_at_overridden: true,
             assignment: parent_assignment
@@ -1689,6 +1771,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: 2.days.from_now,
             unlock_at_overridden: false,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: 2.weeks.from_now,
             lock_at_overridden: true,
             assignment: parent_assignment_with_unlock
@@ -1751,6 +1835,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: 1.day.from_now,
             unlock_at_overridden: true,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: 2.weeks.from_now,
             lock_at_overridden: false,
             assignment: parent_assignment_with_lock
@@ -1813,6 +1899,8 @@ RSpec.describe PeerReview::Validations do
             "parent_override",
             unlock_at: 2.days.from_now,
             unlock_at_overridden: false,
+            due_at: nil,
+            due_at_overridden: false,
             lock_at: 2.weeks.from_now,
             lock_at_overridden: false,
             assignment: parent_assignment_with_both_dates
@@ -1855,6 +1943,8 @@ RSpec.describe PeerReview::Validations do
           "parent_override",
           unlock_at: base_time,
           unlock_at_overridden: true,
+          due_at: nil,
+          due_at_overridden: false,
           lock_at: base_time + 2.weeks,
           lock_at_overridden: true,
           assignment: parent_assignment
@@ -2000,6 +2090,467 @@ RSpec.describe PeerReview::Validations do
             PeerReview::InvalidDatesError,
             /Peer review override lock date cannot be after parent override lock date/
           )
+        end
+      end
+    end
+
+    context "when parent due_at is overridden" do
+      let(:base_time) { Time.zone.parse("2025-01-15 14:30:00") }
+      let(:parent_assignment_with_due_at) do
+        assignment_model(
+          course:,
+          title: "Parent Assignment with due date",
+          points_possible: 10,
+          grading_type: "points",
+          unlock_at: base_time + 1.day,
+          due_at: base_time + 1.week,
+          lock_at: base_time + 2.weeks,
+          peer_review_count: 2,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+      end
+
+      let(:service_with_due_at) { test_service_class.new(parent_assignment: parent_assignment_with_due_at) }
+
+      let(:parent_override_with_due_at) do
+        double(
+          "parent_override",
+          unlock_at: base_time + 1.day,
+          unlock_at_overridden: true,
+          due_at: base_time + 1.week,
+          due_at_overridden: true,
+          lock_at: base_time + 2.weeks,
+          lock_at_overridden: true,
+          assignment: parent_assignment_with_due_at
+        )
+      end
+
+      it "does not raise an error when peer review dates are valid with parent override due_at" do
+        peer_review_override = {
+          unlock_at: base_time + 10.days,
+          due_at: base_time + 12.days,
+          lock_at: base_time + 13.days
+        }
+        expect do
+          service_with_due_at.validate_override_dates_against_parent_override(peer_review_override,
+                                                                              parent_override_with_due_at)
+        end.not_to raise_error
+      end
+
+      it "does not raise an error when child unlock_at equals parent override due_at" do
+        peer_review_override = {
+          unlock_at: base_time + 1.week,
+          due_at: base_time + 12.days,
+          lock_at: base_time + 13.days
+        }
+        expect do
+          service_with_due_at.validate_override_dates_against_parent_override(peer_review_override,
+                                                                              parent_override_with_due_at)
+        end.not_to raise_error
+      end
+
+      it "does not raise an error when parent override unlock_at equals due_at" do
+        parent_override_equal_dates = double(
+          "parent_override",
+          unlock_at: base_time + 1.day,
+          unlock_at_overridden: true,
+          due_at: base_time + 1.day,
+          due_at_overridden: true,
+          lock_at: base_time + 2.weeks,
+          lock_at_overridden: true,
+          assignment: parent_assignment_with_due_at
+        )
+        peer_review_override = {
+          unlock_at: base_time + 2.days,
+          due_at: base_time + 3.days,
+          lock_at: base_time + 4.days
+        }
+        expect do
+          service_with_due_at.validate_override_dates_against_parent_override(peer_review_override,
+                                                                              parent_override_equal_dates)
+        end.not_to raise_error
+      end
+
+      it "raises an error when child override unlock_at is before parent override due_at" do
+        peer_review_override = {
+          unlock_at: base_time + 2.days,
+          due_at: base_time + 12.days,
+          lock_at: base_time + 13.days
+        }
+        expect do
+          service_with_due_at.validate_override_dates_against_parent_override(peer_review_override,
+                                                                              parent_override_with_due_at)
+        end.to raise_error(
+          PeerReview::InvalidDatesError,
+          "Peer review override unlock date cannot be before parent override due date"
+        )
+      end
+
+      it "does not validate against parent due_at when due_at_overridden is false" do
+        parent_override_no_due_at = double(
+          "parent_override",
+          unlock_at: base_time + 1.day,
+          unlock_at_overridden: true,
+          due_at: base_time + 1.week,
+          due_at_overridden: false,
+          lock_at: base_time + 2.weeks,
+          lock_at_overridden: true,
+          assignment: parent_assignment_with_due_at
+        )
+        peer_review_override = {
+          unlock_at: base_time + 2.days,
+          due_at: base_time + 3.days,
+          lock_at: base_time + 4.days
+        }
+        expect do
+          service_with_due_at.validate_override_dates_against_parent_override(peer_review_override,
+                                                                              parent_override_no_due_at)
+        end.not_to raise_error
+      end
+    end
+  end
+
+  describe "#validate_peer_review_dates_against_parent_assignment" do
+    let(:base_time) { Time.zone.parse("2025-01-15 14:30:00") }
+    let(:parent_assignment_with_due_at) do
+      assignment_model(
+        course:,
+        title: "Parent Assignment with due date",
+        points_possible: 10,
+        grading_type: "points",
+        unlock_at: base_time + 1.day,
+        due_at: base_time + 1.week,
+        lock_at: base_time + 2.weeks,
+        peer_review_count: 2,
+        peer_reviews: true,
+        submission_types: "online_text_entry"
+      )
+    end
+
+    let(:service_with_due_at) { test_service_class.new(parent_assignment: parent_assignment_with_due_at) }
+
+    context "when parent due_at is present" do
+      context "with valid date combinations" do
+        it "does not raise an error when parent due_at is between unlock_at and child unlock_at" do
+          peer_review_dates = {
+            unlock_at: base_time + 10.days,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.not_to raise_error
+        end
+
+        it "does not raise an error when child unlock_at equals parent due_at" do
+          peer_review_dates = {
+            unlock_at: base_time + 1.week,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.not_to raise_error
+        end
+
+        it "does not raise an error when parent unlock_at is 1 second before parent due_at" do
+          parent_assignment_with_due_at.update!(
+            unlock_at: base_time + 1.day,
+            due_at: base_time + 1.day + 1.second
+          )
+          peer_review_dates = {
+            unlock_at: base_time + 10.days,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.not_to raise_error
+        end
+
+        it "does not raise an error when all peer review dates are nil" do
+          peer_review_dates = {
+            unlock_at: nil,
+            due_at: nil,
+            lock_at: nil
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.not_to raise_error
+        end
+
+        it "does not raise an error when parent due_at is nil" do
+          parent_assignment_with_due_at.update!(due_at: nil)
+          peer_review_dates = {
+            unlock_at: base_time + 2.days,
+            due_at: base_time + 3.days,
+            lock_at: base_time + 4.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.not_to raise_error
+        end
+      end
+
+      context "with invalid date combinations" do
+        it "does not raise an error when parent unlock_at equals parent due_at" do
+          # Use a mock to avoid ActiveRecord validations
+          parent_with_equal_dates = double(
+            "parent_assignment",
+            unlock_at: base_time + 1.day,
+            due_at: base_time + 1.day,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: base_time + 2.days,
+            due_at: base_time + 3.days,
+            lock_at: base_time + 4.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_with_equal_dates)
+          end.not_to raise_error
+        end
+
+        it "raises an error when parent unlock_at is after parent due_at" do
+          # Use a mock to avoid ActiveRecord validations
+          parent_with_invalid_dates = double(
+            "parent_assignment",
+            unlock_at: base_time + 1.week,
+            due_at: base_time + 1.day,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: base_time + 10.days,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_with_invalid_dates)
+          end.to raise_error(
+            PeerReview::InvalidDatesError,
+            "Assignment due date cannot be before assignment unlock date"
+          )
+        end
+
+        it "raises an error when child unlock_at is before parent due_at" do
+          peer_review_dates = {
+            unlock_at: base_time + 2.days,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.to raise_error(
+            PeerReview::InvalidDatesError,
+            "Peer review unlock date cannot be before assignment due date"
+          )
+        end
+
+        it "raises an error when child due_at is before parent due_at (with nil unlock_at)" do
+          # This scenario can only occur when child unlock_at is nil
+          # (otherwise parent_due_at <= child_unlock_at < child_due_at makes it impossible)
+          parent_with_late_due = double(
+            "parent_assignment",
+            unlock_at: base_time + 1.day,
+            due_at: base_time + 15.days,
+            lock_at: base_time + 3.weeks
+          )
+          peer_review_dates = {
+            unlock_at: nil,
+            due_at: base_time + 10.days,
+            lock_at: base_time + 20.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_with_late_due)
+          end.to raise_error(
+            PeerReview::InvalidDatesError,
+            "Peer review due date cannot be before assignment due date"
+          )
+        end
+
+        it "raises parent unlock/due validation error before child validation errors" do
+          # Use a mock to avoid ActiveRecord validations
+          parent_with_invalid_dates = double(
+            "parent_assignment",
+            unlock_at: base_time + 1.week,
+            due_at: base_time + 1.day,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: base_time + 2.days,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_with_invalid_dates)
+          end.to raise_error(
+            PeerReview::InvalidDatesError,
+            "Assignment due date cannot be before assignment unlock date"
+          )
+        end
+      end
+
+      context "with string date values" do
+        it "handles string dates correctly with parent due_at validation" do
+          parent_assignment_with_due_at.update!(
+            unlock_at: base_time + 1.day,
+            due_at: base_time + 1.week,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: (base_time + 10.days).iso8601,
+            due_at: (base_time + 12.days).iso8601,
+            lock_at: (base_time + 13.days).iso8601
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.not_to raise_error
+        end
+
+        it "raises error when string date violates parent due_at constraint" do
+          parent_assignment_with_due_at.update!(
+            unlock_at: base_time + 1.day,
+            due_at: base_time + 1.week,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: (base_time + 2.days).iso8601,
+            due_at: (base_time + 3.days).iso8601,
+            lock_at: (base_time + 4.days).iso8601
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.to raise_error(
+            PeerReview::InvalidDatesError,
+            "Peer review unlock date cannot be before assignment due date"
+          )
+        end
+      end
+
+      context "time precision validation with parent due_at" do
+        it "allows child unlock_at at exact same time as parent due_at" do
+          parent_assignment_with_due_at.update!(
+            unlock_at: base_time,
+            due_at: base_time + 1.week,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: base_time + 1.week,
+            due_at: base_time + 10.days,
+            lock_at: base_time + 12.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.not_to raise_error
+        end
+
+        it "raises error when child unlock_at is 1 second before parent due_at" do
+          parent_assignment_with_due_at.update!(
+            unlock_at: base_time,
+            due_at: base_time + 1.week,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: base_time + 1.week - 1.second,
+            due_at: base_time + 10.days,
+            lock_at: base_time + 12.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.to raise_error(
+            PeerReview::InvalidDatesError,
+            "Peer review unlock date cannot be before assignment due date"
+          )
+        end
+
+        it "raises error when parent unlock_at is 1 second before parent due_at threshold" do
+          parent_assignment_with_due_at.update!(
+            unlock_at: base_time + 1.week - 1.second,
+            due_at: base_time + 1.week,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: base_time + 10.days,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.not_to raise_error
+        end
+      end
+
+      context "error message internationalization" do
+        it "calls I18n.t for parent unlock/due validation error" do
+          # Use a mock to avoid ActiveRecord validations
+          parent_with_invalid_dates = double(
+            "parent_assignment",
+            unlock_at: base_time + 1.week,
+            due_at: base_time + 1.day,
+            lock_at: base_time + 2.weeks
+          )
+          peer_review_dates = {
+            unlock_at: base_time + 10.days,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect(I18n).to receive(:t).with("Assignment due date cannot be before assignment unlock date").and_call_original
+
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_with_invalid_dates)
+          end.to raise_error(PeerReview::InvalidDatesError)
+        end
+
+        it "calls I18n.t for child unlock before parent due error" do
+          peer_review_dates = {
+            unlock_at: base_time + 2.days,
+            due_at: base_time + 12.days,
+            lock_at: base_time + 13.days
+          }
+          expect(I18n).to receive(:t).with("Peer review unlock date cannot be before assignment due date").and_call_original
+
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_assignment_with_due_at)
+          end.to raise_error(PeerReview::InvalidDatesError)
+        end
+
+        it "calls I18n.t for child due before parent due error" do
+          # This scenario can only occur when child unlock_at is nil
+          parent_with_late_due = double(
+            "parent_assignment",
+            unlock_at: base_time + 1.day,
+            due_at: base_time + 15.days,
+            lock_at: base_time + 3.weeks
+          )
+          peer_review_dates = {
+            unlock_at: nil,
+            due_at: base_time + 10.days,
+            lock_at: base_time + 20.days
+          }
+          expect(I18n).to receive(:t).with("Peer review due date cannot be before assignment due date").and_call_original
+
+          expect do
+            service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
+                                                                                     parent_with_late_due)
+          end.to raise_error(PeerReview::InvalidDatesError)
         end
       end
     end

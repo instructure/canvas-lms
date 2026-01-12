@@ -50,9 +50,9 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
   let(:updated_points_possible) { 15 }
   let(:updated_grading_type) { "letter_grade" }
-  let(:updated_due_at) { 3.days.from_now }
-  let(:updated_unlock_at) { 2.days.from_now }
-  let(:updated_lock_at) { 1.week.from_now }
+  let(:updated_due_at) { 10.days.from_now }
+  let(:updated_unlock_at) { 1.week.from_now }
+  let(:updated_lock_at) { 12.days.from_now }
 
   let(:service) do
     described_class.new(
@@ -65,9 +65,9 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
     )
   end
 
-  let(:service_with_all_attributes_due_at) { 5.days.from_now }
-  let(:service_with_all_attributes_unlock_at) { 4.days.from_now }
-  let(:service_with_all_attributes_lock_at) { 10.days.from_now }
+  let(:service_with_all_attributes_due_at) { 10.days.from_now }
+  let(:service_with_all_attributes_unlock_at) { 8.days.from_now }
+  let(:service_with_all_attributes_lock_at) { 12.days.from_now }
 
   let(:service_with_all_attributes) do
     described_class.new(
@@ -359,9 +359,9 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         it "updates peer review when dates are within parent boundaries" do
           service = described_class.new(
             parent_assignment: parent_with_boundaries,
-            unlock_at: 3.days.from_now,
-            due_at: 1.week.from_now,
-            lock_at: 10.days.from_now
+            unlock_at: 1.week.from_now,
+            due_at: 10.days.from_now,
+            lock_at: 12.days.from_now
           )
 
           expect { service.call }.not_to raise_error
@@ -370,8 +370,8 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         it "updates peer review when dates are at exact parent boundaries" do
           service = described_class.new(
             parent_assignment: parent_with_boundaries,
-            unlock_at: parent_with_boundaries.unlock_at,
-            due_at: 1.week.from_now,
+            unlock_at: parent_with_boundaries.due_at,
+            due_at: 10.days.from_now,
             lock_at: parent_with_boundaries.lock_at
           )
 
@@ -395,7 +395,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       end
 
       context "with invalid dates" do
-        it "raises InvalidDatesError when unlock_at is before parent unlock_at" do
+        it "raises InvalidDatesError when unlock_at is before parent due_at" do
           service = described_class.new(
             parent_assignment: parent_with_boundaries,
             unlock_at: 1.day.from_now
@@ -403,7 +403,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review unlock date cannot be before assignment unlock date/
+            /Peer review unlock date cannot be before assignment due date/
           )
         end
 
@@ -443,7 +443,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
           )
         end
 
-        it "raises InvalidDatesError when due_at is before unlock_at" do
+        it "raises InvalidDatesError when unlock_at is after due_at" do
           service = described_class.new(
             parent_assignment: parent_with_boundaries,
             unlock_at: 1.week.from_now,
