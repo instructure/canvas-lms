@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {createRoot, type Root} from 'react-dom/client'
+import {render} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import SyllabusRevisionsTray from './react/SyllabusRevisionsTray'
 
 let trayContainer: HTMLDivElement | null = null
@@ -62,7 +63,10 @@ export function initSyllabusRevisionsTray(courseId: string, button: HTMLButtonEl
   }
 
   if (!trayRoot) {
-    trayRoot = createRoot(trayContainer)
+    trayRoot = render(
+      <SyllabusRevisionsTray courseId={courseId} open={isOpen} onDismiss={handleDismiss} />,
+      trayContainer,
+    )
   }
 
   courseIdState = courseId

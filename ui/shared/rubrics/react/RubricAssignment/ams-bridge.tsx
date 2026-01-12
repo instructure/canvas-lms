@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {Alert} from '@instructure/ui-alerts'
@@ -119,24 +120,44 @@ export type RubricController = {
  * @returns Controller object with render and unmount methods
  */
 export function createRubricController(container: HTMLElement): RubricController {
-  let root: ReactDOM.Root | null = ReactDOM.createRoot(container)
+  let root: Root | null = render(
+    <QueryClientProvider client={queryClient}>
+      <CanvasRubricBridge
+        assignmentId=""
+        assignmentPointsPossible={0}
+        onRubricChange={() => {}}
+        onRubricLoaded={() => {}}
+      />
+    </QueryClientProvider>,
+    container,
+  )
 
   return {
     render: (config: AmsRubricConfig) => {
       if (!root) {
-        root = ReactDOM.createRoot(container)
+        root = render(
+          <QueryClientProvider client={queryClient}>
+            <CanvasRubricBridge
+              assignmentId={config.assignmentId}
+              assignmentPointsPossible={config.assignmentPointsPossible}
+              onRubricChange={config.onRubricChange}
+              onRubricLoaded={config.onRubricLoaded}
+            />
+          </QueryClientProvider>,
+          container,
+        )
+      } else {
+        root.render(
+          <QueryClientProvider client={queryClient}>
+            <CanvasRubricBridge
+              assignmentId={config.assignmentId}
+              assignmentPointsPossible={config.assignmentPointsPossible}
+              onRubricChange={config.onRubricChange}
+              onRubricLoaded={config.onRubricLoaded}
+            />
+          </QueryClientProvider>,
+        )
       }
-
-      root.render(
-        <QueryClientProvider client={queryClient}>
-          <CanvasRubricBridge
-            assignmentId={config.assignmentId}
-            assignmentPointsPossible={config.assignmentPointsPossible}
-            onRubricChange={config.onRubricChange}
-            onRubricLoaded={config.onRubricLoaded}
-          />
-        </QueryClientProvider>,
-      )
     },
 
     unmount: () => {
