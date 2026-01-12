@@ -1319,7 +1319,7 @@ describe ApplicationHelper do
             allow(helper).to receive(:csp_report_uri).and_return("")
             result = helper.default_csp_logging_directives
             domains = helper.allow_list_domains
-            expect(result).to include("default-src 'self' 'unsafe-inline' data: #{domains};")
+            expect(result).to include("default-src 'self' 'unsafe-inline' data: blob: #{domains};")
           end
 
           it "includes script-src when include_script_src is true" do
@@ -1371,6 +1371,12 @@ describe ApplicationHelper do
             allow(helper).to receive(:csp_report_uri).and_return("report-uri https://one.test/; report-uri https://two.test/; ")
             result = helper.default_csp_logging_directives
             expect(result).to include("report-uri https://one.test/; report-uri https://two.test/;")
+          end
+
+          it "includes blob: in default-src directive" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("default-src 'self' 'unsafe-inline' data: blob:")
           end
         end
       end
