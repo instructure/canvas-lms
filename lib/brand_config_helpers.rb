@@ -19,7 +19,9 @@
 
 module BrandConfigHelpers
   def branding_allowed?
-    root_account? || root_account.sub_account_includes?
+    root_account? ||
+      root_account.sub_account_includes? ||
+      root_account.try(:consortium_parent_account)&.sub_account_includes?
   end
 
   def effective_brand_config
