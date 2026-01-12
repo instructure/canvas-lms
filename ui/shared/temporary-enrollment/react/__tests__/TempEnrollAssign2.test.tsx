@@ -31,6 +31,7 @@ import {
 } from '../TempEnrollAssign'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   type Enrollment,
   MAX_ALLOWED_COURSES_PER_PAGE,
@@ -139,12 +140,11 @@ describe('TempEnrollAssign', () => {
   beforeAll(() => server.listen())
 
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       ACCOUNT_ID: '1',
       CONTEXT_TIMEZONE: 'Asia/Brunei',
       context_asset_string: 'account_1',
-    }
+    })
   })
 
   afterEach(() => {
@@ -156,8 +156,7 @@ describe('TempEnrollAssign', () => {
 
   afterAll(() => {
     server.close()
-    // @ts-expect-error
-    window.ENV = {}
+    fakeENV.teardown()
   })
 
   describe('getEnrollmentAndUserProps', () => {

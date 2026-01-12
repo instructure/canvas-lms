@@ -17,7 +17,7 @@
  */
 
 import React, {useContext, useEffect, useState, useCallback} from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SpeedGraderCheckpoint, EXCUSED} from './SpeedGraderCheckpoint'
@@ -85,12 +85,11 @@ const fetchAssignment = async (
 ): Promise<Assignment | null> => {
   const path = `/api/v1/courses/${courseId}/assignments/${assignmentId}?include=checkpoints`
 
-  const {json} = await doFetchApi({
+  const {json} = await doFetchApi<Assignment>({
     method: 'GET',
     path,
   })
 
-  // @ts-expect-error
   return json || null
 }
 
@@ -101,12 +100,11 @@ const fetchSubmission = async (
 ): Promise<Submission | null> => {
   const path = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}?include=sub_assignment_submissions`
 
-  const {json} = await doFetchApi({
+  const {json} = await doFetchApi<Submission>({
     method: 'GET',
     path,
   })
 
-  // @ts-expect-error
   return json || null
 }
 
@@ -118,6 +116,8 @@ export type SubmissionGradeParams = {
   grade: string | number | null
 }
 
+type SubmissionUpdateResponse = {all_submissions?: unknown[]}
+
 const putSubmissionGrade = ({
   subAssignmentTag,
   courseId,
@@ -125,7 +125,7 @@ const putSubmissionGrade = ({
   studentId,
   grade,
 }: SubmissionGradeParams) => {
-  return doFetchApi({
+  return doFetchApi<SubmissionUpdateResponse>({
     method: 'PUT',
     path: `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`,
     params: {
@@ -160,7 +160,7 @@ const putSubmissionStatus = ({
   secondsLate,
 }: SubmissionStatusParams) => {
   const excuse = latePolicyStatus === EXCUSED
-  return doFetchApi({
+  return doFetchApi<SubmissionUpdateResponse>({
     method: 'PUT',
     path: `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`,
     body: {
@@ -212,8 +212,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
 
   const [shouldAnnounceCurrentGradeChange, setShouldAnnounceCurrentGradeChange] = useState(false)
   const {setOnSuccess} = useContext(AlertManagerContext)
-  // @ts-expect-error
-  const [lastSubmission, setLastSubmission] = useState<SubAssignmentSubmission>(null)
+  const [lastSubmission, setLastSubmission] = useState<SubAssignmentSubmission | null>(null)
 
   const {data: assignment, isLoading: isLoadingAssignment} = useQuery({
     queryKey: ['speedGraderCheckpointsAssignment', props.courseId, props.assignmentId],
@@ -241,11 +240,10 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
   })
 
   const showWarningIfOutlier = useCallback(() => {
-    if (!lastSubmission) return
+    if (!lastSubmission || !assignment) return
 
     const score = Number(lastSubmission.grade)
     const {points_possible: pointsPossible} = getAssignmentWithPropsFromCheckpoints(
-      // @ts-expect-error
       assignment,
       lastSubmission,
     )
@@ -295,11 +293,10 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     })
   }
 
-  const updateSubmissionUI = (data: object) => {
+  const updateSubmissionUI = (data: DoFetchApiResults<{all_submissions?: unknown[]}>) => {
     if (props.EG) {
       // all_submissions[0] has submission_history vs data?.json which is a submission, but does not.
-      /* @ts-expect-error */
-      const submissionData = data?.json?.all_submissions[0]
+      const submissionData = data?.json?.all_submissions?.[0]
       if (submissionData) {
         const student = props.EG.setOrUpdateSubmission(submissionData)
         props.EG.updateSelectMenuStatus(student)

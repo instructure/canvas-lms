@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -24,7 +22,7 @@ import React from 'react'
 import store from '../../stores/index'
 
 describe('GradeLoadingSpinner', () => {
-  let props
+  let props: {onLoadingChange: ReturnType<typeof vi.fn>}
   beforeEach(() => {
     props = {onLoadingChange: vi.fn()}
   })

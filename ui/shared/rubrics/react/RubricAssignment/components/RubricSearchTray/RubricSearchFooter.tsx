@@ -52,7 +52,7 @@ export const RubricSearchFooter = ({disabled, onSubmit, onCancel}: RubricSearchF
         <Flex.Item>
           <Button
             color="primary"
-            // @ts-expect-error
+            // @ts-expect-error - InstUI Button renderIcon prop type mismatch
             renderIcon={IconAddLine}
             onClick={() => onSubmit()}
             data-testid="save-rubric-assessment-button"

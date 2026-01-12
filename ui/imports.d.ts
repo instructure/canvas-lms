@@ -68,3 +68,11 @@ declare module '@instructure/ui-media-player' {
   }
   export const MediaPlayer: ComponentType<MediaPlayerProps & Record<string, any>>
 }
+
+// Auto-generated plugin bundles module (created at build time by webpack)
+declare module 'plugin-bundles-generated' {
+  const pluginBundles: {
+    [bundle: string]: () => Promise<unknown>
+  }
+  export default pluginBundles
+}

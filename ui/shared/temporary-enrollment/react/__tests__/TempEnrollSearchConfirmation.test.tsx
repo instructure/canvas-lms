@@ -50,36 +50,36 @@ const twoUser = {
   primary_email: 'user2@email.com',
 } as User
 
-// @ts-expect-error
-const twoBrotherUser = {
+const twoBrotherUser: DuplicateUser = {
   user_name: 'brother_2',
   user_id: '21',
   sis_user_id: 'sis_2',
-  primary_email: 'user2@email.com',
-} as DuplicateUser
+  address: 'user2@email.com',
+  account_name: 'Test Account',
+}
 
-// @ts-expect-error
-const twoSisterUser = {
-  name: 'sister_2',
+const twoSisterUser: DuplicateUser = {
   user_name: 'sister_2',
   user_id: '22',
-  id: '22',
   sis_user_id: 'sis_2',
-  primary_email: 'user2@email.com',
-} as DuplicateUser
+  address: 'user2@email.com',
+  account_name: 'Test Account',
+}
 
-const threeBrotherUser = {
+const threeBrotherUser: DuplicateUser = {
   user_name: 'brother_3',
   user_id: '31',
   sis_user_id: 'sis_3',
-  primary_email: 'user3@email.com',
+  address: 'user3@email.com',
+  account_name: 'Test Account',
 }
 
-const threeSisterUser = {
+const threeSisterUser: DuplicateUser = {
   user_name: 'sister_3',
   user_id: '32',
   sis_user_id: 'sis_3',
-  primary_email: 'user3@email.com',
+  address: 'user3@email.com',
+  account_name: 'Test Account',
 }
 
 const userDetailsUriMock = (userId: string, response: object) =>
@@ -134,7 +134,6 @@ describe('TempEnrollSearchConfirmation', () => {
       sis_3: [threeSisterUser, threeBrotherUser],
     }
     const {getByText, getAllByText} = render(
-      // @ts-expect-error
       <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />,
     )
 
@@ -153,7 +152,6 @@ describe('TempEnrollSearchConfirmation', () => {
       sis_3: [threeSisterUser, threeBrotherUser],
     }
     const {getByLabelText, getByText} = render(
-      // @ts-expect-error
       <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />,
     )
 

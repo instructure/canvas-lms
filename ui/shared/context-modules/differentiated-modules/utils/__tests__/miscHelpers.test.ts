@@ -177,56 +177,91 @@ describe('convertModuleSettingsForApi', () => {
 })
 
 describe('requirementTypesForResource', () => {
+  const baseRequirement = {
+    id: '1',
+    name: 'Test Requirement',
+    type: 'view' as const,
+  }
+
   it('returns types for assignment', () => {
-    // @ts-expect-error
-    expect(requirementTypesForResource({resource: 'assignment'})).toEqual([
-      'view',
-      'mark',
-      'submit',
-      'score',
-    ])
+    expect(
+      requirementTypesForResource({
+        ...baseRequirement,
+        resource: 'assignment',
+        minimumScore: '0',
+        pointsPossible: '100',
+      }),
+    ).toEqual(['view', 'mark', 'submit', 'score'])
   })
 
   it('returns types for quiz', () => {
-    // @ts-expect-error
-    expect(requirementTypesForResource({resource: 'quiz'})).toEqual(['view', 'submit', 'score'])
+    expect(
+      requirementTypesForResource({
+        ...baseRequirement,
+        resource: 'quiz',
+        minimumScore: '0',
+        pointsPossible: '100',
+      }),
+    ).toEqual(['view', 'submit', 'score'])
   })
 
   it('returns types for file', () => {
-    // @ts-expect-error
-    expect(requirementTypesForResource({resource: 'file'})).toEqual(['view'])
+    expect(
+      requirementTypesForResource({
+        ...baseRequirement,
+        resource: 'file',
+      }),
+    ).toEqual(['view'])
   })
 
   it('returns types for page', () => {
-    // @ts-expect-error
-    expect(requirementTypesForResource({resource: 'page'})).toEqual(['view', 'mark', 'contribute'])
+    expect(
+      requirementTypesForResource({
+        ...baseRequirement,
+        resource: 'page',
+      }),
+    ).toEqual(['view', 'mark', 'contribute'])
   })
 
   it('returns types for graded discussion', () => {
-    // @ts-expect-error
-    expect(requirementTypesForResource({resource: 'discussion', graded: true})).toEqual([
-      'view',
-      'contribute',
-      'submit',
-      'score',
-    ])
+    expect(
+      requirementTypesForResource({
+        ...baseRequirement,
+        resource: 'discussion',
+        graded: true,
+        minimumScore: '0',
+        pointsPossible: '100',
+      }),
+    ).toEqual(['view', 'contribute', 'submit', 'score'])
   })
 
   it('returns types for ungraded discussion', () => {
-    // @ts-expect-error
-    expect(requirementTypesForResource({resource: 'discussion', graded: false})).toEqual([
-      'view',
-      'contribute',
-    ])
+    expect(
+      requirementTypesForResource({
+        ...baseRequirement,
+        resource: 'discussion',
+        graded: false,
+        minimumScore: '0',
+        pointsPossible: '100',
+      }),
+    ).toEqual(['view', 'contribute'])
   })
 
   it('returns types for externalUrl', () => {
-    // @ts-expect-error
-    expect(requirementTypesForResource({resource: 'externalUrl'})).toEqual(['view'])
+    expect(
+      requirementTypesForResource({
+        ...baseRequirement,
+        resource: 'externalUrl',
+      }),
+    ).toEqual(['view'])
   })
 
   it('returns types for externalTool', () => {
-    // @ts-expect-error
-    expect(requirementTypesForResource({resource: 'externalTool'})).toEqual(['view'])
+    expect(
+      requirementTypesForResource({
+        ...baseRequirement,
+        resource: 'externalTool',
+      }),
+    ).toEqual(['view'])
   })
 })

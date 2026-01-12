@@ -24,12 +24,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('SpeedGraderDiscussionsNavigation')
 
 export const SpeedGraderDiscussionsNavigation = () => {
-  // @ts-expect-error
-  function sendPostMessage(message) {
-    const iframe = document.getElementById('speedgrader_iframe')
-    // @ts-expect-error
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
-    const discussion_iframe = iframeDoc?.getElementById('discussion_preview_iframe')
+  function sendPostMessage(message: {subject: string}) {
+    const iframe = document.getElementById('speedgrader_iframe') as HTMLIFrameElement | null
+    if (!iframe) return
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+    const discussion_iframe = iframeDoc?.getElementById(
+      'discussion_preview_iframe',
+    ) as HTMLIFrameElement | null
     const contentWindow = discussion_iframe?.contentWindow
     if (contentWindow) {
       contentWindow.postMessage(message, '*')

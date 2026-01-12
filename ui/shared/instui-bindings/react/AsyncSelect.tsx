@@ -43,15 +43,15 @@ export type CanvasAsyncSelectProps = {
   noOptionsLabel: string
   noOptionsValue?: string
   renderLabel?: string | ReactNode
-  // @ts-expect-error
-  onOptionSelected: (event, optionId: string) => void
+
+  onOptionSelected: (event: any, optionId: string) => void
   onHighlightedOptionChange?: (optionId: string | null) => void
-  // @ts-expect-error
-  onInputChange: (event, value) => void
-  // @ts-expect-error
-  onBlur?: (event) => void
-  // @ts-expect-error
-  onFocus?: (event) => void
+
+  onInputChange: (event: any, value: string) => void
+
+  onBlur?: (event: any) => void
+
+  onFocus?: (event: any) => void
   children?: ReactElement | ReactElement[]
   options?: any[]
   inputRef?: (ref: HTMLInputElement | null) => void
@@ -91,12 +91,11 @@ export default function CanvasAsyncSelect({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedOptionId])
 
-  function findOptionById(id: string | undefined): ReactElement {
-    let option
+  function findOptionById(id: string | undefined): ReactElement | undefined {
+    let option: ReactElement | undefined
     React.Children.forEach(children, (c: ReactElement) => {
       if (c?.props.id === id) option = c
     })
-    // @ts-expect-error
     return option
   }
 

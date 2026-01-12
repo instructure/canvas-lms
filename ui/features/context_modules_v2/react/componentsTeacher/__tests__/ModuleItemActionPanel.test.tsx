@@ -22,6 +22,7 @@ import {setupServer} from 'msw/node'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemActionPanel from '../ModuleItemActionPanel'
 import {http, HttpResponse} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import * as publishingModule from '@canvas/context-modules/react/publishing/publishingContext'
 
 vi.mock('@canvas/context-modules/react/publishing/publishingContext', async () => {
@@ -80,19 +81,21 @@ const setUp = (props: ComponentProps, courseId = DEFAULT_COURSE_ID) => {
 }
 
 beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
+afterEach(() => {
+  server.resetHandlers()
+  fakeENV.teardown()
+})
 afterAll(() => server.close())
 
 beforeEach(() => {
-  // @ts-expect-error
-  window.ENV = {
+  fakeENV.setup({
     TIMEZONE: 'UTC',
     CONTEXT_URL_ROOT: '/courses/1',
     MODULE_FILE_PERMISSIONS: {
       manage_files_edit: true,
       usage_rights_required: false,
     },
-  }
+  })
 })
 
 describe('ModuleItemActionPanel', () => {

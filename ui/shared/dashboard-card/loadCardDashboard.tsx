@@ -57,7 +57,7 @@ export class CardDashboardLoader {
 
   promiseToGetDashboardCards?: Promise<Card[]> = undefined
 
-  renderIntoDOM = (dashboardCards: Card[]) => {
+  renderIntoDOM = (dashboardCards: Card[], _xhrComplete?: boolean) => {
     const dashboardContainer = document.getElementById('DashboardCard_Container')
 
     ReactDOM.render(
@@ -82,12 +82,10 @@ export class CardDashboardLoader {
         this.showError(e as Error)
       }
     } else if (observedUserId && CardDashboardLoader.observedUsersDashboardCards[observedUserId]) {
-      // @ts-expect-error
       renderFn(CardDashboardLoader.observedUsersDashboardCards[observedUserId], true)
     } else if (this.promiseToGetDashboardCards) {
       this.promiseToGetDashboardCards
         .then(cards => {
-          // @ts-expect-error
           renderFn(cards, true)
         })
         .catch(e => {
@@ -124,7 +122,7 @@ export class CardDashboardLoader {
       // once with the newest data.
       // Otherwise, render with the cached stuff from session storage now, then render again
       // when the xhr comes back with the latest data.
-      const promiseToGetCardsFromSessionStorage = new Promise(resolve => {
+      const promiseToGetCardsFromSessionStorage = new Promise<Card[]>(resolve => {
         sessionStorageTimeout = setTimeout(() => {
           const cachedCards = sessionStorage.getItem(sessionStorageKey)
           if (cachedCards) resolve(JSON.parse(cachedCards))
@@ -135,11 +133,9 @@ export class CardDashboardLoader {
           clearTimeout(sessionStorageTimeout)
           // calling the renderFn with `false` indicates to consumers that we're still waiting
           // on the follow-up xhr request to complete.
-          // @ts-expect-error
           renderFn(dashboardCards, xhrHasReturned)
           // calling it with `true` indicates that all outstanding card promises have settled.
           if (!xhrHasReturned && this.promiseToGetDashboardCards)
-            // @ts-expect-error
             return this.promiseToGetDashboardCards.then((cards: Card[]) => renderFn(cards, true))
         })
         .catch(e => {

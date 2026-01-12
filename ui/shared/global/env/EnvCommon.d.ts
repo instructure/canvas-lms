@@ -274,6 +274,11 @@ export interface EnvCommon {
 
   BLUEPRINT_COURSES_DATA: BlueprintCoursesData | undefined
   AI_FEEDBACK_LINK?: string
+
+  /**
+   * Used by ContentTypeExternalToolDrawer for mutex management
+   */
+  INIT_DRAWER_LAYOUT_MUTEX?: string
 }
 
 /**

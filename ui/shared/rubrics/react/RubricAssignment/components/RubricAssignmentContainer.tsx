@@ -272,8 +272,7 @@ export const RubricAssignmentContainer = ({
             <Button
               margin="0 0 0 small"
               data-testid="find-assignment-rubric-button"
-              // @ts-expect-error
-              renderIcon={IconSearchLine}
+              renderIcon={<IconSearchLine />}
               onClick={() => setIsSearchTrayOpen(true)}
             >
               {I18n.t('Find Rubric')}

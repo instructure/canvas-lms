@@ -17,14 +17,14 @@
  */
 
 import round from '@canvas/round'
+import type {GradingStandard} from '@instructure/grading-utils'
 import type {DeprecatedGradingScheme} from './grading.d'
 
 export function indexOfGrade(
   grade: null | string | number,
-  gradingSchemes: DeprecatedGradingScheme[],
+  gradingSchemes: GradingStandard[],
 ) {
-  // @ts-expect-error
-  const matches = (entry, key) => entry[0].toLowerCase() === key
+  const matches = (entry: GradingStandard, key: string) => entry[0].toLowerCase() === key
   const cleanGrade = `${grade}`.trim().toLowerCase()
   let idx = gradingSchemes.findIndex(entry => matches(entry, cleanGrade))
 
@@ -36,7 +36,7 @@ export function indexOfGrade(
   return idx
 }
 
-export function gradeToScoreUpperBound(grade: number, gradingSchemes: DeprecatedGradingScheme[]) {
+export function gradeToScoreUpperBound(grade: number, gradingSchemes: GradingStandard[]) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
@@ -49,9 +49,7 @@ export function gradeToScoreUpperBound(grade: number, gradingSchemes: Deprecated
     return 100
   }
 
-  // @ts-expect-error
   const matchingSchemeValue = gradingSchemes[index][1]
-  // @ts-expect-error
   const nextHigherSchemeValue = gradingSchemes[index - 1][1]
   const schemeValuesDiff = round(nextHigherSchemeValue - matchingSchemeValue, 4) * 100
   let percentageOffset = 1
@@ -73,7 +71,7 @@ export function gradeToScoreUpperBound(grade: number, gradingSchemes: Deprecated
 
 export function gradeToScoreLowerBound(
   grade: null | number,
-  gradingSchemes: DeprecatedGradingScheme[],
+  gradingSchemes: GradingStandard[],
 ) {
   const index = indexOfGrade(grade, gradingSchemes)
 
@@ -82,7 +80,6 @@ export function gradeToScoreLowerBound(
     return null
   }
 
-  // @ts-expect-error
   const matchingSchemeValue = gradingSchemes[index][1]
 
   return round(matchingSchemeValue * 100, 2)

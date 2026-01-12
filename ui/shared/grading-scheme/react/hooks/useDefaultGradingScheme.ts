@@ -48,10 +48,11 @@ export const useDefaultGradingScheme = (): {
         if (!result.response.ok) {
           throw new Error(result.response.statusText)
         }
-        // @ts-expect-error
-        const defaultGradingScheme: GradingScheme = result.json
+        if (!result.json) {
+          throw new Error('No data received from server')
+        }
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.COMPLETED)
-        return defaultGradingScheme
+        return result.json
       } catch (err) {
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.FAILED)
         throw err

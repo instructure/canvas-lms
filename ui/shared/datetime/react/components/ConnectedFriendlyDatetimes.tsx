@@ -38,19 +38,14 @@ type Props = {
 }
 
 function timeFormatting(dateTime: string | Date, format: string | undefined, showTime: boolean) {
-  if (!isDate(dateTime)) {
-    // @ts-expect-error
-    dateTime = tz.parse(dateTime)
-  }
+  const parsedDateTime: Date | null = isDate(dateTime) ? dateTime : tz.parse(dateTime)
 
-  const fudged = fudgeDateForProfileTimezone(dateTime)
+  const fudged = fudgeDateForProfileTimezone(parsedDateTime)
   let friendly
   if (format) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
-    friendly = tz.format(dateTime, format)
+    friendly = tz.format(parsedDateTime, format, ENV.TIMEZONE)
   } else if (showTime) {
-    friendly = datetimeString(dateTime)
+    friendly = datetimeString(parsedDateTime)
   } else {
     friendly = friendlyDatetime(fudged)
   }

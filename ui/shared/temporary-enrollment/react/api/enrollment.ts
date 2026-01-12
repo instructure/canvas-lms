@@ -18,8 +18,12 @@
 
 import type {Enrollment, FetchedEnrollments, TemporaryEnrollmentPairing} from '../types'
 import {ITEMS_PER_PAGE} from '../types'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
+
+interface TemporaryEnrollmentPairingResponse {
+  temporary_enrollment_pairing: TemporaryEnrollmentPairing
+}
 
 const I18n = createI18nScope('temporary_enrollment')
 
@@ -69,8 +73,8 @@ export async function fetchTemporaryEnrollments(
     throw new Error(errorMessage)
   }
 
-  // @ts-expect-error
-  return {enrollments: json, link}
+  // @ts-expect-error - Links type from parse-link-header is structurally incompatible with local Links type
+  return {enrollments: json ?? [], link}
 }
 
 /**
@@ -85,14 +89,16 @@ export async function createTemporaryEnrollmentPairing(
   endingEnrollmentState: string,
 ): Promise<TemporaryEnrollmentPairing> {
   try {
-    const response = await doFetchApi({
+    const response = await doFetchApi<TemporaryEnrollmentPairingResponse>({
       path: `/api/v1/accounts/${accountId}/temporary_enrollment_pairings`,
       method: 'POST',
       params: {
         ending_enrollment_state: endingEnrollmentState,
       },
     })
-    // @ts-expect-error
+    if (!response.json) {
+      throw new Error(I18n.t('Failed to create temporary enrollment pairing'))
+    }
     return response.json.temporary_enrollment_pairing
   } catch (error) {
     if (error instanceof Error) {
@@ -117,12 +123,14 @@ export async function getTemporaryEnrollmentPairing(
   pairingId: number,
 ): Promise<TemporaryEnrollmentPairing> {
   try {
-    const response = await doFetchApi({
+    const response = await doFetchApi<TemporaryEnrollmentPairingResponse>({
       path: `/api/v1/accounts/${accountId}/temporary_enrollment_pairings/${pairingId}`,
       method: 'GET',
     })
 
-    // @ts-expect-error
+    if (!response.json) {
+      throw new Error(I18n.t('Failed to retrieve temporary enrollment pairing'))
+    }
     return response.json.temporary_enrollment_pairing
   } catch (error) {
     if (error instanceof Error) {
@@ -204,8 +212,15 @@ export async function createEnrollment(
     const defaultErrorMessage = I18n.t(
       'Failed to create temporary enrollment, please try again later',
     )
-    // @ts-expect-error because doFetchApi is not type safe (yet)
-    const serverErrorMessage: string = (await error.response?.json())?.message || ''
+    let serverErrorMessage = ''
+    if (error instanceof FetchApiError) {
+      try {
+        const errorBody = await error.response.json()
+        serverErrorMessage = errorBody?.message || ''
+      } catch {
+        // Failed to parse error response body
+      }
+    }
     const serverErrorTranslations: {[key: string]: string} = {
       "Can't add an enrollment to a concluded course.": I18n.t(
         'Cannot add a temporary enrollment to a concluded course',

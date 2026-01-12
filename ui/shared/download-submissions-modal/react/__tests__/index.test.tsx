@@ -33,7 +33,6 @@ const setUp = (propOverrides = {}) => {
     breakpoints: {},
     ...propOverrides,
   }
-  // @ts-expect-error
   return render(<DownloadSubmissionModal {...props} />)
 }
 

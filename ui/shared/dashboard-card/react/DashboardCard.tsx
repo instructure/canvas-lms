@@ -134,8 +134,7 @@ export const DashboardCard = ({
   onPublishedCourse = () => {},
   headingLevel = 'h3',
 }: DashboardCardProps) => {
-  // @ts-expect-error
-  const handleNicknameChange = nickname => setNicknameInfo(getNicknameInfo(nickname))
+  const handleNicknameChange = (nickname: string) => setNicknameInfo(getNicknameInfo(nickname))
 
   const getNicknameInfo = (nickname: string) => ({
     nickname,

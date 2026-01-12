@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -41,8 +39,8 @@ type Props = {
   readonly isOpen: boolean
   readonly onCancel: () => void
   readonly onDeleting: (which: Which) => void
-  readonly onDeleted: (deletedEvents: [Event]) => void
-  readonly onUpdated: (updatedEvents: [Event]) => void
+  readonly onDeleted: (deletedEvents: Event[]) => void
+  readonly onUpdated: (updatedEvents: Event[]) => void
   readonly delUrl: string
   readonly isRepeating: boolean
   readonly isSeriesHead: boolean
@@ -68,8 +66,11 @@ const DeleteCalendarEventDialog = ({
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
   const handleCancel = useCallback(
-    (e = null) => {
-      if (e?.code !== 'Escape' && e?.target.type === 'radio') {
+    (e: React.KeyboardEvent | React.MouseEvent | null = null) => {
+      if (
+        (e as React.KeyboardEvent)?.code !== 'Escape' &&
+        (e?.target as HTMLInputElement)?.type === 'radio'
+      ) {
         return
       }
       onCancel()
@@ -94,7 +95,7 @@ const DeleteCalendarEventDialog = ({
       .then(res => res.json())
       .then(result => {
         setIsDeleting(false)
-        const sortedEvents = {
+        const sortedEvents: {deleted: Event[]; updated: Event[]} = {
           deleted: [],
           updated: [],
         }
@@ -157,8 +158,8 @@ const DeleteCalendarEventDialog = ({
         name="which"
         defaultValue="one"
         description={I18n.t('Delete:')}
-        onChange={(_event, value) => {
-          setWhich(value)
+        onChange={(_event, value: string) => {
+          setWhich(value as Which)
         }}
       >
         <RadioInput

@@ -40,7 +40,7 @@ const DownloadSubmissionsModal = ({
   breakpoints,
 }: {
   open: boolean
-  handleCloseModal: void
+  handleCloseModal: () => void
   assignmentId: string
   courseId: string
   breakpoints: Breakpoints
@@ -131,7 +131,6 @@ const DownloadSubmissionsModal = ({
         <CloseButton
           placement="end"
           offset="small"
-          // @ts-expect-error
           onClick={handleCloseModal}
           screenReaderLabel={I18n.t('Close')}
         />
@@ -159,7 +158,6 @@ const DownloadSubmissionsModal = ({
         {renderProgressText()}
       </Modal.Body>
       <Modal.Footer>
-        {/* @ts-expect-error */}
         <Button onClick={handleCloseModal} margin="0 x-small 0 0">
           {I18n.t('Cancel')}
         </Button>

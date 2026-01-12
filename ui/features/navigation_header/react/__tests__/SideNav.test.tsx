@@ -19,6 +19,7 @@ import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import SideNav, {InformationIconEnum} from '../SideNav'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import type {ExternalTool} from '../utils'
 
 const queryClient = new QueryClient()
@@ -26,24 +27,27 @@ const queryClient = new QueryClient()
 describe('SideNav', () => {
   afterEach(() => {
     cleanup()
+    fakeENV.teardown()
   })
 
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV.current_user = {
-      id: '',
-      avatar_image_url: 'testSrc',
-      anonymous_id: '',
-      display_name: 'Test DisplayName',
-      html_url: '',
-      pronouns: '',
-    }
-    // @ts-expect-error
-    window.ENV.SETTINGS = {
-      collapse_global_nav: false,
-    }
-    window.ENV.K5_USER = false
-    window.ENV.help_link_icon = 'help'
+    fakeENV.setup({
+      current_user: {
+        id: '1',
+        avatar_image_url: 'testSrc',
+        anonymous_id: 'anon1',
+        display_name: 'Test DisplayName',
+        html_url: '/users/1',
+        pronouns: '',
+        fake_student: false,
+        avatar_is_fallback: false,
+      },
+      SETTINGS: {
+        collapse_global_nav: false,
+      },
+      K5_USER: false,
+      help_link_icon: 'help',
+    })
   })
 
   it('renders', () => {
@@ -105,8 +109,7 @@ describe('SideNav', () => {
     })
 
     afterEach(() => {
-      // @ts-expect-error
-      window.ENV.active_brand_config = null
+      window.ENV.active_brand_config = {variables: {}}
     })
 
     it('should render custom logo when theme has custom image', () => {

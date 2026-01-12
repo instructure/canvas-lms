@@ -28,8 +28,7 @@ import {View} from '@instructure/ui-view'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-// @ts-expect-error
-import type {ProgressResult} from '../utils/publishAllModulesHelper'
+import type {CanvasProgress} from '@canvas/progress/ProgressHelpers'
 
 const I18n = createI18nScope('context_modules_publish_menu')
 
@@ -43,7 +42,7 @@ interface Props {
   readonly isPublishing: boolean
   readonly skippingItems: boolean
   readonly progressId: string | number | null
-  readonly progressCurrent?: ProgressResult
+  readonly progressCurrent?: CanvasProgress
   readonly title: string
   readonly continueButtonId: string
   readonly mode: 'publish' | 'unpublish'

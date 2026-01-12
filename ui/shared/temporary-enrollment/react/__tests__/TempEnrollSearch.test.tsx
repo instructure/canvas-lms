@@ -19,6 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {TempEnrollSearch} from '../TempEnrollSearch'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import type {User} from '../types'
 
 describe('TempEnrollSearch', () => {
@@ -36,13 +37,11 @@ describe('TempEnrollSearch', () => {
   }
 
   beforeAll(() => {
-    // @ts-expect-error
-    window.ENV = {ACCOUNT_ID: '1'}
+    fakeENV.setup({ACCOUNT_ID: '1'})
   })
 
   afterAll(() => {
-    // @ts-expect-error
-    window.ENV = {}
+    fakeENV.teardown()
   })
 
   it('shows search page', () => {

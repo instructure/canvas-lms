@@ -43,7 +43,7 @@ export const useGradingSchemeAccountUsedLocations = (): {
       setGradingSchemeAccountUsedLocationsStatus(ApiCallStatus.PENDING)
       try {
         const contextPath = buildContextPath(contextType, contextId)
-        const result = await doFetchApi({
+        const result = await doFetchApi<AccountUsedLocation[]>({
           path: `${contextPath}/grading_schemes/${gradingSchemeId}/account_used_locations`,
           method: 'GET',
         })
@@ -53,10 +53,7 @@ export const useGradingSchemeAccountUsedLocations = (): {
 
         setGradingSchemeAccountUsedLocationsStatus(ApiCallStatus.COMPLETED)
         return {
-          // @ts-expect-error
           accountUsedLocations: result.json || [],
-          isLastPage: result.link?.next === undefined,
-          nextPage: result.link?.next?.url,
         }
       } catch (err) {
         setGradingSchemeAccountUsedLocationsStatus(ApiCallStatus.FAILED)
