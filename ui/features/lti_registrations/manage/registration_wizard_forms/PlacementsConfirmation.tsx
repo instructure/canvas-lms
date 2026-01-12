@@ -126,17 +126,9 @@ export const PlacementsConfirmation = React.memo(
                   enabled={enabledPlacements.includes(p)}
                   onTogglePlacement={onTogglePlacement}
                   courseNavigationDefaultHidden={courseNavigationDefaultHidden}
-                  topNavigationAllowFullscreen={
-                    window.ENV.FEATURES?.increased_top_nav_pane_size
-                      ? topNavigationAllowFullscreen
-                      : false
-                  }
+                  topNavigationAllowFullscreen={topNavigationAllowFullscreen}
                   onToggleDefaultDisabled={onToggleDefaultDisabled}
-                  onToggleAllowFullscreen={
-                    window.ENV.FEATURES?.increased_top_nav_pane_size
-                      ? onToggleAllowFullscreen
-                      : () => {}
-                  }
+                  onToggleAllowFullscreen={onToggleAllowFullscreen}
                 />
               )
             })}
@@ -220,10 +212,7 @@ const PlacementCheckbox = React.memo(
         </FormFieldGroup>
       )
     }
-    if (
-      placement === LtiPlacements.TopNavigation &&
-      window.ENV.FEATURES?.increased_top_nav_pane_size
-    ) {
+    if (placement === LtiPlacements.TopNavigation) {
       return (
         <FormFieldGroup
           rowSpacing="medium"

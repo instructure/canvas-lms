@@ -338,7 +338,6 @@ export type RootAccountFeatureId =
   | 'create_course_subaccount_picker'
   | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
-  | 'increased_top_nav_pane_size'
   | 'instui_nav'
   | 'login_registration_ui_identity'
   | 'lti_apps_page_ai_translation'
