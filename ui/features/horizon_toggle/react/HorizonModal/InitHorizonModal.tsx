@@ -17,7 +17,7 @@
  */
 
 import {AccountChangeModal} from './HorizonAccountModal'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 export const initAccountSelectModal = () => {
   const selectElement = document.getElementById('course_account_id') as HTMLSelectElement
@@ -29,7 +29,10 @@ export const initAccountSelectModal = () => {
   const modalContainer = document.createElement('div')
   modalContainer.id = 'account-change-modal-container'
   document.body.appendChild(modalContainer)
-  const modalRoot = createRoot(modalContainer)
+  const modalRoot = render(
+    <AccountChangeModal isOpen={false} onClose={() => {}} onConfirm={() => {}} />,
+    modalContainer,
+  )
 
   const previousValue = selectElement.value
 

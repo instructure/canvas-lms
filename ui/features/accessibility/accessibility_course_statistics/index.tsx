@@ -17,15 +17,14 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {RouterProvider} from 'react-router-dom'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {router} from './routes/router'
 import {AccessibilityErrorBoundary} from './react/components/AccessibilityErrorBoundary'
 import {queryClient} from '@canvas/query'
 
-const root = createRoot(document.getElementById('content')!)
-root.render(
+render(
   <React.StrictMode>
     <AccessibilityErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -33,4 +32,5 @@ root.render(
       </QueryClientProvider>
     </AccessibilityErrorBoundary>
   </React.StrictMode>,
+  document.getElementById('content'),
 )
