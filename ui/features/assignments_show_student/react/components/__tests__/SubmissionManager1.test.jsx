@@ -23,7 +23,7 @@ import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Qu
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
-import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {act, cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import StudentViewContext, {
   StudentViewContextDefaults,
@@ -56,6 +56,10 @@ describe('SubmissionManager', () => {
 
   beforeEach(() => {
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
+  })
+
+  afterEach(() => {
+    cleanup()
   })
 
   it('renders the AttemptTab', async () => {
