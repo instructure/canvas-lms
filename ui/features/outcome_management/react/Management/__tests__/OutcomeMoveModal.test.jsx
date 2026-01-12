@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {render as realRender, act, fireEvent} from '@testing-library/react'
+import {cleanup, render as realRender, act, fireEvent} from '@testing-library/react'
 import {
   accountMocks,
   smallOutcomeTree,
@@ -85,6 +85,8 @@ describe('OutcomeMoveModal', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    cleanup()
+    cache.reset()
   })
 
   const render = (

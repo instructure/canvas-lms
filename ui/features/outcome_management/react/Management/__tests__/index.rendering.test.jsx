@@ -21,6 +21,7 @@ import OutcomeManagementPanel from '../index'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {
   setupTest,
+  teardownTest,
   accountMocks,
   courseMocks,
   groupMocks,
@@ -47,10 +48,7 @@ describe('OutcomeManagementPanel - Rendering', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = null
+    teardownTest()
   })
 
   it('renders the tree browser for empty root groups', async () => {

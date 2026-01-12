@@ -18,12 +18,7 @@
 
 import {act, fireEvent, waitFor} from '@testing-library/react'
 import OutcomeManagementPanel from '../index'
-import {
-  setupTest,
-  courseMocks,
-  groupMocks,
-  groupDetailMocks,
-} from './testSetup'
+import {setupTest, teardownTest, courseMocks, groupMocks, groupDetailMocks} from './testSetup'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
@@ -46,10 +41,7 @@ describe('OutcomeManagementPanel - Search', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = null
+    teardownTest()
   })
 
   it('should not disable search input and clear search button (X) if there are no results', async () => {

@@ -141,6 +141,12 @@ const useGroupDetail = ({
           outcomesCursor: group?.outcomes?.pageInfo?.endCursor,
         },
         updateQuery: (prevData, {fetchMoreResult}) => {
+          // Guard against null/undefined data which can happen if the cache
+          // is cleared or the component unmounts during async operations
+          if (!prevData?.group?.outcomes?.edges || !fetchMoreResult?.group?.outcomes?.edges) {
+            return prevData
+          }
+
           // Reverse to uniq so it'll remove previous result if they appear
           // again in the load more
           // then reverse again to keep the order
@@ -181,11 +187,18 @@ const useGroupDetail = ({
     const vars = allVars ? allVariables.current : [variables]
 
     vars.forEach(v => {
-      const {group: g} = client.readQuery({
+      const cachedData = client.readQuery({
         query,
         variables: v,
       })
 
+      // Skip if data is not in cache (can happen during test cleanup
+      // or when the component unmounts during async operations)
+      if (!cachedData?.group?.outcomes?.edges) {
+        return
+      }
+
+      const g = cachedData.group
       let removedCount = 0
 
       const newGroup = {

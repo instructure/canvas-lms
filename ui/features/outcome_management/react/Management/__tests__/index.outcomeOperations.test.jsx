@@ -18,10 +18,7 @@
 
 import {act, fireEvent} from '@testing-library/react'
 import OutcomeManagementPanel from '../index'
-import {
-  setupTest,
-  createDefaultCourseMocks,
-} from './testSetup'
+import {setupTest, teardownTest, createDefaultCourseMocks} from './testSetup'
 import {deleteOutcomeMock} from '@canvas/outcomes/mocks/Management'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
@@ -45,10 +42,7 @@ describe('OutcomeManagementPanel - Outcome Operations', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = null
+    teardownTest()
   })
 
   it('selects/unselects outcome via checkbox', async () => {
@@ -201,9 +195,7 @@ describe('OutcomeManagementPanel - Outcome Operations', () => {
       const setup = setupTest()
       const {setTargetGroupIdsToRefetchMock} = setup
       setup.render(
-        <OutcomeManagementPanel
-          {...setup.defaultProps({targetGroupIdsToRefetch: ['200']})}
-        />,
+        <OutcomeManagementPanel {...setup.defaultProps({targetGroupIdsToRefetch: ['200']})} />,
       )
       expect(setTargetGroupIdsToRefetchMock).toHaveBeenCalledTimes(1)
       expect(setTargetGroupIdsToRefetchMock).toHaveBeenCalledWith([])
