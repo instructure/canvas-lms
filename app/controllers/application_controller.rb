@@ -2298,7 +2298,11 @@ class ApplicationController < ActionController::Base
         render "context_modules/lock_explanation"
       else
         tag.context_module_action(@current_user, :read)
-        render "context_modules/url_show"
+        if tag.new_tab && params[:follow_redirect] && Account.site_admin.feature_enabled?(:module_external_url_seamless_redirect)
+          redirect_to tag.url, allow_other_host: true
+        else
+          render "context_modules/url_show"
+        end
       end
     elsif tag.content_type == "ContextExternalTool"
       timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)

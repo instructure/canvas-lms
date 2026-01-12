@@ -36,6 +36,9 @@
   <% if @tag.try(:new_tab) %>
     <%= t :new_tab, "This site was opened in a new browser window." %>
     <div>
+      <%= t :new_tab_fallback, "If it didn't open automatically, select the button below." %>
+    </div>
+    <div style="margin-top: 1em;">
       <a id="open_url_button"
         target="_blank"
         class="btn external"
@@ -75,7 +78,7 @@
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>
 <% if @tag.try(:new_tab) %>
 <script>
-  document.getElementById('open_url_button').click()
+  document.getElementById('open_url_button').click();
 </script>
 <% end %>
 
