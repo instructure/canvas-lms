@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot, type Root} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {queryClient} from '@canvas/query'
@@ -97,8 +98,7 @@ export const renderItemAssignToManager = (
   if (container.reactRoot) {
     container.reactRoot.unmount()
   }
-  container.reactRoot = createRoot(container)
-  container.reactRoot.render(
+  container.reactRoot = render(
     <ItemAssignToManager
       open={open}
       onClose={() => {
@@ -181,5 +181,6 @@ export const renderItemAssignToManager = (
       locale={ENV.LOCALE || 'en'}
       timezone={ENV.TIMEZONE || 'UTC'}
     />,
+    container,
   )
 }

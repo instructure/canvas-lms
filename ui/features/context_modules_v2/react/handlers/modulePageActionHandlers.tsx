@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Module as ModuleType} from '@canvas/context-modules/differentiated-modules/react/types'
 import DifferentiatedModulesTray from '@canvas/context-modules/differentiated-modules/react/DifferentiatedModulesTray'
 import {queryClient} from '@canvas/query'
@@ -215,13 +216,13 @@ export const handleOpeningModuleUpdateTray = (
     : []
 
   const mountPoint = getDifferentiatedModulesMountPoint()
-  const root = createRoot(mountPoint)
+  let root: Root | null = null
 
   const onCompleteFunction = () =>
     queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
   const trayProps = {
     onDismiss: () => {
-      root.unmount()
+      root?.unmount()
       const addButton = document.querySelector('.add-module-button') as HTMLElement
       addButton?.focus()
     },
@@ -244,7 +245,7 @@ export const handleOpeningModuleUpdateTray = (
     published: currentModule?.published || false,
   }
 
-  root.render(<DifferentiatedModulesTray {...(trayProps as any)} />)
+  root = render(<DifferentiatedModulesTray {...(trayProps as any)} />, mountPoint)
 }
 
 export const handleOpeningEditItemModal = (
@@ -280,16 +281,20 @@ export const handleOpeningEditItemModal = (
 
   const mountPoint = document.getElementById('module-item-mount-point') as HTMLElementWithRoot
   let root = mountPoint.reactRoot
-  if (!root) {
-    root = createRoot(mountPoint)
-    mountPoint.reactRoot = root
-  }
 
   const onRequestClose = () => {
-    root.render(<EditItemModal {...itemProps} isOpen={false} onRequestClose={onRequestClose} />)
+    root?.render(<EditItemModal {...itemProps} isOpen={false} onRequestClose={onRequestClose} />)
   }
 
-  root.render(<EditItemModal {...itemProps} isOpen={true} onRequestClose={onRequestClose} />)
+  if (!root) {
+    root = render(
+      <EditItemModal {...itemProps} isOpen={true} onRequestClose={onRequestClose} />,
+      mountPoint,
+    )
+    mountPoint.reactRoot = root
+  } else {
+    root.render(<EditItemModal {...itemProps} isOpen={true} onRequestClose={onRequestClose} />)
+  }
 }
 
 export const handleAddItem = (
