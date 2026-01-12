@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import getDroppableDashboardCardBox from './react/getDroppableDashboardCardBox'
 import DashboardCard from './react/DashboardCard'
 import axios from '@canvas/axios'
@@ -60,7 +60,7 @@ export class CardDashboardLoader {
   renderIntoDOM = (dashboardCards: Card[], _xhrComplete?: boolean) => {
     const dashboardContainer = document.getElementById('DashboardCard_Container')
 
-    ReactDOM.render(
+    legacyRender(
       createDashboardCards(dashboardCards, DashboardCard, {observedUserId: this.observedUserId}),
       dashboardContainer,
     )

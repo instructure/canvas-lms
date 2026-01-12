@@ -17,12 +17,11 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import CoursePeopleApp from './react/CoursePeopleApp'
 
 const container = document.getElementById('content')
 
 if (!container) throw new Error('Failed to find root container element')
 
-const root = createRoot(container)
-root.render(<CoursePeopleApp />)
+render(<CoursePeopleApp />, container)

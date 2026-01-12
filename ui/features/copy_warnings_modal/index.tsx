@@ -18,12 +18,12 @@
 
 import ready from '@instructure/ready'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import CopyWarningsModal from './react/CopyWarningsModal'
 
 ready(() => {
   const container = document.querySelector('#warning_messages_modal_container')
   if (container && ENV.EXPORT_WARNINGS && ENV.EXPORT_WARNINGS.length > 0) {
-    ReactDOM.render(<CopyWarningsModal errorMessages={ENV.EXPORT_WARNINGS} />, container)
+    legacyRender(<CopyWarningsModal errorMessages={ENV.EXPORT_WARNINGS} />, container)
   }
 })
