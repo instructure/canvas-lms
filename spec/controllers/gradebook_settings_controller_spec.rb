@@ -55,6 +55,7 @@ RSpec.describe GradebookSettingsController do
           "sort_rows_by_direction" => "descending",
           "view_ungraded_as_zero" => "true",
           "view_hidden_grades_indicator" => "true",
+          "view_status_for_colorblindness" => "true",
           "colors" => {
             "late" => "#000000",
             "missing" => "#000001",
@@ -106,8 +107,9 @@ RSpec.describe GradebookSettingsController do
         it { is_expected.to include "sort_rows_by_direction" => "descending" }
         it { is_expected.to include "view_ungraded_as_zero" => "true" }
         it { is_expected.to include "view_hidden_grades_indicator" => "true" }
+        it { is_expected.to include "view_status_for_colorblindness" => "true" }
         it { is_expected.not_to include "colors" }
-        it { is_expected.to have(17).items } # ensure we add specs for new additions
+        it { is_expected.to have(18).items } # ensure we add specs for new additions
 
         context "colors" do
           subject { json_parse.fetch("gradebook_settings").fetch("colors") }
