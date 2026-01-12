@@ -17,6 +17,7 @@
  */
 
 export interface EnvDiscussions {
+  AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS?: string
   discussion_ai_survey_link: string
   DISCUSSION_TOPIC: {
     ATTRIBUTES: Record<string, any>
