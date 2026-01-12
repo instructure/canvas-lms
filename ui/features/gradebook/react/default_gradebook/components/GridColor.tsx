@@ -59,10 +59,25 @@ function GridColor(props: Props) {
     )
     .join('')
 
+  const statusIconStyles = `
+    .Grid__GradeCell__StatusIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .Grid__GradeCell__StatusIcon img {
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
+  `
+
   return (
     <style type="text/css" data-testid="grid-color">
       {styleRules}
       {customStyleRules}
+      {statusIconStyles}
     </style>
   )
 }
