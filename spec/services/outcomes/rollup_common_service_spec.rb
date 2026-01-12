@@ -436,7 +436,8 @@ describe Outcomes::RollupCommonService do
              outcome:,
              score: 4.0,
              submitted_at: submitted_at1,
-             title: "Assignment 1")
+             title: "Assignment 1",
+             hide_points: false)
     end
 
     let(:score2) do
@@ -444,7 +445,8 @@ describe Outcomes::RollupCommonService do
              outcome: double("Outcome", id: 2, calculation_method: "highest"),
              score: 3.5,
              submitted_at: submitted_at2,
-             title: "Assignment 2")
+             title: "Assignment 2",
+             hide_points: true)
     end
 
     let(:nil_score) do
@@ -452,7 +454,8 @@ describe Outcomes::RollupCommonService do
              outcome: double("Outcome", id: 3, calculation_method: "n_mastery"),
              score: nil,
              submitted_at: nil,
-             title: nil)
+             title: nil,
+             hide_points: false)
     end
 
     let(:rollup) do
@@ -478,6 +481,7 @@ describe Outcomes::RollupCommonService do
         aggregate_score: 4.0,
         submitted_at: submitted_at1,
         title: "Assignment 1",
+        hide_points: false,
         workflow_state: "active"
       )
 
@@ -486,7 +490,8 @@ describe Outcomes::RollupCommonService do
         calculation_method: "highest",
         aggregate_score: 3.5,
         submitted_at: submitted_at2,
-        title: "Assignment 2"
+        title: "Assignment 2",
+        hide_points: true
       )
     end
 
@@ -520,6 +525,7 @@ describe Outcomes::RollupCommonService do
         :aggregate_score,
         :submitted_at,
         :title,
+        :hide_points,
         :workflow_state,
         :last_calculated_at
       )
