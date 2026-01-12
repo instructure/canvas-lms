@@ -18,10 +18,7 @@
 
 import {act, fireEvent} from '@testing-library/react'
 import OutcomeManagementPanel from '../index'
-import {
-  setupTest,
-  accountMocks,
-} from './testSetup'
+import {setupTest, teardownTest, accountMocks} from './testSetup'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
@@ -43,10 +40,7 @@ describe('OutcomeManagementPanel - Mobile', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = null
+    teardownTest()
   })
 
   const clickWithinMobileSelect = async selectNode => {

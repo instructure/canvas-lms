@@ -20,16 +20,8 @@ import {act, fireEvent} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import axios from 'axios'
 import OutcomeManagementPanel from '../index'
-import {
-  setupTest,
-  courseMocks,
-  groupMocks,
-  groupDetailMocks,
-} from './testSetup'
-import {
-  updateOutcomeGroupMock,
-  createOutcomeGroupMocks,
-} from '@canvas/outcomes/mocks/Management'
+import {setupTest, teardownTest, courseMocks, groupMocks, groupDetailMocks} from './testSetup'
+import {updateOutcomeGroupMock, createOutcomeGroupMocks} from '@canvas/outcomes/mocks/Management'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
@@ -51,10 +43,7 @@ describe('OutcomeManagementPanel - Group Operations', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = null
+    teardownTest()
   })
 
   describe('Removing a group', () => {
@@ -100,59 +89,51 @@ describe('OutcomeManagementPanel - Group Operations', () => {
       axios.delete.mockResolvedValue({status: 200})
     })
 
-    it(
-      'clears selected outcomes',
-      async () => {
-        const {getByText, getByTestId} = render(<OutcomeManagementPanel {...defaultProps()} />, {
+    it('clears selected outcomes', async () => {
+      const {getByText, getByTestId} = render(<OutcomeManagementPanel {...defaultProps()} />, {
+        ...groupDetailDefaultProps,
+        mocks,
+      })
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(getByText('Group 200 folder 0'))
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(getByText('Select outcome Outcome 1 - Group 300'))
+      expect(getByText('1 Outcome Selected')).toBeInTheDocument()
+      fireEvent.click(getByText('Menu for group Group 200 folder 0'))
+      fireEvent.click(getByTestId('outcome-kebab-menu-remove'))
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(getByText('Remove Group'))
+      await act(async () => vi.runOnlyPendingTimers())
+      expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
+    }, 10000)
+
+    it('Show parent group in the RHS', async () => {
+      const {getByText, queryByText, getByTestId} = render(
+        <OutcomeManagementPanel {...defaultProps()} />,
+        {
           ...groupDetailDefaultProps,
           mocks,
-        })
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(getByText('Course folder 0'))
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(getByText('Group 200 folder 0'))
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(getByText('Select outcome Outcome 1 - Group 300'))
-        expect(getByText('1 Outcome Selected')).toBeInTheDocument()
-        fireEvent.click(getByText('Menu for group Group 200 folder 0'))
-        fireEvent.click(getByTestId('outcome-kebab-menu-remove'))
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(getByText('Remove Group'))
-        await act(async () => vi.runOnlyPendingTimers())
-        expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
-      },
-      10000,
-    )
-
-    it(
-      'Show parent group in the RHS',
-      async () => {
-        const {getByText, queryByText, getByTestId} = render(
-          <OutcomeManagementPanel {...defaultProps()} />,
-          {
-            ...groupDetailDefaultProps,
-            mocks,
-          },
-        )
-        await act(async () => vi.runOnlyPendingTimers())
-        // OutcomeManagementPanel Group Tree Browser
-        fireEvent.click(getByText('Course folder 0'))
-        await act(async () => vi.runOnlyPendingTimers())
-        expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
-        fireEvent.click(getByText('Group 200 folder 0'))
-        await act(async () => vi.runOnlyPendingTimers())
-        expect(queryByText('Course folder 0 Outcomes')).not.toBeInTheDocument()
-        // OutcomeManagementPanel Outcome Group Kebab Menu
-        fireEvent.click(getByText('Menu for group Group 200 folder 0'))
-        fireEvent.click(getByTestId('outcome-kebab-menu-remove'))
-        await act(async () => vi.runOnlyPendingTimers())
-        // Remove Modal
-        fireEvent.click(getByText('Remove Group'))
-        await act(async () => vi.runOnlyPendingTimers())
-        expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
-      },
-      10000,
-    )
+        },
+      )
+      await act(async () => vi.runOnlyPendingTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => vi.runOnlyPendingTimers())
+      expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
+      fireEvent.click(getByText('Group 200 folder 0'))
+      await act(async () => vi.runOnlyPendingTimers())
+      expect(queryByText('Course folder 0 Outcomes')).not.toBeInTheDocument()
+      // OutcomeManagementPanel Outcome Group Kebab Menu
+      fireEvent.click(getByText('Menu for group Group 200 folder 0'))
+      fireEvent.click(getByTestId('outcome-kebab-menu-remove'))
+      await act(async () => vi.runOnlyPendingTimers())
+      // Remove Modal
+      fireEvent.click(getByText('Remove Group'))
+      await act(async () => vi.runOnlyPendingTimers())
+      expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
+    }, 10000)
   })
 
   describe('Moving a group', () => {

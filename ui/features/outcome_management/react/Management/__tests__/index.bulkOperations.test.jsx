@@ -22,6 +22,7 @@ import * as useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import OutcomeManagementPanel from '../index'
 import {
   setupTest,
+  teardownTest,
   courseMocks,
   groupMocks,
   groupDetailMocks,
@@ -56,10 +57,7 @@ describe('OutcomeManagementPanel - Bulk Operations', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = null
+    teardownTest()
   })
 
   describe('Bulk remove outcomes', () => {
@@ -121,48 +119,44 @@ describe('OutcomeManagementPanel - Bulk Operations', () => {
       expect(spinners).toHaveLength(2)
     })
 
-    it(
-      'updated group names are passed to the remove modal if a selected outcome is moved',
-      async () => {
-        const {findByText, getByTestId, findByTestId} = render(
-          <OutcomeManagementPanel {...defaultProps()} />,
-          {
-            ...groupDetailDefaultProps,
-            mocks: [
-              ...defaultMocks,
-              ...groupMocks({
-                title: 'Course 101',
-                groupId: '101',
-                parentOutcomeGroupTitle: 'Root course folder',
-                parentOutcomeGroupId: '2',
-              }),
-              moveOutcomeMock({
-                groupId: '2',
-                parentGroupTitle: 'Root course folder',
-                outcomeLinkIds: ['1'],
-              }),
-            ],
-          },
-        )
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(await findByText('Course folder 0'))
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(await findByText('Select outcome Outcome 1 - Course folder 0'))
-        fireEvent.click(await findByText('Select outcome Outcome 2 - Course folder 0'))
-        fireEvent.click(await findByText('Menu for outcome Outcome 1 - Course folder 0'))
-        fireEvent.click(getByTestId('outcome-kebab-menu-move'))
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(await findByText('Back'))
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(getByTestId('outcome-management-move-modal-move-button'))
-        await act(async () => vi.runOnlyPendingTimers())
-        fireEvent.click(await findByTestId('bulk-remove-outcomes'))
-        await act(async () => vi.runOnlyPendingTimers())
-        const removeModal = await findByTestId('outcome-management-remove-modal')
-        expect(within(removeModal).getByText('From Root course folder')).toBeInTheDocument()
-      },
-      10000,
-    )
+    it('updated group names are passed to the remove modal if a selected outcome is moved', async () => {
+      const {findByText, getByTestId, findByTestId} = render(
+        <OutcomeManagementPanel {...defaultProps()} />,
+        {
+          ...groupDetailDefaultProps,
+          mocks: [
+            ...defaultMocks,
+            ...groupMocks({
+              title: 'Course 101',
+              groupId: '101',
+              parentOutcomeGroupTitle: 'Root course folder',
+              parentOutcomeGroupId: '2',
+            }),
+            moveOutcomeMock({
+              groupId: '2',
+              parentGroupTitle: 'Root course folder',
+              outcomeLinkIds: ['1'],
+            }),
+          ],
+        },
+      )
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(await findByText('Course folder 0'))
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(await findByText('Select outcome Outcome 1 - Course folder 0'))
+      fireEvent.click(await findByText('Select outcome Outcome 2 - Course folder 0'))
+      fireEvent.click(await findByText('Menu for outcome Outcome 1 - Course folder 0'))
+      fireEvent.click(getByTestId('outcome-kebab-menu-move'))
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(await findByText('Back'))
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(getByTestId('outcome-management-move-modal-move-button'))
+      await act(async () => vi.runOnlyPendingTimers())
+      fireEvent.click(await findByTestId('bulk-remove-outcomes'))
+      await act(async () => vi.runOnlyPendingTimers())
+      const removeModal = await findByTestId('outcome-management-remove-modal')
+      expect(within(removeModal).getByText('From Root course folder')).toBeInTheDocument()
+    }, 10000)
   })
 
   describe('Bulk move outcomes', () => {

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {render as realRender, act, fireEvent} from '@testing-library/react'
+import {cleanup, render as realRender, act, fireEvent} from '@testing-library/react'
 import {
   smallOutcomeTree,
   updateOutcomeGroupMock,
@@ -61,6 +61,8 @@ describe('GroupMoveModal', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    cleanup()
+    cache.reset()
   })
 
   const render = (

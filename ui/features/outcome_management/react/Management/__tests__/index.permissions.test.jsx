@@ -18,10 +18,7 @@
 
 import {act} from '@testing-library/react'
 import OutcomeManagementPanel from '../index'
-import {
-  setupTest,
-  clickWithPending,
-} from './testSetup'
+import {setupTest, teardownTest, clickWithPending} from './testSetup'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
@@ -43,10 +40,7 @@ describe('OutcomeManagementPanel - Permissions', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = null
+    teardownTest()
   })
 
   describe('With manage_outcomes permission / canManage true', () => {

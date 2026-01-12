@@ -19,7 +19,7 @@
 import {act, fireEvent} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import OutcomeManagementPanel from '../index'
-import {setupTest} from './testSetup'
+import {setupTest, teardownTest} from './testSetup'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
@@ -41,10 +41,7 @@ describe('OutcomeManagementPanel - Modals', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = null
+    teardownTest()
   })
 
   it('shows and closes Find Outcomes modal if Add Outcomes option from group menu is selected', async () => {

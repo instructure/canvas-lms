@@ -18,8 +18,9 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {render as rtlRender} from '@testing-library/react'
+import {render as rtlRender, cleanup} from '@testing-library/react'
 import {createCache} from '@canvas/apollo-v3'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 import OutcomeManagementPanel from '../index'
 import OutcomesContext, {ACCOUNT_GROUP_ID} from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
@@ -30,6 +31,9 @@ import {
 } from '@canvas/outcomes/mocks/Management'
 
 // Note: vi.mock calls must be in each test file for proper hoisting
+
+// Track current cache for teardown
+let currentCache = null
 
 /**
  * Creates the default props for OutcomeManagementPanel
@@ -130,21 +134,34 @@ export const createRenderFunction = (cache, isMobileView = false) => {
 }
 
 /**
+ * Teardown hook for tests - call this in afterEach to prevent memory leaks
+ */
+export const teardownTest = () => {
+  cleanup()
+  if (currentCache) {
+    currentCache.reset()
+    currentCache = null
+  }
+  fakeEnv.teardown()
+}
+
+/**
  * Setup hook for tests - call this in beforeEach
  */
 export const setupTest = (options = {}) => {
   const {isMobileView = false} = options
   const cache = createCache()
+  currentCache = cache
   const onLhsSelectedGroupIdChangedMock = vi.fn()
   const handleFileDropMock = vi.fn()
   const setTargetGroupIdsToRefetchMock = vi.fn()
   const setImportsTargetGroupMock = vi.fn()
 
-  window.ENV = {
+  fakeEnv.setup({
     PERMISSIONS: {
       manage_outcomes: true,
     },
-  }
+  })
 
   const defaultMocks = createDefaultCourseMocks()
   const groupDetailDefaultProps = createGroupDetailDefaultProps(defaultMocks)
