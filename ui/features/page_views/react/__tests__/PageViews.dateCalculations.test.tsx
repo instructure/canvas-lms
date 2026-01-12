@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import PageViews from '../PageViews'
 import * as PageViewsTableModule from '../PageViewsTable'
@@ -34,8 +34,12 @@ vi.mock('@instructure/moment-utils', async () => ({
   fudgeDateForProfileTimezone: vi.fn((date: Date) => date),
 }))
 
-const mockUnfudgeDateForProfileTimezone = momentUtils.unfudgeDateForProfileTimezone as ReturnType<typeof vi.fn>
-const mockFudgeDateForProfileTimezone = momentUtils.fudgeDateForProfileTimezone as ReturnType<typeof vi.fn>
+const mockUnfudgeDateForProfileTimezone = momentUtils.unfudgeDateForProfileTimezone as ReturnType<
+  typeof vi.fn
+>
+const mockFudgeDateForProfileTimezone = momentUtils.fudgeDateForProfileTimezone as ReturnType<
+  typeof vi.fn
+>
 
 function Subject({userId}: {userId: string}) {
   return (
@@ -67,6 +71,7 @@ describe('PageViews - Cache Date Calculations with unfudgeDateForProfileTimezone
   })
 
   afterEach(() => {
+    cleanup()
     MockPageViewsTable.mockReset()
     vi.useRealTimers()
   })

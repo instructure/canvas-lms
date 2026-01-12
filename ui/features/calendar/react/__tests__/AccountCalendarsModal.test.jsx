@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, fireEvent, waitFor} from '@testing-library/react'
+import {act, cleanup, render, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import MockDate from 'mockdate'
@@ -69,7 +69,12 @@ describe('Other Calendars modal ', () => {
   })
 
   afterEach(() => {
+    cleanup()
     fetchMock.restore()
+  })
+
+  afterAll(() => {
+    vi.useRealTimers()
   })
 
   const getProps = (overrides = {}) => ({

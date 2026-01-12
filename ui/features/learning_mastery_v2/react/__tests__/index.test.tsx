@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor} from '@testing-library/react'
+import {cleanup, render, waitFor} from '@testing-library/react'
 import {type MockedFunction} from 'vitest'
 import LearningMastery from '../index'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
@@ -158,6 +158,7 @@ describe('LearningMastery', () => {
   })
 
   afterEach(() => {
+    cleanup()
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockClear()
     mockSaveLearningMasteryGradebookSettings.mockClear()

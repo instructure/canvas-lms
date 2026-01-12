@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 
 import {CourseReport} from '../../types'
 import PaceDownloadModal, {PaceDownloadModalProps} from '../pace_download_modal'
@@ -42,7 +42,9 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  cleanup()
   vi.clearAllMocks()
+  vi.useRealTimers()
 })
 
 describe('PaceDownloadModal', () => {
