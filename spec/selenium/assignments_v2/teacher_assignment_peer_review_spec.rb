@@ -1191,12 +1191,18 @@ describe "as a teacher" do
 
           driver.action.send_keys(:escape).perform
           wait_for_ajaximations
+          wait_for(method: nil, timeout: 3) do
+            !element_exists?("span[data-testid='create-rule-modal']")
+          end
 
           expect(element_exists?("span[data-testid='create-rule-modal']")).to be_falsey
           expect(TeacherViewPageV2.allocation_rules_tray).to be_displayed
 
           driver.action.send_keys(:escape).perform
           wait_for_ajaximations
+          wait_for(method: nil, timeout: 3) do
+            !element_exists?("div[role='dialog'][aria-label='Allocation Rules']")
+          end
 
           expect(element_exists?("div[role='dialog'][aria-label='Allocation Rules']")).to be_falsey
         end

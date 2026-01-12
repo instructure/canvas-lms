@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {ApolloClient, ApolloProvider} from '@apollo/client'
 import TeacherQuery from './TeacherQuery'
 import {createClient} from '@canvas/apollo-v3'
@@ -27,14 +27,14 @@ import AlertManager from '@canvas/alerts/react/AlertManager'
 export default function renderAssignmentsApp(elt: HTMLElement | null) {
   const client: ApolloClient<InMemoryCache> = createClient()
   if (ENV.ASSIGNMENT_ID && elt) {
-    const root = createRoot(elt)
-    root.render(
+    render(
       <ApolloProvider client={client}>
         {/* @ts-expect-error */}
         <AlertManager>
           <TeacherQuery assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
         </AlertManager>
       </ApolloProvider>,
+      elt,
     )
   }
 }
