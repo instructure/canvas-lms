@@ -59,6 +59,7 @@ import type {DeleteDeployment} from '../../../api/deployments'
 
 import {Tag} from '@instructure/ui-tag'
 import {Grid} from '@instructure/ui-grid'
+import {Tooltip} from '@instructure/ui-tooltip'
 const I18n = createI18nScope('lti_registrations')
 
 export type DeploymentAvailabilityProps = {
@@ -158,29 +159,57 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
 
           <Grid.Col width="auto">
             <Flex direction="row" gap="small">
-              <IconButton
-                id={`edit-exception-${rootControl.id}`}
-                data-pendo="lti-registrations-edit-root-control-availability"
-                size="medium"
-                screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
-                  context_name: rootControl.context_name,
-                })}
-                renderIcon={IconEditLine}
-                onClick={() =>
-                  setEditControlInfo({control: rootControl, availableInParentContext: null})
+              <Tooltip
+                renderTip={
+                  <Text
+                    dangerouslySetInnerHTML={{
+                      __html: I18n.t('Modify availability for *%{context_name}*', {
+                        context_name: rootControl.context_name,
+                        wrapper: ['<strong>$1</strong>'],
+                      }),
+                    }}
+                  />
                 }
-              />
-              {!deployment.root_account_deployment && (
+                on={['hover', 'focus', 'click']}
+              >
                 <IconButton
-                  id={`delete-deployment-${deployment.id}`}
-                  data-pendo="lti-registrations-delete-deployment"
+                  id={`edit-exception-${rootControl.id}`}
+                  data-pendo="lti-registrations-edit-root-control-availability"
                   size="medium"
-                  screenReaderLabel={I18n.t('Delete Deployment for %{context_name}', {
+                  screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
                     context_name: rootControl.context_name,
                   })}
-                  renderIcon={IconTrashLine}
-                  onClick={() => setOpenDeleteDeploymentModal(true)}
+                  renderIcon={IconEditLine}
+                  onClick={() =>
+                    setEditControlInfo({control: rootControl, availableInParentContext: null})
+                  }
                 />
+              </Tooltip>
+              {!deployment.root_account_deployment && (
+                <Tooltip
+                  renderTip={
+                    <Text
+                      dangerouslySetInnerHTML={{
+                        __html: I18n.t('Delete Deployment for *%{context_name}*', {
+                          context_name: rootControl.context_name,
+                          wrapper: ['<strong>$1</strong>'],
+                        }),
+                      }}
+                    />
+                  }
+                  on={['hover', 'focus', 'click']}
+                >
+                  <IconButton
+                    id={`delete-deployment-${deployment.id}`}
+                    data-pendo="lti-registrations-delete-deployment"
+                    size="medium"
+                    screenReaderLabel={I18n.t('Delete Deployment for %{context_name}', {
+                      context_name: rootControl.context_name,
+                    })}
+                    renderIcon={IconTrashLine}
+                    onClick={() => setOpenDeleteDeploymentModal(true)}
+                  />
+                </Tooltip>
               )}
               {deployment.context_type !== 'Course' ? (
                 <Button
@@ -294,53 +323,81 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                   <Flex.Item>
                     <Flex gap="small">
                       <Flex.Item>
-                        <IconButton
-                          id={`edit-exception-${control.id}`}
-                          data-pendo="lti-registrations-edit-exception"
-                          size="medium"
-                          renderIcon={IconEditLine}
-                          screenReaderLabel={I18n.t('Edit Exception for %{contextName}', {
-                            contextName: control.context_name,
-                          })}
-                          onClick={() => {
-                            setEditControlInfo({
-                              control,
-                              availableInParentContext: closestParent?.available ?? false,
-                            })
-                          }}
-                        />
+                        <Tooltip
+                          renderTip={
+                            <Text
+                              dangerouslySetInnerHTML={{
+                                __html: I18n.t('Edit Exception for *%{context_name}*', {
+                                  context_name: control.context_name,
+                                  wrapper: ['<strong>$1</strong>'],
+                                }),
+                              }}
+                            />
+                          }
+                          on={['hover', 'focus', 'click']}
+                        >
+                          <IconButton
+                            id={`edit-exception-${control.id}`}
+                            data-pendo="lti-registrations-edit-exception"
+                            size="medium"
+                            renderIcon={IconEditLine}
+                            screenReaderLabel={I18n.t('Edit Exception for %{contextName}', {
+                              contextName: control.context_name,
+                            })}
+                            onClick={() => {
+                              setEditControlInfo({
+                                control,
+                                availableInParentContext: closestParent?.available ?? false,
+                              })
+                            }}
+                          />
+                        </Tooltip>
                       </Flex.Item>
                       <Flex.Item>
-                        <IconButton
-                          id={`delete-exception-${control.id}`}
-                          data-pendo="lti-registrations-delete-exception"
-                          size="medium"
-                          screenReaderLabel={I18n.t('Delete Exception for %{contextName}', {
-                            contextName: control.context_name,
-                          })}
-                          renderIcon={IconTrashLine}
-                          onClick={() => {
-                            if ('course_id' in control && control.course_id) {
-                              setDeleteExceptionModalOpenProps({
-                                open: true,
-                                availableInParentContext: closestParent.available,
-                                toolName: registration.name,
-                                courseControl: control,
-                              })
-                            } else {
-                              setDeleteExceptionModalOpenProps({
-                                ...props,
-                                open: true,
-                                availableInParentContext: closestParent.available,
-                                toolName: registration.name,
-                                accountControl: control,
-                                childControls: (deployment.context_controls || []).filter(
-                                  c => c.path.startsWith(control.path) && c.path !== control.path,
-                                ),
-                              })
-                            }
-                          }}
-                        />
+                        <Tooltip
+                          renderTip={
+                            <Text
+                              dangerouslySetInnerHTML={{
+                                __html: I18n.t('Delete Exception for *%{context_name}*', {
+                                  context_name: control.context_name,
+                                  wrapper: ['<strong>$1</strong>'],
+                                }),
+                              }}
+                            />
+                          }
+                          on={['hover', 'focus', 'click']}
+                        >
+                          <IconButton
+                            id={`delete-exception-${control.id}`}
+                            data-pendo="lti-registrations-delete-exception"
+                            size="medium"
+                            screenReaderLabel={I18n.t('Delete Exception for %{contextName}', {
+                              contextName: control.context_name,
+                            })}
+                            renderIcon={IconTrashLine}
+                            onClick={() => {
+                              if ('course_id' in control && control.course_id) {
+                                setDeleteExceptionModalOpenProps({
+                                  open: true,
+                                  availableInParentContext: closestParent.available,
+                                  toolName: registration.name,
+                                  courseControl: control,
+                                })
+                              } else {
+                                setDeleteExceptionModalOpenProps({
+                                  ...props,
+                                  open: true,
+                                  availableInParentContext: closestParent.available,
+                                  toolName: registration.name,
+                                  accountControl: control,
+                                  childControls: (deployment.context_controls || []).filter(
+                                    c => c.path.startsWith(control.path) && c.path !== control.path,
+                                  ),
+                                })
+                              }
+                            }}
+                          />
+                        </Tooltip>
                       </Flex.Item>
                     </Flex>
                   </Flex.Item>
