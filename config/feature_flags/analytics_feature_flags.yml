@@ -149,6 +149,15 @@ intelligent_insights_rsi_report:
   root_opt_in: true
   beta: true
   shadow: true
+intelligent_insights_rsi_ignore_course:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - RSI - Ignore functionality
+  description:
+    intelligent-insights-rsi-ignore-course: Enables the Intelligent Insights - RSI - Ignore course feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_improved_criteria_builder:
   state: hidden
   applies_to: Account
