@@ -729,4 +729,63 @@ describe AuthenticationProvider do
       expect(aac.otp_via_sms?).to be_truthy
     end
   end
+
+  describe "#login_authentication_provider_path" do
+    shared_examples_for "singleton provider" do |auth_type, required_attrs = {}|
+      it "returns path without ID for #{auth_type} when persisted" do
+        provider = account.authentication_providers.create!(auth_type:, **required_attrs)
+        expect(provider.login_authentication_provider_path).to eq "/login/#{auth_type}"
+      end
+
+      it "returns path without ID for #{auth_type} when unsaved" do
+        provider = account.authentication_providers.new(auth_type:, **required_attrs)
+        expect(provider.login_authentication_provider_path).to eq "/login/#{auth_type}"
+      end
+    end
+
+    shared_examples_for "non-singleton provider" do |auth_type, required_attrs = {}|
+      it "returns path with ID for #{auth_type} when persisted" do
+        provider = account.authentication_providers.create!(auth_type:, **required_attrs)
+        expect(provider.login_authentication_provider_path).to eq "/login/#{auth_type}/#{provider.id}"
+      end
+
+      it "raises error for #{auth_type} when unsaved" do
+        provider = account.authentication_providers.new(auth_type:, **required_attrs)
+        expect { provider.login_authentication_provider_path }.to raise_error(
+          ActionController::UrlGenerationError,
+          "Cannot generate URL for unsaved authentication provider"
+        )
+      end
+    end
+
+    context "for singleton providers" do
+      it_behaves_like "singleton provider", "apple"
+      it_behaves_like "singleton provider", "canvas"
+      it_behaves_like "singleton provider", "facebook"
+      it_behaves_like "singleton provider", "github"
+      it_behaves_like "singleton provider", "linkedin"
+    end
+
+    context "for non-singleton providers" do
+      it_behaves_like "non-singleton provider", "cas"
+      it_behaves_like "non-singleton provider", "clever"
+      it_behaves_like "non-singleton provider", "google"
+      it_behaves_like "non-singleton provider", "ldap"
+      it_behaves_like "non-singleton provider", "microsoft", { tenant: "common", login_attribute: "tid+oid" }
+      it_behaves_like "non-singleton provider", "openid_connect"
+      it_behaves_like "non-singleton provider", "saml"
+      it_behaves_like "non-singleton provider", "saml_idp_discovery"
+    end
+
+    context "error handling" do
+      it "raises error for invalid auth type" do
+        invalid_provider = account.authentication_providers.create!(auth_type: "cas")
+        allow(invalid_provider.class).to receive(:sti_name).and_return("invalid_type")
+        expect { invalid_provider.login_authentication_provider_path }.to raise_error(
+          ActionController::UrlGenerationError,
+          "No route matches invalid_type authentication provider"
+        )
+      end
+    end
+  end
 end
