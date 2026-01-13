@@ -3312,7 +3312,6 @@ class UsersController < ApplicationController
     save_user = @recaptcha_errors.nil? && @user.valid? && @pseudonym.valid? && (@invalid_observee_creds.nil? & @invalid_observee_code.nil?)
 
     message_sent = User.transaction do
-      handle_instructure_identity(save_user)
       if save_user
         # saving the user takes care of the @pseudonym and @cc, so we can't call
         # save_without_session_maintenance directly. we don't want to auto-log-in
@@ -3390,8 +3389,6 @@ class UsersController < ApplicationController
       render json: errors, status: :bad_request
     end
   end
-
-  def handle_instructure_identity(will_be_saving_user) end
 
   def perform_sis_reactivation(sis_user_id)
     @pseudonym = @context.pseudonyms.where(sis_user_id:, workflow_state: "deleted").first
