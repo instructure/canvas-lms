@@ -39,6 +39,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {ContextBrowse} from './ContextBrowse'
 import {LtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -216,17 +217,31 @@ export const ExceptionModal = ({
                           </SimpleSelect>
                         </Flex.Item>
                         <Flex.Item>
-                          <IconButton
-                            screenReaderLabel={I18n.t('Delete exception for %{context_name}', {
-                              context_name: control.context.context.name,
-                            })}
-                            onClick={() => {
-                              // Remove the context from the context control form
-                              setContextControlForm(prev => prev.filter((_c, i) => i !== index))
-                            }}
+                          <Tooltip
+                            renderTip={
+                              <Text
+                                dangerouslySetInnerHTML={{
+                                  __html: I18n.t('Delete exception for *%{context_name}*', {
+                                    context_name: control.context.context.name,
+                                    wrapper: ['<strong>$1</strong>'],
+                                  }),
+                                }}
+                              />
+                            }
+                            on={['hover', 'focus']}
                           >
-                            <IconTrashLine />
-                          </IconButton>
+                            <IconButton
+                              screenReaderLabel={I18n.t('Delete exception for %{context_name}', {
+                                context_name: control.context.context.name,
+                              })}
+                              onClick={() => {
+                                // Remove the context from the context control form
+                                setContextControlForm(prev => prev.filter((_c, i) => i !== index))
+                              }}
+                            >
+                              <IconTrashLine />
+                            </IconButton>
+                          </Tooltip>
                         </Flex.Item>
                       </Flex>
                     </List.Item>
