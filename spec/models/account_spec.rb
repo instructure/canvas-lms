@@ -245,21 +245,6 @@ describe Account do
     expect { Account.new.courses }.not_to raise_error
   end
 
-  context "equella_settings" do
-    it "responds to :equella_settings" do
-      expect(Account.new).to respond_to(:equella_settings)
-      expect(Account.new.equella_settings).to be_nil
-    end
-
-    it "returns the equella_settings data if defined" do
-      a = Account.new
-      a.equella_endpoint = "http://oer.equella.com/signon.do"
-      expect(a.equella_settings).not_to be_nil
-      expect(a.equella_settings[:endpoint]).to eql("http://oer.equella.com/signon.do")
-      expect(a.equella_settings[:default_action]).not_to be_nil
-    end
-  end
-
   # it "should have an atom feed" do
   # account_model
   # @a.to_atom.should be_is_a(Atom::Entry)

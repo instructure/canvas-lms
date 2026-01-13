@@ -3809,16 +3809,6 @@ class Course < ActiveRecord::Base
     enrollment_term.name
   end
 
-  def equella_settings
-    account = self.account
-    while account
-      settings = account.equella_settings
-      return settings if settings
-
-      account = account.parent_account
-    end
-  end
-
   cattr_accessor :settings_options
   self.settings_options = {}
 

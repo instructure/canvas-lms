@@ -389,12 +389,6 @@ module ApplicationHelper
     available_section_tabs.find { |tc| tc[:id] == tool.asset_string }.present?
   end
 
-  def equella_enabled?
-    @equella_settings ||= @context.equella_settings if @context.respond_to?(:equella_settings)
-    @equella_settings ||= @domain_root_account.try(:equella_settings)
-    !!@equella_settings
-  end
-
   def show_user_create_course_button(user, account = nil)
     return true if account&.grants_right?(user, :create_courses)
 
@@ -462,7 +456,6 @@ module ApplicationHelper
       end
     end
     {
-      equellaEnabled: !!equella_enabled?,
       disableGooglePreviews: !service_enabled?(:google_docs_previews),
       logPageViews: !@body_class_no_headers,
       editorButtons: editor_buttons,
