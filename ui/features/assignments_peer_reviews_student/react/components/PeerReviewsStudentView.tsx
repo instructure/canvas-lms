@@ -90,7 +90,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
       const hasSubmitted =
         assignment.submissionsConnection?.nodes &&
         assignment.submissionsConnection.nodes.length > 0 &&
-        assignment.submissionsConnection.nodes[0]?.submissionStatus === 'submitted'
+        assignment.submissionsConnection.nodes[0]?.submittedAt
       const showSubmissionRequiredView = submissionRequired && !hasSubmitted
 
       if (!showSubmissionRequiredView && assessmentRequestsCount < peerReviewsRequired) {
@@ -166,7 +166,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const hasSubmitted =
     submissionsConnection?.nodes &&
     submissionsConnection.nodes.length > 0 &&
-    submissionsConnection.nodes[0]?.submissionStatus === 'submitted'
+    submissionsConnection.nodes[0]?.submittedAt
   const showSubmissionRequiredView = submissionRequired && !hasSubmitted
   const isLocked = isPeerReviewLocked(data.assignment)
   const peerReviewDueAt = assignedToDates?.[0]?.peerReviewDates?.dueAt
