@@ -1346,6 +1346,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/sections", action: :index, as: "course_sections"
       get "courses/:course_id/sections/:id", action: :show, as: "course_section"
       get "sections/:id", action: :show
+      get "sections/:id/users", action: :users, as: "section_users"
       post "courses/:course_id/sections", action: :create
       put "sections/:id", action: :update
       delete "sections/:id", action: :destroy

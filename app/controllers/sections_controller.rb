@@ -83,6 +83,11 @@
 #           "description": "optional: the total number of active and invited students in the section",
 #           "example": 13,
 #           "type": "integer"
+#         },
+#         "students": {
+#           "description": "optional: A list of students that are included in the section. Returned only if include[]=students. WARNING: this collection's size is capped (if there are an extremely large number of users in the section (thousands) not all of them will be returned). If you need to capture all the users in a section with certainty or experiencing slow response consider using the paginated /api/v1/sections/<section_id>/users endpoint.",
+#           "type": "array",
+#           "items": { "$ref": "User" }
 #         }
 #       }
 #     }
@@ -415,6 +420,56 @@ class SectionsController < ApplicationController
         end
       end
     end
+  end
+
+  # @API List section's users
+  #
+  # Returns a paginated list of users in the section.
+  #
+  # @argument search_term [String]
+  #   The partial name or full ID of the users to match and return in the
+  #   results list. Must be at least 2 characters.
+  #
+  # @argument include[] [String, "avatar_url"]
+  #   "avatar_url": Include users' avatar_urls.
+  #
+  # @argument exclude_inactive [Boolean]
+  #   Whether to filter out inactive users from the results. Defaults to
+  #   false unless explicitly provided.
+  #
+  # @argument enrollment_type [String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #   When set, only return users with the specified enrollment type for the given section.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/sections/1/users \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [User]
+  def users
+    return unless authorized_action(@context, @current_user, :read)
+    return unless authorized_action(@context.course, @current_user, :read_roster)
+
+    user_can_interact_with_the_section = @context.course.sections_visible_to(@current_user).where(id: @context.id).exists?
+
+    return render json: { error: "section is not visible to the current user" }, status: :forbidden unless user_can_interact_with_the_section
+
+    search_params = {}
+    search_params[:include_inactive_enrollments] = params[:exclude_inactive].present? ? !value_to_boolean(params[:exclude_inactive]) : true
+    search_params[:enrollment_type] = params[:enrollment_type] if params[:enrollment_type].present?
+    search_term = params[:search_term].presence
+
+    users = if search_term
+              UserSearch.for_user_in_context(search_term, @context, @current_user, session, search_params)
+            else
+              UserSearch.scope_for(@context, @current_user, search_params)
+            end
+
+    includes = Array(params[:include])
+    users = Api.paginate(users, self, api_v1_section_users_url)
+    UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ["uuid", "lti_id"].any? { |id| includes.include? id }
+    json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
+
+    render json: json_users
   end
 
   protected
