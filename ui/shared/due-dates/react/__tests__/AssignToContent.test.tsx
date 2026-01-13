@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, act, within, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import AssignToContent2 from '../AssignToContent2'
+import AssignToContent from '../AssignToContent'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
@@ -37,7 +37,7 @@ const SECTIONS_DATA = [
 const COURSE_ID = 1
 const ASSIGNMENT_ID = '1'
 
-describe('AssignToContent2', () => {
+describe('AssignToContent', () => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore Backbone collection constructor accepts initial models
   const assignmentcollection = new AssignmentOverrideCollection([
@@ -113,7 +113,7 @@ describe('AssignToContent2', () => {
   const setUp = (propOverrides = {}) =>
     render(
       <MockedQueryProvider>
-        <AssignToContent2 {...props} {...propOverrides} />
+        <AssignToContent {...props} {...propOverrides} />
       </MockedQueryProvider>,
     )
 
@@ -159,7 +159,7 @@ describe('AssignToContent2', () => {
     const onSyncMock = vi.fn()
     render(
       <MockedQueryProvider>
-        <AssignToContent2
+        <AssignToContent
           {...props}
           overrides={(twoCardOverrides as any).models.map(
             (m: any) => m.toJSON().assignment_override,

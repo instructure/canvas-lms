@@ -28,7 +28,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
 import AssignToContent from '../../react/AssignToContent'
-import AssignToContent2 from '../../react/AssignToContent2'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import '@canvas/jquery/jquery.instructure_forms'
 import sanitizeData from '../../../forms/sanitizeData'
@@ -86,11 +85,7 @@ DueDateOverrideView.prototype.render = function () {
     )
   }
 
-  const AssignToComponent = ENV.FEATURES?.assign_to_in_edit_pages_rewrite
-    ? AssignToContent2
-    : AssignToContent
-
-  const assignToSection = React.createElement(AssignToComponent, {
+  const assignToSection = React.createElement(AssignToContent, {
     onSync: this.setNewOverridesCollection,
     defaultSectionId: this.model.defaultDueDateSectionId,
     overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),

@@ -265,18 +265,6 @@ widget_dashboard_customization:
     ci:
       state: allowed_on
 
-assign_to_in_edit_pages_rewrite:
-  state: hidden
-  display_name: Assign to in edit pages rewrite
-  description: |-
-    When enabled, uses the rewritten AssignToContent component in edit pages.
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-
 platform_ui_unified_widgets_dashboard:
   state: hidden
   display_name: Platform UI - Unified Widgets Dashboard

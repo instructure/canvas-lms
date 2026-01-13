@@ -19,7 +19,6 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {DiscussionDueDatesContext} from '../../util/constants'
 import AssignToContent from '@canvas/due-dates/react/AssignToContent'
-import AssignToContent2 from '@canvas/due-dates/react/AssignToContent2'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {View} from '@instructure/ui-view'
 
@@ -203,13 +202,9 @@ export const ItemAssignToTrayWrapper = () => {
     return <LoadingIndicator />
   }
 
-  const AssignToComponent = ENV.FEATURES?.assign_to_in_edit_pages_rewrite
-    ? AssignToContent2
-    : AssignToContent
-
   return (
     <View as="div" maxWidth="478px">
-      <AssignToComponent
+      <AssignToContent
         onSync={onSync}
         overrides={overrides}
         setOverrides={setOverrides}
