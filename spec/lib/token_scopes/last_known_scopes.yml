@@ -2122,6 +2122,8 @@
 - verb: POST
   path: '/api/v1/sections/:id/crosslist/:new_course_id'
 - verb: GET
+  path: '/api/v1/sections/:id/users'
+- verb: GET
   path: '/api/v1/sections/:section_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id'
 - verb: PUT
   path: '/api/v1/sections/:section_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id'

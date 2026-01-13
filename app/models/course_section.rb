@@ -435,6 +435,18 @@ class CourseSection < ActiveRecord::Base
     course_paces.published.find_each(&:create_publish_progress)
   end
 
+  def users_visible_to(user, opts = {})
+    return users.none unless grants_right?(user, :read)
+
+    if opts[:include_inactive]
+      users
+    else
+      users.joins(enrollments: :enrollment_state)
+           .where(enrollment_states: { restricted_access: false })
+           .where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')")
+    end
+  end
+
   private
 
   def remove_from_gradebook_filters

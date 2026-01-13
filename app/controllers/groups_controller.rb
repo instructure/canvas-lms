@@ -136,7 +136,7 @@
 #           "value": { "type": "boolean" }
 #         },
 #         "users": {
-#           "description": "optional: A list of users that are members in the group. Returned only if include[]=users. WARNING: this collection's size is capped (if there are an extremely large number of users in the group (thousands) not all of them will be returned).  If you need to capture all the users in a group with certainty consider using the paginated /api/v1/groups/<group_id>/memberships endpoint.",
+#           "description": "optional: A list of users that are members in the group. Returned only if include[]=users. WARNING: this collection's size is capped (if there are an extremely large number of users in the group (thousands) not all of them will be returned). If you need to capture all the users in a group with certainty or experiencing slow response consider using the paginated /api/v1/groups/<group_id>/users endpoint.",
 #           "type": "array",
 #           "items": { "$ref": "User" }
 #         },
@@ -948,7 +948,7 @@ class GroupsController < ApplicationController
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
-  #   results list. Must be at least 3 characters.
+  #   results list. Must be at least 2 characters.
   #
   # @argument include[] [String, "avatar_url"]
   #   "avatar_url": Include users' avatar_urls.
