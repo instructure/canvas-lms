@@ -289,15 +289,6 @@
       <% if @page_view %>
         <div id="page_view_id"><%= @page_view.id %></div>
       <% end %>
-      <% if equella_enabled? %>
-        <a id="equella_endpoint_url" href="<%= @equella_settings[:endpoint] %>">&nbsp;</a>
-        <a id="equella_callback_url" href="<%= external_content_success_url('equella') %>">&nbsp;</a>
-        <a id="equella_cancel_url" href="<%= external_content_cancel_url('equella') %>">&nbsp;</a>
-        <a id="equella_action" href="<%= @equella_settings[:default_action] %>">&nbsp;</a>
-        <% if @equella_settings[:teaser] %>
-          <div id="equella_teaser"><%= @equella_settings[:teaser] %></div>
-        <% end %>
-      <% end %>
     </div>
   <div id='aria_alerts' class='hide-text affix' role="alert" aria-live="assertive"></div>
   <div id='StudentTray__Container'></div>

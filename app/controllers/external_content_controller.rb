@@ -42,13 +42,7 @@ class ExternalContentController < ApplicationController
   def success
     normalize_deprecated_data!
     @retrieved_data = {}
-    if params[:service] == "equella"
-      params.each do |key, value|
-        if key.to_s.start_with?("eq_")
-          @retrieved_data[key.to_s.delete_prefix("eq_")] = value
-        end
-      end
-    elsif params[:return_type] == "oembed"
+    if params[:return_type] == "oembed"
       js_env(oembed: { endpoint: params[:endpoint], url: params[:url] })
       @oembed_token = params[:oembed_token]
     elsif params[:service] == "external_tool_dialog"

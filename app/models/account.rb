@@ -28,6 +28,8 @@ class Account < ActiveRecord::Base
   CALENDAR_SUBSCRIPTION_TYPES = %w[manual auto].freeze
   HORIZON_FEATURE_SLUG = "horizon"
 
+  self.ignored_columns += [:equella_endpoint]
+
   include Workflow
   include BrandConfigHelpers
   include Canvas::Security::PasswordPolicyAccountSettingValidator
@@ -335,8 +337,6 @@ class Account < ActiveRecord::Base
   add_setting :pronouns, root_only: true
 
   add_setting :self_enrollment
-  add_setting :equella_endpoint
-  add_setting :equella_teaser
   add_setting :enable_alerts, boolean: true, root_only: true
   add_setting :enable_eportfolios, boolean: true, root_only: true
   add_setting :users_can_edit_name, boolean: true, root_only: true, default: true
@@ -774,19 +774,6 @@ class Account < ActiveRecord::Base
       end
 
       Account.clear_cache_keys([id] + Account.sub_account_ids_recursive(id), *keys_to_clear)
-    end
-  end
-
-  def equella_settings
-    endpoint = settings[:equella_endpoint] || equella_endpoint
-    if endpoint.blank?
-      nil
-    else
-      {
-        endpoint:,
-        default_action: settings[:equella_action] || "selectOrAdd",
-        teaser: settings[:equella_teaser]
-      }
     end
   end
 
