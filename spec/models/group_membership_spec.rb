@@ -585,6 +585,8 @@ describe GroupMembership do
     let(:group) { group_category.groups.create!(context: course) }
 
     before do
+      course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      course.account.save!
       course.enroll_student(student, enrollment_state: "active")
     end
 
@@ -644,6 +646,35 @@ describe GroupMembership do
             course_ids: [course.id],
             user_ids: [student.id],
             wiki_page_ids: [wiki_page.id],
+            include_concluded: false
+          )
+        ).at_least(:once)
+      end
+
+      it "invalidates quiz visibility cache when group membership changes" do
+        quiz = course.quizzes.create!(title: "Group Quiz", quiz_type: "assignment", workflow_state: "available")
+        quiz.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+        membership = group.group_memberships.create!(user: student)
+
+        allow(QuizVisibility::QuizVisibilityService).to receive(:invalidate_cache)
+
+        membership.destroy
+
+        expect(QuizVisibility::QuizVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            quiz_ids: [quiz.id],
+            include_concluded: true
+          )
+        ).at_least(:once)
+
+        expect(QuizVisibility::QuizVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            quiz_ids: [quiz.id],
             include_concluded: false
           )
         ).at_least(:once)

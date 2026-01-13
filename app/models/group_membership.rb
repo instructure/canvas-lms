@@ -197,6 +197,7 @@ class GroupMembership < ActiveRecord::Base
     assignments = []
     wiki_pages = []
     discussion_topics = []
+    quizzes = []
 
     if group.non_collaborative
       overrides = AssignmentOverride.active.where(set_type: "Group", set_id: group.id)
@@ -207,6 +208,7 @@ class GroupMembership < ActiveRecord::Base
       end
       wiki_pages += overrides.where.not(wiki_page_id: nil).pluck(:wiki_page_id)
       discussion_topics += overrides.where.not(discussion_topic_id: nil).pluck(:discussion_topic_id)
+      quizzes += overrides.where.not(quiz_id: nil).pluck(:quiz_id)
     else
       assignments += Assignment.where(context_type: group.context_type, context_id: group.context_id)
                                .where(group_category_id: group.group_category_id).pluck(:id)
@@ -286,6 +288,30 @@ class GroupMembership < ActiveRecord::Base
         end
 
         UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.invalidate_cache(
+          course_ids: [group.context_id],
+          user_ids: [user.id],
+          include_concluded:
+        )
+      end
+    end
+
+    if quizzes.any?
+      Quizzes::Quiz.where(id: quizzes).touch_and_clear_cache_keys(:availability)
+
+      available_quiz_ids = Quizzes::Quiz.where(context_type: "Course", context_id: group.context_id, workflow_state: "available").pluck(:id)
+      quiz_id_sets = [quizzes, available_quiz_ids].uniq
+
+      [true, false].each do |include_concluded|
+        quiz_id_sets.each do |q_ids|
+          QuizVisibility::QuizVisibilityService.invalidate_cache(
+            course_ids: [group.context_id],
+            user_ids: [user.id],
+            quiz_ids: q_ids,
+            include_concluded:
+          )
+        end
+
+        QuizVisibility::QuizVisibilityService.invalidate_cache(
           course_ids: [group.context_id],
           user_ids: [user.id],
           include_concluded:
