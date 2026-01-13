@@ -162,7 +162,7 @@ interface SubmissionsConnection {
 
 interface SubmissionNode {
   _id: string
-  submissionStatus: string | null
+  submittedAt: string | null
 }
 
 export interface ReviewerSubmission {

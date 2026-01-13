@@ -37,7 +37,7 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
       submissionsConnection(filter: {userId: $userId}) {
         nodes {
           _id
-          submissionStatus
+          submittedAt
         }
       }
       assignedToDates {

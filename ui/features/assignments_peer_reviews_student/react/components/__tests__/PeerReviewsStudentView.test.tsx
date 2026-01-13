@@ -163,7 +163,7 @@ describe('PeerReviewsStudentView', () => {
           submissionRequired: false,
         },
         submissionsConnection: {
-          nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+          nodes: [{_id: 'sub-1', submittedAt: '2025-12-01T00:00:00Z'}],
         },
         assignedToDates: [
           {
@@ -846,7 +846,7 @@ describe('PeerReviewsStudentView', () => {
             submissionRequired: true,
           },
           submissionsConnection: {
-            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+            nodes: [{_id: 'sub-1', submittedAt: '2025-12-01T00:00:00Z'}],
           },
           assessmentRequestsForCurrentUser: [],
         },
@@ -961,7 +961,7 @@ describe('PeerReviewsStudentView', () => {
             submissionRequired: true,
           },
           submissionsConnection: {
-            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+            nodes: [{_id: 'sub-1', submittedAt: '2025-12-01T00:00:00Z'}],
           },
           assessmentRequestsForCurrentUser: [
             {
@@ -1025,7 +1025,7 @@ describe('PeerReviewsStudentView', () => {
             submissionRequired: true,
           },
           submissionsConnection: {
-            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+            nodes: [{_id: 'sub-1', submittedAt: '2025-12-01T00:00:00Z'}],
           },
           assessmentRequestsForCurrentUser: [],
         },
@@ -1038,6 +1038,120 @@ describe('PeerReviewsStudentView', () => {
       })
 
       expect(getByText('Submission')).toBeInTheDocument()
+    })
+
+    it('allows peer reviews when student submits late (after due date)', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '27',
+          name: 'Late Submission Test',
+          dueAt: '2025-12-15T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submittedAt: '2025-12-20T10:30:00Z'}],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText, getByTestId} = setup({assignmentId: '27'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+
+      expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      expect(getByText('Submission')).toBeInTheDocument()
+    })
+
+    it('calls allocate when student submits late and needs reviews', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '28',
+          name: 'Late Submission Allocate Test',
+          dueAt: '2025-12-15T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submittedAt: '2025-12-20T10:30:00Z'}],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      setup({assignmentId: '28'})
+
+      await waitFor(() => {
+        expect(mockMutate).toHaveBeenCalledWith({
+          courseId: '100',
+          assignmentId: '28',
+        })
+      })
+    })
+
+    it('does not allow peer reviews when assignment is graded but not submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '29',
+          name: 'Graded Without Submission Test',
+          dueAt: '2025-12-15T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submittedAt: null}],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText, queryByTestId} = setup({assignmentId: '29'})
+
+      await waitFor(() => {
+        expect(
+          getByText('You must submit your own work before you can review your peers.'),
+        ).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('peer-review-selector')).not.toBeInTheDocument()
+    })
+
+    it('does not allocate reviews when assignment is graded but not submitted', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '30',
+          name: 'Graded No Allocate Test',
+          dueAt: '2025-12-15T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+            submissionRequired: true,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submittedAt: null}],
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      setup({assignmentId: '30'})
+
+      await waitFor(() => {
+        expect(mockMutate).not.toHaveBeenCalled()
+      })
     })
   })
 
