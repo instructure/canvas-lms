@@ -28,6 +28,7 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
 
   field :rubric_assessment, Types::RubricAssessmentType, null: true
+  field :rubric_association, Types::RubricAssociationType, null: true
   field :submission, Types::SubmissionType, null: true
   def resolve(input:)
     root_account = context[:domain_root_account]
@@ -75,7 +76,7 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
         )
 
         submission.reload
-        return { submission:, rubric_assessment: }
+        return { submission:, rubric_assessment:, rubric_association: association }
       end
     rescue Assignment::MaxGradersReachedError => e
       raise GraphQL::ExecutionError, e.message
