@@ -3670,6 +3670,11 @@ describe AssignmentsController do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(assigns[:js_env][:EMOJIS_ENABLED]).to be(false)
       end
+
+      it "sets the page title to assignment title with Peer Review" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:page_title]).to eq("Peer Review Assignment Peer Review")
+      end
     end
 
     context "when user is a teacher and peer_review_allocation_and_grading FF is enabled" do
