@@ -47,13 +47,11 @@ export default class GradeEntry {
     return !!this.options.restrictPointsBasedInput && !!this.gradingScheme?.pointsBased
   }
 
-  // @ts-expect-error
-  formatGradeInfoForDisplay(_gradeInfo) {
+  formatGradeInfoForDisplay(_gradeInfo: GradeOverrideInfo | null) {
     return null
   }
 
-  // @ts-expect-error
-  formatGradeInfoForInput(_gradeInfo) {
+  formatGradeInfoForInput(_gradeInfo: GradeOverrideInfo | null) {
     return null
   }
 

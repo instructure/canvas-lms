@@ -87,11 +87,10 @@ function ClearableDateTimeInput({
   timeInputRef,
   clearButtonAltLabel,
 }: ClearableDateTimeInputProps) {
-  const elementRef = useRef<Element | null>(null)
+  const elementRef = useRef<HTMLElement | null>(null)
   const elementRefCallback = (element: Element | null) => {
-    elementRef.current = element
+    elementRef.current = element instanceof HTMLElement ? element : null
     if (elementRef?.current) {
-      // @ts-expect-error
       setHeight(elementRef.current.offsetHeight)
     }
   }

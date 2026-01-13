@@ -24,9 +24,11 @@ function isNegativePoints(score: number | null) {
   return typeof score === 'number' && score < 0
 }
 
-// @ts-expect-error
-export function isUnusuallyHigh(score, pointsPossible) {
-  if (pointsPossible === 0 || pointsPossible == null) {
+export function isUnusuallyHigh(
+  score: number | null | undefined,
+  pointsPossible: number | null | undefined,
+) {
+  if (pointsPossible === 0 || pointsPossible == null || score == null) {
     return false
   }
   const outlierBoundary = pointsPossible * MULTIPLIER
@@ -38,9 +40,7 @@ export default class OutlierScoreHelper {
 
   pointsPossible: number | null
 
-  // @ts-expect-error
-  constructor(score?: number | null, pointsPossible: number | null) {
-    // @ts-expect-error
+  constructor(score: number | null = null, pointsPossible: number | null) {
     this.score = score
     this.pointsPossible = pointsPossible
   }

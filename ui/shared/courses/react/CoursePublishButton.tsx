@@ -131,8 +131,7 @@ const CoursePublishButton = ({
     }
   }
 
-  const getButtonLabel = (): React.ReactFragment => {
-    // @ts-expect-error
+  const getButtonLabel = (): React.ReactNode => {
     return (
       <>
         {coursePublished ? I18n.t('Published') : I18n.t('Unpublished')}
