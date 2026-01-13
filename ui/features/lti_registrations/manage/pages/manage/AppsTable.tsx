@@ -361,7 +361,7 @@ const CondensedColumns: ReadonlyArray<Column> = [
   {
     id: 'name',
     header: I18n.t('App Name'),
-    width: '32%',
+    width: '27%',
     sortable: true,
     render: r => {
       const appName = (
@@ -397,16 +397,29 @@ const CondensedColumns: ReadonlyArray<Column> = [
     render: r => (r.admin_nickname ? <Text wrap="break-word">{r.admin_nickname}</Text> : null),
   },
   {
+    id: 'installed',
+    header: I18n.t('Installed On'),
+    width: '15%',
+    sortable: true,
+    textAlign: 'center',
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
+    render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
+  },
+  {
     id: 'lti_version',
     sortable: true,
     header: I18n.t('Version'),
     width: '8%',
+    textAlign: 'center',
+
     render: r => <div>{'legacy_configuration_id' in r ? '1.1' : '1.3'}</div>,
   },
   {
     id: 'on',
+    textAlign: 'center',
     header: I18n.t('On/Off'),
-    width: '8%',
+    width: '10%',
     sortable: true,
     render: r => (
       <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
@@ -415,7 +428,7 @@ const CondensedColumns: ReadonlyArray<Column> = [
   {
     id: 'status',
     header: I18n.t('Status'),
-    width: '32%',
+    width: '20%',
     sortable: true,
     render: r => {
       // Check if feature flag is enabled
