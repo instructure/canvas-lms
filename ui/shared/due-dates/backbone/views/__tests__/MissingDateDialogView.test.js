@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
+import {registerFixDialogButtonsPlugin} from '@canvas/enhanced-user-content/jquery'
 import MissingDateDialogView from '../MissingDateDialogView'
 
 const ok = x => expect(x).toBeTruthy()
@@ -44,6 +45,11 @@ Element.prototype.getClientRects = function () {
 let dialog
 
 describe('MissingDateDialogView', () => {
+  beforeAll(() => {
+    // Register jQuery plugin needed by dialogs
+    registerFixDialogButtonsPlugin()
+  })
+
   beforeEach(() => {
     $('#fixtures').append(
       '<label for="date">Section one</label><input type="text" id="date" name="date" />',

@@ -152,7 +152,6 @@ const addResourceIdentifiersToStudioContent = content => {
 
 export function enhanceUserContent(container = document, opts = {}) {
   const {
-    customEnhanceFunc,
     canvasOrigin,
     kalturaSettings,
     disableGooglePreviews,
@@ -431,10 +430,6 @@ export function enhanceUserContent(container = document, opts = {}) {
       handleYoutubeLink($anchor)
     }
   })
-
-  if (customEnhanceFunc) {
-    customEnhanceFunc()
-  }
 
   content.querySelectorAll('.user_content.unenhanced').forEach($elem => {
     $elem.classList.remove('unenhanced')

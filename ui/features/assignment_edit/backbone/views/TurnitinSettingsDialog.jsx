@@ -24,7 +24,6 @@ import {extend as lodashExtend} from 'es-toolkit/compat'
 import vericiteSettingsDialog from '../../jst/VeriCiteSettingsDialog.handlebars'
 import {View} from '@canvas/backbone'
 import htmlEscape from '@instructure/html-escape'
-import '@canvas/util/jquery/fixDialogButtons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 

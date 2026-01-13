@@ -184,7 +184,6 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
 import 'jqueryui/position'
-import '@canvas/util/jquery/fixDialogButtons'
 
 import {
   assignmentSearchMatcher,

@@ -29,6 +29,7 @@ import {
 } from '../jquery/select_content_dialog'
 import $ from 'jquery'
 import 'jquery-migrate' // required
+import {registerFixDialogButtonsPlugin} from '@canvas/enhanced-user-content/jquery'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {fireEvent, waitFor} from '@testing-library/dom'
 
@@ -58,6 +59,11 @@ function mockGetClientRects() {
 
 let originalENV: GlobalEnv
 let fixtures: HTMLElement | null = null
+
+beforeAll(() => {
+  // Register jQuery plugin needed by dialogs
+  registerFixDialogButtonsPlugin()
+})
 
 beforeEach(() => {
   originalENV = {...window.ENV}

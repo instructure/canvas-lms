@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
+import {registerFixDialogButtonsPlugin} from '@canvas/enhanced-user-content/jquery'
 import {http} from 'msw'
 import {setupServer} from 'msw/node'
 import {waitFor} from '@testing-library/react'
@@ -35,6 +36,8 @@ describe('Shared > SetDefaultGradeDialog', () => {
   let dialog
 
   beforeAll(() => {
+    // Register jQuery plugin needed by dialogs
+    registerFixDialogButtonsPlugin()
     server.listen({
       onUnhandledRequest: 'error',
     })
