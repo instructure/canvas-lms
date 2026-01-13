@@ -739,6 +739,7 @@ class AssignmentsController < ApplicationController
     end
 
     if render_a2_peer_review_student_view?
+      @page_title = "#{@assignment.title} #{t("Peer Review")}"
       return render_a2_peer_review_student_view
     end
 
