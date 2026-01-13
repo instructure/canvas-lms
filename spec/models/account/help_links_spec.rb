@@ -55,7 +55,7 @@ describe Account::HelpLinks do
       links = [{ type: "default", id: "instructor_question", available_to: ["user"] }]
       translated = subject.map_default_links(links)
       expect(translated.first[:text].call).to eq "Ask Your Instructor a Question"
-      expect(translated.first[:subtext].call).to eq "Questions are submitted to your instructor"
+      expect(translated.first[:subtext].call).to eq "Questions are submitted to your instructor."
       expect(translated.first[:url]).to eq "#teacher_feedback"
     end
 

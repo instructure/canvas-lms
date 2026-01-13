@@ -809,7 +809,7 @@ describe AccountsController do
                                account: { custom_help_links: { "0" =>
         { id: "instructor_question",
           text: "Ask Your Instructor a Question",
-          subtext: "Questions are submitted to your instructor",
+          subtext: "Questions are submitted to your instructor.",
           type: "default",
           url: "#teacher_feedback",
           available_to: ["student"] } } } }

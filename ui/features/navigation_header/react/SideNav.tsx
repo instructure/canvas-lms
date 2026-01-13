@@ -479,7 +479,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
               </Badge>
             }
             label={I18n.t('Help')}
-            href="https://help.instructure.com/"
+            href="https://community.instructure.com/"
             onClick={event => {
               event.preventDefault()
               handleActiveTray('help', true)
