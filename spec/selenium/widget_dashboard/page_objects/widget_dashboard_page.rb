@@ -65,12 +65,8 @@ module WidgetDashboardPage
     "#{widget_pagination_container_selector(widget)} button[data-direction='prev']"
   end
 
-  def people_widget_selector
-    "[data-testid='widget-people-widget']"
-  end
-
   def instructor_list_item_selector(name)
-    "#{people_widget_selector} span[aria-label='#{name}']"
+    "#{widget_container_selector("people")} span[aria-label='#{name}']"
   end
 
   def message_instructor_button_selector(account_id, course_id)
@@ -211,15 +207,15 @@ module WidgetDashboardPage
   end
 
   def widget_container_selector(widget_id)
-    "[data-testid='widget-container-#{widget_id}']"
+    "[data-testid='widget-container-#{widget_id}-widget']"
   end
 
   def widget_drag_handle_selector(widget_id)
-    "[data-testid='#{widget_id}-drag-handle']"
+    "[data-testid='#{widget_id}-widget-drag-handle']"
   end
 
   def widget_remove_button_selector(widget_id)
-    "[data-testid='#{widget_id}-remove-button']"
+    "[data-testid='#{widget_id}-widget-remove-button']"
   end
 
   def add_widget_modal_selector
@@ -232,6 +228,22 @@ module WidgetDashboardPage
 
   def widget_reorder_menu_option_selector(option_text)
     "span[role='menuitem']:contains('#{option_text}')"
+  end
+
+  def add_widget_button_selector
+    "button:contains('Add widget')"
+  end
+
+  def add_widget_modal_add_button_selector(widget_type)
+    "#{widget_card_selector(widget_type)} button:contains('Add')"
+  end
+
+  def add_widget_modal_added_button_selector(widget_type)
+    "#{widget_card_selector(widget_type)} button:contains('Added')"
+  end
+
+  def add_widget_modal_close_button_selector
+    "#{add_widget_modal_selector} [data-testid='close-button']"
   end
 
   #------------------------------ Elements ------------------------------
@@ -274,10 +286,6 @@ module WidgetDashboardPage
 
   def widget_pagination_prev_button(widget)
     f(widget_pagination_prev_button_selector(widget))
-  end
-
-  def people_widget
-    f(people_widget_selector)
   end
 
   def all_message_buttons
@@ -452,6 +460,22 @@ module WidgetDashboardPage
     fj(widget_reorder_menu_option_selector(option_text))
   end
 
+  def add_widget_button
+    fj(add_widget_button_selector)
+  end
+
+  def add_widget_modal_add_button(widget_type)
+    fj(add_widget_modal_add_button_selector(widget_type))
+  end
+
+  def add_widget_modal_added_button(widget_type)
+    fj(add_widget_modal_added_button_selector(widget_type))
+  end
+
+  def add_widget_modal_close_button
+    f(add_widget_modal_close_button_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -503,5 +527,38 @@ module WidgetDashboardPage
     expect(reordered_column_2_widgets.length).to eq(2)
     expect(reordered_column_1_widgets[1].attribute("data-testid")).to eq("widget-container-announcements-widget")
     expect(reordered_column_2_widgets[0].attribute("data-testid")).to eq("widget-container-course-grades-widget")
+  end
+
+  def click_widget_customize_button
+    expect(customize_dashboard_button).to be_displayed
+    customize_dashboard_button.click
+  end
+
+  def click_add_widget_button
+    expect(add_widget_button).to be_displayed
+    add_widget_button.click
+  end
+
+  def click_widget_remove_button(widget_name)
+    expect(widget_remove_button(widget_name)).to be_displayed
+    widget_remove_button(widget_name).click
+  end
+
+  def click_save_customize_button
+    expect(save_customize_button).to be_displayed
+    save_customize_button.click
+  end
+
+  def verify_widget_is_removed(widget_name, column_number)
+    column_widgets = all_widget_on_column(column_number)
+    expect(column_widgets.length).to eq(1)
+    expect(element_exists?(widget_container_selector(widget_name))).to be_falsey
+  end
+
+  def verify_default_widget_count
+    column_1_widgets = all_widget_on_column(1)
+    column_2_widgets = all_widget_on_column(2)
+    expect(column_1_widgets.length).to eq(2)
+    expect(column_2_widgets.length).to eq(2)
   end
 end
