@@ -520,7 +520,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("feature is not enabled")
 
         # Re-enable for other tests
@@ -540,7 +540,7 @@ describe PeerReviewsApiController, type: :request do
                  @resource_params,
                  {},
                  {},
-                 { expected_status: 400 })
+                 { expected_status: 403 })
       end
 
       it "returns error when student has not submitted" do
@@ -552,7 +552,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("must submit")
       end
 
@@ -566,7 +566,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("no longer available")
       end
 
@@ -580,7 +580,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("locked until")
       end
 
@@ -623,7 +623,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("assigned all required")
       end
 
