@@ -2491,6 +2491,7 @@ class ApplicationController < ActionController::Base
     end
     named_context_url(@context, :context_external_content_success_url, "external_tool_redirect", include_host: true)
   end
+  public :set_return_url
 
   def lti_launch_params(adapter)
     adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool), lti_turnitin_outcomes_placement_url(@tool.id))
