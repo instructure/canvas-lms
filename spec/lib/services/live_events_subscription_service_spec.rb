@@ -46,10 +46,6 @@ module Services
           .and_return({
                         "app-host" => "http://example.com",
                       })
-
-        allow(Rails.application.credentials).to receive(:dig).and_call_original
-        allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :signing_secret).and_return("astringthatisactually32byteslong")
-        allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return("astringthatisactually32byteslong")
       end
 
       let(:developer_key) do
@@ -101,7 +97,7 @@ module Services
           expect(HTTParty).to receive(:send) do |method, endpoint, options|
             expect(method).to eq(:delete)
             expect(endpoint).to eq("http://example.com/api/subscriptions")
-            jwt = CanvasSecurity::ServicesJwt.new(options[:headers]["Authorization"].gsub("Bearer ", ""), false).original_token
+            jwt = CanvasSecurity.decode_jwt(options[:headers]["Authorization"].gsub("Bearer ", ""))
             expect(jwt["DeveloperKey"]).to eq("10000000000003")
             expect(jwt["RootAccountId"]).to eq("10000000000004")
             expect(jwt["sub"]).to eq("ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0")
@@ -117,7 +113,7 @@ module Services
           expect(HTTParty).to receive(:send) do |method, endpoint, options|
             expect(method).to eq(:delete)
             expect(endpoint).to eq("http://example.com/api/subscriptions/subscription_id")
-            jwt = CanvasSecurity::ServicesJwt.new(options[:headers]["Authorization"].gsub("Bearer ", ""), false).original_token
+            jwt = CanvasSecurity.decode_jwt(options[:headers]["Authorization"].gsub("Bearer ", ""))
             expect(jwt["DeveloperKey"]).to eq("10000000000003")
             expect(jwt["RootAccountId"]).to eq("10000000000004")
             expect(jwt["RootAccountUUID"]).to eq("random-account-uuid")
@@ -134,7 +130,7 @@ module Services
           expect(HTTParty).to receive(:send) do |method, endpoint, options|
             expect(method).to eq(:get)
             expect(endpoint).to eq("http://example.com/api/subscriptions/subscription_id")
-            jwt = CanvasSecurity::ServicesJwt.new(options[:headers]["Authorization"].gsub("Bearer ", ""), false).original_token
+            jwt = CanvasSecurity.decode_jwt(options[:headers]["Authorization"].gsub("Bearer ", ""))
             expect(jwt["DeveloperKey"]).to eq("10000000000003")
             expect(jwt["RootAccountId"]).to eq("10000000000007")
             expect(jwt["RootAccountUUID"]).to eq("random-account-uuid")
@@ -151,7 +147,7 @@ module Services
           expect(HTTParty).to receive(:send) do |method, endpoint, options|
             expect(method).to eq(:get)
             expect(endpoint).to eq("http://example.com/api/root_account_subscriptions")
-            jwt = CanvasSecurity::ServicesJwt.new(options[:headers]["Authorization"].gsub("Bearer ", ""), false).original_token
+            jwt = CanvasSecurity.decode_jwt(options[:headers]["Authorization"].gsub("Bearer ", ""))
             expect(jwt["DeveloperKey"]).to eq("10000000000003")
             expect(jwt["RootAccountId"]).to eq("10000000000007")
             expect(jwt["RootAccountUUID"]).to eq("random-account-uuid")
@@ -171,7 +167,7 @@ module Services
             expect(method).to eq(:post)
             expect(endpoint).to eq("http://example.com/api/subscriptions")
             expect(options[:headers]["Content-Type"]).to eq("application/json")
-            jwt = CanvasSecurity::ServicesJwt.new(options[:headers]["Authorization"].gsub("Bearer ", ""), false).original_token
+            jwt = CanvasSecurity.decode_jwt(options[:headers]["Authorization"].gsub("Bearer ", ""))
             expect(jwt["DeveloperKey"]).to eq("10000000000003")
             expect(jwt["RootAccountId"]).to eq("10000000000004")
             expect(jwt["RootAccountUUID"]).to eq("random-account-uuid")
@@ -193,7 +189,7 @@ module Services
             expect(method).to eq(:put)
             expect(endpoint).to eq("http://example.com/api/subscriptions/1234")
             expect(options[:headers]["Content-Type"]).to eq("application/json")
-            jwt = CanvasSecurity::ServicesJwt.new(options[:headers]["Authorization"].gsub("Bearer ", ""), false).original_token
+            jwt = CanvasSecurity.decode_jwt(options[:headers]["Authorization"].gsub("Bearer ", ""))
             expect(jwt["DeveloperKey"]).to eq("10000000000003")
             expect(jwt["RootAccountId"]).to eq("10000000000004")
             expect(jwt["RootAccountUUID"]).to eq("random-account-uuid")
