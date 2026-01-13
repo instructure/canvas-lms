@@ -261,6 +261,7 @@ class AssignmentsController < ApplicationController
     js_env({
              ASSIGNMENT_ID: @assignment.id,
              EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
+             restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user)
            })
 
     if @context.root_account.feature_enabled?(:instui_nav)

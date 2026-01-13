@@ -77,6 +77,7 @@ describe('PeerReviewsStudentView', () => {
   const mockMutate = vi.fn()
   const ENV = {
     current_user_id: '123',
+    restrict_quantitative_data: false,
   }
 
   beforeAll(() => {
@@ -1248,6 +1249,138 @@ describe('PeerReviewsStudentView', () => {
       await waitFor(() => {
         expect(mockUseReviewerSubmissionQuery).toHaveBeenCalledWith('22', '123')
       })
+    })
+  })
+
+  describe('Points display', () => {
+    it('displays total points when points are provided', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '27',
+          name: 'Points Display Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+            submissionRequired: false,
+            pointsPossible: 6,
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByTestId} = setup({assignmentId: '27'})
+
+      await waitFor(() => {
+        expect(getByTestId('total-points')).toBeInTheDocument()
+      })
+
+      expect(getByTestId('total-points')).toHaveTextContent('6 Points Possible')
+    })
+
+    it('displays singular "Point" when points are 1', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '28',
+          name: 'Single Point Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+            submissionRequired: false,
+            pointsPossible: 1,
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByTestId} = setup({assignmentId: '28'})
+
+      await waitFor(() => {
+        expect(getByTestId('total-points')).toBeInTheDocument()
+      })
+
+      expect(getByTestId('total-points')).toHaveTextContent('1 Point Possible')
+    })
+
+    it('displays 0 points when points are zero', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '29',
+          name: 'Zero Points Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+            submissionRequired: false,
+            pointsPossible: 0,
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByTestId} = setup({assignmentId: '29'})
+
+      await waitFor(() => {
+        expect(getByTestId('total-points')).toBeInTheDocument()
+      })
+
+      expect(getByTestId('total-points')).toHaveTextContent('0 Points Possible')
+    })
+
+    it('does not display points when points are null', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '30',
+          name: 'Null Points Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: false,
+            pointsPossible: null,
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {queryByTestId} = setup({assignmentId: '30'})
+
+      await waitFor(() => {
+        expect(queryByTestId('total-points')).not.toBeInTheDocument()
+      })
+    })
+
+    it('does not display points when restrict_quantitative_data is enabled', async () => {
+      window.ENV.restrict_quantitative_data = true
+
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '31',
+          name: 'RQD Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+            submissionRequired: false,
+            pointsPossible: 10,
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {queryByTestId} = setup({assignmentId: '31'})
+
+      await waitFor(() => {
+        expect(queryByTestId('total-points')).not.toBeInTheDocument()
+      })
+
+      window.ENV.restrict_quantitative_data = false
     })
   })
 })
