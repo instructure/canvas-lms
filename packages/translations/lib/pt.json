@@ -1487,6 +1487,9 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "O ficheiro multimédia está a ser processado. É favor, tentar novamente mais tarde."
     },
+    "media_options_saved_560c4ec8": {
+        "message": "Opções de multimédia guardadas."
+    },
     "media_title_2112243b": {
         "message": "Título do Media"
     },
