@@ -1487,6 +1487,9 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "正在處理媒體檔案中。請稍後重試。"
     },
+    "media_options_saved_560c4ec8": {
+        "message": "媒體選項已儲存。"
+    },
     "media_title_2112243b": {
         "message": "媒體標題"
     },

@@ -1487,6 +1487,9 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "Выполняется обработка файла мультимедиа. Попробуйте еще раз позже."
     },
+    "media_options_saved_560c4ec8": {
+        "message": "Параметры мультимедиа сохранены."
+    },
     "media_title_2112243b": {
         "message": "Название мультимедиа"
     },
