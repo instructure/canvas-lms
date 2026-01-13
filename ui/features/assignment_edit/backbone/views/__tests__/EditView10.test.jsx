@@ -18,8 +18,6 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import {waitFor, act} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
@@ -144,6 +142,8 @@ describe('EditView - Quiz Type Handling', () => {
   let view
 
   beforeEach(() => {
+    vi.useFakeTimers()
+
     fakeENV.setup({
       FEATURES: {
         new_quizzes_surveys: true,
@@ -245,6 +245,9 @@ describe('EditView - Quiz Type Handling', () => {
   })
 
   afterEach(() => {
+    vi.runAllTimers()
+    vi.useRealTimers()
+
     fakeENV.teardown()
     view.remove()
     $('#fixtures').empty()
