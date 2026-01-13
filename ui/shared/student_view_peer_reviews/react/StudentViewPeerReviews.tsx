@@ -47,8 +47,7 @@ type PeerReviewProps = {
 export const StudentViewPeerReviews = ({assignment}: StudentViewPeerReviewsProps) => {
   return (
     <>
-      {/* @ts-expect-error */}
-      {assignment.assessment_requests.map((assessment, idx) => (
+      {assignment.assessment_requests?.map((assessment, idx) => (
         <PeerReview
           assessment={assessment}
           index={idx}

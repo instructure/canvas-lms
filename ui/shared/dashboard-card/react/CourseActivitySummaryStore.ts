@@ -30,7 +30,7 @@ const CourseActivitySummaryStore: CanvasStore<{
   streams: Streams
   isFetching?: boolean
 }> & {
-  _fetchForCourse?: (courseId: string) => Promise<void>
+  _fetchForCourse?: (courseId: string) => Promise<void> | undefined
   getStateForCourse?: (courseId: string) => {streams: Streams} | {stream?: Stream} | undefined
   _batchLoadSummaries?: (userID: string) => void
   _fetchActivityStreamSummaries?: (userID: string) => Promise<void>
@@ -55,10 +55,9 @@ CourseActivitySummaryStore.getStateForCourse = function (courseId?: string) {
 }
 
 CourseActivitySummaryStore._fetchForCourse = function (courseId: string) {
-  // @ts-expect-error
   return asJson(
     window.fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, defaultFetchOptions()),
-  ).then((stream: Stream) => {
+  )?.then((stream: Stream) => {
     const state = CourseActivitySummaryStore.getState()
     state.streams[courseId] = {stream}
     CourseActivitySummaryStore.setState(state)

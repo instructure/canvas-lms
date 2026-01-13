@@ -106,7 +106,6 @@ export default class PublishButton extends React.Component<Props> {
             wikiUrl={pagesUrl}
             wikiFrontPageTitle={frontPageTitle}
             onSubmit={() => {
-              // @ts-expect-error
               if (this.defaultViewStore?.getState().savedDefaultView !== 'modules') {
                 apiClient.publishCourse({courseId, onSuccess})
               }

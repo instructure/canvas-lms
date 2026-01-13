@@ -33,8 +33,7 @@ export const BREAKPOINTS = {
 
 const convertMatchesToProp = (matches: string[] | undefined) => {
   const breakpoints: Breakpoints = {}
-  // @ts-expect-error
-  ;(matches || []).forEach(match => (breakpoints[match] = true))
+  ;(matches || []).forEach(match => (breakpoints[match as keyof Breakpoints] = true))
   return breakpoints
 }
 
@@ -42,8 +41,7 @@ const convertMatchesToProp = (matches: string[] | undefined) => {
 export default function WithBreakpoints<T>(WrappedComponent: ComponentType<T>) {
   const EnhancedComponent: ComponentType<T & {breakpoints: Breakpoints}> = props => {
     // TODO: remove since our supported browsers support matchMedia
-    // @ts-expect-error
-    if (window.matchMedia) {
+    if (typeof window.matchMedia === 'function') {
       return (
         <Responsive
           match="media"

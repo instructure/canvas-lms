@@ -34,8 +34,7 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
     return {error}
   }
 
-  // @ts-expect-error
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error(error, errorInfo)
   }
 

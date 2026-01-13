@@ -19,8 +19,7 @@
 import {sortBy, find, forEach, isArray, isDate, isString} from 'es-toolkit/compat'
 import type {CamelizedGradingPeriod} from './grading.d'
 
-// @ts-expect-error
-function validateDate(date, nullAllowed = false) {
+function validateDate(date: Date | null, nullAllowed = false) {
   let valid = isDate(date)
   if (nullAllowed && !valid) {
     valid = date === null
@@ -29,11 +28,12 @@ function validateDate(date, nullAllowed = false) {
   if (!valid) throw new Error(`\`${date}\` must be a Date or null`)
 }
 
-// @ts-expect-error
-function validateGradingPeriodDates(gradingPeriods) {
+function validateGradingPeriodDates(
+  gradingPeriods: CamelizedGradingPeriod | CamelizedGradingPeriod[],
+): CamelizedGradingPeriod[] {
   if (gradingPeriods == null) throw new Error(`\'${gradingPeriods}\' must be an array or object`)
 
-  const dates = ['startDate', 'endDate', 'closeDate']
+  const dates = ['startDate', 'endDate', 'closeDate'] as const
   const periods = isArray(gradingPeriods) ? gradingPeriods : [gradingPeriods]
   forEach(periods, period => {
     forEach(dates, date => validateDate(period[date]))
@@ -50,8 +50,7 @@ function validatePeriodID(id: string) {
 class GradingPeriodsHelper {
   gradingPeriods: CamelizedGradingPeriod[]
 
-  // @ts-expect-error
-  constructor(gradingPeriods) {
+  constructor(gradingPeriods: CamelizedGradingPeriod | CamelizedGradingPeriod[]) {
     this.gradingPeriods = validateGradingPeriodDates(gradingPeriods)
   }
 
@@ -71,8 +70,7 @@ class GradingPeriodsHelper {
     }
   }
 
-  // @ts-expect-error
-  gradingPeriodForDueAt(dueAt) {
+  gradingPeriodForDueAt(dueAt: Date | null) {
     validateDate(dueAt, true)
 
     return (
@@ -81,8 +79,7 @@ class GradingPeriodsHelper {
     )
   }
 
-  // @ts-expect-error
-  isDateInGradingPeriod(date, gradingPeriodID, runValidations = true) {
+  isDateInGradingPeriod(date: Date | null, gradingPeriodID: string, runValidations = true) {
     if (runValidations) {
       validateDate(date, true)
       validatePeriodID(gradingPeriodID)
@@ -98,8 +95,7 @@ class GradingPeriodsHelper {
     }
   }
 
-  // @ts-expect-error
-  isDateInClosedGradingPeriod(date) {
+  isDateInClosedGradingPeriod(date: Date | null) {
     const period = this.gradingPeriodForDueAt(date)
     return !!period && period.isClosed
   }
