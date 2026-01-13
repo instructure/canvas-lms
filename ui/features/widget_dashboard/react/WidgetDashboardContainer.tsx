@@ -43,17 +43,9 @@ const WidgetDashboardContainer: React.FC = () => {
   const {observedUsersList, canAddObservee, currentUser, currentUserRoles, dashboardFeatures} =
     useWidgetDashboard()
   const {isMobile, isDesktop} = useResponsiveContext()
-  const {
-    isEditMode,
-    isDirty,
-    isSaving,
-    saveError,
-    enterEditMode,
-    exitEditMode,
-    saveChanges,
-    clearError,
-  } = useWidgetDashboardEdit()
-  const {config, resetConfig} = useWidgetLayout()
+  const {isEditMode, isDirty, isSaving, saveError, enterEditMode, exitEditMode, clearError} =
+    useWidgetDashboardEdit()
+  const {config, resetConfig, saveLayout} = useWidgetLayout()
   const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
 
   const handleChangeObservedUser = useMemo(() => getHandleChangeObservedUser(), [])
@@ -71,7 +63,7 @@ const WidgetDashboardContainer: React.FC = () => {
   }, [isDirty])
 
   const handleSave = () => {
-    saveChanges(config)
+    saveLayout()
   }
 
   const handleCancel = () => {
