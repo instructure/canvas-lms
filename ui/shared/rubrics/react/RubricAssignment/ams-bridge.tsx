@@ -17,7 +17,7 @@
  */
 
 import type {Root} from 'react-dom/client'
-import {render} from '@canvas/react'
+import {render, rerender} from '@canvas/react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {Alert} from '@instructure/ui-alerts'
@@ -147,7 +147,8 @@ export function createRubricController(container: HTMLElement): RubricController
           container,
         )
       } else {
-        root.render(
+        rerender(
+          root,
           <QueryClientProvider client={queryClient}>
             <CanvasRubricBridge
               assignmentId={config.assignmentId}

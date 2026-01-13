@@ -63,6 +63,17 @@ export function render(
   return root
 }
 
+export function rerender(
+  root: ReturnType<typeof createRoot>,
+  element: React.ReactElement,
+  options: Options = {},
+) {
+  const theme = getTheme(options.highContrast, options.brandVariables)
+  root.render(
+    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>,
+  )
+}
+
 export function legacyUnmountComponentAtNode(container: Element | null) {
   if (!(container instanceof HTMLElement)) {
     return false

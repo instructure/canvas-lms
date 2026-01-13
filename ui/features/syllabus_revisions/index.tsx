@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@canvas/react'
+import {render, rerender} from '@canvas/react'
 import type {Root} from 'react-dom/client'
 import SyllabusRevisionsTray from './react/SyllabusRevisionsTray'
 
@@ -37,7 +37,8 @@ const updateButton = () => {
 
 const renderTray = () => {
   if (trayRoot && courseIdState) {
-    trayRoot.render(
+    rerender(
+      trayRoot,
       <SyllabusRevisionsTray courseId={courseIdState} open={isOpen} onDismiss={handleDismiss} />,
     )
   }

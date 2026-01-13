@@ -36,7 +36,7 @@ import {sendMoveRequests} from './MoveModal/utils'
 import {queryClient} from '@canvas/query'
 import $ from 'jquery'
 import type {Root} from 'react-dom/client'
-import {render} from '@canvas/react'
+import {render, rerender} from '@canvas/react'
 import DragFeedback from '@canvas/files/react/components/DragFeedback'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import {getFilesEnv} from '../../../utils/filesEnvUtils'
@@ -102,7 +102,8 @@ const TableBody: React.FC<TableBodyProps> = ({
         dragHolderRef.current[0],
       )
     } else {
-      dragRootRef.current.render(
+      rerender(
+        dragRootRef.current,
         <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={itemsToDrag()} />,
       )
     }
