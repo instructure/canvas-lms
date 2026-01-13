@@ -203,6 +203,102 @@ describe GradebookImporter do
           expect(actual_grades).to match_array(expected_grades)
         end
       end
+
+      context "with percentages containing spaces" do
+        before do
+          # Use actual Unicode characters for non-breaking spaces
+          nbsp = "\u00A0"  # Non-breaking space (U+00A0)
+          nnbsp = "\u202F" # Narrow non-breaking space (U+202F)
+          figsp = "\u2007" # Figure space (U+2007)
+
+          @rows = [
+            "Student;ID;Section;Aufgabe 1;Aufgabe 2;Aufgabe 3;Aufgabe 4;Aufgabe 5;Aufgabe 6",
+            "Points Possible;;;10;10;10;10;10;10",
+            '"Student 1";1;Kurs;80 %;81%;-75 %;83,5 %; 90% ;85%',
+            "\"Student 2\";2;Kurs;80  %;81#{nbsp}%;82.5#{nbsp}%;83,5#{nnbsp}%;-70#{nbsp}%;95#{figsp}%"
+          ]
+
+          importer_with_rows(*@rows)
+        end
+
+        it "normalizes percentages with single regular space" do
+          actual_grade = @gi.upload.gradebook.fetch("students").first.fetch("submissions").first.fetch("grade")
+          expect(actual_grade).to eq("80%")
+        end
+
+        it "normalizes percentages with multiple regular spaces" do
+          actual_grade = @gi.upload.gradebook.fetch("students").second.fetch("submissions").first.fetch("grade")
+          expect(actual_grade).to eq("80%")
+        end
+
+        it "normalizes percentages with non-breaking space (U+00A0)" do
+          actual_grade = @gi.upload.gradebook.fetch("students").second.fetch("submissions").second.fetch("grade")
+          expect(actual_grade).to eq("81%")
+        end
+
+        it "normalizes decimal percentages with non-breaking space (U+00A0)" do
+          actual_grade = @gi.upload.gradebook.fetch("students").second.fetch("submissions").third.fetch("grade")
+          expect(actual_grade).to eq("82.5%")
+        end
+
+        it "normalizes European format (comma decimal) with regular space" do
+          actual_grade = @gi.upload.gradebook.fetch("students").first.fetch("submissions")[3].fetch("grade")
+          expect(actual_grade).to eq("83.5%")
+        end
+
+        it "normalizes European format with narrow non-breaking space (U+202F)" do
+          actual_grade = @gi.upload.gradebook.fetch("students").second.fetch("submissions")[3].fetch("grade")
+          expect(actual_grade).to eq("83.5%")
+        end
+
+        it "normalizes percentages with figure space (U+2007)" do
+          actual_grade = @gi.upload.gradebook.fetch("students").second.fetch("submissions")[5].fetch("grade")
+          expect(actual_grade).to eq("95%")
+        end
+
+        it "normalizes negative percentages with space" do
+          actual_grade = @gi.upload.gradebook.fetch("students").first.fetch("submissions").third.fetch("grade")
+          expect(actual_grade).to eq("-75%")
+        end
+
+        it "normalizes negative percentages with non-breaking space" do
+          actual_grade = @gi.upload.gradebook.fetch("students").second.fetch("submissions")[4].fetch("grade")
+          expect(actual_grade).to eq("-70%")
+        end
+
+        it "handles percentages without spaces (baseline test)" do
+          actual_grade = @gi.upload.gradebook.fetch("students").first.fetch("submissions").second.fetch("grade")
+          expect(actual_grade).to eq("81%")
+        end
+
+        it "strips leading and trailing spaces from entire value" do
+          actual_grade = @gi.upload.gradebook.fetch("students").first.fetch("submissions")[4].fetch("grade")
+          expect(actual_grade).to eq("90%")
+        end
+      end
+
+      context "with spaces within numbers (preserves invalid formats unchanged)" do
+        # Not a pure number or percentage, return as-is (e.g., letter grades)
+        before do
+          @rows = [
+            "Student;ID;Section;Aufgabe 1;Aufgabe 2",
+            "Points Possible;;;10;10",
+            '"Student 1";1;Kurs;1 234.5%;80 .5'
+          ]
+
+          importer_with_rows(*@rows)
+        end
+
+        it "preserves percentages with spaces within the number unchanged" do
+          actual_grade = @gi.upload.gradebook.fetch("students").first.fetch("submissions").first.fetch("grade")
+          expect(actual_grade).to eq("1 234.5%")
+        end
+
+        it "preserves pure numbers with spaces within them unchanged" do
+          actual_grade = @gi.upload.gradebook.fetch("students").first.fetch("submissions").second.fetch("grade")
+          expect(actual_grade).to eq("80 .5")
+        end
+      end
     end
 
     context "when dealing with a file containing comma field separators" do
