@@ -55,6 +55,7 @@ import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
 import {PreviewHandle} from './Preview'
 import SuccessView from './SuccessView'
+import CloseRemediationView from './CloseRemediationView'
 import WhyMattersPopover from './WhyMattersPopover'
 import {ProblemArea} from './ProblemArea/ProblemArea'
 
@@ -88,13 +89,20 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const [formError, setFormError] = useState<string | null>()
   const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
   const [issues, setIssues] = useState<AccessibilityIssue[]>(item.issues || [])
+  const [allIssuesSkipped, setAllIssuesSkipped] = useState<boolean>(false)
 
   const {setSelectedItem} = useAccessibilityCheckerContext()
   const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
 
-  const [accessibilityScans, nextResource, filters] = useAccessibilityScansStore(
-    useShallow(state => [state.accessibilityScans, state.nextResource, state.filters]),
-  )
+  const [accessibilityScans, nextResource, filters, isCloseIssuesEnabled] =
+    useAccessibilityScansStore(
+      useShallow(state => [
+        state.accessibilityScans,
+        state.nextResource,
+        state.filters,
+        state.isCloseIssuesEnabled,
+      ]),
+    )
 
   const [setAccessibilityScans, setNextResource] = useAccessibilityScansStore(
     useShallow(state => [state.setAccessibilityScans, state.setNextResource]),
@@ -133,11 +141,20 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   }, 1000)
 
   const handleSkip = useCallback(() => {
-    setCurrentIssueIndex(prev => Math.min(prev + 1, issues.length - 1))
-  }, [issues.length])
+    if (isCloseIssuesEnabled && currentIssueIndex === issues.length - 1) {
+      setAllIssuesSkipped(true)
+    } else {
+      setCurrentIssueIndex(prev => Math.min(prev + 1, issues.length - 1))
+    }
+  }, [isCloseIssuesEnabled, currentIssueIndex, issues.length])
 
   const handlePrevious = useCallback(() => {
     setCurrentIssueIndex(prev => Math.max(prev - 1, 0))
+  }, [])
+
+  const handleBackToStart = useCallback(() => {
+    setAllIssuesSkipped(false)
+    setCurrentIssueIndex(0)
   }, [])
 
   const handleNextResource = useCallback(() => {
@@ -380,6 +397,18 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     setIsSaveButtonEnabled(true)
   }, [currentIssue])
 
+  if (allIssuesSkipped && isCloseIssuesEnabled) {
+    return (
+      <CloseRemediationView
+        scan={item}
+        onBack={handleBackToStart}
+        nextResource={nextResource || defaultNextResource}
+        onClose={onClose}
+        handleNextResource={handleNextResource}
+      />
+    )
+  }
+
   if (!currentIssue) {
     return (
       <>
@@ -532,7 +561,9 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           onBack={handlePrevious}
           onSaveAndNext={handleApplyAndSaveAndNext}
           isBackDisabled={currentIssueIndex === 0 || isFormLocked}
-          isSkipDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
+          isSkipDisabled={
+            isFormLocked || (!isCloseIssuesEnabled && currentIssueIndex === issues.length - 1)
+          }
           isSaveAndNextDisabled={
             !isRemediated || isFormLocked || !!formError || !isSaveButtonEnabled
           }

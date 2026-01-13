@@ -64,9 +64,13 @@ export const getAsContentItem = (scan: AccessibilityResourceScan): ContentItem =
   }
 }
 
-export const getAsAccessibilityResourceScan = (item: ContentItem): AccessibilityResourceScan => {
+export const getAsAccessibilityResourceScan = (
+  item: ContentItem,
+  courseId: number,
+): AccessibilityResourceScan => {
   return {
     id: item.id,
+    courseId,
     resourceId: item.id,
     resourceType: item.type as ResourceType,
     resourceName: item.title,
