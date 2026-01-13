@@ -25,7 +25,6 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
-import '@canvas/util/jquery/fixDialogButtons'
 import 'jquery-tinypubsub'
 
 const I18n = createI18nScope('sharedCurveGradesDialog')

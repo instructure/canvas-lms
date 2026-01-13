@@ -459,15 +459,6 @@ describe('enhanceUserContent()', () => {
     })
   })
 
-  describe('customEnhanceFunc', () => {
-    it('is called if provided', () => {
-      subject('<p>hello world</p>')
-      const customFunc = jest.fn()
-      enhanceUserContent(document, {customEnhanceFunc: customFunc})
-      expect(customFunc).toHaveBeenCalledTimes(1)
-    })
-  })
-
   describe('math rendering', () => {
     beforeEach(() => {
       jest.resetAllMocks()

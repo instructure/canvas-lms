@@ -40,7 +40,6 @@ import {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.tree' /* instTree */
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications' /* $.screenReaderFlashMessageExclusive */
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* scrollSidebar */
 import replaceTags from '@canvas/util/replaceTags'

@@ -37,7 +37,6 @@ import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import '@canvas/rails-flash-notifications'
 import 'jquery-tinypubsub'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import '@canvas/util/jquery/fixDialogButtons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import replaceTags from '@canvas/util/replaceTags'
 import useStore from '../stores'

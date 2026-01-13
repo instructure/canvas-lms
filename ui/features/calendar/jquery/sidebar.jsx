@@ -172,11 +172,9 @@ function generateEmptyState() {
 
 function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
   const $calendarFeedModalContent = $('#calendar_feed_box')
-  const $calendarFeedModalOpener = $('#calendar-feed .dialog_opener')
-  // We need to get the modal initialized early rather than wait for
-  // .dialog_opener to open it so we can attach the event to it the first
-  // time.  We extend so that we still get all the magic that .dialog_opener
-  // should give us.
+  const $calendarFeedModalOpener = $('#calendar-feed-button')
+  // We need to initialize the modal early so we can attach accessibility
+  // enhancements to it.
   $calendarFeedModalContent.dialog(
     $.extend(
       {
@@ -203,7 +201,7 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
         },
         close: () => {
           forceScreenreaderToReparse($('#application')[0])
-          $('#calendar-feed .dialog_opener').focus()
+          $('#calendar-feed-button').focus()
         },
       },
       $calendarFeedModalOpener.data('dialogOpts'),
