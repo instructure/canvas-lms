@@ -39,6 +39,42 @@ describe PageViews::PollQueryService do
     expect(result.query_id).to eq(expected_uuid)
   end
 
+  it "returns an error" do
+    expected_uuid = SecureRandom.uuid
+    response = double(code: 202,
+                      body: '{"status": "FAILED", "query_id": "' + expected_uuid + '", "errorCode": "RESULT_SIZE_LIMIT_EXCEEDED"}')
+    allow(CanvasHttp).to receive(:get).and_yield(response)
+
+    result = service.call(expected_uuid)
+
+    expect(result.status).to eq(:failed)
+    expect(result.error_code).to eq("RESULT_SIZE_LIMIT_EXCEEDED")
+  end
+
+  it "passes through unknown error codes as-is" do
+    expected_uuid = SecureRandom.uuid
+    response = double(code: 202,
+                      body: '{"status": "FAILED", "query_id": "' + expected_uuid + '", "errorCode": "SOME_NEW_UNKNOWN_ERROR_CODE"}')
+    allow(CanvasHttp).to receive(:get).and_yield(response)
+
+    result = service.call(expected_uuid)
+
+    expect(result.status).to eq(:failed)
+    expect(result.error_code).to eq("SOME_NEW_UNKNOWN_ERROR_CODE")
+  end
+
+  it "returns nil when status is failed but no error code provided" do
+    expected_uuid = SecureRandom.uuid
+    response = double(code: 202,
+                      body: '{"status": "FAILED", "query_id": "' + expected_uuid + '"}')
+    allow(CanvasHttp).to receive(:get).and_yield(response)
+
+    result = service.call(expected_uuid)
+
+    expect(result.status).to eq(:failed)
+    expect(result.error_code).to be_nil
+  end
+
   it "returns results when query is finished" do
     expected_uuid = SecureRandom.uuid
     response = double(code: 200,
