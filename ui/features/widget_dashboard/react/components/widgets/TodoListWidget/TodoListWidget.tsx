@@ -43,7 +43,11 @@ function isValidTodoFilter(value: unknown): value is TodoFilter {
   return value === 'incomplete_items' || value === 'complete_items' || value === 'all'
 }
 
-const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
+const TodoListWidget: React.FC<BaseWidgetProps> = ({
+  widget,
+  isEditMode = false,
+  dragHandleProps,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [filter, setFilter] = useWidgetConfig<TodoFilter>(
     widget.id,
@@ -177,6 +181,7 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false})
       <TemplateWidget
         widget={widget}
         isEditMode={isEditMode}
+        dragHandleProps={dragHandleProps}
         isLoading={isLoading}
         error={error ? I18n.t('Failed to load to-do items. Please try again.') : null}
         onRetry={refetch}
