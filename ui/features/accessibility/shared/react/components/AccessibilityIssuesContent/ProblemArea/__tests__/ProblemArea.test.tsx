@@ -108,6 +108,7 @@ describe('ProblemArea', () => {
 
   const createMockItem = (): AccessibilityResourceScan => ({
     id: 1,
+    courseId: 1,
     resourceId: 123,
     resourceType: ResourceType.Assignment,
     resourceName: 'Test Assignment',

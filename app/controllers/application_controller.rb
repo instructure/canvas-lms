@@ -458,6 +458,7 @@ class ApplicationController < ActionController::Base
     a11y_checker_ai_alt_text_generation
     a11y_checker_ai_table_caption_generation
     a11y_checker_additional_resources
+    a11y_checker_close_issues
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player

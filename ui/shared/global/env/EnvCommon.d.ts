@@ -294,6 +294,7 @@ export type SiteAdminFeatureId =
   | 'a11y_checker_ai_alt_text_generation'
   | 'a11y_checker_ai_table_caption_generation'
   | 'a11y_checker_additional_resources'
+  | 'a11y_checker_close_issues'
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
   | 'courses_popout_sisid'

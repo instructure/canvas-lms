@@ -28,6 +28,10 @@ vi.mock('../../../../../shared/react/hooks/useQueueScanResource', () => ({
   useQueueScanResource: vi.fn(() => ({mutate: mockMutate})),
 }))
 
+vi.mock('../Cells/ActionsMenuCell', () => ({
+  ActionsMenuCell: () => null,
+}))
+
 describe('AccessibilityIssuesTableRow', () => {
   beforeEach(() => {
     mockMutate.mockClear()

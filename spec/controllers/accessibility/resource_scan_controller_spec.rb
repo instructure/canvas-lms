@@ -181,6 +181,7 @@ describe Accessibility::ResourceScanController do
 
         expected_json = {
           "id" => scan_with_issues.id,
+          "course_id" => course.id,
           "resource_id" => scan_with_issues.wiki_page_id,
           "resource_type" => "WikiPage",
           "resource_name" => "Tutorial",
@@ -190,6 +191,7 @@ describe Accessibility::ResourceScanController do
           "workflow_state" => "completed",
           "error_message" => "",
           "closed_at" => nil,
+          "closed_issue_count" => 0,
           "issue_count" => 1,
           "issues" => [
             {

@@ -47,6 +47,7 @@ const createBaseScan = (
 ): Omit<AccessibilityResourceScan, 'issues'> => {
   return getAsAccessibilityResourceScan(
     createBaseContentItem(resourceName, resourceUrl, `${resourceUrl}/edit`),
+    1,
   )
 }
 

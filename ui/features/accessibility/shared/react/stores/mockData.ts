@@ -131,6 +131,7 @@ export const mockIssue5: AccessibilityIssue = {
 
 export const mockScan1: AccessibilityResourceScan = {
   id: 1,
+  courseId: 14,
   resourceId: 1,
   resourceType: ResourceType.WikiPage,
   resourceName: 'Test Page 1',
@@ -145,6 +146,7 @@ export const mockScan1: AccessibilityResourceScan = {
 
 export const mockScan2: AccessibilityResourceScan = {
   id: 2,
+  courseId: 14,
   resourceId: 2,
   resourceType: ResourceType.WikiPage,
   resourceName: 'Test Page 2',
@@ -159,6 +161,7 @@ export const mockScan2: AccessibilityResourceScan = {
 
 export const mockScan3: AccessibilityResourceScan = {
   id: 3,
+  courseId: 14,
   resourceId: 57,
   resourceType: ResourceType.Assignment,
   resourceName: 'Assignment 1',
@@ -173,6 +176,7 @@ export const mockScan3: AccessibilityResourceScan = {
 
 export const mockScan4: AccessibilityResourceScan = {
   id: 4,
+  courseId: 14,
   resourceId: 56,
   resourceType: ResourceType.Assignment,
   resourceName: 'Assignment 2',
@@ -187,6 +191,7 @@ export const mockScan4: AccessibilityResourceScan = {
 
 export const mockScan5: AccessibilityResourceScan = {
   id: 5,
+  courseId: 14,
   resourceId: 21,
   resourceType: ResourceType.Assignment,
   resourceName: 'Assignment 3',

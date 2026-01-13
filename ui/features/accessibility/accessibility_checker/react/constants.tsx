@@ -36,6 +36,7 @@ export const IssuesTableColumns = {
   ResourceType: 'resource-type-header',
   State: 'state-header',
   LastEdited: 'last-edited-header',
+  Actions: 'actions-header',
 }
 
 export const IssuesTableColumnHeaders = [
@@ -44,6 +45,7 @@ export const IssuesTableColumnHeaders = [
   {id: IssuesTableColumns.ResourceType, name: I18n.t('Type')},
   {id: IssuesTableColumns.State, name: I18n.t('State')},
   {id: IssuesTableColumns.LastEdited, name: I18n.t('Last edited')},
+  {id: IssuesTableColumns.Actions, name: ''},
 ]
 
 export const IssuesTableHeaderApiNames: Record<string, string> = {
