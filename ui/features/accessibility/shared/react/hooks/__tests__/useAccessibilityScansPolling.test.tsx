@@ -68,6 +68,7 @@ const mockScan = (
   issueCount = 0,
 ): AccessibilityResourceScan => ({
   id,
+  courseId: 1,
   resourceId: id,
   resourceType: ResourceType.WikiPage,
   resourceName: `Resource ${id}`,

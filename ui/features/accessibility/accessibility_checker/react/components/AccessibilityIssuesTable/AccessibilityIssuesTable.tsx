@@ -77,7 +77,7 @@ const renderTableData = (
     <>
       {scans?.length === 0 || !scans ? (
         <Table.Row data-testid="no-issues-row">
-          <Table.Cell colSpan={5} textAlign="center">
+          <Table.Cell colSpan={6} textAlign="center">
             <Text color="secondary">{I18n.t('No accessibility issues found')}</Text>
           </Table.Cell>
         </Table.Row>
@@ -206,14 +206,14 @@ export const AccessibilityIssuesTable = () => {
               <Table.Body>
                 {error && (
                   <Table.Row data-testid="error-row">
-                    <Table.Cell colSpan={5} textAlign="center">
+                    <Table.Cell colSpan={6} textAlign="center">
                       <Alert variant="error">{error}</Alert>
                     </Table.Cell>
                   </Table.Row>
                 )}
                 {loading && (
                   <Table.Row data-testid="loading-row">
-                    <Table.Cell colSpan={5} textAlign="center">
+                    <Table.Cell colSpan={6} textAlign="center">
                       {renderLoading()}
                     </Table.Cell>
                   </Table.Row>

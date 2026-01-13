@@ -109,6 +109,7 @@ describe('apiData utils', () => {
     it('converts AccessibilityResourceScan to ContentItem', () => {
       const scan: AccessibilityResourceScan = {
         id: 1,
+        courseId: 1,
         resourceId: 123,
         resourceType: ResourceType.WikiPage,
         resourceName: 'Test Page',
@@ -139,6 +140,7 @@ describe('apiData utils', () => {
     it('handles unpublished resources', () => {
       const scan: AccessibilityResourceScan = {
         id: 1,
+        courseId: 1,
         resourceId: 123,
         resourceType: ResourceType.Assignment,
         resourceName: 'Test Assignment',
@@ -158,6 +160,7 @@ describe('apiData utils', () => {
     it('handles missing resourceName', () => {
       const scan: AccessibilityResourceScan = {
         id: 1,
+        courseId: 1,
         resourceId: 123,
         resourceType: ResourceType.DiscussionTopic,
         resourceName: null as any,
@@ -190,10 +193,11 @@ describe('apiData utils', () => {
         severity: 'Low',
       }
 
-      const result = getAsAccessibilityResourceScan(item)
+      const result = getAsAccessibilityResourceScan(item, 1)
 
       expect(result).toEqual({
         id: 123,
+        courseId: 1,
         resourceId: 123,
         resourceType: ResourceType.DiscussionTopic,
         resourceName: 'Test Discussion',
@@ -219,7 +223,7 @@ describe('apiData utils', () => {
         issues: [],
       }
 
-      const result = getAsAccessibilityResourceScan(item)
+      const result = getAsAccessibilityResourceScan(item, 1)
 
       expect(result.resourceWorkflowState).toBe(ResourceWorkflowState.Unpublished)
     })
@@ -236,7 +240,7 @@ describe('apiData utils', () => {
         editUrl: '/courses/1/pages/test-page/edit',
       }
 
-      const result = getAsAccessibilityResourceScan(item)
+      const result = getAsAccessibilityResourceScan(item, 1)
 
       expect(result.issues).toEqual([])
     })

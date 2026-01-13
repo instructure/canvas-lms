@@ -17,12 +17,15 @@
  */
 
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import React from 'react'
 
 import AccessibilityIssuesDrawerContent from '../index'
 import userEvent from '@testing-library/user-event'
 import {multiIssueItem, checkboxTextInputRuleItem} from './__mocks__'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 
 const mockClose = vi.fn()
 
@@ -85,25 +88,55 @@ vi.mock('use-debounce', () => ({
   useDebouncedCallback: vi.fn((callback, _delay) => callback),
 }))
 
+vi.mock('../../../stores/AccessibilityScansStore')
+
 describe('AccessibilityIssuesDrawerContent', () => {
+  let queryClient: QueryClient
+
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
   beforeEach(() => {
+    // Enable feature flag by default for tests
+    window.ENV = {FEATURES: {a11y_checker_close_issues: true}} as any
     vi.clearAllMocks()
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {retry: false},
+      },
+    })
+    ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
+      const state = {
+        accessibilityScans: null,
+        nextResource: {index: -1, item: null},
+        filters: null,
+        isCloseIssuesEnabled: true,
+        setAccessibilityScans: vi.fn(),
+        setNextResource: vi.fn(),
+        setLoadingOfSummary: vi.fn(),
+        setErrorOfSummary: vi.fn(),
+        setLoading: vi.fn(),
+      }
+      return selector ? selector(state) : state
+    })
   })
 
   afterEach(() => {
     server.resetHandlers()
+    queryClient.clear()
   })
 
+  const wrapper = ({children}: {children: React.ReactNode}) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+
   it('renders the issue counter', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
     expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
   })
 
   it('disables "Back" on first issue and enables "Next"', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
     const back = screen.getByTestId('back-button')
     const next = screen.getByTestId('skip-button')
 
@@ -111,20 +144,57 @@ describe('AccessibilityIssuesDrawerContent', () => {
     expect(next).toBeEnabled()
   })
 
-  it('disables "Next" on last issue', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+  it('shows CloseRemediationView when skipping the last issue', async () => {
+    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
     const next = screen.getByTestId('skip-button')
+
+    // Skip to the last issue
     fireEvent.click(next)
 
     await waitFor(() => {
       expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
-      expect(next).toBeDisabled()
+    })
+
+    // Skip the last issue, should show CloseRemediationView
+    fireEvent.click(next)
+
+    await waitFor(() => {
+      expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: /close remediation/i})).toBeInTheDocument()
+    })
+  })
+
+  it('navigates back to first issue from CloseRemediationView', async () => {
+    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
+
+    const next = screen.getByTestId('skip-button')
+
+    // Skip to last issue
+    fireEvent.click(next)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
+    })
+
+    // Skip last issue to show CloseRemediationView
+    fireEvent.click(next)
+
+    await waitFor(() => {
+      expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+    })
+
+    // Click "Back to start" button
+    const backToStart = screen.getByRole('button', {name: /back to start/i})
+    fireEvent.click(backToStart)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
     })
   })
 
   it('removes issue on save and next', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
     const saveAndNext = screen.getByTestId('save-and-next-button')
     expect(saveAndNext).toBeDisabled()
@@ -144,7 +214,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
   })
 
   it('renders Open Page and Edit Page links', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
     expect(await screen.findByText('Open Page')).toHaveAttribute(
       'href',
@@ -156,10 +226,17 @@ describe('AccessibilityIssuesDrawerContent', () => {
     )
   })
 
+  it('wraps Preview component in a semantic region for screen reader navigation', async () => {
+    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
+
+    const issuePreviewRegion = screen.getByRole('region', {name: 'Problem area'})
+    expect(issuePreviewRegion).toBeInTheDocument()
+  })
+
   describe('Save and Next button', () => {
     describe('is enabled', () => {
       it('when the issue is remediated', async () => {
-        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
         const saveAndNext = screen.getByTestId('save-and-next-button')
         expect(saveAndNext).toBeDisabled()
@@ -172,6 +249,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
       it('when the form type is CheckboxTextInput', async () => {
         render(
           <AccessibilityIssuesDrawerContent item={checkboxTextInputRuleItem} onClose={mockClose} />,
+          {wrapper},
         )
 
         const saveAndNext = screen.getByTestId('save-and-next-button')
@@ -191,14 +269,14 @@ describe('AccessibilityIssuesDrawerContent', () => {
 
     describe('is disabled', () => {
       it('when the issue is not remediated', () => {
-        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
         const saveAndNext = screen.getByTestId('save-and-next-button')
         expect(saveAndNext).toBeDisabled()
       })
 
       it('when the form is locked during apply operation', () => {
-        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
         const apply = screen.getByTestId('apply-button')
 
@@ -210,7 +288,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
       })
 
       it('when the form is locked during undo operation', async () => {
-        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
         const apply = screen.getByTestId('apply-button')
         await userEvent.click(apply)
