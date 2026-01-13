@@ -167,6 +167,15 @@ k20_improved_criteria_builder:
   root_opt_in: true
   beta: true
   shadow: true
+intelligent_insights_accessibility_insights:
+  state: hidden
+  applies_to: Account
+  display_name:  Intelligent Insights - Accessibility Insights
+  description:
+    intelligent-insights-accessibility-insights: Enables the Intelligent Insights - Accessibility Insights feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
