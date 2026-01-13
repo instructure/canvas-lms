@@ -36,7 +36,7 @@ import type {ItemType} from '@canvas/context-modules/differentiated-modules/reac
 
 const I18n = createI18nScope('DueDateOverrideView')
 
-interface AssignToContent2Props {
+interface AssignToContentProps {
   onSync: (overrides?: DateDetailsOverride[], importantDates?: boolean) => void
   assignmentId?: string
   getGroupCategoryId?: () => string | null
@@ -225,7 +225,7 @@ const convertOverridesToCards = (
   return {cards, selectedOptionIds, moduleAssignees, hasModuleOverrides, unassignedOverrides}
 }
 
-const AssignToContent2 = ({
+const AssignToContent = ({
   onSync,
   assignmentId,
   getGroupCategoryId,
@@ -239,7 +239,7 @@ const AssignToContent2 = ({
   postToSIS = false,
   defaultGroupCategoryId = null,
   discussionId = null,
-}: AssignToContent2Props) => {
+}: AssignToContentProps) => {
   const [stagedImportantDates, setStagedImportantDates] = useState(importantDates)
   const [groupCategoryId, setGroupCategoryId] = useState(getGroupCategoryId?.())
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>([])
@@ -429,4 +429,4 @@ const AssignToContent2 = ({
   )
 }
 
-export default AssignToContent2
+export default AssignToContent

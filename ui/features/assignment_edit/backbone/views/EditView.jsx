@@ -1993,10 +1993,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   )?.reactComponentInstance
 
   const invalidInput = sectionViewRef?.focusErrors()
-  // for the case stated in EGG-1507, ad-hoc overrides outside of the course availability
-  // dates show no visible error, but a the card is invalid, the card should be valid
-  // so it should save like everywhere else. until then, we can rely on existence of showError.
-  if (invalidInput && (ENV.FEATURES?.assign_to_in_edit_pages_rewrite || this.showError)) {
+  if (invalidInput) {
     errors.invalid_card = {$input: null, showError: this.showError}
   } else {
     delete errors.invalid_card
