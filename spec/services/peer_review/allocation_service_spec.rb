@@ -75,7 +75,7 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:feature_disabled)
           expect(result[:message]).to include("feature is not enabled")
-          expect(result[:status]).to eq(:bad_request)
+          expect(result[:status]).to eq(:forbidden)
         end
       end
 
@@ -89,7 +89,7 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:peer_reviews_not_enabled)
           expect(result[:message]).to include("peer reviews enabled")
-          expect(result[:status]).to eq(:bad_request)
+          expect(result[:status]).to eq(:forbidden)
         end
       end
 
@@ -103,7 +103,7 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:not_submitted)
           expect(result[:message]).to include("must submit")
-          expect(result[:status]).to eq(:bad_request)
+          expect(result[:status]).to eq(:forbidden)
         end
       end
 
@@ -118,7 +118,7 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:not_submitted)
           expect(result[:message]).to include("must submit")
-          expect(result[:status]).to eq(:bad_request)
+          expect(result[:status]).to eq(:forbidden)
         end
       end
 
@@ -152,7 +152,7 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:locked)
           expect(result[:message]).to include("no longer available")
-          expect(result[:status]).to eq(:bad_request)
+          expect(result[:status]).to eq(:forbidden)
         end
       end
 
@@ -171,7 +171,7 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:not_unlocked)
           expect(result[:message]).to include("locked until")
-          expect(result[:status]).to eq(:bad_request)
+          expect(result[:status]).to eq(:forbidden)
         end
       end
 
@@ -194,7 +194,7 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:peer_review_not_started)
           expect(result[:message]).to include("not available until")
-          expect(result[:status]).to eq(:bad_request)
+          expect(result[:status]).to eq(:forbidden)
         end
       end
 
@@ -379,6 +379,192 @@ RSpec.describe PeerReview::AllocationService do
         end
       end
 
+      context "when peer review lock date has passed" do
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          assignment.reload.peer_review_sub_assignment.update!(lock_at: 1.day.ago)
+
+          assignment.update!(due_at: 3.days.ago)
+          assignment.submit_homework(assessor, body: "My submission")
+          assignment.submit_homework(student1, body: "Student1 submission")
+        end
+
+        it "returns error result with peer review lock date message" do
+          result = service.allocate
+          expect(result[:success]).to be false
+          expect(result[:error_code]).to eq(:peer_review_locked)
+          expect(result[:message]).to include("no longer available")
+          expect(result[:status]).to eq(:forbidden)
+        end
+      end
+
+      context "when peer review lock date has not passed" do
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          assignment.reload.peer_review_sub_assignment.update!(
+            unlock_at: 1.day.ago,
+            lock_at: 1.day.from_now
+          )
+
+          assignment.update!(due_at: 3.days.ago)
+          assignment.submit_homework(assessor, body: "My submission")
+          assignment.submit_homework(student1, body: "Student1 submission")
+          assignment.submit_homework(student2, body: "Student2 submission")
+        end
+
+        it "allows allocation" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests]).to be_an(Array)
+          expect(result[:assessment_requests].size).to eq(2)
+        end
+      end
+
+      context "when peer review lock_at is not set" do
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          assignment.reload.peer_review_sub_assignment.update!(
+            unlock_at: 1.day.ago,
+            lock_at: nil
+          )
+
+          assignment.submit_homework(assessor, body: "My submission")
+          assignment.submit_homework(student1, body: "Student1 submission")
+          assignment.submit_homework(student2, body: "Student2 submission")
+        end
+
+        it "allows allocation when no lock date is set" do
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(2)
+        end
+      end
+
+      context "when peer review lock date has override for specific section" do
+        let(:section1) { course.course_sections.create!(name: "Section 1") }
+        let(:section2) { course.course_sections.create!(name: "Section 2") }
+        let(:assessor_section1) { user_model }
+        let(:assessor_section2) { user_model }
+        let(:student_section1) { user_model }
+        let(:student_section2) { user_model }
+
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          peer_review_sub = assignment.reload.peer_review_sub_assignment
+          peer_review_sub.update!(
+            unlock_at: 3.days.ago,
+            lock_at: 2.days.from_now
+          )
+
+          course.enroll_student(assessor_section1, enrollment_state: :active, section: section1)
+          course.enroll_student(assessor_section2, enrollment_state: :active, section: section2)
+          course.enroll_student(student_section1, enrollment_state: :active, section: section1)
+          course.enroll_student(student_section2, enrollment_state: :active, section: section2)
+
+          assignment.update!(due_at: 3.days.ago)
+          assignment.submit_homework(assessor_section1, body: "Assessor1 submission")
+          assignment.submit_homework(assessor_section2, body: "Assessor2 submission")
+          assignment.submit_homework(student_section1, body: "Student section1 submission")
+          assignment.submit_homework(student_section2, body: "Student section2 submission")
+
+          parent_override1 = assignment.assignment_overrides.create!(
+            set: section1,
+            due_at: 2.days.ago
+          )
+
+          peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_override1,
+            set: section1,
+            lock_at: 1.day.ago
+          )
+        end
+
+        it "blocks allocation for section1 assessor with override lock date in the past" do
+          service1 = described_class.new(assignment:, assessor: assessor_section1)
+          result = service1.allocate
+          expect(result[:success]).to be false
+          expect(result[:error_code]).to eq(:peer_review_locked)
+          expect(result[:message]).to include("no longer available")
+        end
+
+        it "allows allocation for section2 assessor with base lock_at in the future" do
+          service2 = described_class.new(assignment:, assessor: assessor_section2)
+          result = service2.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests]).to be_an(Array)
+        end
+      end
+
+      context "when peer review lock date has ADHOC override" do
+        let(:adhoc_student) { user_model }
+        let(:regular_student) { user_model }
+
+        before do
+          PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: assignment,
+            points_possible: 5
+          ).call
+
+          peer_review_sub = assignment.reload.peer_review_sub_assignment
+          peer_review_sub.update!(
+            unlock_at: 3.days.ago,
+            lock_at: 2.days.from_now
+          )
+
+          course.enroll_student(adhoc_student, enrollment_state: :active)
+          course.enroll_student(regular_student, enrollment_state: :active)
+
+          assignment.update!(due_at: 3.days.ago)
+          assignment.submit_homework(adhoc_student, body: "ADHOC student submission")
+          assignment.submit_homework(regular_student, body: "Regular student submission")
+          assignment.submit_homework(student1, body: "Student1 submission")
+
+          parent_adhoc = assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            due_at: 2.days.ago
+          )
+          parent_adhoc.assignment_override_students.create!(user: adhoc_student)
+
+          peer_review_adhoc = peer_review_sub.assignment_overrides.create!(
+            parent_override: parent_adhoc,
+            set_type: "ADHOC",
+            lock_at: 1.day.ago
+          )
+          peer_review_adhoc.assignment_override_students.create!(user: adhoc_student)
+        end
+
+        it "blocks allocation for student with ADHOC override lock date in the past" do
+          service_adhoc = described_class.new(assignment:, assessor: adhoc_student)
+          result = service_adhoc.allocate
+          expect(result[:success]).to be false
+          expect(result[:error_code]).to eq(:peer_review_locked)
+          expect(result[:message]).to include("no longer available")
+        end
+
+        it "allows allocation for student without override (using base lock_at in the future)" do
+          service_regular = described_class.new(assignment:, assessor: regular_student)
+          result = service_regular.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests]).to be_an(Array)
+        end
+      end
+
       context "when peer review count limit is reached" do
         before do
           assignment.update!(peer_review_count: 1)
@@ -395,7 +581,7 @@ RSpec.describe PeerReview::AllocationService do
           expect(result[:success]).to be false
           expect(result[:error_code]).to eq(:limit_reached)
           expect(result[:message]).to include("assigned all required")
-          expect(result[:status]).to eq(:bad_request)
+          expect(result[:status]).to eq(:forbidden)
         end
       end
     end
@@ -1717,6 +1903,53 @@ RSpec.describe PeerReview::AllocationService do
     it "defaults status to bad_request" do
       result = service.send(:error_result, :test_error, "Test message")
       expect(result[:status]).to eq(:bad_request)
+    end
+  end
+
+  describe "#peer_review_dates_for_assessor caching" do
+    before do
+      PeerReview::PeerReviewCreatorService.new(
+        parent_assignment: assignment,
+        points_possible: 5
+      ).call
+
+      assignment.reload.peer_review_sub_assignment.update!(
+        unlock_at: 1.day.ago,
+        lock_at: 1.day.from_now
+      )
+
+      assignment.submit_homework(assessor, body: "My submission")
+    end
+
+    it "caches the result and only calls peer_review_dates_for_assessor once" do
+      allow(service).to receive(:peer_review_dates_for_assessor).and_call_original
+
+      service.send(:peer_review_start_date_for_assessor)
+      service.send(:peer_review_start_date_for_assessor)
+      service.send(:peer_review_start_date_for_assessor)
+
+      expect(service).to have_received(:peer_review_dates_for_assessor).once
+    end
+
+    it "uses the same cached value for both start and lock date methods" do
+      allow(service).to receive(:peer_review_dates_for_assessor).and_call_original
+
+      service.send(:peer_review_start_date_for_assessor)
+      service.send(:peer_review_lock_date_for_assessor)
+      service.send(:peer_review_start_date_for_assessor)
+      service.send(:peer_review_lock_date_for_assessor)
+
+      expect(service).to have_received(:peer_review_dates_for_assessor).once
+    end
+
+    it "returns consistent values across multiple calls" do
+      start_date1 = service.send(:peer_review_start_date_for_assessor)
+      start_date2 = service.send(:peer_review_start_date_for_assessor)
+      lock_date1 = service.send(:peer_review_lock_date_for_assessor)
+      lock_date2 = service.send(:peer_review_lock_date_for_assessor)
+
+      expect(start_date1).to eq(start_date2)
+      expect(lock_date1).to eq(lock_date2)
     end
   end
 

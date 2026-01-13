@@ -59,19 +59,19 @@ class PeerReview::AllocationService < ApplicationService
   def validate
     # Validation: Feature flag must be enabled
     unless @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
-      return error_result(:feature_disabled, I18n.t("Peer review allocation and grading feature is not enabled"), :bad_request)
+      return error_result(:feature_disabled, I18n.t("Peer review allocation and grading feature is not enabled"), :forbidden)
     end
 
     # Validation: Assignment must have peer reviews enabled
     unless @assignment.has_peer_reviews?
-      return error_result(:peer_reviews_not_enabled, I18n.t("Assignment does not have peer reviews enabled"), :bad_request)
+      return error_result(:peer_reviews_not_enabled, I18n.t("Assignment does not have peer reviews enabled"), :forbidden)
     end
 
     # Validation: Check submission requirement based on assignment configuration
     if @assignment.peer_review_submission_required
       student_submission = @assignment.submissions.find_by(user: @assessor)
       unless student_submission&.has_submission?
-        return error_result(:not_submitted, I18n.t("You must submit the assignment before requesting peer reviews"), :bad_request)
+        return error_result(:not_submitted, I18n.t("You must submit the assignment before requesting peer reviews"), :forbidden)
       end
     end
 
@@ -79,22 +79,28 @@ class PeerReview::AllocationService < ApplicationService
     locked = @assignment.low_level_locked_for?(@assessor)
     if locked
       if locked[:unlock_at]
-        return error_result(:not_unlocked, I18n.t("The assignment is locked until %{unlock_at}", unlock_at: locked[:unlock_at]), :bad_request)
+        return error_result(:not_unlocked, I18n.t("The assignment is locked until %{unlock_at}", unlock_at: locked[:unlock_at]), :forbidden)
       elsif locked[:lock_at]
-        return error_result(:locked, I18n.t("This assignment is no longer available as of %{lock_at}", lock_at: locked[:lock_at]), :bad_request)
+        return error_result(:locked, I18n.t("This assignment is no longer available as of %{lock_at}", lock_at: locked[:lock_at]), :forbidden)
       end
     end
 
     # Validation: Check if peer review start date has passed
     peer_review_start_date = peer_review_start_date_for_assessor
     if peer_review_start_date && peer_review_start_date > Time.zone.now
-      return error_result(:peer_review_not_started, I18n.t("Peer reviews are not available until %{start_date}", start_date: peer_review_start_date), :bad_request)
+      return error_result(:peer_review_not_started, I18n.t("Peer reviews are not available until %{start_date}", start_date: peer_review_start_date), :forbidden)
+    end
+
+    # Validation: Check if past peer review lock date
+    peer_review_lock_date = peer_review_lock_date_for_assessor
+    if peer_review_lock_date && peer_review_lock_date < Time.zone.now
+      return error_result(:peer_review_locked, I18n.t("This assignment is no longer available as of %{lock_date}", lock_date: peer_review_lock_date), :forbidden)
     end
 
     # Validation: Check if assessor has reached the required peer review count
     review_count = count_all_reviews
     if review_count >= @assignment.peer_review_count
-      return error_result(:limit_reached, I18n.t("You have been assigned all required peer reviews"), :bad_request)
+      return error_result(:limit_reached, I18n.t("You have been assigned all required peer reviews"), :forbidden)
     end
 
     { success: true }
@@ -215,19 +221,36 @@ class PeerReview::AllocationService < ApplicationService
     }
   end
 
-  def peer_review_start_date_for_assessor
+  def peer_review_dates_for_assessor
     peer_review_overrides = @assignment.peer_review_overrides_for_dates
-    return nil unless peer_review_overrides
+    return @peer_review_dates_for_assessor = nil unless peer_review_overrides
 
     user_assignment = @assignment.overridden_for(@assessor)
     applied_override = user_assignment.applied_overrides&.first
     override_hash = build_override_hash(applied_override)
 
     peer_review_dates = @assignment.peer_review_dates_for_override(override_hash, peer_review_overrides)
-    return nil unless peer_review_dates
+    return @peer_review_dates_for_assessor = nil unless peer_review_dates
+
+    @peer_review_dates_for_assessor = {
+      dates: peer_review_dates,
+      user_assignment:
+    }
+  end
+
+  def peer_review_start_date_for_assessor
+    result = @peer_review_dates_for_assessor ||= peer_review_dates_for_assessor
+    return nil unless result
 
     # Use unlock_at if set, otherwise fall back to parent assignment's due_at
-    peer_review_dates[:unlock_at] || user_assignment.due_at
+    result[:dates][:unlock_at] || result[:user_assignment].due_at
+  end
+
+  def peer_review_lock_date_for_assessor
+    result = @peer_review_dates_for_assessor ||= peer_review_dates_for_assessor
+    return nil unless result
+
+    result[:dates][:lock_at]
   end
 end
 
