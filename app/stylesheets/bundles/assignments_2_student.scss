@@ -101,3 +101,11 @@ body.is-masquerading-or-student-view {
   bottom: 0;
   right: 0;
 }
+
+// Ensure rubric assessment tray submit button is not hidden behind masquerade bar
+// by allowing the content to scroll down far enough to show the button above the bar
+body.is-masquerading-or-student-view {
+  #enhanced-rubric-assessment-tray div[class*="-tray__content"] {
+    padding-bottom: $student-view-banner-height !important;
+  }
+}
