@@ -20,9 +20,12 @@ import React from 'react'
 
 // Mock react-beautiful-dnd AFTER React import
 vi.mock('react-beautiful-dnd', () => ({
-  DragDropContext: ({children}: any) => React.createElement('div', {'data-testid': 'drag-drop-context'}, children),
+  DragDropContext: ({children}: any) =>
+    React.createElement('div', {'data-testid': 'drag-drop-context'}, children),
   Droppable: ({children, droppableId}: any) =>
-    React.createElement('div', {'data-testid': `droppable-${droppableId}`},
+    React.createElement(
+      'div',
+      {'data-testid': `droppable-${droppableId}`},
       children(
         {
           innerRef: vi.fn(),
@@ -30,13 +33,15 @@ vi.mock('react-beautiful-dnd', () => ({
           placeholder: null,
         },
         {isDraggingOver: false},
-      )
+      ),
     ),
   Draggable: ({children, draggableId, index}: any) =>
-    React.createElement('div', {
-      'data-testid': `draggable-${draggableId}`,
-      'data-rbd-draggable-id': draggableId
-    },
+    React.createElement(
+      'div',
+      {
+        'data-testid': `draggable-${draggableId}`,
+        'data-rbd-draggable-id': draggableId,
+      },
       children(
         {
           innerRef: vi.fn(),
@@ -44,14 +49,15 @@ vi.mock('react-beautiful-dnd', () => ({
           dragHandleProps: {'data-rbd-drag-handle-draggable-id': draggableId},
         },
         {isDragging: false},
-      )
+      ),
     ),
 }))
 
 // Mock the WidgetRegistry to avoid dependency issues
 vi.mock('../WidgetRegistry', () => ({
   getWidget: vi.fn(() => ({
-    component: ({widget}: any) => React.createElement('div', {'data-testid': `widget-${widget.id}`}, widget.title),
+    component: ({widget}: any) =>
+      React.createElement('div', {'data-testid': `widget-${widget.id}`}, widget.title),
     displayName: 'Mock Widget',
     description: 'Mock widget for testing',
   })),
@@ -264,6 +270,38 @@ describe('WidgetGrid', () => {
       expect(getByTestId('widget-widget-1')).toHaveTextContent('Widget 1')
       expect(getByTestId('widget-widget-2')).toHaveTextContent('Widget 2')
       expect(getByTestId('widget-widget-3')).toHaveTextContent('Widget 3')
+    })
+  })
+
+  describe('Edit Mode', () => {
+    it('does not render placeholder buttons before first widget in each column', () => {
+      const {getByTestId} = setUp(buildDefaultProps(), true)
+
+      const column1 = getByTestId('widget-column-1')
+      const column2 = getByTestId('widget-column-2')
+
+      const firstElementCol1 = column1.children[0] as HTMLElement
+      const firstElementCol2 = column2.children[0] as HTMLElement
+
+      expect(firstElementCol1.tagName).not.toBe('BUTTON')
+      expect(firstElementCol2.tagName).not.toBe('BUTTON')
+      expect(firstElementCol1.getAttribute('data-testid')).toMatch(/draggable/)
+      expect(firstElementCol2.getAttribute('data-testid')).toMatch(/draggable/)
+    })
+
+    it('renders placeholder buttons for empty columns', () => {
+      const emptyConfig: WidgetConfig = {
+        columns: 2,
+        widgets: [],
+      }
+
+      const {getByTestId} = setUp({config: emptyConfig}, true)
+
+      const column1 = getByTestId('widget-column-1')
+      const column2 = getByTestId('widget-column-2')
+
+      expect(column1).toBeInTheDocument()
+      expect(column2).toBeInTheDocument()
     })
   })
 })

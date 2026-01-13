@@ -76,7 +76,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
       const destIndex = result.destination.index
 
       const destColWidgets = config.widgets
-        .filter(w => w.position.col === destCol)
+        .filter(w => w.position.col === destCol && w.id !== result.draggableId)
         .sort((a, b) => a.position.row - b.position.row)
 
       const targetRow =
@@ -161,7 +161,6 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                       data-testid="widget-column-1"
                       width="100%"
                     >
-                      {renderAddWidgetPlaceholder(1, 1)}
                       {widgetsByColumn[0].map((widget, index) => (
                         <React.Fragment key={widget.id}>
                           <Draggable draggableId={widget.id} index={index}>
@@ -178,6 +177,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                           {renderAddWidgetPlaceholder(1, widget.position.row + 1)}
                         </React.Fragment>
                       ))}
+                      {widgetsByColumn[0].length === 0 && renderAddWidgetPlaceholder(1, 1)}
                       {provided.placeholder}
                     </Flex>
                   </div>
@@ -210,7 +210,6 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                       data-testid="widget-column-2"
                       width="100%"
                     >
-                      {renderAddWidgetPlaceholder(2, 1)}
                       {widgetsByColumn[1].map((widget, index) => (
                         <React.Fragment key={widget.id}>
                           <Draggable draggableId={widget.id} index={index}>
@@ -227,6 +226,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                           {renderAddWidgetPlaceholder(2, widget.position.row + 1)}
                         </React.Fragment>
                       ))}
+                      {widgetsByColumn[1].length === 0 && renderAddWidgetPlaceholder(2, 1)}
                       {provided.placeholder}
                     </Flex>
                   </div>
