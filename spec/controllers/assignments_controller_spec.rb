@@ -3675,6 +3675,19 @@ describe AssignmentsController do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(assigns[:page_title]).to eq("Peer Review Assignment Peer Review")
       end
+
+      it "sets restrict_quantitative_data in js_env based on course setting" do
+        @course.root_account.enable_feature! :restrict_quantitative_data
+        @course.restrict_quantitative_data = true
+        @course.save!
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:restrict_quantitative_data]).to be(true)
+
+        @course.restrict_quantitative_data = false
+        @course.save!
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:restrict_quantitative_data]).to be(false)
+      end
     end
 
     context "when user is a teacher and peer_review_allocation_and_grading FF is enabled" do

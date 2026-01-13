@@ -32,6 +32,7 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
       peerReviews {
         count
         submissionRequired
+        pointsPossible
       }
       submissionsConnection(filter: {userId: $userId}) {
         nodes {

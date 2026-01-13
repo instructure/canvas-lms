@@ -153,6 +153,7 @@ export interface AssessmentRequest {
 interface PeerReviews {
   count: number | null
   submissionRequired: boolean | null
+  pointsPossible: number | null
 }
 
 interface SubmissionsConnection {

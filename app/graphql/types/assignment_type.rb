@@ -110,6 +110,18 @@ module Types
 
         object.peer_review_across_sections
       end
+      field :points_possible,
+            Float,
+            "Points possible for the peer review sub-assignment",
+            null: true
+      def points_possible
+        return nil unless object.context.feature_enabled?(:peer_review_allocation_and_grading)
+        return nil unless object.peer_reviews
+
+        load_association(:peer_review_sub_assignment).then do |sub_assignment|
+          sub_assignment&.points_possible
+        end
+      end
     end
 
     class AssignmentModeratedGrading < ApplicationObjectType

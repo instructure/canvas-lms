@@ -24,6 +24,7 @@ import {View} from '@instructure/ui-view'
 import {Tabs} from '@instructure/ui-tabs'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import numberFormat from '@canvas/i18n/numberFormat'
 import ErrorShip from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
@@ -170,36 +171,54 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const isLocked = isPeerReviewLocked(data.assignment)
   const peerReviewDueAt = assignedToDates?.[0]?.peerReviewDates?.dueAt
 
-  const renderHeader = () => (
-    <Flex justifyItems="space-between">
-      <Flex.Item shouldGrow={true}>
-        <Flex direction="column">
-          <Flex.Item>
-            <Text
-              size="x-large"
-              wrap="break-word"
-              data-testid="title"
-              weight={isMobile ? 'normal' : 'light'}
-            >
-              {I18n.t('%{name} Peer Review', {name: name})}
-            </Text>
-          </Flex.Item>
-          {peerReviewDueAt && (
+  const renderHeader = () => {
+    return (
+      <Flex justifyItems="space-between">
+        <Flex.Item shouldGrow={true}>
+          <Flex direction="column">
             <Flex.Item>
-              <Text size="medium" weight="bold">
-                <FriendlyDatetime
-                  data-testid="due-date"
-                  prefix={I18n.t('Due:')}
-                  format={I18n.t('#date.formats.full_with_weekday')}
-                  dateTime={peerReviewDueAt}
-                />
+              <Text
+                size="x-large"
+                wrap="break-word"
+                data-testid="title"
+                weight={isMobile ? 'normal' : 'light'}
+              >
+                {I18n.t('%{name} Peer Review', {name: name})}
               </Text>
             </Flex.Item>
-          )}
-        </Flex>
-      </Flex.Item>
-    </Flex>
-  )
+            {peerReviewDueAt && (
+              <Flex.Item>
+                <Text size="medium" weight="bold">
+                  <FriendlyDatetime
+                    data-testid="due-date"
+                    prefix={I18n.t('Due:')}
+                    format={I18n.t('#date.formats.full_with_weekday')}
+                    dateTime={peerReviewDueAt}
+                  />
+                </Text>
+              </Flex.Item>
+            )}
+          </Flex>
+        </Flex.Item>
+        {!ENV.restrict_quantitative_data && peerReviews?.pointsPossible != null && (
+          <Flex.Item>
+            <Text size="x-large" data-testid="total-points">
+              {I18n.t(
+                {one: '1 Point Possible', other: '%{formattedPoints} Points Possible'},
+                {
+                  count: peerReviews.pointsPossible,
+                  formattedPoints: numberFormat._format(peerReviews.pointsPossible, {
+                    precision: 2,
+                    strip_insignificant_zeros: true,
+                  }),
+                },
+              )}
+            </Text>
+          </Flex.Item>
+        )}
+      </Flex>
+    )
+  }
 
   const renderBody = () => {
     if (showSubmissionRequiredView) {

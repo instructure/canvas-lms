@@ -2477,6 +2477,70 @@ describe Types::AssignmentType do
         end
       end
     end
+
+    describe "peerReviews pointsPossible field" do
+      let(:peer_review_assignment) do
+        course.assignments.create!(
+          title: "Peer Review Assignment",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+      end
+      let(:peer_review_assignment_type) { GraphQLTypeTester.new(peer_review_assignment, current_user: student) }
+      let(:teacher_peer_review_assignment_type) { GraphQLTypeTester.new(peer_review_assignment, current_user: teacher) }
+
+      before do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      context "with peer_review_sub_assignment" do
+        let!(:peer_review_sub) do
+          service = PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: peer_review_assignment,
+            points_possible: 5
+          )
+          service.call
+
+          peer_review_assignment.reload.peer_review_sub_assignment.tap do |sub|
+            sub.update!(
+              due_at: 2.weeks.from_now,
+              unlock_at: 1.week.from_now,
+              lock_at: 3.weeks.from_now
+            )
+          end
+        end
+
+        it "returns points from peer review sub-assignment" do
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to eq 5
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to eq 5
+        end
+
+        it "handles zero points" do
+          peer_review_sub.update!(points_possible: 0)
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to eq 0
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to eq 0
+        end
+
+        it "returns nil when peer_reviews is disabled" do
+          peer_review_assignment.update!(peer_reviews: false)
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+        end
+
+        it "returns nil when no peer review sub-assignment exists" do
+          peer_review_sub.update!(workflow_state: "deleted")
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+        end
+
+        it "returns nil when feature flag is disabled" do
+          course.disable_feature!(:peer_review_allocation_and_grading)
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+        end
+      end
+    end
   end
 
   describe "N+1 query prevention" do

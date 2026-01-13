@@ -8240,6 +8240,11 @@ type PeerReviews {
   intraReviews: Boolean
 
   """
+  Points possible for the peer review sub-assignment
+  """
+  pointsPossible: Float
+
+  """
   Boolean indicating if students must submit their assignment before they can do peer reviews
   """
   submissionRequired: Boolean
