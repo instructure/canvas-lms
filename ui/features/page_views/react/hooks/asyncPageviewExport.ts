@@ -37,6 +37,7 @@ export interface AsyncPageviewJob {
   status: AsyncPageViewJobStatus
   createdAt: Date
   updatedAt: Date
+  error_code: string | null
 }
 
 export interface AsyncPageviewJobResult {
@@ -105,7 +106,7 @@ export function useAsyncPageviewJobs(
         // Update the status and the timestamp of the record
         const updatedJobs = jobs.map(record =>
           record.query_id === job.query_id
-            ? {...record, status: json.status, updatedAt: new Date()}
+            ? {...record, status: json.status, updatedAt: new Date(), error_code: json.error_code}
             : record,
         )
         setJobs(updatedJobs)
@@ -151,6 +152,7 @@ export function useAsyncPageviewJobs(
         status: AsyncPageViewJobStatus.Queued,
         createdAt: new Date(),
         updatedAt: new Date(),
+        error_code: null,
       }
       setJobs([newRecord, ...jobs])
     }
@@ -240,4 +242,18 @@ export function statusDisplayName(j: AsyncPageviewJob) {
   if (j.status === AsyncPageViewJobStatus.Failed) return I18n.t('Failed')
   if (j.status === AsyncPageViewJobStatus.Empty) return I18n.t('Empty')
   return j.status
+}
+
+export function errorCodeDisplayName(j: AsyncPageviewJob) {
+  if (!j.error_code) {
+    return I18n.t('Query failed. Please try again later.')
+  }
+
+  const errorCodeMap: {[key: string]: string} = {
+    RESULT_SIZE_LIMIT_EXCEEDED: I18n.t(
+      'The export result size limit was exceeded. Please narrow your date range and try again.',
+    ),
+    USER_FILTERED: I18n.t("This user's page view data is not available for export."),
+  }
+  return errorCodeMap[j.error_code] || I18n.t('Query failed. Please try again later.')
 }

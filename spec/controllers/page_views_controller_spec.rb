@@ -83,7 +83,7 @@ describe PageViewsController do
     before do
       allow(PageView).to receive(:pv4?).and_return(true)
       ConfigFile.reset_cache
-      ConfigFile.stub("pv4", {})
+      ConfigFile.stub("pv4", { "uri" => "https://test.example.com" })
       account_admin_user
       user_session(@user)
     end
@@ -280,6 +280,32 @@ describe PageViewsController do
 
         expect(response).to have_http_status(:not_found)
       end
+
+      it "returns 200 OK when query fails with an error" do
+        expected_uuid = SecureRandom.uuid
+        expected_polling_result = PageViews::Common::PollingResponse.new(query_id: expected_uuid, status: :failed, error_code: "RESULT_SIZE_LIMIT_EXCEEDED")
+        allow_any_instance_of(PageViews::PollQueryService).to receive(:call).and_return(expected_polling_result)
+
+        get "poll_query", params: { user_id: @user.id, query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.parsed_body["query_id"]).to eq(expected_uuid)
+        expect(response.parsed_body["status"]).to eq("failed")
+        expect(response.parsed_body["error_code"]).to eq("RESULT_SIZE_LIMIT_EXCEEDED")
+      end
+
+      it "returns 200 OK when query fails without an error code" do
+        expected_uuid = SecureRandom.uuid
+        expected_polling_result = PageViews::Common::PollingResponse.new(query_id: expected_uuid, status: :failed)
+        allow_any_instance_of(PageViews::PollQueryService).to receive(:call).and_return(expected_polling_result)
+
+        get "poll_query", params: { user_id: @user.id, query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.parsed_body["query_id"]).to eq(expected_uuid)
+        expect(response.parsed_body["status"]).to eq("failed")
+        expect(response.parsed_body["error_code"]).to be_nil
+      end
     end
 
     describe "GET `query_results`" do
@@ -337,7 +363,7 @@ describe PageViewsController do
       account_admin_user
       user_session(@user)
       allow(PageView).to receive(:pv4?).and_return(true)
-      ConfigFile.stub("pv4", {})
+      ConfigFile.stub("pv4", { "uri" => "https://test.example.com" })
       # Mock the PageView fetch to avoid actual API calls
       allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_return([])
     end
@@ -418,6 +444,35 @@ describe PageViewsController do
 
         expect(response).to be_successful
       end
+
+      it "should return 200 rows" do
+        expect(PageViewsController::PAGE_VIEWS_MAX_PER_PAGE).to eq(200)
+
+        # Verify that the constant is respected in pagination
+        expect(Api).to receive(:paginate).with(
+          anything,
+          anything,
+          anything,
+          hash_including(max_per_page: PageViewsController::PAGE_VIEWS_MAX_PER_PAGE)
+        ).and_call_original
+
+        get "index", params: { user_id: @user.id, per_page: 200 }, format: :json
+
+        expect(response).to be_successful
+      end
+
+      it "should fall back to the max per_page number of rows if a higher value is provided" do
+        expect(Api).to receive(:paginate).with(
+          anything,
+          anything,
+          anything,
+          hash_including(max_per_page: PageViewsController::PAGE_VIEWS_MAX_PER_PAGE)
+        ).and_call_original
+
+        get "index", params: { user_id: @user.id, per_page: PageViewsController::PAGE_VIEWS_MAX_PER_PAGE + 1 }, format: :json
+
+        expect(response).to be_successful
+      end
     end
 
     context "async query action" do
@@ -458,7 +513,7 @@ describe PageViewsController do
 
     context "poll_query action" do
       let(:query_id) { SecureRandom.uuid }
-      let(:poll_result) { instance_double(PageViews::Common::PollingResponse, status: :processing, format: :csv) }
+      let(:poll_result) { instance_double(PageViews::Common::PollingResponse, status: :processing, format: :csv, error_code: nil) }
       let(:mock_poll_service) { instance_double(PageViews::PollQueryService) }
 
       before do
