@@ -39,6 +39,7 @@ interface WidgetLayoutContextType {
   removeWidget: (widgetId: string) => void
   addWidget: (type: string, displayName: string, col: number, row: number) => void
   resetConfig: () => void
+  saveLayout: () => Promise<void>
 }
 
 const WidgetLayoutContext = createContext<WidgetLayoutContextType | null>(null)
@@ -230,12 +231,17 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
     const persistedLayout = preferences.widget_dashboard_config?.layout
     return persistedLayout || DEFAULT_WIDGET_CONFIG
   })
-  const {markDirty} = useWidgetDashboardEdit()
+  const [savedConfig, setSavedConfig] = useState<WidgetConfig>(() => {
+    const persistedLayout = preferences.widget_dashboard_config?.layout
+    return persistedLayout || DEFAULT_WIDGET_CONFIG
+  })
+  const {markDirty, saveChanges} = useWidgetDashboardEdit()
 
   useEffect(() => {
     const persistedLayout = preferences.widget_dashboard_config?.layout
     if (persistedLayout) {
       setConfig(persistedLayout)
+      setSavedConfig(persistedLayout)
     }
   }, [preferences.widget_dashboard_config?.layout])
 
@@ -329,7 +335,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
   const addWidget = useCallback(
     (type: string, displayName: string, col: number, row: number) => {
       setConfig(prevConfig => {
-      	const uuid = crypto?.randomUUID?.() ?? '' 
+        const uuid = crypto?.randomUUID?.() ?? ''
         const newWidget: Widget = {
           // For HTTP, return empty string for consistent data-testids in tests
           id: uuid ? `${type}-widget-${uuid}` : `${type}-widget`,
@@ -360,8 +366,13 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
   )
 
   const resetConfig = useCallback(() => {
-    setConfig(DEFAULT_WIDGET_CONFIG)
-  }, [])
+    setConfig(savedConfig)
+  }, [savedConfig])
+
+  const saveLayout = useCallback(async () => {
+    await saveChanges(config)
+    setSavedConfig(config)
+  }, [config, saveChanges])
 
   const value = {
     config,
@@ -370,6 +381,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
     removeWidget,
     addWidget,
     resetConfig,
+    saveLayout,
   }
 
   return <WidgetLayoutContext.Provider value={value}>{children}</WidgetLayoutContext.Provider>
