@@ -424,7 +424,7 @@ module Types
 
       submissions = Submission.active.joins(:assignment).where(
         user_id: allowed_user_ids,
-        assignment_id: course.assignments.published,
+        assignment_id: course.assignments.published.reorder(nil).select(:id),
         workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
       )
 
