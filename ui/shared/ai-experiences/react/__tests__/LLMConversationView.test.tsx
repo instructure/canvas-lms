@@ -24,7 +24,6 @@ import {setupServer} from 'msw/node'
 import LLMConversationView from '../components/LLMConversationView'
 
 const server = setupServer()
-let apiCallCount = 0
 
 const defaultProps = {
   isOpen: true,
@@ -40,11 +39,15 @@ const defaultProps = {
 }
 
 describe('LLMConversationView', () => {
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'error'})
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
-    apiCallCount = 0
     // Mock scrollIntoView which is not available in JSDOM
     Element.prototype.scrollIntoView = vi.fn()
     // Mock focus which is used for accessibility
@@ -288,13 +291,15 @@ describe('LLMConversationView', () => {
       {role: 'Assistant', text: 'Hello', timestamp: new Date()},
     ]
 
+    let localApiCallCount = 0
+
     // Override default mocks with custom messages
     server.use(
       http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
         return HttpResponse.json({})
       }),
       http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-        apiCallCount++
+        localApiCallCount++
         return HttpResponse.json({id: '1', messages: mockMessages})
       }),
     )
@@ -310,7 +315,7 @@ describe('LLMConversationView', () => {
 
     // Should re-initialize conversation
     await waitFor(() => {
-      expect(apiCallCount).toBeGreaterThan(1)
+      expect(localApiCallCount).toBeGreaterThan(1)
     })
   })
 
@@ -540,16 +545,17 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      let postCallCount = 0
+      let hasBeenCalledOnce = false
+
       // Mock get active conversation and create conversation with first success, second failure
       server.use(
         http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
           return HttpResponse.json({})
         }),
         http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-          postCallCount++
-          if (postCallCount === 1) {
+          if (!hasBeenCalledOnce) {
             // First call - success
+            hasBeenCalledOnce = true
             return HttpResponse.json({id: '1', messages: initialMessages})
           }
           // Second call for restart - failure
@@ -559,13 +565,18 @@ describe('LLMConversationView', () => {
 
       render(<LLMConversationView {...defaultProps} />)
 
+      // Wait for initial success
       await waitFor(() => {
         expect(screen.getByText('Hello')).toBeInTheDocument()
       })
 
+      // Verify first call succeeded
+      expect(hasBeenCalledOnce).toBe(true)
+
       const restartButton = screen.getByText('Restart')
       fireEvent.click(restartButton)
 
+      // Wait for restart failure
       await waitFor(() => {
         expect(
           screen.getByText('Failed to restart conversation. Please try again.'),
@@ -603,41 +614,49 @@ describe('LLMConversationView', () => {
     })
 
     it('clears error when retrying after failure', async () => {
-      let postCallCount = 0
+      const initialMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      let hasBeenCalledOnce = false
+
       // Mock get active conversation and create conversation with first failure, second success
       server.use(
         http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
           return HttpResponse.json({})
         }),
         http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-          postCallCount++
-          if (postCallCount === 1) {
+          if (!hasBeenCalledOnce) {
             // First call - failure
+            hasBeenCalledOnce = true
             return HttpResponse.json({error: 'Failed'}, {status: 503})
           }
           // Second call - success
           return HttpResponse.json({
             id: '1',
-            messages: [
-              {role: 'User', text: 'Start', timestamp: new Date()},
-              {role: 'Assistant', text: 'Hello', timestamp: new Date()},
-            ],
+            messages: initialMessages,
           })
         }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
 
+      // Wait for the error to appear after failed initialization
       await waitFor(() => {
         expect(
           screen.getByText('Failed to start conversation. Please try again.'),
         ).toBeInTheDocument()
       })
 
+      // Verify we're in error state
+      expect(hasBeenCalledOnce).toBe(true)
+
       // Trigger restart which should clear the error
       const restartButton = screen.getByText('Restart')
       fireEvent.click(restartButton)
 
+      // Wait for successful restart
       await waitFor(() => {
         expect(
           screen.queryByText('Failed to start conversation. Please try again.'),
