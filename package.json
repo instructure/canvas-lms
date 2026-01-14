@@ -194,7 +194,7 @@
     "spin.js": "2.3.2",
     "styled-components": ">= 4",
     "swc-loader": "^0.2.6",
-    "swc-plugin-coverage-instrument": "^0.0.21",
+    "swc-plugin-coverage-instrument": "^0.0.32",
     "swfobject": "^2.2.1",
     "tablesorter": "2.32.0",
     "timezone": "npm:@instructure/timezone@1.0.32",
