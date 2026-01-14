@@ -733,6 +733,101 @@ describe "Api::V1::Assignment" do
         expect(json["html_url"]).to eq("assignment/url/#{course.id}/#{regular_assignment.id}")
       end
     end
+
+    context "availability_status" do
+      it "includes availability_status when assignment is open with future lock date" do
+        course = course_model
+        teacher = teacher_in_course(course:, active_all: true).user
+        assignment = assignment_model(course:, lock_at: 5.days.from_now)
+
+        json = api.assignment_json(assignment, teacher, session, {})
+
+        expect(json).to have_key("availability_status")
+        expect(json["availability_status"]["status"]).to eq("open")
+        expect(json["availability_status"]["date"]).to eq(assignment.lock_at)
+      end
+
+      it "includes availability_status when assignment is pending with future unlock date" do
+        course = course_model
+        teacher = teacher_in_course(course:, active_all: true).user
+        assignment = assignment_model(course:, unlock_at: 5.days.from_now, due_at: 10.days.from_now)
+
+        json = api.assignment_json(assignment, teacher, session, {})
+
+        expect(json).to have_key("availability_status")
+        expect(json["availability_status"]["status"]).to eq("pending")
+        expect(json["availability_status"]["date"]).to eq(assignment.unlock_at)
+      end
+
+      it "includes availability_status when assignment is closed with past lock date" do
+        course = course_model
+        teacher = teacher_in_course(course:, active_all: true).user
+        assignment = assignment_model(course:, lock_at: 5.days.ago, due_at: 10.days.ago)
+
+        json = api.assignment_json(assignment, teacher, session, {})
+
+        expect(json).to have_key("availability_status")
+        expect(json["availability_status"]["status"]).to eq("closed")
+        expect(json["availability_status"]["date"]).to be_nil
+      end
+
+      it "does not include availability_status when assignment has no date restrictions" do
+        course = course_model
+        teacher = teacher_in_course(course:, active_all: true).user
+        assignment = assignment_model(course:, unlock_at: nil, lock_at: nil)
+
+        json = api.assignment_json(assignment, teacher, session, {})
+
+        expect(json).not_to have_key("availability_status")
+      end
+
+      it "does not include availability_status when unlock_at is in past and lock_at is nil" do
+        course = course_model
+        teacher = teacher_in_course(course:, active_all: true).user
+        assignment = assignment_model(course:, unlock_at: 5.days.ago, lock_at: nil)
+
+        json = api.assignment_json(assignment, teacher, session, {})
+
+        expect(json).not_to have_key("availability_status")
+      end
+
+      context "with all_dates" do
+        it "includes availability_status for each date override" do
+          course = course_model
+          teacher = teacher_in_course(course:, active_all: true).user
+          assignment = assignment_model(course:, lock_at: 5.days.from_now)
+          section = course.course_sections.create!(name: "Test Section")
+          assignment.assignment_overrides.create!(
+            set_type: "CourseSection",
+            set_id: section.id,
+            unlock_at: 2.days.from_now,
+            lock_at: 10.days.from_now
+          )
+
+          json = api.assignment_json(assignment, teacher, session, { include_all_dates: true })
+
+          expect(json["all_dates"]).to be_present
+          open_dates = json["all_dates"].select { |d| d["availability_status"]&.dig("status") == "open" }
+          pending_dates = json["all_dates"].select { |d| d["availability_status"]&.dig("status") == "pending" }
+
+          expect(open_dates).not_to be_empty
+          expect(pending_dates).not_to be_empty
+        end
+
+        it "does not include availability_status for dates with no restrictions" do
+          course = course_model
+          teacher = teacher_in_course(course:, active_all: true).user
+          assignment = assignment_model(course:, unlock_at: nil, lock_at: nil)
+
+          json = api.assignment_json(assignment, teacher, session, { include_all_dates: true })
+
+          expect(json["all_dates"]).to be_present
+          json["all_dates"].each do |date|
+            expect(date).not_to have_key("availability_status")
+          end
+        end
+      end
+    end
   end
 
   describe "*_settings_hash methods" do

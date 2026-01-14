@@ -725,6 +725,15 @@ Assignment.prototype.hasPeerReviewSubmissions = function () {
   return this.get('has_peer_review_submissions')
 }
 
+Assignment.prototype.shouldShowPeerReviewInfo = function () {
+  return (
+    canManage() &&
+    ENV.FLAGS?.peer_review_allocation_and_grading &&
+    this.peerReviews() &&
+    this.peerReviewSubAssignment() !== null
+  )
+}
+
 Assignment.prototype.notifyOfUpdate = function (notifyOfUpdateBoolean) {
   if (!(arguments.length > 0)) {
     return this.get('notify_of_update')
@@ -1158,6 +1167,51 @@ Assignment.prototype.multipleDueDates = function () {
   }
 }
 
+Assignment.prototype.multiplePeerReviewDueDates = function () {
+  const sub = this.peerReviewSubAssignment()
+  const count = sub?.all_dates_count
+  if (count && count > 1) return true
+  else {
+    const dates = sub?.all_dates || []
+    return dates.length > 1
+  }
+}
+
+Assignment.prototype.peerReviewAllDates = function () {
+  const sub = this.peerReviewSubAssignment()
+  const dates = sub?.all_dates || []
+
+  return dates.map(d => ({
+    dueFor: d.title,
+    dueAt: d.due_at,
+    unlockAt: d.unlock_at,
+    lockAt: d.lock_at,
+    availabilityStatus: d.availability_status,
+  }))
+}
+
+Assignment.prototype.peerReviewSingleSection = function () {
+  const allDates = this.peerReviewAllDates()
+  if (allDates && allDates.length === 1) {
+    return allDates[0]
+  }
+  return null
+}
+
+Assignment.prototype.peerReviewDefaultDates = function () {
+  const peerReviewSub = this.peerReviewSubAssignment()
+  if (!peerReviewSub) return null
+
+  const singleSection = this.peerReviewSingleSection()
+  return new DateGroup({
+    due_at: peerReviewSub.due_at,
+    unlock_at: peerReviewSub.unlock_at,
+    lock_at: peerReviewSub.lock_at,
+    single_section_unlock_at: singleSection != null ? singleSection.unlockAt : undefined,
+    single_section_lock_at: singleSection != null ? singleSection.lockAt : undefined,
+  })
+}
+
 Assignment.prototype.hasDueDate = function () {
   return !this.isPage()
 }
@@ -1384,6 +1438,7 @@ Assignment.prototype.toView = function () {
     'peerReviewCount',
     'peerReviews',
     'peerReviewsAssignAt',
+    'peerReviewSubAssignment',
     'pointsPossible',
     'position',
     'postToSIS',

@@ -255,4 +255,19 @@ describe('DateGroup', () => {
     const json = model.toJSON()
     expect(json.closed).toBe(true)
   })
+
+  test('#toJSON includes availabilityStatus when present', () => {
+    const availabilityStatus = {status: 'open', date: '2013-08-20 11:13:00'}
+    const model = new DateGroup({
+      availability_status: availabilityStatus,
+    })
+    const json = model.toJSON()
+    expect(json.availabilityStatus).toEqual(availabilityStatus)
+  })
+
+  test('#toJSON does not include availabilityStatus when not present', () => {
+    const model = new DateGroup({})
+    const json = model.toJSON()
+    expect(json.availabilityStatus).toBeUndefined()
+  })
 })

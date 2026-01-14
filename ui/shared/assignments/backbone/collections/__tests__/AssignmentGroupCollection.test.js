@@ -71,6 +71,16 @@ describe('AssignmentGroupCollection', () => {
     deepEqual(include, ['assignments'], 'include only contains assignments')
   })
 
+  test('default params include peer_review when feature flag is enabled', () => {
+    ENV.FEATURES = {peer_review_allocation_and_grading: true}
+    const {include} = AssignmentGroupCollection.prototype.defaults.params
+    deepEqual(
+      include,
+      ['assignments', 'peer_review'],
+      'include contains assignments and peer_review when feature flag is enabled',
+    )
+  })
+
   test('optionProperties', () => {
     const course = new Course()
     const collection_ = new AssignmentGroupCollection([], {

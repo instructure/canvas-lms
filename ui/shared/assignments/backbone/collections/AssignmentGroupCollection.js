@@ -157,10 +157,18 @@ AssignmentGroupCollection.optionProperty('courseSubmissionsURL')
 
 // TODO: this will also return the assignments discussion_topic if it is of
 // that type, which we don't need.
-AssignmentGroupCollection.prototype.defaults = {
-  params: {
-    include: ['assignments'],
+Object.defineProperty(AssignmentGroupCollection.prototype, 'defaults', {
+  get() {
+    const include = ['assignments']
+    if (ENV.FEATURES?.peer_review_allocation_and_grading) {
+      include.push('peer_review')
+    }
+    return {
+      params: {
+        include,
+      },
+    }
   },
-}
+})
 
 AssignmentGroupCollection.prototype.comparator = 'position'
