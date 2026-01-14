@@ -25,14 +25,14 @@ import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
 const flushAllTimersAndPromises = async () => {
-  while (jest.getTimerCount() > 0) {
+  while (vi.getTimerCount() > 0) {
     await act(async () => {
-      jest.runAllTimers()
+      vi.runAllTimers()
     })
   }
 }
@@ -44,14 +44,14 @@ describe('useCourseAlignments', () => {
   let cache, mocks, searchMocks
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     cache = createCache()
     mocks = courseAlignmentMocks()
     searchMocks = [...courseAlignmentMocks(), ...courseAlignmentMocks({searchQuery: 'TEST'})]
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const wrapper = ({children}) => (
@@ -145,7 +145,7 @@ describe('useCourseAlignments', () => {
         wrapper,
       })
 
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while loading outcome alignments.',
         type: 'error',
@@ -159,7 +159,7 @@ describe('useCourseAlignments', () => {
         wrapper,
       })
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing Search Results Below',
         type: 'info',
@@ -188,7 +188,7 @@ describe('useCourseAlignments', () => {
         wrapper,
       })
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'No Search Results Found',
         type: 'info',
@@ -204,19 +204,19 @@ describe('useCourseAlignments', () => {
     })
 
     hook.result.current.onSearchChangeHandler({target: {value: ''}})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 with alignments', 'Outcome 2'])
 
     hook.result.current.onSearchChangeHandler({target: {value: 'T'}})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 with alignments', 'Outcome 2'])
 
     hook.result.current.onSearchChangeHandler({target: {value: 'TE'}})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 with alignments', 'Outcome 2'])
 
     hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments',
       'Outcome 2 with alignments',
@@ -256,21 +256,21 @@ describe('useCourseAlignments', () => {
     // original search
     hook.result.current.onSearchChangeHandler({target: {value: 'abc'}})
     expect(hook.result.current.loading).toBe(true)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(hook.result.current.loading).toBe(false)
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 with alignments', 'Outcome 2'])
 
     // run a different search to force hook rerender
     hook.result.current.onSearchChangeHandler({target: {value: 'def'}})
     expect(hook.result.current.loading).toBe(true)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(hook.result.current.loading).toBe(false)
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 with alignments', 'Outcome 2'])
 
     // repeat original search to test refetch
     hook.result.current.onSearchChangeHandler({target: {value: 'abc'}})
     expect(hook.result.current.loading).toBe(true)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(hook.result.current.loading).toBe(false)
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments - Refetched',
@@ -285,14 +285,14 @@ describe('useCourseAlignments', () => {
     })
 
     expect(result.current.loading).toBe(false)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.loading).toBe(false)
     expect(result.current.rootGroup).toBe(null)
 
     rerender({shouldWait: false})
 
     expect(result.current.loading).toBe(true)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.loading).toBe(false)
     expect(result.current.rootGroup).not.toBe(null)
     expect(result.current.rootGroup._id).toBe('1')

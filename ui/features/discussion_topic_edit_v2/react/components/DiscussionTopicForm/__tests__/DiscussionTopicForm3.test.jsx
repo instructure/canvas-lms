@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {Assignment} from '../../../../graphql/Assignment'
@@ -25,7 +25,7 @@ import {GroupSet} from '../../../../graphql/GroupSet'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../../../util/constants'
 import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
 
-jest.mock('@canvas/rce/react/CanvasRce')
+vi.mock('@canvas/rce/react/CanvasRce')
 
 describe('DiscussionTopicForm', () => {
   const setup = ({
@@ -311,10 +311,23 @@ describe('DiscussionTopicForm', () => {
 
     it('disable checkpoints if there are student submissions', () => {
       const {queryByTestId} = setup({
+        isEditing: true,
         currentDiscussionTopic: DiscussionTopic.mock({
-          assignment: Assignment.mock({
-            hasSubmittedSubmissions: true,
-          }),
+          assignment: Assignment.mock(),
+          canGroup: false,
+        }),
+      })
+
+      expect(queryByTestId('checkpoints-checkbox').querySelector('input')).toBeDisabled()
+    })
+
+    it('disable checkpoints for group discussions with child topic replies', () => {
+      const {queryByTestId} = setup({
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({
+          assignment: Assignment.mock(),
+          groupSet: GroupSet.mock(),
+          canGroup: false,
         }),
       })
 

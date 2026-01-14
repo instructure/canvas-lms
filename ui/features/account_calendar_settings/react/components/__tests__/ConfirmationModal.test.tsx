@@ -22,8 +22,8 @@ import ConfirmationModal, {type ComponentProps} from '../ConfirmationModal'
 
 const defaultProps: ComponentProps = {
   isOpen: true,
-  onCancel: jest.fn(),
-  onConfirm: jest.fn(),
+  onCancel: vi.fn(),
+  onConfirm: vi.fn(),
 }
 
 describe('ConfirmationModal', () => {
@@ -34,14 +34,14 @@ describe('ConfirmationModal', () => {
   })
 
   it('calls onConfirm when Confirm button is pressed', () => {
-    const onConfirm = jest.fn()
+    const onConfirm = vi.fn()
     const {getByRole} = render(<ConfirmationModal {...defaultProps} onConfirm={onConfirm} />)
     getByRole('button', {name: 'Confirm'}).click()
     expect(onConfirm).toHaveBeenCalledTimes(1)
   })
 
   it('calls onCancel when Cancel button is pressed', () => {
-    const onCancel = jest.fn()
+    const onCancel = vi.fn()
     const {getByRole} = render(<ConfirmationModal {...defaultProps} onCancel={onCancel} />)
     getByRole('button', {name: 'Cancel'}).click()
     expect(onCancel).toHaveBeenCalledTimes(1)

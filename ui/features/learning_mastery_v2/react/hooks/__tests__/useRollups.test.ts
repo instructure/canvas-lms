@@ -23,9 +23,7 @@ import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../../utils/constants'
 import {Outcome, Rating, Student} from '../../types/rollup'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 
-jest.useFakeTimers()
-
-jest.mock('@canvas/axios')
+vi.mock('@canvas/axios')
 
 describe('useRollups', () => {
   const mockedStudents: Student[] = MOCK_STUDENTS
@@ -78,6 +76,8 @@ describe('useRollups', () => {
   ]
 
   beforeEach(() => {
+    vi.useFakeTimers()
+    vi.clearAllMocks()
     const promise = Promise.resolve({
       status: 200,
       data: {
@@ -95,7 +95,94 @@ describe('useRollups', () => {
         },
       },
     })
-    ;(axios.get as jest.Mock).mockResolvedValue(promise)
+    vi.mocked(axios.get).mockResolvedValue(promise)
+  })
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+  })
+
+  describe('useRollups hook with selectedUserIds', () => {
+    const emptyUserIds: number[] = []
+    const singleUserId: number[] = [97]
+    const multipleUserIds: number[] = [97, 42, 101]
+
+    it('passes selectedUserIds to the API call when provided', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+          selectedUserIds: multipleUserIds,
+        }),
+      )
+      await act(async () => vi.runAllTimers())
+      const params = {
+        params: {
+          rating_percents: true,
+          per_page: DEFAULT_STUDENTS_PER_PAGE,
+          exclude: [],
+          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          sort_by: 'student',
+          add_defaults: true,
+          sort_order: SortOrder.ASC,
+          page: 1,
+          user_ids: [97, 42, 101],
+        },
+      }
+      expect(axios.get).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
+    })
+
+    it('does not include user_ids in API call when selectedUserIds is empty array', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+          selectedUserIds: emptyUserIds,
+        }),
+      )
+      await act(async () => vi.runAllTimers())
+      const callArgs = (axios.get as any).mock.calls[0][1]
+      expect(callArgs.params).not.toHaveProperty('user_ids')
+    })
+
+    it('does not include user_ids in API call when selectedUserIds is undefined', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+        }),
+      )
+      await act(async () => vi.runAllTimers())
+      const callArgs = (axios.get as any).mock.calls[0][1]
+      expect(callArgs.params).not.toHaveProperty('user_ids')
+    })
+
+    it('passes user_ids in params for single selectedUserId', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+          selectedUserIds: singleUserId,
+        }),
+      )
+      await act(async () => vi.runAllTimers())
+      const callParams = (axios.get as any).mock.calls[0][1]
+      expect(callParams.params.user_ids).toEqual([97])
+    })
+
+    it('passes user_ids in params for multiple selectedUserIds', async () => {
+      renderHook(() =>
+        useRollups({
+          courseId: '1',
+          accountMasteryScalesEnabled: false,
+          selectedUserIds: multipleUserIds,
+        }),
+      )
+      await act(async () => vi.runAllTimers())
+      const callParams = (axios.get as any).mock.calls[0][1]
+      expect(callParams.params.user_ids).toEqual([97, 42, 101])
+    })
   })
 
   describe('useRollups hook', () => {
@@ -108,7 +195,7 @@ describe('useRollups', () => {
       expect(students).toEqual([])
       expect(outcomes).toEqual([])
       expect(rollups).toEqual([])
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.isLoading).toEqual(false)
     })
 
@@ -116,7 +203,7 @@ describe('useRollups', () => {
       const {result} = renderHook(() =>
         useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
       )
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       const {isLoading, error, students, outcomes, rollups} = result.current
       expect(isLoading).toEqual(false)
       expect(error).toEqual(null)
@@ -151,7 +238,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 0,
-              rating: {...mockedRatings[1], color: `#${mockedRatings[1].color}`},
+              rating: {...mockedRatings[2], color: `#${mockedRatings[2].color}`},
             },
           ],
         },
@@ -163,7 +250,7 @@ describe('useRollups', () => {
       const {result} = renderHook(() =>
         useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
       )
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       const {students} = result.current
       expect(axios.get).toHaveBeenCalled()
       expect(students[2].status).toEqual('concluded')
@@ -171,7 +258,7 @@ describe('useRollups', () => {
 
     it('calls the /rollups URL with the right parameters', async () => {
       renderHook(() => useRollups({courseId: '1', accountMasteryScalesEnabled: false}))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       const params = {
         params: {
           rating_percents: true,
@@ -208,11 +295,11 @@ describe('useRollups', () => {
       it(`returns error message on failed request of ${testCase.description}`, async () => {
         const axiosError = new axios.AxiosError()
         axiosError.message = 'Network Error'
-        ;(axios.get as jest.Mock).mockRejectedValue(testCase.errorResponse)
+        ;(axios.get as any).mockRejectedValue(testCase.errorResponse)
         const {result} = renderHook(() =>
           useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
         )
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         const {isLoading, error} = result.current
         expect(axios.get).toHaveBeenCalled()
         expect(error).toEqual(testCase.expectedErrorMessage)

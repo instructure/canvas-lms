@@ -25,8 +25,6 @@ import {IconArrowOpenStartLine, IconArrowOpenEndLine} from '@instructure/ui-icon
 import Slider from 'react-slick'
 
 const I18n = createI18nScope('lti_registrations')
-const disabled = I18n.t('disabled')
-const enabled = I18n.t('enabled')
 
 type NextArrowProps = {
   currentSlideNumber: number
@@ -46,6 +44,8 @@ type PreviousArrowProps = {
 }
 
 export const NextArrow = (props: NextArrowProps) => {
+  const disabled = I18n.t('disabled') as 'disabled'
+  const enabled = I18n.t('enabled') as 'enabled'
   const {
     currentSlideNumber,
     slider,
@@ -86,6 +86,8 @@ export const NextArrow = (props: NextArrowProps) => {
 }
 
 export const PreviousArrow = (props: PreviousArrowProps) => {
+  const disabled = I18n.t('disabled') as 'disabled'
+  const enabled = I18n.t('enabled') as 'enabled'
   const {currentSlideNumber, slider, screenReaderLabel} = props
   const arrowDisabledAtFirstIndex = currentSlideNumber === 0 ? disabled : enabled
 

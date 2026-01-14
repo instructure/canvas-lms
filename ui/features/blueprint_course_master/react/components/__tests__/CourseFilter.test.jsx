@@ -68,7 +68,7 @@ describe('CourseFilter', () => {
 
   it('onActivate fires when filters are focused', () => {
     const props = defaultProps()
-    props.onActivate = jest.fn()
+    props.onActivate = vi.fn()
     const {getByPlaceholderText} = render(<CourseFilter {...props} />)
     const input = getByPlaceholderText('Search by title, short name, or SIS ID')
     fireEvent.focus(input)
@@ -77,7 +77,7 @@ describe('CourseFilter', () => {
 
   it('onChange not fired when < 3 chars are entered in search text input', async () => {
     const props = defaultProps()
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     const {getByPlaceholderText} = render(<CourseFilter {...props} />)
     const input = getByPlaceholderText('Search by title, short name, or SIS ID')
     fireEvent.change(input, {target: {value: 'aa'}})
@@ -87,7 +87,7 @@ describe('CourseFilter', () => {
 
   it('onChange fired when 3 chars are entered in search text input', async () => {
     const props = defaultProps()
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     const {getByPlaceholderText} = render(<CourseFilter {...props} />)
     const input = getByPlaceholderText('Search by title, short name, or SIS ID')
     fireEvent.change(input, {target: {value: 'aaa'}})
@@ -98,7 +98,7 @@ describe('CourseFilter', () => {
   describe('CourseFilter > Filter behavior', () => {
     it('onChange fires with term filter when term is selected', async () => {
       const props = defaultProps()
-      const onChangeMock = jest.fn(filter => {
+      const onChangeMock = vi.fn(filter => {
         expect(filter.term).toBe('1')
       })
       props.onChange = onChangeMock
@@ -112,7 +112,7 @@ describe('CourseFilter', () => {
 
     it('onChange fires with subaccount filter when a subaccount is selected', async () => {
       const props = defaultProps()
-      const onChangeMock = jest.fn(filter => {
+      const onChangeMock = vi.fn(filter => {
         expect(filter.subAccount).toBe('1')
       })
       props.onChange = onChangeMock

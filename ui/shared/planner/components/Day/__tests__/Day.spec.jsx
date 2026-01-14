@@ -23,7 +23,7 @@ import {createStore} from 'redux'
 import {Day} from '../index'
 
 const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#03893D'}
-const defaultProps = {registerAnimatable: jest.fn(), deregisterAnimatable: jest.fn()}
+const defaultProps = {registerAnimatable: vi.fn(), deregisterAnimatable: vi.fn()}
 
 // Create a mock store for MissingAssignments component
 const defaultState = {
@@ -75,7 +75,7 @@ for (const [timeZoneDesc, timeZoneName] of [
       originalNow = Date.now
       // Set fixed date to 2025-01-01 for consistent testing
       const fixedDate = new Date('2025-01-01T12:53:31-07:00').getTime()
-      Date.now = jest.fn(() => fixedDate)
+      Date.now = vi.fn(() => fixedDate)
     })
 
     afterAll(() => {
@@ -84,7 +84,7 @@ for (const [timeZoneDesc, timeZoneName] of [
     })
 
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('renders today view correctly', () => {
@@ -158,7 +158,7 @@ describe('Day items grouping', () => {
     originalNow = Date.now
     // Set fixed date to 2025-01-01 for consistent testing
     const fixedDate = new Date('2025-01-01T12:53:31-07:00').getTime()
-    Date.now = jest.fn(() => fixedDate)
+    Date.now = vi.fn(() => fixedDate)
   })
 
   afterAll(() => {
@@ -167,7 +167,7 @@ describe('Day items grouping', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('groups items by context correctly', () => {
@@ -250,7 +250,7 @@ describe('Day items grouping', () => {
   })
 
   it('registers as animatable on mount', () => {
-    const registerMock = jest.fn()
+    const registerMock = vi.fn()
     const props = {
       ...defaultProps,
       registerAnimatable: registerMock,
@@ -263,7 +263,7 @@ describe('Day items grouping', () => {
   })
 
   it('deregisters as animatable on unmount', () => {
-    const deregisterMock = jest.fn()
+    const deregisterMock = vi.fn()
     const props = {
       ...defaultProps,
       deregisterAnimatable: deregisterMock,

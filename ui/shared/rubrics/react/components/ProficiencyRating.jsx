@@ -154,7 +154,7 @@ export default class ProficiencyRating extends React.Component {
     </>
   )
 
-  handleBlurChange = (e) => {
+  handleBlurChange = e => {
     const field = e.target.name
     if (field === 'description') {
       this.props.onBlurChange(this.descriptionInput.value, field)
@@ -182,7 +182,7 @@ export default class ProficiencyRating extends React.Component {
             />
           </div>
         </Flex.Item>
-        <Flex.Item shouldGrow={true} shouldShrink={true} size="auto" >
+        <Flex.Item shouldGrow={true} shouldShrink={true} size="auto">
           <TextInput
             name="description"
             ref={this.setDescriptionRef}

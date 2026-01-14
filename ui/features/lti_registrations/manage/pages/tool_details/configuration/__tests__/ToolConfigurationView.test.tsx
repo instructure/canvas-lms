@@ -33,6 +33,7 @@ import {
   mockRegistrationWithAllInformation,
 } from '../../../manage/__tests__/helpers'
 import fetchMock from 'fetch-mock'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('Tool Configuration View Launch Settings', () => {
   it('should render the Launch Settings for manual registrations', () => {
@@ -151,6 +152,20 @@ describe('Tool Configuration View Data Sharing', () => {
 })
 
 describe('Tool Configuration View Placements', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      FEATURES: {
+        top_navigation_placement: true,
+        lti_asset_processor: true,
+        lti_asset_processor_discussions: true,
+      },
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it.each(AllLtiPlacements)('should render the %p placement', placement => {
     const {getByText} = renderApp({
       n: 'Test App',
@@ -192,9 +207,85 @@ describe('Tool Configuration View Placements', () => {
 
     expect(queryAllByText(i18nLtiPlacement(placement))).toHaveLength(0)
   })
+
+  describe('when top_navigation feature flag is disabled', () => {
+    const allLtiPlacements = AllLtiPlacements.filter(p => p !== 'top_navigation')
+
+    it('should not render top_navigation placement', () => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: false,
+        },
+      })
+      const {queryAllByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+          overlaid_configuration: mockConfiguration({
+            placements: [
+              {
+                placement: 'top_navigation',
+                enabled: true,
+                text: 'Top Navigation',
+              },
+              {
+                placement: 'course_navigation',
+                enabled: true,
+                text: 'Course Navigation',
+              },
+            ],
+          }),
+        },
+      })(<ToolConfigurationView />)
+
+      // top_navigation should be filtered out
+      expect(queryAllByText(i18nLtiPlacement('top_navigation'))).toHaveLength(0)
+      // course_navigation should still be visible
+      expect(queryAllByText(i18nLtiPlacement('course_navigation')).length).toBeGreaterThan(0)
+    })
+
+    it('should render top_navigation placement', () => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: true,
+        },
+      })
+
+      const {queryAllByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+          overlaid_configuration: mockConfiguration({
+            placements: [
+              {
+                placement: 'top_navigation',
+                enabled: true,
+                text: 'Top Navigation',
+              },
+            ],
+          }),
+        },
+      })(<ToolConfigurationView />)
+
+      // top_navigation should be visible
+      expect(queryAllByText(i18nLtiPlacement('top_navigation')).length).toBeGreaterThan(0)
+    })
+  })
 })
 
 describe('Tool Configuration View Nickname and Description', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      FEATURES: {
+        top_navigation_placement: true,
+        lti_asset_processor: true,
+        lti_asset_processor_discussions: true,
+      },
+    })
+  })
+
   it('should render the nickname and description', () => {
     const {getByText} = renderApp({
       n: 'Test App',
@@ -251,6 +342,37 @@ describe('Tool Configuration View Nickname and Description', () => {
     })(<ToolConfigurationView />)
 
     expect(queryByText(`No text`)).toBeInTheDocument()
+  })
+
+  describe('when the top_navigation_placement ff is disabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: false,
+        },
+      })
+    })
+
+    it('should not render top_navigation placement name', () => {
+      const {queryByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+          overlaid_configuration: mockConfiguration({
+            placements: [
+              {
+                placement: 'top_navigation',
+                enabled: true,
+                text: 'Test Placement (top_navigation)',
+              },
+            ],
+          }),
+        },
+      })(<ToolConfigurationView />)
+
+      expect(queryByText('Test Placement (top_navigation)')).not.toBeInTheDocument()
+    })
   })
 })
 
@@ -333,7 +455,7 @@ describe('Tool Configuration Restore Default Button', () => {
                 <Outlet
                   context={{
                     registration,
-                    refreshRegistration: jest.fn(),
+                    refreshRegistration: vi.fn(),
                   }}
                 />
               }
@@ -409,7 +531,7 @@ describe('Tool Configuration Copy JSON Code button', () => {
                 <Outlet
                   context={{
                     registration,
-                    refreshRegistration: jest.fn(),
+                    refreshRegistration: vi.fn(),
                   }}
                 />
               }

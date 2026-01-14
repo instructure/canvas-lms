@@ -19,7 +19,7 @@
 import {ImageBlock} from '../ImageBlock'
 import {renderBlock} from '../../__tests__/render-helper'
 
-jest.mock('../../../BlockContentEditorContext', () => ({
+vi.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
 }))
 

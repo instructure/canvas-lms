@@ -26,12 +26,12 @@ import {useDifferentiationTagCategoriesIndex} from '../../hooks/useDifferentiati
 import {useAddTagMembership} from '../../hooks/useAddTagMembership'
 import $ from 'jquery'
 
-jest.mock('../../hooks/useDifferentiationTagCategoriesIndex')
-jest.mock('../../hooks/useAddTagMembership')
+vi.mock('../../hooks/useDifferentiationTagCategoriesIndex')
+vi.mock('../../hooks/useAddTagMembership')
 
-const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as jest.Mock
-const mockUseAddTagMembership = useAddTagMembership as jest.Mock
-const mutateMock = jest.fn()
+const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as any
+const mockUseAddTagMembership = useAddTagMembership as any
+const mutateMock = vi.fn()
 
 // TODO: Fix this test EGG-761
 describe.skip('UserDifferentiationTagManager', () => {
@@ -66,13 +66,13 @@ describe.skip('UserDifferentiationTagManager', () => {
       },
     })
     user = userEvent.setup()
-    $.flashMessage = jest.fn()
-    $.flashError = jest.fn()
+    $.flashMessage = vi.fn()
+    $.flashError = vi.fn()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders the component correctly', () => {

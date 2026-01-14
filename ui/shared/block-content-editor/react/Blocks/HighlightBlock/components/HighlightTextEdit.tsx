@@ -28,7 +28,11 @@ export const HighlightTextEdit = ({
   content,
   setContent,
   labelColor,
-}: {content: string; setContent: (value: string) => void; labelColor: string | null}) => {
+}: {
+  content: string
+  setContent: (value: string) => void
+  labelColor: string | null
+}) => {
   const {focusHandler} = useFocusElement()
   const labelText = I18n.t('Highlight text')
 

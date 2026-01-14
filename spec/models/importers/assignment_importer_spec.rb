@@ -346,6 +346,171 @@ describe "Importing assignments" do
           expect(migration.warnings).to_not be_empty
         end
       end
+
+      context "when blueprint sync with downstream changes" do
+        let(:asset_processors_payload) do
+          [
+            {
+              migration_id: "ap_mig_1",
+              context_external_tool_global_id: tool.id,
+              context_external_tool_url: tool.url,
+              url: "https://example.com/process",
+              title: "Processor 1",
+              text: "AP Text",
+              custom: { foo: "bar" }.to_json
+            }
+          ]
+        end
+
+        let(:master_course_subscription) { double("MasterCourseSubscription") }
+        let(:content_tag) { double("ContentTag") }
+
+        let(:blueprint_migration) do
+          migration = course.content_migrations.create!
+          allow(migration).to receive_messages(for_master_course_import?: true, master_course_subscription:)
+          migration
+        end
+
+        context "when assignment has downstream changes and is not locked" do
+          let(:content_tag) { double("ContentTag", downstream_changes: ["content"]) }
+
+          before do
+            allow(master_course_subscription).to receive(:content_tag_for).and_return(content_tag)
+          end
+
+          it "does not import asset processors" do
+            Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, blueprint_migration)
+            assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
+            allow(assignment).to receive(:editing_restricted?).with(:any).and_return(false)
+
+            Importers::AssignmentImporter.import_asset_processors(assignment, asset_processors_payload, blueprint_migration)
+
+            expect(assignment.lti_asset_processors.count).to eq 0
+          end
+        end
+
+        context "when assignment has downstream changes but is locked" do
+          let(:content_tag) { double("ContentTag", downstream_changes: ["content"]) }
+
+          before do
+            allow(master_course_subscription).to receive(:content_tag_for).and_return(content_tag)
+          end
+
+          it "imports asset processors" do
+            Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, blueprint_migration)
+            assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
+            allow(assignment).to receive(:editing_restricted?).with(:any).and_return(true)
+
+            Importers::AssignmentImporter.import_asset_processors(assignment, asset_processors_payload, blueprint_migration)
+
+            expect(assignment.lti_asset_processors.count).to eq 1
+          end
+        end
+
+        context "when assignment has no downstream changes" do
+          let(:content_tag) { double("ContentTag", downstream_changes: []) }
+
+          before do
+            allow(master_course_subscription).to receive(:content_tag_for).and_return(content_tag)
+          end
+
+          it "imports asset processors" do
+            Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, blueprint_migration)
+            assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
+            allow(assignment).to receive(:editing_restricted?).with(:any).and_return(false)
+
+            Importers::AssignmentImporter.import_asset_processors(assignment, asset_processors_payload, blueprint_migration)
+
+            expect(assignment.lti_asset_processors.count).to eq 1
+          end
+        end
+      end
+
+      context "when blueprint sync with discussion topic" do
+        let(:asset_processors_payload) do
+          [
+            {
+              migration_id: "ap_mig_1",
+              context_external_tool_global_id: tool.id,
+              context_external_tool_url: tool.url,
+              url: "https://example.com/process",
+              title: "Processor 1",
+              text: "AP Text",
+              custom: { foo: "bar" }.to_json
+            }
+          ]
+        end
+
+        let(:master_course_subscription) { double("MasterCourseSubscription") }
+        let(:assignment_content_tag) { double("ContentTag", downstream_changes: []) }
+        let(:discussion_topic_content_tag) { double("ContentTag") }
+
+        let(:blueprint_migration) do
+          migration = course.content_migrations.create!
+          allow(migration).to receive_messages(for_master_course_import?: true, master_course_subscription:)
+          migration
+        end
+
+        let(:discussion_topic) { DiscussionTopic.create_graded_topic!(course:, title: "Discussion Assignment") }
+        let(:assignment_with_discussion) { discussion_topic.assignment }
+
+        before do
+          # Setup discussion topic assignment
+          discussion_topic
+          assignment_with_discussion.update!(migration_id: base_assignment_hash["migration_id"])
+        end
+
+        context "when discussion topic has downstream changes and is not locked" do
+          let(:discussion_topic_content_tag) { double("ContentTag", downstream_changes: ["content"]) }
+
+          before do
+            allow(master_course_subscription).to receive(:content_tag_for).with(assignment_with_discussion).and_return(assignment_content_tag)
+            allow(master_course_subscription).to receive(:content_tag_for).with(discussion_topic).and_return(discussion_topic_content_tag)
+            allow(assignment_with_discussion).to receive(:editing_restricted?).with(:any).and_return(false)
+            allow(discussion_topic).to receive(:editing_restricted?).with(:any).and_return(false)
+          end
+
+          it "does not import asset processors" do
+            Importers::AssignmentImporter.import_asset_processors(assignment_with_discussion, asset_processors_payload, blueprint_migration)
+
+            expect(assignment_with_discussion.lti_asset_processors.count).to eq 0
+          end
+        end
+
+        context "when discussion topic has downstream changes but is locked" do
+          let(:discussion_topic_content_tag) { double("ContentTag", downstream_changes: ["content"]) }
+
+          before do
+            allow(master_course_subscription).to receive(:content_tag_for).with(assignment_with_discussion).and_return(assignment_content_tag)
+            allow(master_course_subscription).to receive(:content_tag_for).with(discussion_topic).and_return(discussion_topic_content_tag)
+            allow(assignment_with_discussion).to receive(:editing_restricted?).with(:any).and_return(false)
+            allow(discussion_topic).to receive(:editing_restricted?).with(:any).and_return(true)
+          end
+
+          it "imports asset processors" do
+            Importers::AssignmentImporter.import_asset_processors(assignment_with_discussion, asset_processors_payload, blueprint_migration)
+
+            expect(assignment_with_discussion.lti_asset_processors.count).to eq 1
+          end
+        end
+
+        context "when discussion topic has no downstream changes" do
+          let(:discussion_topic_content_tag) { double("ContentTag", downstream_changes: []) }
+
+          before do
+            allow(master_course_subscription).to receive(:content_tag_for).with(assignment_with_discussion).and_return(assignment_content_tag)
+            allow(master_course_subscription).to receive(:content_tag_for).with(discussion_topic).and_return(discussion_topic_content_tag)
+            allow(assignment_with_discussion).to receive(:editing_restricted?).with(:any).and_return(false)
+            allow(discussion_topic).to receive(:editing_restricted?).with(:any).and_return(false)
+          end
+
+          it "imports asset processors" do
+            Importers::AssignmentImporter.import_asset_processors(assignment_with_discussion, asset_processors_payload, blueprint_migration)
+
+            expect(assignment_with_discussion.lti_asset_processors.count).to eq 1
+          end
+        end
+      end
     end
   end
 
@@ -1831,6 +1996,69 @@ describe "Importing assignments" do
         expect do
           subject
         end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "is idempotent on re-import (does not duplicate sub_assignments)" do
+        # First import with checkpoints
+        first_import = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        expect(first_import.sub_assignments.count).to eq(2)
+
+        # Re-import the same assignment with checkpoints
+        second_import = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        expect(second_import.sub_assignments.count).to eq(2)
+        expect(second_import.id).to eq(first_import.id)
+      end
+
+      it "handles re-import after enabling checkpoints (migrating from no checkpoints to checkpoints)" do
+        # First import without checkpoints
+        assignment_hash_without_checkpoints = assignment_hash.except(:sub_assignments)
+        first_import = Importers::AssignmentImporter.import_from_migration(assignment_hash_without_checkpoints, course, migration)
+        expect(first_import.sub_assignments.count).to eq(0)
+        expect(first_import.has_sub_assignments).to be_falsey
+
+        # Re-import with checkpoints enabled
+        second_import = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        expect(second_import.sub_assignments.count).to eq(2)
+        expect(second_import.has_sub_assignments).to be_truthy
+        expect(second_import.id).to eq(first_import.id)
+      end
+
+      it "creates missing submissions when checkpoints are added to assignment with enrolled students" do
+        # Enroll a student
+        student = User.create!
+        course.enroll_student(student, enrollment_state: "active")
+
+        # First import without checkpoints
+        assignment_hash_without_checkpoints = assignment_hash.except(:sub_assignments)
+        first_import = Importers::AssignmentImporter.import_from_migration(assignment_hash_without_checkpoints, course, migration)
+        expect(first_import.sub_assignments.count).to eq(0)
+
+        # Re-import with checkpoints enabled
+        second_import = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        expect(second_import.sub_assignments.count).to eq(2)
+
+        # Verify submissions were created for the student
+        second_import.sub_assignments.each do |sub_assignment|
+          submission = sub_assignment.submissions.where(user: student).first
+          expect(submission).to be_present
+          expect(submission.workflow_state).to eq("unsubmitted")
+        end
+      end
+
+      it "clears the due_at when importing assignment with sub_assignments" do
+        assignment_hash[:due_at] = 1_401_947_999_000
+
+        expect(subject.due_at).to be_nil
+      end
+
+      it "clears the due_at even when sub_assignments have their own due dates" do
+        assignment_hash[:due_at] = 1_401_947_999_000
+        assignment_hash[:sub_assignments][0][:due_at] = 1_401_947_999_000
+        assignment_hash[:sub_assignments][1][:due_at] = 1_402_034_399_000
+
+        expect(subject.due_at).to be_nil
+        expect(subject.sub_assignments.first.due_at).not_to be_nil
+        expect(subject.sub_assignments.second.due_at).not_to be_nil
       end
     end
 

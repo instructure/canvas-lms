@@ -23,22 +23,20 @@ import {act, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import TextEntry from '../AttemptType/TextEntry'
-import StudentViewContext, {StudentViewContextDefaults} from '../Context'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.mock('@canvas/do-fetch-api-effect')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -136,7 +134,7 @@ describe('SubmissionManager', () => {
     }
 
     beforeEach(async () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       const alert = document.createElement('div')
       alert.id = 'flash_screenreader_holder'
       alert.setAttribute('role', 'alert')
@@ -144,13 +142,13 @@ describe('SubmissionManager', () => {
     })
 
     afterEach(async () => {
-      jest.runOnlyPendingTimers()
-      jest.useRealTimers()
+      vi.runOnlyPendingTimers()
+      vi.useRealTimers()
     })
 
     // TODO: These tests require complex RCE (Rich Content Editor) setup and proper tinymce mocking.
     // The tests are skipped until we can properly mock the text editor initialization and draft saving behavior.
-    it.skip('shows a "Saving Draft" label when the contents of a text entry have started changing', async () => {
+    it('shows a "Saving Draft" label when the contents of a text entry have started changing', async () => {
       const {findByText} = await renderTextAttempt()
 
       await waitFor(
@@ -163,23 +161,23 @@ describe('SubmissionManager', () => {
       act(() => {
         fakeEditor = tinymce.get('textentry_text')
         fakeEditor.setContent('some edited draft text')
-        jest.advanceTimersByTime(500)
+        vi.advanceTimersByTime(500)
       })
 
       expect(await findByText('Saving Draft')).toBeInTheDocument()
     })
 
-    it.skip('disables the Submit Assignment button while allegedly saving the draft', async () => {
+    it('disables the Submit Assignment button while allegedly saving the draft', async () => {
       const {getByTestId} = await renderTextAttempt()
       act(() => {
         fakeEditor.setContent('some edited draft text')
-        jest.advanceTimersByTime(500)
+        vi.advanceTimersByTime(500)
       })
 
       expect(getByTestId('submit-button')).toBeDisabled()
     })
 
-    it.skip('shows a "Draft Saved" label when a text draft has been successfully saved', async () => {
+    it('shows a "Draft Saved" label when a text draft has been successfully saved', async () => {
       const variables = {
         activeSubmissionType: 'online_text_entry',
         attempt: 1,
@@ -199,13 +197,13 @@ describe('SubmissionManager', () => {
 
       act(() => {
         fakeEditor.setContent('some edited draft text')
-        jest.advanceTimersByTime(5000)
+        vi.advanceTimersByTime(5000)
       })
 
       expect(await findByText('Draft Saved')).toBeInTheDocument()
     })
 
-    it.skip('shows a "Error Saving Draft" label when a problem has occurred while saving', async () => {
+    it('shows a "Error Saving Draft" label when a problem has occurred while saving', async () => {
       const variables = {
         activeSubmissionType: 'online_text_entry',
         attempt: 1,
@@ -223,7 +221,7 @@ describe('SubmissionManager', () => {
 
       act(() => {
         fakeEditor.setContent('some edited draft text')
-        jest.advanceTimersByTime(5000)
+        vi.advanceTimersByTime(5000)
       })
 
       expect(await findByText('Error Saving Draft')).toBeInTheDocument()

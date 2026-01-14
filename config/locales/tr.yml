@@ -462,6 +462,7 @@ tr:
     manually_created_courses: "Manuel Oluşturulan Dersler"
     root_account_cant_have_sis_id: "ÖBS ID'leri kök hesaplara ayarlanamaz"
     sis_id_in_use: "ÖBS ID \"%{sis_id}\" zaten kullanılıyor"
+    tab_accessibility: Erişilebilirlik
     tab_admin_tools: "Yönetici Araçları"
     tab_analytics_hub: "Analiz Merkezi (Analytics Hub)"
     tab_apps: Uygulamalar
@@ -760,7 +761,9 @@ tr:
     report_header_token_dev_key_id: "dev anahtar id"
     report_header_token_dev_key_name: "dev anahtar adı"
     report_header_token_hint: "token ipucu"
+    report_header_token_id: id
     report_header_token_last_used: "son kullanılan"
+    report_header_token_status: durum
     report_header_unposted_current_grade: "yayınlanmamış güncel not"
     report_header_unposted_current_score: "yayınlanmamış güncel puan"
     report_header_unposted_final_grade: "yayınlanmamış nihai not"
@@ -2711,6 +2714,7 @@ tr:
   align_to_start_3b1d5678: "Başa hizala"
   align_to_top_f14e03c1: "Üste hizala"
   align_vertically_584173b7: "Dikey Hizala"
+  aligned_outcomes_d0a0c159: "Sıralanmış Öğrenme Çıktıları"
   aligned_questions_125fd2ce: "Hizalanmış Sorular"
   alignment_f475ed5: Hizalama
   alignment_options_6d5762d1: "Hizalama Seçenekleri"
@@ -12976,6 +12980,7 @@ tr:
   feature_option_dbfa062f: "Özellik seçeneği"
   feature_options_37a2c317: "Özellik Seçenekleri"
   feature_options_account_settings_294a39f8: "Özellik seçenekleri (Hesap Ayarları)"
+  feature_options_aren_t_imported_and_must_be_enable_d10993da: "Kullanıcının Hesap Ayarları'nda bir uygulamayı elle silmesine izin verir."
   feature_options_enable_disable_7e748054: "Özellik seçenekleri - etkinleştir / devre dışı bırak"
   feature_options_like_new_quizzes_aren_t_imported_a_644e0e7a: "Kullanıcının Hesap Ayarları'nda bir uygulamayı elle silmesine izin verir."
   feature_options_view_a170e80c: "Özellik Seçenekleri - göster"

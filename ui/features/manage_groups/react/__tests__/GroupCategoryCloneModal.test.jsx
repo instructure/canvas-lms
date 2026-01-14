@@ -21,12 +21,12 @@ import React from 'react'
 import GroupCategoryCloneModal, {CATEGORY_NAME_MAX_LENGTH} from '../GroupCategoryCloneModal'
 
 // mock reloadWindow
-jest.mock('@canvas/util/globalUtils', () => ({
-  reloadWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: vi.fn(),
 }))
 
 describe('GroupCategoryCloneModal', () => {
-  const onDismiss = jest.fn()
+  const onDismiss = vi.fn()
   const open = true
   const groupCategory = {
     id: '1',
@@ -109,7 +109,7 @@ describe('GroupCategoryCloneModal', () => {
 
   describe('errors', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation()
+      vi.spyOn(console, 'error').mockImplementation()
     })
 
     afterEach(() => {

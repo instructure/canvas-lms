@@ -50,16 +50,16 @@ const sendResponse = (method, url, json) => {
 describe('AddUnassignedMenu', () => {
   beforeEach(() => {
     fakeENV.setup()
-    clock = jest.useFakeTimers()
+    clock = vi.useFakeTimers()
     server = {
-      respond: jest.fn().mockImplementation((method, url, response) => {
+      respond: vi.fn().mockImplementation((method, url, response) => {
         return Promise.resolve({
           status: response[0],
           headers: response[1],
           json: () => Promise.resolve(JSON.parse(response[2])),
         })
       }),
-      restore: jest.fn(),
+      restore: vi.fn(),
     }
     waldo = new GroupUser({
       id: 4,
@@ -97,7 +97,7 @@ describe('AddUnassignedMenu', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.useRealTimers()
+    vi.useRealTimers()
     server.restore.mockClear()
     view.remove()
     document.getElementById('fixtures').innerHTML = ''

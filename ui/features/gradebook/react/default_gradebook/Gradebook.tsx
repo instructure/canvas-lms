@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import type JQuery from 'jquery'
 import deferPromise from '@instructure/defer-promise'
+import {htmlDecode} from '@canvas/util/TextHelper'
 import {
   each,
   every,
@@ -32,7 +33,7 @@ import {
   reduce,
   reject,
   some,
-} from 'lodash'
+} from 'es-toolkit/compat'
 import * as tz from '@instructure/moment-utils'
 import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
@@ -212,7 +213,6 @@ import {
   getStudentGradeForColumn,
   idArraysEqual,
   hiddenStudentIdsForAssignment,
-  htmlDecode,
   isAdmin,
   isGradedOrExcusedSubmissionUnposted,
   onGridKeyDown,
@@ -516,7 +516,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       exportManager: undefined,
       selectedLtiId: null,
     }
-    // @ts-expect-error
+    // @ts-expect-error Legacy function return type not typed
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
     this.courseSettings = new CourseSettings(this, {
@@ -769,9 +769,26 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   updateFilterAssignmentIds = () => {
-    this.filteredAssignmentIds = this.filterAssignments(Object.values(this.assignments)).map(
-      assignment => assignment.id,
-    )
+    const filteredAssignments = this.filterAssignments(Object.values(this.assignments))
+    const assignmentIds: string[] = []
+
+    const filteredAssignmentIds = new Set(filteredAssignments.map(a => a.id))
+
+    filteredAssignments.forEach(assignment => {
+      assignmentIds.push(assignment.id)
+
+      if (assignment.peer_review_sub_assignment) {
+        const peerReviewId = assignment.peer_review_sub_assignment.id
+        const peerReviewExists = this.assignments[peerReviewId]
+        const peerReviewFiltered = filteredAssignmentIds.has(peerReviewId)
+
+        if (peerReviewExists && peerReviewFiltered) {
+          assignmentIds.push(peerReviewId)
+        }
+      }
+    })
+
+    this.filteredAssignmentIds = [...new Set(assignmentIds)]
   }
 
   // Assignment Group Data & Lifecycle Methods
@@ -794,11 +811,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         group = assignmentGroup
         this.assignmentGroups[group.id] = group
       }
-      // @ts-expect-error
+      // @ts-expect-error Type mismatch for assignments property
       group.assignments = group.assignments || [] // perhaps unnecessary
       assignmentGroup.assignments.forEach(assignment => {
         assignment.assignment_group = group
-        // @ts-expect-error
+        // @ts-expect-error Type mismatch for due_at property assignment
         assignment.due_at = tz.parse(assignment.due_at)
         this.updateAssignmentEffectiveDueDates(assignment)
 
@@ -816,6 +833,33 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.assignments[assignment.id] = assignment
         if (!group.assignments.some(a => a.id === assignment.id)) {
           group.assignments.push(assignment)
+        }
+
+        if (
+          ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED &&
+          assignment.peer_review_sub_assignment &&
+          assignment.peer_reviews
+        ) {
+          const peerReview = {
+            ...assignment.peer_review_sub_assignment,
+            assignment_group: group,
+            assignment_group_id: assignment.assignment_group_id,
+            parent_assignment_id: assignment.id,
+            parent_assignment: assignment,
+          } as Assignment
+
+          if (window.ENV.SETTINGS.suppress_assignments) {
+            if (!assignment.suppress_assignment) {
+              this.addAssignmentColumnDefinition(peerReview)
+            }
+          } else {
+            this.addAssignmentColumnDefinition(peerReview)
+          }
+
+          this.assignments[peerReview.id] = peerReview
+          if (!group.assignments.some(a => a.id === peerReview.id)) {
+            group.assignments.push(peerReview)
+          }
         }
       })
     })
@@ -1219,7 +1263,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     return Object.values(assignment.effectiveDueDates || {}).some(
       (effectiveDueDateObject: DueDate) =>
-        // @ts-expect-error
+        // @ts-expect-error Type mismatch for date comparison
         tz.parse(effectiveDueDateObject.due_at) >= tz.parse(date),
     )
   }
@@ -1232,7 +1276,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return Object.keys(assignment.effectiveDueDates || {}).some(
       (assignmentId: string) =>
         assignment.effectiveDueDates &&
-        // @ts-expect-error
+        // @ts-expect-error Type mismatch for date comparison
         tz.parse(assignment.effectiveDueDates[assignmentId].due_at) <= tz.parse(date),
     )
   }
@@ -1553,7 +1597,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       student[`assignment_group_${assignmentGroupId}`] = grade
 
       grade.submissions.forEach((submissionData: StudentGrade) => {
-        // @ts-expect-error
+        // @ts-expect-error Type mismatch for drop property assignment
         submissionData.submission.drop = submissionData.drop
       })
     })
@@ -2562,6 +2606,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         save: this.switchTotalDisplay,
         onClose: cb,
       }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore Legacy dialog class not typed
       return new GradeDisplayWarningDialog(dialog_options)
     }
   }
@@ -2957,6 +3003,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.fixMaxHeaderWidth()
     this.keyboardNav?.init()
     const keyBindings = this.keyboardNav?.keyBindings
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Legacy dialog class not typed
     this.kbDialog = new KeyboardNavDialog().render(KeyboardNavTemplate({keyBindings}))
     return $(document).trigger('gridready')
   }
@@ -3157,12 +3205,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   missingSort = (columnId: string) => {
-    // @ts-expect-error
+    // @ts-expect-error Dynamic property access on typed object
     this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId]?.missing))
   }
 
   lateSort = (columnId: string) => {
-    // @ts-expect-error
+    // @ts-expect-error Dynamic property access on typed object
     this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId]?.late))
   }
 
@@ -3587,6 +3635,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const rowDelta = direction === 'next' ? 1 : -1
     const newRowIdx = location.row + rowDelta
     const student = this.listRows()[newRowIdx]
+    const {assignmentId} = this.getSubmissionTrayState()
     if (!student) {
       return
     }
@@ -3594,7 +3643,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       row: newRowIdx,
       cell: location.cell,
     })
-    this.setSubmissionTrayState(true, student.id)
+    this.setSubmissionTrayState(true, student.id, assignmentId)
     return this.updateRowAndRenderSubmissionTray(student.id)
   }
 
@@ -3604,10 +3653,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return
     }
     const assignment = this.navigateAssignment(direction)
-    if (!assignment) {
+    if (!assignment || !assignment.assignmentId) {
       return
     }
     this.setSubmissionTrayState(true, studentId, assignment.assignmentId)
+
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
@@ -3687,6 +3737,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         assignment.omit_from_final_grade ||
         (this.options.group_weighting_scheme === 'percent' && isGroupWeightZero),
       isOpen: open,
+      isPeerReviewAssignment: Boolean(assignment?.parent_assignment_id),
       latePolicy: this.courseContent.latePolicy,
       locale: this.props.locale,
       onAnonymousSpeedGraderClick: this.showAnonymousSpeedGraderAlertForURL,
@@ -4734,7 +4785,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   changeSticker = (submission: {assignmentId: string; userId: string}, sticker: string | null) => {
     const savedSubmission = this.getSubmission(submission.userId, submission.assignmentId)
     if (savedSubmission) {
-      // @ts-expect-error
+      // @ts-expect-error Type mismatch for sticker property assignment
       savedSubmission.sticker = sticker
     }
   }

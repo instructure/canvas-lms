@@ -85,7 +85,7 @@ describe('ModuleItemLoadingData', () => {
       expect(root).toHaveProperty('render')
 
       // @ts-expect-error
-      const spy = jest.spyOn(root, 'unmount')
+      const spy = vi.spyOn(root, 'unmount')
 
       modules.unmountModuleRoot(moduleId)
       expect(spy).toHaveBeenCalled()

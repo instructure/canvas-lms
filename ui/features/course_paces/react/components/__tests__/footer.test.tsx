@@ -22,10 +22,10 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {Footer, type ComponentProps} from '../footer'
 
-const syncUnpublishedChanges = jest.fn()
-const onResetPace = jest.fn()
-const removePace = jest.fn()
-const handleCancel = jest.fn()
+const syncUnpublishedChanges = vi.fn()
+const onResetPace = vi.fn()
+const removePace = vi.fn()
+const handleCancel = vi.fn()
 
 const defaultProps: ComponentProps = {
   autoSaving: false,
@@ -55,7 +55,7 @@ const defaultProps: ComponentProps = {
 describe('Footer', () => {
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders apply changes buttons when there are unpublished changes', () => {
@@ -299,7 +299,7 @@ describe('Footer', () => {
     })
 
     it('calls focusOnClose when publish button is clicked', () => {
-      const focusOnClose = jest.fn()
+      const focusOnClose = vi.fn()
       const {getByRole} = renderConnected(<Footer {...defaultProps} focusOnClose={focusOnClose} />)
       const publishButton = getByRole('button', {name: 'Apply Changes'})
       act(() => publishButton.click())

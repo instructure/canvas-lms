@@ -25,11 +25,11 @@ describe('UserDateRangeSearch', () => {
   const props: UserDateRangeSearchProps = {
     isOpen: true,
     userName: 'John Doe',
-    onSubmit: jest.fn(),
-    onClose: jest.fn(),
+    onSubmit: vi.fn(),
+    onClose: vi.fn(),
   }
 
-  afterEach(() => jest.resetAllMocks())
+  afterEach(() => vi.resetAllMocks())
 
   it('should render the user name in the title', async () => {
     render(<UserDateRangeSearch {...props} />)

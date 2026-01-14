@@ -23,25 +23,25 @@
 import store from '../index'
 import {AssignmentGroup as GraphAssignmentGroup} from '../graphql/assignmentGroups/getAssignmentGroups'
 import {getAllAssignments} from '../graphql/assignments/getAllAssignments'
-import {flatten} from 'lodash'
+import {flatten} from 'es-toolkit/compat'
 import {getAllAssignmentGroups} from '../graphql/assignmentGroups/getAllAssignmentGroups'
 import {GetAssignmentsParams} from '../graphql/assignments/getAssignments'
 import {v4 as uuidv4} from 'uuid'
 
-jest.mock('../../Gradebook.utils', () => {
-  const actual = jest.requireActual('../../Gradebook.utils')
+vi.mock('../../Gradebook.utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../Gradebook.utils')>()
   return {
     ...actual,
-    maxAssignmentCount: jest.fn(actual.maxAssignmentCount),
+    maxAssignmentCount: vi.fn(actual.maxAssignmentCount),
   }
 })
 
-jest.mock('../graphql/assignmentGroups/getAllAssignmentGroups', () => ({
-  getAllAssignmentGroups: jest.fn(),
+vi.mock('../graphql/assignmentGroups/getAllAssignmentGroups', () => ({
+  getAllAssignmentGroups: vi.fn(),
 }))
 
-jest.mock('../graphql/assignments/getAllAssignments', () => ({
-  getAllAssignments: jest.fn(),
+vi.mock('../graphql/assignments/getAllAssignments', () => ({
+  getAllAssignments: vi.fn(),
 }))
 
 const initialState = store.getState()
@@ -167,24 +167,33 @@ describe('Gradebook', () => {
   describe('fetchAssignmentGroups', () => {
     beforeEach(() => {
       store.setState({courseId: '1201'})
-      ;(getAllAssignmentGroups as jest.Mock).mockResolvedValue({
+      ;(getAllAssignmentGroups as any).mockResolvedValue({
         data: [],
       })
-      ;(getAllAssignments as jest.Mock).mockResolvedValue({data: []})
+      ;(getAllAssignments as any).mockResolvedValue({data: []})
     })
-    afterEach(() => {
-      jest.resetAllMocks()
+    afterEach(async () => {
+      vi.resetAllMocks()
       store.setState(initialState, true)
+      // Wait for any pending promises to settle
+      await new Promise(resolve => setTimeout(resolve, 0))
     })
 
     it.each([true, false])(
       'sets loading state flags correctly during fetch when useGraphQL is %s',
       async value => {
+        // Mock the delegate functions to prevent actual network requests
+        const mockFetch = vi.fn().mockResolvedValue(undefined)
+        store.setState({
+          fetchCompositeAssignmentGroups: mockFetch,
+          fetchGrapqhlAssignmentGroups: mockFetch,
+        })
+
         // Initial state check
         expect(store.getState().isAssignmentGroupsLoading).toBe(false)
 
         // Start the request
-        store.getState().fetchAssignmentGroups({
+        const promise = store.getState().fetchAssignmentGroups({
           params: {
             include: ['assignments'],
             override_assignment_dates: false,
@@ -198,12 +207,15 @@ describe('Gradebook', () => {
 
         // Check loading state was set synchronously
         expect(store.getState().isAssignmentGroupsLoading).toBe(true)
+
+        // Wait for the promise to complete to prevent unhandled rejection
+        await promise
       },
     )
 
     it('calls fetchCompositeAssignmentGroups when useGraphQL is false', async () => {
       // Mock fetchCompositeAssignmentGroups to verify it's called
-      const mockFetchCompositeAssignmentGroups = jest.fn()
+      const mockFetchCompositeAssignmentGroups = vi.fn().mockResolvedValue(undefined)
       store.setState({fetchCompositeAssignmentGroups: mockFetchCompositeAssignmentGroups})
 
       await store.getState().fetchAssignmentGroups({
@@ -217,7 +229,7 @@ describe('Gradebook', () => {
 
     it('calls fetchGrapqhlAssignmentGroups when useGraphQL is true', async () => {
       // Mock fetchCompositeAssignmentGroups to verify it's called
-      const mockFetchGrapqhlAssignmentGroups = jest.fn()
+      const mockFetchGrapqhlAssignmentGroups = vi.fn().mockResolvedValue(undefined)
       store.setState({fetchGrapqhlAssignmentGroups: mockFetchGrapqhlAssignmentGroups})
 
       await store.getState().fetchAssignmentGroups({
@@ -235,13 +247,15 @@ describe('Gradebook', () => {
     beforeEach(() => {
       correlationId = uuidv4()
       store.setState({courseId: '1201', correlationId})
-      ;(getAllAssignmentGroups as jest.Mock).mockResolvedValue({
+      ;(getAllAssignmentGroups as any).mockResolvedValue({
         data: GET_ALL_ASSIGNMENT_GROUPS_RESPONSE,
       })
-      ;(getAllAssignments as jest.Mock).mockImplementation(
+      ;(getAllAssignments as any).mockImplementation(
         ({
           queryParams: {assignmentGroupId, gradingPeriodId},
-        }: {queryParams: Pick<GetAssignmentsParams, 'assignmentGroupId' | 'gradingPeriodId'>}) => {
+        }: {
+          queryParams: Pick<GetAssignmentsParams, 'assignmentGroupId' | 'gradingPeriodId'>
+        }) => {
           return Promise.resolve({
             data: createGetAllAssignmentsResponse({assignmentGroupId, gradingPeriodId}),
           })
@@ -249,9 +263,11 @@ describe('Gradebook', () => {
       )
     })
 
-    afterEach(() => {
-      jest.resetAllMocks()
+    afterEach(async () => {
+      vi.resetAllMocks()
       store.setState(initialState, true)
+      // Wait for any pending promises to settle
+      await new Promise(resolve => setTimeout(resolve, 0))
     })
 
     it('calls getAllAssignmentGroups with courseId', async () => {
@@ -266,11 +282,11 @@ describe('Gradebook', () => {
     it('calls getAllAssignments with correct parameters', async () => {
       await store.getState().fetchGrapqhlAssignmentGroups({})
       expect(getAllAssignments).toHaveBeenCalledTimes(2)
-      expect((getAllAssignments as jest.Mock).mock.calls[0][0]).toEqual({
+      expect((getAllAssignments as any).mock.calls[0][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag1', gradingPeriodId: null},
         headers: {'Correlation-Id': correlationId},
       })
-      expect((getAllAssignments as jest.Mock).mock.calls[1][0]).toEqual({
+      expect((getAllAssignments as any).mock.calls[1][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag2', gradingPeriodId: null},
         headers: {'Correlation-Id': correlationId},
       })
@@ -279,19 +295,19 @@ describe('Gradebook', () => {
     it('calls getAllAssignments with all grading periods', async () => {
       await store.getState().fetchGrapqhlAssignmentGroups({gradingPeriodIds: ['g1', 'g2']})
       expect(getAllAssignments).toHaveBeenCalledTimes(4)
-      expect((getAllAssignments as jest.Mock).mock.calls[0][0]).toEqual({
+      expect((getAllAssignments as any).mock.calls[0][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag1', gradingPeriodId: 'g1'},
         headers: {'Correlation-Id': correlationId},
       })
-      expect((getAllAssignments as jest.Mock).mock.calls[1][0]).toEqual({
+      expect((getAllAssignments as any).mock.calls[1][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag1', gradingPeriodId: 'g2'},
         headers: {'Correlation-Id': correlationId},
       })
-      expect((getAllAssignments as jest.Mock).mock.calls[2][0]).toEqual({
+      expect((getAllAssignments as any).mock.calls[2][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag2', gradingPeriodId: 'g1'},
         headers: {'Correlation-Id': correlationId},
       })
-      expect((getAllAssignments as jest.Mock).mock.calls[3][0]).toEqual({
+      expect((getAllAssignments as any).mock.calls[3][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag2', gradingPeriodId: 'g2'},
         headers: {'Correlation-Id': correlationId},
       })

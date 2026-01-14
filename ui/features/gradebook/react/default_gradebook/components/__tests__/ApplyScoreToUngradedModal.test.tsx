@@ -26,12 +26,12 @@ describe('ApplyScoreToUngradedModal', () => {
     name: 'My Assignment Group',
   }
 
-  let onApply: jest.Mock<any, any>
-  let onClose: jest.Mock<any, any>
+  let onApply: any
+  let onClose: any
 
   beforeEach(() => {
-    onApply = jest.fn()
-    onClose = jest.fn()
+    onApply = vi.fn()
+    onClose = vi.fn()
   })
 
   function renderComponent(overrides = {}) {

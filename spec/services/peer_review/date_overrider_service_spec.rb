@@ -33,7 +33,7 @@ RSpec.describe PeerReview::DateOverriderService do
   end
 
   before do
-    course.enable_feature!(:peer_review_grading)
+    course.enable_feature!(:peer_review_allocation_and_grading)
   end
 
   describe "#initialize" do
@@ -453,7 +453,7 @@ RSpec.describe PeerReview::DateOverriderService do
 
     context "when feature is disabled" do
       before do
-        parent_assignment.context.disable_feature!(:peer_review_grading)
+        parent_assignment.context.disable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "raises FeatureDisabledError" do

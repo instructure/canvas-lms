@@ -50,7 +50,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
         },
       },
     }
-    jest.spyOn(gradebook, 'isFilteringColumnsByGradingPeriod').mockReturnValue(false)
+    vi.spyOn(gradebook, 'isFilteringColumnsByGradingPeriod').mockReturnValue(false)
     gradebook.gradingPeriodId = '1501'
   })
 
@@ -101,7 +101,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
 
     describe('when not using a grading scheme', () => {
       beforeEach(() => {
-        jest.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
+        vi.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
       })
 
       test('renders the percentage of the grade', () => {
@@ -159,7 +159,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
 
     describe('when not using a grading scheme', () => {
       beforeEach(() => {
-        jest.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
+        vi.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
       })
 
       test('renders the percentage of the grade', () => {

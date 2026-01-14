@@ -73,7 +73,11 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
       setTranslationStart(id)
 
       const [translatedTitle, translatedMessage] = await Promise.all([
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - getTranslation's third argument (options) is optional at runtime but required by tsgo
         getTranslation(title, language),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - getTranslation's third argument (options) is optional at runtime but required by tsgo
         getTranslation(message, language),
       ])
 

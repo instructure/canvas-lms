@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {groupBy} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
@@ -59,7 +59,7 @@ export function reportsForAssetsByProcessors(
   reportsAssetSelector: ReportsAssetSelector,
   formatDateTime: DateTimeFormatter,
 ): GroupedLtiAssetReports {
-  const reportsByProc: Record<string, LtiAssetReport[]> = _.groupBy(reports, r => r.processorId)
+  const reportsByProc: Record<string, LtiAssetReport[]> = groupBy(reports, r => r.processorId)
   return processors.map(p => ({
     processor: p,
     reportGroups: reportsForAssets(
@@ -113,7 +113,7 @@ function discussionReports(
   formatDateTime: DateTimeFormatter,
 ): LtiAssetReportGroup[] {
   const discReports = reportsForProc.filter(isDiscussionReport)
-  const grouped = _.groupBy(discReports, r => r.asset.discussionEntryVersion._id)
+  const grouped = groupBy(discReports, r => r.asset.discussionEntryVersion._id)
 
   const result = []
   for (const [entryId, reports] of Object.entries(grouped)) {
@@ -123,6 +123,7 @@ function discussionReports(
       result.push({key: entryId, displayName, reports})
     }
   }
+
   return result
 }
 

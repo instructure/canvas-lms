@@ -17,7 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import CourseSelect, {ALL_COURSES_ID} from '../CourseSelect'
 
@@ -62,7 +62,7 @@ describe('CourseSelect', () => {
   it('renders the course select', () => {
     const props = createProps()
     const {getByTestId} = render(
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>,
     )
@@ -71,10 +71,10 @@ describe('CourseSelect', () => {
 
   it('opens the select and allows selecting an option', () => {
     const props = createProps()
-    const mockCourseFilterSet = jest.fn()
+    const mockCourseFilterSet = vi.fn()
     props.onCourseFilterSelect = mockCourseFilterSet
     const {getByTestId, getByText} = render(
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>,
     )
@@ -87,7 +87,7 @@ describe('CourseSelect', () => {
   it('filters the options when typing', () => {
     const props = createProps()
     const {getByTestId, queryByText} = render(
-      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>,
     )
@@ -102,7 +102,7 @@ describe('CourseSelect', () => {
     it('is present regardless of the current filter', () => {
       const props = createProps()
       const {getByTestId, queryByText} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
@@ -113,22 +113,136 @@ describe('CourseSelect', () => {
     })
 
     it('resets mailbox selections when selected', () => {
-      const filterMock = jest.fn()
+      const filterMock = vi.fn()
       const props = createProps({
         onCourseFilterSelect: filterMock,
       })
       const {getByTestId, getByText} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CourseSelect {...props} />
         </AlertManagerContext.Provider>,
       )
       const select = getByTestId('course-select')
       fireEvent.click(select)
       fireEvent.click(getByText('All Courses'))
-      expect(select.value).toBe('')
+      expect(select.value).toBe('All Courses')
       // assert filter id is updated to null for network request
       expect(filterMock.mock.calls).toHaveLength(1)
       expect(filterMock.mock.calls[0][0].contextID).toBe(null)
+    })
+  })
+
+  describe('ESC key behavior', () => {
+    it('restores "All Courses" when ESC is pressed with no selection', async () => {
+      const props = createProps()
+      const {getByTestId} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <CourseSelect {...props} />
+        </AlertManagerContext.Provider>,
+      )
+      const select = getByTestId('course-select')
+
+      // Open dropdown and start typing
+      fireEvent.click(select)
+      fireEvent.change(select, {target: {value: 'Math'}})
+      expect(select.value).toBe('Math')
+
+      // Press ESC key and blur to close dropdown
+      fireEvent.keyDown(select, {key: 'Escape', code: 'Escape', keyCode: 27})
+      fireEvent.blur(select)
+
+      // Should restore "All Courses" after dropdown closes
+      await waitFor(() => {
+        expect(select.value).toBe('All Courses')
+      })
+    })
+
+    it('restores selected course name when ESC is pressed', async () => {
+      const props = createProps()
+      const {getByTestId, getByText} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <CourseSelect {...props} />
+        </AlertManagerContext.Provider>,
+      )
+      const select = getByTestId('course-select')
+
+      // Select a course
+      fireEvent.click(select)
+      fireEvent.click(getByText('Charms'))
+      expect(select.value).toBe('Charms')
+
+      // Open dropdown again and start typing
+      fireEvent.click(select)
+      fireEvent.change(select, {target: {value: 'Gram'}})
+      expect(select.value).toBe('Gram')
+
+      // Press ESC key and blur to close dropdown
+      fireEvent.keyDown(select, {key: 'Escape', code: 'Escape', keyCode: 27})
+      fireEvent.blur(select)
+
+      // Should restore previously selected course
+      await waitFor(() => {
+        expect(select.value).toBe('Charms')
+      })
+    })
+  })
+
+  describe('input value management', () => {
+    it('shows "All Courses" by default on main page', () => {
+      const props = createProps()
+      const {getByTestId} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <CourseSelect {...props} />
+        </AlertManagerContext.Provider>,
+      )
+      const select = getByTestId('course-select')
+      expect(select.value).toBe('All Courses')
+    })
+
+    it('clears input when dropdown opens on main page', () => {
+      const props = createProps()
+      const {getByTestId} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <CourseSelect {...props} />
+        </AlertManagerContext.Provider>,
+      )
+      const select = getByTestId('course-select')
+      expect(select.value).toBe('All Courses')
+
+      // Click to open dropdown
+      fireEvent.click(select)
+      expect(select.value).toBe('')
+    })
+
+    it('does not reset input value while dropdown is open', async () => {
+      const props = createProps()
+      const {getByTestId} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <CourseSelect {...props} />
+        </AlertManagerContext.Provider>,
+      )
+      const select = getByTestId('course-select')
+
+      // Open dropdown
+      fireEvent.click(select)
+      expect(select.value).toBe('')
+
+      // Wait for any async updates
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Input should still be empty, not reset to "All Courses"
+      expect(select.value).toBe('')
+    })
+
+    it('shows empty string by default on compose modal', () => {
+      const props = createProps({mainPage: false})
+      const {getByTestId} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <CourseSelect {...props} />
+        </AlertManagerContext.Provider>,
+      )
+      const select = getByTestId('course-select-modal')
+      expect(select.value).toBe('')
     })
   })
 })

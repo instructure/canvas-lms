@@ -97,8 +97,8 @@ const toolDefinitions = [
   },
 ]
 
-jest.mock('jquery', () => {
-  const originalModule = jest.requireActual('jquery')
+vi.mock('jquery', async () => {
+  const originalModule = await vi.importActual('jquery')
   return {
     ...originalModule,
     ajax: () => {

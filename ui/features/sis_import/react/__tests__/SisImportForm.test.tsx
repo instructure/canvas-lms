@@ -89,7 +89,7 @@ describe('SisImportForm', () => {
 
   it('should render checkboxes and descriptions', () => {
     const {queryByText, queryByTestId, getByTestId, getByText} = renderWithClient(
-      <SisImportForm onSuccess={jest.fn()} />,
+      <SisImportForm onSuccess={vi.fn()} />,
     )
     expect(getByText('Choose a file to import')).toBeInTheDocument()
 
@@ -115,7 +115,7 @@ describe('SisImportForm', () => {
   it('should show term select if full batch checked', async () => {
     const user = userEvent.setup()
     const {getByTestId, findByText, findByTestId} = renderWithClient(
-      <SisImportForm onSuccess={jest.fn()} />,
+      <SisImportForm onSuccess={vi.fn()} />,
     )
 
     await user.click(getByTestId('batch_mode'))
@@ -130,7 +130,7 @@ describe('SisImportForm', () => {
 
   it('should show additional checkboxes if override sis', async () => {
     const user = userEvent.setup()
-    const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={jest.fn()} />)
+    const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={vi.fn()} />)
 
     await user.click(getByTestId('override_sis_stickiness'))
     expect(getByTestId('add_sis_stickiness')).toBeInTheDocument()
@@ -142,7 +142,7 @@ describe('SisImportForm', () => {
 
   it('disables override checkboxes based on check status', async () => {
     const user = userEvent.setup()
-    const {getByTestId} = renderWithClient(<SisImportForm onSuccess={jest.fn()} />)
+    const {getByTestId} = renderWithClient(<SisImportForm onSuccess={vi.fn()} />)
 
     await user.click(getByTestId('override_sis_stickiness'))
     const addCheck = getByTestId('add_sis_stickiness')
@@ -162,7 +162,7 @@ describe('SisImportForm', () => {
   })
 
   it('calls onSuccess with data on submit', async () => {
-    const onSuccess = jest.fn()
+    const onSuccess = vi.fn()
     const user = userEvent.setup()
     mockPost({batchMode: false, overrideSis: false})
 
@@ -179,7 +179,7 @@ describe('SisImportForm', () => {
     it('if full batch checked', async () => {
       const user = userEvent.setup()
       const {getByTestId, getByText, findByTestId} = renderWithClient(
-        <SisImportForm onSuccess={jest.fn()} />,
+        <SisImportForm onSuccess={vi.fn()} />,
       )
       await uploadFile(user, getByTestId('file_drop'))
       await user.click(getByTestId('batch_mode'))
@@ -192,7 +192,7 @@ describe('SisImportForm', () => {
     })
 
     it('calls onSuccess if confirmed', async () => {
-      const onSuccess = jest.fn()
+      const onSuccess = vi.fn()
       const user = userEvent.setup()
       mockPost({batchMode: true, overrideSis: false, termId: '1'})
       const {getByText, getByTestId, findByTestId} = renderWithClient(
@@ -211,7 +211,7 @@ describe('SisImportForm', () => {
     })
 
     it('does not call onSuccess if cancelled', async () => {
-      const onSuccess = jest.fn()
+      const onSuccess = vi.fn()
       const user = userEvent.setup()
       const {getByText, getByTestId, queryByText, findByTestId} = renderWithClient(
         <SisImportForm onSuccess={onSuccess} />,

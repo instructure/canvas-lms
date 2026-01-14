@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {noop} from 'lodash'
+import {noop} from 'es-toolkit/compat'
 import {render} from '@testing-library/react'
 import {EnabledState} from '../types'
 import * as reduxHooks from 'react-redux'
@@ -27,9 +27,9 @@ import PermissionButton from '../PermissionButton'
 const PERM_LABEL = 'Add widgets'
 const ROLE_LABEL = 'Superuser'
 
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
-  useDispatch: jest.fn(),
+vi.mock('react-redux', () => ({
+  useSelector: vi.fn(),
+  useDispatch: vi.fn(),
 }))
 
 function buildProps({
@@ -63,18 +63,18 @@ function getThings(div: HTMLElement) {
 // Maybe some integration tests do that but it should also be tested here.
 
 describe('permissions::PermissionButton', () => {
-  const mockUseSelector = jest.spyOn(reduxHooks, 'useSelector')
-  const mockUseDispatch = jest.spyOn(reduxHooks, 'useDispatch')
+  const mockUseSelector = vi.spyOn(reduxHooks, 'useSelector')
+  const mockUseDispatch = vi.spyOn(reduxHooks, 'useDispatch')
 
   // if anything needs to examine how PermissionButton calls the Redux
   // dispatching methods, this is the way to do it.
-  let mockDispatch: jest.Mock | undefined = undefined
+  let mockDispatch: any | undefined = undefined
 
   beforeEach(() => {
     // Reset all redux hook mocks before each test
     mockUseSelector.mockClear()
     mockUseDispatch.mockClear()
-    mockDispatch = jest.fn()
+    mockDispatch = vi.fn()
     mockUseDispatch.mockReturnValue(mockDispatch)
   })
 

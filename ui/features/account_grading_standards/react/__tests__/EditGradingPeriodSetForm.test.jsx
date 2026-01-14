@@ -22,18 +22,18 @@ import userEvent from '@testing-library/user-event'
 import GradingPeriodSetForm from '../EditGradingPeriodSetForm'
 
 // Mock jQuery
-jest.mock('jquery', () => ({
+vi.mock('jquery', () => ({
   __esModule: true,
   default: {
-    flashError: jest.fn(),
+    flashError: vi.fn(),
   },
 }))
 
 // Mock flash notifications
-jest.mock('@canvas/rails-flash-notifications', () => ({
+vi.mock('@canvas/rails-flash-notifications', () => ({
   __esModule: true,
   default: {
-    flashError: jest.fn(),
+    flashError: vi.fn(),
   },
 }))
 
@@ -52,8 +52,8 @@ const defaultProps = {
     {id: '3', gradingPeriodGroupId: '1'},
   ],
   disabled: false,
-  onSave: jest.fn(),
-  onCancel: jest.fn(),
+  onSave: vi.fn(),
+  onCancel: vi.fn(),
 }
 
 describe('EditGradingPeriodSetForm', () => {

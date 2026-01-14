@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
 
-type PillColor = "primary" | "info" | "alert" | "success" | "danger" | "warning" | undefined
+type PillColor = 'primary' | 'info' | 'alert' | 'success' | 'danger' | 'warning' | undefined
 
 const StatusPill = ({state}: {state: EnrollmentState}) => {
   const renderPill = (text: string, color: PillColor) => <Pill color={color}>{text}</Pill>

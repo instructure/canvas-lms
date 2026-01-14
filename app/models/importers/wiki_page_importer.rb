@@ -120,7 +120,6 @@ module Importers
       item.publish_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:publish_at])
       item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at])
       item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at])
-      item.saving_user = migration.user
 
       migration.add_imported_item(item)
 

@@ -46,7 +46,7 @@ export type RegistrationHistoryViewProps = {
  * Generate a summary of affected fields for display in the table
  */
 const getAffectedFieldsSummary = (diff: LtiHistoryEntryWithDiff): string => {
-  if ('contextControls' in diff) {
+  if ('deploymentDiffs' in diff) {
     return I18n.t('Availability & Exceptions')
   }
 
@@ -171,13 +171,16 @@ const TableRow = React.memo(
     const createdAt = entry.created_at
     const createdBy =
       entry.created_by === 'Instructure' ? I18n.t('Instructure') : entry.created_by.name
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
+    const formattedDate = tz.format(createdAt, 'date.formats.full')
 
     const affectedFields = getAffectedFieldsSummary(entry)
 
     return (
       <Table.Row>
         <Table.Cell>{status}</Table.Cell>
-        <Table.Cell>{tz.format(createdAt, 'date.formats.full')}</Table.Cell>
+        <Table.Cell>{formattedDate}</Table.Cell>
         <Table.Cell>{createdBy}</Table.Cell>
         <Table.Cell>
           <Link onClick={() => onAffectedFieldsClick(entry)}>{affectedFields}</Link>

@@ -65,7 +65,7 @@ const contentItem = ({
     }
   }
 
-  const navigateToPrevious = (thisListElement) => {
+  const navigateToPrevious = thisListElement => {
     const parentListElement = thisListElement.parentElement.closest('li')
     const previousSiblingListElement = Array.from(parentListElement.querySelectorAll('li')).at(-2)
     if (previousSiblingListElement) {

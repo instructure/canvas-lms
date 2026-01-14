@@ -33,9 +33,9 @@ import detroit from 'timezone/America/Detroit'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock jQuery.flashError to fix the test failure
-jest.mock('jquery', () => {
-  const mockJQuery = jest.requireActual('jquery')
-  mockJQuery.flashError = jest.fn()
+vi.mock('jquery', async () => {
+  const mockJQuery = await vi.importActual('jquery')
+  mockJQuery.flashError = vi.fn()
   return mockJQuery
 })
 
@@ -73,10 +73,10 @@ const dateAdjustmentsWithSub: DateAdjustmentConfig = {
   },
 }
 
-const setDateAdjustments: (cfg: DateAdjustmentConfig) => void = jest.fn()
+const setDateAdjustments: (cfg: DateAdjustmentConfig) => void = vi.fn()
 
 describe('DateAdjustment', () => {
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => vi.clearAllMocks())
 
   it('Fill in with empty values the start and end date fileds', () => {
     render(
@@ -238,7 +238,7 @@ describe('DateAdjustment', () => {
         <CanvasDateInput
           selectedDate="2024-11-08T08:00:00+00:00"
           onSelectedDateChange={() => {}}
-          formatDate={jest.fn(date => date.toISOString())}
+          formatDate={vi.fn(date => date.toISOString())}
           interaction="enabled"
           messages={messages}
         />,

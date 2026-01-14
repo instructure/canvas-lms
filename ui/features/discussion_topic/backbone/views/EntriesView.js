@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {without, sortedIndexOf, find} from 'lodash'
+import {without, sortedIndexOf, find} from 'es-toolkit/compat'
 import flattenObjects from '@canvas/util/flattenObjects'
 import $ from 'jquery'
 import pageNavTemplate from '../../jst/pageNav.handlebars'

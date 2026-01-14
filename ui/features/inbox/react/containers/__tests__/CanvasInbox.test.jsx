@@ -29,23 +29,26 @@ import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import React from 'react'
 import CanvasInbox from '../CanvasInbox'
 
-jest.mock('../../../util/utils', () => ({
-  ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
-}))
+vi.mock('../../../util/utils', async importOriginal => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    responsiveQuerySizes: vi.fn(),
+  }
+})
 
 describe('CanvasInbox App Container', () => {
   const server = setupServer(...handlers.concat(inboxSettingsHandlers()))
 
   beforeAll(() => {
     server.listen()
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -81,7 +84,7 @@ describe('CanvasInbox App Container', () => {
   const setup = () => {
     return render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <CanvasInbox breakpoints={{desktopOnly: true}} />
         </AlertManagerContext.Provider>
       </ApolloProvider>,
@@ -176,7 +179,7 @@ describe('CanvasInbox App Container', () => {
 
         let mailboxDropdown = await container.findByTestId('course-select')
         expect(window.location.hash).toBe('#filter=type=inbox')
-        expect(mailboxDropdown.getAttribute('value')).toBe('')
+        expect(mailboxDropdown.getAttribute('value')).toBe('All Courses')
 
         window.location.hash = '#filter=type=inbox&course=course_195'
         await waitForApolloLoading()
@@ -212,7 +215,7 @@ describe('CanvasInbox App Container', () => {
 
         const mailboxDropdown = await container.findByTestId('course-select')
         expect(window.location.hash).toBe('#filter=type=inbox')
-        expect(mailboxDropdown.getAttribute('value')).toBe('')
+        expect(mailboxDropdown.getAttribute('value')).toBe('All Courses')
       })
       it('should set course select in compose modal to course name when the context id param is in the url', async () => {
         const url = new URL(window.location.href)

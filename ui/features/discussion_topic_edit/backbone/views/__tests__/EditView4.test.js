@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import {defer} from 'lodash'
+import {defer} from 'es-toolkit/compat'
 import EditView from '../EditView'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
@@ -26,8 +26,8 @@ import {editView} from './utils'
 import fetchMock from 'fetch-mock'
 
 // Mock DueDateOverride component
-jest.mock('@canvas/due-dates', () => {
-  return function DueDateOverride() {
+vi.mock('@canvas/due-dates', () => ({
+  default: function DueDateOverride() {
     return {
       render() {
         return this
@@ -41,23 +41,32 @@ jest.mock('@canvas/due-dates', () => {
       validateBeforeSave() {
         return []
       },
+      getDefaultDueDate() {
+        return null
+      },
+      getOverrides() {
+        return []
+      },
+      overridesContainDefault() {
+        return true
+      },
     }
-  }
-})
+  },
+}))
 
 // Mock ConditionalReleaseEditor
 const mockEditor = {
-  updateAssignment: jest.fn(),
-  validateBeforeSave: jest.fn(),
-  save: jest.fn().mockResolvedValue({}),
+  updateAssignment: vi.fn(),
+  validateBeforeSave: vi.fn(),
+  save: vi.fn().mockResolvedValue({}),
 }
-jest.mock('@canvas/conditional-release-editor', () => {
-  return {
+vi.mock('@canvas/conditional-release-editor', () => ({
+  default: {
     attach() {
       return mockEditor
     },
-  }
-})
+  },
+}))
 
 // Filter React warnings/errors about deprecated lifecycle methods and unknown props
 const originalConsoleError = console.error
@@ -92,9 +101,18 @@ describe('EditView', () => {
   let $container
 
   beforeEach(() => {
+    vi.useFakeTimers()
     $container = $('<div>').appendTo(document.body)
-    fakeENV.setup()
-    ENV.SETTINGS = {suppress_assignments: false}
+    fakeENV.setup({
+      COURSE_ID: '1',
+      context_asset_string: 'course_1',
+      DISCUSSION_TOPIC: {
+        ATTRIBUTES: {
+          is_announcement: false,
+        },
+      },
+      SETTINGS: {suppress_assignments: false},
+    })
     $(document).on('submit', e => e.preventDefault())
     fetchMock.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200, {
       overwriteRoutes: true,
@@ -102,6 +120,13 @@ describe('EditView', () => {
   })
 
   afterEach(() => {
+    // Only run timers if fake timers are in use
+    try {
+      vi.runAllTimers()
+      vi.useRealTimers()
+    } catch {
+      // Timers not mocked, ignore
+    }
     $container.remove()
     fakeENV.teardown()
     $(document).off('submit')
@@ -152,12 +177,21 @@ describe('EditView', () => {
 
   describe('ConditionalRelease', () => {
     beforeEach(() => {
-      fakeENV.setup()
-      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-      ENV.CONDITIONAL_RELEASE_ENV = {
-        assignment: {id: 1},
-      }
-      ENV.SETTINGS = {suppress_assignments: false}
+      vi.useFakeTimers()
+      fakeENV.setup({
+        COURSE_ID: '1',
+        context_asset_string: 'course_1',
+        DISCUSSION_TOPIC: {
+          ATTRIBUTES: {
+            is_announcement: false,
+          },
+        },
+        SETTINGS: {suppress_assignments: false},
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+        CONDITIONAL_RELEASE_ENV: {
+          assignment: {id: 1},
+        },
+      })
       $(document).on('submit', e => e.preventDefault())
       // Use overwriteRoutes to prevent duplicate route errors
       fetchMock.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200, {
@@ -166,6 +200,8 @@ describe('EditView', () => {
     })
 
     afterEach(() => {
+      vi.runAllTimers()
+      vi.useRealTimers()
       fakeENV.teardown()
       $(document).off('submit')
       fetchMock.restore()
@@ -258,6 +294,36 @@ describe('EditView', () => {
   })
 
   describe('Conditional Release Editor', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      fakeENV.setup({
+        COURSE_ID: '1',
+        context_asset_string: 'course_1',
+        DISCUSSION_TOPIC: {
+          ATTRIBUTES: {
+            is_announcement: false,
+          },
+        },
+        SETTINGS: {suppress_assignments: false},
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+        CONDITIONAL_RELEASE_ENV: {
+          assignment: {id: 1},
+        },
+      })
+      $(document).on('submit', e => e.preventDefault())
+      fetchMock.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200, {
+        overwriteRoutes: true,
+      })
+    })
+
+    afterEach(() => {
+      vi.runAllTimers()
+      vi.useRealTimers()
+      fakeENV.teardown()
+      $(document).off('submit')
+      fetchMock.restore()
+    })
+
     it('is updated on tab change', () => {
       const view = editView({withAssignment: true})
       view.renderTabs()
@@ -283,31 +349,41 @@ describe('EditView', () => {
 
     it('validates conditional release', async () => {
       const view = editView({withAssignment: true})
-      await defer(() => {
+      const deferPromise = defer(() => {
         view.conditionalReleaseEditor = mockEditor
         mockEditor.validateBeforeSave.mockReturnValue('foo')
         const errors = view.validateBeforeSave(view.getFormData(), {})
         expect(errors.conditional_release).toBe('foo')
       })
+      await vi.runOnlyPendingTimersAsync()
+      await deferPromise
     })
 
     it('calls save in conditional release', async () => {
       const view = editView({withAssignment: true})
-      await defer(() => {
+      const deferPromise = defer(() => {
         view.conditionalReleaseEditor = mockEditor
-        const superPromise = Promise.resolve({})
-        const crPromise = Promise.resolve({})
-        const superSpy = jest
-          .spyOn(EditView.prototype, 'saveFormData')
-          .mockReturnValue(superPromise)
-        mockEditor.save.mockReturnValue(crPromise)
+        // Mock the model's save to return a resolved deferred/promise
+        const saveSpy = vi.spyOn(view.model, 'save').mockImplementation(() => {
+          const deferred = $.Deferred()
+          deferred.resolve({set_assignment: true, assignment: {}})
+          return deferred.promise()
+        })
+        // mockEditor.save must return a jQuery Deferred with .pipe()
+        mockEditor.save.mockImplementation(() => {
+          const deferred = $.Deferred()
+          deferred.resolve({})
+          return deferred.promise()
+        })
         const finalPromise = view.saveFormData()
         return finalPromise.then(() => {
-          expect(superSpy).toHaveBeenCalled()
+          expect(saveSpy).toHaveBeenCalled()
           expect(mockEditor.save).toHaveBeenCalledTimes(1)
-          superSpy.mockRestore()
+          saveSpy.mockRestore()
         })
       })
+      await vi.runOnlyPendingTimersAsync()
+      await deferPromise
     })
   })
 
@@ -336,7 +412,7 @@ describe('EditView', () => {
     it('calls suppressAssignment on the assignment when checkbox is checked', () => {
       ENV.SETTINGS.suppress_assignments = true
       const view = editView()
-      const spy = jest.spyOn(view.assignment, 'suppressAssignment')
+      const spy = vi.spyOn(view.assignment, 'suppressAssignment')
       view.$suppressAssignment.prop('checked', true)
 
       view.handleSuppressFromGradebookChange()
@@ -347,7 +423,7 @@ describe('EditView', () => {
     it('calls suppressAssignment on the assignment when checkbox is unchecked', () => {
       ENV.SETTINGS.suppress_assignments = true
       const view = editView()
-      const spy = jest.spyOn(view.assignment, 'suppressAssignment')
+      const spy = vi.spyOn(view.assignment, 'suppressAssignment')
       view.$suppressAssignment.prop('checked', false)
 
       view.handleSuppressFromGradebookChange()

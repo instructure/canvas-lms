@@ -216,8 +216,8 @@ const ZipFileImporter = ({
       name: f.name,
       collections: searchValue ? [] : f.children || [],
       items: [],
-    };
-    return acc;
+    }
+    return acc
   }
 
   const folderCollection = () => {
@@ -229,7 +229,7 @@ const ZipFileImporter = ({
       )
     }
 
-    return filteredFolders.reduce(folderToTreeBrowserCollection, {});
+    return filteredFolders.reduce(folderToTreeBrowserCollection, {})
   }
 
   const handleCollectionClick: CollectionClickArgs = (_e, collection) => {
@@ -238,21 +238,25 @@ const ZipFileImporter = ({
   }
 
   const renderClearButton = () => {
-    return <>
-      {keyword.length ? <IconButton
-        type="button"
-        size="small"
-        withBackground={false}
-        withBorder={false}
-        screenReaderLabel="Clear search"
-        onClick={() => {
-          setKeyword('')
-          setSearchValue('')
-        }}
-      >
-        <IconTroubleLine />
-      </IconButton> : null}
-    </>
+    return (
+      <>
+        {keyword.length ? (
+          <IconButton
+            type="button"
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel="Clear search"
+            onClick={() => {
+              setKeyword('')
+              setSearchValue('')
+            }}
+          >
+            <IconTroubleLine />
+          </IconButton>
+        ) : null}
+      </>
+    )
   }
 
   const treeBrowserParams = () => {
@@ -319,7 +323,7 @@ const ZipFileImporter = ({
                 <View as="div" margin="small 0">
                   <FormLabel htmlFor="folder-search">{I18n.t('Search folders')}</FormLabel>
                 </View>
-                <Flex alignItems ='start'>
+                <Flex alignItems="start">
                   <TextInput
                     id="folder-search"
                     renderLabel=""

@@ -17,7 +17,9 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse, delay} from 'msw'
 import {
   AccessibilityIssue,
   FormValue,
@@ -26,12 +28,8 @@ import {
   ResourceType,
 } from '../../../types'
 import Preview, {PreviewHandle} from '../Preview'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 
-// Mock dependencies
-jest.mock('@canvas/do-fetch-api-effect')
-
-const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+const server = setupServer()
 
 describe('Preview', () => {
   const mockIssue: AccessibilityIssue = {
@@ -56,22 +54,29 @@ describe('Preview', () => {
     itemType: ResourceType.Assignment,
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup()
+    server.resetHandlers()
   })
 
   describe('initial render and loading', () => {
     it('shows loading spinner initially', () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Test content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      server.use(
+        http.get('/preview', async () => {
+          await delay(100)
+          return HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       render(<Preview {...defaultProps} />)
 
@@ -79,14 +84,15 @@ describe('Preview', () => {
     })
 
     it('shows loading overlay with spinner during API calls', async () => {
-      // Create a promise that we can control
-      let resolvePromise: (value: any) => void
-      const pendingPromise = new Promise(resolve => {
-        resolvePromise = resolve
-      })
-
-      // @ts-expect-error
-      mockDoFetchApi.mockReturnValue(pendingPromise)
+      server.use(
+        http.get('/preview', async () => {
+          await delay(50)
+          return HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       render(<Preview {...defaultProps} />)
 
@@ -95,14 +101,6 @@ describe('Preview', () => {
 
       // Should have the overlay mask
       expect(document.getElementById('a11y-issue-preview-overlay')).toBeInTheDocument()
-
-      // Resolve the promise to complete the loading
-      resolvePromise!({
-        json: {
-          content: '<div>Test content</div>',
-          path: '//div',
-        },
-      })
 
       // Wait for loading to complete
       await waitFor(() => {
@@ -116,10 +114,17 @@ describe('Preview', () => {
         path: '//div',
       }
 
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      let requestCount = 0
+      server.use(
+        http.get('/preview', () => HttpResponse.json(mockResponse)),
+        http.post('/preview', async () => {
+          requestCount++
+          if (requestCount === 1) {
+            await delay(50)
+          }
+          return HttpResponse.json(mockResponse)
+        }),
+      )
 
       const ref = React.createRef<PreviewHandle>()
       render(<Preview {...defaultProps} ref={ref} />)
@@ -129,15 +134,6 @@ describe('Preview', () => {
         expect(screen.queryByText('Loading preview...')).not.toBeInTheDocument()
       })
 
-      // Create a promise for the update operation
-      let resolveUpdatePromise: (value: any) => void
-      const updatePromise = new Promise(resolve => {
-        resolveUpdatePromise = resolve
-      })
-
-      // @ts-expect-error
-      mockDoFetchApi.mockReturnValueOnce(updatePromise)
-
       // Trigger update
       const formValue: FormValue = {value: 'test-value'}
       ref.current?.update(formValue)
@@ -146,11 +142,6 @@ describe('Preview', () => {
       expect(screen.getByText('Loading preview...')).toBeInTheDocument()
       expect(document.getElementById('a11y-issue-preview-overlay')).toBeInTheDocument()
 
-      // Resolve the update promise
-      resolveUpdatePromise!({
-        json: mockResponse,
-      })
-
       // Wait for loading to complete
       await waitFor(() => {
         expect(screen.queryByText('Loading preview...')).not.toBeInTheDocument()
@@ -158,32 +149,27 @@ describe('Preview', () => {
     })
 
     it('calls API on mount with correct parameters', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Test content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      let capturedUrl = ''
+      server.use(
+        http.get('/preview', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       render(<Preview {...defaultProps} />)
 
-      const expectedParams = new URLSearchParams({
-        issue_id: '1',
-      })
-
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: `/preview?${expectedParams.toString()}`,
-          method: 'GET',
-        })
+        expect(capturedUrl).toContain('/preview')
+        expect(capturedUrl).toContain('issue_id=1')
       })
     })
 
     it('handles API error gracefully and shows error alert', async () => {
-      mockDoFetchApi.mockRejectedValue(new Error('API Error'))
+      server.use(http.get('/preview', () => HttpResponse.error()))
 
       render(<Preview {...defaultProps} />)
 
@@ -193,15 +179,14 @@ describe('Preview', () => {
     })
 
     it('hides loading overlay when not loading and no error', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Test content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: '//div',
+          }),
+        ),
+      )
 
       render(<Preview {...defaultProps} />)
 
@@ -218,14 +203,15 @@ describe('Preview', () => {
     })
 
     it('shows loading spinner with correct accessibility attributes', () => {
-      // Create a promise that we can control
-      let resolvePromise: (value: any) => void
-      const pendingPromise = new Promise(resolve => {
-        resolvePromise = resolve
-      })
-
-      // @ts-expect-error
-      mockDoFetchApi.mockReturnValue(pendingPromise)
+      server.use(
+        http.get('/preview', async () => {
+          await delay(100)
+          return HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       render(<Preview {...defaultProps} />)
 
@@ -237,28 +223,19 @@ describe('Preview', () => {
       const overlay = document.getElementById('a11y-issue-preview-overlay')
       expect(overlay).toBeInTheDocument()
       expect(overlay).toContainElement(loadingSpinner)
-
-      // Clean up
-      resolvePromise!({
-        json: {
-          content: '<div>Test content</div>',
-          path: '//div',
-        },
-      })
     })
   })
 
   describe('content rendering', () => {
     it('renders content after successful API call', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div class="test-element">Test content</div>',
-        path: '//div[@class="test-element"]',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div class="test-element">Test content</div>',
+            path: '//div[@class="test-element"]',
+          }),
+        ),
+      )
 
       render(<Preview {...defaultProps} />)
 
@@ -268,15 +245,14 @@ describe('Preview', () => {
     })
 
     it('handles missing path in response', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Test content</div>',
-        path: undefined,
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: undefined,
+          }),
+        ),
+      )
 
       render(<Preview {...defaultProps} />)
 
@@ -288,15 +264,14 @@ describe('Preview', () => {
 
   describe('ref functionality', () => {
     it('exposes update method through ref', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Updated content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Updated content</div>',
+            path: '//div',
+          }),
+        ),
+      )
 
       const ref = React.createRef<PreviewHandle>()
       render(<Preview {...defaultProps} ref={ref} />)
@@ -308,15 +283,22 @@ describe('Preview', () => {
     })
 
     it('calls update API with correct parameters', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Updated content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      let capturedBody: any = null
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Updated content</div>',
+            path: '//div',
+          }),
+        ),
+        http.post('/preview', async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({
+            content: '<div>Updated content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       const ref = React.createRef<PreviewHandle>()
       render(<Preview {...defaultProps} ref={ref} />)
@@ -329,37 +311,43 @@ describe('Preview', () => {
       ref.current?.update(formValue)
 
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: '/preview',
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            content_id: 123,
-            content_type: 'Assignment',
-            rule: 'adjacent-links',
-            path: '//div[@class="test-element"]',
-            value: formValue,
-          }),
+        expect(capturedBody).toEqual({
+          content_id: 123,
+          content_type: 'Assignment',
+          rule: 'adjacent-links',
+          path: '//div[@class="test-element"]',
+          value: formValue,
         })
       })
     })
 
     it('shows loading state during update', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Updated content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Updated content</div>',
+            path: '//div',
+          }),
+        ),
+        http.post('/preview', async () => {
+          await delay(50)
+          return HttpResponse.json({
+            content: '<div>Updated content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       const ref = React.createRef<PreviewHandle>()
       render(<Preview {...defaultProps} ref={ref} />)
 
       await waitFor(() => {
         expect(ref.current).toBeDefined()
+      })
+
+      // Wait for initial load to complete
+      await waitFor(() => {
+        expect(screen.queryByText('Loading preview...')).not.toBeInTheDocument()
       })
 
       const formValue: FormValue = {value: 'test-value'}
@@ -370,19 +358,24 @@ describe('Preview', () => {
     })
 
     it('calls onSuccess callback when update succeeds', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Updated content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Updated content</div>',
+            path: '//div',
+          }),
+        ),
+        http.post('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Updated content</div>',
+            path: '//div',
+          }),
+        ),
+      )
 
       const ref = React.createRef<PreviewHandle>()
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       render(<Preview {...defaultProps} ref={ref} />)
 
@@ -400,11 +393,14 @@ describe('Preview', () => {
     })
 
     it('calls onError callback when update fails', async () => {
-      mockDoFetchApi.mockRejectedValue(new Error('Update failed'))
+      server.use(
+        http.get('/preview', () => HttpResponse.error()),
+        http.post('/preview', () => HttpResponse.error()),
+      )
 
       const ref = React.createRef<PreviewHandle>()
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       render(<Preview {...defaultProps} ref={ref} />)
 
@@ -424,21 +420,24 @@ describe('Preview', () => {
 
   describe('component props', () => {
     it('renders one time when issue changes', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Test content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      let requestCount = 0
+      server.use(
+        http.get('/preview', () => {
+          requestCount++
+          return HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       const {rerender} = render(<Preview {...defaultProps} />)
 
       await waitFor(() => {
         expect(screen.getByText('Test content')).toBeInTheDocument()
       })
+
+      const initialCount = requestCount
 
       const newIssue: AccessibilityIssue = {
         ...mockIssue,
@@ -450,72 +449,61 @@ describe('Preview', () => {
 
       // Should call API again with new issue
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalled()
+        expect(requestCount).toBeGreaterThan(initialCount)
       })
     })
 
     it('handles different content types', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Page content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
-      })
+      let capturedUrl = ''
+      server.use(
+        http.get('/preview', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json({
+            content: '<div>Page content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       render(<Preview {...defaultProps} itemType={ResourceType.WikiPage} />)
 
-      const expectedParams = new URLSearchParams({
-        issue_id: '1',
-      })
-
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: `/preview?${expectedParams.toString()}`,
-          method: 'GET',
-        })
+        expect(capturedUrl).toContain('/preview')
+        expect(capturedUrl).toContain('issue_id=1')
       })
     })
 
     it('handles attachment content type', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Attachment content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
-      })
+      let capturedUrl = ''
+      server.use(
+        http.get('/preview', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json({
+            content: '<div>Attachment content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       render(<Preview {...defaultProps} itemType={ResourceType.Attachment} />)
 
-      const expectedParams = new URLSearchParams({
-        issue_id: '1',
-      })
-
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: `/preview?${expectedParams.toString()}`,
-          method: 'GET',
-        })
+        expect(capturedUrl).toContain('/preview')
+        expect(capturedUrl).toContain('issue_id=1')
       })
     })
   })
 
   describe('DOM structure', () => {
     it('renders with correct container attributes', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Test content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: '//div',
+          }),
+        ),
+      )
 
       render(<Preview {...defaultProps} />)
 
@@ -532,25 +520,31 @@ describe('Preview', () => {
 
   describe('error state management', () => {
     it('clears error state when successful API call follows error', async () => {
-      // First call fails
-      mockDoFetchApi.mockRejectedValueOnce({})
+      let requestCount = 0
+      server.use(
+        http.get('/preview', () => {
+          requestCount++
+          if (requestCount === 1) {
+            return HttpResponse.error()
+          }
+          return HttpResponse.json({
+            content: '<div>Success content</div>',
+            path: '//div',
+          })
+        }),
+        http.post('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Success content</div>',
+            path: '//div',
+          }),
+        ),
+      )
 
       const ref = React.createRef<PreviewHandle>()
       render(<Preview {...defaultProps} ref={ref} />)
 
       await waitFor(() => {
         expect(screen.getByText('Error previewing fixed accessibility issue.')).toBeInTheDocument()
-      })
-
-      // Second call succeeds
-      const mockResponse: PreviewResponse = {
-        content: '<div>Success content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValueOnce({
-        json: mockResponse,
       })
 
       ref.current?.update({value: 'a'})
@@ -563,17 +557,18 @@ describe('Preview', () => {
     })
 
     it('displays content when error response includes content', async () => {
-      const mockErrorWithContent = {
-        response: {
-          json: async () => ({
-            content: '<div>Error content</div>',
-            path: '//div',
-            error: 'Element not found for path: invalid_path',
-          }),
-        },
-      }
-
-      mockDoFetchApi.mockRejectedValueOnce(mockErrorWithContent)
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json(
+            {
+              content: '<div>Error content</div>',
+              path: '//div',
+              error: 'Element not found for path: invalid_path',
+            },
+            {status: 400},
+          ),
+        ),
+      )
 
       const ref = React.createRef<PreviewHandle>()
       render(<Preview {...defaultProps} ref={ref} />)
@@ -588,15 +583,16 @@ describe('Preview', () => {
     })
 
     it('shows error overlay when error response has no content', async () => {
-      const mockErrorWithoutContent = {
-        response: {
-          json: async () => ({
-            error: 'Something went wrong',
-          }),
-        },
-      }
-
-      mockDoFetchApi.mockRejectedValueOnce(mockErrorWithoutContent)
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json(
+            {
+              error: 'Something went wrong',
+            },
+            {status: 400},
+          ),
+        ),
+      )
 
       render(<Preview {...defaultProps} />)
 
@@ -606,23 +602,24 @@ describe('Preview', () => {
     })
 
     it('clears error when itemId changes', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div>Test content</div>',
-        path: '//div',
-      }
-
-      // First call fails
-      mockDoFetchApi.mockRejectedValueOnce({})
+      let requestCount = 0
+      server.use(
+        http.get('/preview', () => {
+          requestCount++
+          if (requestCount === 1) {
+            return HttpResponse.error()
+          }
+          return HttpResponse.json({
+            content: '<div>Test content</div>',
+            path: '//div',
+          })
+        }),
+      )
 
       const {rerender} = render(<Preview {...defaultProps} />)
 
       await waitFor(() => {
         expect(screen.getByText('Error previewing fixed accessibility issue.')).toBeInTheDocument()
-      })
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValueOnce({
-        json: mockResponse,
       })
 
       rerender(<Preview {...defaultProps} resourceId={2} />)

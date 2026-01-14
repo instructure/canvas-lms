@@ -27,10 +27,13 @@ import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-jest.mock('../../../util/utils', () => ({
-  ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
-}))
+vi.mock('../../../util/utils', async () => {
+  const actual = await vi.importActual('../../../util/utils')
+  return {
+    ...actual,
+    responsiveQuerySizes: vi.fn(),
+  }
+})
 
 describe('ConversationListContainer', () => {
   const server = setupServer(...handlers)
@@ -203,13 +206,13 @@ describe('ConversationListContainer', () => {
     server.listen()
 
     // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -355,7 +358,7 @@ describe('ConversationListContainer', () => {
     })
 
     it('should track when conversations are clicked', async () => {
-      const mock = jest.fn()
+      const mock = vi.fn()
       const conversationsQuery = {
         data: getConversationsQuery('multipleConversations').data,
         loading: false,
@@ -414,7 +417,7 @@ describe('ConversationListContainer', () => {
 
   describe('error handling', () => {
     it('should display an error message when the API call fails', async () => {
-      const setOnFailure = jest.fn()
+      const setOnFailure = vi.fn()
       const errorMessage = 'Unable to load messages.'
       const mockError = new Error('Bad Request')
       const conversationsQuery = {

@@ -127,7 +127,6 @@ class Attachment < ActiveRecord::Base
   has_one :canvadoc
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
-  has_many :discussion_entry_drafts, inverse_of: :attachment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
   has_one :estimated_duration, dependent: :destroy, inverse_of: :attachment
   has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment, dependent: :destroy
@@ -1400,7 +1399,10 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.mime_class(content_type)
-    valid_content_types_hash[content_type] || "file"
+    # Strip MIME parameters (charset, boundary, etc.) before lookup
+    # Similar to what File.mime_type does in canvas_mimetype_fu gem
+    base_type = content_type&.split(";")&.first&.strip
+    valid_content_types_hash[base_type] || "file"
   end
 
   def mime_class

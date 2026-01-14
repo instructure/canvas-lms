@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createContext, useContext, useState, useCallback} from 'react'
+import React, {createContext, useContext, useState, useCallback, useEffect} from 'react'
 import type {WidgetConfig, Widget} from '../types'
 import {DEFAULT_WIDGET_CONFIG, LEFT_COLUMN, RIGHT_COLUMN} from '../constants'
 import {useWidgetDashboardEdit} from './useWidgetDashboardEdit'
+import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 export type MoveAction =
   | 'move-left'
@@ -34,6 +35,9 @@ export type MoveAction =
 interface WidgetLayoutContextType {
   config: WidgetConfig
   moveWidget: (widgetId: string, action: MoveAction) => void
+  moveWidgetToPosition: (widgetId: string, targetCol: number, targetRow: number) => void
+  removeWidget: (widgetId: string) => void
+  addWidget: (type: string, displayName: string, col: number, row: number) => void
   resetConfig: () => void
 }
 
@@ -221,8 +225,19 @@ const moveWidgetToBottom = (widgets: Widget[], widgetId: string): Widget[] => {
 }
 
 export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
-  const [config, setConfig] = useState<WidgetConfig>(DEFAULT_WIDGET_CONFIG)
+  const {preferences} = useWidgetDashboard()
+  const [config, setConfig] = useState<WidgetConfig>(() => {
+    const persistedLayout = preferences.widget_dashboard_config?.layout
+    return persistedLayout || DEFAULT_WIDGET_CONFIG
+  })
   const {markDirty} = useWidgetDashboardEdit()
+
+  useEffect(() => {
+    const persistedLayout = preferences.widget_dashboard_config?.layout
+    if (persistedLayout) {
+      setConfig(persistedLayout)
+    }
+  }, [preferences.widget_dashboard_config?.layout])
 
   const moveWidget = useCallback(
     (widgetId: string, action: MoveAction) => {
@@ -267,6 +282,81 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
     [markDirty],
   )
 
+  const moveWidgetToPosition = useCallback(
+    (widgetId: string, targetCol: number, targetRow: number) => {
+      setConfig(prevConfig => {
+        const widget = prevConfig.widgets.find(w => w.id === widgetId)
+        if (!widget) return prevConfig
+
+        const updatedWidgets = prevConfig.widgets.map(w => {
+          if (w.id === widgetId) {
+            return {...w, position: {...w.position, col: targetCol, row: targetRow}}
+          }
+          if (w.position.col === targetCol && w.position.row >= targetRow && w.id !== widgetId) {
+            return {...w, position: {...w.position, row: w.position.row + 1}}
+          }
+          return w
+        })
+
+        const normalizedWidgets = normalizeRowNumbers(
+          normalizeRowNumbers(updatedWidgets, LEFT_COLUMN),
+          RIGHT_COLUMN,
+        )
+        const finalWidgets = recalculateRelativePositions(normalizedWidgets)
+        return {...prevConfig, widgets: finalWidgets}
+      })
+      markDirty()
+    },
+    [markDirty],
+  )
+
+  const removeWidget = useCallback(
+    (widgetId: string) => {
+      setConfig(prevConfig => {
+        const updatedWidgets = prevConfig.widgets.filter(w => w.id !== widgetId)
+        const normalizedWidgets = normalizeRowNumbers(
+          normalizeRowNumbers(updatedWidgets, LEFT_COLUMN),
+          RIGHT_COLUMN,
+        )
+        const finalWidgets = recalculateRelativePositions(normalizedWidgets)
+        return {...prevConfig, widgets: finalWidgets}
+      })
+      markDirty()
+    },
+    [markDirty],
+  )
+
+  const addWidget = useCallback(
+    (type: string, displayName: string, col: number, row: number) => {
+      setConfig(prevConfig => {
+        const newWidget: Widget = {
+          id: `${type}-widget-${crypto.randomUUID()}`,
+          type,
+          position: {col, row, relative: 0},
+          title: displayName,
+        }
+
+        const updatedWidgets = prevConfig.widgets.map(w => {
+          if (w.position.col === col && w.position.row >= row) {
+            return {...w, position: {...w.position, row: w.position.row + 1}}
+          }
+          return w
+        })
+
+        const allWidgets = [...updatedWidgets, newWidget]
+        const normalizedWidgets = normalizeRowNumbers(
+          normalizeRowNumbers(allWidgets, LEFT_COLUMN),
+          RIGHT_COLUMN,
+        )
+        const finalWidgets = recalculateRelativePositions(normalizedWidgets)
+
+        return {...prevConfig, widgets: finalWidgets}
+      })
+      markDirty()
+    },
+    [markDirty],
+  )
+
   const resetConfig = useCallback(() => {
     setConfig(DEFAULT_WIDGET_CONFIG)
   }, [])
@@ -274,6 +364,9 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
   const value = {
     config,
     moveWidget,
+    moveWidgetToPosition,
+    removeWidget,
+    addWidget,
     resetConfig,
   }
 

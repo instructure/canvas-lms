@@ -95,7 +95,7 @@
 #           "type": "string"
 #         },
 #         "peer_review_sub_assignment": {
-#           "description": "peer review sub assignment details, only present when include_peer_review=true is specified, assignment has peer reviews enabled, and peer_review_grading feature flag is enabled",
+#           "description": "peer review sub assignment details, only present when include_peer_review=true is specified, assignment has peer reviews enabled, and peer_review_allocation_and_grading feature flag is enabled",
 #           "type": "object",
 #           "properties": {
 #             "id": {"type": "integer"},
@@ -131,9 +131,25 @@ class LearningObjectDatesController < ApplicationController
   # Get a learning object's date-related information, including due date, availability dates,
   # override status, and a paginated list of all assignment overrides for the item.
   #
-  # @argument include_peer_review [Boolean]
-  #   If true, includes peer review sub assignment information and overrides in the response.
-  #   Requires the peer_review_grading feature flag to be enabled.
+  # @argument include[] [Array]
+  #   Array of strings indicating what additional data to include in the response.
+  #   Valid values:
+  #   - "peer_review": includes peer review sub assignment information and overrides in the response.
+  #     Requires the peer_review_allocation_and_grading feature flag to be enabled.
+  #   - "child_peer_review_override_dates": each assignment override will include a peer_review_dates
+  #     field containing the matched peer review override data (id, due_at, unlock_at, lock_at)
+  #     for that override. The field will be present as null if no matching peer review override exists.
+  #
+  # @argument exclude[] [Array]
+  #   Array of strings indicating what data to exclude from the response.
+  #   Valid values:
+  #   - "peer_review_overrides": when include[]=peer_review is also specified, the
+  #     peer_review_sub_assignment object will not include the overrides array, reducing the
+  #     response payload size. This is useful when using include[]=child_peer_review_override_dates
+  #     since the peer review override data is already embedded in the parent assignment overrides.
+  #   - "child_override_due_dates": prevents the sub_assignment_due_dates field from being included
+  #     in assignment override responses, even when discussion checkpoints are enabled. This reduces
+  #     response payload size when checkpoint due date information is not needed.
   #
   # @returns LearningObjectDates
   def show
@@ -146,15 +162,22 @@ class LearningObjectDatesController < ApplicationController
                                  section_visibilities = overridable.discussion_topic_section_visibilities.active.where.not(course_section_id: section_overrides)
                                  Api.paginate(section_visibilities, self, route)
                                end
+
+    includes = Array(params[:include])
+    excludes = Array(params[:exclude])
+
     # @context here is always a course, which was requested by the API client
-    include_child_override_due_dates = @context.discussion_checkpoints_enabled?
-    all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true, include_child_override_due_dates:)
+    include_child_override_due_dates = @context.discussion_checkpoints_enabled? &&
+                                       !excludes.include?("child_override_due_dates")
+    include_child_peer_review_override_dates = includes.include?("child_peer_review_override_dates")
+    all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true, include_child_override_due_dates:, include_child_peer_review_override_dates:)
     all_overrides += section_visibility_to_override_json(section_visibilities, overridable) if visibilities_to_override
 
-    include_peer_review = value_to_boolean(params[:include_peer_review])
+    include_peer_review = includes.include?("peer_review")
+    exclude_peer_review_overrides = excludes.include?("peer_review_overrides")
 
     render json: {
-      **learning_object_dates_json(asset, overridable, include_peer_review:),
+      **learning_object_dates_json(asset, overridable, include_peer_review:, exclude_peer_review_overrides:),
       **blueprint_date_locks_json(asset),
       overrides: all_overrides,
     }

@@ -30,10 +30,10 @@ function getDefaultDir() {
 }
 
 /**
- * @param {Element} element, will use the <html> element by default
+ * @param {Element} [element] The element to test, will use the <html> element by default
  * @returns {Boolean}
  */
-export function isRTL(element) {
+export function isRTL(element = undefined) {
   return getDirection(element) === 'rtl'
 }
 

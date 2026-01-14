@@ -2287,9 +2287,9 @@ describe LearningObjectDatesController do
       )
     end
 
-    context "when peer_review_grading feature flag is enabled" do
+    context "when peer_review_allocation_and_grading feature flag is enabled" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Peer Review Sub Assignment",
           parent_assignment: @assignment_with_peer_review,
@@ -2302,8 +2302,8 @@ describe LearningObjectDatesController do
       end
 
       context "without peer review sub assignment overrides" do
-        it "includes peer_review_sub_assignment when include_peer_review=true is specified" do
-          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include_peer_review: true }
+        it "includes peer review sub assignment when requested" do
+          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include: ["peer_review"] }
           expect(response).to be_successful
 
           json = json_parse
@@ -2319,7 +2319,7 @@ describe LearningObjectDatesController do
           expect(peer_review_data["overrides"]).to eq([])
         end
 
-        it "does not include peer_review_sub_assignment when include_peer_review is not specified" do
+        it "excludes peer review sub assignment by default" do
           get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id }
           expect(response).to be_successful
 
@@ -2348,8 +2348,8 @@ describe LearningObjectDatesController do
           )
         end
 
-        it "includes peer review sub assignment with overrides in response when include_peer_review=true is specified" do
-          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include_peer_review: true }
+        it "includes peer review sub assignment with overrides when requested" do
+          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include: ["peer_review"] }
           expect(response).to be_successful
 
           json = json_parse
@@ -2369,8 +2369,8 @@ describe LearningObjectDatesController do
           expect(override_data["lock_at"]).to eq("2025-09-17T18:00:00Z")
         end
 
-        it "includes both parent assignment overrides and peer review sub assignment overrides when include_peer_review=true is specified" do
-          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include_peer_review: true }
+        it "includes both parent and peer review overrides when requested" do
+          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include: ["peer_review"] }
           expect(response).to be_successful
 
           json = json_parse
@@ -2385,18 +2385,18 @@ describe LearningObjectDatesController do
       end
     end
 
-    context "when peer_review_grading feature flag is disabled" do
+    context "when peer_review_allocation_and_grading feature flag is disabled" do
       before :once do
         # Peer review sub assignment that exists but should not be shown
         @hidden_peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Hidden Peer Review Sub Assignment",
           parent_assignment: @assignment_with_peer_review
         )
-        @course.disable_feature!(:peer_review_grading)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
         @assignment_with_peer_review.reload
       end
 
-      it "does not include peer_review_sub_assignment in response" do
+      it "does not include peer review sub assignment in response" do
         get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id }
         expect(response).to be_successful
 
@@ -2407,7 +2407,7 @@ describe LearningObjectDatesController do
 
     context "when assignment does not have peer reviews enabled" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @assignment_without_peer_review = @course.assignments.create!(
           title: "Assignment without Peer Review",
           due_at: "2025-09-12T00:00:00Z",
@@ -2415,12 +2415,382 @@ describe LearningObjectDatesController do
         )
       end
 
-      it "does not include peer_review_sub_assignment" do
+      it "does not include peer review sub assignment" do
         get :show, params: { course_id: @course.id, assignment_id: @assignment_without_peer_review.id }
         expect(response).to be_successful
 
         json = json_parse
         expect(json).not_to have_key("peer_review_sub_assignment")
+      end
+    end
+  end
+
+  describe "GET #show with child_peer_review_override_dates parameter" do
+    before :once do
+      @course = course_model
+      @teacher = teacher_in_course(course: @course, active_all: true).user
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @assignment = @course.assignments.create!(
+        title: "Assignment with Peer Review",
+        due_at: 1.day.from_now,
+        peer_reviews: true,
+        peer_reviews_assigned: true
+      )
+      @peer_review_sub = PeerReviewSubAssignment.create!(
+        parent_assignment: @assignment,
+        context: @course,
+        due_at: 1.week.from_now
+      )
+
+      @section = @course.course_sections.create!
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context "with include[]=child_peer_review_override_dates parameter" do
+      it "includes peer_review_dates in parent override" do
+        parent_override = @assignment.assignment_overrides.create!(
+          set: @section,
+          due_at: 1.day.from_now,
+          unlock_at: Time.zone.now,
+          lock_at: 2.days.from_now
+        )
+
+        peer_review_override = @peer_review_sub.assignment_overrides.create!(
+          set: @section,
+          parent_override:,
+          due_at: 3.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 4.days.from_now
+        )
+
+        get :show, params: {
+          course_id: @course.id,
+          assignment_id: @assignment.id,
+          include: ["child_peer_review_override_dates"]
+        }
+
+        expect(response).to be_successful
+        json = json_parse
+
+        override_json = json["overrides"].first
+        expect(override_json).to have_key("peer_review_dates")
+        expect(override_json["peer_review_dates"]).to be_present
+        expect(override_json["peer_review_dates"]["id"]).to eq(peer_review_override.id)
+        expect(override_json["peer_review_dates"]["due_at"]).to be_present
+        expect(override_json["peer_review_dates"]["unlock_at"]).to be_present
+        expect(override_json["peer_review_dates"]["lock_at"]).to be_present
+      end
+    end
+
+    context "when include[]=child_peer_review_override_dates parameter is not specified" do
+      it "excludes peer_review_dates by default" do
+        parent_override = @assignment.assignment_overrides.create!(
+          set: @section,
+          due_at: 1.day.from_now
+        )
+
+        @peer_review_sub.assignment_overrides.create!(
+          set: @section,
+          parent_override:,
+          due_at: 3.days.from_now
+        )
+
+        get :show, params: {
+          course_id: @course.id,
+          assignment_id: @assignment.id
+        }
+
+        json = json_parse
+        override_json = json["overrides"].first
+
+        expect(override_json).not_to have_key("peer_review_dates")
+      end
+    end
+
+    it "includes peer_review_dates as null when no matching peer review override exists" do
+      @assignment.assignment_overrides.create!(
+        set: @section,
+        due_at: 1.day.from_now
+      )
+
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        include: ["child_peer_review_override_dates"]
+      }
+
+      json = json_parse
+      override_json = json["overrides"].first
+
+      expect(override_json).to have_key("peer_review_dates")
+      expect(override_json["peer_review_dates"]).to be_nil
+    end
+
+    it "works with include[]=peer_review" do
+      parent_override = @assignment.assignment_overrides.create!(
+        set: @section,
+        due_at: 1.day.from_now
+      )
+
+      peer_review_override = @peer_review_sub.assignment_overrides.create!(
+        set: @section,
+        parent_override:,
+        due_at: 3.days.from_now
+      )
+
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        include: ["peer_review", "child_peer_review_override_dates"]
+      }
+
+      json = json_parse
+
+      expect(json).to have_key("peer_review_sub_assignment")
+
+      override_json = json["overrides"].first
+      expect(override_json).to have_key("peer_review_dates")
+      expect(override_json["peer_review_dates"]["id"]).to eq(peer_review_override.id)
+    end
+
+    it "handles multiple overrides correctly" do
+      section2 = @course.course_sections.create!
+
+      parent_override1 = @assignment.assignment_overrides.create!(
+        set: @section,
+        due_at: 1.day.from_now
+      )
+
+      parent_override2 = @assignment.assignment_overrides.create!(
+        set: section2,
+        due_at: 2.days.from_now
+      )
+
+      peer_review_override1 = @peer_review_sub.assignment_overrides.create!(
+        set: @section,
+        parent_override: parent_override1,
+        due_at: 3.days.from_now
+      )
+
+      peer_review_override2 = @peer_review_sub.assignment_overrides.create!(
+        set: section2,
+        parent_override: parent_override2,
+        due_at: 4.days.from_now
+      )
+
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        include: ["child_peer_review_override_dates"]
+      }
+
+      json = json_parse
+      overrides = json["overrides"]
+
+      override1 = overrides.find { |o| o["id"] == parent_override1.id }
+      override2 = overrides.find { |o| o["id"] == parent_override2.id }
+
+      expect(override1["peer_review_dates"]["id"]).to eq(peer_review_override1.id)
+      expect(override2["peer_review_dates"]["id"]).to eq(peer_review_override2.id)
+    end
+  end
+
+  describe "exclude_peer_review_overrides parameter" do
+    before do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment = @course.assignments.create!(
+        title: "Assignment with Peer Review",
+        peer_reviews: true
+      )
+      @peer_review_sub = PeerReviewSubAssignment.create!(
+        parent_assignment: @assignment,
+        context: @course,
+        due_at: 1.week.from_now
+      )
+      @section = @course.course_sections.create!(name: "Section 1")
+      @parent_override = create_section_override_for_assignment(@assignment, course_section: @section, due_at: 2.days.from_now)
+      @peer_review_override = @peer_review_sub.assignment_overrides.create!(
+        set: @section,
+        due_at: 3.days.from_now,
+        parent_override: @parent_override
+      )
+    end
+
+    it "excludes peer review overrides array when exclude[]=peer_review_overrides" do
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        include: ["peer_review"],
+        exclude: ["peer_review_overrides"]
+      }
+
+      json = response.parsed_body
+      expect(json["peer_review_sub_assignment"]).to be_present
+      expect(json["peer_review_sub_assignment"]["id"]).to eq(@peer_review_sub.id)
+      expect(json["peer_review_sub_assignment"]["due_at"]).to be_present
+      expect(json["peer_review_sub_assignment"]["overrides"]).to be_nil
+    end
+
+    it "includes peer review overrides array when exclude[]=peer_review_overrides is not specified" do
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        include: ["peer_review"]
+      }
+
+      json = response.parsed_body
+      expect(json["peer_review_sub_assignment"]).to be_present
+      expect(json["peer_review_sub_assignment"]["overrides"]).to be_present
+      expect(json["peer_review_sub_assignment"]["overrides"].length).to eq(1)
+    end
+
+    it "includes peer review overrides array when exclude[] does not include peer_review_overrides" do
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        include: ["peer_review"],
+        exclude: []
+      }
+
+      json = response.parsed_body
+      expect(json["peer_review_sub_assignment"]).to be_present
+      expect(json["peer_review_sub_assignment"]["overrides"]).to be_present
+    end
+
+    it "works together with include[]=child_peer_review_override_dates parameter" do
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        include: ["peer_review", "child_peer_review_override_dates"],
+        exclude: ["peer_review_overrides"]
+      }
+
+      json = response.parsed_body
+      expect(json["peer_review_sub_assignment"]).to be_present
+      expect(json["peer_review_sub_assignment"]["overrides"]).to be_nil
+
+      override = json["overrides"].first
+      expect(override["peer_review_dates"]).to be_present
+      expect(override["peer_review_dates"]["id"]).to eq(@peer_review_override.id)
+    end
+
+    it "has no effect when include[]=peer_review is not specified" do
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        exclude: ["peer_review_overrides"]
+      }
+
+      json = response.parsed_body
+      expect(json["peer_review_sub_assignment"]).to be_nil
+    end
+  end
+
+  describe "exclude[]=child_override_due_dates parameter" do
+    before do
+      @course.account.enable_feature!(:discussion_checkpoints)
+      @discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+      @section = @course.course_sections.create!(name: "Section 1")
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [
+          {
+            type: "override",
+            set_type: "CourseSection",
+            set_id: @section.id,
+            due_at: 2.days.from_now
+          }
+        ],
+        points_possible: 5
+      )
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [
+          {
+            type: "override",
+            set_type: "CourseSection",
+            set_id: @section.id,
+            due_at: 3.days.from_now
+          }
+        ],
+        points_possible: 10
+      )
+
+      @discussion.reload
+      @parent_override = @discussion.assignment.assignment_overrides.active.where(set: @section).first
+    end
+
+    it "includes sub_assignment_due_dates by default when checkpoints are enabled" do
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @discussion.assignment.id
+      }
+
+      expect(response).to be_successful
+      json = response.parsed_body
+      override = json["overrides"].find { |o| o["id"] == @parent_override.id }
+      expect(override).to be_present
+      expect(override["sub_assignment_due_dates"]).to be_present
+      expect(override["sub_assignment_due_dates"].length).to eq(2)
+
+      tags = override["sub_assignment_due_dates"].pluck("sub_assignment_tag")
+      expect(tags).to contain_exactly(CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY)
+    end
+
+    it "excludes sub_assignment_due_dates when exclude[]=child_override_due_dates" do
+      get :show, params: {
+        course_id: @course.id,
+        assignment_id: @discussion.assignment.id,
+        exclude: ["child_override_due_dates"]
+      }
+
+      expect(response).to be_successful
+      json = response.parsed_body
+      override = json["overrides"].find { |o| o["id"] == @parent_override.id }
+      expect(override).to be_present
+      expect(override).not_to have_key("sub_assignment_due_dates")
+    end
+
+    context "when discussion checkpoints are disabled" do
+      before do
+        @course.account.disable_feature!(:discussion_checkpoints)
+      end
+
+      it "does not include sub_assignment_due_dates regardless of exclude parameter" do
+        get :show, params: {
+          course_id: @course.id,
+          assignment_id: @discussion.assignment.id
+        }
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        override = json["overrides"].find { |o| o["id"] == @parent_override.id }
+        expect(override).to be_present
+        sub_dates = override["sub_assignment_due_dates"]
+        expect(sub_dates.nil? || sub_dates == []).to be true
+      end
+
+      it "does not include sub_assignment_due_dates even with empty exclude parameter" do
+        get :show, params: {
+          course_id: @course.id,
+          assignment_id: @discussion.assignment.id,
+          exclude: []
+        }
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        override = json["overrides"].find { |o| o["id"] == @parent_override.id }
+        expect(override).to be_present
+        sub_dates = override["sub_assignment_due_dates"]
+        expect(sub_dates.nil? || sub_dates == []).to be true
       end
     end
   end

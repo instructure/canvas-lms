@@ -20,10 +20,22 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
-import {IconDownloadLine, IconCalendarClockLine, IconQuestionLine} from '@instructure/ui-icons'
+import {
+  IconDownloadLine,
+  IconCalendarClockLine,
+  IconQuestionLine,
+  IconCheckLine,
+  IconTroubleSolid,
+  IconWarningSolid,
+} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {IconButton} from '@instructure/ui-buttons'
+import {IconButton, Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Transition} from '@instructure/ui-motion'
+import {Pill} from '@instructure/ui-pill'
+import {showFlashSuccess, showFlashWarning} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {AccountReportInfo, AccountReport} from '@canvas/account_reports/types'
@@ -44,14 +56,62 @@ export default function ReportsTable({accountId, reports}: Props) {
 
   const [updatedReports, setUpdatedReports] = useState<{[key: string]: AccountReport}>({})
 
+  const alertOnStatusChange = (prevReport: AccountReport, updatedReport: AccountReport) => {
+    if (!prevReport || prevReport.status !== updatedReport.status) {
+      const title =
+        reports.find(r => r.report === updatedReport.report)?.title || updatedReport.report
+      switch (updatedReport.status) {
+        case 'complete':
+          showFlashSuccess(I18n.t('Report %{title} completed successfully', {title}))()
+          break
+        case 'error':
+          showFlashWarning(I18n.t('Report %{title} failed to complete', {title}))()
+          break
+        case 'aborted':
+          showFlashWarning(I18n.t('Report %{title} was canceled', {title}))()
+          break
+      }
+    }
+  }
+
   const updateReport = (report: AccountReport) => {
-    setUpdatedReports(prevReports => ({
-      ...prevReports,
-      [report.report]: report,
-    }))
+    setUpdatedReports(prevReports => {
+      alertOnStatusChange(prevReports[report.report], report)
+      return {
+        ...prevReports,
+        [report.report]: report,
+      }
+    })
   }
 
   const formatDate = useDateTimeFormat('time.formats.medium')
+
+  const updatePill = (
+    color: 'success' | 'warning' | 'danger',
+    text: string,
+    icon: React.ReactElement,
+  ) => {
+    return (
+      <Transition in transitionOnMount type="scale">
+        <Pill color={color} margin="0 small" renderIcon={icon}>
+          {text}
+        </Pill>
+      </Transition>
+    )
+  }
+
+  const renderUpdatePill = (lastRun: AccountReport) => {
+    switch (lastRun.status) {
+      case 'complete':
+        return updatePill('success', I18n.t('Completed'), <IconCheckLine />)
+      case 'error':
+        return updatePill('warning', I18n.t('Failed'), <IconWarningSolid />)
+      case 'aborted':
+        return updatePill('danger', I18n.t('Canceled'), <IconTroubleSolid />)
+      default:
+        return null
+    }
+  }
 
   return (
     <>
@@ -66,6 +126,7 @@ export default function ReportsTable({accountId, reports}: Props) {
         <ReportHistoryModal
           accountId={accountId}
           report={historyReport.report}
+          updatedReport={updatedReports[historyReport.report]}
           closeModal={() => setHistoryReport(null)}
         />
       )}
@@ -74,7 +135,9 @@ export default function ReportsTable({accountId, reports}: Props) {
           <Table.Row>
             <Table.ColHeader id="name">{I18n.t('Name')}</Table.ColHeader>
             <Table.ColHeader id="last_run">{I18n.t('Last Run')}</Table.ColHeader>
-            <Table.ColHeader id="run_report">{I18n.t('Run Report')}</Table.ColHeader>
+            <Table.ColHeader id="run_report" width="12rem">
+              {I18n.t('Run Report')}
+            </Table.ColHeader>
           </Table.Row>
         </Table.Head>
         <Table.Body>
@@ -98,28 +161,34 @@ export default function ReportsTable({accountId, reports}: Props) {
                 <Table.Cell>
                   {lastRun ? (
                     <>
-                      {formatDate(lastRun.created_at)}
-                      {lastRun.parameters?.extra_text && (
-                        <Text>&nbsp;({lastRun.parameters.extra_text})</Text>
-                      )}
-                      {lastRun.file_url && (
-                        <Link
-                          href={`${lastRun.file_url}?download_frd=1`}
-                          margin="0 0 0 x-small"
-                          renderIcon={IconDownloadLine}
+                      <View as="div">
+                        {formatDate(lastRun.created_at)}
+                        {lastRun.report in updatedReports && renderUpdatePill(lastRun)}
+                        {lastRun.parameters?.extra_text && (
+                          <Text>&nbsp;({lastRun.parameters.extra_text})</Text>
+                        )}
+                        {lastRun.file_url && (
+                          <Tooltip renderTip={I18n.t('Download report')}>
+                            <Link
+                              href={`${lastRun.file_url}?download_frd=1`}
+                              margin="0 0 0 x-small"
+                              renderIcon={IconDownloadLine}
+                            >
+                              <ScreenReaderContent>{I18n.t('Download report')}</ScreenReaderContent>
+                            </Link>
+                          </Tooltip>
+                        )}
+                      </View>
+                      <View as="div" margin="x-small 0 0 0">
+                        <Button
+                          size="small"
+                          color="secondary"
+                          onClick={() => setHistoryReport(report)}
+                          renderIcon={<IconCalendarClockLine />}
                         >
-                          <ScreenReaderContent>{I18n.t('Download report')}</ScreenReaderContent>
-                        </Link>
-                      )}
-                      <IconButton
-                        withBackground={false}
-                        withBorder={false}
-                        margin="0 0 0 x-small"
-                        screenReaderLabel={I18n.t('Report history')}
-                        onClick={() => setHistoryReport(report)}
-                      >
-                        <IconCalendarClockLine />
-                      </IconButton>
+                          {I18n.t('Report History')}
+                        </Button>
+                      </View>
                     </>
                   ) : (
                     <Text color="secondary">{I18n.t('Never')}</Text>

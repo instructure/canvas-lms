@@ -26,8 +26,8 @@ const store = {
 }
 
 const actions = {
-  developerKeysModalOpen: jest.fn(),
-  ltiKeysSetLtiKey: jest.fn(),
+  developerKeysModalOpen: vi.fn(),
+  ltiKeysSetLtiKey: vi.fn(),
 }
 
 const renderDeveloperKeyModalTrigger = () =>

@@ -19,26 +19,36 @@
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {IconConfirmationWrapper} from '../components/IconConfirmationWrapper'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import * as ue from '@testing-library/user-event'
 import {LtiPlacements, LtiPlacementsWithIcons} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-const userEvent = ue.userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+const userEvent = ue.userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 
 describe('IconConfirmation', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.resetAllMocks()
+    vi.useFakeTimers()
+    vi.resetAllMocks()
+    fakeENV.setup({
+      FEATURES: {
+        top_navigation_placement: true,
+        lti_asset_processor: true,
+        lti_asset_processor_discussions: true,
+      },
+    })
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
+    cleanup()
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+    fakeENV.teardown()
   })
 
-  const mockTransitionToConfirmationState = jest.fn()
-  const mockTransitionToReviewingState = jest.fn()
+  const mockTransitionToConfirmationState = vi.fn()
+  const mockTransitionToReviewingState = vi.fn()
 
   it('should render', () => {
     const reg = mockRegistration()
@@ -274,7 +284,7 @@ describe('IconConfirmation', () => {
     await userEvent.click(input)
     await userEvent.paste('http://example.com/icon.png')
     // Wait for debouncing
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
     expect(input).toHaveValue('http://example.com/icon.png')
     expect(screen.getByAltText('Global Navigation icon')).toHaveAttribute(
       'src',
@@ -312,7 +322,7 @@ describe('IconConfirmation', () => {
     await userEvent.click(input)
     await userEvent.paste('http://example.com/icon.png')
     // Wait for debouncing
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
 
     expect(input).toHaveValue('http://example.com/icon.png')
     expect(screen.getByAltText('Global Navigation icon')).toHaveAttribute(

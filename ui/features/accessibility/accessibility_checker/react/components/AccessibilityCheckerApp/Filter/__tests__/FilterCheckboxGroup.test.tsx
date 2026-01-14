@@ -16,13 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import FilterCheckboxGroup from '../FilterCheckboxGroup'
 import {FilterOption} from '../../../../../../shared/react/types'
 
 describe('FilterCheckboxGroup', () => {
-  const mockOnUpdate = jest.fn()
+  afterEach(() => {
+    cleanup()
+  })
+
+  const mockOnUpdate = vi.fn()
   const mockOptions: {value: string; label: string}[] = [
     {value: 'option1', label: 'Option 1'},
     {value: 'option2', label: 'Option 2'},
@@ -38,7 +42,7 @@ describe('FilterCheckboxGroup', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders all options including the "All" option', () => {

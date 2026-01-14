@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {renderConnected} from '../../../__tests__/utils'
-import '@testing-library/jest-dom'
 import CourseStats from '../CourseStats'
 
 import {

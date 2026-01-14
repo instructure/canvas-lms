@@ -19,11 +19,11 @@
 import {submitHtmlForm} from '../submitHtmlForm'
 
 describe('submitHtmlForm', () => {
-  let mockSubmit: jest.SpyInstance
+  let mockSubmit: any
 
   beforeEach(() => {
     // Mock form.submit() since jsdom doesn't implement it
-    mockSubmit = jest.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {})
+    mockSubmit = vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {})
     // Mock getCookie to return a test CSRF token
     document.cookie = '_csrf_token=test-csrf-token'
   })

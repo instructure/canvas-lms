@@ -18,7 +18,7 @@
 
 import Role from '../Role'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {clone, omit} from 'lodash'
+import {clone, omit} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'

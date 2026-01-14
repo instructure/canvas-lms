@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {parse, format as format_} from '@instructure/moment-utils'
-import {isDate, memoize} from 'lodash'
+import {isDate, memoize} from 'es-toolkit/compat'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   fudgeDateForProfileTimezone,
@@ -73,6 +73,8 @@ class FriendlyDatetime extends Component<Props> {
       const fudged = fudgeDateForProfileTimezone(datetime)
       let friendly
       if (this.props.format) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - format_'s third argument (zone) is optional at runtime but required by tsgo
         friendly = format_(datetime, this.props.format)
       } else if (showTime) {
         friendly = datetimeString(datetime)

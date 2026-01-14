@@ -138,8 +138,8 @@ describe('SubmissionTray', () => {
   }
 
   function carouselButton(label: string) {
-    const $buttons = [...content.querySelectorAll('button')]
-    return $buttons.find($button => $button.textContent.trim() === label)
+    const $buttons = Array.from(content.querySelectorAll('button')) as HTMLButtonElement[]
+    return $buttons.find($button => $button.textContent?.trim() === label)
   }
 
   function submitForStudentButton() {
@@ -159,7 +159,7 @@ describe('SubmissionTray', () => {
   }
 
   function studentGroupRequiredAlert() {
-    return [...document.querySelectorAll('div')].find($el =>
+    return [...Array.from(document.querySelectorAll('div'))].find($el =>
       $el.textContent?.includes('you must select a student group'),
     )
   }
@@ -304,7 +304,7 @@ describe('SubmissionTray', () => {
     props.assignment.gradingType = 'points'
     props.assignment.htmlUrl = 'http://htmlUrl/'
     props.assignment.published = true
-    props.onAnonymousSpeedGraderClick = jest.fn()
+    props.onAnonymousSpeedGraderClick = vi.fn()
 
     mountComponent()
     fireEvent.click(speedGraderLink()!)
@@ -659,7 +659,7 @@ describe('SubmissionTray', () => {
     })
 
     test('receives the "onGradeSubmission" callback given to the Tray', async () => {
-      const onGradeSubmission = jest.fn()
+      const onGradeSubmission = vi.fn()
       mountComponent({onGradeSubmission})
       const gradeInput = findGradeInput()
       await gradeInput?.inputValueAndBlur('EX')
@@ -799,16 +799,100 @@ describe('SubmissionTray', () => {
   })
 
   test('cancelCommenting calls editSubmissionComment', () => {
-    const editSubmissionComment = jest.fn()
+    const editSubmissionComment = vi.fn()
     mountComponent({editedCommentId: '5', editSubmissionComment})
     reactRef.current.cancelCommenting()
     expect(editSubmissionComment).toHaveBeenCalledTimes(1)
   })
 
   test('cancelCommenting sets the edited submission comment id to null', () => {
-    const editSubmissionComment = jest.fn()
+    const editSubmissionComment = vi.fn()
     mountComponent({editedCommentId: '5', editSubmissionComment})
     reactRef.current.cancelCommenting()
     expect(editSubmissionComment).toHaveBeenCalledWith(null)
+  })
+
+  describe('Peer Review Sub Assignments', () => {
+    test('SpeedGrader link includes peer_review parameter for peer review sub assignments', () => {
+      const assignment = {
+        ...props.assignment,
+        parentAssignmentId: '29',
+      }
+      const submission = {
+        ...props.submission,
+        assignmentId: '29',
+      }
+      const {getByText} = render(
+        <SubmissionTray
+          {...props}
+          assignment={assignment}
+          submission={submission}
+          isPeerReviewAssignment={true}
+        />,
+      )
+      const speedGraderLink = getByText('SpeedGrader').closest('a')
+      expect(speedGraderLink?.href).toMatch(/peer_review=true/)
+    })
+
+    test('SpeedGrader link uses parent assignment ID for peer review sub assignments', () => {
+      const assignment = {
+        ...props.assignment,
+        parentAssignmentId: '29',
+      }
+      const submission = {
+        ...props.submission,
+        assignmentId: '168',
+      }
+      const {getByText} = render(
+        <SubmissionTray
+          {...props}
+          assignment={assignment}
+          submission={submission}
+          isPeerReviewAssignment={true}
+        />,
+      )
+      const speedGraderLink = getByText('SpeedGrader').closest('a')
+      expect(speedGraderLink?.href).toMatch(/assignment_id=29/)
+    })
+
+    test('assignment link uses htmlUrl for peer review sub assignments', () => {
+      const assignment = {
+        ...props.assignment,
+        id: '168',
+        parentAssignmentId: '29',
+        htmlUrl: 'http://localhost/courses/1/assignments/29',
+      }
+      const {getByText} = render(<SubmissionTray {...props} assignment={assignment} />)
+      const assignmentLink = getByText('Book Report').closest('a')
+      expect(assignmentLink?.href).toBe('http://localhost/courses/1/assignments/29')
+    })
+
+    test('displays peer review assignment name when isPeerReviewAssignment is true', () => {
+      const peerReviewAssignment = {
+        ...props.assignment,
+        id: '31',
+        name: 'Peer Review',
+        parent_assignment_id: '30',
+      }
+      const {getByText} = render(
+        <SubmissionTray
+          {...props}
+          assignment={peerReviewAssignment}
+          isPeerReviewAssignment={true}
+        />,
+      )
+      expect(getByText('Peer Review')).toBeInTheDocument()
+    })
+
+    test('displays assignment name for peer review assignments', () => {
+      const assignment = {
+        ...props.assignment,
+        name: 'Main Assignment',
+      }
+      const {getByText} = render(
+        <SubmissionTray {...props} assignment={assignment} isPeerReviewAssignment={true} />,
+      )
+      expect(getByText('Main Assignment')).toBeInTheDocument()
+    })
   })
 })

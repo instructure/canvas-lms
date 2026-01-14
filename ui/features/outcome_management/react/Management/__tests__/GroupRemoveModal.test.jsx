@@ -23,10 +23,10 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/outcomes/graphql/Management')
+vi.mock('@canvas/outcomes/graphql/Management')
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 class CustomError extends Error {
@@ -51,12 +51,12 @@ describe('GroupRemoveModal', () => {
   })
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
-    onSuccessMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
+    onSuccessMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const render = (children, {contextType = 'Account', contextId = '1'} = {}) => {

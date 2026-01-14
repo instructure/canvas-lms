@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import moment from 'moment-timezone'
@@ -25,8 +25,12 @@ import NewAccessToken, {PURPOSE_MAX_LENGTH} from '../NewAccessToken'
 
 describe('NewAccessToken', () => {
   const GENERATE_ACCESS_TOKEN_URI = '/api/v1/users/self/tokens'
-  const onClose = jest.fn()
-  const onSubmit = jest.fn()
+  const onClose = vi.fn()
+  const onSubmit = vi.fn()
+
+  afterEach(() => {
+    cleanup()
+  })
 
   beforeEach(() => {
     window.ENV = window.ENV || {}
@@ -204,13 +208,8 @@ describe('NewAccessToken', () => {
         const submit = screen.getByLabelText('Generate Token')
 
         // Try to enter a date that's too far in the future (e.g., 150 days)
-        const futureDate = new Date()
-        futureDate.setDate(futureDate.getDate() + 150)
-        const futureDateString = futureDate.toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric',
-        })
+        const futureDate = moment.tz(window.ENV.TIMEZONE).add(150, 'days').startOf('day')
+        const futureDateString = futureDate.format('MMMM D, YYYY')
 
         const expirationDateInput = screen.getByLabelText(/Expiration date/)
         const expirationTimeInput = screen.getByLabelText(/Expiration time/)
@@ -234,17 +233,13 @@ describe('NewAccessToken', () => {
 
       it('should accept a valid expiration date within 120 days', async () => {
         const user = userEvent.setup()
-        const validDate = new Date()
-        validDate.setDate(validDate.getDate() + 30) // 30 days from now
+        const validDate = moment.tz(window.ENV.TIMEZONE).add(30, 'days').startOf('day')
         const token = {
           purpose: 'Test purpose',
-          expires_at: validDate.toISOString(),
+          expires_at: validDate.utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
         }
-        const validDateString = validDate.toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric',
-        })
+        const validDateString = validDate.format('MMMM D, YYYY')
+        const validTimeString = '12:00 AM'
 
         fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
         render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
@@ -260,7 +255,7 @@ describe('NewAccessToken', () => {
         await user.paste(validDateString)
         await user.tab() // blur the date field
         expirationTimeInput.focus()
-        await user.paste('12:00 AM')
+        await user.paste(validTimeString)
         await user.tab() // blur the time field
         await user.click(submit)
 

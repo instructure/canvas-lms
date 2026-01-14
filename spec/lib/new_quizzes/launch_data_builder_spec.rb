@@ -27,15 +27,49 @@ module NewQuizzes
     let_once(:user) { user_model }
     let(:tool) { external_tool_1_3_model(context: account, opts: { url: "https://account.quiz-lti-dub-prod.instructure.com/lti/launch" }) }
     let(:request) { double("request", host: "canvas.instructure.com", host_with_port: "canvas.instructure.com", params: {}) }
+    let(:controller) do
+      double("controller",
+             request:,
+             lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
+             blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
+             lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+             named_context_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect")
+    end
+    let(:variable_expander) { Lti::VariableExpander.new(account, course, controller, current_user: user, tool:) }
+    let(:tag) do
+      assignment.external_tool_tag || assignment.create_external_tool_tag(
+        url: tool&.url || "https://example.com/lti",
+        content: tool
+      )
+    end
 
     subject(:builder) do
       described_class.new(
         context: course,
         assignment:,
         tool:,
+        tag:,
         current_user: user,
-        request:
+        controller:,
+        request:,
+        variable_expander:
       )
+    end
+
+    # Helper to create canonical string matching the builder's implementation
+    def canonical_string_for_params(params)
+      normalized_params = params.map do |k, v|
+        value = case v
+                when Float
+                  (v == v.to_i) ? v.to_i.to_s : v.to_s
+                when Array, Hash
+                  v.to_json
+                else
+                  v.to_s
+                end
+        [k.to_s, value]
+      end
+      URI.encode_www_form(normalized_params.sort_by { |k, _v| k })
     end
 
     describe "#build" do
@@ -65,9 +99,8 @@ module NewQuizzes
       context "when tool has no URL or domain" do
         let(:tool) { nil }
 
-        it "returns nil for backend_url" do
-          result = builder.build
-          expect(result[:backend_url]).to be_nil
+        it "raises an error when building" do
+          expect { builder.build }.to raise_error("Tool is required for resource_link_id")
         end
       end
 
@@ -78,6 +111,26 @@ module NewQuizzes
           expect(Rails.logger).to receive(:error).with(/Failed to parse tool URL/)
           result = builder.build
           expect(result[:backend_url]).to be_nil
+        end
+      end
+
+      context "locale parameter" do
+        it "includes locale in the build output" do
+          result = builder.build
+          expect(result["launch_presentation_locale"]).to be_present
+        end
+
+        it "returns current I18n locale" do
+          I18n.with_locale(:es) do
+            result = builder.build
+            expect(result["launch_presentation_locale"]).to eq(:es)
+          end
+        end
+
+        it "returns default locale when I18n.locale is nil" do
+          allow(I18n).to receive(:locale).and_return(nil)
+          result = builder.build
+          expect(result["launch_presentation_locale"]).to eq(I18n.default_locale)
         end
       end
 
@@ -253,11 +306,9 @@ module NewQuizzes
         params = result[:params]
 
         expect(params).to include(
-          custom_canvas_assignment_id: assignment.id,
-          custom_canvas_course_id: course.id,
-          custom_canvas_user_id: user.id,
           backend_url: "https://account.quiz-lti-dub-prod.instructure.com"
         )
+        expect(params["launch_presentation_locale"]).to eq(I18n.locale)
       end
 
       it "generates a base64-encoded signature" do
@@ -274,8 +325,7 @@ module NewQuizzes
         signature = Base64.strict_decode64(result[:signature])
 
         # Recreate the canonical string the same way the builder does
-        # Uses URL-encoded query-string format
-        canonical_string = URI.encode_www_form(params.sort)
+        canonical_string = canonical_string_for_params(params)
 
         # Verify the signature
         expected_signature = OpenSSL::HMAC.digest("sha256", tool.shared_secret, canonical_string)
@@ -284,13 +334,19 @@ module NewQuizzes
 
       it "produces different signatures for different params" do
         result1 = builder.build_with_signature
+        params1 = result1[:params]
 
-        # Modify the assignment to change params
-        assignment.update!(title: "Modified Title")
+        # Modify params to simulate different data
+        params1_modified = params1.dup
+        params1_modified[:backend_url] = "https://different.example.com"
 
-        result2 = builder.build_with_signature
+        # Generate a new signature for the modified params
+        canonical_string = canonical_string_for_params(params1_modified)
+        modified_signature = OpenSSL::HMAC.digest("sha256", tool.shared_secret, canonical_string)
+        modified_signature_base64 = Base64.strict_encode64(modified_signature)
 
-        expect(result1[:signature]).not_to eq(result2[:signature])
+        # The signature should be different for different params
+        expect(modified_signature_base64).not_to eq(result1[:signature])
       end
 
       it "produces the same signature for the same params" do
@@ -325,8 +381,8 @@ module NewQuizzes
       context "when tool is nil" do
         let(:tool) { nil }
 
-        it "raises an error" do
-          expect { builder.build_with_signature }.to raise_error("Missing shared secret for tool")
+        it "raises an error about missing tool" do
+          expect { builder.build_with_signature }.to raise_error("Tool is required for resource_link_id")
         end
       end
 
@@ -337,8 +393,7 @@ module NewQuizzes
           provided_signature = Base64.strict_decode64(result[:signature])
 
           # Simulate verification (what Quiz LTI will do)
-          # Uses URL-encoded query-string format
-          canonical_string = URI.encode_www_form(params.sort)
+          canonical_string = canonical_string_for_params(params)
           expected_signature = OpenSSL::HMAC.digest("sha256", tool.shared_secret, canonical_string)
 
           # Use secure_compare to prevent timing attacks
@@ -355,8 +410,7 @@ module NewQuizzes
           params[:custom_canvas_assignment_id] = 999_999
 
           # Try to verify with tampered params
-          # Uses URL-encoded query-string format
-          canonical_string = URI.encode_www_form(params.sort)
+          canonical_string = canonical_string_for_params(params)
           expected_signature = OpenSSL::HMAC.digest("sha256", tool.shared_secret, canonical_string)
 
           is_valid = ActiveSupport::SecurityUtils.secure_compare(provided_signature, expected_signature)
@@ -370,8 +424,7 @@ module NewQuizzes
 
           # Use wrong secret
           wrong_secret = "wrong-secret-key"
-          # Uses URL-encoded query-string format
-          canonical_string = URI.encode_www_form(params.sort)
+          canonical_string = canonical_string_for_params(params)
           expected_signature = OpenSSL::HMAC.digest("sha256", wrong_secret, canonical_string)
 
           is_valid = ActiveSupport::SecurityUtils.secure_compare(provided_signature, expected_signature)
@@ -387,7 +440,7 @@ module NewQuizzes
           provided_signature = Base64.strict_decode64(result[:signature])
 
           # Verify signature with URL encoding (what Quiz LTI will do)
-          canonical_string = URI.encode_www_form(params.sort)
+          canonical_string = canonical_string_for_params(params)
           expected_signature = OpenSSL::HMAC.digest("sha256", tool.shared_secret, canonical_string)
 
           is_valid = ActiveSupport::SecurityUtils.secure_compare(provided_signature, expected_signature)

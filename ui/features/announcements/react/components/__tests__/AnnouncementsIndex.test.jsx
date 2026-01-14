@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Provider} from 'react-redux'
-import _ from 'lodash'
+import {merge} from 'es-toolkit/compat'
 
 import AnnouncementsIndex from '../AnnouncementsIndex'
 
@@ -51,7 +51,7 @@ const announcements = [
 ]
 
 const makeProps = (props = {}) =>
-  _.merge(
+  merge(
     {
       announcements: [],
       announcementsPage: 1,
@@ -65,11 +65,11 @@ const makeProps = (props = {}) =>
         manage_course_content_edit: true,
         moderate: true,
       },
-      getAnnouncements: jest.fn(),
-      announcementSelectionChangeStart: jest.fn(),
-      setAnnouncementSelection: jest.fn(),
-      deleteAnnouncements: jest.fn(),
-      toggleAnnouncementsLock: jest.fn(),
+      getAnnouncements: vi.fn(),
+      announcementSelectionChangeStart: vi.fn(),
+      setAnnouncementSelection: vi.fn(),
+      deleteAnnouncements: vi.fn(),
+      toggleAnnouncementsLock: vi.fn(),
       announcementsLocked: false,
     },
     props,
@@ -118,7 +118,7 @@ describe('AnnouncementsIndex component', function () {
   })
 
   test('calls getAnnouncements if hasLoadedAnnouncements is false', () => {
-    const getAnnouncements = jest.fn()
+    const getAnnouncements = vi.fn()
     render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps({getAnnouncements})} />
@@ -154,7 +154,7 @@ describe('AnnouncementsIndex component', function () {
   })
 
   test('clicking announcement checkbox triggers setAnnouncementSelection with correct data', async () => {
-    const selectSpy = jest.fn()
+    const selectSpy = vi.fn()
     const props = {
       announcements,
       announcementSelectionChangeStart: selectSpy,
@@ -176,7 +176,7 @@ describe('AnnouncementsIndex component', function () {
   })
 
   test('does not show checkbox if manage_course_content_edit/delete is false', () => {
-    const selectSpy = jest.fn()
+    const selectSpy = vi.fn()
     const props = {
       announcements,
       announcementSelectionChangeStart: selectSpy,
@@ -196,7 +196,7 @@ describe('AnnouncementsIndex component', function () {
     expect(container.querySelector('input[type="checkbox"]')).toBeFalsy()
   })
 
-  test('onManageAnnouncement shows delete modal when called with delete action', done => {
+  test('onManageAnnouncement shows delete modal when called with delete action', async () => {
     const props = {
       announcements,
       hasLoadedAnnouncements: true,
@@ -205,16 +205,10 @@ describe('AnnouncementsIndex component', function () {
       },
     }
 
-    function indexRef(c) {
-      if (c) {
-        c.onManageAnnouncement(null, {action: 'delete'})
+    let componentRef
 
-        setTimeout(() => {
-          expect(c.deleteModal).toBeTruthy()
-          c.deleteModal.hide()
-          done()
-        })
-      }
+    function indexRef(c) {
+      componentRef = c
     }
 
     render(
@@ -222,10 +216,19 @@ describe('AnnouncementsIndex component', function () {
         <AnnouncementsIndex {...makeProps(props)} ref={indexRef} />
       </Provider>,
     )
+
+    if (componentRef) {
+      componentRef.onManageAnnouncement(null, {action: 'delete'})
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      expect(componentRef.deleteModal).toBeTruthy()
+      componentRef.deleteModal.hide()
+    }
   })
 
-  test('onManageAnnouncement calls toggleAnnouncementsLock when called with lock action', done => {
-    const lockSpy = jest.fn()
+  test('onManageAnnouncement calls toggleAnnouncementsLock when called with lock action', async () => {
+    const lockSpy = vi.fn()
     const props = {
       announcements,
       hasLoadedAnnouncements: true,
@@ -234,19 +237,25 @@ describe('AnnouncementsIndex component', function () {
       },
       toggleAnnouncementsLock: lockSpy,
     }
+
+    let componentRef
+
     function indexRef(c) {
-      if (c) {
-        c.onManageAnnouncement(null, {action: 'lock'})
-        setTimeout(() => {
-          expect(lockSpy).toHaveBeenCalledTimes(1)
-          done()
-        })
-      }
+      componentRef = c
     }
+
     render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps(props)} ref={indexRef} />
       </Provider>,
     )
+
+    if (componentRef) {
+      componentRef.onManageAnnouncement(null, {action: 'lock'})
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      expect(lockSpy).toHaveBeenCalledTimes(1)
+    }
   })
 })

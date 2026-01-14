@@ -83,6 +83,14 @@ class Submission::ShowPresenter
     retrieve_course_external_tools_url(@context.id, params)
   end
 
+  def assignment_tool_launch_url
+    retrieve_course_external_tools_url(@context.id, {
+                                         assignment_id: @assignment.id,
+                                         display: "borderless",
+                                         url: @assignment.external_tool_tag&.url
+                                       })
+  end
+
   def submission_preview_frame_url
     submission_data_url(preview: 1, rand: rand(999_999))
   end

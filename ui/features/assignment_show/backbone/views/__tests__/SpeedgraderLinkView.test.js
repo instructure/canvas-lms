@@ -25,6 +25,16 @@ describe('SpeedgraderLinkView', () => {
   let model, container
 
   beforeEach(() => {
+    // Set up document for accessibility testing
+    if (!document.querySelector('title')) {
+      const title = document.createElement('title')
+      title.textContent = 'Test'
+      document.head.appendChild(title)
+    }
+    if (!document.documentElement.getAttribute('lang')) {
+      document.documentElement.setAttribute('lang', 'en')
+    }
+
     model = new Assignment({published: false})
     container = document.createElement('div')
     container.id = 'fixtures'

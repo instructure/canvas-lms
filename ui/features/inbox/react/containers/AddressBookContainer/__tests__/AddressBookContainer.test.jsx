@@ -192,7 +192,7 @@ describe('AddressBookContainer', () => {
     })
 
     it('limits tag selection when limit is 1', async () => {
-      const onSelectedIdsChange = jest.fn()
+      const onSelectedIdsChange = vi.fn()
       const rendered = setup({
         selectedIds: ['1'],
         onSelectedIdsChange,
@@ -218,7 +218,7 @@ describe('AddressBookContainer', () => {
 
   describe('Callbacks', () => {
     it('calls onSelectedIdsChange when id changes', async () => {
-      const onSelectedIdsChange = jest.fn()
+      const onSelectedIdsChange = vi.fn()
       const rendered = setup({onSelectedIdsChange})
       await openAddressBook(rendered)
       const items = await rendered.findAllByTestId('address-book-item')
@@ -229,7 +229,7 @@ describe('AddressBookContainer', () => {
     })
 
     it('calls onInputValueChange when search term changes', async () => {
-      const onInputValueChange = jest.fn()
+      const onInputValueChange = vi.fn()
       const rendered = setup({onInputValueChange})
       const input = await rendered.findByTestId('-address-book-input')
 

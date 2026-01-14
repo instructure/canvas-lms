@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {compact} from 'lodash'
+import {compact} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import UniqueDropdownCollection from './UniqueDropdownCollection'
 

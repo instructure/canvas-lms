@@ -206,11 +206,6 @@ module Types
       get_entries(**args)
     end
 
-    field :discussion_entry_drafts_connection, Types::DiscussionEntryDraftType.connection_type, null: true
-    def discussion_entry_drafts_connection
-      Loaders::DiscussionEntryDraftLoader.for(current_user:).load(object)
-    end
-
     field :entry_counts, Types::DiscussionEntryCountsType, null: true
     def entry_counts
       Loaders::DiscussionEntryCountsLoader.for(current_user:).load(object)

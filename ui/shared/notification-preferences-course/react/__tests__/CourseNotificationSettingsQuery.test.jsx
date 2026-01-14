@@ -163,7 +163,7 @@ describe('Course Notification Settings', () => {
     const mocks = await createMutationMocks([
       {UpdateNotificationPreferencesPayload: {errors: null}},
     ])
-    const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+    const mockedSetOnSuccess = vi.fn().mockResolvedValue({})
 
     const {getByText, getAllByRole} = render(
       <AlertManagerContext.Provider

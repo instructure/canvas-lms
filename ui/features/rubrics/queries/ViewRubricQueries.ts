@@ -29,7 +29,7 @@ import type {
 import getCookie from '@instructure/get-cookie'
 import qs from 'qs'
 import type {Rubric, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
-import type {UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {UsedLocation} from '@canvas/grading-scheme/gradingSchemeApiModel'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const rubricsPerPage = 100

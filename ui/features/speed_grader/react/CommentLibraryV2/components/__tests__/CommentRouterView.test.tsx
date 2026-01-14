@@ -24,20 +24,20 @@ import CommentRouterView from '../CommentRouterView'
 import {SpeedGraderLegacy_UpdateCommentBankItem} from '../../graphql/mutations'
 import * as shave from '@canvas/shave'
 
-jest.mock('@canvas/shave')
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/shave')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 describe('CommentRouterView', () => {
   const defaultProps = {
     id: 'comment-1',
     comment: 'Test comment text',
     index: 0,
-    onClick: jest.fn(),
+    onClick: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    ;(shave.default as jest.Mock).mockReturnValue(false)
+    vi.clearAllMocks()
+    ;(shave.default as any).mockReturnValue(false)
   })
 
   const createUpdateMock = (comment: string) => ({
@@ -173,7 +173,7 @@ describe('CommentRouterView', () => {
 
     it('passes correct onClick to CommentReadView', async () => {
       const user = userEvent.setup()
-      const onClick = jest.fn()
+      const onClick = vi.fn()
       setup([], {onClick})
 
       const commentArea = screen.getByText('Test comment text').closest('div')
@@ -285,7 +285,7 @@ describe('CommentRouterView', () => {
 
     it('clicking edit button does not trigger onClick', async () => {
       const user = userEvent.setup()
-      const onClick = jest.fn()
+      const onClick = vi.fn()
       setup([], {onClick})
 
       const editButton = screen.getByRole('button', {name: /Edit comment:/i})

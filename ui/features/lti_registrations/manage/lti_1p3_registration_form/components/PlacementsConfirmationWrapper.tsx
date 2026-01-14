@@ -20,6 +20,7 @@ import {PlacementsConfirmation} from '../../registration_wizard_forms/Placements
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {AllLtiPlacements, InternalOnlyLtiPlacements} from '../../model/LtiPlacement'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 
 export type PlacementsConfirmationProps = {
@@ -44,15 +45,7 @@ export const PlacementsConfirmationWrapper = ({
     <RegistrationModalBody>
       <PlacementsConfirmation
         appName={internalConfig.title}
-        availablePlacements={availablePlacements.filter(p => {
-          if ('ActivityAssetProcessor' === p) {
-            return window.ENV.FEATURES?.lti_asset_processor
-          }
-          if ('ActivityAssetProcessorContribution' === p) {
-            return window.ENV.FEATURES?.lti_asset_processor_discussions
-          }
-          return true
-        })}
+        availablePlacements={filterPlacementsByFeatureFlags(availablePlacements)}
         enabledPlacements={state.placements.placements ?? []}
         courseNavigationDefaultHidden={state.placements.courseNavigationDefaultDisabled ?? false}
         onToggleDefaultDisabled={actions.toggleCourseNavigationDefaultDisabled}

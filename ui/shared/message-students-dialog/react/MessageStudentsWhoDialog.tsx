@@ -46,7 +46,7 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
-import _ from 'lodash'
+import {sortBy} from 'es-toolkit/compat'
 import {type ObserverEnrollmentConnectionUser} from '../graphql/Queries'
 import Pill from './Pill'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -587,7 +587,7 @@ const MessageStudentsWhoDialog = ({
 
       const args: SendMessageArgs = {
         recipientsIds: uniqueRecipientsIds,
-        subject,
+        subject: subject ?? '',
         body: message.trim(),
       }
 
@@ -915,7 +915,7 @@ const MessageStudentsWhoDialog = ({
                     </Table.Cell>
                     <Table.Cell>
                       <Flex direction="row" margin="0 0 0 small" wrap="wrap">
-                        {_.sortBy(
+                        {sortBy(
                           observersByStudentID[student.id] || [],
                           observer => observer.sortableName,
                         ).map(observer => (

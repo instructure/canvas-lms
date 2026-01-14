@@ -21,7 +21,7 @@ import {render} from '@testing-library/react'
 import VideoConferenceTypeSelect from '../VideoConferenceTypeSelect'
 
 describe('VideoConferenceTypeSelect', () => {
-  const setConferenceType = jest.fn()
+  const setConferenceType = vi.fn()
 
   const conferenceTypeOptions = [
     {

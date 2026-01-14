@@ -28,7 +28,7 @@
 // xsslint safeString.property question_text
 import regradeTemplate from '../jst/regrade.handlebars'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {find, forEach, keys, difference} from 'lodash'
+import {find, forEach, keys, difference} from 'es-toolkit/compat'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
 import htmlEscape, {raw} from '@instructure/html-escape'
@@ -73,6 +73,10 @@ import replaceTags from '@canvas/util/replaceTags'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import MasteryPathToggleView from '@canvas/mastery-path-toggle/backbone/views/MasteryPathToggle'
 import {renderError, restoreOriginalMessage} from '@canvas/quizzes/jquery/quiz_form_utils'
+import {isChangeMultiFuncBound} from './utils/changeMultiFunc'
+
+// Re-export for backward compatibility
+export {isChangeMultiFuncBound}
 
 const I18n = createI18nScope('quizzes_public')
 const QUESTIONS_NUMBER = 'questions_number'
@@ -221,19 +225,6 @@ function toggleSelectAnswerAltText($answers, type) {
       .find('img')
       .attr('alt', clickSetCorrect)
   }
-}
-
-export function isChangeMultiFuncBound($questionContent) {
-  let ret = false
-  const events = $._data($questionContent[0], 'events')
-  if (events && events.change) {
-    events.change.forEach(event => {
-      if (event.handler.origFuncNm === 'changeMultiFunc') {
-        ret = true
-      }
-    })
-  }
-  return ret
 }
 
 function getChangeMultiFunc($questionContent, questionType, $select) {

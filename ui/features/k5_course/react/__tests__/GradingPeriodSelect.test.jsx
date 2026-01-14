@@ -25,7 +25,7 @@ describe('GradingPeriodSelect', () => {
   const getProps = (overrides = {}) => ({
     loadingGradingPeriods: false,
     gradingPeriods: GRADING_PERIODS,
-    onGradingPeriodSelected: jest.fn(),
+    onGradingPeriodSelected: vi.fn(),
     currentGradingPeriodId: '2',
     courseName: 'History',
     ...overrides,
@@ -49,7 +49,7 @@ describe('GradingPeriodSelect', () => {
   })
 
   it('calls setSelectedGradingPeriodId with id of selected grading period', () => {
-    const onGradingPeriodSelected = jest.fn()
+    const onGradingPeriodSelected = vi.fn()
     const {getByText} = render(<GradingPeriodSelect {...getProps({onGradingPeriodSelected})} />)
 
     act(() => getByText('Select Grading Period').click())

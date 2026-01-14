@@ -80,7 +80,7 @@ describe('EditTemplateModal', () => {
   })
 
   it('should call onDismiss when the close button is clicked', () => {
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     const {getByText} = renderModal({onDismiss})
 
     // @ts-expect-error
@@ -90,7 +90,7 @@ describe('EditTemplateModal', () => {
   })
 
   it('should call onDismiss when the Cancel button is clicked', () => {
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     const {getByText} = renderModal({onDismiss})
 
     // @ts-expect-error
@@ -100,7 +100,7 @@ describe('EditTemplateModal', () => {
   })
 
   it('should call onSave with the correct values when the Save button is clicked', () => {
-    const onSave = jest.fn()
+    const onSave = vi.fn()
     const template = {...template1, workflow_state: 'active'}
     const {getByText} = renderModal({template, onSave})
 
@@ -114,7 +114,7 @@ describe('EditTemplateModal', () => {
   })
 
   it('should show a message and not call onSave if there is no name', () => {
-    const onSave = jest.fn()
+    const onSave = vi.fn()
     const {getByText, queryByText} = renderModal({onSave})
 
     expect(queryByText('A template name is required')).toBeNull()

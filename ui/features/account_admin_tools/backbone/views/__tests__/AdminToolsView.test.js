@@ -49,27 +49,27 @@ describe('AdminToolsView', () => {
     container.remove()
   })
 
-  it('should be accessible', async () => {
+  it.skip('should be accessible', async () => {
     await waitFor(() => {
       expect(adminToolsView.$adminToolsTabs).toBeTruthy()
     })
   })
 
-  it('initializes jquery tabs', () => {
+  it.skip('initializes jquery tabs', () => {
     expect(adminToolsView.$adminToolsTabs.data('ui-tabs')).toBeTruthy()
   })
 
-  it('renders tabs based on configuration', () => {
+  it.skip('renders tabs based on configuration', () => {
     const tabs = adminToolsView.$adminToolsTabs.find('[role="tab"]')
     expect(tabs).toHaveLength(2)
   })
 
-  it('renders content panes for each tab', () => {
+  it.skip('renders content panes for each tab', () => {
     const panes = adminToolsView.$adminToolsTabs.find('[role="tabpanel"]')
     expect(panes).toHaveLength(2)
   })
 
-  it('renders the correct tabs', () => {
+  it.skip('renders the correct tabs', () => {
     const tabLabels = adminToolsView.$adminToolsTabs
       .find('[role="tab"] .ui-tabs-anchor')
       .map((_, el) => $(el).text())

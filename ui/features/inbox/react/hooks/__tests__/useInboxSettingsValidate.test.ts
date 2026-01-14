@@ -33,11 +33,11 @@ describe('useInboxSettingsValidate', () => {
   })
 
   beforeEach(() => {
-    focusMock = jest.fn()
+    focusMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('creates custom hook with proper exports', () => {

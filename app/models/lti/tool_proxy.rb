@@ -27,6 +27,7 @@ module Lti
 
     belongs_to :context, polymorphic: [:course, :account]
     belongs_to :product_family, class_name: "Lti::ProductFamily"
+    belongs_to :migrated_to_context_external_tool, class_name: "ContextExternalTool", optional: true
 
     after_save :manage_subscription
     before_destroy :delete_subscription
@@ -106,6 +107,7 @@ module Lti
 
     def self.capability_enabled_in_context?(context, capability)
       tool_proxies = ToolProxy.find_active_proxies_for_context(context)
+      tool_proxies = tool_proxies.where({ lti_tool_proxies: { migrated_to_context_external_tool: nil } }) if context.root_account.feature_enabled?(:lti_asset_processor_tii_migration)
       return true if tool_proxies.map(&:enabled_capabilities).flatten.include? capability
 
       capabilities = MessageHandler.where(tool_proxy_id: tool_proxies.map(&:id)).pluck(:capabilities).flatten

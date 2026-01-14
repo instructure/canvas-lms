@@ -20,67 +20,59 @@ import {Editor} from '@craftjs/core'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Toolbar} from '../Toolbar'
-import {Provider} from '../../utilities/fastContext'
-import {createStore} from '../../store'
-import {useEditorMode} from '../../hooks/useEditorMode'
 
-const mockSetMode = jest.fn()
+const mockSetMode = vi.fn()
+const mockUseAppSelector = vi.fn()
 
-function renderToolbar(toolbarReorder = false) {
-  return render(
-    <Provider
-      store={createStore({
-        aiAltTextGenerationURL: null,
-        toolbarReorder,
-      })}
-    >
-      <Editor>
-        <Toolbar />
-      </Editor>
-    </Provider>,
-  )
-}
+vi.mock('../../store', () => ({
+  useAppSelector: (selector: (state: any) => any) => mockUseAppSelector(selector),
+}))
 
-const mockStore = jest.fn()
-jest.mock('react', () => {
-  const ActualReact = jest.requireActual('react')
-  return {
-    ...ActualReact,
-    useContext: (context: React.Context<any>) => {
-      const result = ActualReact.useContext(context)
-      if (context.displayName === 'FastContext') {
-        return {
-          ...result,
-          get: () => mockStore(),
-        }
-      }
-      return result
-    },
-  }
-})
-
-jest.mock('../../hooks/useEditorMode', () => ({
+vi.mock('../../hooks/useEditorMode', () => ({
   useEditorMode: () => {
-    return {mode: mockStore().editor.mode, setMode: mockSetMode}
+    const store = mockUseAppSelector((state: any) => state)
+    return {mode: store.editor.mode, setMode: mockSetMode}
   },
 }))
 
+vi.mock('../../hooks/useEditHistory', () => ({
+  useEditHistory: () => ({
+    undo: vi.fn(),
+    redo: vi.fn(),
+    canUndo: true,
+    canRedo: true,
+  }),
+}))
+
+vi.mock('../../hooks/useGetBlocksCount', () => ({
+  useGetBlocksCount: () => ({blocksCount: 3}),
+}))
+
+function renderToolbar() {
+  return render(
+    <Editor>
+      <Toolbar />
+    </Editor>,
+  )
+}
+
 describe('Toolbar', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
-  afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('when toolbar is in default mode', () => {
     beforeEach(() => {
-      mockStore.mockReturnValue({
-        editor: {mode: 'default'},
-        accessibility: {
-          a11yIssues: new Map(),
-        },
-      })
+      mockUseAppSelector.mockImplementation((selector: (state: any) => any) =>
+        selector({
+          editor: {mode: 'default'},
+          accessibility: {
+            a11yIssueCount: 0,
+            a11yIssues: new Map(),
+          },
+          toolbarReorder: false,
+        }),
+      )
     })
 
     it('should switch to preview mode when clicked', async () => {
@@ -96,9 +88,16 @@ describe('Toolbar', () => {
 
   describe('when toolbar is in preview mode', () => {
     beforeEach(() => {
-      mockStore.mockReturnValue({
-        editor: {mode: 'preview'},
-      })
+      mockUseAppSelector.mockImplementation((selector: (state: any) => any) =>
+        selector({
+          editor: {mode: 'preview'},
+          accessibility: {
+            a11yIssueCount: 0,
+            a11yIssues: new Map(),
+          },
+          toolbarReorder: false,
+        }),
+      )
     })
 
     it('should switch to default mode when clicked', async () => {
@@ -113,54 +112,63 @@ describe('Toolbar', () => {
   })
 
   describe('reorder blocks button', () => {
-    beforeEach(() => {
-      mockStore.mockReturnValue({
-        editor: {mode: 'default'},
-        accessibility: {
-          a11yIssues: new Map(),
-        },
-        toolbarReorder: false,
-      })
-    })
-
     it('does not show reorder button when feature flag is false', () => {
-      const {queryByTestId} = renderToolbar(false)
+      mockUseAppSelector.mockImplementation((selector: (state: any) => any) =>
+        selector({
+          editor: {mode: 'default'},
+          accessibility: {
+            a11yIssueCount: 0,
+            a11yIssues: new Map(),
+          },
+          toolbarReorder: false,
+        }),
+      )
+      const {queryByTestId} = renderToolbar()
       expect(queryByTestId('reorder-blocks-button')).not.toBeInTheDocument()
     })
 
     it('shows reorder button when feature flag is true', () => {
-      mockStore.mockReturnValue({
-        editor: {mode: 'default'},
-        accessibility: {
-          a11yIssues: new Map(),
-        },
-        toolbarReorder: true,
-      })
-
-      const {getByTestId} = renderToolbar(true)
+      mockUseAppSelector.mockImplementation((selector: (state: any) => any) =>
+        selector({
+          editor: {mode: 'default'},
+          accessibility: {
+            a11yIssueCount: 0,
+            a11yIssues: new Map(),
+          },
+          toolbarReorder: true,
+        }),
+      )
+      const {getByTestId} = renderToolbar()
       expect(getByTestId('reorder-blocks-button')).toBeInTheDocument()
     })
 
     it('does not show reorder button in preview mode', () => {
-      mockStore.mockReturnValue({
-        editor: {mode: 'preview'},
-        toolbarReorder: true,
-      })
-
-      const {queryByTestId} = renderToolbar(true)
+      mockUseAppSelector.mockImplementation((selector: (state: any) => any) =>
+        selector({
+          editor: {mode: 'preview'},
+          accessibility: {
+            a11yIssueCount: 0,
+            a11yIssues: new Map(),
+          },
+          toolbarReorder: true,
+        }),
+      )
+      const {queryByTestId} = renderToolbar()
       expect(queryByTestId('reorder-blocks-button')).not.toBeInTheDocument()
     })
 
     it('shows reorder button after undo/redo buttons', () => {
-      mockStore.mockReturnValue({
-        editor: {mode: 'default'},
-        accessibility: {
-          a11yIssues: new Map(),
-        },
-        toolbarReorder: true,
-      })
-
-      const {getByTestId} = renderToolbar(true)
+      mockUseAppSelector.mockImplementation((selector: (state: any) => any) =>
+        selector({
+          editor: {mode: 'default'},
+          accessibility: {
+            a11yIssueCount: 0,
+            a11yIssues: new Map(),
+          },
+          toolbarReorder: true,
+        }),
+      )
+      const {getByTestId} = renderToolbar()
       const undoButton = getByTestId('undo-button')
       const redoButton = getByTestId('redo-button')
       const reorderButton = getByTestId('reorder-blocks-button')
@@ -171,15 +179,17 @@ describe('Toolbar', () => {
     })
 
     it('shows reorder button before accessibility checker', () => {
-      mockStore.mockReturnValue({
-        editor: {mode: 'default'},
-        accessibility: {
-          a11yIssues: new Map(),
-        },
-        toolbarReorder: true,
-      })
-
-      const {getByTestId} = renderToolbar(true)
+      mockUseAppSelector.mockImplementation((selector: (state: any) => any) =>
+        selector({
+          editor: {mode: 'default'},
+          accessibility: {
+            a11yIssueCount: 0,
+            a11yIssues: new Map(),
+          },
+          toolbarReorder: true,
+        }),
+      )
+      const {getByTestId} = renderToolbar()
       const reorderButton = getByTestId('reorder-blocks-button')
       const a11yButton = getByTestId('accessibility-button')
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -26,6 +26,9 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import AssignmentDescription from '@canvas/assignments/react/AssignmentDescription'
 import {useAssignmentQuery} from '../hooks/useAssignmentQuery'
+import {useAllocatePeerReviews} from '../hooks/useAllocatePeerReviews'
+import {PeerReviewSelector} from './PeerReviewSelector'
+import AssignmentSubmission from './AssignmentSubmission'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -35,7 +38,26 @@ interface PeerReviewsStudentViewProps {
 
 const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignmentId}) => {
   const [selectedTab, setSelectedTab] = useState<'details' | 'submission'>('details')
+  const [selectedAssessmentIndex, setSelectedAssessmentIndex] = useState(0)
+  const [hasCalledAllocate, setHasCalledAllocate] = useState(false)
   const {data, isLoading, isError} = useAssignmentQuery(assignmentId)
+  const {mutate: allocatePeerReviews} = useAllocatePeerReviews()
+
+  useEffect(() => {
+    if (data?.assignment && !hasCalledAllocate) {
+      const assignment = data.assignment
+      const assessmentRequestsCount = assignment.assessmentRequestsForCurrentUser?.length || 0
+      const peerReviewsRequired = assignment.peerReviews?.count || 0
+
+      if (assessmentRequestsCount < peerReviewsRequired) {
+        setHasCalledAllocate(true)
+        allocatePeerReviews({
+          courseId: assignment.courseId,
+          assignmentId: assignment._id,
+        })
+      }
+    }
+  }, [data, allocatePeerReviews, hasCalledAllocate])
 
   if (isLoading) {
     return (
@@ -53,7 +75,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
     )
   }
 
-  const assignment = data.assignment
+  const {assessmentRequestsForCurrentUser, name, dueAt, description} = data.assignment
 
   return (
     <View as="div" padding="medium">
@@ -62,17 +84,17 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
           <Flex direction="column">
             <Flex.Item>
               <Text size="x-large" wrap="break-word" data-testid="title" weight="light">
-                {I18n.t('%{name} Peer Review', {name: assignment.name})}
+                {I18n.t('%{name} Peer Review', {name: name})}
               </Text>
             </Flex.Item>
-            {assignment.dueAt && (
+            {dueAt && (
               <Flex.Item>
                 <Text size="medium" weight="bold">
                   <FriendlyDatetime
                     data-testid="due-date"
                     prefix={I18n.t('Due:')}
                     format={I18n.t('#date.formats.full_with_weekday')}
-                    dateTime={assignment.dueAt}
+                    dateTime={dueAt}
                   />
                 </Text>
               </Flex.Item>
@@ -80,6 +102,16 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
           </Flex>
         </Flex.Item>
       </Flex>
+      {data.assignment && (
+        <View as="div" margin="0 0 medium 0">
+          <PeerReviewSelector
+            key={`${assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}
+            assessmentRequests={assessmentRequestsForCurrentUser || []}
+            selectedIndex={selectedAssessmentIndex}
+            onSelectionChange={setSelectedAssessmentIndex}
+          />
+        </View>
+      )}
       <Tabs
         margin="medium 0"
         onRequestTabChange={(_event, {index}) => {
@@ -92,15 +124,23 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({assignme
           isSelected={selectedTab === 'details'}
         >
           <View as="div" padding="medium 0">
-            <AssignmentDescription description={assignment.description ?? undefined} />
+            <AssignmentDescription description={description ?? undefined} />
           </View>
         </Tabs.Panel>
-
         <Tabs.Panel
           id="submission"
           renderTitle={I18n.t('Submission')}
           isSelected={selectedTab === 'submission'}
-        ></Tabs.Panel>
+        >
+          {assessmentRequestsForCurrentUser &&
+            assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
+              <View as="div">
+                <AssignmentSubmission
+                  submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
+                />
+              </View>
+            )}
+        </Tabs.Panel>
       </Tabs>
     </View>
   )

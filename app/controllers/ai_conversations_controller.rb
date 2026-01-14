@@ -43,6 +43,8 @@ class AiConversationsController < ApplicationController
       client = LLMConversationClient.new(
         current_user: @current_user,
         root_account_uuid: @context.root_account.uuid,
+        conversation_context_id: @experience.llm_conversation_context_id,
+        # Fallback to inline variables if no context exists (for older records)
         facts: @experience.facts,
         learning_objectives: @experience.learning_objective,
         scenario: @experience.pedagogical_guidance,
@@ -76,6 +78,8 @@ class AiConversationsController < ApplicationController
     client = LLMConversationClient.new(
       current_user: @current_user,
       root_account_uuid: @context.root_account.uuid,
+      conversation_context_id: @experience.llm_conversation_context_id,
+      # Fallback to inline variables if no context exists (for older records)
       facts: @experience.facts,
       learning_objectives: @experience.learning_objective,
       scenario: @experience.pedagogical_guidance
@@ -118,6 +122,8 @@ class AiConversationsController < ApplicationController
     client = LLMConversationClient.new(
       current_user: @current_user,
       root_account_uuid: @context.root_account.uuid,
+      conversation_context_id: @experience.llm_conversation_context_id,
+      # Fallback to inline variables if no context exists (for older records)
       facts: @experience.facts,
       learning_objectives: @experience.learning_objective,
       scenario: @experience.pedagogical_guidance,

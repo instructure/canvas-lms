@@ -24,10 +24,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignment_scheduled_release_policy')
 const GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR = I18n.t(
-  'Grades release date must be the same or after comments release date'
+  'Grades release date must be the same or after comments release date',
 )
 const COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR = I18n.t(
-  'Comments release date must be the same or before grades release date'
+  'Comments release date must be the same or before grades release date',
 )
 
 type SeparateScheduledReleaseProps = {
@@ -35,8 +35,11 @@ type SeparateScheduledReleaseProps = {
   commentErrorMessages: FormMessage[]
   postGradesAt?: string | null
   postCommentsAt?: string | null
-  handleChange: (changes: Partial<SeparateScheduledReleaseProps>) => void
-  handleErrorMessages: (grades: FormMessage[], comments: FormMessage[]) => void
+  handleChange: (
+    changes: {postGradesAt?: string; postCommentsAt?: string},
+    gradeErrors: FormMessage[],
+    commentErrors: FormMessage[],
+  ) => void
 }
 export const SeparateScheduledRelease = ({
   gradeErrorMessages,
@@ -44,20 +47,21 @@ export const SeparateScheduledRelease = ({
   postGradesAt,
   postCommentsAt,
   handleChange,
-  handleErrorMessages,
 }: SeparateScheduledReleaseProps) => {
   const filterRelationshipErrors = (messages: FormMessage[]) => {
-    const relationshipErrorTexts = [
+    const relationshipErrorTexts: string[] = [
       GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
       COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
     ]
-    return messages.filter(msg => !relationshipErrorTexts.includes(msg.text))
+    return messages.filter(
+      msg => typeof msg.text === 'string' && !relationshipErrorTexts.includes(msg.text),
+    )
   }
 
-  const validateReleaseDates = (
-    gradesDateString: string | null,
-    commentsDateString: string | null,
-    changedField: 'grades' | 'comments'
+  const validateAndUpdate = (
+    gradesDateString: string | null | undefined,
+    commentsDateString: string | null | undefined,
+    changedField: 'grades' | 'comments',
   ) => {
     const gradeMessages: FormMessage[] = []
     const commentMessages: FormMessage[] = []
@@ -65,14 +69,24 @@ export const SeparateScheduledRelease = ({
     const gradesDate = gradesDateString ? new Date(gradesDateString) : null
     const commentsDate = commentsDateString ? new Date(commentsDateString) : null
 
-    if (changedField === 'grades' && gradesDate && gradesDate < new Date()) {
-      gradeMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+    // Validate date is in future only for the changed field
+    if (changedField === 'grades') {
+      if (!gradesDateString) {
+        gradeMessages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
+      } else if (gradesDate && gradesDate < new Date()) {
+        gradeMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+      }
     }
 
-    if (changedField === 'comments' && commentsDate && commentsDate < new Date()) {
-      commentMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+    if (changedField === 'comments') {
+      if (!commentsDateString) {
+        commentMessages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
+      } else if (commentsDate && commentsDate < new Date()) {
+        commentMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+      }
     }
 
+    // Validate relationship between dates
     if (gradesDate && commentsDate && gradesDate < commentsDate) {
       gradeMessages.push({
         text: GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
@@ -85,46 +99,37 @@ export const SeparateScheduledRelease = ({
     }
 
     // Preserve existing errors from the unchanged field (excluding relationship errors)
-    const preservedGradeErrors = changedField === 'comments' ? filterRelationshipErrors(gradeErrorMessages) : []
-    const preservedCommentErrors = changedField === 'grades' ? filterRelationshipErrors(commentErrorMessages) : []
+    const preservedGradeErrors =
+      changedField === 'comments' ? filterRelationshipErrors(gradeErrorMessages) : []
+    const preservedCommentErrors =
+      changedField === 'grades' ? filterRelationshipErrors(commentErrorMessages) : []
 
-    handleErrorMessages(
+    // Single callback with both value changes and error messages
+    const changes =
+      changedField === 'grades'
+        ? {postGradesAt: gradesDateString ?? undefined}
+        : {postCommentsAt: commentsDateString ?? undefined}
+
+    handleChange(
+      changes,
       [...preservedGradeErrors, ...gradeMessages],
-      [...preservedCommentErrors, ...commentMessages]
+      [...preservedCommentErrors, ...commentMessages],
     )
   }
 
   const onChangeGradeReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
-    const messages: FormMessage[] = []
-    handleChange({postGradesAt: isoDate})
-
-    if (!isoDate) {
-      messages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-      handleErrorMessages(messages, filterRelationshipErrors(commentErrorMessages))
-      return
-    }
-
-    validateReleaseDates(isoDate, postCommentsAt || null, 'grades')
+    validateAndUpdate(isoDate, postCommentsAt, 'grades')
   }
 
   const onChangeCommentReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
-    const messages: FormMessage[] = []
-    handleChange({postCommentsAt: isoDate})
-
-    if (!isoDate) {
-      messages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-      handleErrorMessages(filterRelationshipErrors(gradeErrorMessages), messages)
-      return
-    }
-
-    validateReleaseDates(postGradesAt || null, isoDate, 'comments')
+    validateAndUpdate(postGradesAt, isoDate, 'comments')
   }
 
   return (
     <View as="div" margin="0 medium 0">
       <View as="div" margin="medium 0" data-testid="separate-scheduled-post-datetime-grade">
         <DateTimeInput
-          description={<ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>}
+          description={<ScreenReaderContent>{I18n.t('Grades Release Date')}</ScreenReaderContent>}
           datePlaceholder={I18n.t('Select Date')}
           dateRenderLabel={I18n.t('Grades Release Date')}
           timeRenderLabel={I18n.t('Time')}
@@ -142,7 +147,7 @@ export const SeparateScheduledRelease = ({
       </View>
       <View as="div" margin="medium 0" data-testid="separate-scheduled-post-datetime-comment">
         <DateTimeInput
-          description={<ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>}
+          description={<ScreenReaderContent>{I18n.t('Comments Release Date')}</ScreenReaderContent>}
           datePlaceholder={I18n.t('Select Date')}
           dateRenderLabel={I18n.t('Comments Release Date')}
           timeRenderLabel={I18n.t('Time')}

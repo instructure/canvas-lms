@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash'
+import {toPairs} from 'es-toolkit/compat'
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -27,7 +27,7 @@ const criteriaTypes = ['custom', 'outcome']
 
 const subComponents = ['Threshold', 'OutcomeIcon', 'LongDescription', 'LongDescriptionDialog']
 
-_.toPairs(rubrics).forEach(([key, rubric]) => {
+toPairs(rubrics).forEach(([key, rubric]) => {
   const assessment = assessments[key]
 
   describe(rubric.title, () => {
@@ -231,7 +231,7 @@ describe('Criterion', () => {
         <Table.Body>
           <Criterion
             assessment={{...assessments.points.data[1], comments: 'blah', editComments: false}}
-            onAssessmentChange={jest.fn()}
+            onAssessmentChange={vi.fn()}
             criterion={rubrics.points.criteria[1]}
             freeForm={false}
           />
@@ -246,7 +246,7 @@ describe('Criterion', () => {
         <Table.Body>
           <Criterion
             assessment={{...assessments.points.data[1], comments: '', editComments: true}}
-            onAssessmentChange={jest.fn()}
+            onAssessmentChange={vi.fn()}
             criterion={rubrics.points.criteria[1]}
             freeForm={false}
           />
@@ -261,7 +261,7 @@ describe('Criterion', () => {
         <Table.Body>
           <Criterion
             assessment={{...assessments.points.data[1], comments: '', editComments: false}}
-            onAssessmentChange={jest.fn()}
+            onAssessmentChange={vi.fn()}
             criterion={rubrics.points.criteria[1]}
             freeForm={false}
           />
@@ -308,13 +308,13 @@ describe('Criterion', () => {
 
     const criterion = rubrics.points.criteria[1]
     it('are visible by default', () => {
-      renderPoints({criterion, onAssessmentChange: jest.fn()})
+      renderPoints({criterion, onAssessmentChange: vi.fn()})
       expect(screen.getByLabelText('Points')).toBeInTheDocument()
     })
 
     it('can be changed', async () => {
       const user = userEvent.setup()
-      const onAssessmentChange = jest.fn()
+      const onAssessmentChange = vi.fn()
       renderPoints({criterion, onAssessmentChange})
 
       const pointsInput = screen
@@ -337,7 +337,7 @@ describe('Criterion', () => {
 
     it('can be selected and deselected', async () => {
       const user = userEvent.setup()
-      const onAssessmentChange = jest.fn()
+      const onAssessmentChange = vi.fn()
       renderPoints({criterion, onAssessmentChange})
 
       const pointsInput = screen
@@ -406,7 +406,7 @@ describe('Criterion', () => {
             hidePoints={false}
             freeForm={false}
             hasPointsColumn={true}
-            onAssessmentChange={jest.fn()}
+            onAssessmentChange={vi.fn()}
           />
         </Table.Body>
       </Table>,

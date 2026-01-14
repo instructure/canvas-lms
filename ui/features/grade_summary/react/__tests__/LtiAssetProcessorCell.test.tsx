@@ -121,4 +121,57 @@ describe('LtiAssetProcessorCell', () => {
 
     expect(screen.queryByText('Document Processors for Test Assignment')).not.toBeInTheDocument()
   })
+
+  it('infers discussion_topic submission type for discussion-based asset reports', () => {
+    const mockDiscussionAssetReports = [
+      createMockAssetReport(0, {
+        asset: {
+          attachmentId: null,
+          attachmentName: null,
+          submissionAttempt: 1,
+          discussionEntryVersion: {
+            __typename: 'DiscussionEntryVersion',
+            _id: 'entry_123',
+            messageIntro: 'This is a test discussion entry',
+            createdAt: '2025-01-15T16:45:00Z',
+          },
+        },
+      }),
+    ]
+
+    render(
+      <LtiAssetProcessorCell
+        assetProcessors={mockAssetProcessors}
+        assetReports={mockDiscussionAssetReports}
+        submissionType={undefined}
+        assignmentName="Test Assignment"
+      />,
+    )
+
+    expect(screen.getByText('All good')).toBeInTheDocument()
+  })
+
+  it('does not render when submission type is null and no discussion reports exist', () => {
+    const mockNonDiscussionAssetReports = [
+      createMockAssetReport(0, {
+        asset: {
+          attachmentId: '10',
+          attachmentName: 'test.pdf',
+          submissionAttempt: 1,
+          discussionEntryVersion: null,
+        },
+      }),
+    ]
+
+    const {container} = render(
+      <LtiAssetProcessorCell
+        assetProcessors={mockAssetProcessors}
+        assetReports={mockNonDiscussionAssetReports}
+        submissionType={undefined}
+        assignmentName="Test Assignment"
+      />,
+    )
+
+    expect(container).toBeEmptyDOMElement()
+  })
 })

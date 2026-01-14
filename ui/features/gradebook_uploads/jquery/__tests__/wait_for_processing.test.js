@@ -21,6 +21,21 @@ import {waitForProcessing} from '../wait_for_processing'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
+// Mock the spin.js jQuery plugin
+$.fn.spin = vi.fn(function () {
+  // Add spinner element to simulate spin.js behavior
+  const spinnerDiv = document.createElement('div')
+  spinnerDiv.className = 'spinner'
+  this[0].appendChild(spinnerDiv)
+
+  return {
+    hide: vi.fn(function() {
+      this[0].style.display = 'none'
+    }.bind(this)),
+    0: this[0], // Store reference to the element
+  }
+})
+
 const server = setupServer()
 
 describe('waitForProcessing', () => {
@@ -43,10 +58,25 @@ describe('waitForProcessing', () => {
     const newDiv = document.createElement('div')
     newDiv.id = 'spinner'
     document.body.appendChild(newDiv)
+
+    // Reset the mock for each test
+    $.fn.spin.mockImplementation(function () {
+      // Add spinner element to simulate spin.js behavior
+      const spinnerDiv = document.createElement('div')
+      spinnerDiv.className = 'spinner'
+      this[0].appendChild(spinnerDiv)
+
+      return {
+        hide: vi.fn(function() {
+          this[0].style.display = 'none'
+        }.bind(this)),
+        0: this[0], // Store reference to the element
+      }
+    })
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     const spinner = document.getElementById('spinner')
     spinner.parentNode.removeChild(spinner)
     server.resetHandlers()

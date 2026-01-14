@@ -31,8 +31,8 @@ import {
   SEARCH_OUTCOME_ALIGNMENTS,
 } from '../graphql/Management'
 import {defaultRatings, defaultMasteryPoints} from '../react/hooks/useRatings'
-import {pick, uniq, flattenDeep} from 'lodash'
-import {jest} from '@jest/globals'
+import {flattenDeep, pick, uniq} from 'es-toolkit/compat'
+import {vi} from 'vitest'
 
 const testRatings = defaultRatings.map(rating => pick(rating, ['description', 'points']))
 
@@ -885,7 +885,7 @@ export const groupDetailMocks = ({
           targetGroupId,
         },
       },
-      newData: jest.fn(() => {
+      newData: vi.fn(() => {
         if (!wasFetchedOnce) {
           wasFetchedOnce = true
 

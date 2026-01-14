@@ -28,8 +28,8 @@ const defaultProps = {
     user_name: 'Say my name',
     updated_at: new Date(0).toString(),
   },
-  onDelete: jest.fn(),
-  onCancel: jest.fn(),
+  onDelete: vi.fn(),
+  onCancel: vi.fn(),
 }
 
 describe('DeleteConfirmation', () => {

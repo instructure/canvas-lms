@@ -19,33 +19,38 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
+import {ApolloProvider} from '@apollo/client'
+import {mswClient} from '@canvas/msw/mswClient'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import StudentViewContext, {StudentViewContextDefaults} from '../Context'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
+import {setupServer} from 'msw/node'
+import {graphql, http, HttpResponse} from 'msw'
 
 // Reset all mocks before each test to ensure isolation
 beforeEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
   ContextModuleApi.getContextModuleData.mockResolvedValue({})
+  mswClient.cache.reset()
 })
 
-// Remove or comment out jest.useFakeTimers() to prevent interference with async operations
+// Remove or comment out vi.useFakeTimers() to prevent interference with async operations
 //
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
+vi.mock('../../apis/ContextModuleApi')
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -63,7 +68,7 @@ function gradedOverrides() {
           {
             _id: 1,
             score: 5,
-            assessor: {_id: 1, name: 'assessor1', enrollments: []},
+            assessor: {_id: '1', name: 'assessor1', enrollments: []},
           },
           {
             _id: 2,
@@ -73,7 +78,7 @@ function gradedOverrides() {
           {
             _id: 3,
             score: 8,
-            assessor: {_id: 2, name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
+            assessor: {_id: '2', name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
           },
         ],
       },
@@ -82,10 +87,16 @@ function gradedOverrides() {
 }
 
 describe('SubmissionManager', () => {
+  // Track captured request for verification
+  let lastCapturedRequest = null
+
   beforeAll(() => {
+    server.listen()
     window.INST = window.INST || {}
     window.INST.editorButtons = []
   })
+
+  afterAll(() => server.close())
 
   describe('peer reviews', () => {
     describe('without rubrics', () => {
@@ -93,9 +104,9 @@ describe('SubmissionManager', () => {
         const props = await mockAssignmentAndSubmission()
         props.assignment.env.peerReviewModeEnabled = true
         const {queryByText} = render(
-          <MockedProvider>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         // Wait for any asynchronous operations to complete
@@ -155,11 +166,16 @@ describe('SubmissionManager', () => {
           },
         ]
         const fetchRubricResult = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+
+        // Set up MSW graphql handler for GetRubric query
+        server.use(
+          graphql.query('GetRubric', () => {
+            return HttpResponse.json(fetchRubricResult)
+          }),
+        )
+
+        // Store mock data for access in tests
         mocks = [
-          {
-            request: {query: RUBRIC_QUERY, variables},
-            result: fetchRubricResult,
-          },
           {
             request: {query: RUBRIC_QUERY, variables},
             result: fetchRubricResult,
@@ -168,8 +184,21 @@ describe('SubmissionManager', () => {
       }
 
       beforeEach(async () => {
-        doFetchApi.mockClear()
-        doFetchApi.mockResolvedValue({})
+        lastCapturedRequest = null
+        // Default handler that captures request and returns success
+        server.use(
+          http.post(
+            '/courses/:courseId/rubric_associations/:rubricAssociationId/assessments',
+            async ({request}) => {
+              lastCapturedRequest = {
+                method: 'POST',
+                path: new URL(request.url).pathname,
+                body: await request.text(),
+              }
+              return HttpResponse.json({})
+            },
+          ),
+        )
         setCurrentUserAsAssessmentOwner()
         await setMocks()
         await waitFor(() => {})
@@ -189,6 +218,8 @@ describe('SubmissionManager', () => {
       })
 
       afterEach(() => {
+        server.resetHandlers()
+        mswClient.cache.reset()
         window.ENV = originalENV
         store.setState({
           displayedAssessment: null,
@@ -198,9 +229,9 @@ describe('SubmissionManager', () => {
       it('renders a submit button when the assessment has not been submitted', async () => {
         setOtherUserAsAssessmentOwner()
         const {queryByText} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         // Let Apollo cache settle
@@ -211,15 +242,16 @@ describe('SubmissionManager', () => {
 
       it('does not render a submit button when the assessment has been submitted', async () => {
         const {queryByText} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
-        // Let Apollo cache settle
-        await waitFor(() => {})
-
-        expect(queryByText('Submit')).not.toBeInTheDocument()
+        // Wait for rubric data to load and component to re-render
+        // The Submit button should not appear once data is loaded and user is identified as assessor
+        await waitFor(() => {
+          expect(queryByText('Submit')).not.toBeInTheDocument()
+        })
       })
 
       it('renders an enabled submit button when every criterion has a comment', async () => {
@@ -235,9 +267,9 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         // Let Apollo cache settle
@@ -262,9 +294,9 @@ describe('SubmissionManager', () => {
         props.assignment.env.peerReviewAvailable = true
 
         const {getByTestId} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         // Let Apollo cache settle
@@ -289,9 +321,9 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         // Let Apollo cache settle
@@ -313,9 +345,9 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         // Let Apollo cache settle
@@ -324,13 +356,14 @@ describe('SubmissionManager', () => {
         fireEvent.click(getByTestId('submit-peer-review-button'))
 
         const rubricAssociationId = mocks[0].result.data.assignment.rubricAssociation._id
-        expect(doFetchApi).toHaveBeenCalledWith(
-          expect.objectContaining({
-            method: 'POST',
-            path: `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
-            body: expect.stringContaining('user_id%5D=4'),
-          }),
-        )
+        await waitFor(() => {
+          expect(lastCapturedRequest).not.toBeNull()
+          expect(lastCapturedRequest.method).toBe('POST')
+          expect(lastCapturedRequest.path).toBe(
+            `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
+          )
+          expect(lastCapturedRequest.body).toContain('user_id%5D=4')
+        })
       })
 
       it('sends a http request with anonymous peer reviews enabled to the rubrics assessments endpoint when the user clicks on Submit button', async () => {
@@ -349,9 +382,9 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         // Let Apollo cache settle
@@ -360,18 +393,19 @@ describe('SubmissionManager', () => {
         fireEvent.click(getByTestId('submit-peer-review-button'))
 
         const rubricAssociationId = mocks[0].result.data.assignment.rubricAssociation._id
-        expect(doFetchApi).toHaveBeenCalledWith(
-          expect.objectContaining({
-            method: 'POST',
-            path: `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
-            body: expect.stringContaining('anonymous_id%5D=ad0f'),
-          }),
-        )
+        await waitFor(() => {
+          expect(lastCapturedRequest).not.toBeNull()
+          expect(lastCapturedRequest.method).toBe('POST')
+          expect(lastCapturedRequest.path).toBe(
+            `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
+          )
+          expect(lastCapturedRequest.body).toContain('anonymous_id%5D=ad0f')
+        })
       })
 
       it('creates a success alert when the http request was sent successfully', async () => {
         setOtherUserAsAssessmentOwner()
-        const setOnSuccess = jest.fn()
+        const setOnSuccess = vi.fn()
         store.setState({
           displayedAssessment: {
             score: 5,
@@ -383,10 +417,10 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess}}>
-            <MockedProvider mocks={mocks}>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess}}>
+            <ApolloProvider client={mswClient}>
               <SubmissionManager {...props} />
-            </MockedProvider>
+            </ApolloProvider>
           </AlertManagerContext.Provider>,
         )
 
@@ -433,9 +467,9 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         await waitFor(() => {
@@ -449,7 +483,7 @@ describe('SubmissionManager', () => {
         })
       })
 
-      it.skip('renders peer review modal for completing all rubric assessments', async () => {
+      it('renders peer review modal for completing all rubric assessments', async () => {
         setOtherUserAsAssessmentOwner()
         const reviewerSubmission = {
           id: 'test-id',
@@ -486,10 +520,10 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-            <MockedProvider mocks={mocks} addTypename={false}>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+            <ApolloProvider client={mswClient}>
               <SubmissionManager {...props} />
-            </MockedProvider>
+            </ApolloProvider>
           </AlertManagerContext.Provider>,
         )
 
@@ -512,7 +546,7 @@ describe('SubmissionManager', () => {
 
       it('calls the onSuccessfulPeerReview function to re-render page when a peer review with rubric is successful', async () => {
         setOtherUserAsAssessmentOwner()
-        props.onSuccessfulPeerReview = jest.fn()
+        props.onSuccessfulPeerReview = vi.fn()
         const reviewerSubmission = {
           id: 'test-id',
           _id: 'test-id',
@@ -539,9 +573,9 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <MockedProvider mocks={mocks}>
+          <ApolloProvider client={mswClient}>
             <SubmissionManager {...props} />
-          </MockedProvider>,
+          </ApolloProvider>,
         )
 
         await waitFor(() => {
@@ -557,8 +591,16 @@ describe('SubmissionManager', () => {
 
       it('creates an error alert when the http request fails', async () => {
         setOtherUserAsAssessmentOwner()
-        doFetchApi.mockImplementation(() => Promise.reject(new Error('Network error')))
-        const setOnFailure = jest.fn()
+        // Override the default handler to return an error
+        server.use(
+          http.post(
+            '/courses/:courseId/rubric_associations/:rubricAssociationId/assessments',
+            () => {
+              return HttpResponse.error()
+            },
+          ),
+        )
+        const setOnFailure = vi.fn()
 
         // Set up peer review mode
         props.assignment.env.peerReviewModeEnabled = true
@@ -575,10 +617,10 @@ describe('SubmissionManager', () => {
         })
 
         const {getByTestId} = render(
-          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess: jest.fn()}}>
-            <MockedProvider mocks={mocks} addTypename={false}>
+          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess: vi.fn()}}>
+            <ApolloProvider client={mswClient}>
               <SubmissionManager {...props} />
-            </MockedProvider>
+            </ApolloProvider>
           </AlertManagerContext.Provider>,
         )
 

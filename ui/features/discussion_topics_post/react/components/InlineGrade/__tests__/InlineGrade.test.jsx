@@ -20,8 +20,8 @@ import {render} from '@testing-library/react'
 import React from 'react'
 import {InlineGrade} from '../InlineGrade'
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('../../../utils', () => ({
+  ...vi.requireActual('../../../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 

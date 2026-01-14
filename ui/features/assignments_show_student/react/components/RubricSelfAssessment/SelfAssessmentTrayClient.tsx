@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useMemo} from 'react'
 import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {SelfAssessmentTray} from './SelfAssessmentTray'
@@ -45,45 +46,55 @@ export const SelfAssessmentTrayClient = ({
 }: SelfAssessmentTrayClientProps) => {
   const selfAssessment = useStore(state => state.selfAssessment)
 
-  if (!rubric) {
+  const rubricTrayData = useMemo(() => {
+    if (!rubric) {
+      return null
+    }
+
+    return {
+      id: rubric.id,
+      criteriaCount: rubric.criteria?.length ?? 0,
+      title: rubric.title,
+      ratingOrder: rubric.rating_order,
+      buttonDisplay: rubric.button_display,
+      freeFormCriterionComments: rubric.free_form_criterion_comments,
+      pointsPossible: rubric.points_possible,
+      criteria: (rubric.criteria || []).map(criterion => {
+        return {
+          ...criterion,
+          longDescription: criterion.long_description,
+          criterionUseRange: criterion.criterion_use_range,
+          learningOutcomeId: criterion.learning_outcome_id,
+          ignoreForScoring: criterion.ignore_for_scoring,
+          masteryPoints: criterion.mastery_points,
+          ratings: criterion.ratings.map(rating => {
+            return {
+              ...rating,
+              longDescription: rating.long_description,
+              points: rating.points,
+              criterionId: criterion.id,
+            }
+          }),
+        }
+      }),
+    }
+  }, [rubric])
+
+  const selfAssessmentData = useMemo(
+    () =>
+      (selfAssessment?.data ?? []).map(data => {
+        return {
+          ...data,
+          criterionId: data.criterion_id,
+          points: getPointsValue(data.points),
+        }
+      }),
+    [selfAssessment],
+  )
+
+  if (!rubricTrayData) {
     return null
   }
-
-  const rubricTrayData = {
-    id: rubric.id,
-    criteriaCount: rubric.criteria?.length ?? 0,
-    title: rubric.title,
-    ratingOrder: rubric.rating_order,
-    buttonDisplay: rubric.button_display,
-    freeFormCriterionComments: rubric.free_form_criterion_comments,
-    pointsPossible: rubric.points_possible,
-    criteria: (rubric?.criteria || []).map(criterion => {
-      return {
-        ...criterion,
-        longDescription: criterion.long_description,
-        criterionUseRange: criterion.criterion_use_range,
-        learningOutcomeId: criterion.learning_outcome_id,
-        ignoreForScoring: criterion.ignore_for_scoring,
-        masteryPoints: criterion.mastery_points,
-        ratings: criterion.ratings.map(rating => {
-          return {
-            ...rating,
-            longDescription: rating.long_description,
-            points: rating.points,
-            criterionId: criterion.id,
-          }
-        }),
-      }
-    }),
-  }
-
-  const selfAssessmentData = (selfAssessment?.data ?? []).map(data => {
-    return {
-      ...data,
-      criterionId: data.criterion_id,
-      points: getPointsValue(data.points),
-    }
-  })
 
   return (
     <QueryClientProvider client={queryClient}>

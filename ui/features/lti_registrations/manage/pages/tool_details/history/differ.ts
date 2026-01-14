@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEqual} from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 import {InternalLtiConfiguration} from '../../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {InternalPlacementConfiguration} from '../../../model/internal_lti_configuration/placement_configuration/InternalPlacementConfiguration'
 import {InternalBaseLaunchSettings} from '../../../model/internal_lti_configuration/InternalBaseLaunchSettings'
@@ -26,9 +26,12 @@ import {
   isEntryForConfigChange,
   LtiRegistrationHistoryEntry,
   LtiRegistrationTrackedAttributes,
+  LtiContextControlTrackedAttributes,
 } from '../../../model/LtiRegistrationHistoryEntry'
 import {LtiPlacement} from '../../../model/LtiPlacement'
-import {LtiContextControlId} from 'features/lti_registrations/manage/model/LtiContextControl'
+import {LtiContextControlId} from '../../../model/LtiContextControl'
+import type {LtiDeployment} from '../../../model/LtiDeployment'
+import type {LtiContextControl} from '../../../model/LtiContextControl'
 
 /**
  * Recursively traverses a value and returns null if it's "empty", otherwise returns the value.
@@ -292,8 +295,13 @@ export type PrivacyLevelDiff = Diff<InternalLtiConfiguration['privacy_level']>
 
 export type WorkflowStateDiff = Diff<LtiRegistrationTrackedAttributes['workflow_state']>
 
-// TODO: Implement this when we start actually parsing this.
-export type ContextControlDiff = {}
+export type ContextControlDiff = Omit<LtiContextControl, 'available'> & {
+  availabilityChange: NonNullable<Diff<LtiContextControlTrackedAttributes['available'] | undefined>>
+}
+
+export type DeploymentDiff = Omit<LtiDeployment, 'context_controls'> & {
+  controlDiffs: ContextControlDiff[]
+}
 
 export type ConfigChangeEntryWithDiff = ConfigChangeHistoryEntry & {
   internalConfig: {
@@ -309,7 +317,7 @@ export type ConfigChangeEntryWithDiff = ConfigChangeHistoryEntry & {
 }
 
 export type AvailabilityChangeEntryWithDiff = AvailabilityChangeHistoryEntry & {
-  contextControls: Record<LtiContextControlId, ContextControlDiff>
+  deploymentDiffs: DeploymentDiff[]
   totalAdditions: number
   totalRemovals: number
 }
@@ -502,6 +510,101 @@ export const diffConfigChangeEntry = (
 }
 
 /**
+ * Diffs context controls between old and new deployments, grouping by deployment.
+ *
+ * Processes each deployment independently, comparing its old and new controls.
+ * Only includes deployments where at least one control's availability changed.
+ *
+ * Changes detected:
+ * - Additions: control exists in new but not old
+ * - Deletions: control exists in old but not new
+ * - Modifications: control exists in both but availability differs, or control
+ * was restored from deletion
+ *
+ * @param entry - The availability change history entry
+ * @returns Entry augmented with deployment diffs
+ */
+const diffAvailabilityChangeEntry = (
+  entry: AvailabilityChangeHistoryEntry,
+): AvailabilityChangeEntryWithDiff => {
+  const oldDeploymentsByIdMap = new Map(
+    entry.old_controls_by_deployment.map(d => [d.deployment_id, d]),
+  )
+  const newDeploymentsByIdMap = new Map(
+    entry.new_controls_by_deployment.map(d => [d.deployment_id, d]),
+  )
+
+  const allDeploymentIds = new Set([
+    ...oldDeploymentsByIdMap.keys(),
+    ...newDeploymentsByIdMap.keys(),
+  ])
+
+  const deploymentDiffs: DeploymentDiff[] = []
+  let totalAdditions = 0
+  let totalRemovals = 0
+
+  for (const deploymentId of allDeploymentIds) {
+    const oldDeployment = oldDeploymentsByIdMap.get(deploymentId)
+    const newDeployment = newDeploymentsByIdMap.get(deploymentId)
+
+    const oldControlsById = new Map((oldDeployment?.context_controls ?? []).map(c => [c.id, c]))
+    const newControlsById = new Map((newDeployment?.context_controls ?? []).map(c => [c.id, c]))
+
+    const allControlIds = new Set([...oldControlsById.keys(), ...newControlsById.keys()])
+
+    const controlDiffs: ContextControlDiff[] = []
+
+    for (const controlId of allControlIds) {
+      const oldControl = oldControlsById.get(controlId)
+      const newControl = newControlsById.get(controlId)
+
+      // Account for deletion followed by restoration.
+      const oldAvailable =
+        oldControl?.workflow_state === 'deleted' ? undefined : oldControl?.available
+      const newAvailable =
+        newControl?.workflow_state === 'deleted' ? undefined : newControl?.available
+
+      const diff = createDiffValue(oldAvailable, newAvailable)
+
+      if (diff === null) continue
+
+      const control = newControl ?? oldControl!
+
+      controlDiffs.push({
+        ...control,
+        availabilityChange: diff,
+      })
+    }
+
+    // Only include deployments with actual changes
+    if (controlDiffs.length > 0) {
+      const deployment = newDeployment ?? oldDeployment!
+
+      deploymentDiffs.push({
+        ...deployment,
+        controlDiffs,
+      })
+
+      const {additions, removals} = countContextControlChanges(controlDiffs)
+      totalAdditions += additions
+      totalRemovals += removals
+    }
+  }
+
+  return {
+    ...entry,
+    deploymentDiffs,
+    totalAdditions,
+    totalRemovals,
+  }
+}
+
+const countContextControlChanges = (
+  controlDiffs: ContextControlDiff[],
+): {additions: number; removals: number} =>
+  sumChanges(controlDiffs.map(c => countDiff(c.availabilityChange)))
+
+/**
  * Parses an LtiRegistrationHistoryEntry into a structured diff object organized by UI concerns.
  *
  * Compares old and new configuration attributes to produce a diff containing:
@@ -514,7 +617,6 @@ export const diffConfigChangeEntry = (
  *
  * Note that for many fields, modifying is treated as both addition and removal to simplify rendering.
  *
- * @todo Implement contextControls parsing
  * @param entry - The history entry containing old and new attribute snapshots
  * @returns A structured diff object suitable for rendering in confirmation UI screens
  */
@@ -522,13 +624,7 @@ export const diffHistoryEntry = (entry: LtiRegistrationHistoryEntry): LtiHistory
   if (isEntryForConfigChange(entry)) {
     return diffConfigChangeEntry(entry)
   } else {
-    // TODO: Implement contextControls parsing
-    return {
-      ...entry,
-      contextControls: {},
-      totalAdditions: 0,
-      totalRemovals: 0,
-    }
+    return diffAvailabilityChangeEntry(entry)
   }
 }
 

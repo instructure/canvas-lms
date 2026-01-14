@@ -175,7 +175,6 @@ class User < ActiveRecord::Base
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Assignment"
   has_many :mentions, inverse_of: :user
   has_many :discussion_entries
-  has_many :discussion_entry_drafts, inverse_of: :user
   has_many :discussion_entry_versions, inverse_of: :user
   has_many :discussion_topic_participants, dependent: :destroy
   has_many :all_attachments, as: "context", class_name: "Attachment"
@@ -327,6 +326,18 @@ class User < ActiveRecord::Base
   end
 
   scope :of_account, ->(account) { joins(:user_account_associations).where(user_account_associations: { account_id: account }).shard(account.shard) }
+
+  scope :of_account_cte, lambda { |account|
+    cte_subquery = UserAccountAssociation.select(:user_id).where(account:).to_sql
+    cte_sql = <<~SQL.squish
+      WITH users_in_account AS MATERIALIZED (#{cte_subquery})
+      SELECT user_id
+      FROM users_in_account
+    SQL
+
+    where("users.id IN (#{cte_sql})").shard(account)
+  }
+
   scope :recently_logged_in, lambda {
     eager_load(:pseudonyms)
       .where("pseudonyms.current_login_at>?", 1.month.ago)
@@ -2847,9 +2858,15 @@ class User < ActiveRecord::Base
       )
     end
 
-    if course_ids_with_checkpoints_enabled.any?
+    # Filter context_codes to only checkpoint-enabled courses (consistent with regular assignment filtering)
+    checkpoint_context_codes = context_codes.select do |code|
+      type, id = ActiveRecord::Base.parse_asset_string(code)
+      type == "Course" && course_ids_with_checkpoints_enabled.include?(id)
+    end
+
+    if checkpoint_context_codes.any?
       sub_assignments = SubAssignment.published
-                                     .for_course(course_ids_with_checkpoints_enabled)
+                                     .for_context_codes(checkpoint_context_codes)
                                      .due_between_with_overrides(now, opts[:end_at])
                                      .include_submitted_count.to_a
 
@@ -3932,5 +3949,9 @@ class User < ActiveRecord::Base
 
   def pseudonym_for_restoration_in(account)
     account.pseudonyms.where(user_id: self).order(deleted_at: :desc).first!
+  end
+
+  def all_attachments_frd
+    Attachment.where(user: self).or(Attachment.where(context: self))
   end
 end

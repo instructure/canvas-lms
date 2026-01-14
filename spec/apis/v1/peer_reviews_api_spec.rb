@@ -474,7 +474,7 @@ describe PeerReviewsApiController, type: :request do
   describe "Post 'allocate'" do
     before :once do
       # Enable feature flag for allocation endpoint
-      @course.enable_feature!(:peer_review_allocation)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
 
       @assignment2 = @course.assignments.create!(
         title: "Peer Review Assignment",
@@ -493,22 +493,24 @@ describe PeerReviewsApiController, type: :request do
     end
 
     context "with student context" do
-      it "allocates a peer review successfully" do
+      it "allocates multiple peer reviews successfully" do
+        student3 = student_in_course(active_all: true).user
         @user = @student1
-        # Student1 submits
         @assignment2.submit_homework(@student1, body: "My submission")
-        # Student2 submits
         @assignment2.submit_homework(@student2, body: "Student2 submission")
+        @assignment2.submit_homework(student3, body: "Student3 submission")
 
         json = api_call(:post, @resource_path, @resource_params)
 
-        expect(json["assessor_id"]).to eq(@student1.id)
-        expect(json["user_id"]).to eq(@student2.id)
-        expect(json["workflow_state"]).to eq("assigned")
+        expect(json).to be_an(Array)
+        expect(json.size).to eq(2)
+        expect(json.all? { |ar| ar["assessor_id"] == @student1.id }).to be true
+        expect(json.pluck("user_id")).to match_array([@student2.id, student3.id])
+        expect(json.all? { |ar| ar["workflow_state"] == "assigned" }).to be true
       end
 
       it "returns error when feature flag is not enabled" do
-        @course.disable_feature!(:peer_review_allocation)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
         @user = @student1
         @assignment2.submit_homework(@student1, body: "My submission")
         @assignment2.submit_homework(@student2, body: "Student2 submission")
@@ -522,7 +524,7 @@ describe PeerReviewsApiController, type: :request do
         expect(json["errors"]["base"]).to include("feature is not enabled")
 
         # Re-enable for other tests
-        @course.enable_feature!(:peer_review_allocation)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "returns error when assignment does not have peer reviews enabled" do
@@ -582,10 +584,12 @@ describe PeerReviewsApiController, type: :request do
         expect(json["errors"]["base"]).to include("locked until")
       end
 
-      it "returns existing ongoing review instead of allocating new one" do
+      it "returns existing ongoing reviews and allocates additional to meet required count" do
         @assignment2.submit_homework(@student1, body: "My submission")
         student3 = student_in_course(active_all: true).user
+        student4 = student_in_course(active_all: true).user
         @assignment2.submit_homework(student3, body: "Student3 submission")
+        @assignment2.submit_homework(student4, body: "Student4 submission")
 
         # Create an ongoing review
         existing_request = @assignment2.assign_peer_review(@student1, student3)
@@ -595,8 +599,10 @@ describe PeerReviewsApiController, type: :request do
 
         json = api_call(:post, @resource_path, @resource_params)
 
-        expect(json["id"]).to eq(existing_request.id)
-        expect(json["user_id"]).to eq(student3.id)
+        expect(json).to be_an(Array)
+        expect(json.size).to eq(2)
+        expect(json.pluck("id")).to include(existing_request.id)
+        expect(json.pluck("user_id")).to match_array([student3.id, student4.id])
       end
 
       it "returns error when peer review count limit reached" do
@@ -618,7 +624,7 @@ describe PeerReviewsApiController, type: :request do
                         {},
                         {},
                         { expected_status: 400 })
-        expect(json["errors"]["base"]).to include("completed all required")
+        expect(json["errors"]["base"]).to include("assigned all required")
       end
 
       it "returns error when no submissions available" do
@@ -655,9 +661,11 @@ describe PeerReviewsApiController, type: :request do
         # Set @user AFTER creating additional students
         @user = @student1
 
-        # Student1 should get student4 (unreviewed) even though it's newer
+        # Student1 should get student4 (unreviewed) first, then student2
         json = api_call(:post, @resource_path, @resource_params)
-        expect(json["user_id"]).to eq(student4.id)
+        expect(json).to be_an(Array)
+        expect(json.size).to eq(2)
+        expect(json.pluck("user_id")).to include(student4.id, @student2.id)
       end
 
       it "prioritizes older submissions when all have been reviewed" do
@@ -680,32 +688,42 @@ describe PeerReviewsApiController, type: :request do
         # Set @user AFTER creating additional students
         @user = @student1
 
-        # Should allocate the oldest submission (student3) even though both have been reviewed
+        # Should allocate oldest submissions first (student3, then student4)
         json = api_call(:post, @resource_path, @resource_params)
-        expect(json["user_id"]).to eq(student3.id)
+        expect(json).to be_an(Array)
+        expect(json.size).to eq(2)
+        expect(json.pluck("user_id")).to eq([student3.id, student4.id])
       end
 
       it "excludes student's own submission" do
+        student3 = student_in_course(active_all: true).user
         @user = @student1
         @assignment2.submit_homework(@student1, body: "My submission")
         @assignment2.submit_homework(@student2, body: "Student2 submission")
+        @assignment2.submit_homework(student3, body: "Student3 submission")
 
         json = api_call(:post, @resource_path, @resource_params)
 
-        expect(json["user_id"]).to eq(@student2.id)
-        expect(json["user_id"]).not_to eq(@student1.id)
+        expect(json).to be_an(Array)
+        expect(json.size).to eq(2)
+        expect(json.pluck("user_id")).to match_array([@student2.id, student3.id])
+        expect(json.none? { |ar| ar["user_id"] == @student1.id }).to be true
       end
 
       it "handles anonymous peer reviews" do
+        student3 = student_in_course(active_all: true).user
         @assignment2.update!(anonymous_peer_reviews: true)
         @user = @student1
         @assignment2.submit_homework(@student1, body: "My submission")
         @assignment2.submit_homework(@student2, body: "Student2 submission")
+        @assignment2.submit_homework(student3, body: "Student3 submission")
 
         json = api_call(:post, @resource_path, @resource_params)
 
-        expect(json["assessor_id"]).to be_nil # Should be hidden for students
-        expect(json["user_id"]).to eq(@student2.id)
+        expect(json).to be_an(Array)
+        expect(json.size).to eq(2)
+        expect(json.all? { |ar| ar["assessor_id"].nil? }).to be true # Should be hidden for students
+        expect(json.pluck("user_id")).to match_array([@student2.id, student3.id])
       end
 
       context "with assignment overrides" do
@@ -713,18 +731,22 @@ describe PeerReviewsApiController, type: :request do
           @assignment2.update!(only_visible_to_overrides: true)
           @assignment2.submit_homework(@student1, body: "My submission")
           @assignment2.submit_homework(@student2, body: "Student2 submission")
+          student3 = student_in_course(active_all: true).user
+          @assignment2.submit_homework(student3, body: "Student3 submission")
 
-          # Create adhoc override for student1 and student2 so both can see assignment
-          create_adhoc_override_for_assignment(@assignment2, [@student1, @student2])
+          # Create adhoc override for student1, student2, and student3 so all can see assignment
+          create_adhoc_override_for_assignment(@assignment2, [@student1, @student2, student3])
 
           @user = @student1
 
           json = api_call(:post, @resource_path, @resource_params)
 
           # Verify allocation succeeded
-          expect(json["id"]).to be_present
-          expect(json["user_id"]).to eq(@student2.id)
-          expect(json["workflow_state"]).to eq("assigned")
+          expect(json).to be_an(Array)
+          expect(json.size).to eq(2)
+          expect(json.all? { |ar| ar["id"].present? }).to be true
+          expect(json.pluck("user_id")).to match_array([@student2.id, student3.id])
+          expect(json.all? { |ar| ar["workflow_state"] == "assigned" }).to be true
         end
 
         it "returns 403 when student has no override and only_visible_to_overrides is true" do
@@ -748,12 +770,15 @@ describe PeerReviewsApiController, type: :request do
           section2 = @course.course_sections.create!(name: "Section 2")
           @student1.enrollments.first.update!(course_section: section2)
           @student2.enrollments.first.update!(course_section: section2)
+          student3 = student_in_course(active_all: true).user
+          student3.enrollments.first.update!(course_section: section2)
 
           @assignment2.update!(only_visible_to_overrides: true)
           @assignment2.submit_homework(@student1, body: "My submission")
           @assignment2.submit_homework(@student2, body: "Student2 submission")
+          @assignment2.submit_homework(student3, body: "Student3 submission")
 
-          # Create section override for section2 (both students are in it)
+          # Create section override for section2 (all students are in it)
           create_section_override_for_assignment(@assignment2, course_section: section2)
 
           @user = @student1
@@ -761,8 +786,10 @@ describe PeerReviewsApiController, type: :request do
           json = api_call(:post, @resource_path, @resource_params)
 
           # Verify allocation succeeded
-          expect(json["id"]).to be_present
-          expect(json["workflow_state"]).to eq("assigned")
+          expect(json).to be_an(Array)
+          expect(json.size).to eq(2)
+          expect(json.all? { |ar| ar["id"].present? }).to be true
+          expect(json.all? { |ar| ar["workflow_state"] == "assigned" }).to be true
         end
 
         it "returns 403 when student is not in section with override" do
@@ -789,8 +816,11 @@ describe PeerReviewsApiController, type: :request do
           group_category = @course.group_categories.create!(name: "Project Groups")
           group1 = @course.groups.create!(name: "Group 1", group_category:)
           group2 = @course.groups.create!(name: "Group 2", group_category:)
+          group3 = @course.groups.create!(name: "Group 3", group_category:)
+          student3 = student_in_course(active_all: true).user
           group1.add_user(@student1, "accepted")
           group2.add_user(@student2, "accepted")
+          group3.add_user(student3, "accepted")
 
           @assignment2.update!(only_visible_to_overrides: true, grade_group_students_individually: false)
           @assignment2.group_category = group_category
@@ -798,18 +828,22 @@ describe PeerReviewsApiController, type: :request do
 
           @assignment2.submit_homework(@student1, body: "My submission")
           @assignment2.submit_homework(@student2, body: "Student2 submission")
+          @assignment2.submit_homework(student3, body: "Student3 submission")
 
-          # Create group overrides for both groups
+          # Create group overrides for all groups
           create_group_override_for_assignment(@assignment2, group: group1)
           create_group_override_for_assignment(@assignment2, group: group2)
+          create_group_override_for_assignment(@assignment2, group: group3)
 
           @user = @student1
 
           json = api_call(:post, @resource_path, @resource_params)
 
           # Verify allocation succeeded
-          expect(json["id"]).to be_present
-          expect(json["workflow_state"]).to eq("assigned")
+          expect(json).to be_an(Array)
+          expect(json.size).to eq(2)
+          expect(json.all? { |ar| ar["id"].present? }).to be true
+          expect(json.all? { |ar| ar["workflow_state"] == "assigned" }).to be true
         end
       end
     end
@@ -843,7 +877,7 @@ describe PeerReviewsApiController, type: :request do
 
     context "when all conditions are met" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
           context: @course,
@@ -870,7 +904,7 @@ describe PeerReviewsApiController, type: :request do
       end
     end
 
-    context "when peer_review_grading feature flag is disabled" do
+    context "when peer_review_allocation_and_grading feature flag is disabled" do
       before :once do
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
@@ -894,7 +928,7 @@ describe PeerReviewsApiController, type: :request do
     context "when parent assignment does not have peer_reviews enabled" do
       before :once do
         @assignment_with_peer_reviews.update!(peer_reviews: false)
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
           title: "Test Peer Review",
           context: @course,
@@ -913,7 +947,7 @@ describe PeerReviewsApiController, type: :request do
 
     context "when peer_review_sub_assignment does not exist" do
       before :once do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
       end
 
       it "creates peer review without linking when sub-assignment does not exist (graceful degradation)" do
@@ -936,7 +970,7 @@ describe PeerReviewsApiController, type: :request do
 
     context "with multiple conditions" do
       it "does not link when only feature flag is enabled but other conditions are not met" do
-        @course.enable_feature!(:peer_review_grading)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
         @assignment_with_peer_reviews.update!(peer_reviews: false)
 
         @user = @teacher

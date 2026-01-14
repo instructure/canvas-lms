@@ -21,25 +21,26 @@ import {renderHook} from '@testing-library/react-hooks'
 import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 import {useSafeBackNavigation} from '../useSafeBackNavigation'
 import {waitFor} from '@testing-library/react'
+import {vi, type Mock} from 'vitest'
 
-jest.mock('react-router-dom', () => ({
-  useNavigate: jest.fn(),
-  useNavigationType: jest.fn(),
-  useLocation: jest.fn(),
+vi.mock('react-router-dom', () => ({
+  useNavigate: vi.fn(),
+  useNavigationType: vi.fn(),
+  useLocation: vi.fn(),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-const mockNavigate = jest.fn()
-const mockedUseNavigate = useNavigate as jest.Mock
-const mockedUseNavigationType = useNavigationType as jest.Mock
-const mockedUseLocation = useLocation as jest.Mock
+const mockNavigate = vi.fn()
+const mockedUseNavigate = useNavigate as Mock
+const mockedUseNavigationType = useNavigationType as Mock
+const mockedUseLocation = useLocation as Mock
 
 describe('useSafeBackNavigation', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockedUseNavigate.mockReturnValue(mockNavigate)
   })
 

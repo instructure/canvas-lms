@@ -20,10 +20,10 @@ export interface EnvDeveloperKeys {
   // From DeveloperKeysController
 
   // These may be able to be improved with actual values (?)
-  validLtiPlacements: string[]
   validLtiScopes: Record<string, string>
 
   accountEndpoint: string
   enableTestClusterChecks: boolean
   showApiGetWithBodyNotice: boolean
+  turnitinAPClientId?: string
 }

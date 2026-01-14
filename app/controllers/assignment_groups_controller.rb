@@ -358,7 +358,7 @@ class AssignmentGroupsController < ApplicationController
 
   def index_groups_json(context, current_user, groups, assignments, submissions = {})
     current_user_is_student = context.respond_to?(:user_is_student?) && context.user_is_student?(current_user)
-    can_include_assessment_requests = current_user_is_student && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:peer_reviews_for_a2)
+    can_include_assessment_requests = current_user_is_student && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:assignments_2_student)
     all_submissions = submissions&.values&.flatten || []
     unless all_submissions.empty?
       preloaded_enrollments_by_user_id = context.enrollments

@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import {extend as lodashExtend} from 'lodash'
+import {extend as lodashExtend} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
@@ -117,7 +117,7 @@ DeleteGroupView.prototype.removeFromGroupOptions = function (model) {
 DeleteGroupView.prototype.validateFormData = function (data) {
   const errors = {}
   if (data.action === 'move' && !data.move_assignments_to) {
-      errors.move_assignments_to = [
+    errors.move_assignments_to = [
       {
         type: 'required',
         message: I18n.t('Assignment group is required to move assignments'),
@@ -133,7 +133,7 @@ DeleteGroupView.prototype.showErrors = function (errors) {
     let shouldFocus = true
     Object.entries(errors).forEach(([field, value]) => {
       const container = this.getElement(`#ag_${id}_${field}_container`)
-      if(container){
+      if (container) {
         container.classList.add('error')
         if (shouldFocus) {
           const element = container.querySelector(`select[name='${field}']`)
@@ -146,19 +146,14 @@ DeleteGroupView.prototype.showErrors = function (errors) {
       const errorsContainer = this.getElement(`#${errorsContainerID}`)
       if (errorsContainer) {
         const root = this.errorRoots[errorsContainerID] ?? createRoot(errorsContainer)
-        root.render(
-          <FormattedErrorMessage
-            message={value[0].message}
-            margin={"0 0 0 medium"}
-          />
-        )
+        root.render(<FormattedErrorMessage message={value[0].message} margin={'0 0 0 medium'} />)
         this.errorRoots[errorsContainerID] = root
       }
     })
   }
 }
 
-DeleteGroupView.prototype.getElement = function(selector) {
+DeleteGroupView.prototype.getElement = function (selector) {
   // We need to query for all elements with the given selector and return the last one.
   // e.g. if a new Assignment Group is created, if the user reopens the dialog
   // it will create a new dialog in the DOM.
@@ -174,11 +169,10 @@ DeleteGroupView.prototype.hideErrors = function (field) {
   this.errorRoots[errorsContainerId]?.unmount()
   delete this.errorRoots[errorsContainerId]
   const container = this.getElement(`#ag_${id}_${field}_container`)
-  if(container){
+  if (container) {
     container.classList.remove('error')
   }
 }
-
 
 DeleteGroupView.prototype.saveFormData = function (data) {
   if (data.action === 'move' && data.move_assignments_to) {

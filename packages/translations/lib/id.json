@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Semua App"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Izinkan unduhan media"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Izinkan unduhan transkrip"
+    },
     "alpha_15d59033": {
         "message": "Alf:"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Ubah warna teks"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Perubahan akan diterapkan setelah Anda menyimpan halaman ini."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Perubahan yang Anda buat mungkin tidak tersimpan."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Tanamkan Gambar"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Opsi Tertanam"
     },
     "embed_video_a97a64af": {
         "message": "Tanamkan Video"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Memuat pratinjau"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Kunci Kecepatan pada 1x"
     },
     "locked_762f138b": {
         "message": "Terkunci"

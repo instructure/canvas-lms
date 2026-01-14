@@ -36,6 +36,14 @@ export const DisplayFilterSelector: React.FC<DisplayFilterSelectorProps> = ({val
       onChange={values => onChange(values as DisplayFilter[])}
     >
       <Checkbox
+        label={I18n.t('Unpublished Assignments')}
+        value={DisplayFilter.SHOW_UNPUBLISHED_ASSIGNMENTS}
+      />
+      <Checkbox
+        label={I18n.t('Outcomes with no results')}
+        value={DisplayFilter.SHOW_OUTCOMES_WITH_NO_RESULTS}
+      />
+      <Checkbox
         label={I18n.t('Students with no results')}
         value={DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS}
       />

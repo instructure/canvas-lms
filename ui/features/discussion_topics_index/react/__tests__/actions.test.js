@@ -21,7 +21,7 @@ import * as apiClient from '../apiClient'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 
-jest.mock('../apiClient')
+vi.mock('../apiClient')
 
 describe('Discussions redux actions', () => {
   const getState = () => ({
@@ -32,11 +32,11 @@ describe('Discussions redux actions', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('updateDiscussion', () => {
@@ -46,7 +46,7 @@ describe('Discussions redux actions', () => {
 
       const discussion = {pinned: false, locked: false}
       const updateFields = {pinned: true}
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
 
       await actions.updateDiscussion(discussion, updateFields, {})(dispatch, getState)
 
@@ -66,7 +66,7 @@ describe('Discussions redux actions', () => {
 
       const discussion = {pinned: true, locked: true}
       const updateFields = {pinned: false}
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
 
       await actions.updateDiscussion(discussion, updateFields, {})(dispatch, getState)
 
@@ -83,7 +83,7 @@ describe('Discussions redux actions', () => {
 
       const discussion = {pinned: true, locked: false}
       const updateFields = {locked: true}
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
 
       try {
         await actions.updateDiscussion(discussion, updateFields, {})(dispatch, getState)
@@ -103,12 +103,12 @@ describe('Discussions redux actions', () => {
 
     it('shows success message when successful and message is provided', async () => {
       apiClient.updateDiscussion.mockResolvedValue({})
-      const screenReaderSpy = jest.spyOn($, 'screenReaderFlashMessage')
+      const screenReaderSpy = vi.spyOn($, 'screenReaderFlashMessage')
 
       const discussion = {pinned: true, locked: false}
       const updateFields = {locked: true}
       const flashMessages = {successMessage: 'success message'}
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
 
       await actions.updateDiscussion(discussion, updateFields, flashMessages)(dispatch, getState)
 
@@ -117,11 +117,11 @@ describe('Discussions redux actions', () => {
 
     it('does not show success message when successful but no message provided', async () => {
       apiClient.updateDiscussion.mockResolvedValue({})
-      const screenReaderSpy = jest.spyOn($, 'screenReaderFlashMessage')
+      const screenReaderSpy = vi.spyOn($, 'screenReaderFlashMessage')
 
       const discussion = {pinned: true, locked: false}
       const updateFields = {locked: true}
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
 
       await actions.updateDiscussion(discussion, updateFields, {})(dispatch, getState)
 
@@ -131,12 +131,12 @@ describe('Discussions redux actions', () => {
     it('shows failure message when unsuccessful with custom message', async () => {
       const error = new Error('badness occurred')
       apiClient.updateDiscussion.mockRejectedValue(error)
-      const screenReaderSpy = jest.spyOn($, 'screenReaderFlashMessage')
+      const screenReaderSpy = vi.spyOn($, 'screenReaderFlashMessage')
 
       const discussion = {pinned: true, locked: false}
       const updateFields = {locked: true}
       const flashMessages = {failMessage: 'fail message'}
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
 
       try {
         await actions.updateDiscussion(discussion, updateFields, flashMessages)(dispatch, getState)
@@ -159,7 +159,7 @@ describe('Discussions redux actions', () => {
       }
       const discussion = {pinned: true, locked: false}
       const updateFields = {foobar: true}
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
 
       expect(() => {
         actions.handleDrop(discussion, updateFields, {})(dispatch, () => state)
@@ -179,7 +179,7 @@ describe('Discussions redux actions', () => {
         unpinnedDiscussionIds: [1],
         closedForCommentsDiscussions: [],
       }
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
       const discussion = {id: 1, pinned: false}
       const updateFields = {pinned: true}
       const order = [1, 2]
@@ -210,7 +210,7 @@ describe('Discussions redux actions', () => {
         unpinnedDiscussionIds: [1],
         closedForCommentsDiscussions: [],
       }
-      const dispatch = jest.fn()
+      const dispatch = vi.fn()
 
       await actions.handleDrop({id: 1, pinned: false}, {pinned: true})(dispatch, () => state)
 

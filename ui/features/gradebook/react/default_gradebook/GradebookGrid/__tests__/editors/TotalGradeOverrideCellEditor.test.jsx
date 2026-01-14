@@ -64,9 +64,9 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
     }
 
     gradebook = createGradebook({final_grade_override_enabled: true})
-    jest.spyOn(gradebook, 'isStudentGradeable').mockReturnValue(true)
-    jest.spyOn(gradebook, 'studentHasGradedSubmission').mockReturnValue(true)
-    jest.spyOn(gradebook, 'student').mockReturnValue({
+    vi.spyOn(gradebook, 'isStudentGradeable').mockReturnValue(true)
+    vi.spyOn(gradebook, 'studentHasGradedSubmission').mockReturnValue(true)
+    vi.spyOn(gradebook, 'student').mockReturnValue({
       enrollments: [
         {
           grades: {
@@ -140,7 +140,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the component when triggered', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -148,7 +148,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledWith(keyboardEvent)
@@ -156,7 +156,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
 
     test('returns the return value from the component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
+      vi.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
@@ -165,7 +165,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
     test('calls .handleKeyDown on the ReadOnlyCell component when the student is not gradeable', () => {
       gradebook.isStudentGradeable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'handleKeyDown')
+      vi.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
@@ -201,7 +201,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -209,7 +209,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
     test('calls .focus on the ReadOnlyCell component when the student is not gradeable', () => {
       gradebook.isStudentGradeable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'focus')
+      vi.spyOn(editor.component, 'focus')
       editor.focus()
       expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
@@ -218,14 +218,14 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the student is not gradeable', () => {
       gradebook.isStudentGradeable.mockReturnValue(false)
       createEditor()
-      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
+      vi.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -255,7 +255,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   describe('#applyValue()', () => {
     test('calls .applyValue on the component', () => {
       createEditor()
-      jest.spyOn(editor.component, 'applyValue')
+      vi.spyOn(editor.component, 'applyValue')
       editor.applyValue(/* SlickGrid API parameters are not used */)
       expect(editor.component.applyValue).toHaveBeenCalledTimes(1)
     })

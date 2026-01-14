@@ -17,34 +17,33 @@
  */
 
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
-import {TranslationTriggerModal} from "../components/TranslationTriggerModal/TranslationTriggerModal";
+import {render, fireEvent} from '@testing-library/react'
+import {TranslationTriggerModal} from '../components/TranslationTriggerModal/TranslationTriggerModal'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
 
 describe('TranslationTriggerModal', () => {
-  const mockCloseModal = jest.fn()
-  const mockCloseModalAndKeepTranslations = jest.fn()
-  const mockCloseModalAndRemoveTranslations = jest.fn()
+  const mockCloseModal = vi.fn()
+  const mockCloseModalAndKeepTranslations = vi.fn()
+  const mockCloseModalAndRemoveTranslations = vi.fn()
 
-  const getProps = (isModalOpen) => {
+  const getProps = isModalOpen => {
     return {
       isModalOpen,
       closeModal: mockCloseModal,
       closeModalAndKeepTranslations: mockCloseModalAndKeepTranslations,
-      closeModalAndRemoveTranslations: mockCloseModalAndRemoveTranslations
+      closeModalAndRemoveTranslations: mockCloseModalAndRemoveTranslations,
     }
   }
 
   it('should render the modal when isModalOpen is true', () => {
-    const { getByText } = render(<TranslationTriggerModal {...getProps(true)} />)
+    const {getByText} = render(<TranslationTriggerModal {...getProps(true)} />)
     expect(getByText('Are you sure you want to close?')).toBeInTheDocument()
   })
 
   it('should not render the modal when isModalOpen is false', () => {
-    const { queryByText } = render(<TranslationTriggerModal {...getProps(false)} />)
+    const {queryByText} = render(<TranslationTriggerModal {...getProps(false)} />)
     expect(queryByText('Are you sure you want to close?')).not.toBeInTheDocument()
   })
 
@@ -55,19 +54,19 @@ describe('TranslationTriggerModal', () => {
   })
 
   it('should call closeModal when the Cancel button is clicked', () => {
-    const { getByText } = render(<TranslationTriggerModal {...getProps(true)} />)
+    const {getByText} = render(<TranslationTriggerModal {...getProps(true)} />)
     fireEvent.click(getByText('Cancel'))
     expect(mockCloseModal).toHaveBeenCalled()
   })
 
   it('should call closeModalAndKeepTranslations when the Close and Keep Translations button is clicked', () => {
-    const { getByText } = render(<TranslationTriggerModal {...getProps(true)} />)
+    const {getByText} = render(<TranslationTriggerModal {...getProps(true)} />)
     fireEvent.click(getByText('Close and Keep Translations'))
     expect(mockCloseModalAndKeepTranslations).toHaveBeenCalled()
   })
 
   it('should call closeModalAndRemoveTranslations when the Close and Remove Translations button is clicked', () => {
-    const { getByText } = render(<TranslationTriggerModal {...getProps(true)} />)
+    const {getByText} = render(<TranslationTriggerModal {...getProps(true)} />)
     fireEvent.click(getByText('Close and Remove Translations'))
     expect(mockCloseModalAndRemoveTranslations).toHaveBeenCalled()
   })
@@ -78,4 +77,3 @@ describe('TranslationTriggerModal', () => {
     mockCloseModalAndRemoveTranslations.mockClear()
   })
 })
-

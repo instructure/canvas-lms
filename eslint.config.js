@@ -6,7 +6,6 @@ const jsxA11y = require('eslint-plugin-jsx-a11y')
 const pluginReactHooks = require('eslint-plugin-react-hooks')
 const pluginPromise = require('eslint-plugin-promise')
 const importPlugin = require('eslint-plugin-import')
-const lodashPlugin = require('eslint-plugin-lodash')
 const notice = require('eslint-plugin-notice')
 const comments = require('@eslint-community/eslint-plugin-eslint-comments/configs')
 const reactCompiler = require('eslint-plugin-react-compiler')
@@ -129,18 +128,6 @@ module.exports = [
     },
   },
 
-  // Lodash
-  {
-    plugins: {lodash: lodashPlugin},
-    rules: {
-      'lodash/callback-binding': 'error',
-      'lodash/collection-method-value': 'error',
-      'lodash/collection-return': 'error',
-      'lodash/no-extra-args': 'error',
-      'lodash/no-unbound-this': 'error',
-    },
-  },
-
   // Promises
   pluginPromise.configs['flat/recommended'],
   {
@@ -229,6 +216,9 @@ module.exports = [
       '@eslint-community/eslint-comments/disable-enable-pair': ['error', {allowWholeFile: true}],
     },
   },
+
+  // Vitest
+  require('./eslint.config.vitest'),
 
   // Jest
   require('./eslint.config.jest'),

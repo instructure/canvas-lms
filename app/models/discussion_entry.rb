@@ -34,7 +34,6 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
-  has_many :discussion_entry_drafts, inverse_of: :discussion_entry
   has_many :discussion_entry_versions, -> { order(version: :desc) }, inverse_of: :discussion_entry, dependent: :destroy
   has_many :legacy_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id", inverse_of: :parent_entry
   has_many :root_discussion_replies, -> { where("parent_id=root_entry_id") }, class_name: "DiscussionEntry", foreign_key: "root_entry_id", inverse_of: :root_entry
@@ -118,14 +117,6 @@ class DiscussionEntry < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
-  end
-
-  def delete_draft
-    discussion_topic.discussion_entry_drafts.where(user_id:, root_entry_id:).delete_all
-  end
-
-  def delete_edit_draft(user_id:)
-    discussion_entry_drafts.where(user_id:).delete_all
   end
 
   def log_discussion_entry_metrics

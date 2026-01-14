@@ -21,13 +21,13 @@ import {MemoryRouter, useNavigate} from 'react-router-dom'
 import {useSearchTerm} from '../useSearchTerm'
 import {generateSearchNavigationUrl} from '../../../utils/apiUtils'
 
-jest.mock('../../../utils/apiUtils', () => ({
-  generateSearchNavigationUrl: jest.fn(term => getExpectedSearchUrl(term)),
+vi.mock('../../../utils/apiUtils', () => ({
+  generateSearchNavigationUrl: vi.fn(term => getExpectedSearchUrl(term)),
 }))
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
+  useNavigate: vi.fn(),
 }))
 
 const getExpectedSearchUrl = (term: string) => `/search?search_term=${term}`
@@ -39,15 +39,15 @@ const getWrapper =
 
 describe('useSearchTerm', () => {
   const expectedSearchTerm = 'new-term'
-  let mockNavigate: jest.Mock
+  let mockNavigate: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    mockNavigate = jest.fn()
-    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+    mockNavigate = vi.fn()
+    ;(useNavigate as ReturnType<typeof vi.fn>).mockReturnValue(mockNavigate)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should return the current search term from the URL', () => {

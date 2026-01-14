@@ -155,9 +155,9 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
     }) && selectedGroup
       ? onCreateOutcomeHandler()
       : (() => {
-        focusOnError()
-        invalidTitle && setShowTitleError(true)
-      })()
+          focusOnError()
+          invalidTitle && setShowTitleError(true)
+        })()
 
   const updateProficiencyCalculation = (calculationMethodKey, calculationInt) =>
     setProficiencyCalculation({calculationMethod: calculationMethodKey, calculationInt})

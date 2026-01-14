@@ -47,7 +47,7 @@ it('sets focus to the prior focused item', () => {
 
 it('does not try to scroll to an item in the header', () => {
   const {animation, animator, document} = setup()
-  const contains = jest.fn().mockReturnValueOnce(true)
+  const contains = vi.fn().mockReturnValueOnce(true)
   document.querySelector.mockReturnValueOnce({contains})
   animation.invokeUiWillUpdate()
   animation.invokeUiDidUpdate()

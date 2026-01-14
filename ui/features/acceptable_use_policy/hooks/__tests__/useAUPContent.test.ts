@@ -16,20 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {renderHook} from '@testing-library/react-hooks'
 import {useAUPContent} from '../useAUPContent'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const mockApiResponse = {content: '<p>Test Acceptable Use Policy Content</p>'}
 
 describe('useAUPContent', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it('initializes with loading set to true and error to false', () => {
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
+    )
     const {result} = renderHook(() => useAUPContent())
     expect(result.current.loading).toBe(true)
     expect(result.current.error).toBe(false)
@@ -37,10 +48,9 @@ describe('useAUPContent', () => {
   })
 
   it('fetches content successfully and updates content and loading states', async () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-      json: mockApiResponse,
-      response: {ok: true},
-    })
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
+    )
     const {result, waitForNextUpdate} = renderHook(() => useAUPContent())
     await waitForNextUpdate()
     expect(result.current.loading).toBe(false)
@@ -49,7 +59,7 @@ describe('useAUPContent', () => {
   })
 
   it('sets error to true if the API request fails', async () => {
-    ;(doFetchApi as jest.Mock).mockRejectedValueOnce(new Error('API error'))
+    server.use(http.get('/api/v1/acceptable_use_policy', () => HttpResponse.error()))
     const {result, waitForNextUpdate} = renderHook(() => useAUPContent())
     await waitForNextUpdate()
     expect(result.current.loading).toBe(false)
@@ -58,10 +68,9 @@ describe('useAUPContent', () => {
   })
 
   it('handles null content without setting error when response is ok', async () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-      json: {content: null},
-      response: {ok: true},
-    })
+    server.use(
+      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json({content: null})),
+    )
     const {result, waitForNextUpdate} = renderHook(() => useAUPContent())
     await waitForNextUpdate()
     expect(result.current.loading).toBe(false)

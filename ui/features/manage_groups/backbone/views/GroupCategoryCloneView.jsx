@@ -90,13 +90,15 @@ GroupCategoryCloneView.prototype.submit = function (event) {
   event.preventDefault()
   const data = this.getFormData()
 
-  if(data.clone_option === 'clone') {
-    if(data.name.trim().length === 0) {
-      this.showErrors({name:[{attribute:'name', message: I18n.t('Name is required')}]})
+  if (data.clone_option === 'clone') {
+    if (data.name.trim().length === 0) {
+      this.showErrors({name: [{attribute: 'name', message: I18n.t('Name is required')}]})
       return
     }
-    if(data.name.trim().length >= 255) {
-      this.showErrors({name:[{attribute:'name', message: I18n.t('Enter a shorter category name')}]})
+    if (data.name.trim().length >= 255) {
+      this.showErrors({
+        name: [{attribute: 'name', message: I18n.t('Enter a shorter category name')}],
+      })
       return
     }
   }
@@ -120,7 +122,7 @@ GroupCategoryCloneView.prototype.handleNameInput = function () {
   this.hideErrors('cloned_category_name')
 }
 GroupCategoryCloneView.prototype.showErrors = function (errors) {
-  if(errors.hasOwnProperty('name')) {
+  if (errors.hasOwnProperty('name')) {
     const input = this.$el.find('#cloned_category_name')[0]
     const msg = errors.name[0].message
     if (input) {
@@ -130,20 +132,16 @@ GroupCategoryCloneView.prototype.showErrors = function (errors) {
     }
     const errorsContainer = this.$el.find('#cloned_category_name_errors')[0]
     if (errorsContainer) {
-      if(!this.errorRoot)
-        this.errorRoot = createRoot(errorsContainer)
-      this.errorRoot.render(
-        <FormattedErrorMessage message={msg} margin="x-small 0 0 0" />
-      )
+      if (!this.errorRoot) this.errorRoot = createRoot(errorsContainer)
+      this.errorRoot.render(<FormattedErrorMessage message={msg} margin="x-small 0 0 0" />)
     }
   }
-  
 }
 GroupCategoryCloneView.prototype.hideErrors = function (id) {
   const input = document.getElementById(id)
   this.errorRoot?.unmount()
   this.errorRoot = null
-  if(input){
+  if (input) {
     input.classList.remove('error-outline')
     input.removeAttribute('aria-label')
   }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {find} from 'lodash'
+import {find} from 'es-toolkit/compat'
 
 const RE_EXTRACT_LINK = /<([^>]+)>; rel="([^"]+)",?\s*/g
 const RE_EXTRACT_PP = /per_page=(\d+)/
@@ -202,7 +202,7 @@ const Mixin = {
     })(this)
   },
 
-  /** @private */
+  // @ts-expect-error Legacy class method parameters not typed
   _resetPaginationMeta() {
     this._paginationMeta = {}
   },

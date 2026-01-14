@@ -16,28 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useMemo, useEffect } from 'react'
-import { useTranslationContext } from "./useTranslationContext"
-import { signatureSeparator, translationSeparator } from '../utils/constants'
-import { stripSignature } from '../utils/inbox_translator'
+import {useMemo, useEffect} from 'react'
+import {useTranslationContext} from './useTranslationContext'
+import {signatureSeparator, translationSeparator} from '../utils/constants'
+import {stripSignature} from '../utils/inbox_translator'
 
 const useTranslationDisplay = ({
   signature,
   inboxSettingsFeature,
-  includeTranslation
+  includeTranslation,
 }: {
-  signature: string,
-  inboxSettingsFeature: boolean,
+  signature: string
+  inboxSettingsFeature: boolean
   includeTranslation: boolean
 }) => {
   useTranslationContext()
 
-  const {
-    setMessagePosition,
-    messagePosition,
-    body,
-    setBody
-  } = useTranslationContext()
+  const {setMessagePosition, messagePosition, body, setBody} = useTranslationContext()
 
   // If we have a message position, the message has been translated.
   const primary = useMemo(() => {
@@ -109,14 +104,12 @@ const useTranslationDisplay = ({
     signature,
     setBody,
     translated,
-
   ])
 
   return {
     handleIsPrimaryChange,
-    primary
+    primary,
   }
-
 }
 
 export default useTranslationDisplay

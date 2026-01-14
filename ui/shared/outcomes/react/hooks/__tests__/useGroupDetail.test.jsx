@@ -26,15 +26,14 @@ import OutcomesContext, {ACCOUNT_GROUP_ID} from '../../contexts/OutcomesContext'
 import {FIND_GROUP_OUTCOMES} from '../../../graphql/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
 
 const flushAllTimersAndPromises = async () => {
-  while (jest.getTimerCount() > 0) {
-     
+  while (vi.getTimerCount() > 0) {
     await act(async () => {
-      jest.runAllTimers()
+      vi.runAllTimers()
     })
   }
 }
@@ -54,13 +53,13 @@ describe('groupDetailHook', () => {
   ]
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     cache = createCache()
     mocks = groupDetailMocks()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const wrapper = ({children}) => (
@@ -125,7 +124,7 @@ describe('groupDetailHook', () => {
     const {result} = renderHook(() => useGroupDetail({id: '2'}), {
       wrapper,
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading selected group.',
       type: 'error',
@@ -136,7 +135,7 @@ describe('groupDetailHook', () => {
   describe('should flash a screenreader message when group has finshed loading', () => {
     it('shows pluralized info message when a group has more than 1 outcome', async () => {
       const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.group.title).toBe('Group 1')
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing 2 outcomes for Group 1.',
@@ -147,7 +146,7 @@ describe('groupDetailHook', () => {
     it('shows singularized info message when a group has only 1 outcome', async () => {
       mocks = [...groupDetailMocks({numOfOutcomes: 1})]
       const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.group.title).toBe('Group 1')
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing 1 outcome for Group 1.',
@@ -185,7 +184,7 @@ describe('groupDetailHook', () => {
       id => useGroupDetail({id, rhsGroupIdsToRefetch: ['200']}),
       {wrapper, initialProps: '1'},
     )
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.group.title).toBe('Group 1')
     expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
     expect(outcomeFriendlyDescriptions(result)).toEqual(['', ''])
@@ -204,7 +203,7 @@ describe('groupDetailHook', () => {
     const {result} = renderHook(() => useGroupDetail({id: ACCOUNT_GROUP_ID}), {wrapper})
     expect(result.current.loading).toBe(false)
     expect(result.current.group).toBe(null)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.loading).toBe(false)
     expect(result.current.group).toBe(null)
   })
@@ -222,19 +221,19 @@ describe('groupDetailHook', () => {
       {wrapper},
     )
     hook.rerender('')
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
 
     hook.rerender('s')
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
 
     hook.rerender('se')
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
 
     hook.rerender('search')
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 3 - Group 1'])
   })
 

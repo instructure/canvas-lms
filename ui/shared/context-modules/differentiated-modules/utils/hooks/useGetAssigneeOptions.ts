@@ -21,7 +21,7 @@ import {getSections, getStudents, getGroups, getDifferentiationTags} from './que
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AssigneeOption} from '../../react/Item/types'
-import {uniqBy} from 'lodash'
+import {uniqBy} from 'es-toolkit/compat'
 import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('differentiated_modules')

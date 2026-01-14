@@ -93,7 +93,7 @@ describe('FilePreview', () => {
   beforeEach(() => {
     originalEnv = global.ENV
     global.ENV = {...originalEnv, FEATURES: {lti_asset_processor: true}}
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -238,8 +238,8 @@ describe('FilePreview', () => {
     // Wait for async query to resolve and component to update
     await screen.findByText('Document Processors')
 
-    // Check for status text based on fixture data - all reports have priority > 0, so all show "Needs attention"
-    const needsAttentionLinks = screen.getAllByText('Needs attention')
+    // Check for status text based on fixture data - all reports have priority > 0, so all show "Please review"
+    const needsAttentionLinks = screen.getAllByText('Please review')
     expect(needsAttentionLinks).toHaveLength(files.length) // One per file
   })
 

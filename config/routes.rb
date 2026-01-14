@@ -570,7 +570,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :accessibility_issues, only: [:update, :show]
+    resources :accessibility_issues, only: [:update]
 
     resources :ai_experiences, only: %i[index create new show edit update destroy]
     resources :ai_experiences, only: %i[index show new edit]
@@ -1657,7 +1657,11 @@ CanvasRails::Application.routes.draw do
 
       %w[course account].each do |context|
         get "#{context}s/:#{context}_id/external_tools/sessionless_launch", action: :generate_sessionless_launch, as: "#{context}_external_tool_sessionless_launch"
-        get "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :show, as: "#{context}_external_tool_show"
+
+        # Support client-side routing in federated apps (e.g., New Quizzes)
+        # Routes like `/courses/:course_id/external_tools/:external_tool_id/any/nested/path`
+        # will be handled by the router in the federated app
+        get "#{context}s/:#{context}_id/external_tools/:external_tool_id#{full_path_glob}", action: :show, as: "#{context}_external_tool_show"
 
         # Migration URL
         get "#{context}s/:#{context}_id/external_tools/:external_tool_id/migration_info", action: :migration_info, as: "#{context}_external_tool_migration_info"
@@ -2113,6 +2117,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:id/overlay_history", action: :overlay_history
       get "accounts/:account_id/lti_registrations/:id/history", action: :history, as: :lti_registration_history
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
+      get "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id", action: :show_registration_update_request, as: "lti_registration_update_request"
       put "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id/apply", action: :apply_registration_update_request, as: "apply_lti_registration_update_request"
       put "accounts/:account_id/lti_registrations/:id", action: :update
       put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
@@ -2143,6 +2148,11 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/lti_resource_links/:id", action: :show
       put "courses/:course_id/lti_resource_links/:id", action: :update
       delete "courses/:course_id/lti_resource_links/:id", action: :destroy
+    end
+
+    scope(controller: "lti/asset_processor_tii_migrations_api") do
+      get "accounts/:account_id/asset_processors/tii_migrations", action: :index
+      post "accounts/:account_id/asset_processors/tii_migrations", action: :create
     end
 
     scope(controller: :immersive_reader) do
@@ -2484,6 +2494,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :outcome_results) do
       get "courses/:course_id/outcome_rollups", action: :rollups, as: "course_outcome_rollups"
       get "courses/:course_id/outcome_results", action: :index, as: "course_outcome_results"
+      get "courses/:course_id/outcomes/:outcome_id/contributing_scores", action: :contributing_scores, as: "course_outcome_contributing_scores"
       post "courses/:course_id/assign_outcome_order", action: :outcome_order, as: "course_outcomes_order"
       post "enqueue_outcome_rollup_calculation", action: :enqueue_outcome_rollup_calculation
     end
@@ -2953,6 +2964,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :career_experience) do
+      get "career/enabled", action: :enabled
       get "career/experience_summary", action: :experience_summary
       post "career/switch_experience", action: :switch_experience
       post "career/switch_role", action: :switch_role
@@ -3157,6 +3169,7 @@ CanvasRails::Application.routes.draw do
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
       put "registrations/:registration_id", action: :update, as: :update_lti_registration
+      get "registrations/:registration_id", action: :show_configuration, as: :get_lti_registration
     end
 
     # Public JWK Service

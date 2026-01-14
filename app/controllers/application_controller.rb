@@ -439,7 +439,6 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
-    accessibility_issues_in_full_page
     a11y_checker_ai_generation
     block_content_editor_toolbar_reorder
     commons_new_quizzes
@@ -485,6 +484,7 @@ class ApplicationController < ActionController::Base
     ams_enhanced_rubrics
     api_rate_limits
     buttons_and_icons_root_account
+    canvas_apps_sub_account_access
     course_pace_allow_bulk_pace_assign
     course_pace_download_document
     course_pace_draft_state
@@ -693,7 +693,6 @@ class ApplicationController < ActionController::Base
         tool.feature_flag_enabled?(context)
     end
 
-    tools.select! { |tool| tool.placement_allowed?(type) }
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
     end
@@ -2569,7 +2568,7 @@ class ApplicationController < ActionController::Base
 
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil, authorization: nil)
+  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil, authorization: nil, query_params: {})
     host_and_shard ||= HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     host, shard = host_and_shard
     config = DynamicSettings.find(tree: :private, cluster: attachment.shard.database_server.id)
@@ -2601,6 +2600,8 @@ class ApplicationController < ActionController::Base
         # comment below for why we'd want to set :download
         opts[:inline] = 1
       end
+
+      opts.merge!(query_params)
 
       if @context && Attachment.relative_context?(@context.class.base_class) && @context == attachment.context
         # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
@@ -3422,7 +3423,7 @@ class ApplicationController < ActionController::Base
 
   def peer_reviews_for_a2_enabled?
     current_user_is_student = @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user)
-    current_user_is_student && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:peer_reviews_for_a2)
+    current_user_is_student && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:assignments_2_student)
   end
 
   # Show Student View button on the following controller/action pages, as long as defined tabs are not hidden
@@ -3468,9 +3469,9 @@ class ApplicationController < ActionController::Base
   end
 
   def new_quizzes_native_experience_enabled?
-    return false unless @context.respond_to?(:root_account)
+    return false unless @context.respond_to?(:feature_enabled?)
 
-    @context.root_account.feature_enabled?(:new_quizzes_native_experience)
+    @context.feature_enabled?(:new_quizzes_native_experience)
   end
   helper_method :new_quizzes_native_experience_enabled?
 
@@ -3482,8 +3483,19 @@ class ApplicationController < ActionController::Base
       context: @context,
       assignment: @assignment,
       tool: @tool,
+      tag: @tag || @module_tag,
       current_user: @current_user,
-      request:
+      controller: self,
+      request:,
+      variable_expander: Lti::VariableExpander.new(@domain_root_account, @context, self, {
+                                                     current_user: @current_user,
+                                                     current_pseudonym: @current_pseudonym,
+                                                     assignment: @assignment,
+                                                     content_tag: @module_tag || @tag,
+                                                     launch: @lti_launch,
+                                                     tool: @tool,
+                                                     launch_url: @resource_url
+                                                   })
     ).build_with_signature
 
     js_env(NEW_QUIZZES: signed_launch_data)
@@ -3564,11 +3576,18 @@ class ApplicationController < ActionController::Base
   end
 
   def add_ignite_agent_bundle?
-    return false unless @domain_root_account&.feature_enabled?(:ignite_agent_enabled)
-    return true if @domain_root_account&.grants_right?(@current_user, session, :manage_account_settings)
-    return false unless @current_user&.feature_enabled?(:ignite_agent_enabled_for_user)
+    return false if params[:preview] == "true"
+    return false if controller_name == "oauth2_provider"
+    return false unless @domain_root_account
 
-    true
+    if @domain_root_account.feature_enabled?(:ignite_agent_enabled) # legacy, scheduled for removal
+      return true if @domain_root_account.grants_right?(@current_user, session, :manage_account_settings)
+      return true if @current_user&.feature_enabled?(:ignite_agent_enabled_for_user)
+    end
+
+    return true if @domain_root_account.feature_enabled?(:oak_for_admins) && @domain_root_account.grants_right?(@current_user, session, :access_oak)
+
+    false
   end
   helper_method :add_ignite_agent_bundle?
 

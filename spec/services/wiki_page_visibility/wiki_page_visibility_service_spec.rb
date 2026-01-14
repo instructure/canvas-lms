@@ -84,4 +84,59 @@ describe WikiPageVisibility::WikiPageVisibilityService do
       expect(assignment_ids_visible_to_user(@student2)).to contain_exactly(@page2.assignment.id)
     end
   end
+
+  describe ".invalidate_cache" do
+    it "raises an error when neither course_ids nor wiki_page_ids are provided" do
+      expect do
+        WikiPageVisibility::WikiPageVisibilityService.invalidate_cache(user_ids: [@student1.id])
+      end.to raise_error(ArgumentError, "at least one non nil course_id or wiki_page_id is required (for query performance reasons)")
+    end
+
+    it "deletes the cache when called with course_ids" do
+      WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(
+        course_ids: [@course.id],
+        user_ids: [@student1.id],
+        wiki_page_ids: [@page1.id]
+      )
+
+      expect(Rails.cache).to receive(:delete).and_call_original
+
+      WikiPageVisibility::WikiPageVisibilityService.invalidate_cache(
+        course_ids: [@course.id],
+        user_ids: [@student1.id],
+        wiki_page_ids: [@page1.id]
+      )
+    end
+
+    it "deletes the cache when called with wiki_page_ids only" do
+      WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(
+        wiki_page_ids: [@page1.id, @page2.id]
+      )
+
+      expect(Rails.cache).to receive(:delete).and_call_original
+
+      WikiPageVisibility::WikiPageVisibilityService.invalidate_cache(
+        wiki_page_ids: [@page1.id, @page2.id]
+      )
+    end
+
+    it "accepts include_concluded parameter" do
+      expect do
+        WikiPageVisibility::WikiPageVisibilityService.invalidate_cache(
+          course_ids: [@course.id],
+          include_concluded: false
+        )
+      end.not_to raise_error
+    end
+
+    it "works with multiple user_ids" do
+      expect(Rails.cache).to receive(:delete).and_call_original
+
+      WikiPageVisibility::WikiPageVisibilityService.invalidate_cache(
+        course_ids: [@course.id],
+        user_ids: [@student1.id, @student2.id],
+        wiki_page_ids: [@page1.id]
+      )
+    end
+  end
 end

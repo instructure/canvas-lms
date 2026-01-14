@@ -27,6 +27,7 @@ import {fireEvent, render} from '@testing-library/react'
 import {getSpeedGraderUrl} from '../../../utils'
 import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   updateDiscussionEntryParticipantMock,
   updateDiscussionThreadReadStateMock,
@@ -35,27 +36,27 @@ import {User} from '../../../../graphql/User'
 import {waitFor} from '@testing-library/dom'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
-jest.mock('@canvas/util/globalUtils')
+vi.mock('@canvas/util/globalUtils')
 
 describe('DiscussionThreadContainer', () => {
-  const onFailureStub = jest.fn()
-  const onSuccessStub = jest.fn()
-  const openMock = jest.fn()
+  const onFailureStub = vi.fn()
+  const onSuccessStub = vi.fn()
+  const openMock = vi.fn()
 
   beforeAll(() => {
-    window.ENV = {
+    fakeENV.setup({
       course_id: '1',
       SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
       discussions_reporting: false,
-    }
+    })
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -67,7 +68,7 @@ describe('DiscussionThreadContainer', () => {
     onSuccessStub.mockClear()
     openMock.mockClear()
     window.ENV.discussions_reporting = false
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const defaultProps = ({
@@ -245,7 +246,7 @@ describe('DiscussionThreadContainer', () => {
     })
 
     it('Should render Mark Thread as Unread and Read', () => {
-      const setHighlightEntryId = jest.fn()
+      const setHighlightEntryId = vi.fn()
       const {getByTestId, getAllByText} = setup(
         defaultProps({
           propOverrides: {setHighlightEntryId},
@@ -423,7 +424,7 @@ describe('DiscussionThreadContainer', () => {
 
   describe('Go to Buttons', () => {
     it('Should call scrollTo when go to topic is pressed', async () => {
-      const goToTopic = jest.fn()
+      const goToTopic = vi.fn()
       const {getByTestId} = setup(defaultProps({propOverrides: {goToTopic}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
@@ -435,7 +436,7 @@ describe('DiscussionThreadContainer', () => {
     })
 
     it('Should call props.setHighlightEntryId when go to parent is pressed', async () => {
-      const setHighlightEntryId = jest.fn()
+      const setHighlightEntryId = vi.fn()
       const parentId = '1'
       const {getByTestId} = setup(
         defaultProps({propOverrides: {setHighlightEntryId, parentId, depth: 2}}),

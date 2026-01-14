@@ -58,7 +58,6 @@ export interface MockTrayProps {
   source: {
     initializeCollection: () => void
     initializeUpload: () => void
-    initializeFlickr: () => void
     initializeImages: () => void
     initializeDocuments: () => void
     initializeMedia: () => void

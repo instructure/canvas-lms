@@ -464,7 +464,9 @@ uk:
     report_header_token_dev_key_id: "ідентифікатор ключа dev"
     report_header_token_dev_key_name: "Ім'я ключа dev"
     report_header_token_hint: "маркер поради"
+    report_header_token_id: ідентифікатор
     report_header_token_last_used: "останній використаний"
+    report_header_token_status: статус
     report_header_user__id: user_id
     report_header_user_id: "ідентифікатор користувача"
     report_header_user_name: "імя користувача"
@@ -1956,6 +1958,7 @@ uk:
       recipients_required: "Потрібен принаймні один отримувач"
       threshold_should_be_numeric: "Це має бути додатнє число"
   alerts_6b871b71: "Сповіщення про небезпеку"
+  aligned_outcomes_d0a0c159: "Вирівнювання результатів"
   all_4321c3a1: Всі
   all_account_types_e83c1516: "Всі типи облікових записів"
   all_accounts_3bafc860: "Всі облікові записи"

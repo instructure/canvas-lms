@@ -22,7 +22,7 @@ import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection
 import Group from '@canvas/groups/backbone/models/Group'
 import GroupUser from '@canvas/groups/backbone/models/GroupUser'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 let view = null
 let user = null
@@ -64,8 +64,8 @@ describe('AssignToGroupMenu', () => {
     document.getElementById('fixtures').innerHTML = ''
   })
 
-  test('it should be accessible', done => {
-    isAccessible(view, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await isAccessible(view, {a11yReport: true})
   })
 
   test("updates the user's group", () => {

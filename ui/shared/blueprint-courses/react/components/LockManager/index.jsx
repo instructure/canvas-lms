@@ -22,7 +22,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-import get from 'lodash/get'
+import {get} from 'es-toolkit/compat'
 import buildProps from './buildLockProps'
 import ApiClient from '../../apiClient'
 import LockBanner from './LockBanner'

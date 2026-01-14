@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {filter, isEmpty, find} from 'lodash'
+import {filter, find, isEmpty} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 
 function where(collection, properties, first) {

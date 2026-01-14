@@ -838,6 +838,149 @@ describe Login::SamlController do
     end
   end
 
+  context "OneTimeUse condition" do
+    before do
+      user_with_pseudonym(active_all: 1, account:)
+      allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, nil]
+      )
+    end
+
+    let(:account) { account_with_saml }
+    let(:authentication_provider) { account.authentication_providers.active.where(auth_type: "saml").take! }
+    let(:saml_response) do
+      saml_response = SAML2::Response.new
+      saml_response.issuer = SAML2::NameID.new("saml_entity")
+      saml_response.assertions << (assertion = SAML2::Assertion.new)
+      assertion.subject = SAML2::Subject.new
+      assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+      saml_response
+    end
+
+    it "does nothing by default" do
+      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
+      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
+      expect(controller).to receive(:successful_login)
+
+      post :create, params: { SAMLResponse: "foo" }
+
+      # we mock successful_login to avoid dealing with redirects in this test
+      expect(response).to have_http_status :no_content
+      expect(authentication_provider.reload.settings).not_to have_key("most_recent_one_time_use_violation")
+    end
+
+    it "does nothing even when monitoring feature enabled" do
+      Account.site_admin.enable_feature!(:saml_count_one_time_use_usage)
+      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
+      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
+      expect(controller).to receive(:successful_login)
+
+      post :create, params: { SAMLResponse: "foo" }
+
+      expect(response).to have_http_status :no_content
+      expect(authentication_provider.reload.settings).not_to have_key("most_recent_one_time_use_violation")
+    end
+
+    it "does nothing when enforcement feature enabled" do
+      Account.site_admin.enable_feature!(:saml_enforce_one_time_use)
+      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
+      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
+      expect(controller).to receive(:successful_login)
+
+      post :create, params: { SAMLResponse: "foo" }
+
+      expect(response).to have_http_status :no_content
+      expect(authentication_provider.reload.settings).not_to have_key("most_recent_one_time_use_violation")
+    end
+
+    context "when the condition is present" do
+      before do
+        saml_response.assertions.first.conditions << SAML2::Conditions::OneTimeUse.new
+      end
+
+      it "does nothing by default" do
+        expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
+        expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
+        expect(controller).to receive(:successful_login)
+
+        post :create, params: { SAMLResponse: "foo" }
+
+        expect(response).to have_http_status :no_content
+        expect(authentication_provider.reload.settings).not_to have_key("most_recent_one_time_use_violation")
+      end
+
+      it "sends to Datadog when only monitoring feature enabled" do
+        Account.site_admin.enable_feature!(:saml_count_one_time_use_usage)
+        expect(controller).to receive(:increment_statsd).with(:one_time_use_passed)
+        expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
+        expect(controller).to receive(:successful_login)
+
+        post :create, params: { SAMLResponse: "foo" }
+
+        expect(response).to have_http_status :no_content
+        expect(authentication_provider.reload.settings).not_to have_key("most_recent_one_time_use_violation")
+      end
+
+      context "when violated" do
+        before do
+          allow(controller).to receive(:duplicate_response?).and_return(true)
+        end
+
+        it "just records a timestamp by default" do
+          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
+          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
+          expect(controller).to receive(:successful_login)
+
+          post :create, params: { SAMLResponse: "foo" }
+
+          expect(response).to have_http_status :no_content
+          expect(authentication_provider.reload.settings).to have_key("most_recent_one_time_use_violation")
+        end
+
+        it "updates the timestamp if one already exists" do
+          last_time = 1.day.ago.iso8601
+          authentication_provider.settings["most_recent_one_time_use_violation"] = last_time
+          authentication_provider.save!
+          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
+          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
+          expect(controller).to receive(:successful_login)
+
+          post :create, params: { SAMLResponse: "foo" }
+
+          expect(response).to have_http_status :no_content
+          expect(authentication_provider.reload.settings).to have_key("most_recent_one_time_use_violation")
+          expect(authentication_provider.reload.settings["most_recent_one_time_use_violation"]).not_to eql last_time
+        end
+
+        it "sends to Datadog when only monitoring feature enabled" do
+          Account.site_admin.enable_feature!(:saml_count_one_time_use_usage)
+          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
+          expect(controller).to receive(:increment_statsd).with(:one_time_use_soft_violation)
+          expect(controller).to receive(:successful_login)
+
+          post :create, params: { SAMLResponse: "foo" }
+
+          expect(response).to have_http_status :no_content
+          expect(authentication_provider.reload.settings).to have_key("most_recent_one_time_use_violation")
+        end
+
+        it "blocks login when enforcement feature enabled" do
+          Account.site_admin.enable_feature!(:saml_enforce_one_time_use)
+          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
+          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
+          expect(controller).to receive(:increment_statsd).with(:failure, reason: :one_time_use_violation)
+
+          post :create, params: { SAMLResponse: "foo" }
+
+          expect(response).to redirect_to(login_url)
+          expect(authentication_provider.reload.settings).to have_key("most_recent_one_time_use_violation")
+        end
+      end
+    end
+  end
+
   describe "#destroy" do
     let(:certificates) { ["MIIFnzCCBIegAwIBAgIQItX5wssh0ecd46K65PkSNDANBgkqhkiG9w0BAQsFADCBkDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxNjA0BgNVBAMTLUNPTU9ETyBSU0EgRG9tYWluIFZhbGlkYXRpb24gU2VjdXJlIFNlcnZlciBDQTAeFw0xNjA5MDgwMDAwMDBaFw0xOTEwMjUyMzU5NTlaMIGeMSEwHwYDVQQLExhEb21haW4gQ29udHJvbCBWYWxpZGF0ZWQxSTBHBgNVBAsTQElzc3VlZCB0aHJvdWdoIEl2eSBUZWNoIENvbW11bml0eSBDb2xsZWdlIG9mIEluZGlhbmEgRS1QS0kgTWFuYWcxEzARBgNVBAsTCkNPTU9ETyBTU0wxGTAXBgNVBAMTEGFkZnMuaXZ5dGVjaC5lZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC58zHz7VsV9S2XZMRjgqiWxBZ6M9y6/3zkrbObJ9hZqO7giCoonNDuELUiNt8pBqF8aHef8qbDOecBBXkz8rPAJL1S6lzvbxHIBuvEy+xOpVdUNMoyOaAYHOI5T6ueL1Q4iGMKfnWuXSvVTyB+9wAF/aWVFSoz+alUOiQtqTYyfgIKzHIAmFX7/SjFA9UjKVtqatcvzWsSWZHL4imeTmPosXXjmJVZnl+jaeFsnmW59o66sdGR+NYkhsBcVRnuP3MdxVgr5xSJMN+/BgZwCncX+4LJq5664eeQcJM5Km9kbQ/jMFhYy765ejszcL0vWe/fS7tdXQCfoKjRZ5LzNEb3AgMBAAGjggHjMIIB3zAfBgNVHSMEGDAWgBSQr2o6lFoL2JDqElZz30O0Oija5zAdBgNVHQ4EFgQUdFr6SnHaXUqLAEdOL9qrTJS/3AYwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCME8GA1UdIARIMEYwOgYLKwYBBAGyMQECAgcwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLmNvbS9DUFMwCAYGZ4EMAQIBMFQGA1UdHwRNMEswSaBHoEWGQ2h0dHA6Ly9jcmwuY29tb2RvY2EuY29tL0NPTU9ET1JTQURvbWFpblZhbGlkYXRpb25TZWN1cmVTZXJ2ZXJDQS5jcmwwgYUGCCsGAQUFBwEBBHkwdzBPBggrBgEFBQcwAoZDaHR0cDovL2NydC5jb21vZG9jYS5jb20vQ09NT0RPUlNBRG9tYWluVmFsaWRhdGlvblNlY3VyZVNlcnZlckNBLmNydDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuY29tb2RvY2EuY29tMDEGA1UdEQQqMCiCEGFkZnMuaXZ5dGVjaC5lZHWCFHd3dy5hZGZzLml2eXRlY2guZWR1MA0GCSqGSIb3DQEBCwUAA4IBAQA0dXP0leDcdrr/iKk4nDSCofllPAWE8LE3mD9Yb9K+/oVymxpqNIVJesDPLtf1HqWk6S6eafcYvfzl9aTMcvwEkL27g2l9UQuICkQgqSEY5qTsK//u/2S98JqXep2oRyvxo3UHX+3Ouc3i49hQ0v05Faoeap/ZT3JEsMV2Go9UKRJbYBG9Nqq/CDBuTgyopKJ7fvCtsGxwsvlUAz/NMuNoUphPQ2S+O/SjabjR4XsAGU78Hji2tqJyvPyKPanxc0ioDdnL5lvrk4uZ/6Dy159C5FOFeLU2ZfiNLXRR85KFfhtX954qvX6jmM7CPmcidhzEnZV8fQv9G6XYPfrNL7bh"] }
 

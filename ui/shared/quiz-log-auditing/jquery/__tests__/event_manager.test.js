@@ -56,7 +56,7 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
 
   beforeEach(() => {
     fakeENV.setup()
-    jest.useRealTimers()
+    vi.useRealTimers()
     capturedRequests = []
 
     const handlers = [
@@ -118,7 +118,7 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
     }
     server.resetHandlers()
     server.close()
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fakeENV.teardown()
   })
 
@@ -146,7 +146,7 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
   })
 
   test('should ignore EVT_PAGE_FOCUSED events that are not preceded by EVT_PAGE_BLURRED', async () => {
-    const consoleWarn = jest.spyOn(console, 'warn')
+    const consoleWarn = vi.spyOn(console, 'warn')
     consoleWarn.mockImplementation(() => {})
 
     evtManager = new EventManager({

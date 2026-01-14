@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isArray, each, clone} from 'lodash'
+import {isArray, each, clone} from 'es-toolkit/compat'
 
 // @ts-expect-error
 function flattenObjects(array, key, backward, output) {

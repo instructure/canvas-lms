@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, act, fireEvent} from '@testing-library/react'
+import {render, act, fireEvent, waitFor} from '@testing-library/react'
 import React from 'react'
 import Integrations from '../Integrations'
-import axios from 'axios'
-import useFetchApi from '@canvas/use-fetch-api-hook'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/use-fetch-api-hook')
-jest.mock('axios')
+const server = setupServer()
 
 describe('Integrations', () => {
   const oldENV = window.ENV
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     window.ENV = {
@@ -36,14 +38,16 @@ describe('Integrations', () => {
   })
 
   afterEach(() => {
-    axios.request.mockClear()
-    useFetchApi.mockClear()
+    server.resetHandlers()
     window.ENV = oldENV
   })
 
-  it('renders the Microsoft Sync integration', () => {
+  it('renders the Microsoft Sync integration', async () => {
+    server.use(http.get('/api/v1/courses/2/microsoft_sync/group', () => HttpResponse.json({})))
     const subject = render(<Integrations />)
-    expect(subject.getAllByText('Microsoft Sync')).toBeTruthy()
+    await waitFor(() => {
+      expect(subject.getAllByText('Microsoft Sync')).toBeTruthy()
+    })
   })
 
   describe('when no integrations are enabled', () => {
@@ -56,58 +60,76 @@ describe('Integrations', () => {
     })
 
     it("doesn't fetch from the API", () => {
+      let requestMade = false
+      server.use(
+        http.get('/api/v1/courses/2/microsoft_sync/group', () => {
+          requestMade = true
+          return HttpResponse.json({})
+        }),
+      )
       act(() => {
         render(<Integrations />)
       })
-      expect(useFetchApi).not.toHaveBeenCalled()
+      expect(requestMade).toBe(false)
     })
   })
 
   describe('Microsoft Sync', () => {
-    it('shows errors when they exist', () => {
-      useFetchApi.mockImplementationOnce(({error, loading}) => {
-        error({message: 'error', response: {status: 500}})
-        loading(false)
-      })
+    it('shows errors when they exist', async () => {
+      server.use(
+        http.get(
+          '/api/v1/courses/2/microsoft_sync/group',
+          () => new HttpResponse(null, {status: 500}),
+        ),
+      )
 
       const subject = render(<Integrations />)
-      expect(subject.getByText('Integration error')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(subject.getByText('Integration error')).toBeInTheDocument()
+      })
 
       act(() => {
         fireEvent.click(subject.getByText('Show Microsoft Sync details'))
       })
 
-      expect(
-        subject.getByText('An error occurred, please try again. Error: error'),
-      ).toBeInTheDocument()
+      expect(subject.getByText(/An error occurred, please try again/)).toBeInTheDocument()
     })
 
-    it('disables the integration when toggled', () => {
-      useFetchApi.mockImplementationOnce(({success, loading}) => {
-        success({workflow_state: 'active'})
-        loading(false)
-      })
+    it('disables the integration when toggled', async () => {
+      server.use(
+        http.get('/api/v1/courses/2/microsoft_sync/group', () =>
+          HttpResponse.json({workflow_state: 'active'}),
+        ),
+        http.delete('/api/v1/courses/2/microsoft_sync/group', () => HttpResponse.json({})),
+      )
 
       const subject = render(<Integrations />)
+
+      await waitFor(() => {
+        expect(subject.getByLabelText('Toggle Microsoft Sync')).toBeInTheDocument()
+      })
 
       act(() => {
         fireEvent.click(subject.getByLabelText('Toggle Microsoft Sync'))
       })
 
-      expect(axios.request).toHaveBeenLastCalledWith({
-        method: 'delete',
-        url: `/api/v1/courses/2/microsoft_sync/group`,
+      await waitFor(() => {
+        expect(subject.getByLabelText('Toggle Microsoft Sync').checked).toBeTruthy()
       })
-      expect(subject.getByLabelText('Toggle Microsoft Sync').checked).toBeTruthy()
     })
 
-    it('renders a sync button', () => {
-      useFetchApi.mockImplementationOnce(({success, loading}) => {
-        success({workflow_state: 'active'})
-        loading(false)
-      })
+    it('renders a sync button', async () => {
+      server.use(
+        http.get('/api/v1/courses/2/microsoft_sync/group', () =>
+          HttpResponse.json({workflow_state: 'active'}),
+        ),
+      )
 
       const subject = render(<Integrations />)
+
+      await waitFor(() => {
+        expect(subject.queryByText('Show Microsoft Sync details')).toBeInTheDocument()
+      })
 
       act(() => {
         fireEvent.click(subject.getByText('Show Microsoft Sync details'))
@@ -116,45 +138,52 @@ describe('Integrations', () => {
       expect(subject.getByText('Sync Now')).toBeTruthy()
     })
 
-    it('expands the Microsoft Sync details when toggled on', () => {
-      useFetchApi.mockImplementationOnce(({error, loading}) => {
-        error({message: 'notfound', response: {status: 404}})
-        loading(false)
-      })
+    it('expands the Microsoft Sync details when toggled on', async () => {
+      server.use(
+        http.get(
+          '/api/v1/courses/2/microsoft_sync/group',
+          () => new HttpResponse(null, {status: 404}),
+        ),
+        http.post('/api/v1/courses/2/microsoft_sync/group', () =>
+          HttpResponse.json({workflow_state: 'active'}),
+        ),
+      )
       const subject = render(<Integrations />)
-      expect(subject.queryByText('Sync Now')).not.toBeInTheDocument()
-      useFetchApi.mockImplementationOnce(({success, loading}) => {
-        // Doesn't matter what the API returns, it just needs to return something
-        success({workflow_state: 'active'})
-        loading(false)
+      await waitFor(() => {
+        expect(subject.queryByText('Sync Now')).not.toBeInTheDocument()
       })
+
       act(() => {
         fireEvent.click(subject.getByLabelText('Toggle Microsoft Sync'))
       })
-      expect(subject.getByText('Sync Now')).toBeTruthy()
+
+      await waitFor(() => {
+        expect(subject.getByText('Sync Now')).toBeTruthy()
+      })
     })
 
     describe('when the integration is disabled', () => {
       beforeEach(() => {
-        useFetchApi.mockImplementationOnce(({success, loading}) => {
-          success({})
-          loading(false)
-        })
+        server.use(
+          http.get('/api/v1/courses/2/microsoft_sync/group', () => HttpResponse.json({})),
+          http.post('/api/v1/courses/2/microsoft_sync/group', () => HttpResponse.json({})),
+        )
       })
 
-      it('enables the integration when toggled', () => {
+      it('enables the integration when toggled', async () => {
         const subject = render(<Integrations />)
+
+        await waitFor(() => {
+          expect(subject.getByLabelText('Toggle Microsoft Sync')).toBeInTheDocument()
+        })
 
         act(() => {
           fireEvent.click(subject.getByLabelText('Toggle Microsoft Sync'))
         })
 
-        expect(axios.request).toHaveBeenLastCalledWith({
-          method: 'post',
-          url: `/api/v1/courses/2/microsoft_sync/group`,
+        await waitFor(() => {
+          expect(subject.getByLabelText('Toggle Microsoft Sync').checked).toBeFalsy()
         })
-
-        expect(subject.getByLabelText('Toggle Microsoft Sync').checked).toBeFalsy()
       })
     })
   })

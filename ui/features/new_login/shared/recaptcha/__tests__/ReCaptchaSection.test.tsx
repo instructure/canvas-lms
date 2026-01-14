@@ -16,16 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, screen, waitFor} from '@testing-library/react'
+import {act, cleanup, render, screen, waitFor} from '@testing-library/react'
 import React, {createRef} from 'react'
 import {ReCaptchaSection, type ReCaptchaSectionRef} from '../index'
 
 beforeAll(() => {
   window.grecaptcha = {
-    ready: jest.fn(callback => callback()),
-    render: jest.fn(() => 1),
-    reset: jest.fn(),
+    ready: vi.fn(callback => callback()),
+    render: vi.fn(() => 1),
+    reset: vi.fn(),
   }
+})
+
+afterEach(() => {
+  cleanup()
+  vi.clearAllMocks()
 })
 
 afterAll(() => {
@@ -35,7 +40,7 @@ afterAll(() => {
 describe('ReCaptchaSection', () => {
   it('mounts without crashing', () => {
     const props = {
-      onVerify: jest.fn(),
+      onVerify: vi.fn(),
       recaptchaKey: 'test-site-key',
     }
     const {container} = render(<ReCaptchaSection {...props} />)
@@ -46,7 +51,7 @@ describe('ReCaptchaSection', () => {
 
   it('validates reCAPTCHA and triggers error state if missing', () => {
     const props = {
-      onVerify: jest.fn(),
+      onVerify: vi.fn(),
       recaptchaKey: 'test-site-key',
     }
     const ref = createRef<ReCaptchaSectionRef>()
@@ -59,7 +64,7 @@ describe('ReCaptchaSection', () => {
 
   it('resets reCAPTCHA and clears error state', () => {
     const props = {
-      onVerify: jest.fn(),
+      onVerify: vi.fn(),
       recaptchaKey: 'test-site-key',
     }
     const ref = createRef<ReCaptchaSectionRef>()
@@ -77,7 +82,7 @@ describe('ReCaptchaSection', () => {
 
   it('sets error when an invalid token is received', async () => {
     const props = {
-      onVerify: jest.fn(),
+      onVerify: vi.fn(),
       recaptchaKey: 'test-site-key',
     }
     const ref = createRef<ReCaptchaSectionRef>()
@@ -93,7 +98,7 @@ describe('ReCaptchaSection', () => {
 
   it('removes error when a valid token is received', async () => {
     const props = {
-      onVerify: jest.fn(),
+      onVerify: vi.fn(),
       recaptchaKey: 'test-site-key',
     }
     const ref = createRef<ReCaptchaSectionRef>()

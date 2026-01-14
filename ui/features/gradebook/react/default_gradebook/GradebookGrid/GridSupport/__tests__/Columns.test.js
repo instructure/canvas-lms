@@ -144,7 +144,7 @@ describe('GridSupport Columns', () => {
 
   describe('column header renderers', () => {
     it('calls destroy on the previous renderer when replacing column headers', () => {
-      const destroySpy = jest.fn()
+      const destroySpy = vi.fn()
       const columnHeaderRenderer = {
         renderColumnHeader: () => {},
         destroyColumnHeader: destroySpy,
@@ -184,7 +184,7 @@ describe('GridSupport Columns', () => {
     })
 
     it('triggers onColumnsResized when resizing a column', () => {
-      const onResizeSpy = jest.fn()
+      const onResizeSpy = vi.fn()
       grid.onColumnsResized.subscribe(onResizeSpy)
 
       const columns = grid.getColumns()
@@ -227,7 +227,7 @@ describe('GridSupport Columns', () => {
     })
 
     it('triggers onColumnsReordered when reordering columns', () => {
-      const onReorderSpy = jest.fn()
+      const onReorderSpy = vi.fn()
       grid.onColumnsReordered.subscribe(onReorderSpy)
 
       const columns = grid.getColumns()

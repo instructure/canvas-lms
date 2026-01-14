@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {filter, find, map, some} from 'lodash'
+import {filter, find, map, some} from 'es-toolkit/compat'
 import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Student} from '../../api.d'

@@ -90,7 +90,6 @@ export const handleExternalContentMessages = ({
     if (event.data.subject === 'LtiDeepLinkingResponse') {
       await onDeepLinkingResponse(event.data)
     }
-
   }
 
   window.addEventListener('message', handler)

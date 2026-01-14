@@ -3089,6 +3089,32 @@ describe User do
         expect(events).to match_array([reply_to_topic, reply_to_entry])
       end
 
+      it "only shows checkpoints in the course they belong to, not in all courses" do
+        # Create two courses with the same teacher
+        course_a = @course
+        course_b = course_factory(active_all: true)
+        course_b.enroll_teacher(@user, enrollment_state: "active")
+
+        # Enable checkpoints in both courses
+        course_a.account.enable_feature!(:discussion_checkpoints)
+        course_b.account.enable_feature!(:discussion_checkpoints)
+
+        # Create discussion checkpoint in Course A only
+        reply_to_topic_a, reply_to_entry_a = graded_discussion_topic_with_checkpoints(context: course_a)
+
+        # When querying upcoming_events for Course B only, checkpoints from Course A should NOT appear
+        context_codes_b = [course_b.asset_string]
+        events_b = @user.upcoming_events(context_codes: context_codes_b)
+        expect(events_b).not_to include(reply_to_topic_a)
+        expect(events_b).not_to include(reply_to_entry_a)
+
+        # When querying upcoming_events for Course A, checkpoints from Course A SHOULD appear
+        context_codes_a = [course_a.asset_string]
+        events_a = @user.upcoming_events(context_codes: context_codes_a)
+        expect(events_a).to include(reply_to_topic_a)
+        expect(events_a).to include(reply_to_entry_a)
+      end
+
       it "doesn't include events for enrollments that are inactive due to date" do
         @enrollment.start_at = 1.day.ago
         @enrollment.end_at = 2.days.from_now
@@ -5858,6 +5884,62 @@ describe User do
       private_course = course_factory
       private_course.update!(sis_source_id: "private_sis")
       expect(user.accessible_courses_by_sis_ids(["private_sis"])).to eq([])
+    end
+  end
+
+  describe ".of_account_cte" do
+    let(:account) { Account.create! }
+    let(:user1) { user_model }
+    let(:user2) { user_model }
+    let(:user3) { user_model }
+
+    before do
+      UserAccountAssociation.create!(user: user1, account:)
+      UserAccountAssociation.create!(user: user2, account:)
+    end
+
+    it "returns users associated with the account" do
+      result = User.of_account_cte(account)
+
+      expect(result).to include(user1)
+      expect(result).to include(user2)
+      expect(result).not_to include(user3)
+    end
+
+    it "returns the same results as of_account scope" do
+      cte_results = User.of_account_cte(account).order(:id).to_a
+      regular_results = User.of_account(account).order(:id).to_a
+
+      expect(cte_results).to eq(regular_results)
+    end
+
+    it "includes the materialized CTE in the query" do
+      sql = User.of_account_cte(account).to_sql
+
+      expect(sql).to include("WITH users_in_account AS MATERIALIZED")
+    end
+
+    it "returns empty when no users are associated with the account" do
+      empty_account = Account.create!
+
+      result = User.of_account_cte(empty_account)
+
+      expect(result).to be_empty
+    end
+
+    it "works correctly when chained with other scopes" do
+      user1.update!(workflow_state: "deleted")
+
+      active_users = User.of_account_cte(account).active
+
+      expect(active_users).to include(user2)
+      expect(active_users).not_to include(user1)
+    end
+
+    it "respects the account shard" do
+      result = User.of_account_cte(account)
+
+      expect(result.shard_value.shard).to eq(account.shard)
     end
   end
 end

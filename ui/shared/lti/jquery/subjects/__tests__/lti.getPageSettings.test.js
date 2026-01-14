@@ -26,9 +26,9 @@ describe('lti.getPageSettings handler', () => {
 
   beforeEach(() => {
     responseMessages = {
-      sendBadRequestError: jest.fn(),
-      sendResponse: jest.fn(),
-      sendError: jest.fn(),
+      sendBadRequestError: vi.fn(),
+      sendResponse: vi.fn(),
+      sendError: vi.fn(),
     }
     originalEnv = window.ENV
   })

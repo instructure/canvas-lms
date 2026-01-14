@@ -34,7 +34,7 @@ module Api::V1::LearningObjectDates
   GRADED_MODELS = [Assignment, Quizzes::Quiz].freeze
   LOCKABLE_PSEUDO_COLUMNS = %i[due_dates availability_dates].freeze
 
-  def learning_object_dates_json(learning_object, overridable, include_peer_review: false)
+  def learning_object_dates_json(learning_object, overridable, include_peer_review: false, exclude_peer_review_overrides: false)
     hash = learning_object.slice(BASE_FIELDS)
     LEARNING_OBJECT_DATES_FIELDS.each do |field|
       hash[field] = overridable.send(field) if overridable.respond_to?(field)
@@ -45,7 +45,7 @@ module Api::V1::LearningObjectDates
       hash[:group_category_id] = group_category_id if group_category_id
     end
     add_checkpoint_info(hash, learning_object, overridable)
-    add_peer_review_info(hash, overridable) if include_peer_review
+    add_peer_review_info(hash, overridable, exclude_overrides: exclude_peer_review_overrides) if include_peer_review
     hash
   end
 
@@ -73,27 +73,30 @@ module Api::V1::LearningObjectDates
     end
   end
 
-  def add_peer_review_info(hash, overridable)
+  def add_peer_review_info(hash, overridable, exclude_overrides: false)
     return unless peer_review_overrides_supported?(overridable)
 
     peer_review_sub = overridable.peer_review_sub_assignment
-    peer_review_overrides = peer_review_sub.assignment_overrides.active
-    peer_review_overrides_json = assignment_overrides_json(
-      peer_review_overrides,
-      @current_user,
-      include_names: true,
-      include_child_override_due_dates: false
-    )
 
-    hash["peer_review_sub_assignment"] = {
+    hash[:peer_review_sub_assignment] = {
       id: peer_review_sub.id,
       due_at: peer_review_sub.due_at,
       unlock_at: peer_review_sub.unlock_at,
       lock_at: peer_review_sub.lock_at,
       only_visible_to_overrides: peer_review_sub.only_visible_to_overrides,
-      visible_to_everyone: peer_review_sub.visible_to_everyone,
-      overrides: peer_review_overrides_json
+      visible_to_everyone: peer_review_sub.visible_to_everyone
     }
+
+    unless exclude_overrides
+      peer_review_overrides = peer_review_sub.active_assignment_overrides
+      peer_review_overrides_json = assignment_overrides_json(
+        peer_review_overrides,
+        @current_user,
+        include_names: true,
+        include_child_override_due_dates: false
+      )
+      hash[:peer_review_sub_assignment][:overrides] = peer_review_overrides_json
+    end
   end
 
   def peer_review_overrides_supported?(overridable)
@@ -101,6 +104,6 @@ module Api::V1::LearningObjectDates
       overridable.peer_reviews? &&
       !overridable.discussion_topic? &&
       overridable.peer_review_sub_assignment.present? &&
-      overridable.context.feature_enabled?(:peer_review_grading)
+      overridable.context.feature_enabled?(:peer_review_allocation_and_grading)
   end
 end

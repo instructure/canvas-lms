@@ -24,12 +24,11 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import AllocationRuleCard from '../AllocationRuleCard'
 import {AllocationRuleType} from '../../graphql/teacher/AssignmentTeacherTypes'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
-}))
+import {executeQuery} from '@canvas/graphql'
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+vi.mock('@canvas/graphql')
+
+const mockExecuteQuery = vi.mocked(executeQuery)
 
 describe('AllocationRuleCard', () => {
   const assessor = {
@@ -44,13 +43,13 @@ describe('AllocationRuleCard', () => {
     peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
   }
 
-  const mockRefetchRules = jest.fn()
+  const mockRefetchRules = vi.fn()
 
   let user: ReturnType<typeof userEvent.setup>
 
   beforeEach(() => {
     user = userEvent.setup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockExecuteQuery.mockResolvedValue({
       deleteAllocationRule: {
         allocationRuleId: '1',
@@ -270,7 +269,7 @@ describe('AllocationRuleCard', () => {
 
   describe('Delete functionality', () => {
     it('calls handleRuleDelete on successful delete', async () => {
-      const mockHandleRuleDelete = jest.fn()
+      const mockHandleRuleDelete = vi.fn()
 
       mockExecuteQuery.mockResolvedValueOnce({
         deleteAllocationRule: {
@@ -292,7 +291,7 @@ describe('AllocationRuleCard', () => {
     })
 
     it('calls handleRuleDelete with error on delete failure', async () => {
-      const mockHandleRuleDelete = jest.fn()
+      const mockHandleRuleDelete = vi.fn()
       const mockError = new Error('Allocation rule not found')
 
       mockExecuteQuery.mockRejectedValueOnce(mockError)
@@ -311,7 +310,7 @@ describe('AllocationRuleCard', () => {
     })
 
     it('calls handleRuleDelete with full rule description for screen reader announcement', async () => {
-      const mockHandleRuleDelete = jest.fn()
+      const mockHandleRuleDelete = vi.fn()
 
       mockExecuteQuery.mockResolvedValueOnce({
         deleteAllocationRule: {

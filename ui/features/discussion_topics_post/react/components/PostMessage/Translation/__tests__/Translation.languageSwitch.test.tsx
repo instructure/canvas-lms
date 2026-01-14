@@ -20,15 +20,15 @@ import {act} from '@testing-library/react-hooks'
 import {useTranslationStore} from '../../../../hooks/useTranslationStore'
 import {getTranslation} from '../../../../utils'
 
-jest.mock('../../../../utils', () => ({
-  getTranslation: jest.fn(),
+vi.mock('../../../../utils', () => ({
+  getTranslation: vi.fn(),
 }))
 
-const getTranslationMock = getTranslation as jest.MockedFunction<typeof getTranslation>
+const getTranslationMock = getTranslation as ReturnType<typeof vi.fn>
 
 describe('Translation component - language switching edge cases', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Reset store to initial state
     useTranslationStore.setState({
       activeLanguage: null,

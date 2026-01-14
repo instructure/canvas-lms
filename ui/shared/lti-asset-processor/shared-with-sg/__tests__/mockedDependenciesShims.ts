@@ -28,23 +28,23 @@ import {
   useLtiAssetReports,
 } from '../dependenciesShims'
 
-jest.mock('../dependenciesShims', () => ({
-  gql: jest.fn(),
-  useResubmitLtiAssetReports: jest.fn(() => ({
-    mutate: jest.fn(),
+vi.mock('../dependenciesShims', () => ({
+  gql: vi.fn(),
+  useResubmitLtiAssetReports: vi.fn(() => ({
+    mutate: vi.fn(),
     isIdle: true,
     isError: false,
     variables: undefined,
   })),
-  useResubmitDiscussionNotices: jest.fn(() => ({
-    mutate: jest.fn(),
+  useResubmitDiscussionNotices: vi.fn(() => ({
+    mutate: vi.fn(),
     isIdle: true,
     isError: false,
     variables: undefined,
   })),
-  useLtiAssetProcessors: jest.fn(),
-  useLtiAssetReports: jest.fn(),
-  useFormatDateTime: jest.fn(() => jest.fn((date: Date) => date.toISOString())),
+  useLtiAssetProcessors: vi.fn(),
+  useLtiAssetReports: vi.fn(),
+  useFormatDateTime: vi.fn(() => vi.fn((date: Date) => date.toISOString())),
 }))
 
 export function mockUseLtiAssetProcessors(data: GetLtiAssetProcessorsResult): void {

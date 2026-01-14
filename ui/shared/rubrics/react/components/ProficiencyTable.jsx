@@ -31,7 +31,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Spinner} from '@instructure/ui-spinner'
 import {v1 as uuid} from 'uuid'
-import {memoize} from 'lodash'
+import {memoize} from 'es-toolkit/compat'
 import {fromJS, List} from 'immutable'
 import {fetchProficiency, saveProficiency} from '../api'
 import NumberHelper from '@canvas/i18n/numberHelper'
@@ -154,7 +154,7 @@ export default class ProficiencyTable extends React.Component {
   handleBlurChange = memoize(index => (value, fieldName) => {
     this.setState(oldState => {
       let rows = oldState.rows
-      if(fieldName === 'description') {
+      if (fieldName === 'description') {
         if (this.invalidDescription(value)) {
           rows = rows.setIn([index, 'descriptionError'], I18n.t('Please include a rating title'))
         }
@@ -351,12 +351,7 @@ export default class ProficiencyTable extends React.Component {
         <Flex direction="column" gap="medium">
           <Flex direction="column" gap="medium">
             <Flex gap="medium">
-              <Flex.Item
-                id="mastery-column"
-                as="th"
-                size="80px"
-                textAlign="center"
-              >
+              <Flex.Item id="mastery-column" as="th" size="80px" textAlign="center">
                 {I18n.t('Mastery')}
               </Flex.Item>
               <Flex.Item
@@ -369,20 +364,10 @@ export default class ProficiencyTable extends React.Component {
               >
                 {I18n.t('Proficiency Rating')}
               </Flex.Item>
-              <Flex.Item
-                id="points-column"
-                as="th"
-                size="80px"
-                textAlign="start"
-              >
+              <Flex.Item id="points-column" as="th" size="80px" textAlign="start">
                 {I18n.t('Points')}
               </Flex.Item>
-              <Flex.Item
-                id="color-column"
-                as="th"
-                size="170px"
-                textAlign="start"
-              >
+              <Flex.Item id="color-column" as="th" size="170px" textAlign="start">
                 {I18n.t('Color')}
               </Flex.Item>
             </Flex>

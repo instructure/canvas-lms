@@ -16,7 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor, fireEvent} from '@testing-library/react'
+/* global vi */
+if (typeof vi !== 'undefined') {
+  vi.mock('@canvas/hide-assignment-grades-tray/react/Api')
+  vi.mock('@canvas/alerts/react/FlashAlert')
+}
+vi.mock('@canvas/hide-assignment-grades-tray/react/Api')
+vi.mock('@canvas/alerts/react/FlashAlert')
+
+import {render, screen as rtlScreen, waitFor, fireEvent} from '@testing-library/react'
 import React from 'react'
 
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
@@ -33,25 +41,6 @@ const createControlledPromise = () => {
   return {...handlers, promise}
 }
 
-// Setup API mocks
-jest.mock('@canvas/hide-assignment-grades-tray/react/Api', () => ({
-  hideAssignmentGrades: jest.fn().mockResolvedValue({
-    id: '1',
-    workflowState: 'completed',
-  }),
-  hideAssignmentGradesForSections: jest.fn().mockResolvedValue({
-    id: '1',
-    workflowState: 'completed',
-  }),
-  resolveHideAssignmentGradesStatus: jest.fn().mockResolvedValue({}),
-}))
-
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(),
-  showFlashError: jest.fn(),
-  showFlashAlert: jest.fn(),
-}))
-
 describe('HideAssignmentGradesTray', () => {
   const defaultContext = {
     assignment: {
@@ -60,8 +49,8 @@ describe('HideAssignmentGradesTray', () => {
       id: '2301',
       name: 'Math 1.1',
     },
-    onExited: jest.fn(),
-    onHidden: jest.fn(),
+    onExited: vi.fn(),
+    onHidden: vi.fn(),
     sections: [
       {id: '2001', name: 'Freshmen'},
       {id: '2002', name: 'Sophomores'},
@@ -73,13 +62,13 @@ describe('HideAssignmentGradesTray', () => {
 
   beforeEach(() => {
     trayRef = null
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Clean up any previous renders to avoid duplicate elements
     document.body.innerHTML = ''
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderTray = () => {
@@ -98,13 +87,13 @@ describe('HideAssignmentGradesTray', () => {
 
     // Wait for the tray to be fully rendered
     await waitFor(() => {
-      expect(screen.getByText('Math 1.1')).toBeInTheDocument()
+      expect(rtlScreen.getByText('Math 1.1')).toBeInTheDocument()
     })
   }
 
   it('displays the assignment name when opened', async () => {
     await showTray()
-    expect(screen.getByText('Math 1.1')).toBeInTheDocument()
+    expect(rtlScreen.getByText('Math 1.1')).toBeInTheDocument()
   })
 
   describe('sections functionality', () => {
@@ -112,34 +101,34 @@ describe('HideAssignmentGradesTray', () => {
       await showTray()
 
       // The checkbox for specific sections should be present but not checked
-      const specificSectionsCheckbox = screen.getByText('Specific Sections')
+      const specificSectionsCheckbox = rtlScreen.getByText('Specific Sections')
       expect(specificSectionsCheckbox).toBeInTheDocument()
 
       // Section checkboxes should not be visible initially
-      expect(screen.queryByText('Freshmen')).not.toBeInTheDocument()
+      expect(rtlScreen.queryByText('Freshmen')).not.toBeInTheDocument()
     })
 
     it('shows sections when "Specific Sections" is selected', async () => {
       await showTray()
 
       // Click the specific sections checkbox
-      const checkbox = screen.getByRole('checkbox', {name: 'Specific Sections'})
+      const checkbox = rtlScreen.getByRole('checkbox', {name: 'Specific Sections'})
       fireEvent.click(checkbox)
 
       // Section checkboxes should now be visible
-      expect(screen.getByText('Freshmen')).toBeInTheDocument()
-      expect(screen.getByText('Sophomores')).toBeInTheDocument()
+      expect(rtlScreen.getByText('Freshmen')).toBeInTheDocument()
+      expect(rtlScreen.getByText('Sophomores')).toBeInTheDocument()
     })
 
     it('does not show sections toggle when no sections are available', async () => {
       await showTray({...defaultContext, sections: []})
-      expect(screen.queryByText('Specific Sections')).not.toBeInTheDocument()
+      expect(rtlScreen.queryByText('Specific Sections')).not.toBeInTheDocument()
     })
 
     it('resets section selection when reopening the tray', async () => {
       // First open the tray and select sections
       await showTray()
-      const checkbox = screen.getByRole('checkbox', {name: 'Specific Sections'})
+      const checkbox = rtlScreen.getByRole('checkbox', {name: 'Specific Sections'})
       fireEvent.click(checkbox)
 
       // Close and reopen the tray
@@ -149,21 +138,21 @@ describe('HideAssignmentGradesTray', () => {
       })
 
       // Show the tray again with a fresh context
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       document.body.innerHTML = ''
       await showTray()
 
       // Specific sections should not be checked
-      const specificSectionsCheckbox = screen.getByText('Specific Sections')
+      const specificSectionsCheckbox = rtlScreen.getByText('Specific Sections')
       expect(specificSectionsCheckbox).toBeInTheDocument()
-      expect(screen.queryByText('Freshmen')).not.toBeInTheDocument()
+      expect(rtlScreen.queryByText('Freshmen')).not.toBeInTheDocument()
     })
   })
 
   describe('hide functionality', () => {
     it('hides grades for all sections when no specific sections are selected', async () => {
       await showTray()
-      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      const hideButton = rtlScreen.getByRole('button', {name: 'Hide'})
       fireEvent.click(hideButton)
       expect(Api.hideAssignmentGrades).toHaveBeenCalledWith('2301')
     })
@@ -172,15 +161,15 @@ describe('HideAssignmentGradesTray', () => {
       await showTray()
 
       // Select specific sections
-      const specificSectionsCheckbox = screen.getByRole('checkbox', {name: 'Specific Sections'})
+      const specificSectionsCheckbox = rtlScreen.getByRole('checkbox', {name: 'Specific Sections'})
       fireEvent.click(specificSectionsCheckbox)
 
       // Select a section
-      const freshmenCheckbox = screen.getByRole('checkbox', {name: 'Freshmen'})
+      const freshmenCheckbox = rtlScreen.getByRole('checkbox', {name: 'Freshmen'})
       fireEvent.click(freshmenCheckbox)
 
       // Click hide
-      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      const hideButton = rtlScreen.getByRole('button', {name: 'Hide'})
       fireEvent.click(hideButton)
 
       expect(Api.hideAssignmentGradesForSections).toHaveBeenCalledWith('2301', ['2001'])
@@ -190,14 +179,14 @@ describe('HideAssignmentGradesTray', () => {
       await showTray()
 
       // Select specific sections but don't select any section
-      const specificSectionsCheckbox = screen.getByRole('checkbox', {name: 'Specific Sections'})
+      const specificSectionsCheckbox = rtlScreen.getByRole('checkbox', {name: 'Specific Sections'})
       fireEvent.click(specificSectionsCheckbox)
 
       // Click hide
-      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      const hideButton = rtlScreen.getByRole('button', {name: 'Hide'})
       fireEvent.click(hideButton)
 
-      expect(screen.getByText('Please select at least one option')).toBeInTheDocument()
+      expect(rtlScreen.getByText('Please select at least one option')).toBeInTheDocument()
     })
 
     it('shows success message when hiding grades succeeds', async () => {
@@ -212,7 +201,7 @@ describe('HideAssignmentGradesTray', () => {
       await showTray()
 
       // Click the hide button
-      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      const hideButton = rtlScreen.getByRole('button', {name: 'Hide'})
       fireEvent.click(hideButton)
 
       // Resolve the first promise
@@ -240,7 +229,7 @@ describe('HideAssignmentGradesTray', () => {
       Api.hideAssignmentGrades.mockRejectedValueOnce(error)
       await showTray()
 
-      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      const hideButton = rtlScreen.getByRole('button', {name: 'Hide'})
       fireEvent.click(hideButton)
 
       await waitFor(() => {
@@ -253,18 +242,18 @@ describe('HideAssignmentGradesTray', () => {
 
     // fickle; this test passes individually
     it.skip('disables hide button while processing', async () => {
-      const hideAssignmentGradesMock = jest.fn(
+      const hideAssignmentGradesMock = vi.fn(
         () => new Promise(resolve => setTimeout(resolve, 100)),
       )
       Api.hideAssignmentGrades.mockImplementation(hideAssignmentGradesMock)
       await showTray()
 
-      const hideButton = screen.getByRole('button', {name: 'Hide'})
+      const hideButton = rtlScreen.getByRole('button', {name: 'Hide'})
       fireEvent.click(hideButton)
 
-      expect(screen.getByText(/hiding grades/i, {selector: 'span'})).toBeInTheDocument()
+      expect(rtlScreen.getByText(/hiding grades/i, {selector: 'span'})).toBeInTheDocument()
       await waitFor(() => {
-        expect(screen.queryByText(/hiding grades/i, {selector: 'span'})).not.toBeInTheDocument()
+        expect(rtlScreen.queryByText(/hiding grades/i, {selector: 'span'})).not.toBeInTheDocument()
       })
     })
   })
@@ -274,7 +263,7 @@ describe('HideAssignmentGradesTray', () => {
       await showTray()
 
       // Find the close button by its role
-      const closeButtons = screen.getAllByRole('button', {name: 'Close'})
+      const closeButtons = rtlScreen.getAllByRole('button', {name: 'Close'})
       fireEvent.click(closeButtons[0]) // First close button is the icon
 
       await waitFor(() => {
@@ -286,7 +275,7 @@ describe('HideAssignmentGradesTray', () => {
       await showTray()
 
       // Find the text close button
-      const closeButtons = screen.getAllByRole('button', {name: 'Close'})
+      const closeButtons = rtlScreen.getAllByRole('button', {name: 'Close'})
       fireEvent.click(closeButtons[1]) // Second close button is the text button
 
       await waitFor(() => {

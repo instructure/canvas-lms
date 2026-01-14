@@ -22,17 +22,17 @@ import userEvent from '@testing-library/user-event'
 import {ButtonEdit} from '../ButtonEdit'
 import {ButtonData} from '../types'
 
-const mockOpenSettingsTray = jest.fn()
-jest.mock('../../../../hooks/useSettingsTray', () => ({
+const mockOpenSettingsTray = vi.fn()
+vi.mock('../../../../hooks/useSettingsTray', () => ({
   useSettingsTray: () => ({
     open: mockOpenSettingsTray,
-    close: jest.fn(),
+    close: vi.fn(),
   }),
 }))
 
-const mockUseNode = jest.fn()
-jest.mock('@craftjs/core', () => ({
-  ...jest.requireActual('@craftjs/core'),
+const mockUseNode = vi.fn()
+vi.mock('@craftjs/core', async () => ({
+  ...await vi.importActual('@craftjs/core'),
   useNode: () => mockUseNode(),
 }))
 
@@ -54,7 +54,7 @@ const defaultProps = {
 const expectedNodeId = 'node-123'
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   mockUseNode.mockReturnValue({id: expectedNodeId})
 })
 

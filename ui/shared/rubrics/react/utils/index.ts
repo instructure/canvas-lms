@@ -136,6 +136,8 @@ export const mapRubricUnderscoredKeysToCamelCase = (
 export const mapRubricAssessmentDataUnderscoredKeysToCamelCase = (
   data: RubricAssessmentDataUnderscore[],
 ): RubricAssessmentData[] => {
+  if (!data) return []
+
   return data.map(assessment => {
     return {
       id: assessment.id,

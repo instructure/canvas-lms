@@ -137,7 +137,10 @@ module Types
 
         if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
           Loaders::SubmissionLtiAssetReportsLoader.for(for_student: false, latest:).load(object.id)
-        elsif object.user_can_read_grade?(current_user, for_plagiarism: true)
+        else
+          # If the user can read the submission (student or observer), they can
+          # get student-visible reports. (this is the essentially behavior of
+          # user_can_read_grade?(for_plagiarism:true))
           Loaders::SubmissionLtiAssetReportsLoader.for(for_student: true, latest: true).load(object.id)
         end
       end

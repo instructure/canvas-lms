@@ -31,7 +31,9 @@ class PeerReviewSubAssignment < AbstractAssignment
     description
     group_category_id
     intra_group_peer_reviews
+    peer_review_across_sections
     peer_review_count
+    peer_review_submission_required
     peer_reviews
     peer_reviews_assigned
     peer_reviews_due_at
@@ -47,6 +49,7 @@ class PeerReviewSubAssignment < AbstractAssignment
   validates :sub_assignment_tag, absence: { message: ->(_object, _data) { I18n.t("cannot have sub assignment tag") } }
   validate  :context_matches_parent_assignment, if: :context_explicitly_provided?
   validate  :parent_assignment_not_discussion_topic_or_external_tool
+  validate  :points_possible_changes_ok?
 
   after_initialize :set_default_context
   after_save :unlink_assessment_requests, if: :soft_deleted?
@@ -115,5 +118,21 @@ class PeerReviewSubAssignment < AbstractAssignment
 
   def unlink_assessment_requests
     assessment_requests.update_all(peer_review_sub_assignment_id: nil)
+  end
+
+  def points_possible_changes_ok?
+    # Since PeerReviewSubAssignments are synced with their parent Assignment
+    # on before_save and points possible is one of those attributes that are
+    # synced.  *see /models/assignment.rb#should_sync_peer_review_sub_assignment?*
+    # we need to make sure the workflow_state is not 'deleted'
+    # otherwise validation will fail when it trys sync points possible.
+    return false if workflow_state == "deleted" || will_save_change_to_workflow_state?(to: "deleted")
+    return false unless persisted? && points_possible_changed?
+    return false unless parent_assignment&.peer_reviews? && parent_assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+
+    if parent_assignment.peer_review_submissions?
+      errors.add :points_possible,
+                 I18n.t("Students have already submitted peer reviews, so reviews required and points cannot be changed.")
+    end
   end
 end

@@ -54,8 +54,8 @@ describe('LtiAssetReportStatus', () => {
     })
   })
 
-  describe('with no high priority reports', () => {
-    const reports = [createReport(0), createReport(0)]
+  describe('with processed reports (no high priority)', () => {
+    const reports = [createReport(0, {processingProgress: 'Processed'})]
 
     it('renders "All good" status without openModal prop', () => {
       renderComponent(<LtiAssetReportStatus reports={reports} />)
@@ -86,9 +86,9 @@ describe('LtiAssetReportStatus', () => {
   describe('with high priority reports', () => {
     const reports = [createReport(0), createReport(1)]
 
-    it('renders "Needs attention" status without openModal prop', () => {
+    it('renders "Please review" status without openModal prop', () => {
       renderComponent(<LtiAssetReportStatus reports={reports} />)
-      expect(screen.getByText('Needs attention')).toBeInTheDocument()
+      expect(screen.getByText('Please review')).toBeInTheDocument()
     })
 
     it('renders an IconWarningSolid with error color when no modal is provided', () => {
@@ -97,23 +97,111 @@ describe('LtiAssetReportStatus', () => {
       expect(container.querySelector('[name="IconWarning"]')).toBeInTheDocument()
     })
 
-    it('renders a link with "Needs attention" text when openModal prop is provided', () => {
+    it('renders a link with "Please review" text when openModal prop is provided', () => {
       const openModal = fn()
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
-      const link = screen.getByText('Needs attention')
+      const link = screen.getByText('Please review')
       expect(link).toBeInTheDocument()
     })
 
     it('calls openModal when link is clicked', () => {
       const openModal = fn()
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
-      fireEvent.click(screen.getByText('Needs attention'))
+      fireEvent.click(screen.getByText('Please review'))
       expect(openModal).toHaveBeenCalledTimes(1)
     })
   })
 
+  describe('with processing reports', () => {
+    it('renders "Processing" for Pending status', () => {
+      const reports = [createReport(0, {processingProgress: 'Pending'})]
+      renderComponent(<LtiAssetReportStatus reports={reports} />)
+      expect(screen.getByText('Processing')).toBeInTheDocument()
+    })
+
+    it('renders "Processing" for Processing status', () => {
+      const reports = [createReport(0, {processingProgress: 'Processing'})]
+      renderComponent(<LtiAssetReportStatus reports={reports} />)
+      expect(screen.getByText('Processing')).toBeInTheDocument()
+    })
+
+    it('renders "Processing" for PendingManual status', () => {
+      const reports = [createReport(0, {processingProgress: 'PendingManual'})]
+      renderComponent(<LtiAssetReportStatus reports={reports} />)
+      expect(screen.getByText('Processing')).toBeInTheDocument()
+    })
+
+    it('renders link with "Processing" when openModal prop is provided', () => {
+      const openModal = fn()
+      const reports = [createReport(0, {processingProgress: 'Pending'})]
+      renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
+      const link = screen.getByText('Processing')
+      expect(link).toBeInTheDocument()
+    })
+
+    it('calls openModal when processing link is clicked', () => {
+      const openModal = fn()
+      const reports = [createReport(0, {processingProgress: 'Pending'})]
+      renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
+      fireEvent.click(screen.getByText('Processing'))
+      expect(openModal).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('with no result reports', () => {
+    const reports = [createReport(0, {processingProgress: 'NotReady'})]
+
+    it('renders "No result" status without openModal prop', () => {
+      renderComponent(<LtiAssetReportStatus reports={reports} />)
+      expect(screen.getByText('No result')).toBeInTheDocument()
+    })
+
+    it('renders link with "No result" when openModal prop is provided', () => {
+      const openModal = fn()
+      renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
+      const link = screen.getByText('No result')
+      expect(link).toBeInTheDocument()
+    })
+
+    it('calls openModal when no result link is clicked', () => {
+      const openModal = fn()
+      renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
+      fireEvent.click(screen.getByText('No result'))
+      expect(openModal).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('priority precedence', () => {
+    it('shows "Please review" when there are both high priority and processing reports', () => {
+      const reports = [
+        createReport(1, {processingProgress: 'NotReady'}),
+        createReport(0, {processingProgress: 'Pending'}),
+      ]
+      renderComponent(<LtiAssetReportStatus reports={reports} />)
+      expect(screen.getByText('Please review')).toBeInTheDocument()
+    })
+
+    it('shows "Processing" when there are both processing and processed reports', () => {
+      const reports = [
+        createReport(0, {processingProgress: 'Pending'}),
+        createReport(0, {processingProgress: 'Processed'}),
+      ]
+      renderComponent(<LtiAssetReportStatus reports={reports} />)
+      expect(screen.getByText('Processing')).toBeInTheDocument()
+    })
+
+    it('shows "All good" when there are both processed and no result reports', () => {
+      const reports = [
+        createReport(0, {processingProgress: 'Processed'}),
+        createReport(0, {processingProgress: 'NotReady'}),
+      ]
+      renderComponent(<LtiAssetReportStatus reports={reports} />)
+      expect(screen.getByText('All good')).toBeInTheDocument()
+    })
+  })
+
   describe('custom text styling', () => {
-    const reports = [createReport(0)]
+    const reports = [createReport(0, {processingProgress: 'Processed'})]
 
     it('applies custom textSize when provided', () => {
       const {container} = renderComponent(
@@ -132,7 +220,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('applies both textSize and textWeight when provided', () => {
-      const {container} = renderComponent(
+      renderComponent(
         <LtiAssetReportStatus reports={reports} textSize="small" textWeight="normal" />,
       )
       expect(screen.getByText('All good')).toBeInTheDocument()

@@ -27,10 +27,10 @@ import apiClient, {
 } from '../apiClient'
 import axios from '@canvas/axios'
 
-jest.mock('@canvas/axios', () => ({
+vi.mock('@canvas/axios', () => ({
   __esModule: true,
   default: {
-    get: jest.fn(),
+    get: vi.fn(),
   },
 }))
 
@@ -43,11 +43,11 @@ const getCourseParams = {
 
 describe('Blueprint Course apiClient', () => {
   beforeEach(() => {
-    axios.get = jest.fn()
+    axios.get = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('getCourse generated uri', async () => {

@@ -22,7 +22,7 @@ import {render, act} from '@testing-library/react'
 import WeekdayPicker from '../WeekdayPicker'
 
 const defaultProps = (overrides: object = {}) => ({
-  onChange: jest.fn(),
+  onChange: vi.fn(),
   locale: 'en',
   ...overrides,
 })

@@ -21,7 +21,7 @@ module Accessibility
   class Issue
     module AssignmentIssues
       def generate_assignment_resources(skip_scan: false)
-        assignments = context.assignments.active.order(updated_at: :desc)
+        assignments = context.assignments.active.not_excluded_from_accessibility_scan.order(updated_at: :desc)
         return assignments.map { |assignment| assignment_attributes(assignment) } if skip_scan
 
         assignments.each_with_object({}) do |assignment, issues|

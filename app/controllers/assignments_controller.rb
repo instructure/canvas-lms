@@ -125,7 +125,7 @@ class AssignmentsController < ApplicationController
 
   def render_a2_peer_review_student_view?
     @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
-      @assignment.peer_reviews && @context.feature_enabled?(:peer_review_allocation) &&
+      @assignment.peer_reviews && @context.feature_enabled?(:peer_review_allocation_and_grading) &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
   end
 
@@ -146,7 +146,7 @@ class AssignmentsController < ApplicationController
 
   def render_a2_student_view(student:)
     current_user_submission = @assignment.submissions.find_by(user: student)
-    submission = if @context.feature_enabled?(:peer_reviews_for_a2)
+    submission = if @context.feature_enabled?(:assignments_2_student)
                    if params[:reviewee_id].present? && !@assignment.anonymous_peer_reviews?
                      @assignment.submissions.find_by(user_id: params[:reviewee_id])
                    elsif params[:anonymous_asset_id].present?
@@ -158,7 +158,7 @@ class AssignmentsController < ApplicationController
                    current_user_submission
                  end
 
-    peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
+    peer_review_mode_enabled = @context.feature_enabled?(:assignments_2_student) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
     peer_review_available = submission.present? && @assignment.submitted?(submission:) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
     grading_standard = @context.grading_standard_or_default
     js_env({
@@ -266,6 +266,7 @@ class AssignmentsController < ApplicationController
       add_crumb(t("Peer Reviews"))
     end
 
+    add_body_class("full-width")
     css_bundle :assignments_2_student
     js_bundle :assignments_peer_reviews_student
     render html: "", layout: true
@@ -395,7 +396,7 @@ class AssignmentsController < ApplicationController
                        DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
                        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
                        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
-                       PEER_REVIEW_ALLOCATION_ENABLED: @context.feature_enabled?(:peer_review_allocation),
+                       PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
                        CAN_EDIT_ASSIGNMENTS: @context.grants_right?(@current_user, session, :manage_assignments_edit)
                      })
         set_section_list_js_env
@@ -973,8 +974,7 @@ class AssignmentsController < ApplicationController
           Account.site_admin.feature_enabled?(:grading_scheme_updates),
         ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
         OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
-        PEER_REVIEW_ALLOCATION_ENABLED: @context.feature_enabled?(:peer_review_allocation),
-        PEER_REVIEW_GRADING_ENABLED: @context.feature_enabled?(:peer_review_grading)
+        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading)
       }
 
       if @context.root_account.feature_enabled?(:instui_nav)
@@ -988,7 +988,7 @@ class AssignmentsController < ApplicationController
       end
 
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
-      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false, include_peer_review: @context.feature_enabled?(:peer_review_grading))
+      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false, include_peer_review: @context.feature_enabled?(:peer_review_allocation_and_grading))
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = set_cancel_to_url

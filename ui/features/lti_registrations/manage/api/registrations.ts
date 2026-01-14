@@ -66,6 +66,7 @@ export type AppsSortProperty =
   | 'installed_by'
   | 'updated_by'
   | 'on'
+  | 'status'
 
 export type AppsSortDirection = 'asc' | 'desc'
 
@@ -152,6 +153,29 @@ export const refreshRegistrationWithAllInfo = (
 ) => {
   queryClient.invalidateQueries({
     queryKey: createRegistrationWithAllInfoQueryKey(ltiRegistrationId, accountId),
+  })
+}
+
+const createRegistrationWithConfigQueryKey = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => [accountId, 'lti_registrations', ltiRegistrationId, 'withConfig']
+
+export const useRegistrationWithConfig = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => {
+  return useQuery({
+    queryKey: createRegistrationWithConfigQueryKey(ltiRegistrationId, accountId),
+    queryFn: () => {
+      return doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}?include[]=configuration&include[]=overlay`,
+        },
+        ZLtiRegistrationWithConfiguration,
+      )
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
 

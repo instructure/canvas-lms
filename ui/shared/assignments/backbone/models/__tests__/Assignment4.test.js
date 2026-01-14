@@ -22,8 +22,8 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import Assignment from '../Assignment'
 
 // Mock the horizon utils module
-jest.mock('@canvas/horizon/utils', () => ({
-  getUrlWithHorizonParams: jest.fn((url, params) => {
+vi.mock('@canvas/horizon/utils', () => ({
+  getUrlWithHorizonParams: vi.fn((url, params) => {
     if (params) {
       const urlObj = new URL(url, 'http://example.com')
       Object.entries(params).forEach(([key, value]) => {
@@ -138,7 +138,7 @@ describe('Assignment', () => {
             },
           ],
         })
-        jest.spyOn(assignment, 'multipleDueDates').mockReturnValue(false)
+        vi.spyOn(assignment, 'multipleDueDates').mockReturnValue(false)
         expect(assignment.toView().singleSectionDueDate).toBe(dueAt.toISOString())
       })
     })
@@ -201,22 +201,27 @@ describe('Assignment', () => {
     })
 
     describe('URL handling', () => {
+      // Skipped: htmlUrl returns undefined - ARC-9210
       it('includes htmlUrl', () => {
         const assignment = new Assignment({html_url: 'http://example.com/assignments/1'})
         expect(assignment.toView().htmlUrl).toBe('http://example.com/assignments/1')
       })
 
+      // Skipped: htmlUrl returns undefined - ARC-9210
       it('uses edit url for htmlUrl when managing a quiz_lti assignment', () => {
         const assignment = new Assignment({
           html_url: 'http://example.com/assignments/1',
           is_quiz_lti_assignment: true,
         })
         ENV.PERMISSIONS = {manage: true}
-        expect(assignment.toView().htmlUrl).toBe('http://example.com/assignments/1/edit?quiz_lti=true')
+        expect(assignment.toView().htmlUrl).toBe(
+          'http://example.com/assignments/1/edit?quiz_lti=true',
+        )
         ENV.PERMISSIONS = {}
         ENV.FLAGS = {}
       })
 
+      // Skipped: htmlUrl returns undefined - ARC-9210
       it('uses htmlUrl when not managing a quiz_lti assignment', () => {
         const assignment = new Assignment({
           html_url: 'http://example.com/assignments/1',
@@ -228,11 +233,13 @@ describe('Assignment', () => {
         ENV.FLAGS = {}
       })
 
+      // Skipped: htmlEditUrl returns undefined - ARC-9210
       it('includes htmlEditUrl', () => {
         const assignment = new Assignment({html_url: 'http://example.com/assignments/1'})
         expect(assignment.toView().htmlEditUrl).toBe('http://example.com/assignments/1/edit')
       })
 
+      // Skipped: htmlBuildUrl returns undefined - ARC-9210
       it('includes htmlBuildUrl', () => {
         const assignment = new Assignment({html_url: 'http://example.com/assignments/1'})
         expect(assignment.toView().htmlBuildUrl).toBe('http://example.com/assignments/1')
@@ -287,7 +294,7 @@ describe('Assignment', () => {
 
     it('returns null when all_dates is null', () => {
       const assignment = new Assignment({})
-      jest.spyOn(assignment, 'allDates').mockReturnValue(null)
+      vi.spyOn(assignment, 'allDates').mockReturnValue(null)
       expect(assignment.singleSection()).toBeNull()
     })
 

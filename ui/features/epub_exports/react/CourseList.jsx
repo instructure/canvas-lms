@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 import CourseListItem from './CourseListItem'
 
 export default function CourseList(props) {

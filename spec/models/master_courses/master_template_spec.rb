@@ -357,4 +357,36 @@ describe MasterCourses::MasterTemplate do
       end
     end
   end
+
+  describe "#deletions_for_sub_types" do
+    before do
+      @t = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      @t.add_child_course!(Course.create!)
+      time = 2.days.ago
+      @t.master_migrations.create!(exports_started_at: time, workflow_state: "completed")
+      MasterCourses::MasterTemplate.preload_index_data([@t])
+    end
+
+    it "returns sub-type deletions without filtering by last_export_started_at" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      tool = @course.context_external_tools.create!(
+        name: "Test Tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://example.com/launch"
+      )
+      asset_processor = Lti::AssetProcessor.create!(
+        assignment:,
+        context_external_tool: tool,
+        url: "http://example.com/process",
+        title: "Test Processor"
+      )
+      asset_processor.workflow_state = "deleted"
+      asset_processor.save!
+
+      expected_mig_id = @t.migration_id_for(asset_processor)
+      expect(@t.deletions_for_sub_types).to eq({ "Lti::AssetProcessor" => [expected_mig_id] })
+      expect(@t.deletions_by_type).to eq({ "Lti::AssetProcessor" => [expected_mig_id] })
+    end
+  end
 end

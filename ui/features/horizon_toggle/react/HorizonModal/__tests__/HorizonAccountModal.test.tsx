@@ -20,13 +20,13 @@ import {render, screen, fireEvent} from '@testing-library/react'
 import {AccountChangeModal} from '../HorizonAccountModal'
 import {useCanvasCareer} from '../../hooks/useCanvasCareer'
 
-jest.mock('../../hooks/useCanvasCareer')
+vi.mock('../../hooks/useCanvasCareer')
 
 describe('HorizonAccountModal', () => {
-  const mockOnClose = jest.fn()
-  const mockOnConfirm = jest.fn()
-  const mockOnSubmit = jest.fn()
-  const mockSetTermsAccepted = jest.fn()
+  const mockOnClose = vi.fn()
+  const mockOnConfirm = vi.fn()
+  const mockOnSubmit = vi.fn()
+  const mockSetTermsAccepted = vi.fn()
 
   const defaultHookReturn = {
     data: {},
@@ -41,12 +41,12 @@ describe('HorizonAccountModal', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    ;(useCanvasCareer as jest.Mock).mockReturnValue(defaultHookReturn)
+    vi.clearAllMocks()
+    ;(useCanvasCareer as any).mockReturnValue(defaultHookReturn)
   })
 
   const setup = (propOverrides = {}, hookOverrides = {}) => {
-    ;(useCanvasCareer as jest.Mock).mockReturnValue({
+    ;(useCanvasCareer as any).mockReturnValue({
       ...defaultHookReturn,
       ...hookOverrides,
     })

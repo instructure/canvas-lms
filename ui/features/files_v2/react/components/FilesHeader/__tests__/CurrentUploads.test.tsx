@@ -27,23 +27,25 @@ import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 function makeUploader(name: string, error?: object) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore FileUploader constructor not typed
   const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
   uploader.error = error
   return uploader
 }
 
 // Mock the UploadQueue module
-jest.mock('@canvas/files/react/modules/UploadQueue')
+vi.mock('@canvas/files/react/modules/UploadQueue')
 
 // Define mock implementation types
-const mockAddChangeListener = jest.fn()
-const mockRemoveChangeListener = jest.fn()
-const mockGetAllUploaders = jest.fn()
+const mockAddChangeListener = vi.fn()
+const mockRemoveChangeListener = vi.fn()
+const mockGetAllUploaders = vi.fn()
 
 // Setup mock implementations
 beforeEach(() => {
   // Reset all mocks
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 
   // Setup default mock implementations
   mockAddChangeListener.mockImplementation((callback: () => void) => {
@@ -111,7 +113,7 @@ describe('CurrentUploads', () => {
 
     beforeEach(() => {
       changeCallback = () => {}
-      jest.spyOn(queryClient, 'refetchQueries')
+      vi.spyOn(queryClient, 'refetchQueries')
 
       mockAddChangeListener.mockImplementation((callback: () => void) => {
         changeCallback = callback

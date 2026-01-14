@@ -113,7 +113,7 @@ describe('<CustomHelpLinkForm/>', () => {
 
   it('submits the form with the correct values', async () => {
     const props = makeProps()
-    const submitSpy = jest.fn()
+    const submitSpy = vi.fn()
     const {getByLabelText, getByText} = render(<CustomHelpLinkForm {...props} />, {
       wrapper: ({children}) => (
         <form

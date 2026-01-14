@@ -22,11 +22,13 @@ import CourseItemRow from '../CourseItemRow'
 import AnnouncementModel from '@canvas/discussions/backbone/models/Announcement'
 
 const mockLockIconView = {
-  render: jest.fn(),
-  remove: jest.fn(),
+  render: vi.fn(),
+  remove: vi.fn(),
 }
 
-jest.mock('@canvas/lock-icon', () => jest.fn(() => mockLockIconView))
+vi.mock('@canvas/lock-icon', () => ({
+  default: vi.fn(() => mockLockIconView),
+}))
 
 const defaultProps = {
   title: 'Hello CourseItemRow title',
@@ -62,7 +64,7 @@ const renderCourseItemRow = (props = {}) => {
 
 describe('CourseItemRow', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the CourseItemRow component', () => {
@@ -235,7 +237,7 @@ describe('CourseItemRow', () => {
   })
 
   it('calls onSelectChanged when checkbox is toggled', () => {
-    const onSelectedChanged = jest.fn()
+    const onSelectedChanged = vi.fn()
 
     renderCourseItemRow({selectable: true, onSelectedChanged})
 

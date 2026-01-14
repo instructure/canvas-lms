@@ -25,8 +25,8 @@ describe('SubaccountNameForm', () => {
   const props = {
     accountName: 'New Name',
     accountId: '1',
-    onSuccess: jest.fn(),
-    onCancel: jest.fn(),
+    onSuccess: vi.fn(),
+    onCancel: vi.fn(),
   }
 
   const updatedAccount = {
@@ -38,7 +38,7 @@ describe('SubaccountNameForm', () => {
 
   beforeEach(() => {
     fetchMock.restore()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders an input with submission buttons', () => {
@@ -60,7 +60,7 @@ describe('SubaccountNameForm', () => {
   it('creates new subaccount when passed in name is blank', async () => {
     const path = `/accounts/${props.accountId}/sub_accounts`
     const user = userEvent.setup()
-    const onSuccess = jest.fn()
+    const onSuccess = vi.fn()
     const {getByTestId} = render(
       <SubaccountNameForm {...props} onSuccess={onSuccess} accountName="" />,
     )
@@ -75,7 +75,7 @@ describe('SubaccountNameForm', () => {
   it('updates existing subaccount when passed in name is not blank', async () => {
     const path = `/accounts/${props.accountId}`
     const user = userEvent.setup()
-    const onSuccess = jest.fn()
+    const onSuccess = vi.fn()
     const {getByTestId} = render(<SubaccountNameForm {...props} onSuccess={onSuccess} />)
     fetchMock.put(path, {account: updatedAccount})
 
@@ -86,7 +86,7 @@ describe('SubaccountNameForm', () => {
 
   it('triggers callback when cancelling', async () => {
     const user = userEvent.setup()
-    const onCancel = jest.fn()
+    const onCancel = vi.fn()
     const {getByTestId} = render(<SubaccountNameForm {...props} onCancel={onCancel} />)
 
     await user.click(getByTestId('cancel-button'))

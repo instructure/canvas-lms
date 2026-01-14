@@ -174,7 +174,7 @@ describe('Breakdown Details', () => {
   it('renders component correctly', () => {
     const props = defaultProps()
     props.showDetails = true
-    props.closeSidebar = jest.fn()
+    props.closeSidebar = vi.fn()
     render(<BreakdownDetails {...props} />)
     expect(screen.getByTestId('breakdown-details')).toBeInTheDocument()
   })
@@ -182,8 +182,8 @@ describe('Breakdown Details', () => {
   it('clicking next student calls select student with the next student index', async () => {
     const props = defaultProps()
     props.selectedPath = {range: 0, student: 0}
-    props.selectStudent = jest.fn()
-    props.closeSidebar = jest.fn()
+    props.selectStudent = vi.fn()
+    props.closeSidebar = vi.fn()
     const user = userEvent.setup()
     render(<BreakdownDetails {...props} />)
 
@@ -194,8 +194,8 @@ describe('Breakdown Details', () => {
   it('clicking next student on the last student wraps around to first student', async () => {
     const props = defaultProps()
     props.selectedPath = {range: 0, student: 1}
-    props.selectStudent = jest.fn()
-    props.closeSidebar = jest.fn()
+    props.selectStudent = vi.fn()
+    props.closeSidebar = vi.fn()
     const user = userEvent.setup()
     render(<BreakdownDetails {...props} />)
 
@@ -206,8 +206,8 @@ describe('Breakdown Details', () => {
   it('clicking prev student calls select student with the correct student index', async () => {
     const props = defaultProps()
     props.selectedPath = {range: 0, student: 1}
-    props.selectStudent = jest.fn()
-    props.closeSidebar = jest.fn()
+    props.selectStudent = vi.fn()
+    props.closeSidebar = vi.fn()
     const user = userEvent.setup()
     render(<BreakdownDetails {...props} />)
 
@@ -218,8 +218,8 @@ describe('Breakdown Details', () => {
   it('clicking prev student on first student wraps around to last student', async () => {
     const props = defaultProps()
     props.selectedPath = {range: 0, student: 0}
-    props.selectStudent = jest.fn()
-    props.closeSidebar = jest.fn()
+    props.selectStudent = vi.fn()
+    props.closeSidebar = vi.fn()
     const user = userEvent.setup()
     render(<BreakdownDetails {...props} />)
 
@@ -230,7 +230,7 @@ describe('Breakdown Details', () => {
   it('clicking back on student details unselects student', async () => {
     const props = defaultProps()
     props.selectedPath = {range: 0, student: 0}
-    props.selectStudent = jest.fn()
+    props.selectStudent = vi.fn()
     const user = userEvent.setup()
     render(<BreakdownDetails {...props} />)
 
@@ -244,7 +244,7 @@ describe('Breakdown Details', () => {
   it('clicking back button calls closeSidebar', async () => {
     const props = defaultProps()
     props.selectedPath.student = 1
-    props.closeSidebar = jest.fn()
+    props.closeSidebar = vi.fn()
     const user = userEvent.setup()
     render(<BreakdownDetails {...props} />)
     const closeButton = screen.getByTestId('breakdown-details-close')

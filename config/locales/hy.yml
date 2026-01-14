@@ -439,7 +439,9 @@ hy:
     report_header_term_id: "ժամանակահատվածի id"
     report_header_term_sis: "ժամանակահատվածի sis"
     report_header_token_hint: "token hint"
+    report_header_token_id: նույնականացուցիչ
     report_header_token_last_used: "Օգտագործվել է վերջին անգամ"
+    report_header_token_status: կարգավիճակ
     report_header_user__id: օգտատիրոջ_նույնականացուցիչ
     report_header_user_id: "օգտատիրոջ նույնականացուցիչ"
     report_header_user_name: "օգտատիրոջ անուն"
@@ -1752,6 +1754,7 @@ hy:
       recipients_required: "Առնվազն մեկ ստացող է պահանջվում"
       threshold_should_be_numeric: "Սա պետք է դրական թիվ լինի"
   alerts_6b871b71: Զգուշացումներ
+  aligned_outcomes_d0a0c159: "Համապատասխանեցված արդյունքներ"
   all_4321c3a1: Բոլորը
   all_account_types_e83c1516: "Բոլոր տեսակի հաշիվներ"
   all_accounts_3bafc860: "Բոլոր հաշիվներ"

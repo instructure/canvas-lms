@@ -127,9 +127,7 @@ module Importers
                      end
 
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
-      if options[:assignment]
-        options[:assignment][:lock_at] ||= options[:lock_at]
-      else
+      unless options[:assignment]
         item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
       end
       item.todo_date       = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:todo_date])
@@ -161,8 +159,6 @@ module Importers
       if options[:attachment_ids].present?
         item.message += Attachment.attachment_list_from_migration(context, options[:attachment_ids])
       end
-
-      item.saving_user = migration.user
 
       if options[:has_group_category]
         if migration.context.feature_enabled?(:migrate_assignment_group_categories)

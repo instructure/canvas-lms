@@ -55,12 +55,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def show_distribution_graph?
-    if preload_optimizations_enabled?
-      @assignment.association(:score_statistic).target = @summary.assignment_stats[assignment.id] # Avoid another query
-    else
-      @assignment.score_statistic = @summary.assignment_stats[assignment.id] # Avoid another query
-    end
-
+    @assignment.association(:score_statistic).target = @summary.assignment_stats[assignment.id] # Avoid another query
     @assignment.can_view_score_statistics?(@current_user)
   end
 
@@ -99,7 +94,15 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_assignment?
-    assignment.instance_of?(Assignment)
+    assignment.instance_of?(Assignment) || assignment.is_a?(PeerReviewSubAssignment)
+  end
+
+  def assignment_for_submission_link
+    if assignment.is_a?(PeerReviewSubAssignment)
+      assignment.parent_assignment
+    else
+      assignment
+    end
   end
 
   def has_no_group_weight?
@@ -321,12 +324,6 @@ class GradeSummaryAssignmentPresenter
 
   def viewing_fake_student?
     @summary.student_enrollment.fake_student?
-  end
-
-  def preload_optimizations_enabled?
-    return @preload_optimizations_enabled if defined?(@preload_optimizations_enabled)
-
-    @preload_optimizations_enabled = Account.site_admin.feature_enabled?(:grade_summary_preload_optimizations)
   end
 
   FULLWIDTH = 150.0

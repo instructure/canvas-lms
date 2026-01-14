@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {find, groupBy} from 'lodash'
+import {groupBy, find} from 'es-toolkit/compat'
 import React from 'react'
 import {string} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'

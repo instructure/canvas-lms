@@ -20,7 +20,7 @@ import React from 'react'
 import WebcamModal from '../WebcamModal'
 import {render, fireEvent, act} from '@testing-library/react'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('WebcamModal', () => {
   let mockGetUserMedia
@@ -29,9 +29,9 @@ describe('WebcamModal', () => {
 
   beforeEach(() => {
     mockStream = {
-      getTracks: jest.fn(() => [{stop: jest.fn()}]),
+      getTracks: vi.fn(() => [{stop: vi.fn()}]),
     }
-    mockGetUserMedia = jest.fn(() => Promise.resolve(mockStream))
+    mockGetUserMedia = vi.fn(() => Promise.resolve(mockStream))
 
     // Mock navigator.mediaDevices.getUserMedia
     Object.defineProperty(navigator, 'mediaDevices', {
@@ -47,26 +47,26 @@ describe('WebcamModal', () => {
       videoWidth: 640,
       videoHeight: 480,
     }
-    jest.spyOn(React, 'useRef').mockReturnValue({current: mockVideoRef})
+    vi.spyOn(React, 'useRef').mockReturnValue({current: mockVideoRef})
 
     // Mock canvas methods
-    jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
-      drawImage: jest.fn(),
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+      drawImage: vi.fn(),
     })
-    jest
+    vi
       .spyOn(HTMLCanvasElement.prototype, 'toDataURL')
       .mockReturnValue('data:image/png;base64,mockData')
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   const getProps = (override = {}) => {
     return {
-      onSelectImage: jest.fn(),
-      onDismiss: jest.fn(),
+      onSelectImage: vi.fn(),
+      onDismiss: vi.fn(),
       open: false,
       ...override,
     }
@@ -74,14 +74,14 @@ describe('WebcamModal', () => {
 
   it('focus Take Photo and Use This Photo when showed', async () => {
     // Mock toBlob to call callback immediately
-    jest.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(callback => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(callback => {
       callback(new Blob(['test'], {type: 'image/png'}))
     })
 
     let result
     await act(async () => {
       result = render(<WebcamModal {...getProps({open: true})} />)
-      await jest.runAllTimers()
+      await vi.runAllTimers()
     })
 
     // Verify Take Photo button exists and is visible
@@ -117,7 +117,7 @@ describe('WebcamModal', () => {
   })
 
   it('closes all tracks when prop open goes from true to false', async () => {
-    const stop = jest.fn()
+    const stop = vi.fn()
     mockStream.getTracks.mockReturnValue([{stop}])
 
     let result
@@ -133,7 +133,7 @@ describe('WebcamModal', () => {
     mockGetUserMedia.mockImplementationOnce(() => sleep1s)
     const {getByText} = render(<WebcamModal {...getProps({open: true})} />)
 
-    act(() => jest.advanceTimersByTime(500))
+    act(() => vi.advanceTimersByTime(500))
     expect(getByText('Canvas needs acccess to your camera.')).toBeInTheDocument()
   })
 
@@ -148,7 +148,7 @@ describe('WebcamModal', () => {
   })
 
   it('displays Try Again button when granted and has already took picture', async () => {
-    const mockedToBlob = jest.spyOn(HTMLCanvasElement.prototype, 'toBlob')
+    const mockedToBlob = vi.spyOn(HTMLCanvasElement.prototype, 'toBlob')
     mockedToBlob.mockImplementationOnce(callback =>
       callback(new Blob(['test'], {type: 'image/png'})),
     )
@@ -163,7 +163,7 @@ describe('WebcamModal', () => {
 
   it('calls onSelectImage passing blob and dataURL when select picture', async () => {
     const mockedBlob = new Blob(['test'], {type: 'image/png'})
-    const mockedToBlob = jest.spyOn(HTMLCanvasElement.prototype, 'toBlob')
+    const mockedToBlob = vi.spyOn(HTMLCanvasElement.prototype, 'toBlob')
     mockedToBlob.mockImplementationOnce(callback => callback(mockedBlob))
     const props = getProps({open: true})
     let result

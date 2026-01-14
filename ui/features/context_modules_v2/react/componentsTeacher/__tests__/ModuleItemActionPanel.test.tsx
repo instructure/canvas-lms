@@ -24,11 +24,11 @@ import ModuleItemActionPanel from '../ModuleItemActionPanel'
 import {http, HttpResponse} from 'msw'
 import * as publishingModule from '@canvas/context-modules/react/publishing/publishingContext'
 
-jest.mock('@canvas/context-modules/react/publishing/publishingContext', () => {
-  const actual = jest.requireActual('@canvas/context-modules/react/publishing/publishingContext')
+vi.mock('@canvas/context-modules/react/publishing/publishingContext', async () => {
+  const actual = await vi.importActual('@canvas/context-modules/react/publishing/publishingContext')
   return {
     ...actual,
-    usePublishing: jest.fn(() => ({
+    usePublishing: vi.fn(() => ({
       publishingInProgress: false,
     })),
   }
@@ -54,10 +54,10 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
   published: false,
   canBeUnpublished: true,
   masteryPathsData: null,
-  setModuleAction: jest.fn(),
-  setSelectedModuleItem: jest.fn(),
-  setIsManageModuleContentTrayOpen: jest.fn(),
-  setSourceModule: jest.fn(),
+  setModuleAction: vi.fn(),
+  setSelectedModuleItem: vi.fn(),
+  setIsManageModuleContentTrayOpen: vi.fn(),
+  setSourceModule: vi.fn(),
   moduleTitle: 'Test Module',
   ...overrides,
 })
@@ -159,13 +159,13 @@ describe('ModuleItemActionPanel', () => {
   it('toggles disabled state based on publishingContext (mocked)', () => {
     const props = buildDefaultProps()
 
-    const mockUsePublishing = publishingModule.usePublishing as jest.Mock
+    const mockUsePublishing = publishingModule.usePublishing as any
 
     // Initial state is not publishing
     mockUsePublishing.mockReturnValue({
       publishingInProgress: false,
-      startPublishing: jest.fn(),
-      stopPublishing: jest.fn(),
+      startPublishing: vi.fn(),
+      stopPublishing: vi.fn(),
     })
 
     const {rerender} = setUp(props)

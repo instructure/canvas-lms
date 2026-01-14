@@ -18,7 +18,7 @@
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import range from 'lodash/range'
+import {range} from 'es-toolkit/compat'
 import React from 'react'
 import {
   STUDENT_VIEW_QUERY,
@@ -176,7 +176,7 @@ describe('ViewManager', () => {
           </MockedProvider>,
         )
 
-        const mockFocus = jest.fn()
+        const mockFocus = vi.fn()
         const assignmentToggle = getByTestId('assignments-2-assignment-toggle-details')
         assignmentToggle.focus = mockFocus
 

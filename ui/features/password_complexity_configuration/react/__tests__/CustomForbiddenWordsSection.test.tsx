@@ -19,15 +19,31 @@
 import React from 'react'
 import {render, screen, cleanup} from '@testing-library/react'
 import CustomForbiddenWordsSection from '../CustomForbiddenWordsSection'
-import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect/apiRequest')
-jest.mock('../apiClient')
+vi.mock('../apiClient')
 
-const mockedExecuteApiRequest = executeApiRequest as jest.MockedFunction<typeof executeApiRequest>
+const server = setupServer(
+  http.get('/api/v1/accounts/:accountId/settings', () => {
+    return HttpResponse.json({
+      password_policy: {
+        common_passwords_attachment_id: null,
+      },
+    })
+  }),
+  // Handler for file info requests (used when checking current attachment)
+  http.get('/api/v1/files/:fileId', () => {
+    return HttpResponse.json({
+      id: 123,
+      display_name: 'forbidden_words.txt',
+    })
+  }),
+)
 
 describe('CustomForbiddenWordsSection Component', () => {
   beforeAll(() => {
+    server.listen()
     if (!window.ENV) {
       // @ts-expect-error
       window.ENV = {}
@@ -36,37 +52,17 @@ describe('CustomForbiddenWordsSection Component', () => {
   })
 
   afterAll(() => {
+    server.close()
     // @ts-expect-error
     delete window.ENV.DOMAIN_ROOT_ACCOUNT_ID
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    server.resetHandlers()
     cleanup()
   })
 
-  beforeEach(() => {
-    mockedExecuteApiRequest.mockResolvedValue({
-      status: 200,
-      data: {
-        password_policy: {
-          common_passwords_attachment_id: null,
-        },
-      },
-    })
-  })
-
   describe('when no file is uploaded', () => {
-    beforeEach(() => {
-      mockedExecuteApiRequest.mockResolvedValue({
-        status: 200,
-        data: {
-          password_policy: {
-            common_passwords_attachment_id: null,
-          },
-        },
-      })
-    })
 
     it('shows “Upload” button but not “Current Custom List”', async () => {
       render(

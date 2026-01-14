@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {NutritionFacts} from '../NutritionFacts'
 

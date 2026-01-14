@@ -17,31 +17,80 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import WidgetGrid from '../WidgetGrid'
-import type {WidgetConfig} from '../../types'
-import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
+
+// Mock react-beautiful-dnd AFTER React import
+vi.mock('react-beautiful-dnd', () => ({
+  DragDropContext: ({children}: any) => React.createElement('div', {'data-testid': 'drag-drop-context'}, children),
+  Droppable: ({children, droppableId}: any) =>
+    React.createElement('div', {'data-testid': `droppable-${droppableId}`},
+      children(
+        {
+          innerRef: vi.fn(),
+          droppableProps: {'data-rbd-droppable-id': droppableId},
+          placeholder: null,
+        },
+        {isDraggingOver: false},
+      )
+    ),
+  Draggable: ({children, draggableId, index}: any) =>
+    React.createElement('div', {
+      'data-testid': `draggable-${draggableId}`,
+      'data-rbd-draggable-id': draggableId
+    },
+      children(
+        {
+          innerRef: vi.fn(),
+          draggableProps: {'data-rbd-draggable-id': draggableId},
+          dragHandleProps: {'data-rbd-drag-handle-draggable-id': draggableId},
+        },
+        {isDragging: false},
+      )
+    ),
+}))
 
 // Mock the WidgetRegistry to avoid dependency issues
-jest.mock('../WidgetRegistry', () => ({
-  getWidget: jest.fn(() => ({
-    component: ({widget}: any) => <div data-testid={`widget-${widget.id}`}>{widget.title}</div>,
+vi.mock('../WidgetRegistry', () => ({
+  getWidget: vi.fn(() => ({
+    component: ({widget}: any) => React.createElement('div', {'data-testid': `widget-${widget.id}`}, widget.title),
     displayName: 'Mock Widget',
     description: 'Mock widget for testing',
   })),
 }))
+import {render, screen} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import WidgetGrid from '../WidgetGrid'
+import type {WidgetConfig} from '../../types'
+import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
+import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
+import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
 
 type Props = {
   config: WidgetConfig
   matches?: string[]
 }
 
-const setUp = (props: Props) => {
+const setUp = (props: Props, isEditMode = false) => {
   const {matches = ['desktop'], ...gridProps} = props
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {retry: false},
+      mutations: {retry: false},
+    },
+  })
+
   return render(
-    <ResponsiveProvider matches={matches}>
-      <WidgetGrid {...gridProps} />
-    </ResponsiveProvider>,
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardProvider>
+        <ResponsiveProvider matches={matches}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <WidgetGrid {...gridProps} isEditMode={isEditMode} />
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </ResponsiveProvider>
+      </WidgetDashboardProvider>
+    </QueryClientProvider>,
   )
 }
 
@@ -88,7 +137,7 @@ const indexInParent = (el: HTMLElement) => Array.from(el.parentNode!.children).i
 const mockMatchMedia = (width: number) => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation((query: string) => {
+    value: vi.fn().mockImplementation((query: string) => {
       let matches = false
 
       // Mobile: maxWidth: '639px'
@@ -108,11 +157,11 @@ const mockMatchMedia = (width: number) => {
         matches,
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       }
     }),
   })
@@ -125,7 +174,7 @@ describe('WidgetGrid', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Desktop Layout (≥1024px)', () => {

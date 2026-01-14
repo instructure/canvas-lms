@@ -42,6 +42,11 @@ export interface EnvGradebookCommon {
   EMOJI_DENY_LIST?: unknown
 
   /**
+   * From GradebooksController#set_default_gradebook_env
+   */
+  PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED?: boolean
+
+  /**
    * From GradebooksController#set_individual_gradebook_env
    */
   outcome_service_results_to_canvas: unknown

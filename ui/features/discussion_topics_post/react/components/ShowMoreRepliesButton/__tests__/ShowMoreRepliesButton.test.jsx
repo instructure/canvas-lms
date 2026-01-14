@@ -25,7 +25,7 @@ const setup = props => {
 }
 
 describe('ShowMoreRepliesButton', () => {
-  const onClick = jest.fn()
+  const onClick = vi.fn()
 
   it('Should show the button text', () => {
     const {queryByText} = setup({buttonText: 'Show older replies'})

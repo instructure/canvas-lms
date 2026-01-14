@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import ActionButtons from '../ActionButtons'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 
-jest.mock('@canvas/instui-bindings/react/Confirm')
+vi.mock('@canvas/instui-bindings/react/Confirm')
 
 const defaultProps = ({
   showVisibilityToggle = true,
@@ -32,18 +32,18 @@ const defaultProps = ({
   },
 } = {}) => {
   return {
-    dispatch: jest.fn(),
-    makeVisibleDeveloperKey: jest.fn(),
-    makeInvisibleDeveloperKey: jest.fn(),
-    deleteDeveloperKey: jest.fn(),
-    editDeveloperKey: jest.fn(),
-    developerKeysModalOpen: jest.fn(),
-    ltiKeysSetLtiKey: jest.fn(),
+    dispatch: vi.fn(),
+    makeVisibleDeveloperKey: vi.fn(),
+    makeInvisibleDeveloperKey: vi.fn(),
+    deleteDeveloperKey: vi.fn(),
+    editDeveloperKey: vi.fn(),
+    developerKeysModalOpen: vi.fn(),
+    ltiKeysSetLtiKey: vi.fn(),
     contextId: '2',
     developerKey,
     visible: true,
     developerName: 'Unnamed Tool',
-    onDelete: jest.fn(),
+    onDelete: vi.fn(),
     showVisibilityToggle,
   }
 }

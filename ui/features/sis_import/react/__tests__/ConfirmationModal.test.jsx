@@ -21,8 +21,8 @@ import userEvent from '@testing-library/user-event'
 import {ConfirmationModal} from '../ConfirmationModal'
 
 describe('ConfirmationModal', () => {
-  const onSubmit = jest.fn()
-  const onClose = jest.fn()
+  const onSubmit = vi.fn()
+  const onClose = vi.fn()
 
   const renderConfirmationModal = () => {
     return render(<ConfirmationModal isOpen={true} onSubmit={onSubmit} onRequestClose={onClose} />)

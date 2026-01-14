@@ -20,7 +20,7 @@ import {mapStateToProps} from '../index'
 
 describe('PlannerApp mapStateToProps', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('maps isLoading to true when state.loading.isLoading is true', () => {

@@ -88,6 +88,6 @@ describe('renderAssignToTray embedded', () => {
 
     const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
     expect(selectedOptions).toHaveLength(1)
-    waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
+    await waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
   })
 })

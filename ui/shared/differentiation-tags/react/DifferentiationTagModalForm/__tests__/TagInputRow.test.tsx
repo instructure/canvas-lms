@@ -20,12 +20,11 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import TagInputRow, {TagInputRowProps} from '../TagInputRow'
-import '@testing-library/jest-dom'
 
 describe('TagInputRow', () => {
-  const onChangeMock = jest.fn()
-  const onRemoveMock = jest.fn()
-  const inputRefMock = jest.fn()
+  const onChangeMock = vi.fn()
+  const onRemoveMock = vi.fn()
+  const inputRefMock = vi.fn()
 
   const defaultProps: TagInputRowProps = {
     tag: {id: 100, name: 'Test Tag'},
@@ -37,7 +36,7 @@ describe('TagInputRow', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders an input with variant label when totalTags > 1', () => {

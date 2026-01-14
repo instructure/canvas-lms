@@ -47,7 +47,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
 import type JQuery from 'jquery'
 import $ from 'jquery'
-import {filter, find, includes, isEqual, keyBy, map, reject, some, values} from 'lodash'
+import {isEqual, keyBy, filter, find, includes, map, reject, some, values} from 'es-toolkit/compat'
 import qs from 'qs'
 import React, {useRef} from 'react'
 import ReactDOM from 'react-dom'
@@ -158,6 +158,7 @@ import {windowAlert} from '@canvas/util/globalUtils'
 import replaceTags from '@canvas/util/replaceTags'
 import {isPreviewable} from '@instructure/canvas-rce/es/rce/plugins/shared/Previewable'
 import {createRoot} from 'react-dom/client'
+import {AmsLoader} from '@canvas/ams/react/AmsLoader'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation2} from '../react/SpeedGraderDiscussionsNavigation2'
@@ -236,6 +237,8 @@ let fileIndex: number
 let $add_attachment: JQuery
 let $submissions_container: JQuery
 let $iframe_holder: JQuery
+let $ams_grading_container: JQuery
+let amsGradingRoot: ReturnType<typeof createRoot> | null = null
 let $avatar_image: JQuery
 let $x_of_x_students: JQuery
 let $grded_so_far: JQuery
@@ -1053,9 +1056,19 @@ export function renderLtiAssetReports(
     student = {studentUserId: null, studentAnonymousId: submission.anonymous_id}
   }
 
-  const {attempt, submission_type} = historicalSubmission
   const assignmentId = submission.assignment_id
-  const submissionType = ensureCompatibleSubmissionType(submission_type)
+  let attempt, submissionType
+  const jsonData = window.jsonData
+  // Submissions for checkpointed discussions won't have a submission type
+  // until the student has met both checkpooint criteria, but they can still
+  // have asset reports. So pretend the type is discussion_topic:
+  if (jsonData.submission_types.includes('discussion_topic') && jsonData.has_sub_assignments) {
+    attempt = 1 // dummy value, irrelevant for discussion topics
+    submissionType = 'discussion_topic'
+  } else {
+    attempt = historicalSubmission.attempt
+    submissionType = ensureCompatibleSubmissionType(historicalSubmission.submission_type)
+  }
 
   if (student && assignmentId && attempt && submissionType) {
     const attachments = (historicalSubmission.versioned_attachments || []).map(({attachment}) => ({
@@ -1286,7 +1299,7 @@ function initCommentBox() {
             recording: false,
             html: '<div></div>',
             click() {
-              const $this = $(this)
+              const $this = $(this) as unknown as JQuery<HTMLElement>
               processSpeech($this)
             },
           },
@@ -1571,7 +1584,7 @@ EG = {
           return $width_resizer_ew.clone().addClass('clone')
         },
         snapTolerance: 200,
-        drag(_event: Event, ui) {
+        drag(_event: Event, ui: JQueryUI.DraggableEventUIParams) {
           const offset = ui.offset
           const windowWidth = $window.width() as number
           $left_side.width(`${(offset.left / windowWidth) * 100}%`)
@@ -1587,7 +1600,7 @@ EG = {
             $right_side.width('100%')
           }
         },
-        stop(event: Event, _ui) {
+        stop(event: Event, _ui: JQueryUI.DraggableEventUIParams) {
           event.stopImmediatePropagation()
           $resize_overlay.hide()
         },
@@ -1617,14 +1630,14 @@ EG = {
         snap: '#full_width_container',
         appendTo: '#full_width_container',
         helper: 'original',
-        drag(_event: Event, dragBar) {
+        drag(_event: Event, dragBar: JQueryUI.DraggableEventUIParams) {
           const topContainerDesiredHeight = dragBar.offset.top - $full_width_container.offset()!.top
           const topContainerDesiredPercent =
             (topContainerDesiredHeight / $full_width_container.height()!) * 100
           $left_side.css('flex', `0 0 ${topContainerDesiredPercent}%`)
           $right_side.css('flex', `0 0 ${100 - topContainerDesiredPercent}%`)
         },
-        stop(event: Event, _ui) {
+        stop(event: Event, _ui: JQueryUI.DraggableEventUIParams) {
           event.stopImmediatePropagation()
           $resize_overlay.hide()
         },
@@ -1849,7 +1862,7 @@ EG = {
         resizable: false,
         dialogClass: 'no-close',
         modal: true,
-        create(_e, _ui) {
+        create(_e: Event, _ui: JQueryUI.DialogUIParams) {
           const pane = $(this).dialog('widget').find('.ui-dialog-buttonpane')
           $(
             `<label class='do-not-show-again'><input type='checkbox'/>&nbsp;${I18n.t(
@@ -3265,6 +3278,8 @@ EG = {
       $this_student_has_a_submission.show()
     } else if (attachment) {
       this.renderAttachment(attachment)
+    } else if (submission && submission.submission_type === 'ams') {
+      this.renderAmsGrading(submission)
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
       if (
         !ENV.SINGLE_NQ_SESSION_ENABLED ||
@@ -3278,6 +3293,7 @@ EG = {
         $iframe_holder.show()
       }
     } else {
+      this.unmountAmsGrading()
       this.renderSubmissionPreview()
     }
   },
@@ -3285,6 +3301,7 @@ EG = {
   emptyIframeHolder(elem?: JQuery) {
     elem = elem || $iframe_holder
     elem.empty()
+    this.unmountAmsGrading()
   },
 
   // load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
@@ -3377,6 +3394,52 @@ EG = {
       allowfullscreen: true,
     })
     $div.html(iframe).show()
+  },
+
+  renderAmsGrading(submission: HistoricalSubmission) {
+    this.emptyIframeHolder()
+    this.unmountAmsGrading()
+
+    if (!window.REMOTES?.ams?.launch_url) {
+      console.error('AMS not configured')
+      return
+    }
+
+    const container = document.getElementById('ams_grading_container')
+    if (!container) {
+      console.error('AMS grading container not found')
+      return
+    }
+
+    const handleAmsSubmissionUpdate = () => {
+      refreshGrades(() => {
+        this.updateStatsInHeader()
+      })
+    }
+
+    amsGradingRoot = createRoot(container)
+    amsGradingRoot.render(
+      <AmsLoader
+        containerId="ams_grading_container"
+        gradingContext={{
+          assignmentId: String(window.jsonData.id),
+          studentId: String(this.currentStudent.id),
+          studentUuid: this.currentStudent.uuid,
+          submissionId: String(submission.id),
+        }}
+        onSubmissionUpdate={handleAmsSubmissionUpdate}
+      />,
+    )
+
+    $ams_grading_container.show()
+  },
+
+  unmountAmsGrading() {
+    if (amsGradingRoot) {
+      amsGradingRoot.unmount()
+      amsGradingRoot = null
+    }
+    $ams_grading_container.hide()
   },
 
   generateWarningTimings(numHours: number): number[] {
@@ -4215,7 +4278,10 @@ EG = {
       if (!submissions[0].submission.excused) {
         const outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible)
         if (outlierScoreHelper.hasWarning()) {
-          $.flashWarning(outlierScoreHelper.warningMessage())
+          const warningMessage = outlierScoreHelper.warningMessage()
+          if (warningMessage) {
+            $.flashWarning(warningMessage)
+          }
         }
       }
 
@@ -4912,6 +4978,7 @@ function setupSelectors() {
   $grading_box_selected_grader = $('#grading-box-selected-grader')
   $grded_so_far = $('#x_of_x_graded')
   $iframe_holder = $('#iframe_holder')
+  $ams_grading_container = $('#ams_grading_container')
   $left_side = $('#left_side')
   $multiple_submissions = $('#multiple_submissions')
   $new_screen_capture_indicator_wrapper = $('#new-studio-media-indicator-wrapper')

@@ -23,6 +23,7 @@ import {waitFor} from '@testing-library/dom'
 import {fireEvent, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import useManagedCourseSearchApi from '../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi'
 import {Assignment} from '../../../../graphql/Assignment'
 import {Discussion} from '../../../../graphql/Discussion'
@@ -38,25 +39,25 @@ import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
 // mock assignLocation
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
-  openWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
+  openWindow: vi.fn(),
 }))
 
-jest.mock('../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi')
-jest.mock('@canvas/rce/RichContentEditor')
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi')
+vi.mock('@canvas/rce/RichContentEditor')
+vi.mock('../../../utils', async () => ({
+  ...(await vi.importActual('../../../utils')),
+  responsiveQuerySizes: vi.fn(),
 }))
 
 describe('DiscussionTopicContainer', () => {
-  const setOnFailure = jest.fn()
-  const setOnSuccess = jest.fn()
+  const setOnFailure = vi.fn()
+  const setOnSuccess = vi.fn()
   let liveRegion = null
 
   beforeAll(() => {
-    window.ENV = {
+    fakeENV.setup({
       EDIT_URL: 'this_is_the_edit_url',
       PEER_REVIEWS_URL: 'this_is_the_peer_reviews_url',
       context_asset_string: 'course_1',
@@ -71,15 +72,15 @@ describe('DiscussionTopicContainer', () => {
           title: 'Share to Commons',
         },
       ],
-    }
+    })
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -105,7 +106,7 @@ describe('DiscussionTopicContainer', () => {
   afterEach(() => {
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterAll(() => {
@@ -191,7 +192,7 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Should be able to delete topic', async () => {
-    window.confirm = jest.fn(() => true)
+    window.confirm = vi.fn(() => true)
     const {getByTestId, getByText} = setup(
       {discussionTopic: Discussion.mock()},
       deleteDiscussionTopicMock(),
@@ -208,7 +209,7 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Should be able to delete announcement', async () => {
-    window.confirm = jest.fn(() => true)
+    window.confirm = vi.fn(() => true)
     const {getByTestId, getByText} = setup(
       {discussionTopic: Discussion.mock({isAnnouncement: true})},
       deleteDiscussionTopicMock(),
@@ -353,25 +354,8 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Send To...')).toBeInTheDocument()
   })
 
-  it('renders a modal to send content', async () => {
-    const container = setup({discussionTopic: Discussion.mock()})
-    const kebob = await container.findByTestId('discussion-post-menu-trigger')
-    fireEvent.click(kebob)
-
-    const sendToButton = await container.findByText('Send To...')
-    fireEvent.click(sendToButton)
-    expect(await container.findByText('Send to:')).toBeInTheDocument()
-  })
-
-  it('renders a modal to copy content', async () => {
-    const container = setup({discussionTopic: Discussion.mock()})
-    const kebob = await container.findByTestId('discussion-post-menu-trigger')
-    fireEvent.click(kebob)
-
-    const copyToButton = await container.findByText('Copy To...')
-    fireEvent.click(copyToButton)
-    expect(await container.findByText('Select a Course')).toBeInTheDocument()
-  })
+  // Modal tests are in DiscussionTopicContainerModal.test.jsx
+  // to properly mock lazy-loaded components
 
   it('can send users to Commons if they can manageContent', async () => {
     const discussionTopic = Discussion.mock()

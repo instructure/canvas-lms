@@ -21,7 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {isArray, pick, some} from 'lodash'
+import {isArray, some, pick} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import '@canvas/jquery/jquery.ajaxJSON'
 

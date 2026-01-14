@@ -25,8 +25,8 @@ const setup = (props?: Partial<GroupRuleInputProps>) => {
     groupId: 1,
     type: 'drop_lowest',
     initialValue: '5',
-    onBlur: jest.fn(),
-    onChange: jest.fn(),
+    onBlur: vi.fn(),
+    onChange: vi.fn(),
   }
   return render(<GroupRuleInput {...defaultProps} {...props} />)
 }
@@ -39,7 +39,7 @@ describe('GroupRuleInput', () => {
   })
 
   test('calls onChange when input value changes', () => {
-    const onChangeMock = jest.fn()
+    const onChangeMock = vi.fn()
     setup({onChange: onChangeMock})
     const input = screen.getByTestId('ag_1_drop_lowest') as HTMLInputElement
 
@@ -49,7 +49,7 @@ describe('GroupRuleInput', () => {
   })
 
   test('calls onBlur when input loses focus', () => {
-    const onBlurMock = jest.fn()
+    const onBlurMock = vi.fn()
     setup({onBlur: onBlurMock})
     const input = screen.getByTestId('ag_1_drop_lowest')
 

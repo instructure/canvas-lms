@@ -32,7 +32,7 @@ module Factories
     vendor: "Test Vendor"
   }.with_indifferent_access.freeze
   DEFAULT_OVERLAY_PARAMS = {}.with_indifferent_access.freeze
-  DEFAULT_BINDING_PARAMS = {}.with_indifferent_access.freeze
+  DEFAULT_BINDING_PARAMS = { workflow_state: "on" }.with_indifferent_access.freeze
 
   def lti_registration_model(**params)
     params ||= {}

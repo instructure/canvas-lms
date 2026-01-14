@@ -20,7 +20,7 @@ import $ from 'jquery'
 import Entry from '../../models/Entry'
 import EntryView from '../EntryView'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 describe('EntryView', () => {
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe('EntryView', () => {
   })
 
   // fails in Jest, passes in QUnit
-  test.skip('it should be accessible', done => {
+  test.skip('it should be accessible', async () => {
     const entry = new Entry({
       id: 1,
       message: 'hi',
@@ -51,7 +51,7 @@ describe('EntryView', () => {
       el: '#e1',
     })
     view.render()
-    isAccessible(view, done)
+    await isAccessible(view)
   })
 
   test('renders', () => {
@@ -90,7 +90,7 @@ describe('EntryView', () => {
       message: 'a comment, wooper',
     })
     const view = new EntryView({model: entry})
-    const spy = jest.spyOn(view, 'renderTree')
+    const spy = vi.spyOn(view, 'renderTree')
     entry.set('replies', [new Entry({id: 2, message: 'a reply', parent_id: 1})])
     expect(spy).toHaveBeenCalled()
     spy.mockClear()

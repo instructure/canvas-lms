@@ -65,7 +65,7 @@ describe Api::V1::LearningObjectDates do
 
         it "returns false for discussion topics" do
           discussion_assignment.update!(peer_reviews: true)
-          course.enable_feature!(:peer_review_grading)
+          course.enable_feature!(:peer_review_allocation_and_grading)
 
           expect(harness.send(:peer_review_overrides_supported?, discussion_assignment)).to be false
         end
@@ -74,7 +74,7 @@ describe Api::V1::LearningObjectDates do
       context "when assignment has peer reviews and peer_review_sub_assignment" do
         before do
           assignment.update!(peer_reviews: true)
-          course.enable_feature!(:peer_review_grading)
+          course.enable_feature!(:peer_review_allocation_and_grading)
           PeerReview::PeerReviewCreatorService.new(parent_assignment: assignment).call
           assignment.reload
         end
@@ -84,7 +84,7 @@ describe Api::V1::LearningObjectDates do
         end
 
         it "returns false when feature is disabled" do
-          course.disable_feature!(:peer_review_grading)
+          course.disable_feature!(:peer_review_allocation_and_grading)
           expect(harness.send(:peer_review_overrides_supported?, assignment)).to be false
         end
       end
@@ -108,7 +108,7 @@ describe Api::V1::LearningObjectDates do
 
       before do
         assignment.update!(peer_reviews: true)
-        course.enable_feature!(:peer_review_grading)
+        course.enable_feature!(:peer_review_allocation_and_grading)
         PeerReview::PeerReviewCreatorService.new(
           parent_assignment: assignment,
           due_at: "2025-09-10T18:00:00Z",
@@ -123,8 +123,8 @@ describe Api::V1::LearningObjectDates do
           peer_review_sub = assignment.peer_review_sub_assignment
           harness.send(:add_peer_review_info, hash, assignment)
 
-          expect(hash).to have_key("peer_review_sub_assignment")
-          peer_review_data = hash["peer_review_sub_assignment"]
+          expect(hash).to have_key(:peer_review_sub_assignment)
+          peer_review_data = hash[:peer_review_sub_assignment]
           expect(peer_review_data[:id]).to eq(peer_review_sub.id)
           expect(peer_review_data[:due_at]).to eq("2025-09-10T18:00:00Z")
           expect(peer_review_data[:unlock_at]).to eq("2025-09-05T08:00:00Z")
@@ -157,8 +157,8 @@ describe Api::V1::LearningObjectDates do
         it "includes overrides data in the response" do
           harness.send(:add_peer_review_info, hash, assignment)
 
-          expect(hash).to have_key("peer_review_sub_assignment")
-          peer_review_data = hash["peer_review_sub_assignment"]
+          expect(hash).to have_key(:peer_review_sub_assignment)
+          peer_review_data = hash[:peer_review_sub_assignment]
           expect(peer_review_data[:overrides]).to have(1).item
 
           override_data = peer_review_data[:overrides].first
@@ -190,7 +190,7 @@ describe Api::V1::LearningObjectDates do
         it "excludes inactive overrides" do
           harness.send(:add_peer_review_info, hash, assignment)
 
-          peer_review_data = hash["peer_review_sub_assignment"]
+          peer_review_data = hash[:peer_review_sub_assignment]
           expect(peer_review_data[:overrides]).to eq([])
         end
       end

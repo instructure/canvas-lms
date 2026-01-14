@@ -21,19 +21,19 @@ import {render, fireEvent} from '@testing-library/react'
 
 import {FileAttachmentUpload} from '../FileAttachmentUpload'
 
-jest.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
 
-const setup = (onAddItem = jest.fn()) => {
+const setup = (onAddItem = vi.fn()) => {
   return render(<FileAttachmentUpload onAddItem={onAddItem} />)
 }
 
 describe('FileAttachmentUpload', () => {
   beforeEach(() => {
-    uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
+    uploadFileModule.uploadFiles.mockResolvedValue([])
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders', async () => {
@@ -47,7 +47,7 @@ describe('FileAttachmentUpload', () => {
     const {findByTestId} = setup()
     const button = await findByTestId('attachment-upload')
     const input = await findByTestId('attachment-input')
-    input.click = jest.fn()
+    input.click = vi.fn()
 
     button.click()
 
@@ -55,7 +55,7 @@ describe('FileAttachmentUpload', () => {
   })
 
   it('input handles file upload', async () => {
-    const mockOnAddItem = jest.fn()
+    const mockOnAddItem = vi.fn()
     const {findByTestId} = setup(mockOnAddItem)
     const input = await findByTestId('attachment-input')
     const fileEvent = {

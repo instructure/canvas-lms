@@ -18,7 +18,7 @@
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {uniqueId} from 'lodash'
+import {uniqueId} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -691,6 +691,12 @@ function showFilePreviewInOverlayHandler({file_id, verifier, access_token, instf
 }
 
 function wireUpFilePreview() {
+  if (
+    ENV?.PLATFORM_SERVICE_SPEEDGRADER_ENABLED &&
+    window.location.href.includes('gradebook/speed_grader')
+  ) {
+    return
+  }
   window.addEventListener('message', event => {
     if (event.data.subject === 'preview_file') {
       showFilePreviewInOverlayHandler(event.data)

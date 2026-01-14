@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import DiscussionSettings from '../DiscussionSettings'
-import merge from 'lodash/merge'
+import {merge} from 'es-toolkit/compat'
 
 const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
 
@@ -128,7 +128,7 @@ describe('DiscussionsSettings', () => {
   })
 
   it('will call save settings when button is clicked with correct args', async () => {
-    const saveMock = jest.fn()
+    const saveMock = vi.fn()
 
     const courseSettings = {
       allow_student_discussion_topics: false,
@@ -178,7 +178,7 @@ describe('DiscussionsSettings', () => {
   })
 
   it('will call save settings when button is clicked with correct args round 2', async () => {
-    const saveMock = jest.fn()
+    const saveMock = vi.fn()
 
     const courseSettings = {
       allow_student_discussion_topics: true,

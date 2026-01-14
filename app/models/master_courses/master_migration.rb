@@ -182,7 +182,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   def export_to_child_courses(type, subscriptions, export_is_primary)
     @export_type = type
     if type == :selective
-      @deletions = master_template.deletions_since_last_export
+      @deletions = master_template.deletions_by_type
       @creations = {} # will be populated during export
       @updates = {}   # "
       @export_count = 0

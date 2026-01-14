@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import Router from 'react-router'
+import {useParams} from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
 import {render, waitFor, cleanup} from '@testing-library/react'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
@@ -25,29 +25,29 @@ import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('react-router', () => ({
-  ...jest.requireActual('react-router'),
-  useParams: jest.fn(),
+vi.mock('react-router', async () => ({
+  ...await vi.importActual('react-router'),
+  useParams: vi.fn(),
 }))
-const onDismiss = jest.fn()
-const setPopoverIsOpen = jest.fn()
-const deleteRubricMock = jest.fn()
-jest.mock('../../../queries/ViewRubricQueries', () => ({
-  ...jest.requireActual('../../../queries/ViewRubricQueries'),
+const onDismiss = vi.fn()
+const setPopoverIsOpen = vi.fn()
+const deleteRubricMock = vi.fn()
+vi.mock('../../../queries/ViewRubricQueries', async () => ({
+  ...await vi.importActual('../../../queries/ViewRubricQueries'),
   deleteRubric: () => deleteRubricMock,
 }))
 
 describe('RubricForm Tests', () => {
   beforeEach(() => {
     fakeENV.setup()
-    jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1', rubricId: '1'})
+    vi.mocked(useParams).mockReturnValue({accountId: '1', rubricId: '1'})
   })
 
   afterEach(() => {
     cleanup()
     destroyFlashAlertContainer()
     fakeENV.teardown()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const renderComponent = (isOpen = true) => {
@@ -93,7 +93,7 @@ describe('RubricForm Tests', () => {
   })
 
   it('deletes the rubric when the delete button is clicked', async () => {
-    jest
+    vi
       .spyOn(ViewRubricQueries, 'deleteRubric')
       .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
     const {getByTestId} = renderComponent()

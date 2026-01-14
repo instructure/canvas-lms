@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Pob Ap"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Caniatáu llwytho cyfryngau i lawr"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Caniatáu llwytho trawsgrifiad i lawr"
+    },
     "alpha_15d59033": {
         "message": "Alpha"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Newid lliw''r testun"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Bydd y newidiadau’n berthnasol ar ôl i chi gadw’r dudalen hon."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Mae’n bosib na fydd y newidiadau rydych wedi’u gwneud yn cael eu cadw."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Plannu Delwedd"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Plannu Opsiynau"
     },
     "embed_video_a97a64af": {
         "message": "Plannu Fideo"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Wrthi’n llwytho rhagolwg"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Gosod y cyflymder ar 1x"
     },
     "locked_762f138b": {
         "message": "Wedi Cloi"

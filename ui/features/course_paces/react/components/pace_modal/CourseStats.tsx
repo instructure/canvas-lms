@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { StoreState, PaceContext } from '../../types'
-import { Pill } from '@instructure/ui-pill'
-import { Flex } from '@instructure/ui-flex'
-import { getIsDraftPace, getCoursePaceItems } from '../../reducers/course_paces'
-import { isBulkEnrollment } from '../../reducers/pace_contexts'
+import {connect} from 'react-redux'
+import {StoreState, PaceContext} from '../../types'
+import {Pill} from '@instructure/ui-pill'
+import {Flex} from '@instructure/ui-flex'
+import {getIsDraftPace, getCoursePaceItems} from '../../reducers/course_paces'
+import {isBulkEnrollment} from '../../reducers/pace_contexts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_stats')
@@ -38,10 +38,17 @@ export const CourseStats = ({
   assignmentsCount,
   isDraftPace,
   paceContext,
-  isBulkEnrollment
+  isBulkEnrollment,
 }: CourseStatsProps) => {
-  const StatusElement = ({ title, statValue, dataTestId }: { title: string, statValue: string | number, dataTestId: string }) => {
-
+  const StatusElement = ({
+    title,
+    statValue,
+    dataTestId,
+  }: {
+    title: string
+    statValue: string | number
+    dataTestId: string
+  }) => {
     return (
       <Flex.Item>
         <Pill statusLabel={title} data-testid={dataTestId}>
@@ -52,18 +59,32 @@ export const CourseStats = ({
   }
   return (
     <Flex gap="small" margin="small none" data-testid="course-stats-info">
-      {isDraftPace &&
-        <StatusElement title={I18n.t('Status')} statValue={I18n.t('Draft')} dataTestId='status-draft' />
-      }
-      {
-        paceContext.type !== "StudentEnrollment" && !isBulkEnrollment &&
-        <StatusElement title={I18n.t('Students Enrolled')} statValue={paceContext?.associated_student_count} dataTestId='student-enrollment-count' />
-      }
-      {
-        isBulkEnrollment &&
-        <StatusElement title={I18n.t('Students in Bulk Edit')} statValue={paceContext?.associated_student_count} dataTestId='bulk-student-enrollment-count' />
-      }
-      <StatusElement title={I18n.t('Assignment Count')} statValue={assignmentsCount} dataTestId='assignments-count' />
+      {isDraftPace && (
+        <StatusElement
+          title={I18n.t('Status')}
+          statValue={I18n.t('Draft')}
+          dataTestId="status-draft"
+        />
+      )}
+      {paceContext.type !== 'StudentEnrollment' && !isBulkEnrollment && (
+        <StatusElement
+          title={I18n.t('Students Enrolled')}
+          statValue={paceContext?.associated_student_count}
+          dataTestId="student-enrollment-count"
+        />
+      )}
+      {isBulkEnrollment && (
+        <StatusElement
+          title={I18n.t('Students in Bulk Edit')}
+          statValue={paceContext?.associated_student_count}
+          dataTestId="bulk-student-enrollment-count"
+        />
+      )}
+      <StatusElement
+        title={I18n.t('Assignment Count')}
+        statValue={assignmentsCount}
+        dataTestId="assignments-count"
+      />
     </Flex>
   )
 }
@@ -72,7 +93,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     assignmentsCount: getCoursePaceItems(state).length,
     isDraftPace: getIsDraftPace(state),
-    isBulkEnrollment: isBulkEnrollment(state)
+    isBulkEnrollment: isBulkEnrollment(state),
   }
 }
 

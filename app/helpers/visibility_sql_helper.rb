@@ -84,6 +84,7 @@ module VisibilitySqlHelper
         INNER JOIN #{GroupMembership.quoted_table_name} gm
           ON gm.group_id = g.id
           AND gm.user_id = e.user_id
+          AND gm.workflow_state = 'accepted'
       SQL
     end
 
@@ -136,6 +137,7 @@ module VisibilitySqlHelper
         INNER JOIN #{GroupMembership.quoted_table_name} gm
           ON gm.group_id = g.id
           AND gm.user_id = e.user_id
+          AND gm.workflow_state = 'accepted'
       SQL
     end
 

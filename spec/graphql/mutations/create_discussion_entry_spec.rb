@@ -95,21 +95,6 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     expect(entry.is_anonymous_author).to be true
   end
 
-  it "deletes discussion_entry_drafts on create" do
-    draft_id = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: "Howdy Hey")
-    run_mutation(discussion_topic_id: @topic.id, message: "Howdy Hey")
-    expect(DiscussionEntryDraft.where(id: draft_id)).to eq []
-  end
-
-  it "deletes discussion_entry_drafts on create for the correct entry" do
-    parent = @topic.discussion_entries.create!(message: "parent entry", user: @teacher, discussion_topic: @topic)
-
-    keeper = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: "Howdy Hey")
-    DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, parent:, message: "delete_me")
-    run_mutation(discussion_topic_id: @topic.id, message: "child entry", parent_entry_id: parent.id)
-    expect(DiscussionEntryDraft.where(discussion_topic_id: @topic).pluck(:id)).to eq keeper
-  end
-
   it "replies to an existing discussion entry" do
     parent_entry = @topic.discussion_entries.create!(message: "parent entry", user: @teacher, discussion_topic: @topic)
     result = run_mutation(discussion_topic_id: @topic.id, message: "child entry", parent_entry_id: parent_entry.id)

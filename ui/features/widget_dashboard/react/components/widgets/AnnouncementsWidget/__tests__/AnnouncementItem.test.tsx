@@ -21,6 +21,7 @@ import {render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
+import userEvent from '@testing-library/user-event'
 import AnnouncementItem from '../AnnouncementItem'
 import type {Announcement} from '../../../../types'
 
@@ -103,5 +104,73 @@ describe('AnnouncementItem', () => {
     expect(avatarSpan).toHaveAttribute('shape', 'circle')
 
     expect(screen.getByText(/Sent by Test Teacher/)).toBeInTheDocument()
+  })
+
+  it('removes announcements cache when Read more link is clicked on unread announcement', async () => {
+    const user = userEvent.setup()
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          gcTime: 0,
+        },
+      },
+    })
+
+    const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries')
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AnnouncementItem announcementItem={mockAnnouncement} filter="unread" />
+      </QueryClientProvider>,
+    )
+
+    const readMoreLink = screen.getByText('Read more')
+    await user.click(readMoreLink)
+
+    expect(removeQueriesSpy).toHaveBeenCalledWith({
+      predicate: expect.any(Function),
+    })
+
+    const call = removeQueriesSpy.mock.calls[0]?.[0]
+    expect(call).toBeDefined()
+    const predicate = call?.predicate
+    expect(predicate).toBeDefined()
+
+    const mockQuery = {
+      queryKey: ['announcementsPaginated', 'user123'],
+    } as any
+    expect(predicate!(mockQuery)).toBe(true)
+
+    removeQueriesSpy.mockRestore()
+  })
+
+  it('does not remove cache when Read more link is clicked on read announcement', async () => {
+    const user = userEvent.setup()
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          gcTime: 0,
+        },
+      },
+    })
+
+    const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries')
+
+    const readAnnouncement = {...mockAnnouncement, isRead: true}
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AnnouncementItem announcementItem={readAnnouncement} filter="all" />
+      </QueryClientProvider>,
+    )
+
+    const readMoreLink = screen.getByText('Read more')
+    await user.click(readMoreLink)
+
+    expect(removeQueriesSpy).not.toHaveBeenCalled()
+
+    removeQueriesSpy.mockRestore()
   })
 })

@@ -61,7 +61,6 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_assignment, mutation: Mutations::CreateAssignment
   field :create_comment_bank_item, mutation: Mutations::CreateCommentBankItem
   field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
-  field :create_discussion_entry_draft, mutation: Mutations::CreateDiscussionEntryDraft
   field :create_discussion_topic, mutation: Mutations::CreateDiscussionTopic
   field :create_internal_setting, mutation: Mutations::CreateInternalSetting
   field :create_learning_outcome, mutation: Mutations::CreateLearningOutcome
@@ -129,6 +128,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_submissions_read_state, mutation: Mutations::UpdateSubmissionsReadState
   field :update_user_discussions_splitscreen_view, mutation: Mutations::UpdateUserDiscussionsSplitscreenView
   field :update_widget_dashboard_config, mutation: Mutations::UpdateWidgetDashboardConfig
+  field :update_widget_dashboard_layout, mutation: Mutations::UpdateWidgetDashboardLayout
   field :upsert_custom_grade_status, mutation: Mutations::UpsertCustomGradeStatus
   field :upsert_standard_grade_status, mutation: Mutations::UpsertStandardGradeStatus
 

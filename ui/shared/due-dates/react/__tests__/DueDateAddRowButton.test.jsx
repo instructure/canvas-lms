@@ -36,7 +36,7 @@ describe('DueDateAddRowButton', () => {
   })
 
   it('calls handleAdd when clicked', async () => {
-    const handleAdd = jest.fn()
+    const handleAdd = vi.fn()
     const {getByRole} = render(<DueDateAddRowButton display={true} handleAdd={handleAdd} />)
 
     const button = getByRole('button', {name: /add new set of due dates/i})

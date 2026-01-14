@@ -21,10 +21,10 @@ import {fireEvent, render, act} from '@testing-library/react'
 import Library from '../Library'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
 }))
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('Library', () => {
   let setCommentMock, setFocusToTextAreaMock
@@ -59,12 +59,12 @@ describe('Library', () => {
   }
 
   beforeEach(() => {
-    setCommentMock = jest.fn()
-    setFocusToTextAreaMock = jest.fn()
+    setCommentMock = vi.fn()
+    setFocusToTextAreaMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should open the tray when the link is clicked', () => {
@@ -79,7 +79,7 @@ describe('Library', () => {
     fireEvent.click(getByText('2'), {detail: 1})
     fireEvent.click(getByText('great comment 2'), {detail: 1})
     expect(setCommentMock).toHaveBeenCalledWith('<p>great comment 2</p>')
-    await act(async () => jest.advanceTimersByTime(1000))
+    await act(async () => vi.advanceTimersByTime(1000))
     expect(queryByText('Manage Comment Library')).not.toBeInTheDocument()
   })
 
@@ -87,7 +87,7 @@ describe('Library', () => {
     const {getByText, queryByText} = render(<Library {...defaultProps()} />)
     fireEvent.click(getByText('2'))
     fireEvent.click(getByText('Close comment library'))
-    await act(async () => jest.advanceTimersByTime(1000))
+    await act(async () => vi.advanceTimersByTime(1000))
     expect(queryByText('Manage Comment Library')).not.toBeInTheDocument()
   })
 
@@ -160,7 +160,7 @@ describe('Library', () => {
 
     it('calls addEventListener to the suggestionsRef.parentNode on mount', () => {
       document.body.innerHTML = '<div id="parent"><div id="library-suggestions"/></div>'
-      const spy = jest.spyOn(document.getElementById('parent'), 'addEventListener')
+      const spy = vi.spyOn(document.getElementById('parent'), 'addEventListener')
       render(
         <Library
           {...defaultProps({
@@ -174,7 +174,7 @@ describe('Library', () => {
 
     it('calls removeEventListener on library-suggestions.parentNode on unmount', () => {
       document.body.innerHTML = '<div id="parent"><div id="library-suggestions"/></div>'
-      const spy = jest.spyOn(document.getElementById('parent'), 'removeEventListener')
+      const spy = vi.spyOn(document.getElementById('parent'), 'removeEventListener')
       const {unmount} = render(
         <Library
           {...defaultProps({

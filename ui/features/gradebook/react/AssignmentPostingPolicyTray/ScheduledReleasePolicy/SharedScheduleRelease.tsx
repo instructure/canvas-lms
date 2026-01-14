@@ -27,15 +27,13 @@ const I18n = createI18nScope('assignment_scheduled_release_policy')
 type SharedScheduledReleaseProps = {
   errorMessages: FormMessage[]
   postGradesAt?: string | null
-  handleChange: (value?: string) => void
-  handleErrorMessages: (messages: FormMessage[]) => void
+  handleChange: (value?: string, errorMessages?: FormMessage[]) => void
 }
 
 export const SharedScheduledRelease = ({
   errorMessages,
   postGradesAt,
   handleChange,
-  handleErrorMessages,
 }: SharedScheduledReleaseProps) => {
   const onChange = (_e: React.SyntheticEvent, isoDate?: string) => {
     const messages: FormMessage[] = []
@@ -48,14 +46,14 @@ export const SharedScheduledRelease = ({
       messages.push({text: I18n.t('Date must be in the future'), type: 'error'})
     }
 
-    handleErrorMessages(messages)
-    handleChange(isoDate)
+    // Pass both value and errors in a single callback to ensure atomic state update
+    handleChange(isoDate, messages)
   }
 
   return (
     <View as="div" margin="medium medium 0" data-testid="shared-scheduled-post-datetime">
       <DateTimeInput
-        description={<ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>}
+        description={<ScreenReaderContent>{I18n.t('Release Date')}</ScreenReaderContent>}
         datePlaceholder={I18n.t('Choose release date')}
         dateRenderLabel={I18n.t('Release Date')}
         timeRenderLabel={I18n.t('Time')}

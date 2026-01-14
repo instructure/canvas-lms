@@ -24,6 +24,13 @@ import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import filterUselessConsoleMessages from '@instructure/filter-console-messages'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
+import {mocked} from '@canvas/test-utils/mocked'
+
+// Make mocked() available globally for safe mock casting
+// This is equivalent to jest.mocked() but works in both Jest and Vitest
+// Usage: mocked(myFunction).mockReturnValue('value')
+// Instead of: (myFunction as jest.Mock).mockReturnValue('value')
+global.mocked = mocked
 
 if (process.env.LOG_PLAYGROUND_URL_ON_FAILURE) {
   process.env.RTL_SKIP_AUTO_CLEANUP = 'true'
@@ -159,6 +166,24 @@ if (!Set.prototype.difference) {
     configurable: true,
     value: function difference(other) {
       return new Set([...this].filter(x => !other.has(x)))
+    },
+    writable: true,
+  })
+}
+if (!Map.groupBy) {
+  Object.defineProperty(Map, 'groupBy', {
+    configurable: true,
+    value: function groupBy(items, keySelector) {
+      const map = new Map()
+      let i = 0
+      for (const item of items) {
+        const key = keySelector(item, i++)
+        if (!map.has(key)) {
+          map.set(key, [])
+        }
+        map.get(key).push(item)
+      }
+      return map
     },
     writable: true,
   })

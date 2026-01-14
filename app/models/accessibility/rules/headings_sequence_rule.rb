@@ -54,7 +54,8 @@ module Accessibility
           options: [
             I18n.t("Fix heading hierarchy"),
             I18n.t("Remove heading style")
-          ]
+          ],
+          action: I18n.t("Reformat")
         )
       end
 

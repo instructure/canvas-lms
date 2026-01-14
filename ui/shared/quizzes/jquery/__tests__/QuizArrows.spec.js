@@ -32,14 +32,14 @@ describe('QuizArrowApplicator', () => {
   })
 
   test("applies 'correct' and 'incorrect' arrows when the quiz is not a survey", () => {
-    jest.spyOn(arrowApplicator, 'applyCorrectAndIncorrectArrows')
+    vi.spyOn(arrowApplicator, 'applyCorrectAndIncorrectArrows')
     global.ENV = {IS_SURVEY: false}
     arrowApplicator.applyArrows()
     expect(arrowApplicator.applyCorrectAndIncorrectArrows).toHaveBeenCalledTimes(1)
   })
 
   test("does not apply 'correct' and 'incorrect' arrows when the quiz is a survey", () => {
-    jest.spyOn(arrowApplicator, 'applyCorrectAndIncorrectArrows')
+    vi.spyOn(arrowApplicator, 'applyCorrectAndIncorrectArrows')
     global.ENV = {IS_SURVEY: true}
     arrowApplicator.applyArrows()
     expect(arrowApplicator.applyCorrectAndIncorrectArrows).not.toHaveBeenCalled()

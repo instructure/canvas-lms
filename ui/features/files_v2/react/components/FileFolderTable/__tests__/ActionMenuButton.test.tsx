@@ -31,21 +31,24 @@ import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {mockRowFocusContext, mockRowsContext} from './testUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {downloadZip} from '../../../../utils/downloadUtils'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn().mockReturnValue(() => {}),
+const server = setupServer()
+
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn().mockReturnValue(() => {}),
 }))
 
-// jest.mock('@canvas/util/globalUtils', () => ({
-//   assignLocation: jest.fn(),
-// }))
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
+}))
 
-jest.mock('../../../../utils/downloadUtils', () => ({
-  downloadZip: jest.fn(),
+vi.mock('../../../../utils/downloadUtils', () => ({
+  downloadZip: vi.fn(),
 }))
 
 const defaultProps: ActionMenuButtonProps = {
@@ -76,13 +79,15 @@ const renderComponent = (
 }
 
 describe('ActionMenuButton', () => {
+  beforeAll(() => server.listen())
   afterEach(() => {
-    fetchMock.restore()
-    jest.clearAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
     if (ENV.FEATURES?.restrict_student_access !== undefined) {
       delete ENV.FEATURES.restrict_student_access
     }
   })
+  afterAll(() => server.close())
 
   describe('when item is a file', () => {
     beforeEach(() => {
@@ -432,8 +437,14 @@ describe('ActionMenuButton', () => {
   describe('Delete behavior', () => {
     beforeEach(() => {
       // Mock successful delete responses for both files and folders
-      fetchMock.delete(/.*\/files\/\d+\?force=true/, 200, {overwriteRoutes: true})
-      fetchMock.delete(/.*\/folders\/\d+\?force=true/, 200, {overwriteRoutes: true})
+      server.use(
+        http.delete(/.*\/files\/\d+/, () => {
+          return new HttpResponse(null, {status: 200})
+        }),
+        http.delete(/.*\/folders\/\d+/, () => {
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
     })
 
     it('opens delete modal when delete button is clicked', async () => {
@@ -453,7 +464,11 @@ describe('ActionMenuButton', () => {
 
     it('renders flash error when delete fails', async () => {
       const user = userEvent.setup()
-      fetchMock.delete(/.*\/files\/178\?force=true/, 500, {overwriteRoutes: true})
+      server.use(
+        http.delete(/.*\/files\/178/, () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
       renderComponent()
 
       const button = screen.getByTestId('action-menu-button-large')

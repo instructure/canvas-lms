@@ -17,7 +17,7 @@
  */
 
 import {getAllPages, GetAllPagesCallbacks, GetAllPagesReturnValue} from '../getAllPages'
-import {flatten} from 'lodash'
+import {flatten} from 'es-toolkit/compat'
 import {
   AssignmentGroup,
   getAssignmentGroups,

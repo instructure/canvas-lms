@@ -76,10 +76,10 @@ export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getIsSyncing = (state: StoreState) => state.ui.syncing
 export const getBlueprintLocked = (state: StoreState) => state.ui.blueprintLocked
-export const getShowWeightedAssignmentsTray = (state: StoreState) => state.ui.showWeightedAssignmentsTray
+export const getShowWeightedAssignmentsTray = (state: StoreState) =>
+  state.ui.showWeightedAssignmentsTray
 export const getBulkEditModalOpen = (state: StoreState) => state.ui.bulkEditModalOpen
 export const getSelectedBulkStudents = (state: StoreState) => state.ui.selectedBulkStudents
-
 
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
@@ -143,7 +143,7 @@ export default (state = initialState, action: UIAction): UIState => {
     case UIConstants.OPEN_BULK_EDIT_MODAL:
       return {...state, bulkEditModalOpen: true, selectedBulkStudents: action.payload}
     case UIConstants.CLOSE_BULK_EDIT_MODAL:
-      return {...state, bulkEditModalOpen: false, selectedBulkStudents: [] }
+      return {...state, bulkEditModalOpen: false, selectedBulkStudents: []}
     case UIConstants.SET_SELECTED_BULK_STUDENTS:
       return {...state, selectedBulkStudents: action.payload}
     default:

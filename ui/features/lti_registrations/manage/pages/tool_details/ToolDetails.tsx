@@ -29,7 +29,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {IconCopyLine, IconTrashLine} from '@instructure/ui-icons'
+import {IconCopyLine, IconTrashLine, IconRefreshLine} from '@instructure/ui-icons'
 import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
@@ -43,6 +43,7 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import {InlineList} from '@instructure/ui-list'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import theme from '@instructure/canvas-theme'
+import {TurnitinAPMigrationModal} from './tii_migration/TurnitinAPMigrationModal'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -194,6 +195,7 @@ export const ToolDetailsInner = ({
   const outletContext: ToolDetailsOutletContext = {registration}
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
   const canDelete = !registration.inherited
+  const [tiiMigrationModalShowing, setTiiMigrationModalShowing] = React.useState(false)
 
   const handleCopyClientId = React.useCallback(
     async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
@@ -267,142 +269,178 @@ export const ToolDetailsInner = ({
     })
   }, [])
 
-  return (
-    <Flex direction="column">
-      <View
-        borderRadius="large"
-        borderColor="secondary"
-        borderWidth="small"
-        margin="0 0 small"
-        as="div"
-        padding="small"
-      >
-        <Flex direction="column">
-          <Flex direction="row" margin="0 0 small">
-            <img
-              src={
-                registration.icon_url
-                  ? registration.icon_url
-                  : ltiToolDefaultIconUrl({
-                      base: window.location.origin,
-                      toolName: registration.name,
-                      developerKeyId: registration.developer_key_id || undefined,
-                    })
-              }
-              style={{height: '52px'}}
-              alt={registration.name}
-            />
+  const pendingUpdate = registration.pending_update
+  const tiiMigrationAvailable =
+    !!registration.developer_key_id &&
+    window.ENV.turnitinAPClientId === registration.developer_key_id
 
-            <Flex direction="column" margin="0 small">
-              <Text size="large" weight="bold">
-                {registration.name}
-              </Text>
-              <Text size="small">{registration.vendor}</Text>
-            </Flex>
-          </Flex>
-          <Flex margin="0 0 small">
-            <Text>{registration.description}</Text>
-          </Flex>
-          {HeaderDetailFields(registration)}
-          <Flex margin="0 0 small">
-            {/* Todo: change this based on registration info */}
-            <Pill>v1.3</Pill>
-          </Flex>
+  return (
+    <>
+      {tiiMigrationAvailable && tiiMigrationModalShowing && (
+        <TurnitinAPMigrationModal
+          rootAccountId={accountId}
+          onClose={() => setTiiMigrationModalShowing(false)}
+        />
+      )}
+      <Flex direction="column">
+        <View
+          borderRadius="large"
+          borderColor="secondary"
+          borderWidth="small"
+          margin="0 0 small"
+          as="div"
+          padding="small"
+        >
           <Flex direction="column">
-            <Flex gap="small" margin="0">
-              <Button
-                data-pendo="lti-registrations-copy-client-id"
-                color="secondary"
-                renderIcon={<IconCopyLine />}
-                margin="0"
-                onClick={handleCopyClientId}
-              >
-                {I18n.t('Copy Client ID')}
-              </Button>
-              <Tooltip
-                renderTip={I18n.t(
-                  "This account does not own this app and therefore can't delete it.",
-                )}
-                isShowingContent={tooltipShowing}
-                onShowContent={() => {
-                  // The tooltip should only be shown if they *can't* click the delete button
-                  setTooltipShowing(!canDelete)
-                }}
-                onHideContent={() => {
-                  setTooltipShowing(false)
-                }}
-              >
+            <Flex direction="row" margin="0 0 small">
+              <img
+                src={
+                  registration.icon_url
+                    ? registration.icon_url
+                    : ltiToolDefaultIconUrl({
+                        base: window.location.origin,
+                        toolName: registration.name,
+                        developerKeyId: registration.developer_key_id || undefined,
+                      })
+                }
+                style={{height: '52px'}}
+                alt={registration.name}
+              />
+
+              <Flex direction="column" margin="0 small">
+                <Text size="large" weight="bold">
+                  {registration.name}
+                </Text>
+                <Text size="small">{registration.vendor}</Text>
+              </Flex>
+            </Flex>
+            <Flex margin="0 0 small">
+              <Text>{registration.description}</Text>
+            </Flex>
+            {HeaderDetailFields(registration)}
+            <Flex margin="0 0 small">
+              {/* Todo: change this based on registration info */}
+              <Pill>v1.3</Pill>
+            </Flex>
+            <Flex direction="column">
+              <Flex gap="small" margin="0">
                 <Button
-                  data-pendo="lti-registrations-delete-app"
+                  data-pendo="lti-registrations-copy-client-id"
                   color="secondary"
-                  renderIcon={<IconTrashLine />}
+                  renderIcon={<IconCopyLine />}
                   margin="0"
-                  data-testid="delete-app"
-                  interaction={canDelete ? 'enabled' : 'disabled'}
-                  onClick={handleDelete}
+                  onClick={handleCopyClientId}
                 >
-                  {I18n.t('Delete App')}
+                  {I18n.t('Copy Client ID')}
                 </Button>
-              </Tooltip>
+                <Tooltip
+                  renderTip={I18n.t(
+                    "This account does not own this app and therefore can't delete it.",
+                  )}
+                  isShowingContent={tooltipShowing}
+                  onShowContent={() => {
+                    // The tooltip should only be shown if they *can't* click the delete button
+                    setTooltipShowing(!canDelete)
+                  }}
+                  onHideContent={() => {
+                    setTooltipShowing(false)
+                  }}
+                >
+                  <Button
+                    data-pendo="lti-registrations-delete-app"
+                    color="secondary"
+                    renderIcon={<IconTrashLine />}
+                    margin="0"
+                    data-testid="delete-app"
+                    interaction={canDelete ? 'enabled' : 'disabled'}
+                    onClick={handleDelete}
+                  >
+                    {I18n.t('Delete App')}
+                  </Button>
+                </Tooltip>
+
+                {window.ENV.LTI_DR_REGISTRATIONS_UPDATE && pendingUpdate ? (
+                  <Button
+                    color="secondary"
+                    data-pendo="lti-registrations-update-available-button"
+                    renderIcon={() => <IconRefreshLine />}
+                  >
+                    {I18n.t('Update Available')}
+                  </Button>
+                ) : null}
+
+                {tiiMigrationAvailable && (
+                  <Button
+                    data-pendo="lti-registrations-migrate-app"
+                    color="primary"
+                    margin="0"
+                    onClick={() => {
+                      setTiiMigrationModalShowing(true)
+                    }}
+                  >
+                    {I18n.t('Migrate from LTI 2.0')}
+                  </Button>
+                )}
+              </Flex>
             </Flex>
           </Flex>
-        </Flex>
-      </View>
-      <Tabs margin="0" padding="medium" onRequestTabChange={onTabClick}>
-        <Tabs.Panel
-          isSelected={route === 'access'}
-          active={route === 'access'}
-          id="access"
-          padding="medium 0"
-          href="/"
-          renderTitle={
-            <Text style={{color: 'initial', textDecoration: 'initial'}}>
-              {I18n.t('Availability and Exceptions')}
-            </Text>
-          }
-          themeOverride={OverflowThemeOverride}
-        >
-          <Outlet context={outletContext} />
-        </Tabs.Panel>
-        <Tabs.Panel
-          isSelected={route === 'configuration'}
-          active={route === 'configuration'}
-          renderTitle={
-            <Text style={{color: 'initial', textDecoration: 'initial'}}>
-              {I18n.t('Configuration')}
-            </Text>
-          }
-          id="configuration"
-          padding="medium 0"
-          themeOverride={OverflowThemeOverride}
-        >
-          <Outlet context={outletContext} />
-        </Tabs.Panel>
-        {window.ENV.FEATURES.lti_registrations_usage_tab ? (
+        </View>
+        <Tabs margin="0" padding="medium" onRequestTabChange={onTabClick}>
           <Tabs.Panel
-            isSelected={route === 'usage'}
-            active={route === 'usage'}
+            isSelected={route === 'access'}
+            active={route === 'access'}
+            id="access"
+            padding="medium 0"
+            href="/"
             renderTitle={
-              <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Usage')}</Text>
+              <Text style={{color: 'initial', textDecoration: 'initial'}}>
+                {I18n.t('Availability and Exceptions')}
+              </Text>
             }
-            id="usage"
+            themeOverride={OverflowThemeOverride}
+          >
+            <Outlet context={outletContext} />
+          </Tabs.Panel>
+          <Tabs.Panel
+            isSelected={route === 'configuration'}
+            active={route === 'configuration'}
+            renderTitle={
+              <Text style={{color: 'initial', textDecoration: 'initial'}}>
+                {I18n.t('Configuration')}
+              </Text>
+            }
+            id="configuration"
+            padding="medium 0"
+            themeOverride={OverflowThemeOverride}
+          >
+            <Outlet context={outletContext} />
+          </Tabs.Panel>
+          {window.ENV.FEATURES.lti_registrations_usage_tab ? (
+            <Tabs.Panel
+              isSelected={route === 'usage'}
+              active={route === 'usage'}
+              renderTitle={
+                <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Usage')}</Text>
+              }
+              id="usage"
+              padding="medium 0"
+            >
+              <Outlet context={outletContext} />
+            </Tabs.Panel>
+          ) : null}
+          <Tabs.Panel
+            isSelected={route === 'history'}
+            active={route === 'history'}
+            renderTitle={
+              <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('History')}</Text>
+            }
+            id="history"
             padding="medium 0"
           >
             <Outlet context={outletContext} />
           </Tabs.Panel>
-        ) : null}
-        <Tabs.Panel
-          isSelected={route === 'history'}
-          active={route === 'history'}
-          renderTitle={
-            <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('History')}</Text>
-          }
-          id="history"
-          padding="medium 0"
-        >
-          <Outlet context={outletContext} />
-        </Tabs.Panel>
-      </Tabs>
-    </Flex>
+        </Tabs>
+      </Flex>
+    </>
   )
 }

@@ -80,8 +80,8 @@ let mockTrayProps: any
 const user = userEvent.setup()
 
 describe('AddImageModal', () => {
-  const mockOnSubmit = jest.fn()
-  const mockOnDismiss = jest.fn()
+  const mockOnSubmit = vi.fn()
+  const mockOnDismiss = vi.fn()
 
   const imageData = {
     hasMore: false,
@@ -98,7 +98,7 @@ describe('AddImageModal', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     mockTrayProps = {
       canvasOrigin: 'http://some.origin',
@@ -118,12 +118,11 @@ describe('AddImageModal', () => {
       source: {
         initializeCollection() {},
         initializeUpload() {},
-        initializeFlickr() {},
         initializeImages() {},
         initializeDocuments() {},
         initializeMedia() {},
-        fetchImages: jest.fn().mockResolvedValue({files}),
-        getSession: jest.fn().mockResolvedValue({usageRightsRequired: false}),
+        fetchImages: vi.fn().mockResolvedValue({files}),
+        getSession: vi.fn().mockResolvedValue({usageRightsRequired: false}),
       },
       storeProps: {},
       images: {

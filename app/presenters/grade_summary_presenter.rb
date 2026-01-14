@@ -143,26 +143,25 @@ class GradeSummaryPresenter
     @assignments ||= begin
       visible_assignments = assignments_for_student
       overridden_assignments = assignments_overridden_for_student(visible_assignments)
-      sorted_assignments(overridden_assignments)
+      peer_reviews = peer_review_assignments_for_student(overridden_assignments)
+      all_assignments = overridden_assignments + peer_reviews
+      sorted_assignments(all_assignments)
     end
   end
 
   def assignments_for_student
-    includes = if preload_optimizations_enabled?
-                 [
-                   :assignment_overrides,
-                   :discussion_topic,
-                   :grading_standard,
-                   :post_policy,
-                   :rubric_association,
-                   :quiz,
-                   :wiki_page,
-                   { external_tool_tag: :content },
-                   { sub_assignments: [{ context: :active_course_sections }, :discussion_topic, :quiz] }
-                 ]
-               else
-                 [:assignment_overrides, :post_policy]
-               end
+    includes = [
+      :assignment_overrides,
+      :discussion_topic,
+      :grading_standard,
+      :post_policy,
+      :rubric_association,
+      :quiz,
+      :wiki_page,
+      { external_tool_tag: :content },
+      { sub_assignments: [{ context: :active_course_sections }, :discussion_topic, :quiz] }
+    ]
+
     includes << :assignment_group if @assignment_order == :assignment_group
 
     # AssignmentGroup#visible_assignments returns all published assignments if you pass it
@@ -183,25 +182,45 @@ class GradeSummaryPresenter
       assignments = assignments.not_hidden_in_gradebook
     end
 
-    if preload_optimizations_enabled?
-      assignments.strict_loading(mode: :n_plus_one_only).where.not(submission_types: %w[not_graded wiki_page]).except(:order)
-    else
-      assignments.where.not(submission_types: %w[not_graded wiki_page]).except(:order)
-    end
+    assignments.strict_loading(mode: :n_plus_one_only).where.not(submission_types: %w[not_graded wiki_page]).except(:order)
   end
 
   def assignments_overridden_for_student(assignments)
     group_index = all_groups.index_by(&:id)
     assignments.map do |assignment|
-      if preload_optimizations_enabled?
-        assignment.association(:context).target = @context
-        assignment.association(:assignment_group).target = group_index.fetch(assignment.assignment_group_id)
-      else
-        assignment.context = @context
-        assignment.assignment_group = group_index.fetch(assignment.assignment_group_id)
-      end
+      assignment.association(:context).target = @context
+      assignment.association(:assignment_group).target = group_index.fetch(assignment.assignment_group_id)
       assignment.overridden_for(student)
     end
+  end
+
+  def peer_review_assignments_for_student(assignments)
+    return [] unless @context.feature_enabled?(:peer_review_allocation_and_grading)
+
+    parent_with_reviews = assignments.select(&:peer_reviews?)
+    return [] if parent_with_reviews.blank?
+
+    parent_assignment_ids = parent_with_reviews.map(&:id)
+
+    includes = [
+      :assignment_overrides,
+      :context,
+      :discussion_topic,
+      :grading_standard,
+      :post_policy,
+      :quiz,
+      :rubric_association,
+      :wiki_page,
+      { external_tool_tag: :content }
+    ]
+
+    peer_reviews = PeerReviewSubAssignment
+                   .where(parent_assignment_id: parent_assignment_ids)
+                   .active
+                   .preload(*includes)
+                   .to_a
+
+    assignments_overridden_for_student(peer_reviews)
   end
 
   def sorted_assignments(assignments)
@@ -227,65 +246,34 @@ class GradeSummaryPresenter
   end
 
   def submissions
-    preload_params = if preload_optimizations_enabled?
-                       [
-                         :attachment_associations,
-                         :content_participations,
-                         { originality_reports: :lti_link },
-                         :user,
-                         { assignment: %i[context post_policy] },
-                         { rubric_assessments: [:assessor, :rubric, { rubric_association: { association_object: :context } }] },
-                         { submission_comments: :viewed_submission_comments },
-                         { visible_submission_comments: :author }
-                       ]
-                     else
-                       [
-                         :visible_submission_comments,
-                         { rubric_assessments: [:rubric, :rubric_association] },
-                         :content_participations,
-                         { assignment: [:context, :post_policy] },
-                         { submission_comments: :viewed_submission_comments }
-                       ]
-                     end
+    preload_params = [
+      :attachment_associations,
+      :content_participations,
+      { originality_reports: :lti_link },
+      :user,
+      { assignment: %i[context post_policy] },
+      { rubric_assessments: [:assessor, :rubric, { rubric_association: { association_object: :context } }] },
+      { submission_comments: :viewed_submission_comments },
+      { visible_submission_comments: :author }
+    ]
     @submissions ||= begin
-      ss = if preload_optimizations_enabled?
-             @context.submissions
-                     .strict_loading(mode: :n_plus_one_only)
-                     .preload(*preload_params)
-                     .joins(:assignment)
-                     .where("assignments.workflow_state != 'deleted'")
-                     .where(user_id: student).to_a
-           else
-             @context.submissions
-                     .preload(*preload_params)
-                     .joins(:assignment)
-                     .where("assignments.workflow_state != 'deleted'")
-                     .where(user_id: student).to_a
-           end
+      ss = @context.submissions
+                   .strict_loading(mode: :n_plus_one_only)
+                   .preload(*preload_params)
+                   .joins(:assignment)
+                   .where("assignments.workflow_state != 'deleted'")
+                   .where(user_id: student).to_a
 
-      if preload_optimizations_enabled?
-        Submission.bulk_load_attachments_for_submissions(ss, preloads: [:last_attachment_upload_status], preload_only: true)
-      elsif vericite_enabled? || turnitin_enabled?
-        ActiveRecord::Associations.preload(ss, :originality_reports)
-      end
-
+      Submission.bulk_load_attachments_for_submissions(ss, preloads: [:last_attachment_upload_status], preload_only: true)
       assignments_index = assignments.index_by(&:id)
 
       # preload submission comment stuff
       comments = ss.map do |s|
         assign = assignments_index[s.assignment_id]
-        if preload_optimizations_enabled?
-          s.association(:assignment).target = assign if assign.present?
-        elsif assign.present?
-          s.assignment = assign
-        end
+        s.association(:assignment).target = assign if assign.present?
 
         s.visible_submission_comments.map do |c|
-          if preload_optimizations_enabled?
-            c.association(:submission).target = s
-          else
-            c.submission = s
-          end
+          c.association(:submission).target = s
           c
         end
       end.flatten
@@ -405,12 +393,6 @@ class GradeSummaryPresenter
   end
 
   private
-
-  def preload_optimizations_enabled?
-    return @preload_optimizations_enabled if defined?(@preload_optimizations_enabled)
-
-    @preload_optimizations_enabled = Account.site_admin.feature_enabled?(:grade_summary_preload_optimizations)
-  end
 
   def all_groups
     @all_groups ||= @context.assignment_groups.active.to_a

@@ -52,7 +52,7 @@ function defaultProps(options) {
 }
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('WeeklyPlannerHeader', () => {
@@ -65,7 +65,7 @@ describe('WeeklyPlannerHeader', () => {
   })
 
   it('calls loadPastWeekItems when previous week button is clicked', () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const props = defaultProps({loadPastWeekItems: callback})
     const {getByText} = render(<WeeklyPlannerHeader {...props} />)
     getByText('View previous week').closest('button').click()
@@ -73,7 +73,7 @@ describe('WeeklyPlannerHeader', () => {
   })
 
   it('calls loadNextWeekItems when next week button is clicked', () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const props = defaultProps({loadNextWeekItems: callback})
     const {getByText} = render(<WeeklyPlannerHeader {...props} />)
     getByText('View next week').closest('button').click()
@@ -81,7 +81,7 @@ describe('WeeklyPlannerHeader', () => {
   })
 
   it('calls loadThisWeekItems when Today button is clicked', () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const props = defaultProps({loadThisWeekItems: callback})
     const {getByText} = render(<WeeklyPlannerHeader {...props} />)
     getByText('Today').closest('button').click()
@@ -95,7 +95,7 @@ describe('WeeklyPlannerHeader', () => {
   })
 
   it('disables next week button if there is nothing in the future', () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const props = defaultProps({wayFutureItemDate: '2021-03-25', loadNextWeekItems: callback})
     const {getByText} = render(<WeeklyPlannerHeader {...props} />)
     const button = getByText('View next week').closest('button')
@@ -105,7 +105,7 @@ describe('WeeklyPlannerHeader', () => {
   })
 
   it('disables previous week button if there is nothing in the past', () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const props = defaultProps({wayPastItemDate: '2021-03-25', loadPastWeekItems: callback})
     const {getByText} = render(<WeeklyPlannerHeader {...props} />)
     const button = getByText('View previous week').closest('button')
@@ -115,7 +115,7 @@ describe('WeeklyPlannerHeader', () => {
   })
 
   it('scrolls to today when it becomes visible', async () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const props = defaultProps({visible: false, scrollToToday: callback})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     expect(callback).not.toHaveBeenCalled()
@@ -125,7 +125,7 @@ describe('WeeklyPlannerHeader', () => {
   })
 
   it('scrolls to today when it loads if already visible', async () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const props = defaultProps({scrollToToday: callback, weekLoaded: false})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     expect(callback).not.toHaveBeenCalled()
@@ -136,7 +136,7 @@ describe('WeeklyPlannerHeader', () => {
 
   it('sends today as a focus target if passed via query param', async () => {
     window.history.pushState({}, null, 'http://localhost?focusTarget=today')
-    const callback = jest.fn()
+    const callback = vi.fn()
     const props = defaultProps({visible: false, scrollToToday: callback})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     rerender(<WeeklyPlannerHeader {...props} visible={true} />)
@@ -147,8 +147,8 @@ describe('WeeklyPlannerHeader', () => {
 
   it('sends missing-items as a focus target if passed via query param and expands missing items', async () => {
     window.history.pushState({}, null, 'http://localhost?focusTarget=missing-items')
-    const scrollToToday = jest.fn()
-    const toggleMissing = jest.fn()
+    const scrollToToday = vi.fn()
+    const toggleMissing = vi.fn()
     const props = defaultProps({visible: false, scrollToToday, toggleMissing})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     rerender(<WeeklyPlannerHeader {...props} visible={true} />)

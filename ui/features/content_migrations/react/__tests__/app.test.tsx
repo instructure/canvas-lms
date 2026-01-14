@@ -18,13 +18,22 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
-import '@testing-library/jest-dom/extend-expect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {App} from '../app'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 
-// Mock the doFetchApi function
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
+
+const mockMigrators = [
+  {
+    name: 'Copy a Canvas Course',
+    type: 'course_copy_importer',
+  },
+  {
+    name: 'Common Cartridge',
+    type: 'common_cartridge_importer',
+  },
+]
 
 const mockMigrations = [
   {
@@ -54,14 +63,19 @@ const mockMigrations = [
 ]
 
 describe('App', () => {
-  beforeEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({json: mockMigrations})
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
-  afterEach(() => {
-    jest.clearAllMocks()
-    fetchMock.restore()
+  beforeEach(() => {
+    server.use(
+      http.get(`/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`, () =>
+        HttpResponse.json(mockMigrations),
+      ),
+      http.get(`/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/migrators`, () =>
+        HttpResponse.json(mockMigrators),
+      ),
+    )
   })
 
   it('renders loading spinner while loading', async () => {
@@ -88,23 +102,40 @@ describe('App', () => {
   })
 
   it('fetches first page of migrations on mount', async () => {
+    let capturedUrl = ''
+    server.use(
+      http.get(`/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`, ({request}) => {
+        capturedUrl = request.url
+        return HttpResponse.json(mockMigrations)
+      }),
+      http.get(`/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/migrators`, () =>
+        HttpResponse.json(mockMigrators),
+      ),
+    )
+
     render(<App />)
 
     await waitFor(() => {
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
-        params: {per_page: 25, page: 1},
-      })
+      expect(capturedUrl).toContain('per_page=25')
+      expect(capturedUrl).toContain('page=1')
     })
 
     expect(screen.getByText(/Common Cartridge/)).toBeInTheDocument()
   })
 
   describe('when api call fails', () => {
-    it('displays an error message', async () => {
-      // @ts-expect-error
-      doFetchApi.mockRejectedValue(new Error('API call failed'))
+    beforeEach(() => {
+      server.use(
+        http.get(`/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`, () =>
+          HttpResponse.error(),
+        ),
+        http.get(`/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/migrators`, () =>
+          HttpResponse.json(mockMigrators),
+        ),
+      )
+    })
 
+    it('displays an error message', async () => {
       render(<App />)
 
       await waitFor(() => {
@@ -115,9 +146,6 @@ describe('App', () => {
     })
 
     it("doesn't render loading spinner", async () => {
-      // @ts-expect-error
-      doFetchApi.mockRejectedValue(new Error('API call failed'))
-
       render(<App />)
 
       await waitFor(() => {

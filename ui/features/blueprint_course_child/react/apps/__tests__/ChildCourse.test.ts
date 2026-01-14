@@ -59,7 +59,7 @@ describe('ChildCourse class', () => {
   test('change log route onEnter calls app showChangeLog with params from URL', () => {
     child = new ChildCourse(container, defaultData())
     child.render()
-    child.app.showChangeLog = jest.fn()
+    child.app.showChangeLog = vi.fn()
     child.routes[0].onEnter({
       params: {blueprintType: 'template', templateId: '2', changeId: '3'},
     } as any)
@@ -70,15 +70,15 @@ describe('ChildCourse class', () => {
       changeId: '3',
     })
 
-    child.app.hideChangeLog = jest.fn()
+    child.app.hideChangeLog = vi.fn()
     child.routes[0].onExit()
     expect(child.app.hideChangeLog).toHaveBeenCalledTimes(1)
   })
 
   test.skip('start calls render() and setupRouter()', () => {
     child = new ChildCourse(container, defaultData())
-    const renderSpy = jest.spyOn(child, 'render')
-    const setupRouterSpy = jest.spyOn(child, 'setupRouter')
+    const renderSpy = vi.spyOn(child, 'render')
+    const setupRouterSpy = vi.spyOn(child, 'setupRouter')
 
     child.start()
 

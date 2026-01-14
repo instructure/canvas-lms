@@ -24,20 +24,20 @@ import axios from '@canvas/axios'
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
 import {assignLocation} from '@canvas/util/globalUtils'
 
-jest.mock('@canvas/axios')
-jest.mock('@canvas/calendar/jquery/MessageParticipantsDialog')
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/axios')
+vi.mock('@canvas/calendar/jquery/MessageParticipantsDialog')
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock jQuery dialog and form methods
-$.fn.dialog = jest.fn()
-$.fn.errorBox = jest.fn()
+$.fn.dialog = vi.fn()
+$.fn.errorBox = vi.fn()
 $.fn.getClientRects = () => [{top: 0, left: 0}]
 $.fn.offset = () => ({top: 0, left: 0})
 $.fn.position = () => ({top: 0, left: 0})
-$.fn.val = jest.fn().mockReturnValue('')
-$.flashError = jest.fn()
+$.fn.val = vi.fn().mockReturnValue('')
+$.flashError = vi.fn()
 
 const defaultProps = {
   appointment_group_id: '1',
@@ -73,10 +73,10 @@ const mockContexts = {
 
 describe('AppointmentGroup EditPage', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     MessageParticipantsDialog.mockImplementation(function () {
       return {
-        show: jest.fn(),
+        show: vi.fn(),
       }
     })
     axios.get.mockImplementation(url => {
@@ -91,7 +91,7 @@ describe('AppointmentGroup EditPage', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the EditPage component', async () => {
@@ -257,7 +257,7 @@ describe('AppointmentGroup EditPage', () => {
       fireEvent.change(input, {target: {value: '0'}})
 
       // Mock the jQuery val() call to return 0
-      $.fn.val = jest.fn().mockReturnValue('0')
+      $.fn.val = vi.fn().mockReturnValue('0')
 
       const saveButton = testScreen.getByText('Save')
       fireEvent.click(saveButton)
@@ -286,7 +286,7 @@ describe('AppointmentGroup EditPage', () => {
       fireEvent.change(input, {target: {name: 'limitUsersPerSlot', value: '1'}})
 
       // Mock the jQuery val() call to return 1
-      $.fn.val = jest.fn().mockReturnValue('1')
+      $.fn.val = vi.fn().mockReturnValue('1')
 
       const saveButton = testScreen.getByText('Save')
       fireEvent.click(saveButton)

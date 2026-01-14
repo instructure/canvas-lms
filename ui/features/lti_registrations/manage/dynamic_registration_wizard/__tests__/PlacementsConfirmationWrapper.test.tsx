@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {PlacementsConfirmationWrapper} from '../components/PlacementsConfirmationWrapper'
@@ -26,6 +26,10 @@ import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('PlacementsConfirmation', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders the PlacementsConfirmation', () => {
     const config = mockConfigWithPlacements([LtiPlacements.AccountNavigation])
     const reg = mockRegistration({}, config)
@@ -211,6 +215,7 @@ describe('PlacementsConfirmation', () => {
       fakeENV.setup({
         FEATURES: {
           increased_top_nav_pane_size: true,
+          top_navigation_placement: true,
         },
       })
     })
@@ -361,5 +366,71 @@ describe('PlacementsConfirmation', () => {
     for (const placement of placements) {
       expect(screen.getByText(i18nLtiPlacement(placement))).toBeInTheDocument()
     }
+  })
+
+  describe('when top_navigation_placement feature flag is disabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: false,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('does not show top_navigation placement even if tool requested it', () => {
+      const config = mockConfigWithPlacements([
+        LtiPlacements.TopNavigation,
+        LtiPlacements.CourseNavigation,
+      ])
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
+
+      // Top Navigation should not appear but Course Navigation should still appear
+      expect(
+        screen.queryByLabelText(i18nLtiPlacement(LtiPlacements.TopNavigation)),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.getByLabelText(i18nLtiPlacement(LtiPlacements.CourseNavigation)),
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('when top_navigation_placement feature flag is enabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: true,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('shows top_navigation placement when tool requests it', () => {
+      const config = mockConfigWithPlacements([
+        LtiPlacements.TopNavigation,
+        LtiPlacements.CourseNavigation,
+      ])
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
+
+      // Both placements should appear
+      expect(
+        screen.getByLabelText(i18nLtiPlacement(LtiPlacements.TopNavigation)),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByLabelText(i18nLtiPlacement(LtiPlacements.CourseNavigation)),
+      ).toBeInTheDocument()
+    })
   })
 })

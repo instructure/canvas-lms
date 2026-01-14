@@ -100,6 +100,8 @@ class Login::SamlController < ApplicationController
       aac.debug_set(:login_to_canvas_success, "false")
     end
 
+    aac.collect_response(response, request.request_parameters[:SAMLResponse])
+
     assertion = response.assertions.first
     begin
       provider_attributes = assertion&.attribute_statements&.first.to_h
@@ -117,6 +119,8 @@ class Login::SamlController < ApplicationController
       unique_id = unique_id.split("@", 2)[0]
     end
 
+    failure_reason = handle_one_time_use(aac, response)
+
     logger.info "Attempting SAML2 login for #{aac.login_attribute} #{unique_id} in account #{@domain_root_account.id}"
 
     unless response.errors.empty?
@@ -126,7 +130,7 @@ class Login::SamlController < ApplicationController
       end
       logger.error "Failed to verify SAML signature: #{response.errors.join("\n")}"
       flash[:delegated_message] = login_error_message
-      increment_statsd(:failure, reason: :invalid)
+      increment_statsd(:failure, reason: failure_reason || :invalid)
       return redirect_to login_url
     end
 
@@ -491,5 +495,36 @@ class Login::SamlController < ApplicationController
 
   def auth_type
     AuthenticationProvider::SAML.sti_name
+  end
+
+  def handle_one_time_use(aac, response)
+    assertion = response.assertions.first
+    # SAML2 Library can't validate OneTimeUse on its own, so we have to do it here.
+    if assertion&.conditions&.grep(SAML2::Conditions::OneTimeUse)&.any?
+      if duplicate_response?(aac, response)
+        if !aac.settings.key?("most_recent_one_time_use_violation") ||
+           aac.settings["most_recent_one_time_use_violation"] < 1.minute.ago
+          aac.settings["most_recent_one_time_use_violation"] = Time.zone.now.iso8601
+          aac.save!
+        end
+
+        if aac.account.feature_enabled?(:saml_enforce_one_time_use)
+          response.errors << "OneTimeUse condition violated"
+          return :one_time_use_violation
+        elsif Account.site_admin.feature_enabled?(:saml_count_one_time_use_usage)
+          increment_statsd(:one_time_use_soft_violation)
+        end
+      elsif Account.site_admin.feature_enabled?(:saml_count_one_time_use_usage)
+        # just log that we saw it
+        increment_statsd(:one_time_use_passed)
+      end
+    end
+    nil
+  end
+
+  def duplicate_response?(aac, response)
+    response_id_key = "saml_one_time_use_#{aac.global_id}_#{Digest::MD5.new.update(response.id).hexdigest}"
+    exat = ((response.assertions.first.conditions&.not_on_or_after || Time.zone.now) + 5.minutes).to_i
+    CanvasCache::Redis.enabled? && !Canvas.redis.set(response_id_key, true, nx: true, exat:)
   end
 end

@@ -136,6 +136,65 @@
 #       }
 #     }
 #
+# @model Lti::RegistrationAccountBinding
+#     {
+#       "id": "Lti::RegistrationAccountBinding",
+#       "description": "A binding between an LTI registration and an account, defining the registration's availability in that account",
+#       "properties": {
+#         "id": {
+#           "description": "the Canvas ID of the Lti::RegistrationAccountBinding object",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "account_id": {
+#           "description": "The Canvas id of the account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "root_account_id": {
+#           "description": "The Canvas id of the root account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "registration_id": {
+#           "description": "The Canvas id of the Lti::Registration",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "The state of the binding (on, off, allow, deleted)",
+#           "example": "on",
+#           "type": "string",
+#           "enum": [
+#             "on",
+#             "off",
+#             "allow",
+#             "deleted"
+#           ]
+#         },
+#         "created_at": {
+#           "description": "Timestamp of the binding's creation",
+#           "example": "2024-01-01T00:00:00Z",
+#           "type": "string"
+#         },
+#         "updated_at": {
+#           "description": "Timestamp of the binding's last update",
+#           "example": "2024-01-01T00:00:00Z",
+#           "type": "string"
+#         },
+#         "created_by": {
+#           "description": "The user that created this binding",
+#           "example": { "type": "User" },
+#           "$ref": "User"
+#         },
+#         "updated_by": {
+#           "description": "The user that last updated this binding",
+#           "example": { "type": "User" },
+#           "$ref": "User"
+#         }
+#       }
+#     }
+#
 # @model Lti::LegacyConfiguration
 #     {
 #       "id": "Lti::LegacyConfiguration",
@@ -1057,6 +1116,7 @@ class Lti::RegistrationsController < ApplicationController
 
   include Api::V1::Lti::Registration
   include Api::V1::Lti::RegistrationHistoryEntry
+  include Api::V1::Lti::RegistrationUpdateRequest
 
   def index
     set_active_tab "apps"
@@ -1072,9 +1132,19 @@ class Lti::RegistrationsController < ApplicationController
              })
     end
 
+    if @account.root_account.feature_enabled?(:lti_asset_processor_tii_migration)
+      turnitin_devkey_id = Setting.get("turnitin_asset_processor_client_id", "")
+      if turnitin_devkey_id.present?
+        js_env({
+                 turnitinAPClientId: turnitin_devkey_id
+               })
+      end
+    end
+
     # Inject feature flags for LTI registrations
     js_env({
              LTI_REGISTRATIONS_HISTORY: @account.root_account.feature_enabled?(:lti_registrations_history),
+             LTI_DR_REGISTRATIONS_UPDATE: @account.root_account.feature_enabled?(:lti_dr_registrations_update),
              ACCOUNT_GLOBAL_ID: @account.global_id
            })
     render :index
@@ -1237,13 +1307,24 @@ class Lti::RegistrationsController < ApplicationController
       includes = [:account_binding, :configuration] + Array(params[:include]).map(&:to_sym)
       account_binding = registration.account_binding_for(@context)
       overlay = registration.overlay_for(@context) if includes.include?(:overlay)
+
+      # Load pending update information if feature flag is enabled
+      pending_update = nil
+      if Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
+        pending_update = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
+                                                       .pending
+                                                       .order(created_at: :desc)
+                                                       .first
+      end
+
       render json: lti_registration_json(registration,
                                          @current_user,
                                          session,
                                          @context,
                                          includes:,
                                          account_binding:,
-                                         overlay:)
+                                         overlay:,
+                                         pending_update:)
     end
   rescue => e
     report_error(e)
@@ -1590,6 +1671,13 @@ class Lti::RegistrationsController < ApplicationController
       course_scope = course_scope.where("name ILIKE :s OR sis_source_id ILIKE :s OR course_code ILIKE :s", s: "%#{search_term}%")
     end
 
+    # If search_term can't be parsed as an integer, to_i returns zero.
+    search_term_int = search_term&.to_i
+    if search_term_int&.positive?
+      account_scope = account_scope.or(Account.active.where(id: search_term_int))
+      course_scope = course_scope.or(Course.active.where(id: search_term_int))
+    end
+
     accounts = account_scope.limit(20)
     courses = course_scope.limit(20)
 
@@ -1693,6 +1781,36 @@ class Lti::RegistrationsController < ApplicationController
   rescue => e
     report_error(e)
     raise e
+  end
+
+  # @API Get LTI Registration Update Request
+  # Retrieves details about a specific registration update request.
+  #
+  # @argument id [Integer] The id of the registration.
+  # @argument update_request_id [Integer] The id of the registration update request to retrieve.
+  # @returns Lti::RegistrationUpdateRequest
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<id>/update_requests/<update_request_id>' \
+  #        -H "Authorization: Bearer <token>"
+  def show_registration_update_request
+    registration_update_request = Lti::RegistrationUpdateRequest.find_by(
+      id: params[:update_request_id],
+      lti_registration: registration
+    )
+    raise ActiveRecord::RecordNotFound unless registration_update_request
+
+    unless registration.account == @context
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
+    render json: lti_registration_update_request_json(
+      registration_update_request,
+      @current_user,
+      session,
+      @context
+    )
   end
 
   # @API Apply LTI Registration Update Requst
@@ -1832,7 +1950,7 @@ class Lti::RegistrationsController < ApplicationController
     render_error("invalid_page", "page param should be an integer") unless params[:page].nil? || params[:page].to_i > 0
     render_error("invalid_dir", "dir param should be asc, desc, or empty") unless ["asc", "desc", nil].include?(params[:dir])
 
-    valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by updated on]
+    valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by updated on status]
     render_error("invalid_sort", "#{params[:sort]} is not a valid field for sorting") unless [*valid_sort_fields, nil].include?(params[:sort])
   end
 

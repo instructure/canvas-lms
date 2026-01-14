@@ -26,6 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import React from 'react'
 import {isEntryForConfigChange} from '../../../model/LtiRegistrationHistoryEntry'
+import {ContextControlsDiff} from './diff_components/ContextControlsDiff'
 import {IconsDiff} from './diff_components/IconsDiff'
 import {LaunchSettingsDiff} from './diff_components/LaunchSettingsDiff'
 import {NamingDiff} from './diff_components/NamingDiff'
@@ -72,6 +73,8 @@ export const HistoryDiffModal: React.FC<HistoryDiffModalProps> = ({entry, isOpen
             {I18n.t('Changes by %{userName} on %{date}', {
               userName:
                 entry.created_by === 'Instructure' ? I18n.t('Instructure') : entry.created_by.name,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
               date: tz.format(entry.created_at, 'date.formats.full'),
             })}
           </Heading>
@@ -97,6 +100,80 @@ export const HistoryDiffModal: React.FC<HistoryDiffModalProps> = ({entry, isOpen
   )
 }
 
+type ModificationsCountHeaderProps = {
+  additions: number
+  removals: number
+}
+
+const ModificationsCountHeader = ({additions, removals}: ModificationsCountHeaderProps) => {
+  return (
+    <Heading level="h2" margin="0">
+      <Flex gap="medium" margin="0 0 medium 0">
+        <Flex.Item shouldGrow={true} shouldShrink={true} size="45%">
+          <Flex direction="row" alignItems="center" gap="x-small">
+            <Flex.Item>
+              <span
+                className="diff-container-removal"
+                aria-hidden="true"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '1.5rem',
+                  height: '1.5rem',
+                  borderRadius: '50%',
+                  fontWeight: 'bold',
+                }}
+              >
+                -
+              </span>
+            </Flex.Item>
+            <Flex.Item>
+              {I18n.t(
+                {
+                  one: '1 removal',
+                  other: '%{count} removals',
+                },
+                {count: removals},
+              )}
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+        <Flex.Item shouldGrow={true} shouldShrink={true} size="45%">
+          <Flex direction="row" alignItems="center" gap="x-small">
+            <Flex.Item>
+              <span
+                className="diff-container-addition"
+                aria-hidden="true"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '1.5rem',
+                  height: '1.5rem',
+                  borderRadius: '50%',
+                  fontWeight: 'bold',
+                }}
+              >
+                +
+              </span>
+            </Flex.Item>
+            <Flex.Item>
+              {I18n.t(
+                {
+                  one: '1 addition',
+                  other: '%{count} additions',
+                },
+                {count: additions},
+              )}
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+      </Flex>
+    </Heading>
+  )
+}
+
 type ConfigChangeBodyProps = {
   entry: ConfigChangeEntryWithDiff
 }
@@ -115,71 +192,7 @@ const ConfigChangeBody = ({entry}: ConfigChangeBodyProps) => {
 
   return (
     <View as="div" padding="small">
-      <Heading level="h2" margin="0">
-        <Flex gap="medium" margin="0 0 medium 0">
-          <Flex.Item shouldGrow={true} shouldShrink={true} size="45%">
-            <Flex direction="row" alignItems="center" gap="x-small">
-              <Flex.Item>
-                <span
-                  className="diff-container-removal"
-                  aria-hidden="true"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '1.5rem',
-                    height: '1.5rem',
-                    borderRadius: '50%',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  -
-                </span>
-              </Flex.Item>
-              <Flex.Item>
-                {I18n.t(
-                  {
-                    one: '1 removal',
-                    other: '%{count} removals',
-                  },
-                  {count: entry.totalRemovals},
-                )}
-              </Flex.Item>
-            </Flex>
-          </Flex.Item>
-          <Flex.Item shouldGrow={true} shouldShrink={true} size="45%">
-            <Flex direction="row" alignItems="center" gap="x-small">
-              <Flex.Item>
-                <span
-                  className="diff-container-addition"
-                  aria-hidden="true"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '1.5rem',
-                    height: '1.5rem',
-                    borderRadius: '50%',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  +
-                </span>
-              </Flex.Item>
-              <Flex.Item>
-                {I18n.t(
-                  {
-                    one: '1 addition',
-                    other: '%{count} additions',
-                  },
-                  {count: entry.totalAdditions},
-                )}
-              </Flex.Item>
-            </Flex>
-          </Flex.Item>
-        </Flex>
-      </Heading>
-      {/* Diff Sections */}
+      <ModificationsCountHeader additions={entry.totalAdditions} removals={entry.totalRemovals} />
       {entry.internalConfig?.launchSettings && (
         <LaunchSettingsDiff diff={entry.internalConfig.launchSettings} />
       )}
@@ -214,9 +227,9 @@ type AvailabilityChangeBodyProps = {
 
 const AvailabilityChangeBody = ({entry}: AvailabilityChangeBodyProps) => {
   return (
-    <>
-      <Text>TODO: Implement this properly</Text>
-      <Text>{JSON.stringify(entry, null, 2)}</Text>
-    </>
+    <View as="div" padding="small">
+      <ModificationsCountHeader additions={entry.totalAdditions} removals={entry.totalRemovals} />
+      <ContextControlsDiff deploymentDiffs={entry.deploymentDiffs} />
+    </View>
   )
 }

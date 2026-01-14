@@ -35,6 +35,10 @@ export const WIDGET_TYPES = {
   COURSE_GRADES: 'course_grades',
   ANNOUNCEMENTS: 'announcements',
   PEOPLE: 'people',
+  TODO_LIST: 'todo_list',
+  RECENT_GRADES: 'recent_grades',
+  PROGRESS_OVERVIEW: 'progress_overview',
+  INBOX: 'inbox',
 } as const
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
@@ -51,10 +55,16 @@ export const DEFAULT_WIDGET_CONFIG = {
       position: {col: 1, row: 1, relative: 1},
       title: I18n.t('Course work'),
     },
+    // {
+    //   id: 'todo-list-widget',
+    //   type: WIDGET_TYPES.TODO_LIST,
+    //   position: {col: 2, row: 1, relative: 2},
+    //   title: I18n.t('To-do list'),
+    // },
     {
       id: 'announcements-widget',
       type: WIDGET_TYPES.ANNOUNCEMENTS,
-      position: {col: 2, row: 1, relative: 2},
+      position: {col: 2, row: 2, relative: 3},
       title: I18n.t('Announcements'),
     },
     {
@@ -66,7 +76,7 @@ export const DEFAULT_WIDGET_CONFIG = {
     {
       id: 'people-widget',
       type: WIDGET_TYPES.PEOPLE,
-      position: {col: 2, row: 2, relative: 3},
+      position: {col: 2, row: 3, relative: 5},
       title: I18n.t('People'),
     },
   ],
@@ -106,6 +116,8 @@ export const DASHBOARD_NOTIFICATIONS_KEY = 'dashboardNotifications'
 export const COURSE_WORK_KEY = 'courseWork'
 export const COURSE_STATISTICS_KEY = 'courseStatistics'
 export const COURSE_INSTRUCTORS_PAGINATED_KEY = 'courseInstructorsPaginated'
+export const PROGRESS_OVERVIEW_KEY = 'progressOverview'
+export const INBOX_MESSAGES_KEY = 'inboxMessages'
 
 // URL patterns
 export const URL_PATTERNS = {
@@ -162,6 +174,17 @@ export const UPDATE_WIDGET_DASHBOARD_CONFIG = gql`
     updateWidgetDashboardConfig(input: {widgetId: $widgetId, filters: $filters}) {
       widgetId
       filters
+      errors {
+        message
+      }
+    }
+  }
+`
+
+export const UPDATE_WIDGET_DASHBOARD_LAYOUT = gql`
+  mutation UpdateWidgetDashboardLayout($layout: String!) {
+    updateWidgetDashboardLayout(input: {layout: $layout}) {
+      layout
       errors {
         message
       }

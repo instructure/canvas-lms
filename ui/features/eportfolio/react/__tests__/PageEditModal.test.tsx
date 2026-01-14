@@ -25,8 +25,8 @@ describe('PageEditModal', () => {
   const portfolio = {id: 0, name: 'Test Portfolio', public: true, profile_url: '/path/to/profile'}
   const page = {id: 2, name: 'Second Page', position: 2, entry_url: '/path/to/page'}
   const pageList = [{id: 1, name: 'First Page', position: 1, entry_url: '/path/to/page'}, page]
-  const mockConfirm = jest.fn()
-  const mockCancel = jest.fn()
+  const mockConfirm = vi.fn()
+  const mockCancel = vi.fn()
 
   const props = {
     portfolio,
@@ -39,14 +39,14 @@ describe('PageEditModal', () => {
     fetchMock.restore()
   })
 
-  it('sets focus on blank text input', () => {
+  it('sets focus on blank text input', async () => {
     const {getByTestId, getByText} = render(
       <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />,
     )
     const textInput = getByTestId('add-field')
     const saveButton = getByText('Save')
     saveButton.click()
-    waitFor(() => {
+    await waitFor(() => {
       expect(textInput).toHaveFocus()
       expect(getByText('Name is required.')).toBeInTheDocument()
     })

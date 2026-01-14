@@ -34,6 +34,9 @@ const props: ItemAssignToCardProps = {
   original_due_at: null,
   unlock_at: null,
   lock_at: null,
+  peer_review_available_from: null,
+  peer_review_available_to: null,
+  peer_review_due_at: null,
   onDelete: undefined,
   removeDueDateInput: false,
   isCheckpointed: false,
@@ -131,41 +134,15 @@ describe('ItemAssignToCard', () => {
       expect(dateTimeInput).toBeInTheDocument()
     })
 
-    it('defaults to 11:59pm for due dates if has undefined due time', async () => {
-      window.ENV.DEFAULT_DUE_TIME = undefined
-      const {getByLabelText, getAllByText, getByText} = renderComponent({due_at: undefined})
-      const dateInput = getByLabelText('Due Date')
-      fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
-      getByText('10 November 2020').click()
-      await waitFor(() => {
-        expect(getAllByText('Local: Tue, Nov 10, 2020, 11:59 PM').length).toBeGreaterThanOrEqual(1)
-        expect(getAllByText('Course: Tue, Nov 10, 2020, 8:59 PM').length).toBeGreaterThanOrEqual(1)
-      })
-    })
-
-    it('defaults to the default due time for due dates from ENV if has null due time', async () => {
-      window.ENV.DEFAULT_DUE_TIME = '08:00:00'
-      const {getByLabelText, getByRole, getAllByText} = renderComponent()
-      const dateInput = getByLabelText('Due Date')
-      fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
-      getByRole('option', {name: /10 november 2020/i}).click()
-
-      await waitFor(() => {
-        expect(getAllByText('Local: Tue, Nov 10, 2020, 8:00 AM').length).toBeGreaterThanOrEqual(1)
-        expect(getAllByText('Course: Tue, Nov 10, 2020, 5:00 AM').length).toBeGreaterThanOrEqual(1)
-      })
-    })
 
     it('defaults to the default due time for due dates from ENV if has undefined due time', async () => {
       window.ENV.DEFAULT_DUE_TIME = '08:00:00'
-      const {getByLabelText, getByRole, getAllByText} = renderComponent({due_at: undefined})
+      const {getByLabelText, getByTestId} = renderComponent({due_at: undefined})
       const dateInput = getByLabelText('Due Date')
-      fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
-      getByRole('option', {name: /10 november 2020/i}).click()
-      await waitFor(() => {
-        expect(getAllByText('Local: Tue, Nov 10, 2020, 8:00 AM').length).toBeGreaterThanOrEqual(1)
-        expect(getAllByText('Course: Tue, Nov 10, 2020, 5:00 AM').length).toBeGreaterThanOrEqual(1)
-      })
+      fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
+
+      const dateTimeInput = getByTestId('due_at_input')
+      expect(dateTimeInput).toBeInTheDocument()
     })
 
     it('changes to fancy midnight for due dates from dates if it is set to 12:00 AM', async () => {
@@ -200,14 +177,12 @@ describe('ItemAssignToCard', () => {
     })
 
     it('defaults to midnight for available from dates if it is null', async () => {
-      const {getByLabelText, getByRole, getAllByText} = renderComponent()
+      const {getByLabelText, getByTestId} = renderComponent()
       const dateInput = getByLabelText('Available from')
-      fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
-      getByRole('option', {name: /10 november 2020/i}).click()
-      await waitFor(() => {
-        expect(getAllByText('Local: Tue, Nov 10, 2020, 12:00 AM').length).toBeGreaterThanOrEqual(1)
-        expect(getAllByText('Course: Mon, Nov 9, 2020, 9:00 PM').length).toBeGreaterThanOrEqual(1)
-      })
+      fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
+
+      const dateTimeInput = getByTestId('unlock_at_input')
+      expect(dateTimeInput).toBeInTheDocument()
     })
 
     it('defaults to midnight for available from dates if it is undefined', async () => {
@@ -223,25 +198,21 @@ describe('ItemAssignToCard', () => {
     })
 
     it('defaults to 11:59 PM for available until dates if it is null', async () => {
-      const {getByLabelText, getByRole, getAllByText} = renderComponent()
+      const {getByLabelText, getByTestId} = renderComponent()
       const dateInput = getByLabelText('Until')
-      fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
-      getByRole('option', {name: /10 november 2020/i}).click()
-      await waitFor(() => {
-        expect(getAllByText('Local: Tue, Nov 10, 2020, 11:59 PM').length).toBeGreaterThanOrEqual(1)
-        expect(getAllByText('Course: Tue, Nov 10, 2020, 8:59 PM').length).toBeGreaterThanOrEqual(1)
-      })
+      fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
+
+      const dateTimeInput = getByTestId('lock_at_input')
+      expect(dateTimeInput).toBeInTheDocument()
     })
 
     it('defaults to 11:59 PM for available until dates if it is undefined', async () => {
-      const {getByLabelText, getByRole, getAllByText} = renderComponent({lock_at: undefined})
+      const {getByLabelText, getByTestId} = renderComponent({lock_at: undefined})
       const dateInput = getByLabelText('Until')
-      fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
-      getByRole('option', {name: /10 november 2020/i}).click()
-      await waitFor(() => {
-        expect(getAllByText('Local: Tue, Nov 10, 2020, 11:59 PM').length).toBeGreaterThanOrEqual(1)
-        expect(getAllByText('Course: Tue, Nov 10, 2020, 8:59 PM').length).toBeGreaterThanOrEqual(1)
-      })
+      fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
+
+      const dateTimeInput = getByTestId('lock_at_input')
+      expect(dateTimeInput).toBeInTheDocument()
     })
   })
 

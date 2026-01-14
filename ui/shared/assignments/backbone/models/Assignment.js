@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {map, find, filter, includes, some} from 'lodash'
+import {map, find, filter, includes, some} from 'es-toolkit/compat'
 import {Model} from '@canvas/backbone'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import TurnitinSettings from '../../TurnitinSettings'
@@ -708,6 +708,10 @@ Assignment.prototype.intraGroupPeerReviews = function () {
 
 Assignment.prototype.peerReviewSubAssignment = function () {
   return this.get('peer_review_sub_assignment')
+}
+
+Assignment.prototype.hasPeerReviewSubmissions = function () {
+  return this.get('has_peer_review_submissions')
 }
 
 Assignment.prototype.notifyOfUpdate = function (notifyOfUpdateBoolean) {

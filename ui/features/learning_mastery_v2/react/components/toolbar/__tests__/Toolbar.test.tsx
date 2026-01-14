@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render, waitFor} from '@testing-library/react'
+import {cleanup, render, waitFor} from '@testing-library/react'
 import {Toolbar, ToolbarProps} from '../Toolbar'
 import {DEFAULT_GRADEBOOK_SETTINGS} from '../../../utils/constants'
 
@@ -23,11 +23,15 @@ const makeProps = (props = {}): ToolbarProps => ({
   courseId: '123',
   showDataDependentControls: true,
   gradebookSettings: DEFAULT_GRADEBOOK_SETTINGS,
-  setGradebookSettings: jest.fn(),
+  setGradebookSettings: vi.fn(),
   ...props,
 })
 
 describe('Toolbar', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders the gradebook menu and title', () => {
     const {getByTestId, getByText} = render(<Toolbar {...makeProps()} />)
     expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
@@ -51,7 +55,11 @@ describe('Toolbar', () => {
     getByTestId('lmgb-settings-button').click()
     await waitFor(() => expect(getByTestId('lmgb-settings-tray')).toBeInTheDocument())
     getByTestId('lmgb-close-settings-button').querySelector('button')!.click()
-    await waitFor(() => expect(queryByTestId('lmgb-settings-tray')).toBeNull())
+    // InstUI Tray remains in DOM with transition class, check for exited state
+    await waitFor(() => {
+      const tray = queryByTestId('lmgb-settings-tray')
+      expect(tray?.classList.contains('transition--slide-right-exited')).toBe(true)
+    })
   })
 
   it('hides data-dependent controls when showDataDependentControls is false', () => {

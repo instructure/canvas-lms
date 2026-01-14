@@ -46,6 +46,10 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews/self'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
+- verb: GET
   path: '/api/v1/accounts/:account_id/authentication_providers'
 - verb: POST
   path: '/api/v1/accounts/:account_id/authentication_providers'
@@ -137,10 +141,10 @@
   path: '/api/v1/accounts/:account_id/external_tools'
 - verb: DELETE
   path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id'
-- verb: GET
-  path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id(/*full_path)'
 - verb: GET
   path: '/api/v1/accounts/:account_id/external_tools/:external_tool_id/migration_info'
 - verb: DELETE
@@ -239,6 +243,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/overlay_history'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id/apply'
 - verb: GET
@@ -535,6 +541,8 @@
   path: '/api/v1/canvadoc_session'
 - verb: POST
   path: '/api/v1/canvadoc_session'
+- verb: GET
+  path: '/api/v1/career/enabled'
 - verb: GET
   path: '/api/v1/career/experience_summary'
 - verb: POST
@@ -1021,10 +1029,10 @@
   path: '/api/v1/courses/:course_id/external_tools'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/external_tools/:external_tool_id'
-- verb: GET
-  path: '/api/v1/courses/:course_id/external_tools/:external_tool_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/external_tools/:external_tool_id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/external_tools/:external_tool_id(/*full_path)'
 - verb: GET
   path: '/api/v1/courses/:course_id/external_tools/:external_tool_id/migration_info'
 - verb: GET
@@ -1281,6 +1289,8 @@
   path: '/api/v1/courses/:course_id/outcome_results'
 - verb: GET
   path: '/api/v1/courses/:course_id/outcome_rollups'
+- verb: GET
+  path: '/api/v1/courses/:course_id/outcomes/:outcome_id/contributing_scores'
 - verb: GET
   path: '/api/v1/courses/:course_id/pace_contexts'
 - verb: GET

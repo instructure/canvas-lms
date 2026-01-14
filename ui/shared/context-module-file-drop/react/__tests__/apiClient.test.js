@@ -32,7 +32,7 @@ beforeEach(() => {
 
 afterEach(() => {
   server.resetHandlers()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 afterAll(() => {

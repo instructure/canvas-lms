@@ -24,7 +24,7 @@ const defaultProps: ComponentProps = {
   accountId: 1,
   autoSubscription: false,
   disabled: false,
-  onChange: jest.fn(),
+  onChange: vi.fn(),
   accountName: 'Test',
 }
 
@@ -44,7 +44,7 @@ describe('SubscriptionDropDown', () => {
   })
 
   it('calls onChange with the accountId and the new value', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByTestId, getByText} = render(
       <SubscriptionDropDown {...defaultProps} onChange={onChange} />,
     )

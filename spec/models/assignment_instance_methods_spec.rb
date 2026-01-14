@@ -869,7 +869,7 @@ describe Assignment do
   describe "peer review sub assignment sync" do
     before :once do
       @course = course_factory(active_all: true)
-      @course.enable_feature!(:peer_review_grading)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
       @parent_assignment = @course.assignments.create!(
         title: "Parent Assignment",
         peer_reviews: true,
@@ -884,7 +884,7 @@ describe Assignment do
 
     describe "#should_sync_peer_review_sub_assignment?" do
       it "returns false when feature flag is disabled" do
-        @course.disable_feature!(:peer_review_grading)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
         @parent_assignment.description = "New description"
         @parent_assignment.save!
         expect(@parent_assignment.send(:should_sync_peer_review_sub_assignment?)).to be false
@@ -951,7 +951,7 @@ describe Assignment do
 
       it "syncs context_id and context_type when changed" do
         new_course = course_factory(active_all: true)
-        new_course.enable_feature!(:peer_review_grading)
+        new_course.enable_feature!(:peer_review_allocation_and_grading)
         @parent_assignment.update!(context: new_course)
         @peer_review_sub.reload
         expect(@peer_review_sub.context_id).to eq new_course.id

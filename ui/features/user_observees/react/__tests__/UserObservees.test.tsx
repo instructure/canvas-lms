@@ -25,8 +25,8 @@ import fetchMock from 'fetch-mock'
 
 import UserObservees, {type Observee} from '../UserObservees'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 describe('UserObservees', () => {
@@ -55,7 +55,7 @@ describe('UserObservees', () => {
   const POST_OBSERVEES_URI = `/api/v1/users/${userId}/observees`
   const GET_OBSERVEES_URI = `/api/v1/users/${userId}/observees?per_page=100`
   const createDeleteObserveeUri = (id: string) => `/api/v1/users/self/observees/${id}`
-  const confirmMock = jest.fn().mockReturnValue(true)
+  const confirmMock = vi.fn().mockReturnValue(true)
   global.confirm = confirmMock
 
   const renderComponent = () =>
@@ -72,7 +72,7 @@ describe('UserObservees', () => {
 
   afterEach(() => {
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('when no students are being observed', () => {

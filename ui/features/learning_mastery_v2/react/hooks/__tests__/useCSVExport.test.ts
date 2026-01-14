@@ -17,23 +17,18 @@
  */
 
 import {renderHook, act} from '@testing-library/react-hooks/dom'
-import axios from '@canvas/axios'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useCSVExport, {EXPORT_COMPLETE, EXPORT_FAILED, EXPORT_NOT_STARTED} from '../useCSVExport'
 
-jest.useFakeTimers()
+const server = setupServer()
 
-jest.mock('@canvas/axios', () => ({
-  get: jest.fn(),
-}))
-
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 describe('useCSVExport', () => {
-  let exportMock: jest.Mock
-
   const mockedExport: string =
     'Student name, Student ID, Student SIS ID, Outcome 1 result, Outcome 1 mastery points\n' +
     'test student, 1, student_1, 2.5, 3\n' +
@@ -52,78 +47,109 @@ describe('useCSVExport', () => {
     }
   }
 
-  const forceURLFail = (): void => {
-    exportMock = (axios.get as jest.Mock).mockRejectedValue({})
-  }
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    vi.clearAllMocks()
+  })
+  afterAll(() => server.close())
 
   beforeEach(() => {
-    const promise = Promise.resolve({
-      status: 200,
-      data: {
-        mockedExport,
-      },
-    })
-    exportMock = (axios.get as jest.Mock).mockResolvedValue(promise)
+    server.use(
+      http.get('/courses/1/outcome_rollups.csv', () => {
+        return HttpResponse.json({
+          mockedExport,
+        })
+      }),
+    )
   })
 
   describe('useCSVExport hook', () => {
     it('returns the response when an export is requested', async () => {
-      const {result} = renderHook(() => useCSVExport(defaultProps()))
+      const {result, waitFor} = renderHook(() => useCSVExport(defaultProps()))
       const {exportGradebook, exportState, exportData} = result.current
 
       expect(exportState).toEqual(EXPORT_NOT_STARTED)
       expect(exportData).toStrictEqual([])
 
       act(() => exportGradebook())
-      await act(async () => jest.runAllTimers())
 
-      expect(result.current.exportState).toEqual(EXPORT_COMPLETE)
+      await waitFor(() => {
+        expect(result.current.exportState).toEqual(EXPORT_COMPLETE)
+      })
+
       expect(result.current.exportData).toStrictEqual({
         mockedExport,
       })
     })
 
     it('calls the /rollups.csv URL with the right parameters', async () => {
-      const {result} = renderHook(() =>
+      let requestUrl = ''
+      let requestParams: URLSearchParams = new URLSearchParams()
+
+      server.use(
+        http.get('/courses/1/outcome_rollups.csv', ({request}) => {
+          requestUrl = request.url
+          requestParams = new URL(request.url).searchParams
+          return HttpResponse.json({mockedExport})
+        }),
+      )
+
+      const {result, waitFor} = renderHook(() =>
         useCSVExport(
           defaultProps({gradebookFilters: ['inactive_enrollments', 'missing_user_rollups']}),
         ),
       )
-      const params = {
-        params: {
-          exclude: ['inactive_enrollments', 'missing_user_rollups'],
-        },
-      }
       const {exportGradebook} = result.current
 
       act(() => exportGradebook())
-      await act(async () => jest.runAllTimers())
 
-      expect(exportMock).toHaveBeenCalledWith('/courses/1/outcome_rollups.csv', params)
+      await waitFor(() => {
+        expect(result.current.exportState).toEqual(EXPORT_COMPLETE)
+      })
+
+      expect(requestUrl).toContain('/courses/1/outcome_rollups.csv')
+      expect(requestParams.getAll('exclude[]')).toEqual([
+        'inactive_enrollments',
+        'missing_user_rollups',
+      ])
     })
 
     it('export state is failed when export fails', async () => {
-      const {result} = renderHook(() => useCSVExport(defaultProps()))
+      server.use(
+        http.get('/courses/1/outcome_rollups.csv', () => {
+          return HttpResponse.json({error: 'Failed'}, {status: 500})
+        }),
+      )
+
+      const {result, waitFor} = renderHook(() => useCSVExport(defaultProps()))
       const {exportGradebook} = result.current
 
-      forceURLFail()
       act(() => exportGradebook())
-      await act(async () => jest.runAllTimers())
 
-      expect(axios.get).toHaveBeenCalled()
-      expect(result.current.exportState).toEqual(EXPORT_FAILED)
+      await waitFor(() => {
+        expect(result.current.exportState).toEqual(EXPORT_FAILED)
+      })
+
       expect(result.current.exportData).toStrictEqual([])
     })
 
     it('shows flash alert when export fails', async () => {
-      const {result} = renderHook(() => useCSVExport(defaultProps()))
+      server.use(
+        http.get('/courses/1/outcome_rollups.csv', () => {
+          return HttpResponse.json({error: 'Failed'}, {status: 500})
+        }),
+      )
+
+      const {result, waitFor} = renderHook(() => useCSVExport(defaultProps()))
       const {exportGradebook} = result.current
 
-      forceURLFail()
       act(() => exportGradebook())
-      await act(async () => jest.runAllTimers())
 
-      expect(axios.get).toHaveBeenCalled()
+      await waitFor(() => {
+        expect(result.current.exportState).toEqual(EXPORT_FAILED)
+      })
+
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Error exporting gradebook',
         type: 'error',

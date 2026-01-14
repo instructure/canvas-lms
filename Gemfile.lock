@@ -887,6 +887,10 @@ GEM
       ruby-rc4
       ttfunk
     pg (1.6.2)
+    pg (1.6.2-aarch64-linux)
+    pg (1.6.2-arm64-darwin)
+    pg (1.6.2-x86_64-darwin)
+    pg (1.6.2-x86_64-linux)
     pg_query (6.1.0)
       google-protobuf (>= 3.25.3)
     pp (0.6.3)
@@ -1180,6 +1184,9 @@ GEM
     string_pattern (2.3.0)
       regexp_parser (~> 2.5, >= 2.5.0)
     stringio (3.1.7)
+    swagger_yard (1.1.1)
+      parslet
+      yard
     swearjar (1.4.0)
     switchman (4.2.3)
       activerecord (>= 7.1, < 8.1)
@@ -1458,6 +1465,7 @@ DEPENDENCIES
   stackprof!
   stormbreaker (~> 1.0)
   stringify_ids!
+  swagger_yard (~> 1.1)
   switchman (~> 4.0)
   switchman-inst-jobs (~> 4.0)
   syslog (~> 0.1)

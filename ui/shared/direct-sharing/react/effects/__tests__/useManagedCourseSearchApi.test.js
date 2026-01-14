@@ -58,8 +58,8 @@ describe('useManagedCourseSearchApi', () => {
 
   it('fetches and reports converted results', async () => {
     setupManagedCoursesResponse()
-    const success = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
     renderHook(() => useManagedCourseSearchApi({error, success, params: {term: 'game'}}))
     await fetchMock.flush(true)
     expect(error).not.toHaveBeenCalled()

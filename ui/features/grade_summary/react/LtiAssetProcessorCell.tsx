@@ -27,12 +27,12 @@ import {
 import {ZodType} from 'zod'
 import LtiAssetReportStatus from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportStatus'
 import StudentLtiAssetReportModal from '@canvas/lti-asset-processor/react/StudentLtiAssetReportModal'
-import {AssetReportCompatibleSubmissionType} from '@canvas/lti-asset-processor/shared-with-sg/replicated/types/LtiAssetReports'
+import {ensureCompatibleSubmissionType} from '@canvas/lti-asset-processor/shared-with-sg/replicated/types/LtiAssetReports'
 
 interface AssetProcessorCellProps {
   assetProcessors: LtiAssetProcessor[] | undefined
   assetReports: LtiAssetReportForStudent[] | undefined
-  submissionType: AssetReportCompatibleSubmissionType
+  submissionType: string | undefined
   assignmentName: string
 }
 
@@ -63,7 +63,16 @@ export default function LtiAssetProcessorCell({
     [],
   )
 
-  if (!submissionType || !shouldShowAssetReportCell(assetProcessors, assetReports)) {
+  // Submissions for checkpointed discussions will have null submissionType until they're
+  // fully submitted. They can still have reports, so show those reports if they exist.
+  const inferredSubmissionType = ensureCompatibleSubmissionType(
+    submissionType ||
+      (assetReports?.some(report => report.asset.discussionEntryVersion)
+        ? 'discussion_topic'
+        : undefined),
+  )
+
+  if (!inferredSubmissionType || !shouldShowAssetReportCell(assetProcessors, assetReports)) {
     return null
   }
 
@@ -76,7 +85,7 @@ export default function LtiAssetProcessorCell({
           assignmentName={assignmentName}
           onClose={handleClose}
           reports={validatedReports}
-          submissionType={submissionType}
+          submissionType={inferredSubmissionType}
         />
       )}
     </>

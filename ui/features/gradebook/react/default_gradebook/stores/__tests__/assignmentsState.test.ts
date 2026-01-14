@@ -26,11 +26,11 @@ import PerformanceControls from '../../PerformanceControls'
 import {maxAssignmentCount} from '../../Gradebook.utils'
 import {Assignment, AssignmentGroup, AssignmentMap} from 'api'
 
-jest.mock('../../Gradebook.utils', () => {
-  const actual = jest.requireActual('../../Gradebook.utils')
+vi.mock('../../Gradebook.utils', async () => {
+  const actual = await vi.importActual<typeof import('../../Gradebook.utils')>('../../Gradebook.utils')
   return {
     ...actual,
-    maxAssignmentCount: jest.fn(actual.maxAssignmentCount),
+    maxAssignmentCount: vi.fn(actual.maxAssignmentCount),
   }
 })
 
@@ -142,7 +142,7 @@ describe('Gradebook', () => {
 
     afterEach(() => {
       server.resetHandlers()
-      jest.resetAllMocks()
+      vi.resetAllMocks()
       store.setState(initialState, true)
     })
 
@@ -344,7 +344,7 @@ describe('Gradebook', () => {
 
     afterEach(() => {
       server.resetHandlers()
-      jest.resetAllMocks()
+      vi.resetAllMocks()
       store.setState(initialState, true)
     })
 
@@ -354,7 +354,7 @@ describe('Gradebook', () => {
 
     it.each([false, true])('forwards useGraphQL parameter: %s', async value => {
       // Mock fetchAssignmentGroups to verify parameters
-      const mockFetchAssignmentGroups = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
       store.setState({
         courseId: '1201',
         hasModules: true,
@@ -371,7 +371,7 @@ describe('Gradebook', () => {
 
     it('sends request with correct parameters when no grading period is selected', async () => {
       // Mock fetchAssignmentGroups to verify parameters
-      const mockFetchAssignmentGroups = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
       store.setState({
         courseId: '1201',
         hasModules: true,
@@ -393,6 +393,7 @@ describe('Gradebook', () => {
           'post_manually',
           'checkpoints',
           'has_rubric',
+          'peer_review',
           'module_ids', // This should be included because hasModules is true
         ]),
         hide_zero_point_quizzes: false,
@@ -402,7 +403,7 @@ describe('Gradebook', () => {
 
     it('sends request with hide_zero_point_quizzes parameter when specified', async () => {
       // Mock fetchAssignmentGroups to verify parameters
-      const mockFetchAssignmentGroups = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
       store.setState({
         courseId: '1201',
         hasModules: false,
@@ -420,7 +421,7 @@ describe('Gradebook', () => {
 
     it('calls loadAssignmentGroupsForGradingPeriods when a valid grading period is selected', async () => {
       // Mock loadAssignmentGroupsForGradingPeriods to verify it's called
-      const mockLoadForGradingPeriods = jest.fn()
+      const mockLoadForGradingPeriods = vi.fn()
       store.setState({
         courseId: '1201',
         hasModules: false,
@@ -446,6 +447,7 @@ describe('Gradebook', () => {
           'post_manually',
           'checkpoints',
           'has_rubric',
+          'peer_review',
         ]),
         hide_zero_point_quizzes: false,
       })
@@ -454,8 +456,8 @@ describe('Gradebook', () => {
 
     it('normalizes grading period id of "0" to null and calls fetchAssignmentGroups directly', async () => {
       // Mock both functions to check which one is called
-      const mockLoadForGradingPeriods = jest.fn()
-      const mockFetchAssignmentGroups = jest.fn()
+      const mockLoadForGradingPeriods = vi.fn()
+      const mockFetchAssignmentGroups = vi.fn()
 
       store.setState({
         courseId: '1201',
@@ -479,7 +481,7 @@ describe('Gradebook', () => {
 
     it('includes module_ids in parameters when hasModules is true', async () => {
       // Mock fetchAssignmentGroups to verify parameters
-      const mockFetchAssignmentGroups = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
       store.setState({
         courseId: '1201',
         hasModules: true, // Set hasModules to true
@@ -495,7 +497,7 @@ describe('Gradebook', () => {
 
     it('does not include module_ids in parameters when hasModules is false', async () => {
       // Mock fetchAssignmentGroups to verify parameters
-      const mockFetchAssignmentGroups = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
       store.setState({
         courseId: '1201',
         hasModules: false, // Set hasModules to false
@@ -570,7 +572,7 @@ describe('Gradebook', () => {
 
     afterEach(() => {
       store.setState(initialState, true)
-      jest.resetAllMocks()
+      vi.resetAllMocks()
       server.resetHandlers()
     })
 
@@ -589,7 +591,7 @@ describe('Gradebook', () => {
 
     it.each([false, true])('forwards useGraphQL parameter: %s', async value => {
       // Mock fetchAssignmentGroups to verify parameters
-      const mockFetchAssignmentGroups = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
       store.setState({fetchAssignmentGroups: mockFetchAssignmentGroups})
       const params = createParams()
 
@@ -604,8 +606,8 @@ describe('Gradebook', () => {
     })
 
     it('calls fetchAssignmentGroups with assignment IDs for the selected grading period', async () => {
-      const mockFetchAssignmentGroups = jest.fn()
-      const mockHandleAssignmentGroupsResponse = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
+      const mockHandleAssignmentGroupsResponse = vi.fn()
       store.setState({
         fetchAssignmentGroups: mockFetchAssignmentGroups,
         handleAssignmentGroupsResponse: mockHandleAssignmentGroupsResponse,
@@ -634,7 +636,7 @@ describe('Gradebook', () => {
     })
 
     it('calls fetchAssignmentGroups for other grading period assignments too', async () => {
-      const mockFetchAssignmentGroups = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
 
       store.setState({
         fetchAssignmentGroups: mockFetchAssignmentGroups,
@@ -656,10 +658,10 @@ describe('Gradebook', () => {
     })
 
     it('falls back to fetching all assignments when selected grading period has too many assignments', async () => {
-      const mockFetchAssignmentGroups = jest.fn()
-      const mockHandleAssignmentGroupsResponse = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
+      const mockHandleAssignmentGroupsResponse = vi.fn()
       // Mock maxAssignmentCount to return a small number to trigger the fallback
-      ;(maxAssignmentCount as jest.Mock).mockReturnValue(0)
+      ;(maxAssignmentCount as any).mockReturnValue(0)
 
       store.setState({
         fetchAssignmentGroups: mockFetchAssignmentGroups,
@@ -683,8 +685,8 @@ describe('Gradebook', () => {
     })
 
     it('falls back to fetching all assignments when selected grading period has no assignments', async () => {
-      const mockFetchAssignmentGroups = jest.fn()
-      const mockHandleAssignmentGroupsResponse = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
+      const mockHandleAssignmentGroupsResponse = vi.fn()
 
       // Set up a grading period with no assignments
       store.setState({
@@ -712,8 +714,8 @@ describe('Gradebook', () => {
     })
 
     it('handles empty gradingPeriodAssignments object', async () => {
-      const mockFetchAssignmentGroups = jest.fn()
-      const mockHandleAssignmentGroupsResponse = jest.fn()
+      const mockFetchAssignmentGroups = vi.fn()
+      const mockHandleAssignmentGroupsResponse = vi.fn()
 
       // Set up with empty gradingPeriodAssignments
       store.setState({
@@ -739,7 +741,7 @@ describe('Gradebook', () => {
 
     it('returns the promise from the selected grading period fetch', async () => {
       const expectedResult = [{id: 'test'}]
-      const mockHandleAssignmentGroupsResponse = jest
+      const mockHandleAssignmentGroupsResponse = vi
         .fn()
         .mockImplementation(({isSelectedGradingPeriodId}) => {
           return Promise.resolve(isSelectedGradingPeriodId ? expectedResult : [])
@@ -759,7 +761,7 @@ describe('Gradebook', () => {
 
   describe('handleAssignmentGroupsResponse', () => {
     afterEach(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
       store.setState(initialState, true)
     })
 

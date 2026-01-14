@@ -23,9 +23,9 @@ import {App, type ResponsiveComponentProps} from '../app'
 import fetchMock from 'fetch-mock'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-const pollForPublishStatus = jest.fn()
-const setBlueprintLocked = jest.fn()
-const setResponsiveSize = jest.fn()
+const pollForPublishStatus = vi.fn()
+const setBlueprintLocked = vi.fn()
+const setResponsiveSize = vi.fn()
 
 const defaultProps: ResponsiveComponentProps = {
   loadingMessage: '',
@@ -37,7 +37,7 @@ const defaultProps: ResponsiveComponentProps = {
   unpublishedChanges: [],
   modalOpen: false,
   coursePace: PRIMARY_PACE,
-  hidePaceModal: jest.fn(),
+  hidePaceModal: vi.fn(),
 }
 
 beforeEach(() => {
@@ -50,7 +50,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   fakeENV.teardown()
   fetchMock.reset()
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {PlacementsConfirmationWrapper} from '../components/PlacementsConfirmationWrapper'
 import {mockInternalConfiguration} from './helpers'
@@ -26,12 +26,17 @@ import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('PlacementsConfirmationWrapper', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   describe('when lti_asset_processor and lti_asset_processor_discussions are enabled', () => {
     beforeEach(() => {
       fakeENV.setup({
         FEATURES: {
           lti_asset_processor: true,
           lti_asset_processor_discussions: true,
+          top_navigation_placement: true,
         },
       })
     })
@@ -58,6 +63,62 @@ describe('PlacementsConfirmationWrapper', () => {
     })
   })
 
+  describe('when top_navigation_placement feature flag is disabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: false,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('does not show top_navigation placement in available placements', () => {
+      const internalConfig = mockInternalConfiguration({placements: []})
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <PlacementsConfirmationWrapper
+          internalConfig={internalConfig}
+          overlayStore={overlayStore}
+        />,
+      )
+
+      expect(screen.queryByLabelText(i18nLtiPlacement('top_navigation'))).not.toBeInTheDocument()
+    })
+  })
+
+  describe('when top_navigation_placement feature flag is enabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          top_navigation_placement: true,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('shows top_navigation placement in available placements', () => {
+      const internalConfig = mockInternalConfiguration({placements: []})
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <PlacementsConfirmationWrapper
+          internalConfig={internalConfig}
+          overlayStore={overlayStore}
+        />,
+      )
+
+      expect(screen.getByLabelText(i18nLtiPlacement('top_navigation'))).toBeInTheDocument()
+    })
+  })
+
   it('marks placements as enabled according to the internal configuration', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}, {placement: 'global_navigation'}],
@@ -74,7 +135,7 @@ describe('PlacementsConfirmationWrapper', () => {
   })
 
   it('allows users to toggle placements on and off', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({delay: null})
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}],
     })
@@ -88,7 +149,9 @@ describe('PlacementsConfirmationWrapper', () => {
     expect(courseNavCheckbox).toBeChecked()
 
     await user.click(courseNavCheckbox)
-    expect(courseNavCheckbox).not.toBeChecked()
+    await waitFor(() => {
+      expect(courseNavCheckbox).not.toBeChecked()
+    })
   })
 
   it("renders a 'Default to Hidden' sub-checkbox for the Course Navigation placement when it's enabled", () => {
@@ -119,6 +182,7 @@ describe('PlacementsConfirmationWrapper', () => {
   })
 
   it("maintains the state of the 'Default to Hidden' checkbox through enabling/disabling", async () => {
+    const user = userEvent.setup({delay: null})
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}],
     })
@@ -133,21 +197,27 @@ describe('PlacementsConfirmationWrapper', () => {
 
     expect(defaultHiddenCheckbox).not.toBeChecked()
 
-    await userEvent.click(defaultHiddenCheckbox)
-    expect(defaultHiddenCheckbox).toBeChecked()
+    await user.click(defaultHiddenCheckbox)
+    await waitFor(() => {
+      expect(defaultHiddenCheckbox).toBeChecked()
+    })
 
-    await userEvent.click(courseNavCheckbox)
-    expect(courseNavCheckbox).not.toBeChecked()
-    expect(screen.queryByLabelText(/default to hidden/i)).not.toBeInTheDocument()
+    await user.click(courseNavCheckbox)
+    await waitFor(() => {
+      expect(courseNavCheckbox).not.toBeChecked()
+      expect(screen.queryByLabelText(/default to hidden/i)).not.toBeInTheDocument()
+    })
 
-    await userEvent.click(courseNavCheckbox)
-    expect(courseNavCheckbox).toBeChecked()
-
-    expect(screen.getByLabelText(/default to hidden/i)).toBeChecked()
+    await user.click(courseNavCheckbox)
+    await waitFor(() => {
+      expect(courseNavCheckbox).toBeChecked()
+    })
+    const restoredCheckbox = screen.getByLabelText(/default to hidden/i)
+    expect(restoredCheckbox).toBeChecked()
   })
 
   it('allows users to toggle the "Default to Hidden" checkbox for the Course Navigation placement', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({delay: null})
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}],
     })
@@ -161,7 +231,9 @@ describe('PlacementsConfirmationWrapper', () => {
     expect(defaultHiddenCheckbox).not.toBeChecked()
 
     await user.click(defaultHiddenCheckbox)
-    expect(defaultHiddenCheckbox).toBeChecked()
+    await waitFor(() => {
+      expect(defaultHiddenCheckbox).toBeChecked()
+    })
   })
 
   describe('when the increased_top_nav_pane_size FF is enabled', () => {
@@ -169,6 +241,7 @@ describe('PlacementsConfirmationWrapper', () => {
       fakeENV.setup({
         FEATURES: {
           increased_top_nav_pane_size: true,
+          top_navigation_placement: true,
         },
       })
     })
@@ -218,7 +291,7 @@ describe('PlacementsConfirmationWrapper', () => {
     })
 
     it('allows users to toggle the "Allow Fullscreen" checkbox for the Top Navigation placement', async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({delay: null})
       const internalConfig = mockInternalConfiguration({
         placements: [{placement: 'top_navigation'}],
       })
@@ -235,14 +308,18 @@ describe('PlacementsConfirmationWrapper', () => {
       expect(allowFullscreenCheckbox).not.toBeChecked()
 
       await user.click(allowFullscreenCheckbox)
-      expect(allowFullscreenCheckbox).toBeChecked()
+      await waitFor(() => {
+        expect(allowFullscreenCheckbox).toBeChecked()
+      })
 
       await user.click(allowFullscreenCheckbox)
-      expect(allowFullscreenCheckbox).not.toBeChecked()
+      await waitFor(() => {
+        expect(allowFullscreenCheckbox).not.toBeChecked()
+      })
     })
 
     it("doesn't render an 'Allow Fullscreen' checkbox if the Top Navigation placement is disabled", async () => {
-      const user = userEvent.setup()
+      const user = userEvent.setup({delay: null})
       const internalConfig = mockInternalConfiguration({
         placements: [{placement: 'top_navigation'}],
       })
@@ -267,6 +344,7 @@ describe('PlacementsConfirmationWrapper', () => {
     })
 
     it("maintains the state of the 'Allow Fullscreen' checkbox through enabling/disabling", async () => {
+      const user = userEvent.setup({delay: null})
       const internalConfig = mockInternalConfiguration({
         placements: [{placement: 'top_navigation'}],
       })
@@ -285,16 +363,16 @@ describe('PlacementsConfirmationWrapper', () => {
       expect(allowFullscreenCheckbox).not.toBeChecked()
 
       // Enable Allow Fullscreen
-      await userEvent.click(allowFullscreenCheckbox)
+      await user.click(allowFullscreenCheckbox)
       expect(allowFullscreenCheckbox).toBeChecked()
 
       // Disable Top Navigation placement
-      await userEvent.click(topNavCheckbox)
+      await user.click(topNavCheckbox)
       expect(topNavCheckbox).not.toBeChecked()
       expect(screen.queryByLabelText('Allow Fullscreen')).not.toBeInTheDocument()
 
       // Re-enable Top Navigation placement
-      await userEvent.click(topNavCheckbox)
+      await user.click(topNavCheckbox)
       expect(topNavCheckbox).toBeChecked()
 
       // Allow Fullscreen checkbox should reappear and maintain its checked state

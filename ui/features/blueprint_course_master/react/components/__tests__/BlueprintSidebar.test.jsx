@@ -23,11 +23,11 @@ import BlueprintSidebar from '../BlueprintSidebar'
 
 describe('BlueprintSidebar', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   test('renders the BlueprintSidebar component', () => {
@@ -43,7 +43,7 @@ describe('BlueprintSidebar', () => {
     await user.click(button)
 
     // Run all timers to completion for the tray animation
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     await waitFor(() => {
       const tray = document.querySelector('[role="dialog"][aria-label="Blueprint Settings"]')
@@ -58,7 +58,7 @@ describe('BlueprintSidebar', () => {
 
     // Open the tray first
     await user.click(openButton)
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     await waitFor(() => {
       const tray = document.querySelector('[role="dialog"][aria-label="Blueprint Settings"]')
@@ -68,7 +68,7 @@ describe('BlueprintSidebar', () => {
     // Now close it
     const closeButton = getByRole('button', {name: 'Close sidebar'})
     await user.click(closeButton)
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     await waitFor(() => {
       const tray = document.querySelector('[role="dialog"][aria-label="Blueprint Settings"]')

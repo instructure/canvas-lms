@@ -25,13 +25,13 @@ import {
   DeleteAllocationRuleInput,
   DeleteAllocationRuleResponse,
 } from '../../teacher/AssignmentTeacherTypes'
+import {executeQuery} from '@canvas/graphql'
 
-jest.mock('@canvas/graphql', () => ({
-  executeQuery: jest.fn(),
+vi.mock('@canvas/graphql', () => ({
+  executeQuery: vi.fn(),
 }))
 
-const {executeQuery} = require('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+const mockExecuteQuery = vi.mocked(executeQuery)
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -49,7 +49,7 @@ const createWrapper = () => {
 
 describe('useDeleteAllocationRule', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const mockInput: DeleteAllocationRuleInput = {
@@ -66,8 +66,8 @@ describe('useDeleteAllocationRule', () => {
 
       mockExecuteQuery.mockResolvedValueOnce(mockResponse)
 
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       const {result, waitForNextUpdate} = renderHook(
         () => useDeleteAllocationRule(onSuccess, onError),
@@ -92,8 +92,8 @@ describe('useDeleteAllocationRule', () => {
       const mockError = new Error('Allocation rule not found')
       mockExecuteQuery.mockRejectedValueOnce(mockError)
 
-      const onSuccess = jest.fn()
-      const onError = jest.fn()
+      const onSuccess = vi.fn()
+      const onError = vi.fn()
 
       const {result, waitForNextUpdate} = renderHook(
         () => useDeleteAllocationRule(onSuccess, onError),

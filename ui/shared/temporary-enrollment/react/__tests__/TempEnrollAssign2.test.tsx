@@ -43,11 +43,11 @@ import * as localStorageUtils from '../util/helpers'
 import {getDayBoundaries} from '../util/helpers'
 import MockDate from 'mockdate'
 
-const backCall = jest.fn()
+const backCall = vi.fn()
 
-jest.mock('../api/enrollment', () => ({
-  deleteEnrollment: jest.fn(),
-  getTemporaryEnrollmentPairing: jest.fn(),
+vi.mock('../api/enrollment', () => ({
+  deleteEnrollment: vi.fn(),
+  getTemporaryEnrollmentPairing: vi.fn(),
 }))
 
 const falsePermissions = {
@@ -114,7 +114,7 @@ const props: Props = {
     },
   ],
   goBack: backCall,
-  setEnrollmentStatus: jest.fn(),
+  setEnrollmentStatus: vi.fn(),
   doSubmit: () => false,
   isInAssignEditMode: false,
   enrollmentType: PROVIDER,
@@ -145,7 +145,7 @@ describe('TempEnrollAssign', () => {
   afterEach(() => {
     fetchMock.reset()
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // ensure a clean state before each tests
     localStorage.clear()
   })
@@ -200,7 +200,7 @@ describe('TempEnrollAssign', () => {
         ...props,
         tempEnrollmentsPairing: tempEnrollmentsPairingMock,
       }
-      ;(getTemporaryEnrollmentPairing as jest.Mock).mockResolvedValue({
+      ;(getTemporaryEnrollmentPairing as any).mockResolvedValue({
         response: {status: 204, ok: true},
         json: {
           temporary_enrollment_pairing: {
@@ -400,7 +400,7 @@ describe('TempEnrollAssign', () => {
           role_id: '20',
         },
       ]
-      ;(deleteEnrollment as jest.Mock).mockResolvedValue({
+      ;(deleteEnrollment as any).mockResolvedValue({
         response: {status: 204, ok: true},
         json: [],
       })
@@ -442,7 +442,7 @@ describe('TempEnrollAssign', () => {
     let mockRoles: Role[]
 
     function mockGetFromLocalStorage<T extends object>(data: T | undefined) {
-      jest
+      vi
         .spyOn(localStorageUtils, 'getFromLocalStorage')
         .mockImplementation((storageKey: string) =>
           storageKey === tempEnrollAssignData ? data : undefined,

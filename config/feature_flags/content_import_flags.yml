@@ -9,3 +9,8 @@ skip_reactivating_deleted_attachments:
   applies_to: RootAccount
   display_name: Skip reactivating deleted attachments on import
   description: When enabled, importing course content attachments will not reactivate previously deleted ones
+selective_content_tag_export:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Selective Content Tag Export
+  description: When enabled, allows selective export of content tags within a module during content shares. Only shared module items are exported, not the entire module.

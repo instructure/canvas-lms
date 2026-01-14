@@ -126,27 +126,6 @@ describe Types::UserType do
     end
   end
 
-  context "name" do
-    it "encodes html entities" do
-      @student.update! name: "<script>alert(1)</script>"
-      expect(user_type.resolve("name")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
-    end
-  end
-
-  context "firstName" do
-    it "encodes html entities" do
-      @student.update! sortable_name: "<script>alert(1)</script>"
-      expect(user_type.resolve("firstName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
-    end
-  end
-
-  context "lastName" do
-    it "encodes html entities" do
-      @student.update! sortable_name: "<script>alert(1)</script>,<script>alert(1)</script>"
-      expect(user_type.resolve("lastName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
-    end
-  end
-
   context "shortName" do
     before(:once) do
       @student.update! short_name: "new display name"
@@ -159,18 +138,6 @@ describe Types::UserType do
     it "returns full name if shortname is not set" do
       @student.update! short_name: nil
       expect(user_type.resolve("shortName")).to eq @student.name
-    end
-
-    it "encodes html entities" do
-      @student.update! short_name: "<script>alert(1)</script>"
-      expect(user_type.resolve("shortName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
-    end
-  end
-
-  context "sortableName" do
-    it "encodes html entities" do
-      @student.update! sortable_name: "<script>alert(1)</script>"
-      expect(user_type.resolve("sortableName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
     end
   end
 
@@ -2140,49 +2107,6 @@ describe Types::UserType do
       end
     end
 
-    describe "with the limit argument" do
-      before do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
-      end
-
-      it "returns a limited number of results" do
-        comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
-        expect(
-          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }").length
-        ).to eq 1
-      end
-
-      context "with send_metrics_for_comment_bank_items_connection_limit_used ON" do
-        before do
-          Account.site_admin.enable_feature!(:send_metrics_for_comment_bank_items_connection_limit_used)
-        end
-
-        it "reports metrics when limit is used" do
-          comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
-          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }")
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
-            "graphql.user_type.comment_bank_items_connection.limit_used",
-            { tags: { cluster: "test" } }
-          )
-        end
-      end
-
-      context "with send_metrics_for_comment_bank_items_connection_limit_used OFF" do
-        before do
-          Account.site_admin.disable_feature!(:send_metrics_for_comment_bank_items_connection_limit_used)
-        end
-
-        it "does not report metrics when limit is used" do
-          comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
-          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }")
-          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with(
-            "graphql.user_type.comment_bank_items_connection.limit_used",
-            anything
-          )
-        end
-      end
-    end
-
     describe "with a search query" do
       before do
         @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: "new comment!")
@@ -2204,78 +2128,6 @@ describe Types::UserType do
         expect(
           type.resolve("commentBankItemsConnection(query: \"  \") { nodes { _id } }").length
         ).to eq 2
-      end
-    end
-  end
-
-  context "commentBankItemsCount" do
-    specs_require_sharding
-
-    before do
-      @comment_bank_item_one = comment_bank_item_model(user: @teacher, context: @course, comment: "great comment!")
-      @comment_bank_item_two = comment_bank_item_model(user: @teacher, context: @course, comment: "another comment!")
-    end
-
-    let(:type) do
-      GraphQLTypeTester.new(
-        @teacher,
-        current_user: @teacher,
-        domain_root_account: @course.account.root_account,
-        request: ActionDispatch::TestRequest.create
-      )
-    end
-
-    it "returns the count of comment bank items" do
-      expect(type.resolve("commentBankItemsCount")).to eq 2
-    end
-
-    it "ignores deleted comment bank items" do
-      @comment_bank_item_one.destroy
-      expect(type.resolve("commentBankItemsCount")).to eq 1
-    end
-
-    it "accounts for comment bank items on different shards" do
-      @shard1.activate do
-        account = Account.create!(name: "new shard account")
-        @course2 = course_factory(account:)
-        @course2.enroll_user(@teacher)
-        @comment_bank_item_three = comment_bank_item_model(user: @teacher, context: @course2, comment: "shard 2 comment")
-      end
-
-      expect(type.resolve("commentBankItemsCount")).to eq 3
-    end
-
-    describe "metrics tracking" do
-      before do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
-      end
-
-      context "with send_metrics_for_comment_bank_items_count_used ON" do
-        before do
-          Account.site_admin.enable_feature!(:send_metrics_for_comment_bank_items_count_used)
-        end
-
-        it "reports metrics when commentBankItemsCount is used" do
-          type.resolve("commentBankItemsCount")
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
-            "graphql.user_type.comment_bank_items_count_used",
-            { tags: { cluster: "test" } }
-          )
-        end
-      end
-
-      context "with send_metrics_for_comment_bank_items_count_used OFF" do
-        before do
-          Account.site_admin.disable_feature!(:send_metrics_for_comment_bank_items_count_used)
-        end
-
-        it "does not report metrics when commentBankItemsCount is used" do
-          type.resolve("commentBankItemsCount")
-          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with(
-            "graphql.user_type.comment_bank_items_count_used",
-            anything
-          )
-        end
       end
     end
   end
@@ -3757,7 +3609,7 @@ describe Types::UserType do
       @course.enroll_student(@student1, enrollment_state: "active")
       @course.enroll_student(@student2, enrollment_state: "active")
 
-      @course.enable_feature!(:peer_review_allocation)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
 
       AllocationRule.create!(
         assignment: @assignment,
@@ -3826,7 +3678,7 @@ describe Types::UserType do
       end
 
       it "returns nil when feature is not enabled" do
-        @assignment.context.disable_feature!(:peer_review_allocation)
+        @assignment.context.disable_feature!(:peer_review_allocation_and_grading)
 
         user_type_tester = GraphQLTypeTester.new(
           @student1,

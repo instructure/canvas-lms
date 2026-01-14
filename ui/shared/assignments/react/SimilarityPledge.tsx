@@ -35,17 +35,17 @@ function eulaHTML(eulaUrl: string) {
 }
 
 type SimilarityPledgeProps = {
-  inputId?: string,
+  inputId?: string
   pledgeText: string
-  setShouldShowPledgeError: (showShow: boolean, type?: string) => {},
-  checked?: boolean,
-  eulaUrl?: string,
-  comments?: string,
-  shouldShowPledgeError?: boolean,
-  onChange?: () => void,
-  getShouldShowPledgeError?: (type?: string) => boolean | void,
-  getIsChecked?: () => boolean | void,
-  checkboxRef?: LegacyRef<Checkbox>,
+  setShouldShowPledgeError: (showShow: boolean, type?: string) => {}
+  checked?: boolean
+  eulaUrl?: string
+  comments?: string
+  shouldShowPledgeError?: boolean
+  onChange?: () => void
+  getShouldShowPledgeError?: (type?: string) => boolean | void
+  getIsChecked?: () => boolean | void
+  checkboxRef?: LegacyRef<Checkbox>
   type?: string
 }
 
@@ -60,9 +60,8 @@ const SimilarityPledge = ({
   checked = false,
   shouldShowPledgeError = undefined,
   checkboxRef = null,
-  type = ''
+  type = '',
 }: SimilarityPledgeProps) => {
-
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>([])
   const [isChecked, setIsChecked] = useState<boolean>(checked)
 
@@ -81,13 +80,24 @@ const SimilarityPledge = ({
 
   useEffect(() => {
     if (shouldShowPledgeError) {
-      setErrorMessages([{type: 'newError', text: I18n.t('You must agree to the submission pledge before you can submit the assignment')}])
+      setErrorMessages([
+        {
+          type: 'newError',
+          text: I18n.t(
+            'You must agree to the submission pledge before you can submit the assignment',
+          ),
+        },
+      ])
     }
   }, [shouldShowPledgeError])
 
   useEffect(() => {
     // We remove the required attribute here so we do not get native validations
-    document.querySelector(`#turnitin_pledge_container${type ? '_' + type : ''} input[name="turnitin_pledge"]`)?.removeAttribute('required')
+    document
+      .querySelector(
+        `#turnitin_pledge_container${type ? '_' + type : ''} input[name="turnitin_pledge"]`,
+      )
+      ?.removeAttribute('required')
   }, [type])
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +112,14 @@ const SimilarityPledge = ({
 
   const handleFocus = (_e: React.FocusEvent<HTMLInputElement>) => {
     if (getShouldShowPledgeError(type) && !isChecked) {
-      setErrorMessages([{type: 'newError', text: I18n.t('You must agree to the submission pledge before you can submit the assignment')}])
+      setErrorMessages([
+        {
+          type: 'newError',
+          text: I18n.t(
+            'You must agree to the submission pledge before you can submit the assignment',
+          ),
+        },
+      ])
       // reset the value
       setShouldShowPledgeError(false, type)
     }
@@ -129,7 +146,7 @@ const SimilarityPledge = ({
         onFocus={handleFocus}
         messages={errorMessages}
         isRequired={true}
-        name='turnitin_pledge'
+        name="turnitin_pledge"
       />
     </View>
   )

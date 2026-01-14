@@ -185,8 +185,8 @@ describe "context_modules/index" do
       @module_item_two.publish! if @module_item_two.unpublished?
     end
 
-    it "shows the list of assessment requests when peer_reviews_for_a2 FF is ON" do
-      @course.enable_feature! :peer_reviews_for_a2
+    it "shows the list of assessment requests when assignments_2_student FF is ON" do
+      @course.enable_feature! :assignments_2_student
 
       view_context(@course, @reviewer)
       assign(:modules, @course.context_modules.active)
@@ -198,7 +198,7 @@ describe "context_modules/index" do
     end
 
     it "shows the same assignment in two differenct context_modules" do
-      @course.enable_feature! :peer_reviews_for_a2
+      @course.enable_feature! :assignments_2_student
 
       view_context(@course, @reviewer)
       assign(:modules, @course.context_modules.active)
@@ -212,8 +212,8 @@ describe "context_modules/index" do
       expect(page.include?("module_student_view_peer_reviews_#{@module_item_two.content_id}_#{@module_item_two.context_module_id}")).to be true
     end
 
-    it "does not show the list of assessment requests when peer_reviews_for_a2 FF is OFF" do
-      @course.disable_feature! :peer_reviews_for_a2
+    it "does not show the list of assessment requests when assignments_2_student FF is OFF" do
+      @course.disable_feature! :assignments_2_student
 
       view_context(@course, @reviewer)
       assign(:modules, @course.context_modules.active)

@@ -138,4 +138,4 @@ new_quizzes_native_experience:
   description: When enabled, New Quizzes opens directly within Canvas for a smoother experience.
   state: hidden
   shadow: true
-  applies_to: RootAccount
+  applies_to: Course

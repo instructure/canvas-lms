@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/calendarNavigator.handlebars'
 import React from 'react'

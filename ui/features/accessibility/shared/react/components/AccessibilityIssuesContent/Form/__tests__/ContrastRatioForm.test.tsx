@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ContrastRatioForm from '../ContrastRatioForm'
 
 describe('ContrastRatioForm', () => {
-  const mockOnChange = jest.fn()
+  afterEach(() => {
+    cleanup()
+  })
+
+  const mockOnChange = vi.fn()
 
   const user = userEvent.setup()
   const defaultProps = {
@@ -128,7 +132,7 @@ describe('ContrastRatioForm', () => {
       ...defaultProps,
       options: ['normal'],
       backgroundColor: '#FFFFFF',
-      foregroundColor: '#000000',
+      foregroundColor: '#FF0000', // Start with a different color to ensure we're testing an actual change
     }
     render(<ContrastRatioForm {...propsWithNormal} />)
 
@@ -164,7 +168,7 @@ describe('ContrastRatioForm', () => {
       ...defaultProps,
       options: ['large'],
       backgroundColor: '#FFFFFF',
-      foregroundColor: '#777777',
+      foregroundColor: '#000000', // Start with a different color to ensure we're testing an actual change
     }
     render(<ContrastRatioForm {...propsWithLarge} />)
 

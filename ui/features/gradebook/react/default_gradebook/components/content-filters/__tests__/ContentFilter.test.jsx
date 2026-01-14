@@ -32,7 +32,7 @@ describe('ContentFilter', () => {
       {id: '2', name: 'Item 2'},
     ],
     label: 'Example Filter',
-    onSelect: jest.fn(),
+    onSelect: vi.fn(),
     selectedItemId: 'all',
   }
 
@@ -41,7 +41,7 @@ describe('ContentFilter', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('labels the filter using the given label', () => {

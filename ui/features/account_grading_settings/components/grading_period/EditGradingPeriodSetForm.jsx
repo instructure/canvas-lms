@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {each, map, filter, isEmpty} from 'lodash'
+import {each, map, filter, isEmpty} from 'es-toolkit/compat'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'

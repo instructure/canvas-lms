@@ -16,64 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Outcome, OutcomeRollup} from '../../types/rollup'
+import {Outcome} from '../../types/rollup'
 import {svgUrl} from '../../utils/icons'
 import {ScoreDisplayFormat} from '../../utils/constants'
+import {findRating} from '../../utils/ratings'
+import {ScoreWithLabel} from './ScoreWithLabel'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
 export interface StudentOutcomeScoreProps {
   outcome: Outcome
-  rollup?: OutcomeRollup
+  score?: number
   scoreDisplayFormat?: ScoreDisplayFormat
 }
 
-interface RenderLabelProps {
-  scoreDisplayFormat: ScoreDisplayFormat
-  rollup?: OutcomeRollup
-}
-
-const StudentOutcomeScoreLabel: React.FC<RenderLabelProps> = ({scoreDisplayFormat, rollup}) => {
-  if (scoreDisplayFormat === ScoreDisplayFormat.ICON_AND_LABEL) {
-    return <Text size="legend">{rollup?.rating?.description || I18n.t('Unassessed')}</Text>
-  }
-
-  if (scoreDisplayFormat === ScoreDisplayFormat.ICON_AND_POINTS) {
-    return <Text size="legend">{rollup?.score}</Text>
-  }
-
-  return (
-    <ScreenReaderContent>{rollup?.rating?.description || I18n.t('Unassessed')}</ScreenReaderContent>
-  )
-}
-
-export const StudentOutcomeScore: React.FC<StudentOutcomeScoreProps> = ({
+const StudentOutcomeScoreComponent: React.FC<StudentOutcomeScoreProps> = ({
   outcome,
-  rollup,
+  score,
   scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
 }) => {
-  const justifyItems = scoreDisplayFormat === ScoreDisplayFormat.ICON_ONLY ? 'center' : 'start'
+  const rating = score !== undefined ? findRating(outcome.ratings, score) : undefined
 
   return (
-    <Flex
-      width="100%"
-      height="100%"
-      alignItems="center"
-      justifyItems={justifyItems}
-      gap="small"
-      padding="none medium-small"
-    >
-      <SVGWrapper
-        fillColor={rollup?.rating?.color}
-        url={svgUrl(rollup?.rating?.points, outcome.mastery_points)}
-        style={{display: 'flex', alignItems: 'center', justifyItems: 'center', padding: '0px'}}
-      />
-      <StudentOutcomeScoreLabel scoreDisplayFormat={scoreDisplayFormat} rollup={rollup} />
-    </Flex>
+    <ScoreWithLabel
+      icon={
+        <SVGWrapper
+          fillColor={rating?.color}
+          url={svgUrl(rating?.points, outcome.mastery_points)}
+          style={{display: 'flex', alignItems: 'center', justifyItems: 'center', padding: '0px'}}
+        />
+      }
+      score={score}
+      scoreDisplayFormat={scoreDisplayFormat}
+      label={rating?.description || I18n.t('Unassessed')}
+    />
   )
 }
+
+export const StudentOutcomeScore = React.memo(StudentOutcomeScoreComponent)

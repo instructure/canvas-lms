@@ -31,7 +31,7 @@ export default function useNavigateEntries({
   perPage = 20,
   sort = '',
 } = {}) {
-  const {isInSpeedGrader} = useSpeedGrader()
+  const {isInSpeedGrader, postMessageEntryIds} = useSpeedGrader()
   const [currentStudentId, setCurrentStudentId] = useState(null)
   const STUDENT_ENTRIES_PER_PAGE = 100
 
@@ -71,6 +71,12 @@ export default function useNavigateEntries({
       return sort === 'desc' ? bNum - aNum : aNum - bNum
     })
   }, [currentStudentId, studentEntriesQuery.data, studentEntriesQuery.isLoading, sort])
+
+  useEffect(() => {
+    if (sortedStudentEntries.length > 0) {
+      postMessageEntryIds(sortedStudentEntries.map(entry => entry._id))
+    }
+  }, [sortedStudentEntries, postMessageEntryIds])
 
   const navigateToEntry = useCallback(
     newEntry => {

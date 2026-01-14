@@ -15,13 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useState, useCallback, Fragment} from 'react'
+import {DragDropContext} from 'react-dnd'
+import ReactDnDHTML5Backend from 'react-dnd-html5-backend'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {StudentCell} from './grid/StudentCell'
-import {OutcomeHeader} from './grid/OutcomeHeader'
 import {StudentHeader} from './grid/StudentHeader'
 import {ScoresGrid} from './grid/ScoresGrid'
+import {OutcomeHeader} from './grid/OutcomeHeader'
+import {OutcomeHeadersContainer} from './grid/OutcomeHeadersContainer'
 import {
   COLUMN_WIDTH,
   STUDENT_COLUMN_WIDTH,
@@ -36,6 +39,9 @@ import {
 import {Student, Outcome, StudentRollupData, Pagination as PaginationType} from '../types/rollup'
 import {GradebookPagination} from './pagination/GradebookPagination'
 import {Sorting} from '../types/shapes'
+import DragDropWrapper from './grid/DragDropWrapper'
+import {ContributingScoreAlignment, ContributingScoresManager} from '../hooks/useContributingScores'
+import {ContributingScoreHeader} from './grid/ContributingScoreHeader'
 
 export interface GradebookProps {
   courseId: string
@@ -47,21 +53,58 @@ export interface GradebookProps {
   sorting: Sorting
   gradebookSettings?: GradebookSettings
   onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
+  onOutcomesReorder?: (orderedOutcomes: Outcome[]) => void
+  contributingScores: ContributingScoresManager
+  onOpenStudentAssignmentTray?: (
+    outcome: Outcome,
+    student: Student,
+    alignmentIndex: number,
+    alignments: ContributingScoreAlignment[],
+  ) => void
 }
 
-export const Gradebook: React.FC<GradebookProps> = ({
+const GradebookComponent: React.FC<GradebookProps> = ({
   courseId,
   students,
-  outcomes,
+  outcomes: initialOutcomes,
   rollups,
   pagination,
   setCurrentPage,
   sorting,
   gradebookSettings = DEFAULT_GRADEBOOK_SETTINGS,
   onChangeNameDisplayFormat,
+  onOutcomesReorder,
+  contributingScores,
+  onOpenStudentAssignmentTray,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
+  const [outcomes, setOutcomes] = useState<Outcome[]>(initialOutcomes)
+
+  useEffect(() => {
+    setOutcomes(initialOutcomes)
+  }, [initialOutcomes])
+
+  const handleOutcomeMove = useCallback((outcomeId: string | number, hoverIndex: number) => {
+    setOutcomes(prevOutcomes => {
+      const dragIndex = prevOutcomes.findIndex(o => o.id.toString() === outcomeId.toString())
+      if (dragIndex === -1 || dragIndex === hoverIndex) return prevOutcomes
+
+      const reorderedOutcomes = [...prevOutcomes]
+      const [draggedOutcome] = reorderedOutcomes.splice(dragIndex, 1)
+      reorderedOutcomes.splice(hoverIndex, 0, draggedOutcome)
+
+      return reorderedOutcomes
+    })
+  }, [])
+
+  const handleOutcomeDragEnd = useCallback(() => {
+    onOutcomesReorder?.(outcomes)
+  }, [outcomes, onOutcomesReorder])
+
+  const handleOutcomeDragLeave = useCallback(() => {
+    setOutcomes(initialOutcomes)
+  }, [initialOutcomes])
 
   useEffect(() => {
     const handleGridScroll = (e: Event) => {
@@ -94,23 +137,59 @@ export const Gradebook: React.FC<GradebookProps> = ({
           </View>
         </Flex.Item>
         <Flex.Item size={`${STUDENT_COLUMN_RIGHT_PADDING}px`} />
-        <View
-          as="div"
-          display="flex"
-          id="outcomes-header"
-          overflowX="hidden"
-          elementRef={el => {
-            if (el instanceof HTMLElement) {
-              headerRow.current = el
-            }
-          }}
-        >
-          {outcomes.map((outcome, index) => (
-            <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={`${outcome.id}.${index}`}>
-              <OutcomeHeader outcome={outcome} sorting={sorting} />
-            </Flex.Item>
-          ))}
-        </View>
+        <OutcomeHeadersContainer onDragLeave={handleOutcomeDragLeave}>
+          {connectDropTarget => (
+            <View
+              as="div"
+              display="flex"
+              id="outcomes-header"
+              overflowX="hidden"
+              elementRef={el => {
+                if (el instanceof HTMLElement) {
+                  headerRow.current = el
+                  connectDropTarget(el)
+                }
+              }}
+            >
+              {outcomes.map((outcome, index) => {
+                const contributingScoreForOutcome = contributingScores.forOutcome(outcome.id)
+                return (
+                  <Fragment key={outcome.id}>
+                    <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}>
+                      <DragDropWrapper
+                        component={OutcomeHeader}
+                        type="outcome-header"
+                        itemId={outcome.id}
+                        index={index}
+                        outcome={outcome}
+                        sorting={sorting}
+                        contributingScoresForOutcome={contributingScoreForOutcome}
+                        onMove={handleOutcomeMove}
+                        onDragEnd={handleOutcomeDragEnd}
+                      />
+                    </Flex.Item>
+
+                    {contributingScoreForOutcome.isVisible() &&
+                      (contributingScoreForOutcome.alignments || []).map(
+                        (alignment: ContributingScoreAlignment) => (
+                          <Flex.Item
+                            key={`alignment-${alignment.alignment_id}`}
+                            size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
+                          >
+                            <ContributingScoreHeader
+                              alignment={alignment}
+                              courseId={courseId}
+                              sorting={sorting}
+                            />
+                          </Flex.Item>
+                        ),
+                      )}
+                  </Fragment>
+                )
+              })}
+            </View>
+          )}
+        </OutcomeHeadersContainer>
       </Flex>
       <View display="flex">
         <View as="div" minWidth={STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING}>
@@ -147,13 +226,14 @@ export const Gradebook: React.FC<GradebookProps> = ({
               gridRef.current = el
             }
           }}
-          width={outcomes.length * COLUMN_WIDTH}
         >
           <ScoresGrid
             students={students}
             outcomes={outcomes}
             rollups={rollups}
             scoreDisplayFormat={gradebookSettings.scoreDisplayFormat}
+            contributingScores={contributingScores}
+            onOpenStudentAssignmentTray={onOpenStudentAssignmentTray}
           />
         </View>
       </View>
@@ -163,3 +243,7 @@ export const Gradebook: React.FC<GradebookProps> = ({
     </>
   )
 }
+
+export const Gradebook = DragDropContext(ReactDnDHTML5Backend)(
+  GradebookComponent,
+) as React.ComponentType<GradebookProps>

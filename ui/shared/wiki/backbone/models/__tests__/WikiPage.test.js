@@ -17,7 +17,7 @@
  */
 
 import WikiPage from '../WikiPage'
-import _ from 'lodash'
+import {isObject} from 'es-toolkit/compat'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (a, b) => expect(a).toEqual(b)
@@ -96,7 +96,7 @@ describe('WikiPage', () => {
       const namespacedObj = {}
       namespacedObj.wiki_page = wikiPageObj()
       const parseResponse = wikiPage.parse(namespacedObj)
-      ok(!_.isObject(parseResponse.wiki_page), 'Removes the wiki_page namespace')
+      ok(!isObject(parseResponse.wiki_page), 'Removes the wiki_page namespace')
     })
 
     test('present includes the context information', () => {
@@ -108,7 +108,7 @@ describe('WikiPage', () => {
 
     test('publish convenience method', () => {
       const wikiPage = new WikiPage(wikiPageObj())
-      wikiPage.save = jest.fn(attributes => {
+      wikiPage.save = vi.fn(attributes => {
         ok(attributes, 'attributes present')
         ok(attributes.wiki_page, 'wiki_page present')
         strictEqual(attributes.wiki_page.published, true, 'published provided correctly')
@@ -119,7 +119,7 @@ describe('WikiPage', () => {
 
     test('unpublish convenience method', () => {
       const wikiPage = new WikiPage(wikiPageObj())
-      wikiPage.save = jest.fn(attributes => {
+      wikiPage.save = vi.fn(attributes => {
         ok(attributes, 'attributes present')
         ok(attributes.wiki_page, 'wiki_page present')
         strictEqual(attributes.wiki_page.published, false, 'published provided correctly')
@@ -130,7 +130,7 @@ describe('WikiPage', () => {
 
     test('setFrontPage convenience method', () => {
       const wikiPage = new WikiPage(wikiPageObj())
-      wikiPage.save = jest.fn(attributes => {
+      wikiPage.save = vi.fn(attributes => {
         ok(attributes, 'attributes present')
         ok(attributes.wiki_page, 'wiki_page present')
         strictEqual(attributes.wiki_page.front_page, true, 'front_page provided correctly')
@@ -141,7 +141,7 @@ describe('WikiPage', () => {
 
     test('unsetFrontPage convenience method', () => {
       const wikiPage = new WikiPage(wikiPageObj())
-      wikiPage.save = jest.fn(attributes => {
+      wikiPage.save = vi.fn(attributes => {
         ok(attributes, 'attributes present')
         ok(attributes.wiki_page, 'wiki_page present')
         strictEqual(attributes.wiki_page.front_page, false, 'front_page provided correctly')

@@ -26,15 +26,15 @@ import {MockedProvider} from '@apollo/client/testing'
 import {createCache} from '../../../../shared/apollo-v3'
 import {smallOutcomeTree} from '../../../../shared/outcomes/mocks/Management'
 
-jest.mock('@canvas/rce/RichContentEditor')
-jest.mock('@canvas/outcomes/react/ImportOutcomesModal')
-jest.mock('../CreateOutcomeModal')
+vi.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/outcomes/react/ImportOutcomesModal')
+vi.mock('../CreateOutcomeModal')
 CreateOutcomeModal.mockImplementation(({starterGroupId = ''}) => (
   <div>
     CreateOutcomeModal <span>{starterGroupId}</span>
   </div>
 ))
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 let cache
 
@@ -77,15 +77,15 @@ describe('ManagementHeader', () => {
   })
 
   beforeEach(() => {
-    handleAddOutcomesMock = jest.fn()
-    setTargetGroupIdsToRefetchMock = jest.fn()
-    setImportsTargetGroupMock = jest.fn()
+    handleAddOutcomesMock = vi.fn()
+    setTargetGroupIdsToRefetchMock = vi.fn()
+    setImportsTargetGroupMock = vi.fn()
     cache = createCache()
   })
 
   afterEach(() => {
     showImportOutcomesModal.mockRestore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     showImportOutcomesModal.mockRestore()
   })
 
@@ -158,7 +158,7 @@ describe('ManagementHeader', () => {
   it('opens FindOutcomesModal when Find button is clicked', async () => {
     const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Find'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
   })
 
@@ -172,7 +172,7 @@ describe('ManagementHeader', () => {
   it('opens CreateOutcomeModal when Create button is clicked', async () => {
     const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Create'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(CreateOutcomeModal).toHaveBeenCalled()
     expect(getByText('CreateOutcomeModal')).toBeInTheDocument()
   })
@@ -241,7 +241,7 @@ describe('ManagementHeader', () => {
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Find'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
     })
 
@@ -251,7 +251,7 @@ describe('ManagementHeader', () => {
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Create'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(CreateOutcomeModal).toHaveBeenCalled()
       expect(getByText('CreateOutcomeModal')).toBeInTheDocument()
     })
@@ -264,9 +264,9 @@ describe('ManagementHeader', () => {
       const {queryByText} = render(<ManagementHeader {...defaultProps({lhsGroupId})} />, {
         mocks: smallOutcomeTree(),
       })
-      await act(async () => jest.runOnlyPendingTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       fireEvent.click(queryByText('Create'))
-      await act(async () => jest.runOnlyPendingTimers())
+      await act(async () => vi.runOnlyPendingTimers())
       expect(queryByText(lhsGroupId)).toBeInTheDocument()
     })
   })

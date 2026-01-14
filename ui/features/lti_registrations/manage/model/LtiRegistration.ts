@@ -29,6 +29,7 @@ import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
 import {ZLtiPrivacyLevel} from './LtiPrivacyLevel'
 import {ZInternalPlacementConfiguration} from './internal_lti_configuration/placement_configuration/InternalPlacementConfiguration'
+import {ZLtiRegistrationUpdateRequestId} from './lti_ims_registration/LtiRegistrationUpdateRequestId'
 
 export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
@@ -50,6 +51,8 @@ export const ZLtiRegistration = z.object({
   manual_configuration_id: ZLtiToolConfigurationId.nullable(),
   account_binding: ZLtiRegistrationAccountBinding.nullable().optional(),
   overlay: ZLtiOverlay.nullable().optional(),
+  pending_update: ZLtiRegistrationUpdateRequestId.nullable().optional(),
+  dynamic_registration_url: z.string().nullable().optional(),
 })
 
 export type LtiRegistration = z.infer<typeof ZLtiRegistration>

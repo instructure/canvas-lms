@@ -16,32 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {UsageRightsContainer} from '../UsageRightsContainer'
 
-jest.mock('../../../components/DiscussionOptions/UsageRights', () => ({
-  UsageRights: jest.fn(({initialUsageRights, errorState, creativeCommonsOptions}) => (
-    <div data-testid="usage-rights-mock">
-      <div data-testid="cc-options-length">{creativeCommonsOptions.length}</div>
-      <div data-testid="error-state">{errorState.toString()}</div>
-      <div data-testid="initial-rights">{JSON.stringify(initialUsageRights)}</div>
-    </div>
-  )),
+vi.mock('../../../components/DiscussionOptions/UsageRights', () => ({
+  UsageRights: vi.fn(({initialUsageRights, errorState, creativeCommonsOptions}) =>
+    React.createElement('div', {'data-testid': 'usage-rights-mock'}, [
+      React.createElement('div', {'data-testid': 'cc-options-length', key: '1'}, creativeCommonsOptions.length),
+      React.createElement('div', {'data-testid': 'error-state', key: '2'}, errorState.toString()),
+      React.createElement('div', {'data-testid': 'initial-rights', key: '3'}, JSON.stringify(initialUsageRights)),
+    ])
+  ),
 }))
 
 const mockAlertContext = {
-  setOnFailure: jest.fn(),
-  setOnSuccess: jest.fn(),
+  setOnFailure: vi.fn(),
+  setOnSuccess: vi.fn(),
 }
 
 const renderWithContext = (props = {}) => {
   const defaultProps = {
     contextType: 'course',
     contextId: '123',
-    onSaveUsageRights: jest.fn(),
+    onSaveUsageRights: vi.fn(),
     ...props,
   }
 
@@ -82,7 +83,7 @@ describe('UsageRightsContainer', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with default props', () => {
@@ -187,7 +188,7 @@ describe('UsageRightsContainer', () => {
   })
 
   it('passes onSaveUsageRights callback to UsageRights component', () => {
-    const mockSave = jest.fn()
+    const mockSave = vi.fn()
     const {getByTestId} = renderWithContext({onSaveUsageRights: mockSave})
 
     expect(getByTestId('usage-rights-mock')).toBeInTheDocument()
@@ -202,7 +203,7 @@ describe('UsageRightsContainer', () => {
 
     rerender(
       <AlertManagerContext.Provider value={mockAlertContext}>
-        <UsageRightsContainer contextType="course" contextId="123" onSaveUsageRights={jest.fn()} />
+        <UsageRightsContainer contextType="course" contextId="123" onSaveUsageRights={vi.fn()} />
       </AlertManagerContext.Provider>,
     )
 

@@ -294,6 +294,14 @@ class MediaObjectsController < ApplicationController
     @exclude_account_js = true
     @embeddable = true
 
+    @page_title = if @attachment
+                    t("video_player_with_filename", "Video Player - %{filename}", filename: @attachment.display_name)
+                  elsif @media_object
+                    t("video_player_with_filename", "Video Player - %{filename}", filename: @media_object.title)
+                  else
+                    t("video_player", "Video Player")
+                  end
+
     media_api_json = if @attachment && @media_object
                        media_attachment_api_json(
                          @attachment,

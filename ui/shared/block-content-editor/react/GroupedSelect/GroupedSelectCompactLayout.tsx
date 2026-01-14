@@ -20,10 +20,7 @@ import {ReactNode} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-export const GroupedSelectCompactLayout = (props: {
-  group: ReactNode
-  items: ReactNode
-}) => {
+export const GroupedSelectCompactLayout = (props: {group: ReactNode; items: ReactNode}) => {
   return (
     <Flex direction="column" gap="medium">
       <View width="100%">{props.group}</View>

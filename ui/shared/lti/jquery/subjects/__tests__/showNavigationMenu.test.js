@@ -19,8 +19,8 @@
 import handler from '../showNavigationMenu'
 import {showCourseNav} from '@canvas/courses/jquery/toggleCourseNav'
 
-jest.mock('@canvas/courses/jquery/toggleCourseNav', () => ({
-  showCourseNav: jest.fn(),
+vi.mock('@canvas/courses/jquery/toggleCourseNav', () => ({
+  showCourseNav: vi.fn(),
 }))
 
 describe('showNavigationMenu handler', () => {

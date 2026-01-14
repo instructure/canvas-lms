@@ -31,7 +31,7 @@ const TABS = [
 ]
 
 beforeAll(() => {
-  window.history.replaceState = jest.fn()
+  window.history.replaceState = vi.fn()
 })
 
 afterEach(() => {

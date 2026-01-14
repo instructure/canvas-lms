@@ -22,4 +22,5 @@ group :development, :test do
   gem "bluecloth", "2.2.0" # for generating api docs
   gem "yard", "~> 0.9"
   gem "yard-appendix", "0.1.8"
+  gem "swagger_yard", "~> 1.1" # for generating OpenAPI 3.0 specs
 end

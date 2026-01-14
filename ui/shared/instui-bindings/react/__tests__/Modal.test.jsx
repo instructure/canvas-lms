@@ -23,16 +23,16 @@ import CanvasModal from '../Modal'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock jQuery to prevent flashError errors from unrelated components
-jest.mock('jquery', () => {
+vi.mock('jquery', () => {
   const jQueryMock = {
-    flashError: jest.fn(),
-    Deferred: jest.fn(() => ({
-      resolve: jest.fn(),
-      reject: jest.fn(),
-      promise: jest.fn(),
+    flashError: vi.fn(),
+    Deferred: vi.fn(() => ({
+      resolve: vi.fn(),
+      reject: vi.fn(),
+      promise: vi.fn(),
     })),
   }
-  return jest.fn(() => jQueryMock)
+  return vi.fn(() => jQueryMock)
 })
 
 describe('CanvasModal', () => {
@@ -44,7 +44,7 @@ describe('CanvasModal', () => {
     fakeENV.teardown()
   })
   it('renders a header, close button, and children', async () => {
-    const handleDismiss = jest.fn()
+    const handleDismiss = vi.fn()
     render(
       <CanvasModal
         open={true}

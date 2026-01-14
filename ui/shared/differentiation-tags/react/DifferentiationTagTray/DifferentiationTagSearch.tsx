@@ -20,7 +20,7 @@ import React, {useState, useEffect, useMemo} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconSearchLine} from '@instructure/ui-icons'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('differentiation_tags')

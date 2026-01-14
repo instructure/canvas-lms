@@ -25,7 +25,7 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ConfigurationForm from '../configuration_forms/ConfigurationForm'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 const renderForm = (props: object) => {
   return render(<ConfigurationForm {...props} />)
@@ -41,10 +41,10 @@ const getMembershipServiceCheckbox = () => {
   )
 }
 
-const handleSubmitMock = jest.fn()
+const handleSubmitMock = vi.fn()
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 // Pasting is much faster than typing, and we don't need

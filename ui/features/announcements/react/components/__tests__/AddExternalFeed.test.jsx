@@ -74,7 +74,7 @@ test('closes the tray when cancel button is clicked', async () => {
 
 test('submits feed with correct data when form is filled and submitted', async () => {
   const user = userEvent.setup()
-  const addFeedSpy = jest.fn()
+  const addFeedSpy = vi.fn()
   const props = defaultProps()
   props.defaultOpen = true
   props.addExternalFeed = addFeedSpy

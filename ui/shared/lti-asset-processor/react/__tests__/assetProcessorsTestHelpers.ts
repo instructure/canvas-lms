@@ -96,20 +96,14 @@ function makeMockTools(contribution = false): LtiLaunchDefinition[] {
   ]
 }
 
-export function mockDoFetchApi(expectedPath: string, doFetchApi: jest.Mock) {
-  return doFetchApi.mockImplementation(async (...args: any[]) => {
-    const {path, params} = args[0] as any
-    if (path === expectedPath) {
-      return {
-        response: {ok: true, statusText: 'OK'},
-        json:
-          params['placements[]'] === 'ActivityAssetProcessor'
-            ? mockToolsForAssignment
-            : mockToolsForDiscussions,
-      }
-    }
-    throw new Error(`Unexpected path: ${path}`)
-  })
+// MSW handler for asset processor tools
+export function createAssetProcessorMswHandler(courseId: number = 123) {
+  const path = `/api/v1/courses/${courseId}/lti_apps/launch_definitions`
+  return (req: any) => {
+    const url = new URL(req.request.url)
+    const placements = url.searchParams.get('placements[]')
+    return placements === 'ActivityAssetProcessor' ? mockToolsForAssignment : mockToolsForDiscussions
+  }
 }
 
 export const mockToolsForAssignment = makeMockTools(false)

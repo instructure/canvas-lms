@@ -99,9 +99,29 @@ module Api::V1::DiscussionTopics
         :attachment,
         :context,
         :root_topic,
-        :user
+        :user,
+        { discussion_topic_section_visibilities: :course_section }
       ]
     )
+
+    # preload enrollment counts for sections to avoid N+1 queries when include_sections_user_count is true
+    if opts[:include_sections_user_count] && context.is_a?(Course)
+      section_ids = topics.flat_map do |topic|
+        topic.is_section_specific ? topic.course_sections.map(&:id) : []
+      end.uniq
+
+      if section_ids.any?
+        section_user_counts = GuardRail.activate(:secondary) do
+          Enrollment
+            .where(course_section_id: section_ids)
+            .not_fake
+            .active_or_pending_by_date_ignoring_access
+            .group(:course_section_id)
+            .count
+        end
+        opts[:section_user_counts] = section_user_counts
+      end
+    end
 
     # we're gonna preload only the current user's discussion_topic_participant
     if user
@@ -114,6 +134,29 @@ module Api::V1::DiscussionTopics
         # we're manually injecting user's participant
         topic.association(:discussion_topic_participants).target = participant ? [participant] : []
         topic.association(:discussion_topic_participants).loaded!
+      end
+    end
+
+    # preload child_topic data for root topics to avoid N+1 queries in subscribed? and serialize methods
+    root_topic_ids = topics.filter_map { |t| t.id if !t.root_topic_id && t.group_category_id }
+    if root_topic_ids.any?
+      child_topics_by_root = DiscussionTopic
+                             .where(root_topic_id: root_topic_ids)
+                             .where("discussion_topics.workflow_state<>'deleted'")
+                             .pluck(:root_topic_id, :id, :context_id)
+                             .group_by(&:first)
+
+      topics.each do |topic|
+        next unless root_topic_ids.include?(topic.id)
+
+        child_data = child_topics_by_root[topic.id] || []
+        child_topics = child_data.map do |_, id, context_id|
+          ct = DiscussionTopic.new(id:, context_id:)
+          ct.workflow_state = "active"
+          ct
+        end
+        topic.association(:child_topics).target = child_topics
+        topic.association(:child_topics).loaded!
       end
     end
 
@@ -188,7 +231,8 @@ module Api::V1::DiscussionTopics
     if opts[:include_sections] && topic.is_section_specific
       section_includes = []
       section_includes.push("user_count") if opts[:include_sections_user_count]
-      json[:sections] = sections_json(topic.course_sections, user, session, section_includes)
+      section_options = opts[:section_user_counts] ? { section_user_counts: opts[:section_user_counts] } : {}
+      json[:sections] = sections_json(topic.course_sections, user, session, section_includes, section_options)
     end
 
     json[:todo_date] = topic.todo_date

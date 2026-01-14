@@ -242,8 +242,6 @@ name: student_context_card
 
 name: submission_type_selection
 
-This is a restricted placement, contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com) (Partners) for more information.
-
 <img class="lti-placement-image" src="./images/placements/submission_type_selection.png" alt="Submission Type Selection Screenshot">
 
 # Sync Grades

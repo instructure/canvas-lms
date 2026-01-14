@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import _ from 'lodash'
 import 'jquery-migrate'
 import axios from '@canvas/axios'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -162,8 +161,8 @@ describe('GradeSummary', () => {
   afterEach(() => {
     fakeENV.teardown()
     $fixtures.remove()
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('setup', () => {
@@ -186,7 +185,7 @@ describe('GradeSummary', () => {
       const originalPut = axios.put
       try {
         // Mock axios.put with a fresh mock function
-        const mockPut = jest.fn().mockResolvedValue({})
+        const mockPut = vi.fn().mockResolvedValue({})
         axios.put = mockPut
 
         // Set up a clean environment for this test only
@@ -217,7 +216,7 @@ describe('GradeSummary', () => {
 
     it('does not mark unread submissions as read if assignments_2_student_enabled feature flag off', async () => {
       ENV.assignments_2_student_enabled = false
-      const axiosSpy = jest.spyOn(axios, 'put')
+      const axiosSpy = vi.spyOn(axios, 'put')
       GradeSummary.setup()
       await awhile()
       expect(axiosSpy).not.toHaveBeenCalled()
@@ -277,41 +276,44 @@ describe('GradeSummary', () => {
       ENV.submissions = createSubmissions()
       ENV.assignment_groups = createAssignmentGroups()
       ENV.group_weighting_scheme = 'points'
-      GradeSummary.setup()
       $button = $('#show_all_details_button')
       $announcer = $('#aria-announcer')
-      $(document).ready(() => {
-        GradeSummary.bindShowAllDetailsButton($announcer)
-      })
-      $(document).trigger('ready')
+      GradeSummary.bindShowAllDetailsButton($announcer)
     })
 
-    it.skip('announces "assignment details expanded" when clicked', async () => {
+    it('announces "assignment details expanded" when clicked', async () => {
       $button.trigger('click')
+      await awhile(0) // Flush microtask queue
       await awhile(100)
       expect($announcer.text()).toBe('assignment details expanded')
     })
 
-    it.skip('changes text to "Hide All Details" when clicked', async () => {
+    it('changes text to "Hide All Details" when clicked', async () => {
       $button.trigger('click')
+      await awhile(0) // Flush microtask queue
       await awhile(100)
       expect($button.text()).toBe('Hide All Details')
     })
 
     it('announces "assignment details collapsed" when clicked and already expanded', async () => {
       $button.trigger('click')
-      await awhile(100)
+      await awhile(0) // Flush microtask queue
+      await awhile(200) // Wait for first click to complete
       $announcer.text('') // Clear announcer text
+      await awhile(0) // Flush after clearing
       $button.trigger('click')
-      await awhile(100)
+      await awhile(0) // Flush microtask queue
+      await awhile(200) // Wait for second click to complete
       expect($announcer.text()).toBe('assignment details collapsed')
     })
 
     it('changes text to "Show All Details" when clicked twice', async () => {
       $button.trigger('click')
-      await awhile(100)
+      await awhile(0) // Flush microtask queue
+      await awhile(200) // Wait for first click to complete
       $button.trigger('click')
-      await awhile(100)
+      await awhile(0) // Flush microtask queue
+      await awhile(200) // Wait for second click to complete
       expect($button.text()).toBe('Show All Details')
     })
   })
@@ -380,7 +382,7 @@ describe('GradeSummary', () => {
 
     it('uses I18n to parse the existing "What-If" score', () => {
       $($fixtures).find('.assignment_score').first().find('.what_if_score').text('1.234,56')
-      jest.spyOn(numberHelper, 'parse').mockReturnValue('654321')
+      vi.spyOn(numberHelper, 'parse').mockReturnValue('654321')
       onEditWhatIfScore()
       const $gradeEntry = $($fixtures).find('#grade_entry').first()
       expect($gradeEntry.val()).toBe('654321')

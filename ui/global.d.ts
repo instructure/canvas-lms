@@ -23,6 +23,34 @@ import {GlobalRemotes} from '@canvas/global/remotes/GlobalRemotes'
 import {ajaxJSON} from '@canvas/jquery/jquery.ajaxJSON'
 import type {AdaEmbed, AdaEmbedConstructor} from './shared/help-dialog/react/adaTypes'
 
+// Type definitions for the mocked() utility (test environments only)
+type MockInstance<T extends (...args: any[]) => any> = T & {
+  mockClear: () => MockInstance<T>
+  mockReset: () => MockInstance<T>
+  mockRestore: () => void
+  mockImplementation: (fn: T) => MockInstance<T>
+  mockImplementationOnce: (fn: T) => MockInstance<T>
+  mockReturnValue: (value: ReturnType<T>) => MockInstance<T>
+  mockReturnValueOnce: (value: ReturnType<T>) => MockInstance<T>
+  mockResolvedValue: (value: Awaited<ReturnType<T>>) => MockInstance<T>
+  mockResolvedValueOnce: (value: Awaited<ReturnType<T>>) => MockInstance<T>
+  mockRejectedValue: (value: unknown) => MockInstance<T>
+  mockRejectedValueOnce: (value: unknown) => MockInstance<T>
+  mockName: (name: string) => MockInstance<T>
+  getMockName: () => string
+  mock: {
+    calls: Parameters<T>[]
+    results: Array<{type: 'return' | 'throw'; value: unknown}>
+    instances: unknown[]
+    contexts: unknown[]
+    lastCall: Parameters<T> | undefined
+  }
+}
+
+type DeepMocked<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any ? MockInstance<T[K]> : DeepMocked<T[K]>
+}
+
 declare global {
   interface Global {
     /**
@@ -94,6 +122,20 @@ declare global {
    */
   const REMOTES: GlobalRemotes
 
+  /**
+   * Type-safe utility to cast a function to its mocked version.
+   * Works in both Jest and Vitest test environments.
+   *
+   * @example
+   * // Instead of:
+   * ;(myFunction as jest.Mock).mockReturnValue('value')
+   *
+   * // Use:
+   * mocked(myFunction).mockReturnValue('value')
+   */
+  function mocked<T extends (...args: any[]) => any>(fn: T): MockInstance<T>
+  function mocked<T extends object>(obj: T): DeepMocked<T>
+
   type ShowIf = {
     (bool?: boolean): JQuery<HTMLElement>
     /**
@@ -111,6 +153,8 @@ declare global {
     datetime_field: () => JQuery<HTMLInputElement>
     disableWhileLoading: any
     fileSize: (size: number) => string
+    toJSON: () => Record<string, unknown>
+    toggleAccessibly: (visible?: boolean) => JQuery
     fillTemplateData: any
     fillWindowWithMe: (options?: {onResize: () => void}) => JQuery<HTMLElement>
     fixDialogButtons: () => void
@@ -170,6 +214,37 @@ declare global {
     ajaxJSONFiles: any
     isPreviewable: any
     ajaxJSON: typeof ajaxJSON
+    ui: {
+      keyCode: {
+        ENTER: number
+        ESCAPE: number
+        TAB: number
+        UP: number
+        DOWN: number
+        LEFT: number
+        RIGHT: number
+        SPACE: number
+        BACKSPACE: number
+        DELETE: number
+        HOME: number
+        END: number
+        PAGE_UP: number
+        PAGE_DOWN: number
+      }
+    }
+  }
+
+  interface JQuery {
+    dialog(options?: any): JQuery
+    dialog(method: string, ...args: any[]): any
+    menu(options?: any): JQuery
+    menu(method: string, ...args: any[]): any
+    draggable(options?: any): JQuery
+    draggable(method: string, ...args: any[]): any
+    tooltip(options?: any): JQuery
+    tooltip(method: string, ...args: any[]): any
+    selectmenu(options?: any): JQuery
+    selectmenu(method: string, ...args: any[]): any
   }
 
   // due to overrides in packages/date-js/core.js

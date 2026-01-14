@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 // intentional:
-// import 'jquery-ui-touch-punch'
 // import 'jqueryui/droppable'
 // import 'jqueryui/draggable'
 // import 'jqueryui/mouse'

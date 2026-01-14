@@ -16,7 +16,6 @@
 
 import React, {useReducer} from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import {sideNavReducer} from '../utils'
 
 const initialState = {

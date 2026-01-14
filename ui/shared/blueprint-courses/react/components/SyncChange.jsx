@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import cx from 'classnames'
 
-import get from 'lodash/get'
+import {get} from 'es-toolkit/compat'
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'

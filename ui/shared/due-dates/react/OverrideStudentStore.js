@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {filter, keyBy, map} from 'lodash'
+import {keyBy, filter, map} from 'es-toolkit/compat'
 import createStore from '@canvas/backbone/createStore'
 import $ from 'jquery'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'

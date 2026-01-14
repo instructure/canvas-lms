@@ -23,14 +23,14 @@ import {ExpandCollapseThreadsButton} from '../ExpandCollapseThreadsButton'
 
 const setup = (props = {}, contextOverrides = {}) => {
   const searchContextValues = {
-    setAllThreadsStatus: jest.fn(),
-    setExpandedThreads: jest.fn(),
+    setAllThreadsStatus: vi.fn(),
+    setExpandedThreads: vi.fn(),
     ...contextOverrides,
   }
 
   const defaultProps = {
     isExpanded: false,
-    onCollapseRepliesToggle: jest.fn(),
+    onCollapseRepliesToggle: vi.fn(),
     showText: false,
     tooltipEnabled: false,
     disabled: false,
@@ -125,7 +125,7 @@ describe('ExpandCollapseThreadsButton', () => {
     })
 
     it('should toggle aria-expanded when button is clicked', () => {
-      const onCollapseRepliesToggleMock = jest.fn()
+      const onCollapseRepliesToggleMock = vi.fn()
       const {getByTestId, rerender, searchContextValues} = setup({
         isExpanded: false,
         onCollapseRepliesToggle: onCollapseRepliesToggleMock,
@@ -157,9 +157,9 @@ describe('ExpandCollapseThreadsButton', () => {
 
   describe('Click behavior', () => {
     it('should call correct functions when expanding', () => {
-      const onCollapseRepliesToggleMock = jest.fn()
-      const setAllThreadsStatusMock = jest.fn()
-      const setExpandedThreadsMock = jest.fn()
+      const onCollapseRepliesToggleMock = vi.fn()
+      const setAllThreadsStatusMock = vi.fn()
+      const setExpandedThreadsMock = vi.fn()
       const {getByTestId} = setup(
         {isExpanded: false, onCollapseRepliesToggle: onCollapseRepliesToggleMock},
         {
@@ -176,9 +176,9 @@ describe('ExpandCollapseThreadsButton', () => {
     })
 
     it('should call correct functions when collapsing', () => {
-      const onCollapseRepliesToggleMock = jest.fn()
-      const setAllThreadsStatusMock = jest.fn()
-      const setExpandedThreadsMock = jest.fn()
+      const onCollapseRepliesToggleMock = vi.fn()
+      const setAllThreadsStatusMock = vi.fn()
+      const setExpandedThreadsMock = vi.fn()
       const {getByTestId} = setup(
         {isExpanded: true, onCollapseRepliesToggle: onCollapseRepliesToggleMock},
         {
@@ -197,22 +197,22 @@ describe('ExpandCollapseThreadsButton', () => {
 
   describe('Initial mount behavior', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
     })
 
     afterEach(() => {
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('should call setAllThreadsStatus with Expanded on mount when isExpanded is true', () => {
-      const setAllThreadsStatusMock = jest.fn()
+      const setAllThreadsStatusMock = vi.fn()
       setup({isExpanded: true}, {setAllThreadsStatus: setAllThreadsStatusMock})
 
       expect(setAllThreadsStatusMock).toHaveBeenCalledWith(AllThreadsState.Expanded)
     })
 
     it('should not call setAllThreadsStatus with Expanded on mount when isExpanded is false', () => {
-      const setAllThreadsStatusMock = jest.fn()
+      const setAllThreadsStatusMock = vi.fn()
       setup({isExpanded: false}, {setAllThreadsStatus: setAllThreadsStatusMock})
 
       const expandedCalls = setAllThreadsStatusMock.mock.calls.filter(
@@ -222,10 +222,10 @@ describe('ExpandCollapseThreadsButton', () => {
     })
 
     it('should call setAllThreadsStatus with None after timeout on mount', () => {
-      const setAllThreadsStatusMock = jest.fn()
+      const setAllThreadsStatusMock = vi.fn()
       setup({isExpanded: true}, {setAllThreadsStatus: setAllThreadsStatusMock})
 
-      jest.runAllTimers()
+      vi.runAllTimers()
       expect(setAllThreadsStatusMock).toHaveBeenCalledWith(AllThreadsState.None)
     })
   })

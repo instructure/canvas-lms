@@ -42,8 +42,8 @@ import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import * as ReactQuery from '@tanstack/react-query'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  reloadWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: vi.fn(),
 }))
 
 const render = children =>

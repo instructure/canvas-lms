@@ -20,8 +20,8 @@ import {render} from '@testing-library/react'
 import React from 'react'
 import {LockedDiscussion} from '../LockedDiscussion'
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('../../../utils', async () => ({
+  ...(await vi.importActual('../../../utils')),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 

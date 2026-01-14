@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import merge from 'lodash/merge'
+import {merge} from 'es-toolkit/compat'
 import ConfirmDeleteModal from '../ConfirmDeleteModal'
 
 const container = document.createElement('div')
@@ -54,8 +54,8 @@ describe('ConfirmDeleteModal component', () => {
 
   test('should call onConfirm prop after confirming delete', async () => {
     const user = userEvent.setup()
-    const confirmSpy = jest.fn()
-    const modalRef = jest.fn(ref => {
+    const confirmSpy = vi.fn()
+    const modalRef = vi.fn(ref => {
       modal = ref
     })
 
@@ -76,8 +76,8 @@ describe('ConfirmDeleteModal component', () => {
 
   test('should call onHide prop after confirming delete', async () => {
     const user = userEvent.setup()
-    const hideSpy = jest.fn()
-    const modalRef = jest.fn(ref => {
+    const hideSpy = vi.fn()
+    const modalRef = vi.fn(ref => {
       modal = ref
     })
 
@@ -96,8 +96,8 @@ describe('ConfirmDeleteModal component', () => {
 
   test('should call onCancel prop after cancelling', async () => {
     const user = userEvent.setup()
-    const cancelSpy = jest.fn()
-    const modalRef = jest.fn(ref => {
+    const cancelSpy = vi.fn()
+    const modalRef = vi.fn(ref => {
       modal = ref
     })
 
@@ -118,8 +118,8 @@ describe('ConfirmDeleteModal component', () => {
 
   test('should call onHide prop after cancelling', async () => {
     const user = userEvent.setup()
-    const hideSpy = jest.fn()
-    const modalRef = jest.fn(ref => {
+    const hideSpy = vi.fn()
+    const modalRef = vi.fn(ref => {
       modal = ref
     })
 

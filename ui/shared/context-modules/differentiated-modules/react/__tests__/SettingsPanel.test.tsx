@@ -19,45 +19,52 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import SettingsPanel, {type SettingsPanelProps} from '../SettingsPanel'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import * as miscUtils from '../../utils/miscHelpers'
 import * as moduleUtils from '../../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import userEvent from '@testing-library/user-event'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
-jest.mock('../../utils/miscHelpers', () => {
-  const originalModule = jest.requireActual('../../utils/miscHelpers')
+vi.mock('../../utils/miscHelpers', async () => {
+  const originalModule = await vi.importActual('../../utils/miscHelpers') as any
 
   return {
     __esModule: true,
     ...originalModule,
-    convertModuleSettingsForApi: jest
+    convertModuleSettingsForApi: vi
       .fn()
       .mockImplementation(originalModule.convertModuleSettingsForApi),
   }
 })
 
-jest.mock('../../utils/moduleHelpers', () => {
-  const originalModule = jest.requireActual('../../utils/moduleHelpers')
+vi.mock('../../utils/moduleHelpers', async () => {
+  const originalModule = await vi.importActual('../../utils/moduleHelpers') as any
 
   return {
     __esModule: true,
     ...originalModule,
-    updateModuleUI: jest.fn(),
+    updateModuleUI: vi.fn(),
   }
 })
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
 describe('SettingsPanel', () => {
+  // Track captured request for verification
+  let lastCapturedRequest: {path: string; method: string; body?: any} | null = null
+
   beforeAll(() => {
+    server.listen()
     // GMT-7
     window.ENV.TIMEZONE = 'America/Denver'
   })
+
+  afterAll(() => server.close())
 
   const props: SettingsPanelProps = {
     moduleElement: document.createElement('div'),
@@ -160,7 +167,7 @@ describe('SettingsPanel', () => {
   })
 
   it('calls updateParentData on unmount with changes', async () => {
-    const updateParentDataMock = jest.fn()
+    const updateParentDataMock = vi.fn()
     const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
     await userEvent.type(await findByTestId('module-name-input'), '2')
     unmount()
@@ -184,7 +191,7 @@ describe('SettingsPanel', () => {
   })
 
   it('calls updateParentData on unmount with no changes', () => {
-    const updateParentDataMock = jest.fn()
+    const updateParentDataMock = vi.fn()
     const {unmount} = renderComponent({updateParentData: updateParentDataMock})
     unmount()
     expect(updateParentDataMock).toHaveBeenCalledWith(
@@ -212,10 +219,30 @@ describe('SettingsPanel', () => {
     })
 
     beforeEach(() => {
-      jest.clearAllMocks()
-      // @ts-expect-error
-      doFetchApi.mockReset()
+      vi.clearAllMocks()
+      lastCapturedRequest = null
+      // Default success handler
+      server.use(
+        http.put('/courses/:courseId/modules/:moduleId', async ({request}) => {
+          lastCapturedRequest = {
+            path: new URL(request.url).pathname,
+            method: 'PUT',
+            body: await request.json(),
+          }
+          return HttpResponse.json({})
+        }),
+        http.post('/courses/:courseId/modules', async ({request}) => {
+          lastCapturedRequest = {
+            path: new URL(request.url).pathname,
+            method: 'POST',
+            body: await request.json(),
+          }
+          return HttpResponse.json({})
+        }),
+      )
     })
+
+    afterEach(() => server.resetHandlers())
 
     it('validates the module name', () => {
       const {getByRole, getByText, getByTestId} = renderComponent({moduleName: ''})
@@ -229,31 +256,26 @@ describe('SettingsPanel', () => {
     })
 
     it('makes a request to the modules update endpoint', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole, findByTestId} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
-      expect(doFetchApi).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: '/courses/1/modules/1',
-          method: 'PUT',
-          body: expect.anything(),
-        }),
-      )
+      await waitFor(() => {
+        expect(lastCapturedRequest).not.toBeNull()
+        expect(lastCapturedRequest!.path).toBe('/courses/1/modules/1')
+        expect(lastCapturedRequest!.method).toBe('PUT')
+        expect(lastCapturedRequest!.body).toBeDefined()
+      })
     })
 
-    it('formats the form state for the request body', () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+    it('formats the form state for the request body', async () => {
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
-      expect(miscUtils.convertModuleSettingsForApi).toHaveBeenCalled()
+      await waitFor(() => {
+        expect(miscUtils.convertModuleSettingsForApi).toHaveBeenCalled()
+      })
     })
 
     it('updates the modules page UI', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {
@@ -262,8 +284,6 @@ describe('SettingsPanel', () => {
     })
 
     it('shows a flash alert on success', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {
@@ -276,24 +296,22 @@ describe('SettingsPanel', () => {
     })
 
     it('shows a flash alert on failure', async () => {
-      const e = new Error('error')
-      // @ts-expect-error
-      doFetchApi.mockRejectedValue(e)
+      server.use(
+        http.put('/courses/:courseId/modules/:moduleId', () => HttpResponse.error()),
+      )
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {
         expect(showFlashAlert).toHaveBeenCalledWith({
-          err: e,
+          err: expect.any(Error),
           message: 'Error updating Week 1 settings.',
         })
       })
     })
 
     it('calls onDidSubmit instead of onDismiss if passed', async () => {
-      const onDidSubmitMock = jest.fn()
-      const onDismissMock = jest.fn()
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const onDidSubmitMock = vi.fn()
+      const onDismissMock = vi.fn()
       const {getByRole, findByTestId} = renderComponent({
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,
@@ -301,12 +319,14 @@ describe('SettingsPanel', () => {
       await userEvent.click(getByRole('button', {name: 'Save'}))
 
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
-      expect(onDidSubmitMock).toHaveBeenCalled()
+      await waitFor(() => {
+        expect(onDidSubmitMock).toHaveBeenCalled()
+      })
       expect(onDismissMock).not.toHaveBeenCalled()
     })
 
     it('calls updateParentData with moduleNameDirty state', async () => {
-      const updateParentDataMock = jest.fn()
+      const updateParentDataMock = vi.fn()
       const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
       await userEvent.type(await findByTestId('module-name-input'), '2')
       unmount()
@@ -357,7 +377,7 @@ describe('SettingsPanel', () => {
       })
 
       it('addModuleUI is not called if error in requirements', () => {
-        const addModuleUI = jest.fn()
+        const addModuleUI = vi.fn()
 
         const overrideProps = {
           moduleItems: [{id: '1', name: 'Assignments'}],
@@ -384,10 +404,20 @@ describe('SettingsPanel', () => {
   })
 
   describe('on create', () => {
+    beforeEach(() => {
+      vi.clearAllMocks()
+      // Set up handler for module creation
+      server.use(
+        http.post('/courses/:courseId/modules', async ({request}) => {
+          return HttpResponse.json({})
+        }),
+      )
+    })
+
+    afterEach(() => server.resetHandlers())
+
     it('calls addModuleUI when module is created', async () => {
-      const addModuleUI = jest.fn()
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const addModuleUI = vi.fn()
       const {getByRole, findByTestId} = renderComponent({moduleId: undefined, addModuleUI})
       getByRole('button', {name: 'Add Module'}).click()
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
@@ -402,10 +432,8 @@ describe('SettingsPanel', () => {
     })
 
     it('calls onDidSubmit instead of onDismiss if passed', async () => {
-      const onDidSubmitMock = jest.fn()
-      const onDismissMock = jest.fn()
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const onDidSubmitMock = vi.fn()
+      const onDismissMock = vi.fn()
       const {getByRole, findByTestId} = renderComponent({
         moduleId: undefined,
         onDidSubmit: onDidSubmitMock,
@@ -414,7 +442,9 @@ describe('SettingsPanel', () => {
       await userEvent.click(getByRole('button', {name: 'Add Module'}))
 
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
-      expect(onDidSubmitMock).toHaveBeenCalled()
+      await waitFor(() => {
+        expect(onDidSubmitMock).toHaveBeenCalled()
+      })
       expect(onDismissMock).not.toHaveBeenCalled()
     })
   })

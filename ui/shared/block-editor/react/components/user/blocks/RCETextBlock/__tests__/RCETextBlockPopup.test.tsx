@@ -48,7 +48,7 @@ describe('RCETextBlockPopup', () => {
   })
 
   it('calls onSave with the content', async () => {
-    const onSave = jest.fn()
+    const onSave = vi.fn()
     render(
       <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={() => {}} onSave={onSave} />,
     )
@@ -63,7 +63,7 @@ describe('RCETextBlockPopup', () => {
   })
 
   it('calls onClose when cancel is clicked', async () => {
-    const onClose = jest.fn()
+    const onClose = vi.fn()
     render(
       <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={onClose} onSave={() => {}} />,
     )
@@ -73,7 +73,7 @@ describe('RCETextBlockPopup', () => {
   })
 
   it('fires the close event when the modal is closed', async () => {
-    const handleClose = jest.fn()
+    const handleClose = vi.fn()
     render(
       <RCETextBlockPopup
         nodeId="1"

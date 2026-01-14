@@ -31,7 +31,7 @@ import {
   STUDENT_ROLE,
   TA_ROLE,
   OBSERVER_ROLE,
-  DESIGNER_ROLE
+  DESIGNER_ROLE,
 } from './constants'
 import {EnvRole, SisRole} from '../types'
 import I18nObj, {useScope as createI18nScope} from '@canvas/i18n'
@@ -62,7 +62,11 @@ export const secondsToTime = (seconds: number) => {
 }
 
 // convert an event date and time to a string using the given date and time format specifiers
-export const timeEventToString = (date: string = '', i18n_date_format: string = 'short', i18n_time_format: string = 'tiny') => {
+export const timeEventToString = (
+  date: string = '',
+  i18n_date_format: string = 'short',
+  i18n_time_format: string = 'tiny',
+) => {
   if (date) {
     return I18nObj.t('time.event', {
       defaultValue: '%{date} at %{time}',
@@ -75,7 +79,7 @@ export const timeEventToString = (date: string = '', i18n_date_format: string = 
 export const totalActivity = (enrollments: Enrollment[]) => {
   const times = enrollments.map(e => e.totalActivityTime || 0)
   const maxTime = Math.max(...times)
-  return (maxTime && maxTime > 0) ? secondsToTime(maxTime) : ''
+  return maxTime && maxTime > 0 ? secondsToTime(maxTime) : ''
 }
 
 // for custom roles sis_role is the role name
@@ -86,7 +90,7 @@ export const getRoleName = (sisRole: SisRole | string) => {
     [STUDENT_ROLE]: I18n.t('Student'),
     [TA_ROLE]: I18n.t('TA'),
     [OBSERVER_ROLE]: I18n.t('Observer'),
-    [DESIGNER_ROLE]: I18n.t('Designer')
+    [DESIGNER_ROLE]: I18n.t('Designer'),
   }
 
   // Custom roles are returned as named
@@ -121,7 +125,7 @@ export const sortRoles = (roles: EnvRole[]) => {
     TA_ENROLLMENT,
     TEACHER_ENROLLMENT,
     DESIGNER_ENROLLMENT,
-    OBSERVER_ENROLLMENT
+    OBSERVER_ENROLLMENT,
   ]
 
   const comparator = (role: EnvRole) => {
@@ -140,5 +144,7 @@ export const sortRoles = (roles: EnvRole[]) => {
     return position_string
   }
 
-  return roles.sort((a, b) => comparator(a).toLowerCase().localeCompare(comparator(b).toLowerCase()))
+  return roles.sort((a, b) =>
+    comparator(a).toLowerCase().localeCompare(comparator(b).toLowerCase()),
+  )
 }

@@ -17,7 +17,7 @@
  */
 
 import {useMemo} from 'react'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import useStore from '../stores/index'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'

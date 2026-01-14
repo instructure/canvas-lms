@@ -17,9 +17,9 @@
  */
 
 import React, {useState, useEffect, useRef} from 'react'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {chunk} from 'lodash'
+import {chunk} from 'es-toolkit/compat'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'

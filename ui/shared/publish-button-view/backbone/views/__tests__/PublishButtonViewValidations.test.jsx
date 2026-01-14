@@ -66,9 +66,8 @@ describe('PublishButtonView', () => {
   })
 
   describe('click interactions', () => {
-
     it('publish button renders fail to publish', async () => {
-      jest.spyOn($, 'flashError')
+      vi.spyOn($, 'flashError')
       const btnView = new PublishButtonView({model: publish}).render()
       btnView.$el.trigger('click')
       expect(btnView.$text.html()).not.toMatch(/Published/)
@@ -76,7 +75,7 @@ describe('PublishButtonView', () => {
     })
 
     it('unpublish button renders fail to unpublish', async () => {
-      jest.spyOn($, 'flashError')
+      vi.spyOn($, 'flashError')
       const btnView = new PublishButtonView({model: published}).render()
       btnView.$el.trigger('click')
       expect(btnView.$text.html()).toMatch(/Published/)
@@ -84,9 +83,12 @@ describe('PublishButtonView', () => {
     })
 
     it('publish button renders loading spinner only while publishing', async () => {
-      jest.spyOn($, 'flashError')
-      const renderSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'renderOverlayLoadingSpinner')
-      const hideSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'hideOverlayLoadingSpinner')
+      vi.spyOn($, 'flashError')
+      const renderSpinnerSpy = vi.spyOn(
+        PublishButtonView.prototype,
+        'renderOverlayLoadingSpinner',
+      )
+      const hideSpinnerSpy = vi.spyOn(PublishButtonView.prototype, 'hideOverlayLoadingSpinner')
       const btnView = new PublishButtonView({model: publish}).render()
       btnView.$el.trigger('click')
 
@@ -97,9 +99,12 @@ describe('PublishButtonView', () => {
     })
 
     it('unpublish button renders loading spinner only while unpublishing', async () => {
-      jest.spyOn($, 'flashError')
-      const renderSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'renderOverlayLoadingSpinner')
-      const hideSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'hideOverlayLoadingSpinner')
+      vi.spyOn($, 'flashError')
+      const renderSpinnerSpy = vi.spyOn(
+        PublishButtonView.prototype,
+        'renderOverlayLoadingSpinner',
+      )
+      const hideSpinnerSpy = vi.spyOn(PublishButtonView.prototype, 'hideOverlayLoadingSpinner')
       const btnView = new PublishButtonView({model: published}).render()
       btnView.$el.trigger('click')
 
@@ -108,6 +113,5 @@ describe('PublishButtonView', () => {
       expect(btnView.$text.html()).toMatch(/Published/)
       expect($.flashError).toHaveBeenCalledWith('This assignment has failed to unpublish')
     })
-
   })
 })

@@ -18,7 +18,6 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'lodash'
 
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -386,7 +385,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
         env: ENV.RAILS_ENVIRONMENT,
       }),
       valueMatchesExpected: (value: string) =>
-        value.toLowerCase() === ENV.RAILS_ENVIRONMENT.toLowerCase(),
+        value?.toLowerCase() === ENV.RAILS_ENVIRONMENT?.toLowerCase(),
     })
   }
 

@@ -44,10 +44,7 @@ export default class AssignmentGroupCollection extends PaginatedCollection {
   }
 
   assignments() {
-    return this.chain()
-      .map(ag => ag.get('assignments').toArray())
-      .flatten()
-      .value()
+    return this.toArray().flatMap(ag => ag.get('assignments').toArray())
   }
 
   canReadGrades() {

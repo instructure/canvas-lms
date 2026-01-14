@@ -274,7 +274,7 @@ module DatesOverridable
     if context.user_has_been_observer?(user)
       observed_student_due_dates(user).length > 1
     elsif context.user_has_been_admin?(user)
-      dates = all_dates_visible_to(user)
+      dates = all_dates_visible_to(user, include_module_overrides: false)
       dates && dates.map { |hash| self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
     elsif context.user_has_no_enrollments?(user)
       all_due_dates.length > 1
@@ -326,7 +326,7 @@ module DatesOverridable
     courses_user_has_been_enrolled_in
   end
 
-  def all_dates_visible_to(user, courses_user_has_been_enrolled_in: nil)
+  def all_dates_visible_to(user, include_module_overrides: true, courses_user_has_been_enrolled_in: nil)
     return all_due_dates if user.nil?
 
     if courses_user_has_been_enrolled_in
@@ -336,6 +336,7 @@ module DatesOverridable
             courses_user_has_been_enrolled_in[:admin].include?(context_id) ||
             courses_user_has_been_enrolled_in[:observer].include?(context_id)
         overrides = overrides_for(user)
+        overrides = overrides.reject(&:context_module_id) unless include_module_overrides
         overrides = overrides_to_hash(user, overrides)
         if !differentiated_assignments_applies? &&
            (overrides.empty? || courses_user_has_been_enrolled_in[:admin].include?(context_id))
@@ -351,6 +352,7 @@ module DatesOverridable
           context.user_has_been_admin?(user) ||
           context.user_has_been_observer?(user)
       overrides = overrides_for(user)
+      overrides = overrides.reject(&:context_module_id) unless include_module_overrides
       overrides = overrides_to_hash(user, overrides)
       if !differentiated_assignments_applies? && (overrides.empty? || context.user_has_been_admin?(user))
         overrides << base_due_date_hash
@@ -515,6 +517,16 @@ module DatesOverridable
       )
     end
 
+    if is_a?(Assignment)
+      peer_review_overrides = peer_review_overrides_for_dates
+      if peer_review_overrides
+        result.each do |override|
+          dates = peer_review_dates_for_override(override, peer_review_overrides)
+          override[:peer_review_dates] = dates if dates
+        end
+      end
+    end
+
     result.sort_by do |date|
       due_at = date[:due_at]
       [due_at.present? ? CanvasSort::First : CanvasSort::Last, due_at.presence || CanvasSort::First]
@@ -523,6 +535,22 @@ module DatesOverridable
 
   def base_due_date_hash
     without_overrides.due_date_hash.merge(base: true)
+  end
+
+  def peer_review_dates_for_override(override, peer_review_overrides)
+    return nil unless peer_review_overrides
+
+    peer_review_sub = peer_review_overrides[:peer_review_sub]
+    overrides_by_parent = peer_review_overrides[:overrides]
+
+    peer_review_override = overrides_by_parent[override[:id]] unless override[:base] || override[:id].nil?
+    source = peer_review_override || peer_review_sub
+
+    {
+      due_at: source.due_at,
+      unlock_at: source.unlock_at,
+      lock_at: source.lock_at
+    }
   end
 
   def override_aware_due_date_hash(user, user_is_admin: false, assignment_object: self)
@@ -555,7 +583,12 @@ module DatesOverridable
       if tag_info[:due_date] < Time.zone.now &&
          (is_a?(Quizzes::Quiz) || (is_a?(AbstractAssignment) && expects_submission?)) &&
          !has_submission
-        tag_info[:past_due] = true
+        submission = if is_a?(Quizzes::Quiz)
+                       quiz_submissions.find_by(user:)
+                     else
+                       submissions.find_by(user:)
+                     end
+        tag_info[:past_due] = true unless submission&.excused?
       end
 
       tag_info[:due_date] = tag_info[:due_date].utc.iso8601

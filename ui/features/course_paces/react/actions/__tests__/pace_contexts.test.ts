@@ -29,11 +29,11 @@ import {
 const SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10`
 const STUDENT_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10`
 
-const dispatch = jest.fn()
+const dispatch = vi.fn()
 
 describe('Pace contexts actions', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fetchMock.restore()
   })
 

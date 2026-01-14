@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {defaults} from 'lodash'
+import {defaults} from 'es-toolkit/compat'
 import UploadQueue from './UploadQueue'
 import ReactDOM from 'react-dom'
 import * as CategoryProcessor from '@instructure/canvas-rce/es/rce/plugins/shared/Upload/CategoryProcessor'

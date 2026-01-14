@@ -36,7 +36,6 @@ const captureElementThumbnail = async (element: HTMLElement, templateType: Templ
     const imgData = canvas.toDataURL('image/png')
     return imgData
   } catch (error) {
-     
     console.error('Error capturing element thumbnail:', error)
   }
   return Promise.resolve('')

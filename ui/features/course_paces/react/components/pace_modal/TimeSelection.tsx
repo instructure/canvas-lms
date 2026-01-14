@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {NumberInput} from '@instructure/ui-number-input'
 import {View} from '@instructure/ui-view'
 import moment from 'moment-timezone'
-import _ from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 import type {CoursePace, OptionalDate, Pace, ResponsiveSizes, StoreState} from '../../types'
 import {
   generateDatesCaptions,
@@ -83,6 +83,8 @@ interface NumberInputWithLabelProps {
 }
 
 const formatDate = (date: Date) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
   return tz.format(date, 'date.formats.long') || ''
 }
 
@@ -90,7 +92,11 @@ const DateInputContainer = ({
   children,
   caption,
   dateColumnWidth,
-}: {children: React.ReactNode; caption: string; dateColumnWidth: string}) => {
+}: {
+  children: React.ReactNode
+  caption: string
+  dateColumnWidth: string
+}) => {
   return (
     <Flex.Item width={dateColumnWidth} padding="xxx-small 0 0 0">
       {children}
@@ -173,8 +179,8 @@ const TimeSelection = (props: TimeSelectionProps) => {
 
   useEffect(() => {
     if (
-      !_.isEqual(coursePace.selected_days_to_skip, originalSelectedDaysToSkip.current) ||
-      !_.isEqual(blackoutDates, originalBlackoutDates.current)
+      !isEqual(coursePace.selected_days_to_skip, originalSelectedDaysToSkip.current) ||
+      !isEqual(blackoutDates, originalBlackoutDates.current)
     ) {
       setTimeToCompleteCalendarDaysFromItems(blackoutDates)
       originalSelectedDaysToSkip.current = coursePace.selected_days_to_skip

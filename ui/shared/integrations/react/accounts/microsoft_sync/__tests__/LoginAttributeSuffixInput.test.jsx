@@ -34,7 +34,7 @@ describe('LoginAttributeSuffixInput', () => {
   })
 
   it('calls the provided input handler on input', async () => {
-    const handlerMock = jest.fn()
+    const handlerMock = vi.fn()
     const container = setup({
       suffixInputHandler: handlerMock,
     })

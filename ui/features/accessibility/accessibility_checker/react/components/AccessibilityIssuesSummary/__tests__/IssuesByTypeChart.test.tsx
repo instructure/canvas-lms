@@ -18,7 +18,6 @@
 
 import {render, screen} from '@testing-library/react'
 import {act, renderHook} from '@testing-library/react-hooks'
-import '@testing-library/jest-dom'
 
 import {IssuesByTypeChart} from '../IssuesByTypeChart'
 import {
@@ -41,8 +40,8 @@ describe('IssuesByTypeChart', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
     useAccessibilityScansStore.setState({...mockState})
   })
 
@@ -69,10 +68,7 @@ describe('IssuesByTypeChart', () => {
     render(<IssuesByTypeChart />)
     const chart = screen.getByTestId('issues-by-type-chart')
     expect(chart).toBeInTheDocument()
-    expect(chart).toHaveAttribute(
-      'aria-label',
-      'Issues by type chart. High: 50 issues, Medium: 10 issues, Low: 1 issues.',
-    )
+    expect(chart).toHaveAttribute('aria-label', 'Accessibility issues bar chart showing 61 issues.')
   })
 
   it('handles empty data gracefully', () => {
@@ -86,10 +82,7 @@ describe('IssuesByTypeChart', () => {
     render(<IssuesByTypeChart />)
     const chart = screen.getByTestId('issues-by-type-chart')
     expect(chart).toBeInTheDocument()
-    expect(chart).toHaveAttribute(
-      'aria-label',
-      'Issues by type chart. High: 0 issues, Medium: 0 issues, Low: 0 issues.',
-    )
+    expect(chart).toHaveAttribute('aria-label', 'Accessibility issues bar chart showing 0 issues.')
   })
 
   it('renders loading state', () => {

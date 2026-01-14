@@ -24,7 +24,7 @@ import {TraditionalView} from '../TraditionalView'
 import type {RubricCriterion, RubricAssessmentData} from '../../types/rubric'
 
 // Mock AiUsageButton component
-jest.mock('../../components/AiUsageButton', () => {
+vi.mock('../../components/AiUsageButton', () => {
   return {
     __esModule: true,
     default: () => <button data-testid="ai-usage-button">AI Assisted</button>,
@@ -116,7 +116,7 @@ describe('TraditionalView', () => {
     ratingOrder: 'descending',
     rubricAssessmentData: defaultAssessmentData,
     rubricTitle: 'Test Rubric',
-    onUpdateAssessmentData: jest.fn(),
+    onUpdateAssessmentData: vi.fn(),
   }
 
   const renderTraditionalView = (props = {}) => {
@@ -128,7 +128,7 @@ describe('TraditionalView', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the rubric title', () => {

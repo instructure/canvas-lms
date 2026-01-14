@@ -23,7 +23,7 @@ import {TranslationContext} from '../../../hooks/useTranslationContext'
 
 const createProps = overrides => {
   return {
-    onBodyChange: jest.fn(),
+    onBodyChange: vi.fn(),
     ...overrides,
   }
 }
@@ -46,7 +46,7 @@ describe('MessageBody', () => {
     const props = createProps()
     const mockContext = {
       body: '',
-      setBody: jest.fn(),
+      setBody: vi.fn(),
       translating: false,
     }
 
@@ -87,7 +87,7 @@ describe('MessageBody', () => {
 
       const mockContext = {
         body: '',
-        setBody: jest.fn(),
+        setBody: vi.fn(),
         translating: false,
       }
       render(
@@ -120,7 +120,7 @@ describe('MessageBody', () => {
         signature: 'Best regards, John',
       })
 
-      const setBodyMock = jest.fn()
+      const setBodyMock = vi.fn()
       const mockContext = {
         body: 'Initial message',
         setBody: setBodyMock,

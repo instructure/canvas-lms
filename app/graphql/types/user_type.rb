@@ -19,6 +19,13 @@
 #
 
 module Types
+  class CourseWorkSubmissionsOrderField < BaseEnum
+    graphql_name "CourseWorkSubmissionsOrderField"
+    description "Fields to order course work submissions by"
+    value "graded_at", value: :graded_at, description: "Order by graded date"
+    value "due_at", value: :due_at, description: "Order by due date"
+  end
+
   class DashboardObserveeFilterInputType < BaseInputObject
     graphql_name "DashboardObserveeFilter"
     argument :observed_user_id,
@@ -78,15 +85,15 @@ module Types
 
     global_id_field :id
 
-    field :first_name, HtmlEncodedStringType, null: true
-    field :last_name, HtmlEncodedStringType, null: true
-    field :name, HtmlEncodedStringType, null: true
+    field :first_name, String, null: true
+    field :last_name, String, null: true
+    field :name, String, null: true
     field :short_name,
-          HtmlEncodedStringType,
+          String,
           "A short name the user has selected, for use in conversations or other less formal places through the site.",
           null: true
     field :sortable_name,
-          HtmlEncodedStringType,
+          String,
           "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
           null: true
 
@@ -686,9 +693,10 @@ module Types
       argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
       argument :observed_user_id, ID, required: false, description: "ID of the observed user"
       argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
+      argument :order_by, CourseWorkSubmissionsOrderField, required: false, description: "Field to order results by"
       argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
     end
-    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil)
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil, order_by: nil)
       return [] unless object == current_user
 
       # Get active course enrollments using the same filtering as dashboard
@@ -783,8 +791,13 @@ module Types
         end
       end
 
-      # Order by cached_due_date first (nulls last), then by assignment due_at (nulls last)
-      submissions_query = submissions_query.order(:cached_due_date, assignments: { due_at: :asc })
+      # Order submissions based on order_by parameter
+      submissions_query = case order_by
+                          when :graded_at
+                            submissions_query.order(graded_at: :desc)
+                          when :due_at, nil
+                            submissions_query.order(:cached_due_date, assignments: { due_at: :asc })
+                          end
 
       # Use eager_load for essential associations to avoid N+1 queries
       submissions_query.eager_load(assignment: :course)
@@ -847,32 +860,14 @@ module Types
       MD
       argument :assignment_id, ID, required: false
       argument :course_id, ID, required: false
-      argument :limit, Integer, required: false, deprecation_reason: <<~MD.strip
-        The `limit` argument is deprecated and will be removed in a future version.
-        Please use the standard GraphQL connection argument `first` instead, which provides
-        identical functionality and ensures a consistent API experience across all connection fields.
-      MD
     end
-    def comment_bank_items_connection(query: nil, course_id: nil, assignment_id: nil, limit: nil)
+    def comment_bank_items_connection(query: nil, course_id: nil, assignment_id: nil)
       return unless object == current_user
 
       comments = current_user.comment_bank_items
       comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
       comments = comments.where(course_id:) if course_id.present?
       comments = comments.where(assignment_id:) if assignment_id.present?
-
-      # Limit to be removed with the 2026-01-17 release
-      # .to_a gets around the .shard() bug documented in FOO-1989 so that it can be properly limited.
-      # After that bug is fixed and Switchman is upgraded in Canvas, we can remove the block below
-      # and use the 'first' argument on the connection instead of 'limit'.
-      if limit.present?
-        comments = comments.limit(limit).to_a.first(limit)
-        if Account.site_admin.feature_enabled?(:send_metrics_for_comment_bank_items_connection_limit_used)
-          InstStatsd::Statsd.distributed_increment("graphql.user_type.comment_bank_items_connection.limit_used", tags: {
-                                                     cluster: Shard.current.database_server&.id || "unknown"
-                                                   })
-        end
-      end
 
       comments
     end
@@ -961,18 +956,6 @@ module Types
       end
     end
 
-    field :comment_bank_items_count, Integer, null: true, deprecation_reason: <<~MD.strip
-      Use `commentBankItems.pageInfo.totalCount` instead. This field will be removed in a future version.
-    MD
-    def comment_bank_items_count
-      if Account.site_admin.feature_enabled?(:send_metrics_for_comment_bank_items_count_used)
-        InstStatsd::Statsd.distributed_increment("graphql.user_type.comment_bank_items_count_used", tags: {
-                                                   cluster: Shard.current.database_server&.id || "unknown"
-                                                 })
-      end
-      Loaders::CommentBankItemCountLoader.load(object)
-    end
-
     field :course_roles, [String], null: true do
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
       argument :course_id, String, required: false
@@ -1023,7 +1006,7 @@ module Types
       return nil unless assignment
 
       return nil unless assignment.grants_right?(current_user, :grade) &&
-                        assignment.context.feature_enabled?(:peer_review_allocation) &&
+                        assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
                         assignment.peer_reviews
 
       Loaders::PeerReviewStatusLoader.for(assignment_id).load(object.id)

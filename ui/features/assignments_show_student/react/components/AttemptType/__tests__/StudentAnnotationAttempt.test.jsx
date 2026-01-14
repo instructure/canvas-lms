@@ -27,7 +27,7 @@ async function makeProps(overrides) {
   const props = {
     ...assignmentAndSubmission,
     title: 'Title',
-    createSubmissionDraft: jest.fn().mockResolvedValue({}),
+    createSubmissionDraft: vi.fn().mockResolvedValue({}),
   }
   return props
 }
@@ -35,7 +35,7 @@ async function makeProps(overrides) {
 describe('StudentAnnotationAttempt', () => {
   describe('when fetching canvadocs session fails', () => {
     beforeEach(() => {
-      jest.spyOn(axios, 'post').mockRejectedValue({})
+      vi.spyOn(axios, 'post').mockRejectedValue({})
     })
 
     it('displays an error message', async () => {
@@ -50,7 +50,7 @@ describe('StudentAnnotationAttempt', () => {
   describe('when fetching canvadocs session succeeds', () => {
     let axiosMock
     beforeEach(() => {
-      axiosMock = jest
+      axiosMock = vi
         .spyOn(axios, 'post')
         .mockResolvedValue({data: {canvadocs_session_url: 'CANVADOCS_SESSION_URL'}})
     })

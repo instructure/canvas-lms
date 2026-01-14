@@ -70,7 +70,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 it('adds a new item to partial past days when the new date is after the near past boundary but outside loaded range', () => {

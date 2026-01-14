@@ -495,4 +495,408 @@ describe Api::V1::AssignmentOverride do
                                                         })
     end
   end
+
+  describe "#assignment_override_json" do
+    subject(:assignment_override_json) { test_class.new.assignment_override_json(@override) }
+
+    before :once do
+      course_model
+      @assignment = assignment_model(course: @course)
+      @section = @course.course_sections.create!(name: "Test Section")
+    end
+
+    context "with parent_override_id" do
+      before :once do
+        @parent_override = @assignment.assignment_overrides.create!(
+          set: @section,
+          due_at: 1.week.from_now
+        )
+        @peer_review_sub_assignment = @assignment.peer_review_sub_assignment || @assignment.create_peer_review_sub_assignment!
+        @override = @peer_review_sub_assignment.assignment_overrides.create!(
+          set: @section,
+          due_at: 2.weeks.from_now,
+          parent_override: @parent_override
+        )
+      end
+
+      it "includes parent_override_id in the JSON response" do
+        json = assignment_override_json
+        expect(json[:parent_override_id]).to eq(@parent_override.id)
+      end
+
+      it "does not include parent_override_id when it is nil" do
+        override_without_parent = @assignment.assignment_overrides.create!(
+          set: @course.course_sections.create!(name: "Another Section"),
+          due_at: 3.weeks.from_now
+        )
+        json = test_class.new.assignment_override_json(override_without_parent)
+        expect(json).not_to have_key(:parent_override_id)
+      end
+    end
+
+    context "with include_child_peer_review_override_dates param" do
+      before :once do
+        @course = course_model
+        @teacher = teacher_in_course(course: @course, active_all: true).user
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+
+        @assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          due_at: 1.week.from_now,
+          peer_reviews: true,
+          peer_reviews_assigned: true
+        )
+        @peer_review_sub = PeerReviewSubAssignment.create!(
+          parent_assignment: @assignment,
+          context: @course,
+          due_at: 1.week.from_now
+        )
+        @section = @course.course_sections.create!
+      end
+
+      it "includes child peer review override when param is true" do
+        parent_override = @assignment.assignment_overrides.create!(
+          set: @section,
+          due_at: 1.day.from_now
+        )
+
+        peer_review_override = @peer_review_sub.assignment_overrides.create!(
+          set: @section,
+          parent_override:,
+          due_at: 3.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 4.days.from_now
+        )
+
+        test_instance = test_class.new
+        test_instance.instance_variable_set(:@current_user, @teacher)
+        json = test_instance.assignment_override_json(
+          parent_override,
+          nil,
+          student_names: nil,
+          module_names: nil,
+          include_child_override_due_dates: nil,
+          include_child_peer_review_override_dates: true,
+          peer_review_override:
+        )
+
+        expect(json).to have_key(:peer_review_dates)
+        expect(json[:peer_review_dates]).to be_present
+        expect(json[:peer_review_dates][:id]).to eq(peer_review_override.id)
+        expect(json[:peer_review_dates][:due_at]).to eq(peer_review_override.due_at)
+        expect(json[:peer_review_dates][:unlock_at]).to eq(peer_review_override.unlock_at)
+        expect(json[:peer_review_dates][:lock_at]).to eq(peer_review_override.lock_at)
+      end
+
+      it "does not include field when param is false" do
+        parent_override = @assignment.assignment_overrides.create!(
+          set: @section,
+          due_at: 1.day.from_now
+        )
+
+        peer_review_override = @peer_review_sub.assignment_overrides.create!(
+          set: @section,
+          parent_override:,
+          due_at: 3.days.from_now
+        )
+
+        test_instance = test_class.new
+        test_instance.instance_variable_set(:@current_user, @teacher)
+        json = test_instance.assignment_override_json(
+          parent_override,
+          nil,
+          student_names: nil,
+          module_names: nil,
+          include_child_override_due_dates: nil,
+          include_child_peer_review_override_dates: false,
+          peer_review_override:
+        )
+
+        expect(json).not_to have_key(:peer_review_dates)
+      end
+
+      it "includes field as null when no matching peer review override exists" do
+        parent_override = @assignment.assignment_overrides.create!(
+          set: @section,
+          due_at: 1.day.from_now
+        )
+
+        test_instance = test_class.new
+        test_instance.instance_variable_set(:@current_user, @teacher)
+        json = test_instance.assignment_override_json(
+          parent_override,
+          nil,
+          student_names: nil,
+          module_names: nil,
+          include_child_override_due_dates: nil,
+          include_child_peer_review_override_dates: true,
+          peer_review_override: nil
+        )
+
+        expect(json).to have_key(:peer_review_dates)
+        expect(json[:peer_review_dates]).to be_nil
+      end
+
+      it "only includes specified date fields" do
+        parent_override = @assignment.assignment_overrides.create!(
+          set: @section,
+          due_at: 1.day.from_now
+        )
+
+        peer_review_override = @peer_review_sub.assignment_overrides.create!(
+          set: @section,
+          parent_override:,
+          due_at: 3.days.from_now
+        )
+
+        test_instance = test_class.new
+        test_instance.instance_variable_set(:@current_user, @teacher)
+        json = test_instance.assignment_override_json(
+          parent_override,
+          nil,
+          student_names: nil,
+          module_names: nil,
+          include_child_override_due_dates: nil,
+          include_child_peer_review_override_dates: true,
+          peer_review_override:
+        )
+
+        pr_override_json = json[:peer_review_dates]
+        expect(pr_override_json.keys).to contain_exactly("id", "due_at", "unlock_at", "lock_at")
+      end
+    end
+  end
+
+  describe "#assignment_overrides_json N+1 query prevention" do
+    before :once do
+      @course = course_model
+      @teacher = teacher_in_course(course: @course, active_all: true).user
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @assignment = @course.assignments.create!(
+        title: "Assignment with Peer Review",
+        due_at: 1.day.from_now,
+        peer_reviews: true,
+        peer_reviews_assigned: true
+      )
+
+      @peer_review_sub = PeerReviewSubAssignment.create!(
+        parent_assignment: @assignment,
+        context: @course,
+        due_at: 1.week.from_now
+      )
+
+      @sections = []
+      3.times do |i|
+        @sections << @course.course_sections.create!(name: "Section #{i + 1}")
+      end
+    end
+
+    it "avoids N+1 queries when loading peer review overrides for multiple parent overrides" do
+      parent_overrides = @sections.map do |section|
+        parent_override = @assignment.assignment_overrides.create!(
+          set: section,
+          due_at: 1.day.from_now
+        )
+
+        @peer_review_sub.assignment_overrides.create!(
+          set: section,
+          parent_override:,
+          due_at: 3.days.from_now
+        )
+
+        parent_override
+      end
+
+      test_instance = test_class.new
+      test_instance.instance_variable_set(:@current_user, @teacher)
+
+      peer_review_query_count = 0
+      subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+        if /SELECT.*FROM.*assignment_overrides.*WHERE.*assignment_overrides.*parent_override_id.*IN/im.match?(payload[:sql])
+          peer_review_query_count += 1
+        end
+      end
+
+      result = test_instance.assignment_overrides_json(
+        parent_overrides,
+        @teacher,
+        include_names: false,
+        include_child_override_due_dates: false,
+        include_child_peer_review_override_dates: true
+      )
+
+      ActiveSupport::Notifications.unsubscribe(subscription)
+
+      expect(result.length).to eq(3)
+      result.each do |override_json|
+        expect(override_json).to have_key(:peer_review_dates)
+        expect(override_json[:peer_review_dates]).to be_present
+        expect(override_json[:peer_review_dates]).to have_key(:id)
+        expect(override_json[:peer_review_dates]).to have_key(:due_at)
+      end
+
+      expect(peer_review_query_count).to eq(1)
+    end
+
+    it "makes single query for peer review overrides regardless of number of parent overrides" do
+      parent_overrides_with_pr = []
+      10.times do |i|
+        section = @course.course_sections.create!(name: "Section #{i + 1}")
+        parent_override = @assignment.assignment_overrides.create!(
+          set: section,
+          due_at: 1.day.from_now
+        )
+
+        @peer_review_sub.assignment_overrides.create!(
+          set: section,
+          parent_override:,
+          due_at: 3.days.from_now
+        )
+
+        parent_overrides_with_pr << parent_override
+      end
+
+      test_instance = test_class.new
+      test_instance.instance_variable_set(:@current_user, @teacher)
+
+      peer_review_query_count = 0
+      subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+        if /SELECT.*FROM.*assignment_overrides.*WHERE.*assignment_overrides.*parent_override_id.*IN/im.match?(payload[:sql])
+          peer_review_query_count += 1
+        end
+      end
+
+      test_instance.assignment_overrides_json(
+        parent_overrides_with_pr,
+        @teacher,
+        include_names: false,
+        include_child_override_due_dates: false,
+        include_child_peer_review_override_dates: true
+      )
+
+      ActiveSupport::Notifications.unsubscribe(subscription)
+
+      expect(peer_review_query_count).to eq(1)
+    end
+
+    it "does not query for peer review overrides when include_child_peer_review_override_dates is false" do
+      parent_overrides = @sections.map do |section|
+        parent_override = @assignment.assignment_overrides.create!(
+          set: section,
+          due_at: 1.day.from_now
+        )
+
+        @peer_review_sub.assignment_overrides.create!(
+          set: section,
+          parent_override:,
+          due_at: 3.days.from_now
+        )
+
+        parent_override
+      end
+
+      test_instance = test_class.new
+      test_instance.instance_variable_set(:@current_user, @teacher)
+
+      peer_review_query_count = 0
+      subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+        if /SELECT.*FROM.*assignment_overrides.*WHERE.*assignment_overrides.*parent_override_id.*IN/im.match?(payload[:sql])
+          peer_review_query_count += 1
+        end
+      end
+
+      test_instance.assignment_overrides_json(
+        parent_overrides,
+        @teacher,
+        include_names: false,
+        include_child_override_due_dates: false,
+        include_child_peer_review_override_dates: false
+      )
+
+      ActiveSupport::Notifications.unsubscribe(subscription)
+
+      expect(peer_review_query_count).to eq(0)
+    end
+
+    it "correctly maps peer review overrides to parent overrides" do
+      section1 = @sections[0]
+      section2 = @sections[1]
+
+      parent_override1 = @assignment.assignment_overrides.create!(
+        set: section1,
+        due_at: 1.day.from_now
+      )
+
+      peer_review_override1 = @peer_review_sub.assignment_overrides.create!(
+        set: section1,
+        parent_override: parent_override1,
+        due_at: 3.days.from_now
+      )
+
+      parent_override2 = @assignment.assignment_overrides.create!(
+        set: section2,
+        due_at: 2.days.from_now
+      )
+
+      peer_review_override2 = @peer_review_sub.assignment_overrides.create!(
+        set: section2,
+        parent_override: parent_override2,
+        due_at: 4.days.from_now
+      )
+
+      test_instance = test_class.new
+      test_instance.instance_variable_set(:@current_user, @teacher)
+      result = test_instance.assignment_overrides_json(
+        [parent_override1, parent_override2],
+        @teacher,
+        include_names: false,
+        include_child_override_due_dates: false,
+        include_child_peer_review_override_dates: true
+      )
+
+      override1_json = result.find { |o| o[:id] == parent_override1.id }
+      override2_json = result.find { |o| o[:id] == parent_override2.id }
+
+      expect(override1_json[:peer_review_dates][:id]).to eq(peer_review_override1.id)
+      expect(override2_json[:peer_review_dates][:id]).to eq(peer_review_override2.id)
+    end
+
+    it "handles parent overrides without peer review overrides" do
+      section1 = @sections[0]
+      section2 = @sections[1]
+
+      parent_override1 = @assignment.assignment_overrides.create!(
+        set: section1,
+        due_at: 1.day.from_now
+      )
+
+      @peer_review_sub.assignment_overrides.create!(
+        set: section1,
+        parent_override: parent_override1,
+        due_at: 3.days.from_now
+      )
+
+      parent_override2 = @assignment.assignment_overrides.create!(
+        set: section2,
+        due_at: 2.days.from_now
+      )
+
+      test_instance = test_class.new
+      test_instance.instance_variable_set(:@current_user, @teacher)
+      result = test_instance.assignment_overrides_json(
+        [parent_override1, parent_override2],
+        @teacher,
+        include_names: false,
+        include_child_override_due_dates: false,
+        include_child_peer_review_override_dates: true
+      )
+
+      override1_json = result.find { |o| o[:id] == parent_override1.id }
+      override2_json = result.find { |o| o[:id] == parent_override2.id }
+
+      expect(override1_json[:peer_review_dates]).to be_present
+      expect(override2_json[:peer_review_dates]).to be_nil
+    end
+  end
 end

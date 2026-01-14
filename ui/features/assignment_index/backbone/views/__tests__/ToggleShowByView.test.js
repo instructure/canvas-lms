@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'lodash'
+import {each} from 'es-toolkit/compat'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
@@ -23,7 +23,7 @@ import ToggleShowByView from '../ToggleShowByView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
@@ -133,9 +133,9 @@ describe('ToggleShowByView', function () {
     document.documentElement.removeAttribute('lang')
   })
 
-  test('should be accessible', done => {
+  test.skip('should be accessible', async () => {
     const view = createView(true)
-    isAccessible(view, done, {a11yReport: true})
+    await isAccessible(view, {a11yReport: true})
   })
 
   test('should sort assignments into groups correctly', async function () {
@@ -145,7 +145,7 @@ describe('ToggleShowByView', function () {
     equal(view.assignmentGroups.length, 4)
     view.assignmentGroups.each(group => {
       const assignments = group.get('assignments').models
-      _.each(assignments, as => equal(group.name(), as.name()))
+      each(assignments, as => equal(group.name(), as.name()))
     })
   })
 

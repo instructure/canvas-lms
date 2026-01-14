@@ -23,18 +23,18 @@ import {Text} from '@instructure/ui-text'
 import type {Spacing} from '@instructure/emotion'
 
 export type FormattedErrorMessageProps = {
-  message: string,
-  margin?: Spacing,
-  iconMargin?: Spacing,
+  message: string
+  margin?: Spacing
+  iconMargin?: Spacing
 }
 
 const FormattedErrorMessage = ({message, margin, iconMargin}: FormattedErrorMessageProps) => {
   return (
-    <Flex as='div' alignItems='center' margin={margin || '0'} data-testid='error-message-container'>
-      <Flex as='div' alignItems='center' margin={iconMargin || '0 xx-small 0 0'}>
-        <IconWarningSolid color='error' data-testid='warning-icon' />
+    <Flex as="div" alignItems="center" margin={margin || '0'} data-testid="error-message-container">
+      <Flex as="div" alignItems="center" margin={iconMargin || '0 xx-small 0 0'}>
+        <IconWarningSolid color="error" data-testid="warning-icon" />
       </Flex>
-      <Text size='small' color='danger'>
+      <Text size="small" color="danger">
         {message}
       </Text>
     </Flex>

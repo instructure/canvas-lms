@@ -464,6 +464,56 @@ module Lti
         tool_proxy.save!
         expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_falsey
       end
+
+      context "with lti_asset_processor_tii_migration feature flag" do
+        before do
+          allow_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return("subscription_id")
+          account.root_account.enable_feature!(:lti_asset_processor_tii_migration)
+        end
+
+        it "returns true for non-migrated tool proxies with the capability" do
+          tool_proxy.raw_data["enabled_capability"] = [placement]
+          tool_proxy.save!
+          expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_truthy
+        end
+
+        it "returns false for migrated tool proxies with the capability" do
+          migrated_tool = external_tool_1_3_model(context: course, opts: { name: "migrated tool" })
+          tool_proxy.update!(migrated_to_context_external_tool: migrated_tool)
+          tool_proxy.raw_data["enabled_capability"] = [placement]
+          tool_proxy.save!
+          expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_falsey
+        end
+
+        it "returns true when non-migrated tool has capability and migrated tool does not" do
+          tp1 = create_tool_proxy(course)
+          rh1 = Lti::ResourceHandler.create!(resource_type_code: "code1", name: "resource1", tool_proxy: tp1)
+          mh1 = Lti::MessageHandler.create!(message_type: "basic-lti-launch-request", launch_path: "https://launch1/blti", resource_handler: rh1, tool_proxy: tp1)
+          mh1.update!(capabilities: [placement])
+
+          tp2 = create_tool_proxy(course)
+          migrated_tool = external_tool_1_3_model(context: course, opts: { name: "migrated tool" })
+          tp2.update!(migrated_to_context_external_tool: migrated_tool)
+          tp2.raw_data["enabled_capability"] = [placement]
+          tp2.save!
+
+          expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_truthy
+        end
+
+        it "returns false when all tools with capability are migrated" do
+          migrated_tool = external_tool_1_3_model(context: course, opts: { name: "migrated tool" })
+          tool_proxy.update!(migrated_to_context_external_tool: migrated_tool)
+          tool_proxy.raw_data["enabled_capability"] = [placement]
+          tool_proxy.save!
+
+          tp2 = create_tool_proxy(course)
+          rh2 = Lti::ResourceHandler.create!(resource_type_code: "code2", name: "resource2", tool_proxy: tp2)
+          mh2 = Lti::MessageHandler.create!(message_type: "basic-lti-launch-request", launch_path: "https://launch2/blti", resource_handler: rh2, tool_proxy: tp2)
+          mh2.update!(capabilities: [])
+
+          expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_falsey
+        end
+      end
     end
 
     describe "#matching_tool_profile?" do
@@ -772,6 +822,45 @@ module Lti
         tool_proxy.subscription_id = "subscription_id1"
         tool_proxy.save!
         tool_proxy.destroy
+      end
+    end
+
+    describe "#migrated_to_context_external_tool association" do
+      let(:account) { Account.create! }
+      let(:tool_proxy) { create_tool_proxy(context: account) }
+      let(:context_external_tool) do
+        external_tool_1_3_model(context: account, opts: { name: "migrated tool" })
+      end
+
+      it "allows associating a ContextExternalTool" do
+        tool_proxy.update!(migrated_to_context_external_tool: context_external_tool)
+        expect(tool_proxy.reload.migrated_to_context_external_tool).to eq context_external_tool
+      end
+
+      it "allows nil association" do
+        tool_proxy.update!(migrated_to_context_external_tool: nil)
+        expect(tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+      end
+
+      describe "when ContextExternalTool is hard deleted" do
+        it "nullifies the reference on ToolProxy" do
+          tool_proxy.update!(migrated_to_context_external_tool: context_external_tool)
+          expect(tool_proxy.reload.migrated_to_context_external_tool).to eq context_external_tool
+
+          context_external_tool.destroy_permanently!
+          expect(tool_proxy.reload.migrated_to_context_external_tool_id).to be_nil
+        end
+      end
+
+      describe "when ToolProxy is deleted" do
+        it "does not affect the associated ContextExternalTool" do
+          tool_proxy.update!(migrated_to_context_external_tool: context_external_tool)
+          expect(tool_proxy.reload.migrated_to_context_external_tool).to eq context_external_tool
+
+          tool_proxy.destroy
+          expect(ContextExternalTool.find_by(id: context_external_tool.id)).to eq context_external_tool
+          expect(context_external_tool.reload.workflow_state).to eq "anonymous"
+        end
       end
     end
   end

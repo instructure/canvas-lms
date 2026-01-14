@@ -26,10 +26,10 @@ import {RESPONSE_ACCOUNT_1, RESPONSE_ACCOUNT_4} from './fixtures'
 const defaultProps = {
   originAccountId: 1,
   visibilityChanges: [],
-  onAccountToggled: jest.fn(),
+  onAccountToggled: vi.fn(),
   showSpinner: false,
   subscriptionChanges: [],
-  onAccountSubscriptionToggled: jest.fn(),
+  onAccountSubscriptionToggled: vi.fn(),
   onAccountExpandedToggled: () => {},
   expandedAccounts: [1],
 }
@@ -68,7 +68,7 @@ describe('AccountTree', () => {
   })
 
   it('calls onAccountToggled when a checkbox is toggled', async () => {
-    const onAccountToggled = jest.fn()
+    const onAccountToggled = vi.fn()
     const {findByRole, getByRole} = render(
       <AccountTree {...defaultProps} onAccountToggled={onAccountToggled} />,
     )
@@ -85,7 +85,7 @@ describe('AccountTree', () => {
   })
 
   it('asks to expand tree when a parent account is selected', async () => {
-    const onAccountExpandedToggled = jest.fn()
+    const onAccountExpandedToggled = vi.fn()
     const {findByRole} = render(
       <AccountTree {...defaultProps} onAccountExpandedToggled={onAccountExpandedToggled} />,
     )
@@ -94,17 +94,42 @@ describe('AccountTree', () => {
     expect(onAccountExpandedToggled).toHaveBeenCalledWith(4, true)
   })
 
-  it('expands expanded nodes of the tree', async () => {
-    const {getByText} = render(<AccountTree {...defaultProps} expandedAccounts={[1, 4]} />)
+  it('fetches only origin account on mount', async () => {
+    const {findByRole, findByText} = render(
+      <AccountTree {...defaultProps} expandedAccounts={[1]} />,
+    )
+    // On mount, only the origin account should be fetched (not all accounts in expandedAccounts)
+    await waitFor(() => {
+      expect(fetchMock.calls()).toHaveLength(1)
+    })
+    expect(fetchMock.calls()[0][0]).toContain('/accounts/1/account_calendars')
+
+    // Wait for the parent account to be rendered
+    expect(await findByRole('button', {name: 'University, 5 accounts'})).toBeInTheDocument()
+    // Verify direct child accounts are visible (from the first fetch)
+    expect(await findByText('CPMS, 2 accounts')).toBeInTheDocument()
+  })
+
+  it('fetches account children on user expansion', async () => {
+    const onAccountExpandedToggled = vi.fn()
+    const {findByRole} = render(
+      <AccountTree {...defaultProps} onAccountExpandedToggled={onAccountExpandedToggled} />,
+    )
+    await waitFor(() => {
+      expect(fetchMock.calls()).toHaveLength(1)
+    })
+
+    // Expand CPMS by clicking its toggle button
+    const cpmsButton = await findByRole('button', {name: 'CPMS, 2 accounts'})
+    act(() => cpmsButton.click())
+
+    // Verify that expansion callback was called
+    expect(onAccountExpandedToggled).toHaveBeenCalledWith(4, true)
+    // Verify that a second fetch was triggered for CPMS's children
     await waitFor(() => {
       expect(fetchMock.calls()).toHaveLength(2)
     })
-    await waitFor(() => {
-      expect(getByText('University (5)')).toBeInTheDocument() // this is the parent account
-      expect(getByText('CPMS')).toBeInTheDocument() // this is a child account
-      expect(getByText('CPMS (2)')).toBeInTheDocument() // this is a child account with children
-      expect(getByText('CS')).toBeInTheDocument() // this is a child of CPMS
-    })
+    expect(fetchMock.calls()[1][0]).toContain('/accounts/4/account_calendars')
   })
 
   it('loads multiple pages properly if needed', async () => {

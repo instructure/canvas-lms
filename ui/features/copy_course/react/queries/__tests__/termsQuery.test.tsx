@@ -19,14 +19,24 @@
 import {renderHook} from '@testing-library/react-hooks'
 import {getTermsNextPage, termsQuery, useTermsQuery} from '../termsQuery'
 import {useAllPages} from '@canvas/query'
-import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import type {QueryFunctionContext, InfiniteData} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../../api'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/query', () => ({
-  useAllPages: jest.fn(),
+vi.mock('@canvas/query', () => ({
+  useAllPages: vi.fn(),
 }))
-jest.mock('@canvas/do-fetch-api-effect')
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+afterEach(() => {
+  server.resetHandlers()
+  vi.clearAllMocks()
+})
 
 describe('useTermsQuery', () => {
   const mockData: InfiniteData<DoFetchApiResults<EnrollmentTerms>> = {
@@ -55,11 +65,7 @@ describe('useTermsQuery', () => {
     pageParams: [null, {page: '2', per_page: '10'}],
   }
 
-  const mockUseAllPages = useAllPages as jest.Mock
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
+  const mockUseAllPages = useAllPages as ReturnType<typeof vi.fn>
 
   it('should return terms data', () => {
     mockUseAllPages.mockReturnValue({
@@ -130,16 +136,14 @@ describe('useTermsQuery', () => {
 })
 
 describe('termsQuery', () => {
-  const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
-
   it('should fetch terms with correct parameters', async () => {
-    const mockResponse: DoFetchApiResults<EnrollmentTerms> = {
-      json: {enrollment_terms: []},
-      link: {},
-      response: new Response(),
-      text: '',
-    }
-    mockDoFetchApi.mockResolvedValue(mockResponse)
+    let capturedPath = ''
+    server.use(
+      http.get('/api/v1/accounts/:accountId/terms', ({request}) => {
+        capturedPath = new URL(request.url).pathname + new URL(request.url).search
+        return HttpResponse.json({enrollment_terms: []})
+      }),
+    )
 
     const context = {
       signal: new AbortController().signal,
@@ -149,21 +153,18 @@ describe('termsQuery', () => {
 
     const result = await termsQuery(context)
 
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/accounts/1/terms?page=2&per_page=20',
-      fetchOpts: {signal: context.signal},
-    })
-    expect(result).toEqual(mockResponse)
+    expect(capturedPath).toBe('/api/v1/accounts/1/terms?page=2&per_page=20')
+    expect(result.json).toEqual({enrollment_terms: []})
   })
 
   it('should use default page and per_page if pageParam is missing', async () => {
-    const mockResponse: DoFetchApiResults<EnrollmentTerms> = {
-      json: {enrollment_terms: []},
-      link: {},
-      response: new Response(),
-      text: '',
-    }
-    mockDoFetchApi.mockResolvedValue(mockResponse)
+    let capturedPath = ''
+    server.use(
+      http.get('/api/v1/accounts/:accountId/terms', ({request}) => {
+        capturedPath = new URL(request.url).pathname + new URL(request.url).search
+        return HttpResponse.json({enrollment_terms: []})
+      }),
+    )
 
     const context = {
       signal: new AbortController().signal,
@@ -172,11 +173,8 @@ describe('termsQuery', () => {
 
     const result = await termsQuery(context)
 
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/accounts/1/terms?page=1&per_page=10',
-      fetchOpts: {signal: context.signal},
-    })
-    expect(result).toEqual(mockResponse)
+    expect(capturedPath).toBe('/api/v1/accounts/1/terms?page=1&per_page=10')
+    expect(result.json).toEqual({enrollment_terms: []})
   })
 })
 

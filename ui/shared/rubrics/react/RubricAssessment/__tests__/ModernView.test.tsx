@@ -134,7 +134,7 @@ describe('ModernView', () => {
     ratingOrder: 'descending',
     rubricAssessmentData: mockRubricAssessmentData,
     selectedViewMode: 'horizontal' as const,
-    onUpdateAssessmentData: jest.fn(),
+    onUpdateAssessmentData: vi.fn(),
   }
 
   const renderModernView = (props = {}) => {
@@ -146,7 +146,7 @@ describe('ModernView', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders criteria descriptions and ratings', () => {

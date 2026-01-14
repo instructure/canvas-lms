@@ -125,7 +125,7 @@ it('does not render the Add To Do option when isObserving', () => {
 })
 
 it('toggles the new item tray', async () => {
-  const mockCancel = jest.fn()
+  const mockCancel = vi.fn()
   const {getByTestId, getByRole, queryByRole} = render(
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />,
   )
@@ -140,7 +140,7 @@ it('toggles the new item tray', async () => {
 })
 
 it('sends focus back to the add new item button', () => {
-  const mockCancel = jest.fn()
+  const mockCancel = vi.fn()
   const ref = React.createRef()
   render(<PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} ref={ref} />)
   ref.current.handleToggleTray() // simulate clicking the + button
@@ -151,7 +151,7 @@ it('sends focus back to the add new item button', () => {
 describe('when component is mounted', () => {
   it("calls getNextOpportunities if all opportunities haven't been loaded", () => {
     const tempProps = defaultProps()
-    tempProps.getNextOpportunities = jest.fn()
+    tempProps.getNextOpportunities = vi.fn()
     tempProps.loading.allOpportunitiesLoaded = false
     render(<PlannerHeader {...tempProps} />)
     expect(tempProps.getNextOpportunities).toHaveBeenCalled()
@@ -159,7 +159,7 @@ describe('when component is mounted', () => {
 
   it("doesn't call getNextOpportunities if all opportunities have already been loaded", () => {
     const tempProps = defaultProps()
-    tempProps.getNextOpportunities = jest.fn()
+    tempProps.getNextOpportunities = vi.fn()
     render(<PlannerHeader {...tempProps} />)
     expect(tempProps.getNextOpportunities).not.toHaveBeenCalled()
   })
@@ -196,7 +196,7 @@ it('renders the tray with the name of an existing item when provided', () => {
 })
 
 it('does not call getNextOpportunities when component has loaded all opportunities', () => {
-  const mockDispatch = jest.fn()
+  const mockDispatch = vi.fn()
   const props = defaultProps()
   props.courses = [
     {id: '1', longName: 'Course Long Name', shortName: 'Course Short Name'},
@@ -278,7 +278,7 @@ it('does not call getNextOpportunities when component has loaded all opportuniti
 })
 
 it('does call getNextOpportunities when component has 9 opportunities', () => {
-  const mockDispatch = jest.fn()
+  const mockDispatch = vi.fn()
   const props = defaultProps()
   props.courses = [
     {id: '1', longName: 'Course Long Name', shortName: 'Course Short Name'},
@@ -372,7 +372,7 @@ it('does call getNextOpportunities when component has 9 opportunities', () => {
 })
 
 it('opens tray if todo update item props is set', () => {
-  const mockDispatch = jest.fn()
+  const mockDispatch = vi.fn()
   const props = defaultProps()
   props.courses = [
     {id: '1', longName: 'Course Long Name', shortName: 'Course Short Name'},
@@ -587,7 +587,7 @@ it('shows all opportunities on badge even when we have over 10 items', () => {
 })
 
 it('edits new item in open tray', () => {
-  const openEditingPlannerItem = jest.fn()
+  const openEditingPlannerItem = vi.fn()
   const todo1 = {title: 'todo1'}
   const todo2 = {title: 'todo2'}
   const {rerender, queryByRole} = render(
@@ -621,7 +621,7 @@ it('sets the maxHeight on the Opportunities', async () => {
   const opportunitiesButton = getByText('opportunities popup')
 
   // Mock getBoundingClientRect for the button
-  opportunitiesButton.getBoundingClientRect = jest.fn(() => ({
+  opportunitiesButton.getBoundingClientRect = vi.fn(() => ({
     top: 10,
     height: 20,
   }))
@@ -660,7 +660,7 @@ it('toggles the grades tray', async () => {
 
 it('calls startLoadingGradesSaga when grades are not loaded and the grades tray opens', async () => {
   const props = defaultProps()
-  props.startLoadingGradesSaga = jest.fn()
+  props.startLoadingGradesSaga = vi.fn()
   const {getByTestId} = render(<PlannerHeader {...props} />)
   const gradesButton = getByTestId('show-my-grades-button')
   await userEvent.click(gradesButton)
@@ -680,7 +680,7 @@ it('passes loading to the GradesDisplay when grades are loading', async () => {
 it('does not start the grades saga when grades are loading', async () => {
   const props = defaultProps()
   props.loading.loadingGrades = true
-  props.startLoadingGradesSaga = jest.fn()
+  props.startLoadingGradesSaga = vi.fn()
   const {getByTestId} = render(<PlannerHeader {...props} />)
   const gradesButton = getByTestId('show-my-grades-button')
   await userEvent.click(gradesButton)
@@ -690,7 +690,7 @@ it('does not start the grades saga when grades are loading', async () => {
 it('does not start the grades saga when grades have been loaded', async () => {
   const props = defaultProps()
   props.loading.gradesLoaded = true
-  props.startLoadingGradesSaga = jest.fn()
+  props.startLoadingGradesSaga = vi.fn()
   const {getByTestId} = render(<PlannerHeader {...props} />)
   const gradesButton = getByTestId('show-my-grades-button')
   await userEvent.click(gradesButton)
@@ -701,7 +701,7 @@ describe('new activity button', () => {
   let spy
 
   beforeEach(() => {
-    spy = jest.spyOn(PlannerHeader.prototype, 'newActivityAboveView')
+    spy = vi.spyOn(PlannerHeader.prototype, 'newActivityAboveView')
   })
 
   afterEach(() => {

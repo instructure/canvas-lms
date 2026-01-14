@@ -20,9 +20,9 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {NoResultsFound} from '../NoResultsFound'
 
-jest.mock('@canvas/images/react/EmptyDesert', () => {
-  return jest.fn(() => <div data-testid="empty-desert" />)
-})
+vi.mock('@canvas/images/react/EmptyDesert', () => ({
+  default: () => <div data-testid="empty-desert" />,
+}))
 
 const mockFlashScreenReaderHolder = () => {
   const div = document.createElement('div')

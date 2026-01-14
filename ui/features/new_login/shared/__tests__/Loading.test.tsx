@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import {Loading} from '..'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('Loading Component', () => {
   it('renders with default loading title', async () => {

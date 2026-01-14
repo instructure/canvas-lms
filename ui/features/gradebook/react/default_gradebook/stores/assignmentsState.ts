@@ -25,7 +25,7 @@ import type {GradingPeriodAssignmentMap} from '../gradebook.d'
 import type {AssignmentGroup, Assignment, AssignmentMap, SubmissionType} from '../../../../../api.d'
 import {getAllAssignmentGroups} from './graphql/assignmentGroups/getAllAssignmentGroups'
 import {transformAssignmentGroup} from './graphql/assignmentGroups/transformAssignmentGroup'
-import {flatten, groupBy, isArray} from 'lodash'
+import {groupBy, flatten, isArray} from 'es-toolkit/compat'
 import {getAllAssignments} from './graphql/assignments/getAllAssignments'
 import {transformAssignment} from './graphql/assignments/transformAssignments'
 import pLimit from 'p-limit'
@@ -185,6 +185,7 @@ export default (
       'post_manually',
       'checkpoints',
       'has_rubric',
+      'peer_review',
     ]
 
     if (get().hasModules) {

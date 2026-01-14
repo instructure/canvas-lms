@@ -90,6 +90,134 @@ describe ContentExport do
       @ce.selected_content = { content_exports: { CC::CCHelper.create_key(@ce) => "1" } }
       expect(@ce.export_object?(@ce)).to be true
     end
+
+    context "with ContentTags and selective_content_tag_export" do
+      before :once do
+        @course.account.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+
+        @module = @course.context_modules.create!(name: "Test Module")
+        @ct1 = @module.content_tags.create!(
+          content_id: 0,
+          tag_type: "context_module",
+          content_type: "ExternalUrl",
+          context: @course,
+          title: "Item 1",
+          url: "https://example.com/1"
+        )
+        @ct2 = @module.content_tags.create!(
+          content_id: 0,
+          tag_type: "context_module",
+          content_type: "ExternalUrl",
+          context: @course,
+          title: "Item 2",
+          url: "https://example.com/2"
+        )
+      end
+
+      context "with feature flag enabled" do
+        before do
+          Account.site_admin.enable_feature!(:selective_content_tag_export)
+        end
+
+        it "excludes content tags even when parent module is selected unless explicitly selected" do
+          @ce.settings[:selective_content_tag_export] = true
+          @ce.selected_content = {
+            "context_modules" => { CC::CCHelper.create_key(@module) => "1" },
+            "content_tags" => { CC::CCHelper.create_key(@ct1) => "1" }
+          }
+
+          # ct1 is explicitly selected and should be exported
+          expect(@ce.export_object?(@ct1)).to be true
+          # ct2 is NOT selected and should be excluded even though parent module IS selected
+          expect(@ce.export_object?(@ct2)).to be false
+        end
+
+        it "returns false when content_tags not in selected_content" do
+          @ce.settings[:selective_content_tag_export] = true
+          @ce.selected_content = {
+            "context_modules" => { CC::CCHelper.create_key(@module) => "1" }
+          }
+
+          expect(@ce.export_object?(@ct1)).to be false
+          expect(@ce.export_object?(@ct2)).to be false
+        end
+
+        it "returns true for ExternalUrl content_type when selected" do
+          @ce.settings[:selective_content_tag_export] = true
+          @ce.selected_content = {
+            "context_modules" => { CC::CCHelper.create_key(@module) => "1" },
+            "content_tags" => { CC::CCHelper.create_key(@ct1) => "1" }
+          }
+
+          # ct1 is an ExternalUrl type that IS selected
+          expect(@ct1.content_type).to eq("ExternalUrl")
+          expect(@ce.export_object?(@ct1)).to be true
+        end
+
+        it "returns false for ExternalUrl content_type when not selected" do
+          @ce.settings[:selective_content_tag_export] = true
+          @ce.selected_content = {
+            "context_modules" => { CC::CCHelper.create_key(@module) => "1" },
+            "content_tags" => { CC::CCHelper.create_key(@ct1) => "1" }
+          }
+
+          # ct2 is an ExternalUrl type that is NOT selected
+          expect(@ct2.content_type).to eq("ExternalUrl")
+          expect(@ce.export_object?(@ct2)).to be false
+        end
+
+        it "returns true for SubHeader content_type when selected" do
+          subheader = @module.content_tags.create!(
+            content_id: 0,
+            tag_type: "context_module",
+            content_type: "ContextModuleSubHeader",
+            context: @course,
+            title: "Section Header"
+          )
+
+          @ce.settings[:selective_content_tag_export] = true
+          @ce.selected_content = {
+            "context_modules" => { CC::CCHelper.create_key(@module) => "1" },
+            "content_tags" => { CC::CCHelper.create_key(subheader) => "1" }
+          }
+
+          expect(subheader.content_type).to eq("ContextModuleSubHeader")
+          expect(@ce.export_object?(subheader)).to be true
+        end
+
+        it "returns false for SubHeader content_type when not selected" do
+          subheader = @module.content_tags.create!(
+            content_id: 0,
+            tag_type: "context_module",
+            content_type: "ContextModuleSubHeader",
+            context: @course,
+            title: "Section Header"
+          )
+
+          @ce.settings[:selective_content_tag_export] = true
+          @ce.selected_content = {
+            "context_modules" => { CC::CCHelper.create_key(@module) => "1" },
+            "content_tags" => { CC::CCHelper.create_key(@ct1) => "1" }
+          }
+
+          expect(subheader.content_type).to eq("ContextModuleSubHeader")
+          expect(@ce.export_object?(subheader)).to be false
+        end
+
+        it "returns true when content tags are selected even if parent module is not" do
+          @ce.settings[:selective_content_tag_export] = true
+          @ce.selected_content = {
+            "content_tags" => { CC::CCHelper.create_key(@ct1) => "1" }
+          }
+
+          # ct1 is selected and should be exported even though parent module is not selected
+          expect(@ce.export_object?(@ct1)).to be true
+          # ct2 is not selected
+          expect(@ce.export_object?(@ct2)).to be false
+        end
+      end
+    end
   end
 
   context "Quizzes2 Export" do

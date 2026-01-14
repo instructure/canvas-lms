@@ -37,14 +37,14 @@ const defaultProps = {
   currentEnrollments,
   availableRoles: AVAILABLE_ROLES,
   userId: USER_ID,
-  onClose: jest.fn(),
-  onSubmit: jest.fn(),
+  onClose: vi.fn(),
+  onSubmit: vi.fn(),
 }
 
 describe('EditRolesModal', () => {
   beforeEach(() => {
     fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("renders modal with user's current role", async () => {

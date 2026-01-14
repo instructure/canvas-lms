@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {extend} from 'lodash'
+import {extend} from 'es-toolkit/compat'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 import Section from '@canvas/sections/backbone/models/Section'

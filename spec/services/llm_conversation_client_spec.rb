@@ -194,7 +194,8 @@ describe LLMConversationClient do
         "success" => true,
         "data" => {
           "id" => conversation_id,
-          "root_account_id" => root_account_uuid
+          "root_account_id" => root_account_uuid,
+          "first_message" => "Scenario: Test scenario\n\nFacts: Test facts\nLearning objectives: Test learning objectives\n\nStart the conversation with a focused question (max 15 words)."
         }
       }
     end
@@ -210,7 +211,17 @@ describe LLMConversationClient do
 
     before do
       stub_request(:post, "http://localhost:3001/conversations")
-        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .with(
+          headers: { "Authorization" => "Bearer test-bearer-token" },
+          body: hash_including(
+            "prompt_code" => "alpha",
+            "variables" => hash_including(
+              "scenario" => scenario,
+              "facts" => facts,
+              "learning_objectives" => learning_objectives
+            )
+          )
+        )
         .to_return(status: 200, body: create_response.to_json, headers: { "Content-Type" => "application/json" })
 
       stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
@@ -218,7 +229,7 @@ describe LLMConversationClient do
         .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
     end
 
-    it "creates a conversation and returns starting messages" do
+    it "creates a conversation with alpha prompt and returns starting messages" do
       result = client.starting_messages
 
       expect(result).to be_a(Hash)
@@ -243,6 +254,44 @@ describe LLMConversationClient do
         LlmConversation::Errors::ConversationError,
         "llm_conversation_bearer_token not found in vault secrets"
       )
+    end
+
+    context "with conversation_context_id" do
+      let(:client_with_context) do
+        described_class.new(
+          current_user: user,
+          root_account_uuid:,
+          facts:,
+          learning_objectives:,
+          scenario:,
+          conversation_context_id: "test-context-id"
+        )
+      end
+
+      before do
+        stub_request(:post, "http://localhost:3001/conversations")
+          .with(
+            headers: { "Authorization" => "Bearer test-bearer-token" },
+            body: hash_including(
+              "prompt_code" => "alpha",
+              "conversation_context_id" => "test-context-id"
+            )
+          )
+          .to_return(status: 200, body: create_response.to_json, headers: { "Content-Type" => "application/json" })
+
+        stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
+          .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+          .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
+      end
+
+      it "sends conversation_context_id instead of variables" do
+        result = client_with_context.starting_messages
+
+        expect(result).to be_a(Hash)
+        expect(result[:conversation_id]).to eq(conversation_id)
+        expect(result[:messages]).to be_an(Array)
+        expect(result[:messages].length).to eq(2)
+      end
     end
   end
 

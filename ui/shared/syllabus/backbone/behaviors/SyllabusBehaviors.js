@@ -26,7 +26,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/datetime/jquery/datepicker'
 import easy_student_view from '@canvas/easy-student-view'
 import htmlEscape from '@instructure/html-escape'
-import {escape} from 'lodash'
+import {escape} from 'es-toolkit/compat'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -122,31 +122,218 @@ function selectDate(date) {
   $('.mini_month').find(`#mini_day_${date}`).addClass('selected')
 }
 
+// Builds an accessible label for a mini calendar day
+//    Constructs a comprehensive aria-label that includes weekday, date,
+//    and contextual information (today, other month, events).
+function buildDayAriaLabel($td, cellId, currentMonthNumber) {
+  const [, , year, month, day] = cellId.split('_')
+  const dateObj = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10))
+
+  const weekday = dateObj.toLocaleDateString(undefined, {weekday: 'long'})
+  const monthName = dateObj.toLocaleDateString(undefined, {month: 'long'})
+  const dayNum = dateObj.getDate()
+  const yearNum = dateObj.getFullYear()
+
+  let ariaLabel = `${weekday}, ${monthName} ${dayNum}, ${yearNum}`
+
+  // Add contextual information
+  if ($td.hasClass('today')) {
+    ariaLabel += ', Today'
+  }
+
+  if ($td.hasClass('other_month')) {
+    const isPrevMonth = parseInt(month, 10) < currentMonthNumber
+    ariaLabel += isPrevMonth ? ', Previous month' : ', Next month'
+  }
+
+  if ($td.hasClass('has_event')) {
+    ariaLabel += ', Has events'
+  }
+
+  return ariaLabel
+}
+
+// Navigates focus to another day in the mini calendar using arrow keys
+//    Handles arrow key navigation with wrapping at calendar boundaries.
+//    Supports left/right for adjacent days and up/down for same weekday.
+function navigateMiniCalendarDays(key, $currentWrapper, $mini_month) {
+  const $allWrappers = $mini_month.find('.mini_calendar_day .day_wrapper[tabindex="0"]')
+  const currentIndex = $allWrappers.index($currentWrapper)
+  if (currentIndex === -1) return
+
+  let targetIndex = currentIndex
+  const totalDays = $allWrappers.length
+  const DAYS_PER_WEEK = 7
+
+  switch (key) {
+    case 'ArrowLeft':
+      targetIndex = currentIndex - 1
+      if (targetIndex < 0) targetIndex = totalDays - 1
+      break
+
+    case 'ArrowRight':
+      targetIndex = currentIndex + 1
+      if (targetIndex >= totalDays) targetIndex = 0
+      break
+
+    case 'ArrowUp':
+      targetIndex = currentIndex - DAYS_PER_WEEK
+      if (targetIndex < 0) {
+        const column = currentIndex % DAYS_PER_WEEK
+        const lastRowStart = Math.floor((totalDays - 1) / DAYS_PER_WEEK) * DAYS_PER_WEEK
+        targetIndex = lastRowStart + column
+        if (targetIndex >= totalDays) targetIndex = totalDays - DAYS_PER_WEEK + column
+      }
+      break
+
+    case 'ArrowDown':
+      targetIndex = currentIndex + DAYS_PER_WEEK
+      if (targetIndex >= totalDays) targetIndex = currentIndex % DAYS_PER_WEEK
+      break
+  }
+
+  $allWrappers.eq(targetIndex).focus()
+}
+
+// Sets up accessibility for mini calendar
+//    Removes table semantics for screen readers, adds proper ARIA labels,
+//    and enables keyboard navigation for all calendar days.
+function setupMiniCalendarAccessibility($mini_month) {
+  // Remove table semantics to prevent announcing table structure
+  $mini_month.find('table, thead, tbody, tr, th, td').attr('role', 'presentation')
+
+  const currentMonthNumber = parseInt($mini_month.find('.month_number').text(), 10)
+
+  // Make all days keyboard accessible with proper labels
+  $mini_month.find('.mini_calendar_day').each(function () {
+    const $td = $(this)
+    const $wrapper = $td.find('.day_wrapper')
+    const cellId = $td.attr('id')
+
+    if (!cellId) return
+
+    const ariaLabel = buildDayAriaLabel($td, cellId, currentMonthNumber)
+
+    // Hide redundant screenreader-only spans to prevent "group" announcements
+    $wrapper.find('.screenreader-only').attr('aria-hidden', 'true')
+
+    $wrapper.attr({
+      tabindex: '0',
+      role: 'button',
+      'aria-label': ariaLabel,
+    })
+  })
+
+  // Keyboard navigation for days
+  $mini_month.off('keydown.minical').on('keydown.minical', '.day_wrapper', function (ev) {
+    const isArrowKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(ev.key)
+    const isActivationKey = ev.key === 'Enter' || ev.key === ' '
+
+    if (isArrowKey) {
+      ev.preventDefault()
+      navigateMiniCalendarDays(ev.key, $(this), $mini_month)
+    } else if (isActivationKey) {
+      ev.preventDefault()
+      $(this).trigger('click')
+    }
+  })
+}
+
+// Announce a date to screen readers by forcing focus re-read
+//    Temporarily blurs and refocuses the element to trigger screen reader announcement.
+function announceDate($wrapper) {
+  if (!$wrapper || !$wrapper.length) return
+
+  $wrapper.blur()
+  setTimeout(() => $wrapper.focus(), 50)
+}
+
 // Binds to mini calendar dom events
+//    Called to bind behaviors to the mini calendar after it's rendered.
+//    Sets up day selection, month navigation, and accessibility features.
 function bindToMiniCalendar() {
   const $mini_month = $('.mini_month')
 
+  setupMiniCalendarAccessibility($mini_month)
+
+  // Fix button labels for accessibility
+  $mini_month.find('.prev_month_link').attr('aria-label', 'Previous month')
+  $mini_month.find('.next_month_link').attr('aria-label', 'Next month')
+
+  // Month navigation
   const prev_next_links = $mini_month.find('.next_month_link, .prev_month_link')
   prev_next_links.on('click', function (ev) {
     ev.preventDefault()
+
+    // Store the focused element's position before month change
+    const $focusedWrapper = $mini_month.find('.day_wrapper:focus')
+    let focusPosition = null
+
+    if ($focusedWrapper.length) {
+      const $allWrappers = $mini_month.find('.mini_calendar_day .day_wrapper[tabindex="0"]')
+      focusPosition = $allWrappers.index($focusedWrapper)
+
+      // Only store if we found a valid position
+      if (focusPosition === -1) {
+        focusPosition = null
+      }
+    }
+
     changeMonth($mini_month, $(this).hasClass('next_month_link') ? 1 : -1)
     highlightDaysWithEvents()
+    setupMiniCalendarAccessibility($mini_month)
+
+    // Restore focus to the same position and announce the new date
+    if (focusPosition !== null && focusPosition >= 0) {
+      setTimeout(() => {
+        const $allWrappers = $mini_month.find('.mini_calendar_day .day_wrapper[tabindex="0"]')
+        const $targetWrapper = $allWrappers.eq(focusPosition)
+
+        if ($targetWrapper.length) {
+          announceDate($targetWrapper)
+        }
+      }, 100)
+    }
   })
 
+  prev_next_links.on('keydown', function (ev) {
+    if (ev.key === ' ' || ev.key === 'Enter') {
+      ev.preventDefault()
+      $(this).click()
+    }
+  })
+
+  // Day selection
   const miniCalendarDayClick = function (ev) {
     ev.preventDefault()
+
+    // Store the clicked element's position before month/date change
+    const $clickedWrapper = $(ev.target).closest('.day_wrapper')
+    const $allWrappers = $mini_month.find('.mini_calendar_day .day_wrapper[tabindex="0"]')
+    const focusPosition = $allWrappers.index($clickedWrapper)
+
     const date = $(ev.target).closest('.mini_calendar_day')[0].id.slice(9)
     const [year, month, day] = Array.from(date.split('_'))
     changeMonth($mini_month, `${month}/${day}/${year}`)
     highlightDaysWithEvents()
+    setupMiniCalendarAccessibility($mini_month)
     selectDate(date)
-    const eventSelector = escape(`.events_${date}`)
-    $(eventSelector).ifExists($events => setTimeout(() => selectRow($events), 0)) // focus race condition hack. why do you do this to me, IE?
-  }
 
-  $mini_month.on('keypress', '.day_wrapper', ev => {
-    if (ev.which === 13 || ev.which === 32) miniCalendarDayClick(ev)
-  })
+    // Restore focus to the same position and announce the new date
+    if (focusPosition >= 0) {
+      setTimeout(() => {
+        const $allWrappers = $mini_month.find('.mini_calendar_day .day_wrapper[tabindex="0"]')
+        const $targetWrapper = $allWrappers.eq(focusPosition)
+
+        if ($targetWrapper.length) {
+          announceDate($targetWrapper)
+        }
+      }, 100)
+    }
+
+    const eventSelector = escape(`.events_${date}`)
+    $(eventSelector).ifExists($events => setTimeout(() => selectRow($events), 0))
+  }
 
   $mini_month.on('click', '.day_wrapper', miniCalendarDayClick)
 
@@ -158,6 +345,7 @@ function bindToMiniCalendar() {
     highlightDate(date)
   })
 
+  // Jump to today
   $('.jump_to_today_link').on('click', ev => {
     ev.preventDefault()
     const todayString = $.datepicker.formatDate('yy_mm_dd', new Date())

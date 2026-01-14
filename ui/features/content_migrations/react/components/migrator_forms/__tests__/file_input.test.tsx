@@ -22,11 +22,11 @@ import userEvent from '@testing-library/user-event'
 import MigrationFileInput from '../file_input'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn().mockReturnValue(jest.fn()),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: vi.fn().mockReturnValue(vi.fn()),
 }))
 
-const onChange = jest.fn()
+const onChange = vi.fn()
 
 const renderComponent = (overrideProps?: any) =>
   render(<MigrationFileInput onChange={onChange} {...overrideProps} />)
@@ -34,7 +34,7 @@ const renderComponent = (overrideProps?: any) =>
 describe('MigrationFileInput', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))
 
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => vi.clearAllMocks())
 
   it('renders hidden input', () => {
     renderComponent()

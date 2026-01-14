@@ -490,4 +490,139 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
       end
     end
   end
+
+  describe "sorting by asset creation time" do
+    include LtiSpecHelper
+
+    before do
+      course_with_student(active_all: true)
+      @assignment = assignment_model(course: @course)
+      @tool = new_valid_external_tool(@course)
+      @processor = lti_asset_processor_model(tool: @tool, assignment: @assignment)
+    end
+
+    it "returns reports sorted by asset.created_at DESC (newest first)" do
+      # Create assets with staggered timestamps
+      oldest_asset = lti_asset_model(submission: @assignment.submissions.find_by(user: @student))
+      oldest_asset.update!(created_at: 3.days.ago)
+      oldest_report = lti_asset_report_model(
+        asset: oldest_asset,
+        asset_processor: @processor
+      )
+
+      middle_asset = lti_asset_model(submission: @assignment.submissions.find_by(user: @student))
+      middle_asset.update!(created_at: 2.days.ago)
+      middle_report = lti_asset_report_model(
+        asset: middle_asset,
+        asset_processor: @processor
+      )
+
+      newest_asset = lti_asset_model(submission: @assignment.submissions.find_by(user: @student))
+      newest_asset.update!(created_at: 1.day.ago)
+      newest_report = lti_asset_report_model(
+        asset: newest_asset,
+        asset_processor: @processor
+      )
+
+      result = execute_loader(
+        submission_ids: [@assignment.submissions.find_by(user: @student).id],
+        for_student: false,
+        latest: false
+      )
+
+      submission_id = @assignment.submissions.find_by(user: @student).id
+      # Should be ordered newest first
+      expect(result[submission_id]).to eq([newest_report, middle_report, oldest_report])
+    end
+
+    it "sorts correctly when for_student: true" do
+      submission = @assignment.submissions.find_by(user: @student)
+
+      # Create assets in reverse chronological order
+      older_asset = lti_asset_model(submission:)
+      older_asset.update!(created_at: 2.days.ago)
+      older_report = lti_asset_report_model(
+        asset: older_asset,
+        asset_processor: @processor,
+        visible_to_owner: true,
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED
+      )
+
+      newer_asset = lti_asset_model(submission:)
+      newer_asset.update!(created_at: 1.day.ago)
+      newer_report = lti_asset_report_model(
+        asset: newer_asset,
+        asset_processor: @processor,
+        visible_to_owner: true,
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED
+      )
+
+      result = execute_loader(
+        submission_ids: [submission.id],
+        for_student: true,
+        latest: true
+      )
+
+      # Should be sorted newest first even for students
+      expect(result[submission.id]).to eq([newer_report, older_report])
+    end
+
+    it "handles assets with same creation time using stable sort" do
+      submission = @assignment.submissions.find_by(user: @student)
+      same_time = 1.day.ago
+
+      # Create multiple assets with the same timestamp
+      asset1 = lti_asset_model(submission:)
+      asset1.update!(created_at: same_time)
+      report1 = lti_asset_report_model(asset: asset1, asset_processor: @processor)
+
+      asset2 = lti_asset_model(submission:)
+      asset2.update!(created_at: same_time)
+      report2 = lti_asset_report_model(asset: asset2, asset_processor: @processor)
+
+      asset3 = lti_asset_model(submission:)
+      asset3.update!(created_at: same_time)
+      report3 = lti_asset_report_model(asset: asset3, asset_processor: @processor)
+
+      result = execute_loader(
+        submission_ids: [submission.id],
+        for_student: false,
+        latest: false
+      )
+
+      # All reports should be present
+      expect(result[submission.id]).to match_array([report1, report2, report3])
+      # They should all have the same created_at
+      expect(result[submission.id].map { |r| r.asset.created_at }).to all(eq(same_time))
+    end
+
+    it "handles very old assets appearing before recent ones" do
+      submission = @assignment.submissions.find_by(user: @student)
+
+      # Create very old asset
+      old_asset = lti_asset_model(submission:)
+      old_asset.update!(created_at: 1.year.ago)
+      old_report = lti_asset_report_model(
+        asset: old_asset,
+        asset_processor: @processor
+      )
+
+      # Create recent asset
+      recent_asset = lti_asset_model(submission:)
+      recent_asset.update!(created_at: 1.hour.ago)
+      recent_report = lti_asset_report_model(
+        asset: recent_asset,
+        asset_processor: @processor
+      )
+
+      result = execute_loader(
+        submission_ids: [submission.id],
+        for_student: false,
+        latest: false
+      )
+
+      # Recent report should come first despite old report existing
+      expect(result[submission.id]).to eq([recent_report, old_report])
+    end
+  end
 end

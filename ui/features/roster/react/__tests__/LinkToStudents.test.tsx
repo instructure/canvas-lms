@@ -55,8 +55,8 @@ describe('LinkToStudents', () => {
       avatar_url: 'avatar_url',
       enrollments: [],
     },
-    onClose: jest.fn(),
-    onSubmit: jest.fn(),
+    onClose: vi.fn(),
+    onSubmit: vi.fn(),
   }
 
   beforeAll(() => {

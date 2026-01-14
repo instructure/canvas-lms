@@ -28,7 +28,6 @@ describe('NewKeyModal', () => {
 
   beforeEach(() => {
     fakeENV.setup({
-      validLtiPlacements: [],
       validLtiScopes: {},
       RAILS_ENVIRONMENT: 'production',
     })
@@ -36,7 +35,7 @@ describe('NewKeyModal', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     cleanup()
   })
 
@@ -209,7 +208,7 @@ describe('NewKeyModal', () => {
 
   describe('submitting the form', () => {
     async function submitForm(createOrEditDeveloperKeyState) {
-      const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: jest.fn()}
+      const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: vi.fn()}
       const {ref} = renderDeveloperKeyModal({
         actions: mergedFakeActions,
         createLtiKeyState,
@@ -228,7 +227,7 @@ describe('NewKeyModal', () => {
     }
 
     it('sets isSaving to true to disable the Save button', async () => {
-      const createOrEditSpy = jest
+      const createOrEditSpy = vi
         .fn()
         .mockImplementation(() => () => new Promise(resolve => setTimeout(resolve, 100)))
       const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
@@ -309,7 +308,7 @@ describe('NewKeyModal', () => {
     })
 
     describe('and the context is site admin', () => {
-      const createOrEditSpy = jest.fn()
+      const createOrEditSpy = vi.fn()
       const props = {
         ctx: {
           params: {
@@ -324,7 +323,7 @@ describe('NewKeyModal', () => {
 
       beforeEach(() => {
         fakeENV.setup({
-          ...fakeENV.ENV,
+          ...window.ENV,
           RAILS_ENVIRONMENT: 'production',
         })
       })
@@ -372,8 +371,8 @@ describe('NewKeyModal', () => {
     })
 
     it('flashes an error if no scopes are selected', async () => {
-      const flashStub = jest.spyOn($, 'flashError')
-      const createOrEditSpy = jest.fn()
+      const flashStub = vi.spyOn($, 'flashError')
+      const createOrEditSpy = vi.fn()
       const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
       const developerKey2 = {...developerKey, require_scopes: true, scopes: []}
       const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
@@ -393,7 +392,7 @@ describe('NewKeyModal', () => {
     })
 
     it('allows saving if the key previously had scopes', async () => {
-      const flashStub = jest.spyOn($, 'flashError')
+      const flashStub = vi.spyOn($, 'flashError')
       const keyWithScopes = {...developerKey, require_scopes: true, scopes: selectedScopes}
       const editKeyWithScopesState = {...editDeveloperKeyState, developerKey: keyWithScopes}
       const {ref} = renderDeveloperKeyModal({
@@ -435,7 +434,7 @@ describe('NewKeyModal', () => {
     })
 
     describe('flash alerts checks', () => {
-      const successfulSaveStub = jest.fn()
+      const successfulSaveStub = vi.fn()
 
       const createWrapper = (stateOverrides, actionOverrides) =>
         renderDeveloperKeyModal({
@@ -462,7 +461,7 @@ describe('NewKeyModal', () => {
 
       describe('LTI Developer Key is being created', () => {
         it('notifies if the key saves successfully', async () => {
-          const saveLtiToolConfigurationStub = jest.fn().mockImplementation(() => {
+          const saveLtiToolConfigurationStub = vi.fn().mockImplementation(() => {
             return () => {
               return Promise.resolve({
                 developer_key: developerKey,
@@ -484,7 +483,7 @@ describe('NewKeyModal', () => {
         })
 
         it("doesn't notify if the key fails to be created", async () => {
-          const saveLtiToolConfigurationStub = jest
+          const saveLtiToolConfigurationStub = vi
             .fn()
             .mockImplementation(() => () => Promise.reject(new Error('testing')))
           const {ref} = createWrapper(
@@ -502,7 +501,7 @@ describe('NewKeyModal', () => {
 
         it('notifies and forwards if the API returns a warning_message', async () => {
           const warning_message = 'This is a warning message'
-          const saveLtiToolConfigurationStub = jest.fn().mockImplementation(
+          const saveLtiToolConfigurationStub = vi.fn().mockImplementation(
             () => () =>
               Promise.resolve({
                 developer_key: developerKey,
@@ -526,7 +525,7 @@ describe('NewKeyModal', () => {
 
       describe('LTI Developer Key is being edited', () => {
         it('notifies if the key saves successfully', async () => {
-          const updateLtiKeyStub = jest.fn().mockResolvedValue({
+          const updateLtiKeyStub = vi.fn().mockResolvedValue({
             developer_key: developerKey,
             tool_configuration: validToolConfig,
           })
@@ -542,7 +541,7 @@ describe('NewKeyModal', () => {
         })
 
         it("doesn't notifiy if the key fails to save", async () => {
-          const updateLtiKeyStub = jest.fn().mockRejectedValue(null)
+          const updateLtiKeyStub = vi.fn().mockRejectedValue(null)
           const {ref} = createWrapper({}, {updateLtiKey: updateLtiKeyStub})
 
           await act(async () => {
@@ -555,7 +554,7 @@ describe('NewKeyModal', () => {
 
         it('notifies if the API returns a warning_message', async () => {
           const warning_message = 'This is a warning message'
-          const updateLtiKeyStub = jest.fn().mockResolvedValue({
+          const updateLtiKeyStub = vi.fn().mockResolvedValue({
             developer_key: developerKey,
             tool_configuration: validToolConfig,
             warning_message,
@@ -576,7 +575,7 @@ describe('NewKeyModal', () => {
       // at least with respect to flashing an alert
       describe('API Dev Key is being created/edited', () => {
         it('flashes an alert if the key saves successfully', async () => {
-          const createOrEditStub = jest.fn().mockImplementation(() => {
+          const createOrEditStub = vi.fn().mockImplementation(() => {
             return () => {
               return Promise.resolve(null)
             }
@@ -601,7 +600,7 @@ describe('NewKeyModal', () => {
         })
 
         it("doesn't flash an alert if the key fails to save", async () => {
-          const createOrEditStub = jest.fn().mockImplementation(() => {
+          const createOrEditStub = vi.fn().mockImplementation(() => {
             return () => {
               return Promise.resolve(null)
             }

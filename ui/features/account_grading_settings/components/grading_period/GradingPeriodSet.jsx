@@ -19,7 +19,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import {map, some, every, head, tail, sortBy, reject, isNaN, filter, isEmpty, each} from 'lodash'
+import {
+  isEmpty,
+  sortBy,
+  map,
+  some,
+  every,
+  head,
+  tail,
+  reject,
+  isNaN,
+  filter,
+  each,
+} from 'es-toolkit/compat'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine, IconPlusLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'

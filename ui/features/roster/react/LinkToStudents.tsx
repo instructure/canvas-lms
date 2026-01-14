@@ -93,7 +93,11 @@ const LinkToStudents = ({
     searchTerm,
     page,
     skipAbort,
-  }: {searchTerm: string; page?: string; skipAbort: boolean}) => {
+  }: {
+    searchTerm: string
+    page?: string
+    skipAbort: boolean
+  }) => {
     const context = `course_${course.id}_students`
     const observeeIdsToExclude = [observer.id, ...selectedObservees.map(observee => observee.id)]
 

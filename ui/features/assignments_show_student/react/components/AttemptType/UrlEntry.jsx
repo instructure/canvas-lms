@@ -33,7 +33,7 @@ import {IconEyeLine, IconExternalLinkLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {TextInput} from '@instructure/ui-text-input'
 
 const I18n = createI18nScope('assignments_2_url_entry')
@@ -66,7 +66,7 @@ class UrlEntry extends React.Component {
   }
 
   componentDidMount() {
-    const { submission, focusOnInit, submitButtonRef, newAttemptButtonRef } = this.props
+    const {submission, focusOnInit, submitButtonRef, newAttemptButtonRef} = this.props
     window.addEventListener('beforeunload', this.beforeunload)
     if (submission?.submissionDraft?.url) {
       this.updateInputState()
@@ -108,7 +108,10 @@ class UrlEntry extends React.Component {
     window.removeEventListener('beforeunload', this.beforeunload)
     window.removeEventListener('message', this.handleLTIURLs)
     this.props.submitButtonRef?.current?.removeEventListener('click', this.handleSubmitClick)
-    this.props.newAttemptButtonRef?.current?.removeEventListener('click', this.handleNewAttemptClick)
+    this.props.newAttemptButtonRef?.current?.removeEventListener(
+      'click',
+      this.handleNewAttemptClick,
+    )
   }
 
   handleLTIURLs = async e => {

@@ -114,6 +114,15 @@ describe CalendarEventsController do
       get "show", params: { course_section_id: section.id, id: section_event.id }
       expect(response).to be_redirect
     end
+
+    it "finds section events via course URL" do
+      section = @course.default_section
+      section_event = section.calendar_events.create!(title: "Section event")
+      user_session(@student)
+      get "show", params: { course_id: @course.id, id: section_event.id }
+      expect(response).to be_successful
+      expect(assigns[:event]).to eq(section_event)
+    end
   end
 
   describe "GET 'new'" do

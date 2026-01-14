@@ -22,15 +22,15 @@ import {useManageThreadedRepliesStore} from '../../../hooks/useManageThreadedRep
 import DiscussionThreadedSelect from '../DiscussionThreadedSelect'
 
 // Mock the store hook
-jest.mock('../../../hooks/useManageThreadedRepliesStore')
-const mockedUseManageThreadedRepliesStore = useManageThreadedRepliesStore as unknown as jest.Mock
+vi.mock('../../../hooks/useManageThreadedRepliesStore')
+const mockedUseManageThreadedRepliesStore = useManageThreadedRepliesStore as unknown as any
 
 describe('DiscussionThreadedSelect', () => {
-  const mockSetDiscussionState = jest.fn()
+  const mockSetDiscussionState = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    mockedUseManageThreadedRepliesStore.mockImplementation(selector =>
+    vi.clearAllMocks()
+    mockedUseManageThreadedRepliesStore.mockImplementation((selector: any) =>
       selector({
         discussionStates: {testId: 'not_set'},
         setDiscussionState: mockSetDiscussionState,

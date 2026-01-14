@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {forEach, extend as lodashExtend} from 'lodash'
+import {forEach, extend as lodashExtend} from 'es-toolkit/compat'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
@@ -389,7 +389,7 @@ function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
       elementIdPrefix: '#submission_group',
     }
   }
-  if (params.grades) {
+  if (params.grades && params.bins) {
     for (let i = 0; i < params.bins.length; i++) {
       const binId = params.bins[i].id
       let grade = params.grades[binId]

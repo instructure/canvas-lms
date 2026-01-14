@@ -55,7 +55,7 @@ const ContentShareUserSearchSelector = forwardRef<
   ContentShareUserSearchSelectorProps
 >(({courseId, onUserSelected, selectedUsers, ...restOfSelectProps}, ref) => {
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const [searchedUsers, setSearchedUsers] = useState<BasicUser[] | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)

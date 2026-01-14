@@ -16,27 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor, screen} from '@testing-library/react'
+import {cleanup, render, waitFor, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {InMemoryCache} from '@apollo/client'
 import {CommentLibraryTray} from '../CommentLibraryTray'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {SpeedGraderLegacy_CommentBankItems} from '../../graphql/queries'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
-jest.mock('@canvas/do-fetch-api-effect')
+vi.mock('@canvas/alerts/react/FlashAlert')
+
+const server = setupServer()
 
 describe('CommentLibraryTray', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const defaultProps = {
     userId: '1',
     courseId: '1',
     isOpen: true,
-    onDismiss: jest.fn(),
-    setCommentFromLibrary: jest.fn(),
+    onDismiss: vi.fn(),
+    setCommentFromLibrary: vi.fn(),
     suggestionsWhenTypingEnabled: true,
-    setSuggestionsWhenTypingEnabled: jest.fn(),
+    setSuggestionsWhenTypingEnabled: vi.fn(),
   }
 
   const createCommentsMock = ({
@@ -105,9 +111,19 @@ describe('CommentLibraryTray', () => {
     )
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    vi.clearAllMocks()
+    // Default handler for user settings API
+    server.use(
+      http.put('/api/v1/users/self/settings', () => HttpResponse.json({})),
+    )
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   describe('Rendering Tests', () => {
@@ -224,7 +240,7 @@ describe('CommentLibraryTray', () => {
 
   describe('Error Handling Tests', () => {
     it('shows flash alert when GraphQL query fails', async () => {
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [
         {
           request: {
@@ -248,7 +264,7 @@ describe('CommentLibraryTray', () => {
   describe('Interaction Tests', () => {
     it('calls onDismiss when close button is clicked', async () => {
       const user = userEvent.setup()
-      const onDismiss = jest.fn()
+      const onDismiss = vi.fn()
       const mocks = [createCommentsMock()]
       setup(mocks, {onDismiss})
 
@@ -281,7 +297,7 @@ describe('CommentLibraryTray', () => {
   describe('Comment Selection Tests', () => {
     it('calls setCommentFromLibrary when a comment is clicked', async () => {
       const user = userEvent.setup()
-      const setCommentFromLibrary = jest.fn()
+      const setCommentFromLibrary = vi.fn()
       const mocks = [createCommentsMock({commentCount: 3})]
       setup(mocks, {setCommentFromLibrary})
 
@@ -297,7 +313,7 @@ describe('CommentLibraryTray', () => {
 
     it('calls setCommentFromLibrary with correct comment text for different comments', async () => {
       const user = userEvent.setup()
-      const setCommentFromLibrary = jest.fn()
+      const setCommentFromLibrary = vi.fn()
       const mocks = [createCommentsMock({commentCount: 3})]
       setup(mocks, {setCommentFromLibrary})
 
@@ -314,7 +330,7 @@ describe('CommentLibraryTray', () => {
 
     it('calls setCommentFromLibrary multiple times for multiple clicks', async () => {
       const user = userEvent.setup()
-      const setCommentFromLibrary = jest.fn()
+      const setCommentFromLibrary = vi.fn()
       const mocks = [createCommentsMock({commentCount: 3})]
       setup(mocks, {setCommentFromLibrary})
 
@@ -358,7 +374,7 @@ describe('CommentLibraryTray', () => {
 
     it('calls setSuggestionsWhenTypingEnabled when toggle is clicked', async () => {
       const user = userEvent.setup()
-      const setSuggestionsWhenTypingEnabled = jest.fn()
+      const setSuggestionsWhenTypingEnabled = vi.fn()
       const mocks = [createCommentsMock()]
       setup(mocks, {suggestionsWhenTypingEnabled: true, setSuggestionsWhenTypingEnabled})
 

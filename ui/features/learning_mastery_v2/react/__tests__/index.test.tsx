@@ -17,26 +17,31 @@
  */
 
 import {render, waitFor} from '@testing-library/react'
+import {type MockedFunction} from 'vitest'
 import LearningMastery from '../index'
 import useRollups from '../hooks/useRollups'
 import {useGradebookSettings} from '../hooks/useGradebookSettings'
+import {useStudents} from '../hooks/useStudents'
+import {useContributingScores} from '../hooks/useContributingScores'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
 import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '../utils/constants'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
 import {saveLearningMasteryGradebookSettings} from '../apiClient'
 
-jest.mock('../apiClient')
+vi.mock('../apiClient')
 
-jest.mock('../hooks/useRollups')
-jest.mock('../hooks/useGradebookSettings')
+vi.mock('../hooks/useRollups')
+vi.mock('../hooks/useGradebookSettings')
+vi.mock('../hooks/useStudents')
+vi.mock('../hooks/useContributingScores')
 
 describe('LearningMastery', () => {
   const ratings: Rating[] = MOCK_RATINGS
   const students: Student[] = MOCK_STUDENTS
   const outcomes: Outcome[] = MOCK_OUTCOMES
   const mockSaveLearningMasteryGradebookSettings =
-    saveLearningMasteryGradebookSettings as jest.MockedFunction<
+    saveLearningMasteryGradebookSettings as MockedFunction<
       typeof saveLearningMasteryGradebookSettings
     >
 
@@ -69,8 +74,34 @@ describe('LearningMastery', () => {
     }
   }
 
+  const createMockUseRollupsReturnValue = (
+    overrides: Partial<ReturnType<typeof useRollups>> = {},
+  ): ReturnType<typeof useRollups> => ({
+    isLoading: false,
+    error: null,
+    students: [],
+    outcomes: [],
+    rollups: [],
+    setCurrentPage: vi.fn(),
+    sorting: {
+      sortBy: SortBy.SortableName,
+      sortOrder: SortOrder.ASC,
+      setSortOrder: vi.fn(),
+      setSortBy: vi.fn(),
+      sortOutcomeId: null,
+      setSortOutcomeId: vi.fn(),
+      sortAlignmentId: null,
+      setSortAlignmentId: vi.fn(),
+    },
+    filter: {
+      selectedOutcomeIds: [],
+      setSelectedOutcomeIds: vi.fn(),
+    },
+    ...overrides,
+  })
+
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {
         outcome_proficiency: {ratings},
@@ -80,63 +111,65 @@ describe('LearningMastery', () => {
       FEATURES: {instui_nav: true},
     })
 
-    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
-    mockUseRollups.mockReturnValue({
-      isLoading: false,
-      error: null,
-      students,
-      outcomes,
-      rollups,
-      setCurrentPage: jest.fn(),
-      sorting: {
-        sortOrder: SortOrder.ASC,
-        setSortOrder: jest.fn(),
-        sortBy: SortBy.SortableName,
-        setSortBy: jest.fn(),
-        sortOutcomeId: null,
-        setSortOutcomeId: jest.fn(),
-      },
-    })
+    const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue(
+      createMockUseRollupsReturnValue({
+        students,
+        outcomes,
+        rollups,
+      }),
+    )
 
-    const mockUseGradebookSettings = useGradebookSettings as jest.MockedFunction<
+    const mockUseGradebookSettings = useGradebookSettings as MockedFunction<
       typeof useGradebookSettings
     >
     mockUseGradebookSettings.mockReturnValue({
       settings: DEFAULT_GRADEBOOK_SETTINGS,
       isLoading: false,
       error: null,
-      updateSettings: jest.fn(),
+      updateSettings: vi.fn(),
+    })
+
+    const mockUseStudents = useStudents as MockedFunction<typeof useStudents>
+    mockUseStudents.mockReturnValue({
+      students,
+      isLoading: false,
+      error: null,
+    })
+
+    const mockUseContributingScores = useContributingScores as MockedFunction<
+      typeof useContributingScores
+    >
+    mockUseContributingScores.mockReturnValue({
+      isLoading: false,
+      error: null,
+      contributingScores: {
+        forOutcome: vi.fn(() => ({
+          isVisible: () => false,
+          toggleVisibility: vi.fn(),
+          data: undefined,
+          alignments: undefined,
+          scoresForUser: vi.fn(() => []),
+          isLoading: false,
+          error: undefined,
+        })),
+      },
     })
   })
 
   afterEach(() => {
-    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
+    const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockClear()
     mockSaveLearningMasteryGradebookSettings.mockClear()
-    jest.clearAllMocks()
-    jest.clearAllTimers()
-    jest.useRealTimers()
+    vi.clearAllMocks()
+    vi.clearAllTimers()
+    vi.useRealTimers()
     fakeENV.teardown()
   })
 
   it('renders a loading spinner when useRollups.isLoading is true', async () => {
-    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
-    mockUseRollups.mockReturnValue({
-      isLoading: true,
-      error: null,
-      students: [],
-      outcomes: [],
-      rollups: [],
-      setCurrentPage: jest.fn(),
-      sorting: {
-        sortBy: SortBy.SortableName,
-        sortOrder: SortOrder.ASC,
-        setSortOrder: jest.fn(),
-        setSortBy: jest.fn(),
-        sortOutcomeId: null,
-        setSortOutcomeId: jest.fn(),
-      },
-    } as ReturnType<typeof useRollups>)
+    const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({isLoading: true}))
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
     expect(getByText('Loading')).toBeInTheDocument()
   })
@@ -152,24 +185,22 @@ describe('LearningMastery', () => {
   })
 
   it('does not render the export button on load error', async () => {
-    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
-    mockUseRollups.mockReturnValue({isLoading: false, error: ''} as ReturnType<typeof useRollups>)
+    const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: ''}))
     const {queryByText} = render(<LearningMastery {...defaultProps()} />)
     expect(queryByText('Export')).not.toBeInTheDocument()
   })
 
   it('does not render the gradebook body on the page if loading failed', async () => {
-    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
-    mockUseRollups.mockReturnValue({isLoading: false, error: ''} as ReturnType<typeof useRollups>)
+    const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: ''}))
     const {queryByTestId} = render(<LearningMastery {...defaultProps()} />)
     expect(queryByTestId('gradebook-body')).not.toBeInTheDocument()
   })
 
   it('renders generic error page if loading failed, while still rendering the gradebook menu', async () => {
-    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
-    mockUseRollups.mockReturnValue({isLoading: false, error: 'Banana Error'} as ReturnType<
-      typeof useRollups
-    >)
+    const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: 'Banana Error'}))
     const {getByTestId, getByText} = render(<LearningMastery {...defaultProps()} />)
     expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
     expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
@@ -187,7 +218,7 @@ describe('LearningMastery', () => {
   })
 
   it('calls useRollups with the provided courseId', () => {
-    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
+    const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     const props = defaultProps()
     render(<LearningMastery {...props} />)
     expect(mockUseRollups).toHaveBeenCalledWith({
@@ -195,6 +226,7 @@ describe('LearningMastery', () => {
       accountMasteryScalesEnabled: true,
       enabled: true,
       settings: DEFAULT_GRADEBOOK_SETTINGS,
+      selectedUserIds: [],
     })
   })
 })

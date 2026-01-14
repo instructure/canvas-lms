@@ -25,9 +25,9 @@
         "name": "@0no-co/graphqlsp",
         "schema": "./schema.graphql"
       }
-    ]
+    ],
+    "types": ["vitest/globals", "jqueryui"]
   },
   "include": ["ui/**/*.ts", "ui/**/*.tsx"],
-  "exclude": ["node_modules"],
-  "types": []
+  "exclude": ["node_modules"]
 }

@@ -28,26 +28,38 @@ class PeerReview::AllocationService < ApplicationService
     validation_result = validate
     return validation_result unless validation_result[:success]
 
-    ongoing_review = find_ongoing_review
-    return success_result(ongoing_review) if ongoing_review
+    # Lock on the assessor's submission to ensure only one allocation process
+    # runs at a time for this assessor, preventing duplicate allocations
+    assessor_submission = @assignment.submissions.find_by(user: @assessor)
+    assessor_submission.with_lock do
+      ongoing_reviews = find_ongoing_reviews
+      total_assigned = count_all_reviews
+      remaining_needed = @assignment.peer_review_count - total_assigned
 
-    submission_to_review = find_available_submission
-    return error_result(:no_submissions_available, I18n.t("There are no peer reviews available to allocate to you.")) unless submission_to_review
+      available_submissions = preload_available_submissions
 
-    # Lock the submission to prevent race conditions during concurrent allocations
-    # Create the assessment request (assign_peer_review handles duplicates)
-    assessment_request = submission_to_review.with_lock do
-      @assignment.assign_peer_review(@assessor, submission_to_review.user)
+      if total_assigned.zero? && available_submissions.empty?
+        return error_result(:no_submissions_available, I18n.t("There are no peer reviews available to allocate to you."))
+      end
+
+      submissions_to_allocate = select_submissions_to_allocate(available_submissions, remaining_needed)
+      newly_allocated = []
+      submissions_to_allocate.each do |submission|
+        assessment_request = @assignment.assign_peer_review(@assessor, submission.user)
+        newly_allocated << assessment_request if assessment_request
+      end
+
+      all_requests = ongoing_reviews + newly_allocated
+      return success_result(all_requests)
     end
-    success_result(assessment_request)
   end
 
   private
 
   def validate
     # Validation: Feature flag must be enabled
-    unless @assignment.context.feature_enabled?(:peer_review_allocation)
-      return error_result(:feature_disabled, I18n.t("Peer review allocation feature is not enabled"), :bad_request)
+    unless @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      return error_result(:feature_disabled, I18n.t("Peer review allocation and grading feature is not enabled"), :bad_request)
     end
 
     # Validation: Assignment must have peer reviews enabled
@@ -55,10 +67,12 @@ class PeerReview::AllocationService < ApplicationService
       return error_result(:peer_reviews_not_enabled, I18n.t("Assignment does not have peer reviews enabled"), :bad_request)
     end
 
-    # Validation: Student must have submitted the assignment
-    student_submission = @assignment.submissions.find_by(user: @assessor)
-    unless student_submission && %w[submitted graded complete].include?(student_submission.workflow_state)
-      return error_result(:not_submitted, I18n.t("You must submit the assignment before requesting peer reviews"), :bad_request)
+    # Validation: Check submission requirement based on assignment configuration
+    if @assignment.peer_review_submission_required
+      student_submission = @assignment.submissions.find_by(user: @assessor)
+      unless student_submission&.has_submission?
+        return error_result(:not_submitted, I18n.t("You must submit the assignment before requesting peer reviews"), :bad_request)
+      end
     end
 
     # Validation: Check if assignment is locked or not yet available
@@ -74,17 +88,17 @@ class PeerReview::AllocationService < ApplicationService
     # Validation: Check if assessor has reached the required peer review count
     review_count = count_all_reviews
     if review_count >= @assignment.peer_review_count
-      return error_result(:limit_reached, I18n.t("You have completed all required peer reviews"), :bad_request)
+      return error_result(:limit_reached, I18n.t("You have been assigned all required peer reviews"), :bad_request)
     end
 
     { success: true }
   end
 
-  def find_ongoing_review
+  def find_ongoing_reviews
     AssessmentRequest.for_assignment(@assignment.id)
                      .for_assessor(@assessor.id)
                      .incomplete
-                     .first
+                     .to_a
   end
 
   def count_all_reviews
@@ -93,87 +107,76 @@ class PeerReview::AllocationService < ApplicationService
                      .count
   end
 
-  def find_available_submission
-    must_review_submission = find_must_review_submission
-    return must_review_submission if must_review_submission
-
-    all_submissions = @assignment.submissions
-                                 .where(workflow_state: %w[submitted graded complete])
-                                 .where.not(user_id: @assessor.id)
-
-    return nil if all_submissions.empty?
-
-    # Get submissions already assigned to this assessor for review
-    # This ensures that an assessor does not get the same submission assigned multiple times
+  def preload_available_submissions
     already_assigned_user_ids = AssessmentRequest
                                 .for_assignment(@assignment.id)
                                 .for_assessor(@assessor.id)
                                 .pluck(:user_id)
 
-    available_user_ids = all_submissions.pluck(:user_id) - already_assigned_user_ids
-    return nil if available_user_ids.empty?
+    must_not_review_user_ids = AllocationRule.active
+                                             .where(assignment: @assignment)
+                                             .where(assessor_id: @assessor.id)
+                                             .where(must_review: true, review_permitted: false)
+                                             .pluck(:assessee_id)
 
-    reviewed_user_ids = AssessmentRequest
-                        .for_assignment(@assignment.id)
-                        .where(user_id: available_user_ids)
-                        .distinct
-                        .pluck(:user_id)
+    submissions = @assignment.submissions
+                             .active
+                             .having_submission
+                             .where.not(user_id: [@assessor.id, *already_assigned_user_ids, *must_not_review_user_ids])
 
-    unreviewed_user_ids = available_user_ids - reviewed_user_ids
-
-    if unreviewed_user_ids.any?
-      # Return oldest unreviewed submission
-      all_submissions.where(user_id: unreviewed_user_ids)
-                     .order(:submitted_at)
-                     .first
-    else
-      # All available submissions have been reviewed by someone
-      # Return oldest submission even if it has been reviewed
-      all_submissions.where(user_id: available_user_ids)
-                     .order(:submitted_at)
-                     .first
+    unless @assignment.peer_review_across_sections
+      section_ids = assessor_section_ids
+      if section_ids.any?
+        section_user_ids = Enrollment.where(course_id: @assignment.context_id)
+                                     .where(type: "StudentEnrollment")
+                                     .where(workflow_state: "active")
+                                     .where(course_section_id: section_ids)
+                                     .distinct
+                                     .pluck(:user_id)
+        submissions = submissions.where(user_id: section_user_ids)
+      end
     end
+
+    submissions.preload(:user).to_a
   end
 
-  def find_must_review_submission
-    must_review_rules = AllocationRule.active
-                                      .where(assignment: @assignment)
-                                      .where(assessor_id: @assessor.id)
-                                      .where(must_review: true)
+  def assessor_section_ids
+    Enrollment.where(user_id: @assessor.id, course_id: @assignment.context_id)
+              .where(type: "StudentEnrollment")
+              .where(workflow_state: "active")
+              .pluck(:course_section_id)
+  end
 
-    return nil if must_review_rules.empty?
+  def select_submissions_to_allocate(available_submissions, count)
+    return [] if available_submissions.empty?
 
-    assessee_ids = must_review_rules.pluck(:assessee_id)
-    already_assigned_user_ids = AssessmentRequest
-                                .for_assignment(@assignment.id)
-                                .for_assessor(@assessor.id)
-                                .pluck(:user_id)
+    must_review_user_ids = AllocationRule.active
+                                         .where(assignment: @assignment)
+                                         .where(assessor_id: @assessor.id)
+                                         .where(must_review: true, review_permitted: true)
+                                         .pluck(:assessee_id)
 
-    available_user_ids = assessee_ids - already_assigned_user_ids
-    return nil if available_user_ids.empty?
-
-    available_submissions = @assignment.submissions
-                                       .where(workflow_state: %w[submitted graded complete])
-                                       .where(user_id: available_user_ids)
-
-    return nil if available_submissions.empty?
-
-    submission_ids = available_submissions.pluck(:id)
+    submission_ids = available_submissions.map(&:id)
     review_counts = AssessmentRequest
                     .where(asset_type: "Submission", asset_id: submission_ids)
                     .group(:asset_id)
                     .count
 
-    # Choose the submission with fewest reviews, and if tied, the oldest one
-    available_submissions.min_by do |submission|
-      [review_counts[submission.id] || 0, submission.submitted_at]
-    end
+    must_review_subs = available_submissions.select { |sub| must_review_user_ids.include?(sub.user_id) }
+    regular_subs = available_submissions - must_review_subs
+
+    # Sort submissions by review count (fewest first), then by submitted_at
+    must_review_subs.sort_by! { |sub| [review_counts[sub.id] || 0, sub.submitted_at] }
+    regular_subs.sort_by! { |sub| [review_counts[sub.id] || 0, sub.submitted_at] }
+
+    selected = must_review_subs + regular_subs
+    selected.take(count)
   end
 
-  def success_result(assessment_request)
+  def success_result(assessment_requests)
     {
       success: true,
-      assessment_request:
+      assessment_requests:
     }
   end
 

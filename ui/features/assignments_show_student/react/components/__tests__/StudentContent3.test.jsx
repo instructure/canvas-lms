@@ -27,13 +27,13 @@ import ContextModuleApi from '../../apis/ContextModuleApi'
 
 injectGlobalAlertContainers()
 
-jest.mock('../AttemptSelect')
+vi.mock('../AttemptSelect')
 
-jest.mock('../../apis/ContextModuleApi')
+vi.mock('../../apis/ContextModuleApi')
 
-jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
+vi.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn(),
+    initializeReaderButton: vi.fn(),
   }
 })
 

@@ -37,6 +37,7 @@ import {
   type RegistrationOverlayStore,
 } from './RegistrationOverlayState'
 import {RegistrationPrivacyField} from './RegistrationPrivacyField'
+import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 const I18n = createI18nScope('react_developer_keys')
 
@@ -65,7 +66,8 @@ export const RegistrationOverlayForm = (props: {
     }
   }, [props.store])
 
-  const placements = canvasPlatformSettings(configuration)?.settings.placements || []
+  const platformSettings = canvasPlatformSettings(configuration)?.settings.placements || []
+  const placements = filterPlacementObjectsByFeatureFlags(platformSettings)
 
   const scopes = configuration.scopes || []
 

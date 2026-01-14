@@ -21,15 +21,17 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {SuggestionsEnabledToggleSection} from '../SuggestionsEnabledToggleSection'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
-jest.mock('@canvas/do-fetch-api-effect')
+vi.mock('@canvas/alerts/react/FlashAlert')
+
+const server = setupServer()
 
 describe('SuggestionsEnabledToggleSection', () => {
   const defaultProps = {
     checked: true,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
   }
 
   const setup = (props = {}) => {
@@ -37,9 +39,19 @@ describe('SuggestionsEnabledToggleSection', () => {
     return render(<SuggestionsEnabledToggleSection {...mergedProps} />)
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    vi.clearAllMocks()
+    // Default handler for user settings API
+    server.use(
+      http.put('/api/v1/users/self/settings', () => HttpResponse.json({})),
+    )
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   describe('Rendering Tests', () => {
@@ -82,7 +94,7 @@ describe('SuggestionsEnabledToggleSection', () => {
   describe('User Interaction Tests', () => {
     it('calls onChange with true when unchecked checkbox is clicked', async () => {
       const user = userEvent.setup()
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       setup({checked: false, onChange})
 
       const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
@@ -93,7 +105,7 @@ describe('SuggestionsEnabledToggleSection', () => {
 
     it('calls onChange with false when checked checkbox is clicked', async () => {
       const user = userEvent.setup()
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       setup({checked: true, onChange})
 
       const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
@@ -106,29 +118,39 @@ describe('SuggestionsEnabledToggleSection', () => {
   describe('API Integration Tests', () => {
     it('calls API with correct settings when toggled on', async () => {
       const user = userEvent.setup()
+      let capturedBody: any = null
+      server.use(
+        http.put('/api/v1/users/self/settings', async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({})
+        }),
+      )
       setup({checked: false})
 
       const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
       await user.click(checkbox)
 
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/api/v1/users/self/settings',
-        method: 'PUT',
-        body: {comment_library_suggestions_enabled: true},
+      await waitFor(() => {
+        expect(capturedBody).toEqual({comment_library_suggestions_enabled: true})
       })
     })
 
     it('calls API with correct settings when toggled off', async () => {
       const user = userEvent.setup()
+      let capturedBody: any = null
+      server.use(
+        http.put('/api/v1/users/self/settings', async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({})
+        }),
+      )
       setup({checked: true})
 
       const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
       await user.click(checkbox)
 
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/api/v1/users/self/settings',
-        method: 'PUT',
-        body: {comment_library_suggestions_enabled: false},
+      await waitFor(() => {
+        expect(capturedBody).toEqual({comment_library_suggestions_enabled: false})
       })
     })
   })
@@ -136,8 +158,10 @@ describe('SuggestionsEnabledToggleSection', () => {
   describe('Error Handling Tests', () => {
     it('shows error flash alert when API call fails', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
-      ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('API error'))
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
+      server.use(
+        http.put('/api/v1/users/self/settings', () => HttpResponse.error()),
+      )
 
       setup({checked: false})
 
@@ -154,8 +178,10 @@ describe('SuggestionsEnabledToggleSection', () => {
 
     it('still calls onChange callback even when API fails', async () => {
       const user = userEvent.setup()
-      const onChange = jest.fn()
-      ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('API error'))
+      const onChange = vi.fn()
+      server.use(
+        http.put('/api/v1/users/self/settings', () => HttpResponse.error()),
+      )
 
       setup({checked: false, onChange})
 

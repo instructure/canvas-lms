@@ -19,8 +19,8 @@ import {isValidFileSubmission} from '../HomeworkSubmissionLtiContainer'
 import {findContentExtension} from '../contentExtension'
 import {getEnv} from '../environment'
 
-jest.mock('../contentExtension')
-jest.mock('../environment')
+vi.mock('../contentExtension')
+vi.mock('../environment')
 
 describe('HomeworkSubmissionLtiContainer', () => {
   afterEach(() => {

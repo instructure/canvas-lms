@@ -320,7 +320,7 @@ describe('CourseWorkSummaryWidget', () => {
   })
 
   it('handles error state for statistics', async () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     server.use(
       graphql.query('GetUserCourseStatistics', () => {

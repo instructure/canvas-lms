@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
-import {omit} from 'lodash'
+import {omit} from 'es-toolkit/compat'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import GroupCollection from '../collections/GroupCollection'
@@ -272,6 +270,10 @@ GroupCategory.prototype.urlFor = function (method) {
       '?includes[]=unassigned_users_count&includes[]=groups_count'
     )
   }
+}
+
+GroupCategory.prototype.downloadGroupCategoryRosterCSVPath = function () {
+  return `/api/v1/group_categories/${this.id}/export`
 }
 
 export default GroupCategory

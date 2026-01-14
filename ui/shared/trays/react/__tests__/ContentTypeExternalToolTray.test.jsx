@@ -24,13 +24,13 @@ import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 describe('ContentTypeExternalToolTray', () => {
   let tool
-  const onDismiss = jest.fn()
-  const onExternalContentReady = jest.fn()
+  const onDismiss = vi.fn()
+  const onExternalContentReady = vi.fn()
   const extraQueryParams = {param1: 'value1', param2: 'value2'}
 
   beforeEach(() => {
     tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   function renderTray(props) {

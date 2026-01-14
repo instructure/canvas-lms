@@ -81,7 +81,7 @@ describe('AssignTo', () => {
   })
 
   it('allows backspace to remove tags', () => {
-    const onOptionDismiss = jest.fn()
+    const onOptionDismiss = vi.fn()
 
     const {queryByText, getByTestId} = setup({
       initialAssignedToInformation: ['u_1', 'u_2'],

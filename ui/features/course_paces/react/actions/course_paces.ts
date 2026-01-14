@@ -63,8 +63,8 @@ export enum Constants {
   SET_WEIGHTED_ASSIGNMENTS = 'COURSE_PACE/SET_WEIGHTED_ASSIGNMENTS',
   SET_TIME_TO_COMPLETE_CALENDAR_DAYS = 'COURSE_PACE/SET_TIME_TO_COMPLETE_CALENDAR_DAYS',
   SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS = 'COURSE_PACE/SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS',
-  SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS= 'COURSE_PACE/SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS',
-  SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE= 'COURSE_PACE/SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE',
+  SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS = 'COURSE_PACE/SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS',
+  SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE = 'COURSE_PACE/SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE',
   SET_PACE_ITEM_WEIGHTED_DURATION = 'COURSE_PACE/SET_PACE_ITEM_WEIGHTED_DURATION',
 }
 
@@ -86,16 +86,35 @@ const regularActions = {
   setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress),
   coursePaceSaved: (coursePace: CoursePace) =>
     createAction(Constants.COURSE_PACE_SAVED, coursePace),
-  setWeightedAssignments: (assignmentsWeighting: AssignmentWeightening) => createAction(Constants.SET_WEIGHTED_ASSIGNMENTS, assignmentsWeighting),
-  setTimeToCompleteCalendarDays: (days: number) => createAction(Constants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS, days),
-  setPaceItemDurationTimeToCompleteCalendarDays: (paceItemId: string, duration: number, blackOutDates: BlackoutDate[]) =>
-    createAction(Constants.SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS, {paceItemId, duration, blackOutDates}),
+  setWeightedAssignments: (assignmentsWeighting: AssignmentWeightening) =>
+    createAction(Constants.SET_WEIGHTED_ASSIGNMENTS, assignmentsWeighting),
+  setTimeToCompleteCalendarDays: (days: number) =>
+    createAction(Constants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS, days),
+  setPaceItemDurationTimeToCompleteCalendarDays: (
+    paceItemId: string,
+    duration: number,
+    blackOutDates: BlackoutDate[],
+  ) =>
+    createAction(Constants.SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS, {
+      paceItemId,
+      duration,
+      blackOutDates,
+    }),
   setTimeToCompleteCalendarDaysFromItems: (blackOutDates: BlackoutDate[]) =>
     createAction(Constants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS, {blackOutDates}),
   setPaceItemsDurationFromTimeToComplete: (blackOutDays: BlackoutDate[], calendarDays: number) =>
-    createAction(Constants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE, {blackOutDays, calendarDays}),
-  setPaceItemWeightedDuration: (assignmentWeightedDuration: AssignmentWeightening, blackOutDays: BlackoutDate[]) =>
-    createAction(Constants.SET_PACE_ITEM_WEIGHTED_DURATION, {assignmentWeightedDuration, blackOutDays}),
+    createAction(Constants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE, {
+      blackOutDays,
+      calendarDays,
+    }),
+  setPaceItemWeightedDuration: (
+    assignmentWeightedDuration: AssignmentWeightening,
+    blackOutDays: BlackoutDate[],
+  ) =>
+    createAction(Constants.SET_PACE_ITEM_WEIGHTED_DURATION, {
+      assignmentWeightedDuration,
+      blackOutDays,
+    }),
 }
 
 // @ts-expect-error
@@ -165,7 +184,10 @@ const thunkActions = {
           dispatch(uiActions.closeBulkEditModal())
           dispatch(uiActions.hidePaceModal())
           showFlashAlert({
-            message: I18n.t('All changes were applied to the %{pacesCount} student course paces successfully.', {pacesCount: enrollmentIds.length}),
+            message: I18n.t(
+              'All changes were applied to the %{pacesCount} student course paces successfully.',
+              {pacesCount: enrollmentIds.length},
+            ),
             err: null,
             type: 'success',
           })
@@ -293,7 +315,7 @@ const thunkActions = {
     contextId: string,
     afterAction: LoadingAfterAction = coursePaceActions.saveCoursePace,
     openModal: boolean = true,
-    isBulkEnrollment: boolean = false
+    isBulkEnrollment: boolean = false,
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       if (openModal) {
@@ -382,7 +404,7 @@ const thunkActions = {
         Course: 'course',
         Section: 'section',
         Enrollment: 'student_enrollment',
-        BulkEnrollment: 'bulk_enrollment'
+        BulkEnrollment: 'bulk_enrollment',
       }
       const selectedContextType = CONTEXT_TYPE_MAP[getState().ui.selectedContextType]
       return Api.removePace(getState().coursePace)

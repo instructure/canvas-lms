@@ -53,8 +53,10 @@ module CalendarConferencesHelper
           conf.assign_attributes(valid_params)
         end
       end
-    else
-      context.web_conferences.build(valid_params).tap do |conf|
+    elsif valid_params.values.any?(&:present?)
+      # Build conference if any params provided (even if invalid) to trigger validations
+      conference_context = context.is_a?(CourseSection) ? context.course : context
+      conference_context.web_conferences.build(valid_params).tap do |conf|
         conf.user = @current_user
         conf.settings[:default_return_url] = named_context_url(context, :context_url, include_host: true)
       end

@@ -41,9 +41,9 @@ describe('CourseDifferentiationTagConverterMessage', () => {
   })
 
   it('renders success message when conversion is complete', () => {
-    jest.mock('axios', () => ({
-      put: jest.fn(() => Promise.resolve({status: 204})),
-      get: jest.fn(() =>
+    vi.mock('axios', () => ({
+      put: vi.fn(() => Promise.resolve({status: 204})),
+      get: vi.fn(() =>
         Promise.resolve({status: 200, data: {progress: 100, workflow_state: 'completed'}}),
       ),
     }))
@@ -58,8 +58,8 @@ describe('CourseDifferentiationTagConverterMessage', () => {
   })
 
   it('renders error message when conversion fails', () => {
-    jest.mock('axios', () => ({
-      put: jest.fn(() => Promise.reject(new Error('Conversion failed'))),
+    vi.mock('axios', () => ({
+      put: vi.fn(() => Promise.reject(new Error('Conversion failed'))),
     }))
 
     renderComponent()

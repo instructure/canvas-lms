@@ -62,32 +62,52 @@ const getCourseName = (courseAssetString, options) => {
 
 const CourseSelect = props => {
   const [inputValue, setInputValue] = useState(
-    getCourseName(props.activeCourseFilterID, props.options),
+    props.activeCourseFilterID
+      ? getCourseName(props.activeCourseFilterID, props.options)
+      : props.mainPage
+        ? I18n.t('All Courses')
+        : '',
   )
   const [isShowingOptions, setIsShowingOptions] = useState(false)
-  const [options, setOptions] = useState(props.options)
   const [filteredOptions, setFilteredOptions] = useState(
-    filterOptions(getCourseName(props.activeCourseFilterID, props.options), props.options),
+    // If there's an active filter, filter by that course name
+    // Otherwise, show all options (don't filter by "All Courses" placeholder)
+    props.activeCourseFilterID
+      ? filterOptions(getCourseName(props.activeCourseFilterID, props.options), props.options)
+      : props.options,
   )
   const [highlightedOptionId, setHighlightedOptionId] = useState(null)
   const [selectedOptionId, setSelectedOptionId] = useState(
     props.activeCourseFilterID ? props.activeCourseFilterID : null,
   )
-  const [autoComplete, setAutoComplete] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+
+  // Helper function to get the correct input value based on selection state
+  const getInputValueForSelection = selectedId => {
+    if (selectedId) {
+      return getCourseName(selectedId, props.options)
+    }
+    return props.mainPage ? I18n.t('All Courses') : ''
+  }
 
   useEffect(() => {
     if (props.options !== filteredOptions) {
-      setOptions(filterOptions(inputValue, props.options))
-      setInputValue(getCourseName(props.activeCourseFilterID, props.options))
+      // Only update input value if user is not actively interacting with the dropdown
+      // Prevents unwanted resets while typing or when dropdown is open
+      if (!isTyping && !isShowingOptions) {
+        setInputValue(
+          props.activeCourseFilterID
+            ? getCourseName(props.activeCourseFilterID, props.options)
+            : getInputValueForSelection(null),
+        )
+      }
+      // Update filtered options when props.options change (but no active filter)
+      if (!props.activeCourseFilterID) {
+        setFilteredOptions(props.options)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.options, selectedOptionId])
-
-  useEffect(() => {
-    if (autoComplete) return
-    setOptions(filterOptions(inputValue, props.options))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue, props.options])
 
   const getDefaultHighlightedOption = (newOptions = []) => {
     const defaultOptions = Object.values(newOptions).flat()
@@ -96,40 +116,48 @@ const CourseSelect = props => {
 
   const handleBlur = () => {
     setHighlightedOptionId(null)
-    setAutoComplete(false)
-    if (selectedOptionId) {
-      setInputValue(getCourseName(selectedOptionId, props.options))
+    // Don't restore input value if user is still interacting with dropdown
+    if (isTyping || isShowingOptions) {
+      return
     }
+    setIsTyping(false)
+    setInputValue(getInputValueForSelection(selectedOptionId))
   }
 
   const handleHighlightOption = (event, {id}) => {
     event.persist()
     const option = getOptionById(id, props.options)
     if (!option) return // prevent highlighting of empty options
-    // if event key is arrow up or down, don't update input value
     setHighlightedOptionId(id)
-    const autoComp =
+    const isArrowKey =
       event.type === 'keydown' && (event.key === 'ArrowUp' || event.key === 'ArrowDown')
-    setAutoComplete(autoComp)
-    setInputValue(autoComp ? option.contextName : inputValue)
+    // Update input value during arrow key navigation for autocomplete
+    // BUT don't interfere when user is typing
+    if (isArrowKey && !isTyping) {
+      setInputValue(option.contextName)
+    }
   }
 
-  const handleSelectOption = (event, {id}) => {
+  const handleSelectOption = (_event, {id}) => {
     const option = getOptionById(id, props.options)
-    const contextName = option.contextName
     if (!option) return // prevent selecting of empty options
-    if (id === 'all_courses') id = null
-    props.onCourseFilterSelect({contextID: id, contextName})
-    setSelectedOptionId(id)
-    setInputValue(id === null ? '' : option.contextName)
+
+    const contextName = option.contextName
+    const actualId = id === 'all_courses' ? null : id
+
+    props.onCourseFilterSelect({contextID: actualId, contextName})
+    setSelectedOptionId(actualId)
+    setIsTyping(false)
+    setInputValue(getInputValueForSelection(actualId))
     setIsShowingOptions(false)
     setFilteredOptions(props.options)
   }
 
   const handleInputChange = event => {
     const value = event.target.value
-    const newOptions = filterOptions(value, props.options)
-    setAutoComplete(false)
+    // Filter when user types anything (empty string shows all)
+    const newOptions = value !== '' ? filterOptions(value, props.options) : props.options
+    setIsTyping(true)
     setInputValue(value)
     setFilteredOptions(newOptions)
     setHighlightedOptionId(getDefaultHighlightedOption(newOptions))
@@ -137,19 +165,28 @@ const CourseSelect = props => {
     if (value === '') {
       props.onCourseFilterSelect({contextID: null, contextName: null})
       setSelectedOptionId(null)
-    } else {
-      setSelectedOptionId(selectedOptionId)
     }
   }
 
   const handleShowOptions = () => {
-    if (inputValue !== '') return
     setIsShowingOptions(true)
+    setFilteredOptions(props.options)
+    setHighlightedOptionId(getDefaultHighlightedOption(props.options))
+    // Clear "All Courses" text when opening to allow immediate typing
+    // Only clear if showing default text and no course is selected
+    const isShowingDefaultText = inputValue === I18n.t('All Courses')
+    if (!isTyping && props.mainPage && isShowingDefaultText && !selectedOptionId) {
+      setInputValue('')
+    }
   }
 
   const handleHideOptions = () => {
     setIsShowingOptions(false)
     setHighlightedOptionId(null)
+    setIsTyping(false)
+    // Restore the previous selection state when dropdown closes (e.g., ESC key, blur)
+    setInputValue(getInputValueForSelection(selectedOptionId))
+    setFilteredOptions(props.options)
   }
 
   const getGroupLabel = groupKey => {
@@ -168,10 +205,10 @@ const CourseSelect = props => {
   }
 
   const renderGroups = () => {
-    return Object.keys(options).map(key => {
-      return options[key]?.length > 0 ? (
+    return Object.keys(filteredOptions).map(key => {
+      return filteredOptions[key]?.length > 0 ? (
         <Select.Group key={key} renderLabel={getGroupLabel(key)}>
-          {options[key].map(option => (
+          {filteredOptions[key].map(option => (
             <Select.Option
               id={option.assetString}
               key={option.assetString}
@@ -191,9 +228,10 @@ const CourseSelect = props => {
 
   const handleReset = () => {
     props.onCourseFilterSelect({contextID: null, contextName: null})
-    setAutoComplete(false)
-    setInputValue('')
+    setIsTyping(false)
+    setInputValue(getInputValueForSelection(null))
     setIsShowingOptions(false)
+    setFilteredOptions(props.options)
     setHighlightedOptionId(null)
     setSelectedOptionId(null)
   }
@@ -217,7 +255,7 @@ const CourseSelect = props => {
       onRequestHighlightOption={handleHighlightOption}
       onRequestSelectOption={handleSelectOption}
       renderAfterInput={
-        inputValue !== '' ? (
+        selectedOptionId !== null ? (
           <>
             {props.mainPage && (
               <ScreenReaderContent>

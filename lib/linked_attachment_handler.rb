@@ -22,6 +22,8 @@ module LinkedAttachmentHandler
   def self.included(klass)
     klass.send(:attr_accessor, :saving_user)
     klass.send(:attr_writer, :updating_user)
+    klass.send(:attr_writer, :current_user)
+    klass.send(:attr_accessor, :importing)
     klass.send(:attr_accessor, :skip_attachment_association_update)
 
     klass.after_save :update_attachment_associations
@@ -34,6 +36,7 @@ module LinkedAttachmentHandler
 
   def update_attachment_associations(migration: nil)
     return if skip_attachment_association_update
+    return if importing && !migration
     return unless attachment_associations_creation_enabled?
 
     self.class.html_fields.each do |field|
@@ -106,7 +109,9 @@ module LinkedAttachmentHandler
           to_delete.delete(Shard.global_id_for(attachment.id)) if keep_associations?(attachment, session, user)
         else
           next if exclude_cross_course_attachment_association?(attachment)
-          next unless skip_user_verification || migration || attachment.grants_right?(user, session, :update)
+          next unless skip_user_verification ||
+                      migration&.add_association_for_migration?(html, attachment) ||
+                      (user && attachment.grants_right?(user, session, :update))
 
           shard.activate do
             all_attachment_associations << {
@@ -132,7 +137,7 @@ module LinkedAttachmentHandler
   end
 
   def copy_attachment_associations_from(other)
-    return unless attachment_associations_enabled?
+    return unless attachment_associations_creation_enabled?
 
     AttachmentAssociation.copy_associations(other, [self])
   end

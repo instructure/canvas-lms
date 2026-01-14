@@ -21,11 +21,12 @@ import {render, waitFor} from '@testing-library/react'
 import {DiscussionSummary, DiscussionSummaryProps} from '../DiscussionSummary'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {MockedProvider} from '@apollo/client/testing'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 declare const ENV: {
   discussion_topic_id: string
@@ -35,17 +36,17 @@ declare const ENV: {
 
 const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
   const defaultProps: DiscussionSummaryProps = {
-    onDisableSummaryClick: jest.fn(),
+    onDisableSummaryClick: vi.fn(),
     isMobile: false,
     summary: null,
-    onSetSummary: jest.fn(),
+    onSetSummary: vi.fn(),
     isFeedbackLoading: false,
-    onSetIsFeedbackLoading: jest.fn(),
+    onSetIsFeedbackLoading: vi.fn(),
     liked: false,
-    onSetLiked: jest.fn(),
+    onSetLiked: vi.fn(),
     disliked: false,
-    onSetDisliked: jest.fn(),
-    postDiscussionSummaryFeedback: jest.fn().mockResolvedValue(Promise.resolve()),
+    onSetDisliked: vi.fn(),
+    postDiscussionSummaryFeedback: vi.fn().mockResolvedValue(Promise.resolve()),
     ...props,
   }
 
@@ -53,7 +54,7 @@ const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
     <MockedProvider>
       <AlertManagerContext.Provider
         // @ts-expect-error
-        value={{setOnFailure: props.setOnFailure || jest.fn(), setOnSuccess: jest.fn()}}
+        value={{setOnFailure: props.setOnFailure || vi.fn(), setOnSuccess: vi.fn()}}
       >
         <DiscussionSummary {...defaultProps} />
       </AlertManagerContext.Provider>
@@ -69,6 +70,9 @@ describe('DiscussionSummary', () => {
     usage: {currentCount: 3, limit: 5},
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup({
       discussion_topic_id: '5678',
@@ -77,15 +81,12 @@ describe('DiscussionSummary', () => {
     })
 
     // Reset mocks between tests
-    jest.clearAllMocks()
-  })
-
-  afterEach(() => {
-    ;(doFetchApi as jest.Mock).mockClear()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
     fakeENV.teardown()
+    server.resetHandlers()
   })
 
   describe('Rendering', () => {
@@ -96,15 +97,18 @@ describe('DiscussionSummary', () => {
     })
 
     it('should display generic error message when there is an error', async () => {
-      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
-        Promise.reject(new Error('Some error message')),
+      let capturedUrl = ''
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.error()
+        }),
       )
 
       const {getByTestId} = setup()
 
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'GET',
-        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+      await waitFor(() => {
+        expect(capturedUrl).toContain('/api/v1/courses/1234/discussion_topics/5678/summaries')
       })
       await waitFor(() => {
         expect(getByTestId('summary-error')).toHaveTextContent(
@@ -114,22 +118,18 @@ describe('DiscussionSummary', () => {
     })
 
     it('should display the specific error message when there is an API error with a specific error message', async () => {
-      // Mock an API error with a specific error message in the response
-      const mockJson = jest.fn().mockResolvedValue({error: 'Some error message.'})
-      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
-        Promise.reject({
-          response: {
-            json: mockJson,
-            status: 500,
-          },
+      let capturedUrl = ''
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json({error: 'Some error message.'}, {status: 500})
         }),
       )
 
       const {getByTestId} = setup()
 
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'GET',
-        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+      await waitFor(() => {
+        expect(capturedUrl).toContain('/api/v1/courses/1234/discussion_topics/5678/summaries')
       })
 
       // The component should show the specific error message from the API response
@@ -139,21 +139,18 @@ describe('DiscussionSummary', () => {
     })
 
     it('should not display the response error message when the error status is 404', async () => {
-      const mockJson = jest.fn().mockResolvedValue({error: 'Some error message.'})
-      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
-        Promise.reject({
-          response: {
-            json: mockJson,
-            status: 404,
-          },
+      let capturedUrl = ''
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json({error: 'Some error message.'}, {status: 404})
         }),
       )
 
       const {queryByTestId} = setup()
 
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'GET',
-        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+      await waitFor(() => {
+        expect(capturedUrl).toContain('/api/v1/courses/1234/discussion_topics/5678/summaries')
       })
       await waitFor(() => {
         expect(queryByTestId('summary-error')).not.toBeInTheDocument()
@@ -161,10 +158,12 @@ describe('DiscussionSummary', () => {
     })
 
     it('should reset and call setSummary with the latest generated discussion summary in course context', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({
-        json: expectedSummary,
-      })
-      const setSummary = jest.fn()
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json(expectedSummary),
+        ),
+      )
+      const setSummary = vi.fn()
       setup({onSetSummary: setSummary})
 
       expect(setSummary).toHaveBeenNthCalledWith(1, null)
@@ -182,7 +181,7 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback when summary is provided', async () => {
-      const postDiscussionSummaryFeedback = jest.fn()
+      const postDiscussionSummaryFeedback = vi.fn()
       setup({
         summary: expectedSummary,
         postDiscussionSummaryFeedback,
@@ -192,25 +191,26 @@ describe('DiscussionSummary', () => {
     })
 
     it('should reset and call setSummary with the latest generated discussion summary with group context', async () => {
-      window.ENV = {
-        ...window.ENV,
-        // @ts-expect-error
+      fakeENV.setup({
+        discussion_topic_id: '5678',
+        context_id: '1234',
         context_type: 'Group',
-      }
-      ;(doFetchApi as jest.Mock).mockResolvedValue({
-        json: expectedSummary,
       })
-      const setSummary = jest.fn()
+      let capturedUrl = ''
+      server.use(
+        http.get('/api/v1/groups/1234/discussion_topics/5678/summaries', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json(expectedSummary)
+        }),
+      )
+      const setSummary = vi.fn()
       setup({onSetSummary: setSummary})
 
       expect(setSummary).toHaveBeenNthCalledWith(1, null)
       await waitFor(() => {
         expect(setSummary).toHaveBeenNthCalledWith(2, expectedSummary)
       })
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'GET',
-        path: `/api/v1/groups/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-      })
+      expect(capturedUrl).toContain('/api/v1/groups/1234/discussion_topics/5678/summaries')
     })
 
     describe('Generate Button', () => {

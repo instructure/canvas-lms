@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map, find} from 'lodash'
+import {map, find} from 'es-toolkit/compat'
 import {View} from '@canvas/backbone'
 import template from '../../jst/section_to_show_menu.handlebars'
 import 'jquery-kyle-menu'

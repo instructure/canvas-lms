@@ -36,6 +36,15 @@ module StudentDashboardCommon
     @course2.enroll_student(@student, enrollment_state: :active)
   end
 
+  def workflow_edge_case_course_setup
+    @course4 = course_factory(active_all: true, course_name: "Course 3")
+    @teacher3 = user_factory(active_all: true, name: "Kevin White")
+    @student3 = user_factory(active_all: true, name: "Laura Green")
+
+    @course4.enroll_teacher(@teacher3, enrollment_state: :active)
+    @course4.enroll_student(@student3, enrollment_state: :active)
+  end
+
   def pagination_course_setup
     20.times do |i|
       course = course_with_teacher(name: "Teacher #{i + 3}", course_name: "Course #{i + 3}", active_all: true).course
@@ -83,7 +92,6 @@ module StudentDashboardCommon
 
     @graded_discussion = @course1.assignments.create!(name: "Course 1: graded_discussion", points_possible: "10", due_at: 5.days.ago.end_of_day, submission_types: "discussion_topic")
     @graded_assignment = @course2.assignments.create!(name: "Course 2: graded_assignment", points_possible: "10", due_at: 3.days.ago.end_of_day, submission_types: "online_text_entry")
-
     @submitted_discussion = @course2.assignments.create!(name: "Course 2: submitted_discussion", points_possible: "10", due_at: 2.days.ago.end_of_day, submission_types: "discussion_topic")
     @submitted_assignment = @course1.assignments.create!(name: "Course 1: submitted_assignment", points_possible: "10", due_at: 1.day.from_now.end_of_day, submission_types: "online_text_entry")
   end
@@ -95,7 +103,7 @@ module StudentDashboardCommon
     @graded_assignment.submit_homework(@student, submission_type: "online_text_entry")
     @graded_discussion.submit_homework(@student, submission_type: "discussion_topic")
 
-    @graded_quiz = @course1.quizzes.create!(title: "submitted_quiz", due_at: 1.day.from_now)
+    @graded_quiz = @course1.quizzes.create!(title: "submitted_quiz", due_at: 1.day.from_now.end_of_day)
     @graded_quiz.quiz_questions.create!(question_data: { question_type: "true_false_question", points_possible: 10 })
     @graded_quiz.generate_quiz_data
     @graded_quiz.workflow_state = "available"
@@ -112,7 +120,6 @@ module StudentDashboardCommon
       @course2.assignments.create!(name: "Course2: HW due in #{i + 3} days", points_possible: "10", due_at: (i + 3).days.from_now.end_of_day, submission_types: "online_text_entry")
       @course1.assignments.create!(name: "Course1: Missing HW #{i + 1} days", points_possible: "10", due_at: (i + 1).days.ago.end_of_day, submission_types: "online_text_entry")
       @course2.assignments.create!(name: "Course2: Missing HW #{i + 1} days", points_possible: "10", due_at: (i + 1).days.ago.end_of_day, submission_types: "online_text_entry")
-
       assignment.submit_homework(@student, submission_type: "online_text_entry")
     end
   end
@@ -142,7 +149,7 @@ module StudentDashboardCommon
   def dashboard_pending_enrollment_setup
     @course3 = course_factory(active_all: true, course_name: "Test Course")
 
-    @assignment_pending_course = @course3.assignments.create!(name: "Course 3: due_graded_discussion", points_possible: "10", due_at: 2.days.from_now, submission_types: "discussion_topic")
+    @assignment_pending_course = @course3.assignments.create!(name: "Course 3: due_graded_discussion", points_possible: "10", due_at: 2.days.from_now.end_of_day, submission_types: "discussion_topic")
     @course3.enroll_teacher(@teacher1, enrollment_state: :active)
     @announcement_pending_course = @course3.announcements.create!(title: "Course 3 - Announcement", message: "Announcement message for pending enrollment course")
   end
@@ -213,13 +220,13 @@ module StudentDashboardCommon
   def section_specific_assignments_setup
     @multi_course.enroll_student(@multi_stu_sec1, section: @section3, enrollment_state: "active", allow_multiple_enrollments: true)
 
-    @section1_hw1 = @multi_course.assignments.create!(name: "Section 1 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
-    @section2_hw2 = @multi_course.assignments.create!(name: "Section 2 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
-    @section3_hw3 = @multi_course.assignments.create!(name: "Section 3 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
-    @section1_2_hw4 = @multi_course.assignments.create!(name: "Section 1 & 2 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
-    @section2_3_hw5 = @multi_course.assignments.create!(name: "Section 2 & 3 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
-    @section1_2_3_hw6 = @multi_course.assignments.create!(name: "Section 1 & 2 & 3 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
-    @section2_4_hw7 = @multi_course.assignments.create!(name: "Section 2 & 4 Assignment", points_possible: "10", due_at: 2.days.from_now, submission_types: "online_text_entry")
+    @section1_hw1 = @multi_course.assignments.create!(name: "Section 1 Assignment", points_possible: "10", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
+    @section2_hw2 = @multi_course.assignments.create!(name: "Section 2 Assignment", points_possible: "10", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
+    @section3_hw3 = @multi_course.assignments.create!(name: "Section 3 Assignment", points_possible: "10", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
+    @section1_2_hw4 = @multi_course.assignments.create!(name: "Section 1 & 2 Assignment", points_possible: "10", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
+    @section2_3_hw5 = @multi_course.assignments.create!(name: "Section 2 & 3 Assignment", points_possible: "10", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
+    @section1_2_3_hw6 = @multi_course.assignments.create!(name: "Section 1 & 2 & 3 Assignment", points_possible: "10", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
+    @section2_4_hw7 = @multi_course.assignments.create!(name: "Section 2 & 4 Assignment", points_possible: "10", due_at: 2.days.from_now.end_of_day, submission_types: "online_text_entry")
 
     create_section_override_for_assignment(@section1_hw1, course_section: @section1)
     create_section_override_for_assignment(@section2_hw2, course_section: @section2)
@@ -247,5 +254,69 @@ module StudentDashboardCommon
     @multi_section_observer = user_factory(name: "Observer3", active_all: true)
     @multi_course.enroll_user(@multi_section_observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @multi_stu_sec1, allow_multiple_enrollments: true)
     @multi_course.enroll_user(@multi_section_observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @multi_stu_sec2, allow_multiple_enrollments: true)
+  end
+
+  def group_assignment_course_setup
+    workflow_edge_case_course_setup
+    @student1_group1 = user_factory(active_all: true, name: "Student 1")
+    @student2_group1 = user_factory(active_all: true, name: "Student 2")
+    @student_no_group = user_factory(active_all: true, name: "Student No Group")
+
+    @course4.enroll_student(@student1_group1, enrollment_state: :active)
+    @course4.enroll_student(@student2_group1, enrollment_state: :active)
+    @course4.enroll_student(@student_no_group, enrollment_state: :active)
+
+    # Create group set and groups
+    @group_category = @course4.group_categories.create!(name: "Project Groups")
+    @group1 = @course4.groups.create!(name: "Group 1", group_category: @group_category)
+    @group2 = @course4.groups.create!(name: "Group 2", group_category: @group_category)
+
+    @group1.add_user(@student1_group1)
+    @group1.add_user(@student2_group1)
+    @group2.add_user(@student3)
+  end
+
+  def group_assignment_setup
+    @group_assignment_graded_individually = @course4.assignments.create!(
+      name: "Graded Individually",
+      due_at: 2.days.from_now.end_of_day,
+      submission_types: "online_text_entry",
+      group_category: @group_category,
+      grade_group_students_individually: true,
+      points_possible: 10,
+      only_visible_to_overrides: true
+    )
+    @missing_group_assignment = @course4.assignments.create!(
+      name: "missing Group assignment",
+      due_at: 3.days.ago.end_of_day,
+      submission_types: "online_text_entry",
+      group_category: @group_category,
+      grade_group_students_individually: false,
+      points_possible: 10,
+      only_visible_to_overrides: true
+    )
+    @missing_graded_individually = @course4.assignments.create!(
+      name: "missing Graded Individually group assignment",
+      due_at: 3.days.ago.end_of_day,
+      submission_types: "online_text_entry",
+      group_category: @group_category,
+      grade_group_students_individually: true,
+      points_possible: 10,
+      only_visible_to_overrides: true
+    )
+    create_group_override_for_assignment(@group_assignment_graded_individually, group: @group1)
+    create_group_override_for_assignment(@missing_group_assignment, group: @group1, due_at: 3.days.ago.end_of_day)
+    create_group_override_for_assignment(@missing_graded_individually, group: @group1, due_at: 3.days.ago.end_of_day)
+  end
+
+  def submit_group_assignment
+    @group_assignment.submit_homework(@student1_group1,
+                                      submission_type:
+                                      "online_text_entry",
+                                      body: "Group submission")
+    @group_assignment_graded_individually.submit_homework(@student1_group1,
+                                                          submission_type:
+                                                          "online_text_entry",
+                                                          body: "Individual submission")
   end
 end

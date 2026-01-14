@@ -27,7 +27,7 @@ describe('RatingButton', () => {
     isPreviewMode: false,
     isSelected: false,
     selectedArrowDirection: 'right',
-    onClick: jest.fn(),
+    onClick: vi.fn(),
   }
 
   const renderRatingButton = (props = {}) => {
@@ -35,7 +35,7 @@ describe('RatingButton', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with the provided button display text', () => {

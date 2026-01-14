@@ -81,7 +81,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
   end
 
   before do
-    course.enable_feature!(:peer_review_grading)
+    course.enable_feature!(:peer_review_allocation_and_grading)
   end
 
   describe "#initialize" do
@@ -94,14 +94,14 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       expect(service.instance_variable_get(:@lock_at)).to eq(updated_lock_at)
     end
 
-    it "allows nil values for optional parameters" do
+    it "allows NOT_PROVIDED values for optional parameters" do
       simple_service = described_class.new(parent_assignment:)
       expect(simple_service.instance_variable_get(:@parent_assignment)).to eq(parent_assignment)
-      expect(simple_service.instance_variable_get(:@points_possible)).to be_nil
-      expect(simple_service.instance_variable_get(:@grading_type)).to be_nil
-      expect(simple_service.instance_variable_get(:@due_at)).to be_nil
-      expect(simple_service.instance_variable_get(:@unlock_at)).to be_nil
-      expect(simple_service.instance_variable_get(:@lock_at)).to be_nil
+      expect(simple_service.instance_variable_get(:@points_possible)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
+      expect(simple_service.instance_variable_get(:@grading_type)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
+      expect(simple_service.instance_variable_get(:@due_at)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
+      expect(simple_service.instance_variable_get(:@unlock_at)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
+      expect(simple_service.instance_variable_get(:@lock_at)).to eq(PeerReview::PeerReviewCommonService::NOT_PROVIDED)
     end
   end
 
@@ -189,7 +189,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
       it "syncs context_id and context_type from parent assignment" do
         new_course = course_factory(active_all: true)
-        new_course.enable_feature!(:peer_review_grading)
+        new_course.enable_feature!(:peer_review_allocation_and_grading)
 
         # Move the parent assignment to a new context
         # (This is unusual but testing the sync mechanism)
@@ -202,6 +202,40 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         existing_peer_review_sub_assignment.reload
         expect(existing_peer_review_sub_assignment.context_id).to eq(new_course.id)
         expect(existing_peer_review_sub_assignment.context_type).to eq("Course")
+      end
+
+      it "updates peer_review_submission_required when parent assignment changes" do
+        existing_peer_review_sub_assignment.update!(peer_review_submission_required: true)
+        parent_assignment.update!(peer_review_submission_required: false)
+
+        result = service.call
+
+        expect(result.peer_review_submission_required).to be false
+      end
+
+      it "updates peer_review_across_sections when parent assignment changes" do
+        existing_peer_review_sub_assignment.update!(peer_review_across_sections: true)
+        parent_assignment.update!(peer_review_across_sections: false)
+
+        result = service.call
+
+        expect(result.peer_review_across_sections).to be false
+      end
+
+      it "updates both peer_review_submission_required and peer_review_across_sections together" do
+        existing_peer_review_sub_assignment.update!(
+          peer_review_submission_required: false,
+          peer_review_across_sections: false
+        )
+        parent_assignment.update!(
+          peer_review_submission_required: true,
+          peer_review_across_sections: true
+        )
+
+        result = service.call
+
+        expect(result.peer_review_submission_required).to be true
+        expect(result.peer_review_across_sections).to be true
       end
     end
 
@@ -272,10 +306,10 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       end
 
       it "raises error when feature is disabled" do
-        course.disable_feature!(:peer_review_grading)
+        course.disable_feature!(:peer_review_allocation_and_grading)
         expect { service.call }.to raise_error(
           PeerReview::FeatureDisabledError,
-          "Peer Review Grading feature flag is disabled"
+          "Peer Review Allocation and Grading feature flag is disabled"
         )
       end
 
@@ -292,6 +326,152 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
           PeerReview::SubAssignmentNotExistError,
           "Peer review sub assignment does not exist"
         )
+      end
+    end
+
+    context "when validating peer review dates against parent assignment" do
+      let(:parent_with_boundaries) do
+        assignment_model(
+          course:,
+          title: "Parent with Date Boundaries",
+          unlock_at: 2.days.from_now,
+          due_at: 1.week.from_now,
+          lock_at: 2.weeks.from_now,
+          peer_reviews: true
+        )
+      end
+
+      before do
+        PeerReview::PeerReviewCreatorService.new(parent_assignment: parent_with_boundaries).call
+        parent_with_boundaries.reload
+      end
+
+      context "with valid dates" do
+        it "updates peer review when dates are within parent boundaries" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            unlock_at: 3.days.from_now,
+            due_at: 1.week.from_now,
+            lock_at: 10.days.from_now
+          )
+
+          expect { service.call }.not_to raise_error
+        end
+
+        it "updates peer review when dates are at exact parent boundaries" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            unlock_at: parent_with_boundaries.unlock_at,
+            due_at: 1.week.from_now,
+            lock_at: parent_with_boundaries.lock_at
+          )
+
+          expect { service.call }.not_to raise_error
+        end
+
+        it "updates peer review with partial dates" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            due_at: 1.week.from_now
+          )
+
+          expect { service.call }.not_to raise_error
+        end
+
+        it "updates peer review when no custom dates provided" do
+          service = described_class.new(parent_assignment: parent_with_boundaries)
+
+          expect { service.call }.not_to raise_error
+        end
+      end
+
+      context "with invalid dates" do
+        it "raises InvalidDatesError when unlock_at is before parent unlock_at" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            unlock_at: 1.day.from_now
+          )
+
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review unlock date cannot be before assignment unlock date/
+          )
+        end
+
+        it "raises InvalidDatesError when due_at is before parent unlock_at" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            due_at: 1.day.from_now
+          )
+
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review due date cannot be before assignment unlock date/
+          )
+        end
+
+        it "raises InvalidDatesError when due_at is after parent lock_at" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            due_at: 3.weeks.from_now
+          )
+
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review due date cannot be after assignment lock date/
+          )
+        end
+
+        it "raises InvalidDatesError when lock_at is after parent lock_at" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            lock_at: 3.weeks.from_now
+          )
+
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Peer review lock date cannot be after assignment lock date/
+          )
+        end
+
+        it "raises InvalidDatesError when due_at is before unlock_at" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            unlock_at: 1.week.from_now,
+            due_at: 5.days.from_now
+          )
+
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Due date cannot be before unlock date/
+          )
+        end
+
+        it "raises InvalidDatesError when due_at is after lock_at" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            due_at: 1.week.from_now,
+            lock_at: 5.days.from_now
+          )
+
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Due date cannot be after lock date/
+          )
+        end
+
+        it "raises InvalidDatesError when unlock_at is after lock_at" do
+          service = described_class.new(
+            parent_assignment: parent_with_boundaries,
+            unlock_at: 1.week.from_now,
+            lock_at: 5.days.from_now
+          )
+
+          expect { service.call }.to raise_error(
+            PeerReview::InvalidDatesError,
+            /Unlock date cannot be after lock date/
+          )
+        end
       end
     end
   end
@@ -377,6 +557,126 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       it "suspends due date caching when inherited attributes are synced" do
         expect(AbstractAssignment).to receive(:suspend_due_date_caching).and_yield
         no_update_service.send(:update_peer_review_sub_assignment)
+      end
+    end
+
+    describe "NOT_PROVIDED sentinel behavior" do
+      let!(:peer_review_with_dates) do
+        existing_peer_review_sub_assignment.update!(
+          due_at: 5.days.from_now,
+          unlock_at: 3.days.from_now,
+          lock_at: 1.week.from_now,
+          points_possible: 10
+        )
+        existing_peer_review_sub_assignment
+      end
+
+      context "when dates are not provided in update" do
+        let(:service_without_dates) do
+          described_class.new(
+            parent_assignment:,
+            points_possible: 15
+          )
+        end
+
+        it "does not overwrite existing due_at" do
+          original_due_at = peer_review_with_dates.due_at
+          service_without_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.due_at).to eq(original_due_at)
+        end
+
+        it "does not overwrite existing unlock_at" do
+          original_unlock_at = peer_review_with_dates.unlock_at
+          service_without_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.unlock_at).to eq(original_unlock_at)
+        end
+
+        it "does not overwrite existing lock_at" do
+          original_lock_at = peer_review_with_dates.lock_at
+          service_without_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.lock_at).to eq(original_lock_at)
+        end
+
+        it "updates only the provided attributes" do
+          service_without_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.points_possible).to eq(15)
+        end
+      end
+
+      context "when dates are explicitly set to nil" do
+        let(:service_with_nil_dates) do
+          described_class.new(
+            parent_assignment:,
+            due_at: nil,
+            unlock_at: nil,
+            lock_at: nil
+          )
+        end
+
+        it "clears due_at when explicitly set to nil" do
+          service_with_nil_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.due_at).to be_nil
+        end
+
+        it "clears unlock_at when explicitly set to nil" do
+          service_with_nil_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.unlock_at).to be_nil
+        end
+
+        it "clears lock_at when explicitly set to nil" do
+          service_with_nil_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.lock_at).to be_nil
+        end
+      end
+
+      context "when dates are explicitly updated to new values" do
+        let(:new_due_at) { 10.days.from_now }
+        let(:new_unlock_at) { 8.days.from_now }
+        let(:new_lock_at) { 12.days.from_now }
+
+        let(:service_with_new_dates) do
+          described_class.new(
+            parent_assignment:,
+            due_at: new_due_at,
+            unlock_at: new_unlock_at,
+            lock_at: new_lock_at
+          )
+        end
+
+        it "updates due_at to new value" do
+          service_with_new_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.due_at).to be_within(1.second).of(new_due_at)
+        end
+
+        it "updates unlock_at to new value" do
+          service_with_new_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.unlock_at).to be_within(1.second).of(new_unlock_at)
+        end
+
+        it "updates lock_at to new value" do
+          service_with_new_dates.call
+          peer_review_with_dates.reload
+
+          expect(peer_review_with_dates.lock_at).to be_within(1.second).of(new_lock_at)
+        end
       end
     end
   end

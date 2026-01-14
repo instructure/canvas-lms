@@ -18,7 +18,7 @@
 import {View} from '@canvas/backbone'
 import 'jqueryui/button'
 import $ from 'jquery'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {TextInput} from '@instructure/ui-text-input'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {cleanup, fireEvent, render, waitFor} from '@testing-library/react'
 import CreateOrUpdateUserModal from '../CreateOrUpdateUserModal'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
@@ -27,8 +27,8 @@ const CREATE_URL = '/accounts/2/users'
 const defaultProps = {
   createOrUpdate: 'create' as 'create' | 'update',
   url: CREATE_URL,
-  afterSave: jest.fn(),
-  onClose: jest.fn(),
+  afterSave: vi.fn(),
+  onClose: vi.fn(),
   open: true,
 }
 
@@ -48,8 +48,11 @@ const existingUser = {
 }
 
 describe('CreateOrUpdateUserModal', () => {
+  afterEach(() => {
+    cleanup()
+  })
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

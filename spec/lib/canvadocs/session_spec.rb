@@ -163,5 +163,27 @@ describe Canvadocs::Session do
       permissions = canvadoc_permissions_for_user(@student, true)
       expect(permissions).not_to have_key(:user_filter)
     end
+
+    context "cross-shard user" do
+      specs_require_sharding
+
+      before(:once) do
+        @shard1.activate do
+          @xs_user = User.create!(name: "cross-shard user")
+        end
+      end
+
+      it "returns 'readwritemanage' for cross-shard teacher" do
+        @course.enroll_teacher(@xs_user, enrollment_state: "active")
+        permissions = canvadoc_permissions_for_user(@xs_user, true)
+        expect(permissions[:permissions]).to eq "readwritemanage"
+      end
+
+      it "returns 'read' for cross-shard observer" do
+        @course.enroll_user(@xs_user, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
+        permissions = canvadoc_permissions_for_user(@xs_user, true)
+        expect(permissions[:permissions]).to eq "read"
+      end
+    end
   end
 end

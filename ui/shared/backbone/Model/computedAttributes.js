@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from 'backbone'
-import {map, each, extend} from 'lodash'
+import {map, each, extend} from 'es-toolkit/compat'
 
 extend(Backbone.Model.prototype, {
   initialize() {

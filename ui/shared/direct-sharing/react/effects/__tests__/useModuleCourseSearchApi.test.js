@@ -42,8 +42,8 @@ describe('useModuleCourseSearchApi', () => {
 
   it('fetches and reports results', async () => {
     setupCourseModulesResponse()
-    const success = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
     renderHook(() => useModuleCourseSearchApi({success, params: {contextId: 1}}))
     await fetchMock.flush(true)
     expect(error).not.toHaveBeenCalled()
@@ -55,7 +55,7 @@ describe('useModuleCourseSearchApi', () => {
 
   it('passes "per_page" query param on to the xhr call', async () => {
     setupCourseModulesResponse()
-    const success = jest.fn()
+    const success = vi.fn()
     renderHook(() => useModuleCourseSearchApi({success, params: {contextId: 1, per_page: 50}}))
     await fetchMock.flush(true)
     expect(fetchMock.lastCall()[0]).toBe('/api/v1/courses/1/modules?per_page=50')

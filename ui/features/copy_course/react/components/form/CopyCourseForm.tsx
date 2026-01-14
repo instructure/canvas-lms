@@ -177,7 +177,7 @@ export const CopyCourseForm = ({
     ? I18n.t(
         'Term start and end dates cannot be modified here, only on the Term Details page under Admin.',
       )
-    : null
+    : undefined
 
   return (
     <View as="div">

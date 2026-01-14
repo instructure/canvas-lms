@@ -43,7 +43,7 @@ MasteryPathToggleView.prototype.render = function () {
   ReactDOM.render(
     React.createElement(MasteryPathToggle, {
       overrides: this.getOverrides(),
-      onSync: this.setNewOverridesCollection
+      onSync: this.setNewOverridesCollection,
     }),
     div,
   )

@@ -39,8 +39,8 @@ describe('CanvasCropper', () => {
   })
 
   test('getImage returns cropped image object', async () => {
-    const done = jest.fn()
-     
+    const done = vi.fn()
+
     ref.current.crop().then(image => {
       expect(image instanceof Blob).toBeTruthy()
       expect(done).toHaveBeenCalledTimes(1)

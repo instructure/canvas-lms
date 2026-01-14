@@ -28,29 +28,30 @@ import {SplitScreenViewContainer} from '../SplitScreenViewContainer'
 import {MockedProvider} from '@apollo/client/testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
 injectGlobalAlertContainers()
 
-jest.mock('@canvas/rce/react/CanvasRce')
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('@canvas/rce/react/CanvasRce')
+vi.mock('../../../utils', async () => ({
+  ...(await vi.importActual('../../../utils')),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 describe('SplitScreenViewContainer', () => {
-  const setOnFailure = jest.fn()
-  const setOnSuccess = jest.fn()
-  const onOpenSplitScreenView = jest.fn()
-  const goToTopic = jest.fn()
-  const onClose = jest.fn()
+  const setOnFailure = vi.fn()
+  const setOnSuccess = vi.fn()
+  const onOpenSplitScreenView = vi.fn()
+  const goToTopic = vi.fn()
+  const onClose = vi.fn()
 
   const per_page = 20
   const split_screen_view_initial_page_size = 5
 
   beforeAll(() => {
-    window.ENV = {
+    fakeENV.setup({
       per_page,
       split_screen_view_initial_page_size,
       discussion_topic_id: 'Discussion-default-mock',
@@ -61,21 +62,21 @@ describe('SplitScreenViewContainer', () => {
         avatar_image_url: 'www.avatar.com',
       },
       course_id: '1',
-    }
+    })
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const setup = (props, mocks) => {
@@ -99,7 +100,7 @@ describe('SplitScreenViewContainer', () => {
     onClose,
     onOpenSplitScreenView,
     goToTopic,
-    setHighlightEntryId: jest.fn(),
+    setHighlightEntryId: vi.fn(),
     ...overrides,
     isTrayFinishedOpening: true,
   })
@@ -439,7 +440,7 @@ describe('SplitScreenViewContainer', () => {
   })
 
   it('disables the reply and enables the expand buttons if the RCE is open', async () => {
-    const setRCEOpen = jest.fn()
+    const setRCEOpen = vi.fn()
     const {findByTestId} = setup(
       defaultProps({RCEOpen: true, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
@@ -455,7 +456,7 @@ describe('SplitScreenViewContainer', () => {
   })
 
   it('disables the expand and enables the reply buttons if the RCE is closed', async () => {
-    const setRCEOpen = jest.fn()
+    const setRCEOpen = vi.fn()
     const {findAllByTestId, queryByTestId} = setup(
       defaultProps({RCEOpen: false, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
@@ -472,7 +473,7 @@ describe('SplitScreenViewContainer', () => {
   })
 
   it('calls the setRCEOpen callback with false when clicking the expand button', async () => {
-    const setRCEOpen = jest.fn()
+    const setRCEOpen = vi.fn()
     const {findByTestId} = setup(
       defaultProps({RCEOpen: true, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
@@ -486,7 +487,7 @@ describe('SplitScreenViewContainer', () => {
   })
 
   it('calls the setRCEOpen callback with true when clicking the reply button', async () => {
-    const setRCEOpen = jest.fn()
+    const setRCEOpen = vi.fn()
     const {findAllByTestId} = setup(
       defaultProps({RCEOpen: false, setRCEOpen}),
       getDiscussionSubentriesQueryMock({

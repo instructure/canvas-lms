@@ -17,7 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "spec_helper"
-require_relative "../../app/services/auto_grade_orchestration_service"
+require_relative "../../app/services/grade_service"
+
+GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance, keyword_init: true)
 
 RSpec.describe GradeService do
   # Test data setup
@@ -48,46 +50,42 @@ RSpec.describe GradeService do
     ]
   end
 
-  # Mock response from Cedar AI that includes all criteria
-  let(:mock_cedar_response) do
-    Struct.new(:response, keyword_init: true).new(response: [
-      {
-        "rubric_category" => "Content",
-        "reasoning" => "Well developed ideas",
-        "criterion" => "Meets requirements"
-      },
-      {
-        "rubric_category" => "Grammar",
-        "reasoning" => "Flawless grammar",
-        "criterion" => "Excellent grammar"
-      }
-    ].to_json)
-  end
-
-  # Setup CedarClient mock for all tests
   before do
     allow(Rails.env).to receive(:test?).and_return(true)
-
-    stub_const("CedarClient", Class.new do
-      def self.prompt(*)
-        mock_cedar_response
-      end
-    end)
+    allow(TextNormalizerHelper).to receive(:normalize) { |text| text }
+    stub_const("CedarClient", Class.new)
   end
 
   describe "#call" do
     let(:rubric) { rubric_data }
     let(:assignment) { assignment_text }
 
-    # Test the happy path - Cedar returns valid data for all criteria
-    it "calls CedarClient and returns enriched response" do
-      expect(CedarClient).to receive(:prompt).with(
-        prompt: kind_of(String),
-        model: "anthropic.claude-3-haiku-20240307-v1:0",
+    let(:grading_results) do
+      [
+        GradeResult.new(
+          rubric_category: "Content",
+          reasoning: "Well developed ideas",
+          criterion: "Meets requirements",
+          guidance: "Add more specific historical examples."
+        ),
+        GradeResult.new(
+          rubric_category: "Grammar",
+          reasoning: "Flawless grammar",
+          criterion: "Excellent grammar",
+          guidance: "Great job keeping your grammar clear."
+        )
+      ]
+    end
+
+    it "calls CedarClient.grade_essay and returns mapped rubric ratings including comments" do
+      expect(CedarClient).to receive(:grade_essay).with(
+        description: assignment,
+        essay: kind_of(String),
+        rubric: kind_of(Array),
         feature_slug: "grading-assistance",
         root_account_uuid: "mock-root",
         current_user:
-      ).and_return(mock_cedar_response)
+      ).and_return(grading_results)
 
       result = described_class.new(
         assignment:,
@@ -107,7 +105,8 @@ RSpec.describe GradeService do
               "description" => "Meets requirements",
               "rating" => 3,
               "reasoning" => "Well developed ideas"
-            }
+            },
+            "comments" => "Add more specific historical examples."
           },
           {
             "id" => "criteria_2",
@@ -117,43 +116,50 @@ RSpec.describe GradeService do
               "description" => "Excellent grammar",
               "rating" => 4,
               "reasoning" => "Flawless grammar"
-            }
+            },
+            "comments" => "Great job keeping your grammar clear."
           }
         ]
       )
     end
 
     # Test error handling for malformed JSON responses
-    it "raises an error when CedarClient returns malformed JSON" do
-      allow(CedarClient).to receive(:prompt).and_return("not-valid-json")
+    it "wraps generic CedarClient errors in CedarAi::Errors::GraderError" do
+      allow(CedarClient).to receive(:grade_essay)
+        .and_raise(StandardError.new("Some low-level error"))
+
+      service = described_class.new(
+        assignment:,
+        essay:,
+        rubric:,
+        root_account_uuid:,
+        current_user:
+      )
 
       expect do
-        described_class.new(
-          assignment:,
-          essay:,
-          rubric:,
-          root_account_uuid:,
-          current_user:
-        ).call
-      end.to raise_error(CedarAi::Errors::GraderError, /Invalid JSON response/)
+        service.call
+      end.to raise_error(
+        CedarAi::Errors::GraderError,
+        /Invalid response from gradeEssay: Some low-level error/
+      )
     end
 
     # Test handling of partial responses from Cedar
     context "when Cedar returns partial criteria" do
-      before do
-        allow(CedarClient).to receive(:prompt).and_return(
-          Struct.new(:response, keyword_init: true).new(response: [
-            {
-              "rubric_category" => "Content",
-              "reasoning" => "Well developed ideas",
-              "criterion" => "Meets requirements"
-            }
-            # Grammar is missing from response, but this is a valid partial response
-          ].to_json)
-        )
+      let(:partial_results) do
+        [
+          GradeResult.new(
+            rubric_category: "Content",
+            reasoning: "Well developed ideas",
+            criterion: "Meets requirements",
+            guidance: "Add more examples."
+          )
+        ]
       end
 
-      it "returns only the criteria that were graded, without error" do
+      it "returns only the criteria that were graded" do
+        allow(CedarClient).to receive(:grade_essay).and_return(partial_results)
+
         result = described_class.new(
           assignment:,
           essay:,
@@ -169,24 +175,26 @@ RSpec.describe GradeService do
 
     # Test handling of invalid criteria in Cedar's response
     context "when Cedar returns invalid criteria" do
-      before do
-        allow(CedarClient).to receive(:prompt).and_return(
-          Struct.new(:response, keyword_init: true).new(response: [
-            {
-              "rubric_category" => "Invalid Category", # This category doesn't exist in our rubric
-              "reasoning" => "Some reasoning",
-              "criterion" => "Invalid Criterion"
-            },
-            {
-              "rubric_category" => "Content", # This is valid
-              "reasoning" => "Well developed ideas",
-              "criterion" => "Meets requirements"
-            }
-          ].to_json)
-        )
+      let(:mixed_results) do
+        [
+          GradeResult.new(
+            rubric_category: "Invalid Category",
+            reasoning: "Some reasoning",
+            criterion: "Invalid Criterion",
+            guidance: "Irrelevant guidance"
+          ),
+          GradeResult.new(
+            rubric_category: "Content",
+            reasoning: "Well developed ideas",
+            criterion: "Meets requirements",
+            guidance: "Add more examples."
+          )
+        ]
       end
 
       it "filters out invalid criteria and returns only valid ones" do
+        allow(CedarClient).to receive(:grade_essay).and_return(mixed_results)
+
         result = described_class.new(
           assignment:,
           essay:,
@@ -199,17 +207,42 @@ RSpec.describe GradeService do
         expect(result.first["description"]).to eq("Content")
       end
     end
+
+    context "when rubric matches default template" do
+      let(:default_rubric) do
+        [
+          { description: "Exit Ticket Prompt", ratings: [], points: 1 },
+          { description: "Preparation", ratings: [], points: 1 },
+          { description: "Time", ratings: [], points: 1 },
+          { description: "Participation", ratings: [], points: 1 }
+        ]
+      end
+
+      it "raises an error before calling Cedar" do
+        expect(CedarClient).not_to receive(:grade_essay)
+
+        service = described_class.new(
+          assignment:,
+          essay:,
+          rubric: default_rubric,
+          root_account_uuid:,
+          current_user:
+        )
+
+        expect { service.call }.to raise_error("Rubric criteria not descriptive enough")
+      end
+    end
   end
 
-  describe "#map_criteria_ids_to_grades" do
-    # Test data for mapping criteria
+  describe "#map_grade_essay_results_to_canvas" do
     let(:grader_response) do
       [
-        {
-          "rubric_category" => "Content",
-          "reasoning" => "Good content",
-          "criterion" => "Meets requirements"
-        }
+        GradeResult.new(
+          rubric_category: "Content",
+          reasoning: "Good content",
+          criterion: "Meets requirements",
+          guidance: "Add more details."
+        )
       ]
     end
 
@@ -225,11 +258,18 @@ RSpec.describe GradeService do
       ]
     end
 
-    let(:service) { described_class.new(assignment: "", essay: "", rubric:, root_account_uuid:, current_user:) }
+    let(:service) do
+      described_class.new(
+        assignment: "Test",
+        essay: "Test essay with enough words",
+        rubric:,
+        root_account_uuid:,
+        current_user:
+      )
+    end
 
-    # Test successful mapping of valid criteria
-    it "maps grader response to rubric structure" do
-      result = service.send(:map_criteria_ids_to_grades, grader_response, rubric)
+    it "maps grader response to Canvas rubric structure including comments" do
+      result = service.send(:map_grade_essay_results_to_canvas, grader_response, rubric)
 
       expect(result).to eq(
         [
@@ -241,7 +281,8 @@ RSpec.describe GradeService do
               "description" => "Meets requirements",
               "rating" => 3,
               "reasoning" => "Good content"
-            }
+            },
+            "comments" => "Add more details."
           }
         ]
       )
@@ -250,65 +291,82 @@ RSpec.describe GradeService do
     # Test handling of nonexistent rubric categories
     it "filters out items with nonexistent rubric category" do
       invalid_response = [
-        { "rubric_category" => "Nonexistent", "criterion" => "X" },
-        { "rubric_category" => "Content", "criterion" => "Meets requirements", "reasoning" => "Good content" }
+        GradeResult.new(
+          rubric_category: "Nonexistent",
+          reasoning: "X",
+          criterion: "X",
+          guidance: "X"
+        ),
+        GradeResult.new(
+          rubric_category: "Content",
+          reasoning: "Good content",
+          criterion: "Meets requirements",
+          guidance: "Add more details."
+        )
       ]
-      result = service.send(:map_criteria_ids_to_grades, invalid_response, rubric)
 
-      expect(result).to eq(
-        [
-          {
-            "id" => "criteria_1",
-            "description" => "Content",
-            "rating" => {
-              "id" => "rating_1",
-              "description" => "Meets requirements",
-              "rating" => 3,
-              "reasoning" => "Good content"
-            }
-          }
-        ]
-      )
+      result = service.send(:map_grade_essay_results_to_canvas, invalid_response, rubric)
+
+      expect(result.length).to eq(1)
+      expect(result.first["description"]).to eq("Content")
     end
 
     # Test handling of nonexistent criteria within valid categories
     it "filters out items with nonexistent criterion" do
       invalid_response = [
-        { "rubric_category" => "Content", "criterion" => "Missing", "reasoning" => "Bad" },
-        { "rubric_category" => "Content", "criterion" => "Meets requirements", "reasoning" => "Good content" }
+        GradeResult.new(
+          rubric_category: "Content",
+          reasoning: "Bad",
+          criterion: "Missing",
+          guidance: "X"
+        ),
+        GradeResult.new(
+          rubric_category: "Content",
+          reasoning: "Good content",
+          criterion: "Meets requirements",
+          guidance: "Add more details."
+        )
       ]
-      result = service.send(:map_criteria_ids_to_grades, invalid_response, rubric)
 
-      expect(result).to eq(
-        [
-          {
-            "id" => "criteria_1",
-            "description" => "Content",
-            "rating" => {
-              "id" => "rating_1",
-              "description" => "Meets requirements",
-              "rating" => 3,
-              "reasoning" => "Good content"
-            }
-          }
-        ]
-      )
+      result = service.send(:map_grade_essay_results_to_canvas, invalid_response, rubric)
+
+      expect(result.length).to eq(1)
+      expect(result.first["rating"]["description"]).to eq("Meets requirements")
     end
 
     # Test handling of completely invalid responses
     it "returns empty array when all items are invalid" do
       invalid_response = [
-        { "rubric_category" => "Nonexistent", "criterion" => "X" },
-        { "rubric_category" => "Content", "criterion" => "Missing" }
+        GradeResult.new(
+          rubric_category: "Nonexistent",
+          reasoning: "X",
+          criterion: "X",
+          guidance: "X"
+        ),
+        GradeResult.new(
+          rubric_category: "Content",
+          reasoning: "Bad",
+          criterion: "Missing",
+          guidance: "Y"
+        )
       ]
-      result = service.send(:map_criteria_ids_to_grades, invalid_response, rubric)
+
+      result = service.send(:map_grade_essay_results_to_canvas, invalid_response, rubric)
 
       expect(result).to be_empty
     end
   end
 
   describe "#sanitize_essay" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "", rubric: [], root_account_uuid: "mock-root", current_user:) }
+    let(:service) do
+      described_class.new(
+        assignment: "Test Assignment",
+        essay: "",
+        rubric: [],
+        root_account_uuid: "mock-root",
+        current_user:
+      )
+    end
 
     # Test essay length validation
     context "when validating essay length" do
@@ -346,8 +404,16 @@ RSpec.describe GradeService do
     end
   end
 
-  describe "#rubric_matches_default_template" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric:, root_account_uuid:, current_user:) }
+  describe "#rubric_matches_default_template?" do
+    let(:service) do
+      described_class.new(
+        assignment: "Test Assignment",
+        essay: "Test Essay",
+        rubric:,
+        root_account_uuid:,
+        current_user:
+      )
+    end
 
     # Test various default rubric templates
     context "when rubric matches a default template" do
@@ -393,73 +459,6 @@ RSpec.describe GradeService do
         ]
         service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:, current_user:)
         expect(service.send(:rubric_matches_default_template?)).to be false
-      end
-    end
-  end
-
-  describe "#filter_repeating_keys" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric: [], root_account_uuid: "mock-root", current_user:) }
-
-    # Test handling of duplicate criteria
-    context "when JSON array contains duplicate criteria" do
-      let(:json_array) do
-        [
-          {
-            "rubric_category" => "Content",
-            "reasoning" => "First reasoning",
-            "criterion" => "Meets requirements"
-          },
-          {
-            "rubric_category" => "Content", # Duplicate
-            "reasoning" => "Second reasoning",
-            "criterion" => "Meets requirements"
-          },
-          {
-            "rubric_category" => "Style",
-            "reasoning" => "Third reasoning",
-            "criterion" => "Unique criterion"
-          }
-        ]
-      end
-
-      it "removes entries with duplicate criterion values" do
-        filtered = service.send(:filter_repeating_keys, json_array)
-
-        expect(filtered.length).to eq(2)
-        expect(filtered.pluck("criterion")).to match_array(["Meets requirements", "Unique criterion"])
-      end
-
-      it "keeps the first occurrence of duplicate criteria" do
-        filtered = service.send(:filter_repeating_keys, json_array)
-
-        dup = filtered.find { |item| item["criterion"] == "Meets requirements" }
-        expect(dup["reasoning"]).to eq("First reasoning")
-        expect(dup["rubric_category"]).to eq("Content")
-      end
-    end
-
-    # Test handling of unique criteria
-    context "when JSON array has no duplicates" do
-      let(:unique_array) do
-        [
-          {
-            "rubric_category" => "Content",
-            "reasoning" => "First reasoning",
-            "criterion" => "Criterion 1"
-          },
-          {
-            "rubric_category" => "Grammar",
-            "reasoning" => "Second reasoning",
-            "criterion" => "Criterion 2"
-          }
-        ]
-      end
-
-      it "returns the original array unchanged" do
-        filtered = service.send(:filter_repeating_keys, unique_array)
-
-        expect(filtered).to eq(unique_array)
-        expect(filtered.length).to eq(2)
       end
     end
   end

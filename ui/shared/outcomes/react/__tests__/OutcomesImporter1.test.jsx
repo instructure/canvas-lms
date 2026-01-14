@@ -24,7 +24,7 @@ import OutcomesImporter, {showOutcomesImporterIfInProgress} from '../OutcomesImp
 
 import * as alerts from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 // Use a valid MIME type to encourage multipart/form-data usage
 const file = new File(['dummy content'], 'filename.csv', {type: 'text/csv'})
@@ -34,7 +34,7 @@ const contextUrlRoot = '/accounts/' + userId
 const getApiUrl = path => `/api/v1${contextUrlRoot}/outcome_imports/${path}`
 
 const getFakeTimer = () =>
-  jest.useFakeTimers({
+  vi.useFakeTimers({
     shouldAdvanceTime: true,
     doNotFake: ['setTimeout'],
     now: new Date('2024-01-01T12:00:00Z'),
@@ -94,8 +94,8 @@ describe('OutcomesImporter', () => {
   afterEach(() => {
     server.resetHandlers()
     cleanup()
-    jest.clearAllMocks()
-    jest.clearAllTimers()
+    vi.clearAllMocks()
+    vi.clearAllTimers()
   })
   afterAll(() => server.close())
 
@@ -106,14 +106,14 @@ describe('OutcomesImporter', () => {
   })
 
   it('disables the Outcome Views when upload starts', () => {
-    const disableOutcomeViews = jest.fn()
+    const disableOutcomeViews = vi.fn()
     const {wrapper, unmount} = renderOutcomesImporter({disableOutcomeViews})
     expect(disableOutcomeViews).toHaveBeenCalled()
     unmount()
   })
 
   it('resets the Outcome Views when upload is complete', () => {
-    const resetOutcomeViews = jest.fn()
+    const resetOutcomeViews = vi.fn()
 
     server.use(
       http.get(new RegExp(`/api/v1${contextUrlRoot}/outcome_imports/.*`), () =>
@@ -135,8 +135,8 @@ describe('OutcomesImporter', () => {
 
   it('queries outcomes groups created when upload successfully completes', async () => {
     const id = 10
-    const resetOutcomeViews = jest.fn()
-    const onSuccessfulOutcomesImport = jest.fn()
+    const resetOutcomeViews = vi.fn()
+    const onSuccessfulOutcomesImport = vi.fn()
 
     let requestMade = false
     server.use(
@@ -170,7 +170,7 @@ describe('OutcomesImporter', () => {
   })
 
   it('shows a flash alert when upload successfully completes', () => {
-    const resetOutcomeViews = jest.fn()
+    const resetOutcomeViews = vi.fn()
     const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews})
 
     ref.current.successfulUpload([])
@@ -183,7 +183,7 @@ describe('OutcomesImporter', () => {
   })
 
   it('shows a flash alert when upload fails', () => {
-    const resetOutcomeViews = jest.fn()
+    const resetOutcomeViews = vi.fn()
     const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews})
 
     ref.current.completeUpload(null, 1, false)
@@ -199,7 +199,7 @@ describe('OutcomesImporter', () => {
   })
 
   it('shows a flash alert when upload successfully completes but with warnings', async () => {
-    const resetOutcomeViews = jest.fn()
+    const resetOutcomeViews = vi.fn()
 
     server.use(http.get(getApiUrl('null/created_group_ids'), () => HttpResponse.json([])))
 

@@ -21,8 +21,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {getEveryoneOption} from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
-import _ from 'underscore'
-import {forEach, map} from 'lodash'
+import {forEach, map} from 'es-toolkit/compat'
 import CardActions from '../util/differentiatedModulesCardActions'
 import {string, func, array, number, oneOfType, bool} from 'prop-types'
 import {
@@ -367,6 +366,9 @@ const AssignToContent = ({
         unlock_at: dates.unlock_at,
         reply_to_topic_due_at: dates.reply_to_topic_due_at,
         required_replies_due_at: dates.required_replies_due_at,
+        peer_review_available_from: dates.peer_review_available_from,
+        peer_review_available_to: dates.peer_review_available_to,
+        peer_review_due_at: dates.peer_review_due_at,
         lock_at: dates.lock_at,
         selectedAssigneeIds: uniqueIds,
         initialAssigneeOptions,
@@ -419,7 +421,7 @@ const AssignToContent = ({
     const currentIndex = stagedCardsRef.current[cardId]?.index
     tmp[cardId] = {overrides: newOverrides, dates, index: currentIndex}
 
-    const newCards = _.extend({...stagedCardsRef.current}, tmp)
+    const newCards = {...stagedCardsRef.current, ...tmp}
     setStagedCards(newCards)
   }
 
@@ -449,9 +451,7 @@ const AssignToContent = ({
 
     const initialModuleOverrideState = initialModuleOverrides.find(obj => obj.rowKey === cardId)
 
-    const tmp = {}
-    tmp[dateType] = date
-    const newDates = _.extend(oldDates, tmp)
+    const newDates = {...oldDates, [dateType]: date}
     const hasDates = !Object.values(newDates).every(
       value => value === null || value === undefined || value === '',
     )

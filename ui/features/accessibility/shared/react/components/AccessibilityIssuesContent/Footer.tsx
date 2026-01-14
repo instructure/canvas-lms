@@ -48,10 +48,20 @@ const Footer: React.FC<Props> = ({
       <Flex justifyItems="space-between" alignItems="center" padding="small">
         <Flex.Item>
           <Flex gap="small">
-            <Button data-testid="back-button" onClick={onBack} disabled={isBackDisabled}>
+            <Button
+              data-testid="back-button"
+              onClick={onBack}
+              disabled={isBackDisabled}
+              aria-label={I18n.t('Back to previous issue')}
+            >
               {I18n.t('Back')}
             </Button>
-            <Button data-testid="skip-button" onClick={onSkip} disabled={isSkipDisabled}>
+            <Button
+              data-testid="skip-button"
+              onClick={onSkip}
+              disabled={isSkipDisabled}
+              aria-label={I18n.t('Skip issue')}
+            >
               {I18n.t('Skip')}
             </Button>
           </Flex>
@@ -61,6 +71,7 @@ const Footer: React.FC<Props> = ({
           <Button
             data-testid="save-and-next-button"
             onClick={onSaveAndNext}
+            aria-label={I18n.t('Save and Next issue')}
             color="primary"
             disabled={isSaveAndNextDisabled}
           >

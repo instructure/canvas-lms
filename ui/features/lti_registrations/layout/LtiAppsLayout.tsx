@@ -133,9 +133,13 @@ export const LtiAppsLayout = React.memo(() => {
         ) : null}
       </Flex>
       <Text>
-        {I18n.t(
-          'Apps is the central hub to discover, manage, and monitor integrated apps. Extend and enhance your digital teaching and learning experience with powerful apps that provide and/or enrich your content, assessment, multimedia, collaboration, analytics, accessibility, and more. Select Discover to explore and install new apps, Manage to review and manage installed apps, and Monitor to view and understand usage.',
-        )}
+        {ENV.FEATURES.canvas_apps_sub_account_access
+          ? I18n.t(
+              'The Canvas Apps page lets root account administrators discover, install, and oversee integrated applications, while sub-account administrators can monitor usage.',
+            )
+          : I18n.t(
+              'Apps is the central hub to discover, manage, and monitor integrated apps. Extend and enhance your digital teaching and learning experience with powerful apps that provide and/or enrich your content, assessment, multimedia, collaboration, analytics, accessibility, and more. Select Discover to explore and install new apps, Manage to review and manage installed apps, and Monitor to view and understand usage.',
+            )}
       </Text>
       {isMobile ? (
         <>

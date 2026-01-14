@@ -41,8 +41,8 @@ describe('CoursePicker component', () => {
     subAccounts: getSampleData().subAccounts,
     terms: getSampleData().terms,
     isLoadingCourses: false,
-    loadCourses: jest.fn(),
-    onSelectedChanged: jest.fn(),
+    loadCourses: vi.fn(),
+    onSelectedChanged: vi.fn(),
   })
 
   test('renders the CoursePicker component', () => {

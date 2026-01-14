@@ -407,6 +407,9 @@ class DiscussionTopicsController < ApplicationController
       end
 
       if states.present?
+        if states.include?("locked") || states.include?("unlocked")
+          ActiveRecord::Associations.preload(@topics, context_module_tags: :context_module)
+        end
         @topics.reject! { |t| t.locked_for?(@current_user) } if states.include?("unlocked")
         @topics.select! { |t| t.locked_for?(@current_user) } if states.include?("locked")
       end
@@ -457,14 +460,19 @@ class DiscussionTopicsController < ApplicationController
 
         assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
+        side_comment_scope = @context.active_discussion_topics.only_discussion_topics
+                                     .where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
+        side_comment_count = Account.site_admin.feature_enabled?(:disallow_threaded_replies_manage) ? side_comment_scope.count : 0
+        has_side_comments = Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert) && side_comment_count > 0
+
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
           FEATURE_FLAGS_URL: feature_flags_url,
           ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
           CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
           DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
-          HAS_SIDE_COMMENT_DISCUSSIONS: Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert) ? @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).exists? : false,
-          AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS: Account.site_admin.feature_enabled?(:disallow_threaded_replies_manage) ? @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).count : 0,
+          HAS_SIDE_COMMENT_DISCUSSIONS: has_side_comments,
+          AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS: side_comment_count,
           totalDiscussions: scope.count,
           permissions: {
             create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
@@ -900,7 +908,6 @@ class DiscussionTopicsController < ApplicationController
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
                rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
                discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
-               draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_translation_available: Translation.available?(translation_flags), # Is translation enabled on the course.
                ai_translation_improvements: @domain_root_account.feature_enabled?(:ai_translation_improvements),
@@ -1642,7 +1649,6 @@ class DiscussionTopicsController < ApplicationController
     end
     @topic.current_user = @current_user
     @topic.content_being_saved_by(@current_user)
-    @topic.saving_user = @current_user
 
     if discussion_topic_hash.key?(:message)
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])

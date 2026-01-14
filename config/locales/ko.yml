@@ -327,6 +327,8 @@ ko:
     report_header_student_id: "학생 ID"
     report_header_student_name: "학생 이름"
     report_header_term: 학기
+    report_header_token_id: ID
+    report_header_token_status: 상태
     report_header_user_id: "사용자 id"
     report_header_user_name: "사용자 이름"
     sis_exporter: 
@@ -1467,6 +1469,7 @@ ko:
       recipients_required: "적어도 한 명의 수신인이 필요함"
       threshold_should_be_numeric: "양수이어야 함"
   alerts_6b871b71: 알림
+  aligned_outcomes_d0a0c159: "정렬된 성과"
   all_4321c3a1: 전부
   all_assignment_groups_a65e9e46: "모든 과제 그룹"
   all_courses_a7dbb853: "모든 과목"

@@ -73,7 +73,7 @@
         <% options[:resources].each do |(resource, controllers)| %>
           <%
             next if resource.include?('Plagiarism')
-            link = url_for("#{topicize resource}.html")
+            link = url_for("#{DocumentationHelpers.topicize resource}.html")
             klass = []
             klass << "current" if resource == options[:object]
           %>
@@ -223,7 +223,7 @@
           <a href="<%= url_for("file.plagiarism_platform.html") %>" class="<%= 'current' if options[:object] == 'file.plagiarism_platform.html' %>">Overview</a>
           <% options[:resources].each do |(resource, controllers)| %>
             <% next if resource.exclude?('Plagiarism')
-              link = url_for("#{topicize resource}.html")
+              link = url_for("#{DocumentationHelpers.topicize resource}.html")
               klass = "current" if resource == options[:object]
             %>
             <a class="<%= klass %>" href="<%= link %>"><%= resource %></a>

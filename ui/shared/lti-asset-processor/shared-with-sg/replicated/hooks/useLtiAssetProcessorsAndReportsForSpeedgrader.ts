@@ -37,6 +37,7 @@ type UseLtiAssetProcessorsAndReportsResult = {
   assetProcessors: LtiAssetProcessor[]
   assetReports: LtiAssetReport[]
   compatibleSubmissionType: AssetReportCompatibleSubmissionType
+  hasNextPage: boolean
 }
 
 export function useLtiAssetProcessorsAndReportsForSpeedgrader(
@@ -59,6 +60,8 @@ export function useLtiAssetProcessorsAndReportsForSpeedgrader(
   )
 
   const nullableAssetReports = reportsQueryResult.data?.submission?.ltiAssetReportsConnection?.nodes
+  const hasNextPage =
+    reportsQueryResult.data?.submission?.ltiAssetReportsConnection?.pageInfo?.hasNextPage ?? false
 
   // In the future we may wish to distinguish between 1) no processors and 2)
   // asset reports still loading, but for now, we just show nothing for both cases.
@@ -72,5 +75,6 @@ export function useLtiAssetProcessorsAndReportsForSpeedgrader(
     assetProcessors,
     assetReports,
     compatibleSubmissionType,
+    hasNextPage,
   }
 }

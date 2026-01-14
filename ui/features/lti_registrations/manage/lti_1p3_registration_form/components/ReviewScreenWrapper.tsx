@@ -21,6 +21,7 @@ import type {InternalLtiConfiguration} from '../../model/internal_lti_configurat
 import type {Lti1p3RegistrationWizardStep} from '../Lti1p3RegistrationWizardState'
 import {toUndefined} from '../../../common/lib/toUndefined'
 import {getDefaultPlacementTextFromConfig} from './helpers'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 export type ReviewScreenWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -34,13 +35,13 @@ export const ReviewScreenWrapper = ({
   transitionTo,
 }: ReviewScreenWrapperProps) => {
   const {state} = overlayStore()
-  const placements = state.placements.placements ?? []
+  const placements = filterPlacementsByFeatureFlags(state.placements.placements ?? [])
   const scopes = state.permissions.scopes ?? []
   const privacyLevel =
     state.data_sharing.privacy_level ?? internalConfig.privacy_level ?? 'anonymous'
 
   const labels = Object.fromEntries(
-    (state.placements.placements || []).map(placement => [
+    placements.map(placement => [
       placement,
       state.naming.placements[placement] ??
         getDefaultPlacementTextFromConfig(placement, internalConfig),

@@ -647,7 +647,9 @@ hu:
     report_header_token_dev_key_id: "fejlesztői kulcs azonosító"
     report_header_token_dev_key_name: "fejlesztői kulcs neve"
     report_header_token_hint: "token tipp"
+    report_header_token_id: azonosító
     report_header_token_last_used: "utoljára használt:"
+    report_header_token_status: státusz
     report_header_unposted_current_grade: "nem publikált aktuális osztályzat"
     report_header_unposted_current_score: "el nem küldött jelenlegi eredmény"
     report_header_unposted_final_grade: "nem publikált végső osztályzat"
@@ -2394,6 +2396,7 @@ hu:
   alerts_add_edit_delete_d71091c6: "Értesítések - hozzáadás / szerkesztés / törlés"
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: "A riasztásokat az intézményhez kell konfigurálni. A riasztások egy ritkán használt funkció, amelyet arra terveztek, hogy riasztást küldjön a hallgatóknak, oktatóknak vagy rendszergazdáknak adott eseményindítók esetén (például, hogy 7 napig nincs diák-tanár interakció). Ezeket minden nap ellenőrzik, és értesítést küldenek a tanulónak és/vagy a tanárnak, amíg a kiváltó probléma meg nem oldódik."
   align_outcomes_to_this_page_7d055196: "Hangolja az eredményeket ehhez az oldalhoz"
+  aligned_outcomes_d0a0c159: "Összehangolt tanulási eredmények"
   aligned_questions_125fd2ce: "Összehangolt kérdések"
   alignments_de5f20d8: Összehangolások
   all_4321c3a1: Összes

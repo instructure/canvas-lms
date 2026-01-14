@@ -18,21 +18,22 @@
 
 import {render, screen} from '@testing-library/react'
 import React from 'react'
+import {type MockedFunction} from 'vitest'
 import DocumentProcessorsSection from '../DocumentProcessorsSection'
 import {useShouldShowLtiAssetReportsForStudent} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
 
 // Mock the hook
-jest.mock(
+vi.mock(
   '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent',
   () => ({
-    useShouldShowLtiAssetReportsForStudent: jest.fn(),
+    useShouldShowLtiAssetReportsForStudent: vi.fn(),
   }),
 )
 
 // Mock the component
-jest.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission', () => {
+vi.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission', () => {
   return {
-    LtiAssetReportsForStudentSubmission: jest.fn(({submissionId, submissionType}) => (
+    LtiAssetReportsForStudentSubmission: vi.fn(({submissionId, submissionType}) => (
       <div data-testid="lti-asset-reports">
         Mock LTI Asset Reports for {submissionId} ({submissionType})
       </div>
@@ -40,7 +41,7 @@ jest.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission
   }
 })
 
-const mockUseShouldShow = useShouldShowLtiAssetReportsForStudent as jest.MockedFunction<
+const mockUseShouldShow = useShouldShowLtiAssetReportsForStudent as MockedFunction<
   typeof useShouldShowLtiAssetReportsForStudent
 >
 
@@ -52,7 +53,7 @@ describe('DocumentProcessorsSection', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders LtiAssetReportsForStudentSubmission when there is data', () => {

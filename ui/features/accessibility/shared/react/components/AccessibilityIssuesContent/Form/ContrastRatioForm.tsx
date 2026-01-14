@@ -36,6 +36,7 @@ interface ContrastRatioFormProps {
   description?: string
   onChange: (value: string, isValid: boolean) => void
   inputRef?: (inputElement: HTMLInputElement | null) => void
+  isDisabled?: boolean
 }
 
 const SUGGESTION_MESSAGE = I18n.t(
@@ -53,6 +54,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
   options = [],
   messages = [],
   inputRef,
+  isDisabled,
 }: ContrastRatioFormProps) => {
   const [selectedColor, setSelectedColor] = useState(foregroundColor)
   const pickerRef = useRef<HTMLDivElement | null>(null)
@@ -184,6 +186,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
           value={selectedColor}
           onChange={handleColorChange}
           inputRef={inputRef}
+          disabled={isDisabled}
           renderMessages={() => messages}
           colorMixerSettings={{
             popoverAddButtonLabel: I18n.t('Select'),
@@ -220,6 +223,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
               firstColor: backgroundColor,
             },
           }}
+          popoverButtonScreenReaderLabel={I18n.t('New text color picker')}
         />
       </View>
       {backgroundColor.toUpperCase() === '#FFFFFF' && (

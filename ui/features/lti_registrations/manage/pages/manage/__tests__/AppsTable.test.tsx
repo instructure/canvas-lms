@@ -17,6 +17,7 @@
  */
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {type MockedFunction} from 'vitest'
 import {AppsTableInner, type AppsTableInnerProps} from '../AppsTable'
 import {mockPageOfRegistrations, mockRegistration, mswHandlers} from './helpers'
 import {BrowserRouter} from 'react-router-dom'
@@ -26,9 +27,9 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
-const mockFlash = showFlashAlert as jest.MockedFunction<typeof showFlashAlert>
+const mockFlash = showFlashAlert as MockedFunction<typeof showFlashAlert>
 
 const server = setupServer(...mswHandlers)
 // Need to use AppsTableInner because AppsTable uses Responsive

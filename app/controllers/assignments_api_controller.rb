@@ -1109,6 +1109,13 @@ class AssignmentsApiController < ApplicationController
 
       DatesOverridable.preload_override_data_for_objects(assignments)
 
+      if @context.feature_enabled?(:peer_review_allocation_and_grading)
+        # Only preload for Assignment instances since SubAssignment and PeerReviewSubAssignment
+        # cannot have AssessmentRequests
+        assignment_instances = assignments.select { |a| a.is_a?(Assignment) }
+        Assignment.preload_peer_review_submissions(assignment_instances) if assignment_instances.any?
+      end
+
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
@@ -1163,7 +1170,7 @@ class AssignmentsApiController < ApplicationController
   #   requires that the Differentiated Assignments course feature be turned on. If
   #   "observed_users" is passed, submissions for observed users will also be included.
   #   For "score_statistics" to be included, the "submission" option must also be set.
-  #   The "peer_review" option requires that the Peer Review Grading
+  #   The "peer_review" option requires that the Peer Review Allocation and Grading
   #   course feature be turned on.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
@@ -1441,7 +1448,7 @@ class AssignmentsApiController < ApplicationController
                                      calculate_grades: params.delete(:calculate_grades))
 
       opts = {
-        include_peer_review: @assignment.context.feature_enabled?(:peer_review_grading)
+        include_peer_review: @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       }
 
       render_create_or_update_result(result, opts)
@@ -1694,7 +1701,7 @@ class AssignmentsApiController < ApplicationController
       @assignment.skip_downstream_changes! if params[:skip_downstream_changes].present?
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context, opts)
 
-      opts[:include_peer_review] = @assignment.context.feature_enabled?(:peer_review_grading)
+      opts[:include_peer_review] = @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       render_create_or_update_result(result, opts)
     end
   end

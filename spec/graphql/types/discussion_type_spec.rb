@@ -244,19 +244,6 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("discussionEntriesConnection(rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
   end
 
-  it "loads discussion_entry_drafts" do
-    de = discussion.discussion_entries.create!(message: "root entry", user: @teacher, saving_user: @teacher)
-    dr = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: "hey")
-    dr2 = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: "hooo", parent: de)
-    dr3 = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: "party now", entry: de)
-    # not going to be included cause other user
-    DiscussionEntryDraft.upsert_draft(user: user_model, topic: discussion, message: "party now", entry: de)
-    ids = discussion_type.resolve("discussionEntryDraftsConnection { nodes { _id } }")
-    expect(ids).to match_array([dr, dr2, dr3].flatten.map(&:to_s))
-    messages = discussion_type.resolve("discussionEntryDraftsConnection { nodes { message } }")
-    expect(messages).to match_array(["hey", "hooo", "party now"])
-  end
-
   it "allows querying root discussion entries" do
     de = discussion.discussion_entries.create!(message: "root entry", user: @teacher, saving_user: @teacher)
     discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de.id, saving_user: @teacher)

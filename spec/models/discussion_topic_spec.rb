@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../helpers/notifications/notification_spec_helpers"
+
 describe DiscussionTopic do
+  include NotificationSpecHelpers
+
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -713,11 +717,8 @@ describe DiscussionTopic do
 
     context "differentiated assignements" do
       before do
-        @course = course_factory(active_course: true)
-        discussion_topic_model(user: @teacher, context: @course)
-        @course.enroll_teacher(@teacher).accept!
-        @course_section = @course.course_sections.create
         @student1, @student2, @student3 = create_users(3, return_type: :record)
+        @course.enroll_student(@student2, enrollment_state: "active")
 
         @assignment = @course.assignments.create!(title: "some discussion assignment", only_visible_to_overrides: true)
         @assignment.submission_types = "discussion_topic"
@@ -725,7 +726,6 @@ describe DiscussionTopic do
         @topic.assignment_id = @assignment.id
         @topic.save!
 
-        @course.enroll_student(@student2, enrollment_state: "active")
         @section = @course.course_sections.create!(name: "test section")
         student_in_section(@section, user: @student1)
         create_section_override_for_assignment(@assignment, { course_section: @section })
@@ -807,6 +807,25 @@ describe DiscussionTopic do
           expect(@topic.active_participants_with_visibility.include?(@teacher)).to be_truthy
         end
 
+        it "works for subtopics for graded assignments" do
+          group_discussion_assignment
+          ct = @topic.child_topics.first
+          ct.context.add_user(@student)
+
+          @section = @course.course_sections.create!(name: "test section")
+          student_in_section(@section, user: @student)
+          create_section_override_for_assignment(@assignment, { course_section: @section })
+
+          @topic = @topic.child_topics.first
+          @topic.subscribe(@student)
+          @topic.save!
+
+          expect(@topic.context.class).to eq(Group)
+          expect(@topic.active_participants_with_visibility.include?(@student)).to be_truthy
+        end
+      end
+
+      context "permissions" do
         it "does not grant reply permissions to group if course is concluded" do
           @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(name: "new cat")
@@ -878,23 +897,6 @@ describe DiscussionTopic do
           expect(@topic.context).to eq(@group)
           expect((@topic.check_policy(@teacher) & @relevant_permissions).sort).to eq @relevant_permissions.sort
           expect(@topic.check_policy(@student1) & @relevant_permissions).to be_empty
-        end
-
-        it "works for subtopics for graded assignments" do
-          group_discussion_assignment
-          ct = @topic.child_topics.first
-          ct.context.add_user(@student)
-
-          @section = @course.course_sections.create!(name: "test section")
-          student_in_section(@section, user: @student)
-          create_section_override_for_assignment(@assignment, { course_section: @section })
-
-          @topic = @topic.child_topics.first
-          @topic.subscribe(@student)
-          @topic.save!
-
-          expect(@topic.context.class).to eq(Group)
-          expect(@topic.active_participants_with_visibility.include?(@student)).to be_truthy
         end
       end
     end
@@ -3112,16 +3114,25 @@ describe DiscussionTopic do
       NotificationPolicy.create!(notification: n, communication_channel: @user.communication_channel, frequency: "immediately")
     end
 
+    before do
+      clear_all_notifications
+    end
+
     it "sends a message for a published course" do
       @course.offer!
-      topic = @course.discussion_topics.create!(title: "title")
-      expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to include(@user)
-      expect(topic.messages_sent["New Discussion Topic"].first.from_name).to eq @course.name
+
+      expect_notification(:new_discussion_topic) do |n|
+        n.sent_to @user
+        n.from_name @course.name
+      end.when do
+        @course.discussion_topics.create!(title: "title")
+      end
     end
 
     it "does not send a message for an unpublished course" do
-      topic = @course.discussion_topics.create!(title: "title")
-      expect(topic.messages_sent["New Discussion Topic"]).to be_blank
+      expect_no_notifications.when do
+        @course.discussion_topics.create!(title: "title")
+      end
     end
 
     context "group discussions" do
@@ -3133,12 +3144,117 @@ describe DiscussionTopic do
       it "sends a message for a group discussion in a published course" do
         @course.offer!
         topic = @group.discussion_topics.create!(title: "title")
-        expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to include(@user)
+        expect(topic).to have_sent_notification(:new_discussion_topic).to(@user)
       end
 
       it "does not send a message for a group discussion in an unpublished course" do
-        topic = @group.discussion_topics.create!(title: "title")
-        expect(topic.messages_sent["New Discussion Topic"]).to be_blank
+        expect_no_notifications.when do
+          @group.discussion_topics.create!(title: "title")
+        end
+      end
+    end
+
+    context "with multiple personas" do
+      before :once do
+        @course.offer!
+        @teacher = @user # Save the teacher from outer context
+
+        # Active student 1
+        @student1 = student_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Active student 2
+        @student2 = student_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Teaching assistant
+        @ta = ta_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Second teacher
+        @teacher2 = teacher_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Observer
+        @observer = observer_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Designer
+        @designer = designer_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Inactive student
+        @inactive_student = student_in_course(active_all: true, active_cc: true, course: @course).user
+        @course.enrollments.where(user: @inactive_student).first.deactivate
+
+        # Concluded student
+        @concluded_student = student_in_course(active_all: true, active_cc: true, course: @course).user
+        @course.enrollments.where(user: @concluded_student).first.conclude
+
+        # Student with notification preference set to never
+        @no_notification_student = student_in_course(active_all: true, active_cc: true, course: @course).user
+
+        @user = @teacher.reload # Restore and reload @user to be the teacher
+      end
+
+      before do
+        clear_all_notifications
+
+        n = Notification.where(name: "New Discussion Topic").first
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @student1.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @student2.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @ta.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @teacher2.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @observer.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @designer.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @inactive_student.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @concluded_student.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @no_notification_student.communication_channel)
+        np.frequency = "never"
+        np.save!
+      end
+
+      it "sends notifications to active participants and not to inactive ones" do
+        users_to_send = [@user, @student1, @student2, @ta, @teacher2, @designer]
+        users_not_to_send = [@observer, @inactive_student, @concluded_student, @no_notification_student]
+
+        expect_notification(:new_discussion_topic) do |n|
+          n.sent_to(*users_to_send)
+          n.not_sent_to(*users_not_to_send)
+          n.from_name @course.name
+          n.allowing_other_recipients
+        end.when do
+          @course.discussion_topics.create!(title: "Discussion for all active users")
+        end
+      end
+
+      it "sends to admins only when course is unpublished" do
+        @course.claim!
+
+        expect_no_notifications.when do
+          @course.discussion_topics.create!(title: "Admin only discussion")
+        end
+
+        @course.offer!
       end
     end
   end
@@ -3510,7 +3626,7 @@ describe DiscussionTopic do
       before :once do
         @course = course_factory(active_course: true)
 
-        @item_without_assignment = discussion_topic_model(user: @teacher)
+        @item_without_assignment = discussion_topic_model(user: @teacher, context: @course)
         @item_with_assignment_and_only_vis, @assignment = discussion_and_assignment(only_visible_to_overrides: true)
         @item_with_assignment_and_visible_to_all, @assignment2 = discussion_and_assignment(only_visible_to_overrides: false)
         @item_with_override_for_section_with_no_students, @assignment3 = discussion_and_assignment(only_visible_to_overrides: true)
@@ -3541,6 +3657,17 @@ describe DiscussionTopic do
           @item_without_assignment.id,
           @item_with_assignment_and_visible_to_all.id
         ].sort
+      end
+
+      it "filters concluded students" do
+        # @student2 is in default section, @student1 is in @section
+        student_in_section(@course.default_section, user: @student1, allow_multiple_enrollments: true)
+        @student1.enrollments.where(course: @course, course_section: @section).first.conclude
+        @course.reload
+
+        topic = discussion_topic_model(user: @teacher, workflow_state: "active", only_visible_to_overrides: true)
+        topic.assignment_overrides.create!(set: @section)
+        expect(topic.active_participants_with_visibility.include?(@student1)).to be_falsey
       end
     end
 

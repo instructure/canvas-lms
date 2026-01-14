@@ -17,24 +17,28 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import CommentEditView from '../CommentEditView'
 import {SpeedGraderLegacy_UpdateCommentBankItem} from '../../graphql/mutations'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 describe('CommentEditView', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const defaultProps = {
     id: 'comment-1',
     initialValue: 'Initial comment text',
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const createUpdateMock = ({
@@ -151,7 +155,7 @@ describe('CommentEditView', () => {
 
     it('Cancel button calls onClose callback', async () => {
       const user = userEvent.setup()
-      const onClose = jest.fn()
+      const onClose = vi.fn()
       setup([], {onClose})
 
       const cancelButton = screen.getByTestId('comment-library-edit-cancel-button')
@@ -162,7 +166,7 @@ describe('CommentEditView', () => {
 
     it('Save button triggers mutation with correct variables', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createUpdateMock({comment: 'Initial comment text modified'})]
       setup(mocks)
 
@@ -194,7 +198,7 @@ describe('CommentEditView', () => {
   describe('GraphQL Mutation Tests', () => {
     it('mutation called with correct id and comment value', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [
         createUpdateMock({
           id: 'comment-123',
@@ -216,7 +220,7 @@ describe('CommentEditView', () => {
 
     it('success flash alert shows "Comment updated"', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createUpdateMock({comment: 'Initial comment text changed'})]
       setup(mocks)
 
@@ -236,7 +240,7 @@ describe('CommentEditView', () => {
 
     it('onClose is called after successful mutation', async () => {
       const user = userEvent.setup()
-      const onClose = jest.fn()
+      const onClose = vi.fn()
       const mocks = [createUpdateMock({comment: 'Initial comment text modified'})]
       setup(mocks, {onClose})
 
@@ -298,7 +302,7 @@ describe('CommentEditView', () => {
   describe('Error Handling Tests', () => {
     it('error flash alert shows "Error updating comment" on mutation failure', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createUpdateMock({comment: 'Initial comment text error', success: false})]
       setup(mocks)
 
@@ -318,6 +322,7 @@ describe('CommentEditView', () => {
 
     it('text is preserved in textarea on failure', async () => {
       const user = userEvent.setup()
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createUpdateMock({comment: 'Initial comment text preserved', success: false})]
       setup(mocks)
 
@@ -328,7 +333,7 @@ describe('CommentEditView', () => {
       await user.click(saveButton)
 
       await waitFor(() => {
-        expect(jest.spyOn(FlashAlert, 'showFlashAlert')).toHaveBeenCalledWith({
+        expect(showFlashAlertMock).toHaveBeenCalledWith({
           message: 'Error updating comment',
           type: 'error',
         })
@@ -339,6 +344,7 @@ describe('CommentEditView', () => {
 
     it('button re-enables after error', async () => {
       const user = userEvent.setup()
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createUpdateMock({comment: 'Initial comment text retry', success: false})]
       setup(mocks)
 
@@ -349,7 +355,7 @@ describe('CommentEditView', () => {
       await user.click(saveButton)
 
       await waitFor(() => {
-        expect(jest.spyOn(FlashAlert, 'showFlashAlert')).toHaveBeenCalledWith({
+        expect(showFlashAlertMock).toHaveBeenCalledWith({
           message: 'Error updating comment',
           type: 'error',
         })
@@ -360,7 +366,8 @@ describe('CommentEditView', () => {
 
     it('onClose is not called when mutation fails', async () => {
       const user = userEvent.setup()
-      const onClose = jest.fn()
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
+      const onClose = vi.fn()
       const mocks = [createUpdateMock({comment: 'Initial comment text fail', success: false})]
       setup(mocks, {onClose})
 
@@ -371,7 +378,7 @@ describe('CommentEditView', () => {
       await user.click(saveButton)
 
       await waitFor(() => {
-        expect(jest.spyOn(FlashAlert, 'showFlashAlert')).toHaveBeenCalledWith({
+        expect(showFlashAlertMock).toHaveBeenCalledWith({
           message: 'Error updating comment',
           type: 'error',
         })
@@ -389,7 +396,7 @@ describe('CommentEditView', () => {
 
     it('Cancel button is keyboard accessible with Enter key', async () => {
       const user = userEvent.setup()
-      const onClose = jest.fn()
+      const onClose = vi.fn()
       setup([], {onClose})
 
       const cancelButton = screen.getByTestId('comment-library-edit-cancel-button')
@@ -401,7 +408,7 @@ describe('CommentEditView', () => {
 
     it('Save button is keyboard accessible with Enter key', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createUpdateMock({comment: 'Initial comment text keyboard'})]
       setup(mocks)
 
@@ -419,7 +426,7 @@ describe('CommentEditView', () => {
 
     it('Save button is keyboard accessible with Space key', async () => {
       const user = userEvent.setup()
-      const showFlashAlertMock = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
       const mocks = [createUpdateMock({comment: 'Initial comment text space'})]
       setup(mocks)
 

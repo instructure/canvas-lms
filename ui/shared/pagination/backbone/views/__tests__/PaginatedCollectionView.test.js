@@ -46,11 +46,11 @@ describe('PaginatedCollectionView', () => {
   let container
 
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterAll(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   beforeEach(() => {
@@ -94,7 +94,7 @@ describe('PaginatedCollectionView', () => {
   })
 
   it('detaches scroll listener when collection reaches last page', () => {
-    const scrollSpy = jest.spyOn(view, 'checkScroll')
+    const scrollSpy = vi.spyOn(view, 'checkScroll')
     collection.trigger('fetched:last')
 
     container.dispatchEvent(new Event('scroll'))
@@ -102,13 +102,13 @@ describe('PaginatedCollectionView', () => {
   })
 
   it('fetches next page when scrolled near bottom', () => {
-    const fetchSpy = jest.spyOn(collection, 'fetch')
-    collection.canFetch = jest.fn().mockReturnValue(true)
+    const fetchSpy = vi.spyOn(collection, 'fetch')
+    collection.canFetch = vi.fn().mockReturnValue(true)
 
     // Mock element dimensions for scroll calculation
-    jest.spyOn($.fn, 'height').mockReturnValue(500)
-    jest.spyOn($.fn, 'position').mockReturnValue({top: 0})
-    jest.spyOn($.fn, 'scrollTop').mockReturnValue(400)
+    vi.spyOn($.fn, 'height').mockReturnValue(500)
+    vi.spyOn($.fn, 'position').mockReturnValue({top: 0})
+    vi.spyOn($.fn, 'scrollTop').mockReturnValue(400)
 
     view.checkScroll()
 
@@ -126,10 +126,10 @@ describe('PaginatedCollectionView', () => {
     container.appendChild(view.el)
     view.render()
 
-    const checkScrollSpy = jest.spyOn(view, 'checkScroll')
+    const checkScrollSpy = vi.spyOn(view, 'checkScroll')
     collection.trigger('fetch')
 
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
     expect(checkScrollSpy).toHaveBeenCalled()
   })
 
@@ -144,15 +144,15 @@ describe('PaginatedCollectionView', () => {
     container.appendChild(view.el)
     view.render()
 
-    const checkScrollSpy = jest.spyOn(view, 'checkScroll')
+    const checkScrollSpy = vi.spyOn(view, 'checkScroll')
     collection.trigger('fetch')
 
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
     expect(checkScrollSpy).toHaveBeenCalled()
   })
 
   it('cleans up scroll listeners when removed', () => {
-    const scrollSpy = jest.spyOn(view, 'checkScroll')
+    const scrollSpy = vi.spyOn(view, 'checkScroll')
     view.remove()
 
     container.dispatchEvent(new Event('scroll'))

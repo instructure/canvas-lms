@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {clone, setWith} from 'lodash'
+import {clone, setWith} from 'es-toolkit/compat'
 import React from 'react'
 import {render} from '@testing-library/react'
 import Rubric from '../Rubric'
@@ -23,7 +23,7 @@ import {rubric, assessments} from './fixtures'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the AiUsageButton component
-jest.mock('../components/AiUsageButton', () => {
+vi.mock('../components/AiUsageButton', () => {
   return {
     __esModule: true,
     default: () => <button data-testid="ai-usage-button">AI Assisted</button>,
@@ -78,7 +78,7 @@ describe('the Rubric component', () => {
   })
 
   it('updates the total score when an individual criterion point assessment changes', () => {
-    const onAssessmentChange = jest.fn()
+    const onAssessmentChange = vi.fn()
     const {container} = render(
       <Rubric
         onAssessmentChange={onAssessmentChange}
@@ -141,7 +141,7 @@ describe('the Rubric component', () => {
 
   it('ignores criteria scores when flagged as such', () => {
     const ignoreOutcomeScore = setCloned(rubric, 'criteria.1.ignore_for_scoring', true)
-    const onAssessmentChange = jest.fn()
+    const onAssessmentChange = vi.fn()
     const ignored = {
       ...assessments.points.data[1],
       points: {value: 2, valid: true},

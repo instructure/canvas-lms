@@ -194,6 +194,8 @@ class DiscussionTopicsApiController < ApplicationController
       @topic.update!(summary_enabled: true)
     end
 
+    InstStatsd::Statsd.distributed_increment("discussion_topic.summary.generated")
+
     current_count = Canvas.redis.get(cache_key).to_i
     limit = llm_config_raw.rate_limit[:limit]
 
@@ -203,16 +205,22 @@ class DiscussionTopicsApiController < ApplicationController
 
     case e
     when InstLLM::ServiceQuotaExceededError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.quota_exceeded")
       render(json: { error: t("Sorry, we are currently experiencing high demand. Please try again later.") }, status: :service_unavailable)
     when InstLLM::ThrottlingError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.throttled")
       render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
     when InstLLM::ValidationTooLongError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.too_long")
       render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
     when InstLLM::ValidationError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.validation")
       render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
     when InstLLMHelper::RateLimitExceededError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
       render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed (%{limit}) for now. Please try again later.", limit: e.limit) }, status: :too_many_requests)
     else
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.unknown")
       Canvas::Errors.capture_exception(:discussion_summary, e, :error)
       render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
     end
@@ -282,12 +290,16 @@ class DiscussionTopicsApiController < ApplicationController
       feedback.save! unless feedback.persisted?
     when :like
       feedback.like
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.liked")
     when :dislike
       feedback.dislike
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.disliked")
     when :reset_like
       feedback.reset_like
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.reset_like")
     when :disable_summary
       feedback.disable_summary
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.disabled")
     else
       logger.warn("Invalid discussion topic summary feedback action: #{action}")
       render(json: { error: "Invalid action." }, status: :bad_request) and return

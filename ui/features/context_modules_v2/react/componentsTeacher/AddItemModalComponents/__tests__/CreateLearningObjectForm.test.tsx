@@ -36,9 +36,9 @@ const buildProps = (
   overrides: Partial<CreateLearningObjectFormProps> = {},
 ): CreateLearningObjectFormProps => ({
   itemType: 'quiz',
-  onChange: jest.fn(),
+  onChange: vi.fn(),
   nameError: null,
-  dispatch: jest.fn(),
+  dispatch: vi.fn(),
   state: makeState(),
   ...overrides,
   indentValue: 0,

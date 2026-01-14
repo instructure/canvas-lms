@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import React from 'react'
 import TermsAndPolicyCheckbox from '../TermsAndPolicyCheckbox'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('TermsAndPolicyCheckbox', () => {
   const termsOfUseUrl = 'http://www.canvaslms.com/policies/terms-of-use'
@@ -30,7 +34,7 @@ describe('TermsAndPolicyCheckbox', () => {
         id="terms-checkbox"
         checked={false}
         isDisabled={false}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
       />,
     )
   })
@@ -41,7 +45,7 @@ describe('TermsAndPolicyCheckbox', () => {
         id="terms-checkbox"
         checked={false}
         isDisabled={false}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
         termsOfUseUrl={termsOfUseUrl}
         privacyPolicyUrl={privacyPolicyUrl}
       />,
@@ -61,7 +65,7 @@ describe('TermsAndPolicyCheckbox', () => {
         id="terms-checkbox"
         checked={false}
         isDisabled={false}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
         termsOfUseUrl={termsOfUseUrl}
       />,
     )
@@ -76,7 +80,7 @@ describe('TermsAndPolicyCheckbox', () => {
         id="terms-checkbox"
         checked={false}
         isDisabled={false}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
         privacyPolicyUrl={privacyPolicyUrl}
       />,
     )
@@ -94,7 +98,7 @@ describe('TermsAndPolicyCheckbox', () => {
         id="terms-checkbox"
         checked={false}
         isDisabled={false}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
       />,
     )
     expect(container).toBeEmptyDOMElement()
@@ -106,7 +110,7 @@ describe('TermsAndPolicyCheckbox', () => {
         id="terms-checkbox"
         checked={false}
         isDisabled={false}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
         isRequired={true}
         termsOfUseUrl={termsOfUseUrl}
       />,
@@ -122,7 +126,7 @@ describe('TermsAndPolicyCheckbox', () => {
         id="terms-checkbox"
         checked={false}
         isDisabled={false}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
         isRequired={false}
         termsOfUseUrl={termsOfUseUrl}
       />,
@@ -133,7 +137,7 @@ describe('TermsAndPolicyCheckbox', () => {
   })
 
   it('prevents form submission when isRequired is true and the checkbox is unchecked', async () => {
-    const mockOnChange = jest.fn()
+    const mockOnChange = vi.fn()
     render(
       <TermsAndPolicyCheckbox
         id="terms-checkbox"

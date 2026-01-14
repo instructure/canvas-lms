@@ -30,7 +30,7 @@ export const CompletionProgressBar = ({
 }: {
   workflowState: ContentMigrationWorkflowState
   completion?: number
-  size?: "small" | "x-small" | "medium" | "large"
+  size?: 'small' | 'x-small' | 'medium' | 'large'
 }) => {
   if (typeof completion !== 'number') {
     return null

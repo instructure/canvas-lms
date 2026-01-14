@@ -22,31 +22,36 @@ describe Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations do
   subject(:connection) { ActiveRecord::Base.connection }
 
   it "adds and removes separate columns and check constraint for a new 'polymorphic' reference" do
-    connection.add_reference :users, :asset, polymorphic: %i[assignment submission attachment], null: false
+    connection.add_reference :users, :asset, polymorphic: %i[assignment submission attachment], null: false, foreign_key: true
 
     expect(connection.column_exists?(:users, :assignment_id, :integer, limit: 8, null: true)).to be true
     expect(connection.column_exists?(:users, :submission_id, :integer, limit: 8, null: true)).to be true
     expect(connection.column_exists?(:users, :attachment_id, :integer, limit: 8, null: true)).to be true
     expect(connection.column_exists?(:users, :asset_id)).to be false
     expect(connection.column_exists?(:users, :asset_type)).to be false
+    expect(connection.index_exists?(:users, :assignment_id, where: "(assignment_id IS NOT NULL)")).to be true
+    expect(connection.foreign_key_exists?(:users, :assignments, column: :assignment_id)).to be true
+    expect(connection.foreign_key_exists?(:users, :submissions, column: :submission_id)).to be true
+    expect(connection.foreign_key_exists?(:users, :attachments, column: :attachment_id)).to be true
     expect(connection.check_constraint_exists?(:users,
                                                name: "chk_require_asset",
                                                expression: "(assignment_id IS NOT NULL)::int + (submission_id IS NOT NULL)::int + (attachment_id IS NOT NULL)::int = 1"))
       .to be true
 
-    connection.remove_reference :users, :asset, polymorphic: %i[assignment submission attachment], null: false
+    connection.remove_reference :users, :asset, polymorphic: %i[assignment submission attachment], null: false, foreign_key: true
 
     expect(connection.column_exists?(:users, :assignment_id)).to be false
     expect(connection.column_exists?(:users, :submission_id)).to be false
     expect(connection.column_exists?(:users, :attachment_id)).to be false
     expect(connection.column_exists?(:users, :asset_id)).to be false
     expect(connection.column_exists?(:users, :asset_type)).to be false
+    expect(connection.index_exists?(:users, :assignment_id)).to be false
     expect(connection.check_constraint_exists?(:users, name: "chk_require_asset")).to be false
   end
 
   it "adds columns in a change_table block" do
     connection.change_table :users, bulk: true do |t|
-      t.references :asset, polymorphic: %i[assignment submission attachment], null: false
+      t.references :asset, polymorphic: %i[assignment submission attachment], null: false, foreign_key: true
     end
 
     expect(connection.column_exists?(:users, :assignment_id, :integer, limit: 8, null: true)).to be true
@@ -54,6 +59,10 @@ describe Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations do
     expect(connection.column_exists?(:users, :attachment_id, :integer, limit: 8, null: true)).to be true
     expect(connection.column_exists?(:users, :asset_id)).to be false
     expect(connection.column_exists?(:users, :asset_type)).to be false
+    expect(connection.index_exists?(:users, :assignment_id, where: "(assignment_id IS NOT NULL)")).to be true
+    expect(connection.foreign_key_exists?(:users, :assignments, column: :assignment_id)).to be true
+    expect(connection.foreign_key_exists?(:users, :submissions, column: :submission_id)).to be true
+    expect(connection.foreign_key_exists?(:users, :attachments, column: :attachment_id)).to be true
     expect(connection.check_constraint_exists?(:users,
                                                name: "chk_require_asset",
                                                expression: "(assignment_id IS NOT NULL)::int + (submission_id IS NOT NULL)::int + (attachment_id IS NOT NULL)::int = 1"))
@@ -68,6 +77,7 @@ describe Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations do
     expect(connection.column_exists?(:users, :attachment_id)).to be false
     expect(connection.column_exists?(:users, :asset_id)).to be false
     expect(connection.column_exists?(:users, :asset_type)).to be false
+    expect(connection.index_exists?(:users, :assignment_id)).to be false
     expect(connection.check_constraint_exists?(:users, name: "chk_require_asset")).to be false
   end
 

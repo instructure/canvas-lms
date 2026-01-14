@@ -108,7 +108,7 @@ export function renderToElements<T extends z.ZodType | undefined>({
   let count = 0
   let error = false
 
-  for (const container of containers) {
+  for (const container of Array.from(containers)) {
     try {
       let elem = undefined
       if (datasetSchema === undefined) {

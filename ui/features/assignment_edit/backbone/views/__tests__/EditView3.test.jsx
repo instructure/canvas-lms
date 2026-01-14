@@ -35,44 +35,46 @@ import {setupServer} from 'msw/node'
 let fixtures
 let server
 
-jest.mock('@canvas/user-settings', () => ({
-  contextGet: jest.fn(),
-  contextSet: jest.fn(),
-}))
-
-const userSettingsMock = require('@canvas/user-settings')
+vi.mock('@canvas/user-settings')
 
 // Mock SectionCollection
-jest.mock('@canvas/sections/backbone/collections/SectionCollection', () => {
-  return jest.fn().mockImplementation(() => ({
-    length: 1,
-    add: jest.fn(),
-    models: [],
-    courseSectionID: '1',
-  }))
+vi.mock('@canvas/sections/backbone/collections/SectionCollection', () => {
+  return {
+    default: vi.fn().mockImplementation(() => ({
+      length: 1,
+      add: vi.fn(),
+      models: [],
+      courseSectionID: '1',
+    }))
+  }
 })
 
 // Mock DueDateList
-jest.mock('@canvas/due-dates/backbone/models/DueDateList', () => {
-  return jest.fn().mockImplementation(() => ({
-    sections: {
-      length: 1,
-      add: jest.fn(),
-      models: [],
-    },
-    overrides: {
-      length: 0,
-      models: [],
-    },
-    courseSectionID: '1',
-    _addOverrideForDefaultSectionIfNeeded: jest.fn(),
-  }))
+vi.mock('@canvas/due-dates/backbone/models/DueDateList', () => {
+  return {
+    default: vi.fn().mockImplementation(() => ({
+      sections: {
+        length: 1,
+        add: vi.fn(),
+        models: [],
+      },
+      overrides: {
+        length: 0,
+        models: [],
+      },
+      courseSectionID: '1',
+      _addOverrideForDefaultSectionIfNeeded: vi.fn(),
+    }))
+  }
 })
 
 describe('EditView', () => {
-  beforeAll(() => {
+  let userSettings
+
+  beforeAll(async () => {
     server = setupServer()
     server.listen()
+    userSettings = await import('@canvas/user-settings')
   })
 
   afterAll(() => {
@@ -94,14 +96,18 @@ describe('EditView', () => {
       COURSE_ID: 1,
     })
 
+    // Setup mocks
+    vi.mocked(userSettings.default.contextGet).mockReturnValue(null)
+    vi.mocked(userSettings.default.contextSet).mockReturnValue(undefined)
+
     // Stub RCE initialization since it's async and hard to test
-    jest.spyOn(RCELoader, 'loadOnTarget').mockResolvedValue()
+    vi.spyOn(RCELoader, 'loadOnTarget').mockResolvedValue()
   })
 
   afterEach(() => {
     fakeENV.teardown()
     fixtures.remove()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     server.resetHandlers()
   })
 
@@ -117,7 +123,7 @@ describe('EditView', () => {
     }
 
     const assignment = new Assignment(defaultAssignment)
-    assignment.inClosedGradingPeriod = jest.fn().mockReturnValue(false)
+    assignment.inClosedGradingPeriod = vi.fn().mockReturnValue(false)
     const sectionList = new SectionCollection([Section.defaultDueDateSection()])
     const dueDateList = new DueDateList([], {sectionList})
 
@@ -136,7 +142,7 @@ describe('EditView', () => {
     view.assignment = assignment
 
     // Mock view methods
-    view.$ = jest.fn(selector => {
+    view.$ = vi.fn(selector => {
       const element = $('<div>')
       if (selector === '#assignment_peer_reviews') {
         element.prop('disabled', true)
@@ -147,40 +153,40 @@ describe('EditView', () => {
     })
 
     view.$el = $('<div>')
-    view.setElement = jest.fn()
-    view.render = jest.fn()
+    view.setElement = vi.fn()
+    view.render = vi.fn()
 
     // Mock getFormData to return a simple object
-    view.getFormData = jest.fn().mockReturnValue({
+    view.getFormData = vi.fn().mockReturnValue({
       name: 'Test Assignment',
       peer_reviews: false,
     })
 
     // Mock conditional release editor
     view.conditionalReleaseEditor = {
-      updateAssignment: jest.fn(),
-      validateBeforeSave: jest.fn().mockReturnValue('foo'),
-      save: jest.fn().mockResolvedValue(),
-      focusOnError: jest.fn(),
+      updateAssignment: vi.fn(),
+      validateBeforeSave: vi.fn().mockReturnValue('foo'),
+      save: vi.fn().mockResolvedValue(),
+      focusOnError: vi.fn(),
     }
 
     view.$conditionalReleaseTarget = $('<div>').append($('<div>'))
 
     // Mock EditView.__super__.saveFormData
     EditView.__super__ = {
-      saveFormData: jest.fn().mockReturnValue({
-        pipe: jest.fn().mockReturnValue(Promise.resolve()),
+      saveFormData: vi.fn().mockReturnValue({
+        pipe: vi.fn().mockReturnValue(Promise.resolve()),
       }),
     }
 
     // Mock prototype methods
-    view.checkboxAccessibleAdvisory = jest.fn().mockReturnValue({text: jest.fn()})
-    view.setImplicitCheckboxValue = jest.fn()
-    view.onChange = jest.fn()
+    view.checkboxAccessibleAdvisory = vi.fn().mockReturnValue({text: vi.fn()})
+    view.setImplicitCheckboxValue = vi.fn()
+    view.onChange = vi.fn()
 
     // Implement setDefaultsIfNew
     view.setDefaultsIfNew = function () {
-      const defaults = userSettingsMock.contextGet('new_assignment_settings') || {}
+      const defaults = userSettings.default.contextGet('new_assignment_settings') || {}
       Object.entries(defaults).forEach(([key, value]) => {
         if (key === 'peer_reviews') {
           value = parseInt(value, 10)
@@ -212,7 +218,7 @@ describe('EditView', () => {
           newSettings[key] = null
         }
       })
-      userSettingsMock.contextSet('new_assignment_settings', newSettings)
+      userSettings.default.contextSet('new_assignment_settings', newSettings)
     }
 
     // Track conditional release update calls
@@ -287,66 +293,66 @@ describe('EditView', () => {
     })
 
     it('returns values from localstorage', () => {
-      userSettingsMock.contextGet.mockReturnValue({submission_types: ['foo']})
+      vi.mocked(userSettings.default.contextGet).mockReturnValue({submission_types: ['foo']})
       const view = createEditView()
       view.assignment = {
-        get: jest.fn().mockReturnValue([]),
-        set: jest.fn(),
+        get: vi.fn().mockReturnValue([]),
+        set: vi.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('submission_types', ['foo'])
     })
 
     it('returns string booleans as integers', () => {
-      userSettingsMock.contextGet.mockReturnValue({peer_reviews: '1'})
+      vi.mocked(userSettings.default.contextGet).mockReturnValue({peer_reviews: '1'})
       const view = createEditView()
       view.assignment = {
-        get: jest.fn(),
-        set: jest.fn(),
+        get: vi.fn(),
+        set: vi.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('peer_reviews', 1)
     })
 
     it('doesnt overwrite existing assignment settings', () => {
-      userSettingsMock.contextGet.mockReturnValue({assignment_group_id: 99})
+      vi.mocked(userSettings.default.contextGet).mockReturnValue({assignment_group_id: 99})
       const view = createEditView()
       view.assignment = {
-        get: jest.fn().mockReturnValue(22),
-        set: jest.fn(),
+        get: vi.fn().mockReturnValue(22),
+        set: vi.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).not.toHaveBeenCalledWith('assignment_group_id', 99)
     })
 
     it('sets assignment submission type to online if not already set', () => {
-      userSettingsMock.contextGet.mockReturnValue(null)
+      vi.mocked(userSettings.default.contextGet).mockReturnValue(null)
       const view = createEditView()
       view.assignment = {
-        get: jest.fn().mockReturnValue([]),
-        set: jest.fn(),
+        get: vi.fn().mockReturnValue([]),
+        set: vi.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('submission_types', ['online'])
     })
 
     it('doesnt overwrite assignment submission type', () => {
-      userSettingsMock.contextGet.mockReturnValue({submission_types: ['online']})
+      vi.mocked(userSettings.default.contextGet).mockReturnValue({submission_types: ['online']})
       const view = createEditView()
       view.assignment = {
-        get: jest.fn().mockReturnValue(['external_tool']),
-        set: jest.fn(),
+        get: vi.fn().mockReturnValue(['external_tool']),
+        set: vi.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).not.toHaveBeenCalledWith('submission_types', ['online'])
     })
 
     it('will overwrite empty arrays', () => {
-      userSettingsMock.contextGet.mockReturnValue({submission_types: ['foo']})
+      vi.mocked(userSettings.default.contextGet).mockReturnValue({submission_types: ['foo']})
       const view = createEditView()
       view.assignment = {
-        get: jest.fn().mockReturnValue([]),
-        set: jest.fn(),
+        get: vi.fn().mockReturnValue([]),
+        set: vi.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('submission_types', ['foo'])
@@ -366,14 +372,14 @@ describe('EditView', () => {
         VALID_DATE_RANGE: {},
         COURSE_ID: 1,
       })
-      userSettingsMock.contextGet.mockReturnValue(null)
+      vi.mocked(userSettings.default.contextGet).mockReturnValue(null)
     })
 
     it('submission_type is online if no cache', () => {
       const view = createEditView()
       view.assignment = {
-        get: jest.fn().mockReturnValue([]),
-        set: jest.fn(),
+        get: vi.fn().mockReturnValue([]),
+        set: vi.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('submission_types', ['online'])
@@ -397,20 +403,20 @@ describe('EditView', () => {
 
     it('saves valid attributes to localstorage', () => {
       const view = createEditView()
-      jest.spyOn(view, 'getFormData').mockReturnValue({points_possible: 34})
-      userSettingsMock.contextGet.mockReturnValue({})
+      vi.spyOn(view, 'getFormData').mockReturnValue({points_possible: 34})
+      vi.mocked(userSettings.default.contextGet).mockReturnValue({})
       view.cacheAssignmentSettings()
-      expect(userSettingsMock.contextSet).toHaveBeenCalledWith('new_assignment_settings', {
+      expect(userSettings.default.contextSet).toHaveBeenCalledWith('new_assignment_settings', {
         points_possible: 34,
       })
     })
 
     it('rejects invalid attributes when caching', () => {
       const view = createEditView()
-      jest.spyOn(view, 'getFormData').mockReturnValue({invalid_attribute_example: 30})
-      userSettingsMock.contextGet.mockReturnValue({})
+      vi.spyOn(view, 'getFormData').mockReturnValue({invalid_attribute_example: 30})
+      vi.mocked(userSettings.default.contextGet).mockReturnValue({})
       view.cacheAssignmentSettings()
-      expect(userSettingsMock.contextSet).toHaveBeenCalledWith('new_assignment_settings', {
+      expect(userSettings.default.contextSet).toHaveBeenCalledWith('new_assignment_settings', {
         invalid_attribute_example: null,
       })
     })
@@ -447,14 +453,14 @@ describe('EditView', () => {
 
     it('calls update on first switch', () => {
       const view = createEditView()
-      const updateAssignmentSpy = jest.spyOn(view.conditionalReleaseEditor, 'updateAssignment')
+      const updateAssignmentSpy = vi.spyOn(view.conditionalReleaseEditor, 'updateAssignment')
       view.updateConditionalRelease()
       expect(updateAssignmentSpy).toHaveBeenCalledTimes(1)
     })
 
     it('calls update when modified once', () => {
       const view = createEditView()
-      const updateAssignmentSpy = jest.spyOn(view.conditionalReleaseEditor, 'updateAssignment')
+      const updateAssignmentSpy = vi.spyOn(view.conditionalReleaseEditor, 'updateAssignment')
       view.onChange()
       view.updateConditionalRelease()
       expect(updateAssignmentSpy).toHaveBeenCalledTimes(1)
@@ -462,7 +468,7 @@ describe('EditView', () => {
 
     it('does not call update when not modified', () => {
       const view = createEditView()
-      const updateAssignmentSpy = jest.spyOn(view.conditionalReleaseEditor, 'updateAssignment')
+      const updateAssignmentSpy = vi.spyOn(view.conditionalReleaseEditor, 'updateAssignment')
       view.updateConditionalRelease()
       updateAssignmentSpy.mockReset()
       view.updateConditionalRelease()
@@ -481,10 +487,10 @@ describe('EditView', () => {
       const superPromise = Promise.resolve()
       const crPromise = Promise.resolve()
 
-      jest.spyOn(EditView.__super__, 'saveFormData').mockReturnValue({
-        pipe: jest.fn().mockReturnValue(superPromise),
+      vi.spyOn(EditView.__super__, 'saveFormData').mockReturnValue({
+        pipe: vi.fn().mockReturnValue(superPromise),
       })
-      const saveSpy = jest.spyOn(view.conditionalReleaseEditor, 'save').mockReturnValue(crPromise)
+      const saveSpy = vi.spyOn(view.conditionalReleaseEditor, 'save').mockReturnValue(crPromise)
 
       await view.saveFormData()
 
@@ -494,7 +500,7 @@ describe('EditView', () => {
 
     it('focuses in conditional release editor if conditional save validation fails', () => {
       const view = createEditView()
-      const focusOnErrorSpy = jest.spyOn(view.conditionalReleaseEditor, 'focusOnError')
+      const focusOnErrorSpy = vi.spyOn(view.conditionalReleaseEditor, 'focusOnError')
       view.showErrors({conditional_release: {type: 'foo'}})
       expect(focusOnErrorSpy).toHaveBeenCalled()
     })
@@ -516,7 +522,7 @@ describe('EditView', () => {
     })
 
     it('only appears for group assignments', () => {
-      userSettingsMock.contextGet.mockReturnValue({
+      vi.mocked(userSettings.default.contextGet).mockReturnValue({
         peer_reviews: '1',
         group_category_id: 1,
         automatic_peer_reviews: '1',

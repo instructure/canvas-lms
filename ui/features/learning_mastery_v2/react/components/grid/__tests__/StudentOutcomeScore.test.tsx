@@ -20,18 +20,39 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {StudentOutcomeScore, StudentOutcomeScoreProps} from '../StudentOutcomeScore'
 import {svgUrl} from '../../../utils/icons'
-import {Outcome, OutcomeRollup, Rating} from '../../../types/rollup'
+import {Outcome, Rating} from '../../../types/rollup'
 import {ScoreDisplayFormat} from '../../../utils/constants'
 
-jest.mock('../../../utils/icons', () => ({
-  svgUrl: jest.fn(() => 'http://test.com'),
+vi.mock('../../../utils/icons', () => ({
+  svgUrl: vi.fn(() => 'http://test.com'),
 }))
 
 describe('StudentOutcomeScore', () => {
   interface TestProps {
     outcome?: Partial<Outcome>
-    rollup?: Partial<OutcomeRollup>
+    score?: number
   }
+
+  const defaultRatings: Rating[] = [
+    {
+      points: 5,
+      color: '#00FF00',
+      description: 'excellent!',
+      mastery: true,
+    },
+    {
+      points: 3,
+      color: '#FFFF00',
+      description: 'great!',
+      mastery: false,
+    },
+    {
+      points: 1,
+      color: '#FF0000',
+      description: 'needs improvement',
+      mastery: false,
+    },
+  ]
 
   const defaultProps = (props: TestProps = {}): StudentOutcomeScoreProps => {
     return {
@@ -43,20 +64,10 @@ describe('StudentOutcomeScore', () => {
         calculation_method: 'decaying_average',
         calculation_int: 65,
         mastery_points: 5,
-        ratings: [],
+        ratings: defaultRatings,
         ...props.outcome,
       } as Outcome,
-      rollup: {
-        outcomeId: '1',
-        score: 3,
-        rating: {
-          color: 'FFFFF',
-          points: 3,
-          description: 'great!',
-          mastery: false,
-        },
-        ...props.rollup,
-      } as OutcomeRollup,
+      score: 'score' in props ? props.score : 3,
     }
   }
 
@@ -77,18 +88,8 @@ describe('StudentOutcomeScore', () => {
     expect(getByText('great!')).toBeInTheDocument()
   })
 
-  it('renders ScreenReaderContent with "Unassessed" if there is no rollup rating', () => {
-    const {getByText} = render(
-      <StudentOutcomeScore
-        {...defaultProps({
-          rollup: {
-            outcomeId: '1',
-            score: 3,
-            rating: {points: 3, color: 'FFFFF', description: '', mastery: false},
-          },
-        })}
-      />,
-    )
+  it('renders ScreenReaderContent with "Unassessed" if there is no score', () => {
+    const {getByText} = render(<StudentOutcomeScore {...defaultProps({score: undefined})} />)
     expect(getByText('Unassessed')).toBeInTheDocument()
   })
 
@@ -124,32 +125,20 @@ describe('StudentOutcomeScore', () => {
       expect(pointsText.closest('[class*="screenReaderContent"]')).not.toBeInTheDocument()
     })
 
-    it('renders "Unassessed" label when ICON_AND_LABEL format is used and no rating', () => {
+    it('renders "Unassessed" label when ICON_AND_LABEL format is used and no score', () => {
       const {getByText} = render(
         <StudentOutcomeScore
-          {...defaultProps({
-            rollup: {
-              outcomeId: '1',
-              score: 0,
-              rating: {points: 0, color: 'FFFFF', description: '', mastery: false},
-            },
-          })}
+          {...defaultProps({score: undefined})}
           scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_LABEL}
         />,
       )
       expect(getByText('Unassessed')).toBeInTheDocument()
     })
 
-    it('renders score when ICON_AND_POINTS format is used even with no rating description', () => {
+    it('renders score when ICON_AND_POINTS format is used', () => {
       const {getByText} = render(
         <StudentOutcomeScore
-          {...defaultProps({
-            rollup: {
-              outcomeId: '1',
-              score: 2.5,
-              rating: {points: 2.5, color: 'FFFFF', description: '', mastery: false},
-            },
-          })}
+          {...defaultProps({score: 2.5})}
           scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_POINTS}
         />,
       )

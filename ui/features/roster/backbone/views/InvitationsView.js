@@ -18,7 +18,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
-import {last} from 'lodash'
+import {last} from 'es-toolkit/compat'
 import DialogBaseView from '@canvas/dialog-base-view'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import invitationsViewTemplate from '../../jst/InvitationsView.handlebars'

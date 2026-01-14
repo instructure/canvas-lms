@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {PageViewsTable, type PageViewsTableProps} from '../PageViewsTable'
@@ -26,6 +26,48 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 const server = setupServer()
 const queryClient = new QueryClient()
+
+afterEach(() => {
+  cleanup()
+})
+
+// Helper function to create reusable pagination mock
+function createPaginationMock(
+  userId: string,
+  options: {
+    maxPages?: number
+    onRequest?: (requestCount: number, url: URL) => void
+  } = {},
+) {
+  const {maxPages = 3, onRequest} = options
+  const capturedUrls: string[] = []
+  let requestCount = 0
+
+  const resolver = http.get(`/api/v1/users/:userId/page_views`, ({params, request}) => {
+    if (params.userId !== userId) return // Only handle requests for this userId
+
+    requestCount++
+    capturedUrls.push(request.url)
+
+    const url = new URL(request.url)
+    const perPage = Number(url.searchParams.get('per_page'))
+
+    // Allow tests to inspect request details
+    onRequest?.(requestCount, url)
+
+    let nextLinkHeader = {}
+    if (requestCount < maxPages) {
+      const nextPageBookmark = btoa(`bookmark:${requestCount + 1}`)
+      nextLinkHeader = {
+        Link: `<${url.origin}${url.pathname}?page=${nextPageBookmark}>; rel="next"`,
+      }
+    }
+
+    return HttpResponse.json(generatePageViews(perPage), {headers: nextLinkHeader})
+  })
+
+  return {resolver, capturedUrls, getRequestCount: () => requestCount}
+}
 
 // As of this writing, JS-DOM does not implement Intl.DurationFormat, so we will
 // expect the component under test to fall back to its manual formatting. Putting
@@ -40,6 +82,24 @@ function Subject(props: PageViewsTableProps): React.JSX.Element {
       <PageViewsTable {...props} />
     </QueryClientProvider>
   )
+}
+
+function generatePageViews(count: number): APIPageView[] {
+  const views: APIPageView[] = []
+  for (let i = 0; i < count; i++) {
+    views.push({
+      id: crypto.randomUUID(),
+      app_name: null,
+      http_method: 'get',
+      created_at: new Date(Date.now() - i * Math.random() * 60000).toISOString(),
+      participated: Math.random() < 0.5,
+      interaction_seconds: Math.floor(Math.random() * 300),
+      user_agent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      url: `http://example.com/page${i}`,
+    })
+  }
+  return views
 }
 
 const sample1: APIPageView[] = [
@@ -130,5 +190,70 @@ describe('PageViewsTable', () => {
     await waitFor(() => expect(capturedUrl).toBeTruthy())
     expect(capturedUrl).toMatch(/start_time=2024-01-01/)
     expect(capturedUrl).toMatch(/end_time=2024-01-02/)
+  })
+
+  describe('pagination', () => {
+    it.skip('renders pagination component with correct buttons', async () => {
+      // arrange
+      const id = '127'
+      const {resolver} = createPaginationMock(id, {maxPages: 2})
+      server.use(resolver)
+
+      // act
+      const {findByTestId, findByText} = render(<Subject userId={id} pageSize={100} />)
+
+      // assert - pagination renders with correct buttons
+      await findByTestId('page-views-table-body')
+      await waitFor(async () => {
+        expect(await findByText('1')).toBeInTheDocument() // Current page
+        expect(await findByText('2+')).toBeInTheDocument() // Next page indicator
+      })
+    })
+
+    it.skip('navigates to next page when pagination button is clicked', async () => {
+      // arrange
+      const id = '128'
+      const {resolver} = createPaginationMock(id, {maxPages: 3})
+      server.use(resolver)
+
+      // act
+      const {findByTestId, findByText, queryByText} = render(<Subject userId={id} pageSize={100} />)
+
+      // assert - wait for first page to load
+      await findByTestId('page-views-table-body')
+      await waitFor(async () => {
+        expect(await findByText('1')).toBeInTheDocument() // Page 1 button
+        expect(await findByText('2+')).toBeInTheDocument() // Page 2+ indicator
+      })
+
+      // act - click page 2 button
+      const page2Button = await findByText('2+')
+      page2Button.click()
+
+      // assert - should navigate to page 2 (component integration test)
+      await waitFor(async () => {
+        expect(queryByText('2+')).not.toBeInTheDocument() // 2+ indicator should be gone
+        expect(await findByText('2')).toBeInTheDocument() // Now showing page 2 as current
+      })
+    })
+
+    it('shows empty state when API returns no data', async () => {
+      // arrange
+      const id = '130'
+      const onEmpty = vi.fn()
+      server.use(
+        http.get(`/api/v1/users/:userId/page_views`, ({params}) => {
+          if (params.userId !== id) return
+          return HttpResponse.json([]) // Return empty array (no page views)
+        }),
+      )
+
+      // act
+      const {findByTestId} = render(<Subject userId={id} pageSize={100} onEmpty={onEmpty} />)
+
+      // assert - should show empty state UI
+      await findByTestId('page-views-empty-state')
+      expect(onEmpty).toHaveBeenCalledTimes(1)
+    })
   })
 })

@@ -97,19 +97,6 @@ describe Importers::DiscussionTopicImporter do
     expect(topic.attachment).to be_nil
   end
 
-  it "imports htmls with attachments" do
-    data = get_import_data("vista", "discussion_topic").first.with_indifferent_access
-    context = get_import_context
-    aa_test_data = AttachmentAssociationsSpecHelper.new(context.account, context)
-    migration = context.content_migrations.create!
-    migration.user = @teacher
-    data["description"] = aa_test_data.base_html
-    Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
-    expect(context.discussion_topics.count).to eq 1
-    expect(context.discussion_topics.first.attachment_associations.count).to eq 1
-    expect(context.discussion_topics.first.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
-  end
-
   describe "assignments" do
     subject do
       Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
@@ -162,6 +149,29 @@ describe Importers::DiscussionTopicImporter do
         context.account.disable_feature!(:discussion_checkpoints)
         data.delete(:reply_to_entry_required_count)
         expect(subject.reply_to_entry_required_count).to eq(0)
+      end
+    end
+
+    context "when discussion has lock_at but assignment does not" do
+      it "uses assignment lock_at for discussion topic" do
+        discussion_data = {
+          migration_id: "test_discussion",
+          title: "Test Discussion",
+          description: "Test description",
+          lock_at: "2025-04-05T00:00:00Z",
+          assignment: {
+            migration_id: "test_assignment",
+            title: "Test Assignment",
+            due_at: "2025-12-02T00:00:00Z",
+            lock_at: nil
+          }
+        }
+
+        topic = Importers::DiscussionTopicImporter.import_from_migration(discussion_data, context, migration)
+
+        expect(topic.lock_at).to be_nil
+        expect(topic.assignment.due_at).to eq(Time.zone.parse("2025-12-02T00:00:00Z"))
+        expect(topic.assignment.lock_at).to be_nil
       end
     end
   end

@@ -21,14 +21,14 @@ import {isLastChild, isNthChild} from '../deletable'
 let mockDescendants: any[] = []
 
 const query = {
-  node: jest.fn((nodeId: string) => {
+  node: vi.fn((nodeId: string) => {
     if (nodeId === 'parent') {
       return {
-        descendants: jest.fn().mockReturnValue(mockDescendants),
+        descendants: vi.fn().mockReturnValue(mockDescendants),
       }
     }
     return {
-      get: jest.fn(() => {
+      get: vi.fn(() => {
         return {
           data: {
             parent: 'parent',
@@ -65,8 +65,8 @@ describe('deletable', () => {
 
     it('returns false if the node has no parent', () => {
       const query2 = {
-        node: jest.fn().mockReturnValue({
-          get: jest.fn().mockReturnValue({
+        node: vi.fn().mockReturnValue({
+          get: vi.fn().mockReturnValue({
             data: {},
           }),
         }),

@@ -21,8 +21,8 @@ import RichContentEditor from '../RichContentEditor'
 import * as RceCommandShim from '@canvas/rce-command-shim'
 import RCELoader from '../serviceRCELoader'
 
-jest.mock('@canvas/rce-command-shim', () => ({
-  send: jest.fn(),
+vi.mock('@canvas/rce-command-shim', () => ({
+  send: vi.fn(),
 }))
 
 describe('RichContentEditor', () => {
@@ -56,12 +56,12 @@ describe('RichContentEditor', () => {
 
   describe('remote module loading', () => {
     beforeEach(() => {
-      jest.spyOn(RCELoader, 'preload').mockImplementation(() => {})
+      vi.spyOn(RCELoader, 'preload').mockImplementation(() => {})
       window.ENV = {}
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
       delete window.ENV
     })
 
@@ -77,12 +77,12 @@ describe('RichContentEditor', () => {
 
     beforeEach(() => {
       $target = $('<div/>')
-      jest.spyOn(RCELoader, 'loadOnTarget').mockImplementation(() => Promise.resolve())
-      jest.spyOn(RichContentEditor, 'freshNode').mockReturnValue($target)
+      vi.spyOn(RCELoader, 'loadOnTarget').mockImplementation(() => Promise.resolve())
+      vi.spyOn(RichContentEditor, 'freshNode').mockReturnValue($target)
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     it('calls RCELoader.loadOnTarget', () => {
@@ -97,12 +97,12 @@ describe('RichContentEditor', () => {
 
     beforeEach(() => {
       $target = $('<div/>')
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('passes command to RceCommandShim', () => {
       const $freshTarget = $($target)
-      jest.spyOn(RichContentEditor, 'freshNode').mockReturnValue($freshTarget)
+      vi.spyOn(RichContentEditor, 'freshNode').mockReturnValue($freshTarget)
 
       RichContentEditor.callOnRCE($target, 'someCommand')
       expect(RceCommandShim.send).toHaveBeenCalled()

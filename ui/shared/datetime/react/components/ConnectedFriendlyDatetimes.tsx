@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as tz from '@instructure/moment-utils'
-import _ from 'lodash'
+import {isDate} from 'es-toolkit/compat'
 import {
   fudgeDateForProfileTimezone,
   datetimeString,
@@ -38,7 +38,7 @@ type Props = {
 }
 
 function timeFormatting(dateTime: string | Date, format: string | undefined, showTime: boolean) {
-  if (!_.isDate(dateTime)) {
+  if (!isDate(dateTime)) {
     // @ts-expect-error
     dateTime = tz.parse(dateTime)
   }
@@ -46,6 +46,8 @@ function timeFormatting(dateTime: string | Date, format: string | undefined, sho
   const fudged = fudgeDateForProfileTimezone(dateTime)
   let friendly
   if (format) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
     friendly = tz.format(dateTime, format)
   } else if (showTime) {
     friendly = datetimeString(dateTime)

@@ -20,9 +20,9 @@ import {actions} from '../actions'
 
 describe('Conditional Release Stats actions', () => {
   test('closeSidebar dispatches CLOSE_SIDEBAR action', () => {
-    const trigger = {focus: jest.fn()}
-    const dispatch = jest.fn()
-    const getState = jest.fn().mockReturnValue({sidebarTrigger: trigger})
+    const trigger = {focus: vi.fn()}
+    const dispatch = vi.fn()
+    const getState = vi.fn().mockReturnValue({sidebarTrigger: trigger})
 
     actions.closeSidebar()(dispatch, getState)
 
@@ -31,9 +31,9 @@ describe('Conditional Release Stats actions', () => {
   })
 
   test('closeSidebar focuses sidebar trigger', () => {
-    const trigger = {focus: jest.fn()}
-    const dispatch = jest.fn()
-    const getState = jest.fn().mockReturnValue({sidebarTrigger: trigger})
+    const trigger = {focus: vi.fn()}
+    const dispatch = vi.fn()
+    const getState = vi.fn().mockReturnValue({sidebarTrigger: trigger})
 
     actions.closeSidebar()(dispatch, getState)
 

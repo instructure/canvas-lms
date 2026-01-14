@@ -27,12 +27,14 @@ const I18n = createI18nScope('rubrics-form')
 type CriteriaBuilderHeaderProps = {
   hidePoints: boolean
   hideScoreTotal: boolean
+  isAIRubricsAvailable: boolean
   pointsPossible: number
   rubricId?: string
 }
 export const CriteriaBuilderHeader = ({
   hidePoints,
   hideScoreTotal,
+  isAIRubricsAvailable,
   rubricId,
   pointsPossible,
 }: CriteriaBuilderHeaderProps) => {
@@ -46,7 +48,7 @@ export const CriteriaBuilderHeader = ({
             data-testid="rubric-criteria-builder-header"
             themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
           >
-            {I18n.t('Criteria Builder')}
+            {isAIRubricsAvailable ? I18n.t('Rubric Generator') : I18n.t('Criteria Builder')}
           </Heading>
         </Flex.Item>
         {!hidePoints && !hideScoreTotal && (

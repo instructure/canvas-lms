@@ -65,7 +65,8 @@ class OutcomesController < ApplicationController
       MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE: Account.site_admin.feature_enabled?(:menu_option_for_outcome_details_page),
       OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
       ARCHIVE_OUTCOMES: Account.site_admin.feature_enabled?(:archive_outcomes),
-      PREVENT_DELETION_OUTCOMES_WITH_OS_ALIGNMENTS: Account.site_admin.feature_enabled?(:prevent_deletion_outcomes_with_os_alignments)
+      PREVENT_DELETION_OUTCOMES_WITH_OS_ALIGNMENTS: Account.site_admin.feature_enabled?(:prevent_deletion_outcomes_with_os_alignments),
+      LMGB_STUDENT_REPORTING: @context.feature_enabled?(:lmgb_student_reporting)
     )
 
     set_tutorial_js_env

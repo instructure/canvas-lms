@@ -18,10 +18,11 @@
 
 import {ZAccountId} from '@canvas/lti-apps/models/AccountId'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
+import {ZLtiDeploymentId} from '../../../../model/LtiDeploymentId'
 import type {LtiOverlayVersion} from '../../../../model/LtiOverlayVersion'
 import type {
   AvailabilityChangeHistoryEntry,
@@ -52,23 +53,48 @@ const mockLtiRegistrationHistoryEntry = (
   update_type: 'control_edit',
   comment: 'Test update',
   created_by: mockUser({overrides: {name: 'Foo Bar Baz'}}),
-  old_context_controls: {},
-  new_context_controls: {
-    [ZLtiContextControlId.parse('1')]: {
-      id: ZLtiContextControlId.parse('1'),
-      available: false,
-      account_id: ZAccountId.parse('4'),
-      course_id: null,
+  old_controls_by_deployment: [],
+  new_controls_by_deployment: [
+    {
+      id: ZLtiDeploymentId.parse('1'),
+      registration_id: ZLtiRegistrationId.parse('1'),
       deployment_id: '4',
+      context_id: '4',
+      context_type: 'Account',
+      context_name: 'Test Account',
+      root_account_deployment: false,
       workflow_state: 'active',
+      context_controls: [
+        {
+          id: ZLtiContextControlId.parse('1'),
+          registration_id: ZLtiRegistrationId.parse('1'),
+          deployment_id: ZLtiDeploymentId.parse('4'),
+          available: false,
+          account_id: ZAccountId.parse('4'),
+          course_id: null,
+          workflow_state: 'active',
+          path: '/4',
+          display_path: ['Test Account'],
+          context_name: 'Test Account',
+          depth: 0,
+          child_control_count: 0,
+          course_count: 0,
+          subaccount_count: 0,
+          created_at: new Date('2025-01-15T12:00:00Z'),
+          updated_at: new Date('2025-01-15T12:00:00Z'),
+          created_by: null,
+          updated_by: null,
+        },
+      ],
     },
-  },
+  ],
   ...overrides,
 })
 
 describe('ToolHistory', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
+    cleanup()
     server.resetHandlers()
     fakeENV.teardown()
   })

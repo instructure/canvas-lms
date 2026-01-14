@@ -54,35 +54,35 @@ describe('Gradebook > Students', () => {
     })
 
     test('updates columns when the grid has rendered', () => {
-      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
-      jest.spyOn(gradebook, 'updateColumns')
+      vi.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
+      vi.spyOn(gradebook, 'updateColumns')
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
       expect(gradebook.updateColumns).toHaveBeenCalledTimes(1)
     })
 
     test('updates columns after storing grading period assignments', () => {
-      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
-      jest.spyOn(gradebook, 'updateColumns').mockImplementation(() => {
+      vi.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
+      vi.spyOn(gradebook, 'updateColumns').mockImplementation(() => {
         expect(gradebook.courseContent.gradingPeriodAssignments).toEqual(gradingPeriodAssignments)
       })
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
     })
 
     test('does not update columns when the grid has not yet rendered', () => {
-      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(false)
-      jest.spyOn(gradebook, 'updateColumns')
+      vi.spyOn(gradebook, '_gridHasRendered').mockReturnValue(false)
+      vi.spyOn(gradebook, 'updateColumns')
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
       expect(gradebook.updateColumns).not.toHaveBeenCalled()
     })
 
     test('updates essential data load status', () => {
-      jest.spyOn(gradebook, '_updateEssentialDataLoaded')
+      vi.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
       expect(gradebook._updateEssentialDataLoaded).toHaveBeenCalledTimes(1)
     })
 
     test('updates essential data load status after updating the grading period assignments loaded status', () => {
-      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+      vi.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
         expect(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded).toBe(true)
       })
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)

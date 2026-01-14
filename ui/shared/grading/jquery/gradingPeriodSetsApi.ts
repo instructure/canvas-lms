@@ -36,7 +36,8 @@ const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
 const createUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
-// @ts-expect-error
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - untyped id parameter
 const updateUrl = id => replaceTags(ENV.GRADING_PERIOD_SET_UPDATE_URL, 'id', id)
 
 const serializeSet = (set: CamelizedGradingPeriodSet) => {
@@ -56,14 +57,16 @@ const baseDeserializeSet = (set: GradingPeriodSet): CamelizedGradingPeriodSet =>
   title: gradingPeriodSetTitle(set),
   weighted: !!set.weighted,
   displayTotalsForAllGradingPeriods: set.display_totals_for_all_grading_periods,
-  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - gradingPeriodsApi.deserializePeriods type mismatch
   gradingPeriods: gradingPeriodsApi.deserializePeriods(set.grading_periods),
   permissions: set.permissions,
   createdAt: new Date(set.created_at),
   enrollmentTermIDs: undefined,
 })
 
-// @ts-expect-error
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - untyped set parameter
 const gradingPeriodSetTitle = set => {
   if (set.title && set.title.trim()) {
     return set.title.trim()
@@ -90,22 +93,28 @@ export default {
       const dispatch = new NaiveRequestDispatch()
 
       dispatch
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - NaiveRequestDispatch.getDepaginated returns untyped Promise
         .getDepaginated(listUrl())
-        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - NaiveRequestDispatch Promise chain untyped
         .then(response => resolve(deserializeSets(response)))
-        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - NaiveRequestDispatch Promise chain untyped
         .fail(error => reject(error))
     })
   },
 
-  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - untyped set parameter
   create(set) {
     return axios
       .post(createUrl(), serializeSet(set))
       .then(response => deserializeSet(response.data.grading_period_set))
   },
 
-  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - untyped set parameter
   update(set) {
     return axios.patch(updateUrl(set.id), serializeSet(set)).then(_response => set)
   },

@@ -62,7 +62,6 @@ const I18n = createI18nScope('accessibility_checker')
 interface AccessibilityIssuesDrawerContentProps {
   item: AccessibilityResourceScan
   onClose: () => void
-  pageView?: boolean
 }
 
 function renderSpinner() {
@@ -78,7 +77,6 @@ function renderSpinner() {
 const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps> = ({
   item,
   onClose,
-  pageView = false,
 }: AccessibilityIssuesDrawerContentProps) => {
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
   const [currentIssueIndex, setCurrentIssueIndex] = useState(0)
@@ -120,7 +118,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       formValue,
       () => {
         setFormError(null)
-        setAssertiveAlertMessage(null)
         setIsRemediated(true)
       },
       error => {
@@ -156,7 +153,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     }
   }, [accessibilityScans, nextResource, setSelectedItem, setNextResource, getNextResource])
 
-  const handleApply = useCallback(() => {
+  const handlePreviewApply = useCallback(() => {
     if (formError) {
       formRef.current?.focus()
       return
@@ -168,9 +165,13 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       formValue,
       () => {
         setFormError(null)
-        setAssertiveAlertMessage(currentIssue?.form?.undoText ?? I18n.t('Issue fixed'))
         setIsRemediated(true)
         setIsFormLocked(false)
+
+        setTimeout(
+          () => setAssertiveAlertMessage(I18n.t('Issue preview updated with fixed version')),
+          1500,
+        )
       },
       error => {
         if (error) {
@@ -182,16 +183,17 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setIsFormLocked(false)
       },
     )
-  }, [formError, currentIssue?.form?.undoText])
+  }, [formRef, previewRef])
 
-  const handleUndo = useCallback(() => {
+  const handlePreviewUndo = useCallback(() => {
     setIsFormLocked(true)
     previewRef.current?.reload(
       () => {
         setFormError(null)
-        setAssertiveAlertMessage(I18n.t('Issue undone'))
         setIsRemediated(false)
         setIsFormLocked(false)
+
+        setTimeout(() => setAssertiveAlertMessage(I18n.t('Issue preview fix undone')), 1500)
       },
       error => {
         if (error) {
@@ -241,6 +243,10 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           value: formValue,
         }),
       })
+
+      setTimeout(() => {
+        setAssertiveAlertMessage(I18n.t('Issue fix applied successfully'))
+      }, 1500)
 
       const newScanResponse = await doFetchApi({
         path: getResourceScanPath(item),
@@ -295,7 +301,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       formValue,
       () => {
         setFormError(null)
-        setAssertiveAlertMessage(null)
         setIsRemediated(true)
         setIsFormLocked(false)
         handleSaveAndNext()
@@ -350,6 +355,16 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   )
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (assertiveAlertMessage !== null) {
+        setAssertiveAlertMessage(null)
+      }
+    }, 3000)
+
+    return () => clearTimeout(timeout)
+  }, [assertiveAlertMessage, setAssertiveAlertMessage])
+
+  useEffect(() => {
     // issues are saved into local state, so the state does not update when "item" changes.
     // this effect ensures that issues state is updated on external "item" prop change.
     setIssues(item.issues || [])
@@ -359,23 +374,31 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   useEffect(() => {
     setIsRemediated(false)
     setIsFormLocked(false)
-    setAssertiveAlertMessage(null)
     setFormError(null)
     setIsSaveButtonEnabled(true)
   }, [currentIssue])
 
   if (!currentIssue) {
     return (
-      <SuccessView
-        title={item.resourceName}
-        nextResource={nextResource || defaultNextResource}
-        onClose={onClose}
-        handleSkip={handleSkip}
-        handlePrevious={handlePrevious}
-        handleNextResource={handleNextResource}
-        assertiveAlertMessage={assertiveAlertMessage || ''}
-        getLiveRegion={getLiveRegion}
-      />
+      <>
+        <SuccessView
+          title={item.resourceName}
+          nextResource={nextResource || defaultNextResource}
+          onClose={onClose}
+          handleSkip={handleSkip}
+          handlePrevious={handlePrevious}
+          handleNextResource={handleNextResource}
+        />
+        {assertiveAlertMessage && (
+          <Alert
+            screenReaderOnly={true}
+            liveRegionPoliteness="assertive"
+            liveRegion={getLiveRegion}
+          >
+            {assertiveAlertMessage}
+          </Alert>
+        )}
+      </>
     )
   }
 
@@ -383,10 +406,10 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     return renderSpinner()
   }
 
-  const applyButton = (
+  const previewActionButton = (
     <ApplyButton
-      onApply={handleApply}
-      onUndo={handleUndo}
+      onApply={handlePreviewApply}
+      onUndo={handlePreviewUndo}
       undoMessage={currentIssue.form.undoText}
       isApplied={isRemediated}
       isLoading={isFormLocked}
@@ -396,114 +419,113 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   )
 
   return (
-    <View position={'relative'} width={pageView ? '100%' : 'auto'} overflowY="auto">
-      <Flex
-        as="div"
-        direction="column"
-        height={pageView ? 'auto' : '100%'}
-        width="100%"
-        margin="0 0 medium 0"
-      >
-        <Flex.Item
-          as="header"
-          padding="small small 0"
-          elementRef={(el: Element | null) => {
-            regionRef.current = el as HTMLDivElement | null
-          }}
-        >
-          <Flex direction="column" gap="small">
-            <Flex.Item>
-              <View>
-                <Text size="large" variant="descriptionPage" as="h3">
-                  {I18n.t('Issue %{current}/%{total}: %{message}', {
-                    current: currentIssueIndex + 1,
-                    total: issues.length,
-                    message: currentIssue.displayName,
-                  })}
-                  <WhyMattersPopover issue={currentIssue} />
-                </Text>
+    <Flex as="div" direction="column" height="100%" width="auto">
+      <Flex.Item shouldGrow={true} overflowY="auto">
+        <View position={'relative'} width="100%">
+          <Flex as="div" direction="column" width="100%" margin="0 0 medium 0">
+            <Flex.Item
+              as="header"
+              padding="small small 0"
+              elementRef={(el: Element | null) => {
+                regionRef.current = el as HTMLDivElement | null
+              }}
+            >
+              <Flex direction="column" gap="small">
+                <Flex.Item>
+                  <View>
+                    <Text size="large" variant="descriptionPage" as="h3">
+                      {I18n.t('Issue %{current}/%{total}: %{message}', {
+                        current: currentIssueIndex + 1,
+                        total: issues.length,
+                        message: currentIssue.displayName,
+                      })}
+                      <WhyMattersPopover issue={currentIssue} />
+                    </Text>
+                  </View>
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+            <Flex.Item padding="x-small small">
+              <Flex padding="0 medium 0 0" gap="x-small" direction="column">
+                <Flex justifyItems="space-between">
+                  <Heading level="h4" variant="titleCardMini">
+                    {I18n.t('Problem area')}
+                  </Heading>
+                  <Flex gap="small">
+                    <Link
+                      href={item.resourceUrl}
+                      variant="standalone"
+                      target="_blank"
+                      iconPlacement="end"
+                      renderIcon={<IconExternalLinkLine size="x-small" />}
+                    >
+                      {I18n.t('Open Page')}
+                      <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+                    </Link>
+                    <Link
+                      href={`${item.resourceUrl}/edit`}
+                      variant="standalone"
+                      target="_blank"
+                      iconPlacement="end"
+                      renderIcon={<IconExternalLinkLine size="x-small" />}
+                    >
+                      {I18n.t('Edit Page')}
+                      <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+                    </Link>
+                  </Flex>
+                </Flex>
+                <View as="section" aria-label={I18n.t('Issue preview')}>
+                  <Preview
+                    ref={previewRef}
+                    issue={currentIssue}
+                    resourceId={item.resourceId}
+                    itemType={item.resourceType}
+                  />
+                </View>
+              </Flex>
+              {currentIssue.form.type !== FormType.ColorPicker && (
+                <View as="section" margin="medium 0">
+                  <Heading level="h4" variant="titleCardMini">
+                    {I18n.t('Issue description')}
+                  </Heading>
+                  <br aria-hidden={true} />
+                  <Text weight="weightRegular">{currentIssue.message}</Text>
+                </View>
+              )}
+              <View as="section" margin="medium 0">
+                <Form
+                  key={currentIssue.id}
+                  ref={formRef}
+                  issue={currentIssue}
+                  error={formError}
+                  onReload={updatePreview}
+                  onClearError={handleClearError}
+                  onValidationChange={handleValidationChange}
+                  isDisabled={isRemediated}
+                  actionButtons={currentIssue.form.canGenerateFix ? previewActionButton : undefined}
+                />
+                {currentIssue.form.canGenerateFix &&
+                  formError &&
+                  currentIssue.form.type === FormType.Button && (
+                    <View as="div" margin="x-small 0">
+                      <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
+                    </View>
+                  )}
               </View>
+              {!currentIssue.form.canGenerateFix && (
+                <View as="section" margin="medium 0">
+                  {previewActionButton}
+                  {formError && currentIssue.form.type === FormType.Button && (
+                    <View as="div" margin="x-small 0">
+                      <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
+                    </View>
+                  )}
+                </View>
+              )}
             </Flex.Item>
           </Flex>
-        </Flex.Item>
-        <Flex.Item padding="x-small small" shouldGrow={true} overflowY="auto">
-          <Flex padding="0 medium 0 0" gap="x-small" direction="column">
-            <Flex justifyItems="space-between">
-              <Heading level="h4" variant="titleCardMini">
-                {I18n.t('Problem area')}
-              </Heading>
-              <Flex gap="small">
-                <Link
-                  href={item.resourceUrl}
-                  variant="standalone"
-                  target="_blank"
-                  iconPlacement="end"
-                  renderIcon={<IconExternalLinkLine size="x-small" />}
-                >
-                  {I18n.t('Open Page')}
-                  <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
-                </Link>
-                <Link
-                  href={`${item.resourceUrl}/edit`}
-                  variant="standalone"
-                  target="_blank"
-                  iconPlacement="end"
-                  renderIcon={<IconExternalLinkLine size="x-small" />}
-                >
-                  {I18n.t('Edit Page')}
-                  <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
-                </Link>
-              </Flex>
-            </Flex>
-            <View as="section" aria-label={I18n.t('Issue preview')}>
-              <Preview
-                ref={previewRef}
-                issue={currentIssue}
-                resourceId={item.resourceId}
-                itemType={item.resourceType}
-              />
-            </View>
-          </Flex>
-          {currentIssue.form.type !== FormType.ColorPicker && (
-            <View as="section" margin="medium 0">
-              <Heading level="h4" variant="titleCardMini">
-                {I18n.t('Issue description')}
-              </Heading>
-              <br aria-hidden={true} />
-              <Text weight="weightRegular">{currentIssue.message}</Text>
-            </View>
-          )}
-          <View as="section" margin="medium 0">
-            <Form
-              ref={formRef}
-              issue={currentIssue}
-              error={formError}
-              onReload={updatePreview}
-              onClearError={handleClearError}
-              onValidationChange={handleValidationChange}
-              isDisabled={isRemediated}
-              actionButtons={currentIssue.form.canGenerateFix ? applyButton : undefined}
-            />
-            {currentIssue.form.canGenerateFix &&
-              formError &&
-              currentIssue.form.type === FormType.Button && (
-                <View as="div" margin="x-small 0">
-                  <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
-                </View>
-              )}
-          </View>
-          {!currentIssue.form.canGenerateFix && (
-            <View as="section" margin="medium 0">
-              {applyButton}
-              {formError && currentIssue.form.type === FormType.Button && (
-                <View as="div" margin="x-small 0">
-                  <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
-                </View>
-              )}
-            </View>
-          )}
-        </Flex.Item>
-      </Flex>
+        </View>
+      </Flex.Item>
       <View as="div" position="sticky" insetBlockEnd="0" style={{zIndex: 10}}>
         <AccessibilityIssuesDrawerFooter
           nextButtonName={I18n.t('Save & Next')}
@@ -517,10 +539,17 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           }
         />
       </View>
-      <Alert screenReaderOnly={true} liveRegionPoliteness="assertive" liveRegion={getLiveRegion}>
-        {assertiveAlertMessage || ''}
-      </Alert>
-    </View>
+      {assertiveAlertMessage && (
+        <Alert
+          isLiveRegionAtomic
+          liveRegionPoliteness="assertive"
+          liveRegion={getLiveRegion}
+          screenReaderOnly={true}
+        >
+          {assertiveAlertMessage}
+        </Alert>
+      )}
+    </Flex>
   )
 }
 

@@ -1405,12 +1405,13 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
                               { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
                             ])
 
-      expect_error(result, "If there are replies, checkpoints cannot be enabled.")
+      expect_error(result, "Checkpoints cannot be enabled after replies have been made.")
     end
 
     it "returns an error when attemting to add checkpoints to an ungraded discussion with replies" do
       my_topic = discussion_topic_model({ context: @course, attachment: @attachment })
-      my_topic.discussion_entries.create!(message: "first message", user: @teacher)
+      student = student_in_course.user
+      my_topic.discussion_entries.create!(message: "first message", user: student)
 
       result = run_mutation(id: my_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
                               { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
@@ -1418,7 +1419,51 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
                             ])
       expect(my_topic.assignment).to be_nil
       expect(my_topic.reply_to_entry_required_count).to eq 0
-      expect_error(result, "If there are replies, checkpoints cannot be enabled.")
+      expect_error(result, "Checkpoints cannot be enabled after replies have been made.")
+    end
+
+    it "returns an error when attempting to disable checkpoints on a discussion with submissions" do
+      graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+      result = run_mutation(id: graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+      expect(result["errors"]).to be_nil
+
+      # Create a submission
+      student = student_in_course.user
+      graded_topic.ensure_particular_submission(graded_topic.assignment, student, Time.zone.now)
+
+      # Try to disable checkpoints
+      result = run_mutation(id: graded_topic.id, set_checkpoints: false)
+      expect_error(result, "Checkpoints cannot be disabled after replies have been made.")
+    end
+
+    it "returns an error when attempting to enable checkpoints on a group discussion with child topic replies" do
+      group_category = @course.group_categories.create!(name: "Test Group Category")
+      group = @course.groups.create!(name: "Test Group", group_category:)
+      graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Group Discussion")
+      graded_topic.group_category = group_category
+      graded_topic.save!
+
+      # Child topics are automatically created when group_category is set
+      # Find the child topic for our group
+      child_topic = graded_topic.child_topics.where(context: group).first
+
+      # Add a student to the group and create a submission (not just an entry)
+      student = student_in_course.user
+      group.add_user(student, "accepted")
+      child_topic.discussion_entries.create!(message: "Reply in group", user: student)
+
+      # For graded discussions, we need a submission to trigger the validation
+      graded_topic.assignment.submit_homework(student, submission_type: "online_text_entry", body: "test")
+
+      # Try to enable checkpoints - should be blocked because of submission
+      result = run_mutation(id: graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+      expect_error(result, "Checkpoints cannot be enabled after replies have been made.")
     end
 
     it "graded discussions with only deleted replies can still become checkpointed" do
@@ -1576,6 +1621,50 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "fails to update, if default_expand = false and default_expand_locked = true" do
       result = run_mutation(id: @topic.id, expanded: false, expanded_locked: true)[:data][:updateDiscussionTopic]
       expect(result["errors"][0]["message"]).to match(/Cannot set default thread state locked, when threads are collapsed/)
+    end
+  end
+
+  context "delayed_post_at workflow state" do
+    it "updates workflow_state to post_delayed when editing active announcement with future delayed_post_at" do
+      announcement = @course.announcements.create!(
+        title: "Test Announcement",
+        message: "Test message",
+        user: @teacher,
+        posted_at: Time.zone.now,
+        workflow_state: "active"
+      )
+      expect(announcement.workflow_state).to eq("active")
+
+      future_date = 1.hour.from_now
+      result = run_mutation(id: announcement.id, published: true, delayed_post_at: future_date.iso8601)
+
+      expect(result["errors"]).to be_nil
+      announcement.reload
+      expect(announcement.workflow_state).to eq("post_delayed")
+      expect(announcement.delayed_post_at).to be_within(1.second).of(future_date)
+    end
+
+    it "sends notification when delayed_post event is triggered from post_delayed state" do
+      announcement = @course.announcements.create!(
+        title: "Test Announcement",
+        message: "Test message",
+        user: @teacher,
+        posted_at: Time.zone.now,
+        workflow_state: "active"
+      )
+
+      future_date = 1.hour.from_now
+      run_mutation(id: announcement.id, published: true, delayed_post_at: future_date.iso8601)
+
+      announcement.reload
+      expect(announcement.workflow_state).to eq("post_delayed")
+
+      Timecop.freeze(future_date + 1.minute) do
+        announcement.update_based_on_date
+        announcement.reload
+        expect(announcement.workflow_state).to eq("active")
+        expect(announcement.notify_users).to be true
+      end
     end
   end
 end

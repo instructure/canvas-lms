@@ -24,7 +24,9 @@ import fakeEnv from '@canvas/test-utils/fakeENV'
 import GradingStandardCollection from '../index'
 
 // Mock jQuery and its plugins
-jest.mock('@canvas/jquery/jquery.instructure_misc_plugins', () => {})
+vi.mock('@canvas/jquery/jquery.instructure_misc_plugins', () => ({
+  default: {},
+}))
 import $ from 'jquery'
 
 const server = setupServer()
@@ -77,7 +79,7 @@ describe('GradingStandardCollection', () => {
     )
 
     // Mock jQuery getJSON - component uses jQuery's promise interface
-    $.getJSON = jest.fn(url => {
+    $.getJSON = vi.fn(url => {
       const deferred = $.Deferred()
 
       fetch(url)
@@ -89,13 +91,13 @@ describe('GradingStandardCollection', () => {
     })
 
     // Mock jQuery plugins
-    $.flashMessage = jest.fn()
-    $.flashError = jest.fn()
-    $.fn.confirmDelete = jest.fn(({success}) => success())
+    $.flashMessage = vi.fn()
+    $.flashError = vi.fn()
+    $.fn.confirmDelete = vi.fn(({success}) => success())
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeEnv.teardown()
   })
 

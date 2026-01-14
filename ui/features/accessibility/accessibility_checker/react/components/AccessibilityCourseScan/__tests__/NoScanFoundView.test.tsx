@@ -37,7 +37,7 @@ describe('NoScanFoundView', () => {
 
   it('calls handleCourseScan when button is clicked', async () => {
     const user = userEvent.setup()
-    const handleCourseScan = jest.fn()
+    const handleCourseScan = vi.fn()
 
     render(<NoScanFoundView handleCourseScan={handleCourseScan} />)
 

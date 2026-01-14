@@ -54,7 +54,6 @@ module Importers
       item.workflow_state = "active" if item.deleted?
       item.title = hash[:title] || hash[:name]
 
-      item.updating_user = migration.user
       item.description = migration.convert_html(hash[:description] || "", :calendar_event, hash[:migration_id], :description)
       item.description += import_migration_attachment_suffix(hash, context)
       item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at] || hash[:start_date])

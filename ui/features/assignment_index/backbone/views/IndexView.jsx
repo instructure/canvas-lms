@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import keyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'

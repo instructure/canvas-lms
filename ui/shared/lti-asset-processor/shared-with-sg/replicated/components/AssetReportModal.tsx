@@ -26,8 +26,8 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LtiAssetReportStatus from './LtiAssetReportStatus'
 import {LtiAssetReports, type LtiAssetReportsProps} from './LtiAssetReports'
-import TruncateWithTooltip from './TruncateWithTooltip'
 import {ResubmitDiscussionNoticesButton} from './ResubmitDiscussionNoticesButton'
+import TruncateWithTooltip from './TruncateWithTooltip'
 
 export type AssetReportModalProps = LtiAssetReportsProps & {
   modalTitle: string
@@ -50,6 +50,7 @@ export function AssetReportModal({
   studentIdForResubmission,
   submissionType,
   assignmentId,
+  hasNextPage,
 }: AssetReportModalProps): JSX.Element {
   const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
     reports.some(report => report.processorId === assetProcessor._id),
@@ -66,6 +67,7 @@ export function AssetReportModal({
           screenReaderLabel={I18n.t('Close')}
           elementRef={el => {
             el?.setAttribute('data-pendo', 'asset-reports-modal-close')
+            el?.setAttribute('data-testid', 'asset-report-modal-close-button')
           }}
         />
       </Modal.Header>
@@ -99,6 +101,7 @@ export function AssetReportModal({
             attachments={attachments}
             submissionType={submissionType}
             showDocumentDisplayName={showDocumentDisplayName}
+            hasNextPage={hasNextPage}
           />
         </View>
       </Modal.Body>

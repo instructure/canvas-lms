@@ -19,8 +19,8 @@
 
 module NewQuizzesHelper
   def add_new_quizzes_bundle
-    return unless @context.respond_to?(:root_account)
-    return unless @context.root_account.feature_enabled?(:new_quizzes_native_experience)
+    return unless @context.respond_to?(:feature_enabled?)
+    return unless @context.feature_enabled?(:new_quizzes_native_experience)
 
     js_bundle :new_quizzes
     css_bundle :native_new_quizzes

@@ -81,8 +81,12 @@ const TableBody: React.FC<TableBodyProps> = ({
 
   const itemsToDrag = useCallback(() => {
     if (selectedRows.size == 0) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore Legacy class constructor not typed
       return [new FilesystemObject()]
     }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Legacy class constructor not typed
     return Array.from({length: selectedRows.size}, () => new FilesystemObject())
   }, [selectedRows])
 

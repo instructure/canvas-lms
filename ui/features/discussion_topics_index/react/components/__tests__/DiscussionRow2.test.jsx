@@ -17,13 +17,13 @@
  */
 
 import {render, screen} from '@testing-library/react'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // We can't call the wrapped component because a lot of these tests are depending

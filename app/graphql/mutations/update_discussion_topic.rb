@@ -55,8 +55,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       return validation_error(I18n.t("Anonymity settings are locked due to a posted reply"))
     end
 
-    if !discussion_topic.checkpoints? && input.dig(:assignment, :for_checkpoints) && (discussion_topic.discussion_entries&.active&.any? || discussion_topic.assignment&.has_student_submissions?)
-      return validation_error(I18n.t("If there are replies, checkpoints cannot be enabled."))
+    if !discussion_topic.checkpoints? && input.dig(:assignment, :for_checkpoints) && !discussion_topic.can_group?
+      return validation_error(I18n.t("Checkpoints cannot be enabled after replies have been made."))
     end
 
     unless input[:anonymous_state].nil?
@@ -84,7 +84,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       if input[:published] && !was_published
         discussion_topic.publish!
       elsif input[:published] && was_published
-        discussion_topic.edit!
+        discussion_topic.last_reply_at = Time.zone.now
       else
         discussion_topic.unpublish!
       end
@@ -217,6 +217,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     is_deleting_checkpoints = input.key?(:set_checkpoints) && !input[:set_checkpoints]
 
     if is_deleting_checkpoints
+      unless discussion_topic.can_group?
+        return validation_error(I18n.t("Checkpoints cannot be disabled after replies have been made."))
+      end
+
       Checkpoints::DiscussionCheckpointDeleterService.call(
         discussion_topic:
       )

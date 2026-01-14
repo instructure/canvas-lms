@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {find} from 'es-toolkit/compat'
 import AssignmentGroupGradeCalculator from '../AssignmentGroupGradeCalculator'
 
 let submissions
@@ -171,20 +171,20 @@ describe('AssignmentGroupGradeCalculator.calculate with equivalent submissions a
   test('drops the same low-score submission regardless of submission order', () => {
     assignmentGroup.rules = {drop_lowest: 1}
     let grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
-    const droppedSubmission1 = _.find(grades.current.submissions, 'drop')
+    const droppedSubmission1 = find(grades.current.submissions, 'drop')
     submissions.reverse()
     grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
-    const droppedSubmission2 = _.find(grades.current.submissions, 'drop')
+    const droppedSubmission2 = find(grades.current.submissions, 'drop')
     expect(droppedSubmission1.assignment_id).toBe(droppedSubmission2.assignment_id)
   })
 
   test('drops the same high-score submission regardless of submission order', () => {
     assignmentGroup.rules = {drop_highest: 1}
     let grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
-    const droppedSubmission1 = _.find(grades.current.submissions, 'drop')
+    const droppedSubmission1 = find(grades.current.submissions, 'drop')
     submissions.reverse()
     grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
-    const droppedSubmission2 = _.find(grades.current.submissions, 'drop')
+    const droppedSubmission2 = find(grades.current.submissions, 'drop')
     expect(droppedSubmission1.assignment_id).toBe(droppedSubmission2.assignment_id)
   })
 
@@ -194,10 +194,10 @@ describe('AssignmentGroupGradeCalculator.calculate with equivalent submissions a
       assignment.points_possible = 0
     })
     let grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
-    const droppedSubmission1 = _.find(grades.current.submissions, 'drop')
+    const droppedSubmission1 = find(grades.current.submissions, 'drop')
     submissions.reverse()
     grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
-    const droppedSubmission2 = _.find(grades.current.submissions, 'drop')
+    const droppedSubmission2 = find(grades.current.submissions, 'drop')
     expect(droppedSubmission1.assignment_id).toBe(droppedSubmission2.assignment_id)
   })
 
@@ -207,10 +207,10 @@ describe('AssignmentGroupGradeCalculator.calculate with equivalent submissions a
       assignment.points_possible = 0
     })
     let grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
-    const droppedSubmission1 = _.find(grades.current.submissions, 'drop')
+    const droppedSubmission1 = find(grades.current.submissions, 'drop')
     submissions.reverse()
     grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
-    const droppedSubmission2 = _.find(grades.current.submissions, 'drop')
+    const droppedSubmission2 = find(grades.current.submissions, 'drop')
     expect(droppedSubmission1.assignment_id).toBe(droppedSubmission2.assignment_id)
   })
 })

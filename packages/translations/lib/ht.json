@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "Tout App yo"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "Pèmèt telechajman medya"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Pèmèt telechajman transkripsyon"
+    },
     "alpha_15d59033": {
         "message": "Αlpha"
     },
@@ -268,6 +274,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Chanje koulè tèks"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Chanjman yo ap aplike apre ou sovgade paj sa a."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Chanjman ou fè yo gendwa pa anrejistre."
@@ -706,6 +715,9 @@
     },
     "embed_image_1080badc": {
         "message": "Entegre Imaj"
+    },
+    "embed_options_44c4cba8": {
+        "message": "Entegre Opsyon"
     },
     "embed_video_a97a64af": {
         "message": "Entegre Videyo a"
@@ -1426,6 +1438,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Chajman apèsi"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Fikse vitès la ak 1x"
     },
     "locked_762f138b": {
         "message": "Bloke"

@@ -31,7 +31,7 @@ describe('Lti2Permissions', () => {
       name: 'SomeTool',
     }
     render(
-      <Lti2Permissions tool={tool} handleCancelLti2={jest.fn()} handleActivateLti2={jest.fn()} />,
+      <Lti2Permissions tool={tool} handleCancelLti2={vi.fn()} handleActivateLti2={vi.fn()} />,
     )
 
     expect(screen.getByText(/Would you like to enable this app\?/i)).toBeInTheDocument()

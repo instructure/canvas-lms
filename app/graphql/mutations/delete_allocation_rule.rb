@@ -51,8 +51,8 @@ class Mutations::DeleteAllocationRule < Mutations::BaseMutation
   end
 
   def validate_feature_flag!(course)
-    unless course.feature_enabled?(:peer_review_allocation)
-      raise GraphQL::ExecutionError, I18n.t("peer_review_allocation feature flag is not enabled for this course")
+    unless course.feature_enabled?(:peer_review_allocation_and_grading)
+      raise GraphQL::ExecutionError, I18n.t("peer_review_allocation_and_grading feature flag is not enabled for this course")
     end
   end
 end

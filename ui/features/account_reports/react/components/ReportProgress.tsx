@@ -17,10 +17,13 @@
  */
 
 import React, {useState} from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {IconXSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {ProgressCircle} from '@instructure/ui-progress'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {AccountReport, reportRunning} from '@canvas/account_reports/types'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -48,7 +51,11 @@ export default function ReportProgress({accountId, reportRun, onStateChange}: Pr
       })
       onStateChange(json!)
     } catch (error) {
-      showFlashError(I18n.t('Error canceling report'))(error as Error)
+      // the cancel API uses the created_or_running scope, so a 404 means the report already finished
+      const already_finished = error instanceof FetchApiError && error.response.status === 404
+      if (!already_finished) {
+        showFlashError(I18n.t('Error canceling report'))(error as Error)
+      }
       setCanceling(false)
     }
   }
@@ -78,26 +85,47 @@ export default function ReportProgress({accountId, reportRun, onStateChange}: Pr
     showFlashError(I18n.t('Error updating report progress'))(error as Error)
   }
 
+  const getStatusText = () => {
+    const progress = reportRun.progress
+    if (errored) return I18n.t('Error (%{progress}%)', {progress})
+    if (canceling) return I18n.t('Canceling (%{progress}%)', {progress})
+    switch (reportRun.status) {
+      case 'running':
+        return I18n.t('Running (%{progress}%)', {progress})
+      case 'compiling':
+        return I18n.t('Compiling (%{progress}%)', {progress})
+      case 'created':
+        return I18n.t('Starting (%{progress}%)', {progress})
+      default:
+        return I18n.t('Processing (%{progress}%)', {progress})
+    }
+  }
+
   return (
-    <>
+    <Flex gap="x-small" alignItems="center">
       <ProgressCircle
         size="x-small"
         meterColor={errored ? 'danger' : 'info'}
         screenReaderLabel={I18n.t('Report progress')}
         valueNow={reportRun.progress}
-        margin="0 small 0 0"
         shouldAnimateOnMount
       />
-      <IconButton
-        withBackground={false}
-        withBorder={false}
-        margin="0 0 0 x-small"
-        screenReaderLabel={I18n.t('Cancel report')}
-        onClick={cancelReport}
-        interaction={canceling || errored ? 'disabled' : 'enabled'}
-      >
-        <IconXSolid />
-      </IconButton>
-    </>
+      <Text size="small" weight="normal">
+        {getStatusText()}
+      </Text>
+      <Tooltip renderTip={I18n.t('Cancel report')}>
+        <IconButton
+          size="small"
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel={I18n.t('Cancel report')}
+          onClick={cancelReport}
+          interaction={canceling || errored ? 'disabled' : 'enabled'}
+          data-testid="cancel-report-button"
+        >
+          <IconXSolid />
+        </IconButton>
+      </Tooltip>
+    </Flex>
   )
 }

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import OutcomeKebabMenu from '../OutcomeKebabMenu'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
@@ -63,11 +63,11 @@ describe('OutcomeKebabMenu', () => {
   }
 
   beforeEach(() => {
-    onMenuHandlerMock = jest.fn()
+    onMenuHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders Kebab menu with custom menu title for screen readers if menuTitle prop provided', () => {

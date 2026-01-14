@@ -21,11 +21,11 @@ import ContentShareUserSearchSelector from '../ContentShareUserSearchSelector'
 import {render, fireEvent, act, waitFor} from '@testing-library/react'
 import useContentShareUserSearchApi from '@canvas/direct-sharing/react/effects/useContentShareUserSearchApi'
 
-jest.mock('@canvas/direct-sharing/react/effects/useContentShareUserSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useContentShareUserSearchApi')
 
 const defaultProps = {
   courseId: '1',
-  onUserSelected: jest.fn(),
+  onUserSelected: vi.fn(),
   selectedUsers: [],
 }
 
@@ -46,7 +46,7 @@ describe('ContentShareUserSearchSelector', () => {
   })
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   it('renders', () => {
@@ -55,7 +55,7 @@ describe('ContentShareUserSearchSelector', () => {
   })
 
   it('renders loading spinner while searching', () => {
-    ;(useContentShareUserSearchApi as jest.Mock).mockImplementationOnce(({loading}) =>
+    vi.mocked(useContentShareUserSearchApi).mockImplementationOnce(({loading}) =>
       loading(true),
     )
     const {getByText, getByLabelText} = renderComponent()
@@ -68,7 +68,7 @@ describe('ContentShareUserSearchSelector', () => {
     const selectInput = getByLabelText(/select at least one person/i)
     fireEvent.click(selectInput)
     fireEvent.change(selectInput, {target: {value: 'abc'}})
-    ;(useContentShareUserSearchApi as jest.Mock).mockImplementationOnce(({loading}) =>
+    vi.mocked(useContentShareUserSearchApi).mockImplementationOnce(({loading}) =>
       loading(true),
     )
     const loadingTexts = getAllByText(/loading/i)
@@ -83,22 +83,25 @@ describe('ContentShareUserSearchSelector', () => {
     })
   })
 
-  it('calls onUserSelected when a user is chosen', () => {
+  it('calls onUserSelected when a user is chosen', async () => {
     const {getByText, getByLabelText} = renderComponent()
     const selectInput = getByLabelText(/select at least one person/i)
     fireEvent.click(selectInput)
-    ;(useContentShareUserSearchApi as jest.Mock).mockImplementationOnce(({success}) =>
+    vi.mocked(useContentShareUserSearchApi).mockImplementationOnce(({success}) =>
       success([{id: 'foo', name: 'shrek'}]),
     )
     fireEvent.change(selectInput, {target: {value: 'shr'}})
     act(() => {
-      jest.runAllTimers()
+      vi.advanceTimersByTime(500)
     }) // let the debounce happen
+    await waitFor(() => {
+      expect(getByText('shrek')).toBeInTheDocument()
+    })
     fireEvent.click(getByText('shrek'))
     expect(defaultProps.onUserSelected).toHaveBeenCalledWith({id: 'foo', name: 'shrek'})
   })
 
-  it('hides already-selected users from search result options', () => {
+  it('hides already-selected users from search result options', async () => {
     const alreadySelectedUsers = [{id: 'bar', name: 'extra shrek'}]
     const {getByText, getByLabelText, queryByText} = render(
       <ContentShareUserSearchSelector
@@ -109,7 +112,7 @@ describe('ContentShareUserSearchSelector', () => {
     )
     const selectInput = getByLabelText(/select at least one person/i)
     fireEvent.click(selectInput)
-    ;(useContentShareUserSearchApi as jest.Mock).mockImplementationOnce(({success}) =>
+    vi.mocked(useContentShareUserSearchApi).mockImplementationOnce(({success}) =>
       success([
         {id: 'foo', name: 'shrek'},
         {id: 'bar', name: 'extra shrek'},
@@ -117,9 +120,11 @@ describe('ContentShareUserSearchSelector', () => {
     )
     fireEvent.change(selectInput, {target: {value: 'shr'}})
     act(() => {
-      jest.runAllTimers()
+      vi.advanceTimersByTime(500)
     }) // let the debounce happen
-    expect(getByText('shrek')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(getByText('shrek')).toBeInTheDocument()
+    })
     expect(queryByText('extra shrek')).not.toBeInTheDocument()
   })
 })

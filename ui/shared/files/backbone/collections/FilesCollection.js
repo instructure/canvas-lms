@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
-import {extend as lodashExtend, each} from 'lodash'
+import {each, extend as lodashExtend} from 'es-toolkit/compat'
 import deparam from 'deparam'
 import File from '../models/File'
 

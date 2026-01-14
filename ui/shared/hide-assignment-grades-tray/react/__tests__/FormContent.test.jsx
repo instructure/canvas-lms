@@ -29,16 +29,16 @@ describe('FormContent', () => {
       id: '2001',
       name: 'Math 1.1',
     },
-    dismiss: jest.fn(),
+    dismiss: vi.fn(),
     hideBySections: true,
-    hideBySectionsChanged: jest.fn(),
+    hideBySectionsChanged: vi.fn(),
     hidingGrades: false,
-    onHideClick: jest.fn(),
+    onHideClick: vi.fn(),
     sections: [
       {id: '2001', name: 'Freshmen'},
       {id: '2002', name: 'Sophomores'},
     ],
-    sectionSelectionChanged: jest.fn(),
+    sectionSelectionChanged: vi.fn(),
     selectedSectionIds: [],
   }
 
@@ -47,14 +47,14 @@ describe('FormContent', () => {
   }
 
   it('calls dismiss when clicking Close button', async () => {
-    const dismiss = jest.fn()
+    const dismiss = vi.fn()
     renderComponent({dismiss})
     await userEvent.click(screen.getByRole('button', {name: 'Close'}))
     expect(dismiss).toHaveBeenCalledTimes(1)
   })
 
   it('calls onHideClick when clicking Hide button', async () => {
-    const onHideClick = jest.fn()
+    const onHideClick = vi.fn()
     renderComponent({onHideClick})
     await userEvent.click(screen.getByRole('button', {name: 'Hide'}))
     expect(onHideClick).toHaveBeenCalledTimes(1)
@@ -172,14 +172,14 @@ describe('FormContent', () => {
 
   describe('section selection', () => {
     it('calls hideBySectionsChanged when enabling Specific Sections', async () => {
-      const hideBySectionsChanged = jest.fn()
+      const hideBySectionsChanged = vi.fn()
       renderComponent({hideBySectionsChanged})
       await userEvent.click(screen.getByRole('checkbox', {name: 'Specific Sections'}))
       expect(hideBySectionsChanged).toHaveBeenCalledTimes(1)
     })
 
     it('calls sectionSelectionChanged when selecting a section', async () => {
-      const sectionSelectionChanged = jest.fn()
+      const sectionSelectionChanged = vi.fn()
       renderComponent({sectionSelectionChanged})
       await userEvent.click(screen.getByRole('checkbox', {name: 'Specific Sections'}))
       await userEvent.click(screen.getByRole('checkbox', {name: 'Freshmen'}))

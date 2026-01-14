@@ -183,6 +183,7 @@ export type CamelizedAssignment = {
   muted: boolean
   name: string
   newQuizzesAnonymousParticipants: boolean
+  parentAssignmentId?: string
   pointsPossible: number | null
   postManually: boolean
   published: boolean

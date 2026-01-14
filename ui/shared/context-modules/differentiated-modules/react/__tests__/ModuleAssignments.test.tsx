@@ -26,7 +26,7 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const props: ModuleAssignmentsProps = {
   courseId: '1',
-  onSelect: jest.fn(),
+  onSelect: vi.fn(),
   defaultValues: [],
 }
 
@@ -123,7 +123,7 @@ describe('ModuleAssignments', () => {
   })
 
   it('calls onSelect with parsed options', async () => {
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     const {findByTestId, findByText} = renderComponent({onSelect})
     const moduleAssignments = await findByTestId('assignee_selector')
     act(() => moduleAssignments.click())

@@ -19,17 +19,18 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import ModulePositionPicker from '../ModulePositionPicker'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import {mockRowsContext} from '../../__tests__/testUtils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const defaultProps = {
   courseId: '1',
   moduleId: '1',
-  onSelectPosition: jest.fn(),
+  onSelectPosition: vi.fn(),
 }
 
 const renderComponent = (props = {}) =>
@@ -40,23 +41,33 @@ const renderComponent = (props = {}) =>
   )
 
 describe('ModulePositionPicker', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-      json: [
-        {id: 'abc', title: 'abc', position: '1'},
-        {id: 'cde', title: 'cde', position: '2'},
-      ],
-    })
+    server.use(
+      http.get('/api/v1/courses/:courseId/modules/:moduleId/items', () =>
+        HttpResponse.json([
+          {id: 'abc', title: 'abc', position: '1'},
+          {id: 'cde', title: 'cde', position: '2'},
+        ]),
+      ),
+    )
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   it("shows 'loading additional items' when it's still loading data", async () => {
-    ;(doFetchApi as jest.Mock).mockReset()
-    ;(doFetchApi as jest.Mock).mockImplementationOnce(() => new Promise(() => {}))
+    server.use(
+      http.get('/api/v1/courses/:courseId/modules/:moduleId/items', () => {
+        // Never resolve the request to keep loading state
+        return new Promise(() => {})
+      }),
+    )
     renderComponent()
     await userEvent.type(screen.getByTestId('select-position'), 'Before...')
     await userEvent.click(screen.getByText(/Before.../i))
@@ -144,15 +155,17 @@ describe('ModulePositionPicker', () => {
     await userEvent.click(screen.getByText(/After.../i))
     await userEvent.type(screen.getByTestId('select-sibling'), 'cde')
     await userEvent.click(screen.getByText(/cde/i))
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-      json: [
-        {id: 'fgh', title: 'fgh', position: '3'},
-        {id: 'ijk', title: 'ijk', position: '4'},
-      ],
-    })
+    server.use(
+      http.get('/api/v1/courses/:courseId/modules/:moduleId/items', () =>
+        HttpResponse.json([
+          {id: 'fgh', title: 'fgh', position: '3'},
+          {id: 'ijk', title: 'ijk', position: '4'},
+        ]),
+      ),
+    )
     rerender(
       <RowsProvider
-        value={{setCurrentRows: jest.fn(), currentRows: [], setSessionExpired: jest.fn()}}
+        value={{setCurrentRows: vi.fn(), currentRows: [], setSessionExpired: vi.fn()}}
       >
         <ModulePositionPicker {...defaultProps} moduleId="2" />
       </RowsProvider>,

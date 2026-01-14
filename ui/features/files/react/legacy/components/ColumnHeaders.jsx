@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {defaults} from 'lodash'
+import {defaults} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('react_files')
 

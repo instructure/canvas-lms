@@ -19,7 +19,7 @@
 import {extend as extend1} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {each, extend} from 'lodash'
+import {each, extend} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import {asJson, getPrefetchedXHR} from '@canvas/util/xhr'
 import BackoffPoller from '@canvas/backoff-poller'

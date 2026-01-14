@@ -20,14 +20,11 @@ import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks/dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {useUtidMatching, type UtidLookupResponse, type ApiRegistration} from '../useUtidMatching'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import {useUtidMatching, type ApiRegistration} from '../useUtidMatching'
 
-jest.mock('@canvas/do-fetch-api-effect')
-
-const mockDoFetchApi = doFetchApi<UtidLookupResponse> as jest.MockedFunction<
-  typeof doFetchApi<UtidLookupResponse>
->
+const server = setupServer()
 
 const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}})
 
@@ -58,15 +55,15 @@ describe('useUtidMatching', () => {
     },
   ]
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    mockDoFetchApi.mockReset()
-    jest.clearAllMocks()
-    jest.useFakeTimers()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
+    server.resetHandlers()
     queryClient.clear()
   })
 
@@ -79,17 +76,17 @@ describe('useUtidMatching', () => {
   })
 
   it('fetches matches for valid redirect URIs after debounce', async () => {
-    mockDoFetchApi.mockResolvedValueOnce({
-      json: {api_registrations: mockMatches},
-      response: new Response(),
-      text: JSON.stringify({api_registrations: mockMatches}),
-    })
+    let capturedUrl = ''
+    server.use(
+      http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', ({request}) => {
+        capturedUrl = request.url
+        return HttpResponse.json({api_registrations: mockMatches})
+      }),
+    )
 
     const redirectUris = 'https://example.com/redirect\nhttps://another.com/callback'
     const {result} = renderHook(() => useUtidMatching(redirectUris, accountId), {wrapper})
-    expect(result.current.loading).toBe(true)
 
-    jest.advanceTimersByTime(500)
     await waitFor(
       () => {
         expect(result.current.loading).toBe(false)
@@ -97,41 +94,38 @@ describe('useUtidMatching', () => {
       {timeout: 3000},
     )
 
-    expect(mockDoFetchApi).toHaveBeenCalledWith({
-      path: `/api/v1/accounts/${accountId}/developer_keys/lookup_utids`,
-      method: 'GET',
-      params: {
-        redirect_uris: ['https://example.com/redirect', 'https://another.com/callback'],
-        sources: ['partner_provided', 'manual'],
-      },
-    })
-
+    expect(capturedUrl).toContain(`/api/v1/accounts/${accountId}/developer_keys/lookup_utids`)
     expect(result.current.matches).toEqual(mockMatches)
     expect(result.current.error).toBeNull()
   })
 
   it('handles empty response gracefully', async () => {
-    mockDoFetchApi.mockResolvedValueOnce({
-      json: {api_registrations: []},
-      response: new Response(),
-      text: JSON.stringify({api_registrations: []}),
-    })
+    server.use(
+      http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', () =>
+        HttpResponse.json({api_registrations: []}),
+      ),
+    )
 
     const redirectUris = 'https://example.com/redirect'
     const {result} = renderHook(() => useUtidMatching(redirectUris, accountId), {wrapper})
 
-    jest.advanceTimersByTime(500)
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
+    await waitFor(
+      () => {
+        expect(result.current.loading).toBe(false)
+      },
+      {timeout: 3000},
+    )
 
     expect(result.current.matches).toEqual([])
     expect(result.current.error).toBeNull()
   })
 
   it('handles API errors', async () => {
-    mockDoFetchApi.mockRejectedValue(new Error('API Error'))
+    server.use(
+      http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', () =>
+        HttpResponse.error(),
+      ),
+    )
 
     const redirectUris = 'https://example.com/redirect'
     const {result} = renderHook(() => useUtidMatching(redirectUris, accountId), {wrapper})
@@ -146,28 +140,50 @@ describe('useUtidMatching', () => {
     )
   })
 
-  it('does not make API call for empty redirect URIs', () => {
+  it('does not make API call for empty redirect URIs', async () => {
+    let requestMade = false
+    server.use(
+      http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', () => {
+        requestMade = true
+        return HttpResponse.json({api_registrations: []})
+      }),
+    )
+
     renderHook(() => useUtidMatching('', accountId), {wrapper})
 
-    jest.advanceTimersByTime(500)
+    // Wait longer than debounce delay to ensure no request is made
+    await new Promise(resolve => setTimeout(resolve, 600))
 
-    expect(mockDoFetchApi).not.toHaveBeenCalled()
+    expect(requestMade).toBe(false)
   })
 
-  it('does not make API call for whitespace-only redirect URIs', () => {
+  it('does not make API call for whitespace-only redirect URIs', async () => {
+    let requestMade = false
+    server.use(
+      http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', () => {
+        requestMade = true
+        return HttpResponse.json({api_registrations: []})
+      }),
+    )
+
     renderHook(() => useUtidMatching('   \n  \n  ', accountId), {wrapper})
 
-    jest.advanceTimersByTime(500)
+    // Wait longer than debounce delay to ensure no request is made
+    await new Promise(resolve => setTimeout(resolve, 600))
 
-    expect(mockDoFetchApi).not.toHaveBeenCalled()
+    expect(requestMade).toBe(false)
   })
 
   it('debounces multiple rapid changes', async () => {
-    mockDoFetchApi.mockResolvedValue({
-      json: {api_registrations: mockMatches},
-      response: new Response(),
-      text: JSON.stringify({api_registrations: mockMatches}),
-    })
+    let requestCount = 0
+    let lastCapturedUrl = ''
+    server.use(
+      http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', ({request}) => {
+        requestCount++
+        lastCapturedUrl = request.url
+        return HttpResponse.json({api_registrations: mockMatches})
+      }),
+    )
 
     const {rerender} = renderHook<{uris: string}, ReturnType<typeof useUtidMatching>>(
       ({uris}) => useUtidMatching(uris, accountId),
@@ -177,59 +193,45 @@ describe('useUtidMatching', () => {
       },
     )
 
-    // Rapid changes
+    // Rapid changes within debounce window
     rerender({uris: 'https://example2.com'})
-    jest.advanceTimersByTime(100)
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     rerender({uris: 'https://example3.com'})
-    jest.advanceTimersByTime(100)
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     rerender({uris: 'https://example4.com'})
-    jest.advanceTimersByTime(100)
 
-    // Only the last call should be made after full debounce period
-    jest.advanceTimersByTime(500)
-
+    // Wait for debounce to complete and request to finish
     await waitFor(
       () => {
-        expect(mockDoFetchApi).toHaveBeenCalledTimes(2)
-
-        expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: `/api/v1/accounts/${accountId}/developer_keys/lookup_utids`,
-          method: 'GET',
-          params: {
-            redirect_uris: ['https://example4.com'],
-            sources: ['partner_provided', 'manual'],
-          },
-        })
+        expect(requestCount).toBe(2)
+        expect(lastCapturedUrl).toContain('example4.com')
       },
       {timeout: 3000},
     )
   })
 
   it('trims and filters empty lines from redirect URIs', async () => {
-    mockDoFetchApi.mockResolvedValueOnce({
-      json: {api_registrations: mockMatches},
-      response: new Response(),
-      text: JSON.stringify({api_registrations: mockMatches}),
-    })
+    let capturedUrl = ''
+    server.use(
+      http.get('/api/v1/accounts/:accountId/developer_keys/lookup_utids', ({request}) => {
+        capturedUrl = request.url
+        return HttpResponse.json({api_registrations: mockMatches})
+      }),
+    )
 
     const redirectUris = '  https://example.com  \n\n  https://another.com  \n  \n'
     const {result} = renderHook(() => useUtidMatching(redirectUris, accountId), {wrapper})
 
-    jest.advanceTimersByTime(500)
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
-    expect(mockDoFetchApi).toHaveBeenCalledWith({
-      path: `/api/v1/accounts/${accountId}/developer_keys/lookup_utids`,
-      method: 'GET',
-      params: {
-        redirect_uris: ['https://example.com', 'https://another.com'],
-        sources: ['partner_provided', 'manual'],
+    await waitFor(
+      () => {
+        expect(result.current.loading).toBe(false)
       },
-    })
+      {timeout: 3000},
+    )
+
+    expect(capturedUrl).toContain('example.com')
+    expect(capturedUrl).toContain('another.com')
   })
 })

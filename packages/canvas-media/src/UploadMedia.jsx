@@ -18,7 +18,7 @@
 import {bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 import React, {Suspense, useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
-import {isEqual} from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'

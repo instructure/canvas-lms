@@ -887,6 +887,12 @@ class CoursesController < ApplicationController
   def create
     @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
 
+    create_right = @current_user.create_courses_right(@account)
+
+    if should_return_mcc_specific_error?(create_right)
+      return render json: { error: "manually_created_courses_subaccount_error" }, status: :unauthorized
+    end
+
     if authorized_action(@account, @current_user, :create_courses)
       params[:course] ||= {}
       params_for_create = course_params
@@ -4502,6 +4508,21 @@ class CoursesController < ApplicationController
   end
 
   private
+
+  def should_return_mcc_specific_error?(create_right)
+    return false unless Account.site_admin.feature_enabled?(:mcc_specific_error_message)
+    return false unless create_right.nil?
+
+    teachers_can_create = @domain_root_account.teachers_can_create_courses?
+    teachers_can_create_anywhere = @domain_root_account.teachers_can_create_courses_anywhere?
+    has_teacher_enrollments = @current_user.enrollments.active
+                                           .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                                           .joins(:course)
+                                           .merge(Course.where(root_account: @domain_root_account, account: @account))
+                                           .exists?
+
+    teachers_can_create && !teachers_can_create_anywhere && has_teacher_enrollments
+  end
 
   def validate_assignment_ids(assignment_ids)
     assignment_ids.nil? || assignment_ids.all?(/\A\d+\z/)

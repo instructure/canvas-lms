@@ -88,7 +88,7 @@ describe('FocusManager', () => {
 
   test('movePrev() moves focus to item before index', () => {
     const manager = new FocusManager()
-    const spy = jest.fn()
+    const spy = vi.fn()
     manager.registerItem({focus: spy}, 0)
     manager.registerItem({focus: () => {}}, 1)
 
@@ -98,7 +98,7 @@ describe('FocusManager', () => {
 
   test('movePrev() moves focus to before if on first index', () => {
     const manager = new FocusManager()
-    const spy = jest.fn()
+    const spy = vi.fn()
     manager.before = {focus: spy}
     manager.registerItem({focus: () => {}}, 0)
 
@@ -108,7 +108,7 @@ describe('FocusManager', () => {
 
   test('moveNext() moves focus to item after index', () => {
     const manager = new FocusManager()
-    const spy = jest.fn()
+    const spy = vi.fn()
     manager.registerItem({focus: () => {}}, 0)
     manager.registerItem({focus: spy}, 1)
 
@@ -118,7 +118,7 @@ describe('FocusManager', () => {
 
   test('moveNext() moves focus to after if on last index', () => {
     const manager = new FocusManager()
-    const spy = jest.fn()
+    const spy = vi.fn()
     manager.after = {focus: spy}
     manager.registerItem({focus: () => {}}, 0)
 
@@ -128,7 +128,7 @@ describe('FocusManager', () => {
 
   test('moveBefore() moves focus to before', () => {
     const manager = new FocusManager()
-    const spy = jest.fn()
+    const spy = vi.fn()
     manager.before = {focus: spy}
 
     manager.moveBefore()
@@ -137,7 +137,7 @@ describe('FocusManager', () => {
 
   test('moveAfter() moves focus to after', () => {
     const manager = new FocusManager()
-    const spy = jest.fn()
+    const spy = vi.fn()
     manager.after = {focus: spy}
 
     manager.moveAfter()
@@ -146,7 +146,7 @@ describe('FocusManager', () => {
 
   test('focus() calls focus on thing', () => {
     const manager = new FocusManager()
-    const spy = jest.fn()
+    const spy = vi.fn()
 
     manager.focus({focus: spy})
     expect(spy).toHaveBeenCalledTimes(1)

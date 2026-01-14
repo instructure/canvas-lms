@@ -561,6 +561,31 @@ describe OutcomeResultsController do
       expect(json["meta"]["pagination"]["count"]).to be 1
     end
 
+    it "exclude outcomes without results" do
+      user_session(@teacher)
+
+      outcome1 = @outcome
+      outcome2 = outcome_model(context: outcome_course)
+      # Explicitly create a result for outcome1 to ensure it has results
+      create_result(@student.id, outcome1, outcome_assignment, 3)
+      get "rollups",
+          params: { context_id: @course.id,
+                    course_id: @course.id,
+                    context_type: "Course",
+                    user_ids: [@student.id],
+                    outcome_ids: [outcome1.id, outcome2.id],
+                    exclude: ["missing_outcome_results"],
+                    include: ["outcomes"] },
+          format: "json"
+      json = parse_response(response)
+      # should only include the outcome with results (outcome1)
+      # and exclude outcome2 which has no results
+      outcome_ids = json["linked"]["outcomes"].pluck("id")
+      expect(outcome_ids).to include(outcome1.id)
+      expect(outcome_ids).not_to include(outcome2.id)
+      expect(json["linked"]["outcomes"].length).to be 1
+    end
+
     context "user lmgb outcome orderings" do
       def get_response_ordering(outcomes)
         outcomes.pluck("id")
@@ -580,6 +605,10 @@ describe OutcomeResultsController do
         entries
       end
 
+      def set_outcome_arrangement(arrangement, user: @teacher, course: @course)
+        user.set_preference(:learning_mastery_gradebook_settings, course.global_id, { "outcome_arrangement" => arrangement })
+      end
+
       it "set ordering through API endpoint" do
         user_session(@teacher)
         outcome_ids = create_outcomes(@course, 3)
@@ -590,6 +619,8 @@ describe OutcomeResultsController do
              params: { course_id: @course.id, },
              body: outcome_position_map.to_json,
              as: :json
+
+        set_outcome_arrangement("custom")
 
         get "rollups",
             params: { context_id: @course.id,
@@ -643,6 +674,8 @@ describe OutcomeResultsController do
         outcome_ids.unshift(@outcome.id)
         set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
 
+        set_outcome_arrangement("custom")
+
         get "rollups",
             params: { context_id: @course.id,
                       course_id: @course.id,
@@ -664,6 +697,8 @@ describe OutcomeResultsController do
         # Reorder two outcomes in list and save
         outcome_ids[1], outcome_ids[2] = outcome_ids[2], outcome_ids[1]
         set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+
+        set_outcome_arrangement("custom")
 
         get "rollups",
             params: { context_id: @course.id,
@@ -687,6 +722,8 @@ describe OutcomeResultsController do
         set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
         outcome_ids = outcome_ids.reject { |o| o == @outcomes[0]["id"] }
         @outcomes[0].destroy!
+
+        set_outcome_arrangement("custom")
 
         get "rollups",
             params: { context_id: @course.id,
@@ -712,6 +749,8 @@ describe OutcomeResultsController do
         @outcome_group.add_outcome(outcome)
         outcome_ids.append(outcome["id"])
 
+        set_outcome_arrangement("custom")
+
         get "rollups",
             params: { context_id: @course.id,
                       course_id: @course.id,
@@ -723,6 +762,122 @@ describe OutcomeResultsController do
         response_outcomes = json["linked"]["outcomes"]
         response_outcomes_ordering = get_response_ordering(response_outcomes)
         expect(response_outcomes_ordering).to eq(outcome_ids)
+      end
+
+      context "outcome arrangement sorting" do
+        it "sorts outcomes alphabetically when arrangement is set to alphabetical" do
+          user_session(@teacher)
+
+          outcome_a = @course.created_learning_outcomes.create!(title: "A Outcome")
+          outcome_c = @course.created_learning_outcomes.create!(title: "C Outcome")
+          outcome_b = @course.created_learning_outcomes.create!(title: "B Outcome")
+          @outcome_group.add_outcome(outcome_a)
+          @outcome_group.add_outcome(outcome_c)
+          @outcome_group.add_outcome(outcome_b)
+
+          set_outcome_arrangement("alphabetical")
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          outcome_titles = response_outcomes.pluck("title")
+
+          expect(outcome_titles).to eq(outcome_titles.sort_by(&:downcase))
+        end
+
+        it "sorts outcomes by custom drag & drop order when arrangement is set to custom" do
+          user_session(@teacher)
+          outcome_ids = create_outcomes(@course, 3)
+          outcome_ids.unshift(@outcome.id)
+
+          custom_order = [outcome_ids[2], outcome_ids[0], outcome_ids[3], outcome_ids[1]]
+          set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, custom_order)
+
+          set_outcome_arrangement("custom")
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+
+          expect(response_outcomes_ordering).to eq(custom_order)
+        end
+
+        it "sorts outcomes by upload order (creation time) when arrangement is set to upload_order" do
+          user_session(@teacher)
+          outcome_ids = create_outcomes(@course, 3)
+          outcome_ids.unshift(@outcome.id)
+
+          set_outcome_arrangement("upload_order")
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+
+          expect(response_outcomes_ordering).to eq(outcome_ids.sort)
+        end
+
+        it "defaults to upload_order when no arrangement preference is set" do
+          user_session(@teacher)
+          outcome_ids = create_outcomes(@course, 3)
+          outcome_ids.unshift(@outcome.id)
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+
+          expect(response_outcomes_ordering).to eq(outcome_ids.sort)
+        end
+
+        it "places outcomes without custom position at the end when using custom arrangement" do
+          user_session(@teacher)
+          outcome_ids = create_outcomes(@course, 4)
+
+          custom_order = [outcome_ids[1], outcome_ids[0]]
+          set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, custom_order)
+
+          set_outcome_arrangement("custom")
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        include: ["outcomes"] },
+              format: "json"
+
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+
+          expect(response_outcomes_ordering.first(2)).to eq(custom_order)
+          expect(response_outcomes_ordering.last(2)).to eq([outcome_ids[2], outcome_ids[3]].sort)
+        end
       end
 
       context "cross-shard access" do
@@ -756,6 +911,8 @@ describe OutcomeResultsController do
 
             expect(response.successful?).to be_truthy
 
+            set_outcome_arrangement("custom", user: admin_user, course: @shard1_course)
+
             get "rollups",
                 params: { context_id: @shard1_course.id,
                           course_id: @shard1_course.id,
@@ -781,6 +938,8 @@ describe OutcomeResultsController do
           # Swap the first and last outcomes
           outcome_ids[0], outcome_ids[101] = outcome_ids[101], outcome_ids[0]
           set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+
+          set_outcome_arrangement("custom")
 
           get "rollups",
               params: { context_id: @course.id,
@@ -1092,7 +1251,7 @@ describe OutcomeResultsController do
               # already existing results for @student1 & @student2
               # creating result for @student
               create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(nil)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(nil)
               json = parse_response(get_rollups(sort_by: "student",
                                                 sort_order: "desc",
                                                 exclude: ["missing_user_rollups"],
@@ -1109,7 +1268,7 @@ describe OutcomeResultsController do
               LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -1128,7 +1287,7 @@ describe OutcomeResultsController do
               # results are already created for @student2 in Canvas
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -1150,7 +1309,7 @@ describe OutcomeResultsController do
               # and will not create results for this student
               student_in_course(active_all: true, course: outcome_course)
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -1320,6 +1479,109 @@ describe OutcomeResultsController do
                   expect(user["status"]).not_to eq("completed")
                 end
               end
+            end
+          end
+        end
+
+        context "remove_outcomes_with_no_results" do
+          context "enabled" do
+            it "No OS results found" do
+              outcome1 = @outcome
+              outcome2 = outcome_model(context: outcome_course, title: "unassessed outcome")
+              # already existing results for @student1 & @student2 for outcome1
+              # creating result for @student for outcome1
+              create_result(@student.id, outcome1, outcome_assignment, 2, { possible: 5 })
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(nil)
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_outcome_results"],
+                                                include: ["outcomes"],
+                                                per_page: 5,
+                                                page: 1))
+              # should only include outcome1, not outcome2
+              outcome_ids = json["linked"]["outcomes"].pluck("id")
+              expect(outcome_ids).to include(outcome1.id)
+              expect(outcome_ids).not_to include(outcome2.id)
+              expect(json["linked"]["outcomes"].length).to be 1
+            end
+
+            it "OS results found - no Canvas results found" do
+              outcome1 = @outcome
+              outcome2 = outcome_model(context: outcome_course, title: "OS only outcome")
+              # removing LearningOutcomeResults for outcome1 in Canvas
+              LearningOutcomeResult.where(learning_outcome_id: outcome1.id).update(workflow_state: "deleted")
+              # Mock OS results for outcome2
+              mocked_results = mock_os_lor_results(@student, outcome2, outcome_assignment, 2)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
+                [mocked_results]
+              )
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_outcome_results"],
+                                                include: ["outcomes"],
+                                                per_page: 5,
+                                                page: 1))
+              # should only include outcome2 which has OS results
+              outcome_ids = json["linked"]["outcomes"].pluck("id")
+              expect(outcome_ids).to include(outcome2.id)
+              expect(outcome_ids).not_to include(outcome1.id)
+              expect(json["linked"]["outcomes"].length).to be 1
+            end
+
+            it "Canvas and OS results found" do
+              outcome1 = @outcome
+              outcome2 = outcome_model(context: outcome_course, title: "OS outcome")
+              # outcome1 already has Canvas results for @student1 & @student2
+              # creating result for @student for outcome1
+              create_result(@student.id, outcome1, outcome_assignment, 2, { possible: 5 })
+              # Mock OS results for outcome2
+              mocked_results = mock_os_lor_results(@student, outcome2, outcome_assignment, 2)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
+                [mocked_results]
+              )
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_outcome_results"],
+                                                include: ["outcomes"],
+                                                per_page: 5,
+                                                page: 1))
+              # should include both outcomes
+              outcome_ids = json["linked"]["outcomes"].pluck("id")
+              expect(outcome_ids).to include(outcome1.id)
+              expect(outcome_ids).to include(outcome2.id)
+              expect(json["linked"]["outcomes"].length).to be 2
+            end
+
+            it "removes outcomes with no results" do
+              outcome1 = @outcome
+              outcome2 = outcome_model(context: outcome_course, title: "unassessed outcome")
+              outcome3 = outcome_model(context: outcome_course, title: "OS results outcome")
+              outcome4 = outcome_model(context: outcome_course, title: "Canvas results outcome")
+              # outcome1 already has Canvas results for @student1 & @student2
+              # creating result for @student for outcome1
+              create_result(@student.id, outcome1, outcome_assignment, 2, { possible: 5 })
+              # Create Canvas result for outcome4
+              create_result(@student.id, outcome4, outcome_assignment, 2, { possible: 5 })
+              # Mock OS results for outcome3 only
+              mocked_results = mock_os_lor_results(@student, outcome3, outcome_assignment, 2)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).once.and_return(
+                [mocked_results]
+              )
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_outcome_results"],
+                                                outcome_ids: [outcome1.id, outcome2.id, outcome3.id, outcome4.id],
+                                                include: ["outcomes"],
+                                                per_page: 5,
+                                                page: 1))
+              # should include outcome1 (Canvas), outcome3 (OS), and outcome4 (Canvas)
+              # should exclude outcome2 (no results)
+              outcome_ids = json["linked"]["outcomes"].pluck("id")
+              expect(outcome_ids).to include(outcome1.id)
+              expect(outcome_ids).to include(outcome3.id)
+              expect(outcome_ids).to include(outcome4.id)
+              expect(outcome_ids).not_to include(outcome2.id)
+              expect(json["linked"]["outcomes"].length).to be 3
             end
           end
         end
@@ -1753,6 +2015,143 @@ describe OutcomeResultsController do
         expect(rollup_scores).to eq scores
       end
 
+      context "by contributing_score" do
+        before do
+          # Use the alignment from outcome_result (for @student1)
+          @alignment = outcome_result.alignment
+          @alignment_id = "A_#{@alignment.id}"
+
+          # Find the existing result for @student2 and update it to use the same alignment
+          existing_result = LearningOutcomeResult.where(user_id: @student2.id, learning_outcome_id: @outcome.id).first
+          existing_result&.update_columns(content_tag_id: @alignment.id, score: 1, workflow_state: "active")
+
+          # @student3 has no result for this alignment, so their score will be nil
+        end
+
+        it "validates a missing sort_alignment_id parameter" do
+          get_rollups(sort_by: "contributing_score")
+          expect(response).not_to be_successful
+        end
+
+        it "validates an invalid sort_alignment_id parameter format" do
+          get_rollups(sort_by: "contributing_score", sort_alignment_id: "invalid_format")
+          expect(response).not_to be_successful
+        end
+
+        it "validates an invalid sort_alignment_id parameter with wrong prefix" do
+          get_rollups(sort_by: "contributing_score", sort_alignment_id: "123")
+          expect(response).not_to be_successful
+        end
+
+        it "sorts rollups by ascending alignment score" do
+          get_rollups(sort_by: "contributing_score", sort_alignment_id: @alignment_id)
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect(json["rollups"].length).to eq(3)
+        end
+
+        it "sorts rollups by descending alignment score" do
+          get_rollups(sort_by: "contributing_score", sort_alignment_id: @alignment_id, sort_order: "desc")
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect_user_order(json["rollups"], [@student1, @student2, @student3])
+          expect_score_order(json["rollups"], [3, 1, nil])
+        end
+
+        context "with pagination" do
+          def expect_students_in_pagination_by_alignment(page, students, scores, sort_order = "asc")
+            get_rollups(sort_by: "contributing_score", sort_alignment_id: @alignment_id, sort_order:, per_page: 1, page:)
+            expect(response).to be_successful
+            json = parse_response(response)
+            expect_user_order(json["rollups"], students)
+            expect_score_order(json["rollups"], scores)
+          end
+
+          context "ascending" do
+            it "return student2 in first page" do
+              expect_students_in_pagination_by_alignment(1, [@student2], [1])
+            end
+
+            it "return student1 in second page" do
+              expect_students_in_pagination_by_alignment(2, [@student1], [3])
+            end
+
+            it "return student3 in third page" do
+              expect_students_in_pagination_by_alignment(3, [@student3], [nil])
+            end
+
+            it "return no student in fourth page" do
+              expect_students_in_pagination_by_alignment(4, [], [])
+            end
+          end
+
+          context "descending" do
+            it "return student1 in first page" do
+              expect_students_in_pagination_by_alignment(1, [@student1], [3], "desc")
+            end
+
+            it "return student2 in second page" do
+              expect_students_in_pagination_by_alignment(2, [@student2], [1], "desc")
+            end
+
+            it "return student3 in third page" do
+              expect_students_in_pagination_by_alignment(3, [@student3], [nil], "desc")
+            end
+
+            it "return no student in fourth page" do
+              expect_students_in_pagination_by_alignment(4, [], [], "desc")
+            end
+          end
+        end
+
+        context "with alignment that has no scores" do
+          before do
+            # Create a new outcome with a new alignment that has no scores
+            @outcome2 = @course.created_learning_outcomes.create!(
+              title: "Outcome 2",
+              description: "second outcome",
+              vendor_guid: "vendorguid9002"
+            )
+            @assignment2 = @course.assignments.create!(title: "Assignment 2")
+            @alignment2 = @outcome2.align(@assignment2, @course, mastery_type: "points", mastery_score: 3)
+            @alignment2_id = "A_#{@alignment2.id}"
+          end
+
+          it "returns all students when sorting by alignment with no scores (descending)" do
+            # Before the fix, this would return 0 students when exclude[]=missing_user_rollups
+            get_rollups(
+              sort_by: "contributing_score",
+              sort_alignment_id: @alignment2_id,
+              sort_order: "desc",
+              exclude: ["missing_user_rollups"],
+              outcome_ids: [@outcome2.id]
+            )
+            expect(response).to be_successful
+            json = parse_response(response)
+            # All 3 students should be returned even though they have no scores for this alignment
+            # With no scores, they're sorted by name and reversed (desc)
+            expect(json["rollups"].length).to eq(3)
+            expect_user_order(json["rollups"], [@student3, @student2, @student1])
+          end
+
+          it "returns all students when sorting by alignment with no scores (ascending)" do
+            # Before the fix, this would return 0 students when exclude[]=missing_user_rollups
+            get_rollups(
+              sort_by: "contributing_score",
+              sort_alignment_id: @alignment2_id,
+              sort_order: "asc",
+              exclude: ["missing_user_rollups"],
+              outcome_ids: [@outcome2.id]
+            )
+            expect(response).to be_successful
+            json = parse_response(response)
+            # All 3 students should be returned even though they have no scores for this alignment
+            expect(json["rollups"].length).to eq(3)
+            expect_user_order(json["rollups"], [@student1, @student2, @student3])
+          end
+        end
+      end
+
       context "by student" do
         it "sorts rollups by ascending student sortable name" do
           get_rollups(sort_by: "student")
@@ -2154,6 +2553,249 @@ describe OutcomeResultsController do
         user_session(@teacher)
         post :enqueue_outcome_rollup_calculation, params: { course_id: course.id, student_uuid: student.uuid }, format: :json
         expect(response).to have_http_status(:no_content)
+      end
+    end
+  end
+
+  describe "#contributing_scores" do
+    before :once do
+      @course = outcome_course
+      @teacher = outcome_teacher
+      @student1 = outcome_student
+      @student2 = student_in_course(active_all: true, course: @course, name: "Student 2").user
+
+      outcome_rubric
+      @assignment = @course.assignments.create!(title: "Test Assignment", points_possible: 10)
+      @alignment = @outcome.align(@assignment, @course, mastery_score: 3)
+      @rubric_association = @rubric.associate_with(@assignment, @course, purpose: "grading")
+      @result1 = create_result(@student1.id, @outcome, @assignment, 8)
+      @result2 = create_result(@student2.id, @outcome, @assignment, 6)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "returns contributing scores for specified outcome and users" do
+      alignments = @outcome.alignments.where(context: @course, content_type: "Assignment")
+      expect(alignments.count).to be > 0, "Expected to find alignments for outcome"
+
+      get :contributing_scores,
+          params: {
+            course_id: @course.id,
+            outcome_id: @outcome.id,
+            user_ids: [@student1.id, @student2.id]
+          },
+          format: :json
+
+      expect(response).to be_successful
+      json = response.parsed_body
+
+      expect(json).to have_key("outcome")
+      expect(json).to have_key("alignments")
+      expect(json).to have_key("scores")
+
+      expect(json["outcome"]["id"]).to eq(@outcome.id.to_s)
+      expect(json["outcome"]["title"]).to eq(@outcome.title)
+
+      expect(json["alignments"]).to be_an(Array)
+      expect(json["alignments"].length).to be > 0
+
+      alignment = json["alignments"].first
+      expect(alignment).to have_key("alignment_id")
+      expect(alignment).to have_key("associated_asset_id")
+      expect(alignment).to have_key("associated_asset_name")
+      expect(alignment).to have_key("associated_asset_type")
+      expect(alignment["associated_asset_id"]).to be_present
+      expect(alignment["associated_asset_name"]).to be_present
+      expect(alignment["associated_asset_type"]).to be_present
+      expect(alignment["alignment_id"]).to match(/^(D|I|E)_\d+/)
+
+      expect(json["scores"]).to be_an(Array)
+
+      if json["scores"].any?
+        score = json["scores"].first
+        expect(score).to have_key("user_id")
+        expect(score).to have_key("alignment_id")
+        expect(score).to have_key("score")
+        expect(score["alignment_id"]).to match(/^(D|I|E)_\d+/)
+
+        user_ids = json["scores"].pluck("user_id")
+        expect(user_ids).to include(@student1.id.to_s, @student2.id.to_s)
+      end
+    end
+
+    it "returns empty scores for users with no results" do
+      @student3 = student_in_course(active_all: true, course: @course, name: "Student 3").user
+
+      get :contributing_scores,
+          params: {
+            course_id: @course.id,
+            outcome_id: @outcome.id,
+            user_ids: [@student3.id]
+          },
+          format: :json
+
+      expect(response).to be_successful
+      json = response.parsed_body
+
+      expect(json["scores"]).to be_an(Array)
+      expect(json["scores"].length).to eq(0)
+    end
+
+    it "requires outcome to exist in context" do
+      other_outcome = LearningOutcome.create!(title: "Other Outcome")
+
+      get :contributing_scores,
+          params: {
+            course_id: @course.id,
+            outcome_id: other_outcome.id,
+            user_ids: [@student1.id]
+          },
+          format: :json
+
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    context "with unpublished assignments" do
+      before :once do
+        @published_assignment = @course.assignments.create!(title: "Published Assignment", workflow_state: "published")
+        @unpublished_assignment = @course.assignments.create!(title: "Unpublished Assignment", workflow_state: "unpublished")
+        @published_alignment = @outcome.align(@published_assignment, @course, mastery_score: 3)
+        @unpublished_alignment = @outcome.align(@unpublished_assignment, @course, mastery_score: 3)
+      end
+
+      it "excludes unpublished assignments by default" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id],
+              only_assignment_alignments: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        alignment_names = json["alignments"].pluck("associated_asset_name")
+        expect(alignment_names).to include("Published Assignment")
+        expect(alignment_names).not_to include("Unpublished Assignment")
+      end
+
+      it "includes unpublished assignments when show_unpublished_assignments=true" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id],
+              only_assignment_alignments: true,
+              show_unpublished_assignments: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        alignment_names = json["alignments"].pluck("associated_asset_name")
+        expect(alignment_names).to include("Published Assignment")
+        expect(alignment_names).to include("Unpublished Assignment")
+      end
+
+      it "excludes unpublished assignments when show_unpublished_assignments=false" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id],
+              only_assignment_alignments: true,
+              show_unpublished_assignments: false
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        alignment_names = json["alignments"].pluck("associated_asset_name")
+        expect(alignment_names).to include("Published Assignment")
+        expect(alignment_names).not_to include("Unpublished Assignment")
+      end
+    end
+
+    it "requires proper permissions" do
+      @student_session = user_session(@student1)
+
+      get :contributing_scores,
+          params: {
+            course_id: @course.id,
+            outcome_id: @outcome.id,
+            user_ids: [@student1.id]
+          },
+          format: :json
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    context "with only_assignment_alignments parameter" do
+      before :once do
+        @quiz = @course.quizzes.create!(title: "Test Quiz")
+        @quiz_alignment = @outcome.align(@quiz, @course, mastery_score: 3)
+      end
+
+      it "returns only assignment alignments when only_assignment_alignments is true" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id, @student2.id],
+              only_assignment_alignments: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        expect(json["alignments"]).to be_an(Array)
+        expect(json["alignments"].length).to be > 0
+
+        json["alignments"].each do |alignment|
+          expect(alignment["associated_asset_type"]).to eq("Assignment")
+        end
+      end
+
+      it "returns all alignments when only_assignment_alignments is false" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id, @student2.id],
+              only_assignment_alignments: false
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        expect(json["alignments"]).to be_an(Array)
+        alignment_types = json["alignments"].pluck("associated_asset_type").uniq
+        expect(alignment_types.length).to be > 1
+      end
+
+      it "returns all alignments when only_assignment_alignments is not provided" do
+        get :contributing_scores,
+            params: {
+              course_id: @course.id,
+              outcome_id: @outcome.id,
+              user_ids: [@student1.id, @student2.id]
+            },
+            format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+
+        expect(json["alignments"]).to be_an(Array)
+        alignment_types = json["alignments"].pluck("associated_asset_type").uniq
+        expect(alignment_types.length).to be > 1
       end
     end
   end

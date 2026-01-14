@@ -249,7 +249,9 @@ module Api::V1::Assignment
 
     can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments_edit)
     hash["muted"] = assignment.muted?
-    hash["html_url"] = course_assignment_url(assignment.context_id, assignment)
+    # For peer review sub-assignments, use the parent assignment in the URL
+    assignment_for_url = (assignment.is_a?(PeerReviewSubAssignment) && assignment.parent_assignment) ? assignment.parent_assignment : assignment
+    hash["html_url"] = course_assignment_url(assignment.context_id, assignment_for_url)
     if can_manage
       hash["has_overrides"] = assignment.has_overrides?
     end
@@ -519,7 +521,7 @@ module Api::V1::Assignment
       hash["estimated_duration"] = estimated_duration_json(assignment.estimated_duration, user, session)
     end
 
-    if opts[:include_peer_review] && assignment.context.feature_enabled?(:peer_review_grading)
+    if opts[:include_peer_review] && assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       peer_review_sub_assignment = assignment.peer_review_sub_assignment
       if peer_review_sub_assignment
         # Exclude recursive peer_review_sub_assignment
@@ -538,19 +540,21 @@ module Api::V1::Assignment
 
     context = assignment.context
     automatic_peer_reviews = assignment.automatic_peer_reviews?
-    allocation_enabled = context.feature_enabled?(:peer_review_allocation)
-    grading_enabled = context.feature_enabled?(:peer_review_grading)
+    allocation_and_grading_enabled = context.feature_enabled?(:peer_review_allocation_and_grading)
 
-    return unless automatic_peer_reviews || allocation_enabled || grading_enabled
+    return unless automatic_peer_reviews || allocation_and_grading_enabled
 
     attrs = [:peer_review_count]
     if automatic_peer_reviews
       attrs += [:peer_reviews_assign_at, :intra_group_peer_reviews]
-    elsif allocation_enabled
+    elsif allocation_and_grading_enabled
       attrs += [:peer_review_submission_required, :peer_review_across_sections]
     end
 
-    assignment.slice(*attrs)
+    params = assignment.slice(*attrs)
+    params[:has_peer_review_submissions] = assignment.peer_review_submissions? if allocation_and_grading_enabled
+
+    params
   end
 
   def turnitin_settings_json(assignment)
@@ -648,7 +652,7 @@ module Api::V1::Assignment
     return false unless prepared_create[:valid]
 
     response = :created
-    has_peer_reviews = prepared_create[:assignment].peer_reviews && prepared_create[:assignment].context.feature_enabled?(:peer_review_grading)
+    has_peer_reviews = prepared_create[:assignment].peer_reviews && prepared_create[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
 
     Assignment.suspend_due_date_caching do
       assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
@@ -712,14 +716,14 @@ module Api::V1::Assignment
     response = :ok
 
     has_peer_reviews = prepared_update[:assignment].peer_reviews
-    peer_review_grading_enabled = prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+    peer_review_grading_enabled = prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
 
-    prepared_update[:assignment].skip_peer_review_sub_assignment_sync = true if prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+    prepared_update[:assignment].skip_peer_review_sub_assignment_sync = true if prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
 
     Assignment.suspend_due_date_caching do
       if peer_review_grading_enabled
         Assignment.transaction do
-          response = if prepared_update[:overrides].present?
+          response = if prepared_update[:overrides]
                        update_api_assignment_with_overrides(prepared_update, user)
                      else
                        if assignment_params["force_updated_at"] && !prepared_update[:assignment].changed?
@@ -850,7 +854,7 @@ module Api::V1::Assignment
       end
     end
 
-    if prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+    if prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
       prepared_update[:assignment].skip_peer_review_sub_assignment_sync = false
     end
 
@@ -873,6 +877,7 @@ module Api::V1::Assignment
     "not_graded",
     "wiki_page",
     "student_annotation",
+    "ams",
     ""
   ].freeze
 
@@ -1554,7 +1559,7 @@ module Api::V1::Assignment
       { "ab_guid" => strong_anything },
       ({ "suppress_assignment" => strong_anything } if assignment.root_account.suppress_assignments?),
       ({ "estimated_duration_attributes" => strong_anything } if estimated_duration_enabled?(assignment)),
-      (if assignment.context.feature_enabled?(:peer_review_grading)
+      (if assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
          { "peer_review" => (%w[points_possible grading_type due_at unlock_at lock_at] +
                              [{ "peer_review_overrides" => strong_anything }]) }
        end),
@@ -1620,11 +1625,11 @@ module Api::V1::Assignment
     peer_review_params = {}
 
     unless params.nil?
-      peer_review_params[:points_possible] = params[:points_possible] if params[:points_possible].present?
-      peer_review_params[:grading_type] = params[:grading_type] if params[:grading_type].present?
-      peer_review_params[:due_at] = params[:due_at] if params[:due_at].present?
-      peer_review_params[:unlock_at] = params[:unlock_at] if params[:unlock_at].present?
-      peer_review_params[:lock_at] = params[:lock_at] if params[:lock_at].present?
+      # Use .key? to allow explicit nil, but also check for present? to filter blank strings
+      %i[points_possible grading_type due_at unlock_at lock_at].each do |key|
+        peer_review_params[key] = params[key] if params.key?(key) && (params[key].nil? || params[key].present?)
+      end
+
       if params.key?(:peer_review_overrides)
         overrides = params[:peer_review_overrides]
         # Form-encoded empty arrays come through as [""] (array with empty string)

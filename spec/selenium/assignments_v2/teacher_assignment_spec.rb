@@ -186,7 +186,7 @@ describe "as a teacher" do
 
       context "with peer review tabs" do
         before(:once) do
-          @course.enable_feature!(:peer_review_allocation)
+          @course.enable_feature!(:peer_review_allocation_and_grading)
           @assignment = @course.assignments.create!(
             name: "assignment with peer reviews",
             description: "<p>Description within tabs</p>",

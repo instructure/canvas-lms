@@ -22,58 +22,42 @@ import {useTranslationContext} from '../useTranslationContext'
 import {translationSeparator} from '../../utils/constants'
 import * as translationUtils from '../../utils/inbox_translator'
 
-jest.mock('../useTranslationContext')
-jest.mock('../../utils/inbox_translator')
+vi.mock('../useTranslationContext')
+vi.mock('../../utils/inbox_translator')
 
-const mockStripSignature = jest
+const mockStripSignature = vi
   .spyOn(translationUtils, 'stripSignature')
   .mockImplementation((body: string) => {
     return body
   })
 
-const mockUseTranslationContext = useTranslationContext as jest.MockedFunction<
-  typeof useTranslationContext
->
+const mockUseTranslationContext = useTranslationContext as ReturnType<typeof vi.fn>
 
 describe('useTranslationDisplay', () => {
-  const setMessagePosition = jest.fn()
-  const setBody = jest.fn()
-  const mockContext: {
-    setMessagePosition: jest.Mock<any, any>
-    messagePosition: string | null
-    body: string
-    setBody: jest.Mock<(prevBody: string) => void>
-    translationTargetLanguage: string
-    setTranslationTargetLanguage: jest.Mock<any, any>
-    translating: boolean
-    setTranslating: jest.Mock<any, any>
-    translateBody: jest.Mock<any, any>
-    translateBodyWith: jest.Mock<any, any>
-    errorMessages: any[]
-    setErrorMessages: jest.Mock<any, any>
-    textTooLongErrors: any[]
-  } = {
+  const setMessagePosition = vi.fn()
+  const setBody = vi.fn()
+  const mockContext = {
     translationTargetLanguage: '',
-    setTranslationTargetLanguage: jest.fn(),
+    setTranslationTargetLanguage: vi.fn(),
     translating: false,
-    setTranslating: jest.fn(),
-    translateBody: jest.fn(),
-    translateBodyWith: jest.fn(),
+    setTranslating: vi.fn(),
+    translateBody: vi.fn(),
+    translateBodyWith: vi.fn(),
     setMessagePosition,
     messagePosition: null,
     body: '',
     setBody,
     errorMessages: [],
-    setErrorMessages: jest.fn(),
+    setErrorMessages: vi.fn(),
     textTooLongErrors: [],
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseTranslationContext.mockReturnValue({
       ...mockContext,
-      setTranslationTargetLanguage: jest.fn(),
-      translateBody: jest.fn(),
+      setTranslationTargetLanguage: vi.fn(),
+      translateBody: vi.fn(),
       translating: false,
     })
   })

@@ -658,12 +658,14 @@ describe "Api::V1::Assignment" do
       end
     end
 
-    context "with peer_review_allocation feature flag enabled" do
+    context "with peer_review_allocation_and_grading feature flag enabled" do
       before do
         @assignment = assignment_model
         @assignment.update_attribute(:peer_reviews, true)
         @assignment.update_attribute(:peer_review_count, 2)
-        @assignment.course.enable_feature!(:peer_review_allocation)
+        @assignment.course.enable_feature!(:peer_review_allocation_and_grading)
+        @student1 = student_in_course(active_all: true, course: @assignment.course).user
+        @student2 = student_in_course(active_all: true, course: @assignment.course).user
       end
 
       it "includes peer_review_count" do
@@ -671,21 +673,60 @@ describe "Api::V1::Assignment" do
         expect(json).to have_key("peer_review_count")
         expect(json["peer_review_count"]).to eq 2
       end
-    end
 
-    context "with peer_review_grading feature flag enabled" do
-      before do
-        @assignment = assignment_model
-        @assignment.update_attribute(:peer_reviews, true)
-        @assignment.update_attribute(:peer_review_count, 3)
-        @assignment.course.enable_feature!(:peer_review_grading)
-        @assignment.course.disable_feature!(:peer_review_allocation)
+      it "includes has_peer_review_submissions as false when no peer reviews completed" do
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).to have_key("has_peer_review_submissions")
+        expect(json["has_peer_review_submissions"]).to be false
       end
 
-      it "includes peer_review_count" do
+      it "includes has_peer_review_submissions as true when peer reviews completed" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
         json = api.assignment_json(@assignment, user, session, {})
-        expect(json).to have_key("peer_review_count")
-        expect(json["peer_review_count"]).to eq 3
+        expect(json).to have_key("has_peer_review_submissions")
+        expect(json["has_peer_review_submissions"]).to be true
+      end
+
+      it "does not include has_peer_review_submissions when peer reviews are disabled" do
+        @assignment.update_attribute(:peer_reviews, false)
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).not_to have_key("has_peer_review_submissions")
+      end
+
+      it "does not include has_peer_review_submissions when feature flag is disabled" do
+        @assignment.course.disable_feature!(:peer_review_allocation_and_grading)
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).not_to have_key("has_peer_review_submissions")
+      end
+    end
+
+    context "peer review sub-assignment html_url" do
+      it "uses parent assignment ID in html_url for peer review sub-assignments" do
+        course = course_model
+        parent_assignment = assignment_model(course:)
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(parent_assignment:)
+
+        json = api.assignment_json(peer_review_sub_assignment, user, session, {})
+
+        expect(json["html_url"]).to eq("assignment/url/#{course.id}/#{parent_assignment.id}")
+      end
+
+      it "uses its own ID in html_url for regular assignments" do
+        course = course_model
+        regular_assignment = assignment_model(course:)
+
+        json = api.assignment_json(regular_assignment, user, session, {})
+
+        expect(json["html_url"]).to eq("assignment/url/#{course.id}/#{regular_assignment.id}")
       end
     end
   end
@@ -1701,6 +1742,87 @@ describe "Api::V1::Assignment" do
             end
           end
         end
+      end
+    end
+  end
+
+  describe "#prepare_peer_review_params" do
+    context "when params is nil" do
+      it "returns empty hash" do
+        expect(api.send(:prepare_peer_review_params, nil)).to eq({})
+      end
+    end
+
+    context "when params is empty hash" do
+      it "returns empty hash" do
+        expect(api.send(:prepare_peer_review_params, {})).to eq({})
+      end
+    end
+
+    context "when params has values" do
+      let(:params) do
+        {
+          points_possible: 10,
+          grading_type: "points",
+          due_at: "2025-01-15T12:00:00Z"
+        }
+      end
+
+      it "includes all provided params" do
+        result = api.send(:prepare_peer_review_params, params)
+        expect(result).to eq(params)
+      end
+    end
+
+    context "when params has explicit nil values" do
+      let(:params) do
+        {
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil
+        }
+      end
+
+      it "includes nil values to enable clearing dates" do
+        result = api.send(:prepare_peer_review_params, params)
+        expect(result).to eq(params)
+        expect(result).to have_key(:due_at)
+        expect(result[:due_at]).to be_nil
+      end
+    end
+
+    context "when params has blank string values" do
+      let(:params) do
+        {
+          points_possible: "",
+          due_at: "",
+          unlock_at: ""
+        }
+      end
+
+      it "filters out blank strings" do
+        result = api.send(:prepare_peer_review_params, params)
+        expect(result).to eq({})
+      end
+    end
+
+    context "when params has mix of values, nils, and blanks" do
+      let(:params) do
+        {
+          points_possible: 10,
+          grading_type: "",
+          due_at: nil,
+          unlock_at: "2025-01-15T12:00:00Z"
+        }
+      end
+
+      it "includes values and nil, but filters out blank strings" do
+        result = api.send(:prepare_peer_review_params, params)
+        expect(result[:points_possible]).to eq(10)
+        expect(result).to have_key(:due_at)
+        expect(result[:due_at]).to be_nil
+        expect(result[:unlock_at]).to eq("2025-01-15T12:00:00Z")
+        expect(result).not_to have_key(:grading_type)
       end
     end
   end

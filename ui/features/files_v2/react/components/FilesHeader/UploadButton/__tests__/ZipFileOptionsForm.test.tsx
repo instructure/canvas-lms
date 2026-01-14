@@ -22,11 +22,11 @@ import userEvent from '@testing-library/user-event'
 import ZipFileOptionsForm from '../ZipFileOptionsForm'
 
 // Mock jQuery for flashError function
-jest.mock('jquery', () => {
+vi.mock('jquery', () => {
   return {
     __esModule: true,
     default: {
-      flashError: jest.fn(),
+      flashError: vi.fn(),
     },
   }
 })
@@ -35,22 +35,22 @@ const zipFile = new File(['foo'], 'foo.zip', {type: 'application/zip'})
 
 const defaultProps = {
   open: true,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
   fileOptions: {
     name: 'foo.zip',
     file: zipFile,
     cannotOverwrite: false,
     expandZip: false,
   },
-  onZipOptionsResolved: jest.fn(),
+  onZipOptionsResolved: vi.fn(),
 }
 const renderComponent = (props = {}) => render(<ZipFileOptionsForm {...defaultProps} {...props} />)
 
 describe('ZipFileOptionsForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Reset all mocks before each test
-    jest.resetModules()
+    vi.resetModules()
   })
 
   it('renders header', () => {

@@ -33,7 +33,7 @@ describe('numberFormat _format', () => {
   })
 
   test('proxies to I18n for numbers', () => {
-    jest.spyOn(I18n, 'n').mockReturnValue('1,23')
+    vi.spyOn(I18n, 'n').mockReturnValue('1,23')
     expect(numberFormat._format(1.23, {foo: 'bar'})).toBe('1,23')
     expect(I18n.n).toHaveBeenCalledWith(1.23, {foo: 'bar'})
   })

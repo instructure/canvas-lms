@@ -19,14 +19,14 @@
 import api from '../ContextModuleApi'
 import ModuleSequenceFooter from '@canvas/module-sequence-footer'
 
-jest.mock('@canvas/module-sequence-footer')
+vi.mock('@canvas/module-sequence-footer')
 
 describe('ContextModuleApi', () => {
   let footerInstance
 
   describe('getContextModuleData', () => {
     beforeEach(() => {
-      footerInstance = {fetch: jest.fn(() => Promise.resolve(footerInstance))}
+      footerInstance = {fetch: vi.fn(() => Promise.resolve(footerInstance))}
 
       ModuleSequenceFooter.mockClear()
       ModuleSequenceFooter.mockImplementation(() => footerInstance)

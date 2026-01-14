@@ -105,9 +105,9 @@ describe('SpeedGrader Media Comments', () => {
         return HttpResponse.json({})
       }),
     )
-    jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
-    jest.spyOn(SpeedGrader.EG, 'jsonReady').mockImplementation(() => {})
-    jest.spyOn(SpeedGrader.EG, 'setInitiallyLoadedStudent').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'jsonReady').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'setInitiallyLoadedStudent').mockImplementation(() => {})
 
     SpeedGrader.EG.currentStudent = {
       id: 4,
@@ -161,7 +161,7 @@ describe('SpeedGrader Media Comments', () => {
 
   afterEach(() => {
     SpeedGrader.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fixtures.remove()
     fakeENV.teardown()
     delete window.jsonData

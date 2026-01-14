@@ -18,7 +18,7 @@
 import Backbone from '@canvas/backbone'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {has} from 'lodash'
+import {has} from 'es-toolkit/compat'
 import ExternalContentReturnView from '@canvas/external-tools/backbone/views/ExternalContentReturnView'
 import ExternalToolCollection from './collections/ExternalToolCollection'
 import ExternalContentFileSubmissionView from './views/ExternalContentFileSubmissionView'

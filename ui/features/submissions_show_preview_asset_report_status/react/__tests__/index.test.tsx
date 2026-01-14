@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {type MockedFunction} from 'vitest'
 import AttachmentAssetReportStatus from '../index'
 import {ASSET_REPORT_MODAL_EVENT} from '@canvas/lti-asset-processor/react/StudentAssetReportModalWrapper'
 import {render, screen} from '@testing-library/react'
@@ -24,10 +25,10 @@ import {useLtiAssetProcessorsAndReportsForStudent} from '@canvas/lti-asset-proce
 import {defaultLtiAssetProcessors} from '@canvas/lti-asset-processor/shared-with-sg/replicated/__fixtures__/default/ltiAssetProcessors'
 import {defaultLtiAssetReportsForStudent} from '@canvas/lti-asset-processor/queries/__fixtures__/LtiAssetProcessorsAndReportsForStudent'
 
-jest.mock('@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent')
+vi.mock('@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent')
 
 const mockUseLtiAssetProcessorsAndReportsForStudent =
-  useLtiAssetProcessorsAndReportsForStudent as jest.MockedFunction<
+  useLtiAssetProcessorsAndReportsForStudent as MockedFunction<
     typeof useLtiAssetProcessorsAndReportsForStudent
   >
 
@@ -38,9 +39,9 @@ describe('AttachmentAssetReportStatus', () => {
 
   beforeEach(() => {
     originalPostMessage = window.parent.postMessage
-    window.parent.postMessage = jest.fn()
+    window.parent.postMessage = vi.fn()
     // Clear mock counts before each test
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     const mockReports = defaultLtiAssetReportsForStudent({attachmentId: '10'}).slice(0, 2)
 
@@ -66,7 +67,7 @@ describe('AttachmentAssetReportStatus', () => {
       />,
     )
 
-    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText('Please review')).toBeInTheDocument()
     expect(mockUseLtiAssetProcessorsAndReportsForStudent).toHaveBeenCalledWith({
       submissionId: '1000',
       submissionType: 'online_upload',
@@ -83,7 +84,7 @@ describe('AttachmentAssetReportStatus', () => {
       />,
     )
 
-    screen.getByText('Needs attention').click()
+    screen.getByText('Please review').click()
 
     // Verify window.parent.postMessage was called with correct data
     expect(window.parent.postMessage).toHaveBeenCalledWith(

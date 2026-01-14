@@ -22,8 +22,8 @@ import fetchMock from 'fetch-mock'
 import RegisterService, {serviceConfigByName, USERNAME_MAX_LENGTH} from '../RegisterService'
 
 describe('RegisterService', () => {
-  const onClose = jest.fn()
-  const onSubmit = jest.fn()
+  const onClose = vi.fn()
+  const onSubmit = vi.fn()
   const mockUrl = 'mock-url'
   const USER_SERVICE_URI = '/profile/user_services'
 

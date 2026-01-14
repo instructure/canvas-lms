@@ -39,7 +39,7 @@ module Accessibility
           checkbox_subtext: I18n.t("Screen readers should skip purely decorative images."),
           undo_text: I18n.t("Alt text updated"),
           input_label: I18n.t("Alt text"),
-          input_description: I18n.t("Describe what's in the picture."),
+          input_description: I18n.t("Describe the content or purpose of this image."),
           input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
           generate_button_label: I18n.t("Generate alt text"),
@@ -64,7 +64,7 @@ module Accessibility
       end
 
       def message
-        I18n.t("Add a description for screen readers so people who are blind or have low vision can understand what's in the image.")
+        I18n.t("Add a description (alt text) for screen reader users and instances where the image fails to load.")
       end
 
       def issue_preview(elem)

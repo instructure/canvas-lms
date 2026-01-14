@@ -142,7 +142,9 @@ module CanvasOperations
     # Subclasses must implement this method to define how to process a batch of records
     #
     # Only used when mode is set to :batch.
-    def process_batch(batch); end
+    def process_batch(_batch)
+      raise NoMethodError, "Subclasses must implement #process_batch when mode is :batch"
+    end
 
     # Processes an individual record. Ideal for when each record needs to be
     # loaded and processed separately.
@@ -150,7 +152,9 @@ module CanvasOperations
     # Subclasses must implement this method to define how to process an individual record.
     #
     # Only used when mode is set to :individual_record.
-    def process_record(record); end
+    def process_record(_record)
+      raise NoMethodError, "Subclasses must implement #process_record when mode is :individual_record"
+    end
 
     # Determines if the current shard is a valid target for the DataFixup operation.
     #
@@ -227,13 +231,20 @@ module CanvasOperations
       GuardRail.activate(:report) do
         scope.klass.find_ids_in_ranges(batch_size: range_batch_size, loose: true) do |min_id, max_id|
           # Don't enqueue a bunch of no-op jobs (at the cost of an extra EXISTS query per batch)
-          next unless scope.where(id: min_id..max_id).exists?
+          next unless process_batch?(min_id, max_id)
 
-          GuardRail.activate(:primary) { delay_if_production(n_strand:).process_range(min_id, max_id) }
+          GuardRail.activate(:primary) { delay_if_production(n_strand:, on_permanent_failure: :fail_with_error!).process_range(min_id, max_id) }
 
           wait_between_jobs
         end
       end
+    end
+
+    # Default behavior is to just use the scope of the datafixup, but more complex datafixups might require running
+    # a more specific query to determine if there are records in the batch. Subclasses can override this method
+    # as needed.
+    def process_batch?(min_id, max_id)
+      scope.where(id: min_id..max_id).exists?
     end
 
     # Processes records within a specified ID range using the configured mode.

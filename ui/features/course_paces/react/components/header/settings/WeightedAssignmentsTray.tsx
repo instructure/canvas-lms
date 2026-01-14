@@ -16,28 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { connect } from 'react-redux'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import { Alert } from '@instructure/ui-alerts'
-import { Tray } from '@instructure/ui-tray'
-import { View } from '@instructure/ui-view'
-import { Flex } from '@instructure/ui-flex'
-import { Button, CloseButton } from '@instructure/ui-buttons'
-import { Text } from '@instructure/ui-text'
-import { Heading } from '@instructure/ui-heading'
-import { IconAssignmentLine, IconQuizLine, IconDiscussionLine, IconDocumentLine } from '@instructure/ui-icons'
-import { NumberInput } from '@instructure/ui-number-input'
-import { Link } from '@instructure/ui-link'
-import { getCoursePace, getCoursePaceItems } from '../../../reducers/course_paces'
-import { actions } from '../../../actions/course_pace_items'
-import { CoursePace, StoreState, CoursePaceItem, AssignmentWeightening } from '../../../types'
-import { coursePaceActions } from '../../../actions/course_paces'
-import { calculatePaceItemDuration, isTimeToCompleteCalendarDaysValid } from '../../../utils/utils'
-import { BlackoutDate } from '../../../shared/types'
-import { getBlackoutDates } from '../../../shared/reducers/blackout_dates'
-import { actions as uiActions } from '../../../actions/ui'
-import { getShowWeightedAssignmentsTray } from '../../../reducers/ui'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {connect} from 'react-redux'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Alert} from '@instructure/ui-alerts'
+import {Tray} from '@instructure/ui-tray'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
+import {
+  IconAssignmentLine,
+  IconQuizLine,
+  IconDiscussionLine,
+  IconDocumentLine,
+} from '@instructure/ui-icons'
+import {NumberInput} from '@instructure/ui-number-input'
+import {Link} from '@instructure/ui-link'
+import {getCoursePace, getCoursePaceItems} from '../../../reducers/course_paces'
+import {actions} from '../../../actions/course_pace_items'
+import {CoursePace, StoreState, CoursePaceItem, AssignmentWeightening} from '../../../types'
+import {coursePaceActions} from '../../../actions/course_paces'
+import {calculatePaceItemDuration, isTimeToCompleteCalendarDaysValid} from '../../../utils/utils'
+import {BlackoutDate} from '../../../shared/types'
+import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
+import {actions as uiActions} from '../../../actions/ui'
+import {getShowWeightedAssignmentsTray} from '../../../reducers/ui'
 import {Focusable} from '@instructure/ui-focusable'
 
 const I18n = createI18nScope('course_paces_settings')
@@ -80,19 +85,25 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
   } = props
 
   const alertContainer = useRef<HTMLDivElement | null>(null)
-  const [weightedAssignments, setWeightedAssignments] = useState<AssignmentWeightening>(coursePace.assignments_weighting)
+  const [weightedAssignments, setWeightedAssignments] = useState<AssignmentWeightening>(
+    coursePace.assignments_weighting,
+  )
   const [validationMessage, setValidationMessage] = useState<AlertMessage | undefined>(undefined)
 
   useEffect(() => {
     const weightedPaceItems = calculatePaceItemDuration(coursePaceItems, weightedAssignments)
-    const weightedAssignmentsValid = isTimeToCompleteCalendarDaysValid(coursePace, weightedPaceItems, blackoutDates)
+    const weightedAssignmentsValid = isTimeToCompleteCalendarDaysValid(
+      coursePace,
+      weightedPaceItems,
+      blackoutDates,
+    )
 
     setValidationMessage(undefined)
 
     if (!weightedAssignmentsValid) {
       setValidationMessage({
         message: 'The current assignment durations will cause the pace to exceed its set duration.',
-        type: 'error'
+        type: 'error',
       })
     }
   }, [weightedAssignments, blackoutDates, coursePace, coursePaceItems])
@@ -106,7 +117,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
     if (Object.values(weightedAssignments).every(duration => duration === undefined)) {
       setValidationMessage({
         message: 'To apply any changes one of the following durations must be changed.',
-        type: 'error'
+        type: 'error',
       })
       return
     }
@@ -115,17 +126,23 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
 
     setPaceItemWeightedDuration(weightedAssignments, blackoutDates)
     setWeightedAssignmentsCoursePace(weightedAssignments)
-  }, [weightedAssignments, validationMessage, onDismiss, setPaceItemWeightedDuration, setWeightedAssignmentsCoursePace])
+  }, [
+    weightedAssignments,
+    validationMessage,
+    onDismiss,
+    setPaceItemWeightedDuration,
+    setWeightedAssignmentsCoursePace,
+  ])
 
-  const DurationSetElement = ({ label, durationIcon, item }: DurationSetElementProps) => {
+  const DurationSetElement = ({label, durationIcon, item}: DurationSetElementProps) => {
     const duration = weightedAssignments[item]
-    const resetInteraction = duration !== undefined ? "enabled" : "disabled"
+    const resetInteraction = duration !== undefined ? 'enabled' : 'disabled'
 
     const onIncrement = () => {
       const newDuration = duration === undefined ? 1 : duration + 1
       setWeightedAssignments({
         ...weightedAssignments,
-        [item]: newDuration
+        [item]: newDuration,
       })
     }
 
@@ -133,14 +150,14 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
       const newDuration = duration === 0 || duration === undefined ? undefined : duration - 1
       setWeightedAssignments({
         ...weightedAssignments,
-        [item]: newDuration
+        [item]: newDuration,
       })
     }
 
     const onReset = () => {
       setWeightedAssignments({
         ...weightedAssignments,
-        [item]: undefined
+        [item]: undefined,
       })
     }
 
@@ -149,13 +166,11 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
         <Flex as="div" direction="column">
           <Flex.Item>
             <Flex direction="row" gap="xxx-small">
-              <Flex.Item align="start">
-                {durationIcon}
-              </Flex.Item>
+              <Flex.Item align="start">{durationIcon}</Flex.Item>
               <Flex.Item>
                 <Text>
                   <Heading
-                    themeOverride={{ h1FontWeight: 700, lineHeight: 1.75, h1FontSize: '1rem' }}
+                    themeOverride={{h1FontWeight: 700, lineHeight: 1.75, h1FontSize: '1rem'}}
                     level="h1"
                   >
                     {label}
@@ -200,7 +215,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
     )
   }
 
-  const FormContainer = ({ children }: { children: React.ReactNode }) => {
+  const FormContainer = ({children}: {children: React.ReactNode}) => {
     return (
       <View as="div" margin="medium">
         {children}
@@ -210,7 +225,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
 
   const validationAlert = validationMessage ? (
     <Focusable>
-      {({ focused }: { focused: boolean }) => (
+      {({focused}: {focused: boolean}) => (
         <View
           withFocusOutline={focused}
           focusPosition="inset"
@@ -230,7 +245,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
           }}
           data-testid="validation-message"
         >
-          <Alert variant={validationMessage.type} margin="xx-small" open={true} >
+          <Alert variant={validationMessage.type} margin="xx-small" open={true}>
             <Text>{validationMessage.message}</Text>
           </Alert>
         </View>
@@ -244,7 +259,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
       open={opened}
       placement="end"
       size="small"
-      themeOverride={{ smallWidth: '21.175rem' }}
+      themeOverride={{smallWidth: '21.175rem'}}
       data-testid="weighted-assignments-tray"
     >
       <View as="div">
@@ -252,7 +267,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
           <Flex as="div">
             <Flex.Item width="13.813rem" margin="0 small 0 0">
               <Heading
-                themeOverride={{ h1FontWeight: 700, lineHeight: 1.75, h1FontSize: '1.375rem' }}
+                themeOverride={{h1FontWeight: 700, lineHeight: 1.75, h1FontSize: '1.375rem'}}
                 level="h1"
               >
                 {I18n.t('Weighted Assignment Duration')}
@@ -291,12 +306,23 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
             item="page"
           />
         </FormContainer>
-        <View as="div" margin="medium 0 0 0" insetBlockEnd="1rem" insetInlineEnd="2rem" position="absolute">
+        <View
+          as="div"
+          margin="medium 0 0 0"
+          insetBlockEnd="1rem"
+          insetInlineEnd="2rem"
+          position="absolute"
+        >
           <Flex gap="small">
             <Button type="button" color="secondary" onClick={onDismiss}>
               {I18n.t('Cancel')}
             </Button>
-            <Button type="button" color="primary" onClick={onApply} data-testid="weighted-assignments-apply-button">
+            <Button
+              type="button"
+              color="primary"
+              onClick={onApply}
+              data-testid="weighted-assignments-apply-button"
+            >
               {I18n.t('Apply')}
             </Button>
           </Flex>

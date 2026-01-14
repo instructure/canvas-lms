@@ -96,8 +96,8 @@ export const Header = (props: HeaderProps) => {
     props.syncUnpublishedChanges(false)
   }
 
-  const getPublishLabel = () => {
-    let label = I18n.t('Publish Pace')
+  const getPublishLabel = (): React.ReactNode => {
+    let label: React.ReactNode = I18n.t('Publish Pace')
     if (props.isSyncing) {
       label = (
         <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>

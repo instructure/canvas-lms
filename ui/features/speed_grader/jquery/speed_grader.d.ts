@@ -26,6 +26,7 @@ import AssessmentAuditTray from '../react/AssessmentAuditTray'
 // fields marked as z.null() can be improved in subsequent commits
 
 export const ZSubmissionType = z.union([
+  z.literal('ams'),
   z.literal('basic_lti_launch'),
   z.literal('discussion_topic'),
   z.literal('media_recording'),
@@ -230,6 +231,7 @@ export const ZStudent = z.object({
   sortable_name: z.string(),
   sis_import_id: z.string().nullish(), // not used in SpeedGrader
   sis_user_id: z.string().nullish(), // not used in SpeedGrader
+  uuid: z.string(),
 })
 
 export type Student = z.infer<typeof ZStudent>
@@ -626,6 +628,8 @@ export type SpeedGrader = {
   ) => void
   setState: (state: any) => void
   submittedAtText: string
+  renderAmsGrading: (submission: HistoricalSubmission) => void
+  unmountAmsGrading: () => void
 }
 
 export type Grade = {

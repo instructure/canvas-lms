@@ -17,21 +17,21 @@
  */
 
 import {render, screen} from '@testing-library/react'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 beforeEach(() => {
   fakeENV.setup()
   // Mock Date.now() to return a consistent timestamp for stable testing
-  jest.spyOn(Date, 'now').mockReturnValue(new Date('2025-01-01T00:00:00Z').getTime())
+  vi.spyOn(Date, 'now').mockReturnValue(new Date('2025-01-01T00:00:00Z').getTime())
   // Mock timezone to ensure consistent date formatting
-  jest.spyOn(Intl, 'DateTimeFormat').mockImplementation(() => ({
+  vi.spyOn(Intl, 'DateTimeFormat').mockImplementation(() => ({
     format: date => {
       const d = new Date(date)
       return `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${d.getUTCFullYear()}`
@@ -41,7 +41,7 @@ beforeEach(() => {
 
 afterEach(() => {
   fakeENV.teardown()
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 // We can't call the wrapped component because a lot of these tests are depending

@@ -23,9 +23,9 @@ import App from '../App'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
-  showFlashSuccess: jest.fn(() => jest.fn(() => {})),
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  showFlashSuccess: vi.fn(() => vi.fn(() => {})),
 }))
 
 const makeKey = ({id, name, inherited_from = 'global', account_owns_binding = true}) => ({
@@ -262,7 +262,7 @@ describe('DeveloperKeys App', () => {
   })
 
   describe('when developer keys saved ', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     let ref
     beforeEach(() => {
       fakeENV.setup({FEATURES: {developer_key_page_checkboxes: true}})
@@ -272,60 +272,60 @@ describe('DeveloperKeys App', () => {
 
     describe('with list of warnings', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler(['warning1', 'warning2'])
       })
       it('Alert is shown for each warning message', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(2)
       })
     })
 
     describe('with a warning', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler('warning1')
       })
       it('Alert is shown for each warning message', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
       })
     })
 
     describe('without a warning (null)', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler(null)
       })
       it('No alert is shown', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
       })
     })
 
     describe('without a warning (undefined)', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler(undefined)
       })
       it('No Alert is shown', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
       })
     })
 
     describe('without a warning (empty array)', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler([])
       })
       it('Alert is shown for each warning message', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
       })
     })

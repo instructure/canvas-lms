@@ -599,7 +599,8 @@ class GradebooksController < ApplicationController
     js_env({
              EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
              EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
-             GRADEBOOK_OPTIONS: gradebook_options
+             GRADEBOOK_OPTIONS: gradebook_options,
+             PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
            })
   end
 
@@ -1081,7 +1082,13 @@ class GradebooksController < ApplicationController
       @page_title = t("SpeedGrader")
       @body_classes << "full-width padless-content"
 
-      remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
+      remote_env(
+        speedgrader: Services::PlatformServiceSpeedgrader.launch_url,
+        ams: {
+          launch_url: Services::Ams.launch_url,
+          api_url: Services::Ams.api_url
+        }
+      )
 
       env = {
         A2_STUDENT_ENABLED: @assignment&.a2_enabled? || false,
@@ -1097,6 +1104,7 @@ class GradebooksController < ApplicationController
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
         FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED: @context.filter_speed_grader_by_student_group?,
+        context_url: named_context_url(@context, :context_grades_url),
         course_id: @context.id,
         late_policy: @context.late_policy&.as_json(include_root: false),
         gradebook_group_filter_id: @current_user.get_latest_preference_setting_by_key(:gradebook_settings, @context.global_id, "filter_rows_by", "student_group_ids"),
@@ -1107,6 +1115,7 @@ class GradebooksController < ApplicationController
         MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled?,
         gradebook_section_filter_id: filtered_sections,
         COMMENT_BANK_PER_ASSIGNMENT_ENABLED: Account.site_admin.feature_enabled?(:comment_bank_per_assignment),
+        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
         show_inactive_enrollments: gradebook_settings(@context.global_id)&.[]("show_inactive_enrollments") == "true",
         show_concluded_enrollments: @context.completed? || gradebook_settings(@context.global_id)&.[]("show_concluded_enrollments") == "true",
       }
@@ -1149,6 +1158,13 @@ class GradebooksController < ApplicationController
 
     enhanced_rubrics_enabled = @context.feature_enabled?(:enhanced_rubrics)
 
+    remote_env(
+      ams: {
+        launch_url: Services::Ams.launch_url,
+        api_url: Services::Ams.api_url
+      }
+    )
+
     respond_to do |format|
       format.html do
         grading_role_for_user = @assignment.grading_role(@current_user)
@@ -1167,6 +1183,7 @@ class GradebooksController < ApplicationController
           READ_AS_ADMIN: @context.grants_right?(@current_user, session, :read_as_admin),
           CONTEXT_ACTION_SOURCE: :speed_grader,
           can_view_audit_trail: @assignment.can_view_audit_trail?(@current_user),
+          context_url: named_context_url(@context, :context_grades_url),
           settings_url: speed_grader_settings_course_gradebook_path,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
           anonymous_identities: @assignment.anonymous_grader_identities_by_anonymous_id,

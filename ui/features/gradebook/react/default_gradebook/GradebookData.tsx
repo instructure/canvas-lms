@@ -27,6 +27,7 @@ import PerformanceControls from './PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
 import useStore from './stores/index'
 import {shouldUseGraphQL} from './utils/forceGqlParam'
+import {addCorrelationIdToUrl} from './utils/urlHelpers'
 
 type Props = {
   actionMenuNode: HTMLSpanElement
@@ -116,6 +117,10 @@ export default function GradebookData(props: Props) {
       allowFinalGradeOverride: props.gradebookEnv.course_settings.allow_final_grade_override,
       reorderCustomColumnsUrl: props.gradebookEnv.reorder_custom_columns_url,
     })
+
+    // Add correlationId to URL for Referer header tracking
+    addCorrelationIdToUrl(useStore.getState().correlationId)
+
     initializeAppliedFilters(
       props.gradebookEnv.settings.filter_rows_by || {},
       props.gradebookEnv.settings.filter_columns_by || {},

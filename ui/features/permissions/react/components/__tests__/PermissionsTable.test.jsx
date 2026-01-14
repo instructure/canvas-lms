@@ -27,12 +27,12 @@ import {ROLES, PERMISSIONS, PERMISSION_GROUPS} from '../../__tests__/examples'
 import createStore from '../../store'
 
 // Mock jQuery screenReaderFlashMessage
-jest.mock('jquery', () => ({
-  screenReaderFlashMessage: jest.fn(),
+vi.mock('jquery', () => ({
+  screenReaderFlashMessage: vi.fn(),
 }))
 
 // Mock the rails flash notifications
-jest.mock('@canvas/rails-flash-notifications', () => ({}))
+vi.mock('@canvas/rails-flash-notifications', () => ({}))
 
 function renderWithRedux(component, initialState) {
   const store = createStore(initialState)
@@ -42,8 +42,8 @@ function renderWithRedux(component, initialState) {
 const defaultProps = () => ({
   roles: ROLES.filter(r => r.displayed),
   permissions: PERMISSIONS.filter(p => p.displayed),
-  setAndOpenRoleTray: jest.fn(),
-  setAndOpenPermissionTray: jest.fn(),
+  setAndOpenRoleTray: vi.fn(),
+  setAndOpenPermissionTray: vi.fn(),
   permissionGroups: PERMISSION_GROUPS,
 })
 
@@ -120,7 +120,7 @@ const permissionWithGranulars = {
 
 describe('PermissionsTable', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Component Structure', () => {

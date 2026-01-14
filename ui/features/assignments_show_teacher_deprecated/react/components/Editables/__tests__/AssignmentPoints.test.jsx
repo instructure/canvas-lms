@@ -63,7 +63,7 @@ describe('AssignmentPoints', () => {
   })
 
   it('saves new value on Enter', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByDisplayValue} = renderAssignmentPoints({mode: 'edit', onChange, pointsPossible: 12})
 
     const input = getByDisplayValue('12')
@@ -73,8 +73,8 @@ describe('AssignmentPoints', () => {
   })
 
   it('saves new value on blur', () => {
-    const onChange = jest.fn()
-    const onChangeMode = jest.fn()
+    const onChange = vi.fn()
+    const onChangeMode = vi.fn()
     const {container, getByDisplayValue} = render(
       <div>
         <AssignmentPoints
@@ -99,7 +99,7 @@ describe('AssignmentPoints', () => {
   })
 
   it('reverts to the old value on Escape', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByDisplayValue} = renderAssignmentPoints({mode: 'edit', onChange, pointsPossible: 12})
 
     const input = getByDisplayValue('12')
@@ -110,7 +110,7 @@ describe('AssignmentPoints', () => {
   })
 
   it('rounds to 2 decimal places', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByTestId} = render(
       <div>
         <AssignmentPoints

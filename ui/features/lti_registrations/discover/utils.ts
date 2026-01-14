@@ -16,4 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const isLtiRegistrationsDiscoverEnabled = () => ENV?.FEATURES?.lti_registrations_discover_page ?? false
+export const isLtiRegistrationsDiscoverEnabled = () =>
+  ENV?.FEATURES?.lti_registrations_discover_page ?? false

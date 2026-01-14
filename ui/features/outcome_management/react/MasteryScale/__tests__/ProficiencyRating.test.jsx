@@ -50,15 +50,15 @@ describe('ProficiencyRating', () => {
     render(<ProficiencyRating {...defaultProps(props)} />)
 
   beforeEach(() => {
-    onDeleteMock = jest.fn()
-    onFocusChangeMock = jest.fn()
-    onMasteryChangeMock = jest.fn()
-    onDescriptionChangeMock = jest.fn()
-    onPointsChangeMock = jest.fn()
+    onDeleteMock = vi.fn()
+    onFocusChangeMock = vi.fn()
+    onMasteryChangeMock = vi.fn()
+    onDescriptionChangeMock = vi.fn()
+    onPointsChangeMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('can not manage', () => {

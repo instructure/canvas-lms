@@ -51,7 +51,8 @@ import replaceTags from '@canvas/util/replaceTags'
 import {EXTERNAL_CONTENT_READY, EXTERNAL_CONTENT_CANCEL} from '@canvas/external-tools/messages'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
-// @ts-expect-error
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - window.INST is a Canvas global not in TS types
 if (!('INST' in window)) window.INST = {}
 
 // Allow unchecked access to ENV variables that should exist in this context
@@ -554,6 +555,8 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
   $dialog.find('.select_item_name').showIf(!options.no_name_input)
   if (allow_external_urls) {
     const $services = $('#content_tag_services').empty()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - getUserServices callback type mismatch
     getUserServices('BookmarkService', function (data: any) {
       for (const idx in data) {
         const service = data[idx].user_service
@@ -880,7 +883,8 @@ $(document).ready(function () {
               },
               (data_: unknown) => {
                 $('#select_context_content_dialog').loadingImage('remove')
-                // @ts-expect-error
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore - untyped error response structure
                 if (data_?.errors?.title?.[0]?.message === 'blank') {
                   $('#select_context_content_dialog').errorBox(
                     I18n.t('errors.assignment_name_blank', 'Assignment name cannot be blank.'),
@@ -1098,6 +1102,8 @@ function getFileUploadFolder() {
     const foundFolder: any = fileSelectBox?.getFolderById(folderId)
     const folder = foundFolder ? {...foundFolder} : {}
     if (folder) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - FilesystemObject constructor type mismatch
       folder.files = (folder.files || []).map((f: any) => new FilesystemObject(f))
     }
     return folder

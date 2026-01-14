@@ -26,7 +26,7 @@ import {
   processIssuesToChartData,
 } from '../chart'
 
-jest.mock('@canvas/i18n', () => ({
+vi.mock('@canvas/i18n', () => ({
   useScope: () => ({
     t: (text: string) => text, // mock translation
   }),

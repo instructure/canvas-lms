@@ -20,7 +20,7 @@ import React, {useContext} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
-import { Text } from '@instructure/ui-text'
+import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
@@ -74,9 +74,17 @@ export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> =
   return (
     <Flex>
       {props.liked || props.disliked ? (
-        <Flex.Item margin="0 small 0 0"><Text color="secondary" size="small">{I18n.t('Thank you for sharing!')}</Text></Flex.Item>
+        <Flex.Item margin="0 small 0 0">
+          <Text color="secondary" size="small">
+            {I18n.t('Thank you for sharing!')}
+          </Text>
+        </Flex.Item>
       ) : (
-        <Flex.Item margin="0 small 0 0"><Text color="secondary" size="small">{I18n.t('Do you like this summary?')}</Text></Flex.Item>
+        <Flex.Item margin="0 small 0 0">
+          <Text color="secondary" size="small">
+            {I18n.t('Do you like this summary?')}
+          </Text>
+        </Flex.Item>
       )}
       <RatingButton
         action="like"
@@ -84,14 +92,14 @@ export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> =
         isActive={props.liked}
         isEnabled={props.isEnabled}
         onClick={() => {
-          if(props.liked) {
+          if (props.liked) {
             setOnSuccess(I18n.t('Like summary, deselected'))
           } else {
             setOnSuccess(I18n.t('Like summary, selected'))
           }
           props.onLikeClick()
         }}
-        screenReaderText={ props.liked ? I18n.t('Like summary, selected') : I18n.t('Like summary')}
+        screenReaderText={props.liked ? I18n.t('Like summary, selected') : I18n.t('Like summary')}
         dataTestId="summary-like-button"
       />
       <RatingButton
@@ -100,14 +108,16 @@ export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> =
         isActive={props.disliked}
         isEnabled={props.isEnabled}
         onClick={() => {
-          if(props.disliked) {
+          if (props.disliked) {
             setOnSuccess(I18n.t('Dislike summary, deselected'))
           } else {
             setOnSuccess(I18n.t('Dislike summary, selected'))
           }
           props.onDislikeClick()
         }}
-        screenReaderText={ props.disliked ? I18n.t('Dislike summary, selected') : I18n.t('Dislike summary')}
+        screenReaderText={
+          props.disliked ? I18n.t('Dislike summary, selected') : I18n.t('Dislike summary')
+        }
         dataTestId="summary-dislike-button"
       />
     </Flex>

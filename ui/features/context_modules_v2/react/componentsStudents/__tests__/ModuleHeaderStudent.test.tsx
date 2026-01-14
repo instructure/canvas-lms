@@ -72,7 +72,7 @@ const buildDefaultProps = (overrides = {}) => {
     id: '1',
     name: 'Test Module',
     expanded: true,
-    onToggleExpand: jest.fn(),
+    onToggleExpand: vi.fn(),
     progression: {
       id: '1',
       _id: '1',
@@ -189,7 +189,7 @@ describe('ModuleHeaderStudent', () => {
 
   describe('Keyboard navigation', () => {
     it('toggles expand when Enter key is pressed', () => {
-      const onToggleExpand = jest.fn()
+      const onToggleExpand = vi.fn()
       const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
 
       const toggleButton = getByTestId('module-header-expand-toggle')
@@ -200,7 +200,7 @@ describe('ModuleHeaderStudent', () => {
     })
 
     it('toggles expand when Space key is pressed', () => {
-      const onToggleExpand = jest.fn()
+      const onToggleExpand = vi.fn()
       const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
 
       const toggleButton = getByTestId('module-header-expand-toggle')
@@ -211,7 +211,7 @@ describe('ModuleHeaderStudent', () => {
     })
 
     it('does not toggle expand when other keys are pressed', () => {
-      const onToggleExpand = jest.fn()
+      const onToggleExpand = vi.fn()
       const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
 
       const toggleButton = getByTestId('module-header-expand-toggle')

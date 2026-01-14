@@ -132,7 +132,7 @@ class Lti::Registration < ActiveRecord::Base
   # @param available [Boolean] Sets availability on the ContextControl created alongside this tool. Defaults to true,
   #   which means the tool will be available for use directly after creation.
   # @return [ContextExternalTool] A new ContextExternalTool for this Registration and the given context.
-  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false, current_user: nil, available: true)
+  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false, current_user: nil, available: true, enabled: true)
     # disabled tools should stay disabled while getting updated
     # deleted tools are never updated during a dev key update so can be safely ignored
     tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
@@ -146,7 +146,10 @@ class Lti::Registration < ActiveRecord::Base
     )
     tool.lti_registration = self
     tool.developer_key = developer_key
-    tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level
+    tool.workflow_state = privacy_level
+    if tool_is_disabled || !enabled
+      tool.workflow_state = ContextExternalTool::DISABLED_STATE
+    end
 
     if verify_uniqueness
       tool.check_for_duplication

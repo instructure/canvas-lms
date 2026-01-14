@@ -74,15 +74,15 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                       type="text"
                       size="medium"
                       validate={titleValidator}
-                      elementRef={ref => titleRef.current = ref}
+                      elementRef={ref => (titleRef.current = ref)}
                       data-testid="group-name-input"
                     />
                   </Flex.Item>
                 </Flex>
                 <View as="div" padding="medium 0">
-                  <LabeledRceField 
-                    name="description" 
-                    label={I18n.t('Group Description')} 
+                  <LabeledRceField
+                    name="description"
+                    label={I18n.t('Group Description')}
                     data-testid="group-description-input"
                   />
                 </View>

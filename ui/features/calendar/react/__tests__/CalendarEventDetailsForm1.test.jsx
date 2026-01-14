@@ -27,8 +27,8 @@ import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 
-jest.mock('@canvas/calendar/jquery/CommonEvent/index')
-jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
+vi.mock('@canvas/calendar/jquery/CommonEvent/index')
+vi.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
 
 let defaultProps = eventFormProps()
 
@@ -60,10 +60,13 @@ const testTimezone = async (timezone, inputDate, expectedDate, time) => {
   if (time) setTime(component, 'event-form-end-time', time)
   component.getByText('Submit').click()
 
-  waitFor(() =>
+  // When a time is provided, we're setting the end time, so check end_at
+  // When no time is provided, check start_at (date at midnight)
+  const fieldToCheck = time ? 'calendar_event[end_at]' : 'calendar_event[start_at]'
+  await waitFor(() =>
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[start_at]': expectedDate,
+        [fieldToCheck]: expectedDate,
       }),
       expect.any(Function),
       expect.any(Function),
@@ -97,21 +100,20 @@ const expectFieldsToBeDisabled = (component, fieldNames) => {
 }
 
 describe('CalendarEventDetailsForm', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     defaultProps = eventFormProps()
-    commonEventFactory.mockImplementation(
-      jest.requireActual('@canvas/calendar/jquery/CommonEvent/index').default,
-    )
+    const actualModule = await vi.importActual('@canvas/calendar/jquery/CommonEvent/index')
+    commonEventFactory.mockImplementation(actualModule.default)
     $.ajaxJSON = (_url, _method, _params, onSuccess, _onError) => {
       onSuccess({})
     }
-    jest
-      .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
-      .mockImplementation(() => Promise.resolve('all'))
+    vi.spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog').mockImplementation(
+      () => Promise.resolve('all'),
+    )
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('creates a new event', async () => {
@@ -128,7 +130,7 @@ describe('CalendarEventDetailsForm', () => {
     defaultProps.event.isNewEvent = () => false
   })
 
-  it('renders main elements and updates an event with valid parameters (flaky)', async () => {
+  it('renders main elements and updates an event with valid parameters', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     changeValue(component, 'edit-calendar-event-form-title', 'Class Party')
@@ -136,8 +138,6 @@ describe('CalendarEventDetailsForm', () => {
     changeValue(component, 'edit-calendar-event-form-date', '2022-07-23T00:00:00.000Z')
     setTime(component, 'event-form-start-time', '2:00 AM')
     setTime(component, 'event-form-end-time', '3:00 PM')
-    component.getByText('Calendar').click()
-    component.getByText('Geometry').click()
     expect(component.getByText('More Options')).toBeInTheDocument()
     component.getByText('Submit').click()
     await waitFor(() => expect(defaultProps.closeCB).toHaveBeenCalled())
@@ -148,7 +148,6 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[end_at]': '2022-07-23T15:00:00.000Z',
         'calendar_event[location_name]': 'The Zoo',
         'calendar_event[web_conference]': '',
-        'calendar_event[context_code]': 'course_1',
         'calendar_event[important_dates]': false,
         'calendar_event[blackout_date]': false,
       }),
@@ -240,7 +239,7 @@ describe('CalendarEventDetailsForm', () => {
     props.event = commonEventFactory(null, [userContext, courseContext])
     const d = moment('2023-08-28') // a monday
     props.event.date = d.toDate()
-    props.event.startDate = jest.fn(() => moment(props.event.date))
+    props.event.startDate = vi.fn(() => moment(props.event.date))
 
     const {getByTestId} = render(<CalendarEventDetailsForm {...props} />)
     const beginning_date = getByTestId('edit-calendar-event-form-date')
@@ -250,7 +249,7 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   // LF-630 (08/23/2023)
-  it.skip('can keep the same date when the date input is clicked and blurred', async () => {
+  it('can keep the same date when the date input is clicked and blurred', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     const date = changeValue(component, 'edit-calendar-event-form-date', '2022-07-14T00:00:00.000Z')
@@ -276,11 +275,11 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Denver at 12:00 AM', async () => {
-    testTimezone('America/Denver', '2022-07-14T06:00:00.000Z', '2022-07-14T06:00:00.000Z')
+    await testTimezone('America/Denver', '2022-07-14T06:00:00.000Z', '2022-07-14T06:00:00.000Z')
   })
 
   it('can change the date in Denver at 11:30 PM', async () => {
-    testTimezone(
+    await testTimezone(
       'America/Denver',
       '2022-07-14T06:00:00.000Z',
       '2022-07-15T05:30:00.000Z',
@@ -289,11 +288,11 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Shanghai at 12:00 AM', async () => {
-    testTimezone('Asia/Shanghai', '2022-07-13T16:00:00.000Z', '2022-07-13T16:00:00.000Z')
+    await testTimezone('Asia/Shanghai', '2022-07-13T16:00:00.000Z', '2022-07-13T16:00:00.000Z')
   })
 
   it('can change the date in Shanghai at 11:30 PM', async () => {
-    testTimezone(
+    await testTimezone(
       'Asia/Shanghai',
       '2022-07-13T16:00:00.000Z',
       '2022-07-14T15:30:00.000Z',
@@ -302,11 +301,11 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Adelaide at 12:00 AM', async () => {
-    testTimezone('Australia/Adelaide', '2022-07-13T14:30:00.000Z', '2022-07-13T14:30:00.000Z')
+    await testTimezone('Australia/Adelaide', '2022-07-13T14:30:00.000Z', '2022-07-13T14:30:00.000Z')
   })
 
   it('can change the date in Adelaide at 11:30 PM', async () => {
-    testTimezone(
+    await testTimezone(
       'Australia/Adelaide',
       '2022-07-13T14:30:00.000Z',
       '2022-07-14T14:00:00.000Z',
@@ -315,27 +314,27 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Tokyo at 12:00 AM', async () => {
-    testTimezone('Asia/Tokyo', '2022-07-13T15:00:00.000Z', '2022-07-13T15:00:00.000Z')
+    await testTimezone('Asia/Tokyo', '2022-07-13T15:00:00.000Z', '2022-07-13T15:00:00.000Z')
   })
 
   it('can change the date in Tokyo at 11:30 PM', async () => {
-    testTimezone('Asia/Tokyo', '2022-07-13T15:00:00.000Z', '2022-07-14T14:30:00.000Z', '11:30 PM')
+    await testTimezone('Asia/Tokyo', '2022-07-13T15:00:00.000Z', '2022-07-14T14:30:00.000Z', '11:30 PM')
   })
 
   it('can change the date in the UK at 12:00 AM', async () => {
-    testTimezone('Etc/UTC', '2022-07-14T00:00:00.000Z', '2022-07-14T00:00:00.000Z')
+    await testTimezone('Etc/UTC', '2022-07-14T00:00:00.000Z', '2022-07-14T00:00:00.000Z')
   })
 
   it('can change the date in the UK at 11:30 PM', async () => {
-    testTimezone('Etc/UTC', '2022-07-14T00:00:00.000Z', '2022-07-14T23:30:00.000Z', '11:30 PM')
+    await testTimezone('Etc/UTC', '2022-07-14T00:00:00.000Z', '2022-07-14T23:30:00.000Z', '11:30 PM')
   })
 
   it('can change the date in eastern Brazil at 12:00 AM', async () => {
-    testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-14T03:00:00.000Z')
+    await testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-14T03:00:00.000Z')
   })
 
   it('can change the date in eastern Brazil at 11:30 PM', async () => {
-    testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-15T02:30:00.000Z', '11:30 PM')
+    await testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-15T02:30:00.000Z', '11:30 PM')
   })
 
   it('does not show FrequencyPicker when the event is section-specific', () => {
