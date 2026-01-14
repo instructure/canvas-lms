@@ -1564,6 +1564,25 @@ describe Attachment do
       expect(tag2).to be_deleted
     end
 
+    it "updates AttachmentAssociations when overwriting" do
+      discussion_topic = @course.discussion_topics.create!(title: "Test Topic")
+      association1 = @a1.attachment_associations.create!(context: discussion_topic)
+      association2 = @a2.attachment_associations.create!(context: discussion_topic)
+
+      expect(association1.attachment_id).to eq @a1.id
+      expect(association2.attachment_id).to eq @a2.id
+
+      @a.display_name = "a1"
+      @a.handle_duplicates(:overwrite)
+
+      association1.reload
+      expect(association1.attachment_id).to eq @a.id
+      expect(association1.context).to eq discussion_topic
+
+      association2.reload
+      expect(association2.attachment_id).to eq @a2.id
+    end
+
     it "destroys all associated submission_draft_attachments when overwriting" do
       @a1.update_attribute(:display_name, "a2")
       submission = submission_model
