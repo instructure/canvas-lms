@@ -18,46 +18,30 @@
 
 import {useCallback} from 'react'
 import {useSearchParams} from 'react-router-dom'
-import type {SortOrder} from '../react/components/SortableTableHeader'
 
-interface UseSortParamsOptions {
-  defaultSort: string
-  defaultOrder: SortOrder
+interface usePaginationParamReturn {
+  page: number
+  handlePageChange: (newPage: number) => void
 }
 
-interface UseSortParamsReturn {
-  sort: string
-  order: SortOrder
-  handleChangeSort: (columnId: string) => void
-}
-
-export const useSortParams = ({
-  defaultSort,
-  defaultOrder,
-}: UseSortParamsOptions): UseSortParamsReturn => {
+export const usePaginationParam = (): usePaginationParamReturn => {
   const [searchParams, setSearchParams] = useSearchParams()
+  const parsedPage = parseInt(searchParams.get('page') || '1', 10)
+  const page = parsedPage > 0 ? parsedPage : 1
 
-  const sort = searchParams.get('sort') || defaultSort
-  const order = (searchParams.get('order') || defaultOrder) as SortOrder
-
-  const handleChangeSort = useCallback(
-    (columnId: string) => {
-      const newOrder = columnId === sort && order === 'asc' ? 'desc' : 'asc'
-
+  const handlePageChange = useCallback(
+    (newPage: number) => {
       setSearchParams(params => {
         const newParams = new URLSearchParams(params)
-        newParams.set('sort', columnId)
-        newParams.set('order', newOrder)
-        newParams.set('page', '1')
+        newParams.set('page', String(newPage))
         return newParams
       })
     },
-    [sort, order, setSearchParams],
+    [setSearchParams],
   )
 
   return {
-    sort,
-    order,
-    handleChangeSort,
+    page,
+    handlePageChange,
   }
 }

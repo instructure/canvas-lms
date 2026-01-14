@@ -56,4 +56,5 @@ export interface Course {
 
 export interface CoursesResponse {
   courses: Course[]
+  pageCount: number
 }

@@ -23,7 +23,7 @@ import React from 'react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {useCourses} from '../useCourses'
-import {createMockCourses} from '../../__tests__/factories'
+import {createMockCourses, createMockLinkHeaderString} from '../../__tests__/factories'
 
 const server = setupServer()
 const accountId = '123'
@@ -52,15 +52,17 @@ describe('useCourses', () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 
-  const renderUseCourses = (sort = 'sis_course_id', order: 'asc' | 'desc' = 'asc') => {
-    return renderHook(() => useCourses({accountId, sort, order}), {wrapper})
+  const renderUseCourses = (sort = 'sis_course_id', order: 'asc' | 'desc' = 'asc', page = 1) => {
+    return renderHook(() => useCourses({accountId, sort, order, page}), {wrapper})
   }
 
   it('fetches courses successfully', async () => {
     const mockCourses = createMockCourses(2)
     server.use(
       http.get(`/api/v1/accounts/${accountId}/courses`, () => {
-        return HttpResponse.json(mockCourses)
+        return HttpResponse.json(mockCourses, {
+          headers: {Link: createMockLinkHeaderString(1, accountId)},
+        })
       }),
     )
 
@@ -70,6 +72,7 @@ describe('useCourses', () => {
 
     expect(result.current.data?.courses).toEqual(mockCourses)
     expect(result.current.data?.courses.length).toBe(2)
+    expect(result.current.data?.pageCount).toBe(1)
   })
 
   it('includes correct query parameters in API request', async () => {
@@ -94,10 +97,11 @@ describe('useCourses', () => {
     expect(includeParams).toContain('term')
     expect(includeParams).toContain('accessibility_course_statistic')
     expect(requestParams?.get('teacher_limit')).toBe('25')
-    expect(requestParams?.get('per_page')).toBe('15')
+    expect(requestParams?.get('per_page')).toBe('14')
     expect(requestParams?.get('no_avatar_fallback')).toBe('1')
     expect(requestParams?.get('sort')).toBe('course_name')
     expect(requestParams?.get('order')).toBe('desc')
+    expect(requestParams?.get('page')).toBe('1')
   })
 
   it('includes sort and order in query key for proper caching', async () => {
@@ -117,6 +121,7 @@ describe('useCourses', () => {
       accountId,
       'a11y_active_issue_count',
       'asc',
+      1,
     ])
     expect(cachedData).toBeTruthy()
   })
@@ -183,6 +188,7 @@ describe('useCourses', () => {
       accountId,
       'sis_course_id',
       'asc',
+      1,
     ])
     expect(cachedData).toBeTruthy()
   })
@@ -220,5 +226,66 @@ describe('useCourses', () => {
 
     const course = result.current.data?.courses[0]
     expect(course?.accessibility_course_statistic).toBeNull()
+  })
+
+  describe('pagination', () => {
+    it('uses provided page number', async () => {
+      const mockCourses = createMockCourses(2)
+      let requestParams: URLSearchParams | undefined
+
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/courses`, ({request}) => {
+          requestParams = new URL(request.url).searchParams
+          return HttpResponse.json(mockCourses, {
+            headers: {Link: createMockLinkHeaderString(5, accountId)},
+          })
+        }),
+      )
+
+      const {result} = renderHook(
+        () => useCourses({accountId, sort: 'sis_course_id', order: 'asc', page: 3}),
+        {wrapper},
+      )
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+      expect(requestParams?.get('page')).toBe('3')
+      expect(result.current.data?.pageCount).toBe(5)
+    })
+
+    it('parses page count from Link header', async () => {
+      const mockCourses = createMockCourses(14)
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/courses`, () => {
+          return HttpResponse.json(mockCourses, {
+            headers: {Link: createMockLinkHeaderString(7, accountId)},
+          })
+        }),
+      )
+
+      const {result} = renderHook(
+        () => useCourses({accountId, sort: 'sis_course_id', order: 'asc', page: 1}),
+        {wrapper},
+      )
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+      expect(result.current.data?.pageCount).toBe(7)
+    })
+
+    it('defaults pageCount to 1 when Link header is missing', async () => {
+      const mockCourses = createMockCourses(5)
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/courses`, () => {
+          return HttpResponse.json(mockCourses)
+        }),
+      )
+
+      const {result} = renderUseCourses()
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+      expect(result.current.data?.pageCount).toBe(1)
+    })
   })
 })
