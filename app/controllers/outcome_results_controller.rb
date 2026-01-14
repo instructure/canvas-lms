@@ -552,7 +552,7 @@ class OutcomeResultsController < ApplicationController
       **opts
     )
 
-    os_results = fetch_and_convert_os_results(opts)
+    os_results = fetch_and_convert_os_results(**opts)
 
     [canvas_results, os_results]
   end
@@ -589,6 +589,14 @@ class OutcomeResultsController < ApplicationController
     [results_type, "context_uuid", @context.uuid, "current_user_uuid", @current_user.uuid, "account_uuid", @domain_root_account.uuid, outcome_ids_key].compact
   end
 
+  def needs_canvas_os_results?
+    !Account.site_admin.feature_enabled?(:outcomes_rollup_read) || includes_alignments?
+  end
+
+  def includes_alignments?
+    Api.value_to_array(params[:include]).include?("alignments")
+  end
+
   # used in sLMGB/LMGB
   def user_rollups(opts = { all_users: false })
     excludes = Api.value_to_array(params[:exclude]).uniq
@@ -597,17 +605,35 @@ class OutcomeResultsController < ApplicationController
 
     ff_read_enabled = Account.site_admin.feature_enabled?(:outcomes_rollup_read)
 
+    if needs_canvas_os_results?
+      @results, @outcome_service_results = find_canvas_os_results(opts)
+    end
+
     if ff_read_enabled
-      # TODO: Handle students/outcomes with no results filter (ticket: OUTC-422)
-      stored_outcome_rollups(
+      rollups = stored_outcome_rollups(
         users: opts[:all_users] ? @all_users : @users,
         context: @context,
         outcomes: @outcomes,
         excludes:
       )
-    else
-      @results, @outcome_service_results = find_canvas_os_results(opts)
 
+      # Filter outcomes without results when using stored rollups
+      if excludes.include?("missing_outcome_results")
+        outcome_ids_with_results = rollups.flat_map(&:scores).map { |score| score.outcome.id }.uniq
+        @outcome_links = @outcome_links.select { |link| outcome_ids_with_results.include?(link.content_id) }
+        @outcomes = @outcome_links.map(&:learning_outcome_content)
+      end
+
+      # Filter users without results when using stored rollups
+      # Note: stored_outcome_rollups already filters the rollups themselves,
+      # but we need to sync @users to match for the linked.users response
+      if excludes.include?("missing_user_rollups")
+        user_ids_with_results = rollups.map { |rollup| rollup.context.id }.uniq
+        @users = @users.select { |u| user_ids_with_results.include?(u.id) }
+      end
+
+      rollups
+    else
       remove_users_without_results(@results, @outcome_service_results) if excludes.include?("missing_user_rollups")
       remove_outcomes_without_results(@results, @outcome_service_results) if excludes.include?("missing_outcome_results")
 
@@ -840,7 +866,11 @@ class OutcomeResultsController < ApplicationController
   end
 
   def include_alignments
-    alignments = ContentTag.where(id: @results.map(&:content_tag_id)).preload(:content).map(&:content).uniq
+    canvas_results = @results.respond_to?(:to_a) ? @results.to_a : (@results || [])
+    all_results = @outcome_service_results.nil? ? canvas_results : (canvas_results + @outcome_service_results)
+    content_tag_ids = all_results.map(&:content_tag_id).uniq
+
+    alignments = ContentTag.where(id: content_tag_ids).preload(:content).map(&:content).uniq
     outcome_results_include_alignments_json(alignments)
   end
 
