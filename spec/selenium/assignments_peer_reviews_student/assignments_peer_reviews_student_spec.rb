@@ -505,6 +505,141 @@ describe "peer review student landing page" do
     end
   end
 
+  context "unavailable peer review allocations" do
+    it "does not show completion modal when all available reviews are done but required count not met", custom_timeout: 30 do
+      # Set required count to 5, but only 3 students have submitted
+      @assignment.update(peer_review_count: 5)
+
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      selector = f("input[data-testid='peer-review-selector']")
+      expect(selector.attribute("value")).to eq("Peer Review (1 of 5)")
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("First peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(selector.attribute("value")).to eq("Peer Review (2 of 5)")
+      expect(f("body")).not_to include_text("You have completed your Peer Reviews!")
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("Second peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(selector.attribute("value")).to eq("Peer Review (3 of 5)")
+      expect(f("body")).not_to include_text("You have completed your Peer Reviews!")
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("Third peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).not_to include_text("You have completed your Peer Reviews!")
+      expect(f("[data-testid='unavailable-peer-review']")).to be_displayed
+    end
+
+    it "navigates to unavailable review view when manually selecting unavailable slot", custom_timeout: 30 do
+      # Set required count to 5, but only 3 students have submitted
+      @assignment.update(peer_review_count: 5)
+
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      selector = f("input[data-testid='peer-review-selector']")
+
+      options = INSTUI_Select_options(selector)
+      expect(options.length).to eq(5)
+
+      click_INSTUI_Select_option(selector, "Peer Review (4 of 5)")
+      wait_for_ajaximations
+
+      expect(f("[data-testid='unavailable-peer-review']")).to be_displayed
+      expect(f("body")).to include_text("There are no more peer reviews available to allocate to you at this time")
+    end
+
+    it "shows completion modal only when all required peer reviews are allocated and completed", custom_timeout: 30 do
+      @assignment.update(peer_review_count: 2)
+      @assignment.assign_peer_review(@student1, @student2)
+      @assignment.assign_peer_review(@student1, @student3)
+
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      selector = f("input[data-testid='peer-review-selector']")
+      expect(selector.attribute("value")).to eq("Peer Review (1 of 2)")
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("First peer review")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(selector.attribute("value")).to eq("Peer Review (2 of 2)")
+      expect(f("body")).not_to include_text("You have completed your Peer Reviews!")
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("Second peer review")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("You have completed your Peer Reviews!")
+    end
+  end
+
   context "rubric functionality" do
     before(:once) do
       @rubric = @course.rubrics.create!(

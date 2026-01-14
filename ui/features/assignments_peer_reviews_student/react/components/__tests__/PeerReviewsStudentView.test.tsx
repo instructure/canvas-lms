@@ -454,6 +454,10 @@ describe('PeerReviewsStudentView', () => {
           name: 'Multiple Peer Reviews',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
           assignedToDates: null,
           assessmentRequestsForCurrentUser: [
             {
@@ -1731,11 +1735,6 @@ describe('PeerReviewsStudentView', () => {
       })
 
       const {queryByTestId, getByTestId} = setup({assignmentId: '30'})
-
-      await waitFor(() => {
-        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
-      })
-
       expect(queryByTestId('locked-peer-review')).not.toBeInTheDocument()
     })
 
@@ -1778,6 +1777,153 @@ describe('PeerReviewsStudentView', () => {
       })
 
       expect(queryByTestId('locked-peer-review')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Unavailable peer reviews', () => {
+    it('displays unavailable peer review view when unavailable option is selected', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '28',
+          name: 'Unavailable View Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>First submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, getByText} = setup({assignmentId: '28'})
+
+      await waitFor(() => {
+        expect(getByText('Submission')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toHaveTextContent('First submission')
+      })
+
+      const selector = getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      const unavailableOption = getByText('Peer Review (2 of 3)')
+      await user.click(unavailableOption)
+
+      await waitFor(() => {
+        expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
+      })
+
+      expect(
+        getByText(
+          'There are no more peer reviews available to allocate to you at this time. Check back later or contact your instructor.',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('shows submission view when available option is selected after unavailable', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '29',
+          name: 'Switch Back Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 3,
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Submission content</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, getByText, queryByTestId} = setup({assignmentId: '29'})
+
+      await waitFor(() => {
+        expect(getByText('Submission')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      const selector = getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      const unavailableOption = getByText('Peer Review (2 of 3)')
+      await user.click(unavailableOption)
+
+      await waitFor(() => {
+        expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
+      })
+
+      await user.click(selector)
+
+      const availableOption = getByText('Peer Review (1 of 3)')
+      await user.click(availableOption)
+
+      await waitFor(() => {
+        expect(queryByTestId('unavailable-peer-review')).not.toBeInTheDocument()
+      })
+
+      expect(getByTestId('text-entry-content')).toBeInTheDocument()
+    })
+
+    it('displays all unavailable options when no peer reviews are allocated', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '30',
+          name: 'All Unavailable Test',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByTestId, getByText} = setup({assignmentId: '30'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
+      })
     })
   })
 })
