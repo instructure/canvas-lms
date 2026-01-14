@@ -19,6 +19,7 @@ import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {uniqueId, sortBy} from 'es-toolkit/compat'
+import {fromNow} from '@canvas/fuzzy-relative-time'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {
@@ -27,6 +28,10 @@ import {
 } from '@instructure/canvas-rce/enhance-user-content'
 import {getMountPoint} from '@canvas/top-navigation/react/TopNavPortalBase'
 import 'jqueryui/dialog'
+import 'jqueryui/draggable'
+import 'jqueryui/resizable'
+import 'jqueryui/sortable'
+import 'jqueryui/tabs'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString, fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
@@ -48,34 +53,64 @@ export function formatTimeAgoTitle(date) {
   return fudgedDate.toString('MMM d, yyyy h:mmtt')
 }
 
-export function formatTimeAgoDate(date) {
-  if (typeof date === 'string') {
-    date = Date.parse(date)
-  }
-  const diff = new Date() - date
-  if (diff < 24 * 3600 * 1000) {
-    if (diff < 3600 * 1000) {
-      if (diff < 60 * 1000) {
-        return I18n.t('#time.less_than_a_minute_ago', 'less than a minute ago')
-      } else {
-        const minutes = parseInt(diff / (60 * 1000), 10)
-        return I18n.t(
-          '#time.count_minutes_ago',
-          {one: '1 minute ago', other: '%{count} minutes ago'},
-          {count: minutes},
-        )
-      }
-    } else {
-      const hours = parseInt(diff / (3600 * 1000), 10)
-      return I18n.t(
-        '#time.count_hours_ago',
-        {one: '1 hour ago', other: '%{count} hours ago'},
-        {count: hours},
-      )
-    }
-  } else {
-    return formatTimeAgoTitle(date)
-  }
+// This is temporarily here while we finish the announced deprecation of
+// this functionality. It's been warning users for nine years but is still
+// apparently fairly widely used, so it has to stay until we can get users
+// transitioned off of it. It has to go because it decorates customer content
+// with jQueryUI functionality, which we are moving away from entirely, and
+// also there are security concerns with it.
+const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
+function deprecationWarning(els) {
+  const msg =
+    'Deprecated use of magic jQueryUI widget markup detected:\n\n' +
+    "You're relying on undocumented functionality where Canvas makes " +
+    'jQueryUI widgets out of rich content that has the following class names: ' +
+    JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE +
+    '.\n\n' +
+    'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
+    "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
+    'you should use your own custom JS file to do any such customizations.'
+  console.error(msg, els)
+  captureException(new Error(msg))
+}
+
+function enhanceUserJQueryWidgetContent() {
+  $('.user_content.unenhanced')
+    .find('.enhanceable_content')
+    .show()
+    .filter(JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE)
+    .ifExists(deprecationWarning)
+    .end()
+    .filter('.dialog')
+    .each(function () {
+      const $dialog = $(this)
+      $dialog.hide()
+      $dialog
+        .closest('.user_content')
+        .find("a[href='#" + $dialog.attr('id') + "']")
+        .on('click', event => {
+          event.preventDefault()
+          $dialog.dialog({
+            modal: true,
+            zIndex: 1000,
+          })
+        })
+    })
+    .end()
+    .filter('.draggable')
+    .draggable()
+    .end()
+    .filter('.resizable')
+    .resizable()
+    .end()
+    .filter('.sortable')
+    .sortable()
+    .end()
+    .filter('.tabs')
+    .each(function () {
+      $(this).tabs()
+    })
+    .end()
 }
 
 function ellipsifyBreadcrumbs() {
@@ -185,6 +220,7 @@ function enhanceUserContentWhenAsked() {
   enhanceUserContentTimeout = setTimeout(
     () =>
       enhanceUserContent(document, {
+        customEnhance: enhanceUserJQueryWidgetContent,
         canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin,
         kalturaSettings: INST.kalturaSettings,
         disableGooglePreviews: !!INST.disableGooglePreviews,
@@ -383,7 +419,7 @@ function highlightDiscussionTopicMessagesOnHover() {
 
 function makeDatesPretty() {
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-  // vvvvvvvvvvvvvvvvv BEGIN stuf form making pretty dates vvvvvvvvvvvvvvvvvv
+  // vvvvvvvvvvvvvvvvv BEGIN stuff for making pretty dates vvvvvvvvvvvvvvvvvv
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   let timeAgoEvents = []
   function timeAgoRefresh() {
@@ -398,7 +434,7 @@ function makeDatesPretty() {
       if (date) {
         $event.data('timestamp', date.toISOString())
         $event.data('parsed_date', date)
-        $event.text(formatTimeAgoDate(date))
+        $event.text(fromNow(date))
         $event.attr('title', formatTimeAgoTitle(date))
       }
       setTimeout(processNextTimeAgoEvent, 1)

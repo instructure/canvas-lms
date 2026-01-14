@@ -23,7 +23,8 @@ import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-content'
+import {formatTimeAgoTitle} from '@canvas/enhanced-user-content'
+import {fromNow} from '@canvas/fuzzy-relative-time'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 import {useInfiniteQuery} from '@tanstack/react-query'
@@ -171,7 +172,7 @@ export default function HistoryList() {
                         data-timestamp={entry.visited_at}
                         title={formatTimeAgoTitle(entry.visited_at)}
                       >
-                        {formatTimeAgoDate(entry.visited_at)}
+                        {fromNow(entry.visited_at)}
                       </Text>
                     </div>
                   </Flex.Item>
