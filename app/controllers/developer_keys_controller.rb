@@ -399,8 +399,26 @@ class DeveloperKeysController < ApplicationController
               # Only return keys that belong to the current account
               DeveloperKey.where(account_id: @context.id)
             end
+    scope = scope.nondeleted
     scope = scope.eager_load(:tool_configuration) unless params[:inherited]
-    scope = scope.nondeleted.preload(:account).order("developer_keys.id DESC")
+    scope = scope.preload(:account).order("developer_keys.id DESC")
+    unless params[:inherited]
+      # Add a computed column for has_overlay using an EXISTS subquery
+      scope = scope.select(
+        "developer_keys.*",
+        DeveloperKey.sanitize_sql_array([
+                                          "EXISTS (SELECT 1 FROM #{Lti::Overlay.quoted_table_name} " \
+                                          "INNER JOIN #{Lti::Registration.quoted_table_name} ON #{Lti::Overlay.quoted_table_name}.registration_id = #{Lti::Registration.quoted_table_name}.id " \
+                                          "WHERE #{Lti::Registration.quoted_table_name}.id = developer_keys.lti_registration_id " \
+                                          "AND #{Lti::Registration.quoted_table_name}.workflow_state = 'active' " \
+                                          "AND #{Lti::Overlay.quoted_table_name}.account_id = ? " \
+                                          "AND #{Lti::Overlay.quoted_table_name}.data != '{}' " \
+                                          "AND #{Lti::Overlay.quoted_table_name}.workflow_state = 'active'" \
+                                          ") AS has_overlay",
+                                          @context.id
+                                        ])
+      )
+    end
 
     # query for parent keys is most likely cross-shard,
     # so doesn't fit into the scope cases above
