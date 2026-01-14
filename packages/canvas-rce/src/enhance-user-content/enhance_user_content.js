@@ -119,7 +119,7 @@ function previewId() {
 function buildUrl(url) {
   try {
     return new URL(url)
-  } catch (e) {
+  } catch (_e) {
     // Don't raise an error
   }
 }
@@ -152,6 +152,7 @@ const addResourceIdentifiersToStudioContent = content => {
 
 export function enhanceUserContent(container = document, opts = {}) {
   const {
+    customEnhance,
     canvasOrigin,
     kalturaSettings,
     disableGooglePreviews,
@@ -206,13 +207,13 @@ export function enhanceUserContent(container = document, opts = {}) {
 
   content.querySelectorAll('.user_content:not(.enhanced)').forEach(elem => {
     elem.classList.add('unenhanced')
-    explicit_latex_typesetting && elem.classList.add(MathJaxDirective.Process)
+    if (explicit_latex_typesetting) elem.classList.add(MathJaxDirective.Process)
   })
 
   const mathml = new Mathml({new_math_equation_handling, explicit_latex_typesetting}, {locale})
 
   content.querySelectorAll('.unenhanced').forEach(unenhanced_elem => {
-    explicit_latex_typesetting && mathml.processNewMathInElem(unenhanced_elem)
+    if (explicit_latex_typesetting) mathml.processNewMathInElem(unenhanced_elem)
 
     unenhanced_elem.querySelectorAll('img').forEach(img => {
       const src = img.getAttribute('src')
@@ -331,7 +332,7 @@ export function enhanceUserContent(container = document, opts = {}) {
       if (!href) return
 
       const matchesCanvasFile = href.pathname.match(
-        /(?:\/(courses|groups|users|assessment_questions)\/\d+)?\/files\/([\d~]+)(?=[!*'();:@&=+$,/?#\[\]]|$)/,
+        /(?:\/(courses|groups|users|assessment_questions)\/\d+)?\/files\/([\d~]+)(?=[!*'();:@&=+$,/?#[\]]|$)/,
       )
       if (!matchesCanvasFile) {
         // a bug in the new RCE added instructure_file_link class name to all links
@@ -430,6 +431,8 @@ export function enhanceUserContent(container = document, opts = {}) {
       handleYoutubeLink($anchor)
     }
   })
+
+  if (typeof customEnhance === 'function') customEnhance()
 
   content.querySelectorAll('.user_content.unenhanced').forEach($elem => {
     $elem.classList.remove('unenhanced')
