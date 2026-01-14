@@ -65,7 +65,7 @@ describe Login::OAuth2Controller do
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
       expect(response).to_not be_successful
       expect(response).to_not be_redirect
-      expect(controller.logger).to have_received(:error).with("Nonce mismatch - JWT nonce: 'different', Popped nonce: 'bob'")
+      expect(controller.logger).to have_received(:error).with("Nonce mismatch - JWT nonce: 'different', Session nonce(s): [\"bob\"]")
     end
 
     it "rejects logins that take more than 10 minutes" do
