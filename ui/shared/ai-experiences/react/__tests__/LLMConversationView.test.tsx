@@ -545,38 +545,31 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      let hasBeenCalledOnce = false
-
-      // Mock get active conversation and create conversation with first success, second failure
       server.use(
         http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
           return HttpResponse.json({})
         }),
-        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-          if (!hasBeenCalledOnce) {
-            // First call - success
-            hasBeenCalledOnce = true
+        http.post(
+          '/api/v1/courses/123/ai_experiences/1/conversations',
+          () => {
             return HttpResponse.json({id: '1', messages: initialMessages})
-          }
-          // Second call for restart - failure
+          },
+          {once: true},
+        ),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
           return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
         }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
 
-      // Wait for initial success
       await waitFor(() => {
         expect(screen.getByText('Hello')).toBeInTheDocument()
       })
 
-      // Verify first call succeeded
-      expect(hasBeenCalledOnce).toBe(true)
-
       const restartButton = screen.getByText('Restart')
       fireEvent.click(restartButton)
 
-      // Wait for restart failure
       await waitFor(() => {
         expect(
           screen.getByText('Failed to restart conversation. Please try again.'),
@@ -619,20 +612,17 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      let hasBeenCalledOnce = false
+      let shouldSucceed = false
 
-      // Mock get active conversation and create conversation with first failure, second success
+      server.resetHandlers()
       server.use(
         http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
           return HttpResponse.json({})
         }),
         http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-          if (!hasBeenCalledOnce) {
-            // First call - failure
-            hasBeenCalledOnce = true
+          if (!shouldSucceed) {
             return HttpResponse.json({error: 'Failed'}, {status: 503})
           }
-          // Second call - success
           return HttpResponse.json({
             id: '1',
             messages: initialMessages,
@@ -642,21 +632,17 @@ describe('LLMConversationView', () => {
 
       render(<LLMConversationView {...defaultProps} />)
 
-      // Wait for the error to appear after failed initialization
       await waitFor(() => {
         expect(
           screen.getByText('Failed to start conversation. Please try again.'),
         ).toBeInTheDocument()
       })
 
-      // Verify we're in error state
-      expect(hasBeenCalledOnce).toBe(true)
+      shouldSucceed = true
 
-      // Trigger restart which should clear the error
       const restartButton = screen.getByText('Restart')
       fireEvent.click(restartButton)
 
-      // Wait for successful restart
       await waitFor(() => {
         expect(
           screen.queryByText('Failed to start conversation. Please try again.'),
