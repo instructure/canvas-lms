@@ -27,6 +27,7 @@ module Api::V1::Assignment
   include SubmittablesGradingPeriodProtection
   include Api::V1::PlannerOverride
   include Api::V1::EstimatedDuration
+  include Api::V1::AvailabilityStatus
 
   ALL_DATES_LIMIT = 25
 
@@ -175,6 +176,9 @@ module Api::V1::Assignment
     unless opts[:exclude_response_fields].include?("in_closed_grading_period")
       hash["in_closed_grading_period"] = assignment.in_closed_grading_period?
     end
+
+    availability = calculate_availability_status(assignment.unlock_at, assignment.lock_at)
+    hash["availability_status"] = availability if availability&.dig(:status)
 
     hash["grades_published"] = assignment.grades_published? if opts[:include_grades_published]
     hash["graded_submissions_exist"] = assignment.graded_submissions_exist?
@@ -401,6 +405,11 @@ module Api::V1::Assignment
         date_hash["in_closed_grading_period"] = in_closed_grading_period
         date_hash["can_edit"] = can_edit_assignment && (!in_closed_grading_period || !constrained_by_grading_periods?)
       end
+    end
+
+    hash["all_dates"]&.each do |date_hash|
+      availability = calculate_availability_status(date_hash["unlock_at"], date_hash["lock_at"])
+      date_hash["availability_status"] = availability if availability&.dig(:status)
     end
 
     if opts[:include_module_ids]

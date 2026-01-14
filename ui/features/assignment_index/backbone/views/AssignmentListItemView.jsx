@@ -25,6 +25,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ListViewCheckpoints} from '@canvas/list-view-checkpoints/react/ListViewCheckpoints'
+import {PeerReviewInfo} from '@canvas/assignments/react/PeerReviewInfo'
 import {TeacherCheckpointsInfo} from '@canvas/list-view-checkpoints/react/TeacherCheckpointsInfo'
 import LockIconView from '@canvas/lock-icon'
 import * as MoveItem from '@canvas/move-item-tray'
@@ -48,6 +49,7 @@ import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/
 import {captureException} from '@sentry/browser'
 import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter'
 import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 
 const I18n = createI18nScope('AssignmentListItemView')
 
@@ -92,6 +94,9 @@ export default (AssignmentListItemView = (function () {
       this.focusOnFirstGroup = this.focusOnFirstGroup.bind(this)
       this.onAlignmentCloneFailedRetry = this.onAlignmentCloneFailedRetry.bind(this)
       this.updateAssignmentCollectionItem = this.updateAssignmentCollectionItem.bind(this)
+      this.cleanupPeerReviewInfo = this.cleanupPeerReviewInfo.bind(this)
+      this.buildPeerReviewAssignmentData = this.buildPeerReviewAssignmentData.bind(this)
+      this.renderPeerReviewInfo = this.renderPeerReviewInfo.bind(this)
     }
 
     static initClass() {
@@ -288,6 +293,13 @@ export default (AssignmentListItemView = (function () {
         .toggleClass('ig-published', this.view.model.get('published'))
     }
 
+    cleanupPeerReviewInfo() {
+      if (this.peerReviewInfoRoot) {
+        this.peerReviewInfoRoot.unmount()
+        this.peerReviewInfoRoot = null
+      }
+    }
+
     // call remove on children so that they can clean up old dialogs.
     render() {
       this.toggleHidden(this.model, this.model.get('hidden'))
@@ -306,6 +318,7 @@ export default (AssignmentListItemView = (function () {
       if (this.dateAvailableColumnView) {
         this.dateAvailableColumnView.remove()
       }
+      this.cleanupPeerReviewInfo()
 
       super.render(...arguments)
       this.initializeSisButton()
@@ -314,6 +327,11 @@ export default (AssignmentListItemView = (function () {
       if (this.model) {
         return (this.model.view = this)
       }
+    }
+
+    remove() {
+      this.cleanupPeerReviewInfo()
+      return super.remove()
     }
 
     afterRender() {
@@ -361,6 +379,10 @@ export default (AssignmentListItemView = (function () {
         }
       }
 
+      if (this.model.shouldShowPeerReviewInfo && this.model.shouldShowPeerReviewInfo()) {
+        this.renderPeerReviewInfo()
+      }
+
       if (
         assessmentRequests &&
         assessmentRequests.length &&
@@ -385,6 +407,63 @@ export default (AssignmentListItemView = (function () {
 
       if (ENV.horizon_course) {
         this.publishIconView.$el.addClass('disabled')
+      }
+    }
+
+    buildPeerReviewAssignmentData() {
+      const peerReviewSub = this.model.peerReviewSubAssignment()
+      const assignmentDefaultDates = this.model.defaultDates()
+      const assignmentSingleSection = this.model.singleSection()
+
+      const assignmentData = {
+        ...this.model.attributes,
+        defaultDates: assignmentDefaultDates.toJSON(),
+        all_dates: this.model.allDates(),
+        singleSectionAvailability: assignmentSingleSection?.availabilityStatus,
+      }
+
+      if (peerReviewSub) {
+        const peerReviewDefaultDates = this.model.peerReviewDefaultDates()
+        const peerReviewSingleSection = this.model.peerReviewSingleSection()
+
+        assignmentData.peer_review_sub_assignment = {
+          ...peerReviewSub,
+          defaultDates: peerReviewDefaultDates ? peerReviewDefaultDates.toJSON() : null,
+          all_dates: this.model.peerReviewAllDates(),
+          singleSectionAvailability: peerReviewSingleSection?.availabilityStatus,
+        }
+      }
+
+      return assignmentData
+    }
+
+    renderPeerReviewInfo() {
+      const peerReviewInfoElem = this.$el.find(`#assignment_peer_review_info_${this.model.id}`)
+      const mountPoint = peerReviewInfoElem[0]
+
+      if (!mountPoint) return
+
+      const assignmentData = this.buildPeerReviewAssignmentData()
+
+      try {
+        if (!this.peerReviewInfoRoot) {
+          this.peerReviewInfoRoot = render(
+            React.createElement(PeerReviewInfo, {
+              assignment: assignmentData,
+            }),
+            mountPoint,
+          )
+        } else {
+          rerender(
+            this.peerReviewInfoRoot,
+            React.createElement(PeerReviewInfo, {
+              assignment: assignmentData,
+            }),
+          )
+        }
+      } catch (error) {
+        const errorMessage = I18n.t('Peer review info mount point element not found')
+        captureException(new Error(errorMessage), error)
       }
     }
 
@@ -462,6 +541,10 @@ export default (AssignmentListItemView = (function () {
         : data.isQuizLTIAssignment
           ? 'lti-quiz'
           : 'assignment'
+
+      if (this.model.shouldShowPeerReviewInfo && this.model.shouldShowPeerReviewInfo()) {
+        data.hasPeerReviewInfo = true
+      }
 
       if (data.canManage) {
         data.spanWidth = 'span3'

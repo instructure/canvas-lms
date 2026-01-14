@@ -38,6 +38,7 @@ class PeerReview::DateOverriderService < ApplicationService
     refresh_parent_associations if @reload_associations
     run_validations
     create_or_update_peer_review_overrides
+    update_only_visible_to_overrides
   end
 
   private
@@ -135,5 +136,29 @@ class PeerReview::DateOverriderService < ApplicationService
 
   def destroy_overrides(override_ids)
     @peer_review_sub_assignment.assignment_overrides.where(id: override_ids).destroy_all
+  end
+
+  def update_only_visible_to_overrides
+    updated_only_visible_to_overrides = only_visible_to_overrides?
+
+    if @peer_review_sub_assignment.only_visible_to_overrides != updated_only_visible_to_overrides
+      @peer_review_sub_assignment.update!(only_visible_to_overrides: updated_only_visible_to_overrides)
+    end
+  end
+
+  def only_visible_to_overrides?
+    return false unless no_base_dates?
+
+    override_types = @peer_review_sub_assignment.active_assignment_overrides.distinct.pluck(:set_type).to_set
+    no_course_override = !override_types.include?("Course")
+    has_other_overrides = (override_types - Set["Course"]).any?
+
+    no_course_override && has_other_overrides
+  end
+
+  def no_base_dates?
+    @peer_review_sub_assignment.due_at.nil? &&
+      @peer_review_sub_assignment.unlock_at.nil? &&
+      @peer_review_sub_assignment.lock_at.nil?
   end
 end

@@ -170,4 +170,125 @@ describe "assignments index peer reviews" do
     expect(StudentAssignmentPageV2.comment_container).to include_text("Add a comment to complete your peer review. You will only see comments written by you.")
     expect(StudentAssignmentPageV2.attempt_tab).to include_text("student 2 attempt")
   end
+
+  context "assignment with peer review in teacher view" do
+    before do
+      user_session(@teacher)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    it "displays assignment and peer review dates and points with single override" do
+      due_date = 5.days.from_now
+      unlock_date = 1.day.from_now
+      lock_date = 10.days.from_now
+
+      assignment = assignment_model({
+                                      course: @course,
+                                      peer_reviews: true,
+                                      peer_review_count: 1,
+                                      points_possible: 25,
+                                      due_at: due_date,
+                                      unlock_at: unlock_date,
+                                      lock_at: lock_date,
+                                      submission_types: "online_text_entry"
+                                    })
+
+      peer_review_due = 8.days.from_now
+      peer_review_unlock = 6.days.from_now
+      peer_review_lock = 9.days.from_now
+
+      PeerReview::PeerReviewCreatorService.call(
+        parent_assignment: assignment,
+        points_possible: 15,
+        due_at: peer_review_due,
+        unlock_at: peer_review_unlock,
+        lock_at: peer_review_lock
+      )
+
+      visit_assignments_index_page(@course.id)
+
+      assignment_row = f("#assignment_#{assignment.id}")
+      expect(assignment_row).to include_text("Assignment:")
+      expect(assignment_row).to include_text("Not available until")
+      expect(assignment_row).to include_text("Due")
+      expect(assignment_row).to include_text("25 pts")
+
+      expect(assignment_row).to include_text("Peer Review (1):")
+      expect(assignment_row).to include_text("15 pts")
+    end
+
+    it "displays multiple assignment and peer review dates with multiple overrides" do
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      assignment = assignment_model({
+                                      course: @course,
+                                      peer_reviews: true,
+                                      peer_review_count: 1,
+                                      points_possible: 20,
+                                      due_at: 5.days.from_now,
+                                      unlock_at: 1.day.from_now,
+                                      lock_at: 12.days.from_now,
+                                      submission_types: "online_text_entry"
+                                    })
+
+      AssignmentOverride.create!({
+                                   assignment:,
+                                   set: section1,
+                                   due_at: 6.days.from_now,
+                                   unlock_at: 2.days.from_now,
+                                   lock_at: 13.days.from_now
+                                 })
+
+      AssignmentOverride.create!({
+                                   assignment:,
+                                   set: section2,
+                                   due_at: 7.days.from_now,
+                                   unlock_at: 3.days.from_now,
+                                   lock_at: 14.days.from_now
+                                 })
+
+      peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+        parent_assignment: assignment,
+        points_possible: 10,
+        due_at: 9.days.from_now,
+        unlock_at: 8.days.from_now,
+        lock_at: 11.days.from_now
+      )
+
+      PeerReview::DateOverriderService.call(
+        peer_review_sub_assignment: peer_review_sub,
+        overrides: [
+          {
+            course_section_id: section1.id,
+            due_at: 10.days.from_now,
+            unlock_at: 9.days.from_now,
+            lock_at: 12.days.from_now
+          },
+          {
+            course_section_id: section2.id,
+            due_at: 11.days.from_now,
+            unlock_at: 10.days.from_now,
+            lock_at: 13.days.from_now
+          }
+        ]
+      )
+
+      assignment.reload
+      peer_review_sub.reload
+
+      visit_assignments_index_page(@course.id)
+
+      assignment_row = f("#assignment_#{assignment.id}")
+      expect(assignment_row).to include_text("Assignment:")
+      expect(assignment_row).to include_text("Multiple Dates")
+      expect(assignment_row).to include_text("20 pts")
+
+      expect(assignment_row).to include_text("Peer Review (1):")
+      expect(assignment_row).to include_text("10 pts")
+
+      multiple_dates_links = ffj("a:contains('Multiple Dates')", assignment_row)
+      expect(multiple_dates_links.length).to eq 4
+    end
+  end
 end
