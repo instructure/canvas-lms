@@ -130,6 +130,13 @@ horizon_syncable_objects_redesign:
   display_name: "Canvas Career: Syncable Objects Redesign"
   description: |-
     Enables the redesigned syncable objects interface in Canvas Career.
+horizon_help_navigation:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Help Navigation"
+  description: |-
+    Enables the help navigation menu in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:

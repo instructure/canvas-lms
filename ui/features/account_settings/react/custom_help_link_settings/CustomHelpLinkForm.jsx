@@ -24,15 +24,18 @@ import CustomHelpLinkConstants from './CustomHelpLinkConstants'
 import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('custom_help_link')
+const getHiddenStyle = condition => (condition ? {style: {display: 'none'}} : {})
 
 export default class CustomHelpLinkForm extends React.Component {
   static propTypes = {
+    isCareerAccount: PropTypes.bool,
     link: CustomHelpLinkPropTypes.link.isRequired,
     onSave: PropTypes.func,
     onCancel: PropTypes.func,
   }
 
   static defaultProps = {
+    isCareerAccount: false,
     onSave: () => {},
     onCancel: () => {},
   }
@@ -181,7 +184,11 @@ export default class CustomHelpLinkForm extends React.Component {
               onBlur={e => this.handleChange('text', e.target.value)}
             />
           </label>
-          <label className="ic-Form-control" htmlFor="admin_settings_custom_link_subtext">
+          <label
+            className="ic-Form-control"
+            htmlFor="admin_settings_custom_link_subtext"
+            {...getHiddenStyle(this.props.isCareerAccount)}
+          >
             <span className="ic-Label">{I18n.t('Link description')}</span>
             <textarea
               id="admin_settings_custom_link_subtext"
@@ -209,7 +216,10 @@ export default class CustomHelpLinkForm extends React.Component {
             />
           </label>
           <input type="hidden" name={`${namePrefix}[type]`} value={this.props.link.type} />
-          <fieldset className="ic-Fieldset ic-Fieldset--radio-checkbox">
+          <fieldset
+            className="ic-Fieldset ic-Fieldset--radio-checkbox"
+            {...getHiddenStyle(this.props.isCareerAccount)}
+          >
             <legend className="ic-Legend">{I18n.t('Available to')}</legend>
             <div className="ic-Checkbox-group ic-Checkbox-group--inline">
               {CustomHelpLinkConstants.USER_TYPES.map(type => (
@@ -237,66 +247,68 @@ export default class CustomHelpLinkForm extends React.Component {
               ))}
             </div>
           </fieldset>
-          <>
-            <fieldset className="ic-Fieldset ic-Fieldset--radio-checkbox">
-              <legend className="ic-Legend">
-                {I18n.t('Features')}
-                &nbsp;
-                <Text weight="normal">
-                  {I18n.t('(May have one Featured link and one New link at a time)')}
-                </Text>
-              </legend>
-              <div className="ic-Checkbox-group ic-Checkbox-group--inline">
-                <label
-                  className="ic-Form-control ic-Form-control--checkbox"
-                  htmlFor="admin_settings_custom_link_type_is_featured"
-                >
-                  <input
-                    type="checkbox"
-                    id="admin_settings_custom_link_type_is_featured"
-                    name={`${namePrefix}[is_featured]`}
-                    checked={is_featured}
-                    value={true}
-                    onKeyDown={e => this.handleKeyDown(e, 'is_featured')}
-                    onChange={e => this.handleIsFeaturedChange(e.target.checked)}
-                  />
-                  <span className="ic-Label">{I18n.t('Featured')}</span>
-                </label>
-                <label
-                  className="ic-Form-control ic-Form-control--checkbox"
-                  htmlFor="admin_settings_custom_link_type_is_new"
-                >
-                  <input
-                    type="checkbox"
-                    id="admin_settings_custom_link_type_is_new"
-                    name={`${namePrefix}[is_new]`}
-                    checked={is_new}
-                    value={true}
-                    onKeyDown={e => this.handleKeyDown(e, 'is_new')}
-                    onChange={e => this.handleIsNewChange(e.target.checked)}
-                  />
-                  <span className="ic-Label">{I18n.t('New')}</span>
-                </label>
-              </div>
-            </fieldset>
-            <label
-              className="ic-Form-control"
-              htmlFor="admin_settings_custom_link_feature_headline"
-            >
-              <span className="ic-Label">{I18n.t('Feature headline')}</span>
-              <input
-                id="admin_settings_custom_link_feature_headline"
-                type="text"
-                disabled={!is_featured}
-                name={`${namePrefix}[feature_headline]`}
-                className="ic-Input"
-                value={feature_headline}
-                onKeyDown={e => this.handleKeyDown(e, 'feature_headline')}
-                onChange={e => this.handleChange('feature_headline', e.target.value)}
-                onBlur={e => this.handleChange('feature_headline', e.target.value)}
-              />
-            </label>
-          </>
+          <fieldset
+            className="ic-Fieldset ic-Fieldset--radio-checkbox"
+            {...getHiddenStyle(this.props.isCareerAccount)}
+          >
+            <legend className="ic-Legend">
+              {I18n.t('Features')}
+              &nbsp;
+              <Text weight="normal">
+                {I18n.t('(May have one Featured link and one New link at a time)')}
+              </Text>
+            </legend>
+            <div className="ic-Checkbox-group ic-Checkbox-group--inline">
+              <label
+                className="ic-Form-control ic-Form-control--checkbox"
+                htmlFor="admin_settings_custom_link_type_is_featured"
+              >
+                <input
+                  type="checkbox"
+                  id="admin_settings_custom_link_type_is_featured"
+                  name={`${namePrefix}[is_featured]`}
+                  checked={is_featured}
+                  value={true}
+                  onKeyDown={e => this.handleKeyDown(e, 'is_featured')}
+                  onChange={e => this.handleIsFeaturedChange(e.target.checked)}
+                />
+                <span className="ic-Label">{I18n.t('Featured')}</span>
+              </label>
+              <label
+                className="ic-Form-control ic-Form-control--checkbox"
+                htmlFor="admin_settings_custom_link_type_is_new"
+              >
+                <input
+                  type="checkbox"
+                  id="admin_settings_custom_link_type_is_new"
+                  name={`${namePrefix}[is_new]`}
+                  checked={is_new}
+                  value={true}
+                  onKeyDown={e => this.handleKeyDown(e, 'is_new')}
+                  onChange={e => this.handleIsNewChange(e.target.checked)}
+                />
+                <span className="ic-Label">{I18n.t('New')}</span>
+              </label>
+            </div>
+          </fieldset>
+          <label
+            className="ic-Form-control"
+            htmlFor="admin_settings_custom_link_feature_headline"
+            {...getHiddenStyle(this.props.isCareerAccount)}
+          >
+            <span className="ic-Label">{I18n.t('Feature headline')}</span>
+            <input
+              id="admin_settings_custom_link_feature_headline"
+              type="text"
+              disabled={!is_featured}
+              name={`${namePrefix}[feature_headline]`}
+              className="ic-Input"
+              value={feature_headline}
+              onKeyDown={e => this.handleKeyDown(e, 'feature_headline')}
+              onChange={e => this.handleChange('feature_headline', e.target.value)}
+              onBlur={e => this.handleChange('feature_headline', e.target.value)}
+            />
+          </label>
           <div>
             <button type="submit" className="Button Button--primary" onClick={this.handleSave}>
               {state === 'new' ? I18n.t('Add link') : I18n.t('Update link')}
