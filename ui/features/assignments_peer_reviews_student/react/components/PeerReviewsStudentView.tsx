@@ -39,6 +39,7 @@ import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
 import theme from '@instructure/canvas-theme'
 import {isPeerReviewLocked, isPeerReviewPastLockDate} from '../utils/peerReviewLockUtils'
 import LockedPeerReview from './LockedPeerReview'
+import UnavailablePeerReview from './UnavailablePeerReview'
 import PeerReviewPromptModal from '@canvas/assignments/react/PeerReviewPromptModal'
 import {COMPLETED_PEER_REVIEW_TEXT} from '@canvas/assignments/helpers/PeerReviewHelpers'
 
@@ -120,8 +121,16 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
         const nextIndex = assessmentRequests.indexOf(nextAssignedReview)
         setSelectedAssessmentIndex(nextIndex)
       } else {
-        setPeerReviewModalOpen(true)
-        setHasSeenPeerReviewModal(true)
+        const requiredCount = data?.assignment?.peerReviews?.count || 0
+        const allocatedCount = assessmentRequests.length
+
+        if (allocatedCount >= requiredCount) {
+          setPeerReviewModalOpen(true)
+          setHasSeenPeerReviewModal(true)
+        } else {
+          const availableCount = assessmentRequests.filter(a => a.available).length
+          setSelectedAssessmentIndex(availableCount)
+        }
       }
 
       setShouldNavigateToNext(false)
@@ -134,6 +143,11 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
 
   const handlePeerReviewSubmitted = () => {
     queryClient.invalidateQueries({queryKey: ['peerReviewAssignment', assignmentId]})
+  }
+
+  const isUnavailableReviewSelected = () => {
+    const availableCount = assessmentRequestsForCurrentUser?.filter(a => a.available)?.length || 0
+    return selectedAssessmentIndex >= availableCount
   }
 
   if (isLoading) {
@@ -264,7 +278,10 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
             padding="0"
             data-testid="submission-tab"
           >
-            {assessmentRequestsForCurrentUser &&
+            {isUnavailableReviewSelected() ? (
+              <UnavailablePeerReview />
+            ) : (
+              assessmentRequestsForCurrentUser &&
               assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
                 <AssignmentSubmission
                   submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
@@ -283,7 +300,8 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
                   hasSeenPeerReviewModal={hasSeenPeerReviewModal}
                   isReadOnly={isPastLockDate}
                 />
-              )}
+              )
+            )}
           </Tabs.Panel>
         )}
       </Tabs>
@@ -303,6 +321,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
               assessmentRequests={assessmentRequestsForCurrentUser || []}
               selectedIndex={selectedAssessmentIndex}
               onSelectionChange={setSelectedAssessmentIndex}
+              requiredPeerReviewCount={peerReviews?.count || 0}
             />
           </View>
         )}

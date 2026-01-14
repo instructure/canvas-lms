@@ -69,6 +69,7 @@ describe('PeerReviewSelector', () => {
         assessmentRequests={null as any}
         selectedIndex={0}
         onSelectionChange={mockOnChange}
+        requiredPeerReviewCount={0}
       />,
     )
 
@@ -83,6 +84,7 @@ describe('PeerReviewSelector', () => {
         assessmentRequests={mockAssessmentRequests}
         selectedIndex={1}
         onSelectionChange={mockOnChange}
+        requiredPeerReviewCount={3}
       />,
     )
 
@@ -98,6 +100,7 @@ describe('PeerReviewSelector', () => {
         assessmentRequests={mockAssessmentRequests}
         selectedIndex={0}
         onSelectionChange={mockOnChange}
+        requiredPeerReviewCount={3}
       />,
     )
 
@@ -157,6 +160,7 @@ describe('PeerReviewSelector', () => {
         assessmentRequests={mixedAssessments}
         selectedIndex={0}
         onSelectionChange={mockOnChange}
+        requiredPeerReviewCount={3}
       />,
     )
 
@@ -176,6 +180,7 @@ describe('PeerReviewSelector', () => {
         assessmentRequests={mockAssessmentRequests}
         selectedIndex={0}
         onSelectionChange={mockOnChange}
+        requiredPeerReviewCount={3}
       />,
     )
 
@@ -233,6 +238,7 @@ describe('PeerReviewSelector', () => {
         assessmentRequests={assessmentsWithUnavailableFirst}
         selectedIndex={0}
         onSelectionChange={mockOnChange}
+        requiredPeerReviewCount={2}
       />,
     )
 
@@ -242,5 +248,184 @@ describe('PeerReviewSelector', () => {
     expect(screen.getByText('Peer Review (1 of 2)')).toBeInTheDocument()
     expect(screen.getByText('Peer Review (2 of 2)')).toBeInTheDocument()
     expect(screen.queryByText('Peer Review (1 of 3)')).not.toBeInTheDocument()
+  })
+
+  describe('Unavailable peer reviews', () => {
+    it('shows "Not Yet Available" section when there are fewer available than required', async () => {
+      const mockOnChange = vi.fn()
+      const user = userEvent.setup()
+      const oneAvailableAssessment: AssessmentRequest[] = [
+        {
+          _id: 'ar-1',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+          submission: {
+            _id: 'sub-1',
+            attempt: 1,
+            body: '<p>Test submission 1</p>',
+            submissionType: 'online_text_entry',
+          },
+        },
+      ]
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={oneAvailableAssessment}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={3}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      expect(screen.getByText('Not Yet Available')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (2 of 3)')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (3 of 3)')).toBeInTheDocument()
+    })
+
+    it('shows correct numbering for unavailable reviews', async () => {
+      const mockOnChange = vi.fn()
+      const user = userEvent.setup()
+      const oneAvailableAssessment: AssessmentRequest[] = [
+        {
+          _id: 'ar-1',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+          submission: {
+            _id: 'sub-1',
+            attempt: 1,
+            body: '<p>Test submission 1</p>',
+            submissionType: 'online_text_entry',
+          },
+        },
+      ]
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={oneAvailableAssessment}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={3}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      expect(screen.getByText('Peer Review (1 of 3)')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (2 of 3)')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (3 of 3)')).toBeInTheDocument()
+    })
+
+    it('calls onSelectionChange with correct index when unavailable option is selected', async () => {
+      const mockOnChange = vi.fn()
+      const user = userEvent.setup()
+      const oneAvailableAssessment: AssessmentRequest[] = [
+        {
+          _id: 'ar-1',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+          submission: {
+            _id: 'sub-1',
+            attempt: 1,
+            body: '<p>Test submission 1</p>',
+            submissionType: 'online_text_entry',
+          },
+        },
+      ]
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={oneAvailableAssessment}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={3}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      const unavailableOption = screen.getByText('Peer Review (2 of 3)')
+      await user.click(unavailableOption)
+
+      expect(mockOnChange).toHaveBeenCalledWith(1)
+    })
+
+    it('shows all unavailable when no assessments are allocated', async () => {
+      const mockOnChange = vi.fn()
+      const user = userEvent.setup()
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={[]}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={3}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      expect(screen.getByText('Not Yet Available')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (1 of 3)')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (2 of 3)')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (3 of 3)')).toBeInTheDocument()
+    })
+
+    it('does not show "Not Yet Available" section when all required reviews are available', async () => {
+      const mockOnChange = vi.fn()
+      const user = userEvent.setup()
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={mockAssessmentRequests}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={3}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      expect(screen.queryByText('Not Yet Available')).not.toBeInTheDocument()
+    })
+
+    it('displays unavailable option with correct value when unavailable is selected', () => {
+      const mockOnChange = vi.fn()
+      const oneAvailableAssessment: AssessmentRequest[] = [
+        {
+          _id: 'ar-1',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+          submission: {
+            _id: 'sub-1',
+            attempt: 1,
+            body: '<p>Test submission 1</p>',
+            submissionType: 'online_text_entry',
+          },
+        },
+      ]
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={oneAvailableAssessment}
+          selectedIndex={1}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={3}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      expect(selector).toHaveAttribute('value', 'Peer Review (2 of 3)')
+    })
   })
 })
