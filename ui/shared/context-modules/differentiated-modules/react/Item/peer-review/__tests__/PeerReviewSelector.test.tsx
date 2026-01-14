@@ -47,17 +47,22 @@ describe('PeerReviewSelector', () => {
 
   let mockCheckbox: HTMLInputElement
   const originalENV = window.ENV
+  const originalRequestAnimationFrame = window.requestAnimationFrame
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // Set up ENV
+    // jsdom doesn't execute requestAnimationFrame callbacks
+    window.requestAnimationFrame = (callback: FrameRequestCallback) => {
+      callback(0)
+      return 0
+    }
+
     window.ENV = {
       ...originalENV,
       PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: true,
     }
 
-    // Create and add checkbox to DOM
     mockCheckbox = document.createElement('input')
     mockCheckbox.type = 'checkbox'
     mockCheckbox.id = 'assignment_peer_reviews_checkbox'
@@ -67,6 +72,7 @@ describe('PeerReviewSelector', () => {
 
   afterEach(() => {
     window.ENV = originalENV
+    window.requestAnimationFrame = originalRequestAnimationFrame
     if (mockCheckbox && mockCheckbox.parentNode) {
       document.body.removeChild(mockCheckbox)
     }
@@ -232,7 +238,7 @@ describe('PeerReviewSelector', () => {
 
       await act(async () => {
         mockCheckbox.checked = true
-        window.postMessage({subject: 'ASGMT.togglePeerReviews'}, '*')
+        window.postMessage({subject: 'ASGMT.togglePeerReviews', enabled: true}, '*')
         await new Promise(resolve => setTimeout(resolve, 10))
       })
 
@@ -253,6 +259,47 @@ describe('PeerReviewSelector', () => {
       })
 
       expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
+    })
+
+    it('hides inputs when ASGMT.togglePeerReviews message with enabled: false is received', async () => {
+      renderComponent()
+      expect(screen.getByText('Review Due Date')).toBeInTheDocument()
+
+      await act(async () => {
+        window.postMessage({subject: 'ASGMT.togglePeerReviews', enabled: false}, '*')
+        await new Promise(resolve => setTimeout(resolve, 10))
+      })
+
+      await waitFor(() => {
+        expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
+      })
+    })
+
+    it('shows inputs when ASGMT.togglePeerReviews message with enabled: true is received and checkbox is checked', async () => {
+      mockCheckbox.checked = true
+      const {rerender} = renderComponent()
+
+      await act(async () => {
+        window.postMessage({subject: 'ASGMT.togglePeerReviews', enabled: false}, '*')
+        await new Promise(resolve => setTimeout(resolve, 10))
+      })
+
+      rerender(<PeerReviewSelector {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
+      })
+
+      await act(async () => {
+        window.postMessage({subject: 'ASGMT.togglePeerReviews', enabled: true}, '*')
+        await new Promise(resolve => setTimeout(resolve, 10))
+      })
+
+      rerender(<PeerReviewSelector {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Review Due Date')).toBeInTheDocument()
+      })
     })
   })
 
