@@ -176,6 +176,66 @@ describe DeveloperKeysController, type: :request do
       expect(key_json["lti_registration"]).to eq ims_registration.as_json
     end
 
+    describe "has_overlay field" do
+      def fetch_key_json_for_account(account, developer_key)
+        json = api_call(:get, "/api/v1/accounts/#{account.id}/developer_keys", {
+                          controller: "developer_keys",
+                          action: "index",
+                          format: "json",
+                          account_id: account.id
+                        })
+        json.detect { |r| r["id"] == developer_key.global_id }
+      end
+
+      it "returns false when the developer key has no lti_registration" do
+        account = Account.create!
+        developer_key = DeveloperKey.create!(account:)
+        admin_session
+        key_json = fetch_key_json_for_account(account, developer_key)
+        expect(key_json["has_overlay"]).to be false
+      end
+
+      it "returns false when the lti_registration has no overlays" do
+        account = Account.create!
+        registration = lti_registration_with_tool(account:)
+        developer_key = registration.developer_key
+        admin_session
+        key_json = fetch_key_json_for_account(account, developer_key)
+        expect(key_json["has_overlay"]).to be false
+      end
+
+      it "returns false when the overlay has empty data" do
+        account = Account.create!
+        registration = lti_registration_with_tool(account:)
+        developer_key = registration.developer_key
+        Lti::Overlay.create!(registration:, account:, data: {})
+        admin_session
+        key_json = fetch_key_json_for_account(account, developer_key)
+        expect(key_json["has_overlay"]).to be false
+      end
+
+      it "returns false when the overlay is for a different account" do
+        account = Account.create!
+        other_account = Account.create!
+        registration = lti_registration_with_tool(account:)
+        developer_key = registration.developer_key
+        Lti::Overlay.create!(registration:, account: other_account, data: { title: "Modified Title" })
+        admin_session
+        key_json = fetch_key_json_for_account(account, developer_key)
+        expect(key_json["has_overlay"]).to be false
+      end
+
+      it "returns true when there is an overlay with data for the account" do
+        account = Account.create!
+        registration = lti_registration_with_tool(account:)
+        developer_key = registration.developer_key
+        Lti::Overlay.create!(registration:, account:, data: { title: "Modified Title" })
+        admin_session
+        key_json = fetch_key_json_for_account(account, developer_key)
+        expect(key_json["has_overlay"]).to be true
+      end
+    end
+
     describe "developer key account bindings" do
       specs_require_sharding
 
