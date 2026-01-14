@@ -53,6 +53,10 @@ class WebConference < ActiveRecord::Base
 
   scope :live, -> { where("web_conferences.started_at BETWEEN (NOW() - interval '1 day') AND NOW() AND (web_conferences.ended_at IS NULL OR web_conferences.ended_at > NOW())") }
 
+  scope :concluded, -> { where.not(ended_at: nil) }
+
+  scope :with_participant, ->(user) { where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", user.id).arel.exists) }
+
   serialize :settings
   def settings
     self["settings"] ||= {}

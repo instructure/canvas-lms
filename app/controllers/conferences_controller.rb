@@ -194,7 +194,8 @@ class ConferencesController < ApplicationController
     conferences = if @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
                     @context.web_conferences.active
                   else
-                    @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
+                    active_conferences = @context.web_conferences.active
+                    active_conferences.with_participant(@current_user).or(active_conferences.concluded)
                   end
     conferences = conferences.with_config_for(context: @context).order(created_at: :desc, id: :desc)
     api_request? ? api_index(conferences, polymorphic_url([:api_v1, @context, :conferences])) : web_index(conferences)
@@ -225,15 +226,15 @@ class ConferencesController < ApplicationController
     bookmarker = Plannable::Bookmarker.new(WebConference, true, :created_at, :id)
 
     courses_collection = ShardedBookmarkedCollection.build(bookmarker, @current_user.enrollments) do |enrollments_scope|
-      conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
-                                      .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
+      active_conferences = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
+      conference_scope = active_conferences.with_participant(@current_user).or(active_conferences.concluded)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order(created_at: :desc, id: :desc)
     end
 
     groups_collection = ShardedBookmarkedCollection.build(bookmarker, @current_user.groups) do |groups_scope|
-      conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
-                                      .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
+      active_conferences = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
+      conference_scope = active_conferences.with_participant(@current_user).or(active_conferences.concluded)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order(created_at: :desc, id: :desc)
     end

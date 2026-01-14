@@ -156,6 +156,20 @@ describe ConferencesController do
       expect(@controller.js_env[:sections].include?({ id: @section_deleted.id, name: @section_deleted.display_name })).to be_falsey
     end
 
+    it "shows concluded conferences to students who enrolled after conference was created" do
+      @conference = @course.web_conferences.create!(conference_type: "Wimba", user: @teacher)
+      @conference.add_attendee(@teacher)
+      @conference.close
+      @conference.reload
+
+      new_student = user_with_pseudonym(active_all: true)
+      @course.enroll_student(new_student, enrollment_state: "active")
+
+      user_session(new_student)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:concluded_conferences].map(&:id)).to include(@conference.id)
+    end
+
     context "sets render_alternatives variable" do
       it "sets to false by default" do
         user_session(@teacher)
