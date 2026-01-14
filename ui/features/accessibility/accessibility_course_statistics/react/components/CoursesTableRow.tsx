@@ -24,10 +24,16 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Avatar} from '@instructure/ui-avatar'
 import {Spinner} from '@instructure/ui-spinner'
-import {IconPublishSolid, IconUnpublishedLine, IconCheckSolid} from '@instructure/ui-icons'
+import {
+  IconPublishSolid,
+  IconUnpublishedLine,
+  IconCheckSolid,
+  IconWarningLine,
+} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Course} from '../../types/course'
 import {Badge} from '@instructure/ui-badge'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('accessibility_course_statistics')
 
@@ -158,8 +164,10 @@ const IssuesCell: React.FC<{statistic?: Course['accessibility_course_statistic']
   if (statistic.workflow_state === 'in_progress' || statistic.workflow_state === 'queued') {
     return (
       <Table.Cell>
-        <Spinner renderTitle={I18n.t('Checking...')} size="x-small" margin="0 x-small 0 0" />
-        {I18n.t('Checking...')}
+        <Flex gap="x-small">
+          <Spinner renderTitle={I18n.t('Checking...')} size="x-small" />
+          {I18n.t('Checking...')}
+        </Flex>
       </Table.Cell>
     )
   }
@@ -181,7 +189,14 @@ const IssuesCell: React.FC<{statistic?: Course['accessibility_course_statistic']
   }
 
   if (statistic.workflow_state === 'failed') {
-    return <Table.Cell>{I18n.t('Failed')}</Table.Cell>
+    return (
+      <Table.Cell>
+        <Flex gap="x-small">
+          <IconWarningLine size="x-small" color="error" />
+          {I18n.t('Failed scan')}
+        </Flex>
+      </Table.Cell>
+    )
   }
 
   return <Table.Cell />
