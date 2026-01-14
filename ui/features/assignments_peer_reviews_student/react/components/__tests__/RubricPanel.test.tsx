@@ -444,4 +444,82 @@ describe('RubricPanel', () => {
 
     ENV.current_user_id = originalUserId
   })
+
+  describe('Read-only mode', () => {
+    it('sets isPreviewMode to true when isReadOnly is true', () => {
+      render(<RubricPanel {...createDefaultProps({isReadOnly: true})} />)
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.isPreviewMode).toBe(true)
+    })
+
+    it('sets isPreviewMode to false when isReadOnly is false', () => {
+      render(
+        <RubricPanel
+          {...createDefaultProps({
+            isReadOnly: false,
+            isPeerReviewCompleted: false,
+            rubricAssessmentCompleted: false,
+          })}
+        />,
+      )
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.isPreviewMode).toBe(false)
+    })
+
+    it('sets isPreviewMode to true when isReadOnly is true even if other completed flags are false', () => {
+      render(
+        <RubricPanel
+          {...createDefaultProps({
+            isReadOnly: true,
+            isPeerReviewCompleted: false,
+            rubricAssessmentCompleted: false,
+          })}
+        />,
+      )
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.isPreviewMode).toBe(true)
+    })
+
+    it('defaults isReadOnly to false when not provided', () => {
+      render(
+        <RubricPanel
+          {...createDefaultProps({
+            isPeerReviewCompleted: false,
+            rubricAssessmentCompleted: false,
+          })}
+        />,
+      )
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.isPreviewMode).toBe(false)
+    })
+
+    it('sets isPreviewMode to true when multiple conditions are met (completed + readOnly)', () => {
+      render(
+        <RubricPanel
+          {...createDefaultProps({
+            isReadOnly: true,
+            isPeerReviewCompleted: true,
+            rubricAssessmentCompleted: false,
+          })}
+        />,
+      )
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.isPreviewMode).toBe(true)
+    })
+  })
 })

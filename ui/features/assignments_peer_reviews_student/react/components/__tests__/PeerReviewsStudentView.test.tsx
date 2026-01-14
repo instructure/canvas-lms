@@ -1497,4 +1497,287 @@ describe('PeerReviewsStudentView', () => {
       window.ENV.restrict_quantitative_data = false
     })
   })
+
+  describe('Past lock date', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2020-10-01T12:00:00Z'))
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('renders locked banner above tabs when past lock date', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '24',
+          name: 'Past Lock Date Assignment',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2020-09-10T00:00:00Z',
+            },
+          ],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-09-05T06:00:00Z',
+                dueAt: '2020-09-25T06:00:00Z',
+                lockAt: '2020-09-30T18:00:00Z',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, getByText} = setup({assignmentId: '24'})
+
+      await waitFor(() => {
+        expect(getByTestId('locked-peer-review')).toBeInTheDocument()
+      })
+
+      expect(getByText('Assignment Details')).toBeInTheDocument()
+      expect(getByText('Submission')).toBeInTheDocument()
+    })
+
+    it('does not allocate peer reviews when past lock date', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '25',
+          name: 'Past Lock Date No Allocate',
+          dueAt: '2020-09-15T16:00:00Z',          
+          assessmentRequestsForCurrentUser: [],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-09-05T06:00:00Z',
+                dueAt: null,
+                lockAt: '2020-09-30T18:00:00Z',
+              },
+            },
+          ],
+        },
+      })
+
+      setup({assignmentId: '25'})
+
+      await waitFor(() => {
+        expect(mockMutate).not.toHaveBeenCalled()
+      })
+    })
+
+    it('hides Submission tab when past lock date and no assessment requests', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '26',
+          name: 'Past Lock Date No Assessments',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
+          assessmentRequestsForCurrentUser: [],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-09-05T06:00:00Z',
+                dueAt: null,
+                lockAt: '2020-09-30T18:00:00Z',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText, queryByText} = setup({assignmentId: '26'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+
+      expect(queryByText('Submission')).not.toBeInTheDocument()
+    })
+
+    it('shows Submission tab when past lock date but assessment requests exist', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '27',
+          name: 'Past Lock Date With Assessments',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2020-09-10T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Student submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-09-05T06:00:00Z',
+                dueAt: null,
+                lockAt: '2020-09-30T18:00:00Z',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '27'})
+
+      await waitFor(() => {
+        expect(getByText('Assignment Details')).toBeInTheDocument()
+      })
+
+      expect(getByText('Submission')).toBeInTheDocument()
+    })
+
+    it('shows peer review selector when past lock date and assessment requests exist', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '28',
+          name: 'Past Lock Date Show Selector',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2020-09-10T00:00:00Z',
+            },
+            {
+              _id: 'ar-2',
+              available: true,
+              workflowState: 'completed',
+              createdAt: '2020-09-11T00:00:00Z',
+            },
+          ],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-09-05T06:00:00Z',
+                dueAt: null,
+                lockAt: '2020-09-30T18:00:00Z',
+              },
+            },
+          ],
+        }
+      })
+
+      const {getByTestId} = setup({assignmentId: '28'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+    })
+
+    it('does not show past lock date view when lock date has not passed', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '30',
+          name: 'Before Lock Date',
+          dueAt: '2020-09-15T16:00:00Z',
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2020-09-10T00:00:00Z',
+            },
+          ],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-09-05T06:00:00Z',
+                dueAt: null,
+                lockAt: '2020-10-31T18:00:00Z',
+              },
+            },
+          ],
+        },
+      })
+
+      const {queryByTestId, getByTestId} = setup({assignmentId: '30'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('locked-peer-review')).not.toBeInTheDocument()
+    })
+
+    it('does not show past lock date view when lock date is null', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '31',
+          name: 'No Lock Date',
+          dueAt: '2020-09-15T16:00:00Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2020-09-10T00:00:00Z',
+            },
+          ],
+          assignedToDates: [
+            {
+              dueAt: '2020-09-20T16:00:00Z',
+              peerReviewDates: {
+                unlockAt: '2020-09-05T06:00:00Z',
+                dueAt: null,
+                lockAt: null,
+              },
+            },
+          ],
+        },
+      })
+
+      const {queryByTestId, getByTestId} = setup({assignmentId: '31'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('locked-peer-review')).not.toBeInTheDocument()
+    })
+  })
 })

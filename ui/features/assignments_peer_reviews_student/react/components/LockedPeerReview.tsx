@@ -18,22 +18,37 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import lockExplanation from '@canvas/content-locks/jquery/lock_reason'
 import lockedSVG from '@canvas/assignments/react/images/Locked.svg'
-import {getPeerReviewUnlockDate} from '../utils/peerReviewLockUtils'
+import {getPeerReviewUnlockDate, getPeerReviewLockDate} from '../utils/peerReviewLockUtils'
 import {Assignment} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 
 const I18n = createI18nScope('peer_reviews_student')
 
 interface LockedPeerReviewProps {
   assignment: Assignment
+  isPastLockDate?: boolean
 }
 
-export default function LockedPeerReview({assignment}: LockedPeerReviewProps) {
+export default function LockedPeerReview({
+  assignment,
+  isPastLockDate = false,
+}: LockedPeerReviewProps) {
   const unlockDate = getPeerReviewUnlockDate(assignment)
+  const lockDate = getPeerReviewLockDate(assignment)
+
+  const getMessage = () => {
+    if (isPastLockDate && lockDate) {
+      return String(lockExplanation({lock_at: lockDate}, 'peer-review-sub-assignment'))
+    }
+    if (unlockDate) {
+      return String(lockExplanation({unlock_at: unlockDate}, 'assignment'))
+    }
+    return I18n.t('Assignment is unavailable.')
+  }
 
   return (
     <Flex
@@ -44,16 +59,12 @@ export default function LockedPeerReview({assignment}: LockedPeerReviewProps) {
       data-testid="locked-peer-review"
     >
       <Flex.Item>
-        <Img alt={I18n.t('Assignment locked until future date')} src={lockedSVG} />
+        <Img alt={I18n.t('Assignment locked until future date')} src={lockedSVG} width="380px" />
       </Flex.Item>
       <Flex.Item>
         <Flex margin="small" direction="column" alignItems="center">
-          <Flex.Item>
-            <Heading margin="small">
-              {unlockDate
-                ? String(lockExplanation({unlock_at: unlockDate}, 'assignment'))
-                : I18n.t('Assignment is unavailable.')}
-            </Heading>
+          <Flex.Item margin="small">
+            <Text size="medium">{getMessage()}</Text>
           </Flex.Item>
         </Flex>
       </Flex.Item>

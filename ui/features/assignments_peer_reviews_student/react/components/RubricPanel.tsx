@@ -41,6 +41,7 @@ interface RubricPanelProps {
   onClose: () => void
   onSubmit: (assessment: RubricAssessmentData[]) => void
   onViewModeChange: (mode: ViewMode) => void
+  isReadOnly?: boolean
 }
 
 export const RubricPanel: React.FC<RubricPanelProps> = ({
@@ -52,6 +53,7 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
   onClose,
   onSubmit,
   onViewModeChange,
+  isReadOnly = false,
 }) => {
   if (!assignment.rubric) {
     return null
@@ -106,7 +108,7 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
             }))}
             currentUserId={ENV.current_user_id?.toString() ?? ''}
             hidePoints={assignment.rubricAssociation?.hide_points ?? false}
-            isPreviewMode={isPeerReviewCompleted || rubricAssessmentCompleted}
+            isPreviewMode={isPeerReviewCompleted || rubricAssessmentCompleted || isReadOnly}
             isPeerReview={true}
             isFreeFormCriterionComments={assignment.rubric.free_form_criterion_comments ?? false}
             ratingOrder={assignment.rubric.ratingOrder ?? 'descending'}

@@ -722,4 +722,229 @@ describe "peer review student landing page" do
       expect(selector.attribute("value")).to eq("Peer Review (2 of 2)")
     end
   end
+
+  context "peer review lock date" do
+    before(:once) do
+      @lock_date_assignment = assignment_model({
+                                                 course: @course,
+                                                 peer_reviews: true,
+                                                 automatic_peer_reviews: false,
+                                                 peer_review_count: 2,
+                                                 points_possible: 10,
+                                                 submission_types: "online_text_entry",
+                                                 peer_review_submission_required: false
+                                               })
+      @lock_date_assignment.submit_homework(@student1, body: "student 1 attempt", submission_type: "online_text_entry")
+      @lock_date_assignment.submit_homework(@student2, body: "student 2 attempt", submission_type: "online_text_entry")
+      @lock_date_assignment.submit_homework(@student3, body: "student 3 attempt", submission_type: "online_text_entry")
+    end
+
+    def create_peer_review_override_for_student(assignment, student, unlock_at: nil, lock_at: nil)
+      peer_review_sub = assignment.peer_review_sub_assignment || peer_review_model(parent_assignment: assignment)
+
+      parent_override = AssignmentOverride.create!({
+                                                     assignment:,
+                                                     set_type: "ADHOC"
+                                                   })
+      parent_override.assignment_override_students.create!(user: student)
+
+      child_override = AssignmentOverride.create!({
+                                                    assignment: peer_review_sub,
+                                                    set_type: "ADHOC",
+                                                    parent_override_id: parent_override.id
+                                                  })
+      child_override.override_unlock_at(unlock_at) if unlock_at
+      child_override.override_lock_at(lock_at) if lock_at
+      child_override.save!
+
+      parent_override
+    end
+
+    it "shows locked banner when past lock date", custom_timeout: 30 do
+      @lock_date_assignment.assign_peer_review(@student1, @student2)
+      create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+      visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+      expect(f("[data-testid='locked-peer-review']")).to be_displayed
+      expect(f("body")).to include_text("This assignment is no longer available")
+    end
+
+    it "does not allocate peer reviews when past lock date", custom_timeout: 30 do
+      create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+      submission = @lock_date_assignment.submissions.find_by(user: @student1)
+      initial_count = AssessmentRequest.where(assessor_asset: submission).count
+      expect(initial_count).to eq(0)
+
+      visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+      final_count = AssessmentRequest.where(assessor_asset: submission).count
+      expect(final_count).to eq(0)
+    end
+
+    it "hides Submission tab when past lock date with no assessment requests", custom_timeout: 30 do
+      create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+      visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+      expect(f("div[id='tab-assignment-details']")).to be_displayed
+      expect(f("body")).not_to contain_css("div[id='tab-submission']")
+    end
+
+    it "shows Submission tab when past lock date with assigned assessment requests", custom_timeout: 30 do
+      @lock_date_assignment.assign_peer_review(@student1, @student2)
+      create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+      visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+      expect(f("div[id='tab-assignment-details']")).to be_displayed
+      expect(f("div[id='tab-submission']")).to be_displayed
+    end
+
+    it "hides submit peer review button when past lock date", custom_timeout: 30 do
+      @lock_date_assignment.assign_peer_review(@student1, @student2)
+      create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+      visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      expect(f("div[id='submission']")).not_to contain_css("button[data-testid='submit-peer-review-button']")
+    end
+
+    it "displays comments in read-only mode when past lock date", custom_timeout: 30 do
+      @lock_date_assignment.assign_peer_review(@student1, @student2)
+
+      submission = @lock_date_assignment.submissions.find_by(user: @student2)
+      submission.add_comment({
+                               author: @student1,
+                               comment: "This was submitted before lock date"
+                             })
+
+      create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+      visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("This was submitted before lock date")
+      expect(f("body")).not_to contain_css("textarea[data-testid='comment-text-input']")
+    end
+
+    context "with rubric" do
+      before(:once) do
+        @lock_rubric = @course.rubrics.create!(
+          title: "Lock Date Rubric",
+          user: @teacher,
+          context: @course,
+          data: [
+            {
+              points: 4,
+              description: "Quality",
+              id: "lock_criterion_1",
+              ratings: [
+                { description: "Excellent", points: 4, id: "lock_rating_1" },
+                { description: "Good", points: 2, id: "lock_rating_2" }
+              ]
+            }
+          ],
+          points_possible: 4
+        )
+        @lock_rubric.associate_with(@lock_date_assignment, @course, purpose: "grading")
+      end
+
+      it "displays rubric in read-only mode when past lock date", custom_timeout: 30 do
+        @lock_date_assignment.assign_peer_review(@student1, @student2)
+
+        submission = @lock_date_assignment.submissions.find_by(user: @student2)
+        RubricAssessment.create!({
+                                   artifact: submission,
+                                   assessment_type: "peer_review",
+                                   assessor: @student1,
+                                   rubric: @lock_rubric,
+                                   user: @student2,
+                                   score: 4.0,
+                                   data: [
+                                     {
+                                       points: 4,
+                                       criterion_id: "lock_criterion_1",
+                                       comments: "Great work"
+                                     }
+                                   ],
+                                   rubric_association: @lock_rubric.rubric_associations.first
+                                 })
+
+        create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+        visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+        submission_tab = f("div[id='tab-submission']")
+        submission_tab.click
+        wait_for_ajaximations
+
+        toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
+        toggle_rubric_button.click
+        wait_for_ajaximations
+
+        expect(f("[data-testid='enhanced-rubric-assessment-container']")).to be_displayed
+        expect(f("body")).not_to contain_css("[data-testid='save-rubric-assessment-button']")
+      end
+
+      it "cannot submit new rubric assessment when past lock date", custom_timeout: 30 do
+        @lock_date_assignment.assign_peer_review(@student1, @student2)
+        create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+        visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+        submission_tab = f("div[id='tab-submission']")
+        submission_tab.click
+        wait_for_ajaximations
+
+        toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
+        toggle_rubric_button.click
+        wait_for_ajaximations
+
+        expect(f("[data-testid='enhanced-rubric-assessment-container']")).to be_displayed
+        expect(f("body")).not_to contain_css("button[data-testid='rubric-rating-button-3']")
+      end
+    end
+
+    it "shows peer review selector when past lock date with assigned reviews", custom_timeout: 30 do
+      @lock_date_assignment.assign_peer_review(@student1, @student2)
+      @lock_date_assignment.assign_peer_review(@student1, @student3)
+      create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+      visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+      expect(f("input[data-testid='peer-review-selector']")).to be_displayed
+      selector = f("input[data-testid='peer-review-selector']")
+      options = INSTUI_Select_options(selector)
+      expect(options.length).to eq(2)
+    end
+
+    it "allows viewing but not submitting when past lock date", custom_timeout: 30 do
+      @lock_date_assignment.assign_peer_review(@student1, @student2)
+      create_peer_review_override_for_student(@lock_date_assignment, @student1, unlock_at: 1.week.ago, lock_at: 1.day.ago)
+
+      visit_peer_reviews_page(@course.id, @lock_date_assignment.id)
+
+      expect(f("[data-testid='locked-peer-review']")).to be_displayed
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      expect(f("[data-testid='text-entry-content']")).to be_displayed
+      expect(f("div[id='submission']")).not_to contain_css("button[data-testid='submit-peer-review-button']")
+    end
+  end
 end

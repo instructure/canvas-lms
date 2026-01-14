@@ -38,6 +38,7 @@ interface CommentsPanelProps {
   isOpen: boolean
   onClose: () => void
   onSuccessfulPeerReview: () => void
+  isReadOnly?: boolean
 }
 
 export const CommentsPanel: React.FC<CommentsPanelProps> = ({
@@ -48,6 +49,7 @@ export const CommentsPanel: React.FC<CommentsPanelProps> = ({
   isOpen,
   onClose,
   onSuccessfulPeerReview,
+  isReadOnly = false,
 }) => {
   return (
     <Flex.Item
@@ -87,6 +89,7 @@ export const CommentsPanel: React.FC<CommentsPanelProps> = ({
             open={isOpen}
             onSuccessfulPeerReview={onSuccessfulPeerReview}
             usePeerReviewModal={false}
+            isReadOnly={isReadOnly}
           />
         </Flex.Item>
       </Flex>
