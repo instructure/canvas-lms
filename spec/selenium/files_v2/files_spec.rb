@@ -167,21 +167,15 @@ describe "files index page", :ignore_js_errors do
           edit_name_from_kebab_menu(1, file_rename_to)
           expect(file_rename_to).to be_present
           expect(content).not_to contain_link(a_txt_file_name)
-          # Wait for React table re-render to complete before checking focus
-          keep_trying_until do
-            active_element = driver.execute_script("return document.activeElement")
-            active_element.attribute("data-testid") == "action-menu-button-large"
-          end
+          action_button = get_item_files_table(1, 7).find_element(:css, "button")
+          check_element_has_focus(action_button)
         end
 
         it "deletes file", priority: "1" do
           delete_file_from(1, :kebab_menu)
           expect(content).not_to contain_link(a_txt_file_name)
-          # Wait for React table re-render to complete before checking focus
-          keep_trying_until do
-            active_element = driver.execute_script("return document.activeElement")
-            active_element.attribute("data-testid") == "action-menu-button-large"
-          end
+          action_button = get_item_files_table(1, 7).find_element(:css, "button")
+          check_element_has_focus(action_button)
         end
       end
 
@@ -217,9 +211,9 @@ describe "files index page", :ignore_js_errors do
         it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
           published_status_button.click
           wait_for_ajaximations
-          expect(permissions_dialog_close_button).to be_displayed
-          active_element = driver.execute_script("return document.activeElement")
-          expect(active_element.text).to eq("Close")
+          element = driver.switch_to.active_element
+          should_focus = permissions_dialog_close_button
+          expect(element).to eq(should_focus)
         end
       end
 
@@ -267,11 +261,7 @@ describe "files index page", :ignore_js_errors do
         it "deletes file from toolbar", priority: "1" do
           delete_file_from(1, :toolbar_menu)
           expect(content).not_to contain_link(a_txt_file_name)
-          # Wait for React table re-render to complete before checking focus
-          keep_trying_until do
-            active_element = driver.execute_script("return document.activeElement")
-            active_element.attribute("data-testid") == "select-all-checkbox"
-          end
+          check_element_has_focus(select_all_checkbox)
         end
 
         it "deletes multiple files from toolbar", priority: "1" do
@@ -508,9 +498,9 @@ describe "files index page", :ignore_js_errors do
             get "/courses/#{@course.id}/files"
             file_usage_rights_cloud_icon.click
             wait_for_ajaximations
-            expect(permissions_dialog_close_button).to be_displayed
-            active_element = driver.execute_script("return document.activeElement")
-            expect(active_element.text).to eq("Close")
+            element = driver.switch_to.active_element
+            should_focus = permissions_dialog_close_button
+            expect(element).to eq(should_focus)
           end
         end
 

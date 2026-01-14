@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import '@canvas/media-comments'
 import ready from '@instructure/ready'
-import {render} from '@canvas/react'
+import {createRoot} from 'react-dom/client'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player/react/CanvasStudioPlayer'
 
 type MediaPlayerAttributes = {
@@ -50,7 +50,8 @@ ready(() => {
     $(`#${domId}`).css({
       color: 'unset',
     })
-    render(
+    const root = createRoot(document.getElementById(domId)!)
+    root.render(
       <CanvasStudioPlayer
         media_id={data.media_entry_id}
         type={data.type === 'audio' ? 'audio' : 'video'}
@@ -58,7 +59,6 @@ ready(() => {
         explicitSize={{width: 550, height: 400}}
         hideUploadCaptions={data.bp_locked_attachment}
       />,
-      document.getElementById(domId),
     )
   }
 
