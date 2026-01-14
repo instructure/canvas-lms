@@ -2418,6 +2418,285 @@ describe OutcomeResultsController do
         expect(stored_rollups.first).to respond_to(:scores)
         expect(stored_rollups.first.scores).to be_an(Array)
       end
+
+      it "returns alignments when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        # Create an assignment aligned to the outcome
+        assignment = outcome_assignment
+
+        # Create a result for the alignment
+        create_result(@student1.id, @outcome, assignment, 3)
+
+        # Create stored rollup
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 3.0,
+          last_calculated_at: Time.zone.now
+        )
+
+        get "rollups",
+            params: { course_id: @course.id,
+                      include: ["alignments"] },
+            format: "json"
+
+        expect(response).to be_successful
+        json = parse_response(response)
+        expect(json["linked"]).to have_key("alignments")
+        alignments = json["linked"]["alignments"]
+        expect(alignments).to be_an(Array)
+        expect(alignments.length).to be > 0
+        expect(alignments.pluck("name")).to include(assignment.name)
+      end
+
+      it "returns both Canvas and outcomes service alignments when feature flag is disabled" do
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+
+        # Create a Canvas assignment with result
+        canvas_assignment = outcome_assignment
+        create_result(@student1.id, @outcome, canvas_assignment, 3)
+
+        # Create a New Quiz assignment for outcomes service results
+        new_quiz_assignment = @course.assignments.create!(
+          title: "New Quiz Assignment",
+          submission_types: "external_tool"
+        )
+        @outcome.align(new_quiz_assignment, @course)
+        find_or_create_outcome_submission({ student: @student1, assignment: new_quiz_assignment })
+
+        # Mock outcomes service results for the new quiz
+        os_result = mock_os_lor_results(@student1, @outcome, new_quiz_assignment, 4)
+
+        # Stub fetch_and_convert_os_results to return the mocked OS results
+        expect(controller).to receive(:fetch_and_convert_os_results).with(all_users: false).and_return([os_result])
+
+        get "rollups",
+            params: { course_id: @course.id,
+                      include: ["alignments"] },
+            format: "json"
+
+        expect(response).to be_successful
+        json = parse_response(response)
+        expect(json["linked"]).to have_key("alignments")
+        alignments = json["linked"]["alignments"]
+        expect(alignments).to be_an(Array)
+        expect(alignments.length).to eq(2)
+        expect(alignments.pluck("name")).to include(canvas_assignment.name)
+        expect(alignments.pluck("name")).to include(new_quiz_assignment.name)
+      end
+
+      it "returns both Canvas and outcomes service alignments when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        # Create a Canvas assignment with result
+        canvas_assignment = outcome_assignment
+        create_result(@student1.id, @outcome, canvas_assignment, 3)
+
+        # Create a New Quiz assignment for outcomes service results
+        new_quiz_assignment = @course.assignments.create!(
+          title: "New Quiz Assignment",
+          submission_types: "external_tool"
+        )
+        @outcome.align(new_quiz_assignment, @course)
+        find_or_create_outcome_submission({ student: @student1, assignment: new_quiz_assignment })
+
+        # Mock outcomes service results for the new quiz
+        os_result = mock_os_lor_results(@student1, @outcome, new_quiz_assignment, 4)
+
+        # Stub fetch_and_convert_os_results to return the mocked OS results
+        expect(controller).to receive(:fetch_and_convert_os_results).with(all_users: false).and_return([os_result])
+
+        # Create stored rollup
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 4.0,
+          last_calculated_at: Time.zone.now
+        )
+
+        get "rollups",
+            params: { course_id: @course.id,
+                      include: ["alignments"] },
+            format: "json"
+
+        expect(response).to be_successful
+        json = parse_response(response)
+        expect(json["linked"]).to have_key("alignments")
+        alignments = json["linked"]["alignments"]
+        expect(alignments).to be_an(Array)
+        expect(alignments.length).to eq(2)
+        expect(alignments.pluck("name")).to include(canvas_assignment.name)
+        expect(alignments.pluck("name")).to include(new_quiz_assignment.name)
+      end
+
+      it "filters outcomes without results when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        # Create two outcomes
+        outcome1 = outcome_model(context: @course, title: "Outcome with results")
+        outcome2 = outcome_model(context: @course, title: "Outcome without results")
+
+        # Create assignment and results for outcome1 only
+        assignment = outcome_assignment
+        create_result(@student1.id, outcome1, assignment, 3)
+
+        # Create stored rollup for outcome1 only (outcome2 has no results)
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: outcome1,
+          calculation_method: "highest",
+          aggregate_score: 3.0,
+          last_calculated_at: Time.zone.now
+        )
+
+        get "rollups",
+            params: {
+              course_id: @course.id,
+              outcome_ids: [outcome1.id, outcome2.id],
+              exclude: ["missing_outcome_results"],
+              include: ["outcomes"]
+            },
+            format: "json"
+
+        expect(response).to be_successful
+        json = parse_response(response)
+        outcome_ids = json["linked"]["outcomes"].pluck("id")
+
+        # Should include outcome1 (has results) but not outcome2 (no results)
+        expect(outcome_ids).to include(outcome1.id)
+        expect(outcome_ids).not_to include(outcome2.id)
+        expect(json["linked"]["outcomes"].length).to eq(1)
+      end
+
+      it "includes all outcomes when filter is not applied and feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        # Create two outcomes
+        outcome1 = outcome_model(context: @course, title: "Outcome with results")
+        outcome2 = outcome_model(context: @course, title: "Outcome without results")
+
+        # Create assignment and results for outcome1 only
+        assignment = outcome_assignment
+        create_result(@student1.id, outcome1, assignment, 3)
+
+        # Create stored rollup for outcome1 only
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: outcome1,
+          calculation_method: "highest",
+          aggregate_score: 3.0,
+          last_calculated_at: Time.zone.now
+        )
+
+        # Don't pass the exclude parameter
+        get "rollups",
+            params: {
+              course_id: @course.id,
+              outcome_ids: [outcome1.id, outcome2.id],
+              include: ["outcomes"]
+            },
+            format: "json"
+
+        expect(response).to be_successful
+        json = parse_response(response)
+        outcome_ids = json["linked"]["outcomes"].pluck("id")
+
+        # Should include both outcomes when filter is not applied
+        expect(outcome_ids).to include(outcome1.id)
+        expect(outcome_ids).to include(outcome2.id)
+        expect(json["linked"]["outcomes"].length).to eq(2)
+      end
+
+      it "filters students without results when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        # student1 has results, student2 does not
+        assignment = outcome_assignment
+        create_result(@student1.id, @outcome, assignment, 3)
+
+        # Create stored rollup for student1 only
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 3.0,
+          last_calculated_at: Time.zone.now
+        )
+
+        get "rollups",
+            params: {
+              course_id: @course.id,
+              user_ids: [@student1.id, @student2.id],
+              exclude: ["missing_user_rollups"],
+              include: ["users"]
+            },
+            format: "json"
+
+        expect(response).to be_successful
+        json = parse_response(response)
+
+        # Check rollups array
+        user_ids_in_rollups = json["rollups"].pluck("links").pluck("user").map(&:to_i)
+        expect(user_ids_in_rollups).to include(@student1.id)
+        expect(user_ids_in_rollups).not_to include(@student2.id)
+        expect(json["rollups"].length).to eq(1)
+
+        # Check linked.users array - should match rollups
+        user_ids_in_linked = json["linked"]["users"].pluck("id").map(&:to_i)
+        expect(user_ids_in_linked).to include(@student1.id)
+        expect(user_ids_in_linked).not_to include(@student2.id)
+        expect(json["linked"]["users"].length).to eq(1)
+      end
+
+      it "includes all students when filter is not applied and feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+
+        # student1 has results, student2 does not
+        assignment = outcome_assignment
+        create_result(@student1.id, @outcome, assignment, 3)
+
+        # Create stored rollup for student1 only
+        OutcomeRollup.create!(
+          course: @course,
+          user: @student1,
+          outcome: @outcome,
+          calculation_method: "highest",
+          aggregate_score: 3.0,
+          last_calculated_at: Time.zone.now
+        )
+
+        # Don't pass the exclude parameter
+        get "rollups",
+            params: {
+              course_id: @course.id,
+              user_ids: [@student1.id, @student2.id],
+              include: ["users"]
+            },
+            format: "json"
+
+        expect(response).to be_successful
+        json = parse_response(response)
+
+        # Check rollups array - should include both students
+        user_ids_in_rollups = json["rollups"].pluck("links").pluck("user").map(&:to_i)
+        expect(user_ids_in_rollups).to include(@student1.id)
+        expect(user_ids_in_rollups).to include(@student2.id)
+        expect(json["rollups"].length).to eq(2)
+
+        # Check linked.users array - should also include both
+        user_ids_in_linked = json["linked"]["users"].pluck("id").map(&:to_i)
+        expect(user_ids_in_linked).to include(@student1.id)
+        expect(user_ids_in_linked).to include(@student2.id)
+        expect(json["linked"]["users"].length).to eq(2)
+      end
     end
 
     context "StatsD metrics" do
