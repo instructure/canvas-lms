@@ -55,6 +55,7 @@ interface AssignmentSubmissionProps {
   handleNextPeerReview: () => void
   onPeerReviewSubmitted: () => void
   hasSeenPeerReviewModal: boolean
+  isReadOnly?: boolean
 }
 
 const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
@@ -67,6 +68,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   onPeerReviewSubmitted,
   isMobile = false,
   hasSeenPeerReviewModal,
+  isReadOnly = false,
 }) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
   const [showComments, setShowComments] = useState(false)
@@ -257,6 +259,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             onClose={() => setShowRubric(false)}
             onSubmit={handleRubricSubmit}
             onViewModeChange={setRubricViewMode}
+            isReadOnly={isReadOnly}
           />
         )}
         {showComments && (
@@ -271,6 +274,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
               setPeerReviewCommentCompleted(true)
               onPeerReviewSubmitted()
             }}
+            isReadOnly={isReadOnly}
           />
         )}
       </Flex>
@@ -322,7 +326,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            {!initialIsPeerReviewCompleted && !hasSeenPeerReviewModal && (
+            {!isReadOnly && !initialIsPeerReviewCompleted && !hasSeenPeerReviewModal && (
               <Flex.Item>
                 <Button
                   color="primary"

@@ -37,7 +37,7 @@ import {PeerReviewSelector} from './PeerReviewSelector'
 import AssignmentSubmission from './AssignmentSubmission'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
 import theme from '@instructure/canvas-theme'
-import {isPeerReviewLocked} from '../utils/peerReviewLockUtils'
+import {isPeerReviewLocked, isPeerReviewPastLockDate} from '../utils/peerReviewLockUtils'
 import LockedPeerReview from './LockedPeerReview'
 import PeerReviewPromptModal from '@canvas/assignments/react/PeerReviewPromptModal'
 import {COMPLETED_PEER_REVIEW_TEXT} from '@canvas/assignments/helpers/PeerReviewHelpers'
@@ -78,9 +78,10 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     if (data?.assignment && !hasCalledAllocate) {
       const assignment = data.assignment
       const isLocked = isPeerReviewLocked(assignment)
+      const isPastLockDate = isPeerReviewPastLockDate(assignment)
 
-      // Don't allocate if the peer review is locked
-      if (isLocked) {
+      // Don't allocate if the peer review is locked or past the lock date
+      if (isLocked || isPastLockDate) {
         return
       }
 
@@ -169,6 +170,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     submissionsConnection.nodes[0]?.submittedAt
   const showSubmissionRequiredView = submissionRequired && !hasSubmitted
   const isLocked = isPeerReviewLocked(data.assignment)
+  const isPastLockDate = isPeerReviewPastLockDate(data.assignment)
   const peerReviewDueAt = assignedToDates?.[0]?.peerReviewDates?.dueAt
 
   const renderHeader = () => {
@@ -233,6 +235,11 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
       return <LockedPeerReview assignment={data.assignment} />
     }
 
+    const hasAssessmentRequests =
+      assessmentRequestsForCurrentUser && assessmentRequestsForCurrentUser.length > 0
+    // Only hide Submission tab if past lock date AND no peer reviews were assigned (since no more allocations will happen)
+    const showSubmissionTab = !isPastLockDate || hasAssessmentRequests
+
     return (
       <Tabs
         margin="x-small 0"
@@ -249,33 +256,36 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
             <AssignmentDescription description={description ?? undefined} />
           </View>
         </Tabs.Panel>
-        <Tabs.Panel
-          id="submission"
-          renderTitle={isMobile ? I18n.t('Peer Review') : I18n.t('Submission')}
-          isSelected={selectedTab === 'submission'}
-          padding="0"
-          data-testid="submission-tab"
-        >
-          {assessmentRequestsForCurrentUser &&
-            assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
-              <AssignmentSubmission
-                submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
-                isPeerReviewCompleted={
-                  assessmentRequestsForCurrentUser[selectedAssessmentIndex].workflowState ===
-                  'completed'
-                }
-                rubricAssessment={
-                  assessmentRequestsForCurrentUser[selectedAssessmentIndex].rubricAssessment
-                }
-                assignment={data.assignment}
-                reviewerSubmission={reviewerSubmission}
-                isMobile={isMobile}
-                handleNextPeerReview={handleNextPeerReview}
-                onPeerReviewSubmitted={handlePeerReviewSubmitted}
-                hasSeenPeerReviewModal={hasSeenPeerReviewModal}
-              />
-            )}
-        </Tabs.Panel>
+        {showSubmissionTab && (
+          <Tabs.Panel
+            id="submission"
+            renderTitle={isMobile ? I18n.t('Peer Review') : I18n.t('Submission')}
+            isSelected={selectedTab === 'submission'}
+            padding="0"
+            data-testid="submission-tab"
+          >
+            {assessmentRequestsForCurrentUser &&
+              assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
+                <AssignmentSubmission
+                  submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
+                  isPeerReviewCompleted={
+                    assessmentRequestsForCurrentUser[selectedAssessmentIndex].workflowState ===
+                    'completed'
+                  }
+                  rubricAssessment={
+                    assessmentRequestsForCurrentUser[selectedAssessmentIndex].rubricAssessment
+                  }
+                  assignment={data.assignment}
+                  reviewerSubmission={reviewerSubmission}
+                  isMobile={isMobile}
+                  handleNextPeerReview={handleNextPeerReview}
+                  onPeerReviewSubmitted={handlePeerReviewSubmitted}
+                  hasSeenPeerReviewModal={hasSeenPeerReviewModal}
+                  isReadOnly={isPastLockDate}
+                />
+              )}
+          </Tabs.Panel>
+        )}
       </Tabs>
     )
   }
@@ -285,6 +295,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
       <View as="div">
         {renderHeader()}
         <Divider />
+        {isPastLockDate && <LockedPeerReview assignment={data.assignment} isPastLockDate={true} />}
         {data.assignment && !showSubmissionRequiredView && !isLocked && (
           <View as="div">
             <PeerReviewSelector

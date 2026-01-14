@@ -277,4 +277,33 @@ describe('CommentsPanel', () => {
     expect(props.submission.anonymousId).toBe('anon-123')
     expect(props.submission.user).toBeNull()
   })
+
+  describe('Read-only mode', () => {
+    it('passes isReadOnly as true to CommentsTrayContentWithApollo when isReadOnly is true', () => {
+      render(<CommentsPanel {...createDefaultProps({isReadOnly: true})} />)
+
+      const commentsTray = screen.getByTestId('mocked-comments-tray')
+      const props = JSON.parse(commentsTray.getAttribute('data-props') || '{}')
+
+      expect(props.isReadOnly).toBe(true)
+    })
+
+    it('passes isReadOnly as false to CommentsTrayContentWithApollo when isReadOnly is false', () => {
+      render(<CommentsPanel {...createDefaultProps({isReadOnly: false})} />)
+
+      const commentsTray = screen.getByTestId('mocked-comments-tray')
+      const props = JSON.parse(commentsTray.getAttribute('data-props') || '{}')
+
+      expect(props.isReadOnly).toBe(false)
+    })
+
+    it('defaults isReadOnly to false when not provided', () => {
+      render(<CommentsPanel {...createDefaultProps()} />)
+
+      const commentsTray = screen.getByTestId('mocked-comments-tray')
+      const props = JSON.parse(commentsTray.getAttribute('data-props') || '{}')
+
+      expect(props.isReadOnly).toBe(false)
+    })
+  })
 })
