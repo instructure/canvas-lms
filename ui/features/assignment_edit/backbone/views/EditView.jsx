@@ -1062,7 +1062,33 @@ EditView.prototype.handleRestrictFileUploadsChange = function () {
 }
 
 EditView.prototype.handleGradingTypeChange = function (gradingType) {
-  this.$gradedAssignmentFields.toggleAccessibly(gradingType !== 'not_graded')
+  const isNotGraded = gradingType === 'not_graded'
+  this.$gradedAssignmentFields.toggleAccessibly(!isNotGraded)
+
+  this.$peerReviewsFields.toggleAccessibly(!isNotGraded)
+  if (isNotGraded) {
+    if (this.$peerReviewsBox.prop('checked')) {
+      this.$peerReviewsBox.prop('checked', false)
+    }
+    window.top.postMessage(
+      {
+        subject: 'ASGMT.togglePeerReviews',
+        enabled: false,
+      },
+      '*',
+    )
+    $('#peer_reviews_details')?.toggleAccessibly(false)
+  } else if (!this.assignment.moderatedGrading()) {
+    window.top.postMessage(
+      {
+        subject: 'ASGMT.togglePeerReviews',
+        enabled: true,
+      },
+      '*',
+    )
+  }
+
+  this.renderModeratedGradingFormFieldGroup()
   return this.handleSubmissionTypeChange(null)
 }
 
@@ -1124,7 +1150,11 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
     this.selectedTool = undefined
   }
   this.$groupCategorySelector.toggleAccessibly(subVal !== 'external_tool' && !isPlacementTool)
-  this.$peerReviewsFields.toggleAccessibly(subVal !== 'external_tool' && !isPlacementTool)
+  const gradingType = $('#assignment_grading_type').val()
+  const isNotGraded = gradingType === 'not_graded'
+  this.$peerReviewsFields.toggleAccessibly(
+    subVal !== 'external_tool' && !isPlacementTool && !isNotGraded,
+  )
   this.$defaultExternalToolContainer.toggleAccessibly(subVal === 'default_external_tool')
   this.$allowedAttemptsContainer.toggleAccessibly(
     subVal === 'online' || subVal === 'external_tool' || isPlacementTool,
@@ -2451,12 +2481,11 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
   }
   let isPeerReviewEnabled
   if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
-    const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-    if (peerReviewCheckbox) {
-      isPeerReviewEnabled = peerReviewCheckbox.checked
+    const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
+    if (peerReviewHidden) {
+      isPeerReviewEnabled = peerReviewHidden.value === 'true'
     } else {
-      // The checkbox has not initialized yet, so we use the value on the assignment
-      isPeerReviewEnabled = this.assignment.peerReviews()
+      isPeerReviewEnabled = this.assignment.peerReviews() || false
     }
   } else {
     isPeerReviewEnabled = !!this.$peerReviewsBox.prop('checked')
