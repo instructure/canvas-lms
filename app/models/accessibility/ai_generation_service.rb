@@ -28,6 +28,7 @@ class Accessibility::AiGenerationService
   AI_ALT_TEXT_MAX_LENGTH = 200
   AI_ALT_TEXT_MAX_IMAGE_SIZE = 10.megabytes
   AI_ALT_TEXT_SUPPORTED_IMAGE_TYPES = Attachment.valid_content_types_hash.select { |_, type| type == "image" }.keys.freeze
+  AI_TABLE_CAPTION_FEATURE_FLAG_SLUG = "table-caption-generate"
   FILE_LINK_REGEX = %r{\A(?!//).*?/files/(\d+)(?:[/?]|$)}
 
   def initialize(content_type:, content_id:, path:, context:, current_user:, domain_root_account:)
@@ -42,6 +43,11 @@ class Accessibility::AiGenerationService
   def generate_alt_text
     attachment = assume_attachment
     call_cedar_alt_text_generation(attachment)
+  end
+
+  def generate_table_caption
+    element, resource, html_content = assume_table
+    call_cedar_table_caption_generation(element, resource, html_content)
   end
 
   def self.extract_attachment_id_from_element(elem)
@@ -66,6 +72,18 @@ class Accessibility::AiGenerationService
     attachment_id = extract_and_validate_attachment_id!(element)
 
     load_and_validate_attachment(attachment_id)
+  end
+
+  def assume_table
+    validate_parameters!
+
+    resource = find_resource
+    html_content = extract_html_content(resource)
+
+    element = find_element_at_path(html_content, @path)
+    validate_table_element!(element)
+
+    [element, resource, html_content]
   end
 
   def validate_parameters!
@@ -109,6 +127,10 @@ class Accessibility::AiGenerationService
     attachment
   end
 
+  def validate_table_element!(element)
+    raise InvalidParameterError unless element&.tag_name&.downcase == "table"
+  end
+
   def call_cedar_alt_text_generation(attachment)
     base64_source = Base64.strict_encode64(attachment.open.read)
 
@@ -122,6 +144,25 @@ class Accessibility::AiGenerationService
     )
 
     generation_result.image["altText"]
+  end
+
+  def call_cedar_table_caption_generation(element, resource, html_content)
+    resource_title = resource.try(:title)
+    resource_context = Accessibility::Rules::TableCaptionRuleHelper.extract_resource_context(@path, html_content, resource_title)
+    table_html = Accessibility::Rules::TableCaptionRuleHelper.extract_table_preview(element).to_html
+
+    system_prompt = Accessibility::Rules::TableCaptionRuleHelper.build_system_prompt
+    user_message = Accessibility::Rules::TableCaptionRuleHelper.build_user_message(resource_context, table_html)
+
+    generation_result = CedarClient.conversation(
+      messages: [{ role: "User", text: user_message }],
+      system_prompt:,
+      feature_slug: AI_TABLE_CAPTION_FEATURE_FLAG_SLUG,
+      root_account_uuid: @context.root_account.uuid,
+      current_user: @current_user
+    )
+
+    generation_result.response
   end
 
   def target_language
