@@ -54,9 +54,22 @@ module Canvadocs
         opts.delete :user_filter
       end
 
-      # no commenting when anonymous peer reviews are enabled
-      if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymous_peer_reviews? }
-        opts = {}
+      # anonymous peer reviewers should be able to see student annotation assignments
+      # but they should never be allowed to make annotations
+      submissions.each do |submission|
+        # don't change permissions for submissions by the current user
+        next unless submission.user_id != user.id
+
+        # only modify permissions for anonymous peer reviews
+        assignment = submission.assignment
+        next unless assignment.peer_reviews? && assignment.anonymous_peer_reviews?
+
+        # reviwers can only read the document
+        reviewers = submission.assessment_requests.pluck(:assessor_id)
+        if reviewers.any?(user.id)
+          opts[:permissions] = "read"
+          break
+        end
       end
 
       opts
