@@ -150,8 +150,13 @@ module UserContent
 
       unless @_attachment
         @_attachment = preloaded_attachments[match.obj_id] unless preloaded_attachments[match.obj_id]&.replacement_attachment_id
-        @_attachment ||= Attachment.find_by(id: match.obj_id) if context.is_a?(User) || context.nil? || location.present?
-        @_attachment ||= context.attachments.find_by(id: match.obj_id)
+        if location.present?
+          attachment = Attachment.find_by(id: match.obj_id)
+          @_attachment ||= attachment.context.attachments.find_by(id: attachment)
+        else
+          @_attachment ||= Attachment.find_by(id: match.obj_id) if context.is_a?(User) || context.nil?
+          @_attachment ||= context&.attachments&.find_by(id: match.obj_id)
+        end
       end
       @_attachment
     end
