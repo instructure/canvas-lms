@@ -35,5 +35,13 @@ else
   fi
 fi
 
+# Check if @swc/core is updated without swc-plugin-coverage-instrument
+if git diff HEAD^ package.json | grep -q '@swc/core'; then
+  if ! git diff HEAD^ package.json | grep -q 'swc-plugin-coverage-instrument'; then
+    message="@swc/core was updated without updating swc-plugin-coverage-instrument. These packages must be compatible or the Crystalball build will fail. Verify compatibility at https://plugins.swc.rs/ or update swc-plugin-coverage-instrument to a compatible version."
+    gergich comment "{\"path\":\"package.json\",\"position\":1,\"severity\":\"warn\",\"message\":\"$message\"}"
+  fi
+fi
+
 gergich status
 echo "YARN_LOCK OK!"
