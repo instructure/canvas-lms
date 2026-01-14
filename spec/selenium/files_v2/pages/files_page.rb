@@ -309,7 +309,6 @@ module FilesPage
       date_input_until.send_keys(:enter)
     end
     permission_save_button.click
-    wait_for_ajaximations
   end
 
   def select_item_to_edit_from_kebab_menu(item)
@@ -325,7 +324,6 @@ module FilesPage
     create_folder_button.click
     create_folder_input.send_keys(name)
     create_folder_input.send_keys(:return)
-    wait_for_ajaximations
   end
 
   def edit_name_from_kebab_menu(item, file_name_new)
@@ -335,7 +333,6 @@ module FilesPage
     file_name_textbox_el = rename_folder_component("input-folder-name")
     replace_content(file_name_textbox_el, file_name_new)
     file_name_textbox_el.send_keys(:return)
-    wait_for_ajaximations
   end
 
   def delete_file_from(item = 1, way = :kebab_menu)
@@ -349,7 +346,6 @@ module FilesPage
     end
     expect(body).to contain_css(delete_folder_form_selector)
     delete_folder_delete_button.click
-    wait_for_ajaximations
   end
 
   def move_file_from(item = 1, way = :kebab_menu, index = 0)
@@ -365,7 +361,6 @@ module FilesPage
     expect(body).to contain_css(move_folder_form_selector)
     tree_selector.click
     move_folder_move_button.click
-    wait_for_ajaximations
   end
 
   def move_files(items)
@@ -375,7 +370,6 @@ module FilesPage
     expect(body).to contain_css(move_folder_form_selector)
     tree_selector.click
     move_folder_move_button.click
-    wait_for_ajaximations
   end
 
   def tree_selector
