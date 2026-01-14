@@ -505,7 +505,7 @@ describe('CoursesTableRow', () => {
       expect(badge?.textContent).toBe('5')
     })
 
-    it('shows "Failed" when workflow_state is failed', () => {
+    it('shows "Failed scan" when workflow_state is failed', () => {
       const course = createMockCourse({
         accessibility_course_statistic: {
           id: 1,
@@ -524,7 +524,7 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      expect(screen.getByText('Failed')).toBeInTheDocument()
+      expect(screen.getByText('Failed scan')).toBeInTheDocument()
     })
   })
 })
