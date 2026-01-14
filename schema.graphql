@@ -9923,6 +9923,14 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     includeDraftComments: Boolean = false
 
     """
+    When true and include_draft_comments is true, draft comments from other teachers will be included.
+    Only applies to users with grading permissions (teachers, TAs, etc).
+    When false, only the current user's draft comments are included.
+    Students never see draft comments from others regardless of this setting.
+    """
+    includeDraftsFromOthers: Boolean = false
+
+    """
     When true, provisional comments that the current user has permission to see will be returned.
     The Moderator has permission to see all provisional comments.
     Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
@@ -10355,6 +10363,14 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
     includeDraftComments: Boolean = false
 
     """
+    When true and include_draft_comments is true, draft comments from other teachers will be included.
+    Only applies to users with grading permissions (teachers, TAs, etc).
+    When false, only the current user's draft comments are included.
+    Students never see draft comments from others regardless of this setting.
+    """
+    includeDraftsFromOthers: Boolean = false
+
+    """
     When true, provisional comments that the current user has permission to see will be returned.
     The Moderator has permission to see all provisional comments.
     Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
@@ -10579,6 +10595,14 @@ interface SubmissionInterface {
     """
     first: Int
     includeDraftComments: Boolean = false
+
+    """
+    When true and include_draft_comments is true, draft comments from other teachers will be included.
+    Only applies to users with grading permissions (teachers, TAs, etc).
+    When false, only the current user's draft comments are included.
+    Students never see draft comments from others regardless of this setting.
+    """
+    includeDraftsFromOthers: Boolean = false
 
     """
     When true, provisional comments that the current user has permission to see will be returned.
