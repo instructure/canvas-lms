@@ -627,21 +627,6 @@ top_navigation_placement:
       state: allowed_on
     ci:
       state: allowed_on
-top_navigation_placement_a11y_fixes:
-  state: hidden
-  shadow: true
-  applies_to: SiteAdmin
-  display_name: Top Navigation Placement Accessibility Tab Order Fix
-  description: |-
-    When enabled, fixes the tab order for View as Student and LTI Tools buttons
-    in the top navigation. View as Student will receive focus before LTI Tools,
-    following logical left-to-right reading order. Requires top_navigation_placement
-    to be enabled.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 tune_lti_context_id_history_query:
   state: hidden
   applies_to: RootAccount

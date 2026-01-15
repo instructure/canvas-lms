@@ -475,7 +475,6 @@ class ApplicationController < ActionController::Base
     scheduled_feedback_releases
     speedgrader_studio_media_capture
     student_access_token_management
-    top_navigation_placement_a11y_fixes
     validate_call_to_action
     block_content_editor_ai_alt_text
     ux_list_concluded_courses_in_bp
