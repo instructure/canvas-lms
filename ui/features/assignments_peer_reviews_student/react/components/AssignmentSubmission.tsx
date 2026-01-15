@@ -56,6 +56,7 @@ interface AssignmentSubmissionProps {
   onPeerReviewSubmitted: () => void
   hasSeenPeerReviewModal: boolean
   isReadOnly?: boolean
+  isAnonymous: boolean
 }
 
 const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
@@ -69,6 +70,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   isMobile = false,
   hasSeenPeerReviewModal,
   isReadOnly = false,
+  isAnonymous,
 }) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
   const [showComments, setShowComments] = useState(false)
@@ -242,7 +244,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     <View
       as="div"
       minHeight="calc(720px - 10.75rem)"
-      height="calc(100vh - 22rem)"
+      height={isAnonymous ? 'calc(100vh - 22rem)' : 'calc(100vh - 24rem)'}
       overflowY="hidden"
     >
       <Flex as="div" height="100%" alignItems="start">

@@ -31,7 +31,7 @@ describe('LockedPeerReview', () => {
     nonDigitalSubmission: false,
     pointsPossible: 10,
     courseId: '1',
-    peerReviews: {count: 2, submissionRequired: true, pointsPossible: null},
+    peerReviews: {count: 2, submissionRequired: true, pointsPossible: null, anonymousReviews: false},
     submissionsConnection: null,
     assignedToDates: null,
     assessmentRequestsForCurrentUser: null,

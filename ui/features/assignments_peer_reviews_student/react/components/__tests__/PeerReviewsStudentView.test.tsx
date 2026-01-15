@@ -1559,7 +1559,7 @@ describe('PeerReviewsStudentView', () => {
         assignment: {
           _id: '25',
           name: 'Past Lock Date No Allocate',
-          dueAt: '2020-09-15T16:00:00Z',          
+          dueAt: '2020-09-15T16:00:00Z',
           assessmentRequestsForCurrentUser: [],
           assignedToDates: [
             {
@@ -1697,7 +1697,7 @@ describe('PeerReviewsStudentView', () => {
               },
             },
           ],
-        }
+        },
       })
 
       const {getByTestId} = setup({assignmentId: '28'})
@@ -1923,6 +1923,220 @@ describe('PeerReviewsStudentView', () => {
 
       await waitFor(() => {
         expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Anonymous peer reviews', () => {
+    it('displays peer name when peer reviews are not anonymous', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '27',
+          name: 'Non-Anonymous Peer Review',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: false,
+            anonymousReviews: false,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+          },
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymousId: null,
+              anonymizedUser: {
+                _id: '36',
+                displayName: 'Chansey',
+              },
+              submission: {
+                _id: 'sub-2',
+                attempt: 1,
+                body: '<p>Student submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText, getByTestId} = setup({assignmentId: '27'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(getByText('Peer: Chansey')).toBeInTheDocument()
+    })
+
+    it('does not display peer name when peer reviews are anonymous', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '28',
+          name: 'Anonymous Peer Review',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: false,
+            anonymousReviews: true,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+          },
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymousId: 'LJ4xZ',
+              anonymizedUser: null,
+              submission: {
+                _id: 'sub-2',
+                attempt: 1,
+                body: '<p>Student submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {queryByText, getByTestId} = setup({assignmentId: '28'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(queryByText(/^Peer:/)).not.toBeInTheDocument()
+    })
+
+    it('does not display peer name when anonymizedUser is null', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '29',
+          name: 'No User Data',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 1,
+            submissionRequired: false,
+            anonymousReviews: false,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+          },
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymousId: null,
+              anonymizedUser: null,
+              submission: {
+                _id: 'sub-2',
+                attempt: 1,
+                body: '<p>Student submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {queryByText, getByTestId} = setup({assignmentId: '29'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(queryByText(/^Peer:/)).not.toBeInTheDocument()
+    })
+
+    it('updates peer name when switching between peer reviews', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '30',
+          name: 'Multiple Non-Anonymous Peers',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+            submissionRequired: false,
+            anonymousReviews: false,
+          },
+          submissionsConnection: {
+            nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
+          },
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymousId: null,
+              anonymizedUser: {
+                _id: '36',
+                displayName: 'Chansey',
+              },
+              submission: {
+                _id: 'sub-2',
+                attempt: 1,
+                body: '<p>First submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+            {
+              _id: 'ar-2',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-02T00:00:00Z',
+              anonymousId: null,
+              anonymizedUser: {
+                _id: '37',
+                displayName: 'Pikachu',
+              },
+              submission: {
+                _id: 'sub-3',
+                attempt: 1,
+                body: '<p>Second submission</p>',
+                submissionType: 'online_text_entry',
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText, getByTestId} = setup({assignmentId: '30'})
+
+      await waitFor(() => {
+        expect(getByText('Peer: Chansey')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      const selector = getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      const secondOption = getByText('Peer Review (2 of 2)')
+      await user.click(secondOption)
+
+      await waitFor(() => {
+        expect(getByText('Peer: Pikachu')).toBeInTheDocument()
       })
     })
   })

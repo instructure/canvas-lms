@@ -203,6 +203,7 @@ describe('AssignmentSubmission', () => {
     onPeerReviewSubmitted: jest.fn(),
     hasSeenPeerReviewModal: false,
     isMobile: false,
+    isAnonymous: false,
     ...overrides,
   })
 

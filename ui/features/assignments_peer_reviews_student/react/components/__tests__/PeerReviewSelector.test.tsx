@@ -29,6 +29,8 @@ describe('PeerReviewSelector', () => {
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-01T00:00:00Z',
+      anonymousId: null,
+      anonymizedUser: null,
       submission: {
         _id: 'sub-1',
         attempt: 1,
@@ -41,6 +43,8 @@ describe('PeerReviewSelector', () => {
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-02T00:00:00Z',
+      anonymousId: null,
+      anonymizedUser: null,
       submission: {
         _id: 'sub-2',
         attempt: 1,
@@ -53,6 +57,8 @@ describe('PeerReviewSelector', () => {
       available: true,
       workflowState: 'assigned',
       createdAt: '2025-11-03T00:00:00Z',
+      anonymousId: null,
+      anonymizedUser: null,
       submission: {
         _id: 'sub-3',
         attempt: 1,
@@ -122,6 +128,8 @@ describe('PeerReviewSelector', () => {
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-01T00:00:00Z',
+        anonymousId: null,
+        anonymizedUser: null,
         submission: {
           _id: 'sub-1',
           attempt: 1,
@@ -134,6 +142,8 @@ describe('PeerReviewSelector', () => {
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-02T00:00:00Z',
+        anonymousId: null,
+        anonymizedUser: null,
         submission: {
           _id: 'sub-2',
           attempt: 1,
@@ -146,6 +156,8 @@ describe('PeerReviewSelector', () => {
         available: true,
         workflowState: 'completed',
         createdAt: '2025-11-03T00:00:00Z',
+        anonymousId: null,
+        anonymizedUser: null,
         submission: {
           _id: 'sub-3',
           attempt: 1,
@@ -200,6 +212,8 @@ describe('PeerReviewSelector', () => {
         available: false,
         workflowState: 'assigned',
         createdAt: '2025-11-01T00:00:00Z',
+        anonymousId: null,
+        anonymizedUser: null,
         submission: {
           _id: 'sub-1',
           attempt: 1,
@@ -212,6 +226,8 @@ describe('PeerReviewSelector', () => {
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-02T00:00:00Z',
+        anonymousId: null,
+        anonymizedUser: null,
         submission: {
           _id: 'sub-2',
           attempt: 1,
@@ -224,6 +240,8 @@ describe('PeerReviewSelector', () => {
         available: true,
         workflowState: 'assigned',
         createdAt: '2025-11-03T00:00:00Z',
+        anonymousId: null,
+        anonymizedUser: null,
         submission: {
           _id: 'sub-3',
           attempt: 1,
@@ -260,6 +278,11 @@ describe('PeerReviewSelector', () => {
           available: true,
           workflowState: 'assigned',
           createdAt: '2025-11-01T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: {
+            _id: '1',
+            displayName: 'Student 1',
+          },
           submission: {
             _id: 'sub-1',
             attempt: 1,
@@ -295,6 +318,11 @@ describe('PeerReviewSelector', () => {
           available: true,
           workflowState: 'assigned',
           createdAt: '2025-11-01T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: {
+            _id: '1',
+            displayName: 'Student 1',
+          },
           submission: {
             _id: 'sub-1',
             attempt: 1,
@@ -330,6 +358,11 @@ describe('PeerReviewSelector', () => {
           available: true,
           workflowState: 'assigned',
           createdAt: '2025-11-01T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: {
+            _id: '1',
+            displayName: 'Student 1',
+          },
           submission: {
             _id: 'sub-1',
             attempt: 1,
@@ -406,6 +439,11 @@ describe('PeerReviewSelector', () => {
           available: true,
           workflowState: 'assigned',
           createdAt: '2025-11-01T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: {
+            _id: '1',
+            displayName: 'Student 1',
+          },
           submission: {
             _id: 'sub-1',
             attempt: 1,

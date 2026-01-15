@@ -33,6 +33,7 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
         count
         submissionRequired
         pointsPossible
+        anonymousReviews
       }
       submissionsConnection(filter: {userId: $userId}) {
         nodes {
@@ -65,6 +66,11 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
             description
             points
           }
+        }
+        anonymousId
+        anonymizedUser {
+          _id
+          displayName: shortName
         }
         submission {
           _id
