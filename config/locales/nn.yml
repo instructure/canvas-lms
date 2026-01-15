@@ -25846,6 +25846,7 @@ nn:
       teachers_notified_of_comments: "Faglærarane og innsendaren får melding om alle kommentarane."
     show_preview: 
       anonymous_username: "Denne studenten"
+      assignment_locked: "Denne oppgåva er låst akkurat no."
       discussion_submission_description: "Innleveringane for denne oppgåva er oppføringar i oppgåvediskusjonen. Nedanfor ser du diskusjonsoppføringane frå %{user}, eller du kan *sjå heile diskusjonen*."
       discussion_submission_description_without_link: "Innleveringane for denne oppgåva er oppføringar i oppgåvediskusjonen. Nedanfor ser du diskusjonsoppføringane frå %{user}."
       entry_no_image: "Hugs at denne sida kan vere endra etter at innleveringa opphavleg skjedde."
