@@ -420,3 +420,11 @@ a11y_checker_account_statistics:
   description: |-
     If enabled, the a11y statistics will start calculate on accounts where a11y_checker FF is enabled.
   shadow: true
+
+a11y_checker_course_scan_conditional_resource_scan:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Accessibility Checker Course Scan Conditional Resource Scan
+  description: |-
+    During a11y checker course scan, if enabled, resources will only be scanned if they have been updated since the last scan. When disabled, all resources within a course will be scanned regardless of update timestamps.
+  shadow: true

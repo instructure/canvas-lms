@@ -98,7 +98,9 @@ class Accessibility::CourseScanService < ApplicationService
 
     resources.find_each do |resource|
       last_scan = scans_by_resource_id[resource.id]
-      next unless needs_scan?(resource, last_scan)
+      if Account.site_admin.feature_enabled?(:a11y_checker_course_scan_conditional_resource_scan)
+        next unless needs_scan?(resource, last_scan)
+      end
 
       Accessibility::ResourceScannerService.call(resource:)
     end
