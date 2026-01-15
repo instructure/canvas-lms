@@ -9577,6 +9577,58 @@ describe Course do
           expect(versioned_data).not_to have_key(excluded_field)
         end
       end
+
+      it "saves original version when editing existing syllabus for the first time" do
+        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.update!(syllabus_body: "Original syllabus content")
+        course.reload
+        expect(course.versions.count).to eq(0)
+
+        Account.site_admin.enable_feature!(:syllabus_versioning)
+        expect do
+          course.update!(syllabus_body: "Updated syllabus content")
+        end.to change { course.versions.count }.by(2)
+
+        first_version = course.versions.where(number: 1).first
+        first_version_data = YAML.safe_load(first_version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+        expect(first_version_data["syllabus_body"]).to eq("Original syllabus content")
+
+        second_version = course.versions.where(number: 2).first
+        second_version_data = YAML.safe_load(second_version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+        expect(second_version_data["syllabus_body"]).to eq("Updated syllabus content")
+      end
+
+      it "does not save original version if syllabus was blank" do
+        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.update!(syllabus_body: nil)
+        expect(course.versions.count).to eq(0)
+
+        Account.site_admin.enable_feature!(:syllabus_versioning)
+        expect do
+          course.update!(syllabus_body: "New syllabus content")
+        end.to change { course.versions.count }.by(1)
+
+        version = course.versions.last
+        versioned_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+        expect(versioned_data["syllabus_body"]).to eq("New syllabus content")
+      end
+
+      it "does not save duplicate original version on subsequent edits" do
+        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.update!(syllabus_body: "Original syllabus content")
+        course.reload
+        expect(course.versions.count).to eq(0)
+
+        Account.site_admin.enable_feature!(:syllabus_versioning)
+        course.update!(syllabus_body: "First edit")
+        expect(course.versions.count).to eq(2)
+
+        expect do
+          course.update!(syllabus_body: "Second edit")
+        end.to change { course.versions.count }.by(1)
+
+        expect(course.versions.count).to eq(3)
+      end
     end
 
     context "when syllabus_versioning feature flag is disabled" do
