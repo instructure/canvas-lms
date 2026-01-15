@@ -37,6 +37,7 @@ export const createMockAccessibilityCourseStatistic = (
   id: 1,
   course_id: 1,
   active_issue_count: 5,
+  resolved_issue_count: 10,
   workflow_state: 'active',
   created_at: '2026-01-07T12:00:00Z',
   updated_at: '2026-01-07T12:00:00Z',

@@ -77,6 +77,17 @@ export const CoursesTable: React.FC<CoursesTableProps> = ({
               onChangeSort={onChangeSort}
             />
           </Table.ColHeader>
+          <Table.ColHeader id="header-resolved-issue-count">
+            <SortableTableHeader
+              id="a11y_resolved_issue_count"
+              label={I18n.t('Resolved')}
+              tipDesc={I18n.t('Click to sort by resolved issue count ascending')}
+              tipAsc={I18n.t('Click to sort by resolved issue count descending')}
+              currentSort={sort}
+              currentOrder={order}
+              onChangeSort={onChangeSort}
+            />
+          </Table.ColHeader>
           {showSISIds && (
             <Table.ColHeader id="header-sis-id">
               <SortableTableHeader

@@ -59,6 +59,7 @@ export const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
         as="button"
         renderIcon={isCurrentSort ? <SortIcon /> : undefined}
         iconPlacement="end"
+        display="inline-flex"
         onClick={handleClick}
       >
         <Text weight="bold">{label}</Text>

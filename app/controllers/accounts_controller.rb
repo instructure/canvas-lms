@@ -835,6 +835,29 @@ class AccountsController < ApplicationController
               else
                 "id"
               end
+            when "a11y_resolved_issue_count"
+              if @account.can_see_accessibility_tab?(@current_user)
+                null_last_part = "(SELECT
+                  CASE
+                    WHEN acs.resolved_issue_count IS NULL THEN 1
+                    ELSE 0
+                  END
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+                count_part = "(SELECT COALESCE(acs.resolved_issue_count, 0)
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+
+                # Nulls always last, then sort by count
+                # Framework appends direction (DESC/ASC) and id to the last column
+                "#{null_last_part}, #{count_part}"
+              else
+                "id"
+              end
             else
               "id"
             end

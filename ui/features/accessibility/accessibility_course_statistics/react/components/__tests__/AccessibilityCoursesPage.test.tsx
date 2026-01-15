@@ -141,6 +141,7 @@ describe('AccessibilityCoursesPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Course')).toBeInTheDocument()
       expect(screen.getByText('Issues')).toBeInTheDocument()
+      expect(screen.getByText('Resolved')).toBeInTheDocument()
       expect(screen.getByText('Term')).toBeInTheDocument()
       expect(screen.getByText('Teacher')).toBeInTheDocument()
       expect(screen.getByText('Sub-Account')).toBeInTheDocument()

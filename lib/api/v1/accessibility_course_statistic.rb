@@ -24,6 +24,6 @@ module Api::V1::AccessibilityCourseStatistic
   def accessibility_course_statistic_json(statistic, user, session)
     return nil unless statistic
 
-    api_json(statistic, user, session, only: %w[id course_id active_issue_count workflow_state created_at updated_at])
+    api_json(statistic, user, session, only: %w[id course_id active_issue_count resolved_issue_count workflow_state created_at updated_at])
   end
 end

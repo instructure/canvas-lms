@@ -35,6 +35,7 @@ export interface AccessibilityCourseStatistic {
   id: number
   course_id: number
   active_issue_count: number | null
+  resolved_issue_count: number | null
   workflow_state: 'initialized' | 'queued' | 'in_progress' | 'active' | 'failed' | 'deleted'
   created_at: string
   updated_at: string

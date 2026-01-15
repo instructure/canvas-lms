@@ -20,7 +20,11 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {CoursesTableRow} from '../CoursesTableRow'
-import {createMockCourse, createMockTeacher} from '../../../__tests__/factories'
+import {
+  createMockCourse,
+  createMockTeacher,
+  createMockAccessibilityCourseStatistic,
+} from '../../../__tests__/factories'
 
 describe('CoursesTableRow', () => {
   describe('Status icons', () => {
@@ -113,7 +117,7 @@ describe('CoursesTableRow', () => {
 
     it('renders empty string when SIS ID is missing', () => {
       const course = createMockCourse({sis_course_id: undefined})
-      const {container} = render(
+      render(
         <table>
           <tbody>
             <CoursesTableRow course={course} showSISIds={true} />
@@ -121,10 +125,8 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      // Find the cell in the SIS ID column position
-      const cells = container.querySelectorAll('td')
-      const sisIdCell = cells[2] // Status, Name, SIS ID
-      expect(sisIdCell?.textContent).toBe('')
+      const sisIdCell = screen.getByTestId('sis-id-cell')
+      expect(sisIdCell).toHaveTextContent('')
     })
   })
 
@@ -144,7 +146,7 @@ describe('CoursesTableRow', () => {
 
     it('renders empty string when term is missing', () => {
       const course = createMockCourse({term: undefined})
-      const {container} = render(
+      render(
         <table>
           <tbody>
             <CoursesTableRow course={course} showSISIds={true} />
@@ -152,9 +154,8 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const cells = container.querySelectorAll('td')
-      const termCell = cells[3] // Status, Name, SIS ID, Term
-      expect(termCell?.textContent).toBe('')
+      const termCell = screen.getByTestId('term-cell')
+      expect(termCell).toHaveTextContent('')
     })
   })
 
@@ -221,7 +222,7 @@ describe('CoursesTableRow', () => {
 
     it('renders empty cell when no teachers', () => {
       const course = createMockCourse({teachers: undefined})
-      const {container} = render(
+      render(
         <table>
           <tbody>
             <CoursesTableRow course={course} showSISIds={true} />
@@ -229,9 +230,8 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const cells = container.querySelectorAll('td')
-      const teachersCell = cells[4] // Status, Name, SIS ID, Term, Teachers
-      expect(teachersCell?.textContent).toBe('')
+      const teachersCell = screen.getByTestId('teachers-cell')
+      expect(teachersCell).toHaveTextContent('')
     })
   })
 
@@ -253,7 +253,7 @@ describe('CoursesTableRow', () => {
 
     it('renders empty string when subaccount is missing', () => {
       const course = createMockCourse({subaccount_id: undefined, subaccount_name: undefined})
-      const {container} = render(
+      render(
         <table>
           <tbody>
             <CoursesTableRow course={course} showSISIds={true} />
@@ -261,9 +261,8 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const cells = container.querySelectorAll('td')
-      const subaccountCell = cells[5] // Status, Name, SIS ID, Term, Teachers, Subaccount
-      expect(subaccountCell?.textContent).toBe('')
+      const subaccountCell = screen.getByTestId('subaccount-cell')
+      expect(subaccountCell).toHaveTextContent('')
     })
   })
 
@@ -324,14 +323,10 @@ describe('CoursesTableRow', () => {
 
     it('shows "No report" when workflow_state is initialized', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           active_issue_count: 0,
           workflow_state: 'initialized',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       render(
         <table>
@@ -346,14 +341,9 @@ describe('CoursesTableRow', () => {
 
     it('shows "No report" when workflow_state is deleted', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
-          active_issue_count: 5,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           workflow_state: 'deleted',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       render(
         <table>
@@ -368,14 +358,10 @@ describe('CoursesTableRow', () => {
 
     it('shows spinner and "Checking..." when workflow_state is in_progress', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           active_issue_count: null,
           workflow_state: 'in_progress',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       render(
         <table>
@@ -391,14 +377,10 @@ describe('CoursesTableRow', () => {
 
     it('shows spinner and "Checking..." when workflow_state is queued', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           active_issue_count: null,
           workflow_state: 'queued',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       render(
         <table>
@@ -414,14 +396,9 @@ describe('CoursesTableRow', () => {
 
     it('shows published icon when workflow_state is active and active_issue_count is 0', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           active_issue_count: 0,
-          workflow_state: 'active',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       render(
         <table>
@@ -437,14 +414,9 @@ describe('CoursesTableRow', () => {
 
     it('shows published icon when workflow_state is active and active_issue_count is null', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           active_issue_count: null,
-          workflow_state: 'active',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       render(
         <table>
@@ -460,14 +432,9 @@ describe('CoursesTableRow', () => {
 
     it('shows published icon when workflow_state is active and active_issue_count is undefined', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           active_issue_count: undefined as any,
-          workflow_state: 'active',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       render(
         <table>
@@ -483,14 +450,9 @@ describe('CoursesTableRow', () => {
 
     it('shows badge with count when workflow_state is active and active_issue_count > 0', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           active_issue_count: 5,
-          workflow_state: 'active',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       const {container} = render(
         <table>
@@ -507,14 +469,10 @@ describe('CoursesTableRow', () => {
 
     it('shows "Failed scan" when workflow_state is failed', () => {
       const course = createMockCourse({
-        accessibility_course_statistic: {
-          id: 1,
-          course_id: 1,
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           active_issue_count: null,
           workflow_state: 'failed',
-          created_at: '2026-01-07T12:00:00Z',
-          updated_at: '2026-01-07T12:00:00Z',
-        },
+        }),
       })
       render(
         <table>
@@ -525,6 +483,90 @@ describe('CoursesTableRow', () => {
       )
 
       expect(screen.getByText('Failed scan')).toBeInTheDocument()
+    })
+  })
+
+  describe('Resolved Issues column', () => {
+    it('shows empty cell when statistic is undefined', () => {
+      const course = createMockCourse({accessibility_course_statistic: undefined})
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
+      expect(resolvedIssuesCell).toHaveTextContent('')
+    })
+
+    it('shows empty cell when statistic is null', () => {
+      const course = createMockCourse({accessibility_course_statistic: null})
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
+      expect(resolvedIssuesCell).toHaveTextContent('')
+    })
+
+    it('shows empty cell when resolved_issue_count is null', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
+          resolved_issue_count: null,
+        }),
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
+      expect(resolvedIssuesCell).toHaveTextContent('')
+    })
+
+    it('shows empty cell when resolved_issue_count is 0', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
+          resolved_issue_count: 0,
+        }),
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
+      expect(resolvedIssuesCell).toHaveTextContent('')
+    })
+
+    it('shows success badge with count when resolved_issue_count > 0', () => {
+      const course = createMockCourse({
+        accessibility_course_statistic: createMockAccessibilityCourseStatistic({
+          resolved_issue_count: 3,
+        }),
+      })
+      render(
+        <table>
+          <tbody>
+            <CoursesTableRow course={course} showSISIds={true} />
+          </tbody>
+        </table>,
+      )
+
+      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
+      expect(resolvedIssuesCell).toHaveTextContent('3')
     })
   })
 })

@@ -39,6 +39,7 @@ describe Api::V1::AccessibilityCourseStatistic do
         AccessibilityCourseStatistic.create!(
           course:,
           active_issue_count: 5,
+          resolved_issue_count: 3,
           workflow_state: "active"
         )
       end
@@ -48,6 +49,7 @@ describe Api::V1::AccessibilityCourseStatistic do
         expect(json["id"]).to eq statistic.id
         expect(json["course_id"]).to eq course.id
         expect(json["active_issue_count"]).to eq 5
+        expect(json["resolved_issue_count"]).to eq 3
         expect(json["workflow_state"]).to eq "active"
         expect(json["created_at"]).not_to be_nil
         expect(json["updated_at"]).not_to be_nil
@@ -55,7 +57,7 @@ describe Api::V1::AccessibilityCourseStatistic do
 
       it "includes all expected fields" do
         json = accessibility_course_statistic_json(statistic, user, session)
-        expected_fields = %w[id course_id active_issue_count workflow_state created_at updated_at]
+        expected_fields = %w[id course_id active_issue_count resolved_issue_count workflow_state created_at updated_at]
         expect(json.keys).to match_array(expected_fields)
       end
     end
