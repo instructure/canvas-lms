@@ -19189,6 +19189,7 @@ he:
       teachers_notified_of_comments: "כמורים והמגיש יקבלו הודעה על כל ההערות"
     show_preview: 
       anonymous_username: "תלמיד זה"
+      assignment_locked: "משימה זו נעולה כעת"
       discussion_submission_description: "ההגשות למשימה זו הנן הפרסומים בקבוצת הדיון של המשימה. להלן הפרסומים בדיון של %{user}, וכן ניתן *לעיין בדיון בכללותו*."
       discussion_submission_description_without_link: "ההגשות למשימה זו הנן הפרסומים בקבוצת הדיון של המשימה. להלן הפרסומים בדיון של %{user}."
       entry_no_image: "יש לזכור שיתכן שדף זה השתנה מאז ההגשה המקורית."
