@@ -4417,6 +4417,119 @@ describe CoursesController, type: :request do
       expect(json).not_to have_key("syllabus_versions")
     end
 
+    it "returns syllabus_versions when blank child receives syllabus from master" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+
+      master_course = course_factory
+      template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+      master_course.update!(syllabus_body: "Master syllabus content")
+      template.add_child_course!(@course1)
+
+      migration = MasterCourses::MasterMigration.start_new_migration!(template, @user)
+      run_jobs
+      migration.reload
+      @course1.reload
+
+      expect(@course1.syllabus_body).to eq("Master syllabus content")
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_versions",
+                      { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_versions"] })
+      expect(json).to have_key("syllabus_versions")
+      expect(json["syllabus_versions"].length).to eq(1)
+      expect(json["syllabus_versions"].first["syllabus_body"]).to include("Master syllabus content")
+    end
+
+    it "protects downstream syllabus changes from being overwritten by blueprint sync" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+
+      master_course = course_factory
+      template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+      master_course.update!(syllabus_body: "Master syllabus content")
+      template.add_child_course!(@course1)
+
+      migration = MasterCourses::MasterMigration.start_new_migration!(template, @user)
+      run_jobs
+      migration.reload
+      @course1.reload
+
+      expect(@course1.syllabus_body).to eq("Master syllabus content")
+
+      @course1.update!(syllabus_body: "Child modified syllabus")
+
+      master_course.update!(syllabus_body: "Master syllabus version 2")
+
+      migration2 = MasterCourses::MasterMigration.start_new_migration!(template, @user)
+      run_jobs
+      migration2.reload
+      @course1.reload
+
+      expect(@course1.syllabus_body).to eq("Child modified syllabus")
+    end
+
+    it "does not create syllabus versions during blueprint sync when flag is disabled" do
+      Account.site_admin.disable_feature!(:syllabus_versioning)
+
+      master_course = course_factory
+      template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+      master_course.update!(syllabus_body: "Master syllabus content")
+      template.add_child_course!(@course1)
+
+      migration = MasterCourses::MasterMigration.start_new_migration!(template, @user)
+      run_jobs
+      migration.reload
+      @course1.reload
+
+      expect(@course1.syllabus_body).to eq("Master syllabus content")
+      expect(@course1.versions.count).to eq(0)
+
+      child_tag = template.child_subscriptions.active.first.child_content_tags.where(content: @course1).first
+      expect(child_tag).to be_nil
+    end
+
+    it "creates syllabus versions during blueprint sync when flag is enabled" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+
+      master_course = course_factory
+      template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+      master_course.update!(syllabus_body: "Master syllabus content")
+      template.add_child_course!(@course1)
+
+      migration = MasterCourses::MasterMigration.start_new_migration!(template, @user)
+      run_jobs
+      migration.reload
+      @course1.reload
+
+      expect(@course1.syllabus_body).to eq("Master syllabus content")
+      expect(@course1.versions.count).to eq(1)
+
+      child_tag = template.child_subscriptions.active.first.child_content_tags.where(content: @course1).first
+      expect(child_tag).not_to be_nil
+    end
+
+    it "returns syllabus_versions after blueprint association is removed" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+      6.times do |i|
+        @course1.update(syllabus_body: "Version #{i + 1}")
+      end
+
+      master_course = course_factory
+      template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+      sub = template.add_child_course!(@course1)
+      @course1.reload
+
+      sub.destroy!
+      @course1.reload
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_versions",
+                      { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_versions"] })
+      expect(json).to have_key("syllabus_versions")
+      expect(json["syllabus_versions"]).to be_an(Array)
+      expect(json["syllabus_versions"].length).to eq(5)
+      expect(json["syllabus_versions"].first["syllabus_body"]).to include("Version 6")
+    end
+
     describe "#restore_version" do
       before do
         Account.site_admin.enable_feature!(:syllabus_versioning)

@@ -471,7 +471,11 @@ module Importers
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
       if migration.for_master_course_import?
-        course.master_migration = migration
+        if Account.site_admin.feature_enabled?(:syllabus_versioning)
+          course.mark_as_importing!(migration)
+        else
+          course.master_migration = migration
+        end
       end
       course.syllabus_body = migration.convert_html(syllabus_body, :syllabus, nil, :syllabus)
     end
