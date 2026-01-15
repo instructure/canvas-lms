@@ -23,7 +23,7 @@
     "@instructure/canvas-media": "*",
     "@instructure/debounce": "10.26.3",
     "@instructure/emotion": "10.26.3",
-    "@instructure/media-capture": "^11.5.1",
+    "@instructure/media-capture": "^9.0.0",
     "@instructure/media-capture-new": "npm:@instructure/media-capture@11.3.0",
     "@instructure/outcomes-ui": "3.2.4",
     "@instructure/react-crop": "^5.0.1",
