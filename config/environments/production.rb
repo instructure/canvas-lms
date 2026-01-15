@@ -32,10 +32,16 @@ Rails.application.configure do
   ENV["USE_OPTIMIZED_JS"] = "true"
 
   # Specifies the header that your web server uses for directly sending files
-  # If you have mod_xsendfile enabled in apache:
-  # config.action_dispatch.x_sendfile_header = 'X-Sendfile'
-  # For nginx:
-  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
+  # If you have mod_xsendfile enabled in apache/nginx:
+  config.action_dispatch.x_sendfile_header =
+    case ENV["WEB_SERVER_X_SENDFILE_HEADER"]
+    when "apache"
+      "X-Sendfile"
+    when "nginx"
+      "X-Accel-Redirect"
+    else
+      nil
+    end
 
   # If you have no front-end server that supports something like X-Sendfile,
   # just comment this out and Rails will serve the files
