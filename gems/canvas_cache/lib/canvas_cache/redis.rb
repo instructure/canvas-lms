@@ -87,6 +87,14 @@ module CanvasCache
 
         node_for(key).pipelined(...)
       end
+
+      %i[xacck xackdel xadd xautoclaim xclaim xdel xdelex xlen xpending xrange xrevrange xsetid xtrim].each do |method|
+        class_eval <<~RUBY, __FILE__, __LINE__ + 1
+          def #{method}(key, ...)              # def xadd(key, ...)
+            node_for(key).#{method}(key, ...)  #   node_for(key).xadd(key, ...)
+          end                                  # end
+        RUBY
+      end
     end
 
     class << self
