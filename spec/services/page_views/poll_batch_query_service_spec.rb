@@ -18,13 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe PageViews::PollBatchQueryService do
-  let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.instructure.com"), access_token: "token") }
-  let(:service) { PageViews::PollBatchQueryService.new(configuration) }
+  let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.instructure.com")) }
   let(:account) { instance_double(Account, id: 1, uuid: "abc") }
   let(:user) { instance_double(User, global_id: 1, shard: Shard.default, root_account_ids: [account.id]) }
+  let(:service) { PageViews::PollBatchQueryService.new(configuration, requestor_user: user) }
 
   before do
+    allow(Account).to receive(:find_cached).and_call_original
     allow(Account).to receive(:find_cached).with(1).and_return(account)
+    allow(account).to receive(:environment_specific_domain).and_return("canvas.instructure.com")
+    allow(user).to receive(:uuid).and_return("user-uuid-123")
   end
 
   it "returns query is running" do

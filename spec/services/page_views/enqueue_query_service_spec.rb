@@ -18,15 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe PageViews::EnqueueQueryService do
-  let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.instructure.com"), access_token: "token") }
+  let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.instructure.com")) }
   let(:account) { instance_double(Account, id: 1, uuid: "abc") }
   let(:admin) { instance_double(User, global_id: 1, shard: Shard.default, root_account_ids: [account.id]) }
   let(:user) { instance_double(User, global_id: 2, shard: Shard.default, root_account_ids: [account.id]) }
   let(:service) { PageViews::EnqueueQueryService.new(configuration, requestor_user: admin) }
 
   before do
-    allow(Account).to receive(:find_cached).with(1).and_return(account)
+    allow(Account).to receive(:find_cached).and_return(account)
+    allow(account).to receive(:environment_specific_domain).and_return("canvas.instructure.com")
     allow(user).to receive(:is_a?).with(User).and_return(true)
+    allow(admin).to receive(:uuid).and_return("admin-uuid-123")
   end
 
   it "returns query's job ID" do
@@ -111,11 +113,11 @@ describe PageViews::EnqueueQueryService do
     expect(CanvasHttp).to have_received(:post).with(anything, hash_including("X-Request-Context-Id" => expected_request_id), anything)
   end
 
-  it "includes requestor's global user ID in headers when provided" do
+  it "includes JWT authorization in headers when requestor is provided" do
     allow(CanvasHttp).to receive(:post).and_yield(instance_double(Net::HTTPResponse, code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" }))
 
     service.call("2025-03-01", "2025-06-01", user, "csv")
 
-    expect(CanvasHttp).to have_received(:post).with(anything, hash_including("X-Canvas-User-Id" => "1"), anything)
+    expect(CanvasHttp).to have_received(:post).with(anything, hash_including("Authorization" => /^Bearer /), anything)
   end
 end
