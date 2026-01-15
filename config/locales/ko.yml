@@ -13703,6 +13703,7 @@ ko:
       submitted_at: "%{submit_date}에 제출됨"
       teachers_notified_of_comments: "교사와 제출자에게 모든 의견을 알립니다."
     show_preview: 
+      assignment_locked: "이 과제는 지금 잠겨있습니다."
       discussion_submission_description: "이 과제의 제출물은 과제 토론의 게시글입니다. 아래는 %{user}의 토론 게시글이며 *전체 토론*을 볼 수도 있습니다."
       entry_no_image: "이 페이지가 제출 이후에 바뀌었다는 것을 염두에 두십시오."
       external_url_submission: "이 제출물을 외부 페이지를 가리키는 URL입니다."
