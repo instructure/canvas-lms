@@ -117,6 +117,8 @@ class Accessibility::ResourceScannerService < ApplicationService
       InstStatsd::Statsd.distributed_increment("accessibility.pages_scanned", tags:)
     elsif scan.assignment_id?
       InstStatsd::Statsd.distributed_increment("accessibility.assignments_scanned", tags:)
+    elsif scan.discussion_topic_id?
+      InstStatsd::Statsd.distributed_increment("accessibility.discussion_topics_scanned", tags:)
     end
 
     if scan.failed?
@@ -139,6 +141,8 @@ class Accessibility::ResourceScannerService < ApplicationService
       (@resource.description&.size || 0) > MAX_HTML_SIZE
     when Attachment
       @resource.size > MAX_PDF_SIZE
+    when DiscussionTopic
+      (@resource.message&.size || 0) > MAX_HTML_SIZE
     else
       false
     end
@@ -167,7 +171,7 @@ class Accessibility::ResourceScannerService < ApplicationService
 
   def resource_workflow_state
     case @resource
-    when WikiPage
+    when WikiPage, DiscussionTopic
       @resource.active? ? "published" : "unpublished"
     when Assignment
       @resource.published? ? "published" : "unpublished"
@@ -186,6 +190,8 @@ class Accessibility::ResourceScannerService < ApplicationService
                    check_content_accessibility(@resource.description.to_s)
                  when Attachment
                    check_pdf_accessibility(@resource)
+                 when DiscussionTopic
+                   check_content_accessibility(@resource.message.to_s)
                  else
                    raise ArgumentError, "Unsupported resource type: #{@resource.class.name}"
                  end

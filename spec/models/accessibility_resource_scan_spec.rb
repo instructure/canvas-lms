@@ -289,6 +289,15 @@ describe AccessibilityResourceScan do
       end
     end
 
+    context "when the context is a discussion topic" do
+      let(:discussion_topic) { discussion_topic_model }
+
+      it "returns the correct discussion topic URL" do
+        subject.discussion_topic = discussion_topic
+        expect(subject.context_url).to eq("/courses/#{subject.course_id}/discussion_topics/#{discussion_topic.id}")
+      end
+    end
+
     context "when no context is present" do
       it "returns nil" do
         expect(subject.context_url).to be_nil
