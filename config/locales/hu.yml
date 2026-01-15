@@ -24175,6 +24175,7 @@ hu:
       teachers_notified_of_comments: "Az oktatók és a beküldő értesítést kapnak az összes megjegyzésről."
     show_preview: 
       anonymous_username: "Ez a hallgató"
+      assignment_locked: "A feladat jelenleg zárolva van."
       discussion_submission_description: "Erre a feladatra a hozzá tartozó fórumra írt bejegyzés tekintendő a megoldás beadásának. Lentebb megtalálhatók a/az %{user} által írt fórumbejegyzések, vagy *tekintse meg az öszes fórumbejegyzést*."
       discussion_submission_description_without_link: "Ennél a feladatnál a kapcsolódó fórumra írt bejegyzés tekintendő a megoldás beadásának. Lentebb megtalálhatók a/az %{user} által írt fórumbejegyzések."
       entry_no_image: "Vegye figyelembe, hogy az oldal megváltozhatott az eredeti beadás óta."
