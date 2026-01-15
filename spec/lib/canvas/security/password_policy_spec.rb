@@ -174,10 +174,24 @@ describe Canvas::Security::PasswordPolicy do
         expect(@pseudonym).not_to be_valid
       end
 
-      it "is invalid when the password dictionary member check returns nil" do
+      it "is invalid when the password dictionary member check returns nil and disallow_common_passwords is false" do
         allow(described_class).to receive(:check_password_membership).and_return(nil)
         pseudonym_with_policy(policy)
         @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
+
+      it "falls back to default common passwords when Redis is unavailable and disallow_common_passwords is enabled" do
+        allow(described_class).to receive(:check_password_membership).and_return(nil)
+        pseudonym_with_policy(policy.merge(disallow_common_passwords: true))
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
+
+      it "rejects a password from default list when Redis is unavailable and disallow_common_passwords is enabled" do
+        allow(described_class).to receive(:check_password_membership).and_return(nil)
+        pseudonym_with_policy(policy.merge(disallow_common_passwords: true))
+        @pseudonym.password = @pseudonym.password_confirmation = "football"
         expect(@pseudonym).not_to be_valid
       end
 
@@ -209,7 +223,7 @@ describe Canvas::Security::PasswordPolicy do
       end
 
       it "falls back to default common password dictionary when attachment is corrupted" do
-        allow(attachment).to receive(:open).and_raise(CorruptedDownload)
+        allow(attachment).to receive(:open).and_raise(Attachment::CorruptedDownload)
         pseudonym_with_policy(disallow_common_passwords: true)
         @pseudonym.password = @pseudonym.password_confirmation = "Password!"
         expect(@pseudonym).to be_valid
@@ -253,7 +267,7 @@ describe Canvas::Security::PasswordPolicy do
 
     context "when attachment is corrupted" do
       before do
-        allow(attachment).to receive(:open).and_raise(CorruptedDownload)
+        allow(attachment).to receive(:open).and_raise(Attachment::CorruptedDownload)
       end
 
       it "logs an error and returns false" do
@@ -309,6 +323,34 @@ describe Canvas::Security::PasswordPolicy do
         Redis::Distributed::CannotDistribute.new(:sismember)
       )
       expect(described_class.check_password_membership(cache_key, "password1", policy)).to be_nil
+    end
+
+    it "logs a warning and returns nil when Redis is not enabled" do
+      allow(Canvas).to receive(:redis_enabled?).and_return(false)
+      expect(Rails.logger).to receive(:warn).with(/Redis is not enabled.*custom password dictionary/)
+      expect(described_class.check_password_membership(cache_key, "password1", policy)).to be_nil
+    end
+
+    context "when file loading fails due to corruption" do
+      before do
+        allow(redis).to receive(:srandmember).with(cache_key).and_return(nil)
+        allow(attachment).to receive(:open).and_raise(Attachment::CorruptedDownload.new)
+      end
+
+      it "returns false when attachment is corrupted" do
+        expect(described_class.check_password_membership(cache_key, "password1", policy)).to be_falsey
+      end
+    end
+
+    context "when file loading fails for other reasons" do
+      before do
+        allow(redis).to receive(:srandmember).with(cache_key).and_return(nil)
+        allow(Attachment).to receive(:not_deleted).and_return(double(find_by: nil))
+      end
+
+      it "returns false when attachment is not found" do
+        expect(described_class.check_password_membership(cache_key, "password1", policy)).to be_falsey
+      end
     end
   end
 end
