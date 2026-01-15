@@ -26123,6 +26123,7 @@ tr:
       teachers_notified_of_comments: "Öğretmenler ve gönderenlere tüm bildirimler iletilecektir."
     show_preview: 
       anonymous_username: "Bu Öğrenci"
+      assignment_locked: "Bu ödev şu anda kilitli"
       discussion_submission_description: "Bu ödev için gönderiler ödevin tartışmasına yazılan yazılardır. Aşağıda %{user} için tartışma yazıları var, ya da *tüm yazışmaları görebilirsiniz*."
       discussion_submission_description_without_link: "Bu ödev için gönderiler ödevin tartışma bölümüne yazılanlardır. Aşağıda %{user} için tartışma yazıları vardır."
       entry_no_image: "Unutmayın, orijinal gönderiden sonra bu sayfa değişmiş olabilir."
