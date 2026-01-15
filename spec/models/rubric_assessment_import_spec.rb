@@ -82,9 +82,20 @@ describe RubricAssessmentImport do
       ]
     end
 
-    def generate_csv(rubric_data)
+    let(:rubric_headers_hide_points) do
+      [
+        "Student Id",
+        "Student Name",
+        "Criterion 1 - Rating",
+        "Criterion 1 - Comments",
+        "Criterion 2 - Rating",
+        "Criterion 2 - Comments",
+      ]
+    end
+
+    def generate_csv(rubric_data, hide_points: false)
       uploaded_csv = CSV.generate do |csv|
-        csv << rubric_headers
+        csv << (hide_points ? rubric_headers_hide_points : rubric_headers)
         rubric_data.each do |rubric|
           csv << rubric
         end
@@ -119,6 +130,14 @@ describe RubricAssessmentImport do
                      [@student1.id, "Test Student", "Exceed", "", "", "Meets", "", "Good job"],
                      [@student2.id, "Test Student", "Exceed", "", "test comment", "Meets", "", "Great!"],
                    ])
+    end
+
+    def csv_with_points_hidden
+      generate_csv([
+                     [@student1.id, "Test Student", "Exceed", "", "Meets", "Good job"],
+                     [@student2.id, "Test Student", "Exceed", "test comment", "Meets", "Great!"],
+                   ],
+                   hide_points: true)
     end
 
     def csv_with_mixmatch_points_and_ratings
@@ -193,7 +212,7 @@ describe RubricAssessmentImport do
 
     it "should assess rubrics without points when hide_points is enabled" do
       @rubric_association.update!(hide_points: true)
-      import = create_import_manually(full_csv)
+      import = create_import_manually(csv_with_points_hidden)
       import.run
 
       expect(import.workflow_state).to eq("succeeded")
@@ -202,21 +221,21 @@ describe RubricAssessmentImport do
 
       student1_assessment = RubricAssessment.find_by(user_id: @student1.id)
       student1_first_assessment = student1_assessment.data[0]
-      expect(student1_first_assessment[:points]).to be_nil
+      expect(student1_first_assessment[:points]).to eq(4.0)
       expect(student1_first_assessment[:description]).to eq("Exceed")
       expect(student1_first_assessment[:comments]).to eq("")
       student1_second_assessment = student1_assessment.data[1]
-      expect(student1_second_assessment[:points]).to be_nil
+      expect(student1_second_assessment[:points]).to eq(3.0)
       expect(student1_second_assessment[:description]).to eq("Meets")
       expect(student1_second_assessment[:comments]).to eq("Good job")
 
       student2_assessment = RubricAssessment.find_by(user_id: @student2.id)
       student2_first_assessment = student2_assessment.data[0]
-      expect(student2_first_assessment[:points]).to be_nil
+      expect(student2_first_assessment[:points]).to eq(4.0)
       expect(student2_first_assessment[:description]).to eq("Exceed")
       expect(student2_first_assessment[:comments]).to eq("test comment")
       student2_second_assessment = student2_assessment.data[1]
-      expect(student2_second_assessment[:points]).to be_nil
+      expect(student2_second_assessment[:points]).to eq(3.0)
       expect(student2_second_assessment[:description]).to eq("Meets")
       expect(student2_second_assessment[:comments]).to eq("Great!")
     end
