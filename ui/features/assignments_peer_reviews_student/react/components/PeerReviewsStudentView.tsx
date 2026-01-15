@@ -186,6 +186,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const isLocked = isPeerReviewLocked(data.assignment)
   const isPastLockDate = isPeerReviewPastLockDate(data.assignment)
   const peerReviewDueAt = assignedToDates?.[0]?.peerReviewDates?.dueAt
+  const isAnonymous = data.assignment.peerReviews?.anonymousReviews ?? false
 
   const renderHeader = () => {
     return (
@@ -299,6 +300,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
                   onPeerReviewSubmitted={handlePeerReviewSubmitted}
                   hasSeenPeerReviewModal={hasSeenPeerReviewModal}
                   isReadOnly={isPastLockDate}
+                  isAnonymous={isAnonymous}
                 />
               )
             )}
@@ -323,6 +325,19 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
               onSelectionChange={setSelectedAssessmentIndex}
               requiredPeerReviewCount={peerReviews?.count || 0}
             />
+            {!isAnonymous &&
+              assessmentRequestsForCurrentUser &&
+              assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.anonymizedUser && (
+                <View as="div" margin="x-small 0 0 xx-small">
+                  <Text size="medium" weight="bold">
+                    {I18n.t('Peer: %{peerName}', {
+                      peerName:
+                        assessmentRequestsForCurrentUser[selectedAssessmentIndex].anonymizedUser
+                          ?.displayName,
+                    })}
+                  </Text>
+                </View>
+              )}
           </View>
         )}
         {renderBody()}

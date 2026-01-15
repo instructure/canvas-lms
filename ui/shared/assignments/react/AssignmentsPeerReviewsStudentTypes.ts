@@ -143,6 +143,11 @@ export interface AssessmentRequest {
   available: boolean | null
   workflowState: string
   createdAt: string
+  anonymousId: string | null
+  anonymizedUser: {
+    _id: string
+    displayName: string
+  } | null
   submission: Submission | null
   rubricAssessment?: {
     _id: string
@@ -154,6 +159,7 @@ interface PeerReviews {
   count: number | null
   submissionRequired: boolean | null
   pointsPossible: number | null
+  anonymousReviews: boolean | null
 }
 
 interface SubmissionsConnection {
