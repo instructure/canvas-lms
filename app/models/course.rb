@@ -380,6 +380,27 @@ class Course < ActiveRecord::Base
 
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
+  before_save :check_if_should_save_original_syllabus_version
+  after_save :save_original_syllabus_version_if_needed
+
+  def check_if_should_save_original_syllabus_version
+    @should_save_original_syllabus_version = syllabus_body_changed? &&
+                                             syllabus_body_was.present? &&
+                                             Account.site_admin&.feature_enabled?(:syllabus_versioning) &&
+                                             unversioned?
+  rescue
+    @should_save_original_syllabus_version = false
+  end
+
+  def save_original_syllabus_version_if_needed
+    return unless @should_save_original_syllabus_version
+
+    original_attributes = attributes.merge("syllabus_body" => syllabus_body_previously_was)
+    versions.create(yaml: original_attributes.except(*simply_versioned_options[:exclude]).to_yaml)
+  rescue => e
+    Rails.logger.warn("Error saving original syllabus version: #{e.message}")
+  end
+
   simply_versioned exclude: SIMPLY_VERSIONED_EXCLUDE_FIELDS,
                    keep: 5,
                    when: lambda { |course|
