@@ -108,6 +108,27 @@ describe "submissions/show_preview" do
         expect(response.body).to match(%r{courses/#{@course.id}/external_tools/retrieve})
         expect(response.body).to match(/example\.com/)
       end
+
+      it "shows locked message when assignment is locked by unlock_at" do
+        @assignment.update!(unlock_at: 1.day.from_now)
+        @submission = @assignment.submissions.find_or_create_by!(user: @student)
+        assign(:submission, @submission)
+        render "submissions/show_preview"
+
+        expect(response.body).to match(/locked/i)
+        expect(response.body).not_to match(/meta HTTP-EQUIV="REFRESH"/i)
+      end
+
+      it "shows locked message when assignment is locked by lock_at" do
+        # Students should not be able to start a quiz after the lock date has passed
+        @assignment.update!(lock_at: 1.day.ago)
+        @submission = @assignment.submissions.find_or_create_by!(user: @student)
+        assign(:submission, @submission)
+        render "submissions/show_preview"
+
+        expect(response.body).to match(/locked/i)
+        expect(response.body).not_to match(/meta HTTP-EQUIV="REFRESH"/i)
+      end
     end
 
     it "still shows 'No Preview Available' for non-quiz external_tool assignments" do
