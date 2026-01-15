@@ -178,7 +178,7 @@ describe PageViewsController do
   end
 
   context "pv5" do
-    let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.test"), access_token: "token") }
+    let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.test")) }
 
     before do
       allow(PageViews::Configuration).to receive(:new).and_return(configuration)

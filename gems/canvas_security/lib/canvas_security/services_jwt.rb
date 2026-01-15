@@ -100,7 +100,7 @@ class CanvasSecurity::ServicesJwt
     CanvasSecurity.base64_encode(crypted_token)
   end
 
-  def self.for_user(domain, user, real_user: nil, workflows: nil, context: nil, symmetric: false, encrypt: true, audience: nil, root_account_uuid: nil)
+  def self.for_user(domain, user, real_user: nil, workflows: nil, context: nil, symmetric: false, encrypt: true, audience: nil, root_account_uuid: nil, base64: true)
     if domain.blank? || user.nil?
       raise ArgumentError, "Must have a domain and a user to build a JWT"
     end
@@ -126,7 +126,7 @@ class CanvasSecurity::ServicesJwt
     if root_account_uuid
       payload[:root_account_uuid] = root_account_uuid
     end
-    generate(payload, symmetric:, encrypt:)
+    generate(payload, base64, symmetric:, encrypt:)
   end
 
   def self.refresh_for_user(jwt, domain, user, real_user: nil, symmetric: false)

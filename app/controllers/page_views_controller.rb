@@ -857,11 +857,11 @@ class PageViewsController < ApplicationController
   end
 
   def pv5_poll_service
-    PageViews::PollQueryService.new(PageViews::Configuration.new)
+    PageViews::PollQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
   end
 
   def pv5_fetch_result_service
-    PageViews::FetchResultService.new(PageViews::Configuration.new)
+    PageViews::FetchResultService.new(PageViews::Configuration.new, requestor_user: @current_user)
   end
 
   def pv5_enqueue_batch_service
@@ -869,11 +869,11 @@ class PageViewsController < ApplicationController
   end
 
   def pv5_poll_batch_service
-    PageViews::PollBatchQueryService.new(PageViews::Configuration.new)
+    PageViews::PollBatchQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
   end
 
   def pv5_fetch_batch_result_service
-    PageViews::FetchBatchResultService.new(PageViews::Configuration.new)
+    PageViews::FetchBatchResultService.new(PageViews::Configuration.new, requestor_user: @current_user)
   end
 
   def validate_query_id!

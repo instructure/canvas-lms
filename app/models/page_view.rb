@@ -204,7 +204,7 @@ class PageView < ActiveRecord::Base
     ConfigFile.cache_object("pv4") do |config|
       creds = Rails.application.credentials.pv4_creds
 
-      Pv4Client.new(config["uri"], creds&.dig(Rails.env.to_sym, :access_token))
+      Pv4Client.new(config["uri"], creds&.dig(Rails.env.to_sym, :access_token), **)
     end
   end
 
@@ -212,10 +212,10 @@ class PageView < ActiveRecord::Base
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user, options = {})
-    client = options.delete(:client) || pv4_client
     viewer = options.delete(:viewer)
     viewer = nil if viewer == user
     viewer = nil if viewer && Account.site_admin.grants_any_right?(viewer, :view_statistics, :manage_students)
+    client = options.delete(:client) || pv4_client(requestor_user: viewer || user)
     user.shard.activate do
       if PageView.pv4?
         result = client.for_user(user, **options)

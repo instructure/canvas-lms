@@ -19,15 +19,12 @@
 
 module PageViews
   class Configuration
-    attr_reader :access_token, :uri
+    attr_reader :uri
 
     def initialize
       config = ConfigFile.load("pv5")
-      env_creds = Rails.application.credentials.pv5_creds[Rails.env.to_sym] if Rails.application.credentials.pv5_creds
-      raise Common::ConfigurationError, "Missing credentials for environment: #{Rails.env}" unless env_creds && env_creds[:access_token]
       raise Common::ConfigurationError, "Missing or invalid 'uri' in pv5 config file" unless config["uri"].is_a?(String) && !config["uri"].strip.empty?
 
-      @access_token = env_creds[:access_token]
       @uri = URI.parse(config["uri"])
     end
   end

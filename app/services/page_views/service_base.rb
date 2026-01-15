@@ -30,10 +30,21 @@ module PageViews
 
     def request_headers
       request_id = RequestContext::Generator.request_id
-      headers = { "Authorization" => "Bearer #{@configuration.access_token}",
-                  "X-Request-Context-Id" => request_id }
-      headers["X-Canvas-User-Id"] = @requestor_user.global_id.to_s if @requestor_user
-      headers
+      jwt_token = generate_jwt_token
+      { "Authorization" => "Bearer #{jwt_token}",
+        "X-Request-Context-Id" => request_id }
+    end
+
+    def generate_jwt_token
+      raise ArgumentError, "requestor_user is required for JWT generation" unless @requestor_user
+
+      domain = @configuration.uri.host
+      CanvasSecurity::ServicesJwt.for_user(
+        domain,
+        @requestor_user,
+        encrypt: false,
+        base64: false
+      )
     end
 
     def handle_generic_errors(response)
