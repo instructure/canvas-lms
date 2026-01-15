@@ -127,7 +127,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationReady])
+          return HttpResponse.json({accounts: [mockMigrationReady], coordinator_progress: null})
         },
       ),
     )
@@ -135,7 +135,7 @@ describe('TurnitinAPMigrationModal Status', () => {
     render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
 
     await waitFor(() => {
-      const migrateButton = screen.getByRole('button', {name: /Migrate/i})
+      const migrateButton = screen.getByRole('button', {name: /^Migrate$/i})
       expect(migrateButton).toBeInTheDocument()
       expect(migrateButton).toBeEnabled()
     })
@@ -146,7 +146,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationRunning])
+          return HttpResponse.json({accounts: [mockMigrationRunning], coordinator_progress: null})
         },
       ),
     )
@@ -165,7 +165,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationCompleted])
+          return HttpResponse.json({accounts: [mockMigrationCompleted], coordinator_progress: null})
         },
       ),
     )
@@ -183,7 +183,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationFailed])
+          return HttpResponse.json({accounts: [mockMigrationFailed], coordinator_progress: null})
         },
       ),
     )
@@ -200,7 +200,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationRunning])
+          return HttpResponse.json({accounts: [mockMigrationRunning], coordinator_progress: null})
         },
       ),
     )
@@ -217,7 +217,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationCompleted])
+          return HttpResponse.json({accounts: [mockMigrationCompleted], coordinator_progress: null})
         },
       ),
     )
@@ -234,7 +234,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationFailed])
+          return HttpResponse.json({accounts: [mockMigrationFailed], coordinator_progress: null})
         },
       ),
     )
@@ -251,7 +251,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationCompleted])
+          return HttpResponse.json({accounts: [mockMigrationCompleted], coordinator_progress: null})
         },
       ),
     )
@@ -274,7 +274,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationFailed])
+          return HttpResponse.json({accounts: [mockMigrationFailed], coordinator_progress: null})
         },
       ),
     )
@@ -309,7 +309,7 @@ describe('TurnitinAPMigrationModal Status', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([migrationWithoutReport])
+          return HttpResponse.json({accounts: [migrationWithoutReport], coordinator_progress: null})
         },
       ),
     )

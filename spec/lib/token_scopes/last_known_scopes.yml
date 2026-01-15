@@ -49,6 +49,8 @@
   path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
 - verb: POST
   path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations/migrate_all'
 - verb: GET
   path: '/api/v1/accounts/:account_id/authentication_providers'
 - verb: POST

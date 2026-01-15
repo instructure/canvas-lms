@@ -23,11 +23,14 @@ module Lti
     TII_TOOL_VENDOR_CODE = Rails.env.development? ? "Instructure.com" : "turnitin.com"
     TII_TOOL_PRODUCT_CODE = Rails.env.development? ? "similarity detection reference tool" : "turnitin-lti"
     MIGRATED_ASSET_REPORT_TYPE = "originality_report"
+    PROGRESS_TAG = "lti_tii_ap_migration"
+    COORDINATOR_TAG = "lti_tii_ap_migration_coordinator"
 
-    def initialize(account, email = nil)
+    def initialize(account, email = nil, coordinator_id = nil)
       @account = account
       @email = email
-      @results = { proxies: {} }
+      @coordinator_id = coordinator_id
+      @results = { proxies: {}, coordinator_id: @coordinator_id }
     end
 
     def perform(progress)
@@ -40,7 +43,12 @@ module Lti
       end
       save_migration_report
       @progress.set_results(@results.except(:actl_errors, :actl_warnings)) # actl_errors can be large, exclude from progress results
-      send_migration_report_email
+
+      if @coordinator_id.present?
+        check_and_send_consolidated_email
+      else
+        send_migration_report_email
+      end
 
       if any_error_occurred?
         Rails.logger.info("TII Asset Processor migration completed with errors")
@@ -90,6 +98,8 @@ module Lti
         unless subaccount_toolproxy
           assignment = actl.assignment
           csv << [
+            assignment.course.account.id,
+            assignment.course.account.name,
             assignment.id,
             assignment.name,
             assignment.course.id,
@@ -170,9 +180,10 @@ module Lti
       end
 
       if context_matching_deployments.empty?
+        # Every TP must have a deployment in the exact same context, because there are TPs where contexts are overlapping (there's one in the root account and one in the subaccount)
+        # this is a TII requirement
         if deployments.any?
-          add_proxy_error(tool_proxy, "Found #{deployments.map { |d| "CET ID=#{d.id}" }.join(", ")} TII AP deployments in context of Tool Proxy ID=#{tool_proxy.global_id}, but none match the context. Skipping migration.")
-          return
+          Rails.logger.info("No TII AP deployment found in the same context for Tool Proxy ID=#{tool_proxy.global_id}, there's one above, but we strictly creating one in the same context")
         end
         Rails.logger.info("No TII AP deployment found for Tool Proxy ID=#{tool_proxy.global_id}, creating one")
         deployment = create_tii_deployment(tool_proxy)
@@ -214,7 +225,6 @@ module Lti
       # Create deployment (ContextExternalTool) in the same context as the tool_proxy
       deployment = tii_developer_key.lti_registration.new_external_tool(
         tool_proxy.context,
-        verify_uniqueness: true,
         current_user: @progress.user
       )
       Rails.logger.info("Created TII Asset Processor deployment ID=#{deployment.global_id} for Tool Proxy ID=#{tool_proxy.global_id}")
@@ -434,6 +444,8 @@ module Lti
     def generate_migration_report
       @csv_content = CSV.generate do |csv|
         csv << [
+          "Account ID",
+          "Account Name",
           "Assignment ID",
           "Assignment Name",
           "Course ID",
@@ -464,7 +476,7 @@ module Lti
       Attachments::Storage.store_for_attachment(attachment, StringIO.new(csv))
       attachment.save!
       @results[:migration_report_attachment_id] = attachment.id
-      @results[:migration_report_url] = report_download_url(attachment.id)
+      @results[:migration_report_url] = report_download_url(attachment.id, @account)
     end
 
     def send_migration_report_email
@@ -487,13 +499,149 @@ module Lti
       @results[:email_error] = true
     end
 
-    def report_download_url(attachment_id)
+    def check_and_send_consolidated_email
+      coordinator = Progress.find_by(id: @coordinator_id)
+      if coordinator.nil?
+        Rails.logger.warn("Unable to find coordinator by id: #{@coordinator_id}")
+        return
+      end
+
+      Progress.transaction do
+        coordinator.lock!
+
+        return if coordinator.results&.dig(:report_created)
+
+        all_migrations = Progress
+                         .where(tag: PROGRESS_TAG)
+                         .to_a
+                         .select { |p| p.results&.dig(:coordinator_id) == @coordinator_id }
+
+        return if all_migrations.empty?
+
+        # Check if all migrations have finished their work (report generated)
+        # Note: workflow_state won't be "completed" yet since that happens AFTER this check
+        all_complete = all_migrations.all? do |p|
+          !p.pending? || p.results&.dig(:migration_report_attachment_id).present?
+        end
+        return unless all_complete
+
+        report_url = send_consolidated_report_email(all_migrations, coordinator)
+
+        results = coordinator.results || {}
+        results[:report_created] = true
+        results[:consolidated_report_url] = report_url
+        coordinator.set_results(results)
+        coordinator.complete!
+      end
+    rescue => e
+      capture_and_log_exception(e)
+      Rails.logger.error("Failed to check and send consolidated email: #{e.message}")
+    end
+
+    def send_consolidated_report_email(all_migrations, coordinator)
+      root_account = @account.root_account
+      bulk_migration_id = coordinator.results&.dig(:bulk_migration_id)
+      email = coordinator.results&.dig(:email)
+
+      consolidated_csv = generate_consolidated_report(all_migrations)
+      download_url = save_consolidated_report(consolidated_csv, root_account, bulk_migration_id)
+      return unless download_url
+      return download_url unless email.present?
+
+      any_failed = all_migrations.any? { |p| p.workflow_state == "failed" }
+      subject = I18n.t(
+        :asset_processor_bulk_migration_report_subject,
+        "Turnitin Asset Processor Bulk Migration Report"
+      )
+      body = consolidated_email_body(download_url, all_migrations.size, any_failed)
+
+      m = Message.new
+      m.to = email
+      m.from = HostUrl.outgoing_email_address
+      m.subject = subject
+      m.body = body
+
+      Mailer.deliver(Mailer.create_message(m))
+      Rails.logger.info("Sent consolidated migration report email to #{email} for #{all_migrations.size} migrations")
+      download_url
+    rescue => e
+      capture_and_log_exception(e)
+      Rails.logger.error("Failed to send consolidated migration report email: #{e.message}")
+      download_url
+    end
+
+    def generate_consolidated_report(all_migrations)
+      content = +""
+      header_written = false
+
+      all_migrations.sort_by(&:context_id).each do |progress|
+        attachment_id = progress.results&.dig(:migration_report_attachment_id)
+        next unless attachment_id
+
+        begin
+          attachment = Attachment.find(attachment_id)
+          report_content = attachment.open.read
+          lines = report_content.split("\n")
+
+          unless header_written
+            content << lines.first << "\n"
+            header_written = true
+          end
+
+          lines[1..].each do |line|
+            content << line << "\n" if line.present?
+          end
+        rescue => e
+          Rails.logger.error("Failed to read migration report for progress #{progress.id}: #{e.message}")
+        end
+      end
+      content
+    end
+
+    def save_consolidated_report(csv_content, root_account, bulk_migration_id)
+      attachment = Attachment.new(
+        context: root_account,
+        filename: "tii_ap_bulk_migration_report_#{bulk_migration_id}.csv",
+        content_type: "text/csv"
+      )
+      Attachments::Storage.store_for_attachment(attachment, StringIO.new(csv_content))
+      attachment.save!
+      report_download_url(attachment, root_account)
+    rescue => e
+      capture_and_log_exception(e)
+      Rails.logger.error("Failed to save consolidated migration report: #{e.message}")
+      nil
+    end
+
+    def consolidated_email_body(download_url, migration_count, any_failed)
+      if any_failed
+        I18n.t(
+          :asset_processor_bulk_migration_partial_success_email_body,
+          "The bulk Turnitin migration from LTI 2.0 to LTI 1.3 Asset Processor has completed with some failures.\n\n" \
+          "Migrated %{count} account(s). Some migrations failed - please review the report for details.\n\n" \
+          "Click here to download the consolidated report: %{url}",
+          count: migration_count,
+          url: download_url
+        )
+      else
+        I18n.t(
+          :asset_processor_bulk_migration_success_email_body,
+          "The bulk Turnitin migration from LTI 2.0 to LTI 1.3 Asset Processor has completed successfully.\n\n" \
+          "Migrated %{count} account(s).\n\n" \
+          "Click here to download the consolidated report: %{url}",
+          count: migration_count,
+          url: download_url
+        )
+      end
+    end
+
+    def report_download_url(attachment_id, account)
       return unless attachment_id
 
       Rails.application.routes.url_helpers.account_file_download_url(
-        @account.id,
+        account.id,
         attachment_id,
-        host: HostUrl.context_host(@account),
+        host: HostUrl.context_host(account),
         protocol: HostUrl.protocol
       )
     end
