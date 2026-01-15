@@ -431,6 +431,38 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to equal(50.0)
     end
 
+    it "omits peer review sub-assignment from final grade when parent is omitted" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @group = @course.assignment_groups.create!(name: "group", group_weight: 100)
+      counting_assignment = @course.assignments.create!(
+        title: "Counting Assignment",
+        points_possible: 10,
+        assignment_group: @group
+      )
+
+      parent = @course.assignments.create!(
+        title: "Parent",
+        points_possible: 10,
+        assignment_group: @group,
+        peer_reviews: true,
+        omit_from_final_grade: true
+      )
+
+      peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+        parent_assignment: parent,
+        points_possible: 10,
+        grading_type: "points"
+      )
+
+      expect(peer_review_sub.omit_from_final_grade).to be true
+
+      counting_assignment.grade_student(@user, grade: "10", grader: @teacher)
+      peer_review_sub.grade_student(@user, grade: "5", grader: @teacher)
+
+      expect(@user.enrollments.first.computed_final_score).to equal(100.0)
+    end
+
     it "recomputes when an assignment changes assignment groups" do
       @course.update_attribute :group_weighting_scheme, "percent"
       ag1 = @course.assignment_groups.create! name: "Group 1", group_weight: 80
