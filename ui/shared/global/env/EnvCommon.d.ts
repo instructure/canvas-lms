@@ -318,7 +318,6 @@ export type SiteAdminFeatureId =
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
   | 'student_access_token_management'
-  | 'top_navigation_placement_a11y_fixes'
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
