@@ -16,28 +16,27 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
 module Accessibility
   class Issue
-    module WikiPageIssues
-      def generate_wiki_page_resources(skip_scan: false)
-        pages = context.wiki_pages.not_deleted.order(updated_at: :desc)
-        return pages.map { |page| wiki_page_attributes(page) } if skip_scan
+    module DiscussionTopicIssues
+      def generate_discussion_topic_resources(skip_scan: false)
+        discussion_topics = context.discussion_topics
+        return discussion_topics.map { |discussion_topic| discussion_topic_attributes(discussion_topic) } if skip_scan
 
-        pages.each_with_object({}) do |page, issues|
-          result = check_content_accessibility(page.body)
-          issues[page.id] = result.merge(wiki_page_attributes(page))
+        discussion_topics.each_with_object({}) do |discussion_topic, issues|
+          result = check_content_accessibility(discussion_topic.message.to_s)
+          issues[discussion_topic.id] = result.merge(discussion_topic_attributes(discussion_topic))
         end
       end
 
       private
 
-      def wiki_page_attributes(page)
+      def discussion_topic_attributes(discussion_topic)
         {
-          title: page.title,
-          published: page.published?,
-          updated_at: page.updated_at&.iso8601 || ""
-        }.merge(resource_urls(page))
+          title: discussion_topic.title,
+          published: discussion_topic.published?,
+          updated_at: discussion_topic.updated_at.iso8601 || ""
+        }.merge(resource_urls(discussion_topic))
       end
     end
   end
