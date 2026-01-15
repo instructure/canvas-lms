@@ -326,18 +326,6 @@ class User < ActiveRecord::Base
   end
 
   scope :of_account, ->(account) { joins(:user_account_associations).where(user_account_associations: { account_id: account }).shard(account.shard) }
-
-  scope :of_account_cte, lambda { |account|
-    cte_subquery = UserAccountAssociation.select(:user_id).where(account:).to_sql
-    cte_sql = <<~SQL.squish
-      WITH users_in_account AS MATERIALIZED (#{cte_subquery})
-      SELECT user_id
-      FROM users_in_account
-    SQL
-
-    where("users.id IN (#{cte_sql})").shard(account)
-  }
-
   scope :recently_logged_in, lambda {
     eager_load(:pseudonyms)
       .where("pseudonyms.current_login_at>?", 1.month.ago)
