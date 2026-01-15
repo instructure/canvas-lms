@@ -22,28 +22,99 @@ import {ContentTypeCell} from '../ContentTypeCell'
 import {AccessibilityResourceScan, ResourceType} from '../../../../../../shared/react/types'
 
 describe('ContentTypeCell', () => {
-  it('renders "Page"', () => {
-    render(
-      <ContentTypeCell item={{resourceType: ResourceType.WikiPage} as AccessibilityResourceScan} />,
-    )
-    expect(screen.getByText('Page')).toBeInTheDocument()
+  describe('text rendering', () => {
+    it('renders "Page" for WikiPage resource type', () => {
+      render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.WikiPage} as AccessibilityResourceScan}
+        />,
+      )
+      expect(screen.getByText('Page')).toBeInTheDocument()
+    })
+
+    it('renders "Assignment" for Assignment resource type', () => {
+      render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.Assignment} as AccessibilityResourceScan}
+        />,
+      )
+      expect(screen.getByText('Assignment')).toBeInTheDocument()
+    })
+
+    it('renders "Attachment" for Attachment resource type', () => {
+      render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.Attachment} as AccessibilityResourceScan}
+        />,
+      )
+      expect(screen.getByText('Attachment')).toBeInTheDocument()
+    })
+
+    it('renders "Discussion Topic" for DiscussionTopic resource type', () => {
+      render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.DiscussionTopic} as AccessibilityResourceScan}
+        />,
+      )
+      expect(screen.getByText('Discussion topic')).toBeInTheDocument()
+    })
   })
 
-  it('renders "Assignment"', () => {
-    render(
-      <ContentTypeCell
-        item={{resourceType: ResourceType.Assignment} as AccessibilityResourceScan}
-      />,
-    )
-    expect(screen.getByText('Assignment')).toBeInTheDocument()
+  describe('icon rendering', () => {
+    it('renders document icon for WikiPage', () => {
+      const {container} = render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.WikiPage} as AccessibilityResourceScan}
+        />,
+      )
+      const icon = container.querySelector('svg[name="IconDocument"]')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('renders assignment icon for Assignment', () => {
+      const {container} = render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.Assignment} as AccessibilityResourceScan}
+        />,
+      )
+      const icon = container.querySelector('svg[name="IconAssignment"]')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('renders MS Word icon for Attachment', () => {
+      const {container} = render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.Attachment} as AccessibilityResourceScan}
+        />,
+      )
+      const icon = container.querySelector('svg[name="IconMsWord"]')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('renders discussion icon for DiscussionTopic', () => {
+      const {container} = render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.DiscussionTopic} as AccessibilityResourceScan}
+        />,
+      )
+      const icon = container.querySelector('svg[name="IconDiscussion"]')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('aria-hidden', 'true')
+    })
   })
 
-  it('renders "Attachment"', () => {
-    render(
-      <ContentTypeCell
-        item={{resourceType: ResourceType.Attachment} as AccessibilityResourceScan}
-      />,
-    )
-    expect(screen.getByText('Attachment')).toBeInTheDocument()
+  describe('layout', () => {
+    it('renders icon and text in a flex layout', () => {
+      const {container} = render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.DiscussionTopic} as AccessibilityResourceScan}
+        />,
+      )
+      const flexContainer = container.querySelector('[class*="flex"]')
+      expect(flexContainer).toBeInTheDocument()
+    })
   })
 })

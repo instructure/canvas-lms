@@ -92,6 +92,8 @@ export const getAsContentItemType = (type?: ResourceType): ContentItemType | und
       return ContentItemType.Assignment
     case ResourceType.Attachment:
       return ContentItemType.Attachment
+    case ResourceType.DiscussionTopic:
+      return ContentItemType.DiscussionTopic
   }
 }
 

@@ -948,6 +948,8 @@
 - verb: PUT
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
 - verb: POST
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/accessibility/scan'
+- verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/duplicate'
 - verb: GET
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/entries'
@@ -1775,6 +1777,8 @@
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id'
 - verb: PUT
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id'
+- verb: POST
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/accessibility/scan'
 - verb: POST
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/duplicate'
 - verb: GET

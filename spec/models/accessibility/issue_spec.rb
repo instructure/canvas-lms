@@ -36,6 +36,7 @@ describe Accessibility::Issue do
       allow(context_double).to receive_messages(
         wiki_pages:,
         assignments:,
+        discussion_topics: [],
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: false
       )
@@ -64,6 +65,7 @@ describe Accessibility::Issue do
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments:,
+        discussion_topics: [],
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: false
       )
@@ -76,6 +78,25 @@ describe Accessibility::Issue do
       result = described_class.new(context: context_double).generate
 
       expect(result[:assignments][2][:title]).to eq("Assignment 1")
+      expect(result[:accessibility_scan_disabled]).to be false
+    end
+
+    it "returns issues for discussion topics" do
+      discussion_topic = double("DiscussionTopic", id: 3, message: "<div>message</div>", title: "Discussion 1", published?: true, updated_at: Time.zone.now)
+
+      allow(context_double).to receive_messages(
+        wiki_pages: double("WikiPages", not_deleted: double(order: [])),
+        assignments: double("Assignments", active: double(not_excluded_from_accessibility_scan: double(order: []))),
+        discussion_topics: [discussion_topic],
+        attachments: double("Attachments", not_deleted: double(order: [])),
+        exceeds_accessibility_scan_limit?: false
+      )
+
+      allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
+
+      result = described_class.new(context: context_double).generate
+
+      expect(result[:discussion_topics][3][:title]).to eq("Discussion 1")
       expect(result[:accessibility_scan_disabled]).to be false
     end
 
@@ -99,7 +120,8 @@ describe Accessibility::Issue do
 
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
-        assignments: double("Assignments", active: double(order: [])),
+        assignments: double("Assignments", active: double(not_excluded_from_accessibility_scan: double(order: []))),
+        discussion_topics: [],
         attachments: attachments_collection,
         exceeds_accessibility_scan_limit?: false
       )
@@ -149,6 +171,7 @@ describe Accessibility::Issue do
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments:,
+        discussion_topics: [],
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: true
       )
@@ -250,6 +273,28 @@ describe Accessibility::Issue do
         expect(resource.reload.description).to eq "<div><h2>Assignment Title</h2></div>"
       end
     end
+
+    context "with a discussion topic" do
+      let(:resource) { discussion_topic_model(context: course, message: "<div><h1>Discussion Title</h1></div>") }
+
+      it "updates a discussion topic successfully" do
+        issue = described_class.new(context: course)
+        response = issue.update_content(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "DiscussionTopic",
+          resource.id,
+          ".//h1",
+          "Change it to Heading 2"
+        )
+        expect(response).to eq(
+          {
+            json: { success: true },
+            status: :ok
+          }
+        )
+        expect(resource.reload.message).to eq "<div><h2>Discussion Title</h2></div>"
+      end
+    end
   end
 
   describe "#update_preview" do
@@ -316,6 +361,27 @@ describe Accessibility::Issue do
         expect(response).to eq(
           {
             json: { content: "<h2>Assignment Title</h2>", path: "./div/h2" },
+            status: :ok
+          }
+        )
+      end
+    end
+
+    context "with a discussion topic" do
+      let(:resource) { discussion_topic_model(context: course, message: "<div><h1>Discussion Title</h1></div>") }
+
+      it "previews the resource successfully" do
+        issue = described_class.new(context: course)
+        response = issue.update_preview(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "DiscussionTopic",
+          resource.id,
+          ".//h1",
+          "Change it to Heading 2"
+        )
+        expect(response).to eq(
+          {
+            json: { content: "<h2>Discussion Title</h2>", path: "./div/h2" },
             status: :ok
           }
         )

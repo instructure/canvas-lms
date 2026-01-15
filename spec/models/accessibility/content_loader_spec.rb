@@ -25,8 +25,10 @@ describe Accessibility::ContentLoader do
   let(:course) { course_model }
   let(:assignment) { assignment_model(course:, description: assignment_content) }
   let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: page_content) }
+  let(:discussion_topic) { discussion_topic_model(context: course, message: discussion_content) }
   let(:assignment_content) { "<div><h1>Assignment Title</h1><p>Assignment description</p></div>" }
   let(:page_content) { "<div><h2>Page Title</h2><p>Page body content</p></div>" }
+  let(:discussion_content) { "<div><h3>Discussion Title</h3><p>Discussion message</p></div>" }
 
   describe "#content" do
     context "for Assignments" do
@@ -48,6 +50,17 @@ describe Accessibility::ContentLoader do
         result = content_loader.content
 
         expect(result).to eq(page_content)
+      end
+    end
+
+    context "for DiscussionTopics" do
+      let!(:issue) { accessibility_issue_model(course:, context: discussion_topic, node_path: nil) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+      it "returns discussion topic message" do
+        result = content_loader.content
+
+        expect(result).to eq(discussion_content)
       end
     end
 
@@ -99,6 +112,18 @@ describe Accessibility::ContentLoader do
         result = content_loader.content
 
         expect(result).to eq("<p>Page body content</p>")
+      end
+    end
+
+    context "when extracting from discussion topic" do
+      let!(:issue) { accessibility_issue_model(course:, context: discussion_topic, node_path: xpath) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+      let(:xpath) { ".//h3" }
+
+      it "returns discussion topic element" do
+        result = content_loader.content
+
+        expect(result).to eq("<h3>Discussion Title</h3>")
       end
     end
 

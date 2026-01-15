@@ -32,6 +32,7 @@ class DiscussionTopic < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
   include DatesOverridable
+  include Accessibility::Scannable
   include LinkedAttachmentHandler
 
   def self.html_fields
@@ -2321,5 +2322,9 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     DiscussionTopicParticipant.bulk_insert(participants_data)
+  end
+
+  def a11y_scannable_attributes
+    %i[title message workflow_state]
   end
 end

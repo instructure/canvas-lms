@@ -24,6 +24,7 @@ export enum ContentItemType {
   WikiPage = 'Page',
   Assignment = 'Assignment',
   Attachment = 'attachment',
+  DiscussionTopic = 'DiscussionTopic',
 }
 
 /* export const ContentTypeToKey = {
@@ -82,6 +83,7 @@ export enum ResourceType {
   WikiPage = 'WikiPage',
   Assignment = 'Assignment',
   Attachment = 'Attachment',
+  DiscussionTopic = 'DiscussionTopic',
 }
 
 export interface AccessibilityResourceScan extends HasId {

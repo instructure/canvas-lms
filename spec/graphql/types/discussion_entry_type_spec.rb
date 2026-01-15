@@ -132,7 +132,7 @@ describe Types::DiscussionEntryType do
   describe "when file_association_access ff is enabled" do
     it "adds attachment location tag to the message" do
       attachment = attachment_model(filename: "test.test", context: @teacher)
-      attachment.root_account.enable_feature!(:file_association_access)
+      Account.site_admin.enable_feature!(:file_association_access)
 
       message = "<img src='/users/#{@teacher.id}/files/#{attachment.id}/download'>"
       new_entry = discussion_entry.discussion_topic.discussion_entries.create!(message:, user: @teacher, parent_id: discussion_entry.id, editor: @teacher, saving_user: @teacher)
