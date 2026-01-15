@@ -27,6 +27,7 @@
 
   if add_ignite_agent_bundle?
     js_bundle(:ignite_agent)
+    js_env(show_ignite_agent_button: show_ignite_agent_button?)
     remote_env(ignite_agent: {
       launch_url: Services::IgniteAgent.launch_url,
       backend_url: Services::IgniteAgent.backend_url
