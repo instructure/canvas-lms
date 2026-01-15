@@ -26,6 +26,8 @@ const mockInfo = {
     data: [
       {
         featureName: 'Canvas Course Translation',
+        privacyNoticeText: 'Privacy Notice',
+        privacyNoticeUrl: 'https://www.instructure.com/policies/privacy',
         permissionLevel: 'LEVEL 2',
         modelName: 'OpenAI GPT-4',
         description: 'Test description',

@@ -20,6 +20,8 @@ export interface NutritionFactsProps {
   aiInformation: {
     data: Array<{
       featureName: string
+      privacyNoticeText: string
+      privacyNoticeUrl: string
       permissionLevel: string
       modelName: string
       description: string
