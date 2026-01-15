@@ -19,14 +19,14 @@
 import React from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
-import {canUseScreenCapture, ScreenCapture} from '@instructure/media-capture'
+import {canUseMediaCapture, MediaCapture} from '@instructure/media-capture'
 import {func, object, string} from 'prop-types'
 
 export default function MediaRecorder(props) {
   return (
     <div>
-      {canUseScreenCapture() ? (
-        <ScreenCapture translations={props.MediaCaptureStrings} onCompleted={props.onSave} />
+      {canUseMediaCapture() ? (
+        <MediaCapture translations={props.MediaCaptureStrings} onCompleted={props.onSave} />
       ) : (
         <Alert variant="info" margin="small">
           {props.errorMessage}
@@ -39,5 +39,5 @@ export default function MediaRecorder(props) {
 MediaRecorder.propTypes = {
   onSave: func.isRequired,
   errorMessage: string.isRequired,
-  MediaCaptureStrings: object,
+  MediaCaptureStrings: object
 }
