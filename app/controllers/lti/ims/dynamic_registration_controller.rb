@@ -384,7 +384,7 @@ module Lti
 
       def registration_view
         registration = Lti::IMS::Registration.find(params[:registration_id])
-        redirect_to account_developer_key_view_url(registration.root_account_id, registration.developer_key_id)
+        redirect_to "/accounts/#{registration.root_account_id}/apps/manage/#{registration.lti_registration.id}/configuration"
       end
 
       def dr_iframe
@@ -427,7 +427,7 @@ module Lti
           scope: (registration.scopes + ["openid"]).join(" "),
           "https://purl.imsglobal.org/spec/lti-tool-configuration": registration.lti_tool_configuration.merge(
             {
-              "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/registration_config_url": lti_registration_config_url(registration.global_id),
+              "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/registration_config_url": lti_registration_config_url(registration.lti_registration.account.global_id, registration.global_id),
             }
           ),
           registration_client_uri: get_lti_registration_url(registration_id: registration.global_id),

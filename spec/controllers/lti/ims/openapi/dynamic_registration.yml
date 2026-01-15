@@ -128,6 +128,27 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/registration"
+  /api/lti/accounts/:account_id/registrations/:registration_id/view:
+    get:
+      summary: Redirects the user to the tool's configuration view.
+      parameters:
+        - in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: "The user was redirected to the tool's configuration view."
+          headers:
+            Location:
+              schema:
+                type: string
   /api/lti/registrations:
     post:
       summary: TBD
@@ -236,22 +257,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/registration"
-  /api/lti/registrations/:registration_id/view:
-    get:
-      summary: Redirects the user to the tool's configuration view.
-      parameters:
-        - in: path
-          name: registration_id
-          required: true
-          schema:
-            type: string
-      responses:
-        '302':
-          description: "The user was redirected to the tool's configuration view."
-          headers:
-            Location:
-              schema:
-                type: string
 components:
   schemas:
     placement:
