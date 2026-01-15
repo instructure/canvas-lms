@@ -3916,69 +3916,6 @@ RSpec.describe ApplicationController, "#cached_js_env_account_features" do
   end
 end
 
-RSpec.describe ApplicationController, "#add_ignite_agent_bundle?" do
-  let_once(:account) { Account.default }
-
-  before do
-    controller.instance_variable_set(:@domain_root_account, account)
-    allow(controller).to receive(:session).and_return({})
-  end
-
-  it "returns false when preview param is true" do
-    allow(controller).to receive(:params).and_return({ preview: "true" })
-
-    expect(controller.send(:add_ignite_agent_bundle?)).to be false
-  end
-
-  it "returns false on oauth2_provider confirm page" do
-    allow(controller).to receive_messages(controller_name: "oauth2_provider", action_name: "confirm", params: {})
-
-    expect(controller.send(:add_ignite_agent_bundle?)).to be false
-  end
-
-  context "with legacy ignite_agent_enabled feature flag" do
-    before do
-      account.enable_feature!(:ignite_agent_enabled)
-    end
-
-    it "returns true when user has manage_account_settings permission" do
-      admin_user = account_admin_user
-      controller.instance_variable_set(:@current_user, admin_user)
-
-      expect(controller.send(:add_ignite_agent_bundle?)).to be true
-    end
-
-    it "returns true when user has ignite_agent_enabled_for_user feature flag" do
-      user = user_model
-      user.enable_feature!(:ignite_agent_enabled_for_user)
-      controller.instance_variable_set(:@current_user, user)
-
-      expect(controller.send(:add_ignite_agent_bundle?)).to be true
-    end
-  end
-
-  context "with oak_for_admins feature flag" do
-    before do
-      account.enable_feature!(:oak_for_admins)
-    end
-
-    it "returns true when user has access_oak permissions" do
-      admin_user =
-        account_admin_user_with_role_changes(
-          role_changes: {
-            manage_account_settings: false,
-            access_oak: true
-          },
-          account:,
-          role: Role.get_built_in_role("AccountMembership", root_account_id: account)
-        )
-      controller.instance_variable_set(:@current_user, admin_user)
-
-      expect(controller.send(:add_ignite_agent_bundle?)).to be true
-    end
-  end
-end
-
 RSpec.describe ApplicationController, "#render_native_new_quizzes" do
   let(:course) { course_model }
   let(:assignment) { assignment_model(context: course) }

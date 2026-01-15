@@ -106,7 +106,7 @@ function IgniteAgent(props) {
   }
 
   // Don't render button if agent is open and loaded successfully
-  const shouldShowButton = !isOpen && error === null
+  const shouldShowButton = window.ENV?.show_ignite_agent_button && !isOpen && error === null
 
   return (
     <>
