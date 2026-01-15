@@ -118,6 +118,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         context_id
         context_type
         description
+        omit_from_final_grade
         peer_review_across_sections
         peer_review_count
         peer_review_submission_required
@@ -197,6 +198,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         description
         group_category_id
         intra_group_peer_reviews
+        omit_from_final_grade
         peer_review_across_sections
         peer_review_count
         peer_review_submission_required
