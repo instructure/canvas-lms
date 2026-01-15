@@ -104,6 +104,8 @@ export default function CanvasAiInformation(props: Props) {
   const data = [
     {
       featureName: props.featureName,
+      privacyNoticeText: I18n.t('Privacy Notice'),
+      privacyNoticeUrl: 'https://www.instructure.com/policies/privacy',
       permissionLevelText: I18n.t('Permission Level'),
       permissionLevel: permissionLevel.level,
       description: permissionLevel.description,
