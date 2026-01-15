@@ -2162,6 +2162,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "lti/asset_processor_tii_migrations_api") do
       get "accounts/:account_id/asset_processors/tii_migrations", action: :index
       post "accounts/:account_id/asset_processors/tii_migrations", action: :create
+      post "accounts/:account_id/asset_processors/tii_migrations/migrate_all", action: :migrate_all
     end
 
     scope(controller: :immersive_reader) do

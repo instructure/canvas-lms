@@ -42,10 +42,23 @@ export const ZTiiApMigration = z.object({
   migration_progress: ZTiiApMigrationProgress.nullish(),
 })
 
+const ZCoordinatorProgress = z.object({
+  id: z.string(),
+  workflow_state: z.enum(['running', 'completed', 'failed', 'queued']),
+  consolidated_report_url: z.string().nullish(),
+})
+
+const ZMigrationResponse = z.object({
+  accounts: z.array(ZTiiApMigration),
+  coordinator_progress: ZCoordinatorProgress.nullish(),
+})
+
 export type TiiApMigration = z.infer<typeof ZTiiApMigration> & {
   migrateClicked?: boolean
 }
 export type TiiApMigrationProgress = z.infer<typeof ZTiiApMigrationProgress>
+export type CoordinatorProgress = z.infer<typeof ZCoordinatorProgress>
+export type MigrationResponse = z.infer<typeof ZMigrationResponse>
 
 /**
  * Fetches the list of sub-accounts that need Turnitin migration
@@ -59,19 +72,22 @@ export const useTurnitinMigrationData = (rootAccountId: string) => {
         {
           path: `/api/v1/accounts/${rootAccountId}/asset_processors/tii_migrations`,
         },
-        z.array(ZTiiApMigration),
+        ZMigrationResponse,
       )
       return result.json
     },
     staleTime: 0,
     refetchInterval: query => {
       const data = query.state.data
-      const hasRunningMigrations = data?.some(
+      const hasRunningMigrations = data?.accounts.some(
         m =>
           m.migration_progress?.workflow_state === 'running' ||
           m.migration_progress?.workflow_state === 'queued',
       )
-      return hasRunningMigrations ? 5000 : false // Poll every 5 seconds if any migration is running or queued
+      const coordinatorRunning =
+        data?.coordinator_progress?.workflow_state === 'running' ||
+        data?.coordinator_progress?.workflow_state === 'queued'
+      return hasRunningMigrations || coordinatorRunning ? 5000 : false // Poll every 5 seconds if any migration is running or queued
     },
     enabled: !!rootAccountId,
   })
@@ -99,20 +115,25 @@ export const useMigrationMutation = (
       await queryClient.cancelQueries({queryKey: ['tii_migrations', rootAccountId]})
 
       // Snapshot the previous value
-      const previousMigrations = queryClient.getQueryData<TiiApMigration[]>([
+      const previousData = queryClient.getQueryData<MigrationResponse>([
         'tii_migrations',
         rootAccountId,
       ])
 
       // Optimistically update to the new value
-      queryClient.setQueryData<TiiApMigration[]>(['tii_migrations', rootAccountId], old => {
+      queryClient.setQueryData<MigrationResponse>(['tii_migrations', rootAccountId], old => {
         if (!old) return old
-        return old.map(migration =>
-          migration.account_id === subAccountId ? {...migration, migrateClicked: true} : migration,
-        )
+        return {
+          ...old,
+          accounts: old.accounts.map(migration =>
+            migration.account_id === subAccountId
+              ? {...migration, migrateClicked: true}
+              : migration,
+          ),
+        }
       })
 
-      return {previousMigrations}
+      return {previousData}
     },
     onSuccess: () => {
       // Invalidate the migrations list to refetch with new progress_id
@@ -120,12 +141,99 @@ export const useMigrationMutation = (
     },
     onError: (error, _variables, context) => {
       // Rollback to the previous value on error
-      if (context?.previousMigrations) {
-        queryClient.setQueryData(['tii_migrations', rootAccountId], context.previousMigrations)
+      if (context?.previousData) {
+        queryClient.setQueryData(['tii_migrations', rootAccountId], context.previousData)
       }
       options?.onError?.(error)
     },
   })
+}
+
+/**
+ * Mutation hook to start migrations for all sub-accounts at once
+ */
+export const useMigrateAllMutation = (
+  rootAccountId: string,
+  options?: {onError?: (error: Error) => void},
+) => {
+  return useMutation({
+    mutationFn: async ({email}: {email?: string}) => {
+      const result = await doFetchApi({
+        method: 'POST',
+        path: `/api/v1/accounts/${rootAccountId}/asset_processors/tii_migrations/migrate_all`,
+        body: email ? {email} : undefined,
+      })
+      return result.json
+    },
+    onMutate: async () => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({queryKey: ['tii_migrations', rootAccountId]})
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData<MigrationResponse>([
+        'tii_migrations',
+        rootAccountId,
+      ])
+
+      // Optimistically update coordinator progress to running
+      queryClient.setQueryData<MigrationResponse>(['tii_migrations', rootAccountId], old => {
+        if (!old) return old
+        return {
+          ...old,
+          coordinator_progress: old.coordinator_progress
+            ? {...old.coordinator_progress, workflow_state: 'running' as const}
+            : {id: 'pending', workflow_state: 'running' as const},
+        }
+      })
+
+      return {previousData}
+    },
+    onSuccess: () => {
+      // Invalidate to refetch with new progress for all accounts
+      queryClient.invalidateQueries({queryKey: ['tii_migrations', rootAccountId]})
+    },
+    onError: (error, _variables, context) => {
+      // Rollback to the previous value on error
+      if (context?.previousData) {
+        queryClient.setQueryData(['tii_migrations', rootAccountId], context.previousData)
+      }
+      options?.onError?.(error)
+    },
+  })
+}
+
+/**
+ * Helper to determine if any migrations are eligible for "Migrate All"
+ * Returns true if there are 2 or more migrations that haven't started or have failed
+ */
+export const hasEligibleMigrations = (data?: MigrationResponse): boolean => {
+  const migrations = data?.accounts
+  if (!migrations || migrations.length === 0) return false
+
+  const eligibleCount = migrations.filter(m => {
+    const state = m.migration_progress?.workflow_state
+    // Eligible if no progress yet, or if migration failed (can retry)
+    return !state || state === 'failed'
+  }).length
+
+  return eligibleCount > 1
+}
+
+/**
+ * Helper to check if bulk migration is in progress
+ * Considers it bulk if more than one migration is queued/running at same time
+ */
+export const isBulkMigrationInProgress = (data?: MigrationResponse): boolean => {
+  const migrations = data?.accounts
+  if (!migrations || migrations.length === 0) return false
+
+  // Count active migrations (queued or running)
+  const activeCount = migrations.filter(m => {
+    const state = m.migration_progress?.workflow_state
+    return state === 'queued' || state === 'running'
+  }).length
+
+  return activeCount > 1
 }
 
 /**
