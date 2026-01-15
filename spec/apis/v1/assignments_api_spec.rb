@@ -3704,6 +3704,68 @@ describe AssignmentsApiController, type: :request do
           expect(overrides_after.first.id).to eq(section_override_id)
           expect(overrides_after.first.due_at.to_i).to eq(new_section_due_date.to_i)
         end
+
+        it "creates peer review override during initial assignment creation (regression test)" do
+          # Regression test for bug where peer review overrides failed during initial
+          # assignment creation because parent assignment overrides association was stale
+          section_due_date = 1.week.from_now
+          peer_review_due_date = 2.weeks.from_now
+
+          post "/api/v1/courses/#{@course.id}/assignments",
+               params: {
+                 assignment: {
+                   name: "Regression Test Assignment",
+                   points_possible: 100,
+                   peer_reviews: true,
+                   assignment_overrides: [
+                     {
+                       course_section_id: @section1.id,
+                       due_at: section_due_date.iso8601
+                     }
+                   ],
+                   peer_review: {
+                     points_possible: 10,
+                     peer_review_overrides: [
+                       {
+                         course_section_id: @section1.id,
+                         due_at: peer_review_due_date.iso8601
+                       }
+                     ]
+                   }
+                 }
+               }.to_json,
+               headers: {
+                 "CONTENT_TYPE" => "application/json",
+                 "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@teacher)}"
+               }
+
+          expect(response).to be_successful
+          assignment = Assignment.where(title: "Regression Test Assignment").first
+          expect(assignment).to be_present
+          expect(assignment.peer_reviews).to be true
+
+          parent_overrides = assignment.assignment_overrides.active
+          expect(parent_overrides.count).to eq(1)
+          parent_override = parent_overrides.first
+          expect(parent_override.set_type).to eq("CourseSection")
+          expect(parent_override.set_id).to eq(@section1.id)
+          expect(parent_override.due_at.to_i).to eq(section_due_date.to_i)
+
+          peer_review_sub = assignment.peer_review_sub_assignment
+          expect(peer_review_sub).to be_present
+          expect(peer_review_sub.points_possible).to eq(10)
+
+          # Verify peer review override was created successfully (this was failing before the fix)
+          peer_overrides = peer_review_sub.assignment_overrides.active
+          expect(peer_overrides.count).to eq(1)
+          peer_override = peer_overrides.first
+          expect(peer_override.set_type).to eq("CourseSection")
+          expect(peer_override.set_id).to eq(@section1.id)
+          expect(peer_override.due_at.to_i).to eq(peer_review_due_date.to_i)
+
+          expect(peer_override.parent_override).to be_present
+          expect(peer_override.parent_override.id).to eq(parent_override.id)
+        end
       end
     end
 

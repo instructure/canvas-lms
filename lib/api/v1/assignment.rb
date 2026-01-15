@@ -1651,6 +1651,9 @@ module Api::V1::Assignment
     )
 
     unless overrides.nil?
+      # Reload parent assignment overrides after creation to ensure fresh associations
+      parent_assignment.assignment_overrides.reload
+
       PeerReview::DateOverriderService.call(
         peer_review_sub_assignment:,
         overrides:
