@@ -18,7 +18,7 @@
 
 import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {DisplayFilter} from '../../../utils/constants'
+import {DisplayFilter} from '@canvas/outcomes/react/utils/constants'
 import {DisplayFilterSelector, DisplayFilterSelectorProps} from '../DisplayFilterSelector'
 
 describe('DisplayFilterSelector', () => {

@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -54,13 +55,16 @@ export function alert(alertProps: AlertProps): Promise<void> {
     container.setAttribute('style', 'max-width:5em;margin:1rem auto;')
     container.setAttribute('class', 'flashalert-message')
     alertContainer.appendChild(container)
+
+    let root: Root | null = null
+
     const handleOk = () => {
-      ReactDOM.unmountComponentAtNode(container)
+      root?.unmount()
       alertContainer.removeChild(container)
       resolve()
     }
 
-    ReactDOM.render(<AlertModal {...alertProps} onOk={handleOk} />, container)
+    root = render(<AlertModal {...alertProps} onOk={handleOk} />, container)
   })
 }
 

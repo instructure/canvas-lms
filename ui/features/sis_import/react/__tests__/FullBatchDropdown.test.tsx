@@ -21,8 +21,11 @@ import FullBatchDropdown from '../FullBatchDropdown'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
 import {EnrollmentTerms, Term} from 'api'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import userEvent from '@testing-library/user-event'
+
+const server = setupServer()
 
 const allTerms: Term[] = [
   {
@@ -57,20 +60,36 @@ const renderDropdown = (overrides = {}) => {
   )
 }
 
+// Store dynamic term filters that can be set per-test
+const termFilters: Map<string, EnrollmentTerms> = new Map()
+
 const mockQuery = (termName: string, terms: EnrollmentTerms) => {
-  fetchMock.get(
-    `/api/v1/accounts/${props.accountId}/terms?per_page=100&page=1&term_name=${termName}`,
-    terms,
-  )
+  termFilters.set(termName, terms)
 }
 
 describe('FullBatchDropdown', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    mockQuery('', {enrollment_terms: allTerms})
+    termFilters.clear()
+    termFilters.set('', {enrollment_terms: allTerms})
+
+    server.use(
+      http.get(`/api/v1/accounts/${props.accountId}/terms`, ({request}) => {
+        const url = new URL(request.url)
+        const requestedTermName = url.searchParams.get('term_name') || ''
+        const terms = termFilters.get(requestedTermName)
+        if (terms) {
+          return HttpResponse.json(terms)
+        }
+        return HttpResponse.json({enrollment_terms: []})
+      }),
+    )
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     queryClient.clear()
   })
 

@@ -17,15 +17,14 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import BlockEditor from './BlockEditor'
 
 import BlockEditorView from './BlockEditorView'
 import {type BlockEditorDataTypes} from './utils/transformations'
 
 function renderBlockEditorView(content: BlockEditorDataTypes, container: HTMLElement) {
-  const root = createRoot(container)
-  root.render(<BlockEditorView content={content} />)
+  render(<BlockEditorView content={content} />, container)
 }
 
 export {BlockEditor, BlockEditorView, renderBlockEditorView, type BlockEditorDataTypes}

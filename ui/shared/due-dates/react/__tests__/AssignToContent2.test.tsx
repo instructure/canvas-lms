@@ -23,7 +23,11 @@ import AssignToContent2 from '../AssignToContent2'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
+let sectionsCallCount = 0
 
 const SECTIONS_DATA = [
   {id: '1', course_id: '1', name: 'Course 1', start_at: null, end_at: null},
@@ -64,11 +68,12 @@ describe('AssignToContent2', () => {
     defaultSectionId: 0,
   }
 
-  const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections?per_page=100`
-  const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details?per_page=100`
+  const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections`
+  const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details`
   const SETTINGS_URL = `/api/v1/courses/${COURSE_ID}/settings`
 
   beforeAll(() => {
+    server.listen()
     if (!window.ENV) {
       window.ENV = {} as any
     }
@@ -81,15 +86,28 @@ describe('AssignToContent2', () => {
     }
   })
 
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.get(SECTIONS_URL, SECTIONS_DATA).get(DATE_DETAILS, {}).get(SETTINGS_URL, {})
+    sectionsCallCount = 0
+    server.use(
+      http.get(SECTIONS_URL, () => {
+        sectionsCallCount++
+        return HttpResponse.json(SECTIONS_DATA)
+      }),
+      http.get(DATE_DETAILS, () => {
+        return HttpResponse.json({})
+      }),
+      http.get(SETTINGS_URL, () => {
+        return HttpResponse.json({})
+      }),
+    )
     // Use string courseId to match how the component passes it
     queryClient.setQueryData(['students', String(COURSE_ID), {per_page: 100}], [])
   })
 
   afterEach(() => {
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   const setUp = (propOverrides = {}) =>
@@ -182,7 +200,6 @@ describe('AssignToContent2', () => {
     ).toBeInTheDocument()
   })
 
-
   describe('in a paced course', () => {
     beforeEach(() => {
       ENV.IN_PACED_COURSE = true
@@ -199,7 +216,7 @@ describe('AssignToContent2', () => {
 
     it('does not fetch assignee options', () => {
       setUp()
-      expect(fetchMock.calls(SECTIONS_URL)).toHaveLength(0)
+      expect(sectionsCallCount).toBe(0)
     })
   })
 

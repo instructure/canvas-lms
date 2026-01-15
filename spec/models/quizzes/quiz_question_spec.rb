@@ -107,6 +107,20 @@ describe Quizzes::QuizQuestion do
         @question.update!(question_data: data, saving_user: @teacher)
         expect(@question.attachment_associations.count).to eq(0)
       end
+
+      it "does not update associations when workflow_state is deleted" do
+        data = { question_name: "test question",
+                 points_possible: "1",
+                 question_type: "multiple_choice_question",
+                 question_text: "no attachments here",
+                 answers: [{ "answer_text" => "1", "id" => 1 },
+                           { "answer_html" => @aa_test_data.base_html, "id" => 2 },
+                           { "answer_text" => "3", "id" => 3 },
+                           { "answer_text" => "4", "id" => 4 }] }
+        @question.attachment_associations.destroy_all
+        @question.update!(question_data: data, workflow_state: "deleted")
+        expect(@question.attachment_associations.count).to eq(0)
+      end
     end
 
     it "saves regrade if passed in regrade option in data hash" do

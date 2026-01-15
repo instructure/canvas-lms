@@ -110,9 +110,7 @@ describe('K5Dashboard Parent Support - Cache', () => {
     vi.clearAllMocks()
   })
 
-  // TODO: This test is skipped due to slow rendering in Vitest.
-  // The test involves multiple observer switches and async operations that cause timeouts.
-  it.skip('does not make a request if the user has been already requested', async () => {
+  it('does not make a request if the user has been already requested', async () => {
     const requestUrls = []
     globalServer.use(
       http.get('/api/v1/dashboard/dashboard_cards', ({request}) => {

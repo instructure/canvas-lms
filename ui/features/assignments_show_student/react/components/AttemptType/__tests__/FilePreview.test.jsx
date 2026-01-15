@@ -27,6 +27,7 @@ import {
   defaultGetLtiAssetProcessorsAndReportsForStudentResult,
   defaultLtiAssetReportsForStudent,
 } from '@canvas/lti-asset-processor/queries/__fixtures__/LtiAssetProcessorsAndReportsForStudent'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const files = [
   {
@@ -87,17 +88,22 @@ const resolvers = () => ({
 })
 
 const mockSubmissionWithResolvers = overrides => mockSubmission(overrides, resolvers)
-let originalEnv
 
 describe('FilePreview', () => {
   beforeEach(() => {
-    originalEnv = global.ENV
-    global.ENV = {...originalEnv, FEATURES: {lti_asset_processor: true}}
-    vi.clearAllMocks()
+    fakeENV.setup({FEATURES: {lti_asset_processor: true}})
+    vi.useFakeTimers({shouldAdvanceTime: true})
   })
 
-  afterEach(() => {
-    global.ENV = originalEnv
+  afterEach(async () => {
+    // Flush all pending timers from InstUI transitions before cleanup
+    // Use runAllTimers to ensure nested timers are also flushed
+    await act(async () => {
+      vi.runAllTimers()
+    })
+    vi.useRealTimers()
+    queryClient.clear()
+    fakeENV.teardown()
   })
 
   it('renders a message if there are no files to display', async () => {
@@ -212,7 +218,7 @@ describe('FilePreview', () => {
   })
 
   it('renders the Document Processors column header and LtiAssetReportStatus when asset processors and reports are available', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 
     // Mock the GraphQL query to return fixture data with reports for each file
     const mockData = defaultGetLtiAssetProcessorsAndReportsForStudentResult()
@@ -330,7 +336,7 @@ describe('FilePreview', () => {
   })
 
   it('changes the preview when a different file icon is clicked', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
     const props = {
       submission: await mockSubmissionWithResolvers({
         Submission: {attachments: files},
@@ -352,7 +358,7 @@ describe('FilePreview', () => {
   })
 
   it('displays the first file upload in the preview when switching between attempts', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
     // file[0] = image, file[1] = zip, file[2] = zip
     const propsAttempt1 = {
       submission: await mockSubmissionWithResolvers({

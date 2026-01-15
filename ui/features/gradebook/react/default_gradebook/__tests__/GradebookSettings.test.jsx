@@ -282,7 +282,7 @@ describe('#renderGradebookSettingsModal', () => {
         })
       })
 
-      test.skip('sets showNotes to true if the notes column is shown', () => {
+      test('sets showNotes to true if the notes column is shown', () => {
         gradebook = createGradebook({
           enhanced_gradebook_filters: true,
           teacher_notes: {
@@ -295,10 +295,10 @@ describe('#renderGradebookSettingsModal', () => {
         })
         gradebook.renderGradebookSettingsModal()
 
-        expect(gradebookSettingsModalProps().showNotes).toBe(true)
+        expect(viewOptions().showNotes).toBe(true)
       })
 
-      test.skip('sets showNotes to false if the notes column is hidden', () => {
+      test('sets showNotes to false if the notes column is hidden', () => {
         gradebook = createGradebook({
           enhanced_gradebook_filters: true,
           teacher_notes: {
@@ -311,47 +311,47 @@ describe('#renderGradebookSettingsModal', () => {
         })
         gradebook.renderGradebookSettingsModal()
 
-        expect(gradebookSettingsModalProps().showNotes).toBe(false)
+        expect(viewOptions().showNotes).toBe(false)
       })
 
-      test.skip('sets showNotes to false if the notes column does not exist', () => {
+      test('sets showNotes to false if the notes column does not exist', () => {
         gradebook = createGradebook({enhanced_gradebook_filters: true})
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().showNotes).toBe(false)
+        expect(viewOptions().showNotes).toBe(false)
       })
 
-      test.skip('sets showUnpublishedAssignments to true if unpublished assignments are shown', () => {
+      test('sets showUnpublishedAssignments to true if unpublished assignments are shown', () => {
         gradebook = createGradebook({enhanced_gradebook_filters: true})
         gradebook.initShowUnpublishedAssignments('true')
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().showUnpublishedAssignments).toBe(true)
+        expect(viewOptions().showUnpublishedAssignments).toBe(true)
       })
 
-      test.skip('sets showUnpublishedAssignments to false if unpublished assignments are not shown', () => {
+      test('sets showUnpublishedAssignments to false if unpublished assignments are not shown', () => {
         gradebook = createGradebook({enhanced_gradebook_filters: true})
         gradebook.initShowUnpublishedAssignments('not true')
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().showUnpublishedAssignments).toBe(false)
+        expect(viewOptions().showUnpublishedAssignments).toBe(false)
       })
 
-      test.skip('sets viewUngradedAsZero to true if view ungraded as 0 is active', () => {
+      test('sets viewUngradedAsZero to true if view ungraded as 0 is active', () => {
         gradebook = createGradebook({
           allow_view_ungraded_as_zero: true,
           enhanced_gradebook_filters: true,
         })
         gradebook.gridDisplaySettings.viewUngradedAsZero = true
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().viewUngradedAsZero).toBe(true)
+        expect(viewOptions().viewUngradedAsZero).toBe(true)
       })
 
-      test.skip('sets viewUngradedAsZero to false if view ungraded as 0 is not active', () => {
+      test('sets viewUngradedAsZero to false if view ungraded as 0 is not active', () => {
         gradebook = createGradebook({
           allow_view_ungraded_as_zero: true,
           enhanced_gradebook_filters: true,
         })
         gradebook.gridDisplaySettings.viewUngradedAsZero = false
         gradebook.renderGradebookSettingsModal()
-        expect(gradebookSettingsModalProps().viewUngradedAsZero).toBe(false)
+        expect(viewOptions().viewUngradedAsZero).toBe(false)
       })
     })
   })

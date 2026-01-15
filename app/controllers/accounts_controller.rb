@@ -809,6 +809,55 @@ class AccountsController < ApplicationController
               "(SELECT #{EnrollmentTerm.best_unicode_collation_key("enrollment_terms.name")}
                 FROM #{EnrollmentTerm.quoted_table_name}
                 WHERE enrollment_terms.id = courses.enrollment_term_id)"
+            when "a11y_active_issue_count"
+              if @account.can_see_accessibility_tab?(@current_user)
+                workflow_state_part = "(SELECT
+                  CASE
+                    WHEN acs.workflow_state = 'active' THEN 1
+                    WHEN acs.workflow_state = 'in_progress' THEN 2
+                    WHEN acs.workflow_state = 'queued' THEN 3
+                    WHEN acs.workflow_state = 'failed' THEN 4
+                    ELSE 5
+                  END
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+                issue_count_part = "(SELECT COALESCE(acs.active_issue_count, 0)
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state = 'active'
+                  LIMIT 1)"
+
+                # Active courses always first (workflow_state ASC keeps priority 1 first)
+                # Framework appends direction (DESC/ASC) and id to the last column
+                "#{workflow_state_part}, #{issue_count_part}"
+              else
+                "id"
+              end
+            when "a11y_resolved_issue_count"
+              if @account.can_see_accessibility_tab?(@current_user)
+                null_last_part = "(SELECT
+                  CASE
+                    WHEN acs.resolved_issue_count IS NULL THEN 1
+                    ELSE 0
+                  END
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+                count_part = "(SELECT COALESCE(acs.resolved_issue_count, 0)
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+
+                # Nulls always last, then sort by count
+                # Framework appends direction (DESC/ASC) and id to the last column
+                "#{null_last_part}, #{count_part}"
+              else
+                "id"
+              end
             else
               "id"
             end
@@ -947,6 +996,7 @@ class AccountsController < ApplicationController
       course_preloads << :default_post_policy if includes.include?("post_manually")
       course_preloads << :active_teachers if includes.include?("active_teachers")
       course_preloads << :enrollment_term if includes.include?("term") || includes.include?("concluded")
+      course_preloads << :accessibility_course_statistic if includes.include?("accessibility_course_statistic") && @account.can_see_accessibility_tab?(@current_user)
       ActiveRecord::Associations.preload(@courses, course_preloads)
 
       preload_teachers(@courses) if includes.include?("teachers")
@@ -2152,6 +2202,19 @@ class AccountsController < ApplicationController
     render html: '<div id="account-calendar-settings-container"></div>'.html_safe, layout: true
   end
 
+  def accessibility
+    return render_unauthorized_action unless @account.can_see_accessibility_tab?(@current_user)
+
+    @page_title = t("Accessibility")
+    add_crumb @page_title
+    page_has_instui_topnav
+    set_active_tab "accessibility"
+
+    js_bundle :accessibility_course_statistics
+
+    render html: "", layout: true
+  end
+
   def format_avatar_count(count = 0)
     (count > 99) ? "99+" : count
   end
@@ -2269,6 +2332,9 @@ class AccountsController < ApplicationController
                                    :turnitin_account_id,
                                    :users_can_edit_name,
                                    :users_can_edit_profile,
+                                   :users_can_edit_bio,
+                                   :users_can_edit_title,
+                                   :users_can_edit_profile_links,
                                    :users_can_edit_comm_channels,
                                    { usage_rights_required: [:value, :locked] }.freeze,
                                    { restrict_quantitative_data: [:value, :locked] }.freeze,

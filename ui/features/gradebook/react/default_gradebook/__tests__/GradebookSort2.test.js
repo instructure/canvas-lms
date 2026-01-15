@@ -65,12 +65,12 @@ describe('Gradebook#sortGridRows', () => {
     expect(secondRow.id).toBe('3')
   })
 
-  test.skip('optionally sorts by a custom column', () => {
+  test('optionally sorts by a custom column', () => {
     gradebook.setSortRowsBySetting('custom_col_2301', 'ascending')
     gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
+    expect(firstRow.id).toBe('3')
+    expect(secondRow.id).toBe('4')
   })
 
   test('uses the saved sort setting for custom column sorting', () => {
@@ -89,20 +89,20 @@ describe('Gradebook#sortGridRows', () => {
     expect(secondRow.id).toBe('4')
   })
 
-  test.skip('uses the saved sort setting for assignment sorting', () => {
+  test('uses the saved sort setting for assignment sorting', () => {
     gradebook.setSortRowsBySetting('assignment_2301', 'descending')
     gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
+    expect(firstRow.id).toBe('3')
+    expect(secondRow.id).toBe('4')
   })
 
-  test.skip('optionally sorts by the total grade column', () => {
+  test('optionally sorts by the total grade column', () => {
     gradebook.setSortRowsBySetting('total_grade', 'ascending')
     gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
+    expect(firstRow.id).toBe('3')
+    expect(secondRow.id).toBe('4')
   })
 
   test('uses the saved sort setting for total grade sorting', () => {

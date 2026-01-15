@@ -111,9 +111,9 @@ class GradebookImporter
   end
 
   CSV::Converters[:decimal_comma_to_period] = lambda do |field|
-    if /^-?[0-9.,]+%?$/.match?(field)
-      # This field is a pure number or percentage => let's normalize it
-      number_parts = field.split(/[,.]/)
+    # Helper to normalize decimal separators (comma/period) to period
+    normalize_number = lambda do |value|
+      number_parts = value.split(/[,.]/)
       last_number_part = number_parts.pop
 
       if number_parts.empty?
@@ -121,7 +121,22 @@ class GradebookImporter
       else
         [number_parts.join, last_number_part].join(".")
       end
+    end
+
+    # Check if this is a percentage value with optional space before %
+    # First normalize non-breaking spaces to regular spaces for matching
+    normalized_field = field.gsub(/[\u00A0\u202F\u2007]/, " ").strip
+
+    if /^-?[0-9.,]+\s*%$/.match?(normalized_field)
+      # This is a percentage with space - remove the space before % and process
+      # Remove only spaces between the number and %, not within the number itself
+      without_space = normalized_field.sub(/\s+%$/, "%")
+      normalize_number.call(without_space)
+    elsif /^-?[0-9.,]+%?$/.match?(field)
+      # Pure number or percentage without space - process as before
+      normalize_number.call(field)
     else
+      # Not a pure number or percentage, return as-is (e.g., letter grades)
       field
     end
   end

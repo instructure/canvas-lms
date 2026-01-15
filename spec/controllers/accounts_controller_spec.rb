@@ -809,7 +809,7 @@ describe AccountsController do
                                account: { custom_help_links: { "0" =>
         { id: "instructor_question",
           text: "Ask Your Instructor a Question",
-          subtext: "Questions are submitted to your instructor",
+          subtext: "Questions are submitted to your instructor.",
           type: "default",
           url: "#teacher_feedback",
           available_to: ["student"] } } } }
@@ -1288,7 +1288,6 @@ describe AccountsController do
 
         @root_account = @account
         @root_account.enable_feature!(:horizon_course_setting)
-        @root_account.enable_feature!(:horizon_learning_provider_app_for_courses)
 
         @career_subaccount = @root_account.sub_accounts.create!
         @career_subaccount.horizon_account = true
@@ -1859,6 +1858,69 @@ describe AccountsController do
       end
     end
 
+    context "accessibility_course_statistic" do
+      before do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+      end
+
+      it "includes accessibility_course_statistic when included in the includes param" do
+        admin_logged_in(@account)
+        statistic = AccessibilityCourseStatistic.create!(
+          course: @c1,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        get "courses_api", params: { account_id: @account.id, include: ["accessibility_course_statistic"] }
+
+        expect(response).to be_successful
+        courses = response.parsed_body
+        course1 = courses.find { |c| c["id"] == @c1.id }
+        expect(course1["accessibility_course_statistic"]).not_to be_nil
+        expect(course1["accessibility_course_statistic"]["id"]).to eq statistic.id
+        expect(course1["accessibility_course_statistic"]["course_id"]).to eq @c1.id
+        expect(course1["accessibility_course_statistic"]["active_issue_count"]).to eq 5
+        expect(course1["accessibility_course_statistic"]["workflow_state"]).to eq "active"
+      end
+
+      it "does not include accessibility_course_statistic when not in includes param" do
+        admin_logged_in(@account)
+        AccessibilityCourseStatistic.create!(
+          course: @c1,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        get "courses_api", params: { account_id: @account.id }
+
+        expect(response).to be_successful
+        expect(response.body).not_to match(/"accessibility_course_statistic"/)
+      end
+
+      it "returns null accessibility_course_statistic when course has no statistic" do
+        admin_logged_in(@account)
+        get "courses_api", params: { account_id: @account.id, include: ["accessibility_course_statistic"] }
+
+        expect(response).to be_successful
+        courses = response.parsed_body
+        course1 = courses.find { |c| c["id"] == @c1.id }
+        expect(course1["accessibility_course_statistic"]).to be_nil
+      end
+
+      it "does not include accessibility_course_statistic when a11y_checker_account_statistics is not enabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_account_statistics)
+        admin_logged_in(@account)
+        AccessibilityCourseStatistic.create!(
+          course: @c1,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        get "courses_api", params: { account_id: @account.id, include: ["accessibility_course_statistic"] }
+
+        expect(response).to be_successful
+        expect(response.body).not_to match(/"accessibility_course_statistic"/)
+      end
+    end
+
     it "sets pagination total_pages/last page link for session-authenticated requests" do
       admin_logged_in(@account)
       get "courses_api", params: { account_id: @account.id, per_page: 1 }
@@ -2101,6 +2163,265 @@ describe AccountsController do
         expect(response).to be_successful
         term_names = json_parse(response.body).map { |c| c["term"]["name"] }
         expect(term_names).to eq(letters_in_random_order.sort.reverse)
+      end
+    end
+
+    context "sorting by accessibility active issue count" do
+      before do
+        @c3 = course_factory(account: @account, course_name: "course_with_many_issues", sis_source_id: 30)
+        @c4 = course_factory(account: @account, course_name: "course_with_few_issues", sis_source_id: 40)
+        @c5 = course_factory(account: @account, course_name: "course_in_progress", sis_source_id: 50)
+        @c6 = course_factory(account: @account, course_name: "course_no_stats", sis_source_id: 60)
+
+        # Create active statistics with different issue counts
+        AccessibilityCourseStatistic.create!(
+          course: @c1,
+          workflow_state: "active",
+          active_issue_count: 5
+        )
+        AccessibilityCourseStatistic.create!(
+          course: @c2,
+          workflow_state: "active",
+          active_issue_count: 10
+        )
+        AccessibilityCourseStatistic.create!(
+          course: @c3,
+          workflow_state: "active",
+          active_issue_count: 15
+        )
+        AccessibilityCourseStatistic.create!(
+          course: @c4,
+          workflow_state: "active",
+          active_issue_count: 2
+        )
+
+        # Create in_progress statistic
+        AccessibilityCourseStatistic.create!(
+          course: @c5,
+          workflow_state: "in_progress",
+          active_issue_count: nil
+        )
+
+        # @c6 has no accessibility statistics
+
+        account_admin_user(account: @account)
+        admin_logged_in(@account)
+      end
+
+      context "when the a11y_checker and a11y_checker_account_statistics features are enabled" do
+        before do
+          @account.enable_feature!(:a11y_checker)
+          Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        end
+
+        it "is able to sort by active issue count ascending (active courses first, low to high)" do
+          get "courses_api", params: { account_id: @account.id, sort: "a11y_active_issue_count", order: "asc" }
+
+          expect(response).to be_successful
+          course_names = json_parse(response.body).pluck("name")
+          expect(course_names).to eq([
+                                       @c4.name,
+                                       @c1.name,
+                                       @c2.name,
+                                       @c3.name,
+                                       @c5.name,
+                                       @c6.name
+                                     ])
+        end
+
+        it "is able to sort by active issue count descending (active courses first, high to low)" do
+          get "courses_api", params: { account_id: @account.id, sort: "a11y_active_issue_count", order: "desc" }
+
+          expect(response).to be_successful
+          course_names = json_parse(response.body).pluck("name")
+          expect(course_names).to eq([
+                                       @c3.name,
+                                       @c2.name,
+                                       @c1.name,
+                                       @c4.name,
+                                       @c5.name,
+                                       @c6.name
+                                     ])
+        end
+
+        it "prioritizes active workflow state over other states" do
+          @c7 = course_factory(account: @account, course_name: "course_queued", sis_source_id: 70)
+          @c8 = course_factory(account: @account, course_name: "course_failed", sis_source_id: 80)
+
+          AccessibilityCourseStatistic.create!(
+            course: @c7,
+            workflow_state: "queued",
+            active_issue_count: nil
+          )
+          AccessibilityCourseStatistic.create!(
+            course: @c8,
+            workflow_state: "failed",
+            active_issue_count: nil
+          )
+
+          get "courses_api", params: { account_id: @account.id, sort: "a11y_active_issue_count", order: "asc" }
+
+          expect(response).to be_successful
+          course_names = json_parse(response.body).pluck("name")
+
+          active_courses = course_names.take(4)
+          expect(active_courses).to match_array([
+                                                  @c1.name,
+                                                  @c2.name,
+                                                  @c3.name,
+                                                  @c4.name
+                                                ])
+
+          expect(course_names[4]).to eq(@c5.name)
+          expect(course_names[5]).to eq(@c7.name)
+          expect(course_names[6]).to eq(@c8.name)
+          expect(course_names[7]).to eq(@c6.name)
+        end
+      end
+
+      context "when the a11y_checker_account_statistics feature is disabled" do
+        it "falls back to id sorting when feature flag is disabled" do
+          get "courses_api", params: { account_id: @account.id, sort: "a11y_active_issue_count", order: "asc" }
+
+          expect(response).to be_successful
+          course_names = json_parse(response.body).pluck("name")
+
+          expect(course_names).to eq([
+                                       @c1.name,
+                                       @c2.name,
+                                       @c3.name,
+                                       @c4.name,
+                                       @c5.name,
+                                       @c6.name
+                                     ])
+        end
+      end
+    end
+
+    context "sorting by accessibility resolved issue count" do
+      before do
+        @c3 = course_factory(account: @account, course_name: "course_with_many_resolved", sis_source_id: 30)
+        @c4 = course_factory(account: @account, course_name: "course_with_few_resolved", sis_source_id: 40)
+        @c5 = course_factory(account: @account, course_name: "course_with_null_resolved", sis_source_id: 50)
+        @c6 = course_factory(account: @account, course_name: "course_no_stats", sis_source_id: 60)
+
+        # Create active statistics with different resolved issue counts
+        AccessibilityCourseStatistic.create!(
+          course: @c1,
+          workflow_state: "active",
+          resolved_issue_count: 5
+        )
+        AccessibilityCourseStatistic.create!(
+          course: @c2,
+          workflow_state: "active",
+          resolved_issue_count: 10
+        )
+        AccessibilityCourseStatistic.create!(
+          course: @c3,
+          workflow_state: "active",
+          resolved_issue_count: 15
+        )
+        AccessibilityCourseStatistic.create!(
+          course: @c4,
+          workflow_state: "active",
+          resolved_issue_count: 2
+        )
+
+        # Create statistic with null resolved_issue_count
+        AccessibilityCourseStatistic.create!(
+          course: @c5,
+          workflow_state: "active",
+          resolved_issue_count: nil
+        )
+
+        # @c6 has no accessibility statistics
+
+        account_admin_user(account: @account)
+        admin_logged_in(@account)
+      end
+
+      context "when the a11y_checker and a11y_checker_account_statistics features are enabled" do
+        before do
+          @account.enable_feature!(:a11y_checker)
+          Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        end
+
+        it "is able to sort by resolved issue count ascending (nulls last, low to high)" do
+          get "courses_api", params: { account_id: @account.id, sort: "a11y_resolved_issue_count", order: "asc" }
+
+          expect(response).to be_successful
+          course_names = json_parse(response.body).pluck("name")
+          expect(course_names).to eq([
+                                       @c4.name,
+                                       @c1.name,
+                                       @c2.name,
+                                       @c3.name,
+                                       @c5.name,
+                                       @c6.name
+                                     ])
+        end
+
+        it "is able to sort by resolved issue count descending (nulls last, high to low)" do
+          get "courses_api", params: { account_id: @account.id, sort: "a11y_resolved_issue_count", order: "desc" }
+
+          expect(response).to be_successful
+          course_names = json_parse(response.body).pluck("name")
+          expect(course_names).to eq([
+                                       @c3.name,
+                                       @c2.name,
+                                       @c1.name,
+                                       @c4.name,
+                                       @c5.name,
+                                       @c6.name
+                                     ])
+        end
+
+        it "ensures nulls always come last regardless of order" do
+          @c7 = course_factory(account: @account, course_name: "course_zero_resolved", sis_source_id: 70)
+
+          AccessibilityCourseStatistic.create!(
+            course: @c7,
+            workflow_state: "active",
+            resolved_issue_count: 0
+          )
+
+          get "courses_api", params: { account_id: @account.id, sort: "a11y_resolved_issue_count", order: "asc" }
+
+          expect(response).to be_successful
+          course_names = json_parse(response.body).pluck("name")
+
+          # Courses with counts should come before those with null
+          courses_with_counts = course_names.take(5)
+          expect(courses_with_counts).to match_array([
+                                                       @c1.name,
+                                                       @c2.name,
+                                                       @c3.name,
+                                                       @c4.name,
+                                                       @c7.name
+                                                     ])
+
+          # Nulls should be last
+          expect(course_names[5]).to eq(@c5.name)
+          expect(course_names[6]).to eq(@c6.name)
+        end
+      end
+
+      context "when the a11y_checker_account_statistics feature is disabled" do
+        it "falls back to id sorting when feature flag is disabled" do
+          get "courses_api", params: { account_id: @account.id, sort: "a11y_resolved_issue_count", order: "asc" }
+
+          expect(response).to be_successful
+          course_names = json_parse(response.body).pluck("name")
+
+          expect(course_names).to eq([
+                                       @c1.name,
+                                       @c2.name,
+                                       @c3.name,
+                                       @c4.name,
+                                       @c5.name,
+                                       @c6.name
+                                     ])
+        end
       end
     end
 
@@ -2676,6 +2997,81 @@ describe AccountsController do
       get "account_calendar_settings", params: { account_id: @account.id }
 
       expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("account_calendars.settings.visit")
+    end
+  end
+
+  describe "#accessibility" do
+    before(:once) do
+      @account = Account.default
+    end
+
+    context "when unauthenticated" do
+      it "redirects unauthenticated users to login" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_redirect
+      end
+    end
+
+    context "when only a11y_checker account feature flag is enabled" do
+      before(:once) do
+        @account.enable_feature!(:a11y_checker)
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "returns unauthorized when a11y_checker_account_statistics is disabled" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "when both a11y_checker and a11y_checker_account_statistics feature flags are enabled" do
+      before(:once) do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "renders successfully for authorized users" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_successful
+        expect(assigns[:page_title]).to eq("Accessibility")
+      end
+
+      it "sets the active tab to accessibility" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_successful
+        expect(assigns[:active_tab]).to eq("accessibility")
+      end
+
+      it "returns unauthorized for users without read_course_list permission" do
+        user_model
+        user_session(@user)
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "when a11y_checker flag is disabled" do
+      before(:once) do
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "returns unauthorized when a11y_checker is disabled" do
+        get "accessibility", params: { account_id: @account.id }
+        expect(response).to be_unauthorized
+      end
     end
   end
 end

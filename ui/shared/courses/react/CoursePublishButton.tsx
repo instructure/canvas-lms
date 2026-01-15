@@ -18,7 +18,7 @@
 
 import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import {render} from '@canvas/react'
 import createStore from '@canvas/backbone/createStore'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {Button} from '@instructure/ui-buttons'
@@ -96,8 +96,7 @@ const CoursePublishButton = ({
               if (!container) {
                 throw new Error('Container not found')
               }
-              const root = ReactDOM.createRoot(container)
-              root.render(
+              render(
                 <HomePagePromptContainer
                   forceOpen={true}
                   store={defaultViewStore}
@@ -114,6 +113,7 @@ const CoursePublishButton = ({
                     }
                   }}
                 />,
+                container,
               )
             } else {
               apiClient.publishCourse({courseId, onSuccess: () => handleUpdatePublishSuccess(true)})
@@ -131,8 +131,7 @@ const CoursePublishButton = ({
     }
   }
 
-  const getButtonLabel = (): React.ReactFragment => {
-    // @ts-expect-error
+  const getButtonLabel = (): React.ReactNode => {
     return (
       <>
         {coursePublished ? I18n.t('Published') : I18n.t('Unpublished')}

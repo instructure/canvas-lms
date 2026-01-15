@@ -161,7 +161,11 @@ const MigrationRow = ({
           <Flex direction="column" gap="x-small">
             <View as="div">
               <Flex gap="x-small" alignItems="center">
-                <Link href={`#${migration.account_id}`} isWithinText={false}>
+                <Link
+                  href={`/accounts/${migration.account_id}`}
+                  isWithinText={false}
+                  target="_blank"
+                >
                   {migration.account_name}
                 </Link>
               </Flex>
@@ -259,7 +263,7 @@ export const TurnitinAPMigrationModal = ({
           </View>
         ) : !migrations || migrations.length === 0 ? (
           <View as="div" textAlign="center" padding="large" height="25rem">
-            <Text>{I18n.t('No migrations available.')}</Text>
+            <Text>{I18n.t('There is nothing to migrate.')}</Text>
           </View>
         ) : (
           <Flex direction="column" height="25rem">
@@ -270,10 +274,15 @@ export const TurnitinAPMigrationModal = ({
                   renderCloseButtonLabel={I18n.t('Close')}
                   margin="0 0 medium 0"
                 >
-                  <Flex gap="small">
+                  <Flex gap="small" direction="column">
                     <Text>
                       {I18n.t(
                         'We are replacing LTI 2.0 (CPF) with LTI 1.3 (Asset/Document Processor). Below are the migrations that need to occur in order to easily start using LTI 1.3 on all of your assignments.',
+                      )}
+                    </Text>
+                    <Text>
+                      {I18n.t(
+                        'Once you click the button to start the migration, reports will not be visible in SpeedGrader until they have been migrated.',
                       )}
                     </Text>
                   </Flex>

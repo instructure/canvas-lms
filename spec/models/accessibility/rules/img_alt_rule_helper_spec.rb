@@ -40,28 +40,6 @@ describe Accessibility::Rules::ImgAltRuleHelper do
     end
   end
 
-  describe ".alt_text_valid?" do
-    it "returns true for valid alt text" do
-      expect(described_class.alt_text_valid?("A beautiful landscape")).to be true
-      expect(described_class.alt_text_valid?("Person smiling at camera")).to be true
-    end
-
-    it "returns false for blank alt text" do
-      expect(described_class.alt_text_valid?("")).to be false
-      expect(described_class.alt_text_valid?(nil)).to be false
-    end
-
-    it "returns false for alt text longer than MAX_LENGTH characters" do
-      long_text = "a" * (Accessibility::Rules::ImgAltRuleHelper::MAX_LENGTH + 1)
-      expect(described_class.alt_text_valid?(long_text)).to be false
-    end
-
-    it "returns true for alt text exactly MAX_LENGTH characters" do
-      text = "a" * Accessibility::Rules::ImgAltRuleHelper::MAX_LENGTH
-      expect(described_class.alt_text_valid?(text)).to be true
-    end
-  end
-
   describe ".adjust_img_style" do
     it "returns styled HTML for an image element" do
       html = '<img src="test.jpg" alt="test">'

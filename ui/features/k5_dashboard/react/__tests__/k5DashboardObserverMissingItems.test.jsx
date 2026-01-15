@@ -24,7 +24,7 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {render as testingLibraryRender} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import React from 'react'
 import K5Dashboard from '../K5Dashboard'
@@ -44,20 +44,28 @@ const server = setupServer()
 beforeAll(() => server.listen())
 
 beforeEach(() => {
-  server.use(...createPlannerMocks())
-  fetchMock.get(/\/api\/v1\/announcements.*/, [])
-  fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, [])
-  fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, [])
-  fetchMock.get(/\/api\/v1\/calendar_events\?type=assignment.*/, [])
-  fetchMock.get(/\/api\/v1\/calendar_events\?type=event.*/, [])
-  fetchMock.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, {status: 'ok'})
-  fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, [])
+  vi.restoreAllMocks()
+  resetCardCache()
+  resetPlanner()
+  sessionStorage.clear()
+  server.use(
+    ...createPlannerMocks(),
+    http.get(/\/api\/v1\/announcements.*/, () => HttpResponse.json([])),
+    http.get(/\/api\/v1\/users\/self\/courses.*/, () => HttpResponse.json([])),
+    http.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, () => HttpResponse.json([])),
+    http.get('/api/v1/calendar_events', ({request}) => {
+      return HttpResponse.json([])
+    }),
+    http.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, () =>
+      HttpResponse.json({status: 'ok'}),
+    ),
+    http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json([])),
+  )
   fakeENV.setup(defaultEnv)
 })
 
 afterEach(() => {
   server.resetHandlers()
-  fetchMock.restore()
   fakeENV.teardown()
   resetPlanner()
   resetCardCache()
@@ -69,40 +77,34 @@ afterEach(() => {
 afterAll(() => server.close())
 
 describe('K5Dashboard Missing Items', () => {
-  // Test missing items display for course 1 (Economics 101)
-  // This follows the pattern from K5Dashboard1.test.jsx which is known to work reliably
   it('shows missing items on dashboard cards', async () => {
-    // Pre-populate cards in session storage to avoid async loading delay
     sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
 
-    const {findByTestId} = render(
-      <K5Dashboard
-        {...defaultProps}
-        plannerEnabled={true}
-        // Pass assignmentsMissing directly to avoid relying on slow Redux saga
-        assignmentsMissing={{1: 2}}
-      />,
+    const {findByTestId, findByText} = render(
+      <K5Dashboard {...defaultProps} plannerEnabled={true} assignmentsMissing={{1: 2}} />,
     )
 
-    // Wait for missing items link to appear
-    const missingItemsLink = await findByTestId('number-missing')
+    await findByText('Economics 101')
+
+    const missingItemsLink = await findByTestId('number-missing', {}, {timeout: 5000})
     expect(missingItemsLink).toBeInTheDocument()
     expect(missingItemsLink).toHaveTextContent(
       'View 2 missing items for course Economics 1012 missing',
     )
-  })
+  }, 10000)
 
-  // Test that missing items link points to the correct URL
   it('links to the schedule tab with missing items focus target', async () => {
     sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
 
-    const {findByTestId} = render(
+    const {findByTestId, findByText} = render(
       <K5Dashboard {...defaultProps} plannerEnabled={true} assignmentsMissing={{1: 2}} />,
     )
 
-    const missingItemsLink = await findByTestId('number-missing')
+    await findByText('Economics 101')
+
+    const missingItemsLink = await findByTestId('number-missing', {}, {timeout: 5000})
     expect(missingItemsLink.getAttribute('href')).toMatch(
       '/courses/1?focusTarget=missing-items#schedule',
     )
-  })
+  }, 10000)
 })

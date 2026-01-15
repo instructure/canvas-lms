@@ -998,6 +998,15 @@ class ContextModule < ActiveRecord::Base
     progressions.uniq
   end
 
+  def self.preload_progressions_for_user(modules, user)
+    return {} unless user && modules.any?
+
+    module_ids = modules.map(&:id)
+    ContextModuleProgression
+      .where(user_id: user.id, context_module_id: module_ids)
+      .index_by(&:context_module_id)
+  end
+
   def find_or_create_progression(user)
     return nil unless user
 
@@ -1021,6 +1030,18 @@ class ContextModule < ActiveRecord::Base
       progression, user = [find_or_create_progression(user_or_progression), user_or_progression]
     end
     return nil unless progression && user
+
+    # Check enrollment state before evaluating
+    # For concluded enrollments, return existing progression without re-evaluating
+    # This prevents completed_at timestamps from being updated after enrollment ends
+    if context.is_a?(Course)
+      enrollments = context.enrollments.for_user(user)
+      if enrollments.any? && enrollments.all? { |e| e.state_based_on_date == :completed }
+        return progression if progression.persisted?
+
+        return nil
+      end
+    end
 
     progression.context_module = self if progression.context_module_id == id
     progression.user = user if progression.user_id == user.id

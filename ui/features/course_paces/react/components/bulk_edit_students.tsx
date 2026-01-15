@@ -141,5 +141,5 @@ const mapDispatchToProps: DispatchProps = {
   setSelectedPaceContext: actions.setSelectedPaceContext,
 }
 
-// @ts-expect-error
+// @ts-expect-error Redux connect type incompatibility
 export default connect(mapStateToProps, mapDispatchToProps)(BulkEditStudentPaces)

@@ -24,6 +24,7 @@ module Types
 
     global_id_field :id
     field :color, String, null: false
+    field :icon, String, null: true
     field :name, String, null: false
   end
 end

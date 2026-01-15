@@ -20,8 +20,8 @@ import React from 'react'
 import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ScoresGrid, ScoresGridProps} from '../ScoresGrid'
-import {Student, Outcome, StudentRollupData} from '../../../types/rollup'
-import {ScoreDisplayFormat} from '../../../utils/constants'
+import {Student, Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
+import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {
   ContributingScoresManager,
   ContributingScoreAlignment,

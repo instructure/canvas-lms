@@ -192,6 +192,48 @@ module WidgetDashboardPage
   def observed_student_dropdown_selector
     "[data-testid='observed-student-dropdown']"
   end
+
+  # Customization selectors
+  def customize_dashboard_button_selector
+    "[data-testid='customize-dashboard-button']"
+  end
+
+  def save_customize_button_selector
+    "[data-testid='save-customize-button']"
+  end
+
+  def cancel_customize_button_selector
+    "[data-testid='cancel-customize-button']"
+  end
+
+  def widget_column_selector(column_number)
+    "[data-testid='widget-column-#{column_number}']"
+  end
+
+  def widget_container_selector(widget_id)
+    "[data-testid='widget-container-#{widget_id}']"
+  end
+
+  def widget_drag_handle_selector(widget_id)
+    "[data-testid='#{widget_id}-drag-handle']"
+  end
+
+  def widget_remove_button_selector(widget_id)
+    "[data-testid='#{widget_id}-remove-button']"
+  end
+
+  def add_widget_modal_selector
+    "[data-testid='add-widget-modal']"
+  end
+
+  def widget_card_selector(widget_type)
+    "[data-testid='widget-card-#{widget_type}']"
+  end
+
+  def widget_reorder_menu_option_selector(option_text)
+    "span[role='menuitem']:contains('#{option_text}')"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -366,6 +408,50 @@ module WidgetDashboardPage
     f(observed_student_dropdown_selector)
   end
 
+  def customize_dashboard_button
+    f(customize_dashboard_button_selector)
+  end
+
+  def save_customize_button
+    f(save_customize_button_selector)
+  end
+
+  def cancel_customize_button
+    f(cancel_customize_button_selector)
+  end
+
+  def widget_column(column_number)
+    f(widget_column_selector(column_number))
+  end
+
+  def widget_container(widget_id)
+    f(widget_container_selector(widget_id))
+  end
+
+  def all_widget_on_column(column_number)
+    ff("#{widget_column_selector(column_number)} [data-testid^='widget-container-']")
+  end
+
+  def widget_drag_handle(widget_id)
+    f(widget_drag_handle_selector(widget_id))
+  end
+
+  def widget_remove_button(widget_id)
+    f(widget_remove_button_selector(widget_id))
+  end
+
+  def add_widget_modal
+    f(add_widget_modal_selector)
+  end
+
+  def widget_card(widget_type)
+    f(widget_card_selector(widget_type))
+  end
+
+  def widget_reorder_menu_option(option_text)
+    fj(widget_reorder_menu_option_selector(option_text))
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -392,5 +478,30 @@ module WidgetDashboardPage
   def go_to_dashboard
     get "/"
     wait_for_ajaximations
+  end
+
+  def verify_reordered_widget_up_down
+    wait_for_ajaximations
+    reordered_column_2_widgets = all_widget_on_column(2)
+    expect(reordered_column_2_widgets.length).to eq(2)
+    expect(reordered_column_2_widgets[1].attribute("data-testid")).to eq("widget-container-people-widget")
+  end
+
+  def verify_reordered_widget_top_bottom
+    wait_for_ajaximations
+    reordered_column_1_widgets = all_widget_on_column(1)
+    expect(reordered_column_1_widgets.length).to eq(2)
+    expect(reordered_column_1_widgets[0].attribute("data-testid")).to eq("widget-container-course-work-combined-widget")
+    expect(reordered_column_1_widgets[1].attribute("data-testid")).to eq("widget-container-course-grades-widget")
+  end
+
+  def verify_reordered_widget_btw_columns
+    wait_for_ajaximations
+    reordered_column_1_widgets = all_widget_on_column(1)
+    reordered_column_2_widgets = all_widget_on_column(2)
+    expect(reordered_column_1_widgets.length).to eq(2)
+    expect(reordered_column_2_widgets.length).to eq(2)
+    expect(reordered_column_1_widgets[1].attribute("data-testid")).to eq("widget-container-announcements-widget")
+    expect(reordered_column_2_widgets[0].attribute("data-testid")).to eq("widget-container-course-grades-widget")
   end
 end

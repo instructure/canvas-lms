@@ -1302,6 +1302,83 @@ describe ApplicationHelper do
           helper.set_default_source_csp_directive_if_enabled
           expect(headers["Content-Security-Policy"]).to eq directives
         end
+
+        describe "default_csp_logging_directives" do
+          it "returns empty string when feature is disabled" do
+            account.disable_feature!(:default_source_csp_logging)
+            expect(helper.default_csp_logging_directives).to eq ""
+          end
+
+          it "includes default-src directive with self, unsafe-inline, and data sources" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("default-src 'self' 'unsafe-inline' data:")
+          end
+
+          it "includes allow_list_domains in default-src" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            domains = helper.allow_list_domains
+            expect(result).to include("default-src 'self' 'unsafe-inline' data: blob: #{domains};")
+          end
+
+          it "includes script-src when include_script_src is true" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: true)
+            expect(result).to include("script-src 'self' 'unsafe-inline' 'unsafe-eval'")
+          end
+
+          it "does not include script-src when include_script_src is false" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: false)
+            expect(result).not_to include("script-src")
+          end
+
+          it "includes allow_list_domains in script-src" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: true)
+            domains = helper.allow_list_domains
+            expect(result).to include("script-src 'self' 'unsafe-inline' 'unsafe-eval' #{domains};")
+          end
+
+          it "appends csp_report_uri when present" do
+            allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("report-uri https://somewhere/;")
+          end
+
+          it "does not append csp_report_uri when empty" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            expect(result).not_to include("report-uri")
+          end
+
+          it "returns complete directive with all sources when include_script_src is true" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: true)
+            expect(result).to match(/default-src 'self' 'unsafe-inline' data: .+;/)
+            expect(result).to match(/script-src 'self' 'unsafe-inline' 'unsafe-eval' .+;/)
+          end
+
+          it "returns only default-src when include_script_src is false" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: false)
+            expect(result).to match(/default-src 'self' 'unsafe-inline' data: .+;/)
+            expect(result).not_to include("script-src")
+          end
+
+          it "handles report URI with multiple values correctly" do
+            allow(helper).to receive(:csp_report_uri).and_return("report-uri https://one.test/; report-uri https://two.test/; ")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("report-uri https://one.test/; report-uri https://two.test/;")
+          end
+
+          it "includes blob: in default-src directive" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("default-src 'self' 'unsafe-inline' data: blob:")
+          end
+        end
       end
     end
   end

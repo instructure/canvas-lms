@@ -1361,6 +1361,8 @@
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/extensions'
+- verb: GET
+  path: '/api/v1/courses/:course_id/quizzes/:quiz_id/groups'
 - verb: POST
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/groups'
 - verb: DELETE
@@ -2119,6 +2121,8 @@
   path: '/api/v1/sections/:id/crosslist'
 - verb: POST
   path: '/api/v1/sections/:id/crosslist/:new_course_id'
+- verb: GET
+  path: '/api/v1/sections/:id/users'
 - verb: GET
   path: '/api/v1/sections/:section_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id'
 - verb: PUT

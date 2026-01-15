@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {waitFor} from '@testing-library/react'
 
 import studentRowHeaderConstants from '../../../constants/studentRowHeaderConstants'
 import StudentColumnHeader from '../StudentColumnHeader'
@@ -96,14 +97,17 @@ describe('GradebookGrid StudentColumnHeader', () => {
     return document.querySelector(`[aria-labelledby="${$button.id}"]`)
   }
 
-  function openOptionsMenu() {
+  async function openOptionsMenu() {
     getOptionsMenuTrigger().click()
-    $menuContent = getOptionsMenuContent()
+    await waitFor(() => {
+      $menuContent = getOptionsMenuContent()
+      expect($menuContent).toBeInTheDocument()
+    })
   }
 
-  function mountAndOpenOptionsMenu() {
+  async function mountAndOpenOptionsMenu() {
     mountComponent()
-    openOptionsMenu()
+    await openOptionsMenu()
   }
 
   function closeOptionsMenu() {
@@ -115,35 +119,29 @@ describe('GradebookGrid StudentColumnHeader', () => {
       return getMenuItem($menuContent, 'Display as', label)
     }
 
-    it.skip('is added as a Gradebook element when opened', () => {
-      mountAndOpenOptionsMenu()
-      const $sortByMenuContent = getMenuContent($menuContent, 'Display as')
-      expect(gradebookElements.indexOf($sortByMenuContent)).not.toBe(-1)
-    })
-
-    it.skip('is removed as a Gradebook element when closed', () => {
-      mountAndOpenOptionsMenu()
+    it('is removed as a Gradebook element when closed', async () => {
+      await mountAndOpenOptionsMenu()
       const $sortByMenuContent = getMenuContent($menuContent, 'Display as')
       closeOptionsMenu()
       expect(gradebookElements.indexOf($sortByMenuContent)).toBe(-1)
     })
 
-    it('is disabled when all options are disabled', () => {
+    it('is disabled when all options are disabled', async () => {
       props.disabled = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem($menuContent, 'Display as').getAttribute('aria-disabled')).toBe('true')
     })
 
     describe('"First, Last Name" option', () => {
-      it.skip('is selected when displaying first name before last', () => {
+      it('is selected when displaying first name before last', async () => {
         props.selectedPrimaryInfo = 'first_last'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getDisplayAsOption('First, Last Name').getAttribute('aria-checked')).toBe('true')
       })
 
-      it.skip('is not selected when displaying last name before first', () => {
+      it('is not selected when displaying last name before first', async () => {
         props.selectedPrimaryInfo = 'last_first'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getDisplayAsOption('First, Last Name').getAttribute('aria-checked')).toBe('false')
       })
 
@@ -152,47 +150,41 @@ describe('GradebookGrid StudentColumnHeader', () => {
           props.onSelectPrimaryInfo = vi.fn()
         })
 
-        it.skip('calls the .onSelectPrimaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .onSelectPrimaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getDisplayAsOption('First, Last Name').click()
           expect(props.onSelectPrimaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        it.skip('includes "first_last" when calling the .onSelectPrimaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('includes "first_last" when calling the .onSelectPrimaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getDisplayAsOption('First, Last Name').click()
           const [primaryInfoType] =
             props.onSelectPrimaryInfo.mock.calls[props.onSelectPrimaryInfo.mock.calls.length - 1]
           expect(primaryInfoType).toBe('first_last')
         })
 
-        it.skip('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getDisplayAsOption('First, Last Name').focus()
           getDisplayAsOption('First, Last Name').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        it.skip('does not call the .onSelectPrimaryInfo callback when already selected', () => {
-          props.selectedPrimaryInfo = 'first_last'
-          mountAndOpenOptionsMenu()
-          getDisplayAsOption('First, Last Name').click()
-          expect(props.onSelectPrimaryInfo).not.toHaveBeenCalled()
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
       })
     })
 
     describe('"Last, First Name" option', () => {
-      it.skip('is selected when displaying last name before first', () => {
+      it('is selected when displaying last name before first', async () => {
         props.selectedPrimaryInfo = 'last_first'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getDisplayAsOption('Last, First Name').getAttribute('aria-checked')).toBe('true')
       })
 
-      it.skip('is not selected when displaying first name before last', () => {
+      it('is not selected when displaying first name before last', async () => {
         props.selectedPrimaryInfo = 'first_last'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getDisplayAsOption('Last, First Name').getAttribute('aria-checked')).toBe('false')
       })
 
@@ -201,33 +193,27 @@ describe('GradebookGrid StudentColumnHeader', () => {
           props.onSelectPrimaryInfo = vi.fn()
         })
 
-        it.skip('calls the .onSelectPrimaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .onSelectPrimaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getDisplayAsOption('Last, First Name').click()
           expect(props.onSelectPrimaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        it.skip('includes "last_first" when calling the .onSelectPrimaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('includes "last_first" when calling the .onSelectPrimaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getDisplayAsOption('Last, First Name').click()
           const [primaryInfoType] =
             props.onSelectPrimaryInfo.mock.calls[props.onSelectPrimaryInfo.mock.calls.length - 1]
           expect(primaryInfoType).toBe('last_first')
         })
 
-        it.skip('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getDisplayAsOption('Last, First Name').focus()
           getDisplayAsOption('Last, First Name').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        it.skip('does not call the .onSelectPrimaryInfo callback when already selected', () => {
-          props.selectedPrimaryInfo = 'last_first'
-          mountAndOpenOptionsMenu()
-          getDisplayAsOption('Last, First Name').click()
-          expect(props.onSelectPrimaryInfo).not.toHaveBeenCalled()
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
       })
     })

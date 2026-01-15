@@ -65,12 +65,16 @@ const useFetchAssignees = ({
     return {per_page: 100}
   }, [])
 
-  const {data: fetchedCourseSettings, isSuccess: courseSettingsIsSuccess} =
-    useQuery<CourseSettings>({
-      queryKey: ['courseSettings', courseId],
-      queryFn: getCourseSettings,
-      enabled: shouldFetch && checkMasteryPaths,
-    })
+  const {
+    data: fetchedCourseSettings,
+    isSuccess: courseSettingsIsSuccess,
+    isError: courseSettingsIsError,
+    error: courseSettingsError,
+  } = useQuery<CourseSettings>({
+    queryKey: ['courseSettings', courseId],
+    queryFn: getCourseSettings,
+    enabled: shouldFetch && checkMasteryPaths,
+  })
 
   const {baseFetchedOptions, isLoading} = useGetAssigneeOptions({
     allOptions,
@@ -96,12 +100,11 @@ const useFetchAssignees = ({
   }, [courseSettingsIsSuccess, everyoneOption, fetchedCourseSettings])
 
   useEffect(() => {
-    if (fetchedCourseSettings && !courseSettingsIsSuccess) {
-      // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
-      showFlashError(I18n.t('Failed to load course settings'))(fetchedCourseSettings?.reason)
+    if (courseSettingsIsError) {
+      showFlashError(I18n.t('Failed to load course settings'))(courseSettingsError)
       setHasErrors(true)
     }
-  }, [fetchedCourseSettings, courseSettingsIsSuccess])
+  }, [courseSettingsIsError, courseSettingsError])
 
   useEffect(() => {
     const newOptions = uniqBy([...baseDefaultOptions, ...baseFetchedOptions], 'id')

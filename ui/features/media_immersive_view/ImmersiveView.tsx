@@ -18,7 +18,6 @@
 
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {NoTranscript} from './components/NoTranscript'
-// @ts-expect-error
 import styles from './ImmersiveView.module.css'
 import {ImmersiveViewBackButton} from './components/ImmersiveViewBackButton'
 import {useMedia} from 'react-use'

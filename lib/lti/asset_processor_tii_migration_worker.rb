@@ -20,8 +20,9 @@
 
 module Lti
   class AssetProcessorTiiMigrationWorker
-    TII_TOOL_VENDOR_CODE = "turnitin.com"
-    TII_TOOL_PRODUCT_CODE = "turnitin-lti"
+    TII_TOOL_VENDOR_CODE = Rails.env.development? ? "Instructure.com" : "turnitin.com"
+    TII_TOOL_PRODUCT_CODE = Rails.env.development? ? "similarity detection reference tool" : "turnitin-lti"
+    MIGRATED_ASSET_REPORT_TYPE = "originality_report"
 
     def initialize(account, email = nil)
       @account = account
@@ -38,7 +39,7 @@ module Lti
         end
       end
       save_migration_report
-      @progress.set_results(@results.except(:actl_errors)) # actl_errors can be large, exclude from progress results
+      @progress.set_results(@results.except(:actl_errors, :actl_warnings)) # actl_errors can be large, exclude from progress results
       send_migration_report_email
 
       if any_error_occurred?
@@ -78,7 +79,9 @@ module Lti
 
         ap_migration_status, ap = create_asset_processor_from_actl(actl, tool_proxy)
 
-        report_migration_status, reports_count = migrate_reports(actl, tool_proxy, ap)
+        unless ap_migration_status == :failed
+          report_migration_status, reports_count = migrate_reports(actl, tool_proxy, ap)
+        end
       rescue => e
         capture_and_log_exception(e)
         add_actl_error(actl, "Unexpected error migrating ACTL ID=#{actl.id}")
@@ -96,7 +99,7 @@ module Lti
             report_migration_status.to_s,
             reports_count || 0,
             report_error_message(tool_proxy, actl).join(", "),
-            tool_proxy.present? ? get_proxy_result(tool_proxy, :warnings).join(", ") : ""
+            report_warning_message(tool_proxy, actl).join(", ")
           ]
         end
       end
@@ -111,6 +114,17 @@ module Lti
       end
       if actl.present? && @results[:actl_errors].present? && @results[:actl_errors][actl.id].present?
         messages += @results[:actl_errors][actl.id]
+      end
+      messages
+    end
+
+    def report_warning_message(tool_proxy, actl)
+      messages = []
+      if tool_proxy.present?
+        messages += get_proxy_result(tool_proxy, :warnings) || []
+      end
+      if actl.present? && @results[:actl_warnings].present? && @results[:actl_warnings][actl.id].present?
+        messages += @results[:actl_warnings][actl.id]
       end
       messages
     end
@@ -150,14 +164,14 @@ module Lti
       deployments = find_tii_asset_processor_deployments(tool_proxy.context)
       context_matching_deployments = deployments.select { |deployment| deployment.context == tool_proxy.context }
 
-      if deployments.length > 1
+      if context_matching_deployments.length > 1
         add_proxy_error(tool_proxy, "Multiple TII AP deployments found in context. #{deployments.map(&:id).join(", ")}")
         return
       end
 
       if context_matching_deployments.empty?
         if deployments.any?
-          add_proxy_error(tool_proxy, "Found #{deployments.map { |d| "CET ID=#{d.id}" }.join(", ")}} TII AP deployments in context of Tool Proxy ID=#{tool_proxy.global_id}, but none match the context. Skipping migration.")
+          add_proxy_error(tool_proxy, "Found #{deployments.map { |d| "CET ID=#{d.id}" }.join(", ")} TII AP deployments in context of Tool Proxy ID=#{tool_proxy.global_id}, but none match the context. Skipping migration.")
           return
         end
         Rails.logger.info("No TII AP deployment found for Tool Proxy ID=#{tool_proxy.global_id}, creating one")
@@ -218,12 +232,12 @@ module Lti
       Rails.logger.info("Migrating Tool Proxy ID=#{tool_proxy.global_id} to deployment ID=#{deployment.global_id}")
 
       migration_endpoint = extract_migration_endpoint(tool_proxy)
-      unless migration_endpoint
+      unless migration_endpoint || Rails.env.development?
         add_proxy_error(tool_proxy, "Failed to extract migration endpoint from Tool Proxy ID=#{tool_proxy.global_id}")
         return
       end
 
-      if call_tii_migration_endpoint(tool_proxy, deployment, migration_endpoint)
+      if Rails.env.development? || call_tii_migration_endpoint(tool_proxy, deployment, migration_endpoint)
         # Save deployment ID to tool_proxy
         tool_proxy.update_column(:migrated_to_context_external_tool_id, deployment.id)
         Rails.logger.info("Successfully migrated Tool Proxy ID=#{tool_proxy.global_id} to deployment ID=#{deployment.global_id}")
@@ -349,6 +363,14 @@ module Lti
       end
     end
 
+    def add_actl_warning(actl, message)
+      @results[:actl_warnings] ||= {}
+      @results[:actl_warnings][actl.id] ||= []
+      unless @results[:actl_warnings][actl.id].include?(message)
+        @results[:actl_warnings][actl.id] << message
+      end
+    end
+
     def get_proxy_result(tool_proxy, key)
       @results[:proxies][tool_proxy.id][key]
     end
@@ -393,7 +415,8 @@ module Lti
       ap = Lti::AssetProcessor.new(
         custom: {
           proxy_instance_id: proxy_id,
-          migrated_from_cpf: "true"
+          migrated_from_cpf: "true",
+          tii_app_key: "cpf-migrated"
         }.compact,
         assignment: actl.assignment,
         context_external_tool: tool_proxy.migrated_to_context_external_tool,
@@ -504,9 +527,155 @@ module Lti
       true
     end
 
-    def migrate_reports(_actl, _tool_proxy, _ap)
-      # TODO: implement in later commit
-      [:success, 0]
+    def migrate_reports(actl, _tool_proxy, asset_processor)
+      raise "Asset Processor is not created" unless asset_processor
+
+      successful_migrated_count = 0
+      # Get the most recent originality report for each submission/group/attachment combination
+      reports = OriginalityReport.joins(:submission)
+                                 .where(submissions: { assignment_id: actl.assignment.id })
+                                 .order(created_at: :desc)
+                                 .group_by { |report| [report.submission.group_id || report.submission_id, report.attachment_id] }
+                                 .values
+                                 .map(&:first)
+      reports_count = reports.count
+      reports.each do |report|
+        migrate_report(actl, report, asset_processor)
+        successful_migrated_count += 1
+      rescue => e
+        capture_and_log_exception(e)
+        add_actl_error(actl, "Failed to migrate report ID=#{report.id}: #{e.message}")
+      end
+
+      status = if successful_migrated_count == 0 && reports_count.positive?
+                 :failed
+               elsif successful_migrated_count == reports_count
+                 :success
+               else
+                 :partially_failed
+               end
+
+      [status, successful_migrated_count]
+    rescue => e
+      capture_and_log_exception(e)
+      add_actl_error(actl, "Failed to migrate reports for ACTL ID=#{actl.id}: #{e.message}")
+      [:failed, 0]
+    end
+
+    def migrate_report(actl, cpf_report, asset_processor)
+      if cpf_report.attachment_id.present?
+        asset = Lti::Asset.find_or_create_by!(attachment: cpf_report.attachment, submission: cpf_report.submission)
+      else
+        attempt = find_attempt_for_report(cpf_report)
+        unless attempt
+          raise "Cannot find submission attempt for report ID=#{cpf_report.id}"
+        end
+
+        asset = Lti::Asset.find_or_create_by!(submission_attempt: attempt, submission: cpf_report.submission)
+      end
+
+      raise "Could not create Lti::Asset" unless asset
+
+      timestamp = cpf_report.updated_at
+      indication_color, indication_alt = calc_indications_from_cpf_report(cpf_report)
+      custom_sourcedid = extract_custom_sourcedid(cpf_report)
+      unless custom_sourcedid.present?
+        add_actl_warning(actl, "No custom_sourcedid found on report") # won't include report ID to avoid too big csv cell
+      end
+      result = cpf_report.originality_score.present? ? "#{cpf_report.originality_score}%" : nil
+      priority = priority_from_cpf_report(cpf_report)
+      processing_progress = processing_progress_from_cpf_report(cpf_report)
+      visible_to_owner = actl.assignment.turnitin_settings&.dig(:s_view_report) == "1"
+
+      Lti::AssetReport.transaction do
+        report_scope = asset_processor.asset_reports.where(asset:, report_type: MIGRATED_ASSET_REPORT_TYPE)
+        report_scope.where(timestamp: ..timestamp).destroy_all
+        report_scope.create!(
+          title: "Turnitin Similarity",
+          extensions: {
+            "https://www.instructure.com/legacy_custom_sourcedid": custom_sourcedid,
+            migrated_from: cpf_report.id
+          },
+          timestamp:,
+          result:,
+          priority:,
+          processing_progress:,
+          visible_to_owner:,
+          indication_alt:,
+          indication_color:
+        )
+      end
+    end
+
+    def priority_from_cpf_report(cpf_report)
+      if cpf_report.workflow_state == "error"
+        Lti::AssetReport::PRIORITY_TIME_CRITICAL # 5
+      elsif cpf_report.workflow_state == "scored" && cpf_report.originality_score.present?
+        if cpf_report.originality_score >= 75
+          Lti::AssetReport::PRIORITY_TIME_CRITICAL
+        elsif cpf_report.originality_score >= 50
+          Lti::AssetReport::PRIORITY_SEMI_TIME_CRITICAL
+        elsif cpf_report.originality_score >= 25
+          Lti::AssetReport::PRIORITY_NOT_TIME_CRITICAL
+        else
+          Lti::AssetReport::PRIORITY_GOOD
+        end
+      else
+        Lti::AssetReport::PRIORITY_GOOD
+      end
+    end
+
+    def processing_progress_from_cpf_report(cpf_report)
+      case cpf_report.workflow_state
+      when "pending"
+        Lti::AssetReport::PROGRESS_PROCESSING
+      when "error"
+        Lti::AssetReport::PROGRESS_FAILED
+      when "scored"
+        Lti::AssetReport::PROGRESS_PROCESSED
+      else
+        Lti::AssetReport::PROGRESS_NOT_READY
+      end
+    end
+
+    def extract_custom_sourcedid(cpf_report)
+      resource_url = cpf_report.lti_link&.resource_url
+      return nil unless resource_url
+
+      uri = URI.parse(resource_url)
+      params = URI.decode_www_form(uri.query || "").to_h
+      params["custom_sourcedid"]
+    rescue URI::InvalidURIError
+      nil
+    end
+
+    def find_attempt_for_report(cpf_report)
+      return nil if cpf_report.attachment_id.present?
+
+      submission = cpf_report.submission
+      version = submission.versions.find do |v|
+        v.model.submitted_at == cpf_report.submission_time
+      end
+      version&.model&.attempt
+    end
+
+    def calc_indications_from_cpf_report(cpf_report)
+      if cpf_report.originality_score.present?
+        case Turnitin.state_from_similarity_score(cpf_report.originality_score)
+        when "none"
+          ["#00AC18", "No matching content found"]
+        when "acceptable"
+          ["#00AC18", "Low similarity - acceptable"]
+        when "warning"
+          ["#FC5E13", "Medium similarity - review recommended"]
+        when "problem"
+          ["#EE0612", "High similarity - attention needed"]
+        when "failure"
+          ["#8B1A1A", "Very high similarity - immediate attention required"]
+        end
+      else
+        [nil, nil]
+      end
     end
 
     def any_error_occurred?

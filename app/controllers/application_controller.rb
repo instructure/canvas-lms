@@ -406,6 +406,7 @@ class ApplicationController < ActionController::Base
           }
         end
       end
+      preload_translation_file
     end
 
     add_to_js_env(hash, @js_env, overwrite)
@@ -439,7 +440,9 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
-    a11y_checker_ai_generation
+    a11y_checker_ai_alt_text_generation
+    a11y_checker_ai_table_caption_generation
+    a11y_checker_additional_resources
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player
@@ -481,7 +484,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
     ams_root_account_integration
-    ams_enhanced_rubrics
+    ams_advanced_content_organization
     api_rate_limits
     buttons_and_icons_root_account
     canvas_apps_sub_account_access
@@ -3126,14 +3129,17 @@ class ApplicationController < ActionController::Base
     extend Api::V1::Group
 
     includes ||= []
+    profile_owner = profile.user
+    is_profile_owner = viewer == profile_owner
+    profile_permissions = profile_owner.details_editable_by_user
+    profile_permissions = profile_permissions.transform_values { false } unless is_profile_owner
+
     data = user_profile_json(profile, viewer, session, includes, profile)
-    data[:can_edit] = viewer == profile.user && profile.user.user_can_edit_profile?
-    data[:can_edit_channels] = viewer == profile.user && profile.user.user_can_edit_comm_channels?
-    data[:can_edit_name] = viewer == profile.user && profile.user.user_can_edit_name?
-    data[:can_edit_avatar] = data[:can_edit] && profile.user.avatar_state != :locked
-    data[:known_user] = viewer.address_book.known_user(profile.user)
-    if data[:known_user] && viewer != profile.user
-      common_courses = viewer.address_book.common_courses(profile.user)
+    data = data.merge(profile_permissions)
+    data[:can_edit_avatar] = data[:can_edit] && profile_owner.avatar_state != :locked
+    data[:known_user] = viewer.address_book.known_user(profile_owner)
+    if data[:known_user] && viewer != profile_owner
+      common_courses = viewer.address_book.common_courses(profile_owner)
       # address book can return a fake record in common courses with course_id
       # 0 which represents an admin -> user commonality.
       common_courses.delete(0)
@@ -3396,6 +3402,21 @@ class ApplicationController < ActionController::Base
     (@xhrs_to_prefetch_from_controller ||= []) << [args, kwargs]
   end
 
+  def preload_translation_file
+    return unless (file = @js_env && @js_env[:LOCALE_TRANSLATION_FILE])
+
+    locale = @js_env[:LOCALES]&.first
+    return if locale == "en"
+
+    (@content_for_head ||= []) << helpers.preload_link_tag(
+      file,
+      as: "fetch",
+      type: "application/json",
+      crossorigin: "anonymous"
+    )
+  end
+  helper_method :preload_translation_file
+
   def manage_live_events_context
     setup_live_events_context
     yield
@@ -3497,6 +3518,16 @@ class ApplicationController < ActionController::Base
                                                      launch_url: @resource_url
                                                    })
     ).build_with_signature
+
+    # Calculate basename by removing the quiz subroute (full_path) from the current path
+    # E.g., /courses/3/assignments/9/moderation/1 -> /courses/3/assignments/9
+    basename = if params[:full_path].present?
+                 request.path.sub(params[:full_path], "")
+               else
+                 request.path
+               end
+
+    signed_launch_data[:basename] = basename
 
     js_env(NEW_QUIZZES: signed_launch_data)
 

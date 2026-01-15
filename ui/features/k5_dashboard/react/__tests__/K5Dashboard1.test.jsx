@@ -20,13 +20,12 @@ import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
 import {resetPlanner} from '@canvas/planner'
 import {act, screen, render as testingLibraryRender, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import React from 'react'
 import {
-  MOCK_TODOS,
   createPlannerMocks,
+  MOCK_TODOS,
   defaultEnv,
   defaultK5DashboardProps as defaultProps,
 } from './mocks'
@@ -46,128 +45,157 @@ const render = children =>
 
 const server = setupServer()
 
-const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
-const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/
-const announcements = [
-  {
-    id: '20',
-    context_code: 'course_2',
-    title: 'Announcement here',
-    message: '<p>This is the announcement</p>',
-    html_url: 'http://google.com/announcement',
-    permissions: {
-      update: true,
-    },
-    attachments: [
-      {
-        display_name: 'exam1.pdf',
-        url: 'http://google.com/download',
-        filename: '1608134586_366__exam1.pdf',
-      },
-    ],
-  },
-  {
-    id: '21',
-    context_code: 'course_1',
-    title: "This sure isn't a homeroom",
-    message: '<p>Definitely not!</p>',
-    html_url: '/courses/1/announcements/21',
-  },
-]
-const gradeCourses = [
-  {
-    id: '1',
-    name: 'Economics 101',
-    has_grading_periods: false,
-    enrollments: [
-      {
-        computed_current_score: 82,
-        computed_current_grade: 'B-',
-        type: 'student',
-      },
-    ],
-    homeroom_course: false,
-  },
-  {
-    id: '2',
-    name: 'Homeroom Class',
-    has_grading_periods: false,
-    enrollments: [
-      {
-        computed_current_score: null,
-        computed_current_grade: null,
-        type: 'student',
-      },
-    ],
-    homeroom_course: true,
-  },
-]
-const syllabus = {
-  id: '2',
-  syllabus_body: "<p>Here's the grading scheme for this class.</p>",
-}
-const apps = [
-  {
-    id: '17',
-    course_navigation: {
-      text: 'Google Apps',
-      icon_url: 'google.png',
-    },
-    context_id: '1',
-    context_name: 'Economics 101',
-  },
-]
-const staff = [
-  {
-    id: '1',
-    short_name: 'Mrs. Thompson',
-    bio: 'Office Hours: 1-3pm W',
-    avatar_url: '/images/avatar1.png',
-    enrollments: [
-      {
-        role: 'TeacherEnrollment',
-      },
-    ],
-  },
-  {
-    id: '2',
-    short_name: 'Tommy the TA',
-    bio: 'Office Hours: 1-3pm F',
-    avatar_url: '/images/avatar2.png',
-    enrollments: [
-      {
-        role: 'TaEnrollment',
-      },
-    ],
-  },
-]
+// Track requests for assertions
+let requestLog = []
+const trackRequest = url => requestLog.push(url)
 
 beforeAll(() => {
   server.listen()
 })
 
 beforeEach(() => {
+  requestLog = []
+
+  // Set up planner mocks (already MSW)
   server.use(...createPlannerMocks())
-  fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
-  fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, gradeCourses)
-  fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), syllabus)
-  fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, apps)
-  fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, staff)
-  fetchMock.get(/\/api\/v1\/users\/self\/todo.*/, MOCK_TODOS)
-  fetchMock.put('/api/v1/users/self/settings', {})
-  fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS)
-  fetchMock.get(EVENTS_URL, MOCK_EVENTS)
-  fetchMock.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, {
-    status: 200,
-    body: {status: 'ok'},
-  })
-  fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, {status: 200, body: []})
+
+  // Set up K5 Dashboard mocks with request tracking
+  server.use(
+    http.get(/\/api\/v1\/announcements.*/, ({request}) => {
+      trackRequest(request.url)
+      return HttpResponse.json([
+        {
+          id: '20',
+          context_code: 'course_2',
+          title: 'Announcement here',
+          message: '<p>This is the announcement</p>',
+          html_url: 'http://google.com/announcement',
+          permissions: {update: true},
+          attachments: [
+            {
+              display_name: 'exam1.pdf',
+              url: 'http://google.com/download',
+              filename: '1608134586_366__exam1.pdf',
+            },
+          ],
+        },
+        {
+          id: '21',
+          context_code: 'course_1',
+          title: "This sure isn't a homeroom",
+          message: '<p>Definitely not!</p>',
+          html_url: '/courses/1/announcements/21',
+        },
+      ])
+    }),
+    http.get(/\/api\/v1\/users\/self\/courses.*/, () =>
+      HttpResponse.json([
+        {
+          id: '1',
+          name: 'Economics 101',
+          has_grading_periods: false,
+          enrollments: [
+            {computed_current_score: 82, computed_current_grade: 'B-', type: 'student'},
+          ],
+          homeroom_course: false,
+        },
+        {
+          id: '2',
+          name: 'Homeroom Class',
+          has_grading_periods: false,
+          enrollments: [
+            {computed_current_score: null, computed_current_grade: null, type: 'student'},
+          ],
+          homeroom_course: true,
+        },
+      ]),
+    ),
+    http.get('api/v1/courses/2', () =>
+      HttpResponse.json({
+        id: '2',
+        syllabus_body: "<p>Here's the grading scheme for this class.</p>",
+      }),
+    ),
+    http.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, ({request}) => {
+      trackRequest(request.url)
+      return HttpResponse.json([
+        {
+          id: '17',
+          course_navigation: {text: 'Google Apps', icon_url: 'google.png'},
+          context_id: '1',
+          context_name: 'Economics 101',
+        },
+      ])
+    }),
+    http.get(/\/api\/v1\/courses\/2\/users.*/, () =>
+      HttpResponse.json([
+        {
+          id: '1',
+          short_name: 'Mrs. Thompson',
+          bio: 'Office Hours: 1-3pm W',
+          avatar_url: '/images/avatar1.png',
+          enrollments: [{role: 'TeacherEnrollment'}],
+        },
+        {
+          id: '2',
+          short_name: 'Tommy the TA',
+          bio: 'Office Hours: 1-3pm F',
+          avatar_url: '/images/avatar2.png',
+          enrollments: [{role: 'TaEnrollment'}],
+        },
+      ]),
+    ),
+    http.get(/\/api\/v1\/users\/self\/todo.*/, () =>
+      HttpResponse.json([
+        {
+          assignment: {
+            id: '10',
+            due_at: null,
+            all_dates: [{base: true, due_at: null}],
+            name: 'Drain a drain',
+            points_possible: 10,
+          },
+          context_id: '7',
+          context_type: 'Course',
+          context_name: 'Plumbing',
+          html_url: '/courses/7/gradebook/speed_grader?assignment_id=10',
+          ignore: '/api/v1/users/self/todo/assignment_10/grading?permanent=0',
+          ignore_permanently: '/api/v1/users/self/todo/assignment_10/grading?permanent=1',
+          needs_grading_count: 2,
+          type: 'grading',
+        },
+      ]),
+    ),
+    http.put('/api/v1/users/self/settings', async ({request}) => {
+      trackRequest(request.url)
+      const body = await request.text()
+      requestLog.push({url: request.url, body})
+      return HttpResponse.json({})
+    }),
+    http.get('/api/v1/calendar_events', ({request}) => {
+      const url = new URL(request.url)
+      const type = url.searchParams.get('type')
+      const importantDates = url.searchParams.get('important_dates')
+
+      if (importantDates === 'true' && type === 'assignment') {
+        return HttpResponse.json(MOCK_ASSIGNMENTS)
+      }
+      if (importantDates === 'true' && type === 'event') {
+        return HttpResponse.json(MOCK_EVENTS)
+      }
+      return HttpResponse.json([])
+    }),
+    http.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, () =>
+      HttpResponse.json({status: 'ok'}),
+    ),
+    http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json([])),
+  )
+
   fakeENV.setup(defaultEnv)
 })
 
 afterEach(() => {
   server.resetHandlers()
-  fetchMock.restore()
   fakeENV.teardown()
   resetPlanner()
   resetCardCache()
@@ -207,8 +235,12 @@ describe('K-5 Dashboard', () => {
     // Clicking the Classic View option should update the user's dashboard setting
     act(() => classicViewOption.click())
     await waitFor(() => {
-      expect(fetchMock.called('/api/v1/users/self/settings', 'PUT')).toBe(true)
-      expect(fetchMock.lastOptions('/api/v1/users/self/settings').body).toEqual(
+      const settingsRequests = requestLog.filter(
+        r => typeof r === 'object' && r.url && r.url.includes('/api/v1/users/self/settings'),
+      )
+      expect(settingsRequests.length).toBeGreaterThan(0)
+      const lastRequest = settingsRequests[settingsRequests.length - 1]
+      expect(lastRequest.body).toEqual(
         JSON.stringify({
           elementary_dashboard_disabled: true,
         }),
@@ -272,10 +304,14 @@ describe('K-5 Dashboard', () => {
       // Verify the component respects empty cards by checking that no
       // card-dependent API calls are made
       await waitFor(() => {
-        const announcementCalls = fetchMock.calls(/\/api\/v1\/announcements.*/)
+        const announcementCalls = requestLog.filter(
+          url => typeof url === 'string' && /\/api\/v1\/announcements.*/.test(url),
+        )
         expect(announcementCalls).toHaveLength(0)
-        const externalToolsCalls = fetchMock.calls(
-          /\/api\/v1\/external_tools\/visible_course_nav_tools.*/,
+        const externalToolsCalls = requestLog.filter(
+          url =>
+            typeof url === 'string' &&
+            /\/api\/v1\/external_tools\/visible_course_nav_tools.*/.test(url),
         )
         expect(externalToolsCalls).toHaveLength(0)
       })
@@ -285,7 +321,9 @@ describe('K-5 Dashboard', () => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
       render(<K5Dashboard {...defaultProps} />)
       await waitFor(() => {
-        const announcementCalls = fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true/)
+        const announcementCalls = requestLog.filter(
+          url => typeof url === 'string' && /\/api\/v1\/announcements.*latest_only=true/.test(url),
+        )
         expect(announcementCalls).toHaveLength(1)
       })
     })
@@ -296,11 +334,15 @@ describe('K-5 Dashboard', () => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify([]))
       render(<K5Dashboard {...defaultProps} />)
       await waitFor(() => {
-        const announcementCalls = fetchMock.calls(/\/api\/v1\/announcements.*/)
+        const announcementCalls = requestLog.filter(
+          url => typeof url === 'string' && /\/api\/v1\/announcements.*/.test(url),
+        )
         expect(announcementCalls).toHaveLength(0)
 
-        const externalToolsCalls = fetchMock.calls(
-          /\/api\/v1\/external_tools\/visible_course_nav_tools.*/,
+        const externalToolsCalls = requestLog.filter(
+          url =>
+            typeof url === 'string' &&
+            /\/api\/v1\/external_tools\/visible_course_nav_tools.*/.test(url),
         )
         expect(externalToolsCalls).toHaveLength(0)
       })

@@ -17,10 +17,12 @@
  */
 
 export interface EnvDiscussions {
+  AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS?: string
   discussion_ai_survey_link: string
   DISCUSSION_TOPIC: {
     ATTRIBUTES: Record<string, any>
   }
   discussion_pin_post: string
   ASSIGNMENT_SECURE_PARAMS?: string
+  DISCUSSION_CHECKPOINTS_ENABLED?: boolean
 }

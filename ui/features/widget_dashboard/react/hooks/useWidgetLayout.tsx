@@ -329,8 +329,10 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
   const addWidget = useCallback(
     (type: string, displayName: string, col: number, row: number) => {
       setConfig(prevConfig => {
+      	const uuid = crypto?.randomUUID?.() ?? '' 
         const newWidget: Widget = {
-          id: `${type}-widget-${crypto.randomUUID()}`,
+          // For HTTP, return empty string for consistent data-testids in tests
+          id: uuid ? `${type}-widget-${uuid}` : `${type}-widget`,
           type,
           position: {col, row, relative: 0},
           title: displayName,

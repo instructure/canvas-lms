@@ -22,13 +22,14 @@ class RubricLLMService
   DEFAULT_GENERATE_OPTIONS = {
     criteria_count: 5,
     rating_count: 4,
-    points_per_criterion: 20,
+    total_points: 100,
     use_range: false,
     grade_level: "higher-ed"
   }.freeze
   GENERATE_FEATURE_SLUG = "rubric-generate"
   REGENERATE_CRITERIA_FEATURE_SLUG = "rubric-regenerate-criteria"
   REGENERATE_CRITERION_FEATURE_SLUG = "rubric-regenerate-criterion"
+  ROUNDING_PRECISION = 2
 
   def initialize(rubric)
     @rubric = rubric
@@ -115,37 +116,57 @@ class RubricLLMService
   def parse_and_transform_generated_criteria(response, generate_options)
     ai_rubric = JSON.parse("{" + response, symbolize_names: true)
 
-    ai_rubric[:criteria].map do |criterion_data|
-      build_criterion_from_llm(criterion_data, generate_options)
+    criteria_count = ai_rubric[:criteria].length
+    total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+    points_per_criterion = calculate_points_per_criterion(total_points, criteria_count)
+
+    ai_rubric[:criteria].each_with_index.map do |criterion_data, index|
+      build_criterion_from_llm(criterion_data, points_per_criterion[index], generate_options[:use_range] || DEFAULT_GENERATE_OPTIONS[:use_range])
     end
   rescue JSON::ParserError => e
     Rails.logger.error("Failed to parse LLM response as JSON during generation: #{e.message}")
     raise JSON::ParserError, "The AI response was not in the expected format. Please try again."
   end
 
+  # Calculate points per criterion based on total_points and criteria_count
+  def calculate_points_per_criterion(total_points, criteria_count)
+    points_per_criterion = (total_points / criteria_count).round(ROUNDING_PRECISION)
+    points_for_criterion = {}
+    running_total = 0.0
+
+    Array(1..criteria_count).each_with_index do |_, index|
+      if index == criteria_count - 1
+        points_for_criterion[index] = (total_points - running_total).round(ROUNDING_PRECISION)
+      else
+        running_total += points_per_criterion
+        points_for_criterion[index] = points_per_criterion
+      end
+    end
+    points_for_criterion
+  end
+
   # Transform one LLM criterion into Canvas format.
   #
   # - Renames fields (name → description, description → long_description)
-  # - Assigns decreasing points across ratings, based on points_per_criterion
+  # - Assigns decreasing points across ratings, based on total_points and criterion_points
   # - Sorts ratings by points desc (and description as tiebreaker)
   #
   # Example:
-  #   points_per_criterion=10, 3 ratings → [10, 5, 0]
-  def build_criterion_from_llm(criterion_data, generate_options)
+  #   criterion_points=10, 3 ratings → [10, 5, 0]
+  def build_criterion_from_llm(criterion_data, criterion_points, use_range)
     criterion = {
       id: @rubric.unique_item_id,
       description: (criterion_data[:name].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
       long_description: criterion_data[:description].presence
     }
 
-    points = (generate_options[:points_per_criterion] || DEFAULT_GENERATE_OPTIONS[:points_per_criterion]).to_f
-    points_decrement = points / [(criterion_data[:ratings].length - 1), 1].max
+    points_decrement = criterion_points.to_f / [(criterion_data[:ratings].length - 1), 1].max
 
     ratings = criterion_data[:ratings].each_with_index.map do |rating_data, index|
       {
         description: (rating_data[:title].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
         long_description: rating_data[:description].presence,
-        points: (points - (points_decrement * index)).round,
+        points: (criterion_points - (points_decrement * index)).round(ROUNDING_PRECISION),
         criterion_id: criterion[:id],
         id: @rubric.unique_item_id
       }
@@ -153,7 +174,7 @@ class RubricLLMService
 
     criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
     criterion[:points] = criterion[:ratings].pluck(:points).max || 0
-    criterion[:criterion_use_range] = !!generate_options[:use_range]
+    criterion[:criterion_use_range] = !!use_range
     criterion
   end
 
@@ -177,13 +198,13 @@ class RubricLLMService
   #
   # @param association_object [AbstractAssignment]
   # @param regenerate_options [Hash] includes :criteria (array), optional :criterion_id, :additional_user_prompt, :standard
-  # @param orig_generate_options [Hash] original generation knobs to enforce structure
+  # @param generate_options [Hash] original generation knobs to enforce structure
   # @return [Array<Hash>] normalized criteria set
   #
   # Example of text extraction format fed to LLM (rubric_to_text):
   #   criterion:c1:description="Clarity"
   #   rating:r1:description="Exemplary"
-  def regenerate_criteria_via_llm(association_object, regenerate_options = {}, orig_generate_options = {})
+  def regenerate_criteria_via_llm(association_object, regenerate_options = {}, generate_options = {})
     validate_rubric_and_association_object(association_object)
 
     assignment = association_object
@@ -194,7 +215,7 @@ class RubricLLMService
     # Use current criteria count for full regeneration, not the original count
     current_criteria_count = incoming_criteria.size
     prompt_config_name, regeneration_target_prompt, structure_directives =
-      determine_regeneration_prompt_setup(incoming_criteria, regenerate_options, orig_generate_options)
+      determine_regeneration_prompt_setup(incoming_criteria, regenerate_options, generate_options)
 
     llm_config = LLMConfigs.config_for(prompt_config_name)
     raise "No LLM config found for rubric regeneration" if llm_config.nil?
@@ -204,7 +225,7 @@ class RubricLLMService
       criteria_as_text,
       regeneration_target_prompt,
       regenerate_options,
-      orig_generate_options,
+      generate_options,
       criterion_id,
       structure_directives,
       current_criteria_count
@@ -218,7 +239,7 @@ class RubricLLMService
       response,
       incoming_criteria,
       existing_criteria_json,
-      orig_generate_options,
+      generate_options,
       criterion_id
     )
   end
@@ -244,12 +265,12 @@ class RubricLLMService
   # - Else regenerate the full set → "rubric_regenerate_criteria" and build structure directives
   #
   # Returns [prompt_config_name, regeneration_target_prompt, structure_directives]
-  def determine_regeneration_prompt_setup(incoming_criteria, regenerate_options, orig_generate_options)
+  def determine_regeneration_prompt_setup(incoming_criteria, regenerate_options, generate_options)
     criterion_id = regenerate_options[:criterion_id]
     # Use the current number of criteria, not the original count
     # This allows users to add/remove criteria manually and have regeneration preserve the current structure
     current_criteria_count = incoming_criteria.size
-    orig_rating_count = orig_generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count])
+    orig_rating_count = generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count])
 
     if criterion_id.present?
       ["rubric_regenerate_criterion", criterion_id, ""]
@@ -271,7 +292,7 @@ class RubricLLMService
     criteria_as_text,
     regeneration_target_prompt,
     regenerate_options,
-    orig_generate_options,
+    generate_options,
     criterion_id,
     structure_directives,
     current_criteria_count = nil
@@ -284,11 +305,11 @@ class RubricLLMService
       }.to_json,
       EXISTING_CRITERIA: criteria_as_text,
       REGENERATION_TARGET: regeneration_target_prompt,
-      ADDITIONAL_USER_PROMPT: regenerate_options.fetch(:additional_user_prompt, "No specific expectations, just improve it."),
-      GRADE_LEVEL: orig_generate_options.fetch(:grade_level, DEFAULT_GENERATE_OPTIONS[:grade_level]),
-      STANDARD: regenerate_options.fetch(:standard, " "),
-      ORIG_CRITERIA_COUNT: criterion_id.present? ? "original count" : (current_criteria_count || orig_generate_options.fetch(:criteria_count, DEFAULT_GENERATE_OPTIONS[:criteria_count])),
-      ORIG_RATING_COUNT: criterion_id.present? ? "original count" : orig_generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count]),
+      ADDITIONAL_USER_PROMPT: regenerate_options.fetch(:additional_user_prompt, generate_options.fetch(:additional_prompt_info, "No specific expectations, just improve it.")),
+      GRADE_LEVEL: generate_options.fetch(:grade_level, DEFAULT_GENERATE_OPTIONS[:grade_level]),
+      STANDARD: generate_options.fetch(:standard, " "),
+      ORIG_CRITERIA_COUNT: criterion_id.present? ? "original count" : (current_criteria_count || generate_options.fetch(:criteria_count, DEFAULT_GENERATE_OPTIONS[:criteria_count])),
+      ORIG_RATING_COUNT: criterion_id.present? ? "original count" : generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count]),
       STRUCTURE_DIRECTIVES: criterion_id.present? ? "" : structure_directives,
     }
   end
@@ -320,7 +341,7 @@ class RubricLLMService
     response,
     incoming_criteria,
     existing_criteria_json,
-    orig_generate_options,
+    generate_options,
     criterion_id
   )
     ai_rubric_data = extract_text_from_response(response, tag: "RUBRIC_DATA")
@@ -334,8 +355,8 @@ class RubricLLMService
           ai_rubric_data,
           existing_criteria_json,
           incoming_criteria.size,
-          orig_generate_options.fetch(:points_per_criterion, DEFAULT_GENERATE_OPTIONS[:points_per_criterion]),
-          !!orig_generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
+          generate_options.fetch(:total_points, DEFAULT_GENERATE_OPTIONS[:total_points]),
+          !!generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
         )
       end
 
@@ -345,7 +366,14 @@ class RubricLLMService
     @used_ids = {}
     reserve_existing_ids!(incoming_criteria)
 
-    Array(ai_rubric[:criteria]).map { |criterion_data| rebuild_regenerated_criterion(criterion_data, orig_generate_options) }
+    # Distribute points across criteria, adjusting last criterion for exact total
+    criteria_array = Array(ai_rubric[:criteria])
+    total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+    points_per_criterion = calculate_points_per_criterion(total_points, criteria_array.length)
+
+    criteria_array.each_with_index.map do |criterion_data, index|
+      rebuild_regenerated_criterion(criterion_data, points_per_criterion[index], generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range]))
+    end
   rescue JSON::ParserError => e
     Rails.logger.error("Failed to parse LLM response as JSON during regeneration: #{e.message}")
     raise JSON::ParserError, "The AI response was not in the expected format. Please try again."
@@ -355,12 +383,11 @@ class RubricLLMService
   # - Preserving provided IDs
   # - Generating points ladder per original options
   # - Sorting ratings by points desc
-  def rebuild_regenerated_criterion(criterion_data, orig_generate_options)
+  def rebuild_regenerated_criterion(criterion_data, criterion_points, use_range)
     criterion_data = criterion_data.deep_symbolize_keys
     criterion_id_final = determine_final_criterion_id(criterion_data)
 
-    points = orig_generate_options.fetch(:points_per_criterion, DEFAULT_GENERATE_OPTIONS[:points_per_criterion]).to_f
-    ratings = rebuild_regenerated_ratings(criterion_data, criterion_id_final, points)
+    ratings = rebuild_regenerated_ratings(criterion_data, criterion_id_final, criterion_points)
 
     {
       id: criterion_id_final,
@@ -368,7 +395,7 @@ class RubricLLMService
       long_description: criterion_data[:long_description].presence,
       ratings: ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] },
       points: ratings.pluck(:points).max || 0,
-      criterion_use_range: !!orig_generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
+      criterion_use_range: !!use_range
     }
   end
 
@@ -420,7 +447,7 @@ class RubricLLMService
       {
         description: (rd[:description].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
         long_description: rd[:long_description].presence,
-        points: (points - (points_decrement * index)).round,
+        points: (points - (points_decrement * index)).round(ROUNDING_PRECISION),
         criterion_id: criterion_id_final,
         id: rating_id_final
       }
@@ -484,6 +511,17 @@ class RubricLLMService
     updated = false
     new_criterion = nil
 
+    # Find the original criterion to preserve its points and use_range settings
+    original_criterion = original["criteria"].find { |c| c["id"] == criterion_id.to_s }
+    raise "No updates applied for criterion_id=#{criterion_id} - criterion does not exist in original rubric" unless original_criterion
+
+    # Calculate the criterion's index to get its proper points from distribution
+    criterion_index = original["criteria"].index(original_criterion)
+    total_points = original["criteria"].sum { |c| c["points"].to_f }
+    criteria_count = original["criteria"].length
+    points_distribution = calculate_points_per_criterion(total_points, criteria_count)
+    criterion_points = points_distribution[criterion_index] || original_criterion["points"] || 0
+
     text.each_line do |line|
       line.strip!
       next if line.empty?
@@ -504,8 +542,8 @@ class RubricLLMService
           "description" => "",
           "long_description" => "",
           "ratings" => [],
-          "points" => 0,
-          "criterion_use_range" => false
+          "points" => criterion_points,
+          "criterion_use_range" => original_criterion["criterion_use_range"] || false
         }
         new_criterion[field] = value
         updated = true
@@ -531,10 +569,6 @@ class RubricLLMService
 
     raise "No updates applied for criterion_id=#{criterion_id}" unless updated
 
-    # Validate that the criterion_id exists in the original criteria
-    criterion_found = original["criteria"].any? { |c| c["id"] == criterion_id.to_s }
-    raise "No updates applied for criterion_id=#{criterion_id} - criterion does not exist in original rubric" unless criterion_found
-
     original["criteria"] = original["criteria"].map do |c|
       (c["id"] == criterion_id.to_s) ? new_criterion : c
     end
@@ -545,7 +579,7 @@ class RubricLLMService
   # Replace the entire rubric's criteria based on a line-based text payload.
   #
   # Rules enforced here:
-  # - The resulting number of criteria must equal orig_criteria_count
+  # - The resulting number of criteria must equal desired_criteria_count
   # - New criteria/ratings can use placeholder IDs (_new_c_X / _new_r_X)
   #   which are later mapped to unique Canvas IDs
   # - Ratings are attached to the most recent criterion encountered
@@ -557,13 +591,17 @@ class RubricLLMService
   #
   # Will produce:
   #   criteria: [{id:"<unique>", description:"Thesis", ratings:[{id:"<unique>", ...}]}, {...}]
-  def text_to_rubric(text, rubric_json, orig_criteria_count, orig_points_per_criterion, orig_use_range)
+  def text_to_rubric(text, rubric_json, desired_criteria_count, total_points, use_range)
     original = JSON.parse(rubric_json)
-    orig_criteria_count = orig_criteria_count.to_i
+    desired_criteria_count = desired_criteria_count.to_i
+    total_points = (total_points || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
 
     @used_ids = {}
     reserve_existing_ids!(original.fetch("criteria", []))
     @new_id_map = {}
+
+    # Calculate points distribution across criteria
+    points_distribution = calculate_points_per_criterion(total_points, desired_criteria_count)
 
     new_criteria = []
     current_crit = nil
@@ -584,13 +622,17 @@ class RubricLLMService
 
       if type == "criterion"
         if current_crit.nil? || current_crit["id"] != raw_id
+          # Assign points based on criterion index in the distribution
+          criterion_index = new_criteria.size
+          criterion_points = points_distribution[criterion_index] || 0
+
           current_crit = {
             "id" => raw_id,
             "description" => "",
             "long_description" => "",
             "ratings" => [],
-            "points" => orig_points_per_criterion || 0,
-            "criterion_use_range" => orig_use_range || false
+            "points" => criterion_points,
+            "criterion_use_range" => use_range || false
           }
           new_criteria << current_crit
         end
@@ -614,11 +656,11 @@ class RubricLLMService
     end
 
     # Validate criteria count and truncate if necessary
-    if new_criteria.size > orig_criteria_count
-      Rails.logger.warn("LLM generated #{new_criteria.size} criteria but expected #{orig_criteria_count}. Truncating excess criteria.")
-      new_criteria = new_criteria.take(orig_criteria_count)
-    elsif new_criteria.size < orig_criteria_count
-      raise "Criteria count mismatch: expected #{orig_criteria_count}, got #{new_criteria.size}"
+    if new_criteria.size > desired_criteria_count
+      Rails.logger.warn("LLM generated #{new_criteria.size} criteria but expected #{desired_criteria_count}. Truncating excess criteria.")
+      new_criteria = new_criteria.take(desired_criteria_count)
+    elsif new_criteria.size < desired_criteria_count
+      raise "Criteria count mismatch: expected #{desired_criteria_count}, got #{new_criteria.size}"
     end
 
     original["criteria"] = new_criteria

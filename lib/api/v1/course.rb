@@ -26,6 +26,7 @@ module Api::V1::Course
   include Api::V1::PostGradesStatus
   include Api::V1::User
   include Api::V1::Tab
+  include Api::V1::AccessibilityCourseStatistic
 
   def course_settings_json(course)
     settings = {}
@@ -174,6 +175,9 @@ module Api::V1::Course
       end
       if Account.site_admin.feature_enabled?(:syllabus_versioning) && includes.include?("syllabus_versions") && course.grants_right?(user, :manage_course_content_edit)
         hash["syllabus_versions"] = syllabus_versions_json(course)
+      end
+      if includes.include?("accessibility_course_statistic") && course.account.can_see_accessibility_tab?(user)
+        hash["accessibility_course_statistic"] = accessibility_course_statistic_json(course.accessibility_course_statistic, user, session)
       end
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash

@@ -25,6 +25,8 @@ import {mockLti1p3RegistrationWizardService} from '../../dynamic_registration_wi
 import {ZAccountId} from '../../model/AccountId'
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {LtiPlacements} from '../../model/LtiPlacement'
+import {success} from '../../../common/lib/apiResult/ApiResult'
+import {ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 
 // NOTE: The registration wizard creates it's own store during render, so testing it is currently
 // quite slow. Hopefully, we can refactor it to make testing easier in the future, but for now,
@@ -57,7 +59,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(onDismiss).toHaveBeenCalled()
   })
 
-  it.skip('navigates through all steps in order', async () => {
+  it('navigates through all steps in order', async () => {
     render(<Lti1p3RegistrationWizard {...defaultProps} />)
 
     expect(screen.getByText('LTI 1.3 Registration')).toBeInTheDocument()
@@ -78,7 +80,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getByText('Nickname')).toBeInTheDocument()
 
     await userEvent.click(findNextButton())
-    expect(screen.getByText('Icon URLs')).toBeInTheDocument()
+    expect(screen.getByText('Placement Icon URLs')).toBeInTheDocument()
 
     await userEvent.click(findNextButton())
     expect(screen.getByText('Review')).toBeInTheDocument()
@@ -94,7 +96,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getByText('LTI 1.3 Registration')).toBeInTheDocument()
   })
 
-  it.skip('shows updating state when updating an existing registration', async () => {
+  it('shows updating state when updating an existing registration', async () => {
     const existingRegistration = mockRegistration('Test App', 1)
     render(
       <Lti1p3RegistrationWizard
@@ -110,12 +112,11 @@ describe('Lti1p3RegistrationWizard', () => {
     for (let i = 0; i < 7; i++) {
       await userEvent.click(findNextButton())
     }
-
     await userEvent.click(screen.getByText('Update App').closest('button')!)
     expect(screen.getAllByText('Updating App')[0]).toBeInTheDocument()
   })
 
-  it.skip('shows error state when an error occurs', async () => {
+  it('shows error state when an error occurs', async () => {
     const existingRegistration = mockRegistration('Test App', 1)
     const errorService = mockLti1p3RegistrationWizardService({
       updateLtiRegistration: vi.fn().mockReturnValue({
@@ -144,7 +145,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getByText(/sorry, something broke/i)).toBeInTheDocument()
   })
 
-  it.skip('skips the icon confirmation screen if the tool has no placements with icons', async () => {
+  it("doesn't skip the icon confirmation screen even if the tool has no placements with icons", async () => {
     render(
       <Lti1p3RegistrationWizard
         {...defaultProps}
@@ -159,11 +160,12 @@ describe('Lti1p3RegistrationWizard', () => {
     await userEvent.click(findNextButton())
     await userEvent.click(findNextButton())
     await userEvent.click(findNextButton())
+    expect(screen.getByText(/Tool Icon URL/i, {selector: 'h3'})).toBeInTheDocument()
+    await userEvent.click(findNextButton())
     expect(screen.getByText(/^Review$/i)).toBeInTheDocument()
-    expect(screen.queryByText(/Icon URLs/i)).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByText(/^Previous$/i).closest('button')!)
-    expect(screen.getByText(/^Nickname$/i)).toBeInTheDocument()
+    expect(screen.getByText(/Tool Icon URL/i, {selector: 'h3'})).toBeInTheDocument()
   })
 
   it('includes EULA Settings step when tool has EulaUser scope and asset processor placements', async () => {
@@ -338,5 +340,90 @@ describe('Lti1p3RegistrationWizard', () => {
     await userEvent.click(screen.getByText('Previous').closest('button')!)
     expect(screen.getByText('Placements')).toBeInTheDocument()
     expect(screen.queryByText('EULA Settings')).not.toBeInTheDocument()
+  })
+
+  it('focuses invalid inputs if any fields are invalid on launch settings step', async () => {
+    const user = userEvent.setup()
+    render(<Lti1p3RegistrationWizard {...defaultProps} />)
+
+    const redirectURIs = screen.getByLabelText(/Redirect URIs/i)
+    await user.clear(redirectURIs)
+    await user.paste('http:<<<>>')
+    await user.tab()
+    await user.click(findNextButton())
+    expect(redirectURIs).toHaveFocus()
+
+    await user.clear(redirectURIs)
+    await user.paste('https://example.com/launch')
+
+    const domain = screen.getByLabelText('Domain')
+    await user.clear(domain)
+    await user.paste('domain00---.com.')
+    await user.tab()
+    await user.click(findNextButton())
+    expect(domain).toHaveFocus()
+
+    await user.clear(domain)
+    await user.paste('example.com')
+    await user.click(findNextButton())
+    expect(screen.getByText('Permissions')).toBeInTheDocument()
+  })
+
+  it('focuses invalid inputs if any fields are invalid on override uris step', async () => {
+    const user = userEvent.setup()
+    render(<Lti1p3RegistrationWizard {...defaultProps} />)
+
+    // Navigate to Override URIs step
+    await user.click(findNextButton()) // Launch Settings -> Permissions
+    await user.click(findNextButton()) // Permissions -> Data Sharing
+    await user.click(findNextButton()) // Data Sharing -> Placements
+    await user.click(findNextButton()) // Placements -> Override URIs
+
+    expect(screen.getByText('Override URIs')).toBeInTheDocument()
+
+    // Enter an invalid override URI for course_navigation placement (first one)
+    const overrideUriInputs = screen.getAllByLabelText('Override URI')
+    const overrideUriInput = overrideUriInputs[0]
+    await user.clear(overrideUriInput)
+    await user.paste('invalid-url')
+    await user.tab()
+    await user.click(findNextButton())
+    expect(overrideUriInput).toHaveFocus()
+
+    // Fix the invalid URI and verify the wizard can proceed
+    await user.clear(overrideUriInput)
+    await user.paste('https://example.com/override')
+    await user.click(findNextButton())
+    expect(screen.getByText('Nickname')).toBeInTheDocument()
+  })
+
+  it('focuses invalid inputs if any fields are invalid on icon urls step', async () => {
+    const user = userEvent.setup()
+    render(<Lti1p3RegistrationWizard {...defaultProps} />)
+
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+    await user.click(findNextButton())
+
+    expect(screen.getByText('Placement Icon URLs')).toBeInTheDocument()
+
+    // Enter an invalid icon URL for global_navigation placement (which supports icons)
+    // Find the Global Navigation heading first, then find the input associated with it
+    screen.getByText('Global Navigation')
+    const iconUrlInput = screen.getAllByRole('textbox')[1]
+    await user.clear(iconUrlInput)
+    await user.paste('invalid-url')
+    await user.tab()
+    await user.click(findNextButton())
+    expect(iconUrlInput).toHaveFocus()
+
+    // Fix the invalid URL and verify the wizard can proceed
+    await user.clear(iconUrlInput)
+    await user.paste('https://example.com/icon.png')
+    await user.click(findNextButton())
+    expect(screen.getByText('Review')).toBeInTheDocument()
   })
 })

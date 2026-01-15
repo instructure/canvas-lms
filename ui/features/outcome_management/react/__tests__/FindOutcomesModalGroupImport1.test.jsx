@@ -1,0 +1,296 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React from 'react'
+import {act, fireEvent, waitFor} from '@testing-library/react'
+import FindOutcomesModal from '../FindOutcomesModal'
+import {createCache} from '@canvas/apollo-v3'
+import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
+import {findOutcomesMocks, groupMocks, importGroupMocks} from '@canvas/outcomes/mocks/Management'
+import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
+import resolveProgress from '@canvas/progress/resolve_progress'
+import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {
+  createDefaultProps,
+  renderWithContext,
+  delayImportOutcomesProgress,
+  courseImportMocks,
+  WITH_FIND_GROUP_REFETCH,
+} from './FindOutcomesModalTestUtils'
+
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: vi.fn(),
+}))
+
+vi.mock('@canvas/progress/resolve_progress')
+
+describe('FindOutcomesModal - Group Import Tests Part 1', () => {
+  let cache
+  let onCloseHandlerMock
+  let setTargetGroupIdsToRefetchMock
+  let setImportsTargetGroupMock
+  let defaultProps
+
+  beforeEach(() => {
+    vi.useFakeTimers({shouldAdvanceTime: true})
+    onCloseHandlerMock = vi.fn()
+    setTargetGroupIdsToRefetchMock = vi.fn()
+    setImportsTargetGroupMock = vi.fn()
+    defaultProps = createDefaultProps(
+      onCloseHandlerMock,
+      setTargetGroupIdsToRefetchMock,
+      setImportsTargetGroupMock,
+    )
+    cache = createCache()
+    window.ENV = {}
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+    vi.useRealTimers()
+    resolveProgress.mockReset()
+  })
+
+  const render = (children, options = {}) => {
+    return renderWithContext(children, {...options, cache})
+  }
+
+  it('imports group without ConfirmationBox if Add All Outcomes button is clicked in Account context', async () => {
+    resolveProgress.mockImplementation(() => Promise.resolve())
+    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+      contextType: 'Account',
+      mocks: [
+        ...findModalMocks(),
+        ...groupMocks({groupId: '100'}),
+        ...findOutcomesMocks({groupId: '300', withFindGroupRefetch: WITH_FIND_GROUP_REFETCH}),
+        ...importGroupMocks({groupId: '300'}),
+      ],
+    })
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+    await clickEl(getByText('Add All Outcomes').closest('button'))
+    await act(async () => {
+      vi.runAllTimers()
+      await Promise.resolve()
+    })
+    expect(setImportsTargetGroupMock).toHaveBeenCalledTimes(1)
+    expect(setImportsTargetGroupMock).toHaveBeenCalledWith({300: ROOT_GROUP})
+    expect(setTargetGroupIdsToRefetchMock).toHaveBeenCalledTimes(1)
+    expect(showFlashAlert).toHaveBeenCalledWith({
+      message: 'All outcomes from Group 300 have been successfully added to this account.',
+      type: 'success',
+    })
+  })
+
+  it('imports group without ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes <= 50', async () => {
+    resolveProgress.mockImplementation(() => Promise.resolve())
+    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+      contextType: 'Course',
+      mocks: [
+        ...findModalMocks(),
+        ...groupMocks({groupId: '100'}),
+        ...findOutcomesMocks({
+          groupId: '300',
+          isImported: false,
+          contextType: 'Course',
+          outcomesCount: 50,
+          withFindGroupRefetch: WITH_FIND_GROUP_REFETCH,
+        }),
+        ...importGroupMocks({
+          groupId: '300',
+          targetContextType: 'Course',
+        }),
+      ],
+    })
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+    await clickEl(getByText('Add All Outcomes').closest('button'))
+    await act(async () => {
+      vi.runAllTimers()
+      await Promise.resolve()
+    })
+    expect(showFlashAlert).toHaveBeenCalledWith({
+      message: 'All outcomes from Group 300 have been successfully added to this course.',
+      type: 'success',
+    })
+  })
+
+  it('disables Add All Outcomes button during/after group import', async () => {
+    const {getByText, getAllByText, getByRole} = render(<FindOutcomesModal {...defaultProps()} />, {
+      contextType: 'Course',
+      mocks: [
+        ...courseImportMocks,
+        ...importGroupMocks({
+          groupId: '300',
+          targetContextType: 'Course',
+        }),
+      ],
+    })
+
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+
+    // Get the Add All Outcomes button and verify it's enabled
+    const addAllButton = getByRole('button', {name: 'Add All Outcomes'})
+    expect(addAllButton).toBeEnabled()
+
+    // Click the button to start the import
+    await clickEl(addAllButton)
+
+    // Click Import Anyway on the confirmation dialog
+    const importButtons = getAllByText('Import Anyway')
+    fireEvent.click(importButtons[0])
+
+    // Simulate the progress completion
+    resolveProgress.mockImplementation(() => Promise.resolve())
+
+    // Wait for the import status to update
+    await act(async () => {
+      vi.runAllTimers()
+      await Promise.resolve()
+    })
+
+    // Get the button again after the import and verify it's disabled
+    const updatedButton = getByRole('button', {name: 'Add All Outcomes'})
+    expect(updatedButton).toBeDisabled()
+  })
+
+  it('imports outcomes with ConfirmationBox if Add All Outcomes button is clicked in Course context and outcomes > 50', async () => {
+    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+      contextType: 'Course',
+      mocks: [
+        ...courseImportMocks,
+        ...importGroupMocks({
+          groupId: '300',
+          targetContextType: 'Course',
+        }),
+      ],
+    })
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+    await clickEl(getByText('Add All Outcomes').closest('button'))
+    expect(getByText('You are about to add 51 outcomes to this course.')).toBeInTheDocument()
+    await clickEl(getByText('Cancel'))
+  })
+
+  it('returns focus on Add All Outcomes button if Cancel button of ConfirmationBox is clicked', async () => {
+    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+      contextType: 'Course',
+      mocks: courseImportMocks,
+    })
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+    const AddAllButton = getByText('Add All Outcomes').closest('button')
+    await clickEl(AddAllButton)
+    expect(getByText('You are about to add 51 outcomes to this course.')).toBeInTheDocument()
+    expect(AddAllButton).not.toHaveFocus()
+    await clickEl(getByText('Cancel'))
+    expect(AddAllButton).toHaveFocus()
+  })
+
+  it('returns focus on Done button if Import Anyway button of ConfirmationBox is clicked', async () => {
+    resolveProgress.mockImplementation(() => Promise.resolve())
+    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+      contextType: 'Course',
+      mocks: courseImportMocks,
+    })
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+    const DoneButton = getByText('Done').closest('button')
+    await clickEl(getByText('Add All Outcomes').closest('button'))
+    expect(getByText('You are about to add 51 outcomes to this course.')).toBeInTheDocument()
+    expect(DoneButton).not.toHaveFocus()
+    await clickEl(getByText('Import Anyway'))
+    await act(async () => {
+      vi.runAllTimers()
+      await Promise.resolve()
+    })
+    expect(DoneButton).toHaveFocus()
+  })
+
+  it('enables Add All Outcomes button if group import fails', async () => {
+    resolveProgress.mockImplementation(() => Promise.reject(new Error('Import failed')))
+    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+      contextType: 'Course',
+      mocks: [
+        ...courseImportMocks,
+        ...importGroupMocks({
+          groupId: '300',
+          targetContextType: 'Course',
+          failResponse: true,
+        }),
+      ],
+    })
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+    const AddAllButton = getByText('Add All Outcomes').closest('button')
+    await clickEl(AddAllButton)
+    await clickEl(getByText('Import Anyway'))
+    await act(async () => {
+      vi.runAllTimers()
+      await Promise.resolve()
+    })
+    expect(AddAllButton).toBeEnabled()
+  })
+
+  it('replaces Add buttons of individual outcomes with loading spinner during group import', async () => {
+    const doResolveProgress = delayImportOutcomesProgress()
+    const {getByText, getAllByText, queryByText} = render(
+      <FindOutcomesModal {...defaultProps()} />,
+      {
+        contextType: 'Course',
+        mocks: [
+          ...courseImportMocks,
+          ...importGroupMocks({
+            groupId: '300',
+            targetContextType: 'Course',
+          }),
+        ],
+      },
+    )
+    await act(async () => vi.runAllTimers())
+    await clickEl(getByText('Account Standards'))
+    await clickEl(getByText('Root Account Outcome Group 0'))
+    await clickEl(getByText('Group 100 folder 0'))
+    expect(getAllByText('Add')).toHaveLength(2)
+    await clickEl(getByText('Add All Outcomes').closest('button'))
+    await clickEl(getByText('Import Anyway'))
+    expect(getAllByText('Loading')).toHaveLength(2)
+    await act(async () => {
+      doResolveProgress()
+      await vi.runAllTimersAsync()
+    })
+    await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
+    expect(getAllByText('Added')).toHaveLength(2)
+  })
+})

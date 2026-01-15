@@ -60,11 +60,7 @@ describe('TabsBlock', () => {
     expect(getByText('Custom Tab 2')).toBeInTheDocument()
   })
 
-  it.skip('should switch tabs on click', async () => {
-    // the user.click triggers a console error
-    // "Warning: Cannot update a component (`%s`) while rendering a different component"
-    // This does not happen in the real editor, so there's something about
-    // jsdom at play here.
+  it('should switch tabs on click', async () => {
     const {container} = renderBlock(true)
 
     const tabs = container.querySelectorAll('[role="tab"]')
@@ -81,9 +77,9 @@ describe('TabsBlock', () => {
     expect(tabs2[1]).toHaveAttribute('aria-selected', 'true')
   })
 
+  // I can't seem to select the tabs block in order to make it editable
+  // this may need to be a selenium test
   it.skip('makes tab labels editable', async () => {
-    // I can't seem to select the tabs block in order to make it editable
-    // this may need to be a selenium test
     const {container, getByText} = renderBlock(true)
     let tabs = container.querySelectorAll('[role="tab"]')
     expect(tabs).toHaveLength(2)
@@ -102,8 +98,8 @@ describe('TabsBlock', () => {
     expect(tabs[1]).toHaveAttribute('contenteditable', 'true')
   })
 
+  // when I skipped "should switch tabs on click", this test started failing
   it.skip('should delete tab on clicking delete button', async () => {
-    // shen I skipped "should switch tabs on click", this test started failing
     const {queryByText, getByText, getAllByText} = renderBlock(true)
     expect(getByText('Tab 1')).toBeInTheDocument()
     expect(getByText('Tab 2')).toBeInTheDocument()

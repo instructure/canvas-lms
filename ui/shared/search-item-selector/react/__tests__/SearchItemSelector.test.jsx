@@ -67,7 +67,7 @@ describe('SearchItemSelector', () => {
     expect(getByText(/loading/i)).toBeInTheDocument()
   })
 
-  // Skipped: Causes infinite timer loop - ARC-9212
+  // Infinite timer loop with vi.runAllTimers()
   it.skip('renders a loading spinner and searches with a specific search term when typed', () => {
     const {getAllByText, getByLabelText} = render(
       <SearchItemSelector
@@ -91,7 +91,7 @@ describe('SearchItemSelector', () => {
     )
   })
 
-  // Skipped: Element not rendering in dropdown - ARC-9212
+  // Element not rendering in dropdown
   it.skip('updates select and invokes onItemSelected when an item is chosen', () => {
     testSearchFunction.mockImplementationOnce(({success}) => success([{id: 'foo', name: 'bar'}]))
     const handleCourseSelected = vi.fn()
@@ -182,7 +182,7 @@ describe('SearchItemSelector', () => {
     expect(selectInput.value).toBe('')
   })
 
-  // Skipped: Causes infinite timer loop - ARC-9212
+  // Infinite timer loop with vi.runAllTimers()
   it.skip('supports prepopulating search text (which can be changed by the user)', () => {
     const handleCourseSelected = vi.fn()
     const {getByLabelText} = render(

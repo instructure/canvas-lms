@@ -42,8 +42,7 @@ export default function CopyToClipboardButton({
   const [feedback, setFeedback] = useState<boolean | null>(null)
 
   const temporarilySetFeedback = useCallback(
-    // @ts-expect-error
-    success => {
+    (success: boolean) => {
       setFeedback(success)
       setTimeout(() => setFeedback(null), 1000)
     },

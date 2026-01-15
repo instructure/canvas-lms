@@ -25,8 +25,8 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: vi.fn(),
 }))
 
-vi.mock('react-dom/client', () => ({
-  createRoot: vi.fn(),
+vi.mock('@canvas/react', () => ({
+  render: vi.fn(),
 }))
 
 vi.mock('@canvas/query', () => ({
@@ -40,26 +40,18 @@ vi.mock('@canvas/i18n', () => ({
 }))
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 const mockShowFlashError = showFlashError as ReturnType<typeof vi.fn>
-const mockCreateRoot = createRoot as ReturnType<typeof vi.fn>
+const mockRender = render as ReturnType<typeof vi.fn>
 
 describe('renderToElements', () => {
-  let mockRender: ReturnType<typeof vi.fn>
-  let mockRoot: any
-
   beforeEach(() => {
     // Reset DOM
     document.body.innerHTML = ''
 
     // Reset mocks
     vi.clearAllMocks()
-
-    // Setup mock root
-    mockRender = vi.fn()
-    mockRoot = {render: mockRender}
-    mockCreateRoot.mockReturnValue(mockRoot)
 
     // Mock console methods
     vi.spyOn(console, 'warn').mockImplementation(() => {})
@@ -89,7 +81,6 @@ describe('renderToElements', () => {
       })
 
       expect(count).toBe(2)
-      expect(mockCreateRoot).toHaveBeenCalledTimes(2)
       expect(mockRender).toHaveBeenCalledTimes(2)
       expect(mockShowFlashError).not.toHaveBeenCalled()
     })
@@ -106,7 +97,6 @@ describe('renderToElements', () => {
       })
 
       expect(count).toBe(0)
-      expect(mockCreateRoot).not.toHaveBeenCalled()
       expect(mockRender).not.toHaveBeenCalled()
       expect(mockShowFlashError).not.toHaveBeenCalled()
     })
@@ -140,7 +130,6 @@ describe('renderToElements', () => {
       })
 
       expect(count).toBe(1)
-      expect(mockCreateRoot).toHaveBeenCalledTimes(1)
       expect(mockRender).toHaveBeenCalledTimes(1)
       expect(mockShowFlashError).not.toHaveBeenCalled()
     })
@@ -160,7 +149,6 @@ describe('renderToElements', () => {
       })
 
       expect(count).toBe(0)
-      expect(mockCreateRoot).not.toHaveBeenCalled()
       expect(mockRender).not.toHaveBeenCalled()
       expect(console.warn).toHaveBeenCalledWith(
         'Invalid props for element .test-component:',
@@ -192,7 +180,6 @@ describe('renderToElements', () => {
       })
 
       expect(count).toBe(1)
-      expect(mockCreateRoot).toHaveBeenCalledTimes(1)
       expect(mockRender).toHaveBeenCalledTimes(1)
       expect(mockShowFlashError).toHaveBeenCalledWith('Test Error')
     })
@@ -238,29 +225,6 @@ describe('renderToElements', () => {
 
   describe('error handling', () => {
     const TestComponent = () => <div>Test Component</div>
-
-    it('shows flash error when createRoot throws', () => {
-      document.body.innerHTML = '<div class="test-component"></div>'
-
-      mockCreateRoot.mockImplementationOnce(() => {
-        throw new Error('createRoot failed')
-      })
-
-      const count = renderToElements({
-        selector: '.test-component',
-        Component: TestComponent,
-        datasetSchema: undefined,
-        flashErrorTitle: 'Test Error',
-        withQueryClient: false,
-      })
-
-      expect(count).toBe(0)
-      expect(console.error).toHaveBeenCalledWith(
-        'Error rendering element .test-component',
-        expect.any(Error),
-      )
-      expect(mockShowFlashError).toHaveBeenCalledWith('Test Error')
-    })
 
     it('shows flash error when render throws', () => {
       document.body.innerHTML = '<div class="test-component"></div>'
@@ -327,10 +291,6 @@ describe('convenience functions', () => {
   beforeEach(() => {
     document.body.innerHTML = ''
     vi.clearAllMocks()
-
-    const mockRender = vi.fn()
-    const mockRoot = {render: mockRender}
-    mockCreateRoot.mockReturnValue(mockRoot as any)
   })
 
   describe('renderAPComponent', () => {
@@ -340,7 +300,7 @@ describe('convenience functions', () => {
       const count = renderAPComponent('.test-component', TestComponent)
 
       expect(count).toBe(1)
-      expect(mockCreateRoot).toHaveBeenCalledTimes(1)
+      expect(mockRender).toHaveBeenCalledTimes(1)
     })
 
     it('works with schema', () => {
@@ -353,7 +313,7 @@ describe('convenience functions', () => {
       const count = renderAPComponent('.test-component', TestComponent, schema)
 
       expect(count).toBe(1)
-      expect(mockCreateRoot).toHaveBeenCalledTimes(1)
+      expect(mockRender).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -364,7 +324,7 @@ describe('convenience functions', () => {
       const count = renderAPComponentNoQC('.test-component', TestComponent)
 
       expect(count).toBe(1)
-      expect(mockCreateRoot).toHaveBeenCalledTimes(1)
+      expect(mockRender).toHaveBeenCalledTimes(1)
     })
 
     it('works with schema', () => {
@@ -377,7 +337,7 @@ describe('convenience functions', () => {
       const count = renderAPComponentNoQC('.test-component', TestComponent, schema)
 
       expect(count).toBe(1)
-      expect(mockCreateRoot).toHaveBeenCalledTimes(1)
+      expect(mockRender).toHaveBeenCalledTimes(1)
     })
   })
 })

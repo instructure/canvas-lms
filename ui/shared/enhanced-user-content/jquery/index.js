@@ -18,33 +18,33 @@
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {uniqueId} from 'es-toolkit/compat'
-import htmlEscape from '@instructure/html-escape'
+import {uniqueId, sortBy} from 'es-toolkit/compat'
+import {fromNow} from '@canvas/fuzzy-relative-time'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {enhanceUserContent} from '@instructure/canvas-rce'
-import {makeAllExternalLinksExternalLinks} from '@instructure/canvas-rce/es/enhance-user-content/external_links'
+import {
+  enhanceUserContent,
+  makeAllExternalLinksExternalLinks,
+} from '@instructure/canvas-rce/enhance-user-content'
 import {getMountPoint} from '@canvas/top-navigation/react/TopNavPortalBase'
-import './instructure_helper'
+import 'jqueryui/dialog'
 import 'jqueryui/draggable'
+import 'jqueryui/resizable'
+import 'jqueryui/sortable'
+import 'jqueryui/tabs'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString, fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
-import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import '@instructure/date-js'
-import 'jquery-tinypubsub' /* /\.publish\(/ */
-import 'jqueryui/resizable'
-import 'jqueryui/sortable'
-import 'jqueryui/tabs'
 import {captureException} from '@sentry/browser'
+import preventDefault from '@canvas/util/preventDefault'
 
 const I18n = createI18nScope('instructure_js')
 
@@ -53,57 +53,33 @@ export function formatTimeAgoTitle(date) {
   return fudgedDate.toString('MMM d, yyyy h:mmtt')
 }
 
-export function formatTimeAgoDate(date) {
-  if (typeof date === 'string') {
-    date = Date.parse(date)
-  }
-  const diff = new Date() - date
-  if (diff < 24 * 3600 * 1000) {
-    if (diff < 3600 * 1000) {
-      if (diff < 60 * 1000) {
-        return I18n.t('#time.less_than_a_minute_ago', 'less than a minute ago')
-      } else {
-        const minutes = parseInt(diff / (60 * 1000), 10)
-        return I18n.t(
-          '#time.count_minutes_ago',
-          {one: '1 minute ago', other: '%{count} minutes ago'},
-          {count: minutes},
-        )
-      }
-    } else {
-      const hours = parseInt(diff / (3600 * 1000), 10)
-      return I18n.t(
-        '#time.count_hours_ago',
-        {one: '1 hour ago', other: '%{count} hours ago'},
-        {count: hours},
-      )
-    }
-  } else {
-    return formatTimeAgoTitle(date)
-  }
+// This is temporarily here while we finish the announced deprecation of
+// this functionality. It's been warning users for nine years but is still
+// apparently fairly widely used, so it has to stay until we can get users
+// transitioned off of it. It has to go because it decorates customer content
+// with jQueryUI functionality, which we are moving away from entirely, and
+// also there are security concerns with it.
+const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
+function deprecationWarning(els) {
+  const msg =
+    'Deprecated use of magic jQueryUI widget markup detected:\n\n' +
+    "You're relying on undocumented functionality where Canvas makes " +
+    'jQueryUI widgets out of rich content that has the following class names: ' +
+    JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE +
+    '.\n\n' +
+    'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
+    "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
+    'you should use your own custom JS file to do any such customizations.'
+  console.error(msg, els)
+  captureException(new Error(msg))
 }
 
-// this code was lifted from the original jquery version of enhanceUserContent
-// it's what wires up jquery widgets to DOM elements with magic class names
 function enhanceUserJQueryWidgetContent() {
-  const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
   $('.user_content.unenhanced')
     .find('.enhanceable_content')
     .show()
     .filter(JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE)
-    .ifExists($elements => {
-      const msg =
-        'Deprecated use of magic jQueryUI widget markup detected:\n\n' +
-        "You're relying on undocumented functionality where Canvas makes " +
-        'jQueryUI widgets out of rich content that has the following class names: ' +
-        JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE +
-        '.\n\n' +
-        'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
-        "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
-        'you should use your own custom JS file to do any such customizations.'
-      console.error(msg, $elements)
-      captureException(new Error(msg))
-    })
+    .ifExists(deprecationWarning)
     .end()
     .filter('.dialog')
     .each(function () {
@@ -234,87 +210,6 @@ function expandQuotedTextWhenClicked() {
   })
 }
 
-function previewEquellaContentWhenClicked() {
-  $(document).on('click', 'a.equella_content_link', function (event) {
-    event.preventDefault()
-    let $dialog = $('#equella_preview_dialog')
-    if (!$dialog.length) {
-      $dialog = $('<div/>')
-      $dialog.attr('id', 'equella_preview_dialog').hide()
-      $dialog.html(
-        "<h2/><iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 350px; border: 0;' src='about:blank' borderstyle='0'/><div style='text-align: right;'><a href='#' class='original_link external external_link' target='_blank'>" +
-          htmlEscape(
-            I18n.t('links.view_equella_content_in_new_window', 'view the content in a new window'),
-          ) +
-          '</a>',
-      )
-      $dialog
-        .find('h2')
-        .text(
-          $(this).attr('title') ||
-            $(this).text() ||
-            I18n.t('titles.equella_content_preview', 'Equella Content Preview'),
-        )
-      const $iframe = $dialog.find('iframe')
-      setTimeout(() => {
-        $iframe.css('background', '#fff')
-      }, 2500)
-      $('body').append($dialog)
-      $dialog.dialog({
-        autoOpen: false,
-        width: 'auto',
-        resizable: false,
-        title: I18n.t('titles.equella_content_preview', 'Equella Content Preview'),
-        close() {
-          $dialog.find('iframe').attr('src', 'about:blank')
-        },
-        modal: true,
-        zIndex: 1000,
-      })
-    }
-    $dialog.find('.original_link').attr('href', $(this).attr('href'))
-    $dialog.dialog('close').dialog('open')
-    $dialog.find('iframe').attr('src', $(this).attr('href'))
-  })
-}
-
-function openDialogsWhenClicked() {
-  // Adds a way to automatically open dialogs by just giving them the .dialog_opener class.
-  // Uses the aria-controls attribute to specify id of dialog to open because that is already
-  // a best practice accessibility-wise (as a side note you should also add "role=button").
-  // You can pass in options to the dialog with the data-dialog-options attribute.
-  //
-  // Examples:
-  //
-  // <a class="dialog_opener" aria-controls="foobar" role="button" href="#">
-  // opens the dialog with id="foobar"
-  //
-  // <a class="dialog_opener" aria-controls="my_dialog" data-dialog-opts="{resizable:false, width: 300}" role="button" href="#">
-  // opens the .my_dialog dialog and passes the options {resizable:false, width: 300}
-  // the :not clause is to not allow users access to this functionality in their content.
-  $(document).on('click', '.dialog_opener[aria-controls]:not(.user_content *)', function (event) {
-    const link = this
-    $('#' + $(this).attr('aria-controls')).ifExists($dialog => {
-      event.preventDefault()
-      // if the linked dialog has not already been initialized, initialize it (passing in opts)
-      if (!$dialog.data('ui-dialog')) {
-        $dialog.dialog(
-          $.extend(
-            {
-              autoOpen: false,
-              modal: true,
-              zIndex: 1000,
-            },
-            $(link).data('dialogOpts'),
-          ),
-        )
-        $dialog.fixDialogButtons()
-      }
-      $dialog.dialog('open')
-    })
-  })
-}
-
 let enhanceUserContentTimeout
 function enhanceUserContentWhenAsked() {
   if (ENV?.SKIP_ENHANCING_USER_CONTENT) {
@@ -325,7 +220,7 @@ function enhanceUserContentWhenAsked() {
   enhanceUserContentTimeout = setTimeout(
     () =>
       enhanceUserContent(document, {
-        customEnhanceFunc: enhanceUserJQueryWidgetContent,
+        customEnhance: enhanceUserJQueryWidgetContent,
         canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin,
         kalturaSettings: INST.kalturaSettings,
         disableGooglePreviews: !!INST.disableGooglePreviews,
@@ -524,7 +419,7 @@ function highlightDiscussionTopicMessagesOnHover() {
 
 function makeDatesPretty() {
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-  // vvvvvvvvvvvvvvvvv BEGIN stuf form making pretty dates vvvvvvvvvvvvvvvvvv
+  // vvvvvvvvvvvvvvvvv BEGIN stuff for making pretty dates vvvvvvvvvvvvvvvvvv
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   let timeAgoEvents = []
   function timeAgoRefresh() {
@@ -539,7 +434,7 @@ function makeDatesPretty() {
       if (date) {
         $event.data('timestamp', date.toISOString())
         $event.data('parsed_date', date)
-        $event.text(formatTimeAgoDate(date))
+        $event.text(fromNow(date))
         $event.attr('title', formatTimeAgoTitle(date))
       }
       setTimeout(processNextTimeAgoEvent, 1)
@@ -712,14 +607,57 @@ const setDialogCloseText = () => {
   $.ui.dialog.prototype.options.closeText = I18n.t('Close')
 }
 
+export const registerFixDialogButtonsPlugin = () => {
+  // Registers a jQuery plugin that converts button markup in dialogs
+  // to proper jQueryUI dialog buttons. This is called during boot to
+  // make the .fixDialogButtons() method available throughout the app.
+  $.fn.fixDialogButtons = function () {
+    return this.each(function () {
+      const $dialog = $(this)
+      const $buttons = $dialog.find('.button-container:last .btn, button[type=submit]')
+      if ($buttons.length) {
+        $dialog.find('.button-container:last, button[type=submit]').hide()
+        let buttons = $.map($buttons.toArray(), button => {
+          const $button = $(button)
+          let classes = $button.attr('class') || ''
+          const id = $button.attr('id')
+
+          // if you add the class 'dialog_closer' to any of the buttons,
+          // clicking it will cause the dialog to close
+          if ($button.is('.dialog_closer')) {
+            $button.off('.fixdialogbuttons')
+            $button.on(
+              'click.fixdialogbuttons',
+              preventDefault(() => $dialog.dialog('close')),
+            )
+          }
+
+          if ($button.prop('type') === 'submit' && $button[0].form) {
+            classes += ' button_type_submit'
+          }
+
+          return {
+            text: $button.text(),
+            'data-text-while-loading': $button.data('textWhileLoading'),
+            click: () => $button.click(),
+            class: classes,
+            id,
+          }
+        })
+        // put the primary button(s) on the far right
+        buttons = sortBy(buttons, button => (button.class.match(/btn-primary/) ? 1 : 0))
+        $dialog.dialog('option', 'buttons', buttons)
+      }
+    })
+  }
+}
+
 export function enhanceTheEntireUniverse() {
   ;[
     ellipsifyBreadcrumbs,
     bindKeyboardShortcutsHelpPanel,
     warnAboutRolesBeingSwitched,
     expandQuotedTextWhenClicked,
-    previewEquellaContentWhenClicked,
-    openDialogsWhenClicked,
     enhanceUserContentWhenAsked,
     enhanceUserContentRepeatedly,
     showDiscussionTopicSubMessagesWhenClicked,
@@ -735,5 +673,6 @@ export function enhanceTheEntireUniverse() {
     makeAllExternalLinksExternalLinks,
     wireUpFilePreview,
     setDialogCloseText,
+    registerFixDialogButtonsPlugin,
   ].map(x => x())
 }

@@ -143,6 +143,93 @@ describe AccessibilityResourceScan do
         end
       end
     end
+
+    describe "discussion_topic_id" do
+      context "when the discussion_topic_id is not unique" do
+        let(:course) { course_model }
+        let(:discussion_topic) { discussion_topic_model(course:) }
+
+        before do
+          accessibility_resource_scan_model(context: discussion_topic)
+          subject.discussion_topic = discussion_topic
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:discussion_topic_id]).to include("has already been taken")
+        end
+      end
+    end
+
+    describe "announcement_id" do
+      context "when the announcement_id is not unique" do
+        let(:course) { course_model }
+        let(:announcement) { announcement_model(course:) }
+
+        before do
+          accessibility_resource_scan_model(context: announcement)
+          subject.announcement = announcement
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:announcement_id]).to include("has already been taken")
+        end
+      end
+    end
+
+    describe "is_syllabus_or_context" do
+      let(:course) { course_model }
+      let(:wiki_page) { wiki_page_model(course:) }
+
+      context "when is_syllabus is true and context is present" do
+        before do
+          subject.course = course
+          subject.is_syllabus = true
+          subject.wiki_page = wiki_page
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:base]).to include("is_syllabus and context must be mutually exclusive")
+        end
+      end
+
+      context "when is_syllabus is true and context is nil" do
+        before do
+          subject.course = course
+          subject.is_syllabus = true
+        end
+
+        it "is valid" do
+          expect(subject).to be_valid
+        end
+      end
+
+      context "when is_syllabus is false and context is present" do
+        before do
+          subject.course = course
+          subject.is_syllabus = false
+          subject.wiki_page = wiki_page
+        end
+
+        it "is valid" do
+          expect(subject).to be_valid
+        end
+      end
+
+      context "when is_syllabus is false and context is nil" do
+        before do
+          subject.course = course
+          subject.is_syllabus = false
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:base]).to include("is_syllabus and context must be mutually exclusive")
+        end
+      end
+    end
   end
 
   describe "#update_issue_count!" do

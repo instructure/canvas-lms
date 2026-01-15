@@ -564,7 +564,7 @@ describe('peer review dates', () => {
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
       expect(errors.peer_review_available_from).toBe(
-        'Peer review available from date must be on or after assignment available from date',
+        'Unlock date cannot be before assignment unlock date',
       )
     })
 
@@ -616,7 +616,7 @@ describe('peer review dates', () => {
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
       expect(errors.peer_review_available_from).toBe(
-        'Peer review available from date must be before assignment available to date',
+        'Unlock date cannot be after assignment lock date',
       )
     })
 
@@ -659,9 +659,7 @@ describe('peer review dates', () => {
       const validator = makeValidator()
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
-      expect(errors.peer_review_available_from).toBe(
-        'Reviewing starts date must be before peer review due date',
-      )
+      expect(errors.peer_review_available_from).toBe('Unlock date cannot be after due date')
     })
 
     test('disallows peer_review_due_at to be equal to peer_review_available_from', () => {
@@ -672,9 +670,7 @@ describe('peer review dates', () => {
       const validator = makeValidator()
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
-      expect(errors.peer_review_available_from).toBe(
-        'Reviewing starts date must be before peer review due date',
-      )
+      expect(errors.peer_review_available_from).toBe('Unlock date cannot be after due date')
     })
 
     test('allows peer_review_due_at when peer_review_available_from is null', () => {
@@ -721,9 +717,7 @@ describe('peer review dates', () => {
       const validator = makeValidator()
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
-      expect(errors.peer_review_due_at).toBe(
-        'Peer review due date must be after assignment available from date',
-      )
+      expect(errors.peer_review_due_at).toBe('Due date cannot be before assignment unlock date')
     })
 
     test('allows peer_review_due_at when unlock_at is null', () => {
@@ -773,9 +767,7 @@ describe('peer review dates', () => {
       const validator = makeValidator()
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
-      expect(errors.peer_review_due_at).toBe(
-        'Peer review due date must be before assignment available to date',
-      )
+      expect(errors.peer_review_due_at).toBe('Due date cannot be after assignment lock date')
     })
 
     test('allows peer_review_due_at when lock_at is null', () => {
@@ -826,9 +818,7 @@ describe('peer review dates', () => {
       const validator = makeValidator()
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
-      expect(errors.peer_review_available_to).toBe(
-        'Peer review available to date must be on or after peer review due date',
-      )
+      expect(errors.peer_review_available_to).toBe('Lock date cannot be before due date')
     })
 
     test('allows peer_review_available_to when peer_review_due_at is null', () => {
@@ -880,9 +870,7 @@ describe('peer review dates', () => {
       const validator = makeValidator()
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
-      expect(errors.peer_review_available_to).toBe(
-        'Peer review available to date must be on or before assignment available to date',
-      )
+      expect(errors.peer_review_available_to).toBe('Lock date cannot be after assignment lock date')
     })
 
     test('allows peer_review_available_to when lock_at is null', () => {
@@ -933,7 +921,7 @@ describe('peer review dates', () => {
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
       expect(errors.peer_review_available_to).toBe(
-        'Peer review available to date must be after assignment available from date',
+        'Lock date cannot be before assignment unlock date',
       )
     })
 
@@ -983,9 +971,7 @@ describe('peer review dates', () => {
       const validator = makeValidator()
       const errors = validator.validateDatetimes(data)
       expect(isValid(validator, data)).toBe(false)
-      expect(errors.peer_review_available_to).toBe(
-        'Peer review available to date must be after peer review available from date',
-      )
+      expect(errors.peer_review_available_to).toBe('Lock date cannot be before unlock date')
     })
 
     test('allows peer_review_available_to when peer_review_available_from is null', () => {

@@ -867,6 +867,82 @@ describe Types::CourseType do
         @assignment.destroy
         expect { course_type.resolve(query) }.to raise_error(/assignment not found/)
       end
+
+      context "with peer review sub assignments" do
+        before do
+          course.enable_feature!(:peer_review_allocation_and_grading)
+          @section1 = course.course_sections.create!(name: "Section 1")
+          @section2 = course.course_sections.create!(name: "Section 2")
+          @parent_assignment = course.assignments.create!(
+            title: "Parent Assignment",
+            peer_reviews: true,
+            peer_review_count: 2
+          )
+          @peer_review_sub_assignment = peer_review_model(parent_assignment: @parent_assignment)
+        end
+
+        let(:peer_review_query) { "sectionsConnection(filter: { assignmentId: #{@peer_review_sub_assignment.id} }) { edges { node { _id } } }" }
+
+        it "returns course sections for peer review sub assignment" do
+          result = course_type.resolve(peer_review_query)
+          expect(result).to be_an(Array)
+          expect(result).not_to be_empty
+        end
+
+        it "returns all course sections including multiple sections" do
+          result = course_type.resolve(peer_review_query)
+          expect(result).to include(@section1.id.to_s, @section2.id.to_s)
+        end
+
+        context "with visibility overrides" do
+          before do
+            @section3 = course.course_sections.create!(name: "Section 3")
+            student_in_section(@section1)
+            student_in_section(@section2)
+            @peer_review_sub_assignment.update!(only_visible_to_overrides: true)
+            parent_override1 = @parent_assignment.assignment_overrides.create!(set: @section1)
+            parent_override2 = @parent_assignment.assignment_overrides.create!(set: @section2)
+            @peer_review_sub_assignment.assignment_overrides.create!(set: @section1, parent_override: parent_override1)
+            @peer_review_sub_assignment.assignment_overrides.create!(set: @section2, parent_override: parent_override2)
+          end
+
+          it "returns only sections with overrides when only_visible_to_overrides is true" do
+            result = course_type.resolve(peer_review_query)
+            expect(result).to contain_exactly(@section1.id.to_s, @section2.id.to_s)
+            expect(result).not_to include(@section3.id.to_s)
+          end
+        end
+
+        context "with regular assignment visibility overrides" do
+          before do
+            @regular_assignment = course.assignments.create!(
+              title: "Regular Assignment",
+              only_visible_to_overrides: true
+            )
+            @section3 = course.course_sections.create!(name: "Section 3")
+            student_in_section(@section1)
+            @regular_assignment.assignment_overrides.create!(set: @section1)
+          end
+
+          let(:regular_query) { "sectionsConnection(filter: { assignmentId: #{@regular_assignment.id} }) { edges { node { _id } } }" }
+
+          it "still works correctly for regular assignments" do
+            result = course_type.resolve(regular_query)
+            expect(result).to contain_exactly(@section1.id.to_s)
+            expect(result).not_to include(@section3.id.to_s)
+          end
+        end
+
+        context "when feature flag is disabled" do
+          before do
+            course.disable_feature!(:peer_review_allocation_and_grading)
+          end
+
+          it "raises an error for peer review sub assignment" do
+            expect { course_type.resolve(peer_review_query) }.to raise_error(/assignment not found/)
+          end
+        end
+      end
     end
   end
 

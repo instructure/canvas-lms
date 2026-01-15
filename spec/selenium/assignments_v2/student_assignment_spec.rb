@@ -1394,6 +1394,61 @@ describe "as a student" do
       end
     end
 
+    context "peer reviews with peer_review_allocation_and_grading FF enabled" do
+      before(:once) do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @student1 = student_in_course(name: "Student 1", course: @course, enrollment_state: :active).user
+        @student2 = student_in_course(name: "Student 2", course: @course, enrollment_state: :active).user
+        @student3 = student_in_course(name: "Student 3", course: @course, enrollment_state: :active).user
+
+        @peer_review_assignment = assignment_model({
+                                                     course: @course,
+                                                     peer_reviews: true,
+                                                     automatic_peer_reviews: false,
+                                                     points_possible: 10,
+                                                     submission_types: "online_text_entry"
+                                                   })
+
+        @peer_review_assignment.assign_peer_review(@student1, @student3)
+      end
+
+      before do
+        user_session(@student1)
+      end
+
+      it "does not show peer review details in modal after submitting" do
+        @peer_review_assignment.assign_peer_review(@student1, @student2)
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.create_text_entry_draft("hello")
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.submit_button_enabled
+        StudentAssignmentPageV2.submit_assignment
+
+        expect(StudentAssignmentPageV2.peer_review_header_text).to include("Your work has been submitted.\nCheck back later to view feedback.")
+        expect(StudentAssignmentPageV2.peer_review_header_text).not_to include("Peer Review")
+        expect(element_exists?("[data-testid='peer-review-next-button']")).to be_falsey
+      end
+
+      it "does not show peer review counter or navigation link in header" do
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+
+        expect(element_exists?("[data-testid='header-peer-review-link']")).to be_falsey
+      end
+    end
+
     context "with an active and concluded enrollment" do
       before do
         @assignment = @course.assignments.create!

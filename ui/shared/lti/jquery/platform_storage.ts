@@ -19,26 +19,22 @@
 const STORAGE_CHAR_LIMIT = 4096 // IMS minimum storage limit is 4096 bytes so 4096 chars is more than enough
 const STORAGE_KEY_LIMIT = 500
 
-export const limits = {}
+type ToolLimit = {keyCount: number; charCount: number}
 
-// @ts-expect-error
-export const createLimit = tool_id => {
-  // @ts-expect-error
+export const limits: Record<string, ToolLimit> = {}
+
+export const createLimit = (tool_id: string) => {
   if (!limits[tool_id]) {
-    // @ts-expect-error
     limits[tool_id] = {keyCount: 0, charCount: 0}
   }
 }
 
-// @ts-expect-error
-export const getLimit = tool_id => {
+export const getLimit = (tool_id: string) => {
   createLimit(tool_id)
-  // @ts-expect-error
   return limits[tool_id]
 }
 
 export const clearLimit = (tool_id: string) => {
-  // @ts-expect-error
   delete limits[tool_id]
 }
 
@@ -46,38 +42,28 @@ export const addToLimit = (tool_id: string, key: string, value: string) => {
   createLimit(tool_id)
   const length = key.length + value.length
 
-  // @ts-expect-error
   if (limits[tool_id].keyCount >= STORAGE_KEY_LIMIT) {
     const e: Error & {code?: string} = new Error('Reached key limit for tool')
     e.code = 'storage_exhaustion'
     throw e
   }
 
-  // @ts-expect-error
   if (limits[tool_id].charCount + length > STORAGE_CHAR_LIMIT) {
     const e: Error & {code?: string} = new Error('Reached byte limit for tool')
     e.code = 'storage_exhaustion'
     throw e
   }
-  // @ts-expect-error
   limits[tool_id].keyCount++
-  // @ts-expect-error
   limits[tool_id].charCount += length
 }
 
 export const removeFromLimit = (tool_id: string, key: string, value: string) => {
-  // @ts-expect-error
   limits[tool_id].keyCount--
-  // @ts-expect-error
   limits[tool_id].charCount -= key.length + value.length
-  // @ts-expect-error
   if (limits[tool_id].keyCount < 0) {
-    // @ts-expect-error
     limits[tool_id].keyCount = 0
   }
-  // @ts-expect-error
   if (limits[tool_id].charCount < 0) {
-    // @ts-expect-error
     limits[tool_id].charCount = 0
   }
 }

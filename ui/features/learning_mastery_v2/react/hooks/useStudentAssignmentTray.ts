@@ -17,7 +17,7 @@
  */
 
 import {useState, useMemo, useCallback} from 'react'
-import {Student, Outcome} from '../types/rollup'
+import {Student, Outcome} from '@canvas/outcomes/react/types/rollup'
 import {ContributingScoreAlignment} from './useContributingScores'
 
 export interface StudentAssignmentTrayState {

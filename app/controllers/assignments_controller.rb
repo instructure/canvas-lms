@@ -173,6 +173,7 @@ class AssignmentsController < ApplicationController
              scaling_factor: grading_standard.scaling_factor,
              enhanced_rubrics_enabled: @context.feature_enabled?(:enhanced_rubrics),
              course_pacing_enabled: @context.enable_course_paces,
+             peer_review_allocation_and_grading: @context.feature_enabled?(:peer_review_allocation_and_grading),
            })
 
     if peer_review_mode_enabled
@@ -259,6 +260,7 @@ class AssignmentsController < ApplicationController
 
     js_env({
              ASSIGNMENT_ID: @assignment.id,
+             EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
            })
 
     if @context.root_account.feature_enabled?(:instui_nav)
@@ -737,7 +739,13 @@ class AssignmentsController < ApplicationController
     end
 
     if render_a2_peer_review_student_view?
+      @page_title = "#{@assignment.title} #{t("Peer Review")}"
       return render_a2_peer_review_student_view
+    end
+
+    if @context.feature_enabled?(:peer_review_allocation_and_grading) && authorized_action(@assignment, @current_user, :grade)
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id, open_allocation_tray: true)
+      return
     end
 
     js_env({
@@ -943,7 +951,8 @@ class AssignmentsController < ApplicationController
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(
           @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
           @current_user,
-          include_names: true
+          include_names: true,
+          include_child_peer_review_override_dates: @context.feature_enabled?(:peer_review_allocation_and_grading) && @assignment.peer_reviews && @assignment.peer_review_sub_assignment
         ),
         AVAILABLE_MODERATORS: @assignment.available_moderators.map { |user| { name: user.name, id: user.id } },
         COURSE_ID: @context.id,

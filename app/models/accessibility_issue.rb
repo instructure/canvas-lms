@@ -24,12 +24,13 @@ class AccessibilityIssue < ActiveRecord::Base
   belongs_to :course
   belongs_to :updated_by, class_name: "User", optional: true
   belongs_to :accessibility_resource_scan
-  belongs_to :context, polymorphic: %i[assignment attachment wiki_page], separate_columns: true, optional: false
+  belongs_to :context, polymorphic: %i[assignment attachment wiki_page discussion_topic announcement], separate_columns: true, optional: true
 
   enum :workflow_state, %i[active resolved dismissed], validate: true
 
   validates :course, :workflow_state, presence: true
   validates :rule_type, presence: true, inclusion: { in: Accessibility::Rule.registry.keys }
+  validate :validate_syllabus_or_context
 
   # For some rules, a nil param_value is acceptable (e.g., decorative images)
   # We can extend this list as needed for other rules.
@@ -39,5 +40,13 @@ class AccessibilityIssue < ActiveRecord::Base
       Accessibility::Rules::ImgAltFilenameRule.id,
       Accessibility::Rules::ImgAltLengthRule.id,
     ].include? rule_type
+  end
+
+  private
+
+  def validate_syllabus_or_context
+    if is_syllabus == context.present?
+      errors.add(:base, "is_syllabus and context must be mutually exclusive")
+    end
   end
 end

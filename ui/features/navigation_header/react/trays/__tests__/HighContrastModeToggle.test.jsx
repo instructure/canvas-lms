@@ -19,18 +19,22 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import HighContrastModeToggle from '../HighContrastModeToggle'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+const server = setupServer()
+
 describe('HighContrastModeToggle', () => {
-  let route
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     fakeENV.setup({
       current_user_id: '1',
     })
-    route = `/api/v1/users/${window.ENV.current_user_id}/features/flags/high_contrast`
   })
 
   afterEach(() => {
@@ -38,19 +42,24 @@ describe('HighContrastModeToggle', () => {
   })
 
   describe('when HCM is off', () => {
+    let capturedRequests
+
     beforeEach(() => {
+      capturedRequests = []
       fakeENV.setup({
         current_user_id: '1',
         use_high_contrast: false,
       })
-      fetchMock.put(route, {
-        feature: 'high_contrast',
-        state: 'on',
-      })
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.put('/api/v1/users/:userId/features/flags/high_contrast', async ({request}) => {
+          const body = await request.json()
+          capturedRequests.push(body)
+          return HttpResponse.json({
+            feature: 'high_contrast',
+            state: 'on',
+          })
+        }),
+      )
     })
 
     it('shows a toggle in the "off" position', () => {
@@ -63,9 +72,8 @@ describe('HighContrastModeToggle', () => {
       const {getByRole} = render(<HighContrastModeToggle />)
       const toggle = getByRole('checkbox')
       await userEvent.click(toggle)
-      expect(fetchMock.calls(route)).toHaveLength(1)
-      const response = JSON.parse(fetchMock.calls(route)[0][1].body)
-      expect(response).toMatchObject({
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0]).toMatchObject({
         feature: 'high_contrast',
         state: 'on',
       })
@@ -82,19 +90,24 @@ describe('HighContrastModeToggle', () => {
   })
 
   describe('when HCM is on', () => {
+    let capturedRequests
+
     beforeEach(() => {
+      capturedRequests = []
       fakeENV.setup({
         current_user_id: '1',
         use_high_contrast: true,
       })
-      fetchMock.put(route, {
-        feature: 'high_contrast',
-        state: 'off',
-      })
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.put('/api/v1/users/:userId/features/flags/high_contrast', async ({request}) => {
+          const body = await request.json()
+          capturedRequests.push(body)
+          return HttpResponse.json({
+            feature: 'high_contrast',
+            state: 'off',
+          })
+        }),
+      )
     })
 
     it('shows a toggle in the "on" position', () => {
@@ -107,9 +120,8 @@ describe('HighContrastModeToggle', () => {
       const {getByRole} = render(<HighContrastModeToggle />)
       const toggle = getByRole('checkbox')
       await userEvent.click(toggle)
-      expect(fetchMock.calls(route)).toHaveLength(1)
-      const response = JSON.parse(fetchMock.calls(route)[0][1].body)
-      expect(response).toMatchObject({
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0]).toMatchObject({
         feature: 'high_contrast',
         state: 'off',
       })
@@ -126,17 +138,16 @@ describe('HighContrastModeToggle', () => {
   })
 
   describe('sad path', () => {
-    const badResponse = {
-      status: 400,
-      body: {error: 'something terrible happened'},
-    }
-
     beforeEach(() => {
       fakeENV.setup({
         current_user_id: '1',
         use_high_contrast: false,
       })
-      fetchMock.put(route, badResponse, {overwriteRoutes: true})
+      server.use(
+        http.put('/api/v1/users/:userId/features/flags/high_contrast', () => {
+          return HttpResponse.json({error: 'something terrible happened'}, {status: 400})
+        }),
+      )
       const liveRegion = document.createElement('div')
       liveRegion.id = 'flash_screenreader_holder'
       liveRegion.setAttribute('role', 'alert')
@@ -148,8 +159,6 @@ describe('HighContrastModeToggle', () => {
       if (liveRegion) {
         liveRegion.remove()
       }
-      fetchMock.restore()
-      fakeENV.teardown()
     })
 
     it('puts up a flash when bad data comes back from the API call', async () => {

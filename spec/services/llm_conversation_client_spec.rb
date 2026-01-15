@@ -215,6 +215,7 @@ describe LLMConversationClient do
           headers: { "Authorization" => "Bearer test-bearer-token" },
           body: hash_including(
             "prompt_code" => "alpha",
+            "auto_initialize" => true,
             "variables" => hash_including(
               "scenario" => scenario,
               "facts" => facts,
@@ -224,9 +225,25 @@ describe LLMConversationClient do
         )
         .to_return(status: 200, body: create_response.to_json, headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
+      stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
         .with(headers: { "Authorization" => "Bearer test-bearer-token" })
-        .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
+        .to_return(status: 200,
+                   body: {
+                     "success" => true,
+                     "data" => [
+                       {
+                         "id" => "msg1",
+                         "text" => "Hello! I'm ready to help you learn.",
+                         "is_llm_message" => false
+                       },
+                       {
+                         "id" => "msg2",
+                         "text" => "What do you know about this topic?",
+                         "is_llm_message" => true
+                       }
+                     ]
+                   }.to_json,
+                   headers: { "Content-Type" => "application/json" })
     end
 
     it "creates a conversation with alpha prompt and returns starting messages" do
@@ -256,6 +273,23 @@ describe LLMConversationClient do
       )
     end
 
+    it "raises ConversationError when messages fetch fails after conversation creation" do
+      stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 500, body: "Internal Server Error")
+
+      expect { client.starting_messages }.to raise_error(
+        LlmConversation::Errors::ConversationError,
+        /Failed to get messages/
+      )
+    end
+
+    it "sets the conversation_id after creating conversation" do
+      expect(client.instance_variable_get(:@conversation_id)).to be_nil
+      client.starting_messages
+      expect(client.instance_variable_get(:@conversation_id)).to eq(conversation_id)
+    end
+
     context "with conversation_context_id" do
       let(:client_with_context) do
         described_class.new(
@@ -274,14 +308,31 @@ describe LLMConversationClient do
             headers: { "Authorization" => "Bearer test-bearer-token" },
             body: hash_including(
               "prompt_code" => "alpha",
+              "auto_initialize" => true,
               "conversation_context_id" => "test-context-id"
             )
           )
           .to_return(status: 200, body: create_response.to_json, headers: { "Content-Type" => "application/json" })
 
-        stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
+        stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
           .with(headers: { "Authorization" => "Bearer test-bearer-token" })
-          .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
+          .to_return(status: 200,
+                     body: {
+                       "success" => true,
+                       "data" => [
+                         {
+                           "id" => "msg1",
+                           "text" => "Hello! I'm ready to help you learn.",
+                           "is_llm_message" => false
+                         },
+                         {
+                           "id" => "msg2",
+                           "text" => "What do you know about this topic?",
+                           "is_llm_message" => true
+                         }
+                       ]
+                     }.to_json,
+                     headers: { "Content-Type" => "application/json" })
       end
 
       it "sends conversation_context_id instead of variables" do

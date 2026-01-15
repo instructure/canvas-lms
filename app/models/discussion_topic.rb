@@ -457,6 +457,7 @@ class DiscussionTopic < ActiveRecord::Base
       if saved_change_to_group_category_id?
         assignment.validate_assignment_overrides(force_override_destroy: true)
       end
+      assignment.skip_attachment_association_update = skip_attachment_association_update
       assignment.updating_user = updating_user
       assignment.save
     end
@@ -2160,7 +2161,8 @@ class DiscussionTopic < ActiveRecord::Base
       discussion_topic: self,
       checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
       dates: [],
-      points_possible: reply_to_topic_points
+      points_possible: reply_to_topic_points,
+      updating_user:
     )
 
     Checkpoints::DiscussionCheckpointCreatorService.call(
@@ -2168,7 +2170,8 @@ class DiscussionTopic < ActiveRecord::Base
       checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
       dates: [],
       points_possible: reply_to_entry_points,
-      replies_required: reply_to_entry_required_count
+      replies_required: reply_to_entry_required_count,
+      updating_user:
     )
   end
 

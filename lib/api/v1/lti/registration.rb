@@ -59,12 +59,21 @@ module Api::V1::Lti::Registration
     api_json(registration, user, session, only: JSON_ATTRS).tap do |json|
       json["inherited"] = registration.inherited_for?(context)
       json["lti_version"] = registration.lti_version
-      json["icon_url"] = registration.icon_url
+      json["icon_url"] = if includes.include?(:overlay)
+                           Lti::Overlay.apply_to(overlay&.data, registration.internal_lti_configuration(include_overlay: false))
+                                       &.dig(:launch_settings, :icon_url)
+                         else
+                           registration.icon_url(context:)
+                         end
       json["dynamic_registration"] = true if registration.dynamic_registration?
       json["developer_key_id"] = registration.developer_key&.global_id
       json["ims_registration_id"] = registration.ims_registration&.id
       json["dynamic_registration_url"] = registration.ims_registration&.registration_url
       json["manual_configuration_id"] = registration.manual_configuration&.id
+
+      if context.root_account.feature_enabled?(:lti_registrations_templates)
+        json["template_registration_id"] = registration.template_registration_id
+      end
 
       if registration.site_admin?
         json["created_by"] = "Instructure"

@@ -19,7 +19,7 @@
 import {AIExperiencesEdit} from './react/index'
 import ready from '@instructure/ready'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Portal} from '@instructure/ui-portal'
 import {AIExperience} from './types'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
@@ -50,8 +50,7 @@ ready(() => {
   setTimeout(() => {
     const container = document.getElementById('content')
     if (container) {
-      const root = createRoot(container)
-      root.render(<AIExperiencePageLayout navbarHeight={navbarHeight} />)
+      render(<AIExperiencePageLayout navbarHeight={navbarHeight} />, container)
     }
   })
 })

@@ -33,7 +33,7 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
     return
   }
   const data: {
-    items: Array<{id: string; data: SubmissionOriginalityData}>
+    items: SubmissionOriginalityData[]
     state: string
   } = {
     items: [],
@@ -71,20 +71,19 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
     'pending',
     'error',
   ]
-  const stateMap = invert(stateList)
+  const stateMap: Record<string, string> = invert(stateList)
   const states = (function () {
     let j, len1
     const ref2 = data.items
     const results: number[] = []
     for (j = 0, len1 = ref2.length; j < len1; j++) {
       item = ref2[j]
-      // @ts-expect-error
-      results.push(parseInt(stateMap[item.state || 'no'], 10))
+      results.push(parseInt(stateMap[item.state || 'no'] ?? '0', 10))
     }
     return results
   })()
-  // @ts-expect-error
-  data.state = stateList[max(states)]
+  const maxState = max(states)
+  data.state = stateList[maxState ?? 0]
   return data
 }
 

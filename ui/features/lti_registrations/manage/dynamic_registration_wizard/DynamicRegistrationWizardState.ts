@@ -20,9 +20,11 @@ import {create} from 'zustand'
 import type {AccountId} from '../model/AccountId'
 import type {DynamicRegistrationToken} from '../model/DynamicRegistrationToken'
 import {
-  createDynamicRegistrationOverlayStore,
-  type DynamicRegistrationOverlayStore,
-} from './DynamicRegistrationOverlayState'
+  containsPlacementWithIcon,
+  createLti1p3RegistrationOverlayStore,
+  type Lti1p3RegistrationOverlayStore,
+} from '../registration_overlay/Lti1p3RegistrationOverlayStore'
+import {convertToLtiConfigurationOverlay} from '../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
 import {
   formatApiResultError,
@@ -34,6 +36,15 @@ import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
 import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
+import {isLtiPlacementWithIcon, LtiPlacementsWithIcons} from '../model/LtiPlacement'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
+import {
+  validateIconUris,
+  getInputIdForField,
+  Lti1p3RegistrationOverlayStateErrorField,
+  Lti1p3RegistrationOverlayStateError,
+} from '../registration_overlay/validateLti1p3RegistrationOverlayState'
+import {type Lti1p3RegistrationOverlayState} from '../registration_overlay/Lti1p3RegistrationOverlayState'
 /**
  * Steps are:
  * 1. Open modal, prompting for url
@@ -62,7 +73,14 @@ export interface DynamicRegistrationActions {
     unifiedToolId?: UnifiedToolId,
   ) => void
 
+  /**
+   * Loads an already existing registration from the backend and sets the state to 'reviewing'.
+   *
+   * @param accountId ID of the account the Lti::IMS::Registration is associated with
+   * @param registrationId ID of the Lti::IMS::Registration to load
+   */
   loadRegistration: (accountId: AccountId, registrationId: LtiRegistrationId) => void
+
   /**
    * Enables the developer key for the given registration
    * and closes the modal
@@ -75,17 +93,15 @@ export interface DynamicRegistrationActions {
   enableAndClose: (
     accountId: AccountId,
     registrationId: LtiRegistrationId,
-    overlay: LtiConfigurationOverlay,
     adminNickname: string,
-    onSuccess: () => void,
+    onSuccess: (registrationId: LtiRegistrationId) => void,
   ) => Promise<unknown>
 
   updateAndClose: (
     accountId: AccountId,
     registrationId: LtiRegistrationId,
-    overlay: LtiConfigurationOverlay,
     adminNickname: string,
-    onSuccess: () => void,
+    onSuccess: (registrationId: LtiRegistrationId) => void,
   ) => Promise<unknown>
 
   /**
@@ -117,6 +133,51 @@ export interface DynamicRegistrationActions {
     reviewing?: boolean,
   ): void
   transitionToReviewingState(prevState: ConfirmationStateType): void
+
+  /**
+   * Advance to the next step of the wizard
+   * If there are errors, onErrors will be called with the list of errors
+   * to be handled, and the state will not be advanced.
+   * Otherwise, the state will be advanced to the next step
+   */
+  advanceStep(
+    accountId: AccountId,
+    onErrors: (errors: Array<Lti1p3RegistrationOverlayStateError>) => void,
+    registrationId?: LtiRegistrationId,
+    onSuccessfulRegistration?: (ltiRegistrationId: LtiRegistrationId) => void,
+  ): void
+
+  /**
+   * Handle previous button click for the current step
+   */
+  previousStep(currentState: ConfirmationStateType): void
+
+  /**
+   * Returns true if the given step should be skipped
+   */
+  shouldSkipStep(step: ConfirmationStateType, currentState: DynamicRegistrationWizardState): boolean
+
+  /**
+   * Check if current step can proceed (used for button state)
+   */
+  canProceed(): boolean
+
+  /**
+   * Checks if current step is valid
+   * Returns a list of ids of fields needing attention before
+   * the wizard should proceed
+   * If the list is empty, the wizard can proceed
+   */
+  validateStep(): Array<Lti1p3RegistrationOverlayStateError>
+
+  /**
+   * Handle the final save action from the reviewing screen
+   */
+  handleSave(
+    accountId: AccountId,
+    registrationId?: LtiRegistrationId,
+    onSuccessfulRegistration?: (ltiRegistrationId: LtiRegistrationId) => void,
+  ): void
 }
 
 /**
@@ -157,12 +218,31 @@ export type ConfirmationStateType = Exclude<
   DynamicRegistrationWizardState['_type'],
   'RequestingToken' | 'WaitingForTool' | 'LoadingRegistration' | 'Error'
 >
+
 type ReviewingStateType = Exclude<ConfirmationStateType, 'Enabling' | 'DeletingDevKey' | 'Updating'>
+
+/**
+ * A list of the review steps and their order.
+ * Used for calculating the current step and which step
+ * to advance to.
+ */
+const DynamicRegistrationWizardStepOrder: Array<ConfirmationStateType> = [
+  'PermissionConfirmation',
+  'PrivacyLevelConfirmation',
+  'PlacementsConfirmation',
+  'NamingConfirmation',
+  'IconConfirmation',
+  'Reviewing',
+]
 
 export const isReviewingState = (
   state: DynamicRegistrationWizardState,
-): state is ConfirmationState<ReviewingStateType> =>
-  state._type.endsWith('Confirmation') || state._type === 'Reviewing'
+): state is ConfirmationState<ReviewingStateType> => isReviewingStateType(state._type)
+
+const isReviewingStateType = (
+  stateType: DynamicRegistrationWizardState['_type'],
+): stateType is ConfirmationStateType =>
+  stateType.endsWith('Confirmation') || stateType === 'Reviewing'
 
 /**
  * Helper for constructing a 'confirmation' state (a substate of the confirmation screen)
@@ -170,8 +250,9 @@ export const isReviewingState = (
 export type ConfirmationState<Tag extends string> = {
   _type: Tag
   registration: LtiRegistrationWithConfiguration
-  overlayStore: DynamicRegistrationOverlayStore
+  overlayStore: Lti1p3RegistrationOverlayStore
   reviewing: boolean
+  hasSubmitted?: boolean
 }
 
 const errorState = (message: string): DynamicRegistrationWizardState => ({
@@ -209,13 +290,15 @@ const confirmationState =
   <Tag extends ConfirmationStateType>(_type: Tag) =>
   (
     registration: LtiRegistrationWithConfiguration,
-    overlayStore: DynamicRegistrationOverlayStore,
+    overlayStore: Lti1p3RegistrationOverlayStore,
     reviewing = false,
+    hasSubmitted = false,
   ): DynamicRegistrationWizardState => ({
     _type,
     registration,
     overlayStore,
     reviewing,
+    hasSubmitted,
   })
 
 const enabling = confirmationState('Enabling')
@@ -267,7 +350,7 @@ type StateUpdater = (
  */
 export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistrationWizardService) =>
   create<{state: DynamicRegistrationWizardState} & DynamicRegistrationActions>(
-    (set: StateUpdater) => ({
+    (set: StateUpdater, get) => ({
       state: {_type: 'RequestingToken'},
       /**
        * Fetches a registration token from the dynamic registration URL
@@ -306,8 +389,12 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
 
                   service.getRegistrationByUUID(accountId, resp.data.uuid).then(reg => {
                     if (isSuccessful(reg)) {
-                      const store: DynamicRegistrationOverlayStore =
-                        createDynamicRegistrationOverlayStore(reg.data.name, reg.data)
+                      const store: Lti1p3RegistrationOverlayStore =
+                        createLti1p3RegistrationOverlayStore(
+                          reg.data.configuration,
+                          reg.data.admin_nickname || reg.data.name,
+                          reg.data.overlay?.data,
+                        )
                       set(stateFor(confirmationState('PermissionConfirmation')(reg.data, store)))
                     } else {
                       set(stateFor(errorState(formatApiResultError(reg))))
@@ -321,20 +408,15 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
             }
           })
       },
-      /**
-       * Loads an already existing registration from the backend and sets the state to 'reviewing'.
-       *
-       * @param accountId ID of the account the Lti::IMS::Registration is associated with
-       * @param registrationId ID of the Lti::IMS::Registration to load
-       */
       loadRegistration: async (accountId: AccountId, registrationId: LtiRegistrationId) => {
         set(stateFor({_type: 'LoadingRegistration'}))
         const reg = await service.fetchLtiRegistration(accountId, registrationId)
 
         if (isSuccessful(reg)) {
-          const store: DynamicRegistrationOverlayStore = createDynamicRegistrationOverlayStore(
-            reg.data.name,
-            reg.data,
+          const store: Lti1p3RegistrationOverlayStore = createLti1p3RegistrationOverlayStore(
+            reg.data.configuration,
+            reg.data.admin_nickname || reg.data.name,
+            reg.data.overlay?.data,
           )
 
           set(stateFor(confirmationState('Reviewing')(reg.data, store, true)))
@@ -345,47 +427,67 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
       enableAndClose: async (
         accountId: AccountId,
         registrationId: LtiRegistrationId,
-        overlay: LtiConfigurationOverlay,
         adminNickname: string,
-        onSuccess: () => void,
+        onSuccess: (registrationId: LtiRegistrationId) => void,
       ) => {
-        set(stateFrom('Reviewing')(state => enabling(state.registration, state.overlayStore)))
-        // We explicitly don't send the config, as we can't update the base config for Dynamic Registration.
+        set(
+          stateFrom('Reviewing')(state => {
+            const {overlay: convertedOverlay} = convertToLtiConfigurationOverlay(
+              state.overlayStore.getState().state,
+              state.registration.configuration,
+            )
 
-        const result = await service.updateRegistration({
-          accountId,
-          registrationId,
-          overlay,
-          adminNickname,
-          workflowState: 'on',
-        })
-        if (isSuccessful(result)) {
-          onSuccess()
-        } else {
-          set(stateFor(errorState(formatApiResultError(result))))
-        }
+            service
+              .updateRegistration({
+                accountId,
+                registrationId,
+                overlay: convertedOverlay,
+                adminNickname: state.overlayStore.getState().state.naming.nickname || adminNickname,
+                workflowState: 'on',
+              })
+              .then(result => {
+                if (isSuccessful(result)) {
+                  onSuccess(registrationId)
+                } else {
+                  set(stateFor(errorState(formatApiResultError(result))))
+                }
+              })
+
+            return enabling(state.registration, state.overlayStore)
+          }),
+        )
       },
       updateAndClose: async (
         accountId: AccountId,
         registrationId: LtiRegistrationId,
-        overlay: LtiConfigurationOverlay,
         adminNickname: string,
-        onSuccess: () => void,
+        onSuccess: (registrationId: LtiRegistrationId) => void,
       ) => {
-        set(stateFrom('Reviewing')(state => updating(state.registration, state.overlayStore)))
+        set(
+          stateFrom('Reviewing')(state => {
+            const {overlay: convertedOverlay} = convertToLtiConfigurationOverlay(
+              state.overlayStore.getState().state,
+              state.registration.configuration,
+            )
 
-        const result = await service.updateRegistration({
-          accountId,
-          registrationId,
-          overlay,
-          adminNickname,
-        })
+            service
+              .updateRegistration({
+                accountId,
+                registrationId,
+                overlay: convertedOverlay,
+                adminNickname: state.overlayStore.getState().state.naming.nickname || adminNickname,
+              })
+              .then(result => {
+                if (isSuccessful(result)) {
+                  onSuccess(registrationId)
+                } else {
+                  set(stateFor(errorState(formatApiResultError(result))))
+                }
+              })
 
-        if (isSuccessful(result)) {
-          onSuccess()
-        } else {
-          set(stateFor(errorState(formatApiResultError(result))))
-        }
+            return updating(state.registration, state.overlayStore)
+          }),
+        )
       },
       deleteKey: async (
         prevState: ReviewingStateType,
@@ -418,6 +520,154 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
             _type: 'Reviewing',
             reviewing: true,
           })),
+        ),
+      advanceStep: (accountId, onErrors, registrationId, onSuccessfulRegistration): void => {
+        const currentState = get().state
+        if (currentState._type === 'Reviewing') {
+          get().handleSave(accountId, registrationId, onSuccessfulRegistration)
+        } else if (isReviewingState(currentState)) {
+          set(
+            stateFrom(currentState._type)(state => {
+              const errors = get().validateStep()
+              if (errors.length > 0) {
+                onErrors(errors)
+                return state
+              } else {
+                const currentStepIndex = DynamicRegistrationWizardStepOrder.indexOf(state._type)
+                // if we are at the last step, or we're reviewing, advance to review
+                if (
+                  currentStepIndex === DynamicRegistrationWizardStepOrder.length - 1 ||
+                  state.reviewing
+                ) {
+                  return {
+                    ...state,
+                    reviewing: true,
+                    _type: 'Reviewing',
+                  }
+                }
+
+                let candidateStepIndex = currentStepIndex + 1
+                while (candidateStepIndex < DynamicRegistrationWizardStepOrder.length) {
+                  const candidateStep = DynamicRegistrationWizardStepOrder[candidateStepIndex]
+                  if (get().shouldSkipStep(candidateStep, state)) {
+                    candidateStepIndex++
+                    continue
+                  } else {
+                    break
+                  }
+                }
+
+                return {
+                  ...state,
+                  _type: candidateStepIndex
+                    ? DynamicRegistrationWizardStepOrder[candidateStepIndex]
+                    : state._type,
+                }
+              }
+            }),
+          )
+        }
+      },
+      shouldSkipStep: (
+        step: ConfirmationStateType,
+        currentState: ConfirmationState<ConfirmationStateType>,
+      ): boolean => {
+        return false
+      },
+      previousStep: (currentStep: ConfirmationStateType) => {
+        const currentState = get().state
+        if (isReviewingState(currentState)) {
+          set(
+            stateFrom(currentState._type)(state => {
+              const currentStepIndex = DynamicRegistrationWizardStepOrder.indexOf(currentStep)
+
+              // starting at the current step, find the previous step in the order, skipping any that should be skipped
+              let candidateStepIndex = currentStepIndex - 1
+              while (candidateStepIndex > 0) {
+                const candidateStep = DynamicRegistrationWizardStepOrder[candidateStepIndex]
+                if (get().shouldSkipStep(candidateStep, state)) {
+                  candidateStepIndex--
+                  continue
+                } else {
+                  break
+                }
+              }
+
+              const previousStep =
+                candidateStepIndex >= 0
+                  ? DynamicRegistrationWizardStepOrder[candidateStepIndex]
+                  : DynamicRegistrationWizardStepOrder[0]
+
+              return {
+                ...state,
+                _type: previousStep,
+                reviewing: false,
+              }
+            }),
+          )
+        }
+      },
+      canProceed: () =>
+        !['RequestingToken', 'WaitingForTool', 'LoadingRegistration'].includes(get().state._type),
+      validateStep: () => {
+        const currentState = get().state
+        if (currentState._type === 'IconConfirmation') {
+          return validateIconUris(currentState.overlayStore.getState().state.icons)
+        } else {
+          return []
+        }
+      },
+      handleSave: (
+        accountId: AccountId,
+        registrationId?: LtiRegistrationId,
+        onSuccessfulRegistration?,
+      ) =>
+        set(
+          stateFrom('Reviewing')(state => {
+            const {overlay: convertedOverlay} = convertToLtiConfigurationOverlay(
+              state.overlayStore.getState().state,
+              state.registration.configuration,
+            )
+            const adminNickname =
+              state.overlayStore.getState().state.naming.nickname || state.registration.name
+
+            if (registrationId) {
+              // Update existing registration
+              service
+                .updateRegistration({
+                  accountId,
+                  registrationId,
+                  overlay: convertedOverlay,
+                  adminNickname,
+                })
+                .then(result => {
+                  if (isSuccessful(result)) {
+                    onSuccessfulRegistration?.(registrationId)
+                  } else {
+                    set(stateFor(errorState(formatApiResultError(result))))
+                  }
+                })
+              return updating(state.registration, state.overlayStore)
+            } else {
+              // Enable new registration
+              service
+                .updateRegistration({
+                  accountId,
+                  registrationId: state.registration.id,
+                  overlay: convertedOverlay,
+                  adminNickname,
+                  workflowState: 'on',
+                })
+                .then(result => {
+                  if (isSuccessful(result)) {
+                    onSuccessfulRegistration?.(state.registration.id)
+                  } else {
+                    set(stateFor(errorState(formatApiResultError(result))))
+                  }
+                })
+              return enabling(state.registration, state.overlayStore)
+            }
+          }),
         ),
     }),
   )

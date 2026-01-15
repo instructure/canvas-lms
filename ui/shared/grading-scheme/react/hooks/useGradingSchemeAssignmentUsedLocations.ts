@@ -61,7 +61,7 @@ export const useGradingSchemeAssignmentUsedLocations = (): {
           nextPagePath = `${contextPath}/grading_schemes/${gradingSchemeId}/used_locations/${courseId}?include_archived=true`
         }
 
-        const result = await doFetchApi({
+        const result = await doFetchApi<AssignmentUsedLocation[]>({
           path: nextPagePath,
           method: 'GET',
         })
@@ -71,11 +71,9 @@ export const useGradingSchemeAssignmentUsedLocations = (): {
 
         setGradingSchemeAssignmentUsedLocationsStatus(ApiCallStatus.COMPLETED)
         return {
-          // @ts-expect-error
           assignmentUsedLocations: result.json || [],
           isLastPage: result.link?.next === undefined,
-          // @ts-expect-error
-          nextPage: result.link?.next?.url,
+          nextPage: result.link?.next?.url || '',
         }
       } catch (err) {
         setGradingSchemeAssignmentUsedLocationsStatus(ApiCallStatus.FAILED)

@@ -237,7 +237,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         expect(teacherNotesColumn()).toBeDefined()
       })
 
-      test.skip('does not update the visibility of the notes column if the API call fails', async () => {
+      test('does not update the visibility of the notes column if the API call fails', async () => {
         GradebookApi.createTeacherNotesColumn.mockRejectedValue(new Error('NO!'))
         await expect(gradebook.handleViewOptionsUpdated({showNotes: true})).rejects.toThrow('NO!')
         expect(teacherNotesColumn()).toBeUndefined()
@@ -278,7 +278,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         })
       })
 
-      test.skip('does not update the visibility of the notes column if the API call fails', async () => {
+      test('does not update the visibility of the notes column if the API call fails', async () => {
         GradebookApi.updateTeacherNotesColumn.mockRejectedValue(new Error('NOOOOO'))
         await expect(gradebook.handleViewOptionsUpdated({showNotes: false})).rejects.toThrow(
           'NOOOOO',
@@ -296,6 +296,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         statusColors: gradebook.state.gridColors,
         viewUngradedAsZero: false,
         viewHiddenGradesIndicator: false,
+        viewStatusForColorblindness: false,
         ...overrides,
       })
 
@@ -306,6 +307,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
             statusColors: {...gradebook.state.gridColors, dropped: '#000000'},
             viewUngradedAsZero: true,
             viewHiddenGradesIndicator: true,
+            viewStatusForColorblindness: true,
           }),
         )
 
@@ -316,6 +318,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         expect(params.show_unpublished_assignments).toBe('true')
         expect(params.view_ungraded_as_zero).toBe('true')
         expect(params.view_hidden_grades_indicator).toBe('true')
+        expect(params.view_status_for_colorblindness).toBe('true')
       })
 
       test('does not call saveUserSettings if no value has changed', async () => {
@@ -339,7 +342,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           expect(gradebook.gridData.columns.frozen).toEqual(['student'])
         })
 
-        test.skip('does not update student columns if the request fails', async () => {
+        test('does not update student columns if the request fails', async () => {
           GradebookApi.saveUserSettings.mockRejectedValue(new Error('no way'))
           await expect(
             gradebook.handleViewOptionsUpdated({showSeparateFirstLastNames: true}),
@@ -361,7 +364,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           expect(gradebook.gridData.columns.scrollable.includes('assignment_group_2201')).toBe(true)
         })
 
-        test.skip('does not hide Assignment Group Total columns if the request fails', async () => {
+        test('does not hide Assignment Group Total columns if the request fails', async () => {
           GradebookApi.saveUserSettings.mockRejectedValue(new Error('no way'))
           await expect(
             gradebook.handleViewOptionsUpdated({hideAssignmentGroupTotals: true}),
@@ -381,7 +384,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           expect(gradebook.gridData.columns.scrollable.includes('total_grade')).toBe(true)
         })
 
-        test.skip('does not hide Total column if the request fails', async () => {
+        test('does not hide Total column if the request fails', async () => {
           GradebookApi.saveUserSettings.mockRejectedValue(new Error('no way'))
           await expect(gradebook.handleViewOptionsUpdated({hideTotal: true})).rejects.toThrow(
             'no way',
@@ -408,7 +411,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           expect(gradebook.gridData.columns.scrollable.includes('assignment_2303')).toBe(false)
         })
 
-        test.skip('does not update the list of visible assignments if the request fails', async () => {
+        test('does not update the list of visible assignments if the request fails', async () => {
           GradebookApi.saveUserSettings.mockRejectedValue(new Error('no way'))
           await expect(
             gradebook.handleViewOptionsUpdated({showUnpublishedAssignments: true}),
@@ -424,7 +427,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           expect(gradebook.gridDisplaySettings.viewUngradedAsZero).toBe(true)
         })
 
-        test.skip('does not make updates to grid if the request fails', async () => {
+        test('does not make updates to grid if the request fails', async () => {
           GradebookApi.saveUserSettings.mockRejectedValue(new Error('STILL NO'))
           await expect(
             gradebook.handleViewOptionsUpdated({viewUngradedAsZero: true}),
@@ -439,13 +442,31 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           expect(gradebook.gridDisplaySettings.viewHiddenGradesIndicator).toBe(true)
         })
 
-        test.skip('does not make updates to grid if the request fails', async () => {
+        test('does not make updates to grid if the request fails', async () => {
           GradebookApi.saveUserSettings.mockRejectedValue(new Error('STILL NO'))
           await expect(
             gradebook.handleViewOptionsUpdated({viewHiddenGradesIndicator: true}),
           ).rejects.toThrow('STILL NO')
           expect(gradebook.updateAllTotalColumns).not.toHaveBeenCalled()
           expect(gradebook.gridDisplaySettings.viewHiddenGradesIndicator).toBe(false)
+        })
+      })
+
+      describe('updating view status for colorblindness', () => {
+        test('makes updates to the grid when the request completes', async () => {
+          await gradebook.handleViewOptionsUpdated(
+            updateParams({viewStatusForColorblindness: true}),
+          )
+          expect(gradebook.gridDisplaySettings.viewStatusForColorblindness).toBe(true)
+        })
+
+        test('does not make updates to grid if the request fails', async () => {
+          GradebookApi.saveUserSettings.mockRejectedValue(new Error('STILL NO'))
+          await expect(
+            gradebook.handleViewOptionsUpdated({viewStatusForColorblindness: true}),
+          ).rejects.toThrow('STILL NO')
+          expect(gradebook.updateAllTotalColumns).not.toHaveBeenCalled()
+          expect(gradebook.gridDisplaySettings.viewStatusForColorblindness).toBe(false)
         })
       })
 
@@ -457,7 +478,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           expect(gradebook.state.gridColors.dropped).toBe('#AAAAAA')
         })
 
-        test.skip('does not update the grid colors if the request fails', async () => {
+        test('does not update the grid colors if the request fails', async () => {
           GradebookApi.saveUserSettings.mockRejectedValue(new Error('no :|'))
           const oldColors = {...gradebook.state.gridColors}
 
@@ -508,25 +529,27 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           window.ENV = {FEATURES: {instui_nav: false}, current_user_id: '12345'}
         })
 
-        test.skip('shows a flash error', async () => {
+        test('shows a flash error', async () => {
           GradebookApi.createTeacherNotesColumn.mockRejectedValue(new Error('NO!'))
           await expect(
             gradebook.handleViewOptionsUpdated({
               columnSortSettings: {criterion: 'points', direction: 'ascending'},
               showNotes: true,
             }),
-          ).rejects.toThrow('NO!')
-          expect(FlashAlert.showFlashError).toHaveBeenCalledWith('NO!')
+          ).rejects.toThrow('...')
+          expect(FlashAlert.showFlashError).toHaveBeenCalledWith(
+            'There was an error updating view options.',
+          )
         })
 
-        test.skip('nevertheless updates the grid', async () => {
+        test('nevertheless updates the grid', async () => {
           GradebookApi.createTeacherNotesColumn.mockRejectedValue(new Error('NO!'))
           await expect(
             gradebook.handleViewOptionsUpdated({
               columnSortSettings: {criterion: 'points', direction: 'ascending'},
               showNotes: true,
             }),
-          ).rejects.toThrow('NO!')
+          ).rejects.toThrow('...')
           expect(gradebook.updateGrid).toHaveBeenCalled()
         })
       })
@@ -783,6 +806,60 @@ describe('Gradebook#toggleViewHiddenGradesIndicator', () => {
 
     expect(gradebook.saveSettings).toHaveBeenCalledWith({
       viewHiddenGradesIndicator: true,
+    })
+  })
+})
+
+describe('Gradebook#toggleViewStatusForColorblindness', () => {
+  let gradebook
+  let $fixtures
+
+  beforeEach(() => {
+    $fixtures = document.createElement('div')
+    $fixtures.id = 'fixtures'
+    document.body.appendChild($fixtures)
+
+    setFixtureHtml($fixtures)
+    gradebook = createGradebook({
+      grid: {
+        getColumns: () => [],
+        updateCell: jest.fn(),
+      },
+    })
+
+    jest.spyOn(gradebook, 'saveSettings').mockResolvedValue()
+  })
+
+  afterEach(() => {
+    ReactDOM.unmountComponentAtNode($fixtures)
+    document.body.removeChild($fixtures)
+    jest.restoreAllMocks()
+  })
+
+  test('toggles viewStatusForColorblindness to true when false', () => {
+    gradebook.gridDisplaySettings.viewStatusForColorblindness = false
+    // jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleViewStatusForColorblindness()
+
+    expect(gradebook.gridDisplaySettings.viewStatusForColorblindness).toBe(true)
+  })
+
+  test('toggles viewStatusForColorblindness to false when true', () => {
+    gradebook.gridDisplaySettings.viewStatusForColorblindness = true
+    // jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleViewStatusForColorblindness()
+
+    expect(gradebook.gridDisplaySettings.viewStatusForColorblindness).toBe(false)
+  })
+
+  test('calls saveSettings with the new value of the setting', () => {
+    gradebook.gridDisplaySettings.viewStatusForColorblindness = false
+    jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+
+    gradebook.toggleViewStatusForColorblindness()
+
+    expect(gradebook.saveSettings).toHaveBeenCalledWith({
+      viewStatusForColorblindness: true,
     })
   })
 })

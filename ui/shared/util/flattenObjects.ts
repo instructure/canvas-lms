@@ -18,18 +18,22 @@
 
 import {isArray, each, clone} from 'es-toolkit/compat'
 
-// @ts-expect-error
-function flattenObjects(array, key, backward, output) {
+type FlattenableObject = Record<string, unknown>
+
+function flattenObjects(
+  array: FlattenableObject | FlattenableObject[],
+  key: string,
+  backward?: boolean,
+  output: FlattenableObject[] = [],
+): FlattenableObject[] {
   if (!isArray(array)) {
     array = [array]
   }
-  if (!isArray(output)) {
-    output = []
-  }
-  each(array, object => {
+  each(array, (object: FlattenableObject) => {
     output.push(object)
-    if (object[key]) {
-      let children = object[key]
+    const childArray = object[key]
+    if (childArray && Array.isArray(childArray)) {
+      let children: FlattenableObject[] = childArray
       if (backward) {
         children = clone(children)
         children.reverse()

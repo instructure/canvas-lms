@@ -113,7 +113,7 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
     })
 
-    it.skip('sets isNewItem to false if the item id exists', () => {
+    it('sets isNewItem to false if the item id exists', () => {
       server.use(
         http.put('/api/v1/planner_notes/42', () => {
           return HttpResponse.json({id: '42'}, {status: 200})
@@ -132,7 +132,7 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
     })
 
-    it.skip('sends transformed data in the request', async () => {
+    it('sends transformed data in the request', async () => {
       let capturedRequest
       server.use(
         http.post('/api/v1/planner_notes', async ({request}) => {
@@ -150,7 +150,7 @@ describe('api actions', () => {
       })
     })
 
-    it.skip('resolves the promise with transformed response data', async () => {
+    it('resolves the promise with transformed response data', async () => {
       server.use(
         http.post('/api/v1/planner_notes', () => {
           return HttpResponse.json({some: 'response data'}, {status: 201})
@@ -166,7 +166,7 @@ describe('api actions', () => {
       })
     })
 
-    it.skip('does a post if the planner item is new (no id)', async () => {
+    it('does a post if the planner item is new (no id)', async () => {
       let capturedRequest
       server.use(
         http.post('/api/v1/planner_notes', async ({request}) => {
@@ -194,7 +194,7 @@ describe('api actions', () => {
       })
     })
 
-    it.skip('does a put if the planner item exists (has id)', async () => {
+    it('does a put if the planner item exists (has id)', async () => {
       let capturedRequest
       server.use(
         http.put('/api/v1/planner_notes/42', async ({request}) => {
@@ -241,7 +241,7 @@ describe('api actions', () => {
       expect(fakeAlert).toHaveBeenCalled()
     })
 
-    it.skip('saves and restores the override data', async () => {
+    it('saves and restores the override data', async () => {
       server.use(
         http.put('/api/v1/planner_notes/42', () => {
           return HttpResponse.json({some: 'data', id: '42'}, {status: 200})
@@ -308,7 +308,7 @@ describe('api actions', () => {
       expect(capturedRequest.url).toBe('http://localhost/api/v1/planner_notes/42')
     })
 
-    it.skip('resolves the promise with transformed response data', async () => {
+    it('resolves the promise with transformed response data', async () => {
       server.use(
         http.delete('*/planner_notes/*', () => {
           return HttpResponse.json({some: 'response data'}, {status: 200})
@@ -321,7 +321,7 @@ describe('api actions', () => {
       expect(result).toMatchObject({some: 'response data', transformedToInternal: true})
     })
 
-    it.skip('calls the alert function when a failure occurs', async () => {
+    it('calls the alert function when a failure occurs', async () => {
       server.use(
         http.delete('*/planner_notes/*', () => {
           return new HttpResponse(null, {status: 500})

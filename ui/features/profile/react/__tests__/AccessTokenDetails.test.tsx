@@ -18,11 +18,14 @@
 
 import React from 'react'
 import {cleanup, render, screen, waitFor, fireEvent} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import AccessTokenDetails, {type AccessTokenDetailsProps} from '../AccessTokenDetails'
 import type {Token} from '../types'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 describe('AccessTokenDetails', () => {
   const fully_visible_token = '1~CZXKPGfzRnNrn2QUnBZGvxeuL9n9MLAhNNvRQMN6rW6xCNB2HMyBuAzGruY4yLfa'
@@ -44,24 +47,32 @@ describe('AccessTokenDetails', () => {
     onTokenLoad: vi.fn(),
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup()
-    // Use overwriteRoutes to avoid duplicate route errors when running with --randomize
-    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
+    server.use(
+      http.get(props.url, () => {
+        return HttpResponse.json(loadedToken)
+      }),
+    )
   })
 
   afterEach(() => {
     cleanup()
-    fetchMock.reset()
-    fetchMock.restore()
+    server.resetHandlers()
     fakeENV.teardown()
   })
 
   it('should fetch the data if the token is NOT present', async () => {
-    // Reset fetchMock for this test to ensure clean state
-    fetchMock.reset()
-    // Re-setup the mock with overwriteRoutes to ensure it's properly configured
-    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
+    const requestReceived = vi.fn()
+    server.use(
+      http.get(props.url, () => {
+        requestReceived()
+        return HttpResponse.json(loadedToken)
+      }),
+    )
 
     render(<AccessTokenDetails {...props} loadedToken={undefined} />)
 
@@ -71,16 +82,20 @@ describe('AccessTokenDetails', () => {
     // Wait for the fetch to complete with a more resilient approach
     await waitFor(
       () => {
-        expect(fetchMock.called(props.url)).toBe(true)
+        expect(requestReceived).toHaveBeenCalled()
       },
       {timeout: 2000},
     ) // Increase timeout for stability
   })
 
   it('should NOT fetch the data if the token is present', async () => {
-    // Reset and re-setup fetchMock for this test
-    fetchMock.reset()
-    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
+    const requestReceived = vi.fn()
+    server.use(
+      http.get(props.url, () => {
+        requestReceived()
+        return HttpResponse.json(loadedToken)
+      }),
+    )
 
     render(<AccessTokenDetails {...props} />)
 
@@ -90,16 +105,18 @@ describe('AccessTokenDetails', () => {
     // Use a more reliable approach to verify no fetch was made
     await waitFor(
       () => {
-        expect(fetchMock.called(props.url)).toBe(false)
+        expect(requestReceived).not.toHaveBeenCalled()
       },
       {timeout: 1000},
     )
   })
 
   it('should show an error if the initial fetch request fails', async () => {
-    // Reset and setup fetchMock to return an error
-    fetchMock.reset()
-    fetchMock.get(props.url, 500, {overwriteRoutes: true})
+    server.use(
+      http.get(props.url, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
 
     render(<AccessTokenDetails {...props} loadedToken={undefined} />)
 
@@ -166,13 +183,16 @@ describe('AccessTokenDetails', () => {
   })
 
   it('should update the token if the regeneration request succeed', async () => {
-    // Reset and setup fetchMock for this test
-    fetchMock.reset()
-    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
-    fetchMock.put(
-      props.url,
-      {...loadedToken, visible_token: fully_visible_token},
-      {overwriteRoutes: true},
+    const requestBodyCapture = vi.fn()
+    server.use(
+      http.get(props.url, () => {
+        return HttpResponse.json(loadedToken)
+      }),
+      http.put(props.url, async ({request}) => {
+        const body = await request.json()
+        requestBodyCapture(body)
+        return HttpResponse.json({...loadedToken, visible_token: fully_visible_token})
+      }),
     )
 
     // Mock window.confirm
@@ -186,17 +206,21 @@ describe('AccessTokenDetails', () => {
     // Use a more reliable approach to find the new token
     const newToken = await screen.findByText(fully_visible_token, {}, {timeout: 2000})
     expect(newToken).toBeInTheDocument()
-    expect(fetchMock.called(props.url, {method: 'PUT', body: {token: {regenerate: 1}}})).toBe(true)
+    expect(requestBodyCapture).toHaveBeenCalledWith({token: {regenerate: 1}})
 
     // Clean up the spy
     confirmSpy.mockRestore()
   })
 
   it('should show an error alert if the regeneration request fails', async () => {
-    // Reset and setup fetchMock for this test
-    fetchMock.reset()
-    fetchMock.get(props.url, loadedToken, {overwriteRoutes: true})
-    fetchMock.put(props.url, 500, {overwriteRoutes: true})
+    server.use(
+      http.get(props.url, () => {
+        return HttpResponse.json(loadedToken)
+      }),
+      http.put(props.url, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
 
     // Mock window.confirm
     const confirmSpy = vi.spyOn(window, 'confirm').mockImplementationOnce(() => true)

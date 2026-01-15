@@ -470,10 +470,11 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     objects_needing("WikiPage", "viewing", :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
-      wiki_pages_context
-        .available_to_planner
-        .visible_to_user_in_courses_and_groups(self, shard_course_ids, shard_group_ids)
-        .todo_date_between(due_after, due_before)
+      # Filter by todo_date FIRST to reduce the dataset before expensive visibility check
+      scope = wiki_pages_context
+              .available_to_planner
+              .todo_date_between(due_after, due_before)
+      scope.visible_to_user_in_courses_and_groups(self, shard_course_ids, shard_group_ids)
     end
   end
   # rubocop:enable Style/ArgumentsForwarding

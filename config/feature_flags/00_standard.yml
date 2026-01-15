@@ -403,3 +403,12 @@ restrict_student_access:
   description: Enable restricted functionalities for students so that inbox communications, file movements and calendar events can be restricted.
   applies_to: RootAccount
   shadow: true
+use_client_ip_in_classic_quizzes:
+  state: hidden
+  display_name: Use Client-IP in Classic Quizzes
+  description: |-
+    In regions where Cloudfront is active, X-Forwarded-For header is unreliable.
+    We need to use Client-IP header,to make sure the correct IP address is used, and IP filtering works properly.
+    Don't allow this in regions where Cloudfront is not active, as it makes IP spoofing attacks possible.
+  applies_to: RootAccount
+  shadow: true

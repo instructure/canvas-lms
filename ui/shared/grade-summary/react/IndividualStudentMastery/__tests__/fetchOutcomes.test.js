@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import fetchOutcomes, {fetchUrl} from '../fetchOutcomes'
 import NaiveFetchDispatch from '../NaiveFetchDispatch'
 
+const server = setupServer()
+
 describe('fetchOutcomes', () => {
-  afterEach(() => {
-    fetchMock.restore()
-  })
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
 
   const defaultResponses = () => ({
     groupsResponse: [
@@ -213,40 +216,58 @@ describe('fetchOutcomes', () => {
     assignmentsResponse,
     fullResponse = false,
   }) => {
-    fetchMock.mock('/api/v1/courses/1/outcome_groups?per_page=100', groupsResponse)
-    fetchMock.mock(
-      '/api/v1/courses/1/outcome_group_links?outcome_style=full&per_page=100',
-      linksResponse,
+    server.use(
+      http.get('/api/v1/courses/1/outcome_groups', () => {
+        return HttpResponse.json(groupsResponse)
+      }),
+      http.get('/api/v1/courses/1/outcome_group_links', () => {
+        return HttpResponse.json(linksResponse)
+      }),
+      http.get('/api/v1/courses/1/outcome_rollups', () => {
+        return HttpResponse.json(rollupsResponse)
+      }),
+      http.get('/api/v1/courses/1/outcome_alignments', () => {
+        return HttpResponse.json(alignmentsResponse)
+      }),
+      http.get('/api/v1/courses/1/outcome_results', ({request}) => {
+        const urlStr = request.url
+        // Match both encoded (%5B%5D) and unencoded ([]) versions
+        const outcomeIdPattern = /outcome_ids(?:%5B%5D|\[\])=(\d+)/g
+        const ids = []
+        let match
+        while ((match = outcomeIdPattern.exec(urlStr))) {
+          ids.push(match[1])
+        }
+        const results = {outcome_results: [], linked: {assignments: []}}
+        if (fullResponse) {
+          Object.values(resultsResponses).forEach(result => {
+            results.outcome_results.push(...result.outcome_results)
+            results.linked.assignments.push(...result.linked.assignments)
+          })
+        } else {
+          ids.forEach(id => {
+            const response = resultsResponses[id] || {
+              outcome_results: [],
+              linked: {assignments: []},
+            }
+            results.outcome_results.push(...response.outcome_results)
+            results.linked.assignments.push(...response.linked.assignments)
+          })
+        }
+        return HttpResponse.json(results)
+      }),
+      http.get('/api/v1/courses/1/assignments', () => {
+        return HttpResponse.json(assignmentsResponse)
+      }),
     )
-    fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2&per_page=100', rollupsResponse)
-    fetchMock.mock('/api/v1/courses/1/outcome_alignments?student_id=2', alignmentsResponse)
-    fetchMock.mock('begin:/api/v1/courses/1/outcome_results', url => {
-      const outcomeIdPattern = /outcome_ids\[\]=(\d+)/g
-      const ids = []
-      let match
-      while ((match = outcomeIdPattern.exec(url))) {
-        ids.push(match[1])
-      }
-      const results = {outcome_results: [], linked: {assignments: []}}
-      if (fullResponse) {
-        Object.values(resultsResponses).forEach(result => {
-          results.outcome_results.push(...result.outcome_results)
-          results.linked.assignments.push(...result.linked.assignments)
-        })
-      } else {
-        ids.forEach(id => {
-          const response = resultsResponses[id] || {outcome_results: [], linked: {assignments: []}}
-          results.outcome_results.push(...response.outcome_results)
-          results.linked.assignments.push(...response.linked.assignments)
-        })
-      }
-      return results
-    })
-    fetchMock.mock('/api/v1/courses/1/assignments?per_page=100&page=1', assignmentsResponse)
   }
 
   it('throws error if http throws error', async () => {
-    fetchMock.mock('*', 500)
+    server.use(
+      http.get('*', () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     await expect(fetchOutcomes(1, 1)).rejects.toThrow()
   })
 
@@ -321,27 +342,33 @@ describe('fetchOutcomes', () => {
     })
 
     const mockRequests = (first, second, third) => {
-      fetchMock.mock('/first', {
-        body: first,
-        headers: {
-          link: '</current>; rel="current",</second>; rel="next",</first>; rel="first",</last>; rel="last"',
-        },
-      })
-      fetchMock.mock('/second', {
-        body: second,
-        headers: !third
-          ? null
-          : {
-              link: '</current>; rel="current",</third>; rel="next",</first>; rel="first",</last>; rel="last"',
+      server.use(
+        http.get('/first', () => {
+          return HttpResponse.json(first, {
+            headers: {
+              link: '</current>; rel="current",</second>; rel="next",</first>; rel="first",</last>; rel="last"',
             },
-      })
+          })
+        }),
+        http.get('/second', () => {
+          const headers = !third
+            ? {}
+            : {
+                link: '</current>; rel="current",</third>; rel="next",</first>; rel="first",</last>; rel="last"',
+              }
+          return HttpResponse.json(second, {headers})
+        }),
+      )
       if (third) {
-        fetchMock.mock('/third', {
-          body: third,
-          headers: {
-            link: '</current>; rel="current",</first>; rel="first",</last>; rel="last"',
-          },
-        })
+        server.use(
+          http.get('/third', () => {
+            return HttpResponse.json(third, {
+              headers: {
+                link: '</current>; rel="current",</first>; rel="first",</last>; rel="last"',
+              },
+            })
+          }),
+        )
       }
     }
 

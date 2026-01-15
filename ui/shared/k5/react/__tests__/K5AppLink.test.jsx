@@ -64,7 +64,7 @@ describe('K5AppLink', () => {
     expect(svg.getAttribute('name')).toBe('IconLti')
   })
 
-  it.skip('opens tool directly if installed in only one course', () => {
+  it('opens tool directly if installed in only one course', () => {
     const overrides = {
       courses: [
         {

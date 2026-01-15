@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import '../fixDialogButtons'
+import {registerFixDialogButtonsPlugin} from '@canvas/enhanced-user-content/jquery'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/jquery/jquery.simulate'
 
@@ -27,6 +27,8 @@ describe.skip('fixDialogButtons', () => {
   let fixturesDiv
 
   beforeEach(() => {
+    // Register the fixDialogButtons plugin
+    registerFixDialogButtonsPlugin()
     vi.useFakeTimers()
     fixturesDiv = document.createElement('div')
     fixturesDiv.id = 'fixtures'

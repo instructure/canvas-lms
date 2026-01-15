@@ -24,9 +24,12 @@ import {
 import React from 'react'
 import {fireEvent, render, screen, waitFor, act} from '@testing-library/react'
 import {type Enrollment, ITEMS_PER_PAGE, PROVIDER, RECIPIENT, type User} from '../types'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+
+const server = setupServer()
 
 const renderView = async (props: any) => {
   let result!: ReturnType<typeof render>
@@ -43,8 +46,8 @@ const renderView = async (props: any) => {
 describe('TempEnrollView component', () => {
   window.confirm = vi.fn(() => true)
 
-  beforeEach(() => {
-    vi.useFakeTimers({shouldAdvanceTime: true})
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
   })
 
   const defaultProvider = {
@@ -82,26 +85,25 @@ describe('TempEnrollView component', () => {
     },
   }
 
-  const FETCH_PROVIDER_ENROLLMENTS = `/api/v1/users/${defaultProvider.id}/enrollments?state%5B%5D=current_future_and_restricted&per_page=${ITEMS_PER_PAGE}&page=first&include%5B%5D=avatar_url&temporary_enrollment_recipients_for_provider=true`
-  const FETCH_RECIPIENT_ENROLLMENTS = `/api/v1/users/${defaultProvider.id}/enrollments?state%5B%5D=current_future_and_restricted&per_page=${ITEMS_PER_PAGE}&page=first&include%5B%5D=avatar_url&include%5B%5D=temporary_enrollment_providers&temporary_enrollments_for_recipient=true`
+  const ENROLLMENTS_URL = `/api/v1/users/${defaultProvider.id}/enrollments`
 
   afterEach(() => {
-    // Flush pending timers from InstUI transitions before teardown
-    vi.runOnlyPendingTimers()
-    vi.useRealTimers()
     vi.restoreAllMocks()
-    fetchMock.restore()
+    server.resetHandlers()
     // reset cache between tests
     queryClient.removeQueries()
   })
 
+  afterAll(() => server.close())
+
   it('renders component', async () => {
-    fetchMock.getOnce(FETCH_PROVIDER_ENROLLMENTS, {
-      body: [defaultEnrollment],
-      headers: {
-        link: '<current_url>; rel="current"',
-      },
-    })
+    server.use(
+      http.get(ENROLLMENTS_URL, () =>
+        HttpResponse.json([defaultEnrollment], {
+          headers: {link: '<current_url>; rel="current"'},
+        }),
+      ),
+    )
     const container = (await renderView(props)).container
 
     expect(await screen.findByText(props.user.name)).toBeInTheDocument()
@@ -115,13 +117,14 @@ describe('TempEnrollView component', () => {
   })
 
   describe('table headers', () => {
-    it('displays the provider’s table headers', async () => {
-      fetchMock.getOnce(FETCH_PROVIDER_ENROLLMENTS, {
-        body: [defaultEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+    it("displays the provider's table headers", async () => {
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([defaultEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
       await renderView(props)
 
       expect(await screen.findByText('Recipient Name')).toBeInTheDocument()
@@ -131,13 +134,14 @@ describe('TempEnrollView component', () => {
       expect(screen.getByText('Temporary enrollment option links')).toBeInTheDocument()
     })
 
-    it('displays the recipient’s table headers', async () => {
-      fetchMock.getOnce(FETCH_RECIPIENT_ENROLLMENTS, {
-        body: [defaultEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+    it("displays the recipient's table headers", async () => {
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([defaultEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
       await renderView({...props, enrollmentType: RECIPIENT})
 
       expect(await screen.findByText('Provider Name')).toBeInTheDocument()
@@ -148,12 +152,13 @@ describe('TempEnrollView component', () => {
     })
 
     it('does not display options links if permissions are not set', async () => {
-      fetchMock.getOnce(FETCH_PROVIDER_ENROLLMENTS, {
-        body: [defaultEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([defaultEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
       const newProps = {
         ...props,
         modifyPermissions: {
@@ -178,12 +183,13 @@ describe('TempEnrollView component', () => {
         ...defaultEnrollment,
         start_at: futureDate.toISOString(),
       }
-      fetchMock.getOnce(FETCH_PROVIDER_ENROLLMENTS, {
-        body: [futureEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([futureEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
 
       const {findByText} = await renderView(props)
       expect(await findByText('Future')).toBeInTheDocument()
@@ -196,12 +202,13 @@ describe('TempEnrollView component', () => {
         ...defaultEnrollment,
         start_at: pastDate.toISOString(),
       }
-      fetchMock.getOnce(FETCH_PROVIDER_ENROLLMENTS, {
-        body: [activeEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([activeEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
 
       const {findByText} = await renderView(props)
       expect(await findByText('Active')).toBeInTheDocument()
@@ -212,12 +219,13 @@ describe('TempEnrollView component', () => {
         ...defaultEnrollment,
         start_at: null,
       }
-      fetchMock.getOnce(FETCH_PROVIDER_ENROLLMENTS, {
-        body: [nullEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([nullEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
 
       const {findByText} = await renderView(props)
       expect(await findByText('Active')).toBeInTheDocument()
@@ -226,12 +234,13 @@ describe('TempEnrollView component', () => {
 
   describe('action button visibility based on permissions', () => {
     beforeEach(() => {
-      fetchMock.getOnce(FETCH_PROVIDER_ENROLLMENTS, {
-        body: [defaultEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([defaultEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
     })
 
     it('shows Edit and Delete buttons based on canEdit and canDelete', async () => {
@@ -282,12 +291,13 @@ describe('TempEnrollView component', () => {
         ...props,
         enrollmentType: RECIPIENT,
       }
-      fetchMock.getOnce(FETCH_RECIPIENT_ENROLLMENTS, {
-        body: [defaultEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([defaultEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
 
       await renderView(newProps)
 
@@ -311,12 +321,13 @@ describe('TempEnrollView component', () => {
 
   describe('buttons', () => {
     beforeEach(() => {
-      fetchMock.get(FETCH_PROVIDER_ENROLLMENTS, {
-        body: [defaultEnrollment],
-        headers: {
-          link: '<current_url>; rel="current"',
-        },
-      })
+      server.use(
+        http.get(ENROLLMENTS_URL, () =>
+          HttpResponse.json([defaultEnrollment], {
+            headers: {link: '<current_url>; rel="current"'},
+          }),
+        ),
+      )
     })
 
     describe('edit', () => {
@@ -329,9 +340,11 @@ describe('TempEnrollView component', () => {
 
     describe('delete', () => {
       beforeEach(() => {
-        fetchMock.deleteOnce(
-          `/api/v1/courses/${defaultEnrollment.course_id}/enrollments/${defaultEnrollment.id}?task=delete`,
-          {},
+        server.use(
+          http.delete(
+            `/api/v1/courses/${defaultEnrollment.course_id}/enrollments/${defaultEnrollment.id}`,
+            () => HttpResponse.json({}),
+          ),
         )
         window.confirm = vi.fn(() => true)
       })

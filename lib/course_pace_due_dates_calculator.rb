@@ -80,6 +80,6 @@ class CoursePaceDueDatesCalculator
     account_codes =
       Account.multi_account_chain_ids([course_pace.course.account.id]).map { |id| "account_#{id}" }
     context_codes = account_codes.append("course_#{course_pace.course.id}")
-    CalendarEvent.with_blackout_date.active.for_context_codes(context_codes)
+    CalendarEvent.with_blackout_date.active.valid_ranges.for_context_codes(context_codes)
   end
 end

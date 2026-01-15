@@ -62,12 +62,17 @@ class ModuleProgressionLoader < GraphQL::Batch::Loader
   def perform(context_modules)
     GuardRail.activate(:secondary) do
       if is_student?
-        # Batch create progressions for enrolled modules to avoid N+1
-        enrolled_modules = get_enrolled_modules(context_modules)
-        batch_create_progressions(enrolled_modules)
-
-        # Evaluate modules with pre-created progressions
-        context_modules.each { |m| m.evaluate_for(@user) }
+        progressions_by_module_id = ContextModule.preload_progressions_for_user(context_modules, @user)
+        context_modules.each do |m|
+          existing_progression = progressions_by_module_id[m.id]
+          if existing_progression
+            existing_progression.context_module = m
+            existing_progression.user = @user
+            existing_progression.evaluate!
+          else
+            m.evaluate_for(@user)
+          end
+        end
       end
 
       progressions = ContextModuleProgression.where(
@@ -82,36 +87,6 @@ class ModuleProgressionLoader < GraphQL::Batch::Loader
   end
 
   private
-
-  def get_enrolled_modules(context_modules)
-    return ContextModule.none unless @user && @context
-
-    module_ids = context_modules.map(&:id)
-
-    ContextModule.where(id: module_ids)
-                 .where(
-                   Enrollment.where("enrollments.course_id = context_modules.context_id")
-                            .where(user_id: @user.id)
-                            .arel.exists
-                 )
-  end
-
-  def batch_create_progressions(enrolled_modules_relation)
-    return unless @user
-    return if enrolled_modules_relation.respond_to?(:empty?) && enrolled_modules_relation.empty?
-
-    # Batch create progressions for all enrolled modules with proper shard activation
-    enrolled_modules_relation.find_each do |context_module|
-      context_module.shard.activate do
-        GuardRail.activate(:primary) do
-          ContextModuleProgression.create_and_ignore_on_duplicate(
-            user: @user,
-            context_module:
-          )
-        end
-      end
-    end
-  end
 
   def is_student?
     @context.grants_right?(@user, @session, :participate_as_student)

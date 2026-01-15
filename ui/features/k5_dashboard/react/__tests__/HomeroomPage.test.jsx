@@ -18,10 +18,17 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 import userEvent from '@testing-library/user-event'
 import HomeroomPage from '../HomeroomPage'
+
+const server = setupServer(
+  http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json({})),
+  http.get(/\/api\/v1\/manageable_accounts.*/, () => HttpResponse.json([])),
+  http.get(/\/api\/v1\/users\/self\/courses.*/, () => HttpResponse.json([])),
+)
 
 describe('HomeroomPage', () => {
   const user = userEvent.setup()
@@ -36,10 +43,10 @@ describe('HomeroomPage', () => {
     ...overrides,
   })
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.put(/.*\/api\/v1\/users\/\d+\/colors/, {})
-    fetchMock.get(/api\/v1\/manageable_accounts/, [])
-    fetchMock.get(/api\/v1\/users\/self\/courses/, [])
     fakeEnv.setup({
       INITIAL_NUM_K5_CARDS: 3,
     })
@@ -47,7 +54,7 @@ describe('HomeroomPage', () => {
 
   afterEach(() => {
     localStorage.clear()
-    fetchMock.restore()
+    server.resetHandlers()
     fakeEnv.teardown()
     vi.clearAllMocks()
   })

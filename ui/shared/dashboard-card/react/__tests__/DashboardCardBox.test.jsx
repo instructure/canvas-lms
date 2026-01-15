@@ -21,11 +21,14 @@ import {render, waitFor, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {DragDropContext} from 'react-dnd'
 import ReactDndTestBackend from 'react-dnd-test-backend'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 import DashboardCard from '../DashboardCard'
 import getDroppableDashboardCardBox from '../getDroppableDashboardCardBox'
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
+
+const server = setupServer()
 
 describe('DashboardCardBox', () => {
   let props
@@ -47,27 +50,27 @@ describe('DashboardCardBox', () => {
     ],
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     props = {...defaultProps}
 
     // Mock all color-related API calls
-    fetchMock.put(/\/api\/v1\/users\/.*\/colors\/.*/, {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: {},
-    })
-
-    fetchMock.get(/\/api\/v1\/users\/.*\/colors/, {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: {},
-    })
+    server.use(
+      http.put('/api/v1/users/:userId/colors/:assetString', () => {
+        return HttpResponse.json({})
+      }),
+      http.get('/api/v1/users/:userId/colors', () => {
+        return HttpResponse.json({})
+      }),
+    )
 
     vi.spyOn(CourseActivitySummaryStore, 'getStateForCourse').mockReturnValue({})
   })
 
   afterEach(() => {
-    fetchMock.reset()
+    server.resetHandlers()
     vi.clearAllMocks()
   })
 
@@ -120,10 +123,11 @@ describe('DashboardCardBox', () => {
       const {rerender, Box} = renderComponent()
 
       // Mock the unfavorite API call
-      fetchMock.delete('/api/v1/users/self/favorites/courses/1', {
-        status: 200,
-        body: {},
-      })
+      server.use(
+        http.delete('/api/v1/users/self/favorites/courses/1', () => {
+          return HttpResponse.json({})
+        }),
+      )
 
       const cards = document.querySelectorAll('.ic-DashboardCard')
       const initialCardCount = cards.length

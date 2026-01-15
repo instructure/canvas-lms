@@ -157,6 +157,7 @@ describe('sortedUniqBy', () => {
       expect(result.some(item => item.value === undefined)).toBeTruthy()
     })
 
+    // Test expects function to filter undefined, but source code doesn't do that
     test.skip('handles arrays containing undefined objects', () => {
       type Item = {index: number; component?: string} | undefined
       const items: Item[] = [

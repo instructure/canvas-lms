@@ -31,9 +31,8 @@ export function multiply(a: number, b: number): Big {
   return new Big(a || 0).times(b || 0)
 }
 
-export function toNumber(big: Big) {
-  // @ts-expect-error
-  return Number.parseFloat(big)
+export function toNumber(big: Big): number {
+  return Number.parseFloat(big.toString())
 }
 
 export function bigSum(values: Big[]) {
@@ -54,24 +53,30 @@ export function sumBy(collection, attr) {
   return sum(values)
 }
 
-export function scoreToPercentage(score: number, pointsPossible: number) {
+export function scoreToPercentage(score: number, pointsPossible: number): number {
   const floatingPointResult = (score / pointsPossible) * 100
   if (!Number.isFinite(floatingPointResult)) {
     return floatingPointResult
   }
 
-  // @ts-expect-error
-  return toNumber(multiply(divide(score, pointsPossible), 100))
+  const divResult = divide(score, pointsPossible)
+  const multResult = new Big(divResult).times(100)
+  return toNumber(multResult)
 }
 
-export function scoreToScaledPoints(score: number, pointsPossible: number, scalingFactor: number) {
+export function scoreToScaledPoints(
+  score: number,
+  pointsPossible: number,
+  scalingFactor: number,
+): number {
   const scoreAsScaledPoints = score / (pointsPossible / scalingFactor)
   if (!Number.isFinite(scoreAsScaledPoints)) {
     return scoreAsScaledPoints
   }
 
-  // @ts-expect-error
-  return toNumber(divide(score, divide(pointsPossible, scalingFactor)))
+  const innerDiv = divide(pointsPossible, scalingFactor)
+  const outerDiv = new Big(score).div(innerDiv)
+  return toNumber(outerDiv)
 }
 
 export function weightedPercent({

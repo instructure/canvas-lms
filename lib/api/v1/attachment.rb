@@ -169,7 +169,6 @@ module Api::V1::Attachment
     end
     if includes.include? "preview_url"
       url_opts = {
-        moderated_grading_allow_list: options[:moderated_grading_allow_list],
         enable_annotations: options[:enable_annotations],
         enrollment_type: options[:enrollment_type],
         anonymous_instructor_annotations: options[:anonymous_instructor_annotations],

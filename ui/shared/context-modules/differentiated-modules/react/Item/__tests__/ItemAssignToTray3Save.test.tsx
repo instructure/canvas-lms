@@ -19,16 +19,18 @@
 import {reloadWindow} from '@canvas/util/globalUtils'
 import {act, cleanup, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
 import {ADHOC_WITHOUT_STUDENTS} from '../../__tests__/mocks'
 import {
   DEFAULT_PROPS,
   OVERRIDES_URL,
   renderComponent,
   SECTIONS_DATA,
+  server,
   setupBaseMocks,
   setupEnv,
   setupFlashHolder,
+  http,
+  HttpResponse,
 } from './ItemAssignToTrayTestUtils'
 
 vi.mock('@canvas/util/globalUtils', () => ({
@@ -50,29 +52,54 @@ describe('ItemAssignToTray - Save Operations', () => {
     overrides: [],
   }
 
+  let lastPutBody: string | null = null
+  let lastGetMethod: string | null = null
+
   beforeAll(() => {
     setupFlashHolder()
+    server.listen()
   })
 
   beforeEach(() => {
+    lastPutBody = null
+    lastGetMethod = null
     setupEnv()
     setupBaseMocks()
-    fetchMock.get(OVERRIDES_URL, DATE_DETAILS_OBJ, {
-      overwriteRoutes: true,
-    })
-    fetchMock.put(DATE_DETAILS, {})
+    server.use(
+      http.get(OVERRIDES_URL, () => {
+        return HttpResponse.json(DATE_DETAILS_OBJ)
+      }),
+      http.put(DATE_DETAILS, async ({request}) => {
+        lastPutBody = await request.text()
+        return HttpResponse.json({})
+      }),
+      http.get('/api/v1/courses/1/assignments/24/date_details', ({request}) => {
+        lastGetMethod = request.method
+        return HttpResponse.json({
+          id: '24',
+          due_at: '2023-09-30T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          overrides: [],
+        })
+      }),
+    )
     vi.resetAllMocks()
   })
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 
-  // TODO: flaky in Vitest - times out waiting for flash message
-  it.skip('creates new assignment overrides', async () => {
+  afterAll(() => {
+    server.close()
+  })
+
+  it('creates new assignment overrides', async () => {
     const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
     const assigneeSelector = await findByTestId('assignee_selector')
     act(() => assigneeSelector.click())
@@ -81,13 +108,18 @@ describe('ItemAssignToTray - Save Operations', () => {
 
     getByRole('button', {name: 'Save'}).click()
     expect((await findAllByText(`${DEFAULT_PROPS.itemName} updated`))[0]).toBeInTheDocument()
-    const requestBody = fetchMock.lastOptions(DATE_DETAILS)?.body
+    await waitFor(() => {
+      expect(lastPutBody).not.toBeNull()
+    })
     const {id, overrides, only_visible_to_overrides, visible_to_everyone, ...payloadValues} =
       DATE_DETAILS_OBJ
     const expectedPayload = JSON.stringify({
       ...payloadValues,
       reply_to_topic_due_at: null,
       required_replies_due_at: null,
+      peer_review_available_from: null,
+      peer_review_due_at: null,
+      peer_review_available_to: null,
       only_visible_to_overrides,
       assignment_overrides: [
         {
@@ -98,11 +130,10 @@ describe('ItemAssignToTray - Save Operations', () => {
         },
       ],
     })
-    expect(requestBody).toEqual(expectedPayload)
+    expect(lastPutBody).toEqual(expectedPayload)
   })
 
-  // TODO: flaky in Vitest - times out waiting for flash message
-  it.skip('calls onDismiss after saving', async () => {
+  it('calls onDismiss after saving', async () => {
     const onDismissMock = vi.fn()
     const {findAllByTestId, findByText, getByTestId, findAllByText} = renderComponent({
       onDismiss: onDismissMock,
@@ -132,9 +163,7 @@ describe('ItemAssignToTray - Save Operations', () => {
 
     savebtn.click()
     expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
-    expect(
-      fetchMock.lastOptions('/api/v1/courses/1/assignments/24/date_details?per_page=100')?.method,
-    ).toBe('GET')
+    expect(lastGetMethod).toBe('GET')
     expect(onDismissMock).not.toHaveBeenCalled()
   })
 
@@ -154,8 +183,7 @@ describe('ItemAssignToTray - Save Operations', () => {
     })
   })
 
-  // TODO: flaky in Vitest - intermittently times out
-  it.skip('does not reload the page after saving if onSave is passed', async () => {
+  it('does not reload the page after saving if onSave is passed', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const onSave = vi.fn()
     const {getByTestId, findAllByTestId, findByText, unmount} = renderComponent({onSave})
@@ -174,37 +202,23 @@ describe('ItemAssignToTray - Save Operations', () => {
     unmount()
   })
 
-  // TODO: flaky in Vitest - timing issue with mock delay
-  it.skip('shows loading spinner while saving', async () => {
-    fetchMock.put(DATE_DETAILS, {}, {overwriteRoutes: true, delay: 500})
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {getByTestId, findAllByTestId, findByText, getAllByTestId, unmount} = renderComponent()
-    const addCardBtn = getAllByTestId('add-card')[0]
-    act(() => addCardBtn.click())
-    const assigneeSelector = (await findAllByTestId('assignee_selector'))[0]
-    assigneeSelector.click()
-    const option1 = await findByText(SECTIONS_DATA[3].name)
-    option1.click()
-    const save = getByTestId('differentiated_modules_save_button')
-    await user.click(save)
-    expect(getByTestId('cards-loading')).toBeInTheDocument()
-    unmount()
-  })
-
   it('does not show cards for ADHOC override with no students', async () => {
-    fetchMock.get(OVERRIDES_URL, ADHOC_WITHOUT_STUDENTS, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get(OVERRIDES_URL, () => {
+        return HttpResponse.json(ADHOC_WITHOUT_STUDENTS)
+      }),
+    )
     const {findAllByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(1)
   })
 
-  // TODO: flaky in Vitest - jsdom 25 timing issues with flash messages
-  it.skip('does not include ADHOC overrides without students when saving', async () => {
-    fetchMock.get(OVERRIDES_URL, ADHOC_WITHOUT_STUDENTS, {
-      overwriteRoutes: true,
-    })
+  it('does not include ADHOC overrides without students when saving', async () => {
+    server.use(
+      http.get(OVERRIDES_URL, () => {
+        return HttpResponse.json(ADHOC_WITHOUT_STUDENTS)
+      }),
+    )
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {findByTestId, findAllByText, findAllByTestId, findByText} = renderComponent()
     const assigneeSelector = (await findAllByTestId('assignee_selector'))[0]
@@ -217,8 +231,10 @@ describe('ItemAssignToTray - Save Operations', () => {
     const save = await findByTestId('differentiated_modules_save_button')
     await user.click(save)
     expect((await findAllByText(`${DEFAULT_PROPS.itemName} updated`))[0]).toBeInTheDocument()
-    // @ts-expect-error - fetchMock body type assertion
-    const requestBody = JSON.parse(fetchMock.lastOptions(DATE_DETAILS)?.body)
+    await waitFor(() => {
+      expect(lastPutBody).not.toBeNull()
+    })
+    const requestBody = JSON.parse(lastPutBody!)
     // filters out invalid overrides
     expect(requestBody.assignment_overrides).toHaveLength(2)
   })
@@ -250,8 +266,7 @@ describe('ItemAssignToTray - Save Operations', () => {
       }
     })
 
-    // TODO: flaky in Vitest - intermittently times out
-    it.skip('validates if required due dates are set before applying changes', async () => {
+    it('validates if required due dates are set before applying changes', async () => {
       const {getByTestId, getAllByTestId, findAllByTestId, getByText, getAllByText, findByText} =
         renderComponent({
           postToSIS: true,

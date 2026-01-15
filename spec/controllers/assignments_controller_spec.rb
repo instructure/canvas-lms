@@ -1251,6 +1251,20 @@ describe AssignmentsController do
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
             expect(assigns[:js_env][:REVIEWER_SUBMISSION_ID]).to eq @student_submission_id
           end
+
+          it "sets peer_review_allocation_and_grading to true when feature is enabled" do
+            @course.enable_feature!(:peer_review_allocation_and_grading)
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:js_env][:peer_review_allocation_and_grading]).to be true
+          end
+
+          it "sets peer_review_allocation_and_grading to false when feature is disabled" do
+            @course.disable_feature!(:peer_review_allocation_and_grading)
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:js_env][:peer_review_allocation_and_grading]).to be false
+          end
         end
 
         it "sets correct breadcrumb with assignment title for assignment enhancements" do
@@ -2779,6 +2793,75 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_TYPE]).to eq tool.class.to_s
     end
 
+    context "peer review override dates" do
+      before do
+        user_session(@teacher)
+        @assignment.update!(peer_reviews: true)
+      end
+
+      it "includes child peer review override dates when all conditions are met" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review_sub = peer_review_model(parent_assignment: @assignment)
+        section = @course.course_sections.create!(name: "Test Section")
+        parent_override = @assignment.assignment_overrides.create!(set: section, due_at: 1.day.from_now)
+        child_override = peer_review_sub.assignment_overrides.create!(
+          set: section,
+          parent_override:,
+          due_at: 2.days.from_now
+        )
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        overrides = assigns[:js_env][:ASSIGNMENT_OVERRIDES]
+        expect(overrides).to be_an(Array)
+        expect(overrides.length).to be > 0
+
+        parent_override_json = overrides.find { |o| o[:id] == parent_override.id }
+        expect(parent_override_json).to be_present
+        expect(parent_override_json[:peer_review_dates]).to be_present
+        expect(parent_override_json[:peer_review_dates][:id]).to eq(child_override.id)
+      end
+
+      it "does not include child peer review override dates when feature flag is disabled" do
+        section = @course.course_sections.create!(name: "Test Section")
+        parent_override = @assignment.assignment_overrides.create!(set: section, due_at: 1.day.from_now)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        overrides = assigns[:js_env][:ASSIGNMENT_OVERRIDES]
+        parent_override_json = overrides.find { |o| o[:id] == parent_override.id }
+        expect(parent_override_json).to be_present
+        expect(parent_override_json).not_to have_key(:peer_review_dates)
+      end
+
+      it "does not include child peer review override dates when peer_reviews is false" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @assignment.update!(peer_reviews: false)
+        section = @course.course_sections.create!(name: "Test Section")
+        parent_override = @assignment.assignment_overrides.create!(set: section, due_at: 1.day.from_now)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        overrides = assigns[:js_env][:ASSIGNMENT_OVERRIDES]
+        parent_override_json = overrides.find { |o| o[:id] == parent_override.id }
+        expect(parent_override_json).to be_present
+        expect(parent_override_json).not_to have_key(:peer_review_dates)
+      end
+
+      it "does not include child peer review override dates when peer_review_sub_assignment does not exist" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        section = @course.course_sections.create!(name: "Test Section")
+        parent_override = @assignment.assignment_overrides.create!(set: section, due_at: 1.day.from_now)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        overrides = assigns[:js_env][:ASSIGNMENT_OVERRIDES]
+        parent_override_json = overrides.find { |o| o[:id] == parent_override.id }
+        expect(parent_override_json).to be_present
+        expect(parent_override_json).not_to have_key(:peer_review_dates)
+      end
+    end
+
     it "bootstrap the assignment originality report visibility settings to js_env" do
       user_session(@teacher)
       get "edit", params: { course_id: @course.id, id: @assignment.id }
@@ -3577,9 +3660,24 @@ describe AssignmentsController do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@assignment.id)
       end
+
+      it "sets EMOJIS_ENABLED in js_env based on feature flag" do
+        @course.enable_feature!(:submission_comment_emojis)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:EMOJIS_ENABLED]).to be(true)
+
+        @course.disable_feature!(:submission_comment_emojis)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:EMOJIS_ENABLED]).to be(false)
+      end
+
+      it "sets the page title to assignment title with Peer Review" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:page_title]).to eq("Peer Review Assignment Peer Review")
+      end
     end
 
-    context "when user is a teacher" do
+    context "when user is a teacher and peer_review_allocation_and_grading FF is enabled" do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
       end
@@ -3588,12 +3686,9 @@ describe AssignmentsController do
         user_session(@teacher)
       end
 
-      it "does not render A2 peer review student view" do
+      it "redirects to assignment page with open_allocation_tray parameter" do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
-        expect(response).to have_http_status(:ok)
-        expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@assignment.id)
-        expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
-        expect(assigns[:students_dropdown_list]).to be_present
+        expect(response).to redirect_to(course_assignment_path(@course, @assignment, open_allocation_tray: true))
       end
     end
 

@@ -65,7 +65,7 @@ describe('CourseHomeDialog', () => {
     expect(getByLabelText(/Pages Front Page/)).not.toBeDisabled()
   })
 
-  test.skip('Saves the preference on submit', async () => {
+  test('Saves the preference on submit', async () => {
     const onSubmit = vi.fn()
     axios.put.mockResolvedValue({data: {default_view: 'assignments'}})
 

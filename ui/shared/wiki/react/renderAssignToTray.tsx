@@ -19,7 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import type {
   DateDetailsPayload,
   ItemAssignToCardSpec,
@@ -127,8 +127,7 @@ const AssignToOption = (props: Props) => {
 
 export const renderAssignToTray = (el: HTMLElement, props: Props) => {
   if (el) {
-    const root = createRoot(el)
-    root.render(<AssignToOption {...props} />)
+    render(<AssignToOption {...props} />, el)
   }
   return <AssignToOption {...props} />
 }

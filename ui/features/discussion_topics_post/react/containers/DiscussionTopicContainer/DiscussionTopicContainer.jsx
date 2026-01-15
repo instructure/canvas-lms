@@ -24,6 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useCallback} from 'react'
 import {Discussion} from '../../../graphql/Discussion'
+import {Submission} from '../../../graphql/Submission'
 import {
   DELETE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
@@ -39,7 +40,12 @@ import {LockedDiscussion} from '../../components/LockedDiscussion/LockedDiscussi
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {PodcastFeed} from '../../components/PodcastFeed/PodcastFeed'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
-import {getReviewLinkUrl, getSpeedGraderUrl, responsiveQuerySizes} from '../../utils'
+import {
+  getReviewLinkUrl,
+  getSpeedGraderUrl,
+  responsiveQuerySizes,
+  isSubmissionComplete,
+} from '../../utils'
 import {SearchContext, isSpeedGraderInTopUrl} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 
@@ -404,6 +410,8 @@ export const DiscussionTopicContainer = ({
           <DiscussionTopicAlertManager
             discussionTopic={props.discussionTopic}
             userHasEntry={userHasEntry()}
+            replyToTopicSubmission={props.replyToTopicSubmission}
+            replyToEntrySubmission={props.replyToEntrySubmission}
           />
           <AssignmentAssetProcessorEula launches={ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS} />
           {!isSearch && (
@@ -449,7 +457,14 @@ export const DiscussionTopicContainer = ({
                                   assessmentRequest.user._id,
                                 )}
                                 workflowState={assessmentRequest.workflowState}
-                                disabled={!userHasEntry()}
+                                disabled={
+                                  !isSubmissionComplete(
+                                    props.discussionTopic,
+                                    props.replyToTopicSubmission,
+                                    props.replyToEntrySubmission,
+                                    userHasEntry(),
+                                  )
+                                }
                               />
                             ),
                           )}
@@ -761,11 +776,11 @@ DiscussionTopicContainer.propTypes = {
   /**
    * useState object to set the REPLY_TO_TOPIC submission status
    */
-  replyToTopicSubmission: PropTypes.object,
+  replyToTopicSubmission: Submission.shape,
   /**
    * useState object to set the REPLY_TO_ENTRY submission status
    */
-  replyToEntrySubmission: PropTypes.object,
+  replyToEntrySubmission: Submission.shape,
   expandedTopicReply: PropTypes.bool,
   setExpandedTopicReply: PropTypes.func,
   isSubmitting: PropTypes.bool,

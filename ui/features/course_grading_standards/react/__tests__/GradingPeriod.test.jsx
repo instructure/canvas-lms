@@ -24,34 +24,45 @@ import DateHelper from '@canvas/datetime/dateHelper'
 import $ from 'jquery'
 
 vi.mock('jquery', () => ({
-  default: vi.fn(selector => ({
-    datepicker: vi.fn(),
-    data: vi.fn(key => {
-      if (key === 'unfudged-date') {
-        return new Date('2015-04-01T00:00:00Z')
-      }
-      if (key === 'invalid') {
-        return false
-      }
-      if (key === 'blank') {
-        return false
-      }
-      return null
-    }),
-    val: vi.fn(),
-    on: vi.fn(),
-    trigger: vi.fn(),
-    find: vi.fn(() => ({
+  default: vi.fn(selector => {
+    const mockElement = {
       datepicker: vi.fn(),
-      data: vi.fn(),
+      data: vi.fn(key => {
+        if (key === 'unfudged-date') {
+          return new Date('2015-04-01T00:00:00Z')
+        }
+        if (key === 'invalid') {
+          return false
+        }
+        if (key === 'blank') {
+          return false
+        }
+        return null
+      }),
       val: vi.fn(),
       on: vi.fn(),
       trigger: vi.fn(),
-      find: vi.fn(),
-    })),
-    flashMessage: vi.fn(),
-    flashError: vi.fn(),
-  })),
+      find: vi.fn(() => ({
+        datepicker: vi.fn(),
+        data: vi.fn(),
+        val: vi.fn(),
+        on: vi.fn((event, handler) => {
+          // Store the handler for later use
+          if (event === 'change' && typeof selector !== 'string') {
+            const element = selector
+            if (element && element.addEventListener) {
+              element.addEventListener('change', e => handler.call(element, e))
+            }
+          }
+        }),
+        trigger: vi.fn(),
+        find: vi.fn(),
+      })),
+      flashMessage: vi.fn(),
+      flashError: vi.fn(),
+    }
+    return mockElement
+  }),
 }))
 
 vi.mock('@canvas/datetime/jquery/DatetimeField', () => ({
@@ -114,44 +125,24 @@ describe('GradingPeriod', () => {
     expect(screen.getByText('50%')).toBeInTheDocument()
   })
 
-  it.skip('onDateChange calls replaceInputWithDate', async () => {
+  it('onDateChange calls replaceInputWithDate', async () => {
     renderGradingPeriod()
     const startDateInput = screen.getByRole('textbox', {name: /start date/i})
 
-    // Mock jQuery data return and trigger change
-    const jQueryInstance = $(startDateInput)
-    jQueryInstance.data.mockImplementation(key => {
-      if (key === 'unfudged-date') {
-        return new Date('2015-04-01T00:00:00Z')
-      }
-      return false
-    })
-
-    await userEvent.clear(startDateInput)
-    await userEvent.type(startDateInput, '2015-04-01')
-    jQueryInstance.trigger('change')
+    // Trigger a change event directly on the input
+    fireEvent.change(startDateInput, {target: {name: 'startDate', id: 'period_start_date_1'}})
 
     await waitFor(() => {
       expect(DateHelper.formatDatetimeForDisplay).toHaveBeenCalled()
     })
   })
 
-  it.skip('onDateChange calls updateGradingPeriodCollection', async () => {
+  it('onDateChange calls updateGradingPeriodCollection', async () => {
     renderGradingPeriod()
     const startDateInput = screen.getByRole('textbox', {name: /start date/i})
 
-    // Mock jQuery data return and trigger change
-    const jQueryInstance = $(startDateInput)
-    jQueryInstance.data.mockImplementation(key => {
-      if (key === 'unfudged-date') {
-        return new Date('2015-04-01T00:00:00Z')
-      }
-      return false
-    })
-
-    await userEvent.clear(startDateInput)
-    await userEvent.type(startDateInput, '2015-04-01')
-    jQueryInstance.trigger('change')
+    // Trigger a change event directly on the input
+    fireEvent.change(startDateInput, {target: {name: 'startDate', id: 'period_start_date_1'}})
 
     await waitFor(() => {
       expect(defaultProps.updateGradingPeriodCollection).toHaveBeenCalled()
@@ -185,23 +176,13 @@ describe('GradingPeriod', () => {
     expect(defaultProps.updateGradingPeriodCollection).toHaveBeenCalled()
   })
 
-  it.skip('replaceInputWithDate calls formatDatetimeForDisplay', async () => {
+  it('replaceInputWithDate calls formatDatetimeForDisplay', async () => {
     const formatDatetime = vi.spyOn(DateHelper, 'formatDatetimeForDisplay')
     renderGradingPeriod()
     const startDateInput = screen.getByRole('textbox', {name: /start date/i})
 
-    // Mock jQuery data return and trigger change
-    const jQueryInstance = $(startDateInput)
-    jQueryInstance.data.mockImplementation(key => {
-      if (key === 'unfudged-date') {
-        return new Date('2015-04-01T00:00:00Z')
-      }
-      return false
-    })
-
-    await userEvent.clear(startDateInput)
-    await userEvent.type(startDateInput, '2015-04-01')
-    jQueryInstance.trigger('change')
+    // Trigger a change event directly on the input
+    fireEvent.change(startDateInput, {target: {name: 'startDate', id: 'period_start_date_1'}})
 
     await waitFor(() => {
       expect(formatDatetime).toHaveBeenCalledWith(new Date('2015-04-01T00:00:00Z'))

@@ -19,7 +19,13 @@
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import PageEditModal from '../PageEditModal'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
+
+// Track API calls
+const apiCalls: {method: string; url: string}[] = []
 
 describe('PageEditModal', () => {
   const portfolio = {id: 0, name: 'Test Portfolio', public: true, profile_url: '/path/to/profile'}
@@ -35,9 +41,40 @@ describe('PageEditModal', () => {
     sectionId: 100,
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
+    apiCalls.length = 0
+    vi.clearAllMocks()
+
+    // Set up handlers for all endpoints
+    server.use(
+      http.delete('/eportfolios/:portfolioId/entries/:entryId', ({request}) => {
+        apiCalls.push({method: 'DELETE', url: request.url})
+        return HttpResponse.json({}, {status: 200})
+      }),
+      http.post('/eportfolios/:portfolioId/entries', ({request}) => {
+        apiCalls.push({method: 'POST', url: request.url})
+        return HttpResponse.json({}, {status: 200})
+      }),
+      http.put('/eportfolios/:portfolioId/entries/:entryId', ({request}) => {
+        apiCalls.push({method: 'PUT', url: request.url})
+        return HttpResponse.json({}, {status: 200})
+      }),
+      http.post('/eportfolios/:portfolioId/:sectionId/reorder_entries', ({request}) => {
+        apiCalls.push({method: 'POST', url: request.url})
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
   })
+
+  const wasApiCalled = (method: string, pathFragment?: string) => {
+    return apiCalls.some(
+      call => call.method === method && (!pathFragment || call.url.includes(pathFragment)),
+    )
+  }
 
   it('sets focus on blank text input', async () => {
     const {getByTestId, getByText} = render(
@@ -57,13 +94,11 @@ describe('PageEditModal', () => {
       const {getByText} = render(
         <PageEditModal {...props} modalType="delete" page={page} pageList={pageList} />,
       )
-      const path = encodeURI('/eportfolios/0/entries/2')
-      fetchMock.delete(path, {status: 200})
 
       const cancelButton = getByText('Cancel')
       cancelButton.click()
 
-      await waitFor(() => expect(fetchMock.called(path, 'DELETE')).toBe(false))
+      await waitFor(() => expect(wasApiCalled('DELETE')).toBe(false))
       await waitFor(() => expect(mockCancel).toHaveBeenCalled())
     })
 
@@ -71,13 +106,11 @@ describe('PageEditModal', () => {
       const {getByText} = render(
         <PageEditModal {...props} modalType="delete" page={page} pageList={pageList} />,
       )
-      const path = encodeURI('/eportfolios/0/entries/2')
-      fetchMock.delete(path, {status: 200})
 
       const deleteButton = getByText('Delete')
       deleteButton.click()
 
-      await waitFor(() => expect(fetchMock.called(path, 'DELETE')).toBe(true))
+      await waitFor(() => expect(wasApiCalled('DELETE', '/entries/2')).toBe(true))
       await waitFor(() => expect(mockConfirm).toHaveBeenCalled())
     })
   })
@@ -87,17 +120,13 @@ describe('PageEditModal', () => {
       const {getByText, getByTestId} = render(
         <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />,
       )
-      const path = encodeURI(
-        '/eportfolios/0/entries?eportfolio_entry[name]=Third Page&eportfolio_entry[eportfolio_category_id]=100',
-      )
-      fetchMock.post(path, {status: 200})
 
       const textInput = getByTestId('add-field')
       fireEvent.change(textInput, {target: {value: 'Third Page'}})
       const cancelButton = getByText('Cancel')
       cancelButton.click()
 
-      await waitFor(() => expect(fetchMock.called(path, 'POST')).toBe(false))
+      await waitFor(() => expect(wasApiCalled('POST', '/entries')).toBe(false))
       await waitFor(() => expect(mockCancel).toHaveBeenCalled())
     })
 
@@ -105,17 +134,13 @@ describe('PageEditModal', () => {
       const {getByText, getByTestId} = render(
         <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />,
       )
-      const path = encodeURI(
-        '/eportfolios/0/entries?eportfolio_entry[name]=Third Page&eportfolio_entry[eportfolio_category_id]=100',
-      )
-      fetchMock.post(path, {status: 200})
 
       const textInput = getByTestId('add-field')
       fireEvent.change(textInput, {target: {value: 'Third Page'}})
       const saveButton = getByText('Save')
       saveButton.click()
 
-      await waitFor(() => expect(fetchMock.called(path, 'POST')).toBe(true))
+      await waitFor(() => expect(wasApiCalled('POST', '/entries')).toBe(true))
       await waitFor(() => expect(mockConfirm).toHaveBeenCalled())
     })
   })
@@ -124,15 +149,11 @@ describe('PageEditModal', () => {
       const {getByText} = render(
         <PageEditModal {...props} modalType="rename" page={page} pageList={pageList} />,
       )
-      const path = encodeURI(
-        '/eportfolios/0/entries/2?eportfolio_entry[name]=Second Page&eportfolio_entry[eportfolio_category_id]=100',
-      )
-      fetchMock.put(path, {status: 200})
 
       const cancelButton = getByText('Cancel')
       cancelButton.click()
 
-      await waitFor(() => expect(fetchMock.called(path, 'PUT')).toBe(false))
+      await waitFor(() => expect(wasApiCalled('PUT')).toBe(false))
       await waitFor(() => expect(mockCancel).toHaveBeenCalled())
     })
 
@@ -140,15 +161,11 @@ describe('PageEditModal', () => {
       const {getByText} = render(
         <PageEditModal {...props} modalType="rename" page={page} pageList={pageList} />,
       )
-      const path = encodeURI(
-        '/eportfolios/0/entries/2?eportfolio_entry[name]=Second Page&eportfolio_entry[eportfolio_category_id]=100',
-      )
-      fetchMock.put(path, {status: 200})
 
       const saveButton = getByText('Save')
       saveButton.click()
 
-      await waitFor(() => expect(fetchMock.called(path, 'PUT')).toBe(true))
+      await waitFor(() => expect(wasApiCalled('PUT', '/entries/2')).toBe(true))
       await waitFor(() => expect(mockConfirm).toHaveBeenCalled())
     })
   })
@@ -157,11 +174,6 @@ describe('PageEditModal', () => {
       const {getByText, getByTestId} = render(
         <PageEditModal {...props} modalType="move" page={page} pageList={pageList} />,
       )
-      // encodeURIComponent encodes the slashes
-      // encodeURI enocdes the commas
-      // so we have to hard code the uri
-      const path = encodeURI('/eportfolios/0/100/reorder_entries?order=2%2C1')
-      fetchMock.post(path, {status: 200})
 
       const select = getByTestId('move-select')
       select.click()
@@ -169,7 +181,7 @@ describe('PageEditModal', () => {
       const cancelButton = getByText('Cancel')
       cancelButton.click()
 
-      await waitFor(() => expect(fetchMock.called(path, 'POST')).toBe(false))
+      await waitFor(() => expect(wasApiCalled('POST', '/reorder_entries')).toBe(false))
       await waitFor(() => expect(mockCancel).toHaveBeenCalled())
     })
 
@@ -177,8 +189,6 @@ describe('PageEditModal', () => {
       const {getByText, getByTestId} = render(
         <PageEditModal {...props} modalType="move" page={page} pageList={pageList} />,
       )
-      const path = '/eportfolios/0/100/reorder_entries?order=2%2C1'
-      fetchMock.post(path, {status: 200})
 
       const select = getByTestId('move-select')
       select.click()
@@ -186,7 +196,7 @@ describe('PageEditModal', () => {
       const saveButton = getByText('Save')
       saveButton.click()
 
-      await waitFor(() => expect(fetchMock.called(path, 'POST')).toBe(true))
+      await waitFor(() => expect(wasApiCalled('POST', '/reorder_entries')).toBe(true))
       await waitFor(() => expect(mockConfirm).toHaveBeenCalled())
     })
   })

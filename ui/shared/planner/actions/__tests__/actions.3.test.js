@@ -98,7 +98,7 @@ describe('api actions', () => {
   })
 
   describe('togglePlannerItemCompletion', () => {
-    it.skip('dispatches saving, saved, and maybe update sidebar actions', () => {
+    it('dispatches saving, saved, and maybe update sidebar actions', () => {
       const mockDispatch = vi.fn()
       const plannerItem = simpleItem()
       const savingItem = {...plannerItem, show: true, toggleAPIPending: true}
@@ -114,7 +114,7 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
     })
 
-    it.skip('updates marked_complete and sends override data in the request', async () => {
+    it('updates marked_complete and sends override data in the request', async () => {
       let capturedRequest
       server.use(
         http.post('/api/v1/planner/overrides', async ({request}) => {
@@ -132,7 +132,7 @@ describe('api actions', () => {
       })
     })
 
-    it.skip('does a post if the planner override is new (no id)', async () => {
+    it('does a post if the planner override is new (no id)', async () => {
       let capturedRequest
       server.use(
         http.post('/api/v1/planner/overrides', async ({request}) => {
@@ -156,7 +156,7 @@ describe('api actions', () => {
       })
     })
 
-    it.skip('does a put if the planner override exists (has id)', async () => {
+    it('does a put if the planner override exists (has id)', async () => {
       let capturedRequest
       server.use(
         http.put('/api/v1/planner/overrides/5', async ({request}) => {
@@ -181,7 +181,7 @@ describe('api actions', () => {
       })
     })
 
-    it.skip('resolves the promise with override response data in the item', async () => {
+    it('resolves the promise with override response data in the item', async () => {
       server.use(
         http.put('/api/v1/planner/overrides/override_id', () => {
           return HttpResponse.json(
@@ -208,7 +208,7 @@ describe('api actions', () => {
       })
     })
 
-    it.skip('calls the alert function and resends previous override when a failure occurs', async () => {
+    it('calls the alert function and resends previous override when a failure occurs', async () => {
       server.use(
         http.put('/api/v1/planner/overrides/override_id', () => {
           return new HttpResponse(null, {status: 500})

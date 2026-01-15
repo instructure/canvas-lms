@@ -17,11 +17,12 @@
  */
 
 import * as React from 'react'
-import {useOutletContext, Link as RouterLink} from 'react-router-dom'
+import {useOutletContext, Link as RouterLink, useNavigate} from 'react-router-dom'
 import type {ToolDetailsOutletContext} from '../ToolDetails'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconCopyLine, IconRefreshLine} from '@instructure/ui-icons'
@@ -133,6 +134,7 @@ const LaunchTypeSpecificSettingsSection = (
 export const ToolConfigurationView = () => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
   const mutation = useResetLtiRegistration()
+  const navigate = useNavigate()
 
   const customFields = Object.entries(registration.overlaid_configuration.custom_fields || {})
   const redirectUris = registration.overlaid_configuration.redirect_uris || []
@@ -366,10 +368,32 @@ export const ToolConfigurationView = () => {
         ))}
       </Section>
 
-      <Section title={I18n.t('Icon URLs')}>
+      <Section title={I18n.t('Tool Icon URL')}>
+        {registration.overlaid_configuration.launch_settings?.icon_url ? (
+          <Flex direction="row" alignItems="center" margin="small 0 0" gap="xx-small">
+            <Flex.Item margin="0 xx-small 0 0">
+              <img
+                style={{height: '24px'}}
+                src={registration.overlaid_configuration.launch_settings.icon_url}
+                alt={I18n.t('Icon displayed next to tool on Apps page')}
+              ></img>
+            </Flex.Item>
+            <Flex.Item shouldShrink>
+              <Text wrap="break-word">
+                {registration.overlaid_configuration.launch_settings.icon_url}
+              </Text>
+            </Flex.Item>
+          </Flex>
+        ) : (
+          <Text fontStyle="italic">{I18n.t('No tool icon URL configured.')}</Text>
+        )}
+
+        <Heading level="h3" margin="small 0" id="placement-icon-urls">
+          {I18n.t('Placement Icon URLs')}
+        </Heading>
         {enabledPlacementsWithIcons.length > 0 ? (
           enabledPlacementsWithIcons.map((p, i) => (
-            <View key={p.placement} as="div" margin="0 0 small 0" style={{overflow: 'hidden'}}>
+            <View key={p.placement} as="div" margin="small 0" style={{overflow: 'hidden'}}>
               <Text weight="bold">{i18nLtiPlacement(p.placement)}:</Text>
               <Flex
                 direction="row"
@@ -475,8 +499,9 @@ export const ToolConfigurationView = () => {
             <Button
               data-pendo="lti-registrations-edit-config"
               color="primary"
-              as={RouterLink}
-              to={`/manage/${registration.id}/configuration/edit`}
+              onClick={e => {
+                navigate(`/manage/${registration.id}/configuration/edit`)
+              }}
             >
               {I18n.t('Edit')}
             </Button>

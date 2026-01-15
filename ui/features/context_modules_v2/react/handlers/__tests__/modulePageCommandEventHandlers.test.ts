@@ -172,7 +172,7 @@ describe('modulePageCommandEventHandlers', () => {
         expect(handleOpeningEditItemModal).toHaveBeenCalledWith(courseId, moduleId, moduleItemId)
       })
 
-      it.skip('calls handleDeleteModule when action is delete with moduleId', () => {
+      it('calls handleDeleteModule when action is delete with moduleId', () => {
         const event = new CustomEvent('module-action', {
           detail: {
             action: 'delete',
@@ -438,7 +438,7 @@ describe('modulePageCommandEventHandlers', () => {
     })
   })
 
-  it.skip('does nothing for unknown actions', () => {
+  it('does nothing for unknown actions', () => {
     const event = new CustomEvent('module-action', {
       detail: {
         action: 'unknown',

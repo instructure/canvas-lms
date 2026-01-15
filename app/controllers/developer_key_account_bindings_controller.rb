@@ -145,6 +145,10 @@ class DeveloperKeyAccountBindingsController < ApplicationController
 
   def require_manage_developer_keys
     require_context_with_permission(account, :manage_developer_keys)
+
+    if account.root_account.site_admin? && Account.site_admin.feature_enabled?(:modify_site_admin_developer_keys_permission)
+      require_context_with_permission(Account.site_admin, :modify_site_admin_developer_keys)
+    end
   end
 
   def require_root_account

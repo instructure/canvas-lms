@@ -102,6 +102,20 @@ describe Types::AssignmentType do
 
   describe "hasPlagiarismTool" do
     it "returns true when assignment has a plagiarism tool configured" do
+      assignment.assignment_configuration_tool_lookups.create!(
+        tool_product_code: "product",
+        tool_vendor_code: "vendor",
+        tool_resource_type_code: "resource-type-code",
+        tool_type: "Lti::MessageHandler"
+      )
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be true
+    end
+
+    it "returns false when assignment has no plagiarism tool configured" do
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be false
+    end
+
+    it "returns false when CPF has been migrated" do
       tool = course.context_external_tools.create!(
         name: "Plagiarism Tool",
         url: "http://example.com",
@@ -112,10 +126,10 @@ describe Types::AssignmentType do
         tool:,
         tool_type: "ContextExternalTool"
       )
-      expect(assignment_type.resolve("hasPlagiarismTool")).to be true
-    end
 
-    it "returns false when assignment has no plagiarism tool configured" do
+      # Mock the migrated? method to return true
+      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(true)
+
       expect(assignment_type.resolve("hasPlagiarismTool")).to be false
     end
   end
@@ -279,6 +293,22 @@ describe Types::AssignmentType do
     result = GraphQLTypeTester.new(assignment, current_user: student3).resolve("assessmentRequestsForCurrentUser { user { name } }")
     expect(result.count).to eq 1
     expect(result[0]).to eq student.name
+  end
+
+  it "returns assessment requests ordered by id for the current user" do
+    student2 = student_in_course(course:, active_all: true).user
+    student3 = student_in_course(course:, active_all: true).user
+    student4 = student_in_course(course:, active_all: true).user
+
+    assignment.assign_peer_review(student, student2)
+    assignment.assign_peer_review(student, student3)
+    assignment.assign_peer_review(student, student4)
+
+    result = assignment_type.resolve("assessmentRequestsForCurrentUser { _id }")
+    expect(result.count).to eq 3
+
+    ids = result.map(&:to_i)
+    expect(ids).to eq(ids.sort)
   end
 
   describe "assessmentRequestsForUser" do
@@ -1373,7 +1403,6 @@ describe Types::AssignmentType do
       it "sub_submissions return correct submissions corresponding to the sub assignments" do
         root_entry = @topic.discussion_entries.create!(user: student, message: "my reply to topic")
         2.times { |i| @topic.discussion_entries.create!(user: student, message: "my child reply #{i}", parent_entry: root_entry) }
-        @topic.discussion_entries.create!(user: @other_student, message: "other student reply to topic")
 
         query = GraphQLTypeTester.new(@assignment, current_user: teacher)
 
@@ -1899,7 +1928,9 @@ describe Types::AssignmentType do
       end
 
       it "returns nil for peer review status when peer reviews are disabled" do
-        @peer_review_assignment.update!(peer_reviews: false)
+        # Skip validation: testing GraphQL response format when peer reviews disabled,
+        # not the business logic that prevents this state from occurring normally
+        @peer_review_assignment.update_attribute(:peer_reviews, false)
 
         result = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
 

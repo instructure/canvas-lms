@@ -21,7 +21,8 @@ import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ReportAction from '../components/ReportAction'
 import {AccountReportInfo, AccountReport} from '@canvas/account_reports/types'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -29,6 +30,8 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: vi.fn(() => vi.fn()),
 }))
+
+const server = setupServer()
 
 function renderWithQueryClient(ui: React.ReactElement) {
   const client = new QueryClient()
@@ -85,17 +88,21 @@ const canceledReport: AccountReport = {
   },
 }
 describe('ReportAction', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     vi.clearAllMocks()
   })
 
   describe('report not running', () => {
     beforeEach(() => {
-      fetchMock.post('/api/v1/accounts/123/reports/report_1', {
-        body: completeReport,
-        status: 200,
-      })
+      server.use(
+        http.post('/api/v1/accounts/123/reports/report_1', () => {
+          return HttpResponse.json(completeReport)
+        }),
+      )
     })
 
     it('configures and runs a report with parameters', async () => {
@@ -139,10 +146,11 @@ describe('ReportAction', () => {
   })
 
   it('shows progress for a running report', async () => {
-    fetchMock.get('/api/v1/accounts/123/reports/report_1/101', {
-      body: runningReport,
-      status: 200,
-    })
+    server.use(
+      http.get('/api/v1/accounts/123/reports/report_1/101', () => {
+        return HttpResponse.json(runningReport)
+      }),
+    )
 
     const {container} = renderWithQueryClient(
       <ReportAction
@@ -160,14 +168,14 @@ describe('ReportAction', () => {
   it('cancels a running report', async () => {
     const user = userEvent.setup()
     const spy = vi.fn()
-    fetchMock.get('/api/v1/accounts/123/reports/report_1/101', {
-      body: runningReport,
-      status: 200,
-    })
-    fetchMock.put('/api/v1/accounts/123/reports/report_1/101/abort', {
-      body: canceledReport,
-      status: 200,
-    })
+    server.use(
+      http.get('/api/v1/accounts/123/reports/report_1/101', () => {
+        return HttpResponse.json(runningReport)
+      }),
+      http.put('/api/v1/accounts/123/reports/report_1/101/abort', () => {
+        return HttpResponse.json(canceledReport)
+      }),
+    )
 
     const {getByTestId} = renderWithQueryClient(
       <ReportAction
@@ -187,14 +195,14 @@ describe('ReportAction', () => {
 
   it('shows an error if canceling fails', async () => {
     const user = userEvent.setup()
-    fetchMock.get('/api/v1/accounts/123/reports/report_1/101', {
-      body: runningReport,
-      status: 200,
-    })
-    fetchMock.put('/api/v1/accounts/123/reports/report_1/101/abort', {
-      body: {message: 'Internal server error'},
-      status: 500,
-    })
+    server.use(
+      http.get('/api/v1/accounts/123/reports/report_1/101', () => {
+        return HttpResponse.json(runningReport)
+      }),
+      http.put('/api/v1/accounts/123/reports/report_1/101/abort', () => {
+        return HttpResponse.json({message: 'Internal server error'}, {status: 500})
+      }),
+    )
 
     const {getByTestId} = renderWithQueryClient(
       <ReportAction
@@ -215,14 +223,16 @@ describe('ReportAction', () => {
 
   it('does not show an error if canceling 404s because the report finished already', async () => {
     const user = userEvent.setup()
-    fetchMock.get('/api/v1/accounts/123/reports/report_1/101', {
-      body: runningReport,
-      status: 200,
-    })
-    fetchMock.put('/api/v1/accounts/123/reports/report_1/101/abort', {
-      body: {message: 'Not Found'},
-      status: 404,
-    })
+    const abortRequestReceived = vi.fn()
+    server.use(
+      http.get('/api/v1/accounts/123/reports/report_1/101', () => {
+        return HttpResponse.json(runningReport)
+      }),
+      http.put('/api/v1/accounts/123/reports/report_1/101/abort', () => {
+        abortRequestReceived()
+        return HttpResponse.json({message: 'Not Found'}, {status: 404})
+      }),
+    )
 
     const {getByTestId} = renderWithQueryClient(
       <ReportAction
@@ -238,7 +248,7 @@ describe('ReportAction', () => {
 
     // Wait for the fetch to complete, then verify no error was shown
     await waitFor(() => {
-      expect(fetchMock.done('/api/v1/accounts/123/reports/report_1/101/abort')).toBe(true)
+      expect(abortRequestReceived).toHaveBeenCalled()
     })
     expect(showFlashError).not.toHaveBeenCalled()
   })

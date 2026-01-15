@@ -24,7 +24,7 @@ import CanvasAiInformation from '@canvas/instui-bindings/react/AiInformation'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {theme} from '@instructure/canvas-theme'
 import {Avatar} from '@instructure/ui-avatar'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 const I18n = createI18nScope('SmartSearch')
 
@@ -72,8 +72,7 @@ export function Component(): JSX.Element | null {
     )
     const aiInfoElement = document.getElementById('ai-information-mount')
     if (aiInfoElement) {
-      const root = createRoot(aiInfoElement)
-      root.render(aiInformation)
+      render(aiInformation, aiInfoElement)
     }
   }, [])
 

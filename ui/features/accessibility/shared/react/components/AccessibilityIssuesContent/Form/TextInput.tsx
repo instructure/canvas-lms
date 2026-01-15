@@ -53,8 +53,10 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
       const {selectedItem} = useAccessibilityCheckerContext()
       const inputRef = useRef<HTMLInputElement | null>(null)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const isAiGenerationEnabled = useAccessibilityScansStore(
-        useShallow(state => state.aiGenerationEnabled),
+      const {isAiTableCaptionGenerationEnabled} = useAccessibilityScansStore(
+        useShallow(state => ({
+          isAiTableCaptionGenerationEnabled: state.isAiTableCaptionGenerationEnabled,
+        })),
       )
 
       useImperativeHandle(ref, () => ({
@@ -71,7 +73,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
         setGenerateLoading(true)
         setGenerationError(null)
         doFetchApi<GenerateResponse>({
-          path: `${stripQueryString(window.location.href)}/generate`,
+          path: `${stripQueryString(window.location.href)}/generate/table_caption`,
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -120,7 +122,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             interaction={isDisabled ? 'disabled' : 'enabled'}
           />
           <Flex as="div" margin="medium 0" gap="small">
-            {isAiGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
+            {isAiTableCaptionGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
               <Flex.Item>
                 <Button
                   color="ai-primary"

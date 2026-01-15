@@ -18,9 +18,16 @@
 
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import EditUserDetails, {type EditUserDetailsProps, type UserDetails} from '../EditUserDetails'
 import {computeShortAndSortableNamesFromName} from '@canvas/user-sortable-name/react'
+
+const server = setupServer()
+
+// Track API calls
+let patchRequestBody: any = null
+let patchCalled = false
 
 describe('EditUserDetails', () => {
   const timezones = [
@@ -47,7 +54,15 @@ describe('EditUserDetails', () => {
       time_zone: timezones[0].name,
     },
   }
-  const EDIT_USER_DETAILS_URI = `/users/${props.userId}`
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    server.resetHandlers()
+    patchRequestBody = null
+    patchCalled = false
+  })
 
   describe('when the user do not have permission to manage user details', () => {
     it('should NOT render timezone and email fields', () => {
@@ -85,7 +100,11 @@ describe('EditUserDetails', () => {
     })
 
     it('should show an error if the network request fails', async () => {
-      fetchMock.patch(EDIT_USER_DETAILS_URI, 500, {overwriteRoutes: true})
+      server.use(
+        http.patch('/users/:userId', () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
       render(<EditUserDetails {...props} canManageUserDetails={false} />)
       const submit = screen.getByLabelText('Update Details')
 
@@ -103,7 +122,13 @@ describe('EditUserDetails', () => {
         short_name: 'new short_name',
         sortable_name: 'new sortable_name',
       }
-      fetchMock.patch(EDIT_USER_DETAILS_URI, newUserDetails, {overwriteRoutes: true})
+      server.use(
+        http.patch('/users/:userId', async ({request}) => {
+          patchCalled = true
+          patchRequestBody = await request.json()
+          return HttpResponse.json(newUserDetails)
+        }),
+      )
       render(<EditUserDetails {...props} canManageUserDetails={false} />)
       const submit = screen.getByLabelText('Update Details')
       const name = screen.getByLabelText('Full Name')
@@ -116,9 +141,8 @@ describe('EditUserDetails', () => {
       fireEvent.click(submit)
 
       await waitFor(() => {
-        expect(
-          fetchMock.called(EDIT_USER_DETAILS_URI, {method: 'PATCH', body: {user: newUserDetails}}),
-        ).toBe(true)
+        expect(patchCalled).toBe(true)
+        expect(patchRequestBody).toEqual({user: newUserDetails})
         expect(props.onSubmit).toHaveBeenCalledWith(newUserDetails)
       })
     })
@@ -151,7 +175,13 @@ describe('EditUserDetails', () => {
         ...props,
         userDetails: {...props.userDetails, email: ''},
       }
-      fetchMock.patch(EDIT_USER_DETAILS_URI, newUserDetails, {overwriteRoutes: true})
+      server.use(
+        http.patch('/users/:userId', async ({request}) => {
+          patchCalled = true
+          patchRequestBody = await request.json()
+          return HttpResponse.json(newUserDetails)
+        }),
+      )
       render(<EditUserDetails {...newProps} />)
 
       const name = screen.getByLabelText('Full Name')
@@ -165,9 +195,8 @@ describe('EditUserDetails', () => {
       fireEvent.click(submit)
 
       await waitFor(() => {
-        expect(
-          fetchMock.called(EDIT_USER_DETAILS_URI, {method: 'PATCH', body: {user: newUserDetails}}),
-        ).toBe(true)
+        expect(patchCalled).toBe(true)
+        expect(patchRequestBody).toEqual({user: newUserDetails})
         expect(props.onSubmit).toHaveBeenCalledWith(newUserDetails)
       })
     })
@@ -194,7 +223,13 @@ describe('EditUserDetails', () => {
         email: 'new@email.com',
         time_zone: timezones[1].name,
       }
-      fetchMock.patch(EDIT_USER_DETAILS_URI, newUserDetails, {overwriteRoutes: true})
+      server.use(
+        http.patch('/users/:userId', async ({request}) => {
+          patchCalled = true
+          patchRequestBody = await request.json()
+          return HttpResponse.json(newUserDetails)
+        }),
+      )
       render(<EditUserDetails {...props} />)
       const submit = screen.getByLabelText('Update Details')
       const name = screen.getByLabelText('Full Name')
@@ -213,9 +248,8 @@ describe('EditUserDetails', () => {
       fireEvent.click(submit)
 
       await waitFor(() => {
-        expect(
-          fetchMock.called(EDIT_USER_DETAILS_URI, {method: 'PATCH', body: {user: newUserDetails}}),
-        ).toBe(true)
+        expect(patchCalled).toBe(true)
+        expect(patchRequestBody).toEqual({user: newUserDetails})
         expect(props.onSubmit).toHaveBeenCalledWith(newUserDetails)
       })
     })

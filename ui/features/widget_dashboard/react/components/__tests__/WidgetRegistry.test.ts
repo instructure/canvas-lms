@@ -21,12 +21,14 @@ import {WIDGET_TYPES} from '../../constants'
 import type {WidgetRenderer} from '../../types'
 
 describe('WidgetRegistry', () => {
-  it('returns CourseWorkSummaryWidget for course_work_summary type', () => {
-    const widget = getWidget(WIDGET_TYPES.COURSE_WORK_SUMMARY)
+  it('returns CourseWorkCombinedWidget for course_work_combined type', () => {
+    const widget = getWidget(WIDGET_TYPES.COURSE_WORK_COMBINED)
 
     expect(widget).toBeDefined()
-    expect(widget?.displayName).toBe("Today's course work")
-    expect(widget?.description).toBe('Shows summary of upcoming assignments and course work')
+    expect(widget?.displayName).toBe('Course work')
+    expect(widget?.description).toBe(
+      'View course work statistics and assignments in one comprehensive view',
+    )
     expect(widget?.component).toBeDefined()
   })
 
@@ -37,15 +39,15 @@ describe('WidgetRegistry', () => {
   })
 
   it('correctly identifies registered widgets', () => {
-    expect(isRegisteredWidget(WIDGET_TYPES.COURSE_WORK_SUMMARY)).toBe(true)
+    expect(isRegisteredWidget(WIDGET_TYPES.COURSE_WORK_COMBINED)).toBe(true)
     expect(isRegisteredWidget('unknown_type')).toBe(false)
   })
 
   it('returns all registered widgets', () => {
     const allWidgets = getAllWidgets()
 
-    expect(allWidgets).toHaveProperty(WIDGET_TYPES.COURSE_WORK_SUMMARY)
-    expect(Object.keys(allWidgets)).toContain(WIDGET_TYPES.COURSE_WORK_SUMMARY)
+    expect(allWidgets).toHaveProperty(WIDGET_TYPES.COURSE_WORK_COMBINED)
+    expect(Object.keys(allWidgets)).toContain(WIDGET_TYPES.COURSE_WORK_COMBINED)
   })
 
   it('allows registering new widgets', () => {

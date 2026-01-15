@@ -1404,4 +1404,103 @@ describe Lti::IMS::DynamicRegistrationController do
       end
     end
   end
+
+  describe "modify_site_admin_developer_keys permission" do
+    let(:site_admin) { Account.site_admin }
+    let(:site_admin_admin) { account_admin_user(account: site_admin) }
+    let(:site_admin_without_permission) do
+      user = user_model
+      role = custom_account_role("limited_admin", account: site_admin)
+      # Grant manage_developer_keys but not modify_site_admin_developer_keys
+      site_admin.role_overrides.create!(
+        permission: :manage_developer_keys,
+        role:,
+        enabled: true
+      )
+      site_admin.account_users.create!(user:, role:)
+      user
+    end
+
+    before do
+      site_admin.enable_feature!(:modify_site_admin_developer_keys_permission)
+    end
+
+    describe "GET #registration_token" do
+      context "when user has modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_admin) }
+
+        it "allows generating registration token for site admin" do
+          get :registration_token, params: { account_id: site_admin.id }, format: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body["token"]).to be_present
+        end
+      end
+
+      context "when user lacks modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_without_permission) }
+
+        it "returns forbidden for site admin registration token generation" do
+          get :registration_token, params: { account_id: site_admin.id }, format: :json
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+    end
+
+    describe "PATCH #update_registration_overlay" do
+      let(:registration) { lti_ims_registration_model(account: site_admin) }
+      let(:overlay) { { title: "Updated Title" } }
+
+      context "when user has modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_admin) }
+
+        it "allows updating registration overlay for site admin registrations" do
+          patch :update_registration_overlay, params: { account_id: site_admin.id, registration_id: registration.id }, body: overlay.to_json, format: :json
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "when user lacks modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_without_permission) }
+
+        it "returns forbidden for site admin registration overlay updates" do
+          patch :update_registration_overlay, params: { account_id: site_admin.id, registration_id: registration.id }, body: overlay.to_json, format: :json
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+    end
+
+    context "for regular account operations" do
+      let(:regular_account) { Account.default }
+      let(:regular_admin) do
+        user = user_model
+        role = custom_account_role("limited_admin", account: regular_account)
+        regular_account.role_overrides.create!(
+          permission: :manage_developer_keys,
+          role:,
+          enabled: true
+        )
+        regular_account.account_users.create!(user:, role:)
+        user
+      end
+
+      before { user_session(regular_admin) }
+
+      it "does not require modify_site_admin_developer_keys for regular accounts" do
+        get :registration_token, params: { account_id: regular_account.id }, format: :json
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        site_admin.disable_feature!(:modify_site_admin_developer_keys_permission)
+        user_session(site_admin_without_permission)
+      end
+
+      it "allows access when feature flag is off" do
+        get :registration_token, params: { account_id: site_admin.id }, format: :json
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
 end

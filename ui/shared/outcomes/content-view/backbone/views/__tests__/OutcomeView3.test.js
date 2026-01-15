@@ -87,7 +87,7 @@ describe('OutcomeView', () => {
   })
 
   describe('Delete Button Behavior', () => {
-    it.skip('is disabled for outcomes that have been assessed', () => {
+    it('is disabled for outcomes that have been assessed', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -108,7 +108,7 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('is enabled for outcomes that have not been assessed', () => {
+    it('is enabled for outcomes that have not been assessed', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -129,7 +129,7 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('is not shown for outcomes that cannot be unlinked', () => {
+    it('is not shown for outcomes that cannot be unlinked', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -150,7 +150,7 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('is disabled for account outcomes assessed in this course', () => {
+    it('is disabled for account outcomes assessed in this course', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -171,7 +171,7 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('is enabled for account outcomes assessed but not in this course', () => {
+    it('is enabled for account outcomes assessed but not in this course', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -194,7 +194,7 @@ describe('OutcomeView', () => {
   })
 
   describe('Edit Button Behavior', () => {
-    it.skip('is enabled when viewing an assessed account outcome in its native context', () => {
+    it('is enabled when viewing an assessed account outcome in its native context', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -222,7 +222,7 @@ describe('OutcomeView', () => {
       ENV.PERMISSIONS = {manage_outcomes: true}
     })
 
-    it.skip('is available for an account outcome if user is a local admin', () => {
+    it('is available for an account outcome if user is a local admin', () => {
       ENV.current_user_is_admin = true
       const view = createView({
         model: newOutcome(
@@ -246,7 +246,7 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('is not available for an account outcome if user is a teacher', () => {
+    it('is not available for an account outcome if user is a teacher', () => {
       ENV.current_user_roles = ['teacher']
       ENV.current_user_is_admin = false
       const view = createView({
@@ -273,7 +273,7 @@ describe('OutcomeView', () => {
   })
 
   describe('Form Validation', () => {
-    it.skip('validates title is present', async () => {
+    it('validates title is present', async () => {
       const view = createView({
         model: outcome1,
         state: 'edit',
@@ -287,7 +287,7 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('validates title length', async () => {
+    it('validates title length', async () => {
       const long_name = 'X'.repeat(260)
       const view = createView({
         model: outcome1,
@@ -300,7 +300,7 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('validates display_name length', async () => {
+    it('validates display_name length', async () => {
       const long_name = 'X'.repeat(260)
       const view = createView({
         model: outcome1,
@@ -324,7 +324,7 @@ describe('OutcomeView', () => {
       console.warn.mockRestore()
     })
 
-    it.skip('shows dialog when outcome is modified', async () => {
+    it('shows dialog when outcome is modified', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
@@ -350,7 +350,7 @@ describe('OutcomeView', () => {
       })
     })
 
-    it.skip('saves without dialog when outcome is unchanged', async () => {
+    it('saves without dialog when outcome is unchanged', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
@@ -376,7 +376,7 @@ describe('OutcomeView', () => {
       })
     })
 
-    it.skip('saves without dialog when outcome title is changed but no rubrics aligned', async () => {
+    it('saves without dialog when outcome title is changed but no rubrics aligned', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: false},
@@ -430,7 +430,7 @@ describe('OutcomeView', () => {
       expect(outcome.outcomeLink.outcome.id).toBeTruthy()
     })
 
-    it.skip('renders placeholder text properly for new outcomes', async () => {
+    it('renders placeholder text properly for new outcomes', async () => {
       const view = createView({
         model: newOutcome(),
         state: 'add',

@@ -639,7 +639,7 @@ GEM
     headless (2.3.1)
     highline (3.1.2)
       reline
-    httparty (0.23.1)
+    httparty (0.24.0)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -1361,7 +1361,7 @@ DEPENDENCIES
   headless (= 2.3.1)
   highline (~> 3.0)
   html_text_helper!
-  httparty (~> 0.21)
+  httparty (~> 0.24)
   i18n_extraction!
   i18n_tasks!
   i18nliner (~> 0.2.4)

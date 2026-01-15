@@ -1487,6 +1487,9 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "S’està processant el fitxer multimèdia. Torneu a provar-ho més endavant."
     },
+    "media_options_saved_560c4ec8": {
+        "message": "S’han desat les opcions dels elements multimèdia."
+    },
     "media_title_2112243b": {
         "message": "Títol de l''element multimèdia"
     },

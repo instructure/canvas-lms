@@ -19,7 +19,11 @@
 import React from 'react'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {render, cleanup, waitFor} from '@testing-library/react'
-import AdaChatbot, {autoRestoreAda} from '../AdaChatbot'
+import AdaChatbot, {
+  autoRestoreAda,
+  _resetForTesting,
+  _setScriptLoadedForTesting,
+} from '../AdaChatbot'
 
 const ADA_STATE_KEY = 'persistedAdaState'
 
@@ -70,14 +74,20 @@ describe('AdaChatbot', () => {
       stop: vi.fn().mockResolvedValue(undefined),
     }
     ;(window as any).adaEmbed = mockAdaEmbed
+    // Pre-cache script load promise to prevent real network requests in tests
+    _setScriptLoadedForTesting()
   })
 
   afterEach(async () => {
     if (mockAdaEmbed?.start?.mock?.calls?.length > 0) {
       await resetInitialized().catch(() => {})
+      // Wait for microtasks (like .finally() callbacks) to execute
+      await new Promise(resolve => setTimeout(resolve, 0))
     }
     cleanup()
     localStorage.clear()
+    // Reset module-level state to prevent cross-test pollution
+    _resetForTesting()
     vi.restoreAllMocks()
     fakeENV.teardown()
   })

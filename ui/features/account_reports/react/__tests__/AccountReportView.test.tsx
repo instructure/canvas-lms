@@ -19,13 +19,18 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import AccountReportView from '../components/AccountReportView'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-import fetchMock from 'fetch-mock'
+const server = setupServer()
 
 describe('AccountReportView', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
     vi.clearAllMocks()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('fetches reports and renders ReportsTable with correct props', async () => {
@@ -33,9 +38,10 @@ describe('AccountReportView', () => {
       {report: 'report_1', title: 'Report 1', description_html: '<p>Report 1 description</p>'},
     ]
 
-    fetchMock.get(
-      '/api/v1/accounts/123/reports?include%5B%5D=description_html&include%5B%5D=parameters_html',
-      mockReports,
+    server.use(
+      http.get('/api/v1/accounts/123/reports', () => {
+        return HttpResponse.json(mockReports)
+      }),
     )
 
     const {getByText} = render(<AccountReportView accountId="123" />)

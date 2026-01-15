@@ -68,8 +68,7 @@ export default function ContentTypeExternalToolDrawer({
   const toolIconAlt = toolTitle ? `${toolTitle} Icon` : 'Tool Icon'
   const allow_fullscreen = tool?.allow_fullscreen
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const pageContentRef = useRef()
-  // @ts-expect-error
+  const pageContentRef = useRef<HTMLDivElement>(null)
   const initDrawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
   const STD_TRAY_WIDTH = window.ENV.FEATURES?.increased_top_nav_pane_size ? '33vw' : '320px'
 
@@ -101,7 +100,6 @@ export default function ContentTypeExternalToolDrawer({
     () => {
       // appends pageContent to DrawerLayout.content
       if (pageContentRef.current && pageContent) {
-        // @ts-expect-error
         pageContentRef.current.appendChild(pageContent)
       }
       /* Reparenting causes iFrames to reload or cancel load.
@@ -141,7 +139,6 @@ export default function ContentTypeExternalToolDrawer({
     <View display="block" height={pageContentHeight}>
       <DrawerLayout minWidth={pageContentMinWidth}>
         <DrawerLayout.Content label={pageContentTitle} id="drawer-layout-content">
-          {/* @ts-expect-error */}
           <div ref={pageContentRef} />
         </DrawerLayout.Content>
         <DrawerLayout.Tray

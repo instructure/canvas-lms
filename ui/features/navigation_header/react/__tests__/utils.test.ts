@@ -37,12 +37,12 @@ describe('utils.ts', () => {
       vi.resetAllMocks()
     })
 
-    it.skip('handles empty array response from the API', async () => {
+    it('handles empty array response from the API', async () => {
       const result = await getExternalApps()
       expect(result).toEqual([])
     })
 
-    it.skip('processes valid tools correctly', async () => {
+    it('processes valid tools correctly', async () => {
       mockedAxios.get.mockResolvedValueOnce({
         data: [
           {
@@ -93,7 +93,7 @@ describe('utils.ts', () => {
       ])
     })
 
-    it.skip('ignores tools without required global_navigation data', async () => {
+    it('ignores tools without required global_navigation data', async () => {
       mockedAxios.get.mockResolvedValueOnce({
         data: [{definition_id: '8300', definition_type: 'ContextExternalTool', placements: {}}],
       })
@@ -103,7 +103,7 @@ describe('utils.ts', () => {
       expect(result).toEqual([])
     })
 
-    it.skip('returns an empty array if API does not return an array', async () => {
+    it('returns an empty array if API does not return an array', async () => {
       const not_an_array = {}
       mockedAxios.get.mockResolvedValue({data: not_an_array})
       const result = await getExternalApps()

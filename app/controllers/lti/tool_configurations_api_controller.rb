@@ -45,6 +45,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   before_action :require_user
   before_action :require_settings_or_url, only: :create
   before_action :require_manage_developer_keys, except: :show
+  before_action :require_modify_site_admin_developer_keys, except: :show
   before_action :require_key_in_context, only: :show
   before_action :require_manage_lti, only: :show
   before_action :require_tool_configuration, only: %i[show update destroy]
@@ -233,6 +234,16 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   def require_manage_developer_keys
     authorized_action(account, @current_user, :manage_developer_keys)
+  end
+
+  def require_modify_site_admin_developer_keys
+    return unless account.site_admin?
+    return unless Account.site_admin.feature_enabled?(:modify_site_admin_developer_keys_permission)
+
+    unless Account.site_admin.grants_right?(@current_user, :modify_site_admin_developer_keys)
+      render json: { errors: [{ message: "You don't have permission to modify Site Admin developer keys" }] },
+             status: :forbidden
+    end
   end
 
   def require_settings_or_url

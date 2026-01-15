@@ -890,5 +890,125 @@ describe DeveloperKeysController do
         end
       end
     end
+
+    describe "modify_site_admin_developer_keys permission" do
+      let(:site_admin_admin) { account_admin_user(account: Account.site_admin) }
+      let(:site_admin_without_permission) do
+        user = user_model
+        role = custom_account_role("limited_admin", account: Account.site_admin)
+        # Grant manage_developer_keys but not modify_site_admin_developer_keys
+        Account.site_admin.role_overrides.create!(
+          permission: :manage_developer_keys,
+          role:,
+          enabled: true
+        )
+        Account.site_admin.account_users.create!(user:, role:)
+        user
+      end
+
+      describe "POST 'create'" do
+        let(:create_params) do
+          {
+            account_id: Account.site_admin.id,
+            developer_key: {
+              name: "Test Key",
+              redirect_uri: "http://example.com/redirect"
+            }
+          }
+        end
+
+        context "when user has modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_admin) }
+
+          it "allows creating a site admin developer key" do
+            post :create, params: create_params, format: :json
+            expect(response).to be_successful
+            key = DeveloperKey.find(json_parse(response.body)["id"])
+            expect(key.account).to be_nil
+          end
+        end
+
+        context "when user lacks modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_without_permission) }
+
+          it "returns forbidden" do
+            post :create, params: create_params, format: :json
+            expect(response).to be_forbidden
+            expect(json_parse(response.body)["errors"].first["message"]).to include("Site Admin developer keys")
+          end
+        end
+      end
+
+      describe "PUT 'update'" do
+        let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key") }
+
+        context "when user has modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_admin) }
+
+          it "allows updating a site admin developer key" do
+            put :update, params: { id: site_admin_key.id, developer_key: { name: "Updated Name" }, account_id: Account.site_admin.id }, format: :json
+            expect(response).to be_successful
+            expect(site_admin_key.reload.name).to eq("Updated Name")
+          end
+        end
+
+        context "when user lacks modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_without_permission) }
+
+          it "returns forbidden" do
+            put :update, params: { id: site_admin_key.id, developer_key: { name: "Updated Name" }, account_id: Account.site_admin.id }, format: :json
+            expect(response).to be_forbidden
+            expect(json_parse(response.body)["errors"].first["message"]).to include("Site Admin developer keys")
+          end
+        end
+      end
+
+      describe "DELETE 'destroy'" do
+        let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key") }
+
+        context "when user has modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_admin) }
+
+          it "allows deleting a site admin developer key" do
+            delete :destroy, params: { id: site_admin_key.id, account_id: Account.site_admin.id }, format: :json
+            expect(response).to be_successful
+            expect(site_admin_key.reload.state).to eq(:deleted)
+          end
+        end
+
+        context "when user lacks modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_without_permission) }
+
+          it "returns forbidden" do
+            delete :destroy, params: { id: site_admin_key.id, account_id: Account.site_admin.id }, format: :json
+            expect(response).to be_forbidden
+            expect(json_parse(response.body)["errors"].first["message"]).to include("Site Admin developer keys")
+          end
+        end
+      end
+
+      describe "account-level developer keys" do
+        let(:root_account) { account_model }
+        let(:account_key) { DeveloperKey.create!(name: "Account Key", account: root_account) }
+        let(:account_admin) do
+          user = user_model
+          role = custom_account_role("limited_admin", account: root_account)
+          root_account.role_overrides.create!(
+            permission: :manage_developer_keys,
+            role:,
+            enabled: true
+          )
+          root_account.account_users.create!(user:, role:)
+          user
+        end
+
+        before { user_session(account_admin) }
+
+        it "does not require modify_site_admin_developer_keys for account-level keys" do
+          put :update, params: { id: account_key.id, developer_key: { name: "Updated" }, account_id: root_account.id }, format: :json
+          expect(response).to be_successful
+        end
+      end
+    end
   end
 end

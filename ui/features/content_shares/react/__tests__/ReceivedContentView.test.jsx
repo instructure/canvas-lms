@@ -22,25 +22,37 @@ import ReceivedContentView from '../ReceivedContentView'
 import {assignmentShare, unreadDiscussionShare} from './test-utils'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse, delay} from 'msw'
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 const server = setupServer()
 
 describe('view of received content', () => {
   let liveRegion
 
-  beforeAll(() => server.listen())
+  beforeAll(async () => {
+    await import('../CourseImportPanel')
+    server.listen()
+  })
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
 
   beforeEach(() => {
+    destroyContainer()
+    const existingFlashHolder = document.getElementById('flashalert_message_holder')
+    if (existingFlashHolder) existingFlashHolder.remove()
     liveRegion = document.createElement('div')
     liveRegion.id = 'flash_screenreader_holder'
     liveRegion.setAttribute('role', 'alert')
     document.body.appendChild(liveRegion)
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     if (liveRegion) liveRegion.remove()
+    destroyContainer()
+    // Allow any pending async operations to complete
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
   })
 
   it('renders spinner while loading', async () => {
@@ -187,19 +199,23 @@ describe('view of received content', () => {
     expect(document.querySelector('iframe')).toBeInTheDocument()
   })
 
-  it.skip('displays the import tray when requested', async () => {
+  it('displays the import tray when requested', async () => {
     const shares = [assignmentShare]
     server.use(
       http.get('/api/v1/users/self/content_shares/received', () => HttpResponse.json(shares)),
       http.get('/users/self/manageable_courses', () => HttpResponse.json([])),
     )
-    const {getByText, findByText} = render(<ReceivedContentView />)
+    const {getByText, findByText, queryByRole} = render(<ReceivedContentView />)
     await waitFor(() => {
       expect(getByText(assignmentShare.name)).toBeInTheDocument()
     })
 
     fireEvent.click(getByText(/manage options/i))
-    fireEvent.click(getByText('Import'))
+    const importButton = await findByText('Import')
+    fireEvent.click(importButton)
+    await waitFor(() => {
+      expect(queryByRole('menu')).not.toBeInTheDocument()
+    })
     expect(await findByText(/select a course/i)).toBeInTheDocument()
   })
 

@@ -485,6 +485,8 @@ describe('FilterNav (save)', () => {
   })
 
   it.skip('clicking Save saves new filter', async () => {
+    // SKIP REASON: Test times out (>16s) due to slow userEvent.type on the filter preset
+    // name input. CI timeout is 10s. Would need optimization of user event interactions.
     const user = userEvent.setup({...USER_EVENT_OPTIONS, delay: null})
     const {getByText, getByPlaceholderText, getByTestId, queryByTestId} = render(
       <FilterNav {...defaultProps} />,

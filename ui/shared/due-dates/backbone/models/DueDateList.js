@@ -99,11 +99,22 @@ export default class DueDateList {
       this._overrideCourseIds().some(elem => elem !== undefined)
     )
       return
-    const override = AssignmentOverride.defaultDueDate({
+
+    const overrideData = {
       due_at: this.assignment.get('due_at'),
       lock_at: this.assignment.get('lock_at'),
       unlock_at: this.assignment.get('unlock_at'),
-    })
+    }
+
+    const peerReviewSubAssignment = this.assignment.get('peer_review_sub_assignment')
+    if (peerReviewSubAssignment) {
+      overrideData.peer_review_override_id = undefined
+      overrideData.peer_review_due_at = peerReviewSubAssignment.due_at
+      overrideData.peer_review_available_from = peerReviewSubAssignment.unlock_at
+      overrideData.peer_review_available_to = peerReviewSubAssignment.lock_at
+    }
+
+    const override = AssignmentOverride.defaultDueDate(overrideData)
     return this.overrides.add(override)
   }
 }

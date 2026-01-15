@@ -69,7 +69,7 @@ describe('CourseSearchResultsView', () => {
     expect(renderSpy).toHaveBeenCalledTimes(1)
   })
 
-  it.skip('calls restore on the model when restore button is clicked', () => {
+  it('calls restore on the model when restore button is clicked', () => {
     courseRestore.set(courseJSON)
     const restoreSpy = vi.spyOn(courseRestore, 'restore').mockResolvedValue()
     courseSearchResultsView.$restoreCourseBtn.click()

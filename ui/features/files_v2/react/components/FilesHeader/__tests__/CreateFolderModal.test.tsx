@@ -21,13 +21,16 @@ import CreateFolderModal from '../CreateFolderModal'
 import {fireEvent, render, screen, within, waitFor} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
+
+const server = setupServer()
 
 const defaultProps = {
   isOpen: true,
@@ -47,16 +50,25 @@ const renderComponent = (props = {}) => {
   )
 }
 describe('CreateFolderModal', () => {
+  let lastCallBody: string | undefined
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup()
     vi.clearAllMocks()
-    fetchMock.reset()
-    fetchMock.post(/.*\/folders/, 200)
+    lastCallBody = undefined
+    server.use(
+      http.post(/.*\/folders/, async ({request}) => {
+        lastCallBody = await request.text()
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
   })
 
   afterEach(() => {
-    fetchMock.reset()
-    fetchMock.restore()
+    server.resetHandlers()
     fakeENV.teardown()
   })
 
@@ -85,8 +97,8 @@ describe('CreateFolderModal', () => {
 
     await waitFor(
       () => {
-        expect(fetchMock.lastCall()).toBeTruthy()
-        expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+        expect(lastCallBody).toBeTruthy()
+        expect(lastCallBody).toEqual('{"name":""}')
       },
       {timeout: 5000},
     )
@@ -103,8 +115,8 @@ describe('CreateFolderModal', () => {
 
     await waitFor(
       () => {
-        expect(fetchMock.lastCall()).toBeTruthy()
-        expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+        expect(lastCallBody).toBeTruthy()
+        expect(lastCallBody).toEqual('{"name":""}')
       },
       {timeout: 5000},
     )
@@ -113,7 +125,11 @@ describe('CreateFolderModal', () => {
   it('displays loading spinner when submitting', async () => {
     const user = userEvent.setup()
     // Use a never-resolving promise to keep the loading state active
-    fetchMock.post(/.*\/folders/, new Promise(() => {}), {overwriteRoutes: true})
+    server.use(
+      http.post(/.*\/folders/, () => {
+        return new Promise(() => {}) // Never resolves
+      }),
+    )
     renderComponent()
     const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createFolderButton)
@@ -128,7 +144,11 @@ describe('CreateFolderModal', () => {
 
   it('does not close when there is an error', async () => {
     const user = userEvent.setup()
-    fetchMock.post(/.*\/folders/, 500, {overwriteRoutes: true})
+    server.use(
+      http.post(/.*\/folders/, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     renderComponent()
     const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createFolderButton)
@@ -159,8 +179,8 @@ describe('CreateFolderModal', () => {
 
     await waitFor(
       () => {
-        expect(fetchMock.lastCall()).toBeTruthy()
-        expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
+        expect(lastCallBody).toBeTruthy()
+        expect(lastCallBody).toEqual(`{"name":"${name}"}`)
       },
       {timeout: 5000},
     )

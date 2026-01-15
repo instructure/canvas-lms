@@ -42,7 +42,6 @@ import {dateString, datetimeString} from '@canvas/datetime/date-functions'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.underscore/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
 import '@canvas/jquery/jquery.simulate'
@@ -2544,7 +2543,7 @@ function initContextModules() {
     if (expanding && ENV.FEATURE_MODULES_PERF && collapsedModuleIds?.length > 0) {
       await modules.lazyLoadItems(collapsedModuleIds)
     }
-    $('#expand_collapse_all').prop('disabled', false)
+    $('#expand_collapse_all').attr('aria-disabled', 'false')
   }
 
   // This is the onClick handler for the expand/collapse all button

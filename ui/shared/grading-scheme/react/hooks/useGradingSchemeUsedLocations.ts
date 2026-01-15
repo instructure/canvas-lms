@@ -50,7 +50,7 @@ export const useGradingSchemeUsedLocations = (): {
           nextPagePath = `${contextPath}/grading_schemes/${gradingSchemeId}/used_locations`
         }
 
-        const result = await doFetchApi({
+        const result = await doFetchApi<UsedLocation[]>({
           path: nextPagePath,
           method: 'GET',
         })
@@ -60,11 +60,9 @@ export const useGradingSchemeUsedLocations = (): {
 
         setGradingSchemeUsedLocationsStatus(ApiCallStatus.COMPLETED)
         return {
-          // @ts-expect-error
           usedLocations: result.json || [],
           isLastPage: result.link?.next === undefined,
-          // @ts-expect-error
-          nextPage: result.link?.next?.url,
+          nextPage: result.link?.next?.url || '',
         }
       } catch (err) {
         setGradingSchemeUsedLocationsStatus(ApiCallStatus.FAILED)

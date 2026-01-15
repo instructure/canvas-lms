@@ -109,12 +109,20 @@ export const GradeRow = ({
     const gradeString = notGraded ? '—' : grade
 
     switch (gradingType) {
-      case 'points':
-        return notGraded ? (
-          notGradedContent(I18n.t('— pts'))
-        ) : (
-          <Text data-testid="assignment-score">{I18n.t('%{score} pts', {score: gradeString})}</Text>
+      case 'points': {
+        if (notGraded) {
+          return notGradedContent(I18n.t('— pts'))
+        }
+        const roundedScore = I18n.n(parseFloat(gradeString), {
+          precision: 2,
+          strip_insignificant_zeros: true,
+        })
+        return (
+          <Text data-testid="assignment-score">
+            {I18n.t('%{score} pts', {score: roundedScore})}
+          </Text>
         )
+      }
       case 'gpa_scale':
         return notGraded ? (
           notGradedContent(I18n.t('— GPA'))

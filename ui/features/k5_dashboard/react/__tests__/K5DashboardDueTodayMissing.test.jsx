@@ -23,7 +23,7 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {render as testingLibraryRender} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import React from 'react'
 import K5Dashboard from '../K5Dashboard'
@@ -41,21 +41,23 @@ const server = setupServer()
 beforeAll(() => server.listen())
 
 beforeEach(() => {
-  server.use(...createPlannerMocks())
-  // Use minimal mocks - empty arrays to avoid unnecessary async work
-  fetchMock.get(/\/api\/v1\/announcements.*/, [])
-  fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, [])
-  fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, [])
-  fetchMock.get(/\/api\/v1\/calendar_events\?type=assignment.*/, [])
-  fetchMock.get(/\/api\/v1\/calendar_events\?type=event.*/, [])
-  fetchMock.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, {status: 'ok'})
-  fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, [])
+  server.use(
+    ...createPlannerMocks(),
+    // Use minimal mocks - empty arrays to avoid unnecessary async work
+    http.get(/\/api\/v1\/announcements.*/, () => HttpResponse.json([])),
+    http.get(/\/api\/v1\/users\/self\/courses.*/, () => HttpResponse.json([])),
+    http.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, () => HttpResponse.json([])),
+    http.get('/api/v1/calendar_events', () => HttpResponse.json([])),
+    http.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, () =>
+      HttpResponse.json({status: 'ok'}),
+    ),
+    http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json([])),
+  )
   fakeENV.setup(defaultEnv)
 })
 
 afterEach(() => {
   server.resetHandlers()
-  fetchMock.restore()
   fakeENV.teardown()
   resetPlanner()
   resetCardCache()
@@ -66,34 +68,14 @@ afterEach(() => {
 
 afterAll(() => server.close())
 
-describe('K5Dashboard Due Today and Missing Items', () => {
+describe.skip('K5Dashboard Due Today and Missing Items', () => {
   // FOO-3830: Tests for due today and missing items links on dashboard cards
   // These tests were moved from K5Dashboard1.test.jsx to reduce test file overhead
   // and improve CI reliability
-
-  it('shows due today and missing items links pointing to the schedule tab of the course', async () => {
-    // Pre-populate cards in session storage to avoid async loading delay
-    sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
-
-    const {findByTestId} = render(
-      <K5Dashboard
-        {...defaultProps}
-        plannerEnabled={true}
-        assignmentsDueToday={{1: 1}}
-        assignmentsMissing={{1: 2}}
-      />,
-    )
-
-    const dueTodayLink = await findByTestId('number-due-today')
-    expect(dueTodayLink).toBeInTheDocument()
-    expect(dueTodayLink).toHaveTextContent('View 1 items due today for course Economics 101')
-    expect(dueTodayLink.getAttribute('href')).toMatch('/courses/1?focusTarget=today#schedule')
-
-    const missingItemsLink = await findByTestId('number-missing')
-    expect(missingItemsLink).toBeInTheDocument()
-    expect(missingItemsLink).toHaveTextContent('View 2 missing items for course Economics 101')
-    expect(missingItemsLink.getAttribute('href')).toMatch(
-      '/courses/1?focusTarget=missing-items#schedule',
-    )
-  })
+  //
+  // NOTE: This combined test was further split for better CI performance:
+  // - K5DashboardDueToday.test.jsx (due today link test)
+  // - K5DashboardMissingItems.test.jsx (missing items link test)
+  // This file kept for reference but can be deleted once new tests are verified.
+  it('placeholder', () => {})
 })

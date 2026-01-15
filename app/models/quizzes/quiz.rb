@@ -510,6 +510,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       a.submission_types = "online_quiz"
       a.assignment_group_id = self.assignment_group_id
       a.saved_by = :quiz
+      a.skip_attachment_association_update = skip_attachment_association_update
       a.updating_user = updating_user
       if saved_by == :migration && a.update_cached_due_dates?
         a.needs_update_cached_due_dates = true

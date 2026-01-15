@@ -57,23 +57,21 @@ module Accessibility
     end
 
     def update_content(rule_id, resource_type, resource_id, path, value)
-      resource = find_resource(resource_type, resource_id)
+      resource = self.class.find_resource(context, resource_type, resource_id)
       HtmlFixer.new(rule_id, resource, path, value).apply_fix!
     end
 
     def update_preview(rule_id, resource_type, resource_id, path, value)
-      resource = find_resource(resource_type, resource_id)
+      resource = self.class.find_resource(context, resource_type, resource_id)
       HtmlFixer.new(rule_id, resource, path, value).preview_fix(element_only: path.present?)
     end
 
     def generate_fix(rule_id, resource_type, resource_id, path, value)
-      resource = find_resource(resource_type, resource_id)
+      resource = self.class.find_resource(context, resource_type, resource_id)
       HtmlFixer.new(rule_id, resource, path, value).generate_fix
     end
 
-    private
-
-    def find_resource(resource_type, resource_id)
+    def self.find_resource(context, resource_type, resource_id)
       case resource_type
       when "Page"
         context.wiki_pages.find(resource_id)
@@ -83,6 +81,8 @@ module Accessibility
         raise ArgumentError, "Unsupported resource type: #{resource_type}"
       end
     end
+
+    private
 
     def filter_resources(resources, query)
       resources.values&.select do |resource|

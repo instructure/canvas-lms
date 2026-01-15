@@ -136,7 +136,7 @@ describe('AssignmentGroupListItemView', () => {
   })
 
   describe('SIS integration', () => {
-    it.skip('shows imported icon when sis_source_id is not empty', () => {
+    it('shows imported icon when sis_source_id is not empty', () => {
       model.set('sis_source_id', '1234')
       view = createView(model)
 
@@ -146,7 +146,7 @@ describe('AssignmentGroupListItemView', () => {
       expect(sisIcon).toBeInTheDocument()
     })
 
-    it.skip('shows imported icon with custom SIS_NAME when sis_source_id is not empty', () => {
+    it('shows imported icon with custom SIS_NAME when sis_source_id is not empty', () => {
       ENV.SIS_NAME = 'PowerSchool'
       model.set('sis_source_id', '1234')
       view = createView(model)
@@ -157,7 +157,7 @@ describe('AssignmentGroupListItemView', () => {
       expect(sisIcon).toHaveAttribute('title', 'Imported from PowerSchool')
     })
 
-    it.skip('does not show imported icon when sis_source_id is not set', () => {
+    it('does not show imported icon when sis_source_id is not set', () => {
       view = createView(model)
 
       const sisIcon = document.querySelector(
@@ -166,7 +166,7 @@ describe('AssignmentGroupListItemView', () => {
       expect(sisIcon).not.toBeInTheDocument()
     })
 
-    it.skip('shows link icon when integration_data contains sistemic mapping', () => {
+    it('shows link icon when integration_data contains sistemic mapping', () => {
       model.set('integration_data', {sistemic: {categoryMapping: {abc: {}}}})
       view = createView(model)
 
@@ -177,7 +177,7 @@ describe('AssignmentGroupListItemView', () => {
       expect(linkIcon).toHaveAttribute('title', 'Grading category aligned with SIS')
     })
 
-    it.skip('does not show link icon when integration_data does not contain sistemic mapping', () => {
+    it('does not show link icon when integration_data does not contain sistemic mapping', () => {
       model.set('integration_data', {other: {id: '1234'}})
       view = createView(model)
 
@@ -189,12 +189,12 @@ describe('AssignmentGroupListItemView', () => {
   })
 
   describe('group management', () => {
-    it.skip('initializes with a collection', () => {
+    it('initializes with a collection', () => {
       view = createView(model)
       expect(view.collection).toBeTruthy()
     })
 
-    it.skip('allows deleting groups with assignments due in closed grading periods for admins', () => {
+    it('allows deleting groups with assignments due in closed grading periods for admins', () => {
       model.set('any_assignment_in_closed_grading_period', true)
       view = createView(model, {userIsAdmin: true})
 
@@ -204,7 +204,7 @@ describe('AssignmentGroupListItemView', () => {
       expect(deleteButton).toBeInTheDocument()
     })
 
-    it.skip('provides delete option when canDelete is true', () => {
+    it('provides delete option when canDelete is true', () => {
       vi.spyOn(model, 'canDelete').mockReturnValue(true)
       model.set('any_assignment_in_closed_grading_period', true)
       view = createView(model)
@@ -231,6 +231,7 @@ describe('AssignmentGroupListItemView', () => {
       }
     })
 
+    // TODO: React modal focus management - mockRoot.render not being called
     it.skip('focuses on add assignment link when modal closes', () => {
       const addAssignmentLink = document.createElement('a')
       addAssignmentLink.id = `ag_${model.id}_add_assignment_link`

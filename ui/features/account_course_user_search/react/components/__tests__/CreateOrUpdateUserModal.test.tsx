@@ -19,8 +19,11 @@ import React from 'react'
 import {cleanup, fireEvent, render, waitFor} from '@testing-library/react'
 import CreateOrUpdateUserModal from '../CreateOrUpdateUserModal'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 const CREATE_URL = '/accounts/2/users'
 
@@ -48,16 +51,21 @@ const existingUser = {
 }
 
 describe('CreateOrUpdateUserModal', () => {
-  afterEach(() => {
-    cleanup()
-  })
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
+  let capturedBody: unknown = null
+
+  beforeAll(() => server.listen())
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
+    cleanup()
     fakeENV.teardown()
+    capturedBody = null
+  })
+
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    vi.clearAllMocks()
   })
 
   it('runs onClose when modal is closed', async () => {
@@ -73,10 +81,12 @@ describe('CreateOrUpdateUserModal', () => {
   describe('create', () => {
     it('creates a user when form is submitted', async () => {
       const user = userEvent.setup()
-      fetchMock.post(CREATE_URL, {
-        body: {user: newUser},
-        status: 200,
-      })
+      server.use(
+        http.post(CREATE_URL, async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({user: newUser})
+        }),
+      )
       const {getByTestId} = render(<CreateOrUpdateUserModal {...defaultProps} />)
 
       fireEvent.change(getByTestId('full-name'), {target: {value: 'John Doe'}})
@@ -87,23 +97,18 @@ describe('CreateOrUpdateUserModal', () => {
 
       await waitFor(() => {
         expect(defaultProps.afterSave).toHaveBeenCalled()
-        expect(fetchMock.called(CREATE_URL)).toBe(true)
-      })
-      const userData = fetchMock.lastCall(CREATE_URL)?.[1]?.body
-      expect(userData).toEqual(
-        JSON.stringify({
+        expect(capturedBody).toEqual({
           user: {
             name: 'John Doe',
             sortable_name: 'Doe, John',
             short_name: 'John Doe',
           },
-
           pseudonym: {
             send_confirmation: true,
             unique_id: 'john.doe@example.com',
           },
-        }),
-      )
+        })
+      })
     })
 
     it('runs validation before submitting', async () => {
@@ -138,31 +143,35 @@ describe('CreateOrUpdateUserModal', () => {
     it('displays errors in form fields when API returns errors', async () => {
       // example case: another user already exists with the same SIS ID
       const user = userEvent.setup()
-      fetchMock.post(CREATE_URL, {
-        body: {
-          errors: {
-            user: {
-              pseudonyms: [
-                {
-                  attribute: 'pseudonyms',
-                  message: 'is invalid',
-                  type: 'invalid',
+      server.use(
+        http.post(CREATE_URL, () => {
+          return HttpResponse.json(
+            {
+              errors: {
+                user: {
+                  pseudonyms: [
+                    {
+                      attribute: 'pseudonyms',
+                      message: 'is invalid',
+                      type: 'invalid',
+                    },
+                  ],
                 },
-              ],
-            },
-            pseudonym: {
-              sis_user_id: [
-                {
-                  attribute: 'sis_user_id',
-                  message: 'SIS ID "11" is already in use',
-                  type: 'taken',
+                pseudonym: {
+                  sis_user_id: [
+                    {
+                      attribute: 'sis_user_id',
+                      message: 'SIS ID "11" is already in use',
+                      type: 'taken',
+                    },
+                  ],
                 },
-              ],
+              },
             },
-          },
-        },
-        status: 400,
-      })
+            {status: 400},
+          )
+        }),
+      )
       fakeENV.setup({
         SHOW_SIS_ID_IN_NEW_USER_FORM: true,
         delegated_authentication: false,
@@ -175,7 +184,6 @@ describe('CreateOrUpdateUserModal', () => {
       fireEvent.change(getByTestId('sis-id'), {target: {value: '100'}})
       await user.click(getByTestId('submit-button'))
 
-      expect(fetchMock.called(CREATE_URL)).toBe(true)
       expect(defaultProps.afterSave).not.toHaveBeenCalled()
       await waitFor(() => {
         expect(getByText('The SIS ID is already in use')).toBeInTheDocument()
@@ -211,10 +219,12 @@ describe('CreateOrUpdateUserModal', () => {
         ...updateProps,
         user: userWithBlankEmail,
       }
-      fetchMock.put(updateProps.url, {
-        body: {user: userWithBlankEmail},
-        status: 200,
-      })
+      server.use(
+        http.put(updateProps.url, async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({user: userWithBlankEmail})
+        }),
+      )
       const user = userEvent.setup()
       const {getByTestId, getByText} = render(<CreateOrUpdateUserModal {...blankEmailProps} />)
 
@@ -222,19 +232,17 @@ describe('CreateOrUpdateUserModal', () => {
 
       await user.click(getByTestId('submit-button'))
 
-      expect(defaultProps.afterSave).toHaveBeenCalled()
-      expect(fetchMock.called(updateProps.url)).toBe(true)
-      const userData = fetchMock.lastCall(updateProps.url)?.[1]?.body
-      expect(userData).toEqual(
-        JSON.stringify({
+      await waitFor(() => {
+        expect(defaultProps.afterSave).toHaveBeenCalled()
+        expect(capturedBody).toEqual({
           user: {
             name: userWithBlankEmail.name,
             sortable_name: userWithBlankEmail.sortable_name,
             short_name: userWithBlankEmail.short_name,
             time_zone: userWithBlankEmail.time_zone,
           },
-        }),
-      )
+        })
+      })
     })
 
     it('updates user when form is submitted', async () => {
@@ -243,10 +251,12 @@ describe('CreateOrUpdateUserModal', () => {
         sortable_name: 'Updated Name',
         email: 'updated.email@example.com',
       }
-      fetchMock.put(updateProps.url, {
-        body: {user: updatedUser},
-        status: 200,
-      })
+      server.use(
+        http.put(updateProps.url, async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({user: updatedUser})
+        }),
+      )
       const user = userEvent.setup()
       const {getByTestId, getByText} = render(<CreateOrUpdateUserModal {...updateProps} />)
 
@@ -257,11 +267,9 @@ describe('CreateOrUpdateUserModal', () => {
 
       await user.click(getByTestId('submit-button'))
 
-      expect(defaultProps.afterSave).toHaveBeenCalled()
-      expect(fetchMock.called(updateProps.url)).toBe(true)
-      const userData = fetchMock.lastCall(updateProps.url)?.[1]?.body
-      expect(userData).toEqual(
-        JSON.stringify({
+      await waitFor(() => {
+        expect(defaultProps.afterSave).toHaveBeenCalled()
+        expect(capturedBody).toEqual({
           user: {
             name: updatedUser.name,
             sortable_name: updatedUser.sortable_name,
@@ -269,8 +277,8 @@ describe('CreateOrUpdateUserModal', () => {
             email: updatedUser.email,
             time_zone: updatedUser.time_zone,
           },
-        }),
-      )
+        })
+      })
     })
 
     it('runs validation before submitting', async () => {

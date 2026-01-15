@@ -443,7 +443,10 @@ class UsersController < ApplicationController
                                    .tabs_available(@current_user, root_account: @domain_root_account)
                                    .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
                SHARED_COURSE_DATA: course_data_with_grades,
-               DASHBOARD_FEATURES: { widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization) }
+               DASHBOARD_FEATURES: {
+                 widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
+                 platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard)
+               }
              })
       return render html: "", layout: true
     end
@@ -3174,7 +3177,6 @@ class UsersController < ApplicationController
 
     if cc_params
       cc_type = (cc_params[:type] || CommunicationChannel::TYPE_EMAIL).downcase
-      # cc_type = (cc_params[:type] || CommunicationChannel::TYPE_EMAIL)
       cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
 
       cc_addr = nil if cc_type == CommunicationChannel::TYPE_EMAIL && !EmailAddressValidator.valid?(cc_addr)

@@ -348,9 +348,8 @@ module AccountReports
                                .joins("INNER JOIN #{ordered_pseudonyms(root_account.pseudonyms)} pseudonyms ON access_tokens.user_id = pseudonyms.user_id")
                                .select(columns)
                                .order("access_tokens.user_id, sortable_name, last_used_at DESC")
-      user_tokens = user_tokens.where.not(pseudonyms: { workflow_state: "deleted" }) unless @include_deleted
 
-      user_tokens = add_user_sub_account_scope(user_tokens)
+      user_tokens = filter_user_tokens(user_tokens)
 
       write_report headers do |csv|
         user_tokens.find_each do |token|
@@ -374,11 +373,26 @@ module AccountReports
       end
     end
 
+    private
+
     def developer_key(dev_key_id)
       @dev_keys ||= {}
       return @dev_keys[dev_key_id] if @dev_keys.include?(dev_key_id)
 
       @dev_keys[dev_key_id] = DeveloperKey.find_by(id: dev_key_id)
+    end
+
+    def exclude_deleted_and_expired_access_tokens?
+      return false unless @account_report.value_for_param("exclude_deleted_and_expired")
+
+      value_to_boolean(@account_report.parameters["exclude_deleted_and_expired"])
+    end
+
+    def filter_user_tokens(scope)
+      scope = scope.active if exclude_deleted_and_expired_access_tokens?
+      scope = scope.where.not(pseudonyms: { workflow_state: "deleted" }) unless @include_deleted
+
+      add_user_sub_account_scope(scope)
     end
   end
 end

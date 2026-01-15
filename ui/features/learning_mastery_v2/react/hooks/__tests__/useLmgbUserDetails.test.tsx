@@ -20,8 +20,12 @@ import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {useLmgbUserDetails} from '../useLmgbUserDetails'
+
+const server = setupServer()
+let apiCallCount = 0
 
 describe('useLmgbUserDetails', () => {
   const courseId = '123'
@@ -55,19 +59,24 @@ describe('useLmgbUserDetails', () => {
     return Wrapper
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
+    apiCallCount = 0
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   describe('successful data fetching', () => {
     it('fetches and returns user details', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
@@ -87,9 +96,11 @@ describe('useLmgbUserDetails', () => {
     })
 
     it('returns course name correctly', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
@@ -102,9 +113,11 @@ describe('useLmgbUserDetails', () => {
     })
 
     it('returns user sections correctly', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
@@ -119,9 +132,11 @@ describe('useLmgbUserDetails', () => {
     })
 
     it('returns last login correctly', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
@@ -142,9 +157,11 @@ describe('useLmgbUserDetails', () => {
         },
       }
 
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        detailsWithoutLogin,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(detailsWithoutLogin)
+        }),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
@@ -165,9 +182,11 @@ describe('useLmgbUserDetails', () => {
         },
       }
 
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        detailsWithoutSections,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(detailsWithoutSections)
+        }),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
@@ -182,10 +201,11 @@ describe('useLmgbUserDetails', () => {
 
   describe('error handling', () => {
     it('handles 404 error', async () => {
-      fetchMock.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, {
-        status: 404,
-        body: {error: 'Not found'},
-      })
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          return HttpResponse.json({error: 'Not found'}, {status: 404})
+        }),
+      )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
         wrapper: createWrapper(),
@@ -200,10 +220,11 @@ describe('useLmgbUserDetails', () => {
     })
 
     it('handles 500 server error', async () => {
-      fetchMock.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, {
-        status: 500,
-        body: {error: 'Internal server error'},
-      })
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          return HttpResponse.json({error: 'Internal server error'}, {status: 500})
+        }),
+      )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
         wrapper: createWrapper(),
@@ -218,9 +239,11 @@ describe('useLmgbUserDetails', () => {
     })
 
     it('handles network error', async () => {
-      fetchMock.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, {
-        throws: new Error('Network error'),
-      })
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          return HttpResponse.error()
+        }),
+      )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
         wrapper: createWrapper(),
@@ -236,9 +259,11 @@ describe('useLmgbUserDetails', () => {
 
   describe('enabled parameter', () => {
     it('does not fetch when enabled is false', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: false}), {
@@ -248,16 +273,18 @@ describe('useLmgbUserDetails', () => {
       // Wait a bit to ensure no fetch happens
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
       expect(result.current.data).toBeUndefined()
       expect(result.current.isLoading).toBe(false)
       expect(result.current.isFetching).toBe(false)
     })
 
     it('fetches when enabled changes from false to true', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       const {result, rerender} = renderHook(
@@ -268,7 +295,7 @@ describe('useLmgbUserDetails', () => {
         },
       )
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
 
       rerender({enabled: true})
 
@@ -276,12 +303,17 @@ describe('useLmgbUserDetails', () => {
         expect(result.current.isSuccess).toBe(true)
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
       expect(result.current.data).toEqual(mockUserDetails)
     })
 
     it('does not fetch when enabled is false and courseId is empty', async () => {
-      fetchMock.get(/.*/, mockUserDetails)
+      server.use(
+        http.get('*', () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
+      )
 
       const {result} = renderHook(
         () => useLmgbUserDetails({courseId: '', studentId, enabled: false}),
@@ -292,12 +324,17 @@ describe('useLmgbUserDetails', () => {
 
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
       expect(result.current.data).toBeUndefined()
     })
 
     it('does not fetch when enabled is false and studentId is empty', async () => {
-      fetchMock.get(/.*/, mockUserDetails)
+      server.use(
+        http.get('*', () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
+      )
 
       const {result} = renderHook(
         () => useLmgbUserDetails({courseId, studentId: '', enabled: false}),
@@ -308,16 +345,18 @@ describe('useLmgbUserDetails', () => {
 
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
       expect(result.current.data).toBeUndefined()
     })
   })
 
   describe('caching behavior', () => {
     it('caches data for 5 minutes (staleTime)', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       const {result: result1} = renderHook(
@@ -331,7 +370,7 @@ describe('useLmgbUserDetails', () => {
         expect(result1.current.isSuccess).toBe(true)
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
 
       // Second render with same params should use cache
       const {result: result2} = renderHook(
@@ -348,21 +387,29 @@ describe('useLmgbUserDetails', () => {
 
       // Note: In a real scenario with the same QueryClient, this would be 1
       // But since we create a new wrapper/QueryClient for each test, it's 2
-      expect(fetchMock.calls().length).toBeGreaterThanOrEqual(1)
+      expect(apiCallCount).toBeGreaterThanOrEqual(1)
     })
 
     it('uses different cache keys for different students', async () => {
       const student1Id = '111'
       const student2Id = '222'
 
-      fetchMock.get(`/api/v1/courses/${courseId}/users/${student1Id}/lmgb_user_details`, {
-        ...mockUserDetails,
-        course: {name: 'Course 1'},
-      })
-      fetchMock.get(`/api/v1/courses/${courseId}/users/${student2Id}/lmgb_user_details`, {
-        ...mockUserDetails,
-        course: {name: 'Course 2'},
-      })
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${student1Id}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json({
+            ...mockUserDetails,
+            course: {name: 'Course 1'},
+          })
+        }),
+        http.get(`/api/v1/courses/${courseId}/users/${student2Id}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json({
+            ...mockUserDetails,
+            course: {name: 'Course 2'},
+          })
+        }),
+      )
 
       const wrapper = createWrapper()
 
@@ -384,21 +431,29 @@ describe('useLmgbUserDetails', () => {
         expect(result2.current.data?.course.name).toBe('Course 2')
       })
 
-      expect(fetchMock.calls()).toHaveLength(2)
+      expect(apiCallCount).toBe(2)
     })
 
     it('uses different cache keys for different courses', async () => {
       const course1Id = '100'
       const course2Id = '200'
 
-      fetchMock.get(`/api/v1/courses/${course1Id}/users/${studentId}/lmgb_user_details`, {
-        ...mockUserDetails,
-        course: {name: 'Math 101'},
-      })
-      fetchMock.get(`/api/v1/courses/${course2Id}/users/${studentId}/lmgb_user_details`, {
-        ...mockUserDetails,
-        course: {name: 'History 201'},
-      })
+      server.use(
+        http.get(`/api/v1/courses/${course1Id}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json({
+            ...mockUserDetails,
+            course: {name: 'Math 101'},
+          })
+        }),
+        http.get(`/api/v1/courses/${course2Id}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json({
+            ...mockUserDetails,
+            course: {name: 'History 201'},
+          })
+        }),
+      )
 
       const wrapper = createWrapper()
 
@@ -420,15 +475,22 @@ describe('useLmgbUserDetails', () => {
         expect(result2.current.data?.course.name).toBe('History 201')
       })
 
-      expect(fetchMock.calls()).toHaveLength(2)
+      expect(apiCallCount).toBe(2)
     })
   })
 
   describe('query key generation', () => {
     it('generates correct query key', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      let requestedUrl = ''
+      server.use(
+        http.get(
+          `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
+          ({request}) => {
+            requestedUrl = request.url
+            apiCallCount++
+            return HttpResponse.json(mockUserDetails)
+          },
+        ),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId, enabled: true}), {
@@ -440,16 +502,17 @@ describe('useLmgbUserDetails', () => {
       })
 
       // The query should have been called with the correct endpoint
-      const calls = fetchMock.calls()
-      expect(calls[0][0]).toContain(`/api/v1/courses/${courseId}/users/${studentId}`)
+      expect(requestedUrl).toContain(`/api/v1/courses/${courseId}/users/${studentId}`)
     })
   })
 
   describe('default parameters', () => {
     it('uses enabled=true by default', async () => {
-      fetchMock.get(
-        `/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`,
-        mockUserDetails,
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/users/${studentId}/lmgb_user_details`, () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
       )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId}), {
@@ -460,14 +523,19 @@ describe('useLmgbUserDetails', () => {
         expect(result.current.isSuccess).toBe(true)
       })
 
-      expect(fetchMock.calls()).toHaveLength(1)
+      expect(apiCallCount).toBe(1)
       expect(result.current.data).toEqual(mockUserDetails)
     })
   })
 
   describe('edge cases', () => {
     it('handles empty courseId gracefully', async () => {
-      fetchMock.get(/.*/, mockUserDetails)
+      server.use(
+        http.get('*', () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
+      )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId: '', studentId}), {
         wrapper: createWrapper(),
@@ -475,12 +543,17 @@ describe('useLmgbUserDetails', () => {
 
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
       expect(result.current.data).toBeUndefined()
     })
 
     it('handles empty studentId gracefully', async () => {
-      fetchMock.get(/.*/, mockUserDetails)
+      server.use(
+        http.get('*', () => {
+          apiCallCount++
+          return HttpResponse.json(mockUserDetails)
+        }),
+      )
 
       const {result} = renderHook(() => useLmgbUserDetails({courseId, studentId: ''}), {
         wrapper: createWrapper(),
@@ -488,7 +561,7 @@ describe('useLmgbUserDetails', () => {
 
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
       expect(result.current.data).toBeUndefined()
     })
   })

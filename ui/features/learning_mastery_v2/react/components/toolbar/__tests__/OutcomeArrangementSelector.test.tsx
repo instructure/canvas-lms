@@ -22,7 +22,7 @@ import {
   OutcomeArrangementSelector,
   OutcomeArrangementSelectorProps,
 } from '../OutcomeArrangementSelector'
-import {OutcomeArrangement} from '../../../utils/constants'
+import {OutcomeArrangement} from '@canvas/outcomes/react/utils/constants'
 
 describe('OutcomeArrangementSelector', () => {
   const defaultProps: OutcomeArrangementSelectorProps = {

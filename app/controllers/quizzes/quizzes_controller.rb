@@ -123,7 +123,9 @@ class Quizzes::QuizzesController < ApplicationController
                               permissions: quiz_options,
                               master_course_status: mc_status,
                               skip_date_overrides: true,
-                              skip_lock_tests: true
+                              skip_lock_tests: true,
+                              skip_description: true,
+                              skip_permissions: @context.user_is_student?(@current_user)
                             }]
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
       sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
@@ -1053,7 +1055,7 @@ class Quizzes::QuizzesController < ApplicationController
                                                      quiz: @quiz,
                                                      user: @current_user,
                                                      session:,
-                                                     remote_ip: request.remote_ip,
+                                                     remote_ip: quiz_client_ip,
                                                      access_code: params[:access_code])
 
     if params[:take]
@@ -1173,6 +1175,7 @@ class Quizzes::QuizzesController < ApplicationController
       })
 
     css_bundle :enhanced_rubrics
+    @body_classes << "full-width padless-content"
     render html: '<div id="ams_container"></div>'.html_safe, layout: true
   end
 

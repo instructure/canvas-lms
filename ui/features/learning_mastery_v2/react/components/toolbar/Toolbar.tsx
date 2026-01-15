@@ -28,8 +28,8 @@ import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {View} from '@instructure/ui-view'
 import {ExportCSVButton} from './ExportCSVButton'
 import {SettingsTray} from './SettingsTray'
-import {GradebookSettings} from '../../utils/constants'
-import {mapSettingsToFilters} from '../../utils/filter'
+import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
+import {mapSettingsToFilters} from '@canvas/outcomes/react/utils/filter'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

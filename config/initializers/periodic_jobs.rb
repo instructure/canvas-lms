@@ -197,6 +197,10 @@ Rails.configuration.after_initialize do
     )
   end
 
+  Delayed::Periodic.cron "YoutubeMigrationService.process_stuck_scans", "*/30 * * * *" do
+    with_each_shard_by_database(YoutubeMigrationService, :process_stuck_scans)
+  end
+
   Delayed::Periodic.cron "NotificationFailureProcessor.process", "*/5 * * * *" do
     DatabaseServer.send_in_each_region(
       NotificationFailureProcessor,

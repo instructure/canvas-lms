@@ -472,7 +472,14 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
                 id="lti-key-save-button"
                 onClick={this.handleSave}
                 color="primary"
-                disabled={this.isSaving}
+                disabled={this.isSaving || ENV.devKeysReadOnly}
+                title={
+                  ENV.devKeysReadOnly
+                    ? I18n.t(
+                        'You do not have permission to create or modify developer keys in this account',
+                      )
+                    : undefined
+                }
               >
                 {I18n.t('Save')}
               </Button>

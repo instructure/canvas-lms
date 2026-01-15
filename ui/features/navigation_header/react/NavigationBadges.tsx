@@ -122,7 +122,9 @@ export default function NavigationBadges() {
       </Portal>
 
       <Portal
-        open={hasUnreadReleaseNotesCount && unreadReleaseNotesCount > 0}
+        open={
+          hasUnreadReleaseNotesCount && unreadReleaseNotesCount > 0 && !releaseNotesBadgeDisabled
+        }
         mountNode={unreadReleaseNotesCountElement}
       >
         <ScreenReaderContent>

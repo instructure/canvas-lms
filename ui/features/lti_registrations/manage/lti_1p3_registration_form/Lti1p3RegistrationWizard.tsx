@@ -18,6 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import * as React from 'react'
+import {ProgressBar} from '@instructure/ui-progress'
 import type {AccountId} from '../model/AccountId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
@@ -25,6 +26,7 @@ import {LaunchSettingsConfirmationWrapper} from './components/LaunchSettingsConf
 import {
   createLti1p3RegistrationWizardState,
   type Lti1p3RegistrationWizardStep,
+  type Lti1p3RegistrationWizardStore,
 } from './Lti1p3RegistrationWizardState'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
@@ -42,12 +44,169 @@ import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardSe
 import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 import {toUndefined} from '../../common/lib/toUndefined'
 import {Footer} from '../registration_wizard_forms/Footer'
-import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
-import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {Header} from '../registration_wizard_forms/Header'
 import {LaunchTypeSpecificSettingsConfirmationWrapper} from './components/LaunchTypeSpecificSettingsConfirmationWrapper'
+import {LtiRegistrationId} from '../model/LtiRegistrationId'
+import {getInputIdForField} from '../registration_overlay/validateLti1p3RegistrationOverlayState'
 
 const I18n = createI18nScope('lti_registrations')
+
+const getFooterCurrentScreen = (step: Lti1p3RegistrationWizardStep) => {
+  if (step === 'LaunchSettings') return 'first'
+  if (step === 'Review') return 'last'
+  return 'intermediate'
+}
+
+const shouldShowFooter = (step: Lti1p3RegistrationWizardStep) => {
+  return !['Installing', 'Updating', 'Error'].includes(step)
+}
+
+const TotalProgressLevels = 9
+const ProgressLevels: Record<Lti1p3RegistrationWizardStep, number> = {
+  LaunchSettings: 1,
+  Permissions: 2,
+  DataSharing: 3,
+  Placements: 4,
+  EulaSettings: 5,
+  OverrideURIs: 6,
+  Naming: 7,
+  Icons: 8,
+  Review: 9,
+  Installing: 9,
+  Updating: 9,
+  Error: 0,
+}
+
+const progressBar = (step: Lti1p3RegistrationWizardStep) => (
+  <ProgressBar
+    meterColor="info"
+    shouldAnimate={true}
+    size="x-small"
+    frameBorder="none"
+    screenReaderLabel={I18n.t('Installation Progress')}
+    valueNow={ProgressLevels[step]}
+    valueMax={TotalProgressLevels}
+    themeOverride={{
+      trackBottomBorderWidth: '0',
+    }}
+  />
+)
+
+const shouldShowProgressBar = (step: Lti1p3RegistrationWizardStep) => {
+  return step !== 'Error'
+}
+
+const renderStepContent = (
+  step: Lti1p3RegistrationWizardStep,
+  props: Lti1p3RegistrationWizardProps,
+  storeActions: Lti1p3RegistrationWizardStore,
+) => {
+  const {internalConfiguration} = props
+
+  switch (step) {
+    case 'LaunchSettings':
+      return (
+        <LaunchSettingsConfirmationWrapper
+          internalConfig={internalConfiguration}
+          overlayStore={storeActions.state.overlayStore}
+          reviewing={storeActions.state.reviewing}
+          hasClickedNext={storeActions.state.hasClickedNext}
+        />
+      )
+    case 'Permissions':
+      return (
+        <PermissionConfirmationWrapper
+          showAllSettings={true}
+          overlayStore={storeActions.state.overlayStore}
+          internalConfig={internalConfiguration}
+        />
+      )
+    case 'DataSharing':
+      return (
+        <PrivacyConfirmationWrapper
+          internalConfig={internalConfiguration}
+          overlayStore={storeActions.state.overlayStore}
+        />
+      )
+    case 'Placements':
+      return (
+        <PlacementsConfirmationWrapper
+          internalConfig={internalConfiguration}
+          overlayStore={storeActions.state.overlayStore}
+        />
+      )
+    case 'EulaSettings':
+      return (
+        <LaunchTypeSpecificSettingsConfirmationWrapper
+          settingType="LtiEulaRequest"
+          internalConfig={internalConfiguration}
+          overlayStore={storeActions.state.overlayStore}
+        />
+      )
+    case 'OverrideURIs':
+      return (
+        <OverrideURIsConfirmationWrapper
+          overlayStore={storeActions.state.overlayStore}
+          internalConfig={internalConfiguration}
+          reviewing={storeActions.state.reviewing}
+          hasClickedNext={storeActions.state.hasClickedNext}
+        />
+      )
+    case 'Naming':
+      return (
+        <NamingConfirmationWrapper
+          internalConfig={internalConfiguration}
+          overlayStore={storeActions.state.overlayStore}
+        />
+      )
+    case 'Icons':
+      return (
+        <IconConfirmationWrapper
+          internalConfig={internalConfiguration}
+          reviewing={storeActions.state.reviewing}
+          overlayStore={storeActions.state.overlayStore}
+          hasClickedNext={storeActions.state.hasClickedNext}
+        />
+      )
+    case 'Review':
+      return (
+        <ReviewScreenWrapper
+          overlayStore={storeActions.state.overlayStore}
+          internalConfig={internalConfiguration}
+          transitionTo={step => {
+            storeActions.setStep(step)
+          }}
+        />
+      )
+    case 'Installing':
+    case 'Updating': {
+      const loadingText = step === 'Installing' ? I18n.t('Installing App') : I18n.t('Updating App')
+      return (
+        <RegistrationModalBody>
+          <Flex justifyItems="center" alignItems="center" height="100%">
+            <Flex.Item>
+              <Spinner renderTitle={loadingText} />
+            </Flex.Item>
+            <Flex.Item>{loadingText}</Flex.Item>
+          </Flex>
+        </RegistrationModalBody>
+      )
+    }
+    case 'Error':
+      return (
+        <RegistrationModalBody>
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject={I18n.t('Dynamic Registration error')}
+            errorCategory="Dynamic Registration"
+            errorMessage={storeActions.state.errorMessage}
+          />
+        </RegistrationModalBody>
+      )
+    default:
+      return null
+  }
+}
 
 export type Lti1p3RegistrationWizardProps = {
   existingRegistration?: LtiRegistrationWithConfiguration
@@ -56,7 +215,7 @@ export type Lti1p3RegistrationWizardProps = {
   service: Lti1p3RegistrationWizardService
   onDismiss: () => void
   unifiedToolId?: UnifiedToolId
-  onSuccessfulRegistration: () => void
+  onSuccessfulRegistration: (registrationId: LtiRegistrationId) => void
 }
 
 export const Lti1p3RegistrationWizard = ({
@@ -81,241 +240,52 @@ export const Lti1p3RegistrationWizard = ({
   }, [internalConfiguration, service, existingAdminNickname, existingOverlayData])
 
   const store = useLti1p3RegistrationWizardStore()
+  const currentState = store
 
-  const handlePreviousClicked = (prevStep: Lti1p3RegistrationWizardStep) => () => {
-    store.setReviewing(false)
-    if (prevStep === 'EulaSettings' && !shouldShowEula) {
-      store.setStep('Placements')
-    } else {
-      store.setStep(prevStep)
-    }
-  }
-
-  const shouldShowEula = store.state.overlayStore().isEulaCapable()
-
-  const handleNextClicked = (nextStep: Lti1p3RegistrationWizardStep) => () => {
-    if (store.state.reviewing) {
-      store.setStep('Review')
-    } else {
-      if (nextStep === 'Review') {
-        store.setReviewing(true)
-      }
-      if (nextStep === 'EulaSettings' && !shouldShowEula) {
-        store.setStep('OverrideURIs')
-      } else {
-        store.setStep(nextStep)
-      }
-    }
-  }
-
-  switch (store.state._step) {
-    case 'LaunchSettings':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <LaunchSettingsConfirmationWrapper
-            internalConfig={internalConfiguration}
-            overlayStore={store.state.overlayStore}
-            reviewing={store.state.reviewing}
-            onPreviousClicked={onDismiss}
-            onNextClicked={handleNextClicked('Permissions')}
-          />
-        </>
-      )
-    case 'Permissions':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <PermissionConfirmationWrapper
-            showAllSettings={true}
-            overlayStore={store.state.overlayStore}
-            internalConfig={internalConfiguration}
-          />
-          <Footer
-            currentScreen="intermediate"
-            reviewing={store.state.reviewing}
-            onPreviousClicked={handlePreviousClicked('LaunchSettings')}
-            onNextClicked={handleNextClicked('DataSharing')}
-          />
-        </>
-      )
-    case 'DataSharing':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <PrivacyConfirmationWrapper
-            internalConfig={internalConfiguration}
-            overlayStore={store.state.overlayStore}
-          />
-          <Footer
-            currentScreen="intermediate"
-            reviewing={store.state.reviewing}
-            onPreviousClicked={handlePreviousClicked('Permissions')}
-            onNextClicked={handleNextClicked('Placements')}
-          />
-        </>
-      )
-    case 'Placements':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <PlacementsConfirmationWrapper
-            internalConfig={internalConfiguration}
-            overlayStore={store.state.overlayStore}
-          />
-          <Footer
-            currentScreen="intermediate"
-            reviewing={store.state.reviewing}
-            onPreviousClicked={handlePreviousClicked('DataSharing')}
-            onNextClicked={handleNextClicked('EulaSettings')}
-          />
-        </>
-      )
-    case 'EulaSettings':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <LaunchTypeSpecificSettingsConfirmationWrapper
-            settingType="LtiEulaRequest"
-            internalConfig={internalConfiguration}
-            overlayStore={store.state.overlayStore}
-          />
-          <Footer
-            currentScreen="intermediate"
-            reviewing={store.state.reviewing}
-            onPreviousClicked={handlePreviousClicked('Placements')}
-            onNextClicked={handleNextClicked('OverrideURIs')}
-          />
-        </>
-      )
-    case 'OverrideURIs':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <OverrideURIsConfirmationWrapper
-            overlayStore={store.state.overlayStore}
-            internalConfig={internalConfiguration}
-            reviewing={store.state.reviewing}
-            onPreviousClicked={handlePreviousClicked('EulaSettings')}
-            onNextClicked={handleNextClicked('Naming')}
-          />
-        </>
-      )
-    case 'Naming':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <NamingConfirmationWrapper
-            internalConfig={internalConfiguration}
-            overlayStore={store.state.overlayStore}
-          />
-          <Footer
-            currentScreen="intermediate"
-            reviewing={store.state.reviewing}
-            onPreviousClicked={handlePreviousClicked('OverrideURIs')}
-            onNextClicked={() => {
-              const placements = store.state.overlayStore.getState().state.placements.placements
-              const enabledPlacements = filterPlacementsByFeatureFlags(placements ?? [])
-              if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
-                handleNextClicked('Icons')()
-              } else {
-                handleNextClicked('Review')()
-              }
-            }}
-          />
-        </>
-      )
-    case 'Icons':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <IconConfirmationWrapper
-            internalConfig={internalConfiguration}
-            reviewing={store.state.reviewing}
-            overlayStore={store.state.overlayStore}
-            onPreviousButtonClicked={handlePreviousClicked('Naming')}
-            onNextButtonClicked={handleNextClicked('Review')}
-          />
-        </>
-      )
-    case 'Review':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <ReviewScreenWrapper
-            overlayStore={store.state.overlayStore}
-            internalConfig={internalConfiguration}
-            transitionTo={store.setStep}
-          />
-          <Footer
-            currentScreen="last"
-            onPreviousClicked={() => {
-              const placements = store.state.overlayStore.getState().state.placements.placements
-              const enabledPlacements = filterPlacementsByFeatureFlags(placements ?? [])
-              if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
-                handlePreviousClicked('Icons')()
-              } else {
-                handlePreviousClicked('Naming')()
-              }
-            }}
-            updating={!!existingRegistration}
-            onNextClicked={() => {
-              if (existingRegistration) {
-                store.update(
-                  onSuccessfulRegistration,
-                  accountId,
-                  existingRegistration.id,
-                  unifiedToolId,
-                )
-              } else {
-                store.install(onSuccessfulRegistration, accountId, unifiedToolId)
-              }
-            }}
-            reviewing={store.state.reviewing}
-          />
-        </>
-      )
-    case 'Installing':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <RegistrationModalBody>
-            <Flex justifyItems="center" alignItems="center" height="100%">
-              <Flex.Item>
-                <Spinner renderTitle={I18n.t('Installing App')} />
-              </Flex.Item>
-              <Flex.Item>{I18n.t('Installing App')}</Flex.Item>
-            </Flex>
-          </RegistrationModalBody>
-        </>
-      )
-    case 'Updating':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <RegistrationModalBody>
-            <Flex justifyItems="center" alignItems="center" height="100%">
-              <Flex.Item>
-                <Spinner renderTitle={I18n.t('Updating App')} />
-              </Flex.Item>
-              <Flex.Item>{I18n.t('Updating App')}</Flex.Item>
-            </Flex>
-          </RegistrationModalBody>
-        </>
-      )
-    case 'Error':
-      return (
-        <>
-          <Header onClose={onDismiss} editing={!!existingRegistration} />
-          <RegistrationModalBody>
-            <GenericErrorPage
-              imageUrl={errorShipUrl}
-              errorSubject={I18n.t('Dynamic Registration error')}
-              errorCategory="Dynamic Registration"
-              errorMessage={store.state.errorMessage}
-            />
-          </RegistrationModalBody>
-        </>
-      )
-  }
+  return (
+    <>
+      <Header onClose={onDismiss} editing={!!existingRegistration} />
+      {shouldShowProgressBar(currentState.state._step) && progressBar(currentState.state._step)}
+      {renderStepContent(
+        currentState.state._step,
+        {
+          existingRegistration,
+          accountId,
+          internalConfiguration,
+          service,
+          onDismiss,
+          unifiedToolId,
+          onSuccessfulRegistration,
+        },
+        currentState,
+      )}
+      {shouldShowFooter(currentState.state._step) && (
+        <Footer
+          currentScreen={getFooterCurrentScreen(currentState.state._step)}
+          reviewing={currentState.state.reviewing}
+          onPreviousClicked={
+            currentState.state._step === 'LaunchSettings'
+              ? onDismiss
+              : () => currentState.previousStep(currentState.state._step)
+          }
+          onNextClicked={() =>
+            currentState.advanceStep(
+              accountId,
+              onSuccessfulRegistration,
+              errors => {
+                if (errors.length > 0) {
+                  // focus the first error
+                  document.getElementById(getInputIdForField(errors[0].field))?.focus()
+                }
+              },
+              existingRegistration,
+              unifiedToolId,
+            )
+          }
+          disableNextButton={!currentState.canProceed(currentState.state._step)}
+          updating={!!existingRegistration}
+        />
+      )}
+    </>
+  )
 }

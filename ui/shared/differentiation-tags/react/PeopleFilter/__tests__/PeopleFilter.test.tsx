@@ -29,7 +29,9 @@ vi.mock('@canvas/util/MessageBus', () => ({
   trigger: vi.fn(),
 }))
 
-const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as ReturnType<typeof vi.fn>
+const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as ReturnType<
+  typeof vi.fn
+>
 
 describe('PeopleFilter', () => {
   const defaultProps = {

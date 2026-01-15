@@ -17,9 +17,8 @@
  */
 
 import {cleanup, render} from '@testing-library/react'
-import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
-import {LoginLayout} from '../LoginLayout'
+import LoginLayout from '../LoginLayout'
 import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 vi.mock('react-router-dom', async () => {

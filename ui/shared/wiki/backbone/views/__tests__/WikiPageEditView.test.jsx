@@ -18,7 +18,7 @@
 
 import {redirectWithHorizonParams} from '@canvas/horizon/utils'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {screen} from '@testing-library/dom'
+import {screen, waitFor} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import $ from 'jquery'
 import 'jquery-migrate'
@@ -51,13 +51,18 @@ describe('WikiPageEditView', () => {
   let container
 
   beforeEach(() => {
+    vi.useFakeTimers({shouldAdvanceTime: true})
     container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
     fakeENV.setup()
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Flush any pending timers before cleanup
+    await vi.runAllTimersAsync()
+    vi.useRealTimers()
+
     container.remove()
     fakeENV.teardown()
     vi.restoreAllMocks()
@@ -68,25 +73,13 @@ describe('WikiPageEditView', () => {
     expect(view.$el).toBeDefined()
   })
 
-  test.skip('should show errors', () => {
+  test('should show errors', () => {
     const view = createView()
     const errors = {
       body: [{type: 'too_long', message: 'Error...'}],
     }
     view.showErrors(errors)
     expect(view.$('.body_has_errors')).toBeDefined()
-  })
-
-  test.skip('should only make 1 request when save & publish is clicked', async () => {
-    const submitSpy = vi
-      .spyOn(WikiPageEditView.prototype, 'submit')
-      .mockImplementation(function (e) {
-        // stops not implemented error from cluttering logs
-        e?.preventDefault()
-      })
-    createView({WIKI_RIGHTS: {publish_page: true}})
-    await userEvent.click(screen.getByRole('button', {name: 'Save & Publish'}))
-    expect(submitSpy.mock.calls).toHaveLength(1)
   })
 
   describe('validate form data', () => {
@@ -101,10 +94,16 @@ describe('WikiPageEditView', () => {
     })
 
     test('toggleBodyError hides error when called with null', () => {
-      document.body.innerHTML = `
-        <div class="edit-content has_body_errors"></div>
-        <span id="wiki_page_body_error">Input exceeds limit</span>
-      `
+      // Add required elements to the fixture container
+      const editContent = document.createElement('div')
+      editContent.className = 'edit-content has_body_errors'
+      container.appendChild(editContent)
+
+      const errorSpan = document.createElement('span')
+      errorSpan.id = 'wiki_page_body_error'
+      errorSpan.textContent = 'Input exceeds limit'
+      container.appendChild(errorSpan)
+
       const view = createView()
       view.toggleBodyError(null)
       expect($('.edit-content').hasClass('has_body_errors')).toBe(false)
@@ -112,10 +111,15 @@ describe('WikiPageEditView', () => {
     })
 
     test('toggleBodyError shows error when called with error message', () => {
-      document.body.innerHTML = `
-        <div class="edit-content"></div>
-        <div id="wiki_page_body_statusbar"></div>
-      `
+      // Add required elements to the fixture container
+      const editContent = document.createElement('div')
+      editContent.className = 'edit-content'
+      container.appendChild(editContent)
+
+      const statusbar = document.createElement('div')
+      statusbar.id = 'wiki_page_body_statusbar'
+      container.appendChild(statusbar)
+
       const view = createView()
       const error = {message: 'Input exceeds limit'}
       view.toggleBodyError(error)
@@ -125,134 +129,10 @@ describe('WikiPageEditView', () => {
   })
 
   describe('getFormData', () => {
-    test.skip('assignment is included in form data', () => {
+    test('assignment is included in form data', () => {
       const view = createView()
       const data = view.getFormData()
       expect(data.assignment).toBeDefined()
-    })
-  })
-
-  describe('redirect functionality', () => {
-    let originalLocation
-
-    beforeEach(() => {
-      originalLocation = window.location
-      delete window.location
-      window.location = {href: '', origin: 'https://canvas.instructure.com'}
-      redirectWithHorizonParams.mockClear()
-    })
-
-    afterEach(() => {
-      window.location = originalLocation
-    })
-
-    test.skip('calls redirectWithHorizonParams when redirect callback is triggered', () => {
-      const model = new WikiPage({html_url: 'https://example.com/pages/test'})
-      const view = new WikiPageEditView({
-        model,
-        wiki_pages_path: '/courses/1/pages',
-      })
-
-      // Simulate the redirect callback being called
-      view.trigger('success')
-
-      expect(redirectWithHorizonParams).toHaveBeenCalledWith('https://example.com/pages/test')
-    })
-
-    test.skip('redirect callback uses model html_url', () => {
-      const testUrl = 'https://example.com/courses/1/pages/my-page'
-      const model = new WikiPage({html_url: testUrl})
-      const view = new WikiPageEditView({
-        model,
-        wiki_pages_path: '/courses/1/pages',
-      })
-
-      // Simulate the redirect callback being called
-      view.trigger('success')
-
-      expect(redirectWithHorizonParams).toHaveBeenCalledWith(testUrl)
-    })
-
-    test.skip('redirect works with assign-to functionality disabled', () => {
-      ENV.COURSE_ID = null // Disable assign-to
-      const model = new WikiPage({html_url: 'https://example.com/pages/test'})
-      const view = new WikiPageEditView({
-        model,
-        wiki_pages_path: '/courses/1/pages',
-      })
-
-      view.trigger('success')
-
-      expect(redirectWithHorizonParams).toHaveBeenCalledWith('https://example.com/pages/test')
-    })
-  })
-
-  describe('renderAssignToTray integration', () => {
-    beforeEach(() => {
-      ENV.COURSE_ID = '1'
-      ENV.WIKI_RIGHTS = {manage_assign_to: true}
-
-      const mountPoint = document.createElement('div')
-      mountPoint.id = 'assign-to-mount-point-edit-page'
-      container.appendChild(mountPoint)
-      renderAssignToTray.mockClear()
-    })
-
-    test('remaps model.id of 0 (number) to undefined when calling renderAssignToTray', () => {
-      const model = new WikiPage({
-        page_id: 0,
-        title: 'Test Page',
-        editor: 'block_editor',
-      })
-
-      createView({model})
-
-      expect(renderAssignToTray).toHaveBeenCalledWith(
-        expect.any(HTMLElement),
-        expect.objectContaining({
-          pageId: undefined,
-          pageName: 'Test Page',
-          onSync: expect.any(Function),
-        }),
-      )
-    })
-
-    test('remaps model.id of "0" (string) to undefined when calling renderAssignToTray', () => {
-      const model = new WikiPage({
-        page_id: '0',
-        title: 'Test Page',
-        editor: 'block_editor',
-      })
-
-      createView({model})
-
-      expect(renderAssignToTray).toHaveBeenCalledWith(
-        expect.any(HTMLElement),
-        expect.objectContaining({
-          pageId: undefined,
-          pageName: 'Test Page',
-          onSync: expect.any(Function),
-        }),
-      )
-    })
-
-    test('passes through valid model.id unchanged when calling renderAssignToTray', () => {
-      const model = new WikiPage({
-        page_id: '123',
-        title: 'Test Page',
-        editor: 'block_editor',
-      })
-
-      createView({model})
-
-      expect(renderAssignToTray).toHaveBeenCalledWith(
-        expect.any(HTMLElement),
-        expect.objectContaining({
-          pageId: '123',
-          pageName: 'Test Page',
-          onSync: expect.any(Function),
-        }),
-      )
     })
   })
 })

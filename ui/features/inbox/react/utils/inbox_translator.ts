@@ -74,11 +74,14 @@ export async function translateText(args: TranslateArgs, text: string): Promise<
 
     return (json as {translated_text: string}).translated_text
   } catch (e) {
-    // @ts-expect-error
-    const response = await e.response.json()
-    const error = new Error()
-    Object.assign(error, {...response})
-    throw error
+    const fetchError = e as {response?: Response}
+    if (fetchError.response) {
+      const response = await fetchError.response.json()
+      const error = new Error()
+      Object.assign(error, {...response})
+      throw error
+    }
+    throw e
   }
 }
 

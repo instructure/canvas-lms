@@ -428,22 +428,34 @@ describe Outcomes::RollupCommonService do
   end
 
   describe "#build_rollup_rows" do
+    let(:submitted_at1) { 2.days.ago }
+    let(:submitted_at2) { 1.day.ago }
+
     let(:score1) do
       double("Score",
              outcome:,
-             score: 4.0)
+             score: 4.0,
+             submitted_at: submitted_at1,
+             title: "Assignment 1",
+             hide_points: false)
     end
 
     let(:score2) do
       double("Score",
              outcome: double("Outcome", id: 2, calculation_method: "highest"),
-             score: 3.5)
+             score: 3.5,
+             submitted_at: submitted_at2,
+             title: "Assignment 2",
+             hide_points: true)
     end
 
     let(:nil_score) do
       double("Score",
              outcome: double("Outcome", id: 3, calculation_method: "n_mastery"),
-             score: nil)
+             score: nil,
+             submitted_at: nil,
+             title: nil,
+             hide_points: false)
     end
 
     let(:rollup) do
@@ -467,13 +479,19 @@ describe Outcomes::RollupCommonService do
         outcome_id: 1,
         calculation_method: "average",
         aggregate_score: 4.0,
+        submitted_at: submitted_at1,
+        title: "Assignment 1",
+        hide_points: false,
         workflow_state: "active"
       )
 
       expect(rows[1]).to include(
         outcome_id: 2,
         calculation_method: "highest",
-        aggregate_score: 3.5
+        aggregate_score: 3.5,
+        submitted_at: submitted_at2,
+        title: "Assignment 2",
+        hide_points: true
       )
     end
 
@@ -505,6 +523,9 @@ describe Outcomes::RollupCommonService do
         :outcome_id,
         :calculation_method,
         :aggregate_score,
+        :submitted_at,
+        :title,
+        :hide_points,
         :workflow_state,
         :last_calculated_at
       )

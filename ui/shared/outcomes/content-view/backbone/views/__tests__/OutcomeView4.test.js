@@ -83,7 +83,7 @@ describe('OutcomeView', () => {
     document.body.innerHTML = ''
   })
 
-  describe.skip('Form Validation', () => {
+  describe('Form Validation', () => {
     it('validates mastery points', async () => {
       const view = createView({
         model: newOutcome(),

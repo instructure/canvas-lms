@@ -34,7 +34,7 @@ const mockApiResponse = {
 }
 
 vi.mock('react-router-dom', async () => ({
-  ...await vi.importActual('react-router-dom'),
+  ...(await vi.importActual('react-router-dom')),
   useNavigate: vi.fn(),
   useNavigationType: vi.fn(),
   useLocation: vi.fn(),
@@ -51,14 +51,13 @@ describe('AcceptableUsePolicy', () => {
 
   beforeAll(() => {
     server.listen()
-    ;(useNavigate as any).mockReturnValue(mockNavigate)
   })
 
   afterAll(() => server.close())
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.restoreAllMocks()
+    ;(useNavigate as any).mockReturnValue(mockNavigate)
     mockNavigationType.mockReturnValue('PUSH')
     mockLocation.mockReturnValue({key: 'default'})
   })
@@ -69,16 +68,12 @@ describe('AcceptableUsePolicy', () => {
   })
 
   it('mounts without crashing', () => {
-    server.use(
-      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
-    )
+    server.use(http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)))
     render(<AcceptableUsePolicy />)
   })
 
   it('loads content from the API and displays it', async () => {
-    server.use(
-      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
-    )
+    server.use(http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)))
     render(<AcceptableUsePolicy />)
     expect(screen.getByText('Loading page')).toBeInTheDocument()
     await waitFor(() =>
@@ -104,9 +99,7 @@ describe('AcceptableUsePolicy', () => {
   })
 
   it('displays an info message when content is null', async () => {
-    server.use(
-      http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json({content: null})),
-    )
+    server.use(http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json({content: null})))
     render(<AcceptableUsePolicy />)
     expect(screen.getByText('Loading page')).toBeInTheDocument()
     await waitFor(() =>
@@ -137,7 +130,7 @@ describe('AcceptableUsePolicy', () => {
       expect(mockNavigate).not.toHaveBeenCalled()
     })
 
-    it.skip('navigates back when the CloseButton is clicked and history exists', async () => {
+    it('navigates back when the CloseButton is clicked and history exists', async () => {
       server.use(
         http.get('/api/v1/acceptable_use_policy', () => HttpResponse.json(mockApiResponse)),
       )

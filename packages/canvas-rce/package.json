@@ -1,9 +1,25 @@
 {
   "name": "@instructure/canvas-rce",
-  "version": "7.3.1",
+  "version": "7.3.2",
   "description": "A component wrapping Canvas's usage of Tinymce",
   "main": "es/index.js",
   "types": "es/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "enhance-user-content": ["./es/enhance-user-content/index.d.ts"]
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./es/index.d.ts",
+      "default": "./es/index.js"
+    },
+    "./enhance-user-content": {
+      "types": "./es/enhance-user-content/index.d.ts",
+      "default": "./es/enhance-user-content/index.js"
+    },
+    "./*": "./*"
+  },
   "owner": "RCX",
   "scripts": {
     "i18n:extract": "format-message extract \"es/**/*.js\" -g underscored_crc32 -o locales/en.json",
@@ -59,7 +75,7 @@
     "@instructure/debounce": "10.26.3",
     "@instructure/emotion": "10.26.3",
     "@instructure/k5uploader": "*",
-    "@instructure/media-capture": "^9.0.0",
+    "@instructure/media-capture": "^11.5.1",
     "@instructure/theme-registry": "10.26.3",
     "@instructure/ui-a11y-content": "10.26.3",
     "@instructure/ui-a11y-utils": "10.26.3",

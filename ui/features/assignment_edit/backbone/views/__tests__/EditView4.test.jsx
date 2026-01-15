@@ -32,7 +32,6 @@ import userSettings from '@canvas/user-settings'
 import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
 import {createRoot} from 'react-dom/client'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
@@ -100,11 +99,21 @@ const server = setupServer(
   http.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, () => {
     return HttpResponse.json({})
   }),
+  http.get('/api/v1/courses/1/settings', () => {
+    return HttpResponse.json({})
+  }),
   http.get(/\/api\/v1\/courses\/\d+\/settings/, () => {
     return HttpResponse.json({})
   }),
+  http.get('/api/v1/courses/1/sections', () => {
+    return HttpResponse.json([])
+  }),
   http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
     return HttpResponse.json([])
+  }),
+  // Mock GraphQL endpoint
+  http.post(/.*\/api\/graphql/, () => {
+    return HttpResponse.json({})
   }),
   // Default handler for other API calls
   http.all(/\/api\/.*/, () => {
@@ -223,15 +232,6 @@ describe('EditView - Peer Reviews and Configuration Tools', () => {
       return url
     })
 
-    fetchMock.get('/api/v1/courses/1/settings', {})
-    fetchMock.get('/api/v1/courses/1/sections?per_page=100', [])
-    fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions*/, [])
-    fetchMock.post(/.*\/api\/graphql/, {})
-    // Catch-all for any unmocked requests to prevent XMLHttpRequest errors
-    fetchMock.get('*', {status: 404})
-    fetchMock.post('*', {status: 404})
-    fetchMock.put('*', {status: 404})
-    fetchMock.delete('*', {status: 404})
     RCELoader.RCE = null
     return RCELoader.loadRCE()
   })
@@ -241,7 +241,6 @@ describe('EditView - Peer Reviews and Configuration Tools', () => {
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
-    fetchMock.reset()
     server.resetHandlers()
     vi.resetModules()
     vi.clearAllMocks()

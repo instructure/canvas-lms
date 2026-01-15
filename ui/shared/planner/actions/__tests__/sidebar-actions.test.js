@@ -105,7 +105,7 @@ describe('load items', () => {
     )
   })
 
-  it.skip('dispatches SIDEBAR_ITEMS_LOADED with the proper payload on success', async () => {
+  it('dispatches SIDEBAR_ITEMS_LOADED with the proper payload on success', async () => {
     server.use(
       http.get('*/api/v1/planner/items', () => {
         return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
@@ -129,7 +129,7 @@ describe('load items', () => {
     expect(fakeDispatch).toHaveBeenCalledWith(expected)
   })
 
-  it.skip('dispatches SIDEBAR_ITEMS_LOADED with the proper url on success', async () => {
+  it('dispatches SIDEBAR_ITEMS_LOADED with the proper url on success', async () => {
     server.use(
       http.get('*/api/v1/planner/items', () => {
         return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
@@ -153,7 +153,7 @@ describe('load items', () => {
     expect(fakeDispatch).toHaveBeenCalledWith(expected)
   })
 
-  it.skip('dispatches SIDEBAR_ENOUGH_ITEMS_LOADED when initial load gets them all', async () => {
+  it('dispatches SIDEBAR_ENOUGH_ITEMS_LOADED when initial load gets them all', async () => {
     server.use(
       http.get('*/api/v1/planner/items', () => {
         return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
@@ -305,7 +305,7 @@ describe('load items', () => {
     expect(fakeDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 
-  it.skip('finishes loading even when there are less then 5 incomplete items', async () => {
+  it('finishes loading even when there are less then 5 incomplete items', async () => {
     server.use(
       http.get('*/api/v1/planner/items', () => {
         return new HttpResponse(JSON.stringify([]), {

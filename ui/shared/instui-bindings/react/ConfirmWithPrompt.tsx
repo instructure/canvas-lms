@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {useState, useRef, type ReactNode, useMemo} from 'react'
-import {createRoot} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -44,21 +45,23 @@ export function confirmWithPrompt(props: PromptConfirmProps): Promise<boolean> {
     container.setAttribute('class', 'flashalert-message')
     alertContainer.appendChild(container)
 
+    let root: Root | null = null
+
     const handleConfirm = () => {
-      root.unmount()
+      root?.unmount()
       alertContainer.removeChild(container)
       resolve(true)
     }
 
     const handleCancel = () => {
-      root.unmount()
+      root?.unmount()
       alertContainer.removeChild(container)
       resolve(false)
     }
 
-    const root = createRoot(container)
-    root.render(
+    root = render(
       <PromptConfirmationModal {...props} onConfirm={handleConfirm} onCancel={handleCancel} />,
+      container,
     )
   })
 }

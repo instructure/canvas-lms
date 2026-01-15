@@ -28,6 +28,10 @@ describe('DynamicRegistrationModal', () => {
   let error: (...data: any[]) => void
   let warn: (...data: any[]) => void
 
+  const store = {
+    dispatch: vi.fn(),
+  }
+
   beforeAll(() => {
     // instui logs an error when we render a component
     // immediately under Modal
@@ -48,9 +52,6 @@ describe('DynamicRegistrationModal', () => {
   })
 
   describe('default export', () => {
-    const store = {
-      dispatch: vi.fn(),
-    }
     it('opens the modal', async () => {
       useDynamicRegistrationState.getState().open()
       const component = render(<DynamicRegistrationModal contextId="1" store={store as any} />)
@@ -159,6 +160,38 @@ describe('DynamicRegistrationModal', () => {
 
       const confirmationScreen = await component.findByTestId('dynamic-reg-modal-confirmation')
       expect(confirmationScreen).toBeInTheDocument()
+    })
+  })
+
+  describe('when devKeysReadOnly is true', () => {
+    let originalEnv: any
+
+    beforeEach(() => {
+      originalEnv = window.ENV
+      window.ENV = {...originalEnv, devKeysReadOnly: true}
+    })
+
+    afterEach(() => {
+      window.ENV = originalEnv
+    })
+
+    it('disables the registration button', async () => {
+      useDynamicRegistrationState.getState().open('http://localhost/?foo=bar')
+
+      const component = render(<DynamicRegistrationModal contextId="1" store={store as any} />)
+      const continueButton = await component.findByTestId('dynamic-reg-modal-continue-button')
+      expect(continueButton).toBeDisabled()
+    })
+
+    it('shows tooltip explaining lack of permissions', async () => {
+      useDynamicRegistrationState.getState().open('http://localhost/?foo=bar')
+
+      const component = render(<DynamicRegistrationModal contextId="1" store={store as any} />)
+      const continueButton = await component.findByTestId('dynamic-reg-modal-continue-button')
+      expect(continueButton).toHaveAttribute(
+        'title',
+        'You do not have permission to create or modify developer keys / LTI registrations in this account',
+      )
     })
   })
 })

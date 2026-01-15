@@ -66,17 +66,17 @@ describe('ScanStateCell', () => {
         issueCount: 5,
       } as AccessibilityResourceScan
 
-      it.skip('renders the correct number of issues', () => {
+      it('renders the correct number of issues', () => {
         render(<ScanStateCell item={baseItem} isMobile={false} />)
         expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('5')
       })
 
-      it.skip('renders the correct overflow number if issueCount exceeds the visual limit', () => {
+      it('renders the correct overflow number if issueCount exceeds the visual limit', () => {
         render(<ScanStateCell item={{...baseItem, issueCount: 2000}} isMobile={false} />)
         expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('99+')
       })
 
-      it.skip('renders a working fix button', () => {
+      it('renders a working fix button', () => {
         render(<ScanStateCell item={baseItem} isMobile={false} />)
         expect(screen.getByTestId('issue-remediation-button')).toBeInTheDocument()
         screen.getByTestId('issue-remediation-button').click()
@@ -91,7 +91,7 @@ describe('ScanStateCell', () => {
         issueCount: 5,
       } as AccessibilityResourceScan
 
-      it.skip('renders a working review button', () => {
+      it('renders a working review button', () => {
         render(<ScanStateCell item={baseItem} isMobile={false} />)
         expect(screen.getByTestId('issue-review-button')).toBeInTheDocument()
         screen.getByTestId('issue-review-button').click()

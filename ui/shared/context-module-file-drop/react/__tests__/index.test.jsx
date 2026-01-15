@@ -20,7 +20,7 @@ import React from 'react'
 import ModuleFileDrop from '../index'
 import {cleanup, render} from '@testing-library/react'
 
-vi.mock('../apiClient', async (importOriginal) => {
+vi.mock('../apiClient', async importOriginal => {
   const originalModule = await importOriginal()
   return {
     ...originalModule,
@@ -72,7 +72,7 @@ it('registers and deregisters drop components', () => {
   expect(ModuleFileDrop.activeDrops.size).toEqual(0)
 })
 
-it.skip('renders disabled file drop with loading billboard', () => {
+it('renders disabled file drop with loading billboard', () => {
   const ref = React.createRef()
   component = render(<ModuleFileDrop {...props} ref={ref} />)
   expect(ref.current.state.interaction).toBeTruthy()
@@ -80,7 +80,7 @@ it.skip('renders disabled file drop with loading billboard', () => {
   expect(component.queryAllByText('Loading...')[1]).toBeInTheDocument()
 })
 
-it.skip('renders enabled file drop with active billboard', () => {
+it('renders enabled file drop with active billboard', () => {
   const ref = React.createRef()
   component = render(<ModuleFileDrop {...props} ref={ref} />)
   ref.current.setState({folder: {files: []}})
@@ -90,7 +90,7 @@ it.skip('renders enabled file drop with active billboard', () => {
   expect(component.queryByText('or choose files')).toBeInTheDocument()
 })
 
-it.skip('renders invisible upload form when files are dropped', async () => {
+it('renders invisible upload form when files are dropped', async () => {
   const ref = React.createRef()
   component = render(<ModuleFileDrop {...props} ref={ref} />)
   await ref.current.setState({
@@ -103,7 +103,7 @@ it.skip('renders invisible upload form when files are dropped', async () => {
   expect(component.getByTestId('current-uploads')).toBeInTheDocument()
 })
 
-it.skip('renders accessibility text with the module name', async () => {
+it('renders accessibility text with the module name', async () => {
   const ref = React.createRef()
   component = render(<ModuleFileDrop {...props} ref={ref} />)
   ref.current.setState({folder: {files: []}})

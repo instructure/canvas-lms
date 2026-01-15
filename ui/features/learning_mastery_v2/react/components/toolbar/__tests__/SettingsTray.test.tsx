@@ -23,7 +23,7 @@ import {
   DisplayFilter,
   ScoreDisplayFormat,
   SecondaryInfoDisplay,
-} from '../../../utils/constants'
+} from '@canvas/outcomes/react/utils/constants'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 vi.mock('@canvas/alerts/react/FlashAlert')

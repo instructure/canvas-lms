@@ -28,6 +28,11 @@ import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
+// Mock useBroadcastQuery to avoid BroadcastChannel issues in jsdom
+vi.mock('@canvas/query/broadcast', () => ({
+  useBroadcastQuery: vi.fn(),
+}))
+
 vi.mock('@canvas/message-students-modal/react', () => ({
   default: function MockMessageStudents({onRequestClose, title, recipients, contextCode}: any) {
     return (
@@ -405,7 +410,7 @@ describe('PeopleWidget', () => {
       )
     })
 
-    it.skip('displays pagination controls when totalPages > 1', async () => {
+    it('displays pagination controls when totalPages > 1', async () => {
       renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
 
       await screen.findByText('Instructor 1')
@@ -414,7 +419,7 @@ describe('PeopleWidget', () => {
       expect(screen.getByLabelText('Instructors pagination')).toBeInTheDocument()
     })
 
-    it.skip('navigates to next page when next button clicked', async () => {
+    it('navigates to next page when next button clicked', async () => {
       const user = userEvent.setup()
       renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
 
@@ -464,7 +469,7 @@ describe('PeopleWidget', () => {
       )
     })
 
-    it.skip('renders instructor without email gracefully', async () => {
+    it('renders instructor without email gracefully', async () => {
       renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
 
       await screen.findByText('No Email Instructor')

@@ -85,12 +85,12 @@ describe('Dashboard Options Menu', () => {
     vi.clearAllMocks()
   })
 
-  it.skip('renders the menu button', () => {
+  it('renders the menu button', () => {
     const {getByTestId} = render(<DashboardOptionsMenu onDashboardChange={() => {}} />)
     expect(getByTestId('dashboard-options-button')).toBeInTheDocument()
   })
 
-  it.skip('calls onDashboardChange when new view is selected', async () => {
+  it('calls onDashboardChange when new view is selected', async () => {
     const onDashboardChange = vi.fn()
     const {getByTestId} = render(
       <DashboardOptionsMenu view="planner" onDashboardChange={onDashboardChange} />,
@@ -102,7 +102,7 @@ describe('Dashboard Options Menu', () => {
     expect(onDashboardChange).toHaveBeenCalledWith('cards')
   })
 
-  it.skip('does not call onDashboardChange when current view is selected', async () => {
+  it('does not call onDashboardChange when current view is selected', async () => {
     const onDashboardChange = vi.fn()
     const {getByTestId} = render(
       <DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChange} />,
@@ -114,7 +114,7 @@ describe('Dashboard Options Menu', () => {
     expect(onDashboardChange).not.toHaveBeenCalled()
   })
 
-  it.skip('includes List View when Student Planner is enabled', async () => {
+  it('includes List View when Student Planner is enabled', async () => {
     const {getByTestId} = render(
       <DashboardOptionsMenu planner_enabled={true} onDashboardChange={() => {}} />,
     )
@@ -123,7 +123,7 @@ describe('Dashboard Options Menu', () => {
     expect(getByTestId('list-view-menu-item')).toBeInTheDocument()
   })
 
-  it.skip('includes Homeroom View when Elementary dashboard can be enabled', async () => {
+  it('includes Homeroom View when Elementary dashboard can be enabled', async () => {
     const {getByTestId} = render(
       <DashboardOptionsMenu canEnableElementaryDashboard={true} onDashboardChange={() => {}} />,
     )
@@ -132,14 +132,14 @@ describe('Dashboard Options Menu', () => {
     expect(getByTestId('homeroom-view-menu-item')).toBeInTheDocument()
   })
 
-  it.skip('displays color overlay option in card view', async () => {
+  it('displays color overlay option in card view', async () => {
     const {getByTestId} = render(<DashboardOptionsMenu onDashboardChange={() => {}} />)
 
     await user.click(getByTestId('dashboard-options-button'))
     expect(getByTestId('color-overlay-menu-item')).toBeInTheDocument()
   })
 
-  it.skip('does not display color overlay option in activity view', async () => {
+  it('does not display color overlay option in activity view', async () => {
     const {getByTestId, queryByTestId} = render(
       <DashboardOptionsMenu view="activity" onDashboardChange={() => {}} />,
     )
@@ -148,7 +148,7 @@ describe('Dashboard Options Menu', () => {
     expect(queryByTestId('color-overlay-menu-item')).not.toBeInTheDocument()
   })
 
-  it.skip('toggles color overlays', () => {
+  it('toggles color overlays', () => {
     let dashboardMenu = null
     render(
       <FakeDashboard

@@ -132,8 +132,7 @@ class StatusesModal extends React.Component<Props, State> {
       <StatusColorListItem
         key={status}
         status={status}
-        // @ts-expect-error
-        color={this.state.colors[status]}
+        color={this.state.colors[status as keyof StatusColors]}
         isColorPickerShown={this.isPopoverShown(status)}
         colorPickerOnToggle={this.handleOnToggle(status)}
         colorPickerButtonRef={this.bindColorPickerButton(status)}

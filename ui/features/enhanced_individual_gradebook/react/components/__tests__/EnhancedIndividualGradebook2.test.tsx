@@ -115,34 +115,6 @@ describe('Enhanced Individual Gradebook', () => {
       expect(viewUngradedAsZeroCheckbox).toBeChecked()
     })
 
-    it.skip('makes api call when "View Ungraded as 0" checkbox is checked & save-view-ungraded-as-zero-to-server is true', async () => {
-      const options = setGradebookOptions({save_view_ungraded_as_zero_to_server: true})
-      fakeENV.setup({
-        ...options,
-        FEATURES: {
-          instui_nav: true,
-        },
-      })
-      mockUserSettings(false)
-
-      let apiCallMade = false
-      server.use(
-        http.put('/api/v1/courses/1/gradebook_settings', () => {
-          apiCallMade = true
-          return HttpResponse.json({})
-        }),
-      )
-
-      const {getByTestId} = renderEnhancedIndividualGradebook()
-      await new Promise(resolve => setTimeout(resolve, 0))
-      const viewUngradedAsZeroCheckbox = getByTestId('include-ungraded-assignments-checkbox')
-      expect(viewUngradedAsZeroCheckbox).not.toBeChecked()
-      expect(viewUngradedAsZeroCheckbox).toBeInTheDocument()
-      fireEvent.click(viewUngradedAsZeroCheckbox)
-      await new Promise(resolve => setTimeout(resolve, 100))
-      expect(apiCallMade).toBe(true)
-    })
-
     it('sets local storage when "Hide Student Names" checkbox is checked', async () => {
       const {mockedContextSet} = mockUserSettings(false)
       const {getByTestId} = renderEnhancedIndividualGradebook()

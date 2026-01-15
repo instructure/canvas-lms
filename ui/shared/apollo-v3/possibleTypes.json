@@ -8,6 +8,7 @@
     "Assignment",
     "Checkpoint",
     "Discussion",
+    "PeerReviewSubAssignment",
     "Quiz"
   ],
   "AssignmentOverrideSet": [
@@ -80,6 +81,7 @@
     "OutcomeFriendlyDescriptionType",
     "OutcomeProficiency",
     "Page",
+    "PeerReviewSubAssignment",
     "PostPolicy",
     "ProficiencyRating",
     "Progress",
@@ -116,6 +118,7 @@
     "File",
     "ModuleExternalTool",
     "Page",
+    "PeerReviewSubAssignment",
     "Quiz",
     "SubHeader"
   ],
@@ -156,6 +159,7 @@
     "OutcomeFriendlyDescriptionType",
     "OutcomeProficiency",
     "Page",
+    "PeerReviewSubAssignment",
     "PostPolicy",
     "Progress",
     "Quiz",
@@ -225,6 +229,7 @@
     "OutcomeAlignment",
     "OutcomeFriendlyDescriptionType",
     "Page",
+    "PeerReviewSubAssignment",
     "Progress",
     "Quiz",
     "QuizSubmission",

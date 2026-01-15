@@ -23,7 +23,7 @@ import editorUtils from '@canvas/rce/editorUtils'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import fixtures from '@canvas/test-utils/fixtures'
 
-describe.skip('loadRCE', () => {
+describe('loadRCE', () => {
   let originalTinymce
   let originalTinyMCE
 
@@ -42,27 +42,31 @@ describe.skip('loadRCE', () => {
     return editorUtils.resetRCE()
   })
 
-  it('caches the response of get_module when called', done => {
-    RCELoader.RCE = null
-    RCELoader.loadRCE(module => {
-      expect(RCELoader.RCE).toBe(module)
-      done()
+  it('caches the response of get_module when called', () => {
+    return new Promise(resolve => {
+      RCELoader.RCE = null
+      RCELoader.loadRCE(module => {
+        expect(RCELoader.RCE).toBe(module)
+        resolve()
+      })
     })
   })
 
-  it('handles callbacks once module is loaded', done => {
-    const spy = vi.fn()
-    RCELoader.loadRCE(spy)
-    RCELoader.loadRCE(RCE => {
-      expect(RCE).toBe(RCELoader.RCE)
-      expect(spy).toHaveBeenCalledWith(RCELoader.RCE)
-      expect(spy).toHaveBeenCalledTimes(1)
-      done()
+  it('handles callbacks once module is loaded', () => {
+    return new Promise(resolve => {
+      const spy = vi.fn()
+      RCELoader.loadRCE(spy)
+      RCELoader.loadRCE(RCE => {
+        expect(RCE).toBe(RCELoader.RCE)
+        expect(spy).toHaveBeenCalledWith(RCELoader.RCE)
+        expect(spy).toHaveBeenCalledTimes(1)
+        resolve()
+      })
     })
   })
 })
 
-describe.skip('loadOnTarget', () => {
+describe('loadOnTarget', () => {
   let $div
   let $textarea
   let editor
@@ -135,22 +139,26 @@ describe.skip('loadOnTarget', () => {
     expect(props.onFocus).toBe(opts.onFocus)
   })
 
-  it('yields both the original textarea and the editor to callback', done => {
-    function cb(_textarea, editorInstance) {
-      expect($textarea.get(0)).toBe(mockTextarea)
-      expect(editorInstance).toBe(editor)
-      done()
-    }
-    RCELoader.loadOnTarget($textarea, {}, cb)
+  it('yields both the original textarea and the editor to callback', () => {
+    return new Promise(resolve => {
+      function cb(_textarea, editorInstance) {
+        expect($textarea.get(0)).toBe(mockTextarea)
+        expect(editorInstance).toBe(editor)
+        resolve()
+      }
+      RCELoader.loadOnTarget($textarea, {}, cb)
+    })
   })
 
-  it('ensures yielded editor has call and focus methods', done => {
-    function cb(_textarea, rce_) {
-      expect(typeof rce_.call).toBe('function')
-      expect(typeof rce_.focus).toBe('function')
-      done()
-    }
-    RCELoader.loadOnTarget($textarea, {}, cb)
+  it('ensures yielded editor has call and focus methods', () => {
+    return new Promise(resolve => {
+      function cb(_textarea, rce_) {
+        expect(typeof rce_.call).toBe('function')
+        expect(typeof rce_.focus).toBe('function')
+        resolve()
+      }
+      RCELoader.loadOnTarget($textarea, {}, cb)
+    })
   })
 
   it('populates externalToolsConfig without context_external_tool_resource_selection_url', () => {

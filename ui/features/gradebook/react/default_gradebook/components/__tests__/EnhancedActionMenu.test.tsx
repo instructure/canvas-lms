@@ -19,7 +19,7 @@
  */
 
 import {assignLocation} from '@canvas/util/globalUtils'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, cleanup, fireEvent, render, waitFor} from '@testing-library/react'
 import {assign} from 'es-toolkit/compat'
 import React from 'react'
 import PostGradesApp from '../../../SISGradePassback/PostGradesApp'
@@ -105,11 +105,15 @@ describe('EnhancedActionMenu', () => {
     props = {
       ...workingMenuProps(),
     }
+    // Reset the assignLocation mock to ensure clean state
+    vi.mocked(assignLocation).mockClear()
   })
 
   afterEach(() => {
+    cleanup()
     fakeENV.teardown()
     vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   const renderComponent = props_ => {
@@ -266,6 +270,10 @@ describe('EnhancedActionMenu', () => {
       clickOnDropdown('Export')
     })
 
+    afterEach(() => {
+      startExport.mockRestore()
+    })
+
     it('shows a message to the user indicating the export is in progress', async () => {
       const exportResult = getPromise('resolved')
       startExport.mockReturnValue(exportResult)
@@ -400,6 +408,9 @@ describe('EnhancedActionMenu', () => {
     })
 
     it.skip('on failure, shows a message to the user indicating the export failed', async () => {
+      // SKIP REASON: Test fails with "Timers are not mocked" error when waitFor tries to
+      // advance timers. The test needs vi.useFakeTimers() setup but other tests in this
+      // file may not be compatible with fake timers.
       const spy = vi.spyOn(window.$, 'flashError').mockReturnValue(true)
       const exportResult = getPromise('rejected')
       startExport.mockReturnValue(exportResult)

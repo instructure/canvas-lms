@@ -19,15 +19,33 @@
 import {gql} from '@apollo/client'
 
 export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
-  query GetPeerReviewAssignment($assignmentId: ID!) {
+  query GetPeerReviewAssignment($assignmentId: ID!, $userId: ID!) {
     assignment(id: $assignmentId) {
       _id
       name
       dueAt
       description
+      expectsSubmission
+      nonDigitalSubmission
+      pointsPossible
       courseId
       peerReviews {
         count
+        submissionRequired
+      }
+      submissionsConnection(filter: {userId: $userId}) {
+        nodes {
+          _id
+          submissionStatus
+        }
+      }
+      assignedToDates {
+        dueAt
+        peerReviewDates {
+          dueAt
+          unlockAt
+          lockAt
+        }
       }
       assessmentRequestsForCurrentUser {
         _id
@@ -39,7 +57,35 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
           attempt
           body
           submissionType
+          url
+          attachments {
+            _id
+            displayName
+            mimeClass
+            size
+            thumbnailUrl
+            submissionPreviewUrl
+            url
+          }
         }
+      }
+      rubric {
+        _id
+      }
+    }
+  }
+`
+
+export const REVIEWER_SUBMISSION_QUERY = gql`
+  query GetReviewerSubmission($assignmentId: ID!, $userId: ID!) {
+    submission(assignmentId: $assignmentId, userId: $userId) {
+      _id
+      id
+      attempt
+      assignedAssessments {
+        assetId
+        workflowState
+        assetSubmissionType
       }
     }
   }

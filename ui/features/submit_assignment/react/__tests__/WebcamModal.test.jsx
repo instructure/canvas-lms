@@ -18,7 +18,7 @@
 
 import React from 'react'
 import WebcamModal from '../WebcamModal'
-import {render, fireEvent, act} from '@testing-library/react'
+import {cleanup, render, fireEvent, act} from '@testing-library/react'
 
 vi.useFakeTimers()
 
@@ -53,14 +53,19 @@ describe('WebcamModal', () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
       drawImage: vi.fn(),
     })
-    vi
-      .spyOn(HTMLCanvasElement.prototype, 'toDataURL')
-      .mockReturnValue('data:image/png;base64,mockData')
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+      'data:image/png;base64,mockData',
+    )
   })
 
   afterEach(() => {
+    cleanup()
     vi.clearAllMocks()
     vi.restoreAllMocks()
+  })
+
+  afterAll(() => {
+    vi.useRealTimers()
   })
 
   const getProps = (override = {}) => {

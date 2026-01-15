@@ -153,4 +153,82 @@ describe AssignmentConfigurationToolLookup do
       )
     end
   end
+
+  describe "#migration_started?" do
+    let(:actl) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool_type: "Lti::MessageHandler",
+        tool_product_code: product_family.product_code,
+        tool_vendor_code: product_family.vendor_code,
+        tool_resource_type_code: resource_handler.resource_type_code
+      )
+    end
+    let(:aptool) do
+      course.context_external_tools.create!(
+        name: "migrated tool",
+        url: "http://www.example.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+    end
+
+    it "returns true when tool_proxy.migrated_to_context_external_tool is present" do
+      tool_proxy.update!(migrated_to_context_external_tool: aptool)
+      expect(actl.migration_started?).to be true
+    end
+
+    it "returns false when tool_proxy.migrated_to_context_external_tool is nil" do
+      tool_proxy.update!(migrated_to_context_external_tool: nil)
+      expect(actl.migration_started?).to be false
+    end
+  end
+
+  describe "#migrated?" do
+    let(:actl) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool_type: "Lti::MessageHandler",
+        tool_product_code: product_family.product_code,
+        tool_vendor_code: product_family.vendor_code,
+        tool_resource_type_code: resource_handler.resource_type_code
+      )
+    end
+    let(:aptool) do
+      course.context_external_tools.create!(
+        name: "migrated tool",
+        url: "http://www.example.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+    end
+
+    before { tool_proxy.update!(migrated_to_context_external_tool: aptool) }
+
+    it "returns true when migration started and asset processor has migrated_from_cpf" do
+      assignment.lti_asset_processors.create!(
+        context_external_tool: aptool,
+        custom: { "migrated_from_cpf" => "true" }
+      )
+      expect(actl.migrated?).to be true
+    end
+
+    it "returns false when migration started but asset processor has empty custom" do
+      assignment.lti_asset_processors.create!(context_external_tool: aptool, custom: {})
+      expect(actl.migrated?).to be false
+    end
+
+    it "returns false when no asset processors exist" do
+      expect(actl.migrated?).to be false
+    end
+
+    it "returns false when migration not started" do
+      tool_proxy.update!(migrated_to_context_external_tool: nil)
+      assignment.lti_asset_processors.create!(
+        context_external_tool: aptool,
+        custom: { "migrated_from_cpf" => "true" }
+      )
+      expect(actl.migrated?).to be false
+    end
+  end
 end

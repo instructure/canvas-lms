@@ -62,7 +62,7 @@ describe('OutcomeGroupView', () => {
       })
     })
 
-    it.skip('renders placeholder text properly for new outcome groups', async () => {
+    it('renders placeholder text properly for new outcome groups', async () => {
       const view = createView({
         state: 'add',
         model: outcomeGroup,
@@ -87,7 +87,7 @@ describe('OutcomeGroupView', () => {
       view.remove()
     })
 
-    it.skip('validates title is present', () => {
+    it('validates title is present', () => {
       const view = createView({
         state: 'add',
         model: outcomeGroup,
@@ -98,7 +98,7 @@ describe('OutcomeGroupView', () => {
       view.remove()
     })
 
-    it.skip('displays move, edit, and delete buttons', () => {
+    it('displays move, edit, and delete buttons', () => {
       const view = createView({
         state: 'show',
         model: outcomeGroup,
@@ -108,7 +108,7 @@ describe('OutcomeGroupView', () => {
       view.remove()
     })
 
-    it.skip('hides move, edit, and delete buttons when read only', () => {
+    it('hides move, edit, and delete buttons when read only', () => {
       const view = createView({
         state: 'show',
         model: outcomeGroup,
@@ -133,7 +133,7 @@ describe('OutcomeGroupView', () => {
       })
     })
 
-    it.skip('does not display move, edit, and delete buttons', () => {
+    it('does not display move, edit, and delete buttons', () => {
       const view = createView({
         state: 'show',
         model: outcomeGroup,

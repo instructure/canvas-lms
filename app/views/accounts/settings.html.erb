@@ -571,8 +571,21 @@
                 <%= settings.label :users_can_edit_name, :en => "Users can edit their name" %>
               </div>
               <div>
-                <%= settings.check_box :users_can_edit_profile, :checked => @account.users_can_edit_profile? %>
+                <%= settings.check_box :users_can_edit_profile, :checked => @account.users_can_edit_profile?, class: "element_toggler", "aria-controls": "edit_profile_options" %>
                 <%= settings.label :users_can_edit_profile, :en => "Users can edit their profile" %>
+                <div id="edit_profile_options" <%= hidden(include_style: true) unless @account.users_can_edit_profile? %>>
+                  <div>
+                    <%= settings.check_box :users_can_edit_title, :checked => @account.users_can_edit_title? %>
+                    <%= settings.label :users_can_edit_title, :en => "Users can edit their title" %>
+                  </div>
+                  <div>
+                    <%= settings.check_box :users_can_edit_bio, :checked => @account.users_can_edit_bio? %>
+                    <%= settings.label :users_can_edit_bio, :en => "Users can edit their bio" %>
+                  </div>
+                  <div>
+                    <%= settings.check_box :users_can_edit_profile_links, :checked => @account.users_can_edit_profile_links? %>
+                    <%= settings.label :users_can_edit_profile_links, :en => "Users can edit their profile links" %>
+                  </div>
               </div>
             <% end %>
           </fieldset>

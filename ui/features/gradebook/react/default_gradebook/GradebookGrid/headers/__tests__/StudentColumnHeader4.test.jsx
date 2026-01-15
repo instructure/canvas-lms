@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {waitFor} from '@testing-library/react'
 import studentRowHeaderConstants from '../../../constants/studentRowHeaderConstants'
 import StudentColumnHeader from '../StudentColumnHeader'
 import {getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
@@ -95,65 +96,63 @@ describe('GradebookGrid StudentColumnHeader', () => {
     return document.querySelector(`[aria-labelledby="${$button.id}"]`)
   }
 
-  function openOptionsMenu() {
+  async function openOptionsMenu() {
     getOptionsMenuTrigger().click()
-    $menuContent = getOptionsMenuContent()
+    await waitFor(() => {
+      $menuContent = getOptionsMenuContent()
+      expect($menuContent).toBeInTheDocument()
+    })
   }
 
-  function mountAndOpenOptionsMenu() {
+  async function mountAndOpenOptionsMenu() {
     mountComponent()
-    openOptionsMenu()
+    await openOptionsMenu()
   }
 
   function closeOptionsMenu() {
     getOptionsMenuTrigger().click()
   }
 
-  describe.skip('"Options" > "Secondary info" setting', () => {
+  describe('"Options" > "Secondary info" setting', () => {
     function getSecondaryInfoOption(label) {
       return getMenuItem($menuContent, 'Secondary info', label)
     }
 
-    it.skip('is added as a Gradebook element when opened', () => {
-      mountAndOpenOptionsMenu()
-      const $sortByMenuContent = getMenuContent($menuContent, 'Secondary info')
-      expect(gradebookElements.indexOf($sortByMenuContent)).not.toBe(-1)
-    })
 
-    it('is removed as a Gradebook element when closed', () => {
-      mountAndOpenOptionsMenu()
+    it('is removed as a Gradebook element when closed', async () => {
+      await mountAndOpenOptionsMenu()
       const $sortByMenuContent = getMenuContent($menuContent, 'Secondary info')
       closeOptionsMenu()
       expect(gradebookElements.indexOf($sortByMenuContent)).toBe(-1)
     })
 
-    it('is disabled when all options are disabled', () => {
+    it('is disabled when all options are disabled', async () => {
       props.disabled = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem($menuContent, 'Secondary info').getAttribute('aria-disabled')).toBe('true')
     })
 
     describe('"Section" option', () => {
-      it('is present when the course is using sections', () => {
-        mountAndOpenOptionsMenu()
+      it('is present when the course is using sections', async () => {
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Section')).toBeTruthy()
       })
 
-      it('is not present when the course is not using sections', () => {
+      it('is not present when the course is not using sections', async () => {
         props.sectionsEnabled = false
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Section')).toBeFalsy()
       })
 
-      it('is selected when displaying sections for secondary info', () => {
+      it('is selected when displaying sections for secondary info', async () => {
         props.selectedSecondaryInfo = 'section'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Section').getAttribute('aria-checked')).toBe('true')
       })
 
-      it('is not selected when displaying different secondary info', () => {
+      it('is not selected when displaying different secondary info', async () => {
         props.selectedSecondaryInfo = 'sis_id'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Section').getAttribute('aria-checked')).toBe('false')
       })
 
@@ -162,14 +161,14 @@ describe('GradebookGrid StudentColumnHeader', () => {
           props.onSelectSecondaryInfo = vi.fn()
         })
 
-        it('calls the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Section').click()
           expect(props.onSelectSecondaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        it('includes "section" when calling the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('includes "section" when calling the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Section').click()
           const [secondaryInfoType] =
             props.onSelectSecondaryInfo.mock.calls[
@@ -178,44 +177,38 @@ describe('GradebookGrid StudentColumnHeader', () => {
           expect(secondaryInfoType).toBe('section')
         })
 
-        it('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Section').focus()
           getSecondaryInfoOption('Section').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        it.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
-          props.selectedSecondaryInfo = 'section'
-          mountAndOpenOptionsMenu()
-          getSecondaryInfoOption('Section').click()
-          expect(props.onSelectSecondaryInfo).not.toHaveBeenCalled()
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
       })
     })
 
     describe('"Group" option', () => {
-      it('is present when the course has student groups', () => {
-        mountAndOpenOptionsMenu()
+      it('is present when the course has student groups', async () => {
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Group')).toBeTruthy()
       })
 
-      it('is not present when the course has no student groups', () => {
+      it('is not present when the course has no student groups', async () => {
         props.studentGroupsEnabled = false
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Group')).toBeFalsy()
       })
 
-      it('is selected when displaying student groups for secondary info', () => {
+      it('is selected when displaying student groups for secondary info', async () => {
         props.selectedSecondaryInfo = 'group'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Group').getAttribute('aria-checked')).toBe('true')
       })
 
-      it('is not selected when displaying different secondary info', () => {
+      it('is not selected when displaying different secondary info', async () => {
         props.selectedSecondaryInfo = 'sis_id'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Group').getAttribute('aria-checked')).toBe('false')
       })
 
@@ -224,14 +217,14 @@ describe('GradebookGrid StudentColumnHeader', () => {
           props.onSelectSecondaryInfo = vi.fn()
         })
 
-        it('calls the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Group').click()
           expect(props.onSelectSecondaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        it('includes "group" when calling the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('includes "group" when calling the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Group').click()
           const [secondaryInfoType] =
             props.onSelectSecondaryInfo.mock.calls[
@@ -240,45 +233,39 @@ describe('GradebookGrid StudentColumnHeader', () => {
           expect(secondaryInfoType).toBe('group')
         })
 
-        it('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Group').focus()
           getSecondaryInfoOption('Group').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        it.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
-          props.selectedSecondaryInfo = 'group'
-          mountAndOpenOptionsMenu()
-          getSecondaryInfoOption('Group').click()
-          expect(props.onSelectSecondaryInfo).not.toHaveBeenCalled()
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
       })
     })
 
     describe('"SIS ID" option', () => {
-      it('displays the configured SIS name', () => {
+      it('displays the configured SIS name', async () => {
         props.sisName = 'Powerschool'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Powerschool')).toBeTruthy()
       })
 
-      it('displays "SIS ID" when no SIS is configured', () => {
+      it('displays "SIS ID" when no SIS is configured', async () => {
         props.sisName = null
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('SIS ID')).toBeTruthy()
       })
 
-      it('is selected when displaying SIS ids for secondary info', () => {
+      it('is selected when displaying SIS ids for secondary info', async () => {
         props.selectedSecondaryInfo = 'sis_id'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('SIS ID').getAttribute('aria-checked')).toBe('true')
       })
 
-      it('is not selected when displaying different secondary info', () => {
+      it('is not selected when displaying different secondary info', async () => {
         props.selectedSecondaryInfo = 'section'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('SIS ID').getAttribute('aria-checked')).toBe('false')
       })
 
@@ -287,14 +274,14 @@ describe('GradebookGrid StudentColumnHeader', () => {
           props.onSelectSecondaryInfo = vi.fn()
         })
 
-        it('calls the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('SIS ID').click()
           expect(props.onSelectSecondaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        it('includes "sis_id" when calling the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('includes "sis_id" when calling the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('SIS ID').click()
           const [secondaryInfoType] =
             props.onSelectSecondaryInfo.mock.calls[
@@ -303,38 +290,32 @@ describe('GradebookGrid StudentColumnHeader', () => {
           expect(secondaryInfoType).toBe('sis_id')
         })
 
-        it('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('SIS ID').focus()
           getSecondaryInfoOption('SIS ID').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        it.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
-          props.selectedSecondaryInfo = 'sis_id'
-          mountAndOpenOptionsMenu()
-          getSecondaryInfoOption('SIS ID').click()
-          expect(props.onSelectSecondaryInfo).not.toHaveBeenCalled()
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
       })
     })
 
     describe('"Integration ID" option', () => {
-      it('is always present', () => {
-        mountAndOpenOptionsMenu()
+      it('is always present', async () => {
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Integration ID')).toBeTruthy()
       })
 
-      it('is selected when displaying integration ids for secondary info', () => {
+      it('is selected when displaying integration ids for secondary info', async () => {
         props.selectedSecondaryInfo = 'integration_id'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Integration ID').getAttribute('aria-checked')).toBe('true')
       })
 
-      it('is not selected when displaying different secondary info', () => {
+      it('is not selected when displaying different secondary info', async () => {
         props.selectedSecondaryInfo = 'section'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Integration ID').getAttribute('aria-checked')).toBe('false')
       })
 
@@ -343,14 +324,14 @@ describe('GradebookGrid StudentColumnHeader', () => {
           props.onSelectSecondaryInfo = vi.fn()
         })
 
-        it('calls the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Integration ID').click()
           expect(props.onSelectSecondaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        it('includes "integration_id" when calling the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('includes "integration_id" when calling the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Integration ID').click()
           const [secondaryInfoType] =
             props.onSelectSecondaryInfo.mock.calls[
@@ -359,45 +340,39 @@ describe('GradebookGrid StudentColumnHeader', () => {
           expect(secondaryInfoType).toBe('integration_id')
         })
 
-        it('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Integration ID').focus()
           getSecondaryInfoOption('Integration ID').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        it.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
-          props.selectedSecondaryInfo = 'integration_id'
-          mountAndOpenOptionsMenu()
-          getSecondaryInfoOption('Integration ID').click()
-          expect(props.onSelectSecondaryInfo).not.toHaveBeenCalled()
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
       })
     })
 
     describe('"Login ID" option', () => {
-      it('displays the configured login id name', () => {
+      it('displays the configured login id name', async () => {
         props.loginHandleName = 'Email'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Email')).toBeTruthy()
       })
 
-      it('displays "Login ID" when no login id name is configured', () => {
+      it('displays "Login ID" when no login id name is configured', async () => {
         props.loginHandleName = null
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Login ID')).toBeTruthy()
       })
 
-      it('is selected when displaying login ids for secondary info', () => {
+      it('is selected when displaying login ids for secondary info', async () => {
         props.selectedSecondaryInfo = 'login_id'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Login ID').getAttribute('aria-checked')).toBe('true')
       })
 
-      it('is not selected when displaying different secondary info', () => {
+      it('is not selected when displaying different secondary info', async () => {
         props.selectedSecondaryInfo = 'section'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('Login ID').getAttribute('aria-checked')).toBe('false')
       })
 
@@ -406,14 +381,14 @@ describe('GradebookGrid StudentColumnHeader', () => {
           props.onSelectSecondaryInfo = vi.fn()
         })
 
-        it('calls the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Login ID').click()
           expect(props.onSelectSecondaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        it('includes "login_id" when calling the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('includes "login_id" when calling the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Login ID').click()
           const [secondaryInfoType] =
             props.onSelectSecondaryInfo.mock.calls[
@@ -422,38 +397,32 @@ describe('GradebookGrid StudentColumnHeader', () => {
           expect(secondaryInfoType).toBe('login_id')
         })
 
-        it('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('Login ID').focus()
           getSecondaryInfoOption('Login ID').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        it.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
-          props.selectedSecondaryInfo = 'login_id'
-          mountAndOpenOptionsMenu()
-          getSecondaryInfoOption('Login ID').click()
-          expect(props.onSelectSecondaryInfo).not.toHaveBeenCalled()
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
       })
     })
 
     describe('"None" option', () => {
-      it('is always present', () => {
-        mountAndOpenOptionsMenu()
+      it('is always present', async () => {
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('None')).toBeTruthy()
       })
 
-      it('is selected when not displaying secondary info', () => {
+      it('is selected when not displaying secondary info', async () => {
         props.selectedSecondaryInfo = 'none'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('None').getAttribute('aria-checked')).toBe('true')
       })
 
-      it('is not selected when displaying secondary info', () => {
+      it('is not selected when displaying secondary info', async () => {
         props.selectedSecondaryInfo = 'section'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSecondaryInfoOption('None').getAttribute('aria-checked')).toBe('false')
       })
 
@@ -462,14 +431,14 @@ describe('GradebookGrid StudentColumnHeader', () => {
           props.onSelectSecondaryInfo = vi.fn()
         })
 
-        it('calls the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('None').click()
           expect(props.onSelectSecondaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        it('includes "none" when calling the .onSelectSecondaryInfo callback', () => {
-          mountAndOpenOptionsMenu()
+        it('includes "none" when calling the .onSelectSecondaryInfo callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('None').click()
           const [secondaryInfoType] =
             props.onSelectSecondaryInfo.mock.calls[
@@ -478,19 +447,13 @@ describe('GradebookGrid StudentColumnHeader', () => {
           expect(secondaryInfoType).toBe('none')
         })
 
-        it('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getSecondaryInfoOption('None').focus()
           getSecondaryInfoOption('None').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        it.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
-          props.selectedSecondaryInfo = 'none'
-          mountAndOpenOptionsMenu()
-          getSecondaryInfoOption('None').click()
-          expect(props.onSelectSecondaryInfo).not.toHaveBeenCalled()
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
       })
     })

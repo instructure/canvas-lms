@@ -19,8 +19,11 @@
 import React from 'react'
 import {TempEnrollSearchConfirmation} from '../TempEnrollSearchConfirmation'
 import {render} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import type {User, DuplicateUser} from '../types'
+
+const server = setupServer()
 
 const props = {
   foundUsers: [],
@@ -47,46 +50,50 @@ const twoUser = {
   primary_email: 'user2@email.com',
 } as User
 
-// @ts-expect-error
-const twoBrotherUser = {
+const twoBrotherUser: DuplicateUser = {
   user_name: 'brother_2',
   user_id: '21',
   sis_user_id: 'sis_2',
-  primary_email: 'user2@email.com',
-} as DuplicateUser
+  address: 'user2@email.com',
+  account_name: 'Test Account',
+}
 
-// @ts-expect-error
-const twoSisterUser = {
-  name: 'sister_2',
+const twoSisterUser: DuplicateUser = {
   user_name: 'sister_2',
   user_id: '22',
-  id: '22',
   sis_user_id: 'sis_2',
-  primary_email: 'user2@email.com',
-} as DuplicateUser
+  address: 'user2@email.com',
+  account_name: 'Test Account',
+}
 
-const threeBrotherUser = {
+const threeBrotherUser: DuplicateUser = {
   user_name: 'brother_3',
   user_id: '31',
   sis_user_id: 'sis_3',
-  primary_email: 'user3@email.com',
+  address: 'user3@email.com',
+  account_name: 'Test Account',
 }
 
-const threeSisterUser = {
+const threeSisterUser: DuplicateUser = {
   user_name: 'sister_3',
   user_id: '32',
   sis_user_id: 'sis_3',
-  primary_email: 'user3@email.com',
+  address: 'user3@email.com',
+  account_name: 'Test Account',
 }
 
 const userDetailsUriMock = (userId: string, response: object) =>
-  fetchMock.getOnce(`/api/v1/users/${userId}/profile`, response)
+  server.use(
+    http.get(`/api/v1/users/${userId}/profile`, () => HttpResponse.json(response), {once: true}),
+  )
 
 describe('TempEnrollSearchConfirmation', () => {
-  beforeEach(() => {
-    fetchMock.reset()
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
     vi.clearAllMocks()
   })
+  afterAll(() => server.close())
 
   it('render one user', async () => {
     userDetailsUriMock('1', oneUser)
@@ -127,7 +134,6 @@ describe('TempEnrollSearchConfirmation', () => {
       sis_3: [threeSisterUser, threeBrotherUser],
     }
     const {getByText, getAllByText} = render(
-      // @ts-expect-error
       <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />,
     )
 
@@ -146,7 +152,6 @@ describe('TempEnrollSearchConfirmation', () => {
       sis_3: [threeSisterUser, threeBrotherUser],
     }
     const {getByLabelText, getByText} = render(
-      // @ts-expect-error
       <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />,
     )
 

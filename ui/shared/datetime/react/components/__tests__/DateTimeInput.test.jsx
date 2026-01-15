@@ -80,10 +80,9 @@ describe('DateTimeInput::', () => {
     expect(getByDisplayValue('5:00 AM')).toBeInTheDocument()
   })
 
-  // FOO-3060 (08/16/2022)
-  it.skip('displays the currently-selected date and time', () => {
+  it('displays the currently-selected date and time', () => {
     const {getAllByText} = renderInput()
-    getAllByText('Wed, April 7, 2021, 5:00 AM') // should not throw
+    getAllByText('Wed, April 7, 2021 at 5:00 AM') // should not throw
   })
 
   it('makes a good callback when the date is changed', async () => {
@@ -111,14 +110,13 @@ describe('DateTimeInput::', () => {
     await waitFor(() => expect(queryAllByText('Wed, April 7, 2021, 3:30 PM')).not.toBeNull())
   })
 
-  // FOO-3060 (08/16/2022)
-  it.skip('replaces the value when a new one is provided via props', () => {
+  it('replaces the value when a new one is provided via props', () => {
     const {getByDisplayValue, getAllByText, rerender} = renderInput()
-    getAllByText('Wed, April 7, 2021, 5:00 AM') // should not throw
+    getAllByText('Wed, April 7, 2021 at 5:00 AM') // should not throw
     rerender(<DateTimeInput {...props} value="2022-01-01T14:00:00Z" />)
     expect(getByDisplayValue('Sat, January 1, 2022')).toBeInTheDocument()
     expect(getByDisplayValue('4:00 AM')).toBeInTheDocument()
-    getAllByText('Sat, January 1, 2022, 4:00 AM') // should not throw
+    getAllByText('Sat, January 1, 2022 at 4:00 AM') // should not throw
   })
 
   /*
@@ -127,6 +125,7 @@ describe('DateTimeInput::', () => {
    * The DST behavior was however extensively tested manually.
    */
 
+  // Locale format differs between Node.js versions
   it.skip('works when a DST boundary is crossed DT -> ST', () => {
     const dstProps = {...props, timezone: 'America/New_York'}
     const {getByLabelText, getByDisplayValue, getAllByText} = renderInput(dstProps)

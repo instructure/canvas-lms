@@ -86,9 +86,9 @@ export const useGetAssigneeOptions = ({
     isFetching: isDifferentiationTagsLoading,
     error: differentiationTagsError,
   } = useQuery({
-    queryKey: ['differentiationTags', ENV.current_user_id, courseId, params],
+    queryKey: ['differentiationTags', ENV?.current_user_id, courseId, params],
     queryFn: getDifferentiationTags,
-    enabled: shouldFetch,
+    enabled: shouldFetch && !!ENV?.current_user_id,
   })
 
   useEffect(() => {

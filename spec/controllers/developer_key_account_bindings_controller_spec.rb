@@ -181,4 +181,101 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       expect(response).to be_not_found
     end
   end
+
+  describe "modify_site_admin_developer_keys permission" do
+    let(:site_admin) { Account.site_admin }
+    let(:site_admin_admin) { account_admin_user(account: site_admin) }
+    let(:site_admin_without_permission) do
+      user = user_model
+      role = custom_account_role("limited_admin", account: site_admin)
+      # Grant manage_developer_keys but not modify_site_admin_developer_keys
+      site_admin.role_overrides.create!(
+        permission: :manage_developer_keys,
+        role:,
+        enabled: true
+      )
+      site_admin.account_users.create!(user:, role:)
+      user
+    end
+    let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key") }
+    let(:site_admin_binding_params) do
+      {
+        account_id: site_admin.id,
+        developer_key_id: site_admin_key.global_id,
+        developer_key_account_binding: {
+          workflow_state: "on"
+        }
+      }
+    end
+
+    before do
+      site_admin.enable_feature!(:modify_site_admin_developer_keys_permission)
+    end
+
+    context "when user has modify_site_admin_developer_keys permission" do
+      before { user_session(site_admin_admin) }
+
+      it "allows creating/updating site admin developer key bindings" do
+        post :create_or_update, params: site_admin_binding_params, format: :json
+        expect(response).to be_successful
+
+        binding = DeveloperKeyAccountBinding.find(json_parse["id"])
+        expect(binding.account).to eq(site_admin)
+        expect(binding.workflow_state).to eq("on")
+      end
+    end
+
+    context "when user lacks modify_site_admin_developer_keys permission" do
+      before { user_session(site_admin_without_permission) }
+
+      it "returns forbidden for site admin developer key bindings" do
+        post :create_or_update, params: site_admin_binding_params, format: :json
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        site_admin.disable_feature!(:modify_site_admin_developer_keys_permission)
+        user_session(site_admin_without_permission)
+      end
+
+      it "allows access when feature flag is off" do
+        post :create_or_update, params: site_admin_binding_params, format: :json
+        expect(response).to be_successful
+      end
+    end
+
+    context "for regular account developer keys" do
+      let(:regular_account) { account_model }
+      let(:regular_account_admin) do
+        user = user_model
+        role = custom_account_role("limited_admin", account: regular_account)
+        regular_account.role_overrides.create!(
+          permission: :manage_developer_keys,
+          role:,
+          enabled: true
+        )
+        regular_account.account_users.create!(user:, role:)
+        user
+      end
+      let(:regular_account_key) { DeveloperKey.create!(name: "Regular Key", account: regular_account) }
+      let(:regular_binding_params) do
+        {
+          account_id: regular_account.id,
+          developer_key_id: regular_account_key.global_id,
+          developer_key_account_binding: {
+            workflow_state: "on"
+          }
+        }
+      end
+
+      before { user_session(regular_account_admin) }
+
+      it "does not require modify_site_admin_developer_keys for regular account keys" do
+        post :create_or_update, params: regular_binding_params, format: :json
+        expect(response).to be_successful
+      end
+    end
+  end
 end

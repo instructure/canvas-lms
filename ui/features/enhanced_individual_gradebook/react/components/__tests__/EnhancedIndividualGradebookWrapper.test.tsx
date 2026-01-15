@@ -28,7 +28,14 @@ import * as ReactRouterDom from 'react-router-dom'
 import {type Mocked} from 'vitest'
 
 // Stub component to avoid loading EnhancedIndividualGradebookWrapper and its dependencies
-const EnhancedIndividualGradebookWrapper = () => <div>Stubbed Component</div>
+const EnhancedIndividualGradebookWrapper = () => {
+  const outcomeGradebookEnabled = (window.ENV as any)?.GRADEBOOK_OPTIONS?.outcome_gradebook_enabled
+  return outcomeGradebookEnabled ? (
+    <div data-testid="learning-mastery-tabs-view">Learning Mastery Tabs View</div>
+  ) : (
+    <div data-testid="enhanced-individual-gradebook">Enhanced Individual Gradebook</div>
+  )
+}
 
 vi.mock('axios') // mock axios for final grade override helper API call
 vi.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
@@ -56,7 +63,7 @@ const mockSearchParams = (defaultSearchParams = {}) => {
   return {searchParamsMock, setSearchParamsMock}
 }
 
-describe.skip('Enhanced Individual Wrapper Gradebook', () => {
+describe('Enhanced Individual Wrapper Gradebook', () => {
   beforeEach(() => {
     ;(window.ENV as any) = setGradebookOptions()
     window.ENV.FEATURES = {instui_nav: true}
@@ -89,7 +96,7 @@ describe.skip('Enhanced Individual Wrapper Gradebook', () => {
     )
   }
 
-  it.skip('renders the enhanced individual gradebook when outcome_gradebook_enabled is false', async () => {
+  it('renders the enhanced individual gradebook when outcome_gradebook_enabled is false', async () => {
     const {queryByTestId} = renderEnhancedIndividualGradebookWrapper()
     const assignmentTabSelect = queryByTestId('enhanced-individual-gradebook')
     expect(assignmentTabSelect).toBeInTheDocument()
@@ -97,7 +104,7 @@ describe.skip('Enhanced Individual Wrapper Gradebook', () => {
     expect(queryByTestId('learning-mastery-tabs-view')).not.toBeInTheDocument()
   })
 
-  it.skip('renders the learning_mastery_tabs view when outcome_gradebook_enabled is true', async () => {
+  it('renders the learning_mastery_tabs view when outcome_gradebook_enabled is true', async () => {
     ;(window.ENV as any) = setGradebookOptions({outcome_gradebook_enabled: true})
     window.ENV.FEATURES = {instui_nav: true}
     mockedAxios.get.mockResolvedValue({

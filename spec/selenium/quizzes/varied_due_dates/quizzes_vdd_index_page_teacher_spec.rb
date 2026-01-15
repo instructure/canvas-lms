@@ -79,7 +79,7 @@ describe "viewing a quiz with variable due dates on the quizzes index page" do
     end
 
     it "does not show due dates on index page" do
-      expect(fj("#assignment-quizzes:contains('Test Assignment')")).to be_displayed
+      expect(fj("#assignment-quizzes:contains('Test Quiz')")).to be_displayed
       expect(f("#assignment-quizzes")).not_to contain_css('[data-view="date-available"]')
       expect(f("#assignment-quizzes")).not_to contain_css('[data-view="date-due"]')
     end

@@ -75,18 +75,20 @@ describe('loadEventListeners', () => {
     vi.restoreAllMocks()
   })
 
-  it.skip('initializes equella plugin', done => {
-    expect.assertions(1)
-    window.alert = vi.fn()
+  it('initializes equella plugin', () => {
+    return new Promise(resolve => {
+      expect.assertions(1)
+      window.alert = vi.fn()
 
-    loadEventListeners({
-      equellaCB() {
-        expect(window.alert).toHaveBeenCalledWith(
-          'Equella is not properly configured for this account, please notify your system administrator.',
-        )
-        done()
-      },
+      loadEventListeners({
+        equellaCB() {
+          expect(window.alert).toHaveBeenCalledWith(
+            'Equella is not properly configured for this account, please notify your system administrator.',
+          )
+          resolve()
+        },
+      })
+      dispatchEvent('initEquella')
     })
-    dispatchEvent('initEquella')
   })
 })

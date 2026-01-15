@@ -17,7 +17,12 @@
  */
 
 import type {LtiMessageType} from '../model/LtiMessageType'
-import {type LtiPlacement, type LtiPlacementWithIcon, LtiPlacements} from '../model/LtiPlacement'
+import {
+  type LtiPlacement,
+  type LtiPlacementWithIcon,
+  LtiPlacements,
+  isLtiPlacementWithIcon,
+} from '../model/LtiPlacement'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
 import {type LtiScope, LtiScopes} from '@canvas/lti/model/LtiScope'
 import type {MessageSetting} from '../model/internal_lti_configuration/InternalBaseLaunchSettings'
@@ -27,6 +32,7 @@ import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/
 import {initialOverlayStateFromInternalConfig} from './Lti1p3RegistrationOverlayStateHelpers'
 import {filterEmptyString} from '../../common/lib/filterEmptyString'
 import {Lti1p3RegistrationOverlayState} from './Lti1p3RegistrationOverlayState'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 export type PlacementLabelOverride = string
 export type IconUrlOverride = string
@@ -47,6 +53,7 @@ export interface Lti1p3RegistrationOverlayActions {
   setMessageSettings: (messageSettings: MessageSetting[]) => void
   setOverrideURI: (placement: LtiPlacement, uri: string) => void
   setPlacementIconUrl: (placement: LtiPlacementWithIcon, iconUrl: string) => void
+  setDefaultIconUrl: (iconUrl: string) => void
   setMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
   setAdminNickname: (nickname: string) => void
   setDescription: (description: string) => void
@@ -263,6 +270,19 @@ export const createLti1p3RegistrationOverlayStore = (
         }),
       )
     },
+    setDefaultIconUrl: iconUrl => {
+      set(
+        updateState(state => {
+          return {
+            ...state,
+            icons: {
+              ...state.icons,
+              defaultIconUrl: filterEmptyString(iconUrl),
+            },
+          }
+        }),
+      )
+    },
     isEulaCapable: () => {
       const state = get().state
       return !!(
@@ -277,3 +297,14 @@ export const createLti1p3RegistrationOverlayStore = (
   }))
 
 export type Lti1p3RegistrationOverlayStore = ReturnType<typeof createLti1p3RegistrationOverlayStore>
+
+/**
+ * Returns true if the given state contains placements with icons
+ * Used to determine if we should show the IconConfirmation step
+ * @param state
+ * @returns
+ */
+export const containsPlacementWithIcon = (state: Lti1p3RegistrationOverlayState): boolean => {
+  const enabledPlacements = filterPlacementsByFeatureFlags(state.placements.placements)
+  return enabledPlacements.some(p => isLtiPlacementWithIcon(p))
+}

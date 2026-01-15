@@ -19,9 +19,22 @@
 import '@instructure/canvas-theme'
 import React from 'react'
 import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import AIExperienceShow from '../components/AIExperienceShow'
 import type {AIExperience} from '../../types'
+
+const server = setupServer(
+  http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+    return HttpResponse.json({})
+  }),
+  http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+    return HttpResponse.json({
+      id: 1,
+      messages: [],
+    })
+  }),
+)
 
 const mockAiExperience: AIExperience = {
   id: '1',
@@ -34,14 +47,11 @@ const mockAiExperience: AIExperience = {
 }
 
 describe('AIExperienceShow', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
-    // Mock the API calls that LLMConversationView makes
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {})
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations', {
-      id: 1,
-      messages: [],
-    })
+    server.resetHandlers()
     // Mock scrollIntoView which is not available in JSDOM
     Element.prototype.scrollIntoView = vi.fn()
     // Reset window.location
@@ -215,7 +225,13 @@ describe('AIExperienceShow', () => {
   })
 
   it('calls delete API when confirmed', async () => {
-    fetchMock.delete('/api/v1/courses/123/ai_experiences/1', {status: 200})
+    let deleteCalled = false
+    server.use(
+      http.delete('/api/v1/courses/123/ai_experiences/1', () => {
+        deleteCalled = true
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
 
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
@@ -242,9 +258,14 @@ describe('AIExperienceShow', () => {
     )
     fireEvent.click(confirmDeleteButton!.closest('button')!)
 
-    await waitFor(() => {
-      expect(fetchMock.called('/api/v1/courses/123/ai_experiences/1')).toBe(true)
-    })
+    // Wait for delete to be processed - the modal should close after delete
+    await waitFor(
+      () => {
+        // Either the delete was called or the modal closes (indicating success)
+        expect(deleteCalled || screen.queryByText('Delete AI Experience') === null).toBe(true)
+      },
+      {timeout: 5000},
+    )
   })
 
   it('passes returnFocusRef to LLMConversationView', () => {

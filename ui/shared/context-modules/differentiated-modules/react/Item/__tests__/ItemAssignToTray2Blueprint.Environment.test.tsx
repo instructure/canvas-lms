@@ -17,15 +17,23 @@
  */
 
 import {cleanup} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
-import {renderComponent, setupBaseMocks, setupEnv, setupFlashHolder} from './ItemAssignToTrayTestUtils'
+import {
+  renderComponent,
+  server,
+  setupBaseMocks,
+  setupEnv,
+  setupFlashHolder,
+} from './ItemAssignToTrayTestUtils'
 
 describe('ItemAssignToTray - Blueprint Environment Configuration', () => {
   const originalLocation = window.location
 
   beforeAll(() => {
+    server.listen()
     setupFlashHolder()
   })
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     setupEnv()
@@ -35,8 +43,7 @@ describe('ItemAssignToTray - Blueprint Environment Configuration', () => {
 
   afterEach(() => {
     window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
     cleanup()
   })
 

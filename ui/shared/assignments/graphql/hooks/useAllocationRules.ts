@@ -48,6 +48,7 @@ async function fetchGraphQLPage(
       hasNextPage: false,
       endCursor: null,
       totalCount: 0,
+      requiredPeerReviewsCount: assignment?.peerReviews?.count || 0,
     }
   }
 
@@ -58,6 +59,7 @@ async function fetchGraphQLPage(
       hasNextPage: false,
       endCursor: null,
       totalCount: assignment.allocationRules.count || 0,
+      requiredPeerReviewsCount: assignment.peerReviews?.count || 0,
     }
   }
 
@@ -66,6 +68,7 @@ async function fetchGraphQLPage(
     hasNextPage: connection.pageInfo.hasNextPage,
     endCursor: connection.pageInfo.endCursor,
     totalCount: assignment.allocationRules.count || 0,
+    requiredPeerReviewsCount: assignment.peerReviews?.count || 0,
   }
 }
 
@@ -82,7 +85,11 @@ async function getAllocationRulesPage(
   queryClient: QueryClient,
   searchTerm: string = '',
   forceRefresh: boolean = false,
-): Promise<{rules: AllocationRuleType[]; totalCount: number | null}> {
+): Promise<{
+  rules: AllocationRuleType[]
+  totalCount: number | null
+  requiredPeerReviewsCount: number
+}> {
   const graphQLPageSize = 20
   const startIndex = (page - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage - 1
@@ -92,6 +99,7 @@ async function getAllocationRulesPage(
 
   const allRules: AllocationRuleType[] = []
   let totalCount: number | null = null
+  let requiredPeerReviewsCount = 0
   let cursor: string | null = null
 
   const cachedTotalCount = queryClient.getQueryData<number | null>(
@@ -118,6 +126,10 @@ async function getAllocationRulesPage(
     }
 
     if (pageData) {
+      if (pageData.requiredPeerReviewsCount !== undefined) {
+        requiredPeerReviewsCount = pageData.requiredPeerReviewsCount
+      }
+
       if (totalCount === null && pageData.totalCount !== null) {
         totalCount = pageData.totalCount
         queryClient.setQueryData(TOTAL_COUNT_CACHE_KEY(assignmentId), pageData.totalCount)
@@ -140,7 +152,7 @@ async function getAllocationRulesPage(
   const rulesEndIndex = rulesStartIndex + itemsPerPage
   const pageRules = allRules.slice(rulesStartIndex, rulesEndIndex)
 
-  return {rules: pageRules, totalCount}
+  return {rules: pageRules, totalCount, requiredPeerReviewsCount}
 }
 
 export const useAllocationRules = (
@@ -154,7 +166,7 @@ export const useAllocationRules = (
   const finalSearchTerm = trimmedSearchTerm || undefined
 
   const {data, isLoading, error} = useQuery<
-    {rules: AllocationRuleType[]; totalCount: number | null},
+    {rules: AllocationRuleType[]; totalCount: number | null; requiredPeerReviewsCount: number},
     Error
   >({
     queryKey: ['allocationRules', assignmentId, page, itemsPerPage, finalSearchTerm],
@@ -204,6 +216,7 @@ export const useAllocationRules = (
   return {
     rules: data?.rules || [],
     totalCount: data?.totalCount || null,
+    requiredPeerReviewsCount: data?.requiredPeerReviewsCount || 0,
     loading: isLoading,
     error,
     refetch: enhancedRefetch,

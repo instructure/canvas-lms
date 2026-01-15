@@ -4408,7 +4408,7 @@ class CoursesController < ApplicationController
     return render_unauthorized_action unless @current_user.present?
 
     @user = (params[:user_id] == "self") ? @current_user : api_find(User, params[:user_id])
-    unless @user.grants_right?(@current_user, :read) || @user.check_accounts_right?(@current_user, :read)
+    unless @user.grants_right?(@current_user, :read) || @user.check_accounts_any_right?(@current_user, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
       render_unauthorized_action
     end
   end

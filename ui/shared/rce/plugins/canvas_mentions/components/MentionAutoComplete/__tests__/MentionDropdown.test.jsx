@@ -117,7 +117,7 @@ vi.mock('@apollo/client', async () => {
   }
 })
 
-describe.skip('Mention Dropdown', () => {
+describe('Mention Dropdown', () => {
   beforeAll(() => {
     getPosition.mockImplementation(() => {
       return {top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0}

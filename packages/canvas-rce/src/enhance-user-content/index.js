@@ -18,6 +18,8 @@
 
 import mediaCommentThumbnail from './media_comment_thumbnail'
 
-export * from './enhance_user_content'
+export {enhanceUserContent} from './enhance_user_content'
 export {isPreviewable, loadDocPreview} from './doc_previews'
+export {makeAllExternalLinksExternalLinks} from './external_links'
+export {Mathml} from './mathml'
 export {mediaCommentThumbnail}

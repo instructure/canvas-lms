@@ -31,7 +31,7 @@ const ok = value => expect(value).toBeTruthy()
 
 let contentView
 
-describe.skip('CollectionView', () => {
+describe('CollectionView', () => {
   beforeEach(() => {
     fakeENV.setup()
     const viewEl = $('<div id="content-view-el">original_text</div>')
@@ -50,7 +50,7 @@ describe.skip('CollectionView', () => {
     contentView.remove()
   })
 
-  test('should be accessible', async () => {
+  test.skip('should be accessible', async () => {
     await new Promise(resolve => isAccessible(contentView, resolve, {a11yReport: true}))
   })
 

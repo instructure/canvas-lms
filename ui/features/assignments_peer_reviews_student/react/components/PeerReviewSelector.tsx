@@ -21,7 +21,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconCompleteLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {AssessmentRequest} from '../hooks/useAssignmentQuery'
+import {AssessmentRequest} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 
 const I18n = createI18nScope('peer_reviews_student')
 

@@ -26,7 +26,7 @@ module GraphQLNodeLoader
     when "Account"
       Loaders::IDLoader.for(Account).load(id).then(check_read_permission)
     when "AccountBySis"
-      Loaders::SISIDLoader.for(Account).load(id).then(check_read_permission)
+      Loaders::SISIDLoader.for(Account, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "AccountNotification"
       # AccountNotification doesn't implement grants_any_right?, and they are visible to all users
       Loaders::IDLoader.for(AccountNotification).load(id)
@@ -37,15 +37,22 @@ module GraphQLNodeLoader
     when "StandardGradeStatus"
       Loaders::IDLoader.for(StandardGradeStatus).load(id).then(check_read_permission)
     when "CourseBySis"
-      Loaders::SISIDLoader.for(Course).load(id).then(check_read_permission)
+      Loaders::SISIDLoader.for(Course, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "Assignment"
       Loaders::IDLoader.for(Assignment).load(id).then(check_read_permission)
+    when "PeerReviewSubAssignment"
+      Loaders::IDLoader.for(PeerReviewSubAssignment).load(id).then do |peer_review_sub_assignment|
+        next nil unless peer_review_sub_assignment
+        next nil unless peer_review_sub_assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+
+        peer_review_sub_assignment
+      end.then(check_read_permission)
     when "AssignmentBySis"
-      Loaders::SISIDLoader.for(Assignment).load(id).then(check_read_permission)
+      Loaders::SISIDLoader.for(Assignment, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "Section"
       Loaders::IDLoader.for(CourseSection).load(id).then(check_read_permission)
     when "SectionBySis"
-      Loaders::SISIDLoader.for(CourseSection).load(id).then(check_read_permission)
+      Loaders::SISIDLoader.for(CourseSection, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "User"
       Loaders::IDLoader.for(User).load(id).then(lambda do |user|
         return nil unless user && ctx[:current_user]
@@ -85,7 +92,7 @@ module GraphQLNodeLoader
     when "Group"
       Loaders::IDLoader.for(Group).load(id).then(check_read_permission)
     when "GroupBySis"
-      Loaders::SISIDLoader.for(Group).load(id).then(check_read_permission)
+      Loaders::SISIDLoader.for(Group, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "GroupSet"
       Loaders::IDLoader.for(GroupCategory).load(id).then do |category|
         Loaders::AssociationLoader.for(GroupCategory, :context)
@@ -93,7 +100,7 @@ module GraphQLNodeLoader
                                   .then { check_read_permission.call(category) }
       end
     when "GroupSetBySis"
-      Loaders::SISIDLoader.for(GroupCategory).load(id).then do |category|
+      Loaders::SISIDLoader.for(GroupCategory, root_account: ctx[:domain_root_account]).load(id).then do |category|
         Loaders::AssociationLoader.for(GroupCategory, :context)
                                   .load(category)
                                   .then { check_read_permission.call(category) }
@@ -169,7 +176,7 @@ module GraphQLNodeLoader
     when "AssignmentGroup"
       Loaders::IDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     when "AssignmentGroupBySis"
-      Loaders::SISIDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
+      Loaders::SISIDLoader.for(AssignmentGroup, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "Discussion"
       Loaders::IDLoader.for(DiscussionTopic).load(id).then do |topic|
         next nil unless topic.grants_right?(ctx[:current_user], :read) && !topic.deleted?

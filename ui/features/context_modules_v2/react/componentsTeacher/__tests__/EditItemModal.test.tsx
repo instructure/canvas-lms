@@ -22,6 +22,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import EditItemModal, {type EditItemModalProps} from '../EditItemModal'
 
 const buildDefaultProps = (overrides: Partial<EditItemModalProps> = {}): EditItemModalProps => ({
@@ -68,14 +69,16 @@ const server = setupServer()
 
 describe('EditItemModal', () => {
   beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
+  afterEach(() => {
+    server.resetHandlers()
+    fakeENV.teardown()
+  })
   afterAll(() => server.close())
 
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       TIMEZONE: 'UTC',
-    }
+    })
 
     server.use(
       http.post('/courses/:courseId/modules/items/:itemId', () => {

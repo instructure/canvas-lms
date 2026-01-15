@@ -30,15 +30,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -54,15 +50,11 @@ describe('OverrideURIsConfirmation', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -77,15 +69,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -109,15 +97,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -131,48 +115,16 @@ describe('OverrideURIsConfirmation', () => {
     expect(screen.getByText('Invalid URL')).toBeInTheDocument()
   })
 
-  it('disables the next button if any of the URIs are invalid', async () => {
-    const internalConfig = mockInternalConfiguration({
-      placements: [{placement: LtiPlacements.CourseNavigation}],
-    })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
-    render(
-      <OverrideURIsConfirmationWrapper
-        overlayStore={overlayStore}
-        internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
-        reviewing={false}
-      />,
-    )
-    const input = screen.getByPlaceholderText('https://example.com')
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.paste('invalid-uri^&*&)')
-    await userEvent.tab()
-
-    await userEvent.click(screen.getByText('Next').closest('button')!)
-
-    expect(input).toHaveFocus()
-    expect(onNextClicked).not.toHaveBeenCalled()
-  })
-
   it('allows users to change the message type on placements that support it', async () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: LtiPlacements.ModuleMenuModal}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -188,15 +140,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.EditorButton}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -213,15 +161,11 @@ describe('OverrideURIsConfirmation', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -248,15 +192,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = vi.fn()
-    const onPreviousClicked = vi.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )

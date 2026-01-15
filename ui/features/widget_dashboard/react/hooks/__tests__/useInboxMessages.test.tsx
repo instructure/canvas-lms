@@ -241,6 +241,8 @@ describe('useInboxMessages', () => {
   })
 
   it('handles GraphQL errors', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+
     server.use(
       graphql.query('GetUserConversations', () => {
         return HttpResponse.json({errors: [{message: 'GraphQL error'}]}, {status: 500})
@@ -256,6 +258,7 @@ describe('useInboxMessages', () => {
     expect(result.current.error).toBeTruthy()
 
     cleanup()
+    consoleError.mockRestore()
   })
 
   it('strips HTML tags from message preview', async () => {

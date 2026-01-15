@@ -40,6 +40,27 @@ RSpec.describe Lti::Registration do
       registration.account = account_model(parent_account: registration.account)
       expect(subject).to be false
     end
+
+    it "requires template registrations to be in site admin" do
+      non_site_admin_template = lti_registration_model(account: account_model)
+      registration.template_registration = non_site_admin_template
+      expect(subject).to be false
+      expect(registration.errors[:template_registration]).to include("must be inherited from Site Admin")
+    end
+
+    it "allows site admin template registrations" do
+      site_admin_template = lti_registration_model(account: Account.site_admin)
+      registration.template_registration = site_admin_template
+      expect(subject).to be true
+    end
+
+    it "does not allow a site admin registration to have a template" do
+      registration.account = Account.site_admin
+      site_admin_template = lti_registration_model(account: Account.site_admin)
+      registration.template_registration = site_admin_template
+      expect(subject).to be false
+      expect(registration.errors[:template_registration]).to include("Site Admin registrations cannot inherit from a template")
+    end
   end
 
   describe "#lti_version" do
@@ -344,6 +365,16 @@ RSpec.describe Lti::Registration do
         expect(subject).to be_nil
       end
     end
+
+    context "when the icon_url is overlaid" do
+      let(:icon_url) { "https://a.different.icon.example.com/icon.png" }
+      let(:registration) { lti_registration_with_tool(overlay_params: { icon_url: }) }
+
+      it "returns the overlaid icon_url" do
+        registration
+        expect(subject).to eql(icon_url)
+      end
+    end
   end
 
   describe "#account_binding_for" do
@@ -516,16 +547,44 @@ RSpec.describe Lti::Registration do
     let(:registration) { lti_registration_model(account: context) }
     let(:context) { account_model }
 
-    context "when account matches registration account" do
-      let(:account) { context }
+    context "when flag is disabled" do
+      before do
+        context.disable_feature! :lti_registrations_templates
+      end
 
-      it { is_expected.to be false }
+      context "when account matches registration account" do
+        let(:account) { context }
+
+        it { is_expected.to be false }
+      end
+
+      context "when account does not match registration account" do
+        let(:account) { account_model }
+
+        it { is_expected.to be true }
+      end
     end
 
-    context "when account does not match registration account" do
-      let(:account) { account_model }
+    it { is_expected.to be false }
+
+    context "when template registration is present" do
+      let(:template_registration) { lti_registration_model(account: Account.site_admin) }
+      let(:account) { context }
+
+      before do
+        registration.template_registration = template_registration
+        registration.save!
+      end
 
       it { is_expected.to be true }
+
+      context "and flag is disabled" do
+        before do
+          context.disable_feature! :lti_registrations_templates
+        end
+
+        it { is_expected.to be false }
+      end
     end
   end
 

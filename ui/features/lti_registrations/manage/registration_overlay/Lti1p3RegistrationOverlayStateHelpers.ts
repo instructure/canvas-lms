@@ -119,6 +119,7 @@ export const initialOverlayStateFromInternalConfig = (
         },
         {} as Partial<Record<LtiPlacementWithIcon, string | undefined>>,
       ),
+      defaultIconUrl: existingOverlay?.icon_url || internalConfig.launch_settings?.icon_url,
     },
   }
 }
@@ -137,7 +138,7 @@ export const convertToLtiConfigurationOverlay = (
   state: Lti1p3RegistrationOverlayState,
   internalConfig: InternalLtiConfiguration,
 ): {overlay: LtiConfigurationOverlay; config: InternalLtiConfiguration} => {
-  const placements = state.placements.placements?.reduce((acc, placement) => {
+  const placements = state.placements.placements.reduce((acc, placement) => {
     const internalPlacement = internalConfig.placements.find(p => p.placement === placement)
     const courseNavDefaultValue =
       placement === 'course_navigation'
@@ -222,11 +223,15 @@ export const convertToLtiConfigurationOverlay = (
           ? undefined
           : state.data_sharing.privacy_level,
       disabled_placements,
-      placements,
+      placements: Object.keys(placements).length === 0 ? undefined : placements,
       domain:
         state.launchSettings.domain === internalConfig.domain
           ? undefined
           : state.launchSettings.domain,
+      icon_url:
+        state.icons.defaultIconUrl === internalConfig.launch_settings?.icon_url
+          ? undefined
+          : state.icons.defaultIconUrl,
       // todo: these undefined fields will all be removed
       oidc_initiation_url: undefined,
       redirect_uris: undefined,

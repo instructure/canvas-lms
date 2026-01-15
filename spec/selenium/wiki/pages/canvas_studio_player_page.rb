@@ -89,24 +89,28 @@ module CanvasStudioPlayerPage
     ff("[data-testid='controls-layout'] > div:last-child button")
   end
 
+  def caption_button
+    f("[data-testid='controls-layout'] button[aria-label='Captions']")
+  end
+
   def disable_caption_button
-    f("button[aria-label='Disable Captions']")
+    f("[data-testid='controls-layout'] button[aria-label='Captions'][aria-pressed='true']")
   end
 
   def enable_caption_button
-    f("button[aria-label='Enable Captions']")
+    f("[data-testid='controls-layout'] button[aria-label='Captions'][aria-pressed='false']")
   end
 
   def settings_button
-    f("button[aria-label='Settings']")
+    f("[data-testid='controls-layout'] button[aria-label='Settings']")
   end
 
   def fullscreen_button
-    f("button[aria-label='Enter Fullscreen']")
+    f("[data-testid='controls-layout'] button[aria-label='Fullscreen'][aria-pressed='false']")
   end
 
   def exit_fullscreen_button
-    f("button[aria-label='Exit Fullscreen']")
+    f("[data-testid='controls-layout'] button[aria-label='Fullscreen'][aria-pressed='true']")
   end
 
   def video_setting_menu_buttons

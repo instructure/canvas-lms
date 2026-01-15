@@ -20,10 +20,13 @@ import React from 'react'
 import {render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ZipFileImporter from '../zip_file'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 vi.mock('@canvas/alerts/react/FlashAlert')
+
+const server = setupServer()
 
 const onSubmit = vi.fn()
 const onCancel = vi.fn()
@@ -32,43 +35,50 @@ const renderComponent = (overrideProps?: any) =>
   render(<ZipFileImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
 describe('ZipFileImporter', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     window.ENV.UPLOAD_LIMIT = 1024
     window.ENV.COURSE_ID = '1'
-    fetchMock.mock('/api/v1/courses/1/folders?sort_by=position&per_page=100', [
-      {
-        id: '1',
-        name: 'course files',
-        full_name: 'course files',
-        context_id: '1',
-        context_type: 'Course',
-        parent_folder_id: null,
-        workflow_state: 'visible',
-        created_at: '2023-10-17T15:50:09Z',
-        updated_at: '2023-10-17T15:50:09Z',
-        deleted_at: null,
-        locked: null,
-        lock_at: null,
-        unlock_at: null,
-        cloned_item_id: null,
-        position: null,
-        folders_url: null,
-        files_url: null,
-        files_count: null,
-        folders_count: null,
-        hidden: false,
-        hidden_for_user: false,
-        locked_for_user: false,
-        for_submissions: false,
-        can_upload: true,
-        children: [],
-      },
-    ])
+    server.use(
+      http.get('/api/v1/courses/:courseId/folders', () => {
+        return HttpResponse.json([
+          {
+            id: '1',
+            name: 'course files',
+            full_name: 'course files',
+            context_id: '1',
+            context_type: 'Course',
+            parent_folder_id: null,
+            workflow_state: 'visible',
+            created_at: '2023-10-17T15:50:09Z',
+            updated_at: '2023-10-17T15:50:09Z',
+            deleted_at: null,
+            locked: null,
+            lock_at: null,
+            unlock_at: null,
+            cloned_item_id: null,
+            position: null,
+            folders_url: null,
+            files_url: null,
+            files_count: null,
+            folders_count: null,
+            hidden: false,
+            hidden_for_user: false,
+            locked_for_user: false,
+            for_submissions: false,
+            can_upload: true,
+            children: [],
+          },
+        ])
+      }),
+    )
   })
 
   afterEach(() => {
     vi.clearAllMocks()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('renders hidden input', () => {

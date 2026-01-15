@@ -68,7 +68,7 @@ describe('CreateGroupView - Drop Rules', () => {
     vi.resetAllMocks()
   })
 
-  test.skip('it should not save drop rules when none are given', async () => {
+  test('it should not save drop rules when none are given', async () => {
     view = createView()
     const deferred = $.Deferred()
     saveMock = vi.spyOn(view.model, 'save').mockReturnValue(deferred)
@@ -93,7 +93,7 @@ describe('CreateGroupView - Drop Rules', () => {
     expect(saveMock).toHaveBeenCalled()
   })
 
-  test.skip('it should save drop rules when given', async () => {
+  test('it should save drop rules when given', async () => {
     view = createView()
     const deferred = $.Deferred()
     saveMock = vi.spyOn(view.model, 'save').mockReturnValue(deferred)

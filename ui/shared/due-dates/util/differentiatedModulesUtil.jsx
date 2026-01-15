@@ -51,6 +51,10 @@ export const datesFromOverride = override => ({
   unlock_at: override ? override.unlock_at : null,
   reply_to_topic_due_at: override ? override.reply_to_topic_due_at : null,
   required_replies_due_at: override ? override.required_replies_due_at : null,
+  peer_review_available_from: override ? override.peer_review_available_from : null,
+  peer_review_due_at: override ? override.peer_review_due_at : null,
+  peer_review_available_to: override ? override.peer_review_available_to : null,
+  peer_review_override_id: override ? override.peer_review_override_id : null,
 })
 
 export const getAllOverridesFromCards = givenCards => {

@@ -24,7 +24,6 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {useMedia} from 'react-use'
 
-// @ts-expect-error
 import styles from './ImmersiveViewBackButton.module.css'
 
 const I18n = createI18nScope('media_immersive_view')
@@ -37,11 +36,15 @@ export function ImmersiveViewBackButton() {
   }, [])
 
   return isTablet ? (
-    <CloseButton size="medium" screenReaderLabel={I18n.t('Close')} onClick={handleClick} />
+    <CloseButton
+      size="medium"
+      screenReaderLabel={I18n.t('Go Back to Course')}
+      onClick={handleClick}
+    />
   ) : (
     <div className={styles.noShrink}>
       <Button color="primary" onClick={handleClick}>
-        {I18n.t('Back to Course')}
+        {I18n.t('Go Back to Course')}
       </Button>
     </div>
   )

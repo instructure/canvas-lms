@@ -18,13 +18,12 @@
 
 import React from 'react'
 import ready from '@instructure/ready'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import AiExperiencesIndex from './react/AiExperiencesIndex'
 
 ready(() => {
   const container = document.getElementById('ai-experiences-index')
   if (container) {
-    const root = createRoot(container)
-    root.render(<AiExperiencesIndex />)
+    render(<AiExperiencesIndex />, container)
   }
 })

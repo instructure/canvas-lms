@@ -27,9 +27,6 @@ const I18n = createI18nScope('DateValidator')
 const DATE_RANGE_ERRORS = {
   due_at: {
     start_range: {
-      get peerReviewDueAt() {
-        return I18n.t('Due date must be after peer review due date')
-      },
       get section() {
         return I18n.t('Due date cannot be before section start')
       },
@@ -106,49 +103,45 @@ const DATE_RANGE_ERRORS = {
   peer_review_available_from: {
     start_range: {
       get unlock() {
-        return I18n.t(
-          'Peer review available from date must be on or after assignment available from date',
-        )
+        return I18n.t('Unlock date cannot be before assignment unlock date')
       },
     },
     end_range: {
       get peerReviewDueAt() {
-        return I18n.t('Reviewing starts date must be before peer review due date')
+        return I18n.t('Unlock date cannot be after due date')
       },
       get lock() {
-        return I18n.t('Peer review available from date must be before assignment available to date')
+        return I18n.t('Unlock date cannot be after assignment lock date')
       },
     },
   },
   peer_review_due_at: {
     start_range: {
       get unlock() {
-        return I18n.t('Peer review due date must be after assignment available from date')
+        return I18n.t('Due date cannot be before assignment unlock date')
       },
     },
     end_range: {
       get lock() {
-        return I18n.t('Peer review due date must be before assignment available to date')
+        return I18n.t('Due date cannot be after assignment lock date')
       },
     },
   },
   peer_review_available_to: {
     start_range: {
       get peerReviewDueDate() {
-        return I18n.t('Peer review available to date must be on or after peer review due date')
+        return I18n.t('Lock date cannot be before due date')
       },
       get unlock() {
-        return I18n.t('Peer review available to date must be after assignment available from date')
+        return I18n.t('Lock date cannot be before assignment unlock date')
       },
       get peerReviewAvailableFrom() {
-        return I18n.t('Peer review available to date must be after peer review available from date')
+        return I18n.t('Lock date cannot be before unlock date')
       },
     },
     end_range: {
       get lock() {
-        return I18n.t(
-          'Peer review available to date must be on or before assignment available to date',
-        )
+        return I18n.t('Lock date cannot be after assignment lock date')
       },
     },
   },

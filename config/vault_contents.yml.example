@@ -19,8 +19,12 @@ development:
     access_key: aws-key-id-goes-here
     secret_key: secret-goes-here
   'sts/testaccount/sts/canvas-release-notes':
-    access_key: 'fake-access-key'
-    secret_key: 'fake-secret-key'
+    access_key: 'AKIAIOSFODNN7EXAMPLE'
+    secret_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+    security_token: 'fake-security-token'
+  'sts/testaccount/sts/canvas-global-lookups':
+    access_key: 'AKIAIOSFODNN7EXAMPLE'
+    secret_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
     security_token: 'fake-security-token'
   'app-canvas/data/secrets':
     data:

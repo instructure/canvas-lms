@@ -25,7 +25,6 @@ import React, {Suspense} from 'react'
 import {useNewLoginData} from '../context'
 import {Background, Loading} from '../shared'
 
-// @ts-expect-error
 import styles from './ContentLayout.module.css'
 
 const I18n = createI18nScope('new_login')

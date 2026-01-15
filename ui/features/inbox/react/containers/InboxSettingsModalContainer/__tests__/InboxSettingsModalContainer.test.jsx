@@ -29,7 +29,6 @@ import {ApolloProvider} from '@apollo/client'
 import {inboxSettingsHandlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '@canvas/msw/mswClient'
 import {setupServer} from 'msw/node'
-import waitForApolloLoading from '../../../../util/waitForApolloLoading'
 import MockDate from 'mockdate'
 import moment from 'moment-timezone'
 
@@ -135,8 +134,8 @@ describe('InboxSettingsModalContainer', () => {
     })
 
     it('calls onDismissWithAlert on Close (X) button click', async () => {
-      const {getByRole} = setup({...defaultProps()})
-      await waitForApolloLoading()
+      const {getByRole, findByTestId} = setup({...defaultProps()})
+      await findByTestId('inbox-signature-input')
       fireEvent.click(within(getByRole('dialog')).getByText('Close'))
       await waitFor(() => {
         expect(onDismissWithAlertMock).toHaveBeenCalledTimes(1)
@@ -144,9 +143,9 @@ describe('InboxSettingsModalContainer', () => {
     })
 
     it('calls onDismissWithAlert with SAVE_SETTINGS_OK when GraphQL mutation succeeds', async () => {
-      const {getByText} = setup({...defaultProps()})
-      await waitForApolloLoading()
-      fireEvent.click(getByText('Save'))
+      const {findByText, findByTestId} = setup({...defaultProps()})
+      await findByTestId('inbox-signature-input')
+      fireEvent.click(await findByText('Save'))
       await waitFor(
         () => {
           expect(onDismissWithAlertMock).toHaveBeenCalledWith(SAVE_SETTINGS_OK)
@@ -155,27 +154,26 @@ describe('InboxSettingsModalContainer', () => {
       )
     })
 
-    // TODO: This test is skipped due to MSW handler override timing issues after
-    // Jest-to-Vitest migration. The server.use() call should override handlers but
-    // the mutation still returns success. Needs investigation into Apollo cache behavior.
-    it.skip('calls onDismissWithAlert with SAVE_SETTINGS_FAIL when GraphQL mutation fails', async () => {
+    it('calls onDismissWithAlert with SAVE_SETTINGS_FAIL when GraphQL mutation fails', async () => {
       server.use(...inboxSettingsHandlers(1))
-      const {getByText} = setup({...defaultProps()})
-      await waitForApolloLoading()
-      fireEvent.click(getByText('Save'))
-      await waitForApolloLoading()
-      await waitFor(() => {
-        expect(onDismissWithAlertMock).toHaveBeenCalledWith(SAVE_SETTINGS_FAIL)
-      })
+      const {findByText, findByTestId} = setup({...defaultProps()})
+      await findByTestId('inbox-signature-input')
+      fireEvent.click(await findByText('Save'))
+      await waitFor(
+        () => {
+          expect(onDismissWithAlertMock).toHaveBeenCalledWith(SAVE_SETTINGS_FAIL)
+        },
+        {timeout: 5000},
+      )
     })
 
     describe('when useSignature gets enabled', () => {
       it('shows error if signature > 255 characters', async () => {
-        const {getByText, getByLabelText, getByTestId} = setup({...defaultProps()})
-        await waitForApolloLoading()
-        fireEvent.click(getByLabelText(new RegExp('Signature On')))
-        fireEvent.change(getByTestId('inbox-signature-input'), {target: {value: 'a'.repeat(256)}})
-        expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
+        const {findByText, findByLabelText, findByTestId} = setup({...defaultProps()})
+        const signatureInput = await findByTestId('inbox-signature-input')
+        fireEvent.click(await findByLabelText(new RegExp('Signature On')))
+        fireEvent.change(signatureInput, {target: {value: 'a'.repeat(256)}})
+        expect(await findByText('Must be 255 characters or less')).toBeInTheDocument()
       })
     })
 
@@ -246,21 +244,21 @@ describe('InboxSettingsModalContainer', () => {
       })
 
       it('shows error if message > 255 characters', async () => {
-        const {getByText, getByLabelText} = setup({...defaultProps()})
-        await waitForApolloLoading()
-        fireEvent.click(getByLabelText(new RegExp('Response On')))
-        fireEvent.change(getByLabelText('Message'), {target: {value: 'a'.repeat(256)}})
-        expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
+        const {findByText, findByLabelText} = setup({...defaultProps()})
+        await findByLabelText(new RegExp('Response On'))
+        fireEvent.click(await findByLabelText(new RegExp('Response On')))
+        fireEvent.change(await findByLabelText('Message'), {target: {value: 'a'.repeat(256)}})
+        expect(await findByText('Must be 255 characters or less')).toBeInTheDocument()
       })
 
       it('shows error if subject > 255 characters', async () => {
-        const {getByText, getByLabelText, getByTestId} = setup({...defaultProps()})
-        await waitForApolloLoading()
-        fireEvent.click(getByLabelText(new RegExp('Response On')))
-        fireEvent.change(getByTestId('out-of-office-subject-input'), {
+        const {findByText, findByLabelText, findByTestId} = setup({...defaultProps()})
+        await findByTestId('out-of-office-subject-input')
+        fireEvent.click(await findByLabelText(new RegExp('Response On')))
+        fireEvent.change(await findByTestId('out-of-office-subject-input'), {
           target: {value: 'a'.repeat(256)},
         })
-        expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
+        expect(await findByText('Must be 255 characters or less')).toBeInTheDocument()
       })
     })
 

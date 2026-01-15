@@ -39,7 +39,6 @@ discussions_reporting:
     Discussions Redesign work.
   applies_to: RootAccount
 
-
 discussion_grading_view:
   state: hidden
   beta: true
@@ -143,6 +142,14 @@ discussion_insights:
   beta: true
   description: |-
     Allow access to discussion insights
+
+discussion_insights_with_cedar:
+  state: hidden
+  applies_to: RootAccount
+  shadow: true
+  display_name: Discussion Insights with Cedar
+  description: |-
+    Route Discussion Topic Insights AI requests through Cedar instead of direct Bedrock calls.
 
 discussion_ai_survey_link:
   state: hidden

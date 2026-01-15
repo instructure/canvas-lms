@@ -124,6 +124,16 @@ export function asText(fetchRequest: Promise<Response>) {
   return fetchRequest.then(checkStatus).then(res => res.clone().text())
 }
 
+export class FetchError extends Error {
+  response: Response
+
+  constructor(message: string, response: Response) {
+    super(message)
+    this.response = response
+    this.name = 'FetchError'
+  }
+}
+
 /**
  * filter a response to raise an error on a 400+ status
  */
@@ -131,10 +141,7 @@ export function checkStatus(response: Response) {
   if (response.status < 400) {
     return response
   } else {
-    const error = new Error(response.statusText)
-    // @ts-expect-error
-    error.response = response
-    throw error
+    throw new FetchError(response.statusText, response)
   }
 }
 

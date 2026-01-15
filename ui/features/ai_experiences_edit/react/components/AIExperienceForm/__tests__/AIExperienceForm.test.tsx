@@ -19,9 +19,12 @@
 import '@instructure/canvas-theme'
 import React from 'react'
 import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import AIExperienceForm from '../AIExperienceForm'
 import type {AIExperience} from '../../../../types'
+
+const server = setupServer()
 
 const mockAiExperience: AIExperience = {
   id: '1',
@@ -37,13 +40,16 @@ describe('AIExperienceForm', () => {
   const mockOnSubmit = vi.fn()
   const mockOnCancel = vi.fn()
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
+    server.resetHandlers()
     cleanup()
   })
 
   beforeEach(() => {
     vi.clearAllMocks()
-    fetchMock.restore()
     // @ts-expect-error
     window.ENV = {COURSE_ID: 123}
   })
@@ -343,7 +349,13 @@ describe('AIExperienceForm', () => {
     })
 
     it('calls delete API when confirmed', async () => {
-      fetchMock.delete('/api/v1/courses/123/ai_experiences/1', {status: 200})
+      let deleteCalled = false
+      server.use(
+        http.delete('/api/v1/courses/123/ai_experiences/1', () => {
+          deleteCalled = true
+          return HttpResponse.json({})
+        }),
+      )
 
       render(
         <AIExperienceForm
@@ -372,7 +384,7 @@ describe('AIExperienceForm', () => {
       fireEvent.click(confirmDeleteButton!)
 
       await waitFor(() => {
-        expect(fetchMock.called('/api/v1/courses/123/ai_experiences/1')).toBe(true)
+        expect(deleteCalled).toBe(true)
       })
     })
   })

@@ -23,12 +23,10 @@ import Grid from '../Grid'
 import {speedGraderUrl} from '../../../assignment/AssignmentApi'
 import {STARTED, SUCCESS} from '../../../grades/GradeActions'
 
+const MockGridRow = vi.hoisted(() => vi.fn())
+
 vi.mock('../GridRow', () => ({
-  default: ({row}) => (
-    <tr data-testid={`grid-row-${row.studentId}`}>
-      <td>{row.studentName}</td>
-    </tr>
-  ),
+  default: MockGridRow,
 }))
 
 describe('GradeSummary Grid', () => {
@@ -38,11 +36,13 @@ describe('GradeSummary Grid', () => {
     return speedGraderUrl('1201', '2301', {anonymousStudents: false, studentId})
   }
 
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
   beforeEach(() => {
+    MockGridRow.mockClear()
+    MockGridRow.mockImplementation(({row}) => (
+      <tr data-testid={`grid-row-${row.studentId}`}>
+        <td>{row.studentName}</td>
+      </tr>
+    ))
     props = {
       horizontalScrollRef: () => {},
       disabledCustomGrade: false,
@@ -141,28 +141,22 @@ describe('GradeSummary Grid', () => {
     expect(rows).toHaveLength(4)
   })
 
-  // TODO: fix mock pattern for vitest
-  test.skip('sends disabledCustomGrade to each GridRow', () => {
+  test('sends disabledCustomGrade to each GridRow', () => {
     render(<Grid {...props} />)
-    // eslint-disable-next-line no-undef -- skipped test needs refactoring
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
-    const rowCalls = calls.filter(call => !call[0].disabledCustomGrade)
+    const rowCalls = calls.filter(call => call[0].disabledCustomGrade === false)
     expect(rowCalls).toHaveLength(4)
   })
 
-  // TODO: fix mock pattern for vitest
-  test.skip('sends finalGrader to each GridRow', () => {
+  test('sends finalGrader to each GridRow', () => {
     render(<Grid {...props} />)
-    // eslint-disable-next-line no-undef -- skipped test needs refactoring
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
     const rowCalls = calls.filter(call => !!call[0].finalGrader)
     expect(rowCalls).toHaveLength(4)
   })
 
-  // TODO: fix mock pattern for vitest
-  test.skip('sends graders to each GridRow', () => {
+  test('sends graders to each GridRow', () => {
     render(<Grid {...props} />)
-    // eslint-disable-next-line no-undef -- skipped test needs refactoring
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
     expect(calls).toHaveLength(4)
     calls.forEach(call => {
@@ -173,37 +167,29 @@ describe('GradeSummary Grid', () => {
     })
   })
 
-  // TODO: fix mock pattern for vitest
-  test.skip('sends onGradeSelect to each GridRow', () => {
+  test('sends onGradeSelect to each GridRow', () => {
     render(<Grid {...props} />)
-    // eslint-disable-next-line no-undef -- skipped test needs refactoring
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
     const rowCalls = calls.filter(call => !!call[0].onGradeSelect)
     expect(rowCalls).toHaveLength(4)
   })
 
-  // TODO: fix mock pattern for vitest
-  test.skip('sends student-specific grades to each GridRow', () => {
+  test('sends student-specific grades to each GridRow', () => {
     render(<Grid {...props} />)
-    // eslint-disable-next-line no-undef -- skipped test needs refactoring
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
     const firstStudentGrade = calls[0][0].grades
     expect(Object.keys(firstStudentGrade)).toStrictEqual(['1101', '1102'])
   })
 
-  // TODO: fix mock pattern for vitest
-  test.skip('sends student-specific select provisional grade statuses to each GridRow', () => {
+  test('sends student-specific select provisional grade statuses to each GridRow', () => {
     render(<Grid {...props} />)
-    // eslint-disable-next-line no-undef -- skipped test needs refactoring
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
     const rowCalls = calls.filter(call => call[0].selectProvisionalGradeStatus == STARTED)
     expect(rowCalls).toHaveLength(1)
   })
 
-  // TODO: fix mock pattern for vitest
-  test.skip('sends the related row to each GridRow', () => {
+  test('sends the related row to each GridRow', () => {
     render(<Grid {...props} />)
-    // eslint-disable-next-line no-undef -- skipped test needs refactoring
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
     const rowCalls = calls.filter(call => !!call[0].row)
     expect(rowCalls).toHaveLength(4)

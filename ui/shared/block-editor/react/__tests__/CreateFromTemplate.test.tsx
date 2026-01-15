@@ -20,7 +20,6 @@ import React from 'react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useEditor} from '@craftjs/core'
 import {render, screen, waitFor, getByText} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import CreateFromTemplate from '../CreateFromTemplate'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
@@ -29,16 +28,82 @@ type EnvWithWikiPage = GlobalEnv & {
 }
 declare const window: Window & {ENV: EnvWithWikiPage}
 
-const user = userEvent.setup()
+const mockNodeTree = {
+  rootNodeId: 'ROOT',
+  nodes: {
+    ROOT: {
+      type: {resolvedName: 'PageBlock'},
+      isCanvas: true,
+      props: {},
+      displayName: 'Page',
+      custom: {},
+      hidden: false,
+      nodes: [],
+      linkedNodes: {},
+    },
+  },
+}
 
-const blankPages = 1
-const generalContentPages = 3
-const homePages = 8
-const introPages = 1
-const moduleOverviewPages = 6
-const resourcePages = 4
-const totalPages =
-  blankPages + generalContentPages + homePages + introPages + moduleOverviewPages + resourcePages
+const mockTemplates = [
+  {
+    id: 'blank_page',
+    name: 'Blank Page',
+    description: '',
+    tags: [],
+    editor_version: '0.3',
+    node_tree: mockNodeTree,
+  },
+  {
+    id: 'home_yellow',
+    name: 'Course Home - Yellow',
+    description: 'Home page with yellow theme',
+    tags: ['home'],
+    editor_version: '0.3',
+    node_tree: mockNodeTree,
+  },
+  {
+    id: 'home_blue',
+    name: 'Course Home - Blue',
+    description: 'Home page with blue theme',
+    tags: ['home'],
+    editor_version: '0.3',
+    node_tree: mockNodeTree,
+  },
+  {
+    id: 'content_1',
+    name: 'Content Page 1',
+    description: 'General content',
+    tags: ['generalcontent'],
+    editor_version: '0.3',
+    node_tree: mockNodeTree,
+  },
+  {
+    id: 'intro_1',
+    name: 'Introduction Page',
+    description: 'Introduction',
+    tags: ['intro'],
+    editor_version: '0.3',
+    node_tree: mockNodeTree,
+  },
+  {
+    id: 'module_1',
+    name: 'Module Overview',
+    description: 'Module overview',
+    tags: ['moduleoverview'],
+    editor_version: '0.3',
+    node_tree: mockNodeTree,
+  },
+  {
+    id: 'resource_1',
+    name: 'Resource Page',
+    description: 'Resource',
+    tags: ['resource'],
+    editor_version: '0.3',
+    node_tree: mockNodeTree,
+  },
+]
+
+const totalCards = mockTemplates.length
 
 vi.mock('@craftjs/core', async () => {
   const actual = await vi.importActual('@craftjs/core')
@@ -54,11 +119,15 @@ vi.mock('@craftjs/core', async () => {
   }
 })
 
+vi.mock('@canvas/block-editor/react/assets/globalTemplates', () => ({
+  getGlobalPageTemplates: vi.fn(() => Promise.resolve([...mockTemplates])),
+}))
+
 const renderComponent = async () => {
   const rendered = render(<CreateFromTemplate course_id="1" noBlocks={true} />)
 
   await waitFor(() => {
-    expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(totalPages)
+    expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(totalCards)
   })
   return rendered
 }
@@ -74,12 +143,15 @@ describe('CreateFromTemplate', () => {
     window.ENV.WIKI_PAGE = undefined
   })
 
-  it.skip('renders', async () => {
+  it('renders', async () => {
     await renderComponent()
 
-    expect(screen.getByText('Create Page')).toBeInTheDocument()
-    expect(screen.getByText(/^Start from a blank page/)).toBeInTheDocument()
-    expect(screen.getByText('Back to Pages')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Create Page')).toBeInTheDocument()
+      expect(screen.getByText(/^Start from a blank page/)).toBeInTheDocument()
+      expect(screen.getByText('Back to Pages')).toBeInTheDocument()
+    })
+
     expect(screen.getByText('Clear All Filters')).toBeInTheDocument()
     expect(getByTagText('General Content')).toBeInTheDocument()
     expect(getByTagText('Home')).toBeInTheDocument()
@@ -90,69 +162,5 @@ describe('CreateFromTemplate', () => {
     expect(screen.getByTestId('template-search')).toBeInTheDocument()
     expect(screen.getByText('New Blank Page')).toBeInTheDocument()
     expect(screen.getByLabelText('Course Home - Yellow template')).toBeInTheDocument()
-  })
-
-  it.skip('filters on the search string', async () => {
-    // Skipped: Timing issue with template filtering in Vitest
-    await renderComponent()
-
-    const searchInput = screen.getByTestId('template-search')
-    await user.type(searchInput, 'yellow')
-
-    // Wait for both conditions to be true
-    await waitFor(
-      () => {
-        const cards = document.querySelectorAll('.block-template-preview-card')
-        const blankPage = screen.queryByText('New Blank Page')
-        const yellowTemplate = screen.queryByLabelText('Course Home - Yellow template')
-
-        return cards.length === 2 && blankPage !== null && yellowTemplate !== null
-      },
-      {timeout: 4000}, // Increase timeout but keep it reasonable
-    )
-  })
-
-  // fickle; passes individually
-  it.skip('filters on the tags', async () => {
-    await renderComponent()
-    await user.click(getByTagText('General Content').closest('button') as HTMLButtonElement)
-
-    await waitFor(() => {
-      expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(
-        totalPages - generalContentPages,
-      )
-    })
-
-    await user.click(getByTagText('Home').closest('button') as HTMLButtonElement)
-
-    await waitFor(() => {
-      expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(
-        totalPages - generalContentPages - homePages,
-      )
-    })
-  })
-
-  it.skip('filters on the menu of tags', async () => {
-    await renderComponent()
-
-    expect(
-      document.querySelectorAll('[role="menuitemcheckbox"][aria-checked="true"]'),
-    ).toHaveLength(0)
-
-    user.click(screen.getByText('Apply Filters').closest('button') as HTMLButtonElement)
-
-    await waitFor(() => {
-      expect(
-        document.querySelectorAll('[role="menuitemcheckbox"][aria-checked="true"]'),
-      ).toHaveLength(5)
-    })
-
-    // I don't understand why getByText doesn't work when Home is displayed
-    // await user.click(screen.getByText('Home', {selector: 'ul[role="menu"]'}))
-    await user.click(document.querySelectorAll('[role="menuitemcheckbox"]')[1])
-
-    await waitFor(() => {
-      expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(15)
-    })
   })
 })

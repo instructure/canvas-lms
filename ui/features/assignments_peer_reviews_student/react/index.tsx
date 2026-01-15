@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import PeerReviewsStudentView from './components/PeerReviewsStudentView'
+import PeerReviewsStudentViewWithBreakpoints from './components/PeerReviewsStudentView'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,13 +34,16 @@ const queryClient = new QueryClient({
   },
 })
 
+const PeerReviewsStudentView = PeerReviewsStudentViewWithBreakpoints as React.ComponentType<{
+  assignmentId: string
+}>
+
 export default function renderStudentPeerReview(elt: HTMLElement | null) {
   if (!ENV.ASSIGNMENT_ID || !elt) {
     return
   }
 
-  const root = createRoot(elt)
-  root.render(
+  render(
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary
         errorComponent={({error}: {error: Error}) => (
@@ -56,5 +59,6 @@ export default function renderStudentPeerReview(elt: HTMLElement | null) {
         <PeerReviewsStudentView assignmentId={ENV.ASSIGNMENT_ID.toString()} />
       </ErrorBoundary>
     </QueryClientProvider>,
+    elt,
   )
 }

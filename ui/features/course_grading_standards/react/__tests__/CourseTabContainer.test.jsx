@@ -53,7 +53,7 @@ describe('CourseTabContainer', () => {
     vi.restoreAllMocks()
   })
 
-  it.skip('tabs are present when there are grading periods', () => {
+  it('tabs are present when there are grading periods', () => {
     const {getByTestId} = renderCourseTabContainer({hasGradingPeriods: true})
     const tabs = getByTestId('grading-tabs')
     expect(tabs).toBeInTheDocument()
@@ -66,7 +66,7 @@ describe('CourseTabContainer', () => {
     expect(container.querySelector('.ui-tabs')).not.toBeInTheDocument()
   })
 
-  it.skip('jquery-ui tabs() is called when there are grading periods', () => {
+  it('jquery-ui tabs() is called when there are grading periods', () => {
     const tabsSpy = vi.spyOn($.fn, 'tabs')
     renderCourseTabContainer({hasGradingPeriods: true})
     expect(tabsSpy).toHaveBeenCalled()
@@ -85,7 +85,7 @@ describe('CourseTabContainer', () => {
     expect(queryByText('Grading Periods')).not.toBeInTheDocument()
   })
 
-  it.skip('renders the grading periods if there are grading periods', () => {
+  it('renders the grading periods if there are grading periods', () => {
     const {getByTestId} = renderCourseTabContainer({hasGradingPeriods: true})
     expect(getByTestId('grading-periods-tab-link')).toHaveTextContent('Grading Periods')
   })
@@ -95,7 +95,7 @@ describe('CourseTabContainer', () => {
     expect(getByText('Grading Schemes')).toBeInTheDocument()
   })
 
-  it.skip('renders the grading standards if there are grading periods', () => {
+  it('renders the grading standards if there are grading periods', () => {
     const {getByTestId} = renderCourseTabContainer({hasGradingPeriods: true})
     expect(getByTestId('grading-standards-tab-link')).toHaveTextContent('Grading Schemes')
   })

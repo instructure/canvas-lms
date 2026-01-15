@@ -60,8 +60,7 @@ class PeerReview::PeerReviewCommonService < ApplicationService
     attrs = {
       title: generate_peer_review_title,
       parent_assignment_id: @parent_assignment.id,
-      has_sub_assignments: false,
-      submission_types: expected_submission_types
+      has_sub_assignments: false
     }
 
     # Only include attributes that were explicitly provided
@@ -100,10 +99,6 @@ class PeerReview::PeerReviewCommonService < ApplicationService
       attrs[:title] = expected_title
     end
 
-    if expected_submission_types != peer_review_sub.submission_types
-      attrs[:submission_types] = expected_submission_types
-    end
-
     attrs
   end
 
@@ -118,15 +113,6 @@ class PeerReview::PeerReviewCommonService < ApplicationService
       I18n.t("%{title} Peer Review (%{count})", title: @parent_assignment.title, count:)
     else
       I18n.t("%{title} Peer Review", title: @parent_assignment.title)
-    end
-  end
-
-  def expected_submission_types
-    if @grading_type == "not_graded"
-      "not_graded"
-    else
-      # for compatibility with assignment grading workflows
-      "online_text_entry"
     end
   end
 

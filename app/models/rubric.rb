@@ -540,12 +540,12 @@ class Rubric < ActiveRecord::Base
     end
   end
 
-  def self.process_regenerate_criteria_via_llm(progress, course, user, association_object, regenerate_options, orig_generate_options)
+  def self.process_regenerate_criteria_via_llm(progress, course, user, association_object, regenerate_options, generate_options)
     rubric = course.rubrics.build(user:)
     return unless rubric.grants_right?(user, :update)
 
     process_llm_criteria_with_error_handling(progress, "regeneration") do
-      criteria = RubricLLMService.new(rubric).regenerate_criteria_via_llm(association_object, regenerate_options, orig_generate_options)
+      criteria = RubricLLMService.new(rubric).regenerate_criteria_via_llm(association_object, regenerate_options, generate_options)
       progress.set_results({ criteria: })
     end
   end

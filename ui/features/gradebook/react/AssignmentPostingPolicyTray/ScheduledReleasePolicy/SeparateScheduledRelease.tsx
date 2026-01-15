@@ -23,23 +23,13 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignment_scheduled_release_policy')
-const GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR = I18n.t(
-  'Grades release date must be the same or after comments release date',
-)
-const COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR = I18n.t(
-  'Comments release date must be the same or before grades release date',
-)
 
 type SeparateScheduledReleaseProps = {
   gradeErrorMessages: FormMessage[]
   commentErrorMessages: FormMessage[]
   postGradesAt?: string | null
   postCommentsAt?: string | null
-  handleChange: (
-    changes: {postGradesAt?: string; postCommentsAt?: string},
-    gradeErrors: FormMessage[],
-    commentErrors: FormMessage[],
-  ) => void
+  handleChange: (changes: {postGradesAt?: string; postCommentsAt?: string}) => void
 }
 export const SeparateScheduledRelease = ({
   gradeErrorMessages,
@@ -48,81 +38,12 @@ export const SeparateScheduledRelease = ({
   postCommentsAt,
   handleChange,
 }: SeparateScheduledReleaseProps) => {
-  const filterRelationshipErrors = (messages: FormMessage[]) => {
-    const relationshipErrorTexts: string[] = [
-      GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
-      COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
-    ]
-    return messages.filter(
-      msg => typeof msg.text === 'string' && !relationshipErrorTexts.includes(msg.text),
-    )
-  }
-
-  const validateAndUpdate = (
-    gradesDateString: string | null | undefined,
-    commentsDateString: string | null | undefined,
-    changedField: 'grades' | 'comments',
-  ) => {
-    const gradeMessages: FormMessage[] = []
-    const commentMessages: FormMessage[] = []
-
-    const gradesDate = gradesDateString ? new Date(gradesDateString) : null
-    const commentsDate = commentsDateString ? new Date(commentsDateString) : null
-
-    // Validate date is in future only for the changed field
-    if (changedField === 'grades') {
-      if (!gradesDateString) {
-        gradeMessages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-      } else if (gradesDate && gradesDate < new Date()) {
-        gradeMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
-      }
-    }
-
-    if (changedField === 'comments') {
-      if (!commentsDateString) {
-        commentMessages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
-      } else if (commentsDate && commentsDate < new Date()) {
-        commentMessages.push({text: I18n.t('Date must be in the future'), type: 'error'})
-      }
-    }
-
-    // Validate relationship between dates
-    if (gradesDate && commentsDate && gradesDate < commentsDate) {
-      gradeMessages.push({
-        text: GRADES_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
-        type: 'error',
-      })
-      commentMessages.push({
-        text: COMMENTS_RELEASE_DATE_RELATIONSHIP_VALIDATION_ERROR,
-        type: 'error',
-      })
-    }
-
-    // Preserve existing errors from the unchanged field (excluding relationship errors)
-    const preservedGradeErrors =
-      changedField === 'comments' ? filterRelationshipErrors(gradeErrorMessages) : []
-    const preservedCommentErrors =
-      changedField === 'grades' ? filterRelationshipErrors(commentErrorMessages) : []
-
-    // Single callback with both value changes and error messages
-    const changes =
-      changedField === 'grades'
-        ? {postGradesAt: gradesDateString ?? undefined}
-        : {postCommentsAt: commentsDateString ?? undefined}
-
-    handleChange(
-      changes,
-      [...preservedGradeErrors, ...gradeMessages],
-      [...preservedCommentErrors, ...commentMessages],
-    )
-  }
-
   const onChangeGradeReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
-    validateAndUpdate(isoDate, postCommentsAt, 'grades')
+    handleChange({postGradesAt: isoDate})
   }
 
   const onChangeCommentReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
-    validateAndUpdate(postGradesAt, isoDate, 'comments')
+    handleChange({postCommentsAt: isoDate})
   }
 
   return (

@@ -25,7 +25,6 @@ class AttachmentAssociation < ActiveRecord::Base
   belongs_to :context, polymorphic: [
     :account,
     :account_notification,
-    :announcement,
     :assessment_question,
     :assignment,
     :calendar_event,

@@ -951,6 +951,55 @@ describe ContextModule do
       reqs_met = progression.requirements_met.map { |r| { id: r[:id], type: r[:type] } }
       expect(reqs_met).to eq [{ id: tag.id, type: "must_contribute" }]
     end
+
+    it "does not allow progression updates for date-concluded enrollments" do
+      student_in_course(active_all: true)
+      mod = @course.context_modules.create!(name: "Module")
+      page = @course.wiki_pages.create!(title: "View This Page")
+      tag = mod.add_item(id: page.id, type: "wiki_page")
+      mod.completion_requirements = [{ id: tag.id, type: "must_view" }]
+      mod.workflow_state = "active"
+      mod.save!
+
+      # Student completes the requirement
+      progression = mod.update_for(@student, :read, tag)
+      expect(progression).not_to be_nil
+      expect(progression.requirements_met.pluck(:id)).to include(tag.id)
+      progression.reload
+      original_completed_at = progression.completed_at
+      expect(original_completed_at).not_to be_nil
+
+      # Simulate enrollment being soft-concluded by date (past the end date)
+      # This sets enrollment_state.state to "completed" while workflow_state stays "active"
+      @enrollment.start_at = 2.months.ago
+      @enrollment.end_at = 1.month.ago
+      @enrollment.save!
+      @enrollment.enrollment_state.recalculate_state
+      @enrollment.enrollment_state.save!
+      expect(@enrollment.reload.workflow_state).to eq("active")
+      expect(@enrollment.enrollment_state.state).to eq("completed")
+
+      # Make the progression outdated by updating the module
+      # This simulates a real scenario where module content changes after enrollment conclusion
+      mod.touch
+
+      # Simulate what happens when a concluded user accesses a module page
+      # Controllers call evaluate_for directly, which should return existing progression
+      # without re-evaluating (preventing evaluated_at from being updated)
+      Timecop.freeze(2.days.from_now) do
+        progression.reload
+        original_evaluated_at = progression.evaluated_at
+
+        result = mod.evaluate_for(@student)
+        expect(result).to be_a(ContextModuleProgression)
+        expect(result.persisted?).to be(true)
+
+        # Verify neither timestamp has changed (progression was not re-evaluated)
+        result.reload
+        expect(result.completed_at).to eq(original_completed_at)
+        expect(result.evaluated_at).to eq(original_evaluated_at)
+      end
+    end
   end
 
   describe "evaluate_for" do
@@ -2341,7 +2390,7 @@ describe ContextModule do
 
   it "only loads visibility and progression information once when calculating prerequisites" do
     course_factory(active_all: true)
-    student_in_course(course: @course)
+    student_in_course(course: @course, active_all: true)
     m1 = @course.context_modules.create!(name: "m1")
     m2 = @course.context_modules.create!(name: "m2", prerequisites: [{ id: m1.id, type: "context_module", name: m1.name }])
 
@@ -2394,6 +2443,46 @@ describe ContextModule do
     it "returns false if the module has only deleted overrides" do
       @module.assignment_overrides.create!(workflow_state: "deleted")
       expect(@module.only_visible_to_overrides).to be false
+    end
+  end
+
+  describe ".preload_progressions_for_user" do
+    before :once do
+      course_with_student(active_all: true)
+      @module1 = @course.context_modules.create!(name: "Module 1")
+      @module2 = @course.context_modules.create!(name: "Module 2")
+      @module3 = @course.context_modules.create!(name: "Module 3")
+      @progression1 = @module1.find_or_create_progression(@student)
+      @progression2 = @module2.find_or_create_progression(@student)
+    end
+
+    it "returns a hash of module_id to progression" do
+      result = ContextModule.preload_progressions_for_user([@module1, @module2, @module3], @student)
+      expect(result).to be_a(Hash)
+      expect(result[@module1.id]).to eq @progression1
+      expect(result[@module2.id]).to eq @progression2
+      expect(result[@module3.id]).to be_nil
+    end
+
+    it "returns empty hash when no modules provided" do
+      result = ContextModule.preload_progressions_for_user([], @student)
+      expect(result).to eq({})
+    end
+
+    it "returns empty hash when no user provided" do
+      result = ContextModule.preload_progressions_for_user([@module1, @module2], nil)
+      expect(result).to eq({})
+    end
+
+    it "loads progressions in a single query" do
+      query_count = 0
+      allow(ContextModuleProgression).to receive(:where).and_wrap_original do |method, *args|
+        query_count += 1
+        method.call(*args)
+      end
+
+      ContextModule.preload_progressions_for_user([@module1, @module2, @module3], @student)
+      expect(query_count).to eq 1
     end
   end
 end

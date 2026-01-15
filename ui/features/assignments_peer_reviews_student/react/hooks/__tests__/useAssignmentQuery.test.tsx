@@ -47,15 +47,19 @@ const createWrapper = () => {
 describe('useAssignmentQuery', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockExecuteQuery.mockClear()
   })
 
-  it.skip('initializes with loading set to true and returns assignment data successfully', async () => {
+  it('initializes with loading set to true and returns assignment data successfully', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
         _id: '1',
         name: 'Peer Review Assignment',
         dueAt: '2025-12-31T23:59:59Z',
         description: '<p>Assignment description</p>',
+        expectsSubmission: true,
+        nonDigitalSubmission: false,
+        pointsPossible: 10,
         courseId: '100',
         peerReviews: {
           count: 2,
@@ -74,10 +78,11 @@ describe('useAssignmentQuery', () => {
             createdAt: '2025-11-02T00:00:00Z',
           },
         ],
+        rubric: null,
       },
     })
 
-    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('1'), {
+    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('1', '123'), {
       wrapper: createWrapper(),
     })
 
@@ -93,6 +98,9 @@ describe('useAssignmentQuery', () => {
       name: 'Peer Review Assignment',
       dueAt: '2025-12-31T23:59:59Z',
       description: '<p>Assignment description</p>',
+      expectsSubmission: true,
+      nonDigitalSubmission: false,
+      pointsPossible: 10,
       courseId: '100',
       peerReviews: {
         count: 2,
@@ -111,26 +119,31 @@ describe('useAssignmentQuery', () => {
           createdAt: '2025-11-02T00:00:00Z',
         },
       ],
+      rubric: null,
     })
     expect(result.current.isError).toBe(false)
   })
 
-  it.skip('handles assignment with no due date', async () => {
+  it('handles assignment with no due date', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
         _id: '2',
         name: 'Assignment Without Due Date',
         dueAt: null,
         description: '<p>Description here</p>',
+        expectsSubmission: true,
+        nonDigitalSubmission: false,
+        pointsPossible: 5,
         courseId: '100',
         peerReviews: {
           count: 1,
         },
         assessmentRequestsForCurrentUser: [],
+        rubric: null,
       },
     })
 
-    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('2'), {
+    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('2', '123'), {
       wrapper: createWrapper(),
     })
 
@@ -142,22 +155,26 @@ describe('useAssignmentQuery', () => {
     expect(result.current.isError).toBe(false)
   })
 
-  it.skip('handles assignment with no description', async () => {
+  it('handles assignment with no description', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
         _id: '3',
         name: 'Assignment Without Description',
         dueAt: '2025-12-31T23:59:59Z',
         description: null,
+        expectsSubmission: true,
+        nonDigitalSubmission: false,
+        pointsPossible: 20,
         courseId: '100',
         peerReviews: {
           count: 3,
         },
         assessmentRequestsForCurrentUser: null,
+        rubric: null,
       },
     })
 
-    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('3'), {
+    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('3', '123'), {
       wrapper: createWrapper(),
     })
 
@@ -169,10 +186,10 @@ describe('useAssignmentQuery', () => {
     expect(result.current.isError).toBe(false)
   })
 
-  it.skip('handles query error', async () => {
+  it('handles query error', async () => {
     mockExecuteQuery.mockRejectedValueOnce(new Error('Failed to fetch assignment'))
 
-    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('error-id'), {
+    const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('error-id', '123'), {
       wrapper: createWrapper(),
     })
 
@@ -183,22 +200,26 @@ describe('useAssignmentQuery', () => {
     expect(result.current.isError).toBe(true)
   })
 
-  it.skip('uses correct query key and variables', async () => {
+  it('uses correct query key and variables', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
         _id: '123',
         name: 'Test Assignment',
         dueAt: null,
         description: null,
+        expectsSubmission: true,
+        nonDigitalSubmission: false,
+        pointsPossible: 10,
         courseId: '100',
         peerReviews: {
           count: 2,
         },
         assessmentRequestsForCurrentUser: [],
+        rubric: null,
       },
     })
 
-    const {waitForNextUpdate} = renderHook(() => useAssignmentQuery('123'), {
+    const {waitForNextUpdate} = renderHook(() => useAssignmentQuery('123', '456'), {
       wrapper: createWrapper(),
     })
 
@@ -206,6 +227,7 @@ describe('useAssignmentQuery', () => {
 
     expect(mockExecuteQuery).toHaveBeenCalledWith(PEER_REVIEW_ASSIGNMENT_QUERY, {
       assignmentId: '123',
+      userId: '456',
     })
   })
 
@@ -217,6 +239,11 @@ describe('useAssignmentQuery', () => {
           name: 'Assignment With Text Submission',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          expectsSubmission: true,
+          nonDigitalSubmission: false,
+          pointsPossible: 15,
+          courseId: '100',
+          peerReviews: {count: 2},
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -231,10 +258,11 @@ describe('useAssignmentQuery', () => {
               },
             },
           ],
+          rubric: null,
         },
       })
 
-      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('4'), {
+      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('4', '123'), {
         wrapper: createWrapper(),
       })
 
@@ -257,6 +285,11 @@ describe('useAssignmentQuery', () => {
           name: 'Multiple Peer Reviews',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          expectsSubmission: true,
+          nonDigitalSubmission: false,
+          pointsPossible: 25,
+          courseId: '100',
+          peerReviews: {count: 2},
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -283,10 +316,11 @@ describe('useAssignmentQuery', () => {
               },
             },
           ],
+          rubric: null,
         },
       })
 
-      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('6'), {
+      const {result, waitForNextUpdate} = renderHook(() => useAssignmentQuery('6', '123'), {
         wrapper: createWrapper(),
       })
 

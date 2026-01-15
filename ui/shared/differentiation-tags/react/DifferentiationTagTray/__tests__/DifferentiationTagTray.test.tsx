@@ -66,7 +66,7 @@ describe('DifferentiationTagTray', () => {
     expect(screen.queryByTestId('differentiation-tag-header')).toBeInTheDocument()
   })
 
-  it.skip('does not render search bar or + Tag button in empty state and clicking "Get Started" opens modal in create mode', async () => {
+  it('does not render search bar or + Tag button in empty state and clicking "Get Started" opens modal in create mode', async () => {
     renderComponent({differentiationTagCategories: []})
 
     expect(screen.queryByPlaceholderText('Search for Tag')).not.toBeInTheDocument()
@@ -179,7 +179,7 @@ describe('DifferentiationTagTray', () => {
   })
 
   describe('modal interactions', () => {
-    it.skip('opens modal in create mode when clicking "+ Tag" button', async () => {
+    it('opens modal in create mode when clicking "+ Tag" button', async () => {
       const mockCategories = [{id: 1, name: 'Category 1', groups: []}]
       renderComponent({differentiationTagCategories: mockCategories})
       const createButton = screen.getByText('+ Tag').closest('button')

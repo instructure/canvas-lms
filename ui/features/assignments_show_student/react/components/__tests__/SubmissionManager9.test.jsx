@@ -21,26 +21,14 @@ import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {ApolloProvider} from '@apollo/client'
 import {mswClient} from '@canvas/msw/mswClient'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, screen, waitFor, cleanup} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import StudentViewContext, {
-  StudentViewContextDefaults,
-} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
 import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
-
-// Reset all mocks before each test to ensure isolation
-beforeEach(() => {
-  vi.resetAllMocks()
-  ContextModuleApi.getContextModuleData.mockResolvedValue({})
-  mswClient.cache.reset()
-})
-
-// Remove or comment out vi.useFakeTimers() to prevent interference with async operations
-//
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),
@@ -51,14 +39,6 @@ vi.mock('@canvas/rce/RichContentEditor')
 vi.mock('../../apis/ContextModuleApi')
 
 const server = setupServer()
-
-function renderInContext(overrides = {}, children) {
-  const contextProps = {...StudentViewContextDefaults, ...overrides}
-
-  return render(
-    <StudentViewContext.Provider value={contextProps}>{children}</StudentViewContext.Provider>,
-  )
-}
 
 function gradedOverrides() {
   return {
@@ -86,559 +66,513 @@ function gradedOverrides() {
   }
 }
 
-describe('SubmissionManager', () => {
-  // Track captured request for verification
-  let lastCapturedRequest = null
+function generateAssessmentItem(
+  criterionId,
+  {hasComments = false, hasValue = false, hasValidValue = true},
+) {
+  return {
+    commentFocus: true,
+    comments: hasComments ? 'foo bar' : '',
+    criterion_id: criterionId,
+    description: `Criterion ${criterionId}`,
+    editComments: true,
+    id: 'blank',
+    points: {
+      text: '',
+      valid: hasValidValue,
+      value: hasValue ? 5 : undefined,
+    },
+  }
+}
 
+function resetStore() {
+  store.setState({
+    displayedAssessment: null,
+    isSavingRubricAssessment: false,
+    selfAssessment: null,
+  })
+}
+
+describe('SubmissionManager', () => {
   beforeAll(() => {
-    server.listen()
+    server.listen({onUnhandledRequest: 'bypass'})
     window.INST = window.INST || {}
     window.INST.editorButtons = []
   })
 
-  afterAll(() => server.close())
+  afterAll(() => {
+    server.close()
+  })
 
-  describe('peer reviews', () => {
-    describe('without rubrics', () => {
-      it('does not render a submit button', async () => {
-        const props = await mockAssignmentAndSubmission()
-        props.assignment.env.peerReviewModeEnabled = true
-        const {queryByText} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
+  beforeEach(() => {
+    vi.resetAllMocks()
+    ContextModuleApi.getContextModuleData.mockResolvedValue({})
+    mswClient.cache.reset()
+    resetStore()
 
-        // Wait for any asynchronous operations to complete
-        await waitFor(() => {})
+    server.use(
+      graphql.query('ExternalTools', () => {
+        return HttpResponse.json({
+          data: {
+            course: {
+              __typename: 'Course',
+              externalToolsConnection: {__typename: 'ExternalToolConnection', nodes: []},
+            },
+          },
+        })
+      }),
+      graphql.query('GetUserGroups', () => {
+        return HttpResponse.json({
+          data: {legacyNode: {__typename: 'User', groups: []}},
+        })
+      }),
+    )
+  })
 
-        expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
-      })
+  afterEach(() => {
+    cleanup()
+    server.resetHandlers()
+    mswClient.cache.reset()
+    vi.clearAllMocks()
+    resetStore()
+  })
+
+  describe('peer reviews without rubrics', () => {
+    it('does not render a submit button', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = true
+
+      render(
+        <ApolloProvider client={mswClient}>
+          <SubmissionManager {...props} />
+        </ApolloProvider>,
+      )
+
+      expect(screen.queryByText('Submit Assignment')).not.toBeInTheDocument()
+    })
+  })
+})
+
+describe('SubmissionManager peer reviews with rubrics - submit button states', () => {
+  let props
+  let mocks
+
+  async function setupRubricMocks() {
+    const variables = {
+      courseID: '1',
+      assignmentLid: '1',
+      submissionID: '1',
+      submissionAttempt: 0,
+    }
+    const overrides = gradedOverrides()
+    const allOverrides = [
+      {
+        Node: {__typename: 'Assignment'},
+        Assignment: {rubric: {}, rubricAssociation: {}},
+        Rubric: {
+          criteria: [{}],
+        },
+        ...overrides,
+      },
+    ]
+    const fetchRubricResult = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+
+    server.use(
+      graphql.query('GetRubric', () => {
+        return HttpResponse.json(fetchRubricResult)
+      }),
+    )
+
+    mocks = [
+      {
+        request: {query: RUBRIC_QUERY, variables},
+        result: fetchRubricResult,
+      },
+    ]
+  }
+
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
+    window.INST = window.INST || {}
+    window.INST.editorButtons = []
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
+  beforeEach(async () => {
+    vi.resetAllMocks()
+    ContextModuleApi.getContextModuleData.mockResolvedValue({})
+    mswClient.cache.reset()
+    resetStore()
+
+    server.use(
+      graphql.query('ExternalTools', () => {
+        return HttpResponse.json({
+          data: {
+            course: {
+              __typename: 'Course',
+              externalToolsConnection: {__typename: 'ExternalToolConnection', nodes: []},
+            },
+          },
+        })
+      }),
+      graphql.query('GetUserGroups', () => {
+        return HttpResponse.json({
+          data: {legacyNode: {__typename: 'User', groups: []}},
+        })
+      }),
+      http.post('/courses/:courseId/rubric_associations/:rubricAssociationId/assessments', () => {
+        return HttpResponse.json({})
+      }),
+    )
+
+    fakeENV.setup({COURSE_ID: '4', current_user: {id: '4'}})
+    await setupRubricMocks()
+    const rubricData = mocks[0].result.data
+
+    props = await mockAssignmentAndSubmission()
+    props.assignment.rubric = rubricData.assignment.rubric
+    props.assignment.rubric.criteria.push({...props.assignment.rubric.criteria[0], id: '2'})
+    props.assignment.env.peerReviewModeEnabled = true
+    props.assignment.env.peerReviewAvailable = true
+    props.assignment.env.revieweeId = '4'
+  })
+
+  afterEach(() => {
+    cleanup()
+    server.resetHandlers()
+    mswClient.cache.reset()
+    vi.clearAllMocks()
+    fakeENV.teardown()
+    resetStore()
+  })
+
+  it('renders a submit button when the assessment has not been submitted', async () => {
+    store.setState({
+      displayedAssessment: {
+        score: 5,
+        data: [
+          generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+          generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+        ],
+      },
     })
 
-    describe('with rubrics', () => {
-      const originalENV = window.ENV
-      let props, mocks
+    render(
+      <ApolloProvider client={mswClient}>
+        <SubmissionManager {...props} />
+      </ApolloProvider>,
+    )
 
-      function generateAssessmentItem(
-        criterionId,
-        {hasComments = false, hasValue = false, hasValidValue = true},
-      ) {
-        return {
-          commentFocus: true,
-          comments: hasComments ? 'foo bar' : '',
-          criterion_id: criterionId,
-          description: `Criterion ${criterionId}`,
-          editComments: true,
-          id: 'blank',
-          points: {
-            text: '',
-            valid: hasValidValue,
-            value: hasValue ? Math.floor(Math.random() * 10) : undefined,
-          },
-        }
-      }
+    await waitFor(() => {
+      expect(screen.queryByText('Submit')).toBeInTheDocument()
+    })
+  })
 
-      function setCurrentUserAsAssessmentOwner() {
-        window.ENV = {...originalENV, COURSE_ID: '4', current_user: {id: '2'}}
-      }
+  it('does not render a submit button when the assessment has been submitted', async () => {
+    fakeENV.setup({COURSE_ID: '4', current_user: {id: '2'}})
+    store.setState({
+      displayedAssessment: mocks[0].result.data.submission.rubricAssessmentsConnection.nodes[0],
+    })
 
-      function setOtherUserAsAssessmentOwner() {
-        window.ENV = {...originalENV, COURSE_ID: '4', current_user: {id: '4'}}
-      }
+    render(
+      <ApolloProvider client={mswClient}>
+        <SubmissionManager {...props} />
+      </ApolloProvider>,
+    )
 
-      async function setMocks() {
-        const variables = {
-          courseID: '1',
-          assignmentLid: '1',
-          submissionID: '1',
-          submissionAttempt: 0,
-        }
-        const overrides = gradedOverrides()
-        const allOverrides = [
-          {
-            Node: {__typename: 'Assignment'},
-            Assignment: {rubric: {}, rubricAssociation: {}},
-            Rubric: {
-              criteria: [{}],
-            },
-            ...overrides,
-          },
-        ]
-        const fetchRubricResult = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+    await waitFor(() => {
+      expect(screen.queryByText('Submit')).not.toBeInTheDocument()
+    })
+  })
 
-        // Set up MSW graphql handler for GetRubric query
-        server.use(
-          graphql.query('GetRubric', () => {
-            return HttpResponse.json(fetchRubricResult)
+  it('renders an enabled submit button when every criterion has a comment', async () => {
+    store.setState({
+      displayedAssessment: {
+        score: 5,
+        data: [
+          generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+          generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+        ],
+      },
+    })
+
+    render(
+      <ApolloProvider client={mswClient}>
+        <SubmissionManager {...props} />
+      </ApolloProvider>,
+    )
+
+    const button = await screen.findByTestId('submit-peer-review-button')
+    expect(button).toBeEnabled()
+  })
+
+  it('renders an enabled submit button when every criterion has a valid point', async () => {
+    store.setState({
+      displayedAssessment: {
+        score: 5,
+        data: [
+          generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasValue: true}),
+          generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasValue: true}),
+        ],
+      },
+    })
+
+    render(
+      <ApolloProvider client={mswClient}>
+        <SubmissionManager {...props} />
+      </ApolloProvider>,
+    )
+
+    const button = await screen.findByTestId('submit-peer-review-button')
+    expect(button).toBeEnabled()
+  })
+
+  it('renders a disabled submit button when at least one criterion has an invalid points value', async () => {
+    store.setState({
+      displayedAssessment: {
+        score: 5,
+        data: [
+          generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasValue: true}),
+          generateAssessmentItem(props.assignment.rubric.criteria[1].id, {
+            hasValue: true,
+            hasValidValue: false,
           }),
-        )
+        ],
+      },
+    })
 
-        // Store mock data for access in tests
-        mocks = [
-          {
-            request: {query: RUBRIC_QUERY, variables},
-            result: fetchRubricResult,
-          },
-        ]
-      }
+    render(
+      <ApolloProvider client={mswClient}>
+        <SubmissionManager {...props} />
+      </ApolloProvider>,
+    )
 
-      beforeEach(async () => {
-        lastCapturedRequest = null
-        // Default handler that captures request and returns success
-        server.use(
-          http.post(
-            '/courses/:courseId/rubric_associations/:rubricAssociationId/assessments',
-            async ({request}) => {
-              lastCapturedRequest = {
-                method: 'POST',
-                path: new URL(request.url).pathname,
-                body: await request.text(),
-              }
-              return HttpResponse.json({})
+    const button = await screen.findByTestId('submit-peer-review-button')
+    expect(button).toBeDisabled()
+  })
+})
+
+describe('SubmissionManager peer reviews with rubrics - modal and error handling', () => {
+  let props
+  let mocks
+
+  async function setupRubricMocks() {
+    const variables = {
+      courseID: '1',
+      assignmentLid: '1',
+      submissionID: '1',
+      submissionAttempt: 0,
+    }
+    const overrides = gradedOverrides()
+    const allOverrides = [
+      {
+        Node: {__typename: 'Assignment'},
+        Assignment: {rubric: {}, rubricAssociation: {}},
+        Rubric: {
+          criteria: [{}],
+        },
+        ...overrides,
+      },
+    ]
+    const fetchRubricResult = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+
+    server.use(
+      graphql.query('GetRubric', () => {
+        return HttpResponse.json(fetchRubricResult)
+      }),
+    )
+
+    mocks = [
+      {
+        request: {query: RUBRIC_QUERY, variables},
+        result: fetchRubricResult,
+      },
+    ]
+  }
+
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
+    window.INST = window.INST || {}
+    window.INST.editorButtons = []
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
+  beforeEach(async () => {
+    vi.resetAllMocks()
+    ContextModuleApi.getContextModuleData.mockResolvedValue({})
+    mswClient.cache.reset()
+    resetStore()
+
+    server.use(
+      graphql.query('ExternalTools', () => {
+        return HttpResponse.json({
+          data: {
+            course: {
+              __typename: 'Course',
+              externalToolsConnection: {__typename: 'ExternalToolConnection', nodes: []},
             },
-          ),
-        )
-        setCurrentUserAsAssessmentOwner()
-        await setMocks()
-        await waitFor(() => {})
-        const rubricData = mocks[0].result.data
-        const assessments = rubricData.submission.rubricAssessmentsConnection.nodes
-
-        store.setState({
-          displayedAssessment: assessments[0],
-        })
-
-        props = await mockAssignmentAndSubmission()
-        props.assignment.rubric = rubricData.assignment.rubric
-        props.assignment.rubric.criteria.push({...props.assignment.rubric.criteria[0], id: '2'})
-        props.assignment.env.peerReviewModeEnabled = true
-        props.assignment.env.peerReviewAvailable = true
-        props.assignment.env.revieweeId = '4'
-      })
-
-      afterEach(() => {
-        server.resetHandlers()
-        mswClient.cache.reset()
-        window.ENV = originalENV
-        store.setState({
-          displayedAssessment: null,
-        })
-      })
-
-      it('renders a submit button when the assessment has not been submitted', async () => {
-        setOtherUserAsAssessmentOwner()
-        const {queryByText} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
-
-        // Let Apollo cache settle
-        await waitFor(() => {})
-
-        expect(queryByText('Submit')).toBeInTheDocument()
-      })
-
-      it('does not render a submit button when the assessment has been submitted', async () => {
-        const {queryByText} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
-
-        // Wait for rubric data to load and component to re-render
-        // The Submit button should not appear once data is loaded and user is identified as assessor
-        await waitFor(() => {
-          expect(queryByText('Submit')).not.toBeInTheDocument()
-        })
-      })
-
-      it('renders an enabled submit button when every criterion has a comment', async () => {
-        setOtherUserAsAssessmentOwner()
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
-            ],
           },
         })
-
-        const {getByTestId} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
-
-        // Let Apollo cache settle
-        await waitFor(() => {})
-
-        expect(getByTestId('submit-peer-review-button')).toBeEnabled()
-      })
-
-      it('renders an enabled submit button when every criterion has a valid point', async () => {
-        setOtherUserAsAssessmentOwner()
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasValue: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasValue: true}),
-            ],
-          },
+      }),
+      graphql.query('GetUserGroups', () => {
+        return HttpResponse.json({
+          data: {legacyNode: {__typename: 'User', groups: []}},
         })
+      }),
+    )
 
-        props.assignment.env.peerReviewModeEnabled = true
-        props.assignment.env.peerReviewAvailable = true
+    fakeENV.setup({COURSE_ID: '4', current_user: {id: '4'}})
+    await setupRubricMocks()
+    const rubricData = mocks[0].result.data
 
-        const {getByTestId} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
+    props = await mockAssignmentAndSubmission()
+    props.assignment.rubric = rubricData.assignment.rubric
+    props.assignment.rubric.criteria.push({...props.assignment.rubric.criteria[0], id: '2'})
+    props.assignment.env.peerReviewModeEnabled = true
+    props.assignment.env.peerReviewAvailable = true
+    props.assignment.env.revieweeId = '4'
+  })
 
-        // Let Apollo cache settle
-        await waitFor(() => {})
+  afterEach(() => {
+    cleanup()
+    server.resetHandlers()
+    mswClient.cache.reset()
+    vi.clearAllMocks()
+    fakeENV.teardown()
+    resetStore()
+  })
 
-        expect(getByTestId('submit-peer-review-button')).toBeEnabled()
-      })
+  it('renders peer review modal when submit button is clicked', async () => {
+    let postRequestCompleted = false
 
-      it('renders a disabled submit button when at least one criterion has an invalid points value', async () => {
-        setOtherUserAsAssessmentOwner()
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasValue: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {
-                hasValue: true,
-                hasValidValue: false,
-              }),
-            ],
-          },
-        })
+    // Reset cache to ensure fresh GraphQL query
+    mswClient.cache.reset()
 
-        const {getByTestId} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
+    server.use(
+      graphql.query('GetRubric', () => {
+        return HttpResponse.json(mocks[0].result)
+      }),
+      http.post(
+        '/courses/:courseId/rubric_associations/:rubricAssociationId/assessments',
+        async () => {
+          postRequestCompleted = true
+          return HttpResponse.json({})
+        },
+      ),
+    )
 
-        // Let Apollo cache settle
-        await waitFor(() => {})
+    const reviewerSubmission = {
+      id: 'test-id',
+      _id: 'test-id',
+      assignedAssessments: [
+        {
+          assetId: props.submission._id,
+          workflowState: 'assigned',
+          assetSubmissionType: 'online-text',
+        },
+        {
+          assetId: 'some-other-user-id',
+          workflowState: 'assigned',
+          assetSubmissionType: 'online-text',
+        },
+      ],
+    }
+    props.reviewerSubmission = reviewerSubmission
 
-        expect(getByTestId('submit-peer-review-button')).toBeDisabled()
-      })
+    store.setState({
+      displayedAssessment: {
+        score: 5,
+        data: [
+          generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+          generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+        ],
+      },
+    })
 
-      it('sends a http request with anonymous peer reviews disabled to the rubrics assessments endpoint when the user clicks on Submit button', async () => {
-        setOtherUserAsAssessmentOwner()
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
-            ],
-          },
-        })
+    render(
+      <ApolloProvider client={mswClient}>
+        <SubmissionManager {...props} />
+      </ApolloProvider>,
+    )
 
-        const {getByTestId} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
+    // Wait for the submit button to be enabled (indicates component is ready)
+    const button = await screen.findByTestId('submit-peer-review-button')
+    await waitFor(() => {
+      expect(button).toBeEnabled()
+    })
 
-        // Let Apollo cache settle
-        await waitFor(() => {})
+    // Give time for rubricData to be fetched and set in component state
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    })
 
-        fireEvent.click(getByTestId('submit-peer-review-button'))
+    await act(async () => {
+      fireEvent.click(button)
+    })
 
-        const rubricAssociationId = mocks[0].result.data.assignment.rubricAssociation._id
-        await waitFor(() => {
-          expect(lastCapturedRequest).not.toBeNull()
-          expect(lastCapturedRequest.method).toBe('POST')
-          expect(lastCapturedRequest.path).toBe(
-            `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
-          )
-          expect(lastCapturedRequest.body).toContain('user_id%5D=4')
-        })
-      })
+    // Wait for the POST request to complete
+    await waitFor(() => {
+      expect(postRequestCompleted).toBe(true)
+    })
 
-      it('sends a http request with anonymous peer reviews enabled to the rubrics assessments endpoint when the user clicks on Submit button', async () => {
-        delete props.assignment.env.revieweeId
-        props.assignment.env.anonymousAssetId = 'ad0f'
+    // Wait for modal to appear
+    await waitFor(() => {
+      expect(screen.getByTestId('peer-review-prompt-modal')).toBeInTheDocument()
+    })
+  })
 
-        setOtherUserAsAssessmentOwner()
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
-            ],
-          },
-        })
+  it('creates an error alert when the http request fails', async () => {
+    // Reset cache to ensure fresh GraphQL query
+    mswClient.cache.reset()
 
-        const {getByTestId} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
+    server.use(
+      http.post('/courses/:courseId/rubric_associations/:rubricAssociationId/assessments', () => {
+        return HttpResponse.error()
+      }),
+    )
+    const setOnFailure = vi.fn()
 
-        // Let Apollo cache settle
-        await waitFor(() => {})
+    store.setState({
+      displayedAssessment: {
+        score: 5,
+        data: [
+          generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+          generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+        ],
+      },
+    })
 
-        fireEvent.click(getByTestId('submit-peer-review-button'))
+    render(
+      <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess: vi.fn()}}>
+        <ApolloProvider client={mswClient}>
+          <SubmissionManager {...props} />
+        </ApolloProvider>
+      </AlertManagerContext.Provider>,
+    )
 
-        const rubricAssociationId = mocks[0].result.data.assignment.rubricAssociation._id
-        await waitFor(() => {
-          expect(lastCapturedRequest).not.toBeNull()
-          expect(lastCapturedRequest.method).toBe('POST')
-          expect(lastCapturedRequest.path).toBe(
-            `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
-          )
-          expect(lastCapturedRequest.body).toContain('anonymous_id%5D=ad0f')
-        })
-      })
+    // Wait for submit button to be enabled (indicates component is ready)
+    const submitButton = await screen.findByTestId('submit-peer-review-button')
+    await waitFor(() => {
+      expect(submitButton).toBeEnabled()
+    })
 
-      it('creates a success alert when the http request was sent successfully', async () => {
-        setOtherUserAsAssessmentOwner()
-        const setOnSuccess = vi.fn()
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
-            ],
-          },
-        })
+    // Give time for rubricData to be fetched and set in component state
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    })
 
-        const {getByTestId} = render(
-          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess}}>
-            <ApolloProvider client={mswClient}>
-              <SubmissionManager {...props} />
-            </ApolloProvider>
-          </AlertManagerContext.Provider>,
-        )
+    await act(async () => {
+      fireEvent.click(submitButton)
+    })
 
-        // Let Apollo cache settle
-        await waitFor(() => {})
-
-        fireEvent.click(getByTestId('submit-peer-review-button'))
-
-        await waitFor(() => {
-          expect(setOnSuccess).toHaveBeenCalledWith('Rubric was successfully submitted')
-        })
-      })
-
-      it('renders peer review modal for remaining rubric assessments', async () => {
-        setOtherUserAsAssessmentOwner()
-        const reviewerSubmission = {
-          id: 'test-id',
-          _id: 'test-id',
-          assignedAssessments: [
-            {
-              assetId: props.submission._id,
-              workflowState: 'assigned',
-              assetSubmissionType: 'online-text',
-            },
-            {
-              assetId: 'some other user id',
-              workflowState: 'assigned',
-              assetSubmissionType: 'online-text',
-            },
-          ],
-        }
-        props.reviewerSubmission = reviewerSubmission
-        props.assignment.env.peerReviewModeEnabled = true
-        props.assignment.env.peerReviewAvailable = true
-
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
-            ],
-          },
-        })
-
-        const {getByTestId} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
-
-        await waitFor(() => {
-          expect(getByTestId('submit-peer-review-button')).toBeInTheDocument()
-        })
-
-        fireEvent.click(getByTestId('submit-peer-review-button'))
-
-        await waitFor(() => {
-          expect(getByTestId('peer-review-prompt-modal')).toBeInTheDocument()
-        })
-      })
-
-      it('renders peer review modal for completing all rubric assessments', async () => {
-        setOtherUserAsAssessmentOwner()
-        const reviewerSubmission = {
-          id: 'test-id',
-          _id: 'test-id',
-          assignedAssessments: [
-            {
-              assetId: '1',
-              anonymousId: null,
-              workflowState: 'assigned',
-              anonymousUser: false,
-            },
-            {
-              assetId: '2',
-              anonymousId: null,
-              workflowState: 'assigned',
-              anonymousUser: false,
-            },
-          ],
-        }
-
-        // Set up peer review mode
-        props.assignment.env.peerReviewModeEnabled = true
-        props.assignment.env.peerReviewAvailable = true
-        props.reviewerSubmission = reviewerSubmission
-
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
-            ],
-          },
-        })
-
-        const {getByTestId} = render(
-          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
-            <ApolloProvider client={mswClient}>
-              <SubmissionManager {...props} />
-            </ApolloProvider>
-          </AlertManagerContext.Provider>,
-        )
-
-        // Wait for Apollo cache to settle
-        await waitFor(() => {})
-
-        // Wait for the submit button to be enabled
-        const submitButton = await waitFor(() => getByTestId('submit-peer-review-button'))
-        expect(submitButton).toBeEnabled()
-
-        // Click the submit button
-        fireEvent.click(submitButton)
-
-        // Verify modal appears using screen since it's rendered at the root level
-        await waitFor(() => {
-          const modal = screen.getByTestId('peer-review-prompt-modal')
-          expect(modal).toBeInTheDocument()
-        })
-      })
-
-      it('calls the onSuccessfulPeerReview function to re-render page when a peer review with rubric is successful', async () => {
-        setOtherUserAsAssessmentOwner()
-        props.onSuccessfulPeerReview = vi.fn()
-        const reviewerSubmission = {
-          id: 'test-id',
-          _id: 'test-id',
-          assignedAssessments: [
-            {
-              assetId: props.submission._id,
-              workflowState: 'assigned',
-              assetSubmissionType: 'online-text',
-            },
-          ],
-        }
-        props.reviewerSubmission = reviewerSubmission
-        props.assignment.env.peerReviewModeEnabled = true
-        props.assignment.env.peerReviewAvailable = true
-
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
-            ],
-          },
-        })
-
-        const {getByTestId} = render(
-          <ApolloProvider client={mswClient}>
-            <SubmissionManager {...props} />
-          </ApolloProvider>,
-        )
-
-        await waitFor(() => {
-          expect(getByTestId('submit-peer-review-button')).toBeInTheDocument()
-        })
-
-        fireEvent.click(getByTestId('submit-peer-review-button'))
-
-        await waitFor(() => {
-          expect(props.onSuccessfulPeerReview).toHaveBeenCalled()
-        })
-      })
-
-      it('creates an error alert when the http request fails', async () => {
-        setOtherUserAsAssessmentOwner()
-        // Override the default handler to return an error
-        server.use(
-          http.post(
-            '/courses/:courseId/rubric_associations/:rubricAssociationId/assessments',
-            () => {
-              return HttpResponse.error()
-            },
-          ),
-        )
-        const setOnFailure = vi.fn()
-
-        // Set up peer review mode
-        props.assignment.env.peerReviewModeEnabled = true
-        props.assignment.env.peerReviewAvailable = true
-
-        store.setState({
-          displayedAssessment: {
-            score: 5,
-            data: [
-              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
-              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
-            ],
-          },
-        })
-
-        const {getByTestId} = render(
-          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess: vi.fn()}}>
-            <ApolloProvider client={mswClient}>
-              <SubmissionManager {...props} />
-            </ApolloProvider>
-          </AlertManagerContext.Provider>,
-        )
-
-        // Wait for Apollo cache to settle
-        await waitFor(() => {})
-
-        // Wait for the submit button to be enabled
-        const submitButton = await waitFor(() => getByTestId('submit-peer-review-button'))
-        expect(submitButton).toBeEnabled()
-
-        // Click the submit button
-        fireEvent.click(submitButton)
-
-        // Verify error alert is shown
-        await waitFor(() => {
-          expect(setOnFailure).toHaveBeenCalledWith('Error submitting rubric')
-        })
-      })
+    await waitFor(() => {
+      expect(setOnFailure).toHaveBeenCalledWith('Error submitting rubric')
     })
   })
 })

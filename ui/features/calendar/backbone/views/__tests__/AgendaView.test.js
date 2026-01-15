@@ -120,6 +120,7 @@ const sendCustomEvents = function (events, assignments, plannerItems, includeNex
 
 const server = setupServer()
 
+// FullCalendar fcUtil.stripTime() not available in test environment
 describe.skip('AgendaView', () => {
   let container
   let contexts

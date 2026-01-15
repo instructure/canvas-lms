@@ -24,6 +24,7 @@ import {View} from '@instructure/ui-view'
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 import type {AssignmentGroupCriteriaMap} from '@canvas/grading/grading.d'
+import type {WorkflowState} from '../../../../api.d'
 import AssignmentInformation from './AssignmentInformation'
 import ContentSelection from './ContentSelection'
 import GlobalSettings from './GlobalSettings'
@@ -168,7 +169,14 @@ export default function EnhancedIndividualGradebook() {
         workflow_state: submissionAssignment?.workflowState,
         excused: submission.excused,
         id: submission.id,
-        submission: {assignment_id: submissionAssignment?.id},
+        submission: {
+          score: submission.score,
+          grade: submission.grade,
+          assignment_id: submission.assignmentId,
+          workflow_state: submission.state as WorkflowState,
+          excused: submission.excused,
+          id: submission.id,
+        },
       }
     })
 

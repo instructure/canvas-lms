@@ -45,6 +45,7 @@ export interface IssueForm {
   label?: string
   undoText?: string
   canGenerateFix?: boolean
+  isCanvasImage?: boolean
   generateButtonLabel?: string
   value?: string
   options?: string[]

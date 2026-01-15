@@ -24,6 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import TodoItem from './TodoItem'
@@ -32,11 +33,24 @@ import type {BaseWidgetProps} from '../../../types'
 import {usePlannerItems} from './hooks/usePlannerItems'
 import {useCreatePlannerNote} from './hooks/useCreatePlannerNote'
 import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
+import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 
 const I18n = createI18nScope('widget_dashboard')
 
+type TodoFilter = 'incomplete_items' | 'complete_items' | 'all'
+
+function isValidTodoFilter(value: unknown): value is TodoFilter {
+  return value === 'incomplete_items' || value === 'complete_items' || value === 'all'
+}
+
 const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false}) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [filter, setFilter] = useWidgetConfig<TodoFilter>(
+    widget.id,
+    'filter',
+    'incomplete_items',
+    isValidTodoFilter,
+  )
 
   const dateRange = useMemo(() => {
     const twoWeeksAgo = new Date()
@@ -51,12 +65,26 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false})
     }
   }, [])
 
-  const {currentPage, currentPageIndex, totalPages, goToPage, isLoading, error, refetch} =
-    usePlannerItems({
-      perPage: 5,
-      startDate: dateRange.startDate,
-      endDate: dateRange.endDate,
-    })
+  const {
+    currentPage,
+    currentPageIndex,
+    totalPages,
+    goToPage,
+    isLoading,
+    error,
+    refetch,
+    resetPagination,
+  } = usePlannerItems({
+    perPage: 5,
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
+    filter: filter === 'all' ? undefined : filter,
+  })
+
+  // Reset pagination when filter changes
+  React.useEffect(() => {
+    resetPagination()
+  }, [filter, resetPagination])
 
   const {mutate: createPlannerNote, isPending: isCreating} = useCreatePlannerNote()
   const {sharedCourseData} = useWidgetDashboard()
@@ -99,25 +127,47 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false})
   const timeZone = window.ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const renderContent = () => {
-    if (currentPage.length === 0) {
-      return (
-        <View as="div" textAlign="center" padding="large 0">
-          <Text color="secondary" size="medium" data-testid="no-todos-message">
-            {I18n.t('No upcoming items')}
-          </Text>
-        </View>
-      )
-    }
-
     return (
       <View as="div">
-        <List isUnstyled margin="0">
-          {currentPage.map(item => (
-            <List.Item key={`${item.plannable_type}-${item.plannable_id}`} margin="0">
-              <TodoItem item={item} />
-            </List.Item>
-          ))}
-        </List>
+        <View as="div" padding="small 0" borderWidth="0 0 small 0">
+          <SimpleSelect
+            renderLabel={I18n.t('Filter')}
+            value={filter}
+            onChange={(_e, {value}) => {
+              setFilter(value as TodoFilter)
+            }}
+            width="200px"
+            data-testid="todo-filter-select"
+          >
+            <SimpleSelect.Option id="incomplete" value="incomplete_items">
+              {I18n.t('Incomplete')}
+            </SimpleSelect.Option>
+            <SimpleSelect.Option id="complete" value="complete_items">
+              {I18n.t('Complete')}
+            </SimpleSelect.Option>
+            <SimpleSelect.Option id="all" value="all">
+              {I18n.t('All')}
+            </SimpleSelect.Option>
+          </SimpleSelect>
+        </View>
+
+        {currentPage.length === 0 ? (
+          <View as="div" textAlign="center" padding="large 0">
+            <Text color="secondary" size="medium" data-testid="no-todos-message">
+              {I18n.t('No upcoming items')}
+            </Text>
+          </View>
+        ) : (
+          <View as="div">
+            <List isUnstyled margin="0">
+              {currentPage.map(item => (
+                <List.Item key={`${item.plannable_type}-${item.plannable_id}`} margin="0">
+                  <TodoItem item={item} />
+                </List.Item>
+              ))}
+            </List>
+          </View>
+        )}
       </View>
     )
   }

@@ -29,6 +29,9 @@ const ids = ['flash_screenreader_holder', 'flashalert_message_holder', 'flash-me
 
 describe('FlashAlert', () => {
   beforeEach(() => {
+    // Clean up ENV.flashAlertTimeout BEFORE each test to ensure clean state
+    // This is critical for test isolation when running with randomization
+    delete ENV.flashAlertTimeout
     vi.useFakeTimers()
 
     for (let i = 0; i < ids.length; i++) {
@@ -45,6 +48,9 @@ describe('FlashAlert', () => {
     // add 10ms for cushion
     vi.advanceTimersByTime(10510)
     vi.useRealTimers()
+
+    // Clean up ENV.flashAlertTimeout to prevent state leakage between tests
+    delete ENV.flashAlertTimeout
 
     // remove the screenreader alert holder or railsFlashNotificationsHelperSpec can fail
     const sralertholder = document.getElementById('flash_screenreader_holder')
@@ -70,7 +76,7 @@ describe('FlashAlert', () => {
   }
 
   describe('.showFlashAlert', () => {
-    it.skip('closes after 11 seconds, respecting timeout if ENV.flashAlertTimeout is not set', () => {
+    it('closes after 11 seconds, respecting timeout if ENV.flashAlertTimeout is not set', () => {
       callShowFlashAlert()
       vi.advanceTimersByTime(11000)
       strictEqual(document.querySelector('#flashalert_message_holder').innerHTML, '')
@@ -89,7 +95,7 @@ describe('FlashAlert', () => {
       ok('no error was thrown')
     })
 
-    // passes in Jest, fails in QUnit
+    // TODO: Class not applied - clickthrough-container class is missing from container
     it.skip('applies the "clickthrough-container" class to the container element', () => {
       callShowFlashAlert()
       ok(
@@ -102,8 +108,7 @@ describe('FlashAlert', () => {
   })
 
   describe('.showFlashError', () => {
-    // passes in Jest, fails in QUnit
-    it.skip('renders an alert with a default message', () => {
+    it('renders an alert with a default message', () => {
       showFlashError()()
       vi.advanceTimersByTime(600)
       const expectedText = 'An error occurred making a network request'
@@ -113,8 +118,7 @@ describe('FlashAlert', () => {
   })
 
   describe('.showFlashSuccess', () => {
-    // passes in Jest, fails in QUnit
-    it.skip('renders an alert with a given message', () => {
+    it('renders an alert with a given message', () => {
       const expectedText = 'hello world'
       showFlashSuccess(expectedText)()
       vi.advanceTimersByTime(600)
@@ -122,8 +126,7 @@ describe('FlashAlert', () => {
       vi.advanceTimersByTime(500) // tick to close the alert with timeout
     })
 
-    // passes in Jest, fails in QUnit
-    it.skip('renders an alert without "Details"', () => {
+    it('renders an alert without "Details"', () => {
       showFlashSuccess('yay!')({body: 'a body'})
       vi.advanceTimersByTime(600)
       strictEqual(

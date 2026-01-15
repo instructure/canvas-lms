@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode, legacyRender} from '@canvas/react'
 import FileSelectBox from '../react/components/FileSelectBox'
 import UploadForm from '@canvas/files/react/components/UploadForm'
 import CurrentUploads from '@canvas/files/react/components/CurrentUploads'
@@ -36,7 +36,6 @@ import {findLinkForService, getUserServices} from '@canvas/services/findLinkForS
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/jquery-keycodes'
@@ -866,7 +865,7 @@ $(document).ready(function () {
               renderFileUploadForm()
             }
             // Unmount progress component to reset state
-            ReactDOM.unmountComponentAtNode($('#module_attachment_upload_progress')[0])
+            legacyUnmountComponentAtNode($('#module_attachment_upload_progress')[0])
             UploadQueue.flush() // if there was an error uploading earlier, the queue has stuff in it we no longer want.
             upload_form?.queueUploads()
             fileSelectBox?.setDirty()
@@ -924,14 +923,16 @@ $(document).ready(function () {
 
     $('#select_context_content_dialog .module_item_option').hide()
     if ($(this).val() === 'attachment') {
-      // eslint-disable-next-line react/no-render-return-value
-      fileSelectBox = ReactDOM.render(
-        React.createFactory(FileSelectBox)({
-          contextString: ENV.context_asset_string,
-        }),
+      legacyRender(
+        <FileSelectBox
+          ref={(instance: FileSelectBox | null) => {
+            fileSelectBox = instance ?? undefined
+          }}
+          contextString={ENV.context_asset_string}
+        />,
         $('#module_item_select_file')[0],
       )
-      fileSelectBox.refresh()
+      fileSelectBox?.refresh()
       $('#attachment_folder_id').on('change', update_foc)
       renderFileUploadForm()
       if (fileSelectBox?.folderStore?.getState().isLoading) {
@@ -1079,7 +1080,7 @@ function update_foc() {
     enable_disable_submit_button(numberOrZero(data_input.files?.length) > 0)
     renderFileUploadForm()
     // Unmount progress component to reset state
-    ReactDOM.unmountComponentAtNode($('#module_attachment_upload_progress')[0])
+    legacyUnmountComponentAtNode($('#module_attachment_upload_progress')[0])
   }
 }
 
@@ -1158,15 +1159,20 @@ function renderFileUploadForm() {
     $('#module_attachment_upload_form').show()
     $('#module_attachment_upload_progress').hide()
 
-    upload_form = ReactDOM.render(
-      <UploadForm {...folderProps} />,
+    legacyRender(
+      <UploadForm
+        {...folderProps}
+        ref={(instance: UploadForm | null) => {
+          upload_form = instance ?? undefined
+        }}
+      />,
       $('#module_attachment_upload_form')[0],
-    ) as unknown as UploadForm
+    )
   }
 }
 
 function renderCurrentUploads() {
-  ReactDOM.render(
+  legacyRender(
     <CurrentUploads onUploadChange={handleUploadOnChange} />,
     $('#module_attachment_upload_progress')[0],
   )
@@ -1200,7 +1206,7 @@ function renderQuizTypeSelector() {
     renderQuizTypeSelector()
   }
 
-  ReactDOM.render(
+  legacyRender(
     <QuizTypeSelectorComponent
       quizType={currentQuizType}
       isExistingAssignment={false}
@@ -1214,7 +1220,7 @@ function renderQuizTypeSelector() {
 function unmountQuizTypeSelector() {
   const mountPoint = $('#quiz_type_selector_mount_point')[0]
   if (mountPoint) {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   }
 }
 
@@ -1231,7 +1237,7 @@ function renderAnonymousSubmissionSelector() {
     renderAnonymousSubmissionSelector()
   }
 
-  ReactDOM.render(
+  legacyRender(
     <AnonymousSubmissionComponent
       isAnonymous={isAnonymousSubmission}
       disabled={false}
@@ -1245,7 +1251,7 @@ function renderAnonymousSubmissionSelector() {
 function unmountAnonymousSubmissionSelector() {
   const mountPoint = $('#anonymous_submission_selector_mount_point')[0]
   if (mountPoint) {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   }
 }
 

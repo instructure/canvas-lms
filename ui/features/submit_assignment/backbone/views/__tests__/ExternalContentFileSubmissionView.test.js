@@ -64,7 +64,7 @@ describe('ExternalContentFileSubmissionView#uploadFileFromUrl', () => {
     vi.restoreAllMocks()
   })
 
-  test.skip('hits the course url', () => {
+  test('hits the course url', () => {
     const spy = vi.spyOn(axios, 'post').mockResolvedValue({data: {upload_url: null}})
     view.uploadFileFromUrl({}, model)
     expect(spy).toHaveBeenCalledWith(
@@ -73,7 +73,7 @@ describe('ExternalContentFileSubmissionView#uploadFileFromUrl', () => {
     )
   })
 
-  test.skip('hits the group url', () => {
+  test('hits the group url', () => {
     window.ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER = 2
 
     const spy = vi.spyOn(axios, 'post').mockResolvedValue({data: {upload_url: null}})
@@ -84,7 +84,7 @@ describe('ExternalContentFileSubmissionView#uploadFileFromUrl', () => {
     )
   })
 
-  test.skip('sends the eula agreement timestamp to the submission endpoint', () => {
+  test('sends the eula agreement timestamp to the submission endpoint', () => {
     const spy = vi.spyOn(axios, 'post').mockResolvedValue({data: {upload_url: null}})
     view.uploadFileFromUrl({}, model)
     expect(spy).toHaveBeenCalledWith(
@@ -95,7 +95,7 @@ describe('ExternalContentFileSubmissionView#uploadFileFromUrl', () => {
     )
   })
 
-  test.skip('sends the comment to the submission endpoint', () => {
+  test('sends the comment to the submission endpoint', () => {
     const spy = vi.spyOn(axios, 'post').mockResolvedValue({data: {upload_url: null}})
     view.uploadFileFromUrl({}, model)
     expect(spy).toHaveBeenCalledWith(

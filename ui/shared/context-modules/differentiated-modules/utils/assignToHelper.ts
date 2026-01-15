@@ -23,9 +23,45 @@ import type {
   ItemAssignToCardSpec,
   DateDetailsOverride,
   AssigneeOption,
+  PeerReviewOverride,
+  BackendDateDetailsOverride,
+  AssignmentWithPeerReviewPayload,
+  AssignmentOnlyOverride,
 } from '../react/Item/types'
 
 const I18n = createI18nScope('differentiated_modules')
+
+/**
+ * Converts backend format (nested peer_review_dates object) to frontend format (flat fields).
+ *
+ * @param overrides - Array of assignment overrides from backend
+ * @returns Array of overrides with flattened peer review fields
+ *
+ * @example
+ * // Input (backend format):
+ * { id: 123, peer_review_dates: { id: "456", due_at: "2024-01-20", unlock_at: "...", lock_at: "..." } }
+ *
+ * // Output (frontend format):
+ * { id: 123, peer_review_override_id: "456", peer_review_due_at: "2024-01-20", ... }
+ */
+export const flattenPeerReviewDates = (
+  overrides: BackendDateDetailsOverride[],
+): DateDetailsOverride[] =>
+  overrides.map(override => {
+    const {peer_review_dates, ...rest} = override
+
+    if (peer_review_dates) {
+      return {
+        ...rest,
+        peer_review_override_id: peer_review_dates.id,
+        peer_review_due_at: peer_review_dates.due_at,
+        peer_review_available_from: peer_review_dates.unlock_at,
+        peer_review_available_to: peer_review_dates.lock_at,
+      }
+    }
+
+    return rest
+  })
 
 export const setContainScrollBehavior = (element: HTMLElement | null) => {
   if (element !== null) {
@@ -106,6 +142,90 @@ export const generateAssignmentOverridesPayload = (
 
 /********************* Generating Date Details Payload *********************/
 
+export const getAssignmentOverride = (override: DateDetailsOverride): AssignmentOnlyOverride => {
+  // Keep all fields except peer review-specific ones
+  const {
+    peer_review_override_id,
+    peer_review_available_from,
+    peer_review_due_at,
+    peer_review_available_to,
+    peer_review_default_dates,
+    ...assignmentOverride
+  } = override
+
+  return assignmentOverride
+}
+
+export const markPeerReviewDefaultDates = (
+  overrides: DateDetailsOverride[],
+  defaultSectionId?: string | number,
+): DateDetailsOverride[] =>
+  overrides.map(override => {
+    // Only mark the default section as having default dates
+    // Do NOT mark course overrides - they should create peer review overrides
+    if (override.course_section_id === defaultSectionId?.toString() && !override.course_id) {
+      return {
+        ...override,
+        peer_review_default_dates: true,
+      }
+    }
+    return override
+  })
+
+export const getDefaultPeerReviewDates = (payload: DateDetailsOverride) => ({
+  unlock_at: payload.peer_review_available_from,
+  due_at: payload.peer_review_due_at,
+  lock_at: payload.peer_review_available_to,
+})
+
+export const getPeerReviewOverride = (override: DateDetailsOverride): PeerReviewOverride => ({
+  id: override.peer_review_override_id ?? undefined,
+  course_section_id: override.course_section_id ?? undefined,
+  student_ids: override.student_ids,
+  course_id: override.course_id ?? undefined,
+  group_id: override.group_id,
+  due_at: override.peer_review_due_at ?? null,
+  unlock_at: override.peer_review_available_from ?? null,
+  lock_at: override.peer_review_available_to ?? null,
+  unassign_item: override.unassign_item,
+})
+
+export const hasPeerReviewOverrideDates = (override: DateDetailsOverride) =>
+  override.peer_review_due_at != null ||
+  override.peer_review_available_from != null ||
+  override.peer_review_available_to != null
+
+export const getAssignmentAndPeerReviewOverrides = (
+  overrides: DateDetailsOverride[],
+): AssignmentWithPeerReviewPayload => {
+  const assignmentOverrides: AssignmentOnlyOverride[] = []
+  const peerReviewOverrides: PeerReviewOverride[] = []
+  let peerReview: AssignmentWithPeerReviewPayload['peerReview']
+
+  overrides.forEach(override => {
+    if (override.peer_review_default_dates) {
+      peerReview = getDefaultPeerReviewDates(override)
+    } else {
+      // Only create peer review override if there are any overridden dates
+      if (hasPeerReviewOverrideDates(override)) {
+        peerReviewOverrides.push(getPeerReviewOverride(override))
+      }
+    }
+    assignmentOverrides.push(getAssignmentOverride(override))
+  })
+
+  if (!peerReview) {
+    peerReview = {
+      due_at: null,
+      unlock_at: null,
+      lock_at: null,
+    }
+  }
+  peerReview.peer_review_overrides = peerReviewOverrides
+
+  return {assignmentOverrides, peerReview}
+}
+
 export const generateDateDetailsPayload = (
   cards: ItemAssignToCardSpec[],
   hasModuleOverrides: boolean,
@@ -138,6 +258,9 @@ const defaultDateDetailsPayload = (
     payload.lock_at = everyoneCard.lock_at || null
     payload.reply_to_topic_due_at = everyoneCard.reply_to_topic_due_at || null
     payload.required_replies_due_at = everyoneCard.required_replies_due_at || null
+    payload.peer_review_available_from = everyoneCard.peer_review_available_from || null
+    payload.peer_review_due_at = everyoneCard.peer_review_due_at || null
+    payload.peer_review_available_to = everyoneCard.peer_review_available_to || null
   }
   if (
     (everyoneCard !== undefined && !hasModuleOverrides) ||
@@ -248,7 +371,10 @@ const shouldCreateGroupOverride = (
       card.unlock_at ||
       card.lock_at ||
       card.reply_to_topic_due_at ||
-      card.required_replies_due_at,
+      card.required_replies_due_at ||
+      card.peer_review_available_from ||
+      card.peer_review_due_at ||
+      card.peer_review_available_to,
   )
 
   return !isDefaultGroupOverride || cardHasADate
@@ -468,6 +594,10 @@ const createOverride = (
     required_replies_due_at: card.required_replies_due_at,
     unlock_at: card.unlock_at,
     lock_at: card.lock_at,
+    peer_review_override_id: overrideId === undefined ? undefined : card.peer_review_override_id,
+    peer_review_available_from: card.peer_review_available_from,
+    peer_review_due_at: card.peer_review_due_at,
+    peer_review_available_to: card.peer_review_available_to,
     unassign_item: unassignItem,
   }
 }

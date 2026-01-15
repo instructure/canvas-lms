@@ -1,0 +1,20 @@
+<table>
+  <!--Select to exclude deleted and expired access tokens-->
+  <tr>
+    <td>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[exclude_deleted_and_expired]" %>
+        <%= t('Exclude deleted and expired access tokens') %>
+      </label>
+    </td>
+  </tr>
+  <!--Select to run with deleted users i.e. users with no active pseudonyms-->
+  <tr>
+    <td>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[include_deleted]"   %>
+        <%= t('Include access tokens from deleted users') %>
+      </label>
+    </td>
+  </tr>
+</table>

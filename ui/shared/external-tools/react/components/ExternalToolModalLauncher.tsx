@@ -115,7 +115,9 @@ export default class ExternalToolModalLauncher extends React.Component<
         this.props.launchType,
         this.props.contextModuleId && '&context_module_id=',
         this.props.contextModuleId,
-      ].join('')
+      ]
+        .filter(Boolean)
+        .join('')
     }
   }
 

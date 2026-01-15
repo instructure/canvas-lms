@@ -46,6 +46,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {
   DateDetails,
   DateDetailsOverride,
+  DateDetailsPayload,
   DateLockTypes,
   exportedOverride,
   ItemAssignToCardSpec,
@@ -111,7 +112,7 @@ export const updateModuleItem = ({
   moduleItemType: ItemType
   moduleItemName: string
   moduleItemContentId: string
-  payload: DateDetails
+  payload: DateDetailsPayload
   onLoading: (flag: boolean) => void
   onSuccess: () => void
 }) => {
@@ -219,9 +220,10 @@ export default function ItemAssignToTray({
   isTray = true,
   setOverrides,
 }: ItemAssignToTrayProps) {
-  const isPacedCourse = ENV.IN_PACED_COURSE
+  const isPacedCourse = ENV?.IN_PACED_COURSE ?? false
   const isMasteryPathCourse =
-    !!ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+    !!ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+    ENV?.FEATURES?.course_pace_pacing_with_mastery_paths
   const initialLoadRef = useRef(false)
   const cardsRefs = useRef<{[cardId: string]: RefObject<ItemAssignToCardRef>}>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -247,9 +249,9 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     // On the edit pages, the ENV will contain this data, so we can initialize the lock info here. We'll fall back to
     // fetching it via the date details API in other cases.
-    ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
-      ENV.MASTER_COURSE_DATA?.restricted_by_master_course
-      ? (Object.entries(ENV.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
+    ENV?.MASTER_COURSE_DATA?.is_master_course_child_content &&
+      ENV?.MASTER_COURSE_DATA?.restricted_by_master_course
+      ? (Object.entries(ENV?.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
           .filter(([_lockType, locked]) => locked)
           .filter(([lockType]) => ['due_dates', 'availability_dates'].includes(lockType))
           .map(([lockType]) => lockType) as DateLockTypes[])
@@ -265,7 +267,7 @@ export default function ItemAssignToTray({
   }
 
   const mustConvertTags = useCallback(() => {
-    return !ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides
+    return !ENV?.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides
   }, [hasDifferentiationTagOverrides])
 
   useEffect(() => {

@@ -489,6 +489,7 @@ class ProfileController < ApplicationController
     @user = @current_user
     @profile = @user.profile
     @context = @profile
+    edit_permissions = @user.details_editable_by_user
 
     if allowed_to_change_pronouns?
       valid_pronoun = @domain_root_account.pronouns.include?(params[:pronouns]&.strip) || params[:pronouns] == ""
@@ -496,15 +497,16 @@ class ProfileController < ApplicationController
     end
 
     short_name = params[:user] && params[:user][:short_name]
-    @user.short_name = short_name if short_name && @user.user_can_edit_name?
-    if params[:user_profile] && @user.user_can_edit_profile?
+    @user.short_name = short_name if short_name && edit_permissions[:can_edit_name]
+    if params[:user_profile] && edit_permissions[:can_edit]
       user_profile_params = params[:user_profile].permit(:title, :pronunciation, :bio)
-      user_profile_params.delete(:title) unless @user.user_can_edit_name?
+      user_profile_params.delete(:title) unless edit_permissions[:can_edit_title]
+      user_profile_params.delete(:bio) unless edit_permissions[:can_edit_bio]
       user_profile_params.delete(:pronunciation) unless @user.can_change_pronunciation?(@domain_root_account)
       @profile.attributes = user_profile_params
     end
 
-    if params[:link_urls] && params[:link_titles] && @user.user_can_edit_profile?
+    if params[:link_urls] && params[:link_titles] && edit_permissions[:can_edit_profile_links]
       @profile.links = []
       params[:link_urls].zip(params[:link_titles])
                         .reject { |url, title| url.blank? && title.blank? }

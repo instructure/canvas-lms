@@ -141,29 +141,6 @@ describe Accessibility::Rules::ImgAltRule do
     end
   end
 
-  context "when generating alt text automatically" do
-    it "calls ImgAltRuleHelper and returns generated text" do
-      # Create HTML with an image that has a source
-      input_html = '<figure><img src="https://example.com/image.jpg" class="hero-image" width="500" height="300"><figcaption>Beautiful scenery</figcaption></figure>'
-      document = Nokogiri::HTML.fragment(input_html)
-      extend_nokogiri_with_dom_adapter(document) # Using method from RuleTestHelper
-      img_element = document.at_css("img")
-
-      # Mock ImgAltRuleHelper to verify the call but still use a controlled return value
-      helper_class = Accessibility::Rules::ImgAltRuleHelper
-      generated_alt = "A beautiful landscape with mountains"
-      expect(helper_class).to receive(:generate_alt_text)
-        .with("https://example.com/image.jpg")
-        .and_return(generated_alt)
-
-      # Call the method with our image element
-      result = Accessibility::Rules::ImgAltRule.new.generate_fix(img_element)
-
-      # Verify the result is what our mock returned
-      expect(result).to eq(generated_alt)
-    end
-  end
-
   context "when generating issue preview" do
     it "returns styled HTML for img elements" do
       input_html = '<div><img id="test-img" src="image.jpg" alt=""></div>'

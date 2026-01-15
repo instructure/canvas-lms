@@ -134,8 +134,7 @@ describe('RestrictedDialogForm', () => {
       )
     })
 
-    // fickle - jQuery mock not working properly for dates
-    it.skip('calls save with calendar dates when date range is selected', () => {
+    it('calls save with calendar dates when date range is selected', () => {
       const folder = new Folder({
         id: 999,
         hidden: true,
@@ -161,17 +160,18 @@ describe('RestrictedDialogForm', () => {
       const lockAtDate = screen.getByLabelText('Available Until Date')
       const lockAtTime = screen.getByLabelText('Available Until Time')
 
-      const $ = require('jquery')
       $.fn.data = vi.fn(function (key) {
         if (key === 'unfudged-date') {
-          if (this[0] === unlockAtDate) return startDate
-          if (this[0] === lockAtDate) return endDate
+          const label = this[0]?.getAttribute('aria-label')
+          if (label === 'Available From Date') return startDate
+          if (label === 'Available Until Date') return endDate
         }
         return undefined
       })
       $.fn.val = vi.fn(function () {
-        if (this[0] === unlockAtTime) return '5 AM'
-        if (this[0] === lockAtTime) return '5 PM'
+        const label = this[0]?.getAttribute('aria-label')
+        if (label === 'Available From Time') return '5 AM'
+        if (label === 'Available Until Time') return '5 PM'
         return ''
       })
 
@@ -190,8 +190,7 @@ describe('RestrictedDialogForm', () => {
       )
     })
 
-    // fickle - jQuery mock not working properly for dates
-    it.skip('accepts blank unlock_at date', () => {
+    it('accepts blank unlock_at date', () => {
       const folder = new Folder({
         id: 999,
         hidden: true,
@@ -214,15 +213,16 @@ describe('RestrictedDialogForm', () => {
       const lockAtDate = screen.getByLabelText('Available Until Date')
       const lockAtTime = screen.getByLabelText('Available Until Time')
 
-      const $ = require('jquery')
       $.fn.data = vi.fn(function (key) {
         if (key === 'unfudged-date') {
-          if (this[0] === lockAtDate) return endDate
+          const label = this[0]?.getAttribute('aria-label')
+          if (label === 'Available Until Date') return endDate
         }
         return undefined
       })
       $.fn.val = vi.fn(function () {
-        if (this[0] === lockAtTime) return '5 PM'
+        const label = this[0]?.getAttribute('aria-label')
+        if (label === 'Available Until Time') return '5 PM'
         return ''
       })
 
@@ -241,8 +241,7 @@ describe('RestrictedDialogForm', () => {
       )
     })
 
-    // fickle - jQuery mock not working properly for dates
-    it.skip('accepts blank lock_at date', () => {
+    it('accepts blank lock_at date', () => {
       const folder = new Folder({
         id: 999,
         hidden: true,
@@ -265,15 +264,16 @@ describe('RestrictedDialogForm', () => {
       const unlockAtDate = screen.getByLabelText('Available From Date')
       const unlockAtTime = screen.getByLabelText('Available From Time')
 
-      const $ = require('jquery')
       $.fn.data = vi.fn(function (key) {
         if (key === 'unfudged-date') {
-          if (this[0] === unlockAtDate) return startDate
+          const label = this[0]?.getAttribute('aria-label')
+          if (label === 'Available From Date') return startDate
         }
         return undefined
       })
       $.fn.val = vi.fn(function () {
-        if (this[0] === unlockAtTime) return '5 AM'
+        const label = this[0]?.getAttribute('aria-label')
+        if (label === 'Available From Time') return '5 AM'
         return ''
       })
 
@@ -292,8 +292,7 @@ describe('RestrictedDialogForm', () => {
       )
     })
 
-    // fickle - jQuery mock not working properly for dates
-    it.skip('rejects unlock_at date after lock_at date', () => {
+    it('rejects unlock_at date after lock_at date', () => {
       const folder = new Folder({
         id: 999,
         hidden: true,
@@ -318,17 +317,18 @@ describe('RestrictedDialogForm', () => {
       const lockAtDate = screen.getByLabelText('Available Until Date')
       const lockAtTime = screen.getByLabelText('Available Until Time')
 
-      const $ = require('jquery')
       $.fn.data = vi.fn(function (key) {
         if (key === 'unfudged-date') {
-          if (this[0] === unlockAtDate) return startDate
-          if (this[0] === lockAtDate) return endDate
+          const label = this[0]?.getAttribute('aria-label')
+          if (label === 'Available From Date') return startDate
+          if (label === 'Available Until Date') return endDate
         }
         return undefined
       })
       $.fn.val = vi.fn(function () {
-        if (this[0] === unlockAtTime) return '5 PM'
-        if (this[0] === lockAtTime) return '5 AM'
+        const label = this[0]?.getAttribute('aria-label')
+        if (label === 'Available From Time') return '5 PM'
+        if (label === 'Available Until Time') return '5 AM'
         return ''
       })
 

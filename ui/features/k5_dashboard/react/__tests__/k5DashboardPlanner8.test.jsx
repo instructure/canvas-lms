@@ -24,8 +24,12 @@ import {setupServer} from 'msw/node'
 import {cloneDeep} from 'es-toolkit/compat'
 import {resetPlanner} from '@canvas/planner'
 import {MOCK_CARDS, MOCK_CARDS_2, MOCK_PLANNER_ITEM} from '@canvas/k5/react/__tests__/fixtures'
-import {createPlannerMocks, opportunities, defaultK5DashboardProps as defaultProps, defaultEnv} from './mocks'
-import fetchMock from 'fetch-mock'
+import {
+  createPlannerMocks,
+  opportunities,
+  defaultK5DashboardProps as defaultProps,
+  defaultEnv,
+} from './mocks'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
@@ -42,7 +46,12 @@ const render = children =>
 
 const currentUserId = defaultProps.currentUser.id
 
-const server = setupServer(...createPlannerMocks())
+const server = setupServer(
+  ...createPlannerMocks(),
+  http.get(/\/api\/v1\/announcements.*/, () => HttpResponse.json([])),
+  http.get('/api/v1/calendar_events', () => HttpResponse.json([])),
+  http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json({})),
+)
 
 describe('K5Dashboard Schedule Section', () => {
   beforeAll(() => server.listen())
@@ -50,10 +59,6 @@ describe('K5Dashboard Schedule Section', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    fetchMock.get(/\/api\/v1\/announcements/, [])
-    fetchMock.get(/\/api\/v1\/calendar_events/, [])
-    fetchMock.put(/.*\/api\/v1\/users\/\d+\/colors/, {})
-    fetchMock.spy()
     global.ENV = defaultEnv
     fetchShowK5Dashboard.mockImplementation(() =>
       Promise.resolve({show_k5_dashboard: true, use_classic_font: false}),
@@ -63,7 +68,6 @@ describe('K5Dashboard Schedule Section', () => {
   afterEach(async () => {
     global.ENV = {}
     resetPlanner()
-    fetchMock.reset()
     // Wait a bit for any pending transitions to complete
     await new Promise(resolve => setTimeout(resolve, 100))
   })

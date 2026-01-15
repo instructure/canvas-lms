@@ -676,6 +676,101 @@ describe('DiscussionTopicContainer', () => {
       expect(enabledLinks.length).toBeGreaterThan(0)
     })
 
+    describe('Checkpointed discussions with peer review', () => {
+      it('passes disabled=true to PeerReview when reply_to_topic checkpoint is not complete', () => {
+        const {container} = setup({
+          discussionTopic: Discussion.mock({
+            participant: {posted: false},
+            assignment: {
+              checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+              assessmentRequestsForCurrentUser: [
+                {
+                  _id: 'assessment1',
+                  user: {
+                    _id: 'user1',
+                    displayName: 'Test User',
+                  },
+                  workflowState: 'assigned',
+                },
+              ],
+            },
+          }),
+          replyToTopicSubmission: {},
+          replyToEntrySubmission: {submissionStatus: 'submitted'},
+        })
+
+        const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+        expect(peerReviewElements.length).toBeGreaterThan(0)
+
+        const links = container.querySelectorAll(
+          'a[aria-disabled="true"], button[disabled], [data-interaction="disabled"]',
+        )
+        expect(links.length).toBeGreaterThan(0)
+      })
+
+      it('passes disabled=true to PeerReview when reply_to_entry checkpoint is not complete', () => {
+        const {container} = setup({
+          discussionTopic: Discussion.mock({
+            participant: {posted: true},
+            assignment: {
+              checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+              assessmentRequestsForCurrentUser: [
+                {
+                  _id: 'assessment1',
+                  user: {
+                    _id: 'user1',
+                    displayName: 'Test User',
+                  },
+                  workflowState: 'assigned',
+                },
+              ],
+            },
+          }),
+          replyToTopicSubmission: {submissionStatus: 'submitted'},
+          replyToEntrySubmission: {},
+        })
+
+        const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+        expect(peerReviewElements.length).toBeGreaterThan(0)
+
+        const links = container.querySelectorAll(
+          'a[aria-disabled="true"], button[disabled], [data-interaction="disabled"]',
+        )
+        expect(links.length).toBeGreaterThan(0)
+      })
+
+      it('passes disabled=false to PeerReview when both checkpoints are complete', () => {
+        const {container} = setup({
+          discussionTopic: Discussion.mock({
+            participant: {posted: true},
+            assignment: {
+              checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+              assessmentRequestsForCurrentUser: [
+                {
+                  _id: 'assessment1',
+                  user: {
+                    _id: 'user1',
+                    displayName: 'Test User',
+                  },
+                  workflowState: 'assigned',
+                },
+              ],
+            },
+          }),
+          replyToTopicSubmission: {submissionStatus: 'submitted'},
+          replyToEntrySubmission: {submissionStatus: 'submitted'},
+        })
+
+        const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+        expect(peerReviewElements.length).toBeGreaterThan(0)
+
+        const enabledLinks = container.querySelectorAll(
+          '.discussions-peer-review a:not([aria-disabled="true"]):not([disabled])',
+        )
+        expect(enabledLinks.length).toBeGreaterThan(0)
+      })
+    })
+
     describe('PodcastFeed Button', () => {
       afterEach(() => {
         // Clean up any podcast feed links added to document head

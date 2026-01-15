@@ -175,6 +175,12 @@ module Interfaces::SubmissionInterface
              required: false,
              default_value: nil
     argument :include_draft_comments, Boolean, required: false, default_value: false
+    argument :include_drafts_from_others, Boolean, <<~MD, required: false, default_value: false
+      When true and include_draft_comments is true, draft comments from other teachers will be included.
+      Only applies to users with grading permissions (teachers, TAs, etc).
+      When false, only the current user's draft comments are included.
+      Students never see draft comments from others regardless of this setting.
+    MD
     argument :include_provisional_comments, Boolean, <<~MD, required: false, default_value: false
       When true, provisional comments that the current user has permission to see will be returned.
       The Moderator has permission to see all provisional comments.
@@ -183,7 +189,7 @@ module Interfaces::SubmissionInterface
       Students cannot see provisional comments.
     MD
   end
-  def comments_connection(filter:, sort_order:, include_draft_comments:, include_provisional_comments:)
+  def comments_connection(filter:, sort_order:, include_draft_comments:, include_drafts_from_others:, include_provisional_comments:)
     filter = filter.to_h
     filter => all_comments:, for_attempt:, peer_review:
 
@@ -211,7 +217,13 @@ module Interfaces::SubmissionInterface
     load_association(:assignment).then do
       load_association(:submission_comments).then do
         provisional_comments_promise.then do |provisional_comments|
-          comments = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
+          comments = if include_draft_comments && include_drafts_from_others
+                       submission.visible_submission_comments_for(current_user)
+                     elsif include_draft_comments
+                       submission.comments_including_drafts_for(current_user)
+                     else
+                       submission.comments_excluding_drafts_for(current_user)
+                     end
           comments = comments.to_a
 
           if include_provisional_comments

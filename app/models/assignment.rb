@@ -34,6 +34,7 @@ class Assignment < AbstractAssignment
   validates :parent_assignment_id, :sub_assignment_tag, absence: true
   validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
   validate :peer_review_count_changes_ok?, if: :peer_review_count_changed?
+  validate :peer_reviews_changes_ok?, if: :will_save_change_to_peer_reviews?
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
@@ -255,6 +256,16 @@ class Assignment < AbstractAssignment
     if peer_review_submissions?
       errors.add :peer_review_count,
                  I18n.t("Students have already submitted peer reviews, so reviews required and points cannot be changed.")
+    end
+  end
+
+  def peer_reviews_changes_ok?
+    return true unless peer_reviews_change_to_be_saved == [true, false]
+    return true unless context&.feature_enabled?(:peer_review_allocation_and_grading)
+
+    if peer_review_submissions?
+      errors.add :peer_reviews,
+                 I18n.t("cannot be disabled when students have already submitted reviews")
     end
   end
 

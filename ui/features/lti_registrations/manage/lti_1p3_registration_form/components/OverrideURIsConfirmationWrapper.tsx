@@ -21,51 +21,21 @@ import type {InternalLtiConfiguration} from '../../model/internal_lti_configurat
 
 import {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
-import {Footer} from '../../registration_wizard_forms/Footer'
 import {OverrideURIsConfirmation} from '../../registration_wizard_forms/OverrideURIsConfirmation'
-import {
-  getInputIdForField,
-  validateOverrideUris,
-} from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
 
 export type OverrideURIsConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
   reviewing: boolean
-  onNextClicked: () => void
-  onPreviousClicked: () => void
+  hasClickedNext?: boolean
 }
 
 export const OverrideURIsConfirmationWrapper = React.memo(
-  ({
-    overlayStore,
-    internalConfig,
-    reviewing,
-    onNextClicked,
-    onPreviousClicked,
-  }: OverrideURIsConfirmationWrapperProps) => {
-    const onNextClickedCb = React.useCallback(() => {
-      // if there are any errors, don't proceed
-      const errors = validateOverrideUris(overlayStore.getState().state.override_uris)
-      if (errors.length > 0) {
-        document.getElementById(getInputIdForField(errors[0].field))?.focus()
-      } else {
-        onNextClicked()
-      }
-    }, [onNextClicked, overlayStore])
-
+  ({overlayStore, internalConfig}: OverrideURIsConfirmationWrapperProps) => {
     return (
-      <>
-        <RegistrationModalBody>
-          <OverrideURIsConfirmation overlayStore={overlayStore} internalConfig={internalConfig} />
-        </RegistrationModalBody>
-        <Footer
-          currentScreen="intermediate"
-          reviewing={reviewing}
-          onNextClicked={onNextClickedCb}
-          onPreviousClicked={onPreviousClicked}
-        />
-      </>
+      <RegistrationModalBody>
+        <OverrideURIsConfirmation overlayStore={overlayStore} internalConfig={internalConfig} />
+      </RegistrationModalBody>
     )
   },
 )

@@ -17,6 +17,7 @@
  */
 
 import 'jquery-migrate'
+import {registerFixDialogButtonsPlugin} from '@canvas/enhanced-user-content/jquery'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import SpeedGrader from '../speed_grader'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -54,6 +55,11 @@ describe('SpeedGrader Submission History', () => {
   `
 
   let fixtures
+
+  beforeAll(() => {
+    // Register jQuery plugin needed by dialogs
+    registerFixDialogButtonsPlugin()
+  })
 
   beforeEach(() => {
     vi.useFakeTimers()

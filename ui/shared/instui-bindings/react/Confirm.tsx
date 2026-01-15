@@ -17,7 +17,8 @@
  */
 
 import type React from 'react'
-import ReactDOM from 'react-dom'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -72,18 +73,21 @@ export function confirm(confirmProps: ConfirmProps): Promise<boolean> {
     container.setAttribute('style', 'max-width:5em;margin:1rem auto;')
     container.setAttribute('class', 'flashalert-message')
     alertContainer.appendChild(container)
+
+    let root: Root | null = null
+
     const handleConfirm = () => {
-      ReactDOM.unmountComponentAtNode(container)
+      root?.unmount()
       alertContainer.removeChild(container)
       resolve(true)
     }
     const handleCancel = () => {
-      ReactDOM.unmountComponentAtNode(container)
+      root?.unmount()
       alertContainer.removeChild(container)
       resolve(false)
     }
 
-    ReactDOM.render(
+    root = render(
       <ConfirmationModal {...confirmProps} onConfirm={handleConfirm} onCancel={handleCancel} />,
       container,
     )

@@ -58,6 +58,8 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         onValidationChange,
         actionButtons,
         isDisabled,
+        previewRef,
+        onGenerateLoadingChange,
       }: FormComponentProps,
       ref,
     ) => {
@@ -68,8 +70,10 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       const [generateLoading, setGenerateLoading] = useState(false)
       const [generationError, setGenerationError] = useState<string | null>(null)
       const {selectedItem} = useAccessibilityCheckerContext()
-      const isAiGenerationEnabled = useAccessibilityScansStore(
-        useShallow(state => state.aiGenerationEnabled),
+      const {isAiAltTextGenerationEnabled} = useAccessibilityScansStore(
+        useShallow(state => ({
+          isAiAltTextGenerationEnabled: state.isAiAltTextGenerationEnabled,
+        })),
       )
       const charCountId = useId()
 
@@ -179,11 +183,18 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         [isChecked, value],
       )
 
+      const resetLoadingState = () => {
+        setGenerateLoading(false)
+        onGenerateLoadingChange?.(false)
+      }
+
       const handleGenerateClick = () => {
         setGenerateLoading(true)
         setGenerationError(null)
+        onGenerateLoadingChange?.(true)
+
         doFetchApi<GenerateResponse>({
-          path: `${stripQueryString(window.location.href)}/generate`,
+          path: `${stripQueryString(window.location.href)}/generate/alt_text`,
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -194,31 +205,33 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
             content_type: getAsContentItemType(selectedItem?.resourceType),
           }),
         })
-          .then(result => {
-            return result.json
-          })
+          .then(result => result.json)
           .then(resultJson => {
-            onChangeValue(resultJson?.value)
+            const generatedAltText = resultJson?.value
+            onChangeValue(generatedAltText)
+
+            if (previewRef?.current) {
+              previewRef.current.update(generatedAltText, resetLoadingState, resetLoadingState)
+            } else {
+              resetLoadingState()
+            }
           })
           .catch(error => {
             console.error('Error generating text input:', error)
             const statusCode = error?.response?.status || 0
 
-            if (statusCode == 429) {
-              setGenerationError(
-                I18n.t(
-                  'You have exceeded your daily limit for alt text generation. (You can generate alt text for 300 images per day.) Please try again after a day, or enter alt text manually.',
-                ),
-              )
-            } else {
-              setGenerationError(
-                I18n.t(
-                  'There was an error generating alt text. Please try again, or enter it manually.',
-                ),
-              )
-            }
+            const errorMessage =
+              statusCode === 429
+                ? I18n.t(
+                    'You have exceeded your daily limit for alt text generation. (You can generate alt text for 300 images per day.) Please try again after a day, or enter alt text manually.',
+                  )
+                : I18n.t(
+                    'There was an error generating alt text. Please try again, or enter it manually.',
+                  )
+
+            setGenerationError(errorMessage)
+            resetLoadingState()
           })
-          .finally(() => setGenerateLoading(false))
       }
 
       return (
@@ -256,30 +269,40 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               aria-describedby={charCountId}
             />
           </View>
-          <Flex as="div" margin="medium 0" gap="small">
-            {isAiGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
-              <Flex.Item>
-                <Button
-                  color="ai-primary"
-                  renderIcon={() => <IconAiSolid />}
-                  onClick={handleGenerateClick}
-                  disabled={generateLoading || isDisabled}
-                >
-                  {issue.form.generateButtonLabel}
-                </Button>
-              </Flex.Item>
+          <Flex as="div" margin="medium 0" gap="small" direction="column">
+            {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && (
+              <Flex as="div" gap="x-small" direction="column" margin="0 0 medium 0">
+                <Flex.Item overflowX="visible" overflowY="visible">
+                  <Button
+                    data-testid="generate-alt-text-button"
+                    color="ai-primary"
+                    renderIcon={() => <IconAiSolid />}
+                    onClick={handleGenerateClick}
+                    disabled={generateLoading || isDisabled || !issue.form.isCanvasImage}
+                  >
+                    {generateLoading ? (
+                      <>
+                        {issue.form.generateButtonLabel}{' '}
+                        <Spinner size="x-small" renderTitle={I18n.t('Generating...')} />
+                      </>
+                    ) : (
+                      issue.form.generateButtonLabel
+                    )}
+                  </Button>
+                </Flex.Item>
+                <Flex.Item>
+                  <Text size="small">
+                    {I18n.t(
+                      'AI alt text generation is only available for images uploaded to Canvas.',
+                    )}
+                  </Text>
+                </Flex.Item>
+              </Flex>
             )}
-            {actionButtons && <Flex.Item>{actionButtons}</Flex.Item>}
-            {generateLoading ? (
-              <Flex.Item>
-                <Spinner
-                  size="x-small"
-                  renderTitle={I18n.t('Generating...')}
-                  margin="0 small 0 0"
-                />
+            {actionButtons && (
+              <Flex.Item overflowX="visible" overflowY="visible">
+                {actionButtons}
               </Flex.Item>
-            ) : (
-              <></>
             )}
           </Flex>
           {generationError && (

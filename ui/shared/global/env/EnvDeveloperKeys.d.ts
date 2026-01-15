@@ -26,4 +26,5 @@ export interface EnvDeveloperKeys {
   enableTestClusterChecks: boolean
   showApiGetWithBodyNotice: boolean
   turnitinAPClientId?: string
+  devKeysReadOnly: boolean
 }

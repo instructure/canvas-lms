@@ -143,9 +143,8 @@ module Importers
       end
     end
 
-    def self.process_rubric_association_count(data)
-      migration_ids = (data["rubrics"] || []).pluck("migration_id")
-      rubrics = Rubric.where(migration_id: migration_ids)
+    def self.process_rubric_association_count(migration)
+      rubrics = migration.imported_migration_items_by_class(Rubric)
       rubrics.each(&:update_association_count)
     end
 

@@ -28,6 +28,7 @@ module Lti
 
       before_action :require_user, except: %i[create update show_configuration]
       before_action :require_account, except: %i[create update show_configuration]
+      before_action :require_site_admin_modify_permission, only: %w[registration_token update_registration_overlay]
 
       # This skip_before_action is required because :load_user will
       # attempt to find the bearer token, which is not stored with
@@ -39,6 +40,13 @@ module Lti
 
       def require_account
         require_context_with_permission(account_context, :manage_developer_keys)
+      end
+
+      def require_site_admin_modify_permission
+        return unless account_context.root_account.site_admin?
+        return unless Account.site_admin.feature_enabled?(:modify_site_admin_developer_keys_permission)
+
+        require_context_with_permission(Account.site_admin, :modify_site_admin_developer_keys)
       end
 
       def account_context

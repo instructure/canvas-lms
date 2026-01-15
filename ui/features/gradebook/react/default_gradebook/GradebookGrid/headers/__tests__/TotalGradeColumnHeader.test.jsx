@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {waitFor} from '@testing-library/react'
 
 import TotalGradeColumnHeader from '../TotalGradeColumnHeader'
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
@@ -100,14 +101,17 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
     return document.querySelector(`[aria-labelledby="${$button.id}"]`)
   }
 
-  function openOptionsMenu() {
+  async function openOptionsMenu() {
     getOptionsMenuTrigger().click()
-    menuContent = getOptionsMenuContent()
+    await waitFor(() => {
+      menuContent = getOptionsMenuContent()
+      expect(menuContent).toBeInTheDocument()
+    })
   }
 
-  function mountAndOpenOptionsMenu(overrides = {}) {
+  async function mountAndOpenOptionsMenu(overrides = {}) {
     mountComponent(overrides)
-    openOptionsMenu()
+    await openOptionsMenu()
   }
 
   function closeOptionsMenu() {
@@ -149,8 +153,8 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
       expect(getOptionsMenuContent()).toBeTruthy()
     })
 
-    it('closes the options menu when clicked', () => {
-      mountAndOpenOptionsMenu()
+    it('closes the options menu when clicked', async () => {
+      await mountAndOpenOptionsMenu()
       getOptionsMenuTrigger().click()
       expect(getOptionsMenuContent()).toBeFalsy()
     })
@@ -158,8 +162,8 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
 
   describe('"Options" menu', () => {
     describe('when opened', () => {
-      beforeEach(() => {
-        mountAndOpenOptionsMenu()
+      beforeEach(async () => {
+        await mountAndOpenOptionsMenu()
       })
 
       it('is added as a Gradebook element', () => {
@@ -173,9 +177,9 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
     })
 
     describe('when closed', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         props.onMenuDismiss.mockClear()
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         closeOptionsMenu()
       })
 
@@ -194,54 +198,54 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
     })
   })
 
-  describe.skip('"Options" > "Sort by" setting', () => {
+  describe('"Options" > "Sort by" setting', () => {
     function getSortByOption(label) {
       return getMenuItem(menuContent, 'Sort by', label)
     }
 
-    it('is added as a Gradebook element when opened', () => {
-      mountAndOpenOptionsMenu()
+    it('is added as a Gradebook element when opened', async () => {
+      await mountAndOpenOptionsMenu()
       const sortByMenuContent = getMenuContent(menuContent, 'Sort by')
       expect(gradebookElements.indexOf(sortByMenuContent)).not.toBe(-1)
     })
 
-    it('is removed as a Gradebook element when closed', () => {
-      mountAndOpenOptionsMenu()
+    it('is removed as a Gradebook element when closed', async () => {
+      await mountAndOpenOptionsMenu()
       const sortByMenuContent = getMenuContent(menuContent, 'Sort by')
       closeOptionsMenu()
       expect(gradebookElements.indexOf(sortByMenuContent)).toBe(-1)
     })
 
     describe('"Grade - Low to High" option', () => {
-      it('is selected when sorting by grade ascending', () => {
+      it('is selected when sorting by grade ascending', async () => {
         props.sortBySetting.settingKey = 'grade'
         props.sortBySetting.direction = 'ascending'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('true')
       })
 
-      it('is not selected when sorting by grade descending', () => {
+      it('is not selected when sorting by grade descending', async () => {
         props.sortBySetting.settingKey = 'grade'
         props.sortBySetting.direction = 'descending'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false')
       })
 
-      it('is not selected when sorting by a different setting', () => {
+      it('is not selected when sorting by a different setting', async () => {
         props.sortBySetting.settingKey = 'missing'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false')
       })
 
-      it('is not selected when isSortColumn is false', () => {
+      it('is not selected when isSortColumn is false', async () => {
         props.sortBySetting.isSortColumn = false
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false')
       })
 
-      it('is optionally disabled', () => {
+      it('is optionally disabled', async () => {
         props.sortBySetting.disabled = true
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - Low to High').getAttribute('aria-disabled')).toBe('true')
       })
 
@@ -250,43 +254,45 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
           props.sortBySetting.onSortByGradeAscending.mockClear()
         })
 
-        it('calls the .sortBySetting.onSortByGradeAscending callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .sortBySetting.onSortByGradeAscending callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSortByOption('Grade - Low to High').click()
           expect(props.sortBySetting.onSortByGradeAscending).toHaveBeenCalledTimes(1)
         })
 
-        it('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getSortByOption('Grade - Low to High').focus()
           getSortByOption('Grade - Low to High').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
 
-        it.skip('does not call the .sortBySetting.onSortByGradeAscending callback when already selected', () => {
+        it('calls the .sortBySetting.onSortByGradeAscending callback when already selected', async () => {
           props.sortBySetting.settingKey = 'grade'
           props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           getSortByOption('Grade - Low to High').click()
-          expect(props.sortBySetting.onSortByGradeAscending).not.toHaveBeenCalled()
+          expect(props.sortBySetting.onSortByGradeAscending).toHaveBeenCalledTimes(1)
         })
       })
     })
 
     describe('"Options" > "Message Students Who" action', () => {
-      it('is present when "showMessageStudentsWithObserversDialog" is true', () => {
-        mountAndOpenOptionsMenu()
+      it('is present when "showMessageStudentsWithObserversDialog" is true', async () => {
+        await mountAndOpenOptionsMenu()
         expect(getMenuItem(menuContent, 'Message Students Who')).toBeTruthy()
       })
 
-      it('is not present when "showMessageStudentsWithObserversDialog" is false', () => {
-        mountAndOpenOptionsMenu({showMessageStudentsWithObserversDialog: false})
+      it('is not present when "showMessageStudentsWithObserversDialog" is false', async () => {
+        await mountAndOpenOptionsMenu({showMessageStudentsWithObserversDialog: false})
         expect(getMenuItem(menuContent, 'Message Students Who')).toBeFalsy()
       })
 
       describe('when clicked', () => {
-        it('does not restore focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('does not restore focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getMenuItem(menuContent, 'Message Students Who').click()
           expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
         })
@@ -294,35 +300,35 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
     })
 
     describe('"Grade - High to Low" option', () => {
-      it('is selected when sorting by grade descending', () => {
+      it('is selected when sorting by grade descending', async () => {
         props.sortBySetting.settingKey = 'grade'
         props.sortBySetting.direction = 'descending'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('true')
       })
 
-      it('is not selected when sorting by grade ascending', () => {
+      it('is not selected when sorting by grade ascending', async () => {
         props.sortBySetting.settingKey = 'grade'
         props.sortBySetting.direction = 'ascending'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false')
       })
 
-      it('is not selected when sorting by a different setting', () => {
+      it('is not selected when sorting by a different setting', async () => {
         props.sortBySetting.settingKey = 'missing'
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false')
       })
 
-      it('is not selected when isSortColumn is false', () => {
+      it('is not selected when isSortColumn is false', async () => {
         props.sortBySetting.isSortColumn = false
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false')
       })
 
-      it('is optionally disabled', () => {
+      it('is optionally disabled', async () => {
         props.sortBySetting.disabled = true
-        mountAndOpenOptionsMenu()
+        await mountAndOpenOptionsMenu()
         expect(getSortByOption('Grade - High to Low').getAttribute('aria-disabled')).toBe('true')
       })
 
@@ -331,25 +337,27 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
           props.sortBySetting.onSortByGradeDescending.mockClear()
         })
 
-        it('calls the .sortBySetting.onSortByGradeDescending callback', () => {
-          mountAndOpenOptionsMenu()
+        it('calls the .sortBySetting.onSortByGradeDescending callback', async () => {
+          await mountAndOpenOptionsMenu()
           getSortByOption('Grade - High to Low').click()
           expect(props.sortBySetting.onSortByGradeDescending).toHaveBeenCalledTimes(1)
         })
 
-        it('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
+        it('returns focus to the "Options" menu trigger', async () => {
+          await mountAndOpenOptionsMenu()
           getSortByOption('Grade - High to Low').focus()
           getSortByOption('Grade - High to Low').click()
-          expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          await waitFor(() => {
+            expect(document.activeElement).toBe(getOptionsMenuTrigger())
+          })
         })
 
-        it.skip('does not call the .sortBySetting.onSortByGradeDescending callback when already selected', () => {
+        it('calls the .sortBySetting.onSortByGradeDescending callback when already selected', async () => {
           props.sortBySetting.settingKey = 'grade'
           props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
+          await mountAndOpenOptionsMenu()
           getSortByOption('Grade - High to Low').click()
-          expect(props.sortBySetting.onSortByGradeDescending).not.toHaveBeenCalled()
+          expect(props.sortBySetting.onSortByGradeDescending).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -360,33 +368,33 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
       props.gradeDisplay.currentDisplay = 'points'
     })
 
-    it('is present when the total grade is being displayed as points', () => {
-      mountAndOpenOptionsMenu()
+    it('is present when the total grade is being displayed as points', async () => {
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Display as Percentage')).toBeTruthy()
     })
 
-    it('is not present when the total grade is being displayed as a percentage', () => {
+    it('is not present when the total grade is being displayed as a percentage', async () => {
       props.gradeDisplay.currentDisplay = 'percentage'
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Display as Percentage')).toBeFalsy()
     })
 
-    it('is not present when the total grade display cannot be changed', () => {
+    it('is not present when the total grade display cannot be changed', async () => {
       props.gradeDisplay.hidden = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Display as Percentage')).toBeFalsy()
     })
 
-    it('is disabled when .gradeDisplay.disabled is true', () => {
+    it('is disabled when .gradeDisplay.disabled is true', async () => {
       props.gradeDisplay.disabled = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       const menuItem = getMenuItem(menuContent, 'Display as Percentage')
       expect(menuItem.getAttribute('aria-disabled')).toBe('true')
     })
 
-    it('is not disabled when .gradeDisplay.disabled is false', () => {
+    it('is not disabled when .gradeDisplay.disabled is false', async () => {
       props.gradeDisplay.disabled = false
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       const menuItem = getMenuItem(menuContent, 'Display as Percentage')
       expect(menuItem.getAttribute('aria-disabled')).toBeNull()
     })
@@ -396,20 +404,20 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
         props.gradeDisplay.onSelect.mockClear()
       })
 
-      it('does not immediately restore focus', () => {
-        mountAndOpenOptionsMenu()
+      it('does not immediately restore focus', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Display as Percentage').click()
         expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
       })
 
-      it('calls the .gradeDisplay.onSelect callback', () => {
-        mountAndOpenOptionsMenu()
+      it('calls the .gradeDisplay.onSelect callback', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Display as Percentage').click()
         expect(props.gradeDisplay.onSelect).toHaveBeenCalledTimes(1)
       })
 
-      it('includes a focus-restoring callback when calling .gradeDisplay.onSelect', () => {
-        mountAndOpenOptionsMenu()
+      it('includes a focus-restoring callback when calling .gradeDisplay.onSelect', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Display as Percentage').click()
         const [callback] =
           props.gradeDisplay.onSelect.mock.calls[props.gradeDisplay.onSelect.mock.calls.length - 1]
@@ -424,33 +432,33 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
       props.gradeDisplay.currentDisplay = 'percentage'
     })
 
-    it('is present when the total grade is being displayed as percentage', () => {
-      mountAndOpenOptionsMenu()
+    it('is present when the total grade is being displayed as percentage', async () => {
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Display as Points')).toBeTruthy()
     })
 
-    it('is not present when the total grade is being displayed as points', () => {
+    it('is not present when the total grade is being displayed as points', async () => {
       props.gradeDisplay.currentDisplay = 'points'
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Display as Points')).toBeFalsy()
     })
 
-    it('is not present when the total grade display cannot be changed', () => {
+    it('is not present when the total grade display cannot be changed', async () => {
       props.gradeDisplay.hidden = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Display as Points')).toBeFalsy()
     })
 
-    it('is disabled when .gradeDisplay.disabled is true', () => {
+    it('is disabled when .gradeDisplay.disabled is true', async () => {
       props.gradeDisplay.disabled = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       const menuItem = getMenuItem(menuContent, 'Display as Points')
       expect(menuItem.getAttribute('aria-disabled')).toBe('true')
     })
 
-    it('is not disabled when .gradeDisplay.disabled is false', () => {
+    it('is not disabled when .gradeDisplay.disabled is false', async () => {
       props.gradeDisplay.disabled = false
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       const menuItem = getMenuItem(menuContent, 'Display as Points')
       expect(menuItem.getAttribute('aria-disabled')).toBeNull()
     })
@@ -460,20 +468,20 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
         props.gradeDisplay.onSelect.mockClear()
       })
 
-      it('does not immediately restore focus', () => {
-        mountAndOpenOptionsMenu()
+      it('does not immediately restore focus', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Display as Points').click()
         expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
       })
 
-      it('calls the .gradeDisplay.onSelect callback', () => {
-        mountAndOpenOptionsMenu()
+      it('calls the .gradeDisplay.onSelect callback', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Display as Points').click()
         expect(props.gradeDisplay.onSelect).toHaveBeenCalledTimes(1)
       })
 
-      it('includes a focus-restoring callback when calling .gradeDisplay.onSelect', () => {
-        mountAndOpenOptionsMenu()
+      it('includes a focus-restoring callback when calling .gradeDisplay.onSelect', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Display as Points').click()
         const [callback] =
           props.gradeDisplay.onSelect.mock.calls[props.gradeDisplay.onSelect.mock.calls.length - 1]
@@ -488,14 +496,14 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
       props.position.isInFront = false
     })
 
-    it('is present when the column is in the scrollable section', () => {
-      mountAndOpenOptionsMenu()
+    it('is present when the column is in the scrollable section', async () => {
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Move to Front')).toBeTruthy()
     })
 
-    it('is not present when the column is in the frozen section', () => {
+    it('is not present when the column is in the frozen section', async () => {
       props.position.isInFront = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Move to Front')).toBeFalsy()
     })
 
@@ -504,14 +512,14 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
         props.position.onMoveToFront.mockClear()
       })
 
-      it('restores focus to the "Options" menu trigger', () => {
-        mountAndOpenOptionsMenu()
+      it('restores focus to the "Options" menu trigger', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Move to Front').click()
         expect(document.activeElement).toBe(getOptionsMenuTrigger())
       })
 
-      it('calls the .position.onMoveToFront callback', () => {
-        mountAndOpenOptionsMenu()
+      it('calls the .position.onMoveToFront callback', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Move to Front').click()
         expect(props.position.onMoveToFront).toHaveBeenCalledTimes(1)
       })
@@ -523,14 +531,14 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
       props.position.isInBack = false
     })
 
-    it('is present when the column is in the scrollable section', () => {
-      mountAndOpenOptionsMenu()
+    it('is present when the column is in the scrollable section', async () => {
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Move to End')).toBeTruthy()
     })
 
-    it('is not present when the column is in the frozen section', () => {
+    it('is not present when the column is in the frozen section', async () => {
       props.position.isInBack = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(getMenuItem(menuContent, 'Move to End')).toBeFalsy()
     })
 
@@ -539,14 +547,14 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
         props.position.onMoveToBack.mockClear()
       })
 
-      it('restores focus to the "Options" menu trigger', () => {
-        mountAndOpenOptionsMenu()
+      it('restores focus to the "Options" menu trigger', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Move to End').click()
         expect(document.activeElement).toBe(getOptionsMenuTrigger())
       })
 
-      it('calls the .position.onMoveToBack callback', () => {
-        mountAndOpenOptionsMenu()
+      it('calls the .position.onMoveToBack callback', async () => {
+        await mountAndOpenOptionsMenu()
         getMenuItem(menuContent, 'Move to End').click()
         expect(props.position.onMoveToBack).toHaveBeenCalledTimes(1)
       })
@@ -561,34 +569,34 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
       )
     }
 
-    it('is present when the onApplyScoreToUngraded prop is non-null', () => {
+    it('is present when the onApplyScoreToUngraded prop is non-null', async () => {
       props.onApplyScoreToUngraded = vi.fn()
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(applyScoreToUngradedItem()).toBeTruthy()
     })
 
-    it('calls the onApplyScoreToUngraded prop when clicked', () => {
+    it('calls the onApplyScoreToUngraded prop when clicked', async () => {
       props.onApplyScoreToUngraded = vi.fn()
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       applyScoreToUngradedItem().click()
       expect(props.onApplyScoreToUngraded).toHaveBeenCalledTimes(1)
     })
 
-    it('is not present when the onApplyScoreToUngraded prop is null', () => {
-      mountAndOpenOptionsMenu()
+    it('is not present when the onApplyScoreToUngraded prop is null', async () => {
+      await mountAndOpenOptionsMenu()
       expect(applyScoreToUngradedItem()).toBeFalsy()
     })
 
-    it('is enabled when isRunningScoreToUngraded is false', () => {
+    it('is enabled when isRunningScoreToUngraded is false', async () => {
       props.onApplyScoreToUngraded = vi.fn()
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(applyScoreToUngradedItem().getAttribute('aria-disabled')).toBeNull()
     })
 
-    it('is disabled when isRunningScoreToUngraded is true', () => {
+    it('is disabled when isRunningScoreToUngraded is true', async () => {
       props.onApplyScoreToUngraded = vi.fn()
       props.isRunningScoreToUngraded = true
-      mountAndOpenOptionsMenu()
+      await mountAndOpenOptionsMenu()
       expect(
         applyScoreToUngradedItem({showAlternativeText: true}).getAttribute('aria-disabled'),
       ).toBe('true')

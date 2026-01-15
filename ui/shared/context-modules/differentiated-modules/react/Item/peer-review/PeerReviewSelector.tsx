@@ -153,7 +153,7 @@ const PeerReviewSelector = ({
     setPeerReviewAvailableToDate,
   ])
 
-  if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
+  if (!ENV?.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
     return null
   }
 

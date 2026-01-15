@@ -16,13 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {Alert} from '@instructure/ui-alerts'
 import {RubricAssignmentContainer} from './components/RubricAssignmentContainer'
 import type {RubricAssignmentContainerProps} from './components/RubricAssignmentContainer'
 import {useAssignmentRubric} from './hooks/useAssignmentRubric'
+import type {Rubric} from '../types/rubric'
+import {useEffect} from 'react'
 
 type ENVType = {
   COURSE_ID: string
@@ -32,9 +35,6 @@ type ENVType = {
   ai_rubrics_enabled: boolean
   current_user_id: string
   rubric_self_assessment_ff_enabled: boolean
-  FEATURES: {
-    ams_enhanced_rubrics: boolean
-  }
 }
 declare const ENV: ENVType
 
@@ -44,13 +44,11 @@ declare const ENV: ENVType
 function CanvasRubricBridge({
   assignmentId,
   assignmentPointsPossible,
-}: {
-  assignmentId: string
-  assignmentPointsPossible: number
-}) {
+  onRubricChange,
+  onRubricLoaded,
+}: AmsRubricConfig) {
   const courseId = ENV.COURSE_ID
   const currentUserId = ENV.current_user_id
-  const rubricsEnabled = ENV.FEATURES.ams_enhanced_rubrics
 
   const {
     data: rubricData,
@@ -63,6 +61,14 @@ function CanvasRubricBridge({
   const rubricSelfAssessmentFFEnabled = ENV.rubric_self_assessment_ff_enabled
   const aiRubricsEnabled = ENV.ai_rubrics_enabled
 
+  useEffect(() => {
+    onRubricLoaded()
+  }, [rubricData, onRubricLoaded])
+
+  const handleOnRubricChange = (rubric: Rubric | undefined) => {
+    onRubricChange(!!rubric)
+  }
+
   // Handle error state
   if (rubricError) {
     return <Alert variant="error">{rubricError.message || 'Failed to load rubric'}</Alert>
@@ -70,7 +76,7 @@ function CanvasRubricBridge({
 
   return (
     <>
-      {!rubricLoading && rubricsEnabled && (
+      {!rubricLoading && (
         <RubricAssignmentContainer
           assignmentId={assignmentId}
           courseId={courseId}
@@ -81,6 +87,8 @@ function CanvasRubricBridge({
           canManageRubrics={canManageRubrics}
           rubricSelfAssessmentFFEnabled={rubricSelfAssessmentFFEnabled}
           aiRubricsEnabled={aiRubricsEnabled}
+          onRubricChange={handleOnRubricChange}
+          containerStyles={{width: '100%'}}
         />
       )}
     </>
@@ -90,6 +98,8 @@ function CanvasRubricBridge({
 export type AmsRubricConfig = {
   assignmentId: string
   assignmentPointsPossible: number
+  onRubricChange: (isAdded: boolean) => void
+  onRubricLoaded: () => void
 }
 
 /**
@@ -110,22 +120,45 @@ export type RubricController = {
  * @returns Controller object with render and unmount methods
  */
 export function createRubricController(container: HTMLElement): RubricController {
-  let root: ReactDOM.Root | null = ReactDOM.createRoot(container)
+  let root: Root | null = render(
+    <QueryClientProvider client={queryClient}>
+      <CanvasRubricBridge
+        assignmentId=""
+        assignmentPointsPossible={0}
+        onRubricChange={() => {}}
+        onRubricLoaded={() => {}}
+      />
+    </QueryClientProvider>,
+    container,
+  )
 
   return {
     render: (config: AmsRubricConfig) => {
       if (!root) {
-        root = ReactDOM.createRoot(container)
+        root = render(
+          <QueryClientProvider client={queryClient}>
+            <CanvasRubricBridge
+              assignmentId={config.assignmentId}
+              assignmentPointsPossible={config.assignmentPointsPossible}
+              onRubricChange={config.onRubricChange}
+              onRubricLoaded={config.onRubricLoaded}
+            />
+          </QueryClientProvider>,
+          container,
+        )
+      } else {
+        rerender(
+          root,
+          <QueryClientProvider client={queryClient}>
+            <CanvasRubricBridge
+              assignmentId={config.assignmentId}
+              assignmentPointsPossible={config.assignmentPointsPossible}
+              onRubricChange={config.onRubricChange}
+              onRubricLoaded={config.onRubricLoaded}
+            />
+          </QueryClientProvider>,
+        )
       }
-
-      root.render(
-        <QueryClientProvider client={queryClient}>
-          <CanvasRubricBridge
-            assignmentId={config.assignmentId}
-            assignmentPointsPossible={config.assignmentPointsPossible}
-          />
-        </QueryClientProvider>,
-      )
     },
 
     unmount: () => {

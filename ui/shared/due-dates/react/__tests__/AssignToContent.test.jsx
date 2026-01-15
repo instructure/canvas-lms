@@ -23,7 +23,10 @@ import AssignToContent from '../AssignToContent'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 const SECTIONS_DATA = [
   {id: '1', course_id: '1', name: 'Course 1', start_at: null, end_at: null},
@@ -62,11 +65,10 @@ describe('AssignToContent', () => {
     defaultSectionId: 0,
   }
 
-  const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections?per_page=100`
-  const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details?per_page=100`
-  const SETTINGS_URL = `/api/v1/courses/${COURSE_ID}/settings`
+  let apiCallCount = 0
 
   beforeAll(() => {
+    server.listen()
     window.ENV ||= {}
     ENV.COURSE_ID = COURSE_ID
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -77,14 +79,27 @@ describe('AssignToContent', () => {
     }
   })
 
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.get(SECTIONS_URL, SECTIONS_DATA).get(DATE_DETAILS, {}).get(SETTINGS_URL, {})
+    apiCallCount = 0
+    server.use(
+      http.get(`/api/v1/courses/${COURSE_ID}/sections`, () => {
+        apiCallCount++
+        return HttpResponse.json(SECTIONS_DATA)
+      }),
+      http.get(`/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details`, () => {
+        return HttpResponse.json({})
+      }),
+      http.get(`/api/v1/courses/${COURSE_ID}/settings`, () => {
+        return HttpResponse.json({})
+      }),
+    )
     queryClient.setQueryData(['students', COURSE_ID, {per_page: 100}], [])
   })
 
   afterEach(() => {
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   const setUp = (propOverrides = {}) =>
@@ -221,7 +236,7 @@ describe('AssignToContent', () => {
 
     it('does not fetch assignee options', () => {
       setUp()
-      expect(fetchMock.calls(SECTIONS_URL)).toHaveLength(0)
+      expect(apiCallCount).toBe(0)
     })
   })
 

@@ -74,6 +74,21 @@ describe('CommonEvent', () => {
     expect(event.isOnCalendar('course_2')).toBeFalsy()
   })
 
+  test('isOnCalendar with cross-shard global IDs', () => {
+    const event = commonEventFactory(
+      {
+        title: 'cross-shard appointment',
+        start_at: '2026-01-26T18:00:00Z',
+        all_context_codes: 'course_97700000000059053',
+      },
+      ['course_97700000000059053'],
+    )
+    expect(event.isOnCalendar('course_59053')).toBeTruthy()
+    expect(event.isOnCalendar('course_97700000000059053')).toBeTruthy()
+    expect(event.isOnCalendar('course_59054')).toBeFalsy()
+    expect(event.isOnCalendar('course_590')).toBeFalsy()
+  })
+
   test('finds a context for multi-context events', () => {
     const event = commonEventFactory(
       {
@@ -91,6 +106,50 @@ describe('CommonEvent', () => {
       [{asset_string: 'course_2'}],
     )
     expect(event).not.toBeNull()
+  })
+
+  test('matches local context when API returns global context code', () => {
+    const event = commonEventFactory(
+      {
+        title: 'Cross-shard appointment',
+        start_at: '2026-01-26T18:00:00Z',
+        effective_context_code: 'course_97700000000059053',
+        context_code: 'course_59053',
+        all_context_codes: 'course_97700000000059053',
+        appointment_group_id: '2',
+        appointment_group_url: 'http://localhost:3000/api/v1/appointment_groups/2',
+      },
+      [{asset_string: 'course_59053', can_create_calendar_events: true}],
+    )
+    expect(event).not.toBeNull()
+    expect(event.contextCode()).toBe('course_97700000000059053')
+  })
+
+  test('matches local context in multi-context events with global IDs', () => {
+    const event = commonEventFactory(
+      {
+        title: 'Multi-context with globals',
+        start_at: '2026-01-26T18:00:00Z',
+        effective_context_code: 'course_97700000000059053,course_97700000000059054',
+        context_code: 'user_2',
+        all_context_codes: 'course_97700000000059053,course_97700000000059054',
+      },
+      [{asset_string: 'course_59053'}, {asset_string: 'course_59054'}],
+    )
+    expect(event).not.toBeNull()
+  })
+
+  test('returns null when context cannot be matched', () => {
+    const event = commonEventFactory(
+      {
+        title: 'Unmatched context',
+        start_at: '2026-01-26T18:00:00Z',
+        effective_context_code: 'course_99999',
+        all_context_codes: 'course_99999',
+      },
+      [{asset_string: 'course_59053'}],
+    )
+    expect(event).toBeNull()
   })
 })
 

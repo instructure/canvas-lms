@@ -18,16 +18,16 @@
 
 import groovy.transform.Field
 
-@Field static final JEST_NODE_COUNT = 16
+@Field static final VITEST_NODE_COUNT = 16
 
-def jestNodeRequirementsTemplate(index) {
+def vitestNodeRequirementsTemplate(index) {
   def baseTestContainer = [
     image: 'local/karma-runner',
     command: 'cat'
   ]
 
   return [
-    containers: [baseTestContainer + [name: "jest-${index}"]]
+    containers: [baseTestContainer + [name: "vitest-${index}"]]
   ]
 }
 
@@ -115,14 +115,15 @@ def tearDownNode() {
   }
 }
 
-def queueJestDistribution(index) {
+def queueVitestDistribution(index) {
   { stages ->
-    def jestEnvVars = [
+    def vitestEnvVars = [
       "CI_NODE_INDEX=${index.toInteger() + 1}",
-      "CI_NODE_TOTAL=${JEST_NODE_COUNT}",
+      "CI_NODE_TOTAL=${VITEST_NODE_COUNT}",
+      "NODE_OPTIONS=--max-old-space-size=6144",
     ]
 
-    callableWithDelegate(queueTestStage())(stages, "jest-${index}", jestEnvVars, 'yarn test:jest:build')
+    callableWithDelegate(queueTestStage())(stages, "vitest-${index}", vitestEnvVars, 'yarn test:build')
   }
 }
 

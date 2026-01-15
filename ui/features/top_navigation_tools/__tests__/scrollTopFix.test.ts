@@ -21,10 +21,21 @@
  */
 
 // Mock the ready function to immediately execute the callback
-vi.mock('@instructure/ready', () => (callback: () => void) => callback())
+vi.mock('@instructure/ready', () => ({
+  default: (callback: () => void) => callback(),
+}))
+
+// Mock i18n to avoid infinite recursion issues
+vi.mock('@canvas/i18n', () => ({
+  useScope: () => ({
+    t: (key: string) => key,
+  }),
+}))
 
 // Mock the React components to avoid actual rendering
-vi.mock('@canvas/trays/react/ContentTypeExternalToolDrawer', () => () => null)
+vi.mock('@canvas/trays/react/ContentTypeExternalToolDrawer', () => ({
+  default: () => null,
+}))
 vi.mock('../react/TopNavigationTools', () => ({
   TopNavigationTools: () => null,
   MobileTopNavigationTools: () => null,
@@ -35,11 +46,23 @@ vi.mock('../react/TopNavigationTools', () => ({
   top_navigation_tools: [],
 }
 
+// Mock global I18n
+;(global as any).I18n = {
+  t: (key: string) => key,
+  locale: 'en',
+}
+
 describe('href="#" scrollTop fix', () => {
   let mockDrawerContent: HTMLElement
   let scrollToSpy: any
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Mock I18n before everything else
+    vi.stubGlobal('I18n', {
+      t: (key: string) => key,
+      locale: 'en',
+    })
+
     // Reset DOM
     document.body.innerHTML = ''
 
@@ -81,15 +104,15 @@ describe('href="#" scrollTop fix', () => {
 
     // Load the module to register the event listener
     vi.resetModules()
-     
-    require('../index.tsx')
+
+    await import('../index')
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  it.skip('scrolls drawer content to top when href="#" is clicked and HTML cannot scroll', () => {
+  it('scrolls drawer content to top when href="#" is clicked and HTML cannot scroll', () => {
     // Create a link with href="#"
     const link = document.createElement('a')
     link.href = '#'
@@ -103,7 +126,7 @@ describe('href="#" scrollTop fix', () => {
     expect(scrollToSpy).toHaveBeenCalledWith({top: 0})
   })
 
-  it.skip('does not interfere when HTML element can scroll normally', () => {
+  it('does not interfere when HTML element can scroll normally', () => {
     // Make HTML scrollable
     Object.defineProperty(document.documentElement, 'scrollHeight', {
       configurable: true,
@@ -120,7 +143,7 @@ describe('href="#" scrollTop fix', () => {
     expect(scrollToSpy).not.toHaveBeenCalled()
   })
 
-  it.skip('does not trigger when drawer content is already at top', () => {
+  it('does not trigger when drawer content is already at top', () => {
     // Set drawer content to already be at top
     mockDrawerContent.scrollTop = 0
 
@@ -134,7 +157,7 @@ describe('href="#" scrollTop fix', () => {
     expect(scrollToSpy).not.toHaveBeenCalled()
   })
 
-  it.skip('ignores clicks on non-anchor elements', () => {
+  it('ignores clicks on non-anchor elements', () => {
     const button = document.createElement('button')
     button.textContent = 'Not a link'
     document.body.appendChild(button)
@@ -144,7 +167,7 @@ describe('href="#" scrollTop fix', () => {
     expect(scrollToSpy).not.toHaveBeenCalled()
   })
 
-  it.skip('ignores anchors with different href values', () => {
+  it('ignores anchors with different href values', () => {
     const link = document.createElement('a')
     link.href = '#section1'
     document.body.appendChild(link)

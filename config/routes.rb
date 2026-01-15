@@ -448,7 +448,7 @@ CanvasRails::Application.routes.draw do
 
       post "extensions/:user_id" => "quizzes/quiz_submissions#extensions", :as => :extensions
       resources :quiz_questions, controller: "quizzes/quiz_questions", path: :questions, only: %i[create update destroy show]
-      resources :quiz_groups, controller: "quizzes/quiz_groups", path: :groups, only: %i[create update destroy] do
+      resources :quiz_groups, controller: "quizzes/quiz_groups", path: :groups, only: %i[index show create update destroy] do
         member do
           post :reorder
         end
@@ -561,7 +561,8 @@ CanvasRails::Application.routes.draw do
         resource :issues, only: [:create, :update], module: "accessibility"
         post "preview" => "accessibility/preview#create"
         get "preview" => "accessibility/preview#show"
-        post "generate" => "accessibility/generate#create"
+        post "generate/table_caption" => "accessibility/generate#create_table_caption"
+        post "generate/alt_text" => "accessibility/generate#create_image_alt_text"
         get "course_scan" => "accessibility/course_scan#show"
         post "course_scan" => "accessibility/course_scan#create"
         get "resource_scan" => "accessibility/resource_scan#index"
@@ -715,6 +716,7 @@ CanvasRails::Application.routes.draw do
     get :rate_limiting, controller: :rate_limiting_settings, action: :index, as: :rate_limiting
     resources :rate_limiting_settings, only: %i[index show create update destroy]
     get :eportfolio_moderation
+    get :accessibility
     get "search" => "accounts#course_user_search", :as => :course_user_search
     post "account_users" => "accounts#add_account_user", :as => :add_account_user
     delete "account_users/:id" => "accounts#remove_account_user", :as => :remove_account_user
@@ -1344,6 +1346,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/sections", action: :index, as: "course_sections"
       get "courses/:course_id/sections/:id", action: :show, as: "course_section"
       get "sections/:id", action: :show
+      get "sections/:id/users", action: :users, as: "section_users"
       post "courses/:course_id/sections", action: :create
       put "sections/:id", action: :update
       delete "sections/:id", action: :destroy
@@ -2320,6 +2323,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "quizzes/quiz_groups") do
+      get "courses/:course_id/quizzes/:quiz_id/groups", action: :index, as: "course_quiz_groups"
       get "courses/:course_id/quizzes/:quiz_id/groups/:id", action: :show, as: "course_quiz_group"
       post "courses/:course_id/quizzes/:quiz_id/groups", action: :create, as: "course_quiz_group_create"
       put "courses/:course_id/quizzes/:quiz_id/groups/:id", action: :update, as: "course_quiz_group_update"

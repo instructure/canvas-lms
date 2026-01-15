@@ -19,17 +19,24 @@
 import React from 'react'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import moment from 'moment-timezone'
 import NewAccessToken, {PURPOSE_MAX_LENGTH} from '../NewAccessToken'
+
+const server = setupServer()
 
 describe('NewAccessToken', () => {
   const GENERATE_ACCESS_TOKEN_URI = '/api/v1/users/self/tokens'
   const onClose = vi.fn()
   const onSubmit = vi.fn()
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
     cleanup()
+    server.resetHandlers()
   })
 
   beforeEach(() => {
@@ -69,7 +76,11 @@ describe('NewAccessToken', () => {
 
   it('should show an error if the network request fails', async () => {
     const user = userEvent.setup()
-    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, 500, {overwriteRoutes: true})
+    server.use(
+      http.post(GENERATE_ACCESS_TOKEN_URI, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
     const purpose = screen.getByLabelText(/Purpose/)
@@ -85,7 +96,14 @@ describe('NewAccessToken', () => {
   it('should be able to submit the form if only the purpose filed is provided', async () => {
     const user = userEvent.setup()
     const token = {purpose: 'Test purpose'}
-    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
+    const requestBodyCapture = vi.fn()
+    server.use(
+      http.post(GENERATE_ACCESS_TOKEN_URI, async ({request}) => {
+        const body = await request.json()
+        requestBodyCapture(body)
+        return HttpResponse.json({token})
+      }),
+    )
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
     const purpose = screen.getByLabelText(/Purpose/)
@@ -100,20 +118,8 @@ describe('NewAccessToken', () => {
 
     await waitFor(
       () => {
-        const wasCalled = fetchMock.called(GENERATE_ACCESS_TOKEN_URI)
-        if (!wasCalled) {
-          console.log('Fetch not called yet')
-          return false
-        }
-        const lastCall = fetchMock.lastCall(GENERATE_ACCESS_TOKEN_URI)
-        if (!lastCall) {
-          console.log('No fetch call found')
-          return false
-        }
-        const body = JSON.parse(lastCall[1]?.body as string)
-        expect(body).toEqual({token})
+        expect(requestBodyCapture).toHaveBeenCalledWith({token})
         expect(onSubmit).toHaveBeenCalledWith({token})
-        return true
       },
       {timeout: 20000},
     )
@@ -128,7 +134,14 @@ describe('NewAccessToken', () => {
     }
     const expirationDateValue = 'November 14, 2024'
     const expirationTimeValue = '12:00 AM'
-    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
+    const requestBodyCapture = vi.fn()
+    server.use(
+      http.post(GENERATE_ACCESS_TOKEN_URI, async ({request}) => {
+        const body = await request.json()
+        requestBodyCapture(body)
+        return HttpResponse.json({token})
+      }),
+    )
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
     const purpose = screen.getByLabelText(/Purpose/)
@@ -151,18 +164,8 @@ describe('NewAccessToken', () => {
 
     await waitFor(
       () => {
-        const wasCalled = fetchMock.called(GENERATE_ACCESS_TOKEN_URI)
-        if (!wasCalled) {
-          return false
-        }
-        const lastCall = fetchMock.lastCall(GENERATE_ACCESS_TOKEN_URI)
-        if (!lastCall) {
-          return false
-        }
-        const body = JSON.parse(lastCall[1]?.body as string)
-        expect(body).toEqual({token})
+        expect(requestBodyCapture).toHaveBeenCalledWith({token})
         expect(onSubmit).toHaveBeenCalledWith({token})
-        return true
       },
       {timeout: 20000}, // Increase timeout for CI
     )
@@ -241,7 +244,13 @@ describe('NewAccessToken', () => {
         const validDateString = validDate.format('MMMM D, YYYY')
         const validTimeString = '12:00 AM'
 
-        fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
+        const requestReceived = vi.fn()
+        server.use(
+          http.post(GENERATE_ACCESS_TOKEN_URI, () => {
+            requestReceived()
+            return HttpResponse.json({token})
+          }),
+        )
         render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
 
         const submit = screen.getByLabelText('Generate Token')
@@ -261,7 +270,7 @@ describe('NewAccessToken', () => {
 
         await waitFor(
           () => {
-            expect(fetchMock.called(GENERATE_ACCESS_TOKEN_URI)).toBe(true)
+            expect(requestReceived).toHaveBeenCalled()
           },
           {timeout: 10000},
         )
@@ -293,7 +302,13 @@ describe('NewAccessToken', () => {
       it('should allow submission without expiration date', async () => {
         const user = userEvent.setup()
         const token = {purpose: 'Test purpose'}
-        fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
+        const requestReceived = vi.fn()
+        server.use(
+          http.post(GENERATE_ACCESS_TOKEN_URI, () => {
+            requestReceived()
+            return HttpResponse.json({token})
+          }),
+        )
         render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
 
         const submit = screen.getByLabelText('Generate Token')
@@ -305,7 +320,7 @@ describe('NewAccessToken', () => {
 
         await waitFor(
           () => {
-            expect(fetchMock.called(GENERATE_ACCESS_TOKEN_URI)).toBe(true)
+            expect(requestReceived).toHaveBeenCalled()
           },
           {timeout: 10000},
         )

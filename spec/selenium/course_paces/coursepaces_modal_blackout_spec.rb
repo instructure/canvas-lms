@@ -165,7 +165,7 @@ describe "course pace modal" do
       click_blackout_dates_add_button
       click_blackout_dates_save_button
 
-      expect(blackout_dates_modal_exists?).to be_falsey
+      wait_for_no_such_element { f(blackout_dates_modal_selector) }
     end
 
     it "shows the blackout date in unpublished changes tray" do

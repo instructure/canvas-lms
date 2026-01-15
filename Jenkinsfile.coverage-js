@@ -165,12 +165,12 @@ pipeline {
               extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                 def jsStages = [:]
 
-                for (int i = 0; i < jsStage.JEST_NODE_COUNT; i++) {
+                for (int i = 0; i < jsStage.VITEST_NODE_COUNT; i++) {
                   String index = i
-                  extendedStage("Runner - Jest ${i}").nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(jsStages) {
+                  extendedStage("Runner - Vitest ${i}").nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.vitestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(jsStages) {
                     def tests = [:]
 
-                    callableWithDelegate(jsStage.queueJestDistribution(index))(tests)
+                    callableWithDelegate(jsStage.queueVitestDistribution(index))(tests)
 
                     parallel(tests)
                   }

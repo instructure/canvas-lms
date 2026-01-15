@@ -20,9 +20,11 @@ import Big from 'big.js'
 
 // rounds a number to 'n' digits
 export default function round(n: number | string | null, digits = 0) {
+  if (n === null) {
+    return NaN
+  }
   try {
-    // @ts-expect-error
-    return parseFloat(Big(n).round(digits))
+    return parseFloat(Big(n).round(digits).toString())
   } catch (error) {
     return NaN
   }

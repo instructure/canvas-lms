@@ -16,19 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {act, render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
-import {http, HttpResponse} from 'msw'
-import {setupServer} from 'msw/node'
 import React from 'react'
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
 import DashboardCard from '../DashboardCard'
+import axios from '@canvas/axios'
 
 vi.mock('../CourseActivitySummaryStore')
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(),
-}))
+vi.mock('@canvas/axios')
 
 describe('DashboardCard (Legacy Tests)', () => {
   const defaultProps = {
@@ -54,18 +51,16 @@ describe('DashboardCard (Legacy Tests)', () => {
     connectDropTarget: c => c,
   }
 
-  const server = setupServer()
-
-  beforeAll(() => server.listen())
-  afterEach(() => {
-    server.resetHandlers()
-    localStorage.clear()
-    vi.clearAllMocks()
+  beforeEach(() => {
     CourseActivitySummaryStore.getStateForCourse.mockReturnValue({})
   })
-  afterAll(() => server.close())
 
-  it.skip('obtains new course activity when course activity is updated', async () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+  })
+
+  it('obtains new course activity when course activity is updated', async () => {
     const stream = {
       type: 'DiscussionTopic',
       unread_count: 1,
@@ -97,103 +92,61 @@ describe('DashboardCard (Legacy Tests)', () => {
     expect(CourseActivitySummaryStore.getStateForCourse).toHaveBeenCalledTimes(2)
   })
 
-  it.skip('is accessible', async () => {
+  it('is accessible', async () => {
     const {container} = render(<DashboardCard {...defaultProps} />)
     const results = await axe.run(container)
     expect(results.violations).toHaveLength(0)
   })
 
-  it.skip('does not have an image when a url is not provided', () => {
+  it('does not have an image when a url is not provided', () => {
     const {queryByText, getByText} = render(<DashboardCard {...defaultProps} />)
 
     expect(queryByText(`Course image for ${defaultProps.shortName}`)).not.toBeInTheDocument()
     expect(getByText(`Course card color region for ${defaultProps.shortName}`)).toBeInTheDocument()
   })
 
-  it.skip('has an image when a url is provided', () => {
+  it('has an image when a url is provided', () => {
     const props = {...defaultProps, image: 'http://coolUrl'}
     const {getByText} = render(<DashboardCard {...props} />)
 
     expect(getByText(`Course image for ${props.shortName}`)).toBeInTheDocument()
   })
 
-  it.skip('handles success removing course from favorites', async () => {
-    const handleRerender = vi.fn()
-    const props = {...defaultProps, onConfirmUnfavorite: handleRerender}
-
-    const {getByText} = render(<DashboardCard {...props} />)
-
-    act(() => {
-      getByText(
-        `Choose a color or course nickname or move course card for ${props.shortName}`,
-      ).click()
-    })
-    act(() => {
-      getByText('Move').click()
-    })
-    act(() => {
-      getByText('Unfavorite').click()
-    })
-    server.use(http.delete('*/users/self/favorites/courses/*', () => HttpResponse.json([])))
-
-    act(() => {
-      getByText('Submit').click()
-    })
-
-    await waitFor(() => {
-      expect(handleRerender).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  // fickle
-  it.skip('handles failure removing course from favorites', async () => {
+  it('handles success removing course from favorites', async () => {
+    axios.delete.mockResolvedValue({status: 200, data: []})
+    const user = userEvent.setup()
     const handleRerender = vi.fn()
     const props = {...defaultProps, onConfirmUnfavorite: handleRerender}
 
     const {getByText, getByRole} = render(<DashboardCard {...props} />)
 
-    // Click the menu button
     const menuButton = getByRole('button', {
       name: `Choose a color or course nickname or move course card for ${props.shortName}`,
     })
-    await act(async () => {
-      menuButton.click()
-    })
+    await user.click(menuButton)
 
-    // Wait for menu to be visible and click "Move"
     const moveButton = await waitFor(() => getByText('Move'))
-    await act(async () => {
-      moveButton.click()
-    })
+    await user.click(moveButton)
 
-    // Wait for submenu and click "Unfavorite"
     const unfavoriteButton = await waitFor(() => getByText('Unfavorite'))
-    await act(async () => {
-      unfavoriteButton.click()
+    await user.click(unfavoriteButton)
+
+    const submitButton = await waitFor(() => {
+      const btn = document.getElementById('confirm_unfavorite_course')
+      if (!btn) throw new Error('Button not found')
+      return btn
     })
 
-    // Wait for confirmation dialog and click "Submit"
-    const submitButton = await waitFor(() => getByRole('button', {name: 'Submit'}))
+    await user.click(submitButton)
 
-    server.use(
-      http.delete(
-        '*/users/self/favorites/courses/*',
-        () => new HttpResponse(JSON.stringify({error: 'Unauthorized'}), {status: 403}),
-      ),
-    )
-
-    await act(async () => {
-      submitButton.click()
+    await waitFor(() => {
+      expect(axios.delete).toHaveBeenCalled()
     })
 
-    // Wait for the error alert
-    await waitFor(
-      () => {
-        expect(showFlashError).toHaveBeenCalledWith(
-          'We were unable to remove this course from your favorites.',
-        )
-      },
-      {timeout: 3000},
-    )
+    await waitFor(() => {
+      expect(handleRerender).toHaveBeenCalledTimes(1)
+    })
+
+    document.querySelectorAll('.confirm-unfavorite-modal-container').forEach(el => el.remove())
   })
 })

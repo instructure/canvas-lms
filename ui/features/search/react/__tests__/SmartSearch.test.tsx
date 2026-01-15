@@ -19,8 +19,11 @@
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import SmartSearch from '../SmartSearch'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import userEvent from '@testing-library/user-event'
+
+const server = setupServer()
 
 const props = {
   courseId: '1',
@@ -80,11 +83,13 @@ const results = [
 const SEARCH_TERM = 'apple'
 
 const INDEX_URL = `/api/v1/courses/${props.courseId}/smartsearch/index_status`
-const SEARCH_URL = encodeURI(
-  `/api/v1/courses/${props.courseId}/smartsearch?q=${SEARCH_TERM}&per_page=25&include[]=modules&include[]=status`,
-)
+const SEARCH_URL = `/api/v1/courses/${props.courseId}/smartsearch`
 
 describe('SmartSearch', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
   const renderSearch = (overrides = {}) => {
     return render(
       <BrowserRouter basename="">
@@ -95,16 +100,18 @@ describe('SmartSearch', () => {
     )
   }
 
-  afterEach(() => {
-    fetchMock.restore()
-  })
-
   it('should render progress bar when indexing', async () => {
-    fetchMock.get(INDEX_URL, {
-      status: 'indexing',
-      progress: 75,
-    })
-    fetchMock.get(SEARCH_URL, {results: []})
+    server.use(
+      http.get(INDEX_URL, () => {
+        return HttpResponse.json({
+          status: 'indexing',
+          progress: 75,
+        })
+      }),
+      http.get(SEARCH_URL, () => {
+        return HttpResponse.json({results: []})
+      }),
+    )
     const {getByTestId, queryByText, getByText} = renderSearch()
 
     expect(queryByText('You may also be interested in')).toBeNull()
@@ -116,11 +123,17 @@ describe('SmartSearch', () => {
   })
 
   it('should render nothing when no search has been made', async () => {
-    fetchMock.get(INDEX_URL, {
-      status: 'complete',
-      progress: 100,
-    })
-    fetchMock.get(SEARCH_URL, {results: []})
+    server.use(
+      http.get(INDEX_URL, () => {
+        return HttpResponse.json({
+          status: 'complete',
+          progress: 100,
+        })
+      }),
+      http.get(SEARCH_URL, () => {
+        return HttpResponse.json({results: []})
+      }),
+    )
     const {getByTestId, queryByTestId, queryByText} = renderSearch()
 
     expect(getByTestId('search-input')).toBeInTheDocument()
@@ -133,17 +146,19 @@ describe('SmartSearch', () => {
 
   describe('after a successful search', () => {
     beforeEach(() => {
-      fetchMock.get(INDEX_URL, {
-        status: 'complete',
-        progress: 100,
-      })
-      fetchMock.get(SEARCH_URL, {
-        results: results,
-      })
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.get(INDEX_URL, () => {
+          return HttpResponse.json({
+            status: 'complete',
+            progress: 100,
+          })
+        }),
+        http.get(SEARCH_URL, () => {
+          return HttpResponse.json({
+            results: results,
+          })
+        }),
+      )
     })
 
     it('renders results', async () => {
@@ -218,18 +233,22 @@ describe('SmartSearch', () => {
     })
 
     it('applies filters to search results', async () => {
-      const FILTER_URL = encodeURI(
-        `/api/v1/courses/${props.courseId}/smartsearch?q=${SEARCH_TERM}&per_page=25&filter[]=announcements&filter[]=pages&include[]=modules&include[]=status`,
+      // Override the search endpoint to handle filtered results
+      server.use(
+        http.get(SEARCH_URL, ({request}) => {
+          const url = new URL(request.url)
+          const filters = url.searchParams.getAll('filter[]')
+          // If both announcements and pages filters applied
+          if (filters.includes('announcements') && filters.includes('pages')) {
+            return HttpResponse.json({results: [results[0]]})
+          }
+          // If only pages filter
+          if (filters.includes('pages') && !filters.includes('announcements')) {
+            return HttpResponse.json({results: []})
+          }
+          return HttpResponse.json({results: results})
+        }),
       )
-      const FILTER_URL2 = encodeURI(
-        `/api/v1/courses/${props.courseId}/smartsearch?q=${SEARCH_TERM}&per_page=25&filter[]=pages&include[]=modules&include[]=status`,
-      )
-      fetchMock.get(FILTER_URL, {
-        results: [results[0]], // only the first result matches the filters
-      })
-      fetchMock.get(FILTER_URL2, {
-        results: [], // only the first result matches the filters
-      })
 
       const user = userEvent.setup()
       const {getByTestId, getAllByTestId, queryByTestId, queryAllByTestId} = renderSearch()
@@ -270,11 +289,17 @@ describe('SmartSearch', () => {
 
   it('renders error message after failing to get results', async () => {
     const user = userEvent.setup()
-    fetchMock.get(INDEX_URL, {
-      status: 'complete',
-      progress: 100,
-    })
-    fetchMock.get(SEARCH_URL, 404)
+    server.use(
+      http.get(INDEX_URL, () => {
+        return HttpResponse.json({
+          status: 'complete',
+          progress: 100,
+        })
+      }),
+      http.get(SEARCH_URL, () => {
+        return new HttpResponse(null, {status: 404})
+      }),
+    )
     const {getByTestId, getByText} = renderSearch()
 
     const searchInput = getByTestId('search-input')

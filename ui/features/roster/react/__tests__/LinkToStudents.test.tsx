@@ -20,7 +20,10 @@ import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import LinkToStudents, {LinkToStudentsProps, Observee} from '../LinkToStudents'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 describe('LinkToStudents', () => {
   const GET_OBSERVEES_URL = '/search/recipients'
@@ -60,6 +63,7 @@ describe('LinkToStudents', () => {
   }
 
   beforeAll(() => {
+    server.listen()
     // Not supported by the current version of NodeJS. It will be available in 22.11.0
     Set.prototype.difference = function (setB: Set<any>) {
       const difference = new Set(this)
@@ -71,11 +75,12 @@ describe('LinkToStudents', () => {
   })
 
   afterAll(() => {
+    server.close()
     Set.prototype.difference = undefined as any
   })
 
   afterEach(() => {
-    fetchMock.reset()
+    server.resetHandlers()
   })
 
   it('should render the observer name in the description', () => {
@@ -96,16 +101,16 @@ describe('LinkToStudents', () => {
 
   describe('when the observer has no observees', () => {
     it('should be able to add a student as observee', async () => {
-      fetchMock.get(new RegExp(GET_OBSERVEES_URL), [firstObservee], {
-        overwriteRoutes: true,
-      })
-      fetchMock.get(new RegExp(GET_USER_URL(props.course.id, firstObservee.id)), firstObservee, {
-        overwriteRoutes: true,
-      })
-      fetchMock.post(
-        LINK_OBSERVEE_URL(props.course.id),
-        {observed_user: firstObservee},
-        {overwriteRoutes: true},
+      server.use(
+        http.get(new RegExp(GET_OBSERVEES_URL), () => {
+          return HttpResponse.json([firstObservee])
+        }),
+        http.get(new RegExp(GET_USER_URL(props.course.id, firstObservee.id)), () => {
+          return HttpResponse.json(firstObservee)
+        }),
+        http.post(LINK_OBSERVEE_URL(props.course.id), () => {
+          return HttpResponse.json({observed_user: firstObservee})
+        }),
       )
       render(<LinkToStudents {...props} />)
       const observeeSelect = screen.getByLabelText('Observee select')
@@ -129,16 +134,16 @@ describe('LinkToStudents', () => {
   describe('when the observer has observees', () => {
     it('should be able to remove an observee', async () => {
       const [enrollmentOfFirstObservee] = firstObservee.enrollments!
-      fetchMock.get(new RegExp(GET_OBSERVEES_URL), [firstObservee], {
-        overwriteRoutes: true,
-      })
-      fetchMock.get(new RegExp(GET_USER_URL(props.course.id, firstObservee.id)), firstObservee, {
-        overwriteRoutes: true,
-      })
-      fetchMock.delete(
-        UNLINK_OBSERVEE_URL(props.course.id, enrollmentOfFirstObservee.id),
-        {enrollment: {observed_user: firstObservee}},
-        {overwriteRoutes: true},
+      server.use(
+        http.get(new RegExp(GET_OBSERVEES_URL), () => {
+          return HttpResponse.json([firstObservee])
+        }),
+        http.get(new RegExp(GET_USER_URL(props.course.id, firstObservee.id)), () => {
+          return HttpResponse.json(firstObservee)
+        }),
+        http.delete(UNLINK_OBSERVEE_URL(props.course.id, enrollmentOfFirstObservee.id), () => {
+          return HttpResponse.json({enrollment: {observed_user: firstObservee}})
+        }),
       )
       render(
         <LinkToStudents

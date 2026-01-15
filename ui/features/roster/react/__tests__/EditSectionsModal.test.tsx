@@ -16,11 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor, fireEvent} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {cleanup, render, waitFor, fireEvent} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import EditSectionsModal from '../EditSectionsModal'
 import type {ExistingSectionEnrollment} from '../SectionSelector'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 const mockSections: ExistingSectionEnrollment[] = [
   {
@@ -47,20 +50,22 @@ const defaultProps = {
 
 describe('EditSectionsModal', () => {
   beforeAll(() => {
+    server.listen()
     fakeENV.setup({current_context: {id: '123'}})
   })
 
   beforeEach(() => {
-    fetchMock.restore()
     vi.clearAllMocks()
   })
 
   afterAll(() => {
+    server.close()
     fakeENV.teardown()
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    cleanup()
+    server.resetHandlers()
   })
 
   it('renders the modal with static elements and default values', () => {
@@ -133,19 +138,19 @@ describe('EditSectionsModal', () => {
   })
 
   it('allows adding sections via SectionSelector', async () => {
-    const fetchSections = encodeURI(
-      `/courses/123/sections/user_count?exclude[]=section_1&exclude[]=section_2&search=`,
-    )
     const response = {
       sections: [{id: '3', name: 'Section 3', avatar_url: '', user_count: 0}],
     }
-    fetchMock.get(fetchSections, response)
+    server.use(
+      http.get('/courses/123/sections/user_count', () => {
+        return HttpResponse.json(response)
+      }),
+    )
     const {getByTestId} = render(<EditSectionsModal {...defaultProps} />)
 
     const sectionInput = getByTestId('section-input')
     fireEvent.click(sectionInput)
     await waitFor(() => {
-      expect(fetchMock.called(fetchSections)).toBe(true)
       expect(getByTestId('section-option-3')).toBeInTheDocument()
     })
     fireEvent.click(getByTestId('section-option-3'))

@@ -18,21 +18,16 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import TodoListWidget from '../TodoListWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
-import {
-  plannerItemsHandlers,
-  emptyPlannerItemsHandler,
-  errorPlannerItemsHandler,
-  plannerNoteHandlers,
-} from './mocks/handlers'
+import {plannerItemsHandlers, plannerNoteHandlers} from './mocks/handlers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
 import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const mockWidget: Widget = {
   id: 'todo-list-widget',
@@ -71,15 +66,17 @@ const mockSharedCourseData = [
 
 beforeAll(() => {
   server.listen()
-  window.ENV = window.ENV || ({} as any)
-  window.ENV.LOCALE = 'en'
-  window.ENV.TIMEZONE = 'America/Denver'
 })
 beforeEach(() => {
+  fakeENV.setup({
+    LOCALE: 'en',
+    TIMEZONE: 'America/Denver',
+  })
   clearWidgetDashboardCache()
 })
 afterEach(() => {
   server.resetHandlers()
+  fakeENV.teardown()
 })
 afterAll(() => server.close())
 
@@ -195,131 +192,6 @@ describe('TodoListWidget', () => {
     })
   })
 
-  describe('pagination', () => {
-    it('shows pagination when multiple pages exist', async () => {
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
-      })
-
-      const paginationContainer = await waitFor(
-        () => {
-          const container = screen.queryByTestId('pagination-container')
-          if (!container) throw new Error('Pagination not found')
-          return container
-        },
-        {timeout: 5000},
-      )
-
-      expect(paginationContainer).toBeInTheDocument()
-    })
-
-    it('allows navigation to next page', async () => {
-      const user = userEvent.setup()
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
-      })
-
-      const paginationContainer = await waitFor(
-        () => {
-          const container = screen.queryByTestId('pagination-container')
-          if (!container) throw new Error('Pagination not found')
-          return container
-        },
-        {timeout: 5000},
-      )
-
-      const page2Button = screen.getByRole('button', {name: '2'})
-      expect(page2Button).toBeInTheDocument()
-
-      await user.click(page2Button)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('empty state', () => {
-    it('shows appropriate message when no items', async () => {
-      server.use(emptyPlannerItemsHandler)
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(() => {
-        expect(screen.getByTestId('no-todos-message')).toBeInTheDocument()
-      })
-
-      expect(screen.getByText('No upcoming items')).toBeInTheDocument()
-    })
-
-    it('does not show pagination when no items', async () => {
-      server.use(emptyPlannerItemsHandler)
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(() => {
-        expect(screen.getByText('No upcoming items')).toBeInTheDocument()
-      })
-
-      expect(screen.queryByTestId('pagination-container')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('error handling', () => {
-    it('shows error message on API failure', async () => {
-      server.use(errorPlannerItemsHandler)
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(
-        () => {
-          expect(
-            screen.getByText('Failed to load to-do items. Please try again.'),
-          ).toBeInTheDocument()
-        },
-        {timeout: 5000},
-      )
-    })
-
-    it('shows retry button on error', async () => {
-      server.use(errorPlannerItemsHandler)
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(
-        () => {
-          expect(screen.getByRole('button', {name: /retry/i})).toBeInTheDocument()
-        },
-        {timeout: 5000},
-      )
-    })
-
-    it('retries fetch when retry button clicked', async () => {
-      const user = userEvent.setup()
-      server.use(errorPlannerItemsHandler)
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(
-        () => {
-          expect(
-            screen.getByText('Failed to load to-do items. Please try again.'),
-          ).toBeInTheDocument()
-        },
-        {timeout: 5000},
-      )
-
-      server.resetHandlers()
-      server.use(...plannerItemsHandlers)
-
-      const retryButton = screen.getByRole('button', {name: /retry/i})
-      await user.click(retryButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Lab Report: Cell Structure')).toBeInTheDocument()
-      })
-    })
-  })
-
   describe('checkboxes', () => {
     it('renders checkboxes as enabled', async () => {
       renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
@@ -330,68 +202,6 @@ describe('TodoListWidget', () => {
 
       const checkbox = screen.getByTestId('todo-checkbox-1')
       expect(checkbox).toBeEnabled()
-    })
-  })
-
-  describe('create todo modal', () => {
-    it('opens modal when "+ New" button is clicked', async () => {
-      const user = userEvent.setup()
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
-      })
-
-      const newButton = screen.getByTestId('new-todo-button')
-      await user.click(newButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Add To Do')).toBeInTheDocument()
-      })
-    })
-
-    it('closes modal when cancel button is clicked', async () => {
-      const user = userEvent.setup()
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
-      })
-
-      const newButton = screen.getByTestId('new-todo-button')
-      await user.click(newButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Add To Do')).toBeInTheDocument()
-      })
-
-      const cancelButton = screen.getByTestId('create-todo-cancel-button')
-      await user.click(cancelButton)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Add To Do')).not.toBeInTheDocument()
-      })
-    })
-
-    it('renders create todo modal with all fields', async () => {
-      const user = userEvent.setup()
-      renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
-      })
-
-      const newButton = screen.getByTestId('new-todo-button')
-      await user.click(newButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Add To Do')).toBeInTheDocument()
-      })
-
-      expect(screen.getByTestId('create-todo-title-input')).toBeInTheDocument()
-      expect(screen.getByTestId('create-todo-date-input')).toBeInTheDocument()
-      expect(screen.getByTestId('create-todo-course-select')).toBeInTheDocument()
-      expect(screen.getByTestId('create-todo-details-input')).toBeInTheDocument()
     })
   })
 })

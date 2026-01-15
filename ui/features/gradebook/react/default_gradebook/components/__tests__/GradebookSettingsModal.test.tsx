@@ -47,6 +47,7 @@ describe('GradebookSettingsModal', () => {
       statusColors: statusColors(),
       viewUngradedAsZero: false,
       viewHiddenGradesIndicator: false,
+      viewStatusForColorblindness: false,
     })
 
     props = {
@@ -73,9 +74,7 @@ describe('GradebookSettingsModal', () => {
 
     latePolicyUrl = `/api/v1/courses/${props.courseId}/late_policy`
     // If a course hasn't yet created a late policy, this returns a 404 and the front-end handles it.
-    server.use(
-      http.get(latePolicyUrl, () => new HttpResponse(null, {status: 404}))
-    )
+    server.use(http.get(latePolicyUrl, () => new HttpResponse(null, {status: 404})))
   })
 
   afterEach(() => {
@@ -141,7 +140,7 @@ describe('GradebookSettingsModal', () => {
             })
           }
           return new HttpResponse(null, {status: 404})
-        })
+        }),
       )
 
       const {findByText, findByTestId, getByTestId} = render(<GradebookSettingsModal {...props} />)
@@ -218,7 +217,7 @@ describe('GradebookSettingsModal', () => {
         http.put(`/api/v1/courses/${props.courseId}/settings`, async ({request}) => {
           capturedSettings = await request.json()
           return HttpResponse.json(settingsResponse)
-        })
+        }),
       )
 
       props.courseFeatures.finalGradeOverrideEnabled = true

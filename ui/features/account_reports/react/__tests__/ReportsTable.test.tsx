@@ -21,7 +21,10 @@ import {render, within, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ReportsTable from '../components/ReportsTable'
 import {AccountReportInfo, AccountReport} from '@canvas/account_reports/types'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 const exampleReports: AccountReportInfo[] = [
   {report: 'report_1', title: 'Report 1', description_html: '<p>Description 1</p>'},
@@ -47,8 +50,11 @@ const exampleReports: AccountReportInfo[] = [
 ]
 
 describe('ReportsTable', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('renders a list of reports', () => {
@@ -92,10 +98,11 @@ describe('ReportsTable', () => {
       run_time: 11,
       message: 'Report completed successfully',
     }
-    fetchMock.post('/api/v1/accounts/123/reports/report_1', {
-      body: updatedReport,
-      status: 200,
-    })
+    server.use(
+      http.post('/api/v1/accounts/123/reports/report_1', () => {
+        return HttpResponse.json(updatedReport)
+      }),
+    )
 
     const report1_row = getByTestId('tr_report_1')
     expect(report1_row).toBeInTheDocument()

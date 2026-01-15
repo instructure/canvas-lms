@@ -33,8 +33,7 @@ import ScoreSection from './ScoreSection'
 
 const I18n = createI18nScope('differentiated_modules')
 
-// @ts-expect-error
-const resourceLabelMap: Record<ModuleItem['resource'], string> = {
+const resourceLabelMap: Record<NonNullable<ModuleItem['resource']>, string> = {
   assignment: I18n.t('Assignments'),
   quiz: I18n.t('Quizzes'),
   file: I18n.t('Files'),
@@ -76,7 +75,7 @@ export default function RequirementSelector({
   pointsInputMessages,
   validatePointsInput,
 }: RequirementSelectorProps) {
-  const removeButton = useRef<Element | null>(null)
+  const removeButton = useRef<HTMLElement | null>(null)
   const dropdown = useRef<HTMLInputElement | null>(null)
   const requirementTypeOptions = useMemo(() => {
     const requirementTypes = requirementTypesForResource(requirement)
@@ -99,7 +98,6 @@ export default function RequirementSelector({
   const options = useMemo(() => groupBy(moduleItems, 'resource'), [moduleItems])
 
   useEffect(() => {
-    // @ts-expect-error
     focusDeleteButton && removeButton.current?.focus()
   }, [focusDeleteButton, removeButton])
 
@@ -163,7 +161,7 @@ export default function RequirementSelector({
           </Flex.Item>
           <Flex.Item padding="0 0 small 0">
             <IconButton
-              elementRef={el => (removeButton.current = el)}
+              elementRef={el => (removeButton.current = el instanceof HTMLElement ? el : null)}
               renderIcon={<IconTrashLine color="error" />}
               onClick={() => onDropRequirement(index)}
               screenReaderLabel={I18n.t('Remove %{name} Content Requirement', {
@@ -185,13 +183,10 @@ export default function RequirementSelector({
               onUpdateRequirement({...moduleItem, type: 'view'} as Requirement, index)
             }}
           >
-            {/* @ts-expect-error */}
-            {Object.keys(options).map((resource: ModuleItem['resource']) => {
+            {(Object.keys(options) as NonNullable<ModuleItem['resource']>[]).map(resource => {
               return (
-                // @ts-expect-error
                 <CanvasSelect.Group key={resource} label={resourceLabelMap[resource]}>
-                  {/* @ts-expect-error */}
-                  {options[resource].map((moduleItem: ModuleItem) => (
+                  {options[resource]?.map((moduleItem: ModuleItem) => (
                     <CanvasSelect.Option
                       id={moduleItem.id}
                       key={moduleItem.id}

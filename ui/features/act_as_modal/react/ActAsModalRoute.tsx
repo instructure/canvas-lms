@@ -20,15 +20,32 @@ import React from 'react'
 import {Portal} from '@instructure/ui-portal'
 import ActAsModal from './ActAsModal'
 
+type ActAsUserData = {
+  user: {
+    name?: string
+    short_name?: string
+    pronouns?: string
+    id?: number | string
+    avatar_image_url?: string
+    sortable_name?: string
+    email?: string
+    pseudonyms?: Array<{
+      login_id?: number | string
+      sis_id?: number | string
+      integration_id?: number | string
+    }>
+  }
+}
+
 export function Component() {
   const mountPoint: HTMLElement | null = document.querySelector('#act_as_modal')
   if (!mountPoint) {
     return null
   }
+  const actAsUserData = (ENV as unknown as {act_as_user_data: ActAsUserData}).act_as_user_data
   return (
     <Portal open={true} mountNode={mountPoint}>
-      {/* @ts-expect-error */}
-      <ActAsModal user={ENV.act_as_user_data.user} />
+      <ActAsModal user={actAsUserData.user} />
     </Portal>
   )
 }

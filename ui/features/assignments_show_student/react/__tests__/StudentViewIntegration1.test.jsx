@@ -153,7 +153,7 @@ describe('student view integration tests', () => {
       })
     })
 
-    // TODO: Fix - file input element not rendering
+    // TODO: Fix - file input element not rendering due to GraphQL mock data not including required submission types
     it.skip('handles file upload successfully', async () => {
       uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')

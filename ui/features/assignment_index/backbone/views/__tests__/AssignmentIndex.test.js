@@ -126,7 +126,7 @@ describe('AssignmentIndex', () => {
     container = null
   })
 
-  it.skip('should filter by search term', () => {
+  it('should filter by search term', () => {
     const view = createAssignmentIndex()
     $('#search_term').val('foo')
     view.filterResults()
@@ -141,18 +141,18 @@ describe('AssignmentIndex', () => {
     expect(view.$el.find('.assignment').not('.hidden')).toHaveLength(2)
   })
 
-  it.skip('should have search disabled on render', () => {
+  it('should have search disabled on render', () => {
     const view = createAssignmentIndex()
     expect(view.$('#search_term').is(':disabled')).toBe(true)
   })
 
-  it.skip('should enable search on assignmentGroup reset', () => {
+  it('should enable search on assignmentGroup reset', () => {
     const view = createAssignmentIndex()
     assignmentGroups.reset()
     expect(view.$('#search_term').is(':disabled')).toBe(false)
   })
 
-  it.skip('enable search handler should only fire on the first reset', () => {
+  it('enable search handler should only fire on the first reset', () => {
     const enableSearchSpy = vi.spyOn(IndexView.prototype, 'enableSearch')
     createAssignmentIndex()
     assignmentGroups.reset()
@@ -162,7 +162,7 @@ describe('AssignmentIndex', () => {
     enableSearchSpy.mockRestore()
   })
 
-  it.skip('should show modules column correctly', () => {
+  it('should show modules column correctly', () => {
     fakeENV.setup({
       PERMISSIONS: {manage: true},
       URLS: {
@@ -227,7 +227,7 @@ describe('AssignmentIndex', () => {
     fakeENV.teardown()
   })
 
-  it.skip("should show 'Add Quiz/Test' button if quiz lti is enabled", () => {
+  it("should show 'Add Quiz/Test' button if quiz lti is enabled", () => {
     ENV.QUIZ_LTI_ENABLED = true
     ENV.FEATURES.instui_nav = false
     const view = createAssignmentIndex({withAssignmentSettings: true})
@@ -236,7 +236,7 @@ describe('AssignmentIndex', () => {
     expect($button.attr('href')).toMatch(/\?quiz_lti$/)
   })
 
-  it.skip("should not show 'Add Quiz/Test' button if quiz lti is not enabled", () => {
+  it("should not show 'Add Quiz/Test' button if quiz lti is not enabled", () => {
     ENV.QUIZ_LTI_ENABLED = false
     const view = createAssignmentIndex({withAssignmentSettings: true})
     expect(view.$('#new_quiz_lti')).toHaveLength(0)

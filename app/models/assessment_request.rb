@@ -151,7 +151,13 @@ class AssessmentRequest < ActiveRecord::Base
 
   def available?
     assignment = (assessor_asset || asset).assignment
-    assignment&.submitted?(submission: asset) && assignment.submitted?(submission: assessor_asset)
+    return false unless assignment&.submitted?(submission: asset)
+
+    if assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      return true unless assignment.peer_review_submission_required?
+    end
+
+    assignment.submitted?(submission: assessor_asset)
   end
 
   on_create_send_to_streams do

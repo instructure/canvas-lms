@@ -82,8 +82,7 @@ const buildResponseMessages = ({
     sendError(GENERIC_ERROR_CODE, message)
   }
 
-  // @ts-expect-error
-  const sendBadRequestError = message => {
+  const sendBadRequestError = (message: string) => {
     sendError(BAD_REQUEST_ERROR_CODE, message)
   }
 
@@ -99,8 +98,7 @@ const buildResponseMessages = ({
     sendError(UNAUTHORIZED_ERROR_CODE)
   }
 
-  // @ts-expect-error
-  const isResponse = message => !!message.data?.subject?.endsWith('.response')
+  const isResponse = (message: MessageEvent) => !!message.data?.subject?.endsWith('.response')
 
   return {
     sendResponse,

@@ -580,6 +580,26 @@ describe CoursePace do
       expect(result[:start_date_context]).to eq("user")
     end
 
+    it "uses latest enrollment when student is in multiple sections" do
+      student3 = user_model
+      section1 = @course.course_sections.create! name: "Section 1"
+      section2 = @course.course_sections.create! name: "Section 2"
+
+      enrollment1 = StudentEnrollment.create!(user: student3, course: @course, course_section: section1)
+      enrollment1.update start_at: "2022-01-15"
+      Timecop.freeze(1.day.from_now) do
+        enrollment2 = StudentEnrollment.create!(user: student3, course: @course, course_section: section2)
+        enrollment2.update start_at: "2022-01-20"
+      end
+
+      student_pace = @course.course_paces.create! user: student3
+      expect(student_pace.start_date.to_date).to eq(Date.parse("2022-01-20"))
+
+      result = student_pace.start_date(with_context: true)
+      expect(result[:start_date].to_date).to eq(Date.parse("2022-01-20"))
+      expect(result[:start_date_context]).to eq("user")
+    end
+
     it "returns section start if available" do
       other_section = @course.course_sections.create! name: "other_section", start_at: "2022-01-30"
       section_plan = @course.course_paces.create! course_section: other_section

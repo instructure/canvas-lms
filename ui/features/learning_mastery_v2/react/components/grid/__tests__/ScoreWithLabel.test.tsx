@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {ScoreWithLabel, ScoreWithLabelProps} from '../ScoreWithLabel'
-import {ScoreDisplayFormat} from '../../../utils/constants'
+import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 
 describe('ScoreWithLabel', () => {
   const defaultProps: ScoreWithLabelProps = {

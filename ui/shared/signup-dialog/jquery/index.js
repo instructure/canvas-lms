@@ -29,7 +29,6 @@ import addPrivacyLinkToDialog from './addPrivacyLinkToDialog'
 import htmlEscape from '@instructure/html-escape'
 import './validate'
 import '@canvas/jquery/jquery.instructure_forms'
-import '@canvas/util/jquery/fixDialogButtons'
 import extensions from '@canvas/bundles/extensions'
 
 const I18n = createI18nScope('registration')

@@ -90,10 +90,6 @@ describe('ActionMenuButton', () => {
   afterAll(() => server.close())
 
   describe('when item is a file', () => {
-    beforeEach(() => {
-      defaultProps.row = FAKE_FILES[0]
-    })
-
     it('renders all items for file type', async () => {
       const user = userEvent.setup()
       renderComponent()
@@ -349,13 +345,11 @@ describe('ActionMenuButton', () => {
   })
 
   describe('when item is a folder', () => {
-    beforeEach(() => {
-      defaultProps.row = FAKE_FOLDERS[0]
-    })
+    const folderProps = {...defaultProps, row: FAKE_FOLDERS[0]}
 
     it('renders all items for folder type', async () => {
       const user = userEvent.setup()
-      renderComponent()
+      renderComponent(folderProps)
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -376,7 +370,7 @@ describe('ActionMenuButton', () => {
       ENV.current_user_roles = ['student']
 
       const user = userEvent.setup()
-      renderComponent()
+      renderComponent(folderProps)
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()
@@ -393,7 +387,7 @@ describe('ActionMenuButton', () => {
     })
     it('does call correct download API with correct parameters', async () => {
       const user = userEvent.setup()
-      renderComponent()
+      renderComponent(folderProps)
 
       const button = screen.getByTestId('action-menu-button-large')
       await user.click(button)
@@ -407,7 +401,7 @@ describe('ActionMenuButton', () => {
 
     it('opens the rename modal', async () => {
       const user = userEvent.setup()
-      renderComponent()
+      renderComponent(folderProps)
 
       const button = screen.getByTestId('action-menu-button-large')
       await user.click(button)
@@ -425,7 +419,7 @@ describe('ActionMenuButton', () => {
       const fileMenuTools = [
         {id: '1', title: 'Tool1', base_url: 'http://toolone.com', icon_url: ''},
       ]
-      renderComponent({...defaultProps}, {fileMenuTools})
+      renderComponent(folderProps, {fileMenuTools})
       const menuButton = screen.getByTestId('action-menu-button-large')
       await user.click(menuButton)
       // necessary to make sure the menu is open
@@ -435,8 +429,9 @@ describe('ActionMenuButton', () => {
   })
 
   describe('Delete behavior', () => {
+    const fileProps = {...defaultProps, row: FAKE_FILES[0]}
+
     beforeEach(() => {
-      // Mock successful delete responses for both files and folders
       server.use(
         http.delete(/.*\/files\/\d+/, () => {
           return new HttpResponse(null, {status: 200})
@@ -449,7 +444,7 @@ describe('ActionMenuButton', () => {
 
     it('opens delete modal when delete button is clicked', async () => {
       const user = userEvent.setup()
-      renderComponent()
+      renderComponent(fileProps)
 
       const button = screen.getByTestId('action-menu-button-large')
       await user.click(button)
@@ -469,7 +464,7 @@ describe('ActionMenuButton', () => {
           return new HttpResponse(null, {status: 500})
         }),
       )
-      renderComponent()
+      renderComponent(fileProps)
 
       const button = screen.getByTestId('action-menu-button-large')
       await user.click(button)
@@ -482,14 +477,14 @@ describe('ActionMenuButton', () => {
 
       await waitFor(() => {
         expect(showFlashError).toHaveBeenCalledWith(
-          'An error occurred while deleting the items. Please try again.',
+          'Failed to delete the selected item. Please try again.',
         )
       })
     })
 
     it('does not render "Delete" when userCanDeleteFilesForContext is false', async () => {
       const user = userEvent.setup()
-      renderComponent({...defaultProps, userCanDeleteFilesForContext: false})
+      renderComponent({...fileProps, userCanDeleteFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
       expect(button).toBeInTheDocument()

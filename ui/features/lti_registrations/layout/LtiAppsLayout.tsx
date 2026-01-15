@@ -107,12 +107,15 @@ export const LtiAppsLayout = React.memo(() => {
       lti_version: '1p3',
       method: 'dynamic_registration',
       registering: false,
-      onSuccessfulInstallation: () => {
+      onSuccessfulInstallation: registrationId => {
         refreshRegistrations()
+        if (window.ENV.FEATURES.lti_registrations_next) {
+          navigate(`/manage/${registrationId}`)
+        }
       },
       jsonFetch: {_tag: 'initial'},
     })
-  }, [])
+  }, [navigate])
 
   return (
     <>

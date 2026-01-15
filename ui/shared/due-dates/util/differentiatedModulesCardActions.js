@@ -199,6 +199,9 @@ const CardActions = {
       reply_to_topic_due_at_overridden: !!dates.reply_to_topic_due_at,
       required_replies_due_at: dates.required_replies_due_at,
       required_replies_due_at_overridden: !!dates.required_replies_due_at,
+      peer_review_due_at: dates.peer_review_due_at,
+      peer_review_available_from: dates.peer_review_available_from,
+      peer_review_available_to: dates.peer_review_available_to,
       rowKey,
     }
 

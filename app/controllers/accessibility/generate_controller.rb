@@ -22,8 +22,10 @@ module Accessibility
     before_action :require_context
     before_action :require_user
     before_action :check_authorized_action
+    before_action :check_table_caption_feature, only: [:create_table_caption]
+    before_action :check_alt_text_feature, only: [:create_image_alt_text]
 
-    def create
+    def create_table_caption
       InstLLMHelper.with_rate_limit(user: @current_user, llm_config: LLMConfigs.config_for("alt_text_generate")) do
         response = Accessibility::Issue.new(context: @context).generate_fix(params[:rule], params[:content_type], params[:content_id], params[:path], params[:value])
         render json: response[:json], status: response[:status]
@@ -32,16 +34,38 @@ module Accessibility
       render json: { error: I18n.t("Endpoint rate limit exceeded.") }, status: :too_many_requests
     end
 
+    def create_image_alt_text
+      alt_text = Accessibility::AiGenerationService.new(
+        content_type: params[:content_type],
+        content_id: params[:content_id],
+        path: params[:path],
+        context: @context,
+        current_user: @current_user,
+        domain_root_account: @domain_root_account
+      ).generate_alt_text
+      render json: { value: alt_text }, status: :ok
+    rescue Accessibility::AiGenerationService::InvalidParameterError
+      render json: { error: "Attachment not found" }, status: :bad_request
+    end
+
     private
 
     def check_authorized_action
-      return render status: :forbidden unless @context.try(:a11y_checker_enabled?) && ai_text_generation_enabled?
+      return render status: :forbidden unless @context.try(:a11y_checker_enabled?)
 
       authorized_action(@context, @current_user, [:read, :update])
     end
 
-    def ai_text_generation_enabled?
-      Account.site_admin.feature_enabled?(:a11y_checker_ai_generation)
+    def check_table_caption_feature
+      unless Account.site_admin.feature_enabled?(:a11y_checker_ai_table_caption_generation)
+        render status: :forbidden
+      end
+    end
+
+    def check_alt_text_feature
+      unless Account.site_admin.feature_enabled?(:a11y_checker_ai_alt_text_generation)
+        render status: :forbidden
+      end
     end
   end
 end

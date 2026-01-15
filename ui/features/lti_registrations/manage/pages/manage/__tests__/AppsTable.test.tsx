@@ -231,6 +231,33 @@ describe('AppsTableInner', () => {
       expect(link).toHaveAttribute('href', '/manage/1')
     })
 
+    it('displays the appropriate columns', async () => {
+      const wrapper = renderTable({
+        tableProps: {
+          apps: {
+            data: [
+              mockRegistration(
+                'ExampleApp',
+                1,
+                {},
+                {created_by: 'Instructure', updated_by: 'Instructure'},
+              ),
+            ],
+            total: 1,
+          },
+        },
+      })
+
+      const columns = wrapper.getAllByRole('columnheader')
+      expect(columns).toHaveLength(6)
+      expect(columns[0]).toHaveTextContent('Name')
+      expect(columns[1]).toHaveTextContent('Nickname')
+      expect(columns[2]).toHaveTextContent('Installed On')
+      expect(columns[3]).toHaveTextContent('Version')
+      expect(columns[4]).toHaveTextContent('On/Off')
+      expect(columns[5]).toHaveTextContent('Status')
+    })
+
     it('shows condensed version of table', async () => {
       const wrapper = renderTable({
         tableProps: {
