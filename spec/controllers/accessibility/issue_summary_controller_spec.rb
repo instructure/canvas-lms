@@ -233,5 +233,45 @@ describe Accessibility::IssueSummaryController do
         end
       end
     end
+
+    context "with discussion topics" do
+      let(:discussion_topic) { discussion_topic_model(context: course) }
+      let(:discussion_scan) do
+        AccessibilityResourceScan.create!(
+          course_id: course.id,
+          discussion_topic_id: discussion_topic.id
+        )
+      end
+
+      before do
+        accessibility_issue_model(
+          course:,
+          accessibility_resource_scan: accessibility_scan,
+          rule_type: Accessibility::Rules::ImgAltRule.id,
+          node_path: "//img[1]",
+          workflow_state: "active"
+        )
+        accessibility_issue_model(
+          course:,
+          accessibility_resource_scan: discussion_scan,
+          rule_type: Accessibility::Rules::ImgAltFilenameRule.id,
+          node_path: "//img[2]",
+          workflow_state: "active"
+        )
+      end
+
+      it "includes issues from discussion topics in the summary" do
+        get :show, params: { course_id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        json_response = response.parsed_body
+
+        expect(json_response["total"]).to eq(2)
+        expect(json_response["by_rule_type"]).to eq({
+                                                      Accessibility::Rules::ImgAltRule.id => 1,
+                                                      Accessibility::Rules::ImgAltFilenameRule.id => 1
+                                                    })
+      end
+    end
   end
 end

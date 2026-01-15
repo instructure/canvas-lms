@@ -56,6 +56,8 @@ class AccessibilityResourceScan < ActiveRecord::Base
       url_helpers.course_assignment_path(course_id, context_id)
     when "Attachment"
       url_helpers.course_files_path(course_id, preview: context_id)
+    when "DiscussionTopic"
+      url_helpers.course_discussion_topic_path(course_id, context_id)
     end
   end
 

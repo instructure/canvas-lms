@@ -346,6 +346,26 @@ describe Accessibility::ResourceScannerService do
           expect(AccessibilityIssue.where(context: assignment).count).to be(0)
         end
       end
+
+      context "for a discussion topic with nil message" do
+        subject { described_class.new(resource: discussion_topic) }
+
+        let(:discussion_topic) { discussion_topic_model(context: course, message: nil) }
+        let!(:scan) { accessibility_resource_scan_model(course:, context: discussion_topic) }
+
+        it "completes the scan successfully" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("completed")
+        end
+
+        it "reports no issues for nil content" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.issue_count).to eq(0)
+          expect(AccessibilityIssue.where(context: discussion_topic).count).to be(0)
+        end
+      end
     end
 
     context "when the resource exceeds size limit" do
@@ -402,6 +422,86 @@ describe Accessibility::ResourceScannerService do
             "This file is too large to check. PDF attachments must not be greater than 5 MB."
           )
         end
+      end
+
+      context "for a discussion topic" do
+        subject { described_class.new(resource: discussion_topic) }
+
+        let(:discussion_topic) { discussion_topic_model(context: course) }
+        let!(:scan) { accessibility_resource_scan_model(course:, context: discussion_topic) }
+
+        before do
+          discussion_topic.update!(message: "a" * (Accessibility::ResourceScannerService::MAX_HTML_SIZE + 1))
+        end
+
+        it "fails the scan with an error message" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+          expect(scan.error_message).to eq(
+            "This content is too large to check. HTML body must not be greater than 125 KB."
+          )
+        end
+      end
+    end
+  end
+
+  describe "#log_to_datadog" do
+    let!(:scan) { accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "completed") }
+
+    before do
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    end
+
+    it "logs resources_scanned for all resource types" do
+      subject.send(:log_to_datadog, scan)
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+        "accessibility.resources_scanned",
+        tags: { cluster: scan.course.shard.database_server&.id }
+      )
+    end
+
+    context "for a wiki page" do
+      it "logs pages_scanned" do
+        subject.send(:log_to_datadog, scan)
+
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.pages_scanned",
+          tags: { cluster: scan.course.shard.database_server&.id }
+        )
+      end
+    end
+
+    context "for an assignment" do
+      subject { described_class.new(resource: assignment) }
+
+      let(:assignment) { assignment_model(course:) }
+      let!(:scan) { accessibility_resource_scan_model(course:, context: assignment, workflow_state: "completed") }
+
+      it "logs assignments_scanned" do
+        subject.send(:log_to_datadog, scan)
+
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.assignments_scanned",
+          tags: { cluster: scan.course.shard.database_server&.id }
+        )
+      end
+    end
+
+    context "for a discussion topic" do
+      subject { described_class.new(resource: discussion_topic) }
+
+      let(:discussion_topic) { discussion_topic_model(context: course) }
+      let!(:scan) { accessibility_resource_scan_model(course:, context: discussion_topic, workflow_state: "completed") }
+
+      it "logs discussion_topics_scanned" do
+        subject.send(:log_to_datadog, scan)
+
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.discussion_topics_scanned",
+          tags: { cluster: scan.course.shard.database_server&.id }
+        )
       end
     end
   end

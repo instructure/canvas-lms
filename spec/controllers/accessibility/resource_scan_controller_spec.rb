@@ -69,6 +69,38 @@ describe Accessibility::ResourceScanController do
   end
 
   describe "GET #index" do
+    context "with discussion topics" do
+      before do
+        accessibility_resource_scan_model(
+          course:,
+          context: discussion_topic_model(context: course),
+          workflow_state: "completed",
+          resource_name: "Discussion Topic Resource",
+          resource_workflow_state: :published,
+          issue_count: 1,
+          resource_updated_at: 1.day.ago
+        )
+      end
+
+      it "includes discussion topic scans" do
+        get :index, params: { course_id: course.id }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        resource_types = json.pluck("resource_type")
+        expect(resource_types).to include("DiscussionTopic")
+      end
+
+      it "sorts discussion topics by resource_type" do
+        get :index, params: { course_id: course.id, sort: "resource_type", direction: "asc" }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        discussion_scan = json.find { |scan| scan["resource_type"] == "DiscussionTopic" }
+        expect(discussion_scan).to be_present
+      end
+    end
+
     %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].each do |sort_param|
       it "sorts by #{sort_param} ascending and descending" do
         # Ascending order
@@ -226,6 +258,28 @@ describe Accessibility::ResourceScanController do
           json = response.parsed_body
           expect(json.length).to eq(1)
           expect(json.all? { |scan| scan["resource_type"] == "Assignment" }).to be true
+        end
+
+        context "with discussion topics" do
+          before do
+            accessibility_resource_scan_model(
+              course:,
+              context: discussion_topic_model(context: course),
+              workflow_state: "completed",
+              resource_name: "Discussion",
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
+
+          it "filters by discussion_topic resource type" do
+            get :index, params: { course_id: course.id, filters: { artifactTypes: ["discussion_topic"] } }, format: :json
+            expect(response).to have_http_status(:ok)
+
+            json = response.parsed_body
+            expect(json.length).to eq(1)
+            expect(json.first["resource_type"]).to eq("DiscussionTopic")
+          end
         end
 
         it "filters by workflow states" do

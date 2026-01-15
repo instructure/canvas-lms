@@ -93,6 +93,7 @@ module Accessibility
                            WHEN wiki_page_id IS NOT NULL THEN 'wiki_page'
                            WHEN assignment_id IS NOT NULL THEN 'assignment'
                            WHEN attachment_id IS NOT NULL THEN 'attachment'
+                           WHEN discussion_topic_id IS NOT NULL THEN 'discussion_topic'
                          END
                        SQL
                        Arel.sql("#{type_case} #{direction}")
