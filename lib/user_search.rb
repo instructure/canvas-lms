@@ -95,7 +95,7 @@ module UserSearch
       include_inactive_enrollments = !!options[:include_inactive_enrollments]
       case context
       when Account
-        users = User.of_account_cte(context).active
+        users = User.of_account(context).active
         users = users.union(context.pseudonym_users) if @include_deleted_users
         users
       when Course
