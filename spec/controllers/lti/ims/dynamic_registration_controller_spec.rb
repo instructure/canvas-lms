@@ -169,7 +169,7 @@ describe Lti::IMS::DynamicRegistrationController do
           created_registration = Lti::IMS::Registration.last
           expect(created_registration.privacy_level).to eq("email_only")
           expect(created_registration).not_to be_nil
-          expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/registrations/#{created_registration.global_id}/view"
+          expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/accounts/#{created_registration.lti_registration.account.global_id}/registrations/#{created_registration.global_id}/view"
           expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
           expect(created_registration.unified_tool_id).to eq("asdf")
           expect(created_registration.registration_url).to eq("https://example.com/registration")
@@ -300,7 +300,7 @@ describe Lti::IMS::DynamicRegistrationController do
               created_registration = Lti::IMS::Registration.last
               expect(created_registration.privacy_level).to eq("email_only")
               expect(created_registration).not_to be_nil
-              expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/registrations/#{created_registration.global_id}/view"
+              expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/accounts/#{created_registration.lti_registration.account.global_id}/registrations/#{created_registration.global_id}/view"
               expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
               expect(created_registration.unified_tool_id).to eq("asdf")
               expect(created_registration.registration_url).to eq("https://example.com/registration")

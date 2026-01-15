@@ -3234,7 +3234,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/registrations/:registration_id", action: :show
       put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
       get "accounts/:account_id/dr_iframe", action: :dr_iframe
-      get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
+      get "accounts/:account_id/registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
       put "registrations/:registration_id", action: :update, as: :update_lti_registration
       get "registrations/:registration_id", action: :show_configuration, as: :get_lti_registration
