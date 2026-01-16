@@ -18,10 +18,11 @@
 
 import React from 'react'
 import {render, act, fireEvent, waitFor} from '@testing-library/react'
-
+import userEvent from '@testing-library/user-event'
 import {DashboardHeader} from '../DashboardHeader'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {resetPlanner} from '@canvas/planner'
+import fetchMock from 'fetch-mock'
 
 vi.mock('@canvas/planner', async () => {
   const actual = await vi.importActual('@canvas/planner')
@@ -241,6 +242,97 @@ describe('DashboardHeader', () => {
       const loadCardDashboardSpy = vi.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
       render(<FakeDashboardHeader {...defaultProps} preloadedCards={[]} />)
       expect(loadCardDashboardSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Dashboard Toggle Button', () => {
+    let reloadSpy
+
+    beforeEach(() => {
+      delete window.location
+      window.location = {reload: vi.fn()}
+      reloadSpy = window.location.reload
+      fetchMock.restore()
+    })
+
+    afterEach(() => {
+      fetchMock.restore()
+    })
+
+    it('renders switch button when widget_dashboard_overridable is false', () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+      }
+
+      const {getByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      expect(getByTestId('switch-to-new-dashboard-button')).toBeInTheDocument()
+      expect(getByTestId('switch-to-new-dashboard-button')).toHaveTextContent(
+        'Switch to new dashboard view',
+      )
+    })
+
+    it('does not render switch button when widget_dashboard_overridable is undefined', () => {
+      window.ENV = {
+        ...defaultEnv,
+        current_user_id: '1',
+      }
+
+      const {queryByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      expect(queryByTestId('switch-to-new-dashboard-button')).not.toBeInTheDocument()
+    })
+
+    it('does not render switch button when widget_dashboard_overridable is true', () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: true,
+        current_user_id: '1',
+      }
+
+      const {queryByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      expect(queryByTestId('switch-to-new-dashboard-button')).not.toBeInTheDocument()
+    })
+
+    it('calls API and reloads page when switch button is clicked', async () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+      }
+
+      fetchMock.put('/api/v1/users/1/settings', {
+        widget_dashboard_user_preference: true,
+      })
+
+      const {getByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      const switchButton = getByTestId('switch-to-new-dashboard-button')
+
+      await act(async () => {
+        fireEvent.click(switchButton)
+      })
+
+      await waitFor(() => {
+        expect(fetchMock.called('/api/v1/users/1/settings')).toBe(true)
+      })
+
+      await waitFor(() => {
+        expect(reloadSpy).toHaveBeenCalled()
+      })
+    })
+
+    it('renders switch button in responsive view', () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+        FEATURES: {
+          instui_header: true,
+        },
+      }
+
+      const {getByTestId} = render(<FakeDashboardHeader {...defaultProps} responsiveSize="small" />)
+      expect(getByTestId('switch-to-new-dashboard-button')).toBeInTheDocument()
     })
   })
 })

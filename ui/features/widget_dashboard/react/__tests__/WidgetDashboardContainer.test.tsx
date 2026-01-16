@@ -316,3 +316,83 @@ describe('WidgetDashboardContainer - Observer Options', () => {
     cleanup()
   })
 })
+
+describe('WidgetDashboardContainer - Dashboard Toggle Button', () => {
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'error'})
+  })
+
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user_id: '123',
+    })
+    clearWidgetDashboardCache()
+    Object.defineProperty(window, 'location', {
+      value: {reload: vi.fn()},
+      writable: true,
+    })
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+    if (queryClient) {
+      queryClient.clear()
+    }
+    fakeENV.teardown()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
+  it('should render switch to old dashboard button when widget_dashboard_overridable is set', () => {
+    fakeENV.setup({
+      current_user_id: '123',
+      widget_dashboard_overridable: true,
+    })
+
+    const {getByTestId, cleanup} = setup()
+
+    expect(getByTestId('switch-to-old-dashboard-button')).toBeInTheDocument()
+    expect(getByTestId('switch-to-old-dashboard-button')).toHaveTextContent(
+      'Switch to old dashboard view',
+    )
+
+    cleanup()
+  })
+
+  it('should not render switch button when widget_dashboard_overridable is undefined', () => {
+    const {queryByTestId, cleanup} = setup()
+
+    expect(queryByTestId('switch-to-old-dashboard-button')).not.toBeInTheDocument()
+
+    cleanup()
+  })
+
+  it('should not render switch button when widget_dashboard_overridable is false', () => {
+    fakeENV.setup({
+      current_user_id: '123',
+      widget_dashboard_overridable: false,
+    })
+
+    const {queryByTestId, cleanup} = setup()
+
+    expect(queryByTestId('switch-to-old-dashboard-button')).not.toBeInTheDocument()
+
+    cleanup()
+  })
+
+  it('should render clickable switch button', async () => {
+    fakeENV.setup({
+      current_user_id: '123',
+      widget_dashboard_overridable: true,
+    })
+
+    const {getByTestId, cleanup} = setup()
+
+    const switchButton = getByTestId('switch-to-old-dashboard-button')
+    expect(switchButton).toBeEnabled()
+
+    cleanup()
+  })
+})
