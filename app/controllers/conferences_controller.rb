@@ -194,8 +194,7 @@ class ConferencesController < ApplicationController
     conferences = if @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
                     @context.web_conferences.active
                   else
-                    active_conferences = @context.web_conferences.active
-                    active_conferences.with_participant(@current_user).or(active_conferences.concluded)
+                    @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
                   end
     conferences = conferences.with_config_for(context: @context).order(created_at: :desc, id: :desc)
     api_request? ? api_index(conferences, polymorphic_url([:api_v1, @context, :conferences])) : web_index(conferences)
@@ -226,15 +225,15 @@ class ConferencesController < ApplicationController
     bookmarker = Plannable::Bookmarker.new(WebConference, true, :created_at, :id)
 
     courses_collection = ShardedBookmarkedCollection.build(bookmarker, @current_user.enrollments) do |enrollments_scope|
-      active_conferences = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
-      conference_scope = active_conferences.with_participant(@current_user).or(active_conferences.concluded)
+      conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
+                                      .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order(created_at: :desc, id: :desc)
     end
 
     groups_collection = ShardedBookmarkedCollection.build(bookmarker, @current_user.groups) do |groups_scope|
-      active_conferences = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
-      conference_scope = active_conferences.with_participant(@current_user).or(active_conferences.concluded)
+      conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
+                                      .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order(created_at: :desc, id: :desc)
     end
@@ -344,13 +343,21 @@ class ConferencesController < ApplicationController
 
   def create
     if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
-      calendar_event_param = params[:web_conference].try(:delete, :calendar_event).try(&:to_i)
+      calendar_event_param = params[:web_conference].try(:delete, :calendar_event)
       @conference = @context.web_conferences.build(conference_params)
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, include_host: true)
       @conference.user = @current_user
       respond_to do |format|
         if @conference.save
-          if calendar_event_param && calendar_event_param == 1
+          # Detect and track invite_all option
+          # Match the logic in member_ids method
+          remove_observers = value_to_boolean(params.dig(:observers, :remove))
+          invite_all = !params[:user] || value_to_boolean(params.dig(:user, :all)) || remove_observers
+
+          @conference.invite_all_enabled = invite_all
+          @conference.remove_observers_enabled = remove_observers if remove_observers
+
+          if value_to_boolean(calendar_event_param)
             calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
             calendar_event&.save
           end
@@ -378,23 +385,14 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
-        sync_attendees = params[:web_conference].try(:delete, :sync_attendees).try(&:to_i)
-
-        @conference.invite_users_from_context if sync_attendees == 1
-
-        calendar_event_param = params[:web_conference].try(:delete, :calendar_event).try(&:to_i)
+        calendar_event_param = params[:web_conference].try(:delete, :calendar_event)
         if @conference.update(conference_params)
-          # TODO: ability to dis-invite people
-          @conference.invite_users_from_context(member_ids) unless sync_attendees == 1
-
-          unless sync_attendees == 1
-            if calendar_event_param && calendar_event_param == 1
-              calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
-              calendar_event&.save
-            elsif @conference.calendar_event
-              @conference.calendar_event.destroy
-              @conference.calendar_event = nil
-            end
+          if value_to_boolean(calendar_event_param)
+            calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
+            calendar_event&.save
+          elsif @conference.calendar_event
+            @conference.calendar_event.destroy
+            @conference.calendar_event = nil
           end
 
           @conference.save

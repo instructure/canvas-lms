@@ -48,7 +48,6 @@ ConferenceView.prototype.template = template
 
 ConferenceView.prototype.events = {
   'click .edit_conference_link': 'edit',
-  'click .sync_conference_link': 'syncAttendees',
   'click .delete_conference_link': 'delete',
   'click .close_conference_link': 'close',
   'click .start-button': 'start',
@@ -69,69 +68,6 @@ ConferenceView.prototype.initialize = function () {
   })
 
   return this.model.on('change', this.render)
-}
-
-ConferenceView.prototype.syncAttendees = function (e) {
-  let ref, ref1
-  if ((ref = this.el.querySelector("a[data-testid='settings-cog']")) != null) {
-    ref.classList.add('ui-state-disabled')
-  }
-  if ((ref1 = this.el.querySelector("a[data-testid='start-button']")) != null) {
-    ref1.setAttribute('disabled', '')
-  }
-  const atag = e.target
-  const form = atag.parentElement.querySelector('form')
-  const conference_name = form.querySelector("[name='web_conference[title]']").value || ''
-  const spinner = React.createElement(Spinner, {
-    renderTitle: 'Loading',
-    size: 'x-small',
-  })
-  const spinnerText = React.createElement(
-    Text,
-    {
-      size: 'small',
-    },
-    I18n.t(' Attendee sync in progress... '),
-  )
-  const spinnerDomEl = this.el.querySelector('.conference-loading-indicator')
-
-  ReactDOM.render([spinner, spinnerText], spinnerDomEl)
-  this.el.querySelector('.conference-loading-indicator').style.display = 'block'
-  this.$(form).formSubmit({
-    object_name: 'web_conference',
-    success: (function (_this) {
-      return function (data) {
-        let ref2, ref3
-        _this.model.set(data)
-        _this.model.trigger('sync')
-        _this.el.querySelector('.conference-loading-indicator').style.display = 'none'
-        ReactDOM.unmountComponentAtNode(spinnerDomEl)
-        $.flashMessage(conference_name + I18n.t(' Attendees Synced!'))
-        if ((ref2 = _this.el.querySelector("a[data-testid='settings-cog']")) != null) {
-          ref2.classList.remove('ui-state-disabled')
-        }
-        return (ref3 = _this.el.querySelector("a[data-testid='start-button']")) != null
-          ? ref3.removeAttribute('disabled')
-          : void 0
-      }
-    })(this),
-    error: (function (_this) {
-      return function () {
-        let ref2, ref3
-        _this.show(_this.model)
-        _this.el.querySelector('.conference-loading-indicator').style.display = 'none'
-        ReactDOM.unmountComponentAtNode(spinnerDomEl)
-        $.flashError(conference_name + I18n.t(' Attendees Failed to Sync.'))
-        if ((ref2 = _this.el.querySelector("a[data-testid='settings-cog']")) != null) {
-          ref2.classList.remove('ui-state-disabled')
-        }
-        return (ref3 = _this.el.querySelector("a[data-testid='start-button']")) != null
-          ? ref3.removeAttribute('disabled')
-          : void 0
-      }
-    })(this),
-  })
-  return this.$(form).submit()
 }
 
 ConferenceView.prototype.edit = function (_e) {

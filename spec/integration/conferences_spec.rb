@@ -42,11 +42,10 @@ describe ConferencesController do
       @conference = WebConference.first
       expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2])
 
-      @student3 = student_in_course(active_all: true, user: user_with_pseudonym(username: "student3@example.com")).user
+      @student3 = user_with_pseudonym(username: "student3@example.com")
       @student3.register!
       @student3.email_channel.confirm!
-      put "/courses/#{@course.id}/conferences/#{@conference.id}", params: { web_conference: { "title" => "moar" }, user: { @student3.id => "1" } }
-      expect(response).to be_redirect
+      student_in_course(user: @student3, active_all: true)
       expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2, @student3])
     end
 
