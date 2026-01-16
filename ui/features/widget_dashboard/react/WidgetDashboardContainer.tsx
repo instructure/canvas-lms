@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useMemo} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
@@ -36,6 +36,7 @@ import FeedbackQuestionTile from './components/FeedbackQuestionTile'
 import {useResponsiveContext} from './hooks/useResponsiveContext'
 import {useWidgetDashboardEdit} from './hooks/useWidgetDashboardEdit'
 import {useWidgetLayout} from './hooks/useWidgetLayout'
+import {toggleDashboardView} from '@canvas/dashboard-toggle/utils/dashboardToggle'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -47,6 +48,7 @@ const WidgetDashboardContainer: React.FC = () => {
     useWidgetDashboardEdit()
   const {config, resetConfig, saveLayout} = useWidgetLayout()
   const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
+  const [switchingDashboard, setSwitchingDashboard] = useState(false)
 
   const handleChangeObservedUser = useMemo(() => getHandleChangeObservedUser(), [])
 
@@ -71,6 +73,15 @@ const WidgetDashboardContainer: React.FC = () => {
     exitEditMode()
   }
 
+  const handleSwitchToOldDashboard = async () => {
+    setSwitchingDashboard(true)
+    try {
+      await toggleDashboardView(false)
+    } catch {
+      setSwitchingDashboard(false)
+    }
+  }
+
   return (
     <View as="div">
       <DashboardNotifications />
@@ -92,6 +103,17 @@ const WidgetDashboardContainer: React.FC = () => {
                 {I18n.t('Dashboard')}
               </Heading>
             </Flex.Item>
+            {ENV.widget_dashboard_overridable === true && (
+              <Flex.Item>
+                <Button
+                  onClick={handleSwitchToOldDashboard}
+                  disabled={switchingDashboard}
+                  data-testid="switch-to-old-dashboard-button"
+                >
+                  {I18n.t('Switch to old dashboard view')}
+                </Button>
+              </Flex.Item>
+            )}
             {isCustomizationEnabled && isDesktop && (
               <>
                 {isEditMode ? (
