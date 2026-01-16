@@ -330,9 +330,6 @@
   <% js_bundle 'submissions_show_preview_media' %>
 <% elsif @submission.submission_type == 'basic_lti_launch' %>
   <meta HTTP-EQUIV="REFRESH" content="0; url=<%= presenter.submission_details_tool_launch_url %>"/>
-<% elsif @assignment.quiz_lti? && !@submission.has_submission? %>
-  <%# New Quiz without submission yet - embed the quiz in borderless mode %>
-  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= presenter.assignment_tool_launch_url %>"/>
 <% elsif @submission.submission_type == "student_annotation" %>
   <div class="ef-file-preview-stretch">
     <iframe
