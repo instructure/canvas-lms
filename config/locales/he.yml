@@ -4358,6 +4358,7 @@ he:
   close_grade_info_58ef5a20: "סגור/י את המידע על ציונים"
   close_move_tray_8609e988: "סגירת העברת תיבה"
   close_opportunity_center_popup_9907d981: "חלון קופץ של סגירת מרכז ההזדמנויות"
+  close_rubric_a0fc8166: "סגירת רובריקה"
   close_sidebar_10b0fbb4: "סגירת סרגל-צד"
   close_submission_tray_c4988fa8: "סגירת תיבת הגשות"
   closed_for_comments_e395b42f: "סגור להערות"
@@ -10211,6 +10212,7 @@ he:
   hide_groups_navigation_menu_62e8b3d0: "הסתרת תפריט ניווט קבוצות"
   hide_navigation_menu_f0b3e90: "הסתרת תפריט ניווט"
   hide_notes_column_7749f408: "הסתרת עמודת ההערות"
+  hide_rubric_27903c8: "הסתרת רובריקה"
   hide_score_total_for_assessment_results_d0ef117f: "הסתרת הציון הכולל של תוצאות ההערכה"
   hide_sidebar_2b5b3776: "הסתרת ניווט צידי"
   hide_student_names_3e59e862: "הסתרת שמות תלמידים"
@@ -14964,6 +14966,7 @@ he:
   print_d0e3d53f: הדפסה
   priority_dd4381ee: עדיפות
   privacy_290109ea: פרטיות
+  privacy_notice_7eff08fe: "הערת צנעת הפרט"
   privacy_policy_c68f482a: "מדיניות פרטיות"
   private_copyrighted_3cac9686: "פרטי (מוגן בזכויות יוצרים)"
   process_as_ui_changes_8e34ed2a: "עבד כשינויי UI"
