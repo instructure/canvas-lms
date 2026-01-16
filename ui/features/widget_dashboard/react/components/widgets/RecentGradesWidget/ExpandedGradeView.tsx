@@ -50,7 +50,11 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
       <Flex direction="column" gap="small">
         <Flex.Item>
           <GradeDisplay
+            score={submission.score}
+            pointsPossible={submission.assignment.pointsPossible}
             grade={submission.grade}
+            excused={submission.excused}
+            gradingType={submission.assignment.gradingType}
             courseGrade={courseGrade}
             submissionId={submission._id}
           />

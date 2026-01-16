@@ -21,18 +21,44 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = createI18nScope('widget_dashboard')
 
 interface GradeDisplayProps {
+  score: number | null
+  pointsPossible: number | null
   grade: string | null
+  excused: boolean
+  gradingType: string
   courseGrade: number | null
   submissionId: string
 }
 
-export const GradeDisplay: React.FC<GradeDisplayProps> = ({grade, courseGrade, submissionId}) => {
-  // TODO: update to handle all possible grade formats
-  const assignmentGradeText = grade || I18n.t('No grade')
+export const GradeDisplay: React.FC<GradeDisplayProps> = ({
+  score,
+  pointsPossible,
+  grade,
+  excused,
+  gradingType,
+  courseGrade,
+  submissionId,
+}) => {
+  // If the submission is excused, pass "EX" to the formatter which will handle it properly
+  const gradeToFormat = excused ? 'EX' : grade
+
+  const assignmentGradeText = GradeFormatHelper.formatGrade(gradeToFormat, {
+    gradingType,
+    pointsPossible: pointsPossible ?? undefined,
+    score: score ?? undefined,
+    defaultValue: I18n.t('No grade'),
+    restrict_quantitative_data: ENV?.restrict_quantitative_data,
+    grading_scheme: ENV?.grading_scheme,
+    points_based_grading_scheme: ENV?.points_based,
+    scaling_factor: ENV?.scaling_factor,
+    formatType: 'points_out_of_fraction',
+  })
+
   const courseGradeText =
     courseGrade !== null ? I18n.t('%{grade}%', {grade: courseGrade}) : I18n.t('N/A')
 
