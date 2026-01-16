@@ -37,7 +37,7 @@ class Course < ActiveRecord::Base
 
   restrict_columns :content, [:syllabus_body]
 
-  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
+  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by, :saving_user
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   alias_attribute :short_name, :course_code
@@ -414,6 +414,18 @@ class Course < ActiveRecord::Base
                      rescue => e
                        Rails.logger.warn("Error checking syllabus_versioning flag: #{e.message}")
                        false
+                     end
+                   },
+                   on_create: lambda { |course, version|
+                     if course.saving_user
+                       begin
+                         yaml_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+                         yaml_data["user_id"] = course.saving_user.id
+                         version.yaml = yaml_data.to_yaml
+                         version.save
+                       rescue => e
+                         Rails.logger.error("Failed to add user_id to course version: #{e.message}")
+                       end
                      end
                    }
 

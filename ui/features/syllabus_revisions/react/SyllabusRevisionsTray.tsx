@@ -36,6 +36,10 @@ interface SyllabusVersion {
   created_at: string
   syllabus_body: string
   updated_at?: string
+  edited_by?: {
+    id: number
+    name: string
+  }
 }
 
 interface SyllabusRevisionsTrayProps {
@@ -237,8 +241,14 @@ export default function SyllabusRevisionsTray({
                         themeOverride={isSelected ? {backgroundPrimary: '#E0EBF5'} : undefined}
                       >
                         <View as="div" margin="0 0 xx-small 0">
-                          <Text weight="bold" lineHeight="condensed">
-                            {formatDateTime(version.created_at)}
+                          <Text lineHeight="condensed">
+                            <Text weight="bold">{formatDateTime(version.created_at)}</Text>
+                            {version.edited_by && (
+                              <>
+                                {' '}
+                                {I18n.t('by')} {version.edited_by.name}
+                              </>
+                            )}
                           </Text>
                         </View>
                         {revisionText(version, index) && (
