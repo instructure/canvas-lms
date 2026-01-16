@@ -29,13 +29,19 @@ import {Alert} from '@instructure/ui-alerts'
 import {IconPlayLine, IconXLine, IconRefreshLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {LLMConversationMessage, LLMConversationViewProps} from '../../types'
+import type {
+  LLMConversationMessage,
+  LLMConversationViewProps,
+  ConversationProgress,
+} from '../../types'
+import ConversationProgressComponent from './ConversationProgress'
 
 const I18n = createI18nScope('ai_experiences')
 
 interface ConversationResponse {
   id: string
   messages: LLMConversationMessage[]
+  progress?: ConversationProgress
 }
 
 const LLMConversationView: React.FC<LLMConversationViewProps> = ({
@@ -53,6 +59,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 }) => {
   const [messages, setMessages] = useState<LLMConversationMessage[]>([])
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [progress, setProgress] = useState<ConversationProgress | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isInitializing, setIsInitializing] = useState(false)
@@ -133,6 +140,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
       if (activeConversation?.id && activeConversation?.messages) {
         setConversationId(activeConversation.id)
         setMessages(activeConversation.messages)
+        setProgress(activeConversation.progress || null)
         setError(null)
       } else {
         // No active conversation, create a new one
@@ -144,6 +152,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
         if (newConversation?.id && newConversation?.messages) {
           setConversationId(newConversation.id)
           setMessages(newConversation.messages)
+          setProgress(newConversation.progress || null)
           setError(null)
         }
       }
@@ -181,6 +190,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
       if (json?.messages) {
         setMessages(json.messages)
+        setProgress(json.progress || null)
         setError(null)
       }
     } catch (error) {
@@ -215,6 +225,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
       if (json?.id && json?.messages) {
         setConversationId(json.id)
         setMessages(json.messages)
+        setProgress(json.progress || null)
         setError(null)
       }
     } catch (error) {
@@ -257,16 +268,23 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           }
         }}
       >
-        <Flex gap="small" alignItems="center">
-          <IconPlayLine size="small" />
-          <View>
-            <Heading level="h3" margin="0 0 xx-small 0">
-              {I18n.t('Preview')}
-            </Heading>
-            <Text size="small">
-              {I18n.t('Here, you can have a chat with the AI just like a student would.')}
-            </Text>
-          </View>
+        <Flex gap="small" alignItems="center" justifyItems="space-between">
+          <Flex gap="small" alignItems="center">
+            <IconPlayLine size="small" />
+            <View>
+              <Heading level="h3" margin="0 0 xx-small 0">
+                {I18n.t('Preview')}
+              </Heading>
+              <Text size="small">
+                {I18n.t('Here, you can have a chat with the AI just like a student would.')}
+              </Text>
+            </View>
+          </Flex>
+          {progress && (
+            <View as="div" minWidth="200px">
+              <ConversationProgressComponent progress={progress} />
+            </View>
+          )}
         </Flex>
       </View>
     )
@@ -324,6 +342,11 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             {I18n.t('Restart')}
           </Button>
         </Flex>
+        {progress && (
+          <View as="div" margin="small 0 0 0">
+            <ConversationProgressComponent progress={progress} />
+          </View>
+        )}
       </View>
 
       {/* Chat conversation section */}

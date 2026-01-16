@@ -22,6 +22,16 @@ export interface LLMConversationMessage {
   timestamp?: Date
 }
 
+export interface ConversationProgress {
+  current: number
+  total: number
+  percentage: number
+  objectives: Array<{
+    objective: string
+    status: '' | 'covered'
+  }>
+}
+
 export interface LLMConversationViewProps {
   isOpen: boolean
   onClose: () => void
