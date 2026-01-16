@@ -433,12 +433,13 @@ describe LLMConversationClient do
     it "fetches and converts messages" do
       result = client_with_conversation_id.messages
 
-      expect(result).to be_an(Array)
-      expect(result.length).to eq(2)
-      expect(result[0][:role]).to eq("User")
-      expect(result[0][:text]).to eq("User message")
-      expect(result[1][:role]).to eq("Assistant")
-      expect(result[1][:text]).to eq("Assistant message")
+      expect(result).to be_a(Hash)
+      expect(result[:messages]).to be_an(Array)
+      expect(result[:messages].length).to eq(2)
+      expect(result[:messages][0][:role]).to eq("User")
+      expect(result[:messages][0][:text]).to eq("User message")
+      expect(result[:messages][1][:role]).to eq("Assistant")
+      expect(result[:messages][1][:text]).to eq("Assistant message")
     end
 
     it "raises ConversationError when conversation_id is not set" do
@@ -450,6 +451,96 @@ describe LLMConversationClient do
         .to_return(status: 404, body: "Not Found")
 
       expect { client_with_conversation_id.messages }.to raise_error(LlmConversation::Errors::ConversationError)
+    end
+  end
+
+  describe "#messages_with_conversation_progress" do
+    before do
+      allow(described_class).to receive_messages(base_url: "http://localhost:3001", bearer_token: "test-bearer-token")
+    end
+
+    let(:conversation_response) do
+      {
+        "success" => true,
+        "data" => {
+          "id" => conversation_id,
+          "learning_objective_progress" => {
+            "objectives" => [
+              { "objective" => "Learn basics", "status" => "covered" },
+              { "objective" => "Advanced topics", "status" => "" }
+            ]
+          }
+        }
+      }
+    end
+
+    let(:messages_response) do
+      {
+        "success" => true,
+        "data" => [
+          {
+            "id" => "msg1",
+            "text" => "User message",
+            "is_llm_message" => false
+          }
+        ]
+      }
+    end
+
+    before do
+      stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 200, body: conversation_response.to_json, headers: { "Content-Type" => "application/json" })
+
+      stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 200, body: messages_response.to_json, headers: { "Content-Type" => "application/json" })
+    end
+
+    it "fetches messages and progress from conversation endpoint" do
+      result = client_with_conversation_id.messages_with_conversation_progress
+
+      expect(result).to be_a(Hash)
+      expect(result[:messages]).to be_an(Array)
+      expect(result[:progress]).to be_a(Hash)
+      expect(result[:progress][:percentage]).to eq(50)
+      expect(result[:progress][:current]).to eq(1)
+      expect(result[:progress][:total]).to eq(2)
+      expect(result[:progress][:objectives]).to be_an(Array)
+      expect(result[:progress][:objectives].length).to eq(2)
+    end
+  end
+
+  describe "#extract_progress_from_data" do
+    it "extracts and calculates progress correctly" do
+      progress_data = {
+        "objectives" => [
+          { "objective" => "Objective 1", "status" => "covered" },
+          { "objective" => "Objective 2", "status" => "" },
+          { "objective" => "Objective 3", "status" => "covered" }
+        ]
+      }
+
+      result = client.send(:extract_progress_from_data, progress_data)
+
+      expect(result[:current]).to eq(2)
+      expect(result[:total]).to eq(3)
+      expect(result[:percentage]).to eq(67)
+      expect(result[:objectives]).to eq(progress_data["objectives"])
+    end
+
+    it "returns nil when progress_data is nil" do
+      result = client.send(:extract_progress_from_data, nil)
+      expect(result).to be_nil
+    end
+
+    it "handles empty objectives array" do
+      progress_data = { "objectives" => [] }
+      result = client.send(:extract_progress_from_data, progress_data)
+
+      expect(result[:current]).to eq(0)
+      expect(result[:total]).to eq(0)
+      expect(result[:percentage]).to eq(0)
     end
   end
 end
