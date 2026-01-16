@@ -28,50 +28,93 @@ describe('AIExperiencesEmptyState', () => {
     vi.clearAllMocks()
   })
 
-  it('renders the spaceman image', () => {
-    render(<AIExperiencesEmptyState onCreateNew={mockOnCreateNew} />)
+  describe('Teacher view (canManage = true)', () => {
+    it('renders the spaceman image', () => {
+      render(<AIExperiencesEmptyState canManage={true} onCreateNew={mockOnCreateNew} />)
 
-    const image = screen.getByAltText('Spaceman floating in space')
-    expect(image).toBeInTheDocument()
-    expect(image).toHaveAttribute('src', '/images/spaceman.png')
+      const image = screen.getByAltText('Spaceman floating in space')
+      expect(image).toBeInTheDocument()
+      expect(image).toHaveAttribute('src', '/images/spaceman.png')
+    })
+
+    it('renders the teacher empty state heading', () => {
+      render(<AIExperiencesEmptyState canManage={true} onCreateNew={mockOnCreateNew} />)
+
+      expect(screen.getByText('No AI experiences created yet.')).toBeInTheDocument()
+    })
+
+    it('renders the teacher empty state description', () => {
+      render(<AIExperiencesEmptyState canManage={true} onCreateNew={mockOnCreateNew} />)
+
+      expect(
+        screen.getByText('Click the Create New button to start building your first AI experience.'),
+      ).toBeInTheDocument()
+    })
+
+    it('renders the Create new button', () => {
+      render(<AIExperiencesEmptyState canManage={true} onCreateNew={mockOnCreateNew} />)
+
+      expect(screen.getByText('Create new')).toBeInTheDocument()
+    })
+
+    it('calls onCreateNew when Create new button is clicked', async () => {
+      const user = userEvent.setup()
+      render(<AIExperiencesEmptyState canManage={true} onCreateNew={mockOnCreateNew} />)
+
+      const createButton = screen.getByText('Create new').closest('button')
+      await user.click(createButton!)
+
+      expect(mockOnCreateNew).toHaveBeenCalledTimes(1)
+    })
+
+    it('has the plus icon on the Create new button', () => {
+      render(<AIExperiencesEmptyState canManage={true} onCreateNew={mockOnCreateNew} />)
+
+      const createButton = screen.getByText('Create new').closest('button')
+      const icon = createButton!.querySelector('svg')
+
+      expect(icon).toBeInTheDocument()
+    })
   })
 
-  it('renders the empty state heading', () => {
-    render(<AIExperiencesEmptyState onCreateNew={mockOnCreateNew} />)
+  describe('Student view (canManage = false)', () => {
+    it('renders the spaceman image', () => {
+      render(<AIExperiencesEmptyState canManage={false} onCreateNew={mockOnCreateNew} />)
 
-    expect(screen.getByText('No AI experiences created yet.')).toBeInTheDocument()
-  })
+      const image = screen.getByAltText('Spaceman floating in space')
+      expect(image).toBeInTheDocument()
+      expect(image).toHaveAttribute('src', '/images/spaceman.png')
+    })
 
-  it('renders the empty state description', () => {
-    render(<AIExperiencesEmptyState onCreateNew={mockOnCreateNew} />)
+    it('renders the student empty state heading', () => {
+      render(<AIExperiencesEmptyState canManage={false} onCreateNew={mockOnCreateNew} />)
 
-    expect(
-      screen.getByText('Click the Create New button to start building your first AI experience.'),
-    ).toBeInTheDocument()
-  })
+      expect(screen.getByText('No AI experiences available yet.')).toBeInTheDocument()
+    })
 
-  it('renders the Create new button', () => {
-    render(<AIExperiencesEmptyState onCreateNew={mockOnCreateNew} />)
+    it('renders the student empty state description', () => {
+      render(<AIExperiencesEmptyState canManage={false} onCreateNew={mockOnCreateNew} />)
 
-    expect(screen.getByText('Create new')).toBeInTheDocument()
-  })
+      expect(
+        screen.getByText('Your instructor has not published any AI experiences yet.'),
+      ).toBeInTheDocument()
+    })
 
-  it('calls onCreateNew when Create new button is clicked', async () => {
-    const user = userEvent.setup()
-    render(<AIExperiencesEmptyState onCreateNew={mockOnCreateNew} />)
+    it('does not render the Create new button', () => {
+      render(<AIExperiencesEmptyState canManage={false} onCreateNew={mockOnCreateNew} />)
 
-    const createButton = screen.getByText('Create new').closest('button')
-    await user.click(createButton!)
+      expect(screen.queryByText('Create new')).not.toBeInTheDocument()
+    })
 
-    expect(mockOnCreateNew).toHaveBeenCalledTimes(1)
-  })
+    it('does not show teacher-specific messaging', () => {
+      render(<AIExperiencesEmptyState canManage={false} onCreateNew={mockOnCreateNew} />)
 
-  it('has the plus icon on the Create new button', () => {
-    render(<AIExperiencesEmptyState onCreateNew={mockOnCreateNew} />)
-
-    const createButton = screen.getByText('Create new').closest('button')
-    const icon = createButton!.querySelector('svg')
-
-    expect(icon).toBeInTheDocument()
+      expect(screen.queryByText('No AI experiences created yet.')).not.toBeInTheDocument()
+      expect(
+        screen.queryByText(
+          'Click the Create New button to start building your first AI experience.',
+        ),
+      ).not.toBeInTheDocument()
+    })
   })
 })

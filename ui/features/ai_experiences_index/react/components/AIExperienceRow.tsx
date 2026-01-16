@@ -27,6 +27,7 @@ import {Menu} from '@instructure/ui-menu'
 import {IconPublishSolid, IconUnpublishedLine, IconMoreLine} from '@instructure/ui-icons'
 
 interface AIExperienceRowProps {
+  canManage: boolean
   id: number
   title: string
   workflowState: 'published' | 'unpublished'
@@ -38,6 +39,7 @@ interface AIExperienceRowProps {
 }
 
 const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
+  canManage,
   id,
   title,
   workflowState,
@@ -89,67 +91,71 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
           </View>
         </Flex.Item>
 
-        <Flex.Item>
-          <Flex alignItems="center" gap="small">
-            <Flex.Item>
-              <Text size="small" color="secondary">
-                {isPublished ? I18n.t('Published') : I18n.t('Not published')}
-              </Text>
-            </Flex.Item>
-            <Flex.Item>
-              <IconButton
-                size="small"
-                withBackground={false}
-                withBorder={false}
-                onClick={handlePublishToggle}
-                screenReaderLabel={
-                  isPublished ? I18n.t('Unpublish AI Experience') : I18n.t('Publish AI Experience')
-                }
-                data-testid="ai-experience-publish-toggle"
-              >
-                {isPublished ? (
-                  <IconPublishSolid color="success" size="x-small" />
-                ) : (
-                  <IconUnpublishedLine color="secondary" size="x-small" />
-                )}
-              </IconButton>
-            </Flex.Item>
-            <Flex.Item>
-              <Menu
-                trigger={
-                  <IconButton
-                    size="small"
-                    withBackground={false}
-                    withBorder={false}
-                    screenReaderLabel={I18n.t('AI Experience Options')}
-                    data-testid="ai-experience-menu"
+        {canManage && (
+          <Flex.Item>
+            <Flex alignItems="center" gap="small">
+              <Flex.Item>
+                <Text size="small" color="secondary">
+                  {isPublished ? I18n.t('Published') : I18n.t('Not published')}
+                </Text>
+              </Flex.Item>
+              <Flex.Item>
+                <IconButton
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                  onClick={handlePublishToggle}
+                  screenReaderLabel={
+                    isPublished
+                      ? I18n.t('Unpublish AI Experience')
+                      : I18n.t('Publish AI Experience')
+                  }
+                  data-testid="ai-experience-publish-toggle"
+                >
+                  {isPublished ? (
+                    <IconPublishSolid color="success" size="x-small" />
+                  ) : (
+                    <IconUnpublishedLine color="secondary" size="x-small" />
+                  )}
+                </IconButton>
+              </Flex.Item>
+              <Flex.Item>
+                <Menu
+                  trigger={
+                    <IconButton
+                      size="small"
+                      withBackground={false}
+                      withBorder={false}
+                      screenReaderLabel={I18n.t('AI Experience Options')}
+                      data-testid="ai-experience-menu"
+                    >
+                      <IconMoreLine />
+                    </IconButton>
+                  }
+                >
+                  <Menu.Item
+                    data-testid="ai-experiences-index-edit-menu-item"
+                    onSelect={() => onEdit(id)}
                   >
-                    <IconMoreLine />
-                  </IconButton>
-                }
-              >
-                <Menu.Item
-                  data-testid="ai-experiences-index-edit-menu-item"
-                  onSelect={() => onEdit(id)}
-                >
-                  {I18n.t('Edit')}
-                </Menu.Item>
-                <Menu.Item
-                  data-testid="ai-experiences-index-test-conversation-menu-item"
-                  onSelect={() => onTestConversation(id)}
-                >
-                  {I18n.t('Test Conversation')}
-                </Menu.Item>
-                <Menu.Item
-                  data-testid="ai-experiences-index-delete-menu-item"
-                  onSelect={() => onDelete(id)}
-                >
-                  {I18n.t('Delete')}
-                </Menu.Item>
-              </Menu>
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
+                    {I18n.t('Edit')}
+                  </Menu.Item>
+                  <Menu.Item
+                    data-testid="ai-experiences-index-test-conversation-menu-item"
+                    onSelect={() => onTestConversation(id)}
+                  >
+                    {I18n.t('Test Conversation')}
+                  </Menu.Item>
+                  <Menu.Item
+                    data-testid="ai-experiences-index-delete-menu-item"
+                    onSelect={() => onDelete(id)}
+                  >
+                    {I18n.t('Delete')}
+                  </Menu.Item>
+                </Menu>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        )}
       </Flex>
     </View>
   )

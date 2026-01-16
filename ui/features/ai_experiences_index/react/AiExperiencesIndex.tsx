@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
-import {IconAddLine} from '@instructure/ui-icons'
+import {IconAddLine, IconAiColoredSolid} from '@instructure/ui-icons'
 import AIExperienceList from './components/AIExperienceList'
 import AIExperiencesEmptyState from './components/AIExperiencesEmptyState'
 import type {AiExperience} from './types'
@@ -34,6 +34,7 @@ const AiExperiencesIndex: React.FC = () => {
   const [experiences, setExperiences] = useState<AiExperience[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [canManage, setCanManage] = useState(false)
 
   useEffect(() => {
     const fetchExperiences = async () => {
@@ -55,7 +56,8 @@ const AiExperiencesIndex: React.FC = () => {
         }
 
         const data = await response.json()
-        setExperiences(data)
+        setExperiences(data.experiences)
+        setCanManage(data.can_manage)
       } catch (err) {
         // TODO: Show flash alert to user for fetch error
         setError(err instanceof Error ? err.message : 'An error occurred')
@@ -167,9 +169,16 @@ const AiExperiencesIndex: React.FC = () => {
       <View as="div" margin="0 0 medium 0">
         <Flex justifyItems="space-between" alignItems="center">
           <Flex.Item>
-            <Heading level="h1">{I18n.t('AI Experiences')}</Heading>
+            <Flex alignItems="center" gap="small">
+              <Flex.Item>
+                <IconAiColoredSolid size="small" />
+              </Flex.Item>
+              <Flex.Item>
+                <Heading level="h1">{I18n.t('AI Experiences')}</Heading>
+              </Flex.Item>
+            </Flex>
           </Flex.Item>
-          {experiences.length > 0 && (
+          {experiences.length > 0 && canManage && (
             <Flex.Item>
               <Button
                 data-testid="ai-expriences-index-create-new-button"
@@ -185,9 +194,10 @@ const AiExperiencesIndex: React.FC = () => {
       </View>
 
       {experiences.length === 0 ? (
-        <AIExperiencesEmptyState onCreateNew={handleCreateNew} />
+        <AIExperiencesEmptyState canManage={canManage} onCreateNew={handleCreateNew} />
       ) : (
         <AIExperienceList
+          canManage={canManage}
           experiences={experiences}
           onEdit={handleEdit}
           onTestConversation={handleTestConversation}

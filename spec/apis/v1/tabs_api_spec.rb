@@ -562,6 +562,7 @@ describe TabsController, type: :request do
                                     a_hash_including({ "id" => "home" }),
                                     a_hash_including({ "id" => "syllabus" }),
                                     a_hash_including({ "id" => "people" }),
+                                    a_hash_including({ "id" => "ai_experiences" }),
                                   ])
     end
 

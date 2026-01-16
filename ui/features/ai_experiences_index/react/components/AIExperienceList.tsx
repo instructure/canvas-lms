@@ -22,6 +22,7 @@ import AIExperienceRow from './AIExperienceRow'
 import type {AiExperience} from '../types'
 
 interface AIExperienceListProps {
+  canManage: boolean
   experiences: AiExperience[]
   onEdit: (id: number) => void
   onTestConversation: (id: number) => void
@@ -30,6 +31,7 @@ interface AIExperienceListProps {
 }
 
 const AIExperienceList: React.FC<AIExperienceListProps> = ({
+  canManage,
   experiences,
   onEdit,
   onTestConversation,
@@ -47,6 +49,7 @@ const AIExperienceList: React.FC<AIExperienceListProps> = ({
       {experiences.map((experience, index) => (
         <React.Fragment key={experience.id}>
           <AIExperienceRow
+            canManage={canManage}
             id={experience.id}
             title={experience.title}
             workflowState={experience.workflow_state}

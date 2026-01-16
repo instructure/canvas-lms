@@ -711,6 +711,7 @@ describe CoursesController, type: :request do
                                                   a_hash_including({ "id" => "grades" }),
                                                   a_hash_including({ "id" => "people" }),
                                                   a_hash_including({ "id" => "syllabus" }),
+                                                  a_hash_including({ "id" => "ai_experiences" }),
                                                 ])
     end
 
