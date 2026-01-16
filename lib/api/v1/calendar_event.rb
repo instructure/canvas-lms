@@ -29,32 +29,6 @@ module Api::V1::CalendarEvent
   include Api::V1::Conferences
   include ::RruleHelper
 
-  # Convert context codes to global IDs when object is on different shard than request
-  # @example Single context code
-  #   globalize_context_codes("course_2", shard5, shard1)  => "course_50000000000002"
-  # @example Multiple context codes (comma-separated)
-  #   globalize_context_codes("course_2,group_3", shard5, shard1) => "course_50000000000002,group_50000000000003"
-  def globalize_context_codes(context_codes, object_shard, request_shard)
-    return context_codes if object_shard == request_shard
-    return context_codes unless context_codes
-
-    if context_codes.is_a?(String)
-      codes = context_codes.split(",")
-      result = codes.map do |code|
-        type, id = code.split("_", 2)
-        global_id = Shard.global_id_for(id.to_i, object_shard)
-        "#{type}_#{global_id}"
-      end
-      result.join(",")
-    else
-      context_codes.map do |code|
-        type, id = code.split("_", 2)
-        global_id = Shard.global_id_for(id.to_i, object_shard)
-        "#{type}_#{global_id}"
-      end
-    end
-  end
-
   def event_json(event, user, session, options = {})
     if event.is_a?(::CalendarEvent)
       calendar_event_json(event, user, session, options)
@@ -92,7 +66,6 @@ module Api::V1::CalendarEvent
                rrule
                blackout_date]
     )
-
     if user
       hash["location_address"] = event.location_address
       hash["location_name"] = event.location_name
@@ -118,51 +91,33 @@ module Api::V1::CalendarEvent
                                    options[:child_events_count] || event.child_events.size
                                  end
 
+    request_shard = options[:request_shard] || @request_shard || user.shard
     if event.effective_context_code
+      effective_context_code = (request_shard == event.shard) ? event.effective_context_code : event.sharded_effective_context_code
       if appointment_group && include_child_events
         common_context_codes = common_ag_context_codes(appointment_group, user, event, options[:for_scheduler])
-        effective_context_code = (event.effective_context_code.split(",") & common_context_codes).first
-        if effective_context_code
-          hash["context_code"] = hash["effective_context_code"] = effective_context_code
+        matched_common_context = (effective_context_code.split(",") & common_context_codes).first
+        if matched_common_context
+          hash["context_code"] = hash["effective_context_code"] = matched_common_context
         else
           # the teacher has no courses in common with the signups
           include_child_events = false
           hash["child_events"] = []
           hash["child_events_count"] = 0
-          hash["effective_context_code"] = event.effective_context_code
+          hash["effective_context_code"] = effective_context_code
         end
       else
-        hash["effective_context_code"] = event.effective_context_code
+        hash["effective_context_code"] = effective_context_code
       end
-      hash["all_context_codes"] = event.effective_context_code
+      hash["all_context_codes"] = effective_context_code
     else
       hash["all_context_codes"] = Context.context_code_for(event)
     end
     hash["context_code"] ||= Context.context_code_for(event)
-
-    request_shard = options[:request_shard] || @request_shard || user.shard
-    if event.shard != request_shard
-      if event.parent_calendar_event_id
-        hash["id"] = "#{event.shard.id}~#{event.local_id}"
-      end
-      hash["effective_context_code"] = globalize_context_codes(hash["effective_context_code"], event.shard, request_shard)
-      hash["all_context_codes"] = globalize_context_codes(hash["all_context_codes"], event.shard, request_shard)
-
-      original_context_code = Context.context_code_for(event)
-      hash["context_code"] = globalize_context_codes(hash["context_code"], event.shard, request_shard) if hash["context_code"] == original_context_code
-    end
     hash["context_name"] = context.try(:nickname_for, user)
     hash["context_color"] = context.try(:course_color)
 
-    hash["parent_event_id"] = if event.parent_calendar_event_id
-                                parent_shard = Shard.shard_for(event.parent_calendar_event_id)
-                                if parent_shard == request_shard
-                                  event.parent_calendar_event_id
-                                else
-                                  parent_event = event.parent_event
-                                  "#{parent_event.shard.id}~#{parent_event.local_id}"
-                                end
-                              end
+    hash["parent_event_id"] = request_shard.activate { event.parent_calendar_event_id }
     # events are hidden when section-specific events override them
     # but if nobody is logged in, no sections apply, so show the base event
     hash["hidden"] = user ? event.hidden? : false
@@ -176,12 +131,8 @@ module Api::V1::CalendarEvent
       end
     end
     if appointment_group
-      hash["appointment_group_id"] = if appointment_group.shard == request_shard
-                                       appointment_group.id
-                                     else
-                                       "#{appointment_group.shard.id}~#{appointment_group.local_id}"
-                                     end
-      hash["appointment_group_url"] = api_v1_appointment_group_url(appointment_group)
+      hash["appointment_group_id"] = request_shard.activate { appointment_group.id }
+      hash["appointment_group_url"] = request_shard.activate { api_v1_appointment_group_url(appointment_group) }
       hash["can_manage_appointment_group"] = appointment_group.grants_right?(user, session, :manage)
       hash["participant_type"] = appointment_group.participant_type
       if options[:current_participant] && event.has_asset?(options[:current_participant])
@@ -240,11 +191,7 @@ module Api::V1::CalendarEvent
     end
 
     if options.key?(:url_override) ? options[:url_override] || hash["own_reservation"] : event.grants_right?(user, session, :read)
-      hash["url"] = if event.shard == request_shard || !event.parent_calendar_event_id
-                      api_v1_calendar_event_url(event)
-                    else
-                      api_v1_calendar_event_url("#{event.shard.id}~#{event.local_id}")
-                    end
+      hash["url"] = request_shard.activate { api_v1_calendar_event_url(event) }
     end
     hash["html_url"] = calendar_url_for(options[:effective_context] || event.effective_context, event:)
     if duplicates
@@ -367,12 +314,10 @@ module Api::V1::CalendarEvent
     end
 
     request_shard = @request_shard || user.shard
-    context_codes = group.shard.activate { group.context_codes }
-    hash["context_codes"] = globalize_context_codes(context_codes, group.shard, request_shard)
+    hash["context_codes"] = request_shard.activate { group.contexts.map(&:asset_string) }
 
     if include.include?("all_context_codes") && group.grants_right?(user, session, :manage)
-      all_context_codes = group.shard.activate { group.context_codes }
-      hash["all_context_codes"] = globalize_context_codes(all_context_codes, group.shard, request_shard)
+      hash["all_context_codes"] = request_shard.activate { group.contexts.map(&:asset_string) }
     end
     hash["requiring_action"] = group.requiring_action?(user)
     if group.new_appointments.present?
