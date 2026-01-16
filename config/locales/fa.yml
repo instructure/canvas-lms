@@ -5530,6 +5530,7 @@ fa:
   close_for_comments_ce0e5d00: "بستن امکان ارسال نظر"
   close_grade_info_58ef5a20: "بستن اطلاعات نمره"
   close_move_tray_8609e988: "بستن سینی انتقال"
+  close_rubric_a0fc8166: "بستن دستورالعمل ارزیابی"
   close_sidebar_10b0fbb4: "بستن نوار کناری"
   close_student_details_2f6900: "بستن جزئیات دانشجو"
   close_submission_tray_c4988fa8: "بستن سینی موارد ارسالی"
@@ -12589,6 +12590,7 @@ fa:
   hide_outcomes_with_no_results_7e4ce06f: "مخفی کردن خروجی های بدون نتیجه"
   hide_params_eadf0961: "پنهان کردن پارامترها"
   hide_projections_9d4ed1e1: "مخفی کردن پیش بینی ها"
+  hide_rubric_27903c8: "مخفی کردن دستورالعمل ارزیابی"
   hide_score_total_for_assessment_results_d0ef117f: "مخفی کردن کل نمره برای نتایج ارزیابی"
   hide_sidebar_2b5b3776: "مخفی کردن نوار کناری"
   hide_student_names_3e59e862: "مخفی کردن نام دانشجویان"
@@ -18425,6 +18427,7 @@ fa:
   priority_dd4381ee: اولویت
   privacy_290109ea: "حریم خصوصی"
   privacy_level_f0ec09a3: "سطح حریم خصوصی"
+  privacy_notice_7eff08fe: "اطلاعیه حریم خصوصی"
   privacy_policy_c68f482a: "سیاست حریم خصوصی"
   private_3883d133: خصوصی
   private_copyrighted_3cac9686: "خصوصی (دارای حق تکثیر)"
