@@ -29,6 +29,7 @@ export interface AIExperience {
   workflow_state?: string
   created_at?: string
   updated_at?: string
+  can_manage: boolean
 }
 
 export interface EnvAiExperiences {

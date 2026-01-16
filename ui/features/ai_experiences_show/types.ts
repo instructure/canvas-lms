@@ -24,6 +24,7 @@ export interface AIExperience {
   facts: string
   learning_objective: string
   pedagogical_guidance: string
+  can_manage: boolean
 }
 
 export interface AIExperienceShowProps {
