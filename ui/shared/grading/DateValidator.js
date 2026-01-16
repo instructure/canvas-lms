@@ -105,6 +105,9 @@ const DATE_RANGE_ERRORS = {
       get unlock() {
         return I18n.t('Unlock date cannot be before assignment unlock date')
       },
+      get due() {
+        return I18n.t('Unlock date cannot be before assignment due date')
+      },
     },
     end_range: {
       get peerReviewDueAt() {
@@ -119,6 +122,9 @@ const DATE_RANGE_ERRORS = {
     start_range: {
       get unlock() {
         return I18n.t('Due date cannot be before assignment unlock date')
+      },
+      get due() {
+        return I18n.t('Due date cannot be before assignment due date')
       },
     },
     end_range: {
@@ -292,6 +298,18 @@ export default class DateValidator {
       })
     }
 
+    // Peer review available from must be >= due_at (assignment due date)
+    if (peerReviewAvailableFrom && dueAt) {
+      datetimesToValidate.push({
+        date: dueAt,
+        validationDates: {
+          peer_review_available_from: peerReviewAvailableFrom,
+        },
+        range: 'start_range',
+        type: 'due',
+      })
+    }
+
     // Peer review available from must be < lock_at (assignment available to)
     if (peerReviewAvailableFrom && lockAt) {
       datetimesToValidate.push({
@@ -304,7 +322,7 @@ export default class DateValidator {
       })
     }
 
-    // Peer review available from must be < peer review due date (strict inequality)
+    // Peer review available from must be <= peer review due date
     if (peerReviewDueAt && peerReviewAvailableFrom) {
       datetimesToValidate.push({
         date: peerReviewDueAt,
@@ -313,7 +331,6 @@ export default class DateValidator {
         },
         range: 'end_range',
         type: 'peerReviewDueAt',
-        strict: true,
       })
     }
 
@@ -341,7 +358,7 @@ export default class DateValidator {
       })
     }
 
-    // Peer review due date must be > assignment available from (unlock_at)
+    // Peer review due date must be >= assignment available from (unlock_at)
     if (peerReviewDueAt && unlockAt) {
       datetimesToValidate.push({
         date: unlockAt,
@@ -353,7 +370,19 @@ export default class DateValidator {
       })
     }
 
-    // Peer review due date must be < lock_at (assignment available to)
+    // Peer review due date must be >= assignment due date
+    if (peerReviewDueAt && dueAt) {
+      datetimesToValidate.push({
+        date: dueAt,
+        validationDates: {
+          peer_review_due_at: peerReviewDueAt,
+        },
+        range: 'start_range',
+        type: 'due',
+      })
+    }
+
+    // Peer review due date must be <= lock_at (assignment available to)
     if (peerReviewDueAt && lockAt) {
       datetimesToValidate.push({
         date: lockAt,
