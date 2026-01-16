@@ -153,6 +153,12 @@ describe AiExperiencesController do
         expect(experience["title"]).to eq(@ai_experience.title)
       end
 
+      it "returns can_manage true in JSON response" do
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+        json_response = json_parse(response.body)
+        expect(json_response["can_manage"]).to be true
+      end
+
       it "sets the active tab and page title" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }
         expect(assigns(:active_tab)).to eq("ai_experiences")
@@ -163,9 +169,30 @@ describe AiExperiencesController do
     context "as student" do
       before { user_session(@student) }
 
-      it "returns forbidden" do
+      it "returns success for published experiences" do
+        @ai_experience.update!(workflow_state: "published")
         get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
-        assert_forbidden
+        expect(response).to be_successful
+      end
+
+      it "returns can_manage false in JSON response" do
+        @ai_experience.update!(workflow_state: "published")
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+        json_response = json_parse(response.body)
+        expect(json_response["can_manage"]).to be false
+      end
+
+      it "returns forbidden for unpublished experiences" do
+        @ai_experience.update!(workflow_state: "unpublished")
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "renders unauthorized page for unpublished experiences in HTML format" do
+        @ai_experience.update!(workflow_state: "unpublished")
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(response).to have_http_status(:unauthorized)
+        expect(response).to render_template("shared/unauthorized")
       end
     end
   end
