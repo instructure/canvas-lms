@@ -858,6 +858,104 @@ describe "peer review student landing page" do
     end
   end
 
+  context "must review allocation rules with unavailable submissions" do
+    before(:once) do
+      @must_review_assignment = assignment_model({
+                                                   course: @course,
+                                                   peer_reviews: true,
+                                                   automatic_peer_reviews: false,
+                                                   peer_review_count: 2,
+                                                   points_possible: 10,
+                                                   submission_types: "online_text_entry",
+                                                   peer_review_submission_required: false
+                                                 })
+
+      @must_review_assignment.submit_homework(@student2, body: "student 2 attempt", submission_type: "online_text_entry")
+      @must_review_assignment.submit_homework(@student3, body: "student 3 attempt", submission_type: "online_text_entry")
+
+      AllocationRule.create!(
+        course: @course,
+        assignment: @must_review_assignment,
+        assessor: @student1,
+        assessee: @student4,
+        must_review: true,
+        review_permitted: true
+      )
+    end
+
+    it "allocates must_review peer even when their submission is unavailable", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @must_review_assignment.id)
+
+      submission = @must_review_assignment.submissions.find_by(user: @student1)
+      assessment_requests = AssessmentRequest.where(assessor_asset: submission)
+
+      expect(assessment_requests.count).to eq(2)
+
+      allocated_user_ids = assessment_requests.map(&:user_id)
+      expect(allocated_user_ids).to include(@student4.id)
+    end
+
+    it "shows unavailable view when selecting must_review peer with no submission", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @must_review_assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("This student has not yet submitted their work.")
+    end
+
+    it "does not show submit button for unavailable must_review peer", custom_timeout: 30 do
+      @must_review_assignment.assign_peer_review(@student1, @student4) # must_review, no submission
+
+      visit_peer_reviews_page(@course.id, @must_review_assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      expect(f("[data-testid='unavailable-peer-review']")).to be_displayed
+      expect(f("div[id='submission']")).not_to contain_css("button[data-testid='submit-peer-review-button']")
+    end
+
+    it "does not show comments section for unavailable must_review peer", custom_timeout: 30 do
+      @must_review_assignment.assign_peer_review(@student1, @student4) # must_review, no submission
+
+      visit_peer_reviews_page(@course.id, @must_review_assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      expect(f("[data-testid='unavailable-peer-review']")).to be_displayed
+      expect(f("div[id='submission']")).not_to contain_css("button[data-testid='toggle-comments-button']")
+    end
+
+    it "shows correct count in selector with mixed available and unavailable peers", custom_timeout: 30 do
+      student5 = student_in_course(name: "Student 5", course: @course, enrollment_state: :active).user
+
+      AllocationRule.create!(
+        course: @course,
+        assignment: @must_review_assignment,
+        assessor: @student1,
+        assessee: student5,
+        must_review: true,
+        review_permitted: true
+      )
+
+      @must_review_assignment.update!(peer_review_count: 3)
+
+      visit_peer_reviews_page(@course.id, @must_review_assignment.id)
+
+      selector = f("input[data-testid='peer-review-selector']")
+      options = INSTUI_Select_options(selector)
+
+      expect(options.length).to eq(3)
+      option_names = options.map(&:text)
+      expect(option_names).to contain_exactly("Peer Review (1 of 3)", "Peer Review (2 of 3)", "Peer Review (3 of 3)")
+    end
+  end
+
   context "peer review lock date" do
     before(:once) do
       @lock_date_assignment = assignment_model({

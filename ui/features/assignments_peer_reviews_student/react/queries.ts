@@ -79,6 +79,7 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
           body
           submissionType
           url
+          submittedAt
           attachments {
             _id
             displayName

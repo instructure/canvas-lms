@@ -150,6 +150,15 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     return selectedAssessmentIndex >= availableCount
   }
 
+  const getUnavailableReason = () => {
+    const selectedAssessment = assessmentRequestsForCurrentUser?.[selectedAssessmentIndex]
+
+    // If the assessment request exists but submission hasn't been submitted yet
+    if (selectedAssessment && !selectedAssessment.submission?.submittedAt) {
+      return I18n.t('This student has not yet submitted their work.')
+    }
+  }
+
   if (isLoading) {
     return (
       <View as="div" padding="medium" textAlign="center">
@@ -279,30 +288,29 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
             padding="0"
             data-testid="submission-tab"
           >
-            {isUnavailableReviewSelected() ? (
-              <UnavailablePeerReview />
+            {isUnavailableReviewSelected() ||
+            !assessmentRequestsForCurrentUser?.[selectedAssessmentIndex]?.submission
+              ?.submittedAt ? (
+              <UnavailablePeerReview reason={getUnavailableReason()} />
             ) : (
-              assessmentRequestsForCurrentUser &&
-              assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
-                <AssignmentSubmission
-                  submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
-                  isPeerReviewCompleted={
-                    assessmentRequestsForCurrentUser[selectedAssessmentIndex].workflowState ===
-                    'completed'
-                  }
-                  rubricAssessment={
-                    assessmentRequestsForCurrentUser[selectedAssessmentIndex].rubricAssessment
-                  }
-                  assignment={data.assignment}
-                  reviewerSubmission={reviewerSubmission}
-                  isMobile={isMobile}
-                  handleNextPeerReview={handleNextPeerReview}
-                  onPeerReviewSubmitted={handlePeerReviewSubmitted}
-                  hasSeenPeerReviewModal={hasSeenPeerReviewModal}
-                  isReadOnly={isPastLockDate}
-                  isAnonymous={isAnonymous}
-                />
-              )
+              <AssignmentSubmission
+                submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission!}
+                isPeerReviewCompleted={
+                  assessmentRequestsForCurrentUser[selectedAssessmentIndex].workflowState ===
+                  'completed'
+                }
+                rubricAssessment={
+                  assessmentRequestsForCurrentUser[selectedAssessmentIndex].rubricAssessment
+                }
+                assignment={data.assignment}
+                reviewerSubmission={reviewerSubmission}
+                isMobile={isMobile}
+                handleNextPeerReview={handleNextPeerReview}
+                onPeerReviewSubmitted={handlePeerReviewSubmitted}
+                hasSeenPeerReviewModal={hasSeenPeerReviewModal}
+                isReadOnly={isPastLockDate}
+                isAnonymous={isAnonymous}
+              />
             )}
           </Tabs.Panel>
         )}

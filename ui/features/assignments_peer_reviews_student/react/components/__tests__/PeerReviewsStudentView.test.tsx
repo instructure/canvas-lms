@@ -391,6 +391,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>Student submission text</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-11-01T12:00:00Z',
               },
             },
           ],
@@ -423,6 +424,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>This is the peer review submission</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-11-01T12:00:00Z',
               },
             },
           ],
@@ -470,6 +472,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>First submission</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-11-01T12:00:00Z',
               },
             },
             {
@@ -482,6 +485,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>Second submission</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-11-02T12:00:00Z',
               },
             },
           ],
@@ -635,6 +639,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>Submission text</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-11-01T12:00:00Z',
               },
             },
           ],
@@ -676,6 +681,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>Submission</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-11-01T12:00:00Z',
               },
             },
           ],
@@ -1637,6 +1643,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>Student submission</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-09-10T12:00:00Z',
               },
             },
           ],
@@ -1803,6 +1810,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>First submission</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-11-01T12:00:00Z',
               },
             },
           ],
@@ -1861,6 +1869,7 @@ describe('PeerReviewsStudentView', () => {
                 attempt: 1,
                 body: '<p>Submission content</p>',
                 submissionType: 'online_text_entry',
+                submittedAt: '2025-11-01T12:00:00Z',
               },
             },
           ],
@@ -2137,6 +2146,170 @@ describe('PeerReviewsStudentView', () => {
 
       await waitFor(() => {
         expect(getByText('Peer: Pikachu')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Assessments without submissions', () => {
+    it('displays "This student has not yet submitted" message when assessment has no submission', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '31',
+          name: 'Must Review Assignment',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,        
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: false,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 0,
+                body: null,
+                submissionType: 'online_text_entry',
+                submittedAt: null,
+              },
+            },
+          ],
+        },
+      })
+      
+      const {getByTestId, getByText} = setup({assignmentId: '31'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+      
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
+        expect(
+          getByText(
+            'This student has not yet submitted their work. Check back later or contact your instructor.',
+          ),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('displays UnavailablePeerReview when submission has no submittedAt', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '32',
+          name: 'Assignment with Unsubmitted Work',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 1,        
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: false,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
+                _id: 'sub-1',
+                attempt: 0,
+                submissionType: 'online_text_entry',
+                submittedAt: null,
+              },
+            },
+          ],
+        },
+      })
+      
+      const {getByTestId, getByText, queryByTestId} = setup({assignmentId: '32'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+      
+      const user = userEvent.setup()
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('assignment-submission')).not.toBeInTheDocument()
+    })
+
+    it('shows correct assessment when multiple assessments exist with and without submissions', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '33',
+          name: 'Mixed Assessment States',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,        
+          },
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',            
+                submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                body: '<p>Submitted work</p>',
+                submissionType: 'online_text_entry',
+                submittedAt: '2025-11-01T12:00:00Z',
+              },
+            },
+            {
+              _id: 'ar-2',            
+              available: false,
+              workflowState: 'assigned',
+              createdAt: '2025-11-02T00:00:00Z',
+              submission: {
+                _id: 'sub-2',
+                attempt: 0,
+                body: null,
+                submissionType: 'online_text_entry',
+                submittedAt: null,
+              },
+            },
+          ],
+        },
+      })
+      
+      const {getByTestId, getByText} = setup({assignmentId: '33'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      const selector = getByTestId('peer-review-selector')      
+      
+      await user.click(getByText('Submission'))
+
+      await waitFor(() => {
+        expect(getByTestId('text-entry-content')).toBeInTheDocument()
+      })
+
+      await user.click(selector)
+      await user.click(getByText('Peer Review (2 of 2)'))
+
+      await waitFor(() => {
+        expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
+        expect(
+          getByText(
+            'This student has not yet submitted their work. Check back later or contact your instructor.',
+          ),
+        ).toBeInTheDocument()
       })
     })
   })

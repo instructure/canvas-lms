@@ -38,9 +38,8 @@ export const PeerReviewSelector = ({
   onSelectionChange,
   requiredPeerReviewCount,
 }: PeerReviewSelectorProps) => {
-  const availableAssessments = (assessmentRequests ?? []).filter(
-    assessment => assessment.available === true,
-  )
+  // Include all assessment requests (both available and unavailable due to missing submissions)
+  const availableAssessments = assessmentRequests ?? []
   const hasAssessments = availableAssessments.length > 0
   const unavailableCount = Math.max(0, requiredPeerReviewCount - availableAssessments.length)
 
@@ -50,11 +49,21 @@ export const PeerReviewSelector = ({
   }
 
   const readyToReview = availableAssessments.filter(
-    assessment => assessment.workflowState === 'assigned',
+    assessment =>
+      assessment.workflowState === 'assigned' &&
+      assessment.submission?.submittedAt !== null &&
+      assessment.submission?.submittedAt !== undefined,
   )
 
   const completedReviews = availableAssessments.filter(
-    assessment => assessment.workflowState === 'completed',
+    assessment =>
+      assessment.workflowState === 'completed' &&
+      assessment.submission?.submittedAt !== null &&
+      assessment.submission?.submittedAt !== undefined,
+  )
+
+  const submissionNotAvailable = availableAssessments.filter(
+    assessment => !assessment.submission?.submittedAt,
   )
 
   const renderChildren = () => {
@@ -113,9 +122,24 @@ export const PeerReviewSelector = ({
       )
     }
 
-    if (unavailableCount > 0) {
+    if (submissionNotAvailable.length > 0 || unavailableCount > 0) {
       children.push(
         <SimpleSelect.Group key="unavailable-group" renderLabel={I18n.t('Not Yet Available')}>
+          {submissionNotAvailable.map(assessment => {
+            const index = availableAssessments.indexOf(assessment)
+            return (
+              <SimpleSelect.Option
+                key={assessment._id}
+                id={`peer-review-option-${index}`}
+                value={String(index)}
+              >
+                {I18n.t('Peer Review (%{number} of %{total})', {
+                  number: index + 1,
+                  total: requiredPeerReviewCount,
+                })}
+              </SimpleSelect.Option>
+            )
+          })}
           {Array.from({length: unavailableCount}, (_, i) => {
             const reviewNumber = availableAssessments.length + i + 1
             const indexValue = availableAssessments.length + i

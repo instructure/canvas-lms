@@ -59,6 +59,7 @@ export interface Submission {
     _id: string
   } | null
   anonymousId?: string | null
+  submittedAt?: string | null
 }
 
 export interface PeerReviewDates {

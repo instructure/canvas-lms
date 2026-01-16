@@ -36,6 +36,7 @@ describe('PeerReviewSelector', () => {
         attempt: 1,
         body: '<p>Test submission 1</p>',
         submissionType: 'online_text_entry',
+        submittedAt: '2025-11-01T00:00:00Z',
       },
     },
     {
@@ -50,6 +51,7 @@ describe('PeerReviewSelector', () => {
         attempt: 1,
         body: '<p>Test submission 2</p>',
         submissionType: 'online_text_entry',
+        submittedAt: '2025-11-02T00:00:00Z',
       },
     },
     {
@@ -64,6 +66,7 @@ describe('PeerReviewSelector', () => {
         attempt: 1,
         body: '<p>Test submission 3</p>',
         submissionType: 'online_text_entry',
+        submittedAt: '2025-11-03T00:00:00Z',
       },
     },
   ]
@@ -135,6 +138,7 @@ describe('PeerReviewSelector', () => {
           attempt: 1,
           body: '<p>Test submission 1</p>',
           submissionType: 'online_text_entry',
+          submittedAt: '2025-11-01T00:00:00Z',
         },
       },
       {
@@ -149,6 +153,7 @@ describe('PeerReviewSelector', () => {
           attempt: 1,
           body: '<p>Test submission 2</p>',
           submissionType: 'online_text_entry',
+          submittedAt: '2025-11-02T00:00:00Z',
         },
       },
       {
@@ -163,6 +168,7 @@ describe('PeerReviewSelector', () => {
           attempt: 1,
           body: '<p>Test submission 3</p>',
           submissionType: 'online_text_entry',
+          submittedAt: '2025-11-03T00:00:00Z',
         },
       },
     ]
@@ -219,6 +225,7 @@ describe('PeerReviewSelector', () => {
           attempt: 1,
           body: '<p>Test submission 1</p>',
           submissionType: 'online_text_entry',
+          submittedAt: null,
         },
       },
       {
@@ -233,6 +240,7 @@ describe('PeerReviewSelector', () => {
           attempt: 1,
           body: '<p>Test submission 2</p>',
           submissionType: 'online_text_entry',
+          submittedAt: '2025-11-02T00:00:00Z',
         },
       },
       {
@@ -247,6 +255,7 @@ describe('PeerReviewSelector', () => {
           attempt: 1,
           body: '<p>Test submission 3</p>',
           submissionType: 'online_text_entry',
+          submittedAt: '2025-11-03T00:00:00Z',
         },
       },
     ]
@@ -288,6 +297,7 @@ describe('PeerReviewSelector', () => {
             attempt: 1,
             body: '<p>Test submission 1</p>',
             submissionType: 'online_text_entry',
+            submittedAt: '2025-11-01T00:00:00Z',
           },
         },
       ]
@@ -328,6 +338,7 @@ describe('PeerReviewSelector', () => {
             attempt: 1,
             body: '<p>Test submission 1</p>',
             submissionType: 'online_text_entry',
+            submittedAt: '2025-11-01T00:00:00Z',
           },
         },
       ]
@@ -368,6 +379,7 @@ describe('PeerReviewSelector', () => {
             attempt: 1,
             body: '<p>Test submission 1</p>',
             submissionType: 'online_text_entry',
+            submittedAt: '2025-11-01T00:00:00Z',
           },
         },
       ]
@@ -449,6 +461,7 @@ describe('PeerReviewSelector', () => {
             attempt: 1,
             body: '<p>Test submission 1</p>',
             submissionType: 'online_text_entry',
+            submittedAt: '2025-11-01T00:00:00Z',
           },
         },
       ]
@@ -464,6 +477,221 @@ describe('PeerReviewSelector', () => {
 
       const selector = screen.getByTestId('peer-review-selector')
       expect(selector).toHaveAttribute('value', 'Peer Review (2 of 3)')
+    })
+  })
+
+  describe('Assessments without submissions', () => {
+    it('shows assessment without submission in "Not Yet Available" group', async () => {
+      const mockOnChange = vi.fn()
+      const user = userEvent.setup()
+      const assessmentsWithoutSubmission: AssessmentRequest[] = [
+        {
+          _id: 'ar-1',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: null,
+          submission: {
+            _id: 'sub-1',
+            attempt: 1,
+            body: '<p>Test submission 1</p>',
+            submissionType: 'online_text_entry',
+            submittedAt: '2025-11-01T00:00:00Z',
+          },
+        },
+        {
+          _id: 'ar-2',
+          available: false,
+          workflowState: 'assigned',
+          createdAt: '2025-11-02T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: null,
+          submission: {
+            _id: 'sub-2',
+            attempt: 0,
+            body: null,
+            submissionType: 'online_text_entry',
+            submittedAt: null,
+          },
+        },
+      ]
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={assessmentsWithoutSubmission}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={2}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      expect(screen.getByText('Ready to Review')).toBeInTheDocument()
+      expect(screen.getByText('Not Yet Available')).toBeInTheDocument()
+    })
+
+    it('groups assessment without submission with unallocated reviews in "Not Yet Available"', async () => {
+      const mockOnChange = vi.fn()
+      const user = userEvent.setup()
+      const assessmentsWithoutSubmission: AssessmentRequest[] = [
+        {
+          _id: 'ar-1',
+          available: false,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: null,
+          submission: {
+            _id: 'sub-1',
+            attempt: 0,
+            body: null,
+            submissionType: 'online_text_entry',
+            submittedAt: null,
+          },
+        },
+      ]
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={assessmentsWithoutSubmission}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={3}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      expect(screen.getByText('Not Yet Available')).toBeInTheDocument()
+      // Should have 3 items: 1 without submission + 2 unallocated
+      expect(screen.getByText('Peer Review (1 of 3)')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (2 of 3)')).toBeInTheDocument()
+      expect(screen.getByText('Peer Review (3 of 3)')).toBeInTheDocument()
+    })
+
+    it('displays assessment without submission with correct numbering', async () => {
+      const mockOnChange = vi.fn()
+      const user = userEvent.setup()
+      const assessmentsWithMixedStatus: AssessmentRequest[] = [
+        {
+          _id: 'ar-1',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: null,
+          submission: {
+            _id: 'sub-1',
+            attempt: 1,
+            body: '<p>Test submission 1</p>',
+            submissionType: 'online_text_entry',
+            submittedAt: '2025-11-01T00:00:00Z',
+          },
+        },
+        {
+          _id: 'ar-2',
+          available: false,
+          workflowState: 'assigned',
+          createdAt: '2025-11-02T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: null,
+          submission: {
+            _id: 'sub-2',
+            attempt: 0,
+            body: null,
+            submissionType: 'online_text_entry',
+            submittedAt: null,
+          },
+        },
+        {
+          _id: 'ar-3',
+          available: true,
+          workflowState: 'completed',
+          createdAt: '2025-11-03T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: null,
+          submission: {
+            _id: 'sub-3',
+            attempt: 1,
+            body: '<p>Test submission 3</p>',
+            submissionType: 'online_text_entry',
+            submittedAt: '2025-11-03T00:00:00Z',
+          },
+        },
+      ]
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={assessmentsWithMixedStatus}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={3}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      await user.click(selector)
+
+      expect(screen.getByText('Ready to Review')).toBeInTheDocument()
+      expect(screen.getByText('Completed Peer Reviews')).toBeInTheDocument()
+      expect(screen.getByText('Not Yet Available')).toBeInTheDocument()
+
+      // Check that numbering is correct
+      const options = screen.getAllByText(/Peer Review \(\d+ of 3\)/)
+      expect(options).toHaveLength(3)
+    })
+
+    it('includes all assessments regardless of available status', () => {
+      const mockOnChange = vi.fn()
+      const assessmentsIncludingUnavailable: AssessmentRequest[] = [
+        {
+          _id: 'ar-1',
+          available: true,
+          workflowState: 'assigned',
+          createdAt: '2025-11-01T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: null,
+          submission: {
+            _id: 'sub-1',
+            attempt: 1,
+            body: '<p>Test submission 1</p>',
+            submissionType: 'online_text_entry',
+            submittedAt: '2025-11-01T00:00:00Z',
+          },
+        },
+        {
+          _id: 'ar-2',
+          available: false,
+          workflowState: 'assigned',
+          createdAt: '2025-11-02T00:00:00Z',
+          anonymousId: null,
+          anonymizedUser: null,
+          submission: {
+            _id: 'sub-2',
+            attempt: 0,
+            body: null,
+            submissionType: 'online_text_entry',
+            submittedAt: null,
+          },
+        },
+      ]
+
+      render(
+        <PeerReviewSelector
+          assessmentRequests={assessmentsIncludingUnavailable}
+          selectedIndex={0}
+          onSelectionChange={mockOnChange}
+          requiredPeerReviewCount={2}
+        />,
+      )
+
+      const selector = screen.getByTestId('peer-review-selector')
+      // Both assessments should be available in the selector (showing "1 of 2" for first one)
+      expect(selector).toHaveAttribute('value', 'Peer Review (1 of 2)')
     })
   })
 })

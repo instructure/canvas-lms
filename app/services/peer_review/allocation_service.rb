@@ -36,17 +36,28 @@ class PeerReview::AllocationService < ApplicationService
       total_assigned = count_all_reviews
       remaining_needed = @assignment.peer_review_count - total_assigned
 
-      available_submissions = preload_available_submissions
+      newly_allocated = []
 
-      if total_assigned.zero? && available_submissions.empty?
-        return error_result(:no_submissions_available, I18n.t("There are no peer reviews available to allocate to you."))
+      # First, enforce "must review" rules regardless of submission availability
+      if remaining_needed > 0
+        must_review_allocated = allocate_must_review_rules(ongoing_reviews)
+        newly_allocated.concat(must_review_allocated)
+        remaining_needed -= must_review_allocated.size
       end
 
-      submissions_to_allocate = select_submissions_to_allocate(available_submissions, remaining_needed)
-      newly_allocated = []
-      submissions_to_allocate.each do |submission|
-        assessment_request = @assignment.assign_peer_review(@assessor, submission.user)
-        newly_allocated << assessment_request if assessment_request
+      # Then, fill remaining slots from available submissions
+      if remaining_needed > 0
+        available_submissions = preload_available_submissions
+
+        if total_assigned.zero? && newly_allocated.empty? && available_submissions.empty?
+          return error_result(:no_submissions_available, I18n.t("There are no peer reviews available to allocate to you."))
+        end
+
+        submissions_to_allocate = select_submissions_to_allocate(available_submissions, remaining_needed)
+        submissions_to_allocate.each do |submission|
+          assessment_request = @assignment.assign_peer_review(@assessor, submission.user)
+          newly_allocated << assessment_request if assessment_request
+        end
       end
 
       all_requests = ongoing_reviews + newly_allocated
@@ -117,6 +128,38 @@ class PeerReview::AllocationService < ApplicationService
     AssessmentRequest.for_assignment(@assignment.id)
                      .for_assessor(@assessor.id)
                      .count
+  end
+
+  def allocate_must_review_rules(ongoing_reviews)
+    rules = fetch_allocation_rules
+    must_review_user_ids = rules[:must_review]
+    return [] if must_review_user_ids.empty?
+
+    already_assigned_user_ids = ongoing_reviews.map(&:user_id)
+    unassigned_must_review_ids = must_review_user_ids - already_assigned_user_ids
+
+    # Respect section restrictions if peer_review_across_sections is false
+    unless @assignment.peer_review_across_sections
+      section_ids = assessor_section_ids
+      if section_ids.any?
+        section_user_ids = Enrollment.where(course_id: @assignment.context_id)
+                                     .where(type: "StudentEnrollment")
+                                     .where(workflow_state: "active")
+                                     .where(course_section_id: section_ids)
+                                     .distinct
+                                     .pluck(:user_id)
+        unassigned_must_review_ids &= section_user_ids
+      end
+    end
+
+    users = User.find(unassigned_must_review_ids)
+    allocated = []
+    users.each do |user|
+      assessment_request = @assignment.assign_peer_review(@assessor, user)
+      allocated << assessment_request if assessment_request
+    end
+
+    allocated
   end
 
   def preload_available_submissions
