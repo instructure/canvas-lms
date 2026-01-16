@@ -54,7 +54,8 @@ describe AiExperiencesController do
         )
 
         get :index, params: { course_id: @course.id }, format: :json
-        experiences = json_parse(response.body)
+        json_response = json_parse(response.body)
+        experiences = json_response["experiences"]
         expect(experiences.length).to eq 2
         experience_ids = experiences.pluck("id")
         expect(experience_ids).to include(@ai_experience.id)
@@ -71,7 +72,8 @@ describe AiExperiencesController do
         )
 
         get :index, params: { course_id: @course.id, workflow_state: "published" }, format: :json
-        experiences = json_parse(response.body)
+        json_response = json_parse(response.body)
+        experiences = json_response["experiences"]
         expect(experiences.length).to eq 1
         expect(experiences.first["id"]).to eq published_experience.id
       end
@@ -86,14 +88,50 @@ describe AiExperiencesController do
         get :index, params: { course_id: @course.id }
         expect(assigns(:active_tab)).to eq("ai_experiences")
       end
+
+      it "returns can_manage true for teachers" do
+        get :index, params: { course_id: @course.id }, format: :json
+        json_response = json_parse(response.body)
+        expect(json_response["can_manage"]).to be true
+      end
     end
 
     context "as student" do
       before { user_session(@student) }
 
-      it "returns forbidden" do
+      it "returns http success" do
         get :index, params: { course_id: @course.id }, format: :json
-        assert_forbidden
+        expect(response).to be_successful
+      end
+
+      it "returns only published experiences for students" do
+        unpublished_experience = @course.ai_experiences.create!(
+          title: "Unpublished Experience",
+          facts: "Test prompt",
+          learning_objective: "Test objective",
+          pedagogical_guidance: "Test pedagogical guidance",
+          workflow_state: "unpublished"
+        )
+        published_experience = @course.ai_experiences.create!(
+          title: "Published Experience",
+          facts: "Test prompt",
+          learning_objective: "Test objective",
+          pedagogical_guidance: "Test pedagogical guidance",
+          workflow_state: "published"
+        )
+
+        get :index, params: { course_id: @course.id }, format: :json
+        json_response = json_parse(response.body)
+        experiences = json_response["experiences"]
+        experience_ids = experiences.pluck("id")
+        expect(experience_ids).to include(published_experience.id)
+        expect(experience_ids).not_to include(unpublished_experience.id)
+      end
+
+      it "returns can_manage false for students" do
+        get :index, params: { course_id: @course.id }, format: :json
+        json_response = json_parse(response.body)
+        expect(json_response["can_manage"]).to be false
       end
     end
   end

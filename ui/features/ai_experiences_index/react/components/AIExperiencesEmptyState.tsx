@@ -25,10 +25,14 @@ import {IconAddLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 
 interface AIExperiencesEmptyStateProps {
+  canManage: boolean
   onCreateNew: () => void
 }
 
-const AIExperiencesEmptyState: React.FC<AIExperiencesEmptyStateProps> = ({onCreateNew}) => {
+const AIExperiencesEmptyState: React.FC<AIExperiencesEmptyStateProps> = ({
+  canManage,
+  onCreateNew,
+}) => {
   const I18n = useI18nScope('ai_experiences')
 
   return (
@@ -38,19 +42,25 @@ const AIExperiencesEmptyState: React.FC<AIExperiencesEmptyStateProps> = ({onCrea
       </Flex.Item>
       <Flex.Item margin="0 0 small 0">
         <Text size="large" weight="bold">
-          {I18n.t('No AI experiences created yet.')}
+          {canManage
+            ? I18n.t('No AI experiences created yet.')
+            : I18n.t('No AI experiences available yet.')}
         </Text>
       </Flex.Item>
       <Flex.Item margin="0 0 medium 0">
         <Text size="medium" color="secondary">
-          {I18n.t('Click the Create New button to start building your first AI experience.')}
+          {canManage
+            ? I18n.t('Click the Create New button to start building your first AI experience.')
+            : I18n.t('Your instructor has not published any AI experiences yet.')}
         </Text>
       </Flex.Item>
-      <Flex.Item>
-        <Button color="primary" renderIcon={() => <IconAddLine />} onClick={onCreateNew}>
-          {I18n.t('Create new')}
-        </Button>
-      </Flex.Item>
+      {canManage && (
+        <Flex.Item>
+          <Button color="primary" renderIcon={() => <IconAddLine />} onClick={onCreateNew}>
+            {I18n.t('Create new')}
+          </Button>
+        </Flex.Item>
+      )}
     </Flex>
   )
 }

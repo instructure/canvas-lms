@@ -46,6 +46,7 @@ const mockExperiences: AiExperience[] = [
 ]
 
 const defaultProps = {
+  canManage: true,
   experiences: mockExperiences,
   onEdit: vi.fn(),
   onTestConversation: vi.fn(),

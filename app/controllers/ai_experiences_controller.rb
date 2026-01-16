@@ -77,7 +77,7 @@ class AiExperiencesController < ApplicationController
 
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
-  before_action :require_manage_rights
+  before_action :require_manage_rights, except: [:index]
   before_action :load_experience, only: %i[show edit update destroy]
 
   # @API List AI experiences
@@ -90,7 +90,12 @@ class AiExperiencesController < ApplicationController
   #
   # @returns [AiExperience]
   def index
+    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
+    can_manage = @context.grants_any_right?(@current_user, *permissions)
+
     @experiences = @context.ai_experiences.active
+    # Students (non-managers) should only see published experiences
+    @experiences = @experiences.where(workflow_state: "published") unless can_manage
     @experiences = @experiences.where(workflow_state: params[:workflow_state]) if params[:workflow_state].present?
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences")
@@ -100,7 +105,12 @@ class AiExperiencesController < ApplicationController
         js_env({ COURSE_ID: @context.id })
         render
       end
-      format.json { render json: ai_experiences_json(@experiences, @current_user, session) }
+      format.json do
+        render json: {
+          experiences: ai_experiences_json(@experiences, @current_user, session),
+          can_manage:
+        }
+      end
     end
   end
 

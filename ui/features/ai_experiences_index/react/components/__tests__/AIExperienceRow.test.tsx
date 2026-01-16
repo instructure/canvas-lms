@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event'
 import AIExperienceRow from '../AIExperienceRow'
 
 const defaultProps = {
+  canManage: true,
   id: 1,
   title: 'Customer Service Training',
   workflowState: 'published' as const,
@@ -106,5 +107,76 @@ describe('AIExperienceRow', () => {
 
     const titleLink = screen.getByText('Customer Service Training')
     expect(titleLink).toHaveAttribute('href', '/courses/123/ai_experiences/1')
+  })
+
+  describe('Teacher view (canManage = true)', () => {
+    it('shows published status text', () => {
+      render(<AIExperienceRow {...defaultProps} workflowState="published" />)
+      expect(screen.getByText('Published')).toBeInTheDocument()
+    })
+
+    it('shows unpublished status text', () => {
+      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" />)
+      expect(screen.getByText('Not published')).toBeInTheDocument()
+    })
+
+    it('shows publish/unpublish button', () => {
+      render(<AIExperienceRow {...defaultProps} />)
+      expect(screen.getByTestId('ai-experience-publish-toggle')).toBeInTheDocument()
+    })
+
+    it('shows kebab menu', () => {
+      render(<AIExperienceRow {...defaultProps} />)
+      expect(screen.getByTestId('ai-experience-menu')).toBeInTheDocument()
+    })
+
+    it('kebab menu has Edit, Test Conversation, and Delete options', async () => {
+      const user = userEvent.setup()
+      render(<AIExperienceRow {...defaultProps} />)
+
+      const menuButton = screen.getByTestId('ai-experience-menu')
+      await user.click(menuButton)
+
+      expect(screen.getByText('Edit')).toBeInTheDocument()
+      expect(screen.getByText('Test Conversation')).toBeInTheDocument()
+      expect(screen.getByText('Delete')).toBeInTheDocument()
+    })
+  })
+
+  describe('Student view (canManage = false)', () => {
+    const studentProps = {...defaultProps, canManage: false}
+
+    it('does not show published status text', () => {
+      render(<AIExperienceRow {...studentProps} workflowState="published" />)
+      expect(screen.queryByText('Published')).not.toBeInTheDocument()
+    })
+
+    it('does not show unpublished status text', () => {
+      render(<AIExperienceRow {...studentProps} workflowState="unpublished" />)
+      expect(screen.queryByText('Not published')).not.toBeInTheDocument()
+    })
+
+    it('does not show publish/unpublish button', () => {
+      render(<AIExperienceRow {...studentProps} />)
+      expect(screen.queryByTestId('ai-experience-publish-toggle')).not.toBeInTheDocument()
+    })
+
+    it('does not show kebab menu', () => {
+      render(<AIExperienceRow {...studentProps} />)
+      expect(screen.queryByTestId('ai-experience-menu')).not.toBeInTheDocument()
+    })
+
+    it('title link is still clickable', () => {
+      ;(global as any).ENV = {COURSE_ID: 123}
+      render(<AIExperienceRow {...studentProps} />)
+
+      const titleLink = screen.getByText('Customer Service Training')
+      expect(titleLink).toHaveAttribute('href', '/courses/123/ai_experiences/1')
+    })
+
+    it('still shows creation date', () => {
+      render(<AIExperienceRow {...studentProps} />)
+      expect(screen.getByText(/Created on January 15, 2025/)).toBeInTheDocument()
+    })
   })
 })
