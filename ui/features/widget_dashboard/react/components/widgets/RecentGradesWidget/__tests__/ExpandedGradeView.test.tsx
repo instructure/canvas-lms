@@ -26,6 +26,7 @@ const mockSubmission: RecentGradeSubmission = {
   _id: 'sub1',
   score: 85,
   grade: 'B',
+  excused: false,
   submittedAt: '2025-11-28T10:00:00Z',
   gradedAt: '2025-11-30T14:30:00Z',
   state: 'graded',
@@ -34,6 +35,7 @@ const mockSubmission: RecentGradeSubmission = {
     name: 'Test Assignment',
     htmlUrl: '/courses/1/assignments/101',
     pointsPossible: 100,
+    gradingType: 'letter_grade',
     submissionTypes: ['online_text_entry'],
     quiz: null,
     discussion: null,
@@ -132,5 +134,120 @@ describe('ExpandedGradeView', () => {
       </WidgetDashboardProvider>,
     )
     expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: N/A')
+  })
+
+  describe('grading type support', () => {
+    it('displays percentage grade for percent grading type', () => {
+      const submission = {
+        ...mockSubmission,
+        grade: '85',
+        score: 85,
+        assignment: {
+          ...mockSubmission.assignment,
+          gradingType: 'percent',
+          pointsPossible: 100,
+        },
+      }
+      renderWithContext(<ExpandedGradeView submission={submission} />)
+      expect(screen.getByTestId('grade-percentage-sub1')).toHaveTextContent('85%')
+    })
+
+    it('displays points grade for points grading type', () => {
+      const submission = {
+        ...mockSubmission,
+        grade: '8.5',
+        score: 8.5,
+        assignment: {
+          ...mockSubmission.assignment,
+          gradingType: 'points',
+          pointsPossible: 10,
+        },
+      }
+      renderWithContext(<ExpandedGradeView submission={submission} />)
+      expect(screen.getByTestId('grade-percentage-sub1')).toHaveTextContent('8.5')
+    })
+
+    it('displays letter grade for letter_grade grading type', () => {
+      const submission = {
+        ...mockSubmission,
+        grade: 'B+',
+        assignment: {
+          ...mockSubmission.assignment,
+          gradingType: 'letter_grade',
+        },
+      }
+      renderWithContext(<ExpandedGradeView submission={submission} />)
+      expect(screen.getByTestId('grade-percentage-sub1')).toHaveTextContent('B+')
+    })
+
+    it('displays Complete for pass_fail grading type with passing grade', () => {
+      const submission = {
+        ...mockSubmission,
+        grade: 'complete',
+        score: 1,
+        assignment: {
+          ...mockSubmission.assignment,
+          gradingType: 'pass_fail',
+        },
+      }
+      renderWithContext(<ExpandedGradeView submission={submission} />)
+      expect(screen.getByTestId('grade-percentage-sub1')).toHaveTextContent('complete')
+    })
+
+    it('displays Incomplete for pass_fail grading type with failing grade', () => {
+      const submission = {
+        ...mockSubmission,
+        grade: 'incomplete',
+        score: 0,
+        assignment: {
+          ...mockSubmission.assignment,
+          gradingType: 'pass_fail',
+        },
+      }
+      renderWithContext(<ExpandedGradeView submission={submission} />)
+      expect(screen.getByTestId('grade-percentage-sub1')).toHaveTextContent('incomplete')
+    })
+
+    it('displays Excused for excused submissions', () => {
+      const submission = {
+        ...mockSubmission,
+        grade: null,
+        score: null,
+        excused: true,
+        assignment: {
+          ...mockSubmission.assignment,
+          gradingType: 'points',
+        },
+      }
+      renderWithContext(<ExpandedGradeView submission={submission} />)
+      expect(screen.getByTestId('grade-percentage-sub1')).toHaveTextContent('Excused')
+    })
+
+    it('displays GPA for gpa_scale grading type', () => {
+      const submission = {
+        ...mockSubmission,
+        grade: '4.0',
+        assignment: {
+          ...mockSubmission.assignment,
+          gradingType: 'gpa_scale',
+        },
+      }
+      renderWithContext(<ExpandedGradeView submission={submission} />)
+      expect(screen.getByTestId('grade-percentage-sub1')).toHaveTextContent('4.0')
+    })
+
+    it('displays No grade when grade is null', () => {
+      const submission = {
+        ...mockSubmission,
+        grade: null,
+        score: null,
+        assignment: {
+          ...mockSubmission.assignment,
+          gradingType: 'points',
+        },
+      }
+      renderWithContext(<ExpandedGradeView submission={submission} />)
+      expect(screen.getByTestId('grade-percentage-sub1')).toHaveTextContent('No grade')
+    })
   })
 })
