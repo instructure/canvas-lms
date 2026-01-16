@@ -44,7 +44,9 @@ module Extensions
           false
         else
           ::Rails.logger.info("Database configuration changed; reconnecting...")
-          ::ActiveRecord::Base.configurations = db_configs
+          ::ActiveRecord::Base.preserve_overrides(preserved_keys: %i[username service password]) do
+            ::ActiveRecord::Base.configurations = db_configs
+          end
           # reset a whole bunch of connection info in both AR and Switchman
           Switchman::DatabaseServer.instance_variable_get(:@database_servers).clear
           ::ActiveRecord::Base.connection_handler.each_connection_pool(&:disconnect)
