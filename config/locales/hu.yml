@@ -5756,6 +5756,7 @@ hu:
   close_help_dialog_653a6549: "Súgó párbeszéd bezárása"
   close_move_tray_8609e988: "zárja be a mozgó tálcát"
   close_opportunity_center_popup_9907d981: "A Lehetőségek popup ablak bezárása"
+  close_rubric_a0fc8166: "Értékelőtábla bezárása"
   close_sidebar_10b0fbb4: "Oldalsáv bezárása"
   close_student_details_2f6900: "A tanuló adatainak bezárása"
   close_submission_tray_c4988fa8: "Zárja be a benyújtási tálcát"
@@ -12535,6 +12536,7 @@ hu:
   hide_outcomes_with_no_results_7e4ce06f: "Érték nélküli eredmények elrejtése"
   hide_params_eadf0961: "Paraméterek elrejtése"
   hide_projections_9d4ed1e1: "Kivetítések elrejtése"
+  hide_rubric_27903c8: "Értékelőtábla elrejtése"
   hide_score_total_for_assessment_results_d0ef117f: "Teljes pontszám elrejtése az értékelési eredményekben"
   hide_sidebar_2b5b3776: "Oldalsáv elrejtése"
   hide_student_names_3e59e862: "Hallgatók nevének elrejtése"
@@ -19185,6 +19187,7 @@ hu:
   priority_dd4381ee: Prioritás
   privacy_290109ea: Adatvédelem
   privacy_level_f0ec09a3: "Adatvédelmi szint"
+  privacy_notice_7eff08fe: "Adatvédelmi figyelmeztetés"
   privacy_policy_c68f482a: "Adatvédelmi irányelvek"
   private_3883d133: Privát
   private_copyrighted_3cac9686: "Magán (jogvédett)"
