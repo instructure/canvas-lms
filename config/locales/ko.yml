@@ -3009,6 +3009,7 @@ ko:
   close_d634289d: 닫기
   close_for_comments_37783f56: "의견 닫기"
   close_for_comments_ce0e5d00: "의견 닫기"
+  close_rubric_a0fc8166: "루브릭 마감"
   closed_for_comments_e395b42f: "의견 닫힘"
   collaboration: 
     collaboration: 
@@ -7162,6 +7163,7 @@ ko:
   hidden_14a032a7: 비공개
   hide_all_details_61d7ebb: "모든 세부 정보 숨기기"
   hide_e057ff36: 숨기기
+  hide_rubric_27903c8: "루브릭 숨기기"
   hide_score_total_for_assessment_results_d0ef117f: "평가 결과에 대한 총점 숨기기"
   hide_student_names_3e59e862: "학생 이름 숨기기"
   high_contrast_description: "고대비는 UI (텍스트, 버튼 등)의 색상 대비를 증가시켜 항목들이 더 분명하고 쉽게 알아볼 수 있게 만듭니다. 주의: 기관 브랜딩은 사용이 중단됩니다."
@@ -10604,6 +10606,7 @@ ko:
   priority_dd4381ee: "우선 순위"
   privacy_290109ea: "개인 정보"
   privacy_level_f0ec09a3: "개인 정보 보호 수준"
+  privacy_notice_7eff08fe: "개인 정보 보호 표시"
   privacy_policy_c68f482a: "개인 정보 보호 정책"
   private_3883d133: 비공개
   private_copyrighted_3cac9686: "비공개 (저작권 있음)"
