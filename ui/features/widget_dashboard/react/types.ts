@@ -133,12 +133,14 @@ export interface RecentGradeSubmission {
   gradedAt: string | null
   score: number | null
   grade: string | null
+  excused: boolean
   state: string
   assignment: {
     _id: string
     name: string
     htmlUrl: string
     pointsPossible: number | null
+    gradingType: string
     submissionTypes: string[]
     quiz: {_id: string; title: string} | null
     discussion: {_id: string; title: string} | null
