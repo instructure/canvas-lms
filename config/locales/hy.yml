@@ -3568,6 +3568,7 @@ hy:
   close_d634289d: Փակել
   close_for_comments_37783f56: "Փակ է մեկնաբանությունների համար"
   close_for_comments_ce0e5d00: "Մեկնաբանությունների համար փակել"
+  close_rubric_a0fc8166: "Փակել ռուբրիկը"
   closed_for_comments_e395b42f: "Փակ է մեկնաբանությունների համար"
   collaboration: 
     default_title: "Առանց անվանման համատեղ աշխատանք"
@@ -8525,6 +8526,7 @@ hy:
   hide_courses_without_enrollments_6df4dfad: "Թաքցնել գրանցում չունեցող դասընթացները"
   hide_e057ff36: Թաքցնել
   hide_notes_column_7749f408: "Թաքցնել նշումների սյունակը"
+  hide_rubric_27903c8: "Թաքցնել ռուբրիկը"
   hide_score_total_for_assessment_results_d0ef117f: "Անտեսանելի դարձնել ընդհանուր միավորները ստուգման արդյունքների համար"
   hide_student_names_3e59e862: "Թաքցնել ունկնդիրների անունները"
   high_score_267b6641: "Բարձր գնահատական"
@@ -12686,6 +12688,7 @@ hy:
   primary_color_button_disabled_9081ddff: "Առաջնային գույնի կոճակը անջատվել է"
   priority_dd4381ee: Առաջնահերթություն
   privacy_290109ea: Գաղտնիություն
+  privacy_notice_7eff08fe: "Գաղտնիության նշում"
   privacy_policy_c68f482a: "Գաղտնիության պահպանման քաղաքականություն"
   private_copyrighted_3cac9686: "Մասնավոր (պաշտպանված է հեղինակային իրավունքով)"
   process_as_ui_changes_8e34ed2a: "Մշակվում են  որպես UI փոփոխություններ "
