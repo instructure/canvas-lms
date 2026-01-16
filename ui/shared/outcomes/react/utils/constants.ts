@@ -23,6 +23,8 @@ export const STUDENT_COLUMN_RIGHT_PADDING: number = 15
 export const COLUMN_PADDING: number = 2
 export const CELL_HEIGHT: number = 48
 
+export const BAR_CHART_HEIGHT: number = 64
+
 export const DEFAULT_PAGE_NUMBER: number = 1
 export const DEFAULT_STUDENTS_PER_PAGE: number = 15
 export const STUDENTS_PER_PAGE_OPTIONS: number[] = [15, 30, 50, 100]

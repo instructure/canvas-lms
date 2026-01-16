@@ -47,6 +47,7 @@ import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import DragDropWrapper from './grid/DragDropWrapper'
 import {ContributingScoreAlignment, ContributingScoresManager} from '../hooks/useContributingScores'
 import {ContributingScoreHeader} from './grid/ContributingScoreHeader'
+import {BarChartRow} from './grid/BarChartRow'
 
 export interface GradebookProps {
   courseId: string
@@ -83,6 +84,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
   onOpenStudentAssignmentTray,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
+  const barChartRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
   const [outcomes, setOutcomes] = useState<Outcome[]>(initialOutcomes)
 
@@ -116,6 +118,10 @@ const GradebookComponent: React.FC<GradebookProps> = ({
       if (headerRow.current && e.target instanceof HTMLElement) {
         headerRow.current.scrollLeft = e.target.scrollLeft
       }
+
+      if (barChartRow.current && e.target instanceof HTMLElement) {
+        barChartRow.current.scrollLeft = e.target.scrollLeft
+      }
     }
 
     if (gridRef.current) {
@@ -131,7 +137,14 @@ const GradebookComponent: React.FC<GradebookProps> = ({
 
   return (
     <>
-      <Flex padding="medium 0 0 0">
+      <BarChartRow
+        outcomes={outcomes}
+        rollups={rollups}
+        students={students}
+        contributingScores={contributingScores}
+        barChartRowRef={barChartRow}
+      />
+      <Flex>
         <Flex.Item>
           <View borderWidth="large 0 medium 0">
             <StudentHeader
