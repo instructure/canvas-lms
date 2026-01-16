@@ -87,6 +87,7 @@ class Enrollment < ActiveRecord::Base
   after_update :needs_grading_count_updated, if: :active_student_changed?
 
   after_commit :sync_microsoft_group
+  after_commit :sync_to_invite_all_conferences, if: :should_sync_to_conferences?
   scope :microsoft_sync_relevant, -> { active_or_pending.accepted.not_fake }
   scope :microsoft_sync_irrelevant_but_not_fake, -> { not_fake.where("enrollments.workflow_state IN ('rejected', 'completed', 'inactive', 'invited')") }
 
@@ -106,6 +107,13 @@ class Enrollment < ActiveRecord::Base
 
   def cant_observe_self
     errors.add(:associated_user_id, "Cannot observe yourself") if user_id == associated_user_id
+  end
+
+  def should_sync_to_conferences?
+    saved_change_to_workflow_state? &&
+      workflow_state == "active" &&
+      course.is_a?(Course) &&
+      workflow_state_before_last_save != "active"
   end
 
   def cant_observe_observer
@@ -764,6 +772,18 @@ class Enrollment < ActiveRecord::Base
         Favorite.create_or_find_by(user:, context: course)
       end
     end
+  end
+
+  def sync_to_invite_all_conferences
+    return unless course.is_a?(Course)
+
+    course.web_conferences.active.each do |conference|
+      next unless conference.invite_all_enabled?
+
+      conference.add_new_enrollment_user(user_id)
+    end
+  rescue => e
+    Canvas::Errors.capture_exception(:web_conference_sync, e, :info)
   end
 
   workflow do
