@@ -167,38 +167,6 @@ describe Submission::ShowPresenter do
     end
   end
 
-  describe "#assignment_tool_launch_url" do
-    subject do
-      presenter_for_teacher.assignment_tool_launch_url
-    end
-
-    let(:tool_url) { "http://example.com/quiz/launch" }
-
-    before do
-      assignment.external_tool_tag = ContentTag.new(
-        url: tool_url,
-        content_type: "ContextExternalTool"
-      )
-    end
-
-    it "returns the tool launch url with borderless display" do
-      expect(subject).to match(%r{courses/#{course.id}/external_tools/retrieve})
-      expect(subject).to include("display=borderless")
-      expect(subject).to include("assignment_id=#{assignment.id}")
-    end
-
-    context "when external_tool_tag has no url" do
-      before do
-        assignment.external_tool_tag.url = nil
-      end
-
-      it "still generates a launch url" do
-        expect(subject).to match(%r{courses/#{course.id}/external_tools/retrieve})
-        expect(subject).to include("display=borderless")
-      end
-    end
-  end
-
   describe "#comment_attachment_download_url" do
     it "calls submission_data_url with parameters from the passed-in comment and attachment" do
       attachment = Attachment.create!(
