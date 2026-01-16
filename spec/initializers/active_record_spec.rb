@@ -19,6 +19,44 @@
 
 module ActiveRecord
   describe Base do
+    describe ".preserve_overrides" do
+      specs_require_sharding
+
+      around do |example|
+        @shard1.activate do
+          example.run
+        end
+      end
+
+      def current_database_config_hash
+        ::ActiveRecord::Base.configurations.configurations.find do |configuration|
+          configuration.configuration_hash.value? Shard.current.name
+        end
+      end
+
+      it "preserves specified configuration keys across a block", :aggregate_failures do
+        configuration = current_database_config_hash
+        current_username = configuration.configuration_hash[:username]
+        current_service = configuration.configuration_hash[:service]
+
+        ::ActiveRecord::Base.preserve_overrides(preserved_keys: %i[username service]) do
+          configuration.instance_variable_set(
+            :@configuration_hash,
+            configuration.configuration_hash.merge(
+              username: "modified_user",
+              service: "modified_service",
+              password: "modified_password"
+            )
+          )
+        end
+
+        mutated_configuration = current_database_config_hash
+        expect(mutated_configuration.configuration_hash[:username]).to eq current_username
+        expect(mutated_configuration.configuration_hash[:service]).to eq current_service
+        expect(mutated_configuration.configuration_hash[:password]).to eq "modified_password"
+      end
+    end
+
     describe ".serializable_hash" do
       let(:account) { Account.create! }
 
