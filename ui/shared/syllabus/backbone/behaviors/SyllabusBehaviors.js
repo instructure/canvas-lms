@@ -401,7 +401,10 @@ const bindToEditSyllabus = function (course_summary_enabled) {
     $course_syllabus_details.hide()
     easy_student_view.hide()
     $course_syllabus_body = RichContentEditor.freshNode($course_syllabus_body)
-    $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
+    const currentHTML = $course_syllabus.html()
+    const originalHTML = $course_syllabus.data('syllabus_body')
+    const contentToEdit = currentHTML !== originalHTML ? currentHTML : originalHTML
+    $course_syllabus_body.val(contentToEdit)
     RichContentEditor.loadNewEditor($course_syllabus_body, {
       focus: true,
       manageParent: true,

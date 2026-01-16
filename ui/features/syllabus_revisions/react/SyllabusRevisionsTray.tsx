@@ -30,6 +30,8 @@ import {List} from '@instructure/ui-list'
 import {Modal} from '@instructure/ui-modal'
 import {Spinner} from '@instructure/ui-spinner'
 import {dateString} from '@instructure/moment-utils'
+import $ from 'jquery'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 interface SyllabusVersion {
   version: number
@@ -62,6 +64,11 @@ export default function SyllabusRevisionsTray({
   const [restoring, setRestoring] = useState(false)
   const [currentSyllabusBody, setCurrentSyllabusBody] = useState<string | null>(null)
 
+  const isInEditMode = (): boolean => {
+    const editForm = document.getElementById('edit_course_syllabus_form')
+    return editForm !== null && editForm.style.display !== 'none'
+  }
+
   const fetchVersions = useCallback(async () => {
     setLoading(true)
     try {
@@ -90,9 +97,11 @@ export default function SyllabusRevisionsTray({
     if (open) {
       fetchVersions()
     } else if (currentSyllabusBody) {
-      const syllabusElement = document.getElementById('course_syllabus')
-      if (syllabusElement && syllabusElement.innerHTML !== currentSyllabusBody) {
-        syllabusElement.innerHTML = currentSyllabusBody
+      if (!isInEditMode()) {
+        const syllabusElement = document.getElementById('course_syllabus')
+        if (syllabusElement && syllabusElement.innerHTML !== currentSyllabusBody) {
+          syllabusElement.innerHTML = currentSyllabusBody
+        }
       }
     }
   }, [open, fetchVersions, currentSyllabusBody])
@@ -114,16 +123,23 @@ export default function SyllabusRevisionsTray({
   }
 
   const handleVersionClick = (version: SyllabusVersion) => {
-    const syllabusElement = document.getElementById('course_syllabus')
-    let shouldUpdateDOM = false
+    if (isInEditMode()) {
+      const $editorTextarea = $('#course_syllabus_body')
+      if ($editorTextarea.length && version.syllabus_body) {
+        RichContentEditor.callOnRCE($editorTextarea, 'set_code', version.syllabus_body)
+      }
+    } else {
+      const syllabusElement = document.getElementById('course_syllabus')
+      let shouldUpdateDOM = false
 
-    if (syllabusElement && version.syllabus_body) {
-      const normalizedCurrent = syllabusElement.innerHTML.trim()
-      const normalizedNew = version.syllabus_body.trim()
-      shouldUpdateDOM = normalizedCurrent !== normalizedNew
+      if (syllabusElement && version.syllabus_body) {
+        const normalizedCurrent = syllabusElement.innerHTML.trim()
+        const normalizedNew = version.syllabus_body.trim()
+        shouldUpdateDOM = normalizedCurrent !== normalizedNew
 
-      if (shouldUpdateDOM) {
-        syllabusElement.innerHTML = version.syllabus_body
+        if (shouldUpdateDOM) {
+          syllabusElement.innerHTML = version.syllabus_body
+        }
       }
     }
 
@@ -164,13 +180,15 @@ export default function SyllabusRevisionsTray({
   }
 
   const handleTrayDismiss = () => {
-    const syllabusElement = document.getElementById('course_syllabus')
-    if (
-      syllabusElement &&
-      currentSyllabusBody &&
-      syllabusElement.innerHTML !== currentSyllabusBody
-    ) {
-      syllabusElement.innerHTML = currentSyllabusBody
+    if (!isInEditMode()) {
+      const syllabusElement = document.getElementById('course_syllabus')
+      if (
+        syllabusElement &&
+        currentSyllabusBody &&
+        syllabusElement.innerHTML !== currentSyllabusBody
+      ) {
+        syllabusElement.innerHTML = currentSyllabusBody
+      }
     }
     onDismiss()
   }
