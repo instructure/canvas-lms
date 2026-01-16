@@ -21,7 +21,7 @@ import {render, screen} from '@testing-library/react'
 import UnavailablePeerReview from '../UnavailablePeerReview'
 
 describe('UnavailablePeerReview', () => {
-  it('renders the unavailable peer review message', () => {
+  it('renders the default unavailable peer review message', () => {
     render(<UnavailablePeerReview />)
 
     expect(
@@ -36,5 +36,23 @@ describe('UnavailablePeerReview', () => {
 
     const image = screen.getByAltText('No peer reviews available')
     expect(image).toBeInTheDocument()
+  })
+
+  it('renders custom reason with suffix when reason prop is provided', () => {
+    render(<UnavailablePeerReview reason="This student has not yet submitted their work." />)
+
+    expect(
+      screen.getByText(
+        'This student has not yet submitted their work. Check back later or contact your instructor.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('combines custom reason with standard suffix', () => {
+    const customReason = 'Custom unavailability reason.'
+    render(<UnavailablePeerReview reason={customReason} />)
+
+    const expectedText = `${customReason} Check back later or contact your instructor.`
+    expect(screen.getByText(expectedText)).toBeInTheDocument()
   })
 })

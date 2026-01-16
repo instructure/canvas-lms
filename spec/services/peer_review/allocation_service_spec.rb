@@ -903,6 +903,119 @@ RSpec.describe PeerReview::AllocationService do
           allocated_user_ids = result[:assessment_requests].map(&:user_id)
           expect(allocated_user_ids).to include(student1.id, student2.id, student3.id)
         end
+
+        it "does not have N+1 queries when fetching must_review users" do
+          student4 = student_in_course(active_all: true).user
+          student5 = student_in_course(active_all: true).user
+
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student4,
+            must_review: true
+          )
+          AllocationRule.create!(
+            course:,
+            assignment:,
+            assessor:,
+            assessee: student5,
+            must_review: true
+          )
+
+          # Count User.find queries
+          user_find_count = 0
+          allow(User).to receive(:find).and_wrap_original do |method, *args|
+            user_find_count += 1
+            method.call(*args)
+          end
+
+          service.allocate
+
+          # Should only call User.find once for all must_review users, not once per user
+          expect(user_find_count).to eq(1)
+        end
+
+        it "allocates must_review even when assessee has not submitted" do
+          assignment.submissions.find_by(user: student1).update!(workflow_state: "unsubmitted", submission_type: nil)
+
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(3)
+
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          expect(allocated_user_ids).to include(student1.id, student2.id, student3.id)
+        end
+
+        it "allocates all must_review users regardless of submission status, then fills remaining from available pool" do
+          assignment.submissions.find_by(user: student1).update!(workflow_state: "unsubmitted", submission_type: nil)
+          assignment.submissions.find_by(user: student2).update!(workflow_state: "unsubmitted", submission_type: nil)
+
+          result = service.allocate
+          expect(result[:success]).to be true
+          expect(result[:assessment_requests].size).to eq(3)
+
+          allocated_user_ids = result[:assessment_requests].map(&:user_id)
+          # All three allocated: 2 must_review (not submitted) + 1 regular (submitted)
+          expect(allocated_user_ids).to match_array([student1.id, student2.id, student3.id])
+        end
+
+        context "when peer_review_across_sections is false" do
+          let(:section1) { course.course_sections.create!(name: "Section 1") }
+          let(:section2) { course.course_sections.create!(name: "Section 2") }
+          let(:assessor_section1) { user_model }
+          let(:student_section1) { user_model }
+          let(:student_section2) { user_model }
+          let(:section_assignment) do
+            assignment_model(
+              course:,
+              title: "Section Peer Review Assignment",
+              peer_reviews: true,
+              peer_review_count: 2,
+              peer_review_across_sections: false,
+              automatic_peer_reviews: false,
+              submission_types: "online_text_entry"
+            )
+          end
+
+          before do
+            course.enroll_student(assessor_section1, enrollment_state: :active, section: section1)
+            course.enroll_student(student_section1, enrollment_state: :active, section: section1)
+            course.enroll_student(student_section2, enrollment_state: :active, section: section2)
+
+            section_assignment.submit_homework(assessor_section1, body: "Assessor submission")
+            section_assignment.submit_homework(student_section1, body: "Student section1 submission")
+
+            # Student in section2 has must_review rule but is in different section
+            AllocationRule.create!(
+              course:,
+              assignment: section_assignment,
+              assessor: assessor_section1,
+              assessee: student_section2,
+              must_review: true
+            )
+
+            # Student in section1 also has must_review rule and hasn't submitted
+            AllocationRule.create!(
+              course:,
+              assignment: section_assignment,
+              assessor: assessor_section1,
+              assessee: student_section1,
+              must_review: true
+            )
+            section_assignment.submissions.find_by(user: student_section1).update!(workflow_state: "unsubmitted", submission_type: nil)
+          end
+
+          it "respects section restrictions for must_review rules" do
+            service2 = described_class.new(assignment: section_assignment, assessor: assessor_section1)
+            result = service2.allocate
+            expect(result[:success]).to be true
+
+            allocated_user_ids = result[:assessment_requests].map(&:user_id)
+            expect(allocated_user_ids).to include(student_section1.id)
+            expect(allocated_user_ids).not_to include(student_section2.id)
+          end
+        end
       end
 
       context "when prioritizing should_review submissions" do

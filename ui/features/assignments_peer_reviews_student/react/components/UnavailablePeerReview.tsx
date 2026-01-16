@@ -25,7 +25,17 @@ import unavailablePeerReviewSVG from '@canvas/assignments/images/UnavailablePeer
 
 const I18n = createI18nScope('peer_reviews_student')
 
-export default function UnavailablePeerReview() {
+export interface UnavailablePeerReviewProps {
+  reason?: string
+}
+
+export default function UnavailablePeerReview({reason}: UnavailablePeerReviewProps) {
+  const defaultReason = I18n.t(
+    'There are no more peer reviews available to allocate to you at this time.',
+  )
+  const suffix = I18n.t('Check back later or contact your instructor.')
+  const message = `${reason || defaultReason} ${suffix}`
+
   return (
     <Flex
       textAlign="center"
@@ -43,9 +53,7 @@ export default function UnavailablePeerReview() {
         </Flex.Item>
         <Flex.Item margin="medium 0 0 0">
           <Text size="medium" weight="bold">
-            {I18n.t(
-              'There are no more peer reviews available to allocate to you at this time. Check back later or contact your instructor.',
-            )}
+            {message}
           </Text>
         </Flex.Item>
       </Flex>
