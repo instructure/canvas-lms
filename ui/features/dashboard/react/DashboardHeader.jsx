@@ -45,6 +45,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
+import {toggleDashboardView} from '@canvas/dashboard-toggle/utils/dashboardToggle'
 
 const I18n = createI18nScope('dashboard')
 
@@ -125,6 +126,7 @@ class DashboardHeader extends React.Component {
       : 'cards',
     loadedViews: [],
     selectedObserveeId: null,
+    switchingDashboard: false,
   }
 
   componentDidMount() {
@@ -319,6 +321,15 @@ class DashboardHeader extends React.Component {
     })
   }
 
+  handleSwitchToNewDashboard = async () => {
+    this.setState({switchingDashboard: true})
+    try {
+      await toggleDashboardView(true)
+    } catch {
+      this.setState({switchingDashboard: false})
+    }
+  }
+
   renderLegacy(canEnableElementaryDashboard) {
     return (
       <div className={classnames(this.props.responsiveSize, 'ic-Dashboard-header__layout')}>
@@ -347,6 +358,16 @@ class DashboardHeader extends React.Component {
                   className="CanvasPlanner__HeaderContainer"
                   style={{display: this.state.currentDashboard === 'planner' ? 'block' : 'none'}}
                 />
+              )}
+              {ENV.widget_dashboard_overridable === false && (
+                <Button
+                  onClick={this.handleSwitchToNewDashboard}
+                  margin="0 small 0 0"
+                  disabled={this.state.switchingDashboard}
+                  data-testid="switch-to-new-dashboard-button"
+                >
+                  {I18n.t('Switch to new dashboard view')}
+                </Button>
               )}
               <div id="DashboardOptionsMenu_Container">
                 <DashboardOptionsMenu
@@ -409,6 +430,18 @@ class DashboardHeader extends React.Component {
                     canAddObservee={ENV.CAN_ADD_OBSERVEE}
                     handleChangeObservedUser={id => this.handleChangeObservedUser(id)}
                   />
+                </Flex.Item>
+              )}
+              {ENV.widget_dashboard_overridable === false && (
+                <Flex.Item overflowY="visible">
+                  <Button
+                    display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
+                    onClick={this.handleSwitchToNewDashboard}
+                    disabled={this.state.switchingDashboard}
+                    data-testid="switch-to-new-dashboard-button"
+                  >
+                    {I18n.t('Switch to new dashboard view')}
+                  </Button>
                 </Flex.Item>
               )}
               <Flex.Item overflowY="visible">
