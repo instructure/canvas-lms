@@ -1554,6 +1554,10 @@ class Account < ActiveRecord::Base
     state :deleted
   end
 
+  def marked_for_deletion?
+    deleted? && external_status == "delete_me_frd"
+  end
+
   def account_users_for(user)
     if self == Account.site_admin
       shard.activate do
