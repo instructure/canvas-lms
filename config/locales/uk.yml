@@ -4003,6 +4003,7 @@ uk:
   close_grade_info_58ef5a20: "Закрити інформацію оцінки"
   close_move_tray_8609e988: "закрити панель переміщення"
   close_opportunity_center_popup_9907d981: "Закрити спливаюче вікно Центру можливостей"
+  close_rubric_a0fc8166: "Закрити рубрику"
   close_sidebar_10b0fbb4: "Закрити бічну панель"
   close_submission_tray_c4988fa8: "Закрити панель подання"
   closed_for_comments_e395b42f: "Закрито для коментарів"
@@ -8919,6 +8920,7 @@ uk:
   hide_e057ff36: Приховати
   hide_groups_navigation_menu_62e8b3d0: "Сховати меню навігації груп"
   hide_navigation_menu_f0b3e90: "Сховати меню навігації "
+  hide_rubric_27903c8: "Приховати рубрику"
   hide_score_total_for_assessment_results_d0ef117f: "Приховати загальну кількість балів за результатами оцінки"
   hide_sidebar_2b5b3776: "Сховати бічну панель"
   hide_student_names_3e59e862: "Приховати імена студентів"
@@ -13469,6 +13471,7 @@ uk:
   print_d0e3d53f: Розрдрукувати
   priority_dd4381ee: Пріоритет
   privacy_290109ea: Приватність
+  privacy_notice_7eff08fe: Конфіденційність
   privacy_policy_c68f482a: "Політика конфіденційності"
   private_copyrighted_3cac9686: "Приватний (Захищено авторським правом)"
   proceed_f3d33864: Продовжувати
