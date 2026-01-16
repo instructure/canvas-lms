@@ -31,13 +31,15 @@ ready(() => {
     render(<App />, node)
   }
 
-  const loadExtension = extensions['ui/features/content_migrations/instui_setup.tsx']?.()
+  const loadExtension = (extensions as Record<string, () => Promise<{default: () => void}>>)[
+    'ui/features/content_migrations/instui_setup.tsx'
+  ]?.()
   if (loadExtension) {
     loadExtension
-      .then(module => {
+      .then((module: {default: () => void}) => {
         module.default()
       })
-      .catch(err => {
+      .catch((err: Error) => {
         throw new Error(
           'Error loading extension for ui/features/content_migrations/instui_setup.tsx',
           err,

@@ -272,6 +272,12 @@ export interface EnvCommon {
    */
   top_navigation_tools: Tool[]
 
+  /**
+   * Used by ui/features/assignment_index/react/IndexMenu.tsx
+   * Set in ApplicationController#js_env
+   */
+  assignment_index_menu_tools?: Tool[]
+
   BLUEPRINT_COURSES_DATA: BlueprintCoursesData | undefined
   AI_FEEDBACK_LINK?: string
 

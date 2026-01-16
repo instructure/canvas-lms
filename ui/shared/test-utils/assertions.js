@@ -79,7 +79,7 @@ export function isAccessible($el, options = {}) {
       }
 
       try {
-        expect(violations.length).toBe(0)
+        expect(violations).toHaveLength(0)
         resolve()
       } catch (error) {
         _reject(error)

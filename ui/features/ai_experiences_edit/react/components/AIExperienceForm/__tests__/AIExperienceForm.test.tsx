@@ -23,6 +23,7 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import AIExperienceForm from '../AIExperienceForm'
 import type {AIExperience} from '../../../../types'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 const server = setupServer()
 
@@ -46,12 +47,12 @@ describe('AIExperienceForm', () => {
   afterEach(() => {
     server.resetHandlers()
     cleanup()
+    fakeEnv.teardown()
   })
 
   beforeEach(() => {
     vi.clearAllMocks()
-    // @ts-expect-error
-    window.ENV = {COURSE_ID: 123}
+    fakeEnv.setup({COURSE_ID: 123})
   })
 
   describe('rendering', () => {

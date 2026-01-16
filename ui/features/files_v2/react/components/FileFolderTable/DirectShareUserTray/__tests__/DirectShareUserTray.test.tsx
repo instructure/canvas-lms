@@ -72,8 +72,7 @@ describe('DirectShareUserTray', () => {
 
   beforeAll(() => {
     server.listen()
-    // @ts-expect-error
-    window.ENV = {COURSE_ID: '42'}
+    ;(window as any).ENV = {COURSE_ID: '42'}
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
     ariaLive.setAttribute('role', 'alert')
@@ -82,8 +81,7 @@ describe('DirectShareUserTray', () => {
 
   afterAll(() => {
     server.close()
-    // @ts-expect-error
-    delete window.ENV
+    delete (window as any).ENV
     if (ariaLive) document.body.removeChild(ariaLive)
   })
 
