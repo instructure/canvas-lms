@@ -6277,6 +6277,7 @@ nn:
   close_help_dialog_653a6549: "Lukk hjelpemeny"
   close_move_tray_8609e988: "lukk flyttmeny"
   close_opportunity_center_popup_9907d981: "Lukk popup-menyen med val"
+  close_rubric_a0fc8166: "Lukk vurderingsskjema"
   close_sidebar_10b0fbb4: "Lukk sidestolpe"
   close_student_details_2f6900: "Lukk studentdetaljar"
   close_submission_tray_c4988fa8: "Lukk innleveringsmeny"
@@ -13807,6 +13808,7 @@ nn:
   hide_outcomes_with_no_results_7e4ce06f: "Skjuler læringsmål utan resultat"
   hide_params_eadf0961: "Skjul params"
   hide_projections_9d4ed1e1: "Gøym anslag"
+  hide_rubric_27903c8: "Skjul vurderingsskjemaet"
   hide_score_total_for_assessment_results_d0ef117f: "Skjul endeleg resultat for vurderingsresultat"
   hide_sidebar_2b5b3776: "Skjul sidestolpe"
   hide_student_names_3e59e862: "Skjul studentnamn"
@@ -20539,6 +20541,7 @@ nn:
   priority_dd4381ee: Prioritet
   privacy_290109ea: Personvern
   privacy_level_f0ec09a3: Personvernnivå
+  privacy_notice_7eff08fe: Personvernerklæring
   privacy_policy_c68f482a: "Retningslinjer for personvern"
   private_3883d133: Privat
   private_copyrighted_3cac9686: "Privat (med opphavsrett)"
