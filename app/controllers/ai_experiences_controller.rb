@@ -77,7 +77,7 @@ class AiExperiencesController < ApplicationController
 
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
-  before_action :require_manage_rights, except: [:index]
+  before_action :require_manage_rights, except: [:index, :show]
   before_action :load_experience, only: %i[show edit update destroy]
 
   # @API List AI experiences
@@ -121,6 +121,11 @@ class AiExperiencesController < ApplicationController
   # @returns AiExperience
   def show
     @ai_experience = @experience
+    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
+    can_manage = @context.grants_any_right?(@current_user, *permissions)
+
+    return render_unauthorized_action unless can_manage || @ai_experience.published?
+
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
     add_crumb @ai_experience.title
@@ -128,11 +133,11 @@ class AiExperiencesController < ApplicationController
       format.html do
         @page_title = @ai_experience.title
         js_bundle :ai_experiences_show
-        js_env(AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session))
+        js_env(AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session, can_manage:))
         render html: view_context.content_tag(:div, nil, id: "ai_experiences_show"),
                layout: true
       end
-      format.json { render json: ai_experience_json(@experience, @current_user, session) }
+      format.json { render json: ai_experience_json(@experience, @current_user, session, can_manage:) }
     end
   end
 
