@@ -62,39 +62,39 @@ describe('isCompleted()', () => {
 })
 
 describe('commonEventFactory cross-shard context matching', () => {
-  it('matches local context when API returns global context code', () => {
+  it('matches context when API returns consistent IDs', () => {
     const event = commonEventFactory(
       {
         title: 'Cross-shard appointment',
         start_at: '2026-01-26T18:00:00Z',
         effective_context_code: 'course_97700000000059053',
-        context_code: 'course_59053',
+        context_code: 'course_97700000000059053',
         all_context_codes: 'course_97700000000059053',
         appointment_group_id: '2',
         appointment_group_url: 'http://localhost:3000/api/v1/appointment_groups/2',
       },
-      [{asset_string: 'course_59053', can_create_calendar_events: true}],
+      [{asset_string: 'course_97700000000059053', can_create_calendar_events: true}],
     )
     expect(event).not.toBeNull()
-    expect(event.contextCode()).toBe('course_59053')
-    expect(event.calendarEvent.effective_context_code).toBe('course_59053')
-    expect(event.calendarEvent.all_context_codes).toBe('course_59053')
+    expect(event.contextCode()).toBe('course_97700000000059053')
+    expect(event.calendarEvent.effective_context_code).toBe('course_97700000000059053')
+    expect(event.calendarEvent.all_context_codes).toBe('course_97700000000059053')
   })
 
-  it('matches local context in multi-context events with global IDs', () => {
+  it('matches context in multi-context events', () => {
     const event = commonEventFactory(
       {
-        title: 'Multi-context with globals',
+        title: 'Multi-context',
         start_at: '2026-01-26T18:00:00Z',
         effective_context_code: 'course_97700000000059053,course_97700000000059054',
         context_code: 'user_2',
         all_context_codes: 'course_97700000000059053,course_97700000000059054',
       },
-      [{asset_string: 'course_59053'}, {asset_string: 'course_59054'}],
+      [{asset_string: 'course_97700000000059053'}, {asset_string: 'course_97700000000059054'}],
     )
     expect(event).not.toBeNull()
-    expect(event.calendarEvent.effective_context_code).toBe('course_59053')
-    expect(event.calendarEvent.all_context_codes).toBe('course_59053,course_59054')
+    expect(event.calendarEvent.effective_context_code).toBe('course_97700000000059053,course_97700000000059054')
+    expect(event.calendarEvent.all_context_codes).toBe('course_97700000000059053,course_97700000000059054')
   })
 
   it('returns null when context cannot be matched', () => {
@@ -110,7 +110,7 @@ describe('commonEventFactory cross-shard context matching', () => {
     expect(event).toBeNull()
   })
 
-  it('does not match different ID when checking global IDs', () => {
+  it('does not match different IDs', () => {
     const event = commonEventFactory(
       {
         title: 'Should not match',

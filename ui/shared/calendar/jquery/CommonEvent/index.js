@@ -73,48 +73,17 @@ export default function commonEventFactory(data, contexts) {
     contextCode = data.effective_context_code || data.context_code
   }
 
-  const matchesContext = (contextAssetString, codeToMatch) => {
-    if (contextAssetString === codeToMatch) return true
-
-    const [contextType, contextId] = contextAssetString.split('_')
-    const [codeType, codeId] = codeToMatch.split('_')
-
-    if (contextType !== codeType || !contextId || !codeId) return false
-    if (contextId === codeId) return true
-
-    if (codeId.length < 10 || contextId.length >= codeId.length) return false
-
-    const globalIdPattern = new RegExp(`^\\d{10,}${contextId}$`)
-    return globalIdPattern.test(codeId)
-  }
-
-  let contextInfo = contexts.find(context => matchesContext(context.asset_string, contextCode))
+  let contextInfo = contexts.find(context => context.asset_string === contextCode)
 
   // match one of a multi-context event
   if (contextInfo == null && contextCode && contextCode.indexOf(',') >= 0) {
     const contextCodes = contextCode.split(',')
-    contextInfo = contexts.find(context =>
-      contextCodes.some(code => matchesContext(context.asset_string, code.trim())),
-    )
+    contextInfo = contexts.find(context => contextCodes.includes(context.asset_string))
   }
 
   // If we can't find the context, then we're not sure
   // how to handle or display this, so we ditch it.
   if (contextInfo == null) return null
-
-  if (contextCode !== contextInfo.asset_string) {
-    data.effective_context_code = contextInfo.asset_string
-    if (data.all_context_codes) {
-      const codes = data.all_context_codes.split(',')
-      data.all_context_codes = codes
-        .map(code => {
-          const trimmedCode = code.trim()
-          const matchedContext = contexts.find(ctx => matchesContext(ctx.asset_string, trimmedCode))
-          return matchedContext ? matchedContext.asset_string : trimmedCode
-        })
-        .join(',')
-    }
-  }
 
   if (actualContextCode !== contextCode) {
     parts = splitAssetString(actualContextCode)

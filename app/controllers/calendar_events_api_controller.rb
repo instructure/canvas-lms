@@ -681,7 +681,7 @@ class CalendarEventsApiController < ApplicationController
     @event.shard.activate do
       if authorized_action(@event, @current_user, :reserve) && check_for_past_signup(@event)
         begin
-          participant_id = Shard.relative_id_for(params[:participant_id], Shard.current, Shard.current) if params[:participant_id]
+          participant_id = Shard.relative_id_for(params[:participant_id], @request_shard, Shard.current) if params[:participant_id]
           if participant_id && @event.appointment_group.grants_right?(@current_user, session, :manage)
             participant = @event.appointment_group.possible_participants.detect { |p| p.id == participant_id }
           else
@@ -1691,14 +1691,8 @@ class CalendarEventsApiController < ApplicationController
       # pull in reservable appointment group events, if requested
       group_codes = codes.grep(/\Aappointment_group_(\d+)\z/).map { |m| m.sub(/.*_/, "").to_i }
       if group_codes.present?
-        # Support cross-shard appointment groups
-        ags = []
-        group_codes.each do |id|
-          shard = Shard.shard_for(id)
-          shard.activate do
-            ag = AppointmentGroup.reservable_by(user).where(id:).select(:id).first
-            ags << ag if ag
-          end
+        ags = Shard.partition_by_shard(group_codes) do |shard_ids|
+          AppointmentGroup.reservable_by(user).where(id: shard_ids).select(:id)
         end
         @selected_contexts += ags
         @context_codes += ags.map(&:asset_string)
