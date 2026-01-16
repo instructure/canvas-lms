@@ -4530,6 +4530,31 @@ describe CoursesController, type: :request do
       expect(json["syllabus_versions"].first["syllabus_body"]).to include("Version 6")
     end
 
+    it "includes edited_by user information in syllabus_versions when saving_user is set" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.saving_user = @me
+      @course1.update(syllabus_body: "Version with user")
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_versions",
+                      { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_versions"] })
+      expect(json).to have_key("syllabus_versions")
+      expect(json["syllabus_versions"].first).to have_key("edited_by")
+      expect(json["syllabus_versions"].first["edited_by"]["id"]).to eq(@me.id)
+      expect(json["syllabus_versions"].first["edited_by"]["name"]).to eq(@me.name)
+    end
+
+    it "does not include edited_by when saving_user is not set" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.update(syllabus_body: "Version without user")
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_versions",
+                      { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_versions"] })
+      expect(json).to have_key("syllabus_versions")
+      expect(json["syllabus_versions"].first).not_to have_key("edited_by")
+    end
+
     describe "#restore_version" do
       before do
         Account.site_admin.enable_feature!(:syllabus_versioning)

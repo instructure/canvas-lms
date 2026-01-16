@@ -33,11 +33,19 @@ describe('SyllabusRevisionsTray', () => {
       version: 3,
       created_at: '2025-01-03T00:00:00Z',
       syllabus_body: '<p>Current content</p>',
+      edited_by: {
+        id: 1,
+        name: 'John Doe',
+      },
     },
     {
       version: 2,
       created_at: '2025-01-02T00:00:00Z',
       syllabus_body: '<p>Previous content</p>',
+      edited_by: {
+        id: 2,
+        name: 'Jane Smith',
+      },
     },
     {
       version: 1,
@@ -286,5 +294,39 @@ describe('SyllabusRevisionsTray', () => {
     rerender(<SyllabusRevisionsTray {...defaultProps} open={false} />)
 
     expect(syllabusElement?.innerHTML).toBe(originalInnerHTML)
+  })
+
+  it('displays user name when edited_by is present', async () => {
+    server.use(
+      http.get('/api/v1/courses/123', () => HttpResponse.json({syllabus_versions: mockVersions})),
+    )
+    render(<SyllabusRevisionsTray {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/by John Doe/)).toBeInTheDocument()
+      expect(screen.getByText(/by Jane Smith/)).toBeInTheDocument()
+    })
+  })
+
+  it('does not display user name when edited_by is not present', async () => {
+    const versionsWithoutUser = [
+      {
+        version: 1,
+        created_at: '2025-01-01T00:00:00Z',
+        syllabus_body: '<p>Old content</p>',
+      },
+    ]
+    server.use(
+      http.get('/api/v1/courses/123', () =>
+        HttpResponse.json({syllabus_versions: versionsWithoutUser}),
+      ),
+    )
+    render(<SyllabusRevisionsTray {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('current-version')).toBeInTheDocument()
+    })
+
+    expect(screen.queryByText(/by /)).not.toBeInTheDocument()
   })
 })
