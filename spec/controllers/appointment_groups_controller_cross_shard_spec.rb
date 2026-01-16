@@ -445,7 +445,7 @@ describe AppointmentGroupsController, type: :request do
 
         expect(json).to be_an(Array)
         expect(json.size).to eq(1)
-        expect(json.first["appointment_group_id"]).to eq("#{@ag.shard.id}~#{@ag.local_id}")
+        expect(json.first["appointment_group_id"]).to eq(@ag.global_id)
         expect(json.first["start_at"]).to be_present
       end
     end
@@ -479,7 +479,7 @@ describe AppointmentGroupsController, type: :request do
 
         expect(json).to be_an(Array)
         expect(json.size).to eq(1)
-        expect(json.first["appointment_group_id"]).to eq("#{@ag.shard.id}~#{@ag.local_id}")
+        expect(json.first["appointment_group_id"]).to eq(@ag.global_id)
       end
     end
   end
@@ -502,8 +502,8 @@ describe AppointmentGroupsController, type: :request do
         )
 
         expect(response).to be_successful
-        expect(json["appointment_group_id"]).to eq("#{@ag.shard.id}~#{@ag.local_id}")
-        expect(json["parent_event_id"]).to eq("#{@appointment.shard.id}~#{@appointment.local_id}")
+        expect(json["appointment_group_id"]).to eq(@ag.global_id)
+        expect(json["parent_event_id"]).to eq(@appointment.global_id)
       end
     end
 
