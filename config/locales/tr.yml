@@ -6685,6 +6685,7 @@ tr:
   close_opportunity_center_popup_9907d981: "Anonim Kip Açık:"
   close_picker_256aca8a: "Seçiciyi Kapat"
   close_preview_2fd61cda: "Anonim moderasyonlu ödevler, notlar yayımlanana kadar sessizden çıkarılamaz."
+  close_rubric_a0fc8166: "Değerlendirme Listesini Kapat"
   close_settings_tray_7b3084c2: "Anonim Kapalı"
   close_sidebar_10b0fbb4: "Kenar çubuğunu kapat"
   close_student_details_2f6900: "Anonim Açık"
@@ -15103,6 +15104,7 @@ tr:
   hide_outcomes_with_no_results_7e4ce06f: "Sonuç içermeyen öğrenme çıktılarını gizle"
   hide_params_eadf0961: "Parametreleri gizle"
   hide_revision_history_4111f3d1: "Revizyon geçmişini gizle"
+  hide_rubric_27903c8: "Değerlendirme Listesini Gizle"
   hide_rubric_score_total_from_students_a2b2274a: "Rubrik toplam puanını öğrencilerden gizle"
   hide_score_total_for_assessment_results_d0ef117f: "Sınav sonuçlarından toplam puanları gizle"
   hide_sidebar_2b5b3776: "Paneli Gizle"
@@ -22046,6 +22048,7 @@ tr:
   print_d0e3d53f: Yazdır
   priority_dd4381ee: Öncelik
   privacy_290109ea: Gizlilik
+  privacy_notice_7eff08fe: "Gizlilik Bildirimi"
   privacy_policy_c68f482a: "Gizlilik Sözleşmesi"
   private_3883d133: Özel
   private_copyrighted_3cac9686: "Özel (Telif Hakkı Saklı)"
