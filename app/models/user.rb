@@ -232,6 +232,7 @@ class User < ActiveRecord::Base
   has_many :submission_comments, foreign_key: "author_id", inverse_of: :author
 
   has_one :profile, class_name: "UserProfile"
+  has_many :profile_links, through: :profile, source: :links
 
   has_many :progresses, as: :context, inverse_of: :context
   has_many :one_time_passwords, -> { order(:id) }, inverse_of: :user
