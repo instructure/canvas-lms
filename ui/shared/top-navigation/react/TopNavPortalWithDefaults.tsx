@@ -28,10 +28,21 @@ import type {ItemChild} from '@instructure/ui-top-nav-bar/types/TopNavBar/props'
 
 const I18n = createI18nScope('discussions_v2')
 const STUDENT_VIEW_URL_TEMPLATE = '/courses/{courseId}/student_view?redirect_to_referer=1'
-type EnvCommon = import('@canvas/global/env/EnvCommon').EnvCommon
+
+type WindowEnvExtended = Window & {
+  ENV: import('@canvas/global/env/EnvCommon').EnvCommon & {
+    COURSE_ID?: string | number
+    course_id?: string | number
+    NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT?: {is_enabled: boolean}
+    PERMISSIONS?: {manage?: boolean}
+    course?: {id?: string | number}
+    NEW_USER_TUTORIALS?: {is_enabled: boolean}
+  }
+}
+
 const isStudent = () => {
-  // @ts-expect-error
-  return window.ENV.current_user_roles?.includes('student') && !window.ENV.PERMISSIONS?.manage
+  const env = (window as WindowEnvExtended).ENV
+  return env.current_user_roles?.includes('student') && !env.PERMISSIONS?.manage
 }
 
 const handleStudentViewClick = (studentViewUrl: string) => {
@@ -57,9 +68,8 @@ const handleBreadCrumbSetter = (
 }
 
 const addStudentViewActionItem = (courseId?: number) => {
-  // @ts-expect-error
-  const cId: number =
-    courseId || window.ENV?.course?.id || window.ENV?.COURSE_ID || window.ENV?.course_id
+  const env = (window as WindowEnvExtended).ENV
+  const cId = courseId || env?.course?.id || env?.COURSE_ID || env?.course_id
   if (!cId) {
     return null
   }
@@ -96,8 +106,7 @@ const addTutorialActionItem = () => {
 }
 
 const tutorialEnabled = () => {
-  const env = window.ENV
-  // @ts-expect-error
+  const env = (window as WindowEnvExtended).ENV
   const new_user_tutorial_on_off = env?.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT?.is_enabled
   return env?.NEW_USER_TUTORIALS?.is_enabled && new_user_tutorial_on_off
 }

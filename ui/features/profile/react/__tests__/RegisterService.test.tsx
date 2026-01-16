@@ -36,8 +36,7 @@ describe('RegisterService', () => {
   })
 
   afterAll(() => {
-    // @ts-expect-error
-    window.ENV = {}
+    ;(window as any).ENV = {}
     server.close()
   })
 

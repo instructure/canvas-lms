@@ -21,6 +21,7 @@ import {renderAssignToTray} from '../renderAssignToTray'
 import {queryClient} from '@canvas/query'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 const server = setupServer()
 
@@ -58,14 +59,15 @@ export const STUDENTS_DATA = [
   },
 ]
 
-// @ts-expect-error
-window.ENV = {
-  COURSE_ID: '1',
-}
-
 describe('renderAssignToTray embedded', () => {
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
+  beforeAll(() => {
+    server.listen()
+    fakeEnv.setup({COURSE_ID: '1'})
+  })
+  afterAll(() => {
+    server.close()
+    fakeEnv.teardown()
+  })
 
   beforeEach(() => {
     server.use(

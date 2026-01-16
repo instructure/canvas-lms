@@ -72,15 +72,13 @@ const isCaptionMetaData = (track: MediaTrack | CaptionMetaData): track is Captio
 const convertMediaTracksIfNeeded = (
   tracks: MediaTrack[] | CaptionMetaData[],
 ): CaptionMetaData[] => {
-  // @ts-expect-error
-  return tracks.map(track => {
+  return tracks.map((track): CaptionMetaData => {
     if (isCaptionMetaData(track)) return track
     return {
-      locale: track.locale,
       language: captionLanguageForLocale(track.locale),
-      inherited: track.inherited,
       label: captionLanguageForLocale(track.locale),
       src: track.url,
+      type: 'vtt',
     }
   })
 }

@@ -112,8 +112,6 @@ class TableFiles extends React.Component<TableFilesProps, TableFilesState> {
   }
 
   formattedDateTime = (dateTime: string) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
     return tz.format(tz.parse(dateTime), I18n.t('#date.formats.medium'))
   }
 
