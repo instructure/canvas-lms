@@ -3442,6 +3442,7 @@ el:
   close_and_return_to_canvas_80544344: "Κλείσιμο και επιστροφή στο Canvas"
   close_d634289d: Κλείσιμο
   close_for_comments_37783f56: "Κλεισμένο για Σχόλια"
+  close_rubric_a0fc8166: "Κλείσιμο Ρουμπρίκας"
   closed_for_comments_e395b42f: "Κλεισμένο για Σχόλια"
   collaboration_was_deleted_9cf9934b: "Η συνεργασία διαγράφηκε"
   collaborations: 
@@ -7529,6 +7530,7 @@ el:
   hide_correct_answers_at_b1a59408: "Απόκρυψη Σωστών Απαντήσεων Σε"
   hide_courses_without_enrollments_6df4dfad: "Απόκρυψη μαθημάτων στα οποία δεν υπάρχουν εγγραφές"
   hide_e057ff36: Απόκρυψη
+  hide_rubric_27903c8: "Απόκρυψη Ρουμπρίκας"
   hide_score_total_for_assessment_results_d0ef117f: "Απόκρυψη της συνολικής βαθμολογίας των αποτελεσμάτων αξιολόγησης"
   hide_student_names_3e59e862: "Απόκρυψη Ονομάτων των Μαθητών"
   high_contrast_description: |-
@@ -11417,6 +11419,7 @@ el:
   primary_color_button_disabled_9081ddff: "Το κουμπί βασικού χρώματος έχει απενεργοποιηθεί"
   priority_dd4381ee: Προτεραιότητα
   privacy_290109ea: Απόρρητο
+  privacy_notice_7eff08fe: "Σημείωση περί Απορρήτου"
   privacy_policy_c68f482a: "Πολιτική Απορρήτου"
   private_copyrighted_3cac9686: "Ιδιωτική (Προστατευόμενη)"
   process_as_ui_changes_8e34ed2a: "Επεξεργασία ως αλλαγές UI"
