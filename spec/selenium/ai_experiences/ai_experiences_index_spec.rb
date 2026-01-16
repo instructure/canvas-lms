@@ -142,9 +142,11 @@ describe "ai experiences index" do
       get AiExperiencesIndexPage.ai_experiences_url(@course.id)
     end
 
-    it "cannot access the AI Experiences index page" do
-      # Should show unauthorized error - verify AI Experiences heading doesn't exist
-      expect(AiExperiencesIndexPage.page_heading_text).not_to eq("AI Experiences")
+    it "can access the AI Experiences index page but with view-only access" do
+      # Students can now view the AI Experiences page (they will only see published experiences)
+      expect(AiExperiencesIndexPage.page_heading_text).to eq("AI Experiences")
+      # Create button should not be visible for students
+      expect(AiExperiencesIndexPage.create_new_button_displayed?).to be false
     end
   end
 

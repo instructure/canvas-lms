@@ -25,4 +25,5 @@ export type AiExperience = {
   learning_objective?: string
   pedagogical_guidance?: string
   created_at: string
+  can_manage?: boolean
 }
