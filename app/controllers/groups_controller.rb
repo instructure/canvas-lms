@@ -819,7 +819,11 @@ class GroupsController < ApplicationController
                     else
                       User.where(id: user_ids)
                     end
+            # Capture users being removed before set_users destroys their memberships
+            removed_user_ids = @group.group_memberships.where.not(user_id: user_ids).pluck(:user_id)
             @memberships = @group.set_users(users)
+            # Invalidate visibility caches for removed users (set_users uses destroy_all which bypasses callbacks)
+            GroupMembership.invalidate_visibility_caches_for_group(@group, removed_user_ids) if removed_user_ids.any?
           end
         end
 

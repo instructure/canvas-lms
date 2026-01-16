@@ -680,6 +680,35 @@ describe GroupMembership do
         ).at_least(:once)
       end
 
+      it "invalidates module visibility cache when group membership changes" do
+        context_module = course.context_modules.create!(name: "Group Module", workflow_state: "active")
+        context_module.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+        membership = group.group_memberships.create!(user: student)
+
+        allow(ModuleVisibility::ModuleVisibilityService).to receive(:invalidate_cache)
+
+        membership.destroy
+
+        expect(ModuleVisibility::ModuleVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            context_module_ids: [context_module.id],
+            include_concluded: true
+          )
+        ).at_least(:once)
+
+        expect(ModuleVisibility::ModuleVisibilityService).to have_received(:invalidate_cache).with(
+          hash_including(
+            course_ids: [course.id],
+            user_ids: [student.id],
+            context_module_ids: [context_module.id],
+            include_concluded: false
+          )
+        ).at_least(:once)
+      end
+
       it "invalidates both caches when both wiki pages and discussions exist" do
         membership = group.group_memberships.create!(user: student)
 
@@ -724,6 +753,172 @@ describe GroupMembership do
           )
         ).at_least(:once)
       end
+    end
+  end
+
+  describe ".invalidate_visibility_caches_for_group" do
+    let(:course) { course_factory(active_all: true) }
+    let(:student) { student_in_course(course:, active_all: true).user }
+    let(:student2) { student_in_course(course:, active_all: true).user }
+    let(:group_category) { course.group_categories.create!(name: "Category", non_collaborative: true) }
+    let(:group) { group_category.groups.create!(context: course) }
+
+    before do
+      course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      course.account.save!
+    end
+
+    it "invalidates module visibility cache for multiple users" do
+      context_module = course.context_modules.create!(name: "Group Module", workflow_state: "active")
+      context_module.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      allow(ModuleVisibility::ModuleVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(group, [student.id, student2.id])
+
+      expect(ModuleVisibility::ModuleVisibilityService).to have_received(:invalidate_cache).with(
+        hash_including(
+          course_ids: [course.id],
+          user_ids: [student.id],
+          context_module_ids: [context_module.id]
+        )
+      ).at_least(:once)
+
+      expect(ModuleVisibility::ModuleVisibilityService).to have_received(:invalidate_cache).with(
+        hash_including(
+          course_ids: [course.id],
+          user_ids: [student2.id],
+          context_module_ids: [context_module.id]
+        )
+      ).at_least(:once)
+    end
+
+    it "invalidates quiz visibility cache for multiple users" do
+      quiz = course.quizzes.create!(title: "Group Quiz", quiz_type: "assignment", workflow_state: "available")
+      quiz.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      allow(QuizVisibility::QuizVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(group, [student.id])
+
+      expect(QuizVisibility::QuizVisibilityService).to have_received(:invalidate_cache).with(
+        hash_including(
+          course_ids: [course.id],
+          user_ids: [student.id],
+          quiz_ids: [quiz.id]
+        )
+      ).at_least(:once)
+    end
+
+    it "does nothing for collaborative groups" do
+      collaborative_category = course.group_categories.create!(name: "Collaborative", non_collaborative: false)
+      collaborative_group = collaborative_category.groups.create!(context: course)
+
+      allow(ModuleVisibility::ModuleVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(collaborative_group, [student.id])
+
+      expect(ModuleVisibility::ModuleVisibilityService).not_to have_received(:invalidate_cache)
+    end
+
+    it "invalidates wiki page visibility cache" do
+      wiki_page = course.wiki_pages.create!(title: "Group Page", workflow_state: "active")
+      wiki_page.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      allow(WikiPageVisibility::WikiPageVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(group, [student.id])
+
+      expect(WikiPageVisibility::WikiPageVisibilityService).to have_received(:invalidate_cache).with(
+        hash_including(
+          course_ids: [course.id],
+          user_ids: [student.id],
+          wiki_page_ids: [wiki_page.id]
+        )
+      ).at_least(:once)
+    end
+
+    it "invalidates discussion topic visibility cache" do
+      discussion = course.discussion_topics.create!(title: "Group Discussion", workflow_state: "active")
+      discussion.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      allow(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(group, [student.id])
+
+      expect(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to have_received(:invalidate_cache).with(
+        hash_including(
+          course_ids: [course.id],
+          user_ids: [student.id],
+          discussion_topic_ids: [discussion.id]
+        )
+      ).at_least(:once)
+    end
+
+    it "does nothing for non-course contexts" do
+      account = Account.default
+      account_group_category = account.group_categories.create!(name: "Account Category")
+      account_group = account_group_category.groups.create!(context: account)
+
+      allow(ModuleVisibility::ModuleVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(account_group, [student.id])
+
+      expect(ModuleVisibility::ModuleVisibilityService).not_to have_received(:invalidate_cache)
+    end
+
+    it "does nothing when user_ids is empty" do
+      context_module = course.context_modules.create!(name: "Group Module", workflow_state: "active")
+      context_module.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      allow(ModuleVisibility::ModuleVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(group, [])
+
+      expect(ModuleVisibility::ModuleVisibilityService).not_to have_received(:invalidate_cache)
+    end
+
+    it "invalidates cache with both include_concluded true and false" do
+      context_module = course.context_modules.create!(name: "Group Module", workflow_state: "active")
+      context_module.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      allow(ModuleVisibility::ModuleVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(group, [student.id])
+
+      expect(ModuleVisibility::ModuleVisibilityService).to have_received(:invalidate_cache).with(
+        hash_including(include_concluded: true)
+      ).at_least(:once)
+
+      expect(ModuleVisibility::ModuleVisibilityService).to have_received(:invalidate_cache).with(
+        hash_including(include_concluded: false)
+      ).at_least(:once)
+    end
+
+    it "invalidates multiple content types when they all have overrides" do
+      wiki_page = course.wiki_pages.create!(title: "Group Page", workflow_state: "active")
+      wiki_page.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      discussion = course.discussion_topics.create!(title: "Group Discussion", workflow_state: "active")
+      discussion.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      quiz = course.quizzes.create!(title: "Group Quiz", quiz_type: "assignment", workflow_state: "available")
+      quiz.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      context_module = course.context_modules.create!(name: "Group Module", workflow_state: "active")
+      context_module.assignment_overrides.create!(set_type: "Group", set_id: group.id)
+
+      allow(WikiPageVisibility::WikiPageVisibilityService).to receive(:invalidate_cache)
+      allow(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to receive(:invalidate_cache)
+      allow(QuizVisibility::QuizVisibilityService).to receive(:invalidate_cache)
+      allow(ModuleVisibility::ModuleVisibilityService).to receive(:invalidate_cache)
+
+      described_class.invalidate_visibility_caches_for_group(group, [student.id])
+
+      expect(WikiPageVisibility::WikiPageVisibilityService).to have_received(:invalidate_cache).at_least(:once)
+      expect(UngradedDiscussionVisibility::UngradedDiscussionVisibilityService).to have_received(:invalidate_cache).at_least(:once)
+      expect(QuizVisibility::QuizVisibilityService).to have_received(:invalidate_cache).at_least(:once)
+      expect(ModuleVisibility::ModuleVisibilityService).to have_received(:invalidate_cache).at_least(:once)
     end
   end
 end
