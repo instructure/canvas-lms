@@ -519,4 +519,100 @@ describe('RecentGradesWidget', () => {
       expect(screen.getByText(/GraphQL Error/i)).toBeInTheDocument()
     })
   })
+
+  it('expands grade details when expand button is clicked', async () => {
+    const user = userEvent.setup()
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+    })
+
+    const expandButton = screen.getByTestId('expand-grade-sub1')
+    expect(expandButton).toBeInTheDocument()
+
+    await user.click(expandButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('expanded-grade-view-sub1')).toBeInTheDocument()
+    })
+  })
+
+  it('collapses grade details when collapse button is clicked', async () => {
+    const user = userEvent.setup()
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+    })
+
+    const expandButton = screen.getByTestId('expand-grade-sub1')
+    await user.click(expandButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('expanded-grade-view-sub1')).toBeInTheDocument()
+    })
+
+    await user.click(expandButton)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('expanded-grade-view-sub1')).not.toBeInTheDocument()
+    })
+  })
+
+  it('does not show expand button for ungraded items', async () => {
+    server.use(
+      http.post('/api/graphql', async () => {
+        return HttpResponse.json({
+          data: {
+            legacyNode: {
+              _id: '1',
+              courseWorkSubmissionsConnection: {
+                nodes: [
+                  {
+                    _id: 'sub-ungraded',
+                    score: null,
+                    grade: null,
+                    submittedAt: '2025-11-28T10:00:00Z',
+                    gradedAt: null,
+                    state: 'submitted',
+                    assignment: {
+                      _id: '201',
+                      name: 'Ungraded Assignment',
+                      htmlUrl: '/courses/1/assignments/201',
+                      pointsPossible: 100,
+                      submissionTypes: ['online_text_entry'],
+                      quiz: null,
+                      discussion: null,
+                      course: {
+                        _id: '1',
+                        name: 'Test Course',
+                        courseCode: 'TEST-101',
+                      },
+                    },
+                  },
+                ],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  endCursor: null,
+                  startCursor: null,
+                  totalCount: 1,
+                },
+              },
+            },
+          },
+        })
+      }),
+    )
+
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Ungraded Assignment')).toBeInTheDocument()
+      expect(screen.getByTestId('grade-status-badge-sub-ungraded')).toHaveTextContent('Not graded')
+    })
+
+    expect(screen.queryByTestId('expand-grade-sub-ungraded')).not.toBeInTheDocument()
+  })
 })
