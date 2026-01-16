@@ -51,8 +51,8 @@ class AiConversationsController < ApplicationController
         conversation_id: existing_conversation.llm_conversation_id
       )
 
-      messages = client.messages
-      render json: { id: existing_conversation.id, messages: }
+      messages_and_progress = client.messages_with_conversation_progress
+      render json: { id: existing_conversation.id, messages: messages_and_progress[:messages], progress: messages_and_progress[:progress] }
     else
       render json: {}
     end
@@ -100,8 +100,8 @@ class AiConversationsController < ApplicationController
       )
     end
 
-    # Return only the Canvas conversation ID and messages, not the LLM conversation ID
-    render json: { id: conversation_record&.id, messages: result[:messages] }, status: :created
+    # Return only the Canvas conversation ID, messages, and progress
+    render json: { id: conversation_record&.id, messages: result[:messages], progress: result[:progress] }, status: :created
   rescue LlmConversation::Errors::ConversationError => e
     render json: { error: e.message }, status: :service_unavailable
   end
@@ -131,7 +131,8 @@ class AiConversationsController < ApplicationController
     )
 
     # Get current messages first
-    current_messages = client.messages
+    messages_data = client.messages
+    current_messages = messages_data[:messages]
 
     # Send the new message
     result = client.continue_conversation(
@@ -139,8 +140,8 @@ class AiConversationsController < ApplicationController
       new_user_message: params[:message]
     )
 
-    # Return only the Canvas conversation ID and messages, not the LLM conversation ID
-    render json: { id: @conversation.id, messages: result[:messages] }
+    # Return only the Canvas conversation ID, messages, and progress
+    render json: { id: @conversation.id, messages: result[:messages], progress: result[:progress] }
   rescue LlmConversation::Errors::ConversationError => e
     render json: { error: e.message }, status: :service_unavailable
   end

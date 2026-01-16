@@ -35,11 +35,70 @@ describe AiConversationsController do
     )
   end
 
+  describe "GET #active_conversation" do
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "returns existing active conversation with progress" do
+        conversation = @ai_experience.ai_conversations.create!(
+          llm_conversation_id: "existing-llm-conv-id",
+          user: @teacher,
+          course: @course,
+          root_account: @course.root_account,
+          account: @course.account,
+          workflow_state: "active"
+        )
+
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:messages_with_conversation_progress).and_return({
+                                                                                         messages: [
+                                                                                           { role: "User", text: "Hello" },
+                                                                                           { role: "Assistant", text: "Hi there!" }
+                                                                                         ],
+                                                                                         progress: {
+                                                                                           current: 1,
+                                                                                           total: 3,
+                                                                                           percentage: 33,
+                                                                                           objectives: [
+                                                                                             { objective: "Objective 1", status: "covered" },
+                                                                                             { objective: "Objective 2", status: "" },
+                                                                                             { objective: "Objective 3", status: "" }
+                                                                                           ]
+                                                                                         }
+                                                                                       })
+
+        get :active_conversation,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id },
+            format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["id"]).to eq(conversation.id)
+        expect(json_response["messages"]).to be_an(Array)
+        expect(json_response["progress"]).to be_present
+        expect(json_response["progress"]["percentage"]).to eq(33)
+        expect(json_response["progress"]["current"]).to eq(1)
+        expect(json_response["progress"]["total"]).to eq(3)
+      end
+
+      it "returns empty object when no active conversation" do
+        get :active_conversation,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id },
+            format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response).to eq({})
+      end
+    end
+  end
+
   describe "POST #create" do
     context "as teacher" do
       before { user_session(@teacher) }
 
-      it "creates a new conversation and returns initial messages" do
+      it "creates a new conversation and returns initial messages with progress" do
         mock_client = instance_double(LLMConversationClient)
         allow(LLMConversationClient).to receive(:new).and_return(mock_client)
         allow(mock_client).to receive(:starting_messages).and_return({
@@ -47,7 +106,16 @@ describe AiConversationsController do
                                                                        messages: [
                                                                          { role: "User", text: "Hello" },
                                                                          { role: "Assistant", text: "Hi there!" }
-                                                                       ]
+                                                                       ],
+                                                                       progress: {
+                                                                         current: 0,
+                                                                         total: 2,
+                                                                         percentage: 0,
+                                                                         objectives: [
+                                                                           { objective: "Objective 1", status: "" },
+                                                                           { objective: "Objective 2", status: "" }
+                                                                         ]
+                                                                       }
                                                                      })
 
         post :create,
@@ -60,6 +128,9 @@ describe AiConversationsController do
         expect(json_response["messages"]).to be_an(Array)
         expect(json_response["messages"].length).to eq(2)
         expect(json_response["conversation_id"]).to be_nil # Should not expose LLM conversation ID
+        expect(json_response["progress"]).to be_present
+        expect(json_response["progress"]["percentage"]).to eq(0)
+        expect(json_response["progress"]["objectives"]).to be_an(Array)
       end
 
       it "creates an AiConversation record" do
@@ -166,19 +237,31 @@ describe AiConversationsController do
     context "as teacher" do
       before { user_session(@teacher) }
 
-      it "posts a message and returns updated messages" do
+      it "posts a message and returns updated messages with progress" do
         mock_client = instance_double(LLMConversationClient)
         allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive_messages(messages: [
-                                                 { role: "User", text: "Hello" }
-                                               ],
+        allow(mock_client).to receive_messages(messages: {
+                                                 messages: [
+                                                   { role: "User", text: "Hello" }
+                                                 ],
+                                                 progress: nil
+                                               },
                                                continue_conversation: {
                                                  conversation_id: "llm-conv-id",
                                                  messages: [
                                                    { role: "User", text: "Hello" },
                                                    { role: "User", text: "How are you?" },
                                                    { role: "Assistant", text: "I'm doing well!" }
-                                                 ]
+                                                 ],
+                                                 progress: {
+                                                   current: 1,
+                                                   total: 2,
+                                                   percentage: 50,
+                                                   objectives: [
+                                                     { objective: "Objective 1", status: "covered" },
+                                                     { objective: "Objective 2", status: "" }
+                                                   ]
+                                                 }
                                                })
 
         post :post_message,
@@ -196,6 +279,8 @@ describe AiConversationsController do
         expect(json_response["messages"]).to be_an(Array)
         expect(json_response["messages"].length).to eq(3)
         expect(json_response["conversation_id"]).to be_nil # Should not expose LLM conversation ID
+        expect(json_response["progress"]).to be_present
+        expect(json_response["progress"]["percentage"]).to eq(50)
       end
 
       it "returns bad request when message is missing" do
@@ -243,9 +328,11 @@ describe AiConversationsController do
       it "allows students to post messages to their own conversations" do
         mock_client = instance_double(LLMConversationClient)
         allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive_messages(messages: [], continue_conversation: {
+        allow(mock_client).to receive_messages(messages: { messages: [], progress: nil },
+                                               continue_conversation: {
                                                  conversation_id: "student-llm-conv-id",
-                                                 messages: []
+                                                 messages: [],
+                                                 progress: nil
                                                })
 
         post :post_message,
