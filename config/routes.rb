@@ -2448,6 +2448,12 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/live_assessments/:assessment_id/results", action: :create, as: "course_live_assessment_result_create"
     end
 
+    scope(controller: :assessment_question_banks) do
+      get "question_banks", action: :index, as: "question_banks"
+      get "question_banks/:id", action: :show, as: "question_bank"
+      get "question_banks/:id/questions", action: :questions, as: "question_bank_questions"
+    end
+
     scope(controller: "support_helpers/turnitin") do
       get "support_helpers/turnitin/md5", action: :md5
       get "support_helpers/turnitin/error2305", action: :error2305

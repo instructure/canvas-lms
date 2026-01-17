@@ -37,6 +37,18 @@
 #         "type": "integer",
 #         "format": "int64"
 #       },
+#       "assessment_question_bank_id": {
+#         "description": "The ID of the assessment question bank this question belongs to. If assessment_question_bank_id has been enabled by SiteAdmin.",
+#         "example": 3,
+#         "type": "integer",
+#         "format": "int64"
+#       },
+#       "created_at": {
+#         "description": "The date and time when the quiz question was created.",
+#         "example": "2013-01-23T23:59:00-07:00",
+#         "type": "string",
+#         "format": "date-time"
+#       },
 #       "position": {
 #         "description": "The order in which the question will be retrieved and displayed.",
 #         "example": 1,
@@ -217,7 +229,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
       # are not guaranteed to be unique by position (due to the way we position questions in groups),
       # we also order by id here to ensure a consistent ordering. Without this secondary order,
       # pagination can result in duplicates or omissions accross pages.
-      render_question_set(@quiz.active_quiz_questions.order(:id))
+      if Account.site_admin.feature_enabled?(:ams_add_question_bank_to_quiz_question)
+        render_question_set(
+          @quiz.active_quiz_questions
+               .preload(assessment_question: :assessment_question_bank)
+               .order(:id)
+        )
+      else
+        render_question_set(@quiz.active_quiz_questions.order(:id))
+      end
     end
   end
 
@@ -307,9 +327,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
       @assessment_questions = @bank.assessment_questions.active.where(id: params[:assessment_questions_ids].split(",")).to_a
       @group = @quiz.quiz_groups.where(id: params[:quiz_group_id]).first if params[:quiz_group_id].to_i > 0
       @questions = @quiz.add_assessment_questions(@assessment_questions, @group)
+
+      if Account.site_admin.feature_enabled?(:ams_add_question_bank_to_quiz_question)
+        @questions = Quizzes::QuizQuestion.where(id: @questions.map(&:id))
+                                          .preload(assessment_question: :assessment_question_bank)
+      end
+
       bank_outcome_ids = @bank.learning_outcome_alignments.select(:learning_outcome_id)
       LearningOutcome.ensure_presence_in_context(bank_outcome_ids, @context)
-      render json: questions_json(@questions, @current_user, session, includes: [:assessment_question])
+      render json: questions_json(@questions, @current_user, session, context: @context, includes: [:assessment_question])
     end
   end
   protected :add_questions
@@ -451,6 +477,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       scope = Quizzes::QuizQuestion.where({
                                             id: @quiz_submission.quiz_data.pluck("id")
                                           })
+      scope = scope.preload(assessment_question: :assessment_question_bank) if Account.site_admin.feature_enabled?(:ams_add_question_bank_to_quiz_question)
 
       results_visible = @quiz_submission.results_visible?(user: @current_user)
       reject! "Cannot view questions due to quiz settings", 401 unless results_visible

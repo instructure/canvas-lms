@@ -28,7 +28,9 @@ module Api::V1::QuizQuestion
       position
       regrade_option
       assessment_question_id
+      assessment_question_bank_id
       quiz_group_id
+      created_at
     ]
   }.freeze
 
@@ -107,6 +109,9 @@ module Api::V1::QuizQuestion
       API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.each do |field|
         question_data = quiz_data&.find { |data_question| data_question[:id] == question[:id] } || question.question_data
         json[field] = question_data[field]
+      end
+      if Account.site_admin.feature_enabled?(:ams_add_question_bank_to_quiz_question)
+        json[:assessment_question_bank_id] = question&.assessment_question_bank&.id
       end
     end
 
