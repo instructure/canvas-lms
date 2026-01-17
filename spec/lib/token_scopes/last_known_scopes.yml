@@ -2082,6 +2082,12 @@
 - verb: POST
   path: '/api/v1/progress/:id/cancel'
 - verb: GET
+  path: '/api/v1/question_banks'
+- verb: GET
+  path: '/api/v1/question_banks/:id'
+- verb: GET
+  path: '/api/v1/question_banks/:id/questions'
+- verb: GET
   path: '/api/v1/quiz_submissions/:quiz_submission_id/questions'
 - verb: POST
   path: '/api/v1/quiz_submissions/:quiz_submission_id/questions'
