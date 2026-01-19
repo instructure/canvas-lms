@@ -18,12 +18,12 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import EpubExportsApp from './react/App'
 import ready from '@instructure/ready'
 
 ready(() => {
   $('.course-epub-exports-app').each((_i, element) => {
-    ReactDOM.render(<EpubExportsApp />, element)
+    legacyRender(<EpubExportsApp />, element)
   })
 })
