@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {findDOMNode} from 'react-dom'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import TimeBlockListManager from '@canvas/calendar/TimeBlockListManager'
@@ -110,7 +110,7 @@ export default class TimeBlockSelector extends React.Component {
 
   handleSlotDivision = () => {
     // eslint-disable-next-line react/no-find-dom-node
-    const node = ReactDOM.findDOMNode(this)
+    const node = findDOMNode(this)
     const minuteValue = node.querySelector('#TimeBlockSelector__DivideSection-Input', node)?.value
     if (!NumberHelper.validate(minuteValue)) return
     const timeManager = new TimeBlockListManager(this.getNewSlotData())
