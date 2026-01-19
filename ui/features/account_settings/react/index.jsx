@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-dom'
+import {render} from '@canvas/react'
 import {Provider} from 'react-redux'
 import {ConnectedSecurityPanel} from './components/SecurityPanel'
 import {configStore, defaultState} from './store'
