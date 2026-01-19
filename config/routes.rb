@@ -1467,6 +1467,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/assignments/:assignment_id/retry_alignment_clone", action: :retry_alignment_clone
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
       post "courses/:course_id/assignments/:assignment_id/accessibility/scan", action: :accessibility_scan, as: "assignment_accessibility_scan"
+      post "courses/:course_id/assignments/:assignment_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "assignment_accessibility_queue_scan"
     end
 
     scope(controller: "assignment_extensions") do
@@ -2264,6 +2265,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/pages_ai/alt_text", action: :ai_generate_alt_text
       post "groups/:group_id/pages_ai/alt_text", action: :ai_generate_alt_text
       post "courses/:course_id/pages/:url_or_id/accessibility/scan", action: :accessibility_scan, as: "pages_accessibility_scan"
+      post "courses/:course_id/pages/:url_or_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "pages_accessibility_queue_scan"
     end
 
     scope(controller: :context_modules_api) do

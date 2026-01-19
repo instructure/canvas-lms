@@ -20,14 +20,15 @@ import {useCallback} from 'react'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {theme} from '@instructure/canvas-theme'
-import {
-  AccessibleContent,
-  PresentationContent,
-  ScreenReaderContent,
-} from '@instructure/ui-a11y-content'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex, FlexItemProps} from '@instructure/ui-flex'
-import {IconEditLine, IconPublishSolid, IconQuestionLine} from '@instructure/ui-icons'
+import {
+  IconEditLine,
+  IconPublishSolid,
+  IconQuestionLine,
+  IconWarningLine,
+} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -44,6 +45,7 @@ const I18n = createI18nScope('accessibility_checker')
 interface ScanStateCellProps {
   item: AccessibilityResourceScan
   isMobile: boolean
+  onRescan?: (item: AccessibilityResourceScan) => void
 }
 
 const ISSUES_COUNT_OFFSET = '2.75rem'
@@ -72,6 +74,22 @@ const FixOrReviewAction = ({item}: ScanStateCellProps) => {
     <Flex.Item textAlign="start">
       <Button data-testid={dataTestId} size="small" renderIcon={renderIcon} onClick={handleClick}>
         <AccessibleContent alt={altText}>{text}</AccessibleContent>
+      </Button>
+    </Flex.Item>
+  )
+}
+
+const RescanAction = ({item, onRescan}: ScanStateCellProps) => {
+  const handleClick = useCallback(() => {
+    onRescan?.(item)
+  }, [item, onRescan])
+
+  return (
+    <Flex.Item textAlign="start">
+      <Button id="accessibility-checker-rescan-button" size="small" onClick={handleClick}>
+        <AccessibleContent alt={I18n.t('Rescan issues for %{name}', {name: item.resourceName})}>
+          {I18n.t('Rescan')}
+        </AccessibleContent>
       </Button>
     </Flex.Item>
   )
@@ -132,14 +150,14 @@ const Explanation = ({icon, tooltipText}: ExplanationProps) => (
 
 interface ScanStateWithExplanationProps {
   icon: React.ReactNode
-  text: string
+  content: React.ReactNode
   tooltipText: string
   isMobile: boolean
 }
 
 const ScanStateWithExplanation = ({
   icon,
-  text,
+  content,
   tooltipText,
   isMobile,
 }: ScanStateWithExplanationProps) => (
@@ -147,9 +165,7 @@ const ScanStateWithExplanation = ({
     <Flex.Item {...getDesktopProps(isMobile)}>
       <Explanation icon={icon} tooltipText={tooltipText} />
     </Flex.Item>
-    <Flex.Item textAlign="start">
-      <Text>{text}</Text>
-    </Flex.Item>
+    <Flex.Item>{content}</Flex.Item>
   </Flex>
 )
 
@@ -183,11 +199,19 @@ const UnknownIssuesText = ({isMobile}: {isMobile: boolean}) => (
   />
 )
 
-const ScanWithError = ({item, isMobile}: {item: AccessibilityResourceScan; isMobile: boolean}) => (
+const ScanWithError = ({
+  item,
+  isMobile,
+  onRescan,
+}: {
+  item: AccessibilityResourceScan
+  isMobile: boolean
+  onRescan?: (item: AccessibilityResourceScan) => void
+}) => (
   <ScanStateWithExplanation
-    icon={<IconQuestionLine color="secondary" aria-hidden="true" />}
-    text={I18n.t('Failed')}
-    tooltipText={I18n.t('Scan error:') + ` ${item.errorMessage || I18n.t('Unknown error')}`}
+    icon={<IconWarningLine color="error" size="x-small" aria-hidden="true" />}
+    content={<RescanAction item={item} isMobile={isMobile} onRescan={onRescan} />}
+    tooltipText={I18n.t('Failed scan')}
     isMobile={isMobile}
   />
 )
@@ -195,6 +219,7 @@ const ScanWithError = ({item, isMobile}: {item: AccessibilityResourceScan; isMob
 export const ScanStateCell: React.FC<ScanStateCellProps> = ({
   item,
   isMobile,
+  onRescan,
 }: ScanStateCellProps) => {
   switch (item.workflowState) {
     case ScanWorkflowState.Queued:
@@ -210,7 +235,7 @@ export const ScanStateCell: React.FC<ScanStateCellProps> = ({
       break
     }
     case ScanWorkflowState.Failed: {
-      return <ScanWithError item={item} isMobile={isMobile} />
+      return <ScanWithError item={item} isMobile={isMobile} onRescan={onRescan} />
     }
     default: {
       return <UnknownIssuesText isMobile={isMobile} />
