@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import StudentView from '@canvas/groups/react'
 import ready from '@instructure/ready'
 import React from 'react'
 
 ready(() => {
-  ReactDOM.render(
+  legacyRender(
     <StudentView enableGroupCreation={true} enableEveryoneTab={true} />,
     document.getElementById('content'),
   )
