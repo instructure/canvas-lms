@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import RubricAddCriterionPopover from '../react/components/RubricAddCriterionPopover'
 import RubricManagement from '../react/components/RubricManagement'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -71,12 +71,12 @@ const rubricEditing = {
     $('#add_criterion_container').remove()
     $rubric.find('#add_criterion_holder').append($('<span/>').attr('id', 'add_criterion_container'))
     setTimeout(() => {
-      const root = createRoot(document.getElementById('add_criterion_container'))
-      root.render(
+      render(
         <RubricAddCriterionPopover
           rubric={$rubric}
           duplicateFunction={rubricEditing.copyCriterion}
         />,
+        document.getElementById('add_criterion_container'),
       )
       if (focusTarget) {
         $rubric.find(`#add_criterion_container ${focusTarget}:visible`).focus()
@@ -1769,8 +1769,7 @@ if (
   $('h1').hide()
   const contextId = ENV.context_asset_string.split('_')[1]
 
-  const root = createRoot(document.getElementById('rubric_management'))
-  root.render(<RubricManagement accountId={contextId} />)
+  render(<RubricManagement accountId={contextId} />, document.getElementById('rubric_management'))
 }
 
 const getEditRubricPrompt = useMasteryScale => {
