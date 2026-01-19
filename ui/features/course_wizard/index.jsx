@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React, {Suspense} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 const CourseWizard = React.lazy(() => import('./react/CourseWizard'))
 
@@ -27,7 +27,7 @@ const CourseWizard = React.lazy(() => import('./react/CourseWizard'))
  * CourseWizard React component that is the actual wizard.
  */
 function renderWizard(showWizard) {
-  ReactDOM.render(
+  legacyRender(
     <Suspense fallback={<div />}>
       {showWizard && <CourseWizard onHideWizard={() => renderWizard(false)} />}
     </Suspense>,
