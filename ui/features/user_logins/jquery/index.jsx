@@ -17,6 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {render} from '@canvas/react'
 import {createRoot} from 'react-dom/client'
 import SuspendedIcon from '../react/SuspendedIcon'
 import $ from 'jquery'
@@ -87,9 +88,8 @@ ready(() => {
     const defaultPolicy = ENV.PASSWORD_POLICY
     const userId = ENV.USER_ID
     const isEdit = Boolean(pseudonym)
-    const root = createRoot(mountPoint)
 
-    root.render(
+    const root = render(
       <AddEditPseudonym
         pseudonym={pseudonym}
         canManageSis={canManageSis}
@@ -111,6 +111,7 @@ ready(() => {
           root.unmount()
         }}
       />,
+      mountPoint,
     )
   }
 
