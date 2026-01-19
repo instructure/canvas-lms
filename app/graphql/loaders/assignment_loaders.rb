@@ -103,13 +103,15 @@ module Loaders
         # Early return if no gradeable assignments
         return if gradeable_assignment_ids.empty?
 
-        # Get graded counts for gradeable assignments only
-        graded_counts = Submission
-                        .where(assignment_id: gradeable_assignment_ids)
-                        .graded
-                        .in_workflow_state("graded")
-                        .group(:assignment_id)
-                        .count
+        # Get assignment IDs that have at least one graded submission
+        # Using SELECT DISTINCT is much faster than COUNT(*) GROUP BY when we only need existence
+        assignment_ids_with_graded = Submission
+                                     .where(assignment_id: gradeable_assignment_ids)
+                                     .graded
+                                     .in_workflow_state("graded")
+                                     .distinct
+                                     .pluck(:assignment_id)
+                                     .to_set
 
         # Check for provisional grades for moderated assignments
         provisional_grade_assignment_ids = Set.new
@@ -128,8 +130,7 @@ module Loaders
 
         # Process gradeable assignments
         gradeable_assignment_ids.each do |id|
-          graded_count = graded_counts.fetch(id, 0)
-          fulfill(id, graded_count > 0 || provisional_grade_assignment_ids.include?(id))
+          fulfill(id, assignment_ids_with_graded.include?(id) || provisional_grade_assignment_ids.include?(id))
         end
       end
     end
