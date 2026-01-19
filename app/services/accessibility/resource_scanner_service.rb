@@ -31,7 +31,8 @@ class Accessibility::ResourceScannerService < ApplicationService
   end
 
   def call
-    return if scan_already_queued_or_in_progress?
+    queued_or_in_progress_scan = find_queued_or_in_progress_scan
+    return queued_or_in_progress_scan if queued_or_in_progress_scan
 
     scan = first_or_initialize_scan
     delay(
@@ -39,6 +40,7 @@ class Accessibility::ResourceScannerService < ApplicationService
       singleton: "#{SCAN_TAG}_#{@resource.global_id}",
       priority: Delayed::LOW_PRIORITY
     ).scan_resource(scan:)
+    scan
   end
 
   def call_sync
@@ -123,10 +125,10 @@ class Accessibility::ResourceScannerService < ApplicationService
     end
   end
 
-  def scan_already_queued_or_in_progress?
+  def find_queued_or_in_progress_scan
     AccessibilityResourceScan.where(context: @resource)
                              .where(workflow_state: %w[queued in_progress])
-                             .exists?
+                             .first
   end
 
   def over_size_limit?

@@ -702,6 +702,14 @@ class WikiPagesApiController < ApplicationController
     render json: accessibility_resource_scan_json(scan)
   end
 
+  def accessibility_queue_scan
+    return render_unauthorized_action unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    scan = Accessibility::ResourceScannerService.new(resource: @page).call
+    render json: accessibility_resource_scan_json(scan)
+  end
+
   protected
 
   def ai_alt_text_feature_enabled?

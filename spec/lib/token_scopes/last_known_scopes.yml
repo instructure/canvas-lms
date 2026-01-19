@@ -650,6 +650,8 @@
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments'
 - verb: POST
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/accessibility/queue_scan'
+- verb: POST
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/accessibility/scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/allocate'
@@ -1305,6 +1307,8 @@
   path: '/api/v1/courses/:course_id/pages/:url_or_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/pages/:url_or_id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/pages/:url_or_id/accessibility/queue_scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/pages/:url_or_id/accessibility/scan'
 - verb: GET

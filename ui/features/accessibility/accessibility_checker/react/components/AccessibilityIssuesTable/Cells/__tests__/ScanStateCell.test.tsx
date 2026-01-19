@@ -113,19 +113,62 @@ describe('ScanStateCell', () => {
       expect(screen.getByText(/No issues/i)).toBeInTheDocument()
     })
 
-    it('renders failed scan state correctly, ', () => {
+    it('renders rescan button for failed scan', () => {
+      const baseFailedItem = {
+        workflowState: ScanWorkflowState.Failed,
+        errorMessage: 'other error',
+      } as AccessibilityResourceScan
+
+      const {container} = render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
+
+      expect(container.querySelector('#accessibility-checker-rescan-button')).toBeInTheDocument()
+    })
+
+    it('renders failed scan explanation tooltip', () => {
       const baseFailedItem = {
         workflowState: ScanWorkflowState.Failed,
         errorMessage: 'other error',
       } as AccessibilityResourceScan
 
       render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
-      expect(screen.getByText(/Failed/i)).toBeInTheDocument()
 
       const explanation = screen.getByTestId('scan-state-explanation-trigger')
       expect(explanation).toBeInTheDocument()
       explanation.focus()
-      expect(explanation).toHaveTextContent(baseFailedItem.errorMessage!)
+      expect(explanation).toHaveTextContent('Failed scan')
+    })
+
+    it('calls onRescan when rescan button is clicked', () => {
+      const mockOnRescan = vi.fn()
+      const baseFailedItem = {
+        workflowState: ScanWorkflowState.Failed,
+        errorMessage: 'other error',
+      } as AccessibilityResourceScan
+
+      const {container} = render(
+        <ScanStateCell item={baseFailedItem} isMobile={false} onRescan={mockOnRescan} />,
+      )
+
+      const rescanButton = container.querySelector(
+        '#accessibility-checker-rescan-button',
+      ) as HTMLElement
+      rescanButton.click()
+
+      expect(mockOnRescan).toHaveBeenCalledWith(baseFailedItem)
+      expect(mockOnRescan).toHaveBeenCalledTimes(1)
+    })
+
+    it('has unique ID for Pendo analytics on rescan button', () => {
+      const baseFailedItem = {
+        workflowState: ScanWorkflowState.Failed,
+        errorMessage: 'other error',
+      } as AccessibilityResourceScan
+
+      const {container} = render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
+
+      const rescanButton = container.querySelector('#accessibility-checker-rescan-button')
+      expect(rescanButton).toBeInTheDocument()
+      expect(rescanButton).toHaveAttribute('id', 'accessibility-checker-rescan-button')
     })
   })
 })

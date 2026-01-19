@@ -22,7 +22,17 @@ import {Table} from '@instructure/ui-table'
 import {AccessibilityIssuesTableRow} from '../AccessibilityIssuesTableRow'
 import {mockScan1} from '../../../../../shared/react/stores/mockData'
 
+const mockMutate = vi.fn()
+
+vi.mock('../../../../../shared/react/hooks/useQueueScanResource', () => ({
+  useQueueScanResource: vi.fn(() => ({mutate: mockMutate})),
+}))
+
 describe('AccessibilityIssuesTableRow', () => {
+  beforeEach(() => {
+    mockMutate.mockClear()
+  })
+
   it('renders without crashing', () => {
     render(
       <Table caption="Test table">
