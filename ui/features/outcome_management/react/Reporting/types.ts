@@ -49,9 +49,10 @@ export interface LMGBOutcomeReporting extends LMGBOutcome {
 }
 
 export interface LMGBScoreReporting extends LMGBScore {
-  count: number
+  count?: number
   title: string
   submitted_at: string
+  type?: string
 }
 
 export interface RollupsResponseReporting {
@@ -82,6 +83,7 @@ export type MasteryLevel =
   | 'near_mastery'
   | 'remediation'
   | 'unassessed'
+  | 'no_evidence'
 
 export type MasteryFilter = 'all' | 'mastery' | 'not_started' | 'in_progress'
 

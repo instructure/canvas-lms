@@ -29,7 +29,7 @@ import {MasteryDistributionChart} from '../charts'
 import {
   ContributingScoreAlignment,
   ContributingScoresManager,
-} from '../../hooks/useContributingScores'
+} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {Outcome, Student, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 import {colors} from '@instructure/canvas-theme'
 import {getScoresForOutcome, getScoresForAlignment} from '../../utils/scoreUtils'

@@ -33,6 +33,7 @@ export interface ContributingScore {
   user_id: string
   alignment_id: string
   score: number
+  submitted_or_assessed_at?: string
 }
 
 export interface ContributingScoresResponse {
@@ -73,10 +74,25 @@ const getScoresForUser = (
   if (!data) return []
 
   return data.alignments.map(alignment => {
-    const score = data.scores.find(
+    // Find all scores for this user and alignment, then return the most recent one
+    const matchingScores = data.scores.filter(
       s => s.user_id === userId && s.alignment_id === alignment.alignment_id,
     )
-    return score
+
+    if (matchingScores.length === 0) return undefined
+    if (matchingScores.length === 1) return matchingScores[0]
+
+    // Sort by submitted_or_assessed_at descending (most recent first)
+    // Scores without dates are considered oldest
+    return matchingScores.sort((a, b) => {
+      if (!a.submitted_or_assessed_at && !b.submitted_or_assessed_at) return 0
+      if (!a.submitted_or_assessed_at) return 1
+      if (!b.submitted_or_assessed_at) return -1
+      return (
+        new Date(b.submitted_or_assessed_at).getTime() -
+        new Date(a.submitted_or_assessed_at).getTime()
+      )
+    })[0]
   })
 }
 

@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ContributingScoreHeader, ContributingScoreHeaderProps} from '../ContributingScoreHeader'
-import {ContributingScoreAlignment} from '../../../hooks/useContributingScores'
+import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
 
 const mockOpenWindow = vi.fn()

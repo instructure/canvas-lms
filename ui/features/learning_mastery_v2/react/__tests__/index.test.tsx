@@ -22,7 +22,7 @@ import LearningMastery from '../index'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
 import {useGradebookSettings} from '../hooks/useGradebookSettings'
 import {useStudents} from '../hooks/useStudents'
-import {useContributingScores} from '../hooks/useContributingScores'
+import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributingScores'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {Rating, Student, Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
@@ -34,7 +34,7 @@ vi.mock('../apiClient')
 vi.mock('@canvas/outcomes/react/hooks/useRollups')
 vi.mock('../hooks/useGradebookSettings')
 vi.mock('../hooks/useStudents')
-vi.mock('../hooks/useContributingScores')
+vi.mock('@canvas/outcomes/react/hooks/useContributingScores')
 
 describe('LearningMastery', () => {
   const ratings: Rating[] = MOCK_RATINGS

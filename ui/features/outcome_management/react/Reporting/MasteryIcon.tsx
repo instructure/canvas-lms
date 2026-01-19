@@ -48,6 +48,10 @@ const masteryLevelToIcon: Record<MasteryLevel, {url: string; alt: string}> = {
     url: '/images/outcomes/unassessed.svg',
     alt: I18n.t('Unassessed'),
   },
+  no_evidence: {
+    url: '/images/outcomes/no_evidence.svg',
+    alt: I18n.t('No Evidence'),
+  },
 }
 
 const MasteryIcon = ({masteryLevel}: MasteryIconProps) => {

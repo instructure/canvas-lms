@@ -24,45 +24,75 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {LMGBScoreReporting} from './types'
 import {useOutcomesChart} from './hooks/useOutcomesChart'
+import {useMemo, useEffect} from 'react'
+import type {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {Spinner} from '@instructure/ui-spinner'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('outcome_management')
 
-/**
- * Mock function to generate sample scores data
- * In production, this would come from the API mapped to each outcome
- */
-const getMockScores = (outcomeId: number | string): LMGBScoreReporting[] => {
-  // Generate 4-11 mock scores with varying dates
-  const scoreCount = Math.floor(Math.random() * 8) + 4
-  const mockScores: LMGBScoreReporting[] = []
-  const today = new Date()
-
-  for (let i = 0; i < scoreCount; i++) {
-    const daysAgo = (scoreCount - i) * 7 // Space out by ~1 week
-    const date = new Date(today)
-    date.setDate(date.getDate() - daysAgo)
-
-    mockScores.push({
-      score: Math.random() * 4, // Random score between 0-4
-      title: `Assignment ${i + 1}`,
-      submitted_at: date.toISOString(),
-      count: 1,
-      links: {
-        outcome: String(outcomeId),
-      },
-    })
-  }
-
-  return mockScores
-}
-
 interface OutcomesTableRowExpansionProps {
   outcomeId: number | string
+  studentId: string
+  contributingScores: ContributingScoresManager
 }
 
-const OutcomesTableRowExpansion = ({outcomeId}: OutcomesTableRowExpansionProps) => {
-  const scores = getMockScores(outcomeId)
+const OutcomesTableRowExpansion = ({
+  outcomeId,
+  studentId,
+  contributingScores,
+}: OutcomesTableRowExpansionProps) => {
+  const outcomeScores = contributingScores.forOutcome(outcomeId)
+
+  useEffect(() => {
+    if (!outcomeScores.isVisible()) {
+      outcomeScores.toggleVisibility()
+    }
+  }, [outcomeId, outcomeScores])
+
+  // Transform contributing scores data to match the expected LMGBScoreReporting format
+  const scores: LMGBScoreReporting[] = useMemo(() => {
+    if (!outcomeScores.data) return []
+
+    const userScores = outcomeScores.scoresForUser(studentId)
+    const alignments = outcomeScores.alignments || []
+
+    const transformedScores: LMGBScoreReporting[] = []
+
+    userScores.forEach((score, index) => {
+      if (!score) return
+      const alignment = alignments[index]
+      if (!alignment) return
+
+      transformedScores.push({
+        score: score.score,
+        title: alignment.associated_asset_name,
+        type: alignment.associated_asset_type,
+        submitted_at: score.submitted_or_assessed_at || new Date().toISOString(),
+        links: {
+          outcome: outcomeId,
+        },
+      })
+    })
+
+    return transformedScores
+  }, [outcomeScores, studentId, outcomeId])
+
   const {canvasRef, sortedScores} = useOutcomesChart(scores)
+
+  useEffect(() => {
+    if (outcomeScores.error) {
+      showFlashError(I18n.t('Failed to load contributing scores'))()
+    }
+  }, [outcomeScores.error])
+
+  if (outcomeScores.isLoading) {
+    return (
+      <View data-testid="outcome-reporting" display="block" textAlign="center">
+        <Spinner renderTitle={I18n.t('Loading contributing scores')} size="large" />
+      </View>
+    )
+  }
 
   if (scores.length === 0) {
     return (

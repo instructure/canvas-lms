@@ -113,14 +113,18 @@ const Reporting = () => {
         />
       </View>
 
-      <OutcomesControlsBar
-        search={search}
-        onSearchChangeHandler={onSearchChangeHandler}
-        onSearchClearHandler={onSearchClearHandler}
-        masteryFilter={masteryFilter}
-        onMasteryFilterChange={setMasteryFilter}
-      />
-      <StudentOutcomesTable outcomes={filteredOutcomes} />
+      {studentId && (
+        <>
+          <OutcomesControlsBar
+            search={search}
+            onSearchChangeHandler={onSearchChangeHandler}
+            onSearchClearHandler={onSearchClearHandler}
+            masteryFilter={masteryFilter}
+            onMasteryFilterChange={setMasteryFilter}
+          />
+          <StudentOutcomesTable outcomes={filteredOutcomes} studentId={studentId} />
+        </>
+      )}
     </View>
   )
 }

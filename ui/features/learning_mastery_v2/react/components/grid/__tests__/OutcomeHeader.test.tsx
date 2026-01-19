@@ -23,7 +23,7 @@ import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
-import {ContributingScoresForOutcome} from '../../../hooks/useContributingScores'
+import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 
 describe('OutcomeHeader', () => {
   const outcome: Outcome = {
