@@ -3232,6 +3232,7 @@ uk:
   big_blue_button_conference: 
     recording_setting: Запис
     recording_setting_enabled_description: "Дозволити запис для цієї конференції"
+  bio_a519d807: Біо
   blackboard: 
     no_manifest: "Цей Blackboard .zip не має файлу imsmanifest.xml в кореневому каталозі."
   blank_38df4238: порожній
@@ -8052,6 +8053,7 @@ uk:
       warning: Попередження
   grade_distribution_e52c9256: "Розподіл оцінок"
   grade_export_title: "Експорт оцінок"
+  grade_f949a691: "%{grade}%"
   grade_for_name_b9df168a: "Оцінка за: %{name}"
   grade_grade_7e52dd1c: "Оцінка: %{grade}"
   grade_high_to_low_1cea0381: "Оцінка - від більшої до меншої"
@@ -12131,6 +12133,7 @@ uk:
   not_submitted_7d05fdb4: "Не відправлено"
   not_synced_529cbf29: "Не синхронізовано"
   not_synced_message_a343fe5e: "Не синхронізовано: %{message}"
+  not_yet_available_9aa23a77: "Ще недоступний"
   not_yet_completed_345a0bca: "Ще не завершено "
   not_yet_graded_8b655a7: "Ще не оцінений"
   note_8b73ce09: Примітка
