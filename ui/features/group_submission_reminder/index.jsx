@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {string} from 'prop-types'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {Alert} from '@instructure/ui-alerts'
 import ready from '@instructure/ready'
 
@@ -42,7 +42,7 @@ GroupSubmissionAlert.propTypes = {
 
 ready(() => {
   $('.group_submission_alert').each((idx, alertContainer) => {
-    ReactDOM.render(
+    legacyRender(
       <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type')} />,
       alertContainer,
     )
