@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
+import {findDOMNode} from 'react-dom'
 import update from 'immutability-helper'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -124,7 +124,7 @@ class GradingPeriodForm extends React.Component {
 
   hackTheDatepickers = () => {
     // This can be replaced when we have an extensible datepicker
-    const $form = ReactDOM.findDOMNode(this)
+    const $form = findDOMNode(this)
     const $appends = $form.querySelectorAll('.input-append')
     $appends.forEach($el => {
       $el.classList.add('ic-Input-group')

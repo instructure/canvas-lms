@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import AccountTabContainer from './react/AccountTabContainer'
 import ready from '@instructure/ready'
 
 ready(() => {
-  ReactDOM.render(
+  legacyRender(
     <AccountTabContainer
       {...{
         readOnly: ENV.GRADING_PERIODS_READ_ONLY,
