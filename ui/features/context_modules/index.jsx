@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ModulesHomePage from './react/ModulesHomePage'
 import modules from '@canvas/context-modules'
 import ready from '@instructure/ready'
@@ -25,8 +25,7 @@ import ready from '@instructure/ready'
 ready(() => {
   const container = document.getElementById('modules_homepage_user_create')
   if (container) {
-    const root = createRoot(container)
-    root.render(<ModulesHomePage onCreateButtonClick={modules.addModule} />)
+    render(<ModulesHomePage onCreateButtonClick={modules.addModule} />, container)
   }
 
   if (ENV.NO_MODULE_PROGRESSIONS) {
