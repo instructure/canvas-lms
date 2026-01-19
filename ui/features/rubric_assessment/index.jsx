@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import Rubric from '@canvas/rubrics/react/Rubric'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import ready from '@instructure/ready'
@@ -50,7 +50,7 @@ ready(() => {
     const assessment = findRubricAssessment(rubricElement.dataset.rubricAssessmentId)
     const submission = findSubmission(rubricElement.dataset.assignmentId)
 
-    ReactDOM.render(
+    legacyRender(
       <Rubric
         rubric={rubric}
         rubricAssessment={fillAssessment(rubric, assessment || {})}
