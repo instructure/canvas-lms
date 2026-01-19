@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import MessageStudentsDialog from '@canvas/message-students-dialog'
 import QuizArrowApplicator from '@canvas/quizzes/jquery/quiz_arrows'
 import inputMethods from '@canvas/quizzes/jquery/quiz_inputs'
@@ -56,10 +56,11 @@ function createOrUpdateRoot(elementId, component) {
 
   let root = roots.get(elementId)
   if (!root) {
-    root = createRoot(container)
+    root = render(component, container)
     roots.set(elementId, root)
+  } else {
+    rerender(root, component)
   }
-  root.render(component)
 }
 
 function unmountRoot(elementId) {
@@ -248,8 +249,7 @@ $(document).ready(function () {
     if (event) event.preventDefault()
 
     const container = document.getElementById('direct-share-mount-point')
-    const root = createRoot(container)
-    root.render(
+    const root = render(
       <DirectShareUserModal
         open={open}
         sourceCourseId={ENV.COURSE_ID}
@@ -260,6 +260,7 @@ $(document).ready(function () {
           $('.al-trigger').focus()
         }}
       />,
+      container,
     )
   }
 
@@ -269,8 +270,7 @@ $(document).ready(function () {
     if (event) event.preventDefault()
 
     const container = document.getElementById('direct-share-mount-point')
-    const root = createRoot(container)
-    root.render(
+    const root = render(
       <DirectShareCourseTray
         open={open}
         sourceCourseId={ENV.COURSE_ID}
@@ -281,6 +281,7 @@ $(document).ready(function () {
           $('.al-trigger').focus()
         }}
       />,
+      container,
     )
   }
 
