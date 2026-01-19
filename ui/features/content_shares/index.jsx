@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ReceivedContentView from './react/ReceivedContentView'
 import ErrorBoundary from '@canvas/error-boundary'
@@ -30,7 +30,7 @@ const I18n = createI18nScope('content_share')
 ready(() => {
   const container = document.getElementById('content')
 
-  ReactDOM.render(
+  legacyRender(
     <ErrorBoundary
       errorComponent={
         <GenericErrorPage
