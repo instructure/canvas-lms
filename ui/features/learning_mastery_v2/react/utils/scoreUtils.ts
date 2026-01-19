@@ -17,7 +17,7 @@
  */
 
 import {Student, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
-import {ContributingScoresManager} from '../hooks/useContributingScores'
+import {type ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
 
 /**
  * Extracts scores for a specific outcome from student rollup data

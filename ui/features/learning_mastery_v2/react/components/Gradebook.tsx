@@ -45,7 +45,10 @@ import {
 import {GradebookPagination} from './pagination/GradebookPagination'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import DragDropWrapper from './grid/DragDropWrapper'
-import {ContributingScoreAlignment, ContributingScoresManager} from '../hooks/useContributingScores'
+import {
+  ContributingScoreAlignment,
+  ContributingScoresManager,
+} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {ContributingScoreHeader} from './grid/ContributingScoreHeader'
 import {BarChartRow} from './grid/BarChartRow'
 import {getScoresForOutcome} from '../utils/scoreUtils'

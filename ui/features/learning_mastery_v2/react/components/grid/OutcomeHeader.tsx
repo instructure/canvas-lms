@@ -27,7 +27,7 @@ import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
 import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
 import {DragDropConnectorProps} from './DragDropWrapper'
-import {ContributingScoresForOutcome} from '../../hooks/useContributingScores'
+import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {DraggableColumnHeader} from './DraggableColumnHeader'
 
 const I18n = createI18nScope('learning_mastery_gradebook')

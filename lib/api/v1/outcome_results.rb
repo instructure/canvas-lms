@@ -359,7 +359,8 @@ module Api::V1::OutcomeResults
       {
         user_id: result.user_id.to_s,
         alignment_id: alignment.prefixed_id,
-        score: result.score
+        score: result.score,
+        submitted_or_assessed_at: result.submitted_or_assessed_at&.iso8601
       }
     end
   end

@@ -18,7 +18,7 @@
 
 import {render} from '@testing-library/react'
 import {BarChartRow, BarChartRowProps} from '../BarChartRow'
-import {ContributingScoresManager} from '../../../hooks/useContributingScores'
+import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {MOCK_OUTCOMES, MOCK_STUDENTS, MOCK_ROLLUPS} from '../../../__fixtures__/rollups'
 import {MOCK_ALIGNMENTS} from '../../../__fixtures__/contributingScores'
 

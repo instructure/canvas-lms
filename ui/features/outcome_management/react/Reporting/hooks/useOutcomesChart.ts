@@ -131,7 +131,14 @@ export const useOutcomesChart = (scores: LMGBScoreReporting[]) => {
           if (xScale.ticks) {
             // Draw X-axis icons
             xScale.ticks.forEach((_tick, index) => {
-              const scoreTypeIcon = scoreTypeIconsRef.current['quiz']
+              const scoreData = sortedScores[index]
+              if (!scoreData) return
+
+              // Use the type from the score data, or default to 'assignment'
+              const assetType: ScoreType =
+                (scoreData.type?.toLowerCase() as ScoreType) || 'assignment'
+              const iconType = SCORE_TYPES.includes(assetType) ? assetType : 'assignment'
+              const scoreTypeIcon = scoreTypeIconsRef.current[iconType]
 
               if (!scoreTypeIcon) return
 

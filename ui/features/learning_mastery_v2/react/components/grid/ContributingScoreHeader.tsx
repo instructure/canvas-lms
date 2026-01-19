@@ -22,7 +22,7 @@ import {Menu} from '@instructure/ui-menu'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {openWindow} from '@canvas/util/globalUtils'
 import {SortBy, SortOrder} from '@canvas/outcomes/react/utils/constants'
-import {ContributingScoreAlignment} from '../../hooks/useContributingScores'
+import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {ColumnHeader} from './ColumnHeader'
 
