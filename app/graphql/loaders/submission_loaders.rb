@@ -58,5 +58,24 @@ module Loaders
         end
       end
     end
+
+    class HasUnreadRubricAssessmentLoader < GraphQL::Batch::Loader
+      def perform(submission_ids)
+        return if submission_ids.empty?
+
+        # Get submission IDs that have at least one unread rubric assessment
+        # Using SELECT DISTINCT is much faster than loading all content_participations
+        submissions_with_unread = ContentParticipation
+                                  .where(content_id: submission_ids, content_type: "Submission")
+                                  .where(workflow_state: "unread", content_item: "rubric")
+                                  .distinct
+                                  .pluck(:content_id)
+                                  .to_set
+
+        submission_ids.each do |id|
+          fulfill(id, submissions_with_unread.include?(id))
+        end
+      end
+    end
   end
 end
