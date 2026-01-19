@@ -129,6 +129,49 @@ describe Types::DiscussionEntryType do
     end
   end
 
+  describe "user mentions in messages" do
+    it "handles non-existent user mentions gracefully" do
+      student_in_course(active_all: true)
+      non_existent_user_id = 999_999_999
+
+      # Message with both valid and invalid user mentions
+      message = %(Hello <span class="mceNonEditable mention" data-mention="#{@student.id}">@Student</span> and <span class="mceNonEditable mention" data-mention="#{non_existent_user_id}">@NonExistent</span>!)
+
+      entry = discussion_entry.discussion_topic.discussion_entries.create!(
+        message:,
+        user: @teacher,
+        editor: @teacher,
+        saving_user: @teacher
+      )
+
+      type = GraphQLTypeTester.new(entry, current_user: @teacher)
+
+      # Should not crash and should process the valid mention
+      resolved_message = type.resolve("message", request: ActionDispatch::TestRequest.create)
+      expect(resolved_message).to be_present
+      expect(resolved_message).to include(@student.name) # Valid mention gets name replaced
+      expect(resolved_message).to include("@NonExistent") # Invalid mention stays as-is
+    end
+
+    it "processes valid user mentions correctly" do
+      student_in_course(active_all: true)
+
+      message = %(Hi <span class="mceNonEditable mention" data-mention="#{@student.id}">@Someone</span>!)
+
+      entry = discussion_entry.discussion_topic.discussion_entries.create!(
+        message:,
+        user: @teacher,
+        editor: @teacher,
+        saving_user: @teacher
+      )
+
+      type = GraphQLTypeTester.new(entry, current_user: @teacher)
+
+      resolved_message = type.resolve("message", request: ActionDispatch::TestRequest.create)
+      expect(resolved_message).to include(@student.name)
+    end
+  end
+
   describe "when file_association_access ff is enabled" do
     it "adds attachment location tag to the message" do
       attachment = attachment_model(filename: "test.test", context: @teacher)
