@@ -152,7 +152,7 @@ export const DELETE_CONVERSATION_MESSAGES = gql`
 `
 
 export const CREATE_SUBMISSION_COMMENT = gql`
-  mutation CreateSubmissionComment($submissionId: ID!, $body: String!) {
+  mutation CreateInboxSubmissionComment($submissionId: ID!, $body: String!) {
     createSubmissionComment(input: {submissionId: $submissionId, comment: $body}) {
       submissionComment {
         ...SubmissionComment

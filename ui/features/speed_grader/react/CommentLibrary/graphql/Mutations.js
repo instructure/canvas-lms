@@ -20,7 +20,7 @@ import {gql} from '@canvas/apollo-v3'
 import {COMMENTS_QUERY} from './Queries'
 
 export const CREATE_COMMENT_MUTATION = gql`
-  mutation CreateCommentBankItem($courseId: ID!, $comment: String!) {
+  mutation CreateCommentBankItemLegacy($courseId: ID!, $comment: String!) {
     createCommentBankItem(input: {courseId: $courseId, comment: $comment}) {
       commentBankItem {
         _id

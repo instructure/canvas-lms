@@ -22,7 +22,7 @@ import {DiscussionTopic} from './DiscussionTopic'
 import {gql} from '@apollo/client'
 
 export const DISCUSSION_TOPIC_QUERY = gql`
-  query GetDiscussionTopic($discussionTopicId: ID!) {
+  query GetDiscussionTopicForEdit($discussionTopicId: ID!) {
     legacyNode(_id: $discussionTopicId, type: Discussion) {
       ...DiscussionTopic
     }

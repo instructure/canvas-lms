@@ -27,7 +27,7 @@ import {PageInfo} from './PageInfo'
 import {TotalCountPageInfo} from './TotalCountPageInfo'
 
 export const ADDRESS_BOOK_RECIPIENTS = gql`
-  query GetAddressBookRecipients(
+  query GetInboxAddressBookRecipients(
     $userID: ID!
     $context: String
     $search: String
@@ -78,7 +78,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
 
 // This query is used for the compose modal
 export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
-  query GetAddressBookRecipients(
+  query GetAddressBookRecipientsWithCommonCourses(
     $userID: ID!
     $context: String
     $search: String
@@ -342,7 +342,7 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
 `
 
 export const SUBMISSION_COMMENTS_QUERY = gql`
-  query GetSubmissionComments(
+  query GetInboxSubmissionComments(
     $submissionID: ID!
     $sort: SubmissionCommentsSortOrderType
     $allComments: Boolean = true
