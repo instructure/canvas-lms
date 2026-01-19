@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {bindActionCreators} from 'redux'
 import {connect, Provider} from 'react-redux'
 import createStore from './store'
@@ -39,7 +39,7 @@ export default {
       selectedOption: state.selectedOption,
     }))(ChooseMasteryPath)
 
-    ReactDOM.render(
+    legacyRender(
       <Provider store={store}>
         <ConnectedApp selectOption={boundActions.selectOption} />
       </Provider>,
