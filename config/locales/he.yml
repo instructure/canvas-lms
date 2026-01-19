@@ -3534,6 +3534,7 @@ he:
   big_blue_button_conference: 
     recording_setting: מקליט
     recording_setting_enabled_description: "הפעלת אפשרות הקלטה בשיחת ועידה זו"
+  bio_a519d807: "קורות חיים"
   blackboard: 
     no_manifest: "קובץ ה Blackboard בפורמט zip הזה אינו כולל את הקבץ imsmanifest.xml  בתיקית הבסיס."
   blank_38df4238: "תו ריק"
@@ -8859,6 +8860,7 @@ he:
       warning: אזהרה
   grade_distribution_e52c9256: "התפלגות ציונים"
   grade_export_title: "ייצוא ציונים"
+  grade_f949a691: "%{grade}%"
   grade_for_name_b9df168a: "הערכה של: %{name}"
   grade_grade_7e52dd1c: "ציון: %{grade}"
   grade_high_to_low_1cea0381: "הערכה - מהגבוה לנמוך"
@@ -13563,6 +13565,7 @@ he:
   not_starred_no_subject_click_to_star_dc91380: "'לא הודגש בכוכבית \"(אין נושא)\", הקלק/י להדגיש."
   not_starred_subject_click_to_star_4ea6eb64: "'לא הודגש בכוכבית \"%{subject}\", הקלק/י להדגיש."
   not_submitted_7d05fdb4: "לא הוגש"
+  not_yet_available_9aa23a77: "עדיין לא זמין"
   not_yet_completed_345a0bca: "טרם הושלם"
   not_yet_graded_8b655a7: "טרם בוצעה הערכה"
   note_8b73ce09: הערה
