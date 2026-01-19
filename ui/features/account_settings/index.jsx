@@ -17,8 +17,7 @@
  */
 
 import {Suspense} from 'react'
-import ReactDOM from 'react-dom'
-import {createRoot} from 'react-dom/client'
+import {legacyRender, render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CustomEmojiDenyList from './react/custom_emoji_deny_list/CustomEmojiDenyList'
 import CustomHelpLinkSettings from './react/custom_help_link_settings/CustomHelpLinkSettings'
@@ -49,7 +48,7 @@ ready(() => {
   const customHelpLinkSettingsContainer = document.getElementById('custom_help_link_settings')
 
   if (customHelpLinkSettingsContainer) {
-    ReactDOM.render(
+    legacyRender(
       <CustomHelpLinkSettings
         {...{
           isCareerAccount: window.ENV.HORIZON_ACCOUNT,
@@ -65,11 +64,11 @@ ready(() => {
 
   const emojiDenyListContainer = document.getElementById('emoji-deny-list')
   if (emojiDenyListContainer) {
-    ReactDOM.render(<CustomEmojiDenyList />, emojiDenyListContainer)
+    legacyRender(<CustomEmojiDenyList />, emojiDenyListContainer)
   }
 
   if (document.getElementById('tab-security-mount')) {
-    ReactDOM.render(
+    legacyRender(
       <View as="div" margin="large" padding="large" textAlign="center">
         <Spinner size="large" renderTitle={I18n.t('Loading')} />
       </View>,
@@ -79,11 +78,11 @@ ready(() => {
 
   const internalSettingsMountpoint = document.getElementById('tab-internal-settings-mount')
   if (internalSettingsMountpoint) {
-    ReactDOM.render(<InternalSettings />, internalSettingsMountpoint)
+    legacyRender(<InternalSettings />, internalSettingsMountpoint)
   }
 
   if (document.getElementById('tab-integrations-mount')) {
-    ReactDOM.render(
+    legacyRender(
       <MicrosoftSyncAccountSettings />,
       document.getElementById('tab-integrations-mount'),
     )
@@ -91,7 +90,7 @@ ready(() => {
 
   const courseCreationSettingsContainer = document.getElementById('course_creation_settings')
   if (courseCreationSettingsContainer) {
-    ReactDOM.render(
+    legacyRender(
       <CourseCreationSettings currentValues={ENV.COURSE_CREATION_SETTINGS} />,
       courseCreationSettingsContainer,
     )
@@ -101,8 +100,7 @@ ready(() => {
     ready(function () {
       const mountPoint = document.getElementById('quotas_tab_content_mount_point')
       if (mountPoint) {
-        const root = createRoot(mountPoint)
-        root.render(<QuotasTabContent accountWithQuotas={ENV.ACCOUNT} />)
+        render(<QuotasTabContent accountWithQuotas={ENV.ACCOUNT} />, mountPoint)
       }
     })
   }
@@ -110,13 +108,13 @@ ready(() => {
   const tabsMountpoint = document.getElementById('account_settings_tabs_mount')
   if (tabsMountpoint && tabsMountpoint.dataset.props) {
     const {tabs} = JSON.parse(tabsMountpoint.dataset.props)
-    const root = createRoot(tabsMountpoint)
-    root.render(
+    render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<ErrorMessage />}>
           <SettingsTabs tabs={tabs} />
         </ErrorBoundary>
       </Suspense>,
+      tabsMountpoint,
     )
   }
 })
