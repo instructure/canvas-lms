@@ -5324,6 +5324,7 @@ tr:
     recording_setting: Kaydediliyor
     recording_setting_enabled_description: "Bu canlı ders için kaydı etkinleştir"
   billing_country_code_as_reported_by_salesforce_625bbb4e: "Salesforce tarafından bildirilen fatura ülke kodu"
+  bio_a519d807: Hakkımda
   blackboard: 
     no_manifest: "Bu Blackboard .zip uzantılı dosyasının içeriği ana dizininde imsmanifest.xml dosyası bulunamadı."
   blackout_date_5fc44c2b: "Karartma tarihi"
@@ -20584,6 +20585,7 @@ tr:
   not_valid_after_81c9faec: "Şu tarihten sonra geçerli değil"
   not_valid_before_9ad2d22d: "Şu tarihten önce geçerli değil"
   not_yet_assessed_9362f199: "Henüz değerlendirilmedi"
+  not_yet_available_9aa23a77: "Henüz Mevcut Değildir"
   not_yet_completed_345a0bca: "Henüz tamamlanmadı"
   not_yet_ed60d582: "Henüz değerlendirilmedi"
   not_yet_graded_40475341: "Boş notlar hesaplamaya dâhil edilmez; yalnızca bir gönderim olduğunda geçici notlar uygulanır."

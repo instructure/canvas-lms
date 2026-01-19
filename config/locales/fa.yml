@@ -4469,6 +4469,7 @@ fa:
     create_time: "زمان ایجاد کنید"
     recording_setting: "در حال ضبط"
     recording_setting_enabled_description: "فعالسازی ضبط برای این کنفرانس"
+  bio_a519d807: "شرح حال"
   blackboard: 
     no_manifest: "این Blackboard .zip هیچ فایل imsmanifest.xml در دایرکتوری ریشه ندارد."
   blackout_dates_4a140a72: "تاریخ های خاموشی"
@@ -11112,6 +11113,7 @@ fa:
       warning: هشدار
   grade_distribution_e52c9256: "توزیع نمره"
   grade_export_title: "صدور نمره"
+  grade_f949a691: "%{grade}%"
   grade_for_course_ccc8513c: "نمره برای %{course}"
   grade_for_missing_submissions_56f91c83: "نمره برای موارد ارسالی موجود نیست"
   grade_for_name_b9df168a: "نمره برای: %{name}"
@@ -16741,6 +16743,7 @@ fa:
   not_synced_message_a343fe5e: "همگام نشده است: %{message}"
   not_visible_in_student_files_22f11883: "در پرونده های دانشجویی قابل مشاهده نیست"
   not_yet_assessed_9362f199: "هنوز ارزیابی نشده است"
+  not_yet_available_9aa23a77: "هنوز در دسترس نیست"
   not_yet_completed_345a0bca: "هنوز تکمیل نشده است"
   not_yet_graded_40475341: "هنوز نمره گذاری نشده"
   not_yet_graded_8b655a7: "هنوز نمره گذاری نشده"

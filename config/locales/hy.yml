@@ -2915,6 +2915,7 @@ hy:
   big_blue_button_conference: 
     recording_setting: Ձայնագրում
     recording_setting_enabled_description: "Միացնել այս կոնֆերանսի ձայնագրման ֆունկցիան"
+  bio_a519d807: "Կենսագրական տվյալներ"
   blackboard: 
     no_manifest: "Blackboard համակարգի zip արխիվը արմատային կատալոգում չունի imsmanifest.xml ֆայլ:"
   blue_daf8fea9: Կապույտ
@@ -7416,6 +7417,7 @@ hy:
       warning: Նախազգուշացում
   grade_distribution_e52c9256: "Գնահատականների բաշխում"
   grade_export_title: "Գնահատականների արտահանում"
+  grade_f949a691: "%{grade}%"
   grade_grade_7e52dd1c: "Գնահատական՝  %{grade}"
   grade_summary: 
     graph_title: "Միջին %{mean}, բարձր %{high}, ցածր %{low}"
@@ -11507,6 +11509,7 @@ hy:
   not_graded_e027c866: "Գնահատված չէ"
   not_installed_37a21a76: "Տեղադրված չէ"
   not_now_97efd947: "Ոչ հիմա"
+  not_yet_available_9aa23a77: "առայժմ հասանելի չէ"
   not_yet_completed_345a0bca: "Դեռեւս ավարտված չէ"
   not_yet_graded_8b655a7: "Դեռևս գնահատված չէ"
   note_length_cannot_exceed_maxlength_characters_82798b1: "Նշումը չի կարող գերազանցել %{maxLength} նիշը"

@@ -2434,6 +2434,7 @@ ko:
   beginning_date_2d2a29ac: "시작 날짜"
   big_blue_button_conference: 
     recording_setting: 녹음/녹화
+  bio_a519d807: 약력
   blackboard: 
     no_manifest: "이 Blackboard .zip은 루트 디렉토리에 imsmanifest.xml 파일이 없습니다."
   bookmark_service: 
@@ -6235,6 +6236,7 @@ ko:
     grade_display_warning: 
       warning: 경고
   grade_export_title: "평점 내보내기"
+  grade_f949a691: "%{grade}%"
   grade_grade_7e52dd1c: "평점: %{grade}"
   gradebook: 
     alerts: 
@@ -9719,6 +9721,7 @@ ko:
   no_time_limit_for_long_running_conferences_d49fdfad: "시간 제한 없음(장기 회의)"
   not_deleted_2a7f63ef: "(삭제 안 됨)"
   not_installed_37a21a76: "설치 안 됨"
+  not_yet_available_9aa23a77: "아직 사용할 수 없음"
   not_yet_graded_8b655a7: "평가 안 됨"
   nothing_for_now_e3e3ce2a: "현재 없음"
   notice_some_notifications_may_contain_confidential_5985f52a: "주의: 일부 알림은 기밀 정보를 포함할 수도 있습니다. 여러분의 기관에서 제공하는 것이 아닌 이메일로 알림을 받게 되면 민감한 Canvas 과목 및 그룹 정보를 기관 시스템 밖으로 보내는 결과를 낳을 수도 있습니다."
