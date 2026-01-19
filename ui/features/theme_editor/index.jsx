@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import ThemeEditor from './react/ThemeEditor'
 import ready from '@instructure/ready'
 import {checkShouldFramebust} from './framebust'
@@ -29,7 +29,7 @@ if (checkShouldFramebust()) {
 }
 
 ready(() => {
-  ReactDOM.render(
+  legacyRender(
     <ThemeEditor
       {...{
         brandConfig: window.ENV.brandConfig,
