@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import $ from 'jquery'
 import page from 'page'
 import qs from 'qs'
@@ -79,9 +79,13 @@ function renderShowCollaborations(ctx) {
   const view = () => {
     const state = store.getState()
     if (!root) {
-      root = createRoot(document.getElementById('content'))
+      root = render(
+        <CollaborationsApp applicationState={state} actions={actions} />,
+        document.getElementById('content'),
+      )
+    } else {
+      rerender(root, <CollaborationsApp applicationState={state} actions={actions} />)
     }
-    root.render(<CollaborationsApp applicationState={state} actions={actions} />)
   }
   unsubscribe = store.subscribe(view)
   view()
@@ -90,11 +94,16 @@ function renderShowCollaborations(ctx) {
 function renderLaunchTool(ctx) {
   const view = () => {
     if (!root) {
-      root = createRoot(document.getElementById('content'))
+      root = render(
+        <CollaborationsToolLaunch launchUrl={ctx.path.replace('/lti_collaborations', '')} />,
+        document.getElementById('content'),
+      )
+    } else {
+      rerender(
+        root,
+        <CollaborationsToolLaunch launchUrl={ctx.path.replace('/lti_collaborations', '')} />,
+      )
     }
-    root.render(
-      <CollaborationsToolLaunch launchUrl={ctx.path.replace('/lti_collaborations', '')} />,
-    )
   }
   view()
 }
