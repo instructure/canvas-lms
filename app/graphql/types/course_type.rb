@@ -407,46 +407,47 @@ module Types
                required: false
     end
     def submissions_connection(student_ids: nil, order_by: [], filter: {})
-      allowed_user_ids = if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
-                           # TODO: make a preloader for this???
-                           course.apply_enrollment_visibility(course.all_student_enrollments, current_user).pluck(:user_id)
-                         elsif course.grants_right?(current_user, session, :read_grades)
-                           [current_user.id]
-                         else
-                           []
-                         end
+      allowed_user_ids_promise = if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+                                   Loaders::CourseVisibleStudentUserIdsLoader.for(current_user:).load(course)
+                                 elsif course.grants_right?(current_user, session, :read_grades)
+                                   Promise.resolve([current_user.id])
+                                 else
+                                   Promise.resolve([])
+                                 end
 
-      if student_ids.present?
-        allowed_user_ids &= student_ids.map(&:to_i)
-      end
+      allowed_user_ids_promise.then do |allowed_user_ids|
+        if student_ids.present?
+          allowed_user_ids &= student_ids.map(&:to_i)
+        end
 
-      filter ||= {}
+        filter ||= {}
 
-      submissions = Submission.active.joins(:assignment).where(
-        user_id: allowed_user_ids,
-        assignment_id: course.assignments.published.reorder(nil).select(:id),
-        workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
-      )
+        submissions = Submission.active.joins(:assignment).where(
+          user_id: allowed_user_ids,
+          assignment_id: course.assignments.published.reorder(nil).select(:id),
+          workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
+        )
 
-      if filter[:submitted_since]
-        submissions = submissions.where("submitted_at > ?", filter[:submitted_since])
-      end
-      if filter[:graded_since]
-        submissions = submissions.where("graded_at > ?", filter[:graded_since])
-      end
-      if filter[:updated_since]
-        submissions = submissions.where("submissions.updated_at > ?", filter[:updated_since])
-      end
-      if (due_between = filter[:due_between])
-        submissions = submissions.where(cached_due_date: (due_between[:start])..(due_between[:end]))
-      end
+        if filter[:submitted_since]
+          submissions = submissions.where("submitted_at > ?", filter[:submitted_since])
+        end
+        if filter[:graded_since]
+          submissions = submissions.where("graded_at > ?", filter[:graded_since])
+        end
+        if filter[:updated_since]
+          submissions = submissions.where("submissions.updated_at > ?", filter[:updated_since])
+        end
+        if (due_between = filter[:due_between])
+          submissions = submissions.where(cached_due_date: (due_between[:start])..(due_between[:end]))
+        end
 
-      (order_by || []).each do |order|
-        direction = (order[:direction] == "descending") ? "DESC NULLS LAST" : "ASC"
-        submissions = submissions.order("#{order[:field]} #{direction}")
-      end
+        (order_by || []).each do |order|
+          direction = (order[:direction] == "descending") ? "DESC NULLS LAST" : "ASC"
+          submissions = submissions.order("#{order[:field]} #{direction}")
+        end
 
-      submissions
+        submissions
+      end
     end
 
     field :groups_connection, GroupType.connection_type, null: true do
