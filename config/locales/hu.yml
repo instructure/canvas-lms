@@ -4618,6 +4618,7 @@ hu:
     recording_setting: Felvétel
     recording_setting_enabled_description: "A konferencia felvételének engedélyezése"
   billing_country_code_as_reported_by_salesforce_625bbb4e: "A Salesforce által jelentett számlázási országkód"
+  bio_a519d807: "Életrajz, bemutatkozás"
   blackboard: 
     no_manifest: "Ennek a Blackboard .zip-nek nem található imsmanifest.xml fájl a gyökérkönyvtárában."
   blackout_date_5fc44c2b: "Tilalmi dátum"
@@ -11489,6 +11490,7 @@ hu:
       warning: Figyelmeztetés
   grade_distribution_e52c9256: Értékeléseloszlás
   grade_export_title: Osztályzatexportálás
+  grade_f949a691: "%{grade}%"
   grade_for_4c87a353: "Osztályzat ehhez"
   grade_for_assignment_acd954e9: "%{assignment} osztályzata"
   grade_for_ce7621f0: "osztályzat ehhez"
@@ -17250,6 +17252,7 @@ hu:
   not_valid_after_81c9faec: "Nem érvényes ezután"
   not_valid_before_9ad2d22d: "Nem érvényes ezelőtt"
   not_yet_assessed_9362f199: "Még nem értékelték"
+  not_yet_available_9aa23a77: "Még nem elérhető"
   not_yet_completed_345a0bca: "Még befejezetlen"
   not_yet_graded_40475341: "Még nem értékelt"
   not_yet_graded_8b655a7: "Még nincs értékelve"
