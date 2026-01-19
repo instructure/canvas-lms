@@ -5068,6 +5068,7 @@ nn:
     recording_setting: Opptak
     recording_setting_enabled_description: "Aktiver opptak for denne konferansen"
   bigeasy_locale: nn_NO
+  bio_a519d807: Bio
   blackboard: 
     no_manifest: "ZIP-fil for Blackboard har inga imsmanifest.xml-fil i rotkatalogen."
   blackout_date_5fc44c2b: "Blokkerte datoar"
@@ -12232,6 +12233,7 @@ nn:
       warning: Åtvaring
   grade_distribution_e52c9256: Resultatfordeling
   grade_export_title: Vurderingseksport
+  grade_f949a691: "%{grade}%"
   grade_for_4c87a353: "Vurdering for"
   grade_for_assignment_acd954e9: "Vurdering for %{assignment}"
   grade_for_ce7621f0: "vurdering for"
@@ -18554,6 +18556,7 @@ nn:
   not_valid_before_9ad2d22d: "Ikkje gyldig før"
   not_visible_in_student_files_22f11883: "Ikkje synleg i studentfiler"
   not_yet_assessed_9362f199: "Ikkje vurdert enno"
+  not_yet_available_9aa23a77: "Ikkje tilgjengeleg"
   not_yet_completed_345a0bca: "Ikkje fullført enno"
   not_yet_graded_40475341: "Ikkje vurdert enno"
   not_yet_graded_8b655a7: "Ikkje vurdert"
