@@ -22,7 +22,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/rails-flash-notifications'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Alert} from '@instructure/ui-alerts'
 import replaceTags from '@canvas/util/replaceTags'
 import {postMessageExternalContentReady} from '@canvas/external-tools/messages'
@@ -72,9 +72,9 @@ ready(() => {
       wrapper.setAttribute('id', 'lti_messages_wrapper')
       target.parentNode.insertBefore(wrapper, target)
 
-      const root = createRoot(wrapper)
+      let root
       await new Promise(resolve => {
-        root.render(
+        root = render(
           <>
             {[
               [errorMessage, true],
@@ -95,6 +95,7 @@ ready(() => {
                 )
               })}
           </>,
+          wrapper,
         )
       })
       root.unmount()
