@@ -36,7 +36,7 @@ interface UpdateDiscussionReadStateResponse {
 }
 
 const UPDATE_DISCUSSION_READ_STATE_MUTATION = gql`
-  mutation UpdateDiscussionReadState($discussionTopicId: ID!, $read: Boolean!) {
+  mutation UpdateAnnouncementReadState($discussionTopicId: ID!, $read: Boolean!) {
     updateDiscussionReadState(input: {
       discussionTopicId: $discussionTopicId
       read: $read

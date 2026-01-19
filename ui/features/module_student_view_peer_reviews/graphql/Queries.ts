@@ -19,7 +19,7 @@
 import {gql} from '@apollo/client'
 
 const ASSIGNMENT_QUERY = gql`
-  query GetCourseModules($courseId: ID!) {
+  query GetCourseModulesForPeerReviews($courseId: ID!) {
     course(id: $courseId) {
       modulesConnection {
         nodes {
