@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {View} from '@instructure/ui-view'
 import ready from '@instructure/ready'
 
@@ -26,7 +26,7 @@ import {AlignmentWidget} from '@instructure/outcomes-ui'
 ready(() => {
   const container = document.getElementById('canvas_outcomes_alignment_widget')
   if (ENV.canvas_outcomes && ENV.canvas_outcomes.host) {
-    ReactDOM.render(
+    legacyRender(
       <View as="div" borderWidth="small none none none" padding="medium none">
         <AlignmentWidget
           host={ENV.canvas_outcomes.host}
