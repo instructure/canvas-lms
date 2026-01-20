@@ -554,16 +554,22 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     return unless (maxlen = settings["collect_responses"])
 
     maxlen = 10 unless maxlen.is_a?(Integer) && maxlen.positive?
-    ::Canvas.redis.xadd(collected_responses_key,
-                        additional_fields.merge(xml: response_raw, errors: response.errors.join("\n")),
-                        maxlen:)
+    shard.activate do
+      ::Canvas.redis.xadd(collected_responses_key,
+                          additional_fields.merge(xml: response_raw, errors: response.errors.join("\n")),
+                          maxlen:)
+    end
   end
 
   def collected_responses
-    ::Canvas.redis.xrange(collected_responses_key, "-", "+").map(&:last)
+    shard.activate do
+      ::Canvas.redis.xrange(collected_responses_key, "-", "+").map(&:last)
+    end
   end
 
   def clear_collected_responsees
-    ::Canvas.redis.del(collected_responses_key)
+    shard.activate do
+      ::Canvas.redis.del(collected_responses_key)
+    end
   end
 end
