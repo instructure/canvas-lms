@@ -90,13 +90,20 @@ const OutcomeModalBody = ({
   contextURL: string | undefined
 }) => (
   <>
-    {outcome.display_name && (
-      <View display="block" width="100%" margin="0 0 medium 0" data-testid="outcome-display-name">
-        <Text wrap="break-word" size="large">
-          {outcome.display_name}
+    <View display="block" margin="none none medium none">
+      <View display="block" width="100%" data-testid="outcome-title">
+        <Text wrap="break-word" size="large" weight="bold" lineHeight="lineHeight100">
+          {outcome.title}
         </Text>
       </View>
-    )}
+      {outcome.display_name && (
+        <View display="block" width="100%" margin="0 0 medium 0" data-testid="outcome-display-name">
+          <Text wrap="break-word" size="medium">
+            {outcome.display_name}
+          </Text>
+        </View>
+      )}
+    </View>
     {outcomesFriendlyDescriptionFF && outcome.friendly_description && (
       <View
         display="block"
@@ -170,7 +177,7 @@ export const OutcomeDescriptionModal: React.FC<OutcomeDescriptionModalProps> = (
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={false}
       overflow="scroll"
-      label={I18n.t('%{outcomeTitle}', {outcomeTitle: outcome.title})}
+      label={I18n.t('Outcome Info')}
       data-testid="outcome-description-modal"
     >
       <Modal.Body>
