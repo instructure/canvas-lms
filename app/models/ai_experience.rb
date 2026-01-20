@@ -34,7 +34,28 @@ class AiExperience < ApplicationRecord
   scope :active, -> { where.not(workflow_state: "deleted") }
   scope :for_course, ->(course_id) { where(course_id:) }
 
+  set_policy do
+    # Students can read published experiences if they're enrolled in the course
+    given do |user, session|
+      published? && course.grants_right?(user, session, :read_as_member)
+    end
+    can :read
+
+    # Teachers/TAs/admins can read any experience (published or unpublished)
+    given do |user, session|
+      course.grants_any_right?(user, session, :manage_assignments_add, :manage_assignments_edit, :manage_assignments_delete)
+    end
+    can :read and can :create and can :update and can :delete
+
+    # Only teachers/TAs/admins can manage experiences
+    given do |user, session|
+      course.grants_any_right?(user, session, :manage_assignments_add, :manage_assignments_edit, :manage_assignments_delete)
+    end
+    can :manage
+  end
+
   # Manage conversation_context lifecycle in llm-conversation service
+  before_create :set_account_associations
   after_create :create_conversation_context
   after_update :update_conversation_context, if: :should_update_context?
   before_destroy :delete_conversation_context
@@ -103,6 +124,4 @@ class AiExperience < ApplicationRecord
     Rails.logger.error("Failed to delete conversation context for AiExperience #{id}: #{e.message}")
     # Don't fail the AiExperience deletion if context deletion fails
   end
-
-  before_create :set_account_associations
 end
