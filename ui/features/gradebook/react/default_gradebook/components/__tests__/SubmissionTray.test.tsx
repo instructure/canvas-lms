@@ -813,46 +813,42 @@ describe('SubmissionTray', () => {
   })
 
   describe('Peer Review Sub Assignments', () => {
-    test('SpeedGrader link includes peer_review parameter for peer review sub assignments', () => {
-      const assignment = {
-        ...props.assignment,
-        parentAssignmentId: '29',
-      }
-      const submission = {
-        ...props.submission,
-        assignmentId: '29',
-      }
-      const {getByText} = render(
-        <SubmissionTray
-          {...props}
-          assignment={assignment}
-          submission={submission}
-          isPeerReviewAssignment={true}
-        />,
-      )
-      const speedGraderLink = getByText('SpeedGrader').closest('a')
-      expect(speedGraderLink?.href).toMatch(/peer_review=true/)
-    })
+    let peerReviewAssignment: typeof props.assignment
+    let peerReviewSubmission: typeof props.submission
 
-    test('SpeedGrader link uses parent assignment ID for peer review sub assignments', () => {
-      const assignment = {
+    beforeEach(() => {
+      peerReviewAssignment = {
         ...props.assignment,
         parentAssignmentId: '29',
       }
-      const submission = {
+      peerReviewSubmission = {
         ...props.submission,
         assignmentId: '168',
       }
+    })
+
+    test('SpeedGrader link does not include peer_review parameter for peer review sub assignments', () => {
       const {getByText} = render(
         <SubmissionTray
           {...props}
-          assignment={assignment}
-          submission={submission}
-          isPeerReviewAssignment={true}
+          assignment={peerReviewAssignment}
+          submission={peerReviewSubmission}
         />,
       )
       const speedGraderLink = getByText('SpeedGrader').closest('a')
-      expect(speedGraderLink?.href).toMatch(/assignment_id=29/)
+      expect(speedGraderLink?.href).not.toMatch(/peer_review=true/)
+    })
+
+    test('SpeedGrader link uses sub-assignment ID for peer review sub assignments', () => {
+      const {getByText} = render(
+        <SubmissionTray
+          {...props}
+          assignment={peerReviewAssignment}
+          submission={peerReviewSubmission}
+        />,
+      )
+      const speedGraderLink = getByText('SpeedGrader').closest('a')
+      expect(speedGraderLink?.href).toMatch(/assignment_id=168/)
     })
 
     test('assignment link uses htmlUrl for peer review sub assignments', () => {
@@ -865,34 +861,6 @@ describe('SubmissionTray', () => {
       const {getByText} = render(<SubmissionTray {...props} assignment={assignment} />)
       const assignmentLink = getByText('Book Report').closest('a')
       expect(assignmentLink?.href).toBe('http://localhost/courses/1/assignments/29')
-    })
-
-    test('displays peer review assignment name when isPeerReviewAssignment is true', () => {
-      const peerReviewAssignment = {
-        ...props.assignment,
-        id: '31',
-        name: 'Peer Review',
-        parent_assignment_id: '30',
-      }
-      const {getByText} = render(
-        <SubmissionTray
-          {...props}
-          assignment={peerReviewAssignment}
-          isPeerReviewAssignment={true}
-        />,
-      )
-      expect(getByText('Peer Review')).toBeInTheDocument()
-    })
-
-    test('displays assignment name for peer review assignments', () => {
-      const assignment = {
-        ...props.assignment,
-        name: 'Main Assignment',
-      }
-      const {getByText} = render(
-        <SubmissionTray {...props} assignment={assignment} isPeerReviewAssignment={true} />,
-      )
-      expect(getByText('Main Assignment')).toBeInTheDocument()
     })
   })
 })

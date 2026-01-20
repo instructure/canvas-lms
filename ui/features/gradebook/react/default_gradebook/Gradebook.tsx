@@ -3759,7 +3759,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         assignment.omit_from_final_grade ||
         (this.options.group_weighting_scheme === 'percent' && isGroupWeightZero),
       isOpen: open,
-      isPeerReviewAssignment: Boolean(assignment?.parent_assignment_id),
       latePolicy: this.courseContent.latePolicy,
       locale: this.props.locale,
       onAnonymousSpeedGraderClick: this.showAnonymousSpeedGraderAlertForURL,
