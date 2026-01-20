@@ -93,6 +93,34 @@ RSpec.describe Lti::Registration do
     end
   end
 
+  describe "#developer_key" do
+    subject { registration.developer_key }
+
+    let(:registration) { lti_registration_with_tool }
+
+    it "returns the associated developer key" do
+      expect(subject).to eq(registration.developer_key)
+    end
+
+    context "for local copy of template registration" do
+      let(:template) { lti_registration_with_tool(account: Account.site_admin) }
+      let(:registration) do
+        lti_registration_model.tap do |reg|
+          # mimics the local copy creation process:
+          # the local copy can't be associated with the developer key
+          # can only reference one lti_registration_id
+          reg.developer_key = nil
+          reg.template_registration = template
+          reg.save!
+        end
+      end
+
+      it "returns the developer key from the template registration" do
+        expect(subject).to eq(template.developer_key)
+      end
+    end
+  end
+
   describe "#internal_lti_configuration" do
     subject { registration.internal_lti_configuration(context: account) }
 
