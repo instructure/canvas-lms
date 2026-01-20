@@ -132,13 +132,13 @@ export default function SyllabusRevisionsTray({
       const syllabusElement = document.getElementById('course_syllabus')
       let shouldUpdateDOM = false
 
-      if (syllabusElement && version.syllabus_body) {
+      if (syllabusElement) {
         const normalizedCurrent = syllabusElement.innerHTML.trim()
-        const normalizedNew = version.syllabus_body.trim()
+        const normalizedNew = (version.syllabus_body || '').trim()
         shouldUpdateDOM = normalizedCurrent !== normalizedNew
 
         if (shouldUpdateDOM) {
-          syllabusElement.innerHTML = version.syllabus_body
+          syllabusElement.innerHTML = version.syllabus_body || ''
         }
       }
     }
