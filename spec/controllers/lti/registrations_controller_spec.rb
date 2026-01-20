@@ -1638,8 +1638,7 @@ RSpec.describe Lti::RegistrationsController do
   describe "POST bind", type: :request do
     subject { post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/bind", params: { workflow_state: } }
 
-    let_once(:registration) { developer_key.lti_registration }
-    let_once(:developer_key) { lti_developer_key_model(account:) }
+    let_once(:registration) { lti_registration_with_tool(account: Account.site_admin) }
     let_once(:workflow_state) { "off" }
 
     context "without user session" do
@@ -1676,7 +1675,7 @@ RSpec.describe Lti::RegistrationsController do
       subject { post "/api/v1/accounts/#{account.id}/lti_registrations/#{other_registration.id}/bind", params: { workflow_state: } }
 
       let(:other_account) { account_model }
-      let(:other_registration) { lti_developer_key_model(account: other_account).lti_registration }
+      let(:other_registration) { lti_registration_with_tool(account: other_account) }
 
       it "returns 400" do
         subject
@@ -1706,21 +1705,41 @@ RSpec.describe Lti::RegistrationsController do
       it "constructs the binding properly" do
         subject
         account_binding = Lti::RegistrationAccountBinding.last
-        expect(account_binding.registration).to eq(registration)
         expect(account_binding.account).to eq(account)
         expect(account_binding.workflow_state).to eq(workflow_state)
         expect(account_binding.created_by).to eq(admin)
         expect(account_binding.updated_by).to eq(admin)
         expect(account_binding.root_account_id).to eq(account.id)
       end
+
+      context "with templates flag off" do
+        before do
+          account.disable_feature!(:lti_registrations_templates)
+        end
+
+        it "binds to the original registration" do
+          subject
+          account_binding = Lti::RegistrationAccountBinding.last
+          expect(account_binding.registration).to eq(registration)
+        end
+      end
+
+      it "creates a local copy of the registration" do
+        subject
+        local_registration = Lti::Registration.last
+        account_binding = Lti::RegistrationAccountBinding.last
+        expect(account_binding.registration).to eq(local_registration)
+        expect(local_registration.template_registration).to eq(registration)
+      end
     end
 
-    context "with existing binding" do
+    context "with existing binding and template flag off" do
       let(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
       let(:initial_workflow_state) { "on" }
       let(:initial_updated_by) { user_model }
 
       before do
+        account.disable_feature!(:lti_registrations_templates)
         account_binding.update!(workflow_state: initial_workflow_state, updated_by: initial_updated_by)
       end
 
@@ -1730,6 +1749,80 @@ RSpec.describe Lti::RegistrationsController do
 
       it "updates the existing binding" do
         expect { subject }.to change { account_binding.reload.workflow_state }.from(initial_workflow_state).to(workflow_state).and change { account_binding.updated_by }.from(initial_updated_by).to(admin)
+      end
+    end
+
+    context "with a non-site-admin registration" do
+      let_once(:registration) { lti_registration_with_tool(account:) }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include("must be inherited from Site Admin")
+      end
+    end
+  end
+
+  describe "POST install_from_template", type: :request do
+    subject { post "/api/v1/accounts/#{account.id}/lti_registrations/#{template.id}/install_from_template", as: :json }
+
+    let_once(:template) { lti_registration_with_tool(account: Account.site_admin) }
+
+    context "with templates flag disabled" do
+      before { account.disable_feature!(:lti_registrations_templates) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it "creates a local copy of the template" do
+      expect { subject }.to change { Lti::Registration.count }.by(1)
+      local_registration = Lti::Registration.last
+      expect(local_registration.template_registration).to eq(template)
+    end
+
+    it "creates an account binding for backwards compatibility" do
+      expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+      account_binding = Lti::RegistrationAccountBinding.last
+      local_registration = Lti::Registration.last
+      expect(account_binding.registration).to eq(local_registration)
+      expect(account_binding.account).to eq(account)
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    context "with a non-site-admin template" do
+      let_once(:template) { lti_registration_with_tool(account:) }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include("must be inherited from Site Admin")
+      end
+    end
+
+    context "with existing local copy" do
+      before do
+        post "/api/v1/accounts/#{account.id}/lti_registrations/#{template.id}/install_from_template", as: :json
+      end
+
+      it "does not create a new local copy" do
+        expect { subject }.not_to change { Lti::Registration.count }
+      end
+
+      it "returns the existing local copy" do
+        local_registration = Lti::Registration.last
+        subject
+        expect(response_json["id"]).to eq(local_registration.id)
+      end
+
+      it "does not create a new account binding" do
+        expect { subject }.not_to change { Lti::RegistrationAccountBinding.count }
       end
     end
   end

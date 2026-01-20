@@ -1604,14 +1604,61 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
+    workflow_state = params.require(:workflow_state).to_sym
+    to_bind = if @context.feature_enabled?(:lti_registrations_templates)
+                # for backwards compatibility with UI until template flag is fully on.
+                # use the local copy to bind
+                Lti::InstallTemplateRegistrationService.call(
+                  template: registration,
+                  account: @context,
+                  user: @current_user
+                )
+              else
+                registration
+              end
+
     Lti::AccountBindingService.call(
+      registration: to_bind,
       account: @context,
-      registration:,
-      workflow_state: params.require(:workflow_state),
+      workflow_state:,
       user: @current_user
     ) => { lti_registration_account_binding: }
 
     render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
+  end
+
+  # @API Install an LTI Registration from a Template
+  # This endpoint installs a local copy of a "template" LTI registration from Site Admin into the specified account.
+  # The local copy can then be customized for the account without affecting the template registration.
+  #
+  # Only allowed for root accounts and for registrations from Site Admin marked as templates.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   This would install the specified template LTI registration into the specified account
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/install_from_template' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Type: application/json"
+  def install_from_template
+    unless @context.feature_enabled?(:lti_registrations_templates)
+      return head :not_found
+    end
+
+    local_registration = Lti::InstallTemplateRegistrationService.call(
+      template: registration,
+      account: @context,
+      user: @current_user,
+      create_binding: true
+    )
+
+    account_binding = local_registration.account_binding_for(@context)
+    overlay = local_registration.overlay_for(@context)
+    includes = %i[account_binding configuration overlay]
+    json = lti_registration_json(local_registration, @current_user, session, @context, includes:, account_binding:, overlay:)
+
+    render json:
   end
 
   # @API Search for Accounts and Courses

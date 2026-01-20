@@ -241,6 +241,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/bind'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/history'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/install_from_template'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/overlay_history'
 - verb: PUT
