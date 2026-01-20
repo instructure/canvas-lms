@@ -23,8 +23,8 @@ admin_manage_access_tokens:
 login_registration_ui_identity:
   state: hidden
   applies_to: RootAccount
-  display_name: New Login/Registration UI for Identity
-  description: Rework the Login/Registration UI to support Identity changes, ensuring a uniform login experience and transparent auth migration.
+  display_name: New Canvas Login UI
+  description: Enable the new Login/Registration UI.  This change is part of our ongoing transition to Instructure Identity Services and represents an important step in modernizing our authentication infrastructure.
   environments:
     development:
       state: allowed
