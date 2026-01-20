@@ -78,7 +78,7 @@ module Accessibility
       end
 
       def message
-        I18n.t("Table headers aren't set up correctly for screen readers to know which headers apply to which cells.")
+        I18n.t("This table headers isn't set up correctly for screen readers to know which cells it applies to.")
       end
 
       def why

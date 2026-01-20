@@ -166,7 +166,7 @@ describe('AppliedFilters', () => {
         },
         {
           key: 'ruleTypes',
-          option: {value: 'heading-order', label: 'Heading order'} as FilterOption,
+          option: {value: 'heading-order', label: 'Skipped heading level'} as FilterOption,
         },
         {
           key: 'ruleTypes',
@@ -178,7 +178,7 @@ describe('AppliedFilters', () => {
 
       expect(screen.getByText(/With issues of:/)).toBeInTheDocument()
       expect(screen.getByText(/Alt text \+2/)).toBeInTheDocument()
-      expect(screen.queryByText(/Heading order/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/Skipped heading level/)).not.toBeInTheDocument()
       expect(screen.queryByText(/Duplicate links/)).not.toBeInTheDocument()
     })
 
@@ -190,7 +190,7 @@ describe('AppliedFilters', () => {
         },
         {
           key: 'ruleTypes',
-          option: {value: 'heading-order', label: 'Heading order'} as FilterOption,
+          option: {value: 'heading-order', label: 'Skipped heading level'} as FilterOption,
         },
         {
           key: 'workflowStates',
@@ -216,7 +216,7 @@ describe('AppliedFilters', () => {
         },
         {
           key: 'ruleTypes',
-          option: {value: 'heading-order', label: 'Heading order'} as FilterOption,
+          option: {value: 'heading-order', label: 'Skipped heading level'} as FilterOption,
         },
         {
           key: 'workflowStates',

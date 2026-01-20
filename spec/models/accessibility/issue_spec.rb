@@ -222,7 +222,7 @@ describe Accessibility::Issue do
         "Page",
         resource.id,
         "./invalid_path",
-        "Change it to Heading 2"
+        "Change heading level to Heading 2"
       )
       expect(response).to eq(
         {
@@ -240,7 +240,7 @@ describe Accessibility::Issue do
           "Page",
           resource.id,
           ".//h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
         expect(response).to eq(
           {
@@ -262,7 +262,7 @@ describe Accessibility::Issue do
           "Assignment",
           resource.id,
           ".//h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
         expect(response).to eq(
           {
@@ -284,7 +284,7 @@ describe Accessibility::Issue do
           "DiscussionTopic",
           resource.id,
           ".//h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
         expect(response).to eq(
           {
@@ -335,7 +335,7 @@ describe Accessibility::Issue do
           "Page",
           resource.id,
           ".//h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
         expect(response).to eq(
           {
@@ -356,7 +356,7 @@ describe Accessibility::Issue do
           "Assignment",
           resource.id,
           ".//h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
         expect(response).to eq(
           {
@@ -377,7 +377,7 @@ describe Accessibility::Issue do
           "DiscussionTopic",
           resource.id,
           ".//h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
         expect(response).to eq(
           {
