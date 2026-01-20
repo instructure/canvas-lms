@@ -22,7 +22,7 @@ import {ContextModule} from './ContextModule'
 
 export const AssignmentOverride = {
   fragment: gql`
-    fragment AssignmentOverride on AssignmentOverride {
+    fragment EditV2AssignmentOverride on AssignmentOverride {
       _id
       id
       dueAt
@@ -30,7 +30,7 @@ export const AssignmentOverride = {
       unlockAt
       unassignItem
       contextModule {
-        ...ContextModule
+        ...EditV2ContextModule
       }
       set {
         ... on AdhocStudents {

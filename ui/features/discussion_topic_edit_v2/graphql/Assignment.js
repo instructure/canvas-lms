@@ -23,7 +23,7 @@ import {LtiAssetProcessor} from './LtiAssetProcessor'
 
 export const Assignment = {
   fragment: gql`
-    fragment Assignment on Assignment {
+    fragment EditV2Assignment on Assignment {
       id
       _id
       name
@@ -49,11 +49,11 @@ export const Assignment = {
         intraReviews
       }
       assignmentGroup {
-        ...AssignmentGroup
+        ...EditV2AssignmentGroup
       }
       assignmentOverrides {
         nodes {
-          ...AssignmentOverride
+          ...EditV2AssignmentOverride
         }
       }
       hasSubAssignments
@@ -67,7 +67,7 @@ export const Assignment = {
         tag
         assignmentOverrides {
           nodes {
-            ...AssignmentOverride
+            ...EditV2AssignmentOverride
           }
         }
       }
@@ -75,7 +75,7 @@ export const Assignment = {
       suppressAssignment
       ltiAssetProcessorsConnection {
         nodes {
-          ...LtiAssetProcessor
+          ...EditV2LtiAssetProcessor
         }
       }
     }
