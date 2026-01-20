@@ -2816,6 +2816,18 @@ describe Course do
         @course.root_account.disable_feature!(:a11y_checker)
       end
 
+      it "returns Accessibility tab if a11y_checker_ga1 feature flag is enabled for teachers" do
+        @course.root_account.enable_feature!(:a11y_checker_ga1)
+        tabs = @course.tabs_available(@user)
+
+        # Checks that Accessibility tab is at the end of the tabs (except for Settings tab)
+        settings_tab_index = tabs.pluck(:id).index(Course::TAB_SETTINGS)
+        accessibility_tab_index = tabs.pluck(:id).index(Course::TAB_ACCESSIBILITY)
+        expect(accessibility_tab_index).to eq(settings_tab_index - 1)
+      ensure
+        @course.root_account.disable_feature!(:a11y_checker_ga1)
+      end
+
       describe "TAB_YOUTUBE_MIGRATION" do
         before do
           @course.enable_feature!(:youtube_migration)
@@ -9553,6 +9565,82 @@ describe Course do
 
       it "returns false" do
         expect(course.block_content_editor_enabled?).to be false
+      end
+    end
+  end
+
+  describe "#a11y_checker_enabled?" do
+    let(:course) { Course.new(account: Account.default) }
+
+    context "when both a11y_checker and a11y_checker_eap features are enabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(true)
+        allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(true)
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(false)
+      end
+
+      it "returns true" do
+        expect(course.a11y_checker_enabled?).to be true
+      end
+    end
+
+    context "when only a11y_checker_ga1 is enabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(false)
+        allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(false)
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(true)
+      end
+
+      it "returns true" do
+        expect(course.a11y_checker_enabled?).to be true
+      end
+    end
+
+    context "when both EAP path and GA1 are enabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(true)
+        allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(true)
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(true)
+      end
+
+      it "returns true" do
+        expect(course.a11y_checker_enabled?).to be true
+      end
+    end
+
+    context "when account a11y_checker is enabled but course a11y_checker_eap is disabled and ga1 is disabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(true)
+        allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(false)
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(false)
+      end
+
+      it "returns false" do
+        expect(course.a11y_checker_enabled?).to be false
+      end
+    end
+
+    context "when account a11y_checker is disabled but course a11y_checker_eap is enabled and ga1 is disabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(false)
+        allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(true)
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(false)
+      end
+
+      it "returns false" do
+        expect(course.a11y_checker_enabled?).to be false
+      end
+    end
+
+    context "when all features are disabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(false)
+        allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(false)
+        allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(false)
+      end
+
+      it "returns false" do
+        expect(course.a11y_checker_enabled?).to be false
       end
     end
   end
