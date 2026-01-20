@@ -19,7 +19,7 @@
 
 module Lti
   class ToolConfiguration < ActiveRecord::Base
-    belongs_to :developer_key
+    belongs_to :developer_key, optional: true
     belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :manual_configuration, optional: true
 
     before_validation :set_redirect_uris
@@ -27,7 +27,8 @@ module Lti
     after_update :update_external_tools!, if: :configuration_changed?
     after_commit :update_unified_tool_id, if: :update_unified_tool_id?
 
-    validates :developer_key_id, uniqueness: true, presence: true
+    validates :developer_key_id, uniqueness: { scope: :lti_registration_id }, allow_nil: true
+    validate :require_developer_key_or_lti_registration
     validate :validate_configuration
     validate :validate_placements
     validate :validate_oidc_initiation_urls
@@ -66,6 +67,10 @@ module Lti
       }
     end
 
+    def effective_developer_key
+      developer_key || lti_registration&.developer_key
+    end
+
     def self.retrieve_and_extract_configuration(url)
       InstrumentTLSCiphers.without_tls_metrics do
         response = CanvasHttp.get(url)
@@ -88,8 +93,14 @@ module Lti
     end
     private_class_method :raise_error
 
+    def require_developer_key_or_lti_registration
+      if developer_key_id.blank? && lti_registration_id.blank?
+        errors.add(:base, "must have either a developer_key or lti_registration")
+      end
+    end
+
     def update_external_tools!
-      developer_key.update_external_tools!
+      effective_developer_key&.update_external_tools!
     end
 
     def set_redirect_uris
