@@ -27,7 +27,6 @@
 !/config/crystalball.yml
 !/config/graphql_persisted_queries.yml
 /config/environments/*-local.rb
-/config/locales/generated/
 /config/saml/*
 /config/RAILS_VERSION
 /coverage/
