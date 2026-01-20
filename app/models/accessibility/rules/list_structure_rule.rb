@@ -130,14 +130,7 @@ module Accessibility
       # Helper methods
 
       def self.list_check_helper?(elem, regex)
-        if elem.tag_name.downcase == "p"
-          return true if regex.match?(elem.content)
-
-          elem.children.each do |child|
-            return true if regex.match?(child.content)
-          end
-        end
-        false
+        elem.tag_name.downcase == "p" && regex.match?(elem.content)
       end
 
       def self.list?(elem)
