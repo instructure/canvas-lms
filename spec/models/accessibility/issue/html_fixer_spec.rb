@@ -29,7 +29,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           "invalid_resource",
           "./div/h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -46,7 +46,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           wiki_page,
           "invalid_path",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -70,7 +70,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           wiki_page,
           "./div/h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -114,7 +114,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           discussion_topic,
           "./div/h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -150,7 +150,7 @@ describe Accessibility::Issue::HtmlFixer do
               Accessibility::Rules::HeadingsStartAtH2Rule.id,
               wiki_page,
               "invalid_path",
-              "Change it to Heading 2"
+              "Change heading level to Heading 2"
             )
           end
 
@@ -176,7 +176,7 @@ describe Accessibility::Issue::HtmlFixer do
               Accessibility::Rules::HeadingsStartAtH2Rule.id,
               wiki_page,
               "./div/h1",
-              "Change it to Heading 2"
+              "Change heading level to Heading 2"
             )
           end
 
@@ -203,7 +203,7 @@ describe Accessibility::Issue::HtmlFixer do
               Accessibility::Rules::HeadingsStartAtH2Rule.id,
               wiki_page,
               "invalid_path",
-              "Change it to Heading 2"
+              "Change heading level to Heading 2"
             )
           end
 
@@ -229,7 +229,7 @@ describe Accessibility::Issue::HtmlFixer do
               Accessibility::Rules::HeadingsStartAtH2Rule.id,
               wiki_page,
               "./div/h1",
-              "Change it to Heading 2"
+              "Change heading level to Heading 2"
             )
           end
 
@@ -258,7 +258,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           assignment,
           "./div/h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -285,7 +285,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           discussion_topic,
           "./div/h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
