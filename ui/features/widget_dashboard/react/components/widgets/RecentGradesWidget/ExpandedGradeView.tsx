@@ -148,7 +148,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
                 </Flex.Item>
                 <Flex.Item overflowY="visible">
                   <Link
-                    href={`/conversations?context_id=course_${courseId}`}
+                    href={`/conversations?context_id=course_${courseId}&compose=true`}
                     isWithinText={false}
                     data-testid={`message-instructor-link-${submission._id}`}
                   >
