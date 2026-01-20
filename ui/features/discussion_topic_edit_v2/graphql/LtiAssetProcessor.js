@@ -21,7 +21,7 @@ import {gql} from '@apollo/client'
 
 export const LtiAssetProcessor = {
   fragment: gql`
-    fragment LtiAssetProcessor on LtiAssetProcessor {
+    fragment EditV2LtiAssetProcessor on LtiAssetProcessor {
       _id
       title
       text

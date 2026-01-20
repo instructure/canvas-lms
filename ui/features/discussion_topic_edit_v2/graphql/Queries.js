@@ -24,7 +24,7 @@ import {gql} from '@apollo/client'
 export const DISCUSSION_TOPIC_QUERY = gql`
   query GetDiscussionTopicForEdit($discussionTopicId: ID!) {
     legacyNode(_id: $discussionTopicId, type: Discussion) {
-      ...DiscussionTopic
+      ...EditV2DiscussionTopic
     }
   }
   ${DiscussionTopic.fragment}
@@ -33,7 +33,7 @@ export const DISCUSSION_TOPIC_QUERY = gql`
 export const COURSE_QUERY = gql`
   query GetCourseQuery($courseId: ID!) {
     legacyNode(_id: $courseId, type: Course) {
-      ...Course
+      ...EditV2Course
     }
   }
   ${Course.fragment}
@@ -42,7 +42,7 @@ export const COURSE_QUERY = gql`
 export const GROUP_QUERY = gql`
   query GetGroupQuery($groupId: ID!) {
     legacyNode(_id: $groupId, type: Group) {
-      ...Group
+      ...EditV2Group
     }
   }
   ${Group.fragment}
