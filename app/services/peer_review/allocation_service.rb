@@ -78,6 +78,11 @@ class PeerReview::AllocationService < ApplicationService
       return error_result(:peer_reviews_not_enabled, I18n.t("Assignment does not have peer reviews enabled"), :forbidden)
     end
 
+    # Validation: Assessor must have an active student enrollment
+    unless @assessor.enrollments.where(course_id: @assignment.context_id, type: "StudentEnrollment", workflow_state: "active").exists?
+      return error_result(:enrollment_concluded, I18n.t("You cannot receive new peer review allocations because your enrollment is not active"), :forbidden)
+    end
+
     # Validation: Check submission requirement based on assignment configuration
     if @assignment.peer_review_submission_required
       student_submission = @assignment.submissions.find_by(user: @assessor)
