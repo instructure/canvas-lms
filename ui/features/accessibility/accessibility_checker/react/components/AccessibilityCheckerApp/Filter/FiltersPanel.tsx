@@ -61,10 +61,27 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   const [toDate, setToDate] = useState<FilterOption | null>(null)
   const [filterCount, setFilterCount] = useState(0)
   const [alertMessage, setAlertMessage] = useState<string | null>(null)
+  const [toDateError, setToDateError] = useState<Array<{type: 'error'; text: string}>>([])
   const toggleButtonRef = React.useRef<CustomToggleGroup | null>(null)
 
   const dateFormatter = useDateTimeFormat('date.formats.medium_with_weekday')
   const dateFormatHint = useDateFormatPattern()
+
+  const getDisabledDatesForFromDate = useCallback(
+    (isoDate: string) => {
+      if (!toDate?.value) return false
+      return new Date(isoDate) > new Date(toDate.value)
+    },
+    [toDate],
+  )
+
+  const getDisabledDatesForToDate = useCallback(
+    (isoDate: string) => {
+      if (!fromDate?.value) return false
+      return new Date(isoDate) < new Date(fromDate.value)
+    },
+    [fromDate],
+  )
 
   useEffect(() => {
     const filters = getFilters(appliedFilters)
@@ -124,16 +141,36 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   }, [handleFilterChange])
 
   const handleApply = useCallback(() => {
+    if (fromDate?.value && toDate?.value) {
+      const from = new Date(fromDate.value)
+      const to = new Date(toDate.value)
+
+      if (from > to) {
+        setToDateError([
+          {
+            type: 'error',
+            text: I18n.t('End date must be after the start date.'),
+          },
+        ])
+        return
+      }
+    }
+
+    setToDateError([])
+
     const filters = getFilterSelections()
     setFilterCount(appliedFilters.length)
     handleFilterChange(filters)
     setIsOpen(false)
     toggleButtonRef.current?.focus()
-  }, [appliedFilters, handleFilterChange, getFilterSelections])
+  }, [fromDate, toDate, appliedFilters, handleFilterChange, getFilterSelections])
 
   const handleDateChange = useCallback(
     (dateFieldId: 'fromDate' | 'toDate') => (date: Date | null) => {
       const setDate = dateFieldId === 'fromDate' ? setFromDate : setToDate
+
+      setToDateError([])
+
       if (!date) {
         setDate(null)
         return
@@ -259,6 +296,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             calendarIcon: I18n.t('Choose a date for Last edited from'),
                           }}
                           onSelectedDateChange={handleDateChange('fromDate')}
+                          disabledDates={getDisabledDatesForFromDate}
                         />
                       </Flex.Item>
                       <Flex.Item overflowY="visible" height="auto">
@@ -271,6 +309,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 date_format: dateFormatHint,
                               }),
                             },
+                            ...toDateError,
                           ]}
                           width="100%"
                           selectedDate={toDate?.value ?? null}
@@ -281,6 +320,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             calendarIcon: I18n.t('Choose a date for Last edited to'),
                           }}
                           onSelectedDateChange={handleDateChange('toDate')}
+                          disabledDates={getDisabledDatesForToDate}
                         />
                       </Flex.Item>
                     </Flex>

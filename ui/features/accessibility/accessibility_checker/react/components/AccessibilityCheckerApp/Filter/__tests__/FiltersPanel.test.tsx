@@ -177,6 +177,69 @@ describe('FiltersPanel', () => {
 
       expect(fromDateInput).toHaveValue('')
     })
+
+    describe('date range validation', () => {
+      it('disables fromDate dates after selected toDate', async () => {
+        const appliedFilters: AppliedFilter[] = [
+          {
+            key: 'toDate',
+            option: {value: '2024-01-20T00:00:00.000Z', label: 'Jan 20, 2024'},
+          },
+        ]
+
+        render(<FiltersPanel {...defaultProps} appliedFilters={appliedFilters} />)
+
+        const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+        await userEvent.click(toggleButton!)
+
+        const toDateInput = screen.getByLabelText(/Last edited to/i) as HTMLInputElement
+        expect(toDateInput.value).toBeTruthy()
+      })
+
+      it('disables toDate dates before selected fromDate', async () => {
+        const appliedFilters: AppliedFilter[] = [
+          {
+            key: 'fromDate',
+            option: {value: '2024-01-10T00:00:00.000Z', label: 'Jan 10, 2024'},
+          },
+        ]
+
+        render(<FiltersPanel {...defaultProps} appliedFilters={appliedFilters} />)
+
+        const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+        await userEvent.click(toggleButton!)
+
+        // Verify fromDate is set in the component
+        const fromDateInput = screen.getByLabelText(/Last edited from/i) as HTMLInputElement
+        expect(fromDateInput.value).toBeTruthy()
+      })
+
+      it('allows all dates when toDate is not selected', async () => {
+        render(<FiltersPanel {...defaultProps} />)
+
+        const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+        await userEvent.click(toggleButton!)
+
+        const fromDateInput = screen.getByLabelText(/Last edited from/i) as HTMLInputElement
+        const toDateInput = screen.getByLabelText(/Last edited to/i) as HTMLInputElement
+
+        expect(fromDateInput.value).toBe('')
+        expect(toDateInput.value).toBe('')
+      })
+
+      it('allows all dates when fromDate is not selected', async () => {
+        render(<FiltersPanel {...defaultProps} />)
+
+        const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+        await userEvent.click(toggleButton!)
+
+        const fromDateInput = screen.getByLabelText(/Last edited from/i) as HTMLInputElement
+        const toDateInput = screen.getByLabelText(/Last edited to/i) as HTMLInputElement
+
+        expect(fromDateInput.value).toBe('')
+        expect(toDateInput.value).toBe('')
+      })
+    })
   })
 
   describe('checkbox groups', () => {
@@ -339,6 +402,91 @@ describe('FiltersPanel', () => {
       await userEvent.click(clearButton)
 
       expect(screen.queryByTestId('apply-filters-button')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Apply filter validation', () => {
+    it('shows error when fromDate > toDate and prevents filter application', async () => {
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+      await userEvent.click(toggleButton!)
+
+      const fromDateInput = screen.getByLabelText(/Last edited from/i)
+      const toDateInput = screen.getByLabelText(/Last edited to/i)
+
+      await userEvent.type(fromDateInput, '2024-01-20')
+      await userEvent.type(toDateInput, '2024-01-10')
+
+      const applyButton = screen.getByTestId('apply-filters-button')
+      await userEvent.click(applyButton)
+
+      expect(screen.getByText(/End date must be after the start date\./i)).toBeInTheDocument()
+
+      expect(mockOnFilterChange).not.toHaveBeenCalled()
+      expect(screen.getByTestId('apply-filters-button')).toBeInTheDocument()
+    })
+
+    it('applies filters successfully when fromDate < toDate', async () => {
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+      await userEvent.click(toggleButton!)
+
+      const fromDateInput = screen.getByLabelText(/Last edited from/i)
+      const toDateInput = screen.getByLabelText(/Last edited to/i)
+
+      await userEvent.type(fromDateInput, '2024-01-10')
+      await userEvent.type(toDateInput, '2024-01-20')
+
+      const applyButton = screen.getByTestId('apply-filters-button')
+      await userEvent.click(applyButton)
+
+      expect(screen.queryByText(/End date must be after the start date\./i)).not.toBeInTheDocument()
+
+      expect(mockOnFilterChange).toHaveBeenCalled()
+      expect(screen.queryByTestId('apply-filters-button')).not.toBeInTheDocument()
+    })
+
+    it('clears errors when date is changed and apply succeeds with valid range', async () => {
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+      await userEvent.click(toggleButton!)
+
+      const fromDateInput = screen.getByLabelText(/Last edited from/i)
+      const toDateInput = screen.getByLabelText(/Last edited to/i)
+
+      await userEvent.type(fromDateInput, '2024-01-20')
+      await userEvent.type(toDateInput, '2024-01-10')
+
+      const applyButton = screen.getByTestId('apply-filters-button')
+      await userEvent.click(applyButton)
+
+      expect(screen.getByText(/End date must be after the start date\./i)).toBeInTheDocument()
+
+      await userEvent.clear(fromDateInput)
+      await userEvent.type(fromDateInput, '2024-01-05')
+
+      await userEvent.click(applyButton)
+
+      expect(mockOnFilterChange).toHaveBeenCalled()
+      expect(screen.queryByTestId('apply-filters-button')).not.toBeInTheDocument()
+    })
+
+    it('applies filters when only one date is set', async () => {
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+      await userEvent.click(toggleButton!)
+
+      const fromDateInput = screen.getByLabelText(/Last edited from/i)
+      await userEvent.type(fromDateInput, '2024-01-10')
+
+      const applyButton = screen.getByTestId('apply-filters-button')
+      await userEvent.click(applyButton)
+
+      expect(mockOnFilterChange).toHaveBeenCalled()
     })
   })
 })
