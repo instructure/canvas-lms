@@ -51,6 +51,7 @@ const ConversationProgress: React.FC<ConversationProgressProps> = ({progress}) =
   }
 
   const {percentage, objectives} = progress
+  const isComplete = percentage >= 100
 
   return (
     <Flex gap="small" alignItems="center" justifyItems="space-between">
@@ -60,7 +61,7 @@ const ConversationProgress: React.FC<ConversationProgressProps> = ({progress}) =
           valueNow={percentage}
           valueMax={100}
           size="small"
-          meterColor="info"
+          meterColor={isComplete ? 'success' : 'info'}
         />
       </Flex.Item>
       <Flex.Item>

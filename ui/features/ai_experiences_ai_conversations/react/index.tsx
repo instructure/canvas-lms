@@ -16,33 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface LLMConversationMessage {
-  role: 'User' | 'Assistant'
-  text: string
-  timestamp?: Date
-}
+import React from 'react'
+import ReactDOM from 'react-dom'
+import AIConversationsPage from './components/AIConversationsPage'
+import {AIExperience} from '../types'
 
-export interface ConversationProgress {
-  current: number
-  total: number
-  percentage: number
-  objectives: Array<{
-    objective: string
-    status: '' | 'covered'
-  }>
-}
+const container = document.getElementById('ai_experiences_ai_conversations')
 
-export interface LLMConversationViewProps {
-  isOpen: boolean
-  onClose: () => void
-  returnFocusRef?: React.RefObject<HTMLElement>
-  courseId?: string | number
-  aiExperienceId?: string
-  aiExperienceTitle?: string
-  facts?: string
-  learningObjectives?: string
-  scenario?: string
-  isExpanded?: boolean
-  onToggleExpanded?: () => void
-  isTeacherPreview?: boolean
+if (container) {
+  const aiExperience: AIExperience = (window.ENV.AI_EXPERIENCE as AIExperience) || {}
+  const courseId = window.ENV.COURSE_ID || ''
+
+  ReactDOM.render(
+    <AIConversationsPage aiExperience={aiExperience} courseId={courseId} />,
+    container,
+  )
 }

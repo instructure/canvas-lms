@@ -16,33 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface LLMConversationMessage {
-  role: 'User' | 'Assistant'
-  text: string
-  timestamp?: Date
-}
+import ready from '@instructure/ready'
 
-export interface ConversationProgress {
-  current: number
-  total: number
-  percentage: number
-  objectives: Array<{
-    objective: string
-    status: '' | 'covered'
-  }>
-}
-
-export interface LLMConversationViewProps {
-  isOpen: boolean
-  onClose: () => void
-  returnFocusRef?: React.RefObject<HTMLElement>
-  courseId?: string | number
-  aiExperienceId?: string
-  aiExperienceTitle?: string
-  facts?: string
-  learningObjectives?: string
-  scenario?: string
-  isExpanded?: boolean
-  onToggleExpanded?: () => void
-  isTeacherPreview?: boolean
-}
+ready(() => {
+  import('./react')
+})

@@ -56,6 +56,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   scenario: _scenario,
   isExpanded = false,
   onToggleExpanded,
+  isTeacherPreview = false,
 }) => {
   const [messages, setMessages] = useState<LLMConversationMessage[]>([])
   const [conversationId, setConversationId] = useState<string | null>(null)
@@ -273,10 +274,12 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             <IconPlayLine size="small" />
             <View>
               <Heading level="h3" margin="0 0 xx-small 0">
-                {I18n.t('Preview')}
+                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
               </Heading>
               <Text size="small">
-                {I18n.t('Here, you can have a chat with the AI just like a student would.')}
+                {isTeacherPreview
+                  ? I18n.t('Here, you can have a chat with the AI just like a student would.')
+                  : I18n.t('Start the experience by having a conversation with the AI. Good luck!')}
               </Text>
             </View>
           </Flex>
@@ -326,10 +329,12 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             </IconButton>
             <View>
               <Heading level="h3" margin="0 0 xx-small 0">
-                {I18n.t('Preview')}
+                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
               </Heading>
               <Text size="small">
-                {I18n.t('Here, you can have a chat with the AI just like a student would.')}
+                {isTeacherPreview
+                  ? I18n.t('Here, you can have a chat with the AI just like a student would.')
+                  : I18n.t('Start the experience by having a conversation with the AI. Good luck!')}
               </Text>
             </View>
           </Flex>
