@@ -17,10 +17,37 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {ExpandedGradeView} from '../ExpandedGradeView'
 import type {RecentGradeSubmission} from '../../../../types'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
+
+const server = setupServer()
+
+beforeAll(() => {
+  server.listen()
+})
+
+afterEach(() => {
+  server.resetHandlers()
+})
+
+afterAll(() => {
+  server.close()
+})
+
+beforeEach(() => {
+  window.ENV = {current_user_id: '1'} as any
+
+  server.use(
+    http.post('/api/graphql', () => {
+      return HttpResponse.json(mockEmptyRubricResponse)
+    }),
+  )
+})
 
 const mockSubmission: RecentGradeSubmission = {
   _id: 'sub1',
@@ -59,11 +86,59 @@ const mockSharedCourseData = [
 ]
 
 const renderWithContext = (component: React.ReactElement) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+  })
+
   return render(
-    <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
-      {component}
-    </WidgetDashboardProvider>,
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+        {component}
+      </WidgetDashboardProvider>
+    </QueryClientProvider>,
   )
+}
+
+const mockRubricResponse = {
+  data: {
+    legacyNode: {
+      _id: 'sub1',
+      rubricAssessmentsConnection: {
+        nodes: [
+          {
+            _id: 'rubric1',
+            score: 85,
+            assessmentRatings: [
+              {
+                _id: 'rating1',
+                criterion: {
+                  _id: 'criterion1',
+                  description: 'Content Quality',
+                  longDescription: 'How well does the content address the topic?',
+                  points: 50,
+                },
+                description: 'Good work',
+                points: 45,
+                comments: 'Nice job on the analysis',
+                commentsHtml: '<p>Nice job on the analysis</p>',
+              },
+            ],
+          },
+        ],
+      },
+    },
+  },
+}
+
+const mockEmptyRubricResponse = {
+  data: {
+    legacyNode: {
+      _id: 'sub1',
+      rubricAssessmentsConnection: {
+        nodes: [],
+      },
+    },
+  },
 }
 
 describe('ExpandedGradeView', () => {
@@ -83,27 +158,75 @@ describe('ExpandedGradeView', () => {
     expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: 88%')
   })
 
-  it('renders the rubric section with placeholder', () => {
-    renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
-    expect(screen.getByTestId('rubric-section-heading-sub1')).toHaveTextContent('Rubric')
-    expect(screen.getByTestId('rubric-placeholder-sub1')).toHaveTextContent(
-      'Rubric details will be displayed here',
+  it('displays rubric data', async () => {
+    server.use(
+      http.post('/api/graphql', () => {
+        return HttpResponse.json(mockRubricResponse)
+      }),
     )
+
+    renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('rubric-section-sub1')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('rubric-section-heading-sub1')).toHaveTextContent('Rubric')
   })
 
-  it('renders the feedback section with placeholder', () => {
+  it('renders the feedback section with placeholder', async () => {
+    server.use(
+      http.post('/api/graphql', () => {
+        return HttpResponse.json(mockEmptyRubricResponse)
+      }),
+    )
+
     renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('submission-details-loading-sub1')).not.toBeInTheDocument()
+    })
+
     expect(screen.getByTestId('feedback-section-heading-sub1')).toHaveTextContent('Feedback')
     expect(screen.getByTestId('feedback-placeholder-sub1')).toHaveTextContent(
       'Feedback comments will be displayed here',
     )
   })
 
-  it('renders the view inline feedback button', () => {
-    renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
-    expect(screen.getByTestId('view-inline-feedback-button-sub1')).toHaveTextContent(
-      'View inline feedback',
+  it('displays error state when submission details fetch fails', async () => {
+    server.use(
+      http.post('/api/graphql', () => {
+        return HttpResponse.json({
+          errors: [{message: 'GraphQL error'}],
+        })
+      }),
     )
+
+    renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('submission-details-error-sub1')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('submission-details-error-sub1')).toHaveTextContent(
+      'Error loading submission details',
+    )
+  })
+
+  it('renders the view inline feedback button', async () => {
+    server.use(
+      http.post('/api/graphql', () => {
+        return HttpResponse.json(mockRubricResponse)
+      }),
+    )
+
+    renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('view-inline-feedback-button-sub1')).toHaveTextContent(
+        'View inline feedback',
+      )
+    })
   })
 
   it('renders the open assignment link', () => {
@@ -128,10 +251,16 @@ describe('ExpandedGradeView', () => {
   })
 
   it('displays course grade when no course data available', () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+    })
+
     render(
-      <WidgetDashboardProvider sharedCourseData={[]}>
-        <ExpandedGradeView submission={mockSubmission} />
-      </WidgetDashboardProvider>,
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={[]}>
+          <ExpandedGradeView submission={mockSubmission} />
+        </WidgetDashboardProvider>
+      </QueryClientProvider>,
     )
     expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: N/A')
   })

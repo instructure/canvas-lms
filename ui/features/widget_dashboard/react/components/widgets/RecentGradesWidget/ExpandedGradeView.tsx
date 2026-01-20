@@ -22,10 +22,13 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
+import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {GradeDisplay} from './GradeDisplay'
+import {RubricSection} from './RubricSection'
 import type {RecentGradeSubmission} from '../../../types'
 import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
+import {useSubmissionDetails} from '../../../hooks/useSubmissionDetails'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -40,6 +43,10 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
 
   const courseData = sharedCourseData.find(course => course.courseId === courseId)
   const courseGrade = courseData?.currentGrade ?? null
+
+  const {data: submissionDetails, isLoading, error} = useSubmissionDetails(submission._id)
+
+  const rubricAssessment = submissionDetails?.rubricAssessments?.[0] || null
 
   return (
     <View
@@ -64,44 +71,58 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
           <Flex direction="row" gap="medium" alignItems="start">
             <Flex.Item shouldGrow shouldShrink>
               <Flex direction="column" gap="x-small" padding="x-small">
-                <Flex.Item>
-                  <Text
-                    weight="bold"
-                    size="large"
-                    data-testid={`rubric-section-heading-${submission._id}`}
-                  >
-                    {I18n.t('Rubric')}
-                  </Text>
-                </Flex.Item>
-                <Flex.Item>
-                  <Text color="secondary" data-testid={`rubric-placeholder-${submission._id}`}>
-                    {I18n.t('Rubric details will be displayed here')}
-                  </Text>
-                </Flex.Item>
-
-                <Flex.Item>
-                  <Text
-                    weight="bold"
-                    size="large"
-                    data-testid={`feedback-section-heading-${submission._id}`}
-                  >
-                    {I18n.t('Feedback')}
-                  </Text>
-                </Flex.Item>
-                <Flex.Item>
-                  <Text color="secondary" data-testid={`feedback-placeholder-${submission._id}`}>
-                    {I18n.t('Feedback comments will be displayed here')}
-                  </Text>
-                </Flex.Item>
-                <Flex.Item overflowY="visible">
-                  <Button
-                    color="primary-inverse"
-                    size="medium"
-                    data-testid={`view-inline-feedback-button-${submission._id}`}
-                  >
-                    {I18n.t('View inline feedback')}
-                  </Button>
-                </Flex.Item>
+                {isLoading ? (
+                  <Flex.Item>
+                    <Spinner
+                      renderTitle={I18n.t('Loading submission details')}
+                      size="small"
+                      data-testid={`submission-details-loading-${submission._id}`}
+                    />
+                  </Flex.Item>
+                ) : error ? (
+                  <Flex.Item>
+                    <Text color="danger" data-testid={`submission-details-error-${submission._id}`}>
+                      {I18n.t('Error loading submission details')}
+                    </Text>
+                  </Flex.Item>
+                ) : (
+                  <>
+                    {rubricAssessment && (
+                      <Flex.Item>
+                        <RubricSection
+                          rubricAssessment={rubricAssessment}
+                          submissionId={submission._id}
+                        />
+                      </Flex.Item>
+                    )}
+                    <Flex.Item>
+                      <Text
+                        weight="bold"
+                        size="large"
+                        data-testid={`feedback-section-heading-${submission._id}`}
+                      >
+                        {I18n.t('Feedback')}
+                      </Text>
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text
+                        color="secondary"
+                        data-testid={`feedback-placeholder-${submission._id}`}
+                      >
+                        {I18n.t('Feedback comments will be displayed here')}
+                      </Text>
+                    </Flex.Item>
+                    <Flex.Item overflowY="visible">
+                      <Button
+                        color="primary-inverse"
+                        size="medium"
+                        data-testid={`view-inline-feedback-button-${submission._id}`}
+                      >
+                        {I18n.t('View inline feedback')}
+                      </Button>
+                    </Flex.Item>
+                  </>
+                )}
               </Flex>
             </Flex.Item>
 

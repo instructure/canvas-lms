@@ -171,3 +171,29 @@ export interface InboxMessage {
   conversationUrl: string
   participants: ConversationParticipant[]
 }
+
+export interface RubricCriterion {
+  _id: string
+  description: string | null
+  longDescription: string | null
+  points: number | null
+}
+
+export interface RubricAssessmentRating {
+  _id: string | null
+  criterion: RubricCriterion | null
+  description: string | null
+  points: number | null
+  comments: string | null
+  commentsHtml: string | null
+}
+
+export interface RubricAssessment {
+  _id: string
+  score: number | null
+  assessmentRatings: RubricAssessmentRating[]
+}
+
+export interface SubmissionDetails {
+  rubricAssessments: RubricAssessment[]
+}
