@@ -222,6 +222,24 @@ describe Accessibility::Rules::ListStructureRule do
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
+
+    context "when checking false positives" do
+      it "does not flag text with hyphens after inline formatting" do
+        input_html = "<p><strong>Graph 1</strong> - The graph above shows data.</p>"
+
+        issues = find_issues(:list_structure, input_html, "page-123")
+
+        expect(issues).to be_empty
+      end
+
+      it "does not flag text with period after inline elements" do
+        input_html = "<p>Answer is 10<sup>-2</sup>m. This represents the conversion factor.</p>"
+
+        issues = find_issues(:list_structure, input_html, "page-123")
+
+        expect(issues).to be_empty
+      end
+    end
   end
 
   context "rootNode" do
