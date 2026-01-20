@@ -77,6 +77,7 @@ class AiExperiencesController < ApplicationController
 
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
+  before_action :require_access_right, only: [:index, :show]
   before_action :require_manage_rights, except: [:index, :show]
   before_action :load_experience, only: %i[show edit update destroy]
 
@@ -124,7 +125,8 @@ class AiExperiencesController < ApplicationController
     permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
     can_manage = @context.grants_any_right?(@current_user, *permissions)
 
-    return render_unauthorized_action unless can_manage || @ai_experience.published?
+    # Use the policy to check if user can read this experience
+    return unless authorized_action(@ai_experience, @current_user, :read)
 
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
@@ -255,6 +257,17 @@ class AiExperiencesController < ApplicationController
       render_404
       false
     end
+  end
+
+  def require_access_right
+    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
+    can_manage = @context.grants_any_right?(@current_user, *permissions)
+
+    # Allow if user can manage OR is enrolled in the course
+    return if can_manage || @context.grants_right?(@current_user, :read_as_member)
+
+    render_unauthorized_action
+    false
   end
 
   def load_experience
