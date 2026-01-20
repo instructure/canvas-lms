@@ -120,6 +120,8 @@ const CanvasInbox = ({breakpoints}) => {
     const userIdFromUrlData = urlData.get('user_id')
     const userNameFromUrlData = urlData.get('user_name')
     const contextIdFromUrlData = urlData.get('context_id')
+    const composeFromUrlData = urlData.get('compose')
+
     if (userIdFromUrlData && userNameFromUrlData) {
       setUrlUserRecepient({
         _id: userIdFromUrlData,
@@ -127,6 +129,11 @@ const CanvasInbox = ({breakpoints}) => {
         commonCoursesInfo: [],
         itemType: 'user',
       })
+      if (contextIdFromUrlData) {
+        setUrlContextId(contextIdFromUrlData)
+      }
+      setComposeModal(true)
+    } else if (composeFromUrlData === 'true') {
       if (contextIdFromUrlData) {
         setUrlContextId(contextIdFromUrlData)
       }

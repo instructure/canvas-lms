@@ -156,4 +156,45 @@ describe('CanvasInbox App Container - URL Routing', () => {
       expect(mailboxDropdown.getAttribute('value')).toBe('Inbox')
     })
   })
+
+  describe('compose modal URL parameter', () => {
+    it('should open compose modal when compose=true parameter is present', async () => {
+      const url = new URL(window.location.href)
+      url.search = '?compose=true'
+      window.history.replaceState({}, '', url.toString())
+
+      const container = setup()
+      await waitForApolloLoading()
+
+      const composeModal = await container.findByTestId('compose-modal-desktop')
+      expect(composeModal).toBeInTheDocument()
+    })
+
+    it('should open compose modal with course pre-selected when compose=true and context_id parameters are present', async () => {
+      const url = new URL(window.location.href)
+      url.search = '?compose=true&context_id=course_195'
+      window.history.replaceState({}, '', url.toString())
+
+      const container = setup()
+      await waitForApolloLoading()
+
+      const composeModal = await container.findByTestId('compose-modal-desktop')
+      expect(composeModal).toBeInTheDocument()
+
+      const courseSelectModal = await container.findByTestId('course-select-modal')
+      expect(courseSelectModal.getAttribute('value')).toBe('XavierSchool')
+    })
+
+    it('should not open compose modal when compose parameter is false or missing', async () => {
+      const url = new URL(window.location.href)
+      url.search = '?compose=false'
+      window.history.replaceState({}, '', url.toString())
+
+      const container = setup()
+      await waitForApolloLoading()
+
+      const composeModal = container.queryByTestId('compose-modal-desktop')
+      expect(composeModal).not.toBeInTheDocument()
+    })
+  })
 })

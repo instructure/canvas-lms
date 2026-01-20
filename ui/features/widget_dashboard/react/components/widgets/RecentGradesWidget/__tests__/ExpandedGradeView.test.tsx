@@ -243,11 +243,11 @@ describe('ExpandedGradeView', () => {
     expect(link).toHaveAttribute('href', '/courses/1/grades')
   })
 
-  it('renders the message instructor link', () => {
+  it('renders the message instructor link with compose parameter', () => {
     renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
     const link = screen.getByTestId('message-instructor-link-sub1')
     expect(link).toHaveTextContent('Message instructor')
-    expect(link).toHaveAttribute('href', '/conversations?context_id=course_1')
+    expect(link).toHaveAttribute('href', '/conversations?context_id=course_1&compose=true')
   })
 
   it('displays course grade when no course data available', () => {
