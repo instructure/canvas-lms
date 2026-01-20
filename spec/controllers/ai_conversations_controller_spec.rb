@@ -92,6 +92,22 @@ describe AiConversationsController do
         expect(json_response).to eq({})
       end
     end
+
+    context "as unenrolled user" do
+      before :once do
+        @unenrolled_user = user_factory(active_all: true)
+      end
+
+      before { user_session(@unenrolled_user) }
+
+      it "returns forbidden for unenrolled users" do
+        get :active_conversation,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id },
+            format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
   describe "POST #create" do
@@ -218,6 +234,22 @@ describe AiConversationsController do
              format: :json
 
         expect(response).to have_http_status(:created)
+      end
+    end
+
+    context "as unenrolled user" do
+      before :once do
+        @unenrolled_user = user_factory(active_all: true)
+      end
+
+      before { user_session(@unenrolled_user) }
+
+      it "returns forbidden for unenrolled users" do
+        post :create,
+             params: { course_id: @course.id, ai_experience_id: @ai_experience.id },
+             format: :json
+
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end

@@ -134,6 +134,43 @@ describe AiExperiencesController do
         expect(json_response["can_manage"]).to be false
       end
     end
+
+    context "as teacher from different course" do
+      before do
+        @original_course = @course
+        @original_teacher = @teacher
+        course_with_teacher(active_all: true, user: user_factory, course_name: "Other Course")
+        @other_teacher = @teacher
+        @other_course = @course
+        @course = @original_course
+        @teacher = @original_teacher
+        user_session(@other_teacher)
+      end
+
+      it "returns forbidden for teachers not enrolled in this course" do
+        get :index, params: { course_id: @course.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context "as unenrolled user" do
+      before :once do
+        @unenrolled_user = user_factory(active_all: true)
+      end
+
+      before { user_session(@unenrolled_user) }
+
+      it "returns forbidden for unenrolled users" do
+        get :index, params: { course_id: @course.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "renders unauthorized page for HTML requests" do
+        get :index, params: { course_id: @course.id }
+        expect(response).to have_http_status(:unauthorized)
+        expect(response).to render_template("shared/unauthorized")
+      end
+    end
   end
 
   describe "GET #show" do
@@ -195,9 +232,76 @@ describe AiExperiencesController do
         expect(response).to render_template("shared/unauthorized")
       end
     end
+
+    context "as teacher from different course" do
+      before do
+        @original_course = @course
+        @original_teacher = @teacher
+        course_with_teacher(active_all: true, user: user_factory, course_name: "Other Course")
+        @other_teacher = @teacher
+        @other_course = @course
+        @course = @original_course
+        @teacher = @original_teacher
+        user_session(@other_teacher)
+      end
+
+      it "returns forbidden for teachers not enrolled in this course" do
+        @ai_experience.update!(workflow_state: "published")
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context "as unenrolled user" do
+      before :once do
+        @unenrolled_user = user_factory(active_all: true)
+      end
+
+      before { user_session(@unenrolled_user) }
+
+      it "returns forbidden for published experiences when unenrolled" do
+        @ai_experience.update!(workflow_state: "published")
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "returns forbidden for unpublished experiences when unenrolled" do
+        @ai_experience.update!(workflow_state: "unpublished")
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
   describe "POST #create" do
+    context "as teacher from different course" do
+      before do
+        @original_course = @course
+        @original_teacher = @teacher
+        course_with_teacher(active_all: true, user: user_factory, course_name: "Other Course")
+        @other_teacher = @teacher
+        @other_course = @course
+        @course = @original_course
+        @teacher = @original_teacher
+        user_session(@other_teacher)
+      end
+
+      it "returns forbidden for teachers not enrolled in this course" do
+        post :create,
+             params: {
+               course_id: @course.id,
+               ai_experience: {
+                 title: "New Experience",
+                 learning_objective: "Test objective",
+                 pedagogical_guidance: "Test guidance"
+               }
+             },
+             format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
     context "as teacher" do
       before { user_session(@teacher) }
 
@@ -291,6 +395,31 @@ describe AiExperiencesController do
   end
 
   describe "PUT #update" do
+    context "as teacher from different course" do
+      before do
+        @original_course = @course
+        @original_teacher = @teacher
+        course_with_teacher(active_all: true, user: user_factory, course_name: "Other Course")
+        @other_teacher = @teacher
+        @other_course = @course
+        @course = @original_course
+        @teacher = @original_teacher
+        user_session(@other_teacher)
+      end
+
+      it "returns forbidden for teachers not enrolled in this course" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              id: @ai_experience.id,
+              ai_experience: { title: "Updated Title" }
+            },
+            format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
     context "as teacher" do
       before { user_session(@teacher) }
 
@@ -346,6 +475,27 @@ describe AiExperiencesController do
   end
 
   describe "DELETE #destroy" do
+    context "as teacher from different course" do
+      before do
+        @original_course = @course
+        @original_teacher = @teacher
+        course_with_teacher(active_all: true, user: user_factory, course_name: "Other Course")
+        @other_teacher = @teacher
+        @other_course = @course
+        @course = @original_course
+        @teacher = @original_teacher
+        user_session(@other_teacher)
+      end
+
+      it "returns forbidden for teachers not enrolled in this course" do
+        delete :destroy,
+               params: { course_id: @course.id, id: @ai_experience.id },
+               format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
     context "as teacher" do
       before { user_session(@teacher) }
 
