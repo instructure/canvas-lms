@@ -21,7 +21,7 @@ import {gql} from '@apollo/client'
 
 export const TotalCountPageInfo = {
   fragment: gql`
-    fragment TotalCountPageInfo on TotalCountPageInfo {
+    fragment InboxTotalCountPageInfo on TotalCountPageInfo {
       endCursor
       hasNextPage
       totalCount

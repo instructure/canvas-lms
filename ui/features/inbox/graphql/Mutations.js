@@ -39,7 +39,7 @@ export const UPDATE_CONVERSATION_PARTICIPANTS = gql`
       }
     ) {
       conversationParticipants {
-        ...ConversationParticipant
+        ...InboxConversationParticipant
       }
       errors {
         message
@@ -90,9 +90,9 @@ export const CREATE_CONVERSATION = gql`
       }
     ) {
       conversations {
-        ...ConversationParticipant
+        ...InboxConversationParticipant
         conversation {
-          ...Conversation
+          ...InboxConversation
         }
       }
       errors {
@@ -129,7 +129,7 @@ export const ADD_CONVERSATION_MESSAGE = gql`
       }
     ) {
       conversationMessage {
-        ...ConversationMessage
+        ...InboxConversationMessage
       }
       errors {
         ...Error
@@ -155,7 +155,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
   mutation CreateInboxSubmissionComment($submissionId: ID!, $body: String!) {
     createSubmissionComment(input: {submissionId: $submissionId, comment: $body}) {
       submissionComment {
-        ...SubmissionComment
+        ...InboxSubmissionComment
       }
       errors {
         ...Error
