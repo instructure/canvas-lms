@@ -2894,8 +2894,6 @@ class Account < ActiveRecord::Base
   end
 
   def provision_horizon_tenants(root_account, current_user)
-    return unless horizon_account?
-
     [PineClient, RedwoodClient].each do |client|
       next unless client.enabled?
 
@@ -2904,8 +2902,6 @@ class Account < ActiveRecord::Base
   end
 
   def delete_horizon_tenants(root_account, current_user)
-    return if horizon_account?
-
     [PineClient, RedwoodClient].each do |client|
       next unless client.enabled?
 
