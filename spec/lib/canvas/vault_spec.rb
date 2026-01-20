@@ -57,6 +57,53 @@ module Canvas
       WebMock.enable_net_connect!
     end
 
+    describe ".addr" do
+      after do
+        ENV.delete("VAULT_ADDR")
+      end
+
+      it "uses VAULT_ADDR environment variable over config file addr" do
+        ENV["VAULT_ADDR"] = "http://vault-from-env:8200"
+        allow(described_class).to receive(:config).and_return(static_config)
+
+        # static_config has addr set, but env var takes precedence
+        expect(described_class.api_client.address).to eq("http://vault-from-env:8200")
+        expect(static_config[:addr]).to eq(addr) # confirm config had a value
+      end
+
+      it "uses VAULT_ADDR over addr_path file" do
+        ENV["VAULT_ADDR"] = "http://vault-from-env:8200"
+        allow(described_class).to receive(:config).and_return(path_config)
+        allow(File).to receive(:read).with(token_path).and_return(token)
+        # File.read for addr_path should not be called
+
+        expect(described_class.api_client.address).to eq("http://vault-from-env:8200")
+      end
+
+      it "falls back to config addr when VAULT_ADDR is not set" do
+        ENV.delete("VAULT_ADDR")
+        allow(described_class).to receive(:config).and_return(static_config)
+
+        expect(described_class.api_client.address).to eq(addr)
+      end
+
+      it "falls back to addr_path file when VAULT_ADDR is not set" do
+        ENV.delete("VAULT_ADDR")
+        allow(described_class).to receive(:config).and_return(path_config)
+        allow(File).to receive(:read).with(token_path).and_return(token)
+        allow(File).to receive(:read).with(addr_path).and_return("http://vault-from-file:8200")
+
+        expect(described_class.api_client.address).to eq("http://vault-from-file:8200")
+      end
+
+      it "ignores empty VAULT_ADDR" do
+        ENV["VAULT_ADDR"] = ""
+        allow(described_class).to receive(:config).and_return(static_config)
+
+        expect(described_class.api_client.address).to eq(addr)
+      end
+    end
+
     describe ".api_client" do
       context "Static config" do
         it "Constructs a client using the address and path from the config" do
@@ -75,6 +122,279 @@ module Canvas
           allow(File).to receive(:read).with(addr_path).and_return(addr + "_frompath")
           expect(described_class.api_client.address).to eq(addr + "_frompath")
           expect(described_class.api_client.token).to eq(token + "_frompath")
+        end
+      end
+
+      context "IAM auth config" do
+        let(:iam_token) { "s.iam_generated_token" }
+        let(:lease_duration) { 3600 }
+
+        before do
+          allow(described_class).to receive(:config).and_return(static_config)
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+        end
+
+        after do
+          ENV.delete("VAULT_IAM_AUTH_ENABLED")
+          ENV.delete("VAULT_AWS_AUTH_ROLE")
+        end
+
+        it "uses IAM token when IAM auth is enabled" do
+          mock_secret = double(
+            "Vault::Secret",
+            auth: double(
+              "auth",
+              client_token: iam_token,
+              lease_duration:
+            )
+          )
+
+          # First call to Vault::Client.new is during authentication (no token)
+          mock_auth_client = instance_double(::Vault::Client)
+          mock_auth = double("auth")
+          allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_auth_client)
+          allow(mock_auth_client).to receive(:auth).and_return(mock_auth)
+          allow(mock_auth).to receive(:aws_iam).with(role: "canvas-role", mount: "aws").and_return(mock_secret)
+
+          # Second call to Vault::Client.new is for the final client (with token)
+          mock_final_client = instance_double(::Vault::Client, token: iam_token)
+          allow(::Vault::Client).to receive(:new).with(address: addr, token: iam_token).and_return(mock_final_client)
+
+          expect(described_class.api_client.token).to eq(iam_token)
+        end
+      end
+    end
+
+    describe "IAM authentication" do
+      let(:iam_token) { "s.iam_generated_token" }
+      let(:lease_duration) { 3600 }
+
+      before do
+        allow(described_class).to receive(:config).and_return(static_config)
+      end
+
+      after do
+        ENV.delete("VAULT_IAM_AUTH_ENABLED")
+        ENV.delete("VAULT_AWS_AUTH_ROLE")
+        ENV.delete("VAULT_AWS_AUTH_PATH")
+        ENV.delete("VAULT_AWS_AUTH_HEADER_VALUE")
+        # Clear the in-memory token cache
+        described_class.instance_variable_set(:@iam_token_cache, nil)
+      end
+
+      describe ".iam_auth_enabled?" do
+        it "returns true when VAULT_IAM_AUTH_ENABLED is true" do
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          expect(described_class.send(:iam_auth_enabled?)).to be true
+        end
+
+        it "returns true when VAULT_IAM_AUTH_ENABLED is 1" do
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "1"
+          expect(described_class.send(:iam_auth_enabled?)).to be true
+        end
+
+        it "returns false when VAULT_IAM_AUTH_ENABLED is false" do
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "false"
+          expect(described_class.send(:iam_auth_enabled?)).to be false
+        end
+
+        it "returns false when VAULT_IAM_AUTH_ENABLED is not set" do
+          ENV.delete("VAULT_IAM_AUTH_ENABLED")
+          expect(described_class.send(:iam_auth_enabled?)).to be_falsey
+        end
+      end
+
+      describe ".authenticate_with_iam" do
+        it "raises VaultAuthError when VAULT_AWS_AUTH_ROLE is not set" do
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV.delete("VAULT_AWS_AUTH_ROLE")
+          expect { described_class.send(:authenticate_with_iam) }
+            .to raise_error(Canvas::Vault::VaultAuthError, /VAULT_AWS_AUTH_ROLE required/)
+        end
+
+        it "authenticates successfully and caches the token in memory" do
+          mock_secret = double(
+            "Vault::Secret",
+            auth: double(
+              "auth",
+              client_token: iam_token,
+              lease_duration:
+            )
+          )
+
+          mock_client = instance_double(::Vault::Client)
+          mock_auth = double("auth")
+          allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
+          allow(mock_client).to receive(:auth).and_return(mock_auth)
+          allow(mock_auth).to receive(:aws_iam).with(role: "canvas-role", mount: "aws").and_return(mock_secret)
+
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+          result = described_class.send(:authenticate_with_iam)
+          expect(result).to eq(iam_token)
+
+          cached = described_class.instance_variable_get(:@iam_token_cache)
+          expect(cached[:token]).to eq(iam_token)
+          expect(cached[:lease_duration]).to eq(lease_duration)
+        end
+
+        it "uses custom auth path when VAULT_AWS_AUTH_PATH is set" do
+          mock_secret = double(
+            "Vault::Secret",
+            auth: double(
+              "auth",
+              client_token: iam_token,
+              lease_duration:
+            )
+          )
+
+          mock_client = instance_double(::Vault::Client)
+          mock_auth = double("auth")
+          allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
+          allow(mock_client).to receive(:auth).and_return(mock_auth)
+          allow(mock_auth).to receive(:aws_iam)
+            .with(role: "canvas-role", mount: "custom-aws-path")
+            .and_return(mock_secret)
+
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+          ENV["VAULT_AWS_AUTH_PATH"] = "custom-aws-path"
+          result = described_class.send(:authenticate_with_iam)
+          expect(result).to eq(iam_token)
+        end
+
+        it "includes server ID header when VAULT_AWS_AUTH_HEADER_VALUE is set" do
+          mock_secret = double(
+            "Vault::Secret",
+            auth: double(
+              "auth",
+              client_token: iam_token,
+              lease_duration:
+            )
+          )
+
+          mock_client = instance_double(::Vault::Client)
+          mock_auth = double("auth")
+          allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
+          allow(mock_client).to receive(:auth).and_return(mock_auth)
+          allow(mock_auth).to receive(:aws_iam)
+            .with(role: "canvas-role", mount: "aws", iam_server_id_header_value: "vault.example.com")
+            .and_return(mock_secret)
+
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+          ENV["VAULT_AWS_AUTH_HEADER_VALUE"] = "vault.example.com"
+          result = described_class.send(:authenticate_with_iam)
+          expect(result).to eq(iam_token)
+        end
+
+        it "falls back to expired cached token on auth failure" do
+          cached_data = {
+            token: "cached_expired_token",
+            lease_duration: 3600,
+            obtained_at: Time.now.to_i - 7200 # expired 2 hours ago
+          }
+          described_class.instance_variable_set(:@iam_token_cache, cached_data)
+
+          mock_client = instance_double(::Vault::Client)
+          mock_auth = double("auth")
+          allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
+          allow(mock_client).to receive(:auth).and_return(mock_auth)
+          allow(mock_auth).to receive(:aws_iam).and_raise(::Vault::HTTPError.new(addr, double(code: "403")))
+
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+          result = described_class.send(:authenticate_with_iam)
+          expect(result).to eq("cached_expired_token")
+        end
+
+        it "raises VaultAuthError when auth fails and no cached token exists" do
+          described_class.instance_variable_set(:@iam_token_cache, nil)
+
+          mock_client = instance_double(::Vault::Client)
+          mock_auth = double("auth")
+          allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
+          allow(mock_client).to receive(:auth).and_return(mock_auth)
+          allow(mock_auth).to receive(:aws_iam).and_raise(::Vault::HTTPError.new(addr, double(code: "403")))
+
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+          expect { described_class.send(:authenticate_with_iam) }
+            .to raise_error(Canvas::Vault::VaultAuthError, /Failed to authenticate to Vault with IAM/)
+        end
+      end
+
+      describe ".iam_token" do
+        it "returns cached token if valid" do
+          cached_data = {
+            token: "cached_valid_token",
+            lease_duration: 3600,
+            obtained_at: Time.now.to_i
+          }
+          described_class.instance_variable_set(:@iam_token_cache, cached_data)
+
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+          expect(described_class.send(:iam_token)).to eq("cached_valid_token")
+        end
+
+        it "re-authenticates when cached token is about to expire" do
+          # Token obtained 3400 seconds ago (within 300s buffer of expiry)
+          cached_data = {
+            token: "cached_expiring_token",
+            lease_duration: 3600,
+            obtained_at: Time.now.to_i - 3400
+          }
+          described_class.instance_variable_set(:@iam_token_cache, cached_data)
+
+          mock_secret = double(
+            "Vault::Secret",
+            auth: double(
+              "auth",
+              client_token: "new_iam_token",
+              lease_duration: 3600
+            )
+          )
+
+          mock_client = instance_double(::Vault::Client)
+          mock_auth = double("auth")
+          allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
+          allow(mock_client).to receive(:auth).and_return(mock_auth)
+          allow(mock_auth).to receive(:aws_iam).with(role: "canvas-role", mount: "aws").and_return(mock_secret)
+
+          ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
+          ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+          expect(described_class.send(:iam_token)).to eq("new_iam_token")
+        end
+      end
+
+      describe ".iam_token_valid?" do
+        it "returns true when token has time remaining beyond buffer" do
+          cached = {
+            token: "test_token",
+            lease_duration: 3600,
+            obtained_at: Time.now.to_i
+          }
+          expect(described_class.send(:iam_token_valid?, cached)).to be true
+        end
+
+        it "returns false when token is within refresh buffer" do
+          cached = {
+            token: "test_token",
+            lease_duration: 3600,
+            obtained_at: Time.now.to_i - 3400 # 200s remaining, less than 300s buffer
+          }
+          expect(described_class.send(:iam_token_valid?, cached)).to be false
+        end
+
+        it "returns false when token is expired" do
+          cached = {
+            token: "test_token",
+            lease_duration: 3600,
+            obtained_at: Time.now.to_i - 7200 # expired 1 hour ago
+          }
+          expect(described_class.send(:iam_token_valid?, cached)).to be false
         end
       end
     end
