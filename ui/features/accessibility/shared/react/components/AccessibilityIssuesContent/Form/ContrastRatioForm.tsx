@@ -57,21 +57,11 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
   isDisabled,
 }: ContrastRatioFormProps) => {
   const [selectedColor, setSelectedColor] = useState(foregroundColor)
-  const pickerRef = useRef<HTMLDivElement | null>(null)
   const contrastForm = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setSelectedColor(foregroundColor)
   }, [foregroundColor])
-
-  useEffect(() => {
-    if (pickerRef.current) {
-      const buttonDiv = pickerRef.current.lastElementChild as HTMLElement
-      if (buttonDiv) {
-        buttonDiv.style.marginTop = 'auto'
-      }
-    }
-  }, [])
 
   useEffect(() => {
     const wrapper = contrastForm.current as HTMLDivElement | null
@@ -178,11 +168,6 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
           data-testid="color-picker"
           placeholderText={I18n.t('Enter HEX')}
           label={inputLabel}
-          elementRef={r => {
-            if (r instanceof HTMLDivElement || r === null) {
-              pickerRef.current = r
-            }
-          }}
           value={selectedColor}
           onChange={handleColorChange}
           inputRef={inputRef}
