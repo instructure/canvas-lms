@@ -76,17 +76,31 @@ describe('LLMConversationView', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders collapsed state when not expanded', () => {
-    render(<LLMConversationView {...defaultProps} isExpanded={false} />)
+  it('renders collapsed state when not expanded (teacher preview)', () => {
+    render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={true} />)
     expect(screen.getByText('Preview')).toBeInTheDocument()
     expect(
       screen.getByText('Here, you can have a chat with the AI just like a student would.'),
     ).toBeInTheDocument()
   })
 
-  it('renders expanded state when expanded', () => {
-    render(<LLMConversationView {...defaultProps} />)
+  it('renders collapsed state when not expanded (student view)', () => {
+    render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={false} />)
+    expect(screen.getByText('Conversation')).toBeInTheDocument()
+    expect(
+      screen.getByText('Start the experience by having a conversation with the AI. Good luck!'),
+    ).toBeInTheDocument()
+  })
+
+  it('renders expanded state when expanded (teacher preview)', () => {
+    render(<LLMConversationView {...defaultProps} isTeacherPreview={true} />)
     expect(screen.getByText('Preview')).toBeInTheDocument()
+    expect(screen.getByText('Restart')).toBeInTheDocument()
+  })
+
+  it('renders expanded state when expanded (student view)', () => {
+    render(<LLMConversationView {...defaultProps} isTeacherPreview={false} />)
+    expect(screen.getByText('Conversation')).toBeInTheDocument()
     expect(screen.getByText('Restart')).toBeInTheDocument()
   })
 
@@ -101,6 +115,7 @@ describe('LLMConversationView', () => {
       <LLMConversationView
         {...defaultProps}
         isExpanded={false}
+        isTeacherPreview={true}
         onToggleExpanded={onToggleExpanded}
       />,
     )

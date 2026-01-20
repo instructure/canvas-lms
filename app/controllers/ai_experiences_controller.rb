@@ -79,7 +79,7 @@ class AiExperiencesController < ApplicationController
   before_action :check_ai_experiences_feature_flag
   before_action :require_access_right, only: [:index, :show]
   before_action :require_manage_rights, except: [:index, :show]
-  before_action :load_experience, only: %i[show edit update destroy]
+  before_action :load_experience, only: %i[show edit update destroy ai_conversations_index ai_conversation_show]
 
   # @API List AI experiences
   #
@@ -248,6 +248,98 @@ class AiExperiencesController < ApplicationController
         format.json { render json: @experience.errors, status: :bad_request }
       end
     end
+  end
+
+  # @API List student AI conversations
+  #
+  # Retrieve the latest AI conversation for each student in the course for this AI experience.
+  # Only available to teachers and course managers.
+  #
+  # @returns [AiConversation]
+  def ai_conversations_index
+    # Ensure user has manage rights
+    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
+    unless @context.grants_any_right?(@current_user, *permissions)
+      return render_unauthorized_action
+    end
+
+    # Get all students in the course
+    students = @context.students.distinct
+
+    # For each student, get their latest conversation for this experience
+    conversations = students.map do |student|
+      latest_conversation = @experience.ai_conversations
+                                       .for_user(student.id)
+                                       .where.not(workflow_state: "deleted")
+                                       .order(updated_at: :desc)
+                                       .first
+
+      if latest_conversation
+        ai_conversation_json(latest_conversation, @current_user, session, include_student: true)
+      else
+        # Include students without conversations
+        student_info = user_json(student, @current_user, session, ["avatar_url"], @context)
+        {
+          id: nil,
+          user_id: student.id.to_s,
+          student: {
+            id: student_info["id"].to_s,
+            name: student_info["name"],
+            avatar_url: student_info["avatar_url"]
+          },
+          has_conversation: false
+        }
+      end
+    end
+
+    render json: { conversations: }
+  end
+
+  # @API Show student AI conversation
+  #
+  # Retrieve a specific student's AI conversation with full message history.
+  # Only available to teachers and course managers.
+  #
+  # @returns AiConversation
+  def ai_conversation_show
+    # Ensure user has manage rights
+    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
+    unless @context.grants_any_right?(@current_user, *permissions)
+      return render_unauthorized_action
+    end
+
+    # Load the conversation and verify it belongs to this experience
+    @conversation = AiConversation.find_by(id: params[:conversation_id])
+
+    unless @conversation&.ai_experience == @experience && @conversation.course == @context
+      return render json: { error: "Conversation not found" }, status: :not_found
+    end
+
+    # Initialize LLM client to fetch message history from the llm-conversation service.
+    # We use the student's user context to ensure proper authorization and conversation continuity.
+    # The client handles communication with the external LLM service that stores the actual messages.
+    client = LLMConversationClient.new(
+      current_user: @conversation.user,
+      root_account_uuid: @context.root_account.uuid,
+      conversation_context_id: @experience.llm_conversation_context_id,
+      facts: @experience.facts,
+      learning_objectives: @experience.learning_objective,
+      scenario: @experience.pedagogical_guidance,
+      conversation_id: @conversation.llm_conversation_id
+    )
+
+    messages_and_progress = client.messages_with_conversation_progress
+
+    render json: ai_conversation_json(
+      @conversation,
+      @current_user,
+      session,
+      include_student: true,
+      messages: messages_and_progress[:messages],
+      progress: messages_and_progress[:progress]
+    )
+  rescue LlmConversation::Errors::ConversationError => e
+    render json: { error: e.message }, status: :service_unavailable
   end
 
   private
