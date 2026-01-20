@@ -20,7 +20,7 @@ import {shape, string} from 'prop-types'
 
 export const Assignment = {
   fragment: gql`
-    fragment Assignment on Assignment {
+    fragment InboxAssignment on Assignment {
       id
       _id
       name
