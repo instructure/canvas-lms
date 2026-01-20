@@ -2819,6 +2819,7 @@ el:
   big_blue_button_conference: 
     recording_setting: Εγγράφεται
     recording_setting_enabled_description: "Ενεργοποίηση της εγγραφής για αυτή τη συνεδρία"
+  bio_a519d807: Βιογραφικό
   blackboard: 
     no_manifest: "Το zip αρχείο Blackboard δεν περιέχει αρχείο imsmanifest.xml στον κατάλογο ρίζας."
   blank_38df4238: κενό
@@ -6789,6 +6790,7 @@ el:
       warning: Προειδοποίηση
   grade_distribution_e52c9256: "Κατανομή Βαθμών"
   grade_export_title: "Εξαγωγή Βαθμών"
+  grade_f949a691: "%{grade}%"
   grade_grade_7e52dd1c: "Βαθμός: %{grade}"
   grade_summary: 
     graph_title: "Μέση βαθμολογία %{mean}, Υψηλή βαθμολογία %{high}, Χαμηλή βαθμολογία %{low}"
@@ -10262,6 +10264,7 @@ el:
   not_installed_37a21a76: "Δεν εγκαταστάθηκε"
   not_published_73f7079: "Μη δημοσιευμένο"
   not_synced_529cbf29: "Δεν έχει συγχρονιστεί"
+  not_yet_available_9aa23a77: "Δεν είναι ακόμα διαθέσιμο"
   not_yet_completed_345a0bca: "Δεν έχει ολοκληρωθεί ακόμη"
   not_yet_graded_8b655a7: "Δεν έχει βαθμολογηθεί ακόμη"
   note_8b73ce09: Σημείωση
