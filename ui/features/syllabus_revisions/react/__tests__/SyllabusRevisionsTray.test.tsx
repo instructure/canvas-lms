@@ -434,4 +434,45 @@ describe('SyllabusRevisionsTray', () => {
       expect(RichContentEditor.callOnRCE).not.toHaveBeenCalled()
     })
   })
+
+  it('displays blank content when clicking a blank version after viewing content version', async () => {
+    document.body.innerHTML = '<div id="course_syllabus"></div>'
+    const versionsWithBlank = [
+      {
+        version: 3,
+        created_at: '2025-01-03T00:00:00Z',
+        syllabus_body: '<p>Current content</p>',
+      },
+      {
+        version: 2,
+        created_at: '2025-01-02T00:00:00Z',
+        syllabus_body: '',
+      },
+      {
+        version: 1,
+        created_at: '2025-01-01T00:00:00Z',
+        syllabus_body: '<p>Old content</p>',
+      },
+    ]
+
+    server.use(
+      http.get('/api/v1/courses/123', () =>
+        HttpResponse.json({syllabus_versions: versionsWithBlank}),
+      ),
+    )
+    render(<SyllabusRevisionsTray {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('version-1')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByTestId('version-1'))
+
+    const syllabusElement = document.getElementById('course_syllabus')
+    expect(syllabusElement?.innerHTML).toBe('<p>Old content</p>')
+
+    fireEvent.click(screen.getByTestId('version-2'))
+
+    expect(syllabusElement?.innerHTML).toBe('')
+  })
 })
