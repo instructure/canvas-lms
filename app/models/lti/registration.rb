@@ -344,7 +344,6 @@ class Lti::Registration < ActiveRecord::Base
   end
 
   def template_registration_must_be_in_site_admin
-    # TODO: support consortium parent accounts here as well
     return unless template_registration
 
     errors.add :template_registration, "Site Admin registrations cannot inherit from a template" if site_admin? && template_registration.present?
