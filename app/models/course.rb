@@ -3942,7 +3942,7 @@ class Course < ActiveRecord::Base
   end
 
   def a11y_checker_enabled?
-    account.feature_enabled?(:a11y_checker) && feature_enabled?(:a11y_checker_eap)
+    (account.feature_enabled?(:a11y_checker) && feature_enabled?(:a11y_checker_eap)) || account.feature_enabled?(:a11y_checker_ga1)
   end
 
   def elementary_enabled?

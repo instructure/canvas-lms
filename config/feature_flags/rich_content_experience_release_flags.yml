@@ -361,7 +361,7 @@ youtube_overlay:
 a11y_checker:
   applies_to: Account
   state: hidden
-  display_name: Accessibility Checker
+  display_name: Accessibility Checker Account EAP enabler
   description: |-
     Course level content accessibility report and remediation wizard.
   shadow: true
@@ -369,7 +369,7 @@ a11y_checker:
 a11y_checker_eap:
   applies_to: Course
   state: allowed
-  display_name: Accessibility Checker EAP
+  display_name: Accessibility Checker EAP 2
   description: |-
     Enable the new Accessibility Checker in EAP. The flag is allowed only for Account Admins.
   visible_on: a11y_checker_flag_enabled
@@ -444,3 +444,10 @@ a11y_checker_course_scan_conditional_resource_scan:
   description: |-
     During a11y checker course scan, if enabled, resources will only be scanned if they have been updated since the last scan. When disabled, all resources within a course will be scanned regardless of update timestamps.
   shadow: true
+
+a11y_checker_ga1:
+  applies_to: Account
+  state: hidden
+  display_name: Accessibility Checker
+  description: |-
+    Enable the new Accessibility Checker.
