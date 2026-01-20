@@ -191,6 +191,15 @@ class PeerReview::AllocationService < ApplicationService
       end
     end
 
+    # Filter out same-group submissions if intra_group_peer_reviews is false
+    if @assignment.group_category_id && !@assignment.intra_group_peer_reviews
+      assessor_submission = @assignment.submissions.find_by(user: @assessor)
+      if assessor_submission&.group_id
+        # Exclude submissions with the same group_id (same group partners)
+        submissions = submissions.where.not(group_id: assessor_submission.group_id)
+      end
+    end
+
     submissions.preload(:user).to_a
   end
 
