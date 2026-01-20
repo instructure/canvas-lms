@@ -2227,5 +2227,149 @@ RSpec.describe PeerReview::AllocationService do
         expect(available.map(&:id)).not_to include(submission.id)
       end
     end
+
+    context "when assignment has group_category_id and intra_group_peer_reviews is false" do
+      let(:group_category) { course.group_categories.create!(name: "Project Groups") }
+      let(:group1) { group_category.groups.create!(name: "Group 1", context: course) }
+      let(:group2) { group_category.groups.create!(name: "Group 2", context: course) }
+      let(:group_assignment) do
+        assignment_model(
+          course:,
+          title: "Group Assignment",
+          peer_reviews: true,
+          peer_review_count: 2,
+          automatic_peer_reviews: false,
+          submission_types: "online_text_entry",
+          group_category:,
+          intra_group_peer_reviews: false
+        )
+      end
+
+      before do
+        # Add assessor and student1 to group1
+        group1.add_user(assessor)
+        group1.add_user(student1)
+
+        # Add student2 and student3 to group2
+        group2.add_user(student2)
+        group2.add_user(student3)
+
+        # Submit homework for all students
+        group_assignment.submit_homework(assessor, body: "Assessor submission")
+        group_assignment.submit_homework(student1, body: "Student1 submission")
+        group_assignment.submit_homework(student2, body: "Student2 submission")
+        group_assignment.submit_homework(student3, body: "Student3 submission")
+
+        # Set group_id on submissions for group assignment
+        group_assignment.submissions.find_by(user: assessor).update!(group: group1)
+        group_assignment.submissions.find_by(user: student1).update!(group: group1)
+        group_assignment.submissions.find_by(user: student2).update!(group: group2)
+        group_assignment.submissions.find_by(user: student3).update!(group: group2)
+      end
+
+      it "excludes submissions from the assessor's group members" do
+        service_group = described_class.new(assignment: group_assignment, assessor:)
+        available = service_group.send(:preload_available_submissions)
+        # Should not include student1 (same group as assessor)
+        expect(available.map(&:user_id)).not_to include(student1.id)
+      end
+
+      it "includes submissions from different groups" do
+        service_group = described_class.new(assignment: group_assignment, assessor:)
+        available = service_group.send(:preload_available_submissions)
+        # Should include student2 and student3 (different group)
+        expect(available.map(&:user_id)).to include(student2.id, student3.id)
+      end
+
+      it "prevents allocation of same-group reviews even with must_review rule" do
+        # Create a must_review rule for student1 (same group as assessor)
+        AllocationRule.create!(
+          course:,
+          assignment: group_assignment,
+          assessor:,
+          assessee: student1,
+          must_review: true,
+          review_permitted: true
+        )
+
+        service_group = described_class.new(assignment: group_assignment, assessor:)
+        available = service_group.send(:preload_available_submissions)
+
+        # Student1 should still be excluded despite must_review rule
+        expect(available.map(&:user_id)).not_to include(student1.id)
+      end
+
+      it "allocates reviews only from different groups" do
+        service_group = described_class.new(assignment: group_assignment, assessor:)
+        result = service_group.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(2)
+        expect(result[:assessment_requests].map(&:user_id)).to match_array([student2.id, student3.id])
+      end
+    end
+
+    context "when assignment has group_category_id and intra_group_peer_reviews is true" do
+      let(:group_category) { course.group_categories.create!(name: "Project Groups") }
+      let(:group1) { group_category.groups.create!(name: "Group 1", context: course) }
+      let(:group2) { group_category.groups.create!(name: "Group 2", context: course) }
+      let(:group_assignment) do
+        assignment_model(
+          course:,
+          title: "Group Assignment",
+          peer_reviews: true,
+          peer_review_count: 2,
+          automatic_peer_reviews: false,
+          submission_types: "online_text_entry",
+          group_category:,
+          intra_group_peer_reviews: true
+        )
+      end
+
+      before do
+        # Add assessor and student1 to group1
+        group1.add_user(assessor)
+        group1.add_user(student1)
+
+        # Add student2 and student3 to group2
+        group2.add_user(student2)
+        group2.add_user(student3)
+
+        # Submit homework for all students
+        group_assignment.submit_homework(assessor, body: "Assessor submission")
+        group_assignment.submit_homework(student1, body: "Student1 submission")
+        group_assignment.submit_homework(student2, body: "Student2 submission")
+        group_assignment.submit_homework(student3, body: "Student3 submission")
+
+        # Set group_id on submissions for group assignment
+        group_assignment.submissions.find_by(user: assessor).update!(group: group1)
+        group_assignment.submissions.find_by(user: student1).update!(group: group1)
+        group_assignment.submissions.find_by(user: student2).update!(group: group2)
+        group_assignment.submissions.find_by(user: student3).update!(group: group2)
+      end
+
+      it "includes submissions from the assessor's group members" do
+        service_group = described_class.new(assignment: group_assignment, assessor:)
+        available = service_group.send(:preload_available_submissions)
+        # Should include student1 (same group as assessor)
+        expect(available.map(&:user_id)).to include(student1.id)
+      end
+
+      it "includes submissions from different groups" do
+        service_group = described_class.new(assignment: group_assignment, assessor:)
+        available = service_group.send(:preload_available_submissions)
+        # Should include student2 and student3 (different group)
+        expect(available.map(&:user_id)).to include(student2.id, student3.id)
+      end
+
+      it "allows allocation from any group including same group" do
+        service_group = described_class.new(assignment: group_assignment, assessor:)
+        result = service_group.allocate
+        expect(result[:success]).to be true
+        expect(result[:assessment_requests].size).to eq(2)
+        # Can include any combination of students
+        allocated_user_ids = result[:assessment_requests].map(&:user_id)
+        expect([student1.id, student2.id, student3.id]).to include(*allocated_user_ids)
+      end
+    end
   end
 end
