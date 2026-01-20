@@ -634,4 +634,223 @@ describe AiExperiencesController do
       end
     end
   end
+
+  describe "GET #ai_conversations_index" do
+    before :once do
+      @student1 = @student
+      @student2 = student_in_course(active_all: true, course: @course).user
+      @student3 = student_in_course(active_all: true, course: @course).user
+
+      # Create conversations for students
+      @conversation1 = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "conv-student1",
+        user: @student1,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "active"
+      )
+
+      @conversation2 = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "conv-student2",
+        user: @student2,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "completed"
+      )
+
+      # Student 3 has no conversation
+    end
+
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "returns all students including those without conversations" do
+        get :ai_conversations_index, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+        expect(response).to be_successful
+
+        json_response = json_parse(response.body)
+        conversations = json_response["conversations"]
+        expect(conversations.length).to eq(3) # All 3 students
+
+        # Check that students with conversations have IDs
+        students_with_convs = conversations.select { |c| c["id"].present? }
+        expect(students_with_convs.length).to eq(2)
+
+        conversation_ids = students_with_convs.pluck("id")
+        expect(conversation_ids).to include(@conversation1.id, @conversation2.id)
+
+        # Check that student without conversation is included with nil ID
+        student_without_conv = conversations.find { |c| c["user_id"] == @student3.id.to_s }
+        expect(student_without_conv).to be_present
+        expect(student_without_conv["id"]).to be_nil
+        expect(student_without_conv["has_conversation"]).to be(false)
+      end
+
+      it "includes student information in each conversation" do
+        get :ai_conversations_index, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+
+        json_response = json_parse(response.body)
+        conversations = json_response["conversations"]
+
+        conversations.each do |conv|
+          expect(conv).to have_key("student")
+          expect(conv["student"]).to have_key("id")
+          expect(conv["student"]).to have_key("name")
+        end
+      end
+
+      it "excludes deleted conversations but includes student without conversation" do
+        @conversation1.update_column(:workflow_state, "deleted")
+
+        get :ai_conversations_index, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+
+        json_response = json_parse(response.body)
+        conversations = json_response["conversations"]
+        expect(conversations.length).to eq(3) # All 3 students
+
+        # Only conversation2 should have an ID
+        students_with_convs = conversations.select { |c| c["id"].present? }
+        expect(students_with_convs.length).to eq(1)
+        expect(students_with_convs.first["id"]).to eq(@conversation2.id)
+
+        # Student1 should now appear without conversation (since theirs was deleted)
+        student1_entry = conversations.find { |c| c["user_id"] == @student1.id.to_s }
+        expect(student1_entry["id"]).to be_nil
+        expect(student1_entry["has_conversation"]).to be(false)
+      end
+
+      it "returns the latest conversation for each student" do
+        # Create an older conversation for student1
+        @ai_experience.ai_conversations.create!(
+          llm_conversation_id: "conv-student1-old",
+          user: @student1,
+          course: @course,
+          root_account: @course.root_account,
+          account: @course.account,
+          workflow_state: "completed",
+          created_at: 2.days.ago,
+          updated_at: 2.days.ago
+        )
+
+        get :ai_conversations_index, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+
+        json_response = json_parse(response.body)
+        conversations = json_response["conversations"]
+
+        student1_conversations = conversations.select { |c| c["user_id"] == @student1.id }
+        expect(student1_conversations.length).to eq(1)
+        expect(student1_conversations.first["id"]).to eq(@conversation1.id)
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student1) }
+
+      it "returns unauthorized" do
+        get :ai_conversations_index, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+        assert_forbidden
+      end
+    end
+
+    context "with invalid experience" do
+      before { user_session(@teacher) }
+
+      it "returns 404 for non-existent experience" do
+        get :ai_conversations_index, params: { course_id: @course.id, id: 99_999 }, format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe "GET #ai_conversation_show" do
+    before :once do
+      @student1 = @student
+      @conversation = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "conv-123",
+        user: @student1,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "active"
+      )
+    end
+
+    context "as teacher" do
+      before do
+        user_session(@teacher)
+        # Mock the LLM client
+        allow_any_instance_of(LLMConversationClient).to receive(:messages_with_conversation_progress).and_return({
+                                                                                                                   messages: [
+                                                                                                                     { role: "assistant", content: "Hello!" },
+                                                                                                                     { role: "user", content: "Hi there!" }
+                                                                                                                   ],
+                                                                                                                   progress: { status: "in_progress" }
+                                                                                                                 })
+      end
+
+      it "returns conversation with messages" do
+        get :ai_conversation_show, params: { course_id: @course.id, id: @ai_experience.id, conversation_id: @conversation.id }, format: :json
+        expect(response).to be_successful
+
+        json_response = json_parse(response.body)
+        expect(json_response["id"]).to eq(@conversation.id)
+        expect(json_response).to have_key("messages")
+        expect(json_response["messages"].length).to eq(2)
+      end
+
+      it "includes student information" do
+        get :ai_conversation_show, params: { course_id: @course.id, id: @ai_experience.id, conversation_id: @conversation.id }, format: :json
+
+        json_response = json_parse(response.body)
+        expect(json_response).to have_key("student")
+        expect(json_response["student"]["id"]).to eq(@student1.id)
+      end
+
+      it "includes progress information" do
+        get :ai_conversation_show, params: { course_id: @course.id, id: @ai_experience.id, conversation_id: @conversation.id }, format: :json
+
+        json_response = json_parse(response.body)
+        expect(json_response).to have_key("progress")
+        expect(json_response["progress"]["status"]).to eq("in_progress")
+      end
+
+      it "returns 404 for conversation from different experience" do
+        other_experience = @course.ai_experiences.create!(
+          title: "Other Experience",
+          learning_objective: "Test",
+          pedagogical_guidance: "Test"
+        )
+
+        get :ai_conversation_show, params: { course_id: @course.id, id: other_experience.id, conversation_id: @conversation.id }, format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for non-existent conversation" do
+        get :ai_conversation_show, params: { course_id: @course.id, id: @ai_experience.id, conversation_id: 99_999 }, format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns service unavailable when LLM service fails" do
+        allow_any_instance_of(LLMConversationClient).to receive(:messages_with_conversation_progress)
+          .and_raise(LlmConversation::Errors::ConversationError.new("Service unavailable"))
+
+        get :ai_conversation_show, params: { course_id: @course.id, id: @ai_experience.id, conversation_id: @conversation.id }, format: :json
+        expect(response).to have_http_status(:service_unavailable)
+
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to include("Service unavailable")
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student1) }
+
+      it "returns unauthorized" do
+        get :ai_conversation_show, params: { course_id: @course.id, id: @ai_experience.id, conversation_id: @conversation.id }, format: :json
+        assert_forbidden
+      end
+    end
+  end
 end

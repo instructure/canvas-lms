@@ -110,6 +110,74 @@ describe AiConversationsController do
     end
   end
 
+  describe "GET #show" do
+    before :once do
+      @student2 = student_in_course(active_all: true, course: @course).user
+      @conversation = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "student-conv-123",
+        user: @student2,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "active"
+      )
+    end
+
+    context "as teacher" do
+      before do
+        user_session(@teacher)
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:messages_with_conversation_progress).and_return({
+                                                                                         messages: [
+                                                                                           { role: "User", text: "Hello" },
+                                                                                           { role: "Assistant", text: "Hi there!" }
+                                                                                         ],
+                                                                                         progress: {
+                                                                                           current: 1,
+                                                                                           total: 2,
+                                                                                           percentage: 50,
+                                                                                           objectives: []
+                                                                                         }
+                                                                                       })
+      end
+
+      it "returns student conversation with messages" do
+        get :show,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id, id: @conversation.id },
+            format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["id"]).to eq(@conversation.id)
+        expect(json_response["user_id"]).to eq(@student2.id.to_s)
+        expect(json_response["messages"]).to be_an(Array)
+        expect(json_response["messages"].length).to eq(2)
+        expect(json_response["progress"]).to be_present
+      end
+
+      it "returns 404 for non-existent conversation" do
+        get :show,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id, id: 99_999 },
+            format: :json
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student) }
+
+      it "returns unauthorized when viewing another student's conversation" do
+        get :show,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id, id: @conversation.id },
+            format: :json
+
+        assert_forbidden
+      end
+    end
+  end
+
   describe "POST #create" do
     context "as teacher" do
       before { user_session(@teacher) }

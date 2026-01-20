@@ -105,6 +105,29 @@ describe('ConversationProgress', () => {
     expect(screen.getByText('100%')).toBeInTheDocument()
   })
 
+  it('uses blue color for progress less than 100%', () => {
+    render(<ConversationProgress progress={mockProgress} />)
+    const progressBar = screen.getByLabelText(/Learning objective progress: 50%/i)
+    expect(progressBar).toBeInTheDocument()
+  })
+
+  it('uses green color for 100% progress', () => {
+    const completeProgress = {
+      current: 3,
+      total: 3,
+      percentage: 100,
+      objectives: [
+        {objective: 'Objective 1', status: 'covered' as 'covered' | ''},
+        {objective: 'Objective 2', status: 'covered' as 'covered' | ''},
+        {objective: 'Objective 3', status: 'covered' as 'covered' | ''},
+      ],
+    }
+
+    render(<ConversationProgress progress={completeProgress} />)
+    const progressBar = screen.getByLabelText(/Learning objective progress: 100%/i)
+    expect(progressBar).toBeInTheDocument()
+  })
+
   it('has accessible label for screen readers', () => {
     render(<ConversationProgress progress={mockProgress} />)
     expect(screen.getByLabelText(/Learning objective progress: 50%/i)).toBeInTheDocument()
