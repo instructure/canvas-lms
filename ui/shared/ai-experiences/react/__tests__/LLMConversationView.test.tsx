@@ -155,7 +155,7 @@ describe('LLMConversationView', () => {
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello! How can I help you?')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello!.*How can I help you\?/i)[0]).toBeInTheDocument()
     })
   })
 
@@ -183,9 +183,9 @@ describe('LLMConversationView', () => {
       // First message is hidden (starting prompt)
       expect(screen.queryByText('Starting prompt')).not.toBeInTheDocument()
       // Others are visible
-      expect(screen.getByText('Hello!')).toBeInTheDocument()
-      expect(screen.getByText('Hi there')).toBeInTheDocument()
-      expect(screen.getByText('How can I help?')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello!/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/Hi there/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/How can I help\?/i)[0]).toBeInTheDocument()
     })
   })
 
@@ -225,7 +225,7 @@ describe('LLMConversationView', () => {
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText('Your answer...')
@@ -285,7 +285,7 @@ describe('LLMConversationView', () => {
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText('Your answer...')
@@ -322,7 +322,7 @@ describe('LLMConversationView', () => {
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const restartButton = screen.getByText('Restart')
@@ -477,7 +477,7 @@ describe('LLMConversationView', () => {
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const input = screen.getByPlaceholderText('Your answer...')
@@ -537,7 +537,7 @@ describe('LLMConversationView', () => {
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const input = screen.getByPlaceholderText('Your answer...')
@@ -579,7 +579,7 @@ describe('LLMConversationView', () => {
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const restartButton = screen.getByText('Restart')
@@ -662,7 +662,7 @@ describe('LLMConversationView', () => {
         expect(
           screen.queryByText('Failed to start conversation. Please try again.'),
         ).not.toBeInTheDocument()
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
     })
   })

@@ -26,5 +26,6 @@ export type AiExperience = {
   pedagogical_guidance?: string
   created_at: string
   can_manage?: boolean
+  can_unpublish?: boolean
   submission_status?: 'not_started' | 'in_progress' | 'submitted'
 }

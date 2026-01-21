@@ -30,6 +30,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience} from '../../types'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
+import AIExperiencePublishButton from './AIExperiencePublishButton'
 
 const I18n = createI18nScope('ai_experiences_show')
 
@@ -39,6 +40,7 @@ interface AIExperienceShowProps {
 
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   const canManage = aiExperience.can_manage
+  const [workflowState, setWorkflowState] = useState(aiExperience.workflow_state)
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     const shouldPreview = params.get('preview') === 'true'
@@ -90,6 +92,15 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         {canManage && (
           <Flex.Item>
             <Flex gap="small">
+              <Flex.Item>
+                <AIExperiencePublishButton
+                  experienceId={aiExperience.id!}
+                  courseId={aiExperience.course_id!}
+                  isPublished={workflowState === 'published'}
+                  canUnpublish={aiExperience.can_unpublish ?? true}
+                  onPublishChange={setWorkflowState}
+                />
+              </Flex.Item>
               <Flex.Item>
                 <Button
                   color="primary"

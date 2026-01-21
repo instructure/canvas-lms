@@ -25,6 +25,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine, IconAiColoredSolid} from '@instructure/ui-icons'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import AIExperienceList from './components/AIExperienceList'
 import AIExperiencesEmptyState from './components/AIExperiencesEmptyState'
 import type {AiExperience} from './types'
@@ -129,17 +130,29 @@ const AiExperiencesIndex: React.FC = () => {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to update AI experience')
+        const errorData = await response.json()
+        const errorMessage =
+          errorData?.errors?.workflow_state?.[0] || I18n.t('Failed to update AI experience')
+        showFlashError(errorMessage)()
+        return
       }
 
       const updatedExperience = await response.json()
 
       // Update the local state
       setExperiences(prevExperiences =>
-        prevExperiences.map(exp => (exp.id === id ? {...exp, workflow_state: newState} : exp)),
+        prevExperiences.map(exp =>
+          exp.id === id
+            ? {
+                ...exp,
+                workflow_state: newState,
+                can_unpublish: updatedExperience.can_unpublish,
+              }
+            : exp,
+        ),
       )
     } catch (err) {
-      // TODO: Show flash alert to user for publish/unpublish error
+      showFlashError(I18n.t('Failed to update AI Experience. Please try again.'))()
     }
   }
 
