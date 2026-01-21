@@ -1149,11 +1149,17 @@ class Submission < ActiveRecord::Base
         check_vericite_status(0)
       end
     end
-    unless self.vericite_data_hash.empty?
+
+    # Return a copy with the provider flag set, without mutating the original hash
+    # This prevents the vericite provider from being added to turnitin_data when
+    # both turnitinData and vericiteData GraphQL fields are queried together.
+    # Mutating the shared hash causes turnitin permission checks to fail.
+    result = self.vericite_data_hash.dup
+    unless result.empty?
       # only set vericite provider flag if the hash isn't empty
-      self.vericite_data_hash[:provider] = :vericite
+      result[:provider] = :vericite
     end
-    self.vericite_data_hash
+    result
   end
 
   def vericite_data_hash

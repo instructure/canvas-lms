@@ -16,8 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && @submission.turnitin_data[:provider] == :vericite &&
-  (vericite_score = @submission.vericite_data(true)[attachment&.asset_string] || @submission.originality_data[OriginalityReport.submission_asset_key(@submission)]) &&
+<% vericite_data = @submission.vericite_data(true) %>
+<% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && vericite_data[:provider] == :vericite &&
+  (vericite_score = vericite_data[attachment&.asset_string] || @submission.originality_data[OriginalityReport.submission_asset_key(@submission)]) &&
   vericite_score[:similarity_score] %>
   <% if show_updated_icons %>
     <%

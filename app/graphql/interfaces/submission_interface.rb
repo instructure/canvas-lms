@@ -461,74 +461,78 @@ module Interfaces::SubmissionInterface
 
   field :vericite_data, [Types::VericiteDataType], null: true
   def vericite_data
-    return nil unless object.vericite_data(false).present? &&
+    load_association(:assignment).then do
+      next nil unless object.vericite_data(false).present? &&
                       object.grants_right?(current_user, :view_vericite_report) &&
                       object.assignment.vericite_enabled
 
-    promises =
-      object.vericite_data
-            .except(
-              :provider,
-              :last_processed_attempt,
-              :webhook_info,
-              :eula_agreement_timestamp,
-              :assignment_error,
-              :student_error,
-              :status
-            )
-            .map do |asset_string, data|
-              Loaders::AssetStringLoader
-                .load(asset_string.to_s)
-                .then do |target|
-                  next if target.nil?
+      promises =
+        object.vericite_data
+              .except(
+                :provider,
+                :last_processed_attempt,
+                :webhook_info,
+                :eula_agreement_timestamp,
+                :assignment_error,
+                :student_error,
+                :status
+              )
+              .map do |asset_string, data|
+                Loaders::AssetStringLoader
+                  .load(asset_string.to_s)
+                  .then do |target|
+                    next if target.nil?
 
-                  {
-                    target:,
-                    asset_string:,
-                    report_url: data[:report_url],
-                    score: data[:similarity_score],
-                    status: data[:status],
-                    state: data[:state],
-                  }
-                end
-      end
-    Promise.all(promises).then(&:compact)
+                    {
+                      target:,
+                      asset_string:,
+                      report_url: data[:report_url],
+                      score: data[:similarity_score],
+                      status: data[:status],
+                      state: data[:state],
+                    }
+                  end
+        end
+      Promise.all(promises).then(&:compact)
+    end
   end
 
   field :turnitin_data, [Types::TurnitinDataType], null: true
   def turnitin_data
-    return nil unless object.grants_right?(current_user, :view_turnitin_report)
-    return nil if object.turnitin_data.empty?
+    load_association(:assignment).then do
+      next nil unless object.grants_right?(current_user, :view_turnitin_report)
+      next nil if object.turnitin_data.empty?
 
-    promises =
-      object
-      .turnitin_data
-      .except(
-        :last_processed_attempt,
-        :webhook_info,
-        :eula_agreement_timestamp,
-        :assignment_error,
-        :provider,
-        :student_error,
-        :status
-      )
-      .map do |asset_string, data|
-        Loaders::AssetStringLoader
-          .load(asset_string.to_s)
-          .then do |target|
-            next if target.nil?
+      promises =
+        object
+        .turnitin_data
+        .except(
+          :last_processed_attempt,
+          :webhook_info,
+          :eula_agreement_timestamp,
+          :assignment_error,
+          :provider,
+          :student_error,
+          :status
+        )
+        .map do |asset_string, data|
+          Loaders::AssetStringLoader
+            .load(asset_string.to_s)
+            .then do |target|
+              next if target.nil?
 
-            {
-              target:,
-              asset_string:,
-              report_url: data[:report_url],
-              score: data[:similarity_score],
-              status: data[:status],
-              state: data[:state]
-            }
-          end
-      end
-    Promise.all(promises).then(&:compact)
+              {
+                target:,
+                asset_string:,
+                report_url: data[:report_url],
+                score: data[:similarity_score],
+                status: data[:status],
+                state: data[:state]
+              }
+            end
+        end
+      Promise.all(promises).then(&:compact)
+    end
   end
 
   field :originality_data, GraphQL::Types::JSON, null: true
