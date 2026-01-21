@@ -160,6 +160,21 @@ class AuthenticationProvider < ActiveRecord::Base
     root_account.authentication_providers.where.not(workflow_state: :active).find_by(auth_type:)
   end
 
+  def login_authentication_provider_path
+    unless self.class.valid_auth_types.include? self.class.sti_name
+      raise ActionController::UrlGenerationError, "No route matches #{self.class.sti_name} authentication provider"
+    end
+
+    base_path = "/login/#{self.class.sti_name}"
+    return base_path if self.class.singleton?
+
+    unless persisted?
+      raise ActionController::UrlGenerationError, "Cannot generate URL for unsaved authentication provider"
+    end
+
+    "#{base_path}/#{id}"
+  end
+
   def visible_to?(_user)
     true
   end
