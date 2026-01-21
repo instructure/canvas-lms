@@ -8812,6 +8812,14 @@ tr:
   course_name_successfully_added_48116a50: "%{course_name} başarıyla eklendi!"
   course_navigation_dd035109: "Ders Gezinme Menüsü"
   course_navigation_default_9f015ac9: "Araçla ilişkili not defterinde ödev verileri oluşturabilir ve görüntüleyebilir"
+  course_navigation_settings: 
+    buttons: 
+      save: Kaydet
+    drag_details: "Çoğu sayfanın etkisizleştirilmesi bu sayfayı ziyaret eden öğrencilerin dersin ana sayfasına yönlendirilmesine neden olacaktır."
+    drag_to_hide: "Öğrencilerden gizlemek için öğeleri buraya sürükleyin."
+    help: 
+      edit_navigation: "Ders menüsündeki öğeleri yeniden sıralamak için sürükleyip bırakın."
+      edit_navigation_k5: "Kullanıcının kullanıcı hesap ayrıntılarını değiştirmesine izin verir."
   course_nicknames_csv_92e325a7: "Araçla ilişkili not defterinde ödev verileri oluşturabilir ve görüntüleyebilir."
   course_not_found_c248a721: "Ders bulunamadı"
   course_notification_settings_d9821d36: "Ders Bildirim Ayarları"
@@ -9137,6 +9145,15 @@ tr:
         content: İçerik
         due_dates: "Bitiş Tarihi"
         points: Puanlar
+    navigation_form: 
+      drag_details: "Çoğu sayfanın etkisizleştirilmesi bu sayfayı ziyaret eden öğrencilerin dersin ana sayfasına yönlendirilmesine neden olacaktır."
+      drag_to_hide: "Öğrencilerden gizlemek için öğeleri buraya sürükleyin."
+      help: 
+        edit_navigation: "Ders menüsündeki öğeleri yeniden sıralamak için sürükleyip bırakın."
+        edit_navigation_info_k5: "Kullanıcının, oran sınırı değerlerini ve yorumları değiştirmek de dahil olmak üzere mevcut oran sınırı ayarlarını değiştirmesine izin verir."
+        edit_navigation_k5: "Kullanıcının kullanıcı hesap ayrıntılarını değiştirmesine izin verir."
+      titles: 
+        edit_navigation: "Ders Gezinme Menüsünü Düzenle"
     notices: 
       backup_restored: "Yedek Başarı ile Yeniden Yüklendi!"
       concluded: "Ders başarılı bir şekilde sonlandırıldı"
@@ -9726,6 +9743,7 @@ tr:
   crowdsourced: true
   crumbs: 
     access_report: "Erişim Raporu"
+    ai_conversations: "Yapay Zekâ Sohbetleri"
     ai_experiences: "Yapay Zeka Deneyimleri"
     announcements: Duyurular
     apps: Uygulamalar

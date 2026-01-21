@@ -1493,7 +1493,7 @@ ko:
       email_notification_from_description: "이 설정을 이용하면 관리자가 이 계정에 대해 Canvas에서 보내는 모든 알림의 \"보낸 사람\" 텍스트에 브랜드나 레이블을 넣을 수 있습니다."
       email_notification_from_settings: "이메일 알림 \"보낸 사람\" 설정"
       enabled_web_serices_title: "사용하는 웹 서비스"
-      equall_endpoint_help: "Equella 서비스에 대한 URL입니다. URL은 \"%{sample_url}\"와(과) 비슷한 형식입니다."
+      equall_endpoint_help: "자신의 EQUELLA 서비스에 URL입니다. 예를 들어 \"%{sample_url}\"과(와) 같은 형식입니다."
       equella_settings_title: "Equella 설정"
       feature_options: "기능 옵션"
       features_title: 기능
@@ -1555,7 +1555,7 @@ ko:
         enable_user_notes: "교원 일지"
         end_at: 끝
         equella: Equella
-        equella_endpoint: "Equella 끝점"
+        equella_endpoint: "Equella 엔드포인트"
         equella_teaser: "Equella 설명"
         global_includes: "사용자 지정 CSS/JavaScript 재정의"
         global_javascript: "전역 자바스크립트 URL"
@@ -7561,6 +7561,7 @@ ko:
   contributed_to_this_module_item_and_is_complete_2799d5c: "이 모듈 항목에 작업했으며 완료됨"
   contributing_to_development_4647b24e: "개발에 기여"
   control_app_name_s_availability_and_exceptions_in__aa67f6a5: "Canvas에서 특정 하위 계정 또는 과목에 대한 예외 설정을 포함하여 %{app_name}의 사용 가능 및 예외를 제어합니다. *자신의 모든 하위 계정을 확인*하거나 자세한 정보를 설명서에서 참고할 수 있습니다."
+  conversation_3c7b49b0: 대화
   conversation_dialog: 
     errors: 
       field_is_required: "이 필드가 필요함"
@@ -8427,6 +8428,13 @@ ko:
   course_name_must_be_255_characters_or_less_e7afed1a: "과목 이름 255자 이하여야 합니다"
   course_name_successfully_added_48116a50: "%{course_name}이(가) 추가되었습니다."
   course_navigation_dd035109: "과목 탐색"
+  course_navigation_settings: 
+    buttons: 
+      save: 저장
+    drag_details: "대부분의 페이지를 비활성화하면 해당 페이지를 방문하는 학생이 과목 홈페이지로 리디렉트됩니다."
+    drag_to_hide: "학생에게 항목을 숨기려면 여기에 끌어다 놓으십시오."
+    help: 
+      edit_navigation: "과목 탐색에 순서를 다시 매기려면 항목을 끌어다 놓으십시오."
   course_nicknames_csv_92e325a7: "과목 별칭 CSV"
   course_not_found_c248a721: "과목을 찾을 수 없음"
   course_notification_settings_d9821d36: "과목 알림 설정"
@@ -8745,6 +8753,13 @@ ko:
     master_course_restrictions: 
       labels: 
         points: 배점
+    navigation_form: 
+      drag_details: "대부분의 페이지를 비활성화하면 해당 페이지를 방문하는 학생이 과목 홈페이지로 리디렉트됩니다."
+      drag_to_hide: "학생에게 항목을 숨기려면 여기에 끌어다 놓으십시오."
+      help: 
+        edit_navigation: "과목 탐색에 순서를 다시 매기려면 항목을 끌어다 놓으십시오."
+      titles: 
+        edit_navigation: "과목 탐색 편집"
     notices: 
       backup_restored: "백업을 성공적으로 복원함"
       concluded: "과목을 성공적으로 종결함"
@@ -8864,7 +8879,7 @@ ko:
       deatils: 
         move_course: "이 과목의 새 루트 계정을 선택합니다. 과목을 이동한 후에 과목의 새 학과도 지정해야 합니다."
       drag_details: "대부분의 페이지를 비활성화하면 해당 페이지를 방문하는 학생이 과목 홈페이지로 리디렉트됩니다."
-      drag_to_hide: "학생에게 항목을 숨기려면 여기에 끌어다 놓으십시오."
+      drag_to_hide: "학생에게 항목을 숨기려면 여기에 끌어놓으세요."
       enrollment_count: 
         one: "사용자 %{count}명"
         other: "사용자 %{count}명"
@@ -8875,7 +8890,7 @@ ko:
         navigation: "과목 탐색"
         sections: "과목 섹션"
       help: 
-        edit_navigation: "과목 탐색에 순서를 다시 매기려면 항목을 끌어다 놓으십시오."
+        edit_navigation: "항목을 끌어 놓아서 과목 탐색에서 순서를 변경합니다."
         edit_navigation_info_k5: "사용으로 설정하면 LTI 도구는 항상 선택한 순서로 리소스 탭에서 마지막으로 나타납니다."
         edit_navigation_k5: "항목을 끌어 놓아서 과목 탐색에서 순서를 변경합니다."
       images: 

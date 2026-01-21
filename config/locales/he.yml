@@ -5940,6 +5940,13 @@ he:
   course_name_is_required_90919349: "נדרש שם קורס"
   course_name_successfully_added_48116a50: "%{course_name} נתווסף בהצלחה!"
   course_navigation_dd035109: "ניווט בקורס"
+  course_navigation_settings: 
+    buttons: 
+      save: "שמירה "
+    drag_details: "הפיכת רוב הדפים ללא פעילים יגרום לתלמידים אשר ביקרו בדפים אלו להתנתב לדף הבית של הקורס."
+    drag_to_hide: "גרור/י פריטים לכאן כדי להסתירם מתלמידים"
+    help: 
+      edit_navigation: "גרור ושחרר פריטים כדי לארגנם מחדש בסרגל ניווט של הקורס."
   course_not_found_c248a721: "הקורס לא נמצא"
   course_option_links_a79d263d: "קישורי אפשרויות הקורס"
   course_outcomes_7dc1cbc7: "תוצאות מצופות בקורס"
@@ -6178,6 +6185,13 @@ he:
         content: תוכן
         due_dates: "תאריכי יעד"
         points: ניקוד
+    navigation_form: 
+      drag_details: "הפיכת רוב הדפים ללא פעילים יגרום לתלמידים אשר ביקרו בדפים אלו להתנתב לדף הבית של הקורס."
+      drag_to_hide: "גרור/י פריטים לכאן כדי להסתירם מתלמידים"
+      help: 
+        edit_navigation: "גרור ושחרר פריטים כדי לארגנם מחדש בסרגל ניווט של הקורס."
+      titles: 
+        edit_navigation: "עריכת ניווט הקורס"
     notices: 
       backup_restored: "השיחזור מגיבוי נסתיים בהצלחה!"
       concluded: "הקורס נסתיים וסוכם בהצלחה"
