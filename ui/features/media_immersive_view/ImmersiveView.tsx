@@ -38,12 +38,18 @@ export function ImmersiveView({id, title, attachmentId, isAttachment}: Immersive
   const isTablet = !useMedia('(min-width: 769px)')
   const playerHeight = isTablet ? 'calc(100vw / (16 / 9) + 40px)' : '490px'
 
+  // Check for custom_embed_hide_header URL parameter
+  const searchParams = new URLSearchParams(window.location.search)
+  const hideHeader = searchParams.get('custom_embed_hide_header') === 'true'
+
   return (
     <div className={styles.immersiveView}>
-      <div className={styles.immersiveViewHeader}>
-        <h1 className={styles.immersiveViewTitle}>{title}</h1>
-        <ImmersiveViewBackButton />
-      </div>
+      {!hideHeader && (
+        <div className={styles.immersiveViewHeader}>
+          <h1 className={styles.immersiveViewTitle}>{title}</h1>
+          <ImmersiveViewBackButton />
+        </div>
+      )}
 
       <div className={styles.immersiveViewContent}>
         <CanvasStudioPlayer

@@ -7,6 +7,12 @@
   margin: 0 auto;
 }
 
+@media (max-width: 768px) and (orientation: landscape) {
+  .immersiveView {
+      height: auto;
+  }
+}
+
 .immersiveView [data-media-player] {
   --radius-3: 0;
 }
