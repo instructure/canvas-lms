@@ -47,6 +47,9 @@ export const PeerReview: React.FC<PeerReviewProps> = props => {
   const reviewLinkUrl = props.reviewLinkUrl
   const interaction = props.disabled ? 'disabled' : 'enabled'
 
+  const isEmbedded = new URLSearchParams(window.location.search).get('embed') === 'true'
+  const linkTarget = isEmbedded ? '_top' : undefined
+
   const renderNotCompletedMobileView = (responsiveProps: ResponsiveProps) => {
     const mobileIcon = <IconPeerReviewLine />
     const mobileMmessage = (
@@ -63,6 +66,7 @@ export const PeerReview: React.FC<PeerReviewProps> = props => {
             isWithinText={false}
             interaction={interaction}
             margin="0 xx-small 0 x-small"
+            target={linkTarget}
           >
             <Flex.Item>{mobileIcon}</Flex.Item>
             <Flex.Item margin="0 0 0 x-small">{mobileMmessage}</Flex.Item>
@@ -122,6 +126,7 @@ export const PeerReview: React.FC<PeerReviewProps> = props => {
                 isWithinText={false}
                 interaction={interaction}
                 margin="0 xx-small 0 x-small"
+                target={linkTarget}
               >
                 <Text weight="bold" size={responsiveProps.textSize}>
                   {I18n.t('Review Now')}
