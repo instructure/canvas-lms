@@ -52,7 +52,7 @@ const createWrapper = () => {
   )
 }
 
-const mockRubricResponse = {
+const mockSubmissionDetailsResponse = {
   data: {
     legacyNode: {
       _id: 'sub1',
@@ -92,15 +92,34 @@ const mockRubricResponse = {
           },
         ],
       },
+      recentCommentsConnection: {
+        nodes: [
+          {
+            _id: 'comment1',
+            comment: 'Great work on this assignment!',
+            htmlComment: '<p>Great work on this assignment!</p>',
+            author: {
+              _id: 'teacher1',
+              name: 'Mr. Smith',
+            },
+            createdAt: '2025-11-30T14:30:00Z',
+          },
+        ],
+      },
+      allCommentsConnection: {
+        pageInfo: {
+          totalCount: 3,
+        },
+      },
     },
   },
 }
 
 describe('useSubmissionDetails', () => {
-  it('fetches rubric assessment data successfully', async () => {
+  it('fetches submission details successfully', async () => {
     server.use(
       http.post('/api/graphql', () => {
-        return HttpResponse.json(mockRubricResponse)
+        return HttpResponse.json(mockSubmissionDetailsResponse)
       }),
     )
 
@@ -145,10 +164,23 @@ describe('useSubmissionDetails', () => {
           ],
         },
       ],
+      comments: [
+        {
+          _id: 'comment1',
+          comment: 'Great work on this assignment!',
+          htmlComment: '<p>Great work on this assignment!</p>',
+          author: {
+            _id: 'teacher1',
+            name: 'Mr. Smith',
+          },
+          createdAt: '2025-11-30T14:30:00Z',
+        },
+      ],
+      totalCommentsCount: 3,
     })
   })
 
-  it('returns empty array when no rubric assessments exist', async () => {
+  it('handles empty rubric and comments', async () => {
     server.use(
       http.post('/api/graphql', () => {
         return HttpResponse.json({
@@ -157,6 +189,14 @@ describe('useSubmissionDetails', () => {
               _id: 'sub1',
               rubricAssessmentsConnection: {
                 nodes: [],
+              },
+              recentCommentsConnection: {
+                nodes: [],
+              },
+              allCommentsConnection: {
+                pageInfo: {
+                  totalCount: 0,
+                },
               },
             },
           },
@@ -172,6 +212,8 @@ describe('useSubmissionDetails', () => {
 
     expect(result.current.data).toEqual({
       rubricAssessments: [],
+      comments: [],
+      totalCommentsCount: 0,
     })
   })
 
@@ -220,6 +262,8 @@ describe('useSubmissionDetails', () => {
 
     expect(result.current.data).toEqual({
       rubricAssessments: [],
+      comments: [],
+      totalCommentsCount: 0,
     })
   })
 })

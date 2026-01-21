@@ -23,9 +23,9 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Spinner} from '@instructure/ui-spinner'
-import {Button} from '@instructure/ui-buttons'
 import {GradeDisplay} from './GradeDisplay'
 import {RubricSection} from './RubricSection'
+import {FeedbackSection} from './FeedbackSection'
 import type {RecentGradeSubmission} from '../../../types'
 import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
 import {useSubmissionDetails} from '../../../hooks/useSubmissionDetails'
@@ -47,6 +47,8 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
   const {data: submissionDetails, isLoading, error} = useSubmissionDetails(submission._id)
 
   const rubricAssessment = submissionDetails?.rubricAssessments?.[0] || null
+  const comments = submissionDetails?.comments || []
+  const totalCommentsCount = submissionDetails?.totalCommentsCount || 0
 
   return (
     <View
@@ -96,30 +98,11 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
                       </Flex.Item>
                     )}
                     <Flex.Item>
-                      <Text
-                        weight="bold"
-                        size="large"
-                        data-testid={`feedback-section-heading-${submission._id}`}
-                      >
-                        {I18n.t('Feedback')}
-                      </Text>
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text
-                        color="secondary"
-                        data-testid={`feedback-placeholder-${submission._id}`}
-                      >
-                        {I18n.t('Feedback comments will be displayed here')}
-                      </Text>
-                    </Flex.Item>
-                    <Flex.Item overflowY="visible">
-                      <Button
-                        color="primary-inverse"
-                        size="medium"
-                        data-testid={`view-inline-feedback-button-${submission._id}`}
-                      >
-                        {I18n.t('View inline feedback')}
-                      </Button>
+                      <FeedbackSection
+                        comments={comments}
+                        submissionId={submission._id}
+                        totalCommentsCount={totalCommentsCount}
+                      />
                     </Flex.Item>
                   </>
                 )}

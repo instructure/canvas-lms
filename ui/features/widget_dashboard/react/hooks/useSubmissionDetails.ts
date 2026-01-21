@@ -45,6 +45,23 @@ const SUBMISSION_DETAILS_QUERY = gql`
             }
           }
         }
+        recentCommentsConnection: commentsConnection(first: 5, sortOrder: desc) {
+          nodes {
+            _id
+            comment
+            htmlComment
+            author {
+              _id
+              name
+            }
+            createdAt
+          }
+        }
+        allCommentsConnection: commentsConnection(first: 1) {
+          pageInfo {
+            totalCount
+          }
+        }
       }
     }
   }
@@ -72,6 +89,23 @@ interface GraphQLResponse {
         }>
       }>
     }
+    recentCommentsConnection: {
+      nodes: Array<{
+        _id: string
+        comment: string | null
+        htmlComment: string | null
+        author: {
+          _id: string
+          name: string
+        } | null
+        createdAt: string
+      }>
+    }
+    allCommentsConnection: {
+      pageInfo: {
+        totalCount: number
+      }
+    }
   } | null
 }
 
@@ -80,7 +114,7 @@ export function useSubmissionDetails(submissionId: string | null) {
     queryKey: ['submission-details', submissionId],
     queryFn: async (): Promise<SubmissionDetails> => {
       if (!submissionId) {
-        return {rubricAssessments: []}
+        return {rubricAssessments: [], comments: [], totalCommentsCount: 0}
       }
 
       const response = await executeGraphQLQuery<GraphQLResponse>(SUBMISSION_DETAILS_QUERY, {
@@ -88,7 +122,7 @@ export function useSubmissionDetails(submissionId: string | null) {
       })
 
       if (!response?.legacyNode) {
-        return {rubricAssessments: []}
+        return {rubricAssessments: [], comments: [], totalCommentsCount: 0}
       }
 
       const rubricAssessments =
@@ -105,7 +139,19 @@ export function useSubmissionDetails(submissionId: string | null) {
           })),
         })) || []
 
-      return {rubricAssessments}
+      const comments =
+        response.legacyNode.recentCommentsConnection?.nodes.map(comment => ({
+          _id: comment._id,
+          comment: comment.comment,
+          htmlComment: comment.htmlComment,
+          author: comment.author,
+          createdAt: comment.createdAt,
+        })) || []
+
+      const totalCommentsCount =
+        response.legacyNode.allCommentsConnection?.pageInfo?.totalCount || 0
+
+      return {rubricAssessments, comments, totalCommentsCount}
     },
     enabled: !!submissionId && !!window.ENV?.current_user_id,
     staleTime: 5 * 60 * 1000,
