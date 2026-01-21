@@ -815,6 +815,35 @@ describe Course do
         expect(course).to_not be_valid
       end
 
+      it "does not allow updating account to a subaccount where roles for existing enrollments don't exist" do
+        account1 = Account.default.sub_accounts.create!
+        role = account1.roles.create! name: "Something", base_role_type: "StudentEnrollment"
+        course = course_model(account: account1)
+        user = user_with_pseudonym(account: Account.default)
+        course.enroll_user(user, "StudentEnrollment", role:)
+
+        account2 = Account.default.sub_accounts.create! name: "Sad Account"
+        course.account = account2
+        expect(course).not_to be_valid
+        expect(course.errors[:account_id]).to include "course roles unavailable in Sad Account: Something"
+      end
+
+      it "maps enrollment roles to matching ones in the new account" do
+        account1 = Account.default.sub_accounts.create!
+        role = account1.roles.create! name: "Something", base_role_type: "StudentEnrollment"
+        course = course_model(account: account1)
+        user = user_with_pseudonym(account: Account.default)
+        enrollment = course.enroll_user(user, "StudentEnrollment", role:)
+
+        account2 = Account.default.sub_accounts.create!
+        # ensure the active role is chosen if there are dups (a unique constraint ensures only one active one can exist)
+        account2.roles.create! name: "Something", workflow_state: "inactive", base_role_type: "StudentEnrollment"
+        role2 = account2.roles.create! name: "Something", workflow_state: "active", base_role_type: "StudentEnrollment"
+        course.account = account2
+        course.save!
+        expect(enrollment.reload.role).to eq role2
+      end
+
       it "requires unique sis_source_id" do
         other_course = course_factory
         other_course.sis_source_id = "sisid"
