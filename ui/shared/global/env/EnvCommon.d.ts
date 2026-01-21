@@ -360,6 +360,7 @@ export type RootAccountFeatureId =
   | 'lti_registrations_usage_tab'
   | 'mobile_offline_mode'
   | 'modules_requirements_allow_percentage'
+  | 'nav_menu_links'
   | 'non_scoring_rubrics'
   | 'open_tools_in_new_tab'
   | 'pendo_extended'

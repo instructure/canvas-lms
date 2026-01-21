@@ -481,6 +481,7 @@ class ApplicationController < ActionController::Base
     instui_header
     media_links_use_attachment_id
     multiselect_gradebook_filters
+    nav_menu_links
     new_quizzes_media_type
     new_quizzes_navigation_updates
     new_quizzes_surveys

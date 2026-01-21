@@ -18,19 +18,27 @@
 
 import {create} from 'zustand'
 import {EnvCommon} from '@canvas/global/env/EnvCommon'
+import {v4 as uuidv4} from 'uuid'
 
 declare const ENV: EnvCommon & {
-  COURSE_SETTINGS_NAVIGATION_TABS?: NavigationTabFromEnv[]
+  COURSE_SETTINGS_NAVIGATION_TABS?: EnvNavigationTab[]
 }
 
-// MoveItemTray requires id strings so use these internally
-export type NavigationTab = NavigationTabFromEnv & {
-  id: string
-}
+// Internal representation of a NavigationTab.
+// Uses an explicit discriminator for easy type safety.
+export type NavigationTab = Omit<EnvNavigationTab, 'id'> & {
+  // MoveItemTray also requires every item to have a string unique id
+  internalId: string
+} & // existing tab (link or otherwise)
+  (
+    | {type: 'existing'; externalId: number | string}
+    // new unsaved link tab
+    | {type: 'newLink'; externalId?: never; linkUrl: string}
+  )
 
-// Used only to get input from ENV variable
-type NavigationTabFromEnv = {
-  id: number | string
+// The Navigation Tab as provided from the ENV variable
+type EnvNavigationTab = {
+  id: number | string // to go in externalId
   label: string
   hidden?: boolean
   disabled_message?: string
@@ -39,6 +47,25 @@ type NavigationTabFromEnv = {
   href?: string
   position?: number
   immovable?: boolean
+  linkUrl?: string
+}
+
+export type CourseNavigationTabToSave = {
+  hidden?: boolean
+} & // Existing tab
+(
+  | {id: number | string}
+  // New link tab
+  | {id: undefined; label: string; linkUrl: string}
+)
+
+function newLinkItem({text, url}: {text: string; url: string}): NavigationTab {
+  return {
+    type: 'newLink',
+    internalId: uuidv4(),
+    label: text,
+    linkUrl: url,
+  }
 }
 
 export type MoveItemTrayResult = {
@@ -53,8 +80,10 @@ export interface TabListsState {
     source: {droppableId: string; index: number}
     destination: {droppableId: string; index: number} | null | undefined
   }) => void
-  toggleTabEnabled: (tabId: string) => void
+  toggleTabEnabled: (tabInternalId: string) => void
   moveUsingTrayResult: (result: MoveItemTrayResult) => void
+  tabsToSave: () => CourseNavigationTabToSave[]
+  appendNewLinkItemTab: (params: {text: string; url: string}) => void
 }
 
 function reorder<T>(list: T[], sourceIndex: number, destIndex: number): T[] {
@@ -71,7 +100,7 @@ function moveBetweenLists(
   destination: NavigationTab[],
   sourceIndex: number,
   destinationIndex: number,
-  merge: Partial<NavigationTab>,
+  merge: Pick<NavigationTab, 'hidden'>,
 ): {newSource: NavigationTab[]; newDestination: NavigationTab[]} {
   const sourceClone = Array.from(source)
   const destClone = Array.from(destination)
@@ -94,16 +123,52 @@ function moveBetweenLists(
   }
 }
 
+function navigationTabFromEnv(tab: EnvNavigationTab): NavigationTab {
+  const {id, linkUrl, ...rest} = tab
+  return {
+    ...rest,
+    type: 'existing',
+    externalId: id,
+    linkUrl,
+    internalId: tab.id.toString(),
+  }
+}
+
+function makeTabToSave(tab: NavigationTab): CourseNavigationTabToSave {
+  let result: CourseNavigationTabToSave
+  if (tab.type === 'newLink') {
+    result = {
+      id: undefined,
+      label: tab.label,
+      linkUrl: tab.linkUrl,
+    }
+  } else {
+    // The update_nav requires numeric IDs to of type number, not string, in the
+    // request JSON
+    const idStr = String(tab.externalId)
+    const id = /^\d+$/.test(idStr) ? parseInt(idStr, 10) : idStr
+    result = {id}
+  }
+  if (tab.hidden) {
+    result.hidden = true
+  }
+  return result
+}
+
 export const useTabListsStore = create<TabListsState>((set, get) => {
   const initialTabsInput = ENV.COURSE_SETTINGS_NAVIGATION_TABS || []
-  const initialTabs: NavigationTab[] = initialTabsInput.map(tab => ({
-    ...tab,
-    id: tab.id.toString(),
-  }))
+  const initialTabs: NavigationTab[] = initialTabsInput.map(navigationTabFromEnv)
 
   return {
     enabledTabs: initialTabs.filter(tab => !tab.hidden),
     disabledTabs: initialTabs.filter(tab => tab.hidden),
+
+    tabsToSave: () => [...get().enabledTabs, ...get().disabledTabs].map(makeTabToSave),
+
+    appendNewLinkItemTab: ({text, url}) => {
+      const newTab = newLinkItem({text, url})
+      set({enabledTabs: [...get().enabledTabs, newTab]})
+    },
 
     moveTab: result => {
       if (!result.destination) return
@@ -135,9 +200,9 @@ export const useTabListsStore = create<TabListsState>((set, get) => {
       }
     },
 
-    toggleTabEnabled: tabId => {
+    toggleTabEnabled: tabInternalId => {
       const {enabledTabs, disabledTabs, moveTab} = get()
-      const enabledIndex = enabledTabs.findIndex(tab => tab.id === tabId)
+      const enabledIndex = enabledTabs.findIndex(tab => tab.internalId === tabInternalId)
       let source, destination
 
       if (enabledIndex !== -1) {
@@ -145,7 +210,7 @@ export const useTabListsStore = create<TabListsState>((set, get) => {
         destination = {droppableId: 'disabled-tabs', index: disabledTabs.length}
       } else {
         // Tab is currently disabled, enable it
-        const disabledIndex = disabledTabs.findIndex(tab => tab.id === tabId)
+        const disabledIndex = disabledTabs.findIndex(tab => tab.internalId === tabInternalId)
         if (disabledIndex === -1) return
         source = {droppableId: 'disabled-tabs', index: disabledIndex}
         destination = {droppableId: 'enabled-tabs', index: enabledTabs.length}
@@ -158,11 +223,11 @@ export const useTabListsStore = create<TabListsState>((set, get) => {
       const {moveTab, enabledTabs, disabledTabs} = get()
       const {data: newOrderedList, itemIds} = moveTrayResult
       // We only support moving 1 item for now
-      const tabId = itemIds?.[0]
-      if (!tabId) return
+      const tabInternalId = itemIds?.[0]
+      if (tabInternalId === null || tabInternalId === undefined) return
 
       let tabsList, droppableId, sourceIndex
-      const indexInEnabled = enabledTabs.findIndex(t => t.id.toString() === tabId.toString())
+      const indexInEnabled = enabledTabs.findIndex(t => t.internalId === tabInternalId)
       if (indexInEnabled > -1) {
         tabsList = enabledTabs
         droppableId = 'enabled-tabs'
@@ -170,7 +235,7 @@ export const useTabListsStore = create<TabListsState>((set, get) => {
       } else {
         tabsList = disabledTabs
         droppableId = 'disabled-tabs'
-        sourceIndex = disabledTabs.findIndex(t => t.id.toString() === tabId.toString())
+        sourceIndex = disabledTabs.findIndex(t => t.internalId === tabInternalId)
         if (sourceIndex === -1) return
       }
 
@@ -178,17 +243,21 @@ export const useTabListsStore = create<TabListsState>((set, get) => {
       // but in case the lists change while the tray is open, it's safer to use
       // moveTab() to move it by index, so we never lose or get extra items
 
-      const destIndexAmongMovable = newOrderedList.findIndex(d => d.toString() === tabId.toString())
+      const destIndexAmongMovable = newOrderedList.findIndex(
+        d => d.toString() === tabInternalId.toString(),
+      )
       let destIndex
       if (destIndexAmongMovable === -1) {
-        console.error('Tab ID not found in move tray result data:', tabId) // shouldn't happen
+        console.error('Tab internal ID not found in move tray result data:', tabInternalId) // shouldn't happen
         return
       } else if (destIndexAmongMovable === 0) {
         // Move to top (after any immovable)
         destIndex = tabsList.findIndex(t => !t.immovable)
       } else {
         const placeAfterId = newOrderedList[destIndexAmongMovable - 1]
-        const placeAfterIndex = tabsList.findIndex(t => t.id.toString() === placeAfterId.toString())
+        const placeAfterIndex = tabsList.findIndex(
+          t => t.internalId.toString() === placeAfterId.toString(),
+        )
         if (placeAfterIndex === -1) {
           // placeAfterId item was moved while tray was open, don't know where to put it, abort
           return

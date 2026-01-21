@@ -19,18 +19,40 @@
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {useTabListsStore, type NavigationTab} from '../useTabListsStore'
 
+function createTab(
+  id: number | string,
+  label: string,
+  props: Partial<Omit<NavigationTab, 'type' | 'externalId' | 'internalId'>> = {},
+): NavigationTab {
+  return {
+    type: 'existing',
+    externalId: id,
+    internalId: id.toString(),
+    label,
+    ...props,
+  }
+}
+
+function tabToEnvTab(tab: NavigationTab) {
+  const {type: _type, externalId, internalId: _internalId, ...rest} = tab
+  // For existing tabs, externalId should always be defined
+  return {id: externalId!, ...rest}
+}
+
 describe('useTabListsStore', () => {
   const mockTabs: NavigationTab[] = [
-    {id: '1', label: 'Home', hidden: false},
-    {id: '2', label: 'Assignments', hidden: false},
-    {id: '3', label: 'Quizzes', hidden: false},
-    {id: '4', label: 'Grades', hidden: true},
-    {id: '5', label: 'People', hidden: true},
+    createTab(1, 'Home', {hidden: false}),
+    createTab(2, 'Assignments', {hidden: false}),
+    createTab(3, 'Quizzes', {hidden: false}),
+    createTab('context_external_tool_1', 'External Tool', {hidden: false}),
+    createTab(4, 'Grades', {hidden: true}),
+    createTab(5, 'People', {hidden: true}),
+    createTab('context_external_tool_2', 'Another Tool', {hidden: true}),
   ]
 
   beforeEach(() => {
     fakeENV.setup({
-      COURSE_SETTINGS_NAVIGATION_TABS: mockTabs,
+      COURSE_SETTINGS_NAVIGATION_TABS: mockTabs.map(tabToEnvTab),
     })
     // Reset the store state between tests
     useTabListsStore.setState({
@@ -43,10 +65,10 @@ describe('useTabListsStore', () => {
     it('should initialize with enabled and disabled tabs from ENV', () => {
       const state = useTabListsStore.getState()
 
-      expect(state.enabledTabs).toHaveLength(3)
-      expect(state.disabledTabs).toHaveLength(2)
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '2', '3'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['4', '5'])
+      expect(state.enabledTabs).toHaveLength(4)
+      expect(state.disabledTabs).toHaveLength(3)
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 2, 3, 'context_external_tool_1'])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([4, 5, 'context_external_tool_2'])
     })
 
     it('should handle empty COURSE_SETTINGS_NAVIGATION_TABS', () => {
@@ -72,7 +94,7 @@ describe('useTabListsStore', () => {
       })
 
       let state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['2', '3', '1'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([2, 3, 1, 'context_external_tool_1'])
 
       moveTab({
         source: {droppableId: 'enabled-tabs', index: 2},
@@ -80,7 +102,7 @@ describe('useTabListsStore', () => {
       })
 
       state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '2', '3'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 2, 3, 'context_external_tool_1'])
     })
 
     it('should reorder tabs within disabled list', () => {
@@ -92,7 +114,7 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['5', '4'])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([5, 4, 'context_external_tool_2'])
     })
 
     it('should not change order if source and destination are the same', () => {
@@ -119,8 +141,13 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '3'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['2', '4', '5'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 3, 'context_external_tool_1'])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([
+        2,
+        4,
+        5,
+        'context_external_tool_2',
+      ])
       expect(state.disabledTabs[0].hidden).toBe(true)
     })
 
@@ -133,8 +160,14 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '4', '2', '3'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['5'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([
+        1,
+        4,
+        2,
+        3,
+        'context_external_tool_1',
+      ])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([5, 'context_external_tool_2'])
       expect(state.enabledTabs[1].hidden).toBe(false)
     })
 
@@ -143,29 +176,33 @@ describe('useTabListsStore', () => {
 
       moveTab({
         source: {droppableId: 'enabled-tabs', index: 0},
-        destination: {droppableId: 'disabled-tabs', index: 2},
+        destination: {droppableId: 'disabled-tabs', index: 3},
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['2', '3'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['4', '5', '1'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([2, 3, 'context_external_tool_1'])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([
+        4,
+        5,
+        'context_external_tool_2',
+        1,
+      ])
     })
   })
 
   describe('moveTab - edge cases', () => {
-    it('should do nothing when destination is null', () => {
+    it('should do nothing when destination is null or undefined', () => {
       const initialEnabledTabs = [...useTabListsStore.getState().enabledTabs]
       const initialDisabledTabs = [...useTabListsStore.getState().disabledTabs]
       const {moveTab} = useTabListsStore.getState()
 
-      moveTab({
-        source: {droppableId: 'enabled-tabs', index: 0},
-        destination: null,
-      })
+      moveTab({source: {droppableId: 'enabled-tabs', index: 0}, destination: null})
+      expect(useTabListsStore.getState().enabledTabs).toEqual(initialEnabledTabs)
+      expect(useTabListsStore.getState().disabledTabs).toEqual(initialDisabledTabs)
 
-      const state = useTabListsStore.getState()
-      expect(state.enabledTabs).toEqual(initialEnabledTabs)
-      expect(state.disabledTabs).toEqual(initialDisabledTabs)
+      moveTab({source: {droppableId: 'enabled-tabs', index: 0}, destination: undefined})
+      expect(useTabListsStore.getState().enabledTabs).toEqual(initialEnabledTabs)
+      expect(useTabListsStore.getState().disabledTabs).toEqual(initialDisabledTabs)
     })
 
     it('should do nothing when destination is undefined', () => {
@@ -207,9 +244,14 @@ describe('useTabListsStore', () => {
       toggleTabEnabled('2') // Toggle "Assignments"
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '3'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['4', '5', '2'])
-      expect(state.disabledTabs[2].hidden).toBe(true)
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 3, 'context_external_tool_1'])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([
+        4,
+        5,
+        'context_external_tool_2',
+        2,
+      ])
+      expect(state.disabledTabs[3].hidden).toBe(true)
     })
 
     it('should move disabled tab to enabled', () => {
@@ -218,9 +260,15 @@ describe('useTabListsStore', () => {
       toggleTabEnabled('4') // Toggle "Grades"
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '2', '3', '4'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['5'])
-      expect(state.enabledTabs[3].hidden).toBe(false)
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([
+        1,
+        2,
+        3,
+        'context_external_tool_1',
+        4,
+      ])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([5, 'context_external_tool_2'])
+      expect(state.enabledTabs[4].hidden).toBe(false)
     })
 
     it('should do nothing for non-existent tab id', () => {
@@ -234,44 +282,23 @@ describe('useTabListsStore', () => {
       expect(state.enabledTabs).toEqual(initialEnabledTabs)
       expect(state.disabledTabs).toEqual(initialDisabledTabs)
     })
-
-    it('should handle string tab ids', () => {
-      fakeENV.setup({
-        COURSE_SETTINGS_NAVIGATION_TABS: [
-          {id: 'context_external_tool_1', label: 'External Tool', hidden: false},
-          {id: 'context_external_tool_2', label: 'Another Tool', hidden: true},
-        ],
-      })
-      useTabListsStore.setState({
-        enabledTabs: [{id: 'context_external_tool_1', label: 'External Tool', hidden: false}],
-        disabledTabs: [{id: 'context_external_tool_2', label: 'Another Tool', hidden: true}],
-      })
-      const {toggleTabEnabled} = useTabListsStore.getState()
-
-      toggleTabEnabled('context_external_tool_1')
-
-      const state = useTabListsStore.getState()
-      expect(state.enabledTabs).toHaveLength(0)
-      expect(state.disabledTabs).toHaveLength(2)
-      expect(state.disabledTabs.map(t => t.id)).toContain('context_external_tool_1')
-    })
   })
 
   describe('moveUsingTrayResult', () => {
     const mockTabsWithImmovable: NavigationTab[] = [
-      {id: '1', label: 'Immovable Home', hidden: false, immovable: true},
-      {id: '2', label: 'Assignments', hidden: false},
-      {id: '3', label: 'Quizzes', hidden: false},
-      {id: '4', label: 'Discussions', hidden: false},
-      {id: '5', label: 'Grades', hidden: false},
-      {id: '6', label: 'People', hidden: false},
-      {id: '7', label: 'Pages', hidden: false},
-      {id: '8', label: 'Files', hidden: true},
+      createTab(1, 'Immovable Home', {hidden: false, immovable: true}),
+      createTab(2, 'Assignments', {hidden: false}),
+      createTab(3, 'Quizzes', {hidden: false}),
+      createTab(4, 'Discussions', {hidden: false}),
+      createTab(5, 'Grades', {hidden: false}),
+      createTab(6, 'People', {hidden: false}),
+      createTab(7, 'Pages', {hidden: false}),
+      createTab(8, 'Files', {hidden: true}),
     ]
 
     beforeEach(() => {
       fakeENV.setup({
-        COURSE_SETTINGS_NAVIGATION_TABS: mockTabsWithImmovable,
+        COURSE_SETTINGS_NAVIGATION_TABS: mockTabsWithImmovable.map(tabToEnvTab),
       })
       useTabListsStore.setState({
         enabledTabs: mockTabsWithImmovable.filter(tab => !tab.hidden),
@@ -289,7 +316,7 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '5', '2', '3', '4', '6', '7'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 5, 2, 3, 4, 6, 7])
     })
 
     it('should move item to bottom', () => {
@@ -302,7 +329,7 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '3', '4', '5', '6', '7', '2'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 3, 4, 5, 6, 7, 2])
     })
 
     it('should move item to before an item before the item being moved', () => {
@@ -315,7 +342,7 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '2', '4', '3', '5', '6', '7'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 2, 4, 3, 5, 6, 7])
     })
 
     it('should move item to before an item at least 2 after the item being moved', () => {
@@ -328,7 +355,7 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '2', '4', '5', '3', '6', '7'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 2, 4, 5, 3, 6, 7])
     })
 
     it('should move item to after an item at least 2 before the one being moved', () => {
@@ -341,7 +368,7 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '2', '3', '6', '4', '5', '7'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 2, 3, 6, 4, 5, 7])
     })
 
     it('should move item to after an item after the one being moved', () => {
@@ -354,18 +381,20 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '2', '3', '5', '6', '4', '7'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 2, 3, 5, 6, 4, 7])
     })
 
     it('should work with disabled tabs', () => {
       // Add more disabled tabs for testing
       const mockTabsDisabled = [
         ...mockTabsWithImmovable.slice(0, 3), // Keep first 3 enabled (including immovable)
-        ...mockTabsWithImmovable.slice(3).map(tab => ({...tab, hidden: true})), // Rest disabled
+        ...mockTabsWithImmovable
+          .slice(3)
+          .map(tab => createTab(tab.externalId!, tab.label, {...tab, hidden: true})), // Rest disabled
       ]
 
       fakeENV.setup({
-        COURSE_SETTINGS_NAVIGATION_TABS: mockTabsDisabled,
+        COURSE_SETTINGS_NAVIGATION_TABS: mockTabsDisabled.map(tabToEnvTab),
       })
       useTabListsStore.setState({
         enabledTabs: mockTabsDisabled.filter(tab => !tab.hidden),
@@ -381,7 +410,7 @@ describe('useTabListsStore', () => {
       })
 
       const state = useTabListsStore.getState()
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['7', '4', '5', '6', '8'])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([7, 4, 5, 6, 8])
     })
 
     it('should handle non-existent item gracefully', () => {
@@ -425,10 +454,10 @@ describe('useTabListsStore', () => {
 
     it('should add movable tabs to end when enabled list has only immovable tabs and destination index is 0', () => {
       useTabListsStore.setState({
-        enabledTabs: [{id: '1', label: 'Immovable', hidden: false, immovable: true}],
+        enabledTabs: [createTab(1, 'Immovable', {hidden: false, immovable: true})],
         disabledTabs: [
-          {id: '3', label: 'Assignments', hidden: true}, // tab to move
-          {id: '4', label: 'Quizzes', hidden: true},
+          createTab(3, 'Assignments', {hidden: true}), // tab to move
+          createTab(4, 'Quizzes', {hidden: true}),
         ],
       })
 
@@ -440,8 +469,8 @@ describe('useTabListsStore', () => {
 
       const state = useTabListsStore.getState()
       // Should be added after immovable tabs (at the end)
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['1', '3'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['4'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 3])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([4])
     })
   })
 
@@ -452,8 +481,13 @@ describe('useTabListsStore', () => {
       // Move Home to disabled
       state.toggleTabEnabled('1')
       state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['2', '3'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['4', '5', '1'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([2, 3, 'context_external_tool_1'])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([
+        4,
+        5,
+        'context_external_tool_2',
+        1,
+      ])
 
       // Reorder enabled tabs
       state.moveTab({
@@ -461,39 +495,27 @@ describe('useTabListsStore', () => {
         destination: {droppableId: 'enabled-tabs', index: 1},
       })
       state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['3', '2'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([3, 2, 'context_external_tool_1'])
 
       // Move Grades back to enabled
       state.toggleTabEnabled('4')
       state = useTabListsStore.getState()
-      expect(state.enabledTabs.map(t => t.id)).toEqual(['3', '2', '4'])
-      expect(state.disabledTabs.map(t => t.id)).toEqual(['5', '1'])
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([3, 2, 'context_external_tool_1', 4])
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([5, 'context_external_tool_2', 1])
     })
 
     it('should preserve tab properties when moving between lists', () => {
+      const tabWithProps = createTab(1, 'Home', {
+        hidden: false,
+        css_class: 'home-icon',
+        external: false,
+        href: '/courses/1/home',
+      })
       fakeENV.setup({
-        COURSE_SETTINGS_NAVIGATION_TABS: [
-          {
-            id: '1',
-            label: 'Home',
-            hidden: false,
-            css_class: 'home-icon',
-            external: false,
-            href: '/courses/1/home',
-          },
-        ],
+        COURSE_SETTINGS_NAVIGATION_TABS: [tabWithProps].map(tabToEnvTab),
       })
       useTabListsStore.setState({
-        enabledTabs: [
-          {
-            id: '1',
-            label: 'Home',
-            hidden: false,
-            css_class: 'home-icon',
-            external: false,
-            href: '/courses/1/home',
-          },
-        ],
+        enabledTabs: [tabWithProps],
         disabledTabs: [],
       })
       const {toggleTabEnabled} = useTabListsStore.getState()
@@ -507,6 +529,64 @@ describe('useTabListsStore', () => {
       expect(movedTab.external).toBe(false)
       expect(movedTab.href).toBe('/courses/1/home')
       expect(movedTab.hidden).toBe(true)
+    })
+  })
+
+  describe('tabsToSave', () => {
+    it('should return existing tabs with numeric and string IDs', () => {
+      const {tabsToSave} = useTabListsStore.getState()
+      const result = tabsToSave()
+
+      expect(result).toEqual([
+        {id: 1},
+        {id: 2},
+        {id: 3},
+        {id: 'context_external_tool_1'},
+        {id: 4, hidden: true},
+        {id: 5, hidden: true},
+        {id: 'context_external_tool_2', hidden: true},
+      ])
+    })
+
+    it('should handle mix of existing and new link tabs', () => {
+      const {appendNewLinkItemTab, tabsToSave, toggleTabEnabled} = useTabListsStore.getState()
+      appendNewLinkItemTab({text: 'Link 1', url: 'https://one.com'})
+      appendNewLinkItemTab({text: 'Link 2', url: 'https://two.com'})
+      // disable Link 2:
+      toggleTabEnabled(useTabListsStore.getState().enabledTabs.slice(-1)[0].internalId)
+
+      const result = tabsToSave()
+
+      expect(result[0]).toEqual({id: 1})
+      const newTabs = result.slice(1).filter(t => t.id === undefined)
+      expect(newTabs).toHaveLength(2)
+      expect(newTabs[0]).toMatchObject({
+        id: undefined,
+        label: 'Link 1',
+        linkUrl: 'https://one.com',
+      })
+      expect(newTabs[1]).toMatchObject({
+        id: undefined,
+        label: 'Link 2',
+        linkUrl: 'https://two.com',
+        hidden: true,
+      })
+    })
+  })
+
+  describe('appendNewLinkItemTab', () => {
+    it('should create proper newLink structure', () => {
+      const {appendNewLinkItemTab} = useTabListsStore.getState()
+
+      appendNewLinkItemTab({text: 'Test Link', url: 'https://test.com'})
+
+      const state = useTabListsStore.getState()
+      const newTab = state.enabledTabs[state.enabledTabs.length - 1]
+      expect(newTab.type).toBe('newLink')
+      expect(newTab.externalId).toBeUndefined()
+      expect(newTab.internalId).toBeTruthy()
+      expect(newTab.label).toBe('Test Link')
+      expect(newTab.linkUrl).toBe('https://test.com')
     })
   })
 })
