@@ -7670,6 +7670,11 @@ hu:
   course_name_is_required_90919349: "A kurzusnév megadása kötelező"
   course_name_successfully_added_48116a50: " %{course_name} sikeresen hozzáadva!"
   course_navigation_dd035109: Kurzusnavigáció
+  course_navigation_settings: 
+    drag_details: "Az oldal letiltása azt fogja eredményezni a legtöbb esetben, hogy a látogatók a kurzus kezdőlapjára lesznek átirányítva."
+    help: 
+      edit_navigation: "Az átrendezéshez ragadja meg és mozgassa el az elemeket."
+      edit_navigation_k5: "Húzza át az elemeket, hogy átrendezhesse őket a navigációban."
   course_nicknames_csv_92e325a7: "Kurzus becenevek CSV"
   course_not_found_c248a721: "Kurzus nem található"
   course_notification_settings_d9821d36: "A kurzus értesítési beállításai"
@@ -7917,6 +7922,14 @@ hu:
         content: Tartalom
         due_dates: Határidők
         points: Pontok
+    navigation_form: 
+      drag_details: "Az oldal letiltása azt fogja eredményezni a legtöbb esetben, hogy a látogatók a kurzus kezdőlapjára lesznek átirányítva."
+      help: 
+        edit_navigation: "Az átrendezéshez ragadja meg és mozgassa el az elemeket."
+        edit_navigation_info_k5: "Ha engedélyezve van, az LTI-eszközök mindig utoljára jelennek meg az Erőforrások lapon a kiválasztott sorrendben."
+        edit_navigation_k5: "Húzza át az elemeket, hogy átrendezhesse őket a navigációban."
+      titles: 
+        edit_navigation: "Kurzusnavigáció szerkesztése"
     notices: 
       concluded: "A kurzus sikeresen le lett zárva"
       deleted: "A kurzus sikeresen törölve lett"
