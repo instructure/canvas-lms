@@ -37,6 +37,13 @@ horizon_user_profile_page:
   display_name: "Canvas Career: User Profile Page"
   description: |-
     Enables the refreshed user profile page in Canvas Career.
+horizon_block_content_editor:
+  applies_to: Account
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Block Content Editor"
+  description: |-
+    Enables the block content editor in Canvas Career.
 horizon_manual_dashboard_builder:
   applies_to: RootAccount
   state: hidden
