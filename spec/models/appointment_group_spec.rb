@@ -668,6 +668,88 @@ describe AppointmentGroup do
       expect(@ag.possible_participants(current_user: @teacher, context_code: "course_#{@ag.context.id}")).to eql [@users[1], @users[2]]
     end
 
+    it "normalizes participant list with multiple context codes" do
+      course_with_student(active_all: true)
+      course1 = @course
+      student1 = @user
+      course_with_student(active_all: true)
+      course2 = @course
+      student2 = @user
+      course_with_teacher(course: course1, active_all: true)
+      teacher = @user
+      course2.enroll_teacher(teacher, enrollment_state: "active")
+
+      ag = AppointmentGroup.create!(
+        title: "multi-course test",
+        contexts: [course1, course2],
+        participants_per_appointment: 2,
+        new_appointments: [["#{Time.zone.now.year + 1}-01-01 12:00:00", "#{Time.zone.now.year + 1}-01-01 13:00:00"]]
+      )
+
+      # Without context_code, should return all students
+      expect(ag.possible_participants.sort_by(&:id)).to eq [student1, student2].sort_by(&:id)
+
+      context_codes = ["course_#{course1.id}", "course_#{course2.id}"]
+      expect(ag.possible_participants(current_user: teacher, context_code: context_codes).sort_by(&:id)).to eq [student1, student2].sort_by(&:id)
+    end
+
+    it "does not return duplicate users when a student is enrolled in multiple courses" do
+      course_with_student(active_all: true)
+      course1 = @course
+      student = @user
+      course_with_teacher(course: course1, active_all: true)
+      teacher = @user
+
+      # Create second course and enroll the same student
+      course2 = Course.create!(name: "Course 2")
+      course2.enroll_student(student, enrollment_state: "active")
+      course2.enroll_teacher(teacher, enrollment_state: "active")
+
+      ag = AppointmentGroup.create!(
+        title: "multi-course test with duplicate enrollments",
+        contexts: [course1, course2],
+        participants_per_appointment: 2,
+        new_appointments: [["#{Time.zone.now.year + 1}-01-01 12:00:00", "#{Time.zone.now.year + 1}-01-01 13:00:00"]]
+      )
+
+      # Should return the student only once, not twice
+      participants = ag.possible_participants
+      expect(participants).to eq [student]
+      expect(participants.size).to eq 1
+
+      # Same with context_codes provided
+      context_codes = ["course_#{course1.id}", "course_#{course2.id}"]
+      participants_with_context = ag.possible_participants(current_user: teacher, context_code: context_codes)
+      expect(participants_with_context).to eq [student]
+      expect(participants_with_context.size).to eq 1
+    end
+
+    it "returns groups correctly with context_code array" do
+      course_with_student(active_all: true)
+      course1 = @course
+
+      gc = GroupCategory.create!(name: "Project Groups", context: course1)
+      group1 = gc.groups.create!(name: "Group 1", context: course1)
+      group2 = gc.groups.create!(name: "Group 2", context: course1)
+
+      course_with_teacher(course: course1, active_all: true)
+      teacher = @user
+
+      ag = AppointmentGroup.create!(
+        title: "group appointment test",
+        contexts: [course1],
+        participants_per_appointment: 1,
+        new_appointments: [["#{Time.zone.now.year + 1}-01-01 12:00:00", "#{Time.zone.now.year + 1}-01-01 13:00:00"]]
+      )
+      ag.appointment_group_sub_contexts.create!(sub_context: gc)
+
+      # Should return groups even when context_code is passed as an array
+      context_codes = ["course_#{course1.id}"]
+      groups = ag.possible_participants(current_user: teacher, context_code: context_codes)
+      expect(groups.sort_by(&:id)).to eq [group1, group2].sort_by(&:id)
+      expect(groups.size).to eq 2
+    end
+
     it "returns only the active courses users" do
       course_with_student(active_all: true)
       course1 = @course
