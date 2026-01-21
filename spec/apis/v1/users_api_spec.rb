@@ -1294,6 +1294,15 @@ describe "Users API", type: :request do
         expect(response.headers["Link"]).to include("last")
       end
 
+      it "sets pagination totals/last page link with include[]=ui_invoked" do
+        api_call(:get,
+                 "/api/v1/accounts/#{root_account.id}/users",
+                 { controller: "users", action: "api_index", format: "json", account_id: root_account.id.to_param, per_page: 1 },
+                 { role_filter_id: student_role.id.to_s, include: %w[ui_invoked] })
+        expect(response).to be_successful
+        expect(response.headers["Link"]).to include("last")
+      end
+
       it "includes context account and sub-accounts when filtering by role" do
         subaccount = Account.create!(parent_account: root_account)
         course_with_student(account: subaccount, active_all: true)
