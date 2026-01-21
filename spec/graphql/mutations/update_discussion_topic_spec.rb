@@ -1667,4 +1667,292 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       end
     end
   end
+
+  context "accessibility scanning" do
+    before do
+      Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+      @course.account.enable_feature!(:a11y_checker)
+      @course.enable_feature!(:a11y_checker_eap)
+      @course.reload
+      Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: @course, workflow_state: "completed")
+    end
+
+    context "with multiple saves in a transaction" do
+      # When a DiscussionTopic is saved multiple times within a single transaction,
+      # the after_commit callback fires only once (per Rails behavior). This is important
+      # because:
+      #
+      # 1. GraphQL mutations automatically wrap operations in a transaction for timeout handling
+      # 2. Complex operations may save the same record multiple times (e.g., updating different
+      #    attributes in sequence)
+      # 3. We want to trigger accessibility scanning exactly once per transaction, not per save
+      # 4. The scan should fire regardless of which save modified the content (message/title)
+      #
+      # These specs verify that the after_commit callback correctly triggers the accessibility
+      # scan once, whether content changes happen in the first save or a later save within
+      # the transaction.
+
+      it "triggers accessibility scan once when unrelated column is saved first, then message" do
+        topic = DiscussionTopic.create!(title: "Test Topic", message: "Original message", course: @course)
+
+        expect(Accessibility::ResourceScannerService).to receive(:call).once
+
+        DiscussionTopic.transaction do
+          topic.pinned = true
+          topic.save!
+          topic.message = "Updated message"
+          topic.save!
+        end
+      end
+
+      it "triggers accessibility scan once when message is saved first, then unrelated column" do
+        topic = DiscussionTopic.create!(title: "Test Topic", message: "Original message", course: @course)
+
+        expect(Accessibility::ResourceScannerService).to receive(:call).once
+
+        DiscussionTopic.transaction do
+          topic.message = "Updated message"
+          topic.save!
+          topic.pinned = true
+          topic.save!
+        end
+      end
+
+      it "does not trigger accessibility scan when only unrelated columns are saved" do
+        topic = DiscussionTopic.create!(title: "Test Topic", message: "Original message", course: @course)
+
+        expect(Accessibility::ResourceScannerService).to_not receive(:call)
+
+        DiscussionTopic.transaction do
+          topic.sort_order = "asc"
+          topic.save!
+          topic.pinned = true
+          topic.save!
+        end
+      end
+    end
+
+    it "triggers accessibility scan when message content changes" do
+      expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+      result = run_mutation(id: @topic.id, message: "Updated message with new content")
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.message).to include "Updated message with new content"
+    end
+
+    it "triggers accessibility scan when title changes" do
+      expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+      result = run_mutation(id: @topic.id, title: "Updated Title")
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.title).to eq "Updated Title"
+    end
+
+    it "triggers accessibility scan when workflow_state changes via published param" do
+      @topic.update!(workflow_state: "unpublished")
+      expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+      result = run_mutation(id: @topic.id, published: true)
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.workflow_state).to eq "active"
+    end
+
+    it "does not trigger accessibility scan when only non-scannable attributes change" do
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(
+        id: @topic.id,
+        require_initial_post: true,
+        lock_at: 10.days.from_now.iso8601
+      )
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.require_initial_post).to be true
+    end
+
+    it "does not trigger accessibility scan when a11y_checker_additional_resources feature is disabled" do
+      Account.site_admin.disable_feature!(:a11y_checker_additional_resources)
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
+    end
+
+    it "does not trigger accessibility scan when a11y_checker feature is disabled" do
+      @course.account.disable_feature!(:a11y_checker)
+      @course.reload
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
+    end
+
+    it "does not trigger accessibility scan when a11y_checker_eap feature is disabled" do
+      @course.disable_feature!(:a11y_checker_eap)
+      @course.reload
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
+    end
+
+    it "does not trigger accessibility scan when no completed course scan exists" do
+      Progress.where(tag: Accessibility::CourseScanService::SCAN_TAG, context: @course).destroy_all
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
+    end
+
+    it "triggers accessibility scan exactly once even when multiple attributes change" do
+      expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+      result = run_mutation(
+        id: @topic.id,
+        title: "Updated Title",
+        message: "Updated message"
+      )
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.title).to eq "Updated Title"
+      expect(@topic.message).to include "Updated message"
+    end
+
+    context "with graded discussion" do
+      before do
+        @assignment = @course.assignments.create!(title: "Graded Discussion")
+        @topic.update!(assignment: @assignment)
+      end
+
+      it "triggers scan for both assignment and discussion topic when title is updated" do
+        # When a graded discussion's title is updated, it syncs to the assignment,
+        # so both the discussion topic and assignment should be scanned
+        @assignment.reload
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: @topic).once
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: @assignment).once
+
+        result = run_mutation(
+          id: @topic.id,
+          title: "Updated Graded Discussion",
+          assignment: {
+            pointsPossible: 15,
+            gradingType: "points"
+          }
+        )
+
+        expect(result["errors"]).to be_nil
+        @topic.reload
+        expect(@topic.title).to eq "Updated Graded Discussion"
+        expect(@topic.assignment.points_possible).to eq 15
+      end
+
+      it "triggers scan for both assignment and discussion topic when message is updated" do
+        # For graded discussions, message updates sync to the assignment's description,
+        # so both the discussion topic and assignment should be scanned
+        @assignment.reload
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: @topic).once
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: @assignment).once
+
+        result = run_mutation(
+          id: @topic.id,
+          message: "Updated discussion message with new content"
+        )
+
+        expect(result["errors"]).to be_nil
+        @topic.reload
+        expect(@topic.message).to include "Updated discussion message with new content"
+      end
+    end
+
+    context "with announcements" do
+      before do
+        @announcement = @course.announcements.create!(
+          title: "Test Announcement",
+          message: "Test message",
+          user: @teacher
+        )
+      end
+
+      it "does not trigger accessibility scan when announcement title is updated" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        result = run_mutation(
+          id: @announcement.id,
+          title: "Updated Announcement Title"
+        )
+
+        expect(result["errors"]).to be_nil
+        @announcement.reload
+        expect(@announcement.title).to eq "Updated Announcement Title"
+      end
+
+      it "does not trigger accessibility scan when announcement message is updated" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        result = run_mutation(
+          id: @announcement.id,
+          message: "Updated announcement message"
+        )
+
+        expect(result["errors"]).to be_nil
+        @announcement.reload
+        expect(@announcement.message).to include "Updated announcement message"
+      end
+
+      it "does not trigger accessibility scan when announcement workflow_state is updated" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        result = run_mutation(
+          id: @announcement.id,
+          locked: true
+        )
+
+        expect(result["errors"]).to be_nil
+        @announcement.reload
+        expect(@announcement.locked).to be true
+      end
+    end
+
+    context "with group category changes" do
+      it "triggers scan once when group_category_id is changed along with content" do
+        gc = @course.group_categories.create!(name: "My Group Category")
+        expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+        result = run_mutation(
+          id: @topic.id,
+          title: "Updated Group Discussion",
+          group_category_id: gc.id
+        )
+
+        expect(result["errors"]).to be_nil
+        @topic.reload
+        expect(@topic.title).to eq "Updated Group Discussion"
+        expect(@topic.group_category_id).to eq gc.id
+      end
+    end
+
+    it "does not trigger scan when save is called with skip_accessibility_scan flag" do
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      @topic.skip_accessibility_scan = true
+      @topic.title = "Updated title"
+      @topic.save!
+    end
+  end
 end
