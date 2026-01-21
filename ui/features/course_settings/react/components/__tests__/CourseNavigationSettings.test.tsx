@@ -78,29 +78,35 @@ const triggerMockDragEnd = (result: any) => {
 import {render, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CourseNavigationSettings from '../CourseNavigationSettings'
-import {useTabListsStore} from '../../store/useTabListsStore'
+import {NavigationTab, useTabListsStore} from '../../store/useTabListsStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 beforeEach(() => {
-  const enabledTabs = [
+  const enabledTabs: NavigationTab[] = [
     {
-      id: '0',
+      externalId: 0,
+      internalId: '0',
+      type: 'existing',
       label: 'Home',
       hidden: false,
       disabled_message: 'Page disabled, will redirect to course home page',
       immovable: true,
     },
     {
-      id: '3',
+      externalId: 3,
+      internalId: '3',
+      type: 'existing',
       label: 'Assignments',
       hidden: false,
       disabled_message: 'Page disabled, will redirect to course home page',
       immovable: false,
     },
   ]
-  const disabledTabs = [
+  const disabledTabs: NavigationTab[] = [
     {
-      id: '8',
+      externalId: 8,
+      internalId: '8',
+      type: 'existing',
       label: 'Discussions',
       hidden: true,
       disabled_message: "This page can't be disabled, only hidden",
@@ -251,6 +257,73 @@ describe('CourseNavigationSettings', () => {
     expect(discussionsSettingsButton).not.toBeInTheDocument()
   })
 
+  describe('Link icon display', () => {
+    beforeEach(() => {
+      const testEnabledTabs = [
+        {
+          id: 100,
+          label: 'Regular Tab',
+          hidden: false,
+          disabled_message: '',
+          immovable: false,
+          type: 'existing' as const,
+          externalId: 100,
+          internalId: '100',
+        },
+        {
+          id: 101,
+          label: 'External Link',
+          hidden: false,
+          disabled_message: '',
+          immovable: false,
+          linkUrl: 'https://example.com',
+          type: 'existing' as const,
+          externalId: 101,
+          internalId: '101',
+        },
+      ]
+
+      const testDisabledTabs = [
+        {
+          id: 102,
+          label: 'Another Link',
+          hidden: true,
+          disabled_message: '',
+          immovable: false,
+          linkUrl: 'https://test.com',
+          type: 'existing' as const,
+          externalId: 102,
+          internalId: '102',
+        },
+      ]
+
+      fakeENV.setup({
+        COURSE_SETTINGS_NAVIGATION_TABS: [...testEnabledTabs, ...testDisabledTabs],
+        K5_SUBJECT_COURSE: false,
+      })
+
+      useTabListsStore.setState({
+        enabledTabs: testEnabledTabs,
+        disabledTabs: testDisabledTabs,
+      })
+    })
+
+    it('shows link icon only for items with linkUrl', () => {
+      render(<CourseNavigationSettings {...defaultProps} />)
+
+      // Check that tabs with linkUrl show the link icon
+      const externalLinkTab = screen.getByText('External Link').closest('[id^="nav_edit_tab_id_"]')
+      expect(externalLinkTab?.querySelector('[name="IconLink"]')).toBeInTheDocument()
+
+      const anotherLinkTab = screen.getByText('Another Link').closest('[id^="nav_edit_tab_id_"]')
+      expect(anotherLinkTab?.querySelector('[name="IconLink"]')).toBeInTheDocument()
+
+      // Check that tabs without linkUrl do not show the link icon
+      const regularTab = screen.getByText('Regular Tab').closest('[id^="nav_edit_tab_id_"]')
+      expect(regularTab?.querySelector('[name="IconLink"]')).not.toBeInTheDocument()
+    })
+  })
+
   it('handles keyboard space key on menu trigger', async () => {
     render(<CourseNavigationSettings {...defaultProps} />)
 
@@ -354,17 +427,35 @@ describe('CourseNavigationSettings', () => {
       // Set up complex test scenario with immovable tabs mixed in
       useTabListsStore.setState({
         enabledTabs: [
-          {id: '1', label: 'Home', immovable: true},
-          {id: '2', label: 'Syllabus', immovable: true}, // immovable
-          {id: '3', label: 'Assignments', immovable: false},
-          {id: '4', label: 'Grades', immovable: false},
-          {id: '5', label: 'Calendar', immovable: true}, // immovable
-          {id: '6', label: 'Files', immovable: false},
+          {type: 'existing', externalId: 1, internalId: '1', label: 'Home', immovable: true}, // immovable
+          {type: 'existing', externalId: 2, internalId: '2', label: 'Syllabus', immovable: true}, // immovable
+          {
+            type: 'existing',
+            externalId: 3,
+            internalId: '3',
+            label: 'Assignments',
+            immovable: false,
+          },
+          {type: 'existing', externalId: 4, internalId: '4', label: 'Grades', immovable: false},
+          {type: 'existing', externalId: 5, internalId: '5', label: 'Calendar', immovable: true}, // immovable
+          {type: 'existing', externalId: 6, internalId: '6', label: 'Files', immovable: false},
         ],
         disabledTabs: [
-          {id: '7', label: 'Discussions', immovable: false},
-          {id: '8', label: 'Announcements', immovable: true}, // immovable
-          {id: '9', label: 'Quizzes', immovable: false},
+          {
+            type: 'existing',
+            externalId: 7,
+            internalId: '7',
+            label: 'Discussions',
+            immovable: false,
+          },
+          {
+            type: 'existing',
+            externalId: 8,
+            internalId: '8',
+            label: 'Announcements',
+            immovable: true,
+          }, // immovable
+          {type: 'existing', externalId: 9, internalId: '9', label: 'Quizzes', immovable: false},
         ],
       })
     })
@@ -386,17 +477,17 @@ describe('CourseNavigationSettings', () => {
         // This should place it before the first immovable tab (Syllabus)
         const moveNavItemTray = useTabListsStore.getState()
         const enabledTabs = moveNavItemTray.enabledTabs
-        const tabId = '6' // Files
-        const sourceIndex = enabledTabs.findIndex(t => t.id === tabId) // position 5
+        const tabInternalId = '6' // Files
+        const sourceIndex = enabledTabs.findIndex(t => t.internalId === tabInternalId) // position 5
 
         // Simulate moving to first position among movable tabs
         // data represents the final order of movable tabs with Files first
         const data = ['6', '1', '3', '4'] // Files, Home, Assignments, Grades
 
-        const destIndexAmongMovable = data.findIndex(d => d.toString() === tabId.toString()) // 0
+        const destIndexAmongMovable = data.findIndex(d => d.toString() === tabInternalId.toString()) // 0
         const placeAfterId = destIndexAmongMovable === 0 ? null : data[destIndexAmongMovable - 1]
         const destIndex = placeAfterId
-          ? enabledTabs.findIndex(t => t.id === placeAfterId) + 1
+          ? enabledTabs.findIndex(t => t.internalId === placeAfterId) + 1
           : enabledTabs.findIndex(t => !t.immovable) // should be after immovable tabs
 
         expect(destIndex).toBe(2) // Should place Files after Home and Syllabus (both immovable)
@@ -417,7 +508,7 @@ describe('CourseNavigationSettings', () => {
       const destIndexAmongMovable = data.findIndex(d => d.toString() === tabId.toString()) // 3
       const placeAfterId = destIndexAmongMovable === 0 ? null : data[destIndexAmongMovable - 1] // 6 (Files)
       const destIndex = placeAfterId
-        ? enabledTabs.findIndex(t => t.id === placeAfterId) + 1 // position after Files = 6
+        ? enabledTabs.findIndex(t => t.internalId === placeAfterId) + 1 // position after Files = 6
         : enabledTabs.findIndex(t => !t.immovable)
 
       expect(destIndex).toBe(6) // Should place Home after Files, at the end
@@ -427,15 +518,15 @@ describe('CourseNavigationSettings', () => {
       render(<CourseNavigationSettings onSubmit={vi.fn()} />)
 
       const enabledTabs = useTabListsStore.getState().enabledTabs
-      const tabId = '1' // Home
+      const tabInternalId = '1' // Home
 
       // Simulate getting sibling tabs (excluding immovable ones and the tab being moved)
-      const siblingTabs = enabledTabs.filter(t => t.id !== tabId && !t.immovable)
+      const siblingTabs = enabledTabs.filter(t => t.internalId !== tabInternalId && !t.immovable)
 
       // Should only include: Assignments (3), Grades (4), Files (6)
       // Should exclude: Home (1, being moved), Syllabus (2, immovable), Calendar (5, immovable)
       expect(siblingTabs).toHaveLength(3)
-      expect(siblingTabs.map(t => t.id)).toEqual(['3', '4', '6'])
+      expect(siblingTabs.map(t => t.internalId)).toEqual(['3', '4', '6'])
       expect(siblingTabs.every(t => !t.immovable)).toBe(true)
     })
   })
@@ -450,7 +541,7 @@ describe('CourseNavigationSettings', () => {
         draggableId: 'tab-3',
         type: 'DEFAULT',
         source: {droppableId: 'enabled-tabs', index: 1},
-        destination: {droppableId: 'disabled-tabs', index: 0},
+        destination: {droppableId: 'disabled-tabs', index: 1},
       })
 
       // Click save button

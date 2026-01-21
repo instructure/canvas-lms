@@ -35,6 +35,7 @@ import {
   IconXSolid,
   IconPlusSolid,
   IconUpdownLine,
+  IconLinkLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import classnames from 'classnames'
@@ -42,17 +43,14 @@ import {Flex} from '@instructure/ui-flex'
 import MoveItemTray from '@canvas/move-item-tray/react'
 import {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {
+  CourseNavigationTabToSave,
   useTabListsStore,
   type MoveItemTrayResult,
   type NavigationTab,
 } from '../store/useTabListsStore'
+import {AddLinkModal} from './AddLinkModal'
 
 const I18n = createI18nScope('course_navigation_settings')
-
-export interface CourseNavigationTabToSave {
-  id: number | string
-  hidden?: boolean
-}
 
 declare const ENV: EnvCommon & {
   COURSE_SETTINGS_NAVIGATION_TABS?: NavigationTab[]
@@ -67,10 +65,18 @@ export default function CourseNavigationSettings({
 }: {
   onSubmit: (tabs: CourseNavigationTabToSave[]) => void
 }): JSX.Element {
-  const {enabledTabs, disabledTabs, moveTab, toggleTabEnabled, moveUsingTrayResult} =
-    useTabListsStore()
+  const {
+    enabledTabs,
+    disabledTabs,
+    moveTab,
+    toggleTabEnabled,
+    moveUsingTrayResult,
+    tabsToSave,
+    appendNewLinkItemTab,
+  } = useTabListsStore()
   const [isSaving, setIsSaving] = useState(false)
-  const [moveTrayItemId, setMoveTrayItemId] = useState<string | undefined>(undefined)
+  const [moveTrayItemInternalId, setMoveTrayItemId] = useState<string | undefined>(undefined)
+  const [isAddLinkModalOpen, setIsAddLinkModalOpen] = useState(false)
   const tabRefs = useRef<{[key: string]: HTMLDivElement | null}>({})
   const [isDragging, setIsDragging] = useState(false)
 
@@ -78,19 +84,16 @@ export default function CourseNavigationSettings({
 
   const handleSave = () => {
     setIsSaving(true)
-    onSubmit([
-      ...enabledTabs.map(tab => ({id: normalizeTabId(tab.id)})),
-      ...disabledTabs.map(tab => ({id: normalizeTabId(tab.id), hidden: true})),
-    ])
+    onSubmit(tabsToSave())
   }
 
   const renderTab = (tab: NavigationTab, index: number, isEnabled: boolean) => {
     const tabContent = (provided?: DraggableProvided, snapshot?: DraggableStateSnapshot) => (
       <div
-        key={`tabdiv-${tab.id}`}
+        key={`tabdiv-${tab.internalId}`}
         ref={el => {
           if (provided?.innerRef) provided.innerRef(el)
-          tabRefs.current[`tab-${tab.id}`] = el
+          tabRefs.current[`tab-${tab.internalId}`] = el
         }}
         {...(provided?.draggableProps || {})}
         {...(!tab.immovable && provided?.dragHandleProps ? provided.dragHandleProps : {})}
@@ -114,20 +117,21 @@ export default function CourseNavigationSettings({
     return tab.immovable ? (
       tabContent()
     ) : (
-      <Draggable key={`tab-${tab.id}`} draggableId={`tab-${tab.id}`} index={index}>
+      <Draggable key={`tab-${tab.internalId}`} draggableId={`tab-${tab.internalId}`} index={index}>
         {tabContent}
       </Draggable>
     )
   }
 
-  const isMoveTrayItemHidden = moveTrayItemId && disabledTabs.find(t => t.id === moveTrayItemId)
+  const isMoveTrayItemHidden =
+    moveTrayItemInternalId && disabledTabs.find(t => t.internalId === moveTrayItemInternalId)
 
   return (
     <>
-      {moveTrayItemId && (
+      {moveTrayItemInternalId && (
         <MoveNavItemTray
           onExited={() => setMoveTrayItemId(undefined)}
-          tabId={moveTrayItemId}
+          tabInternalId={moveTrayItemInternalId}
           tabsList={isMoveTrayItemHidden ? disabledTabs : enabledTabs}
           onMoveSuccess={moveUsingTrayResult}
         />
@@ -170,6 +174,20 @@ export default function CourseNavigationSettings({
           </Droppable>
         </div>
 
+        {ENV.FEATURES?.nav_menu_links && (
+          <View as="div" padding="medium 0 0 0">
+            <Button type="button" onClick={() => setIsAddLinkModalOpen(true)}>
+              {I18n.t('Add a Link')}
+            </Button>
+            {isAddLinkModalOpen && (
+              <AddLinkModal
+                onDismiss={() => setIsAddLinkModalOpen(false)}
+                onAdd={appendNewLinkItemTab}
+              />
+            )}
+          </View>
+        )}
+
         <ScreenReaderContent as="h3">{I18n.t('Disabled Links')}</ScreenReaderContent>
         <div>
           <Droppable droppableId="disabled-tabs">
@@ -209,13 +227,6 @@ export default function CourseNavigationSettings({
   )
 }
 
-// The update_nav requires numeric IDs to of type number, not string, in the
-// request JSON
-function normalizeTabId(id: string): number | string {
-  const idStr = String(id)
-  return /^\d+$/.test(idStr) ? parseInt(idStr, 10) : idStr
-}
-
 /**
  * Item in the list of Course Nav tabs, with drag handle, label, and settings menu.
  */
@@ -228,12 +239,12 @@ const NavItem = React.memo(
   }: {
     tab: NavigationTab
     isEnabled: boolean
-    onToggleEnabled: (tabId: string) => void
-    onMove: (tabId: string) => void
+    onToggleEnabled: (tabInternalId: string) => void
+    onMove: (tabInternalId: string) => void
   }) => {
     return (
       <View
-        id={`nav_edit_tab_id_${tab.id}`}
+        id={`nav_edit_tab_id_${tab.internalId}`}
         aria-label={tab.label}
         cursor={tab.immovable ? 'default' : 'grab'}
       >
@@ -242,7 +253,16 @@ const NavItem = React.memo(
             {tab.immovable ? <span>&nbsp;</span> : <IconDragHandleLine size="x-small" />}
           </View>
           <View as="div" display="inline-block" padding="small 0" margin="0 auto 0 0">
-            <Text>{tab.label}</Text>
+            <Flex alignItems="center" gap="x-small">
+              {tab.linkUrl && (
+                <Flex.Item>
+                  <IconLinkLine size="x-small" />
+                </Flex.Item>
+              )}
+              <Flex.Item>
+                <Text>{tab.label}</Text>
+              </Flex.Item>
+            </Flex>
             {!isEnabled && tab.disabled_message && (
               <View as="div">
                 <Text size="small" fontStyle="italic">
@@ -272,7 +292,7 @@ const NavItem = React.memo(
               placement="bottom"
               shouldHideOnSelect={true}
             >
-              <Menu.Item onClick={() => onToggleEnabled(tab.id)} type="button">
+              <Menu.Item onClick={() => onToggleEnabled(tab.internalId)} type="button">
                 <Flex>
                   <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
                     {isEnabled ? <IconXSolid /> : <IconPlusSolid />}
@@ -280,7 +300,7 @@ const NavItem = React.memo(
                   <Flex.Item>{isEnabled ? I18n.t('Disable') : I18n.t('Enable')}</Flex.Item>
                 </Flex>
               </Menu.Item>
-              <Menu.Item onClick={() => onMove(tab.id)} type="button">
+              <Menu.Item onClick={() => onMove(tab.internalId)} type="button">
                 <Flex>
                   <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
                     <IconUpdownLine />
@@ -316,21 +336,23 @@ function useUpDownKeysChangeFocusHandler({
       if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
       if (isDragging) return
 
-      const currentTabId = (e.target as HTMLElement)
+      const currentTabInternalId = (e.target as HTMLElement)
         .closest('.course-nav-tab')
         ?.querySelector('[id^="nav_edit_tab_id_"]')
         ?.id?.replace('nav_edit_tab_id_', '')
 
-      if (!currentTabId) return
+      if (!currentTabInternalId) return
 
       const allTabs = [...enabledTabs, ...disabledTabs]
-      const currentIndex = allTabs.findIndex(tab => tab.id.toString() === currentTabId)
+      const currentIndex = allTabs.findIndex(
+        tab => tab.internalId.toString() === currentTabInternalId,
+      )
 
       if (currentIndex === -1) return
 
       e.preventDefault()
       const nextIndex = currentIndex + (e.key === 'ArrowUp' ? -1 : 1)
-      const nextTabId = allTabs[nextIndex]?.id
+      const nextTabId = allTabs[nextIndex]?.internalId
       if (nextTabId) {
         tabRefs.current?.[`tab-${nextTabId}`]?.focus()
       }
@@ -351,21 +373,21 @@ function useKeyDownEventHandler(handler: (e: KeyboardEvent) => void, deps: any[]
  */
 function MoveNavItemTray({
   tabsList,
-  tabId,
+  tabInternalId,
   onExited,
   onMoveSuccess,
 }: {
   tabsList: NavigationTab[]
-  tabId: string
+  tabInternalId: string
   onExited: () => void
   onMoveSuccess: (result: MoveItemTrayResult) => void
 }) {
-  const makeMoveTrayItem = (tab: NavigationTab) => ({id: tab.id, title: tab.label})
-  const tabToMove = tabsList.find(t => t.id === tabId)
+  const makeMoveTrayItem = (tab: NavigationTab) => ({id: tab.internalId, title: tab.label})
+  const tabToMove = tabsList.find(t => t.internalId === tabInternalId)
   if (!tabToMove) {
     return null
   }
-  const siblingTabs = tabsList.filter(t => t.id !== tabId && !t.immovable)
+  const siblingTabs = tabsList.filter(t => t.internalId !== tabInternalId && !t.immovable)
 
   return (
     <MoveItemTray

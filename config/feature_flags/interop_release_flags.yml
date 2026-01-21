@@ -68,7 +68,7 @@ course_settings_navigation_react:
   display_name: Course Navigation Settings React UI
   description: |-
     If enabled, the Course Settings Navigation tab will use the new React-based
-    interface. (This is a prerequisite for the Custom Links feature in courses).
+    interface. (This is a prerequisite for the Nav Menu Links feature in courses).
   environments:
     development:
       state: allowed_on
