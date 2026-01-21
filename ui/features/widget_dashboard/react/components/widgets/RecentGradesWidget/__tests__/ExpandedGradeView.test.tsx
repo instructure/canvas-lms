@@ -44,7 +44,7 @@ beforeEach(() => {
 
   server.use(
     http.post('/api/graphql', () => {
-      return HttpResponse.json(mockEmptyRubricResponse)
+      return HttpResponse.json(mockEmptySubmissionDetailsResponse)
     }),
   )
 })
@@ -99,7 +99,7 @@ const renderWithContext = (component: React.ReactElement) => {
   )
 }
 
-const mockRubricResponse = {
+const mockSubmissionDetailsResponse = {
   data: {
     legacyNode: {
       _id: 'sub1',
@@ -126,16 +126,43 @@ const mockRubricResponse = {
           },
         ],
       },
+      recentCommentsConnection: {
+        nodes: [
+          {
+            _id: 'comment1',
+            comment: 'Great work on this assignment!',
+            htmlComment: '<p>Great work on this assignment!</p>',
+            author: {
+              _id: 'teacher1',
+              name: 'Mr. Smith',
+            },
+            createdAt: '2025-11-30T14:30:00Z',
+          },
+        ],
+      },
+      allCommentsConnection: {
+        pageInfo: {
+          totalCount: 3,
+        },
+      },
     },
   },
 }
 
-const mockEmptyRubricResponse = {
+const mockEmptySubmissionDetailsResponse = {
   data: {
     legacyNode: {
       _id: 'sub1',
       rubricAssessmentsConnection: {
         nodes: [],
+      },
+      recentCommentsConnection: {
+        nodes: [],
+      },
+      allCommentsConnection: {
+        pageInfo: {
+          totalCount: 0,
+        },
       },
     },
   },
@@ -158,10 +185,10 @@ describe('ExpandedGradeView', () => {
     expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: 88%')
   })
 
-  it('displays rubric data', async () => {
+  it('displays rubric and feedback sections with data', async () => {
     server.use(
       http.post('/api/graphql', () => {
-        return HttpResponse.json(mockRubricResponse)
+        return HttpResponse.json(mockSubmissionDetailsResponse)
       }),
     )
 
@@ -172,12 +199,14 @@ describe('ExpandedGradeView', () => {
     })
 
     expect(screen.getByTestId('rubric-section-heading-sub1')).toHaveTextContent('Rubric')
+    expect(screen.getByTestId('feedback-section-sub1')).toBeInTheDocument()
+    expect(screen.getByTestId('feedback-section-heading-sub1')).toHaveTextContent('Feedback')
   })
 
-  it('renders the feedback section with placeholder', async () => {
+  it('shows feedback section with "None" when no comments', async () => {
     server.use(
       http.post('/api/graphql', () => {
-        return HttpResponse.json(mockEmptyRubricResponse)
+        return HttpResponse.json(mockEmptySubmissionDetailsResponse)
       }),
     )
 
@@ -187,10 +216,9 @@ describe('ExpandedGradeView', () => {
       expect(screen.queryByTestId('submission-details-loading-sub1')).not.toBeInTheDocument()
     })
 
-    expect(screen.getByTestId('feedback-section-heading-sub1')).toHaveTextContent('Feedback')
-    expect(screen.getByTestId('feedback-placeholder-sub1')).toHaveTextContent(
-      'Feedback comments will be displayed here',
-    )
+    expect(screen.queryByTestId('rubric-section-sub1')).not.toBeInTheDocument()
+    expect(screen.getByTestId('feedback-section-sub1')).toBeInTheDocument()
+    expect(screen.getByTestId('feedback-none-sub1')).toHaveTextContent('None')
   })
 
   it('displays error state when submission details fetch fails', async () => {
@@ -213,10 +241,10 @@ describe('ExpandedGradeView', () => {
     )
   })
 
-  it('renders the view inline feedback button', async () => {
+  it('shows view inline feedback button in feedback section with count', async () => {
     server.use(
       http.post('/api/graphql', () => {
-        return HttpResponse.json(mockRubricResponse)
+        return HttpResponse.json(mockSubmissionDetailsResponse)
       }),
     )
 
@@ -224,7 +252,7 @@ describe('ExpandedGradeView', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('view-inline-feedback-button-sub1')).toHaveTextContent(
-        'View inline feedback',
+        'View all inline feedback (3)',
       )
     })
   })

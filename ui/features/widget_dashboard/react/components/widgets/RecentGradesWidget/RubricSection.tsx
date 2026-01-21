@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -62,6 +62,7 @@ export const RubricSection: React.FC<RubricSectionProps> = ({rubricAssessment, s
                       <Flex.Item>
                         <Text
                           weight="bold"
+                          size="small"
                           data-testid={`rubric-criterion-description-${criterion._id}`}
                         >
                           {criterion.description || I18n.t('Criterion')}
@@ -70,6 +71,7 @@ export const RubricSection: React.FC<RubricSectionProps> = ({rubricAssessment, s
                       <Flex.Item>
                         <Text
                           weight="bold"
+                          size="small"
                           data-testid={`rubric-criterion-points-${criterion._id}`}
                         >
                           {rating.points !== null && criterion.points !== null
