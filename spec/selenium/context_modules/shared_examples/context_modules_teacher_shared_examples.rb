@@ -751,6 +751,24 @@ shared_examples_for "context modules for teachers" do
       end
       expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
     end
+
+    it "shows quiz type selector without scrolling when creating new quiz with new_quizzes_surveys enabled" do
+      Account.site_admin.enable_feature!(:new_quizzes_surveys)
+      @course.disable_feature!(:new_quizzes_by_default)
+      get "/courses/#{@course.id}/modules"
+
+      add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A Graded Quiz") do
+        expect(f("#quizs_select")).to contain_css("input[name=quiz_engine_selection]")
+
+        f("label[for=new_quizzes_radio]").click
+        wait_for_ajaximations
+
+        expect(f("#quiz_type_selector_row")).to be_displayed
+
+        quiz_type_selector = f("#quiz_type_selector_mount_point")
+        expect(quiz_type_selector).to be_displayed
+      end
+    end
   end
 
   context "with discussion_checkpoints enabled" do
