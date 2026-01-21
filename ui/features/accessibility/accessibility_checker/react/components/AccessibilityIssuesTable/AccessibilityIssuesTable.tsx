@@ -183,7 +183,7 @@ export const AccessibilityIssuesTable = () => {
               data-testid="accessibility-issues-table"
             >
               <Table.Head
-                renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+                renderSortLabel={<Flex padding="small small 0">{I18n.t('Sort by')}</Flex>}
               >
                 <Table.Row>
                   {IssuesTableColumnHeaders.map(header => {
