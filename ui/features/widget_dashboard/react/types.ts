@@ -194,6 +194,21 @@ export interface RubricAssessment {
   assessmentRatings: RubricAssessmentRating[]
 }
 
+export interface SubmissionCommentAuthor {
+  _id: string
+  name: string
+}
+
+export interface SubmissionComment {
+  _id: string
+  comment: string | null
+  htmlComment: string | null
+  author: SubmissionCommentAuthor | null
+  createdAt: string
+}
+
 export interface SubmissionDetails {
   rubricAssessments: RubricAssessment[]
+  comments: SubmissionComment[]
+  totalCommentsCount: number
 }
