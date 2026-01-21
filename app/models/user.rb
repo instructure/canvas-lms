@@ -210,6 +210,7 @@ class User < ActiveRecord::Base
   has_many :stream_item_instances, dependent: :delete_all
   has_many :all_conversations, -> { preload(:conversation) }, class_name: "ConversationParticipant"
   has_many :conversation_batches, -> { preload(:root_conversation_message) }
+  has_many :authored_conversation_messages, foreign_key: :author_id, class_name: "ConversationMessage", inverse_of: :author
   has_many :favorites
   has_many :messages
   has_many :sis_batches
