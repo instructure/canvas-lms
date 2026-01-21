@@ -107,8 +107,9 @@ class AiExperiencesController < ApplicationController
         render
       end
       format.json do
+        experiences_json = can_manage ? experiences_json_for_teacher : experiences_json_for_student
         render json: {
-          experiences: ai_experiences_json(@experiences, @current_user, session),
+          experiences: experiences_json,
           can_manage:
         }
       end
@@ -383,6 +384,32 @@ class AiExperiencesController < ApplicationController
     respond_to do |format|
       format.html { render status: :not_found, template: "shared/errors/404_message" }
       format.json { render json: { error: "Resource Not Found" }, status: :not_found }
+    end
+  end
+
+  def experiences_json_for_teacher
+    ai_experiences_json(@experiences, @current_user, session)
+  end
+
+  def experiences_json_for_student
+    @experiences.map do |experience|
+      # Query for the student's latest conversation for this experience
+      latest_conversation = experience.ai_conversations
+                                      .for_user(@current_user.id)
+                                      .where.not(workflow_state: "deleted")
+                                      .order(updated_at: :desc)
+                                      .first
+
+      # Determine submission status based on conversation state
+      submission_status = if latest_conversation.nil?
+                            "not_started"
+                          elsif latest_conversation.completed?
+                            "submitted"
+                          else
+                            "in_progress"
+                          end
+
+      ai_experience_json(experience, @current_user, session, { submission_status: })
     end
   end
 end

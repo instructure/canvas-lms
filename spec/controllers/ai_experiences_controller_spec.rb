@@ -94,6 +94,16 @@ describe AiExperiencesController do
         json_response = json_parse(response.body)
         expect(json_response["can_manage"]).to be true
       end
+
+      it "does not include submission_status for teachers" do
+        get :index, params: { course_id: @course.id }, format: :json
+        json_response = json_parse(response.body)
+        experiences = json_response["experiences"]
+
+        experiences.each do |exp|
+          expect(exp).not_to have_key("submission_status")
+        end
+      end
     end
 
     context "as student" do
@@ -132,6 +142,149 @@ describe AiExperiencesController do
         get :index, params: { course_id: @course.id }, format: :json
         json_response = json_parse(response.body)
         expect(json_response["can_manage"]).to be false
+      end
+
+      context "with submission status" do
+        it "includes submission_status as not_started when no conversation exists" do
+          published_experience = @course.ai_experiences.create!(
+            title: "Published Experience",
+            facts: "Test prompt",
+            learning_objective: "Test objective",
+            pedagogical_guidance: "Test guidance",
+            workflow_state: "published"
+          )
+
+          get :index, params: { course_id: @course.id }, format: :json
+          json_response = json_parse(response.body)
+          experiences = json_response["experiences"]
+
+          experience = experiences.find { |e| e["id"] == published_experience.id }
+          expect(experience["submission_status"]).to eq("not_started")
+        end
+
+        it "includes submission_status as in_progress when active conversation exists" do
+          published_experience = @course.ai_experiences.create!(
+            title: "Published Experience",
+            facts: "Test prompt",
+            learning_objective: "Test objective",
+            pedagogical_guidance: "Test guidance",
+            workflow_state: "published"
+          )
+
+          # Create an active conversation for the student
+          published_experience.ai_conversations.create!(
+            llm_conversation_id: "test-conversation-id",
+            user: @student,
+            course: @course,
+            root_account: @course.root_account,
+            account: @course.account,
+            workflow_state: "active"
+          )
+
+          get :index, params: { course_id: @course.id }, format: :json
+          json_response = json_parse(response.body)
+          experiences = json_response["experiences"]
+
+          experience = experiences.find { |e| e["id"] == published_experience.id }
+          expect(experience["submission_status"]).to eq("in_progress")
+        end
+
+        it "includes submission_status as submitted when completed conversation exists" do
+          published_experience = @course.ai_experiences.create!(
+            title: "Published Experience",
+            facts: "Test prompt",
+            learning_objective: "Test objective",
+            pedagogical_guidance: "Test guidance",
+            workflow_state: "published"
+          )
+
+          # Create a completed conversation for the student
+          published_experience.ai_conversations.create!(
+            llm_conversation_id: "test-conversation-id",
+            user: @student,
+            course: @course,
+            root_account: @course.root_account,
+            account: @course.account,
+            workflow_state: "completed"
+          )
+
+          get :index, params: { course_id: @course.id }, format: :json
+          json_response = json_parse(response.body)
+          experiences = json_response["experiences"]
+
+          experience = experiences.find { |e| e["id"] == published_experience.id }
+          expect(experience["submission_status"]).to eq("submitted")
+        end
+
+        it "uses the latest conversation when multiple exist" do
+          published_experience = @course.ai_experiences.create!(
+            title: "Published Experience",
+            facts: "Test prompt",
+            learning_objective: "Test objective",
+            pedagogical_guidance: "Test guidance",
+            workflow_state: "published"
+          )
+
+          # Create an older completed conversation
+          published_experience.ai_conversations.create!(
+            llm_conversation_id: "old-conversation-id",
+            user: @student,
+            course: @course,
+            root_account: @course.root_account,
+            account: @course.account,
+            workflow_state: "completed",
+            created_at: 2.days.ago,
+            updated_at: 2.days.ago
+          )
+
+          # Create a newer active conversation
+          published_experience.ai_conversations.create!(
+            llm_conversation_id: "new-conversation-id",
+            user: @student,
+            course: @course,
+            root_account: @course.root_account,
+            account: @course.account,
+            workflow_state: "active",
+            created_at: 1.day.ago,
+            updated_at: 1.day.ago
+          )
+
+          get :index, params: { course_id: @course.id }, format: :json
+          json_response = json_parse(response.body)
+          experiences = json_response["experiences"]
+
+          experience = experiences.find { |e| e["id"] == published_experience.id }
+          # Should use the newer active conversation
+          expect(experience["submission_status"]).to eq("in_progress")
+        end
+
+        it "ignores deleted conversations" do
+          published_experience = @course.ai_experiences.create!(
+            title: "Published Experience",
+            facts: "Test prompt",
+            learning_objective: "Test objective",
+            pedagogical_guidance: "Test guidance",
+            workflow_state: "published"
+          )
+
+          # Create a deleted conversation
+          published_experience.ai_conversations.create!(
+            llm_conversation_id: "deleted-conversation-id",
+            user: @student,
+            course: @course,
+            root_account: @course.root_account,
+            account: @course.account,
+            workflow_state: "deleted"
+          )
+
+          get :index, params: { course_id: @course.id }, format: :json
+          json_response = json_parse(response.body)
+          experiences = json_response["experiences"]
+
+          experience = experiences.find { |e| e["id"] == published_experience.id }
+          # Should show not_started since deleted conversations are ignored
+          expect(experience["submission_status"]).to eq("not_started")
+        end
       end
     end
 

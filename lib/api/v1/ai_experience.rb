@@ -31,8 +31,8 @@ module Api::V1::AiExperience
 
   def ai_experience_json(ai_experience, user, session, opts = {})
     json = api_json(ai_experience, user, session, opts.merge(API_JSON_OPTS))
-    # Include can_manage permission if provided
     json[:can_manage] = opts[:can_manage] if opts.key?(:can_manage)
+    json[:submission_status] = opts[:submission_status] if opts.key?(:submission_status)
     json
   end
 
