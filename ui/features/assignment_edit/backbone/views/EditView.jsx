@@ -1102,9 +1102,10 @@ EditView.prototype.handleQuizTypeChange = function (quizType) {
     this.$assignmentPointsPossible.val('0')
   }
 
-  const isSurvey = quizType === 'graded_survey' || quizType === 'ungraded_survey'
-  // Hide Assignment Group, Display Grade as, Submission Type and Graded Assignment Fields for surveys
-  this.$assignmentGroupSelector.toggleAccessibly(!isSurvey)
+  const isGradedSurvey = quizType === 'graded_survey'
+  const isSurvey = isUngradedSurvey || isGradedSurvey
+
+  this.$assignmentGroupSelector.toggleAccessibly(!isUngradedSurvey)
   this.$gradingTypeSelector.toggleAccessibly(!isSurvey)
   this.$submissionTypeFields.toggleAccessibly(!isSurvey)
   this.$gradedAssignmentFields.toggleAccessibly(!isSurvey)
@@ -1429,12 +1430,14 @@ EditView.prototype.afterRender = function () {
     this.renderDefaultExternalTool()
   }
 
-  // Hide Assignment Group, Display Grade as, and Submission Type for surveys on initial load
+  // Show/hide fields based on survey type on initial load
   if (this.quizTypeSelector) {
     const currentQuizType = this.assignment.newQuizzesType() || 'graded_quiz'
+    const isGradedSurvey = currentQuizType === 'graded_survey'
+    const isUngradedSurvey = currentQuizType === 'ungraded_survey'
 
-    if (currentQuizType === 'graded_survey' || currentQuizType === 'ungraded_survey') {
-      this.$assignmentGroupSelector.toggleAccessibly(false)
+    if (isGradedSurvey || isUngradedSurvey) {
+      this.$assignmentGroupSelector.toggleAccessibly(isGradedSurvey)
       this.$gradingTypeSelector.toggleAccessibly(false)
       this.$submissionTypeFields.toggleAccessibly(false)
       // Hide graded assignment fields for surveys
@@ -1442,7 +1445,7 @@ EditView.prototype.afterRender = function () {
       this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(true)
     }
 
-    if (currentQuizType === 'ungraded_survey') {
+    if (isUngradedSurvey) {
       this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(false)
       this.$assignmentPointsPossible.val('0')
     }
