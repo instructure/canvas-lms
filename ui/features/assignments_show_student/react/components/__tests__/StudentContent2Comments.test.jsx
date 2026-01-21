@@ -46,6 +46,8 @@ vi.mock('@canvas/assignments/react/AssignmentExternalTools', () => ({
 }))
 
 describe('StudentContent Comments Tray', () => {
+  const originalLocation = window.location
+
   beforeEach(() => {
     fakeENV.setup({current_user: {id: '1'}})
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
@@ -53,6 +55,7 @@ describe('StudentContent Comments Tray', () => {
 
   afterEach(() => {
     fakeENV.teardown()
+    window.location = originalLocation
   })
 
   const makeMocks = async () => {
@@ -95,5 +98,34 @@ describe('StudentContent Comments Tray', () => {
     )
     fireEvent.click(getByText('Add Comment'))
     expect(getAllByTitle('Loading')[0]).toBeInTheDocument()
+  })
+
+  it('opens comments tray automatically when open_feedback=true URL parameter is present', async () => {
+    window.location = new URL('http://localhost/?open_feedback=true')
+
+    const mocks = await makeMocks()
+    const props = await mockAssignmentAndSubmission()
+    const {findByText} = render(
+      <MockedProvider mocks={mocks}>
+        <StudentContent {...props} />
+      </MockedProvider>,
+    )
+
+    expect(await findByText(/attempt 1 feedback/i)).toBeInTheDocument()
+  })
+
+  it('does not open comments tray automatically when open_feedback URL parameter is not true', async () => {
+    window.location = new URL('http://localhost/?open_feedback=false')
+
+    const mocks = await makeMocks()
+    const props = await mockAssignmentAndSubmission()
+    const {queryByText} = render(
+      <MockedProvider mocks={mocks}>
+        <StudentContent {...props} />
+      </MockedProvider>,
+    )
+
+    await new Promise(resolve => setTimeout(resolve, 100))
+    expect(queryByText(/attempt 1 feedback/i)).not.toBeInTheDocument()
   })
 })

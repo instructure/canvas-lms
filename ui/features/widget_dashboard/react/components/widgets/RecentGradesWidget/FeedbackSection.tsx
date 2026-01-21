@@ -31,13 +31,16 @@ interface FeedbackSectionProps {
   comments: SubmissionComment[]
   submissionId: string
   totalCommentsCount: number
+  assignmentUrl: string
 }
 
 export const FeedbackSection: React.FC<FeedbackSectionProps> = ({
   comments,
   submissionId,
   totalCommentsCount,
+  assignmentUrl,
 }) => {
+  const feedbackUrl = `${assignmentUrl}?open_feedback=true`
   return (
     <View as="div" data-testid={`feedback-section-${submissionId}`}>
       <Flex direction="column">
@@ -85,6 +88,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = ({
                 <Button
                   color="primary-inverse"
                   size="medium"
+                  href={feedbackUrl}
                   data-testid={`view-inline-feedback-button-${submissionId}`}
                 >
                   {I18n.t('View all inline feedback (%{count})', {count: totalCommentsCount})}
