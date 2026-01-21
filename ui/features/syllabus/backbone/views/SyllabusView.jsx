@@ -28,6 +28,13 @@ import {reduce, each} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/Syllabus.handlebars'
 import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
+import {render} from '@canvas/react'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {datetimeString} from '@canvas/datetime/date-functions'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import React from 'react'
+
+const I18n = createI18nScope('syllabus')
 
 function assignmentSubType(json) {
   if (/discussion/.test(json.submission_types)) return 'discussion_topic'
@@ -42,6 +49,7 @@ export default class SyllabusView extends Backbone.View {
   initialize({can_read, is_valid_user}) {
     this.can_read = can_read
     this.is_valid_user = is_valid_user
+    this.tooltipRoots = []
     return super.initialize(...arguments)
   }
 
@@ -249,6 +257,57 @@ export default class SyllabusView extends Backbone.View {
       dates,
       overrides_present,
     }
+  }
+
+  afterRender() {
+    this.mountTimezoneTooltips()
+  }
+
+  mountTimezoneTooltips() {
+    this.$el.find('.tooltip-time-mount').each((_, mountPoint) => {
+      const $mountPoint = this.$(mountPoint)
+      const datetime = $mountPoint.data('datetime')
+      const timeText = $mountPoint.data('time-text')
+      const label = $mountPoint.data('label')
+      if (!datetime) return
+
+      const tooltipContent = this.generateTooltipContent(datetime)
+      const displayText = label ? `${label} ${timeText}` : timeText
+
+      const root = render(
+        <Tooltip renderTip={tooltipContent}>
+          <button type="button" style={{all: 'unset', cursor: 'pointer'}}>
+            {displayText}
+          </button>
+        </Tooltip>,
+        mountPoint,
+      )
+      this.tooltipRoots.push(root)
+    })
+  }
+
+  generateTooltipContent(datetime) {
+    const localDatetime = datetimeString(datetime)
+
+    if (ENV.CONTEXT_TIMEZONE && ENV.TIMEZONE !== ENV.CONTEXT_TIMEZONE) {
+      const courseDatetime = datetimeString(datetime, {timezone: ENV.CONTEXT_TIMEZONE})
+      if (localDatetime !== courseDatetime) {
+        return (
+          <>
+            {I18n.t('Local')}: {localDatetime}
+            <br />
+            {I18n.t('Course')}: {courseDatetime}
+          </>
+        )
+      }
+    }
+    return localDatetime
+  }
+
+  remove() {
+    this.tooltipRoots?.forEach(root => root?.unmount())
+    this.tooltipRoots = []
+    return super.remove(...arguments)
   }
 }
 SyllabusView.initClass()
