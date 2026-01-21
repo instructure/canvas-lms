@@ -67,6 +67,7 @@ ready(() => {
           heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
         },
         emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
+        fixedWarnings: window.ENV.fixed_warnings || [],
         mediaSettings: window.INST.kalturaSettings,
         lang: ENV.LOCALE || ENV.BIGEASY_LOCALE || window.navigator.language,
         currentUserIsAdmin: ENV.current_user_is_admin ?? false,
