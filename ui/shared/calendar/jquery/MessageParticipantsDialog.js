@@ -182,7 +182,11 @@ export default class MessageParticipantsDialog {
 
     if (this.group) {
       data.tags = this.group.context_codes
-      data.context_code = this.group.context_codes[0]
+      // For multi-course appointment groups, don't set a single context_code
+      // as it would restrict permission checks to only that course
+      if (this.group.context_codes.length === 1) {
+        data.context_code = this.group.context_codes[0]
+      }
     } else if (this.opts.timeslot) {
       data.tags = this.opts.timeslot.all_context_codes.split(',')
     }
