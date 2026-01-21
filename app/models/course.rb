@@ -367,6 +367,7 @@ class Course < ActiveRecord::Base
   after_update :log_course_format_publish_update, if: :saved_change_to_workflow_state?
   after_update :log_course_pacing_settings_update, if: :change_to_logged_settings?
   after_update :log_rqd_setting_enable_or_disable
+  after_update :queue_remap_enrollment_roles
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
@@ -374,6 +375,7 @@ class Course < ActiveRecord::Base
   validate :validate_default_view
   validate :validate_template
   validate :validate_not_on_siteadmin
+  validate :validate_enrollment_roles
   validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
   validates :account_id, :root_account_id, :enrollment_term_id, :workflow_state, presence: true
   validates :syllabus_body, length: { maximum: maximum_long_text_length, allow_blank: true }
@@ -813,6 +815,59 @@ class Course < ActiveRecord::Base
     if root_account_id_changed? && root_account_id == Account.site_admin&.id
       errors.add(:root_account_id, t("Courses cannot be created on the site_admin account."))
     end
+  end
+
+  def validate_enrollment_roles
+    return unless account_id_changed?
+
+    @role_map = build_role_map
+    if @role_map[:missing].present?
+      errors.add(:account_id,
+                 t("course roles unavailable in %{account}: %{roles}",
+                   account: account.name,
+                   roles: @role_map[:missing].join(", ")))
+    end
+  end
+
+  def queue_remap_enrollment_roles
+    return unless @role_map.present?
+
+    self.class.connection.after_transaction_commit do
+      delay_if_production.remap_enrollment_roles(@role_map.except(:missing))
+    end
+  end
+
+  def remap_enrollment_roles(role_map)
+    Course.transaction do
+      role_map.each do |old_role_id, new_role_id|
+        enrollments.where(role_id: old_role_id).in_batches.update_all(role_id: new_role_id, updated_at: Time.now.utc)
+      end
+    end
+  end
+
+  # returns a mapping from (existing role id => role id in the new account), matching by role name and built_in status
+  # names of roles unavailable in the new account are returned under the :missing key
+  def build_role_map
+    role_map = {}
+    used_roles = Role.where(id: enrollments.distinct.select(:role_id)).to_a
+    if used_roles.any?
+      available_roles = account.available_course_roles(true)
+      (used_roles - available_roles).each do |missing_role|
+        replacement_roles = available_roles.select do |role|
+          role.built_in? == missing_role.built_in? &&
+            role.name == missing_role.name &&
+            role.base_role_type == missing_role.base_role_type
+        end
+        replacement_role = replacement_roles.find(&:active?) || replacement_roles.first
+        if replacement_role
+          role_map[missing_role.id] = replacement_role.id
+        else
+          role_map[:missing] ||= []
+          role_map[:missing] << missing_role.name
+        end
+      end
+    end
+    role_map
   end
 
   def image
@@ -4587,7 +4642,7 @@ class Course < ActiveRecord::Base
                .preload(:post_policy)
                .each do |assignment|
                  assignment.ensure_post_policy(post_manually:)
-    end
+               end
   end
 
   CUSTOMIZABLE_PERMISSIONS.each do |key, cfg|
