@@ -26,6 +26,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Pill} from '@instructure/ui-pill'
 import {Spinner} from '@instructure/ui-spinner'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {IconPublishSolid, IconUnpublishedLine, IconMoreLine} from '@instructure/ui-icons'
 
 interface AIExperienceRowProps {
@@ -33,6 +34,7 @@ interface AIExperienceRowProps {
   id: number
   title: string
   workflowState: 'published' | 'unpublished'
+  canUnpublish: boolean
   createdAt: string
   submissionStatus?: 'not_started' | 'in_progress' | 'submitted'
   onEdit: (id: number) => void
@@ -46,6 +48,7 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
   id,
   title,
   workflowState,
+  canUnpublish,
   createdAt,
   submissionStatus,
   onEdit,
@@ -103,6 +106,9 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
   }, [submissionStatus, id, canManage])
 
   const handlePublishToggle = () => {
+    // Only allow toggle if published and can unpublish, or if unpublished
+    if (isPublished && !canUnpublish) return
+
     const newState = isPublished ? 'unpublished' : 'published'
     onPublishToggle(id, newState)
   }
@@ -164,24 +170,43 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
                 </Text>
               </Flex.Item>
               <Flex.Item>
-                <IconButton
-                  size="small"
-                  withBackground={false}
-                  withBorder={false}
-                  onClick={handlePublishToggle}
-                  screenReaderLabel={
-                    isPublished
-                      ? I18n.t('Unpublish AI Experience')
-                      : I18n.t('Publish AI Experience')
-                  }
-                  data-testid="ai-experience-publish-toggle"
-                >
-                  {isPublished ? (
-                    <IconPublishSolid color="success" size="x-small" />
-                  ) : (
-                    <IconUnpublishedLine color="secondary" size="x-small" />
-                  )}
-                </IconButton>
+                {isPublished && !canUnpublish ? (
+                  <Tooltip
+                    renderTip={I18n.t("Can't unpublish: students have started conversations")}
+                    on={['hover', 'focus']}
+                  >
+                    <IconButton
+                      size="small"
+                      withBackground={false}
+                      withBorder={false}
+                      onClick={handlePublishToggle}
+                      interaction="disabled"
+                      screenReaderLabel={I18n.t('Cannot unpublish - students have conversations')}
+                      data-testid="ai-experience-publish-toggle"
+                    >
+                      <IconPublishSolid color="success" size="x-small" />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <IconButton
+                    size="small"
+                    withBackground={false}
+                    withBorder={false}
+                    onClick={handlePublishToggle}
+                    screenReaderLabel={
+                      isPublished
+                        ? I18n.t('Unpublish AI Experience')
+                        : I18n.t('Publish AI Experience')
+                    }
+                    data-testid="ai-experience-publish-toggle"
+                  >
+                    {isPublished ? (
+                      <IconPublishSolid color="success" size="x-small" />
+                    ) : (
+                      <IconUnpublishedLine color="secondary" size="x-small" />
+                    )}
+                  </IconButton>
+                )}
               </Flex.Item>
               <Flex.Item>
                 <Menu

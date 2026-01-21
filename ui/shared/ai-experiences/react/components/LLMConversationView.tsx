@@ -218,10 +218,15 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
     try {
       // Create a new conversation (server will automatically complete any existing active conversation)
-      const {json} = await doFetchApi<ConversationResponse>({
+      const {json, response} = await doFetchApi<ConversationResponse>({
         path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
         method: 'POST',
       })
+
+      if (!response?.ok) {
+        setError(I18n.t('Failed to restart conversation. Please try again.'))
+        return
+      }
 
       if (json?.id && json?.messages) {
         setConversationId(json.id)

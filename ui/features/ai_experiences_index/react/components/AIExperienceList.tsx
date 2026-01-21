@@ -53,6 +53,7 @@ const AIExperienceList: React.FC<AIExperienceListProps> = ({
             id={experience.id}
             title={experience.title}
             workflowState={experience.workflow_state}
+            canUnpublish={experience.can_unpublish ?? true}
             createdAt={experience.created_at}
             submissionStatus={experience.submission_status}
             onEdit={onEdit}
