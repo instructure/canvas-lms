@@ -299,7 +299,12 @@ function renderContentBaseOnAvailability(
 function StudentContent(props) {
   const alertContext = useContext(AlertManagerContext)
   const [, setAssignedAssessments] = useState([])
+
+  const urlParams = new URLSearchParams(window.location.search)
+  const openFeedbackParam = urlParams.get('open_feedback') === 'true'
+
   const initialCommentTrayState =
+    openFeedbackParam ||
     !!props.submission?.unreadCommentCount ||
     (!!props.assignment.env.peerReviewModeEnabled &&
       props.assignment.env.peerReviewAvailable &&
