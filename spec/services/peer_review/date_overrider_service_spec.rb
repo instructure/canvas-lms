@@ -430,6 +430,75 @@ RSpec.describe PeerReview::DateOverriderService do
     end
   end
 
+  describe "#refresh_parent_associations" do
+    context "when reload_associations is false (default)" do
+      it "does not call refresh_parent_associations during call" do
+        service = described_class.new(
+          peer_review_sub_assignment:,
+          reload_associations: false
+        )
+
+        allow(service).to receive(:run_validations)
+        allow(service).to receive(:create_or_update_peer_review_overrides)
+        expect(service).not_to receive(:refresh_parent_associations)
+
+        service.call
+      end
+    end
+
+    context "when reload_associations is true" do
+      it "calls refresh_parent_associations during call and reloads associations" do
+        service = described_class.new(
+          peer_review_sub_assignment:,
+          reload_associations: true
+        )
+
+        allow(service).to receive(:run_validations)
+        allow(service).to receive(:create_or_update_peer_review_overrides)
+        expect(peer_review_sub_assignment.association(:parent_assignment)).to receive(:reload).and_return(parent_assignment)
+        expect(parent_assignment.association(:assignment_overrides)).to receive(:reload)
+
+        service.call
+      end
+    end
+
+    context "when assignment is nil" do
+      it "does not reload even when called directly" do
+        service = described_class.new(
+          peer_review_sub_assignment: nil,
+          reload_associations: true
+        )
+
+        expect(service.send(:refresh_parent_associations)).to be_nil
+      end
+    end
+
+    context "when peer_review_sub_assignment is nil" do
+      it "does not reload even when method is called directly" do
+        service = described_class.new(
+          peer_review_sub_assignment: nil,
+          reload_associations: true
+        )
+
+        expect(service.send(:refresh_parent_associations)).to be_nil
+      end
+    end
+
+    context "when called directly" do
+      it "reloads parent_assignment and assignment_overrides associations" do
+        service = described_class.new(
+          peer_review_sub_assignment:,
+          reload_associations: false
+        )
+
+        expect(peer_review_sub_assignment.association(:parent_assignment)).to receive(:reload).and_return(parent_assignment)
+        expect(parent_assignment.association(:assignment_overrides)).to receive(:reload)
+
+        service.send(:refresh_parent_associations)
+      end
+    end
+  end
+
   describe "#run_validations" do
     it "runs all required validations" do
       expect(service).to receive(:validate_parent_assignment).with(parent_assignment)

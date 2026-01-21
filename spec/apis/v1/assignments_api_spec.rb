@@ -4082,7 +4082,8 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::DateOverriderService).to receive(:call).with(
             peer_review_sub_assignment:,
-            overrides: params[:peer_review_overrides]
+            overrides: params[:peer_review_overrides],
+            reload_associations: true
           )
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
@@ -4110,7 +4111,8 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::DateOverriderService).to receive(:call).with(
             peer_review_sub_assignment:,
-            overrides: []
+            overrides: [],
+            reload_associations: true
           )
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
@@ -5187,7 +5189,8 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::DateOverriderService).to receive(:call).with(
             peer_review_sub_assignment:,
-            overrides: params[:peer_review_overrides]
+            overrides: params[:peer_review_overrides],
+            reload_associations: true
           )
 
           test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
@@ -5215,7 +5218,8 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::DateOverriderService).to receive(:call).with(
             peer_review_sub_assignment:,
-            overrides: []
+            overrides: [],
+            reload_associations: true
           )
 
           test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
