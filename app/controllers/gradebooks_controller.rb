@@ -1114,6 +1114,9 @@ class GradebooksController < ApplicationController
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
         FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED: @context.filter_speed_grader_by_student_group?,
+        # create_tc_warning is provided by instructure_misc_plugin (separate repo)
+        # Check defensively if available
+        fixed_warnings: [respond_to?(:create_tc_warning, true) ? create_tc_warning : nil].compact,
         context_url: named_context_url(@context, :context_grades_url),
         course_id: @context.id,
         late_policy: @context.late_policy&.as_json(include_root: false),
