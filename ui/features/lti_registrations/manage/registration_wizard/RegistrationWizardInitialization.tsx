@@ -234,7 +234,7 @@ export const RegistrationWizardInitialization = (props: RegistrationWizardInitia
           data-testid="registration-wizard-next-button"
           color="primary"
           type="submit"
-          margin="small"
+          margin="0"
           disabled={validForm(props.state) === false || props.state.jsonFetch._tag === 'loading'}
           onClick={() => {
             // if it's json_url, we need to fetch the configuration first
