@@ -25,6 +25,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -103,7 +104,10 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
             value={searchInput}
             renderBeforeInput={() => <IconSearchLine inline={false} />}
             renderAfterInput={clearButton}
-            renderLabel={''}
+            renderLabel={
+              <ScreenReaderContent>{I18n.t('Search resource titles')}</ScreenReaderContent>
+            }
+            type="search"
             onChange={event => handleChange(event.target.value)}
             messages={[
               {
