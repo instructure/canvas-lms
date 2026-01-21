@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -24,6 +24,8 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
+import {Pill} from '@instructure/ui-pill'
+import {Spinner} from '@instructure/ui-spinner'
 import {IconPublishSolid, IconUnpublishedLine, IconMoreLine} from '@instructure/ui-icons'
 
 interface AIExperienceRowProps {
@@ -32,6 +34,7 @@ interface AIExperienceRowProps {
   title: string
   workflowState: 'published' | 'unpublished'
   createdAt: string
+  submissionStatus?: 'not_started' | 'in_progress' | 'submitted'
   onEdit: (id: number) => void
   onTestConversation: (id: number) => void
   onPublishToggle: (id: number, newState: 'published' | 'unpublished') => void
@@ -44,6 +47,7 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
   title,
   workflowState,
   createdAt,
+  submissionStatus,
   onEdit,
   onTestConversation,
   onPublishToggle,
@@ -56,6 +60,47 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
     month: 'long',
     day: 'numeric',
   })
+
+  const [loadingProgress, setLoadingProgress] = useState(false)
+  const [fetchedProgressPercentage, setFetchedProgressPercentage] = useState<number | null>(null)
+
+  // Fetch progress data when status is in_progress
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (submissionStatus !== 'in_progress' || canManage) {
+        return
+      }
+
+      setLoadingProgress(true)
+      try {
+        const courseId = ENV.COURSE_ID
+        const response = await fetch(
+          `/api/v1/courses/${courseId}/ai_experiences/${id}/conversations`,
+          {
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch progress')
+        }
+
+        const data = await response.json()
+        console.log('Progress data for experience', id, ':', data.progress)
+        const percentage = data.progress?.percentage ?? 0
+        setFetchedProgressPercentage(percentage)
+      } catch (err) {
+        // On error, default to 0%
+        setFetchedProgressPercentage(0)
+      } finally {
+        setLoadingProgress(false)
+      }
+    }
+
+    fetchProgress()
+  }, [submissionStatus, id, canManage])
 
   const handlePublishToggle = () => {
     const newState = isPublished ? 'unpublished' : 'published'
@@ -90,6 +135,25 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
             </View>
           </View>
         </Flex.Item>
+
+        {!canManage && submissionStatus && (
+          <Flex.Item>
+            <View as="div" margin="0 small 0 0">
+              {loadingProgress ? (
+                <Spinner renderTitle={I18n.t('Loading progress')} size="x-small" />
+              ) : (
+                <Pill color={submissionStatus === 'in_progress' ? 'success' : undefined}>
+                  {submissionStatus === 'not_started' && I18n.t('Not Started')}
+                  {submissionStatus === 'in_progress' &&
+                    I18n.t('In Progress (%{percentage}%)', {
+                      percentage: fetchedProgressPercentage ?? 0,
+                    })}
+                  {submissionStatus === 'submitted' && I18n.t('Submitted')}
+                </Pill>
+              )}
+            </View>
+          </Flex.Item>
+        )}
 
         {canManage && (
           <Flex.Item>
