@@ -102,6 +102,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
                         comments={comments}
                         submissionId={submission._id}
                         totalCommentsCount={totalCommentsCount}
+                        assignmentUrl={assignmentUrl}
                       />
                     </Flex.Item>
                   </>

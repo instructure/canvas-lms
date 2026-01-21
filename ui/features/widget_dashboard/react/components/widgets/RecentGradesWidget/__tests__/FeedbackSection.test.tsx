@@ -46,22 +46,45 @@ describe('FeedbackSection', () => {
     },
   ]
 
+  const mockAssignmentUrl = '/courses/123/assignments/456'
+
   it('renders feedback section with comments', () => {
-    render(<FeedbackSection comments={mockComments} submissionId="sub1" totalCommentsCount={2} />)
+    render(
+      <FeedbackSection
+        comments={mockComments}
+        submissionId="sub1"
+        totalCommentsCount={2}
+        assignmentUrl={mockAssignmentUrl}
+      />,
+    )
 
     expect(screen.getByTestId('feedback-section-sub1')).toBeInTheDocument()
     expect(screen.getByTestId('feedback-section-heading-sub1')).toHaveTextContent('Feedback')
   })
 
   it('displays author names', () => {
-    render(<FeedbackSection comments={mockComments} submissionId="sub1" totalCommentsCount={2} />)
+    render(
+      <FeedbackSection
+        comments={mockComments}
+        submissionId="sub1"
+        totalCommentsCount={2}
+        assignmentUrl={mockAssignmentUrl}
+      />,
+    )
 
     expect(screen.getByTestId('feedback-author-comment1')).toHaveTextContent('Mr. Smith')
     expect(screen.getByTestId('feedback-author-comment2')).toHaveTextContent('Mrs. Johnson')
   })
 
   it('displays comment text', () => {
-    render(<FeedbackSection comments={mockComments} submissionId="sub1" totalCommentsCount={2} />)
+    render(
+      <FeedbackSection
+        comments={mockComments}
+        submissionId="sub1"
+        totalCommentsCount={2}
+        assignmentUrl={mockAssignmentUrl}
+      />,
+    )
 
     const comment1 = screen.getByTestId('feedback-comment-comment1')
     expect(comment1).toBeInTheDocument()
@@ -69,22 +92,44 @@ describe('FeedbackSection', () => {
   })
 
   it('renders "None" when comments array is empty and total count is 0', () => {
-    render(<FeedbackSection comments={[]} submissionId="sub1" totalCommentsCount={0} />)
+    render(
+      <FeedbackSection
+        comments={[]}
+        submissionId="sub1"
+        totalCommentsCount={0}
+        assignmentUrl={mockAssignmentUrl}
+      />,
+    )
 
     expect(screen.getByTestId('feedback-none-sub1')).toBeInTheDocument()
     expect(screen.getByTestId('feedback-none-sub1')).toHaveTextContent('None')
   })
 
-  it('shows view inline feedback button with total count', () => {
-    render(<FeedbackSection comments={mockComments} submissionId="sub1" totalCommentsCount={5} />)
+  it('shows view inline feedback button with total count and correct URL', () => {
+    render(
+      <FeedbackSection
+        comments={mockComments}
+        submissionId="sub1"
+        totalCommentsCount={5}
+        assignmentUrl={mockAssignmentUrl}
+      />,
+    )
 
     const button = screen.getByTestId('view-inline-feedback-button-sub1')
     expect(button).toBeInTheDocument()
     expect(button).toHaveTextContent('View all inline feedback (5)')
+    expect(button).toHaveAttribute('href', '/courses/123/assignments/456?open_feedback=true')
   })
 
   it('does not show button when total count is 0', () => {
-    render(<FeedbackSection comments={[]} submissionId="sub1" totalCommentsCount={0} />)
+    render(
+      <FeedbackSection
+        comments={[]}
+        submissionId="sub1"
+        totalCommentsCount={0}
+        assignmentUrl={mockAssignmentUrl}
+      />,
+    )
 
     expect(screen.queryByTestId('view-inline-feedback-button-sub1')).not.toBeInTheDocument()
   })
@@ -103,6 +148,7 @@ describe('FeedbackSection', () => {
         comments={[commentWithoutAuthor]}
         submissionId="sub1"
         totalCommentsCount={1}
+        assignmentUrl={mockAssignmentUrl}
       />,
     )
 
@@ -122,7 +168,14 @@ describe('FeedbackSection', () => {
       createdAt: '2025-11-30T14:30:00Z',
     }
 
-    render(<FeedbackSection comments={[emptyComment]} submissionId="sub1" totalCommentsCount={1} />)
+    render(
+      <FeedbackSection
+        comments={[emptyComment]}
+        submissionId="sub1"
+        totalCommentsCount={1}
+        assignmentUrl={mockAssignmentUrl}
+      />,
+    )
 
     expect(screen.getByTestId('feedback-comment-empty-comment')).toBeInTheDocument()
   })
