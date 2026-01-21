@@ -8290,6 +8290,14 @@ nn:
   course_name_is_required_90919349: "Emnenamn er obligatorisk"
   course_name_successfully_added_48116a50: "%{course_name} er lagt til."
   course_navigation_dd035109: Emnenavigering
+  course_navigation_settings: 
+    buttons: 
+      save: Lagre
+    drag_details: "Dersom du deaktiverer sider, blir studentane som vitjar sidene omdirigerte til emnet si startside."
+    drag_to_hide: "Dra element hit om du vil skjule dei frå studentane."
+    help: 
+      edit_navigation: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
+      edit_navigation_k5: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
   course_nicknames_csv_92e325a7: "Emne-kallenamn CSV"
   course_not_found_c248a721: "Finn ikkje emne"
   course_notification_settings_d9821d36: "Varslingsinnstillingar for emnet"
@@ -8578,6 +8586,15 @@ nn:
         content: Innhald
         due_dates: Innleveringsfristar
         points: Poeng
+    navigation_form: 
+      drag_details: "Dersom du deaktiverer sider, blir studentane som vitjar sidene omdirigerte til emnet si startside."
+      drag_to_hide: "Dra element hit om du vil skjule dei frå studentane."
+      help: 
+        edit_navigation: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
+        edit_navigation_info_k5: "Dersom skrudd på, vil LTI-verktøy alltid visast under Ressurs-fana i rekkefølgen du vel."
+        edit_navigation_k5: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
+      titles: 
+        edit_navigation: "Rediger emnenavigasjon"
     notices: 
       backup_restored: "Tryggingskopien er lagra på nytt."
       concluded: "Emnet er avslutta"
