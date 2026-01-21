@@ -23,21 +23,34 @@ class PeerReview::DateOverriderService < ApplicationService
 
   def initialize(
     peer_review_sub_assignment: nil,
-    overrides: nil
+    overrides: nil,
+    reload_associations: false
   )
     super()
 
     @peer_review_sub_assignment = peer_review_sub_assignment
     @assignment = @peer_review_sub_assignment&.parent_assignment
     @overrides = format_overrides(overrides || [])
+    @reload_associations = reload_associations
   end
 
   def call
+    refresh_parent_associations if @reload_associations
     run_validations
     create_or_update_peer_review_overrides
   end
 
   private
+
+  # Reloads parent assignment and its overrides to ensure changes made upstream are visible,
+  # preventing stale cache when linking peer review overrides to parent overrides.
+  # Set reload_associations: true when parent overrides are modified in same request.
+  def refresh_parent_associations
+    return unless @assignment && @peer_review_sub_assignment
+
+    @peer_review_sub_assignment.association(:parent_assignment).reload
+    @peer_review_sub_assignment.parent_assignment.association(:assignment_overrides).reload
+  end
 
   def run_validations
     validate_parent_assignment(@assignment)

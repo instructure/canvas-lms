@@ -1826,4 +1826,393 @@ describe "Api::V1::Assignment" do
       end
     end
   end
+
+  describe "#create_api_peer_review_sub_assignment" do
+    let(:course) { course_factory(active_all: true) }
+    let(:teacher) { teacher_in_course(course:, active_all: true).user }
+    let(:section) { course.default_section }
+    let(:parent_assignment) do
+      course.assignments.create!(
+        title: "Parent Assignment",
+        peer_reviews: true,
+        submission_types: "online_text_entry"
+      )
+    end
+
+    before do
+      course.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    context "when creating peer review overrides alongside assignment overrides" do
+      it "successfully creates both assignment and peer review overrides" do
+        parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section.id,
+          due_at: 2.days.from_now
+        )
+
+        params = {
+          points_possible: 10,
+          due_at: 3.days.from_now,
+          peer_review_overrides: [
+            {
+              course_section_id: section.id,
+              due_at: 4.days.from_now
+            }
+          ]
+        }
+
+        result = api.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+
+        expect(result).to be_a(PeerReviewSubAssignment)
+        expect(result).to be_persisted
+        expect(parent_assignment.assignment_overrides.count).to eq(1)
+        expect(result.assignment_overrides.count).to eq(1)
+
+        peer_review_override = result.assignment_overrides.first
+        expect(peer_review_override.set_type).to eq("CourseSection")
+        expect(peer_review_override.set_id).to eq(section.id)
+        expect(peer_review_override.parent_override_id).to eq(parent_assignment.assignment_overrides.first.id)
+      end
+
+      it "successfully creates ADHOC peer review overrides" do
+        student1 = student_in_course(course:, active_all: true).user
+        student2 = student_in_course(course:, active_all: true).user
+
+        parent_override = parent_assignment.assignment_overrides.create!(
+          set_type: "ADHOC",
+          due_at: 2.days.from_now
+        )
+        parent_override.assignment_override_students.create!(user: student1)
+        parent_override.assignment_override_students.create!(user: student2)
+
+        params = {
+          points_possible: 10,
+          due_at: 3.days.from_now,
+          peer_review_overrides: [
+            {
+              student_ids: [student1.id, student2.id],
+              due_at: 4.days.from_now
+            }
+          ]
+        }
+
+        result = api.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+
+        expect(result).to be_persisted
+        expect(result.assignment_overrides.count).to eq(1)
+
+        peer_review_override = result.assignment_overrides.first
+        expect(peer_review_override.set_type).to eq("ADHOC")
+        expect(peer_review_override.assignment_override_students.count).to eq(2)
+        expect(peer_review_override.parent_override_id).to eq(parent_override.id)
+      end
+    end
+  end
+
+  describe "#update_api_peer_review_sub_assignment" do
+    let(:course) { course_factory(active_all: true) }
+    let(:teacher) { teacher_in_course(course:, active_all: true).user }
+    let(:section) { course.default_section }
+    let(:parent_assignment) do
+      course.assignments.create!(
+        title: "Parent Assignment",
+        peer_reviews: true,
+        submission_types: "online_text_entry"
+      )
+    end
+    let(:peer_review_sub_assignment) do
+      PeerReview::PeerReviewCreatorService.call(
+        parent_assignment:,
+        points_possible: 10,
+        due_at: 3.days.from_now
+      )
+    end
+
+    before do
+      course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    context "when updating peer review overrides alongside assignment overrides" do
+      it "successfully creates peer review overrides during update" do
+        peer_review_sub_assignment
+        parent_assignment.reload
+
+        parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section.id,
+          due_at: 2.days.from_now
+        )
+
+        params = {
+          due_at: 5.days.from_now,
+          peer_review_overrides: [
+            {
+              course_section_id: section.id,
+              due_at: 6.days.from_now
+            }
+          ]
+        }
+
+        result = api.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
+
+        expect(result).to be_a(PeerReviewSubAssignment)
+        expect(result).to be_persisted
+        expect(result.assignment_overrides.count).to eq(1)
+
+        peer_review_override = result.assignment_overrides.first
+        expect(peer_review_override.set_type).to eq("CourseSection")
+        expect(peer_review_override.set_id).to eq(section.id)
+        expect(peer_review_override.parent_override_id).to eq(parent_assignment.assignment_overrides.first.id)
+      end
+    end
+  end
+
+  describe "transaction rollback when peer review creation fails" do
+    let(:course) { course_factory(active_all: true) }
+    let(:teacher) { teacher_in_course(course:, active_all: true).user }
+    let(:section) { course.default_section }
+
+    before do
+      course.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    describe "#create_api_assignment" do
+      context "when peer review date validation fails" do
+        it "rolls back assignment creation when peer review due_at is before assignment due_at" do
+          initial_assignment_count = Assignment.count
+          assignment = course.assignments.build
+          assignment_params = ActionController::Parameters.new(
+            name: "Test Assignment 1",
+            peer_reviews: true,
+            submission_types: ["online_text_entry"],
+            due_at: 5.days.from_now.iso8601,
+            peer_review: {
+              points_possible: 10,
+              due_at: 2.days.from_now.iso8601
+            }
+          )
+
+          result = api.create_api_assignment(assignment, assignment_params, teacher, course)
+
+          expect(result).to be(false)
+          expect(Assignment.count).to eq(initial_assignment_count)
+          expect(Assignment.find_by(title: "Test Assignment 1")).to be_nil
+        end
+
+        it "rolls back when peer review unlock_at is before assignment due_at" do
+          initial_assignment_count = Assignment.count
+          assignment = course.assignments.build
+          assignment_params = ActionController::Parameters.new(
+            name: "Test Assignment 2",
+            peer_reviews: true,
+            submission_types: ["online_text_entry"],
+            due_at: 5.days.from_now.iso8601,
+            peer_review: {
+              points_possible: 10,
+              unlock_at: 3.days.from_now.iso8601,
+              due_at: 7.days.from_now.iso8601
+            }
+          )
+
+          result = api.create_api_assignment(assignment, assignment_params, teacher, course)
+
+          expect(result).to be(false)
+          expect(Assignment.count).to eq(initial_assignment_count)
+          expect(Assignment.find_by(title: "Test Assignment 2")).to be_nil
+        end
+
+        it "rolls back when peer review lock_at is after assignment lock_at" do
+          initial_assignment_count = Assignment.count
+          assignment = course.assignments.build
+          assignment_params = ActionController::Parameters.new(
+            name: "Test Assignment 3",
+            peer_reviews: true,
+            submission_types: ["online_text_entry"],
+            due_at: 3.days.from_now.iso8601,
+            lock_at: 5.days.from_now.iso8601,
+            peer_review: {
+              points_possible: 10,
+              due_at: 4.days.from_now.iso8601,
+              lock_at: 7.days.from_now.iso8601
+            }
+          )
+
+          result = api.create_api_assignment(assignment, assignment_params, teacher, course)
+
+          expect(result).to be(false)
+          expect(Assignment.count).to eq(initial_assignment_count)
+          expect(Assignment.find_by(title: "Test Assignment 3")).to be_nil
+        end
+      end
+
+      context "when peer review override validation fails" do
+        it "rolls back when ADHOC override has no matching parent override" do
+          student1 = student_in_course(course:, active_all: true).user
+          student2 = student_in_course(course:, active_all: true).user
+          initial_assignment_count = Assignment.count
+          assignment = course.assignments.build
+          assignment_params = ActionController::Parameters.new(
+            name: "Test Assignment 4",
+            peer_reviews: true,
+            submission_types: ["online_text_entry"],
+            due_at: 3.days.from_now.iso8601,
+            peer_review: {
+              points_possible: 10,
+              due_at: 5.days.from_now.iso8601,
+              peer_review_overrides: [
+                {
+                  student_ids: [student1.id, student2.id],
+                  due_at: 6.days.from_now.iso8601
+                }
+              ]
+            }
+          )
+
+          result = api.create_api_assignment(assignment, assignment_params, teacher, course)
+
+          expect(result).to be(false)
+          expect(Assignment.count).to eq(initial_assignment_count)
+          expect(Assignment.find_by(title: "Test Assignment 4")).to be_nil
+        end
+      end
+
+      context "successful creation for comparison" do
+        it "creates assignment and peer review when dates are valid" do
+          assignment = course.assignments.build
+          assignment_params = ActionController::Parameters.new(
+            name: "Test Assignment 5",
+            peer_reviews: true,
+            submission_types: ["online_text_entry"],
+            due_at: 3.days.from_now.iso8601,
+            peer_review: {
+              points_possible: 10,
+              due_at: 5.days.from_now.iso8601
+            }
+          )
+
+          result = api.create_api_assignment(assignment, assignment_params, teacher, course)
+
+          expect(result).to eq(:created)
+          expect(assignment).to be_persisted
+          expect(assignment.peer_review_sub_assignment).to be_present
+        end
+      end
+    end
+
+    describe "#update_api_assignment" do
+      let(:existing_assignment) do
+        course.assignments.create!(
+          name: "Existing Assignment",
+          peer_reviews: false,
+          submission_types: "online_text_entry",
+          due_at: 5.days.from_now
+        )
+      end
+
+      it "rolls back update when peer review creation fails due to invalid dates" do
+        update_params = ActionController::Parameters.new(
+          peer_reviews: true,
+          peer_review: {
+            points_possible: 10,
+            due_at: 2.days.from_now.iso8601
+          }
+        )
+
+        result = api.update_api_assignment(existing_assignment, update_params, teacher, course)
+
+        expect(result).to be(false)
+        existing_assignment.reload
+        expect(existing_assignment.peer_reviews).to be(false)
+        expect(existing_assignment.peer_review_sub_assignment).to be_nil
+      end
+
+      it "rolls back update when peer review unlock_at is before assignment due_at" do
+        update_params = ActionController::Parameters.new(
+          peer_reviews: true,
+          peer_review: {
+            points_possible: 10,
+            unlock_at: 3.days.from_now.iso8601,
+            due_at: 7.days.from_now.iso8601
+          }
+        )
+
+        result = api.update_api_assignment(existing_assignment, update_params, teacher, course)
+
+        expect(result).to be(false)
+        existing_assignment.reload
+        expect(existing_assignment.peer_reviews).to be(false)
+        expect(existing_assignment.peer_review_sub_assignment).to be_nil
+      end
+    end
+
+    describe "#create_api_peer_review_sub_assignment rollback scenarios" do
+      let(:parent_assignment) do
+        course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          submission_types: "online_text_entry",
+          due_at: 3.days.from_now
+        )
+      end
+
+      it "returns false and adds error when peer review due_at is before assignment due_at" do
+        params = {
+          points_possible: 10,
+          due_at: 1.day.from_now
+        }
+
+        result = api.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+
+        expect(result).to be(false)
+        expect(parent_assignment.errors[:base]).to include(a_string_matching(/Peer review due date cannot be before assignment due date/))
+      end
+
+      it "returns false when peer review override due_at is before parent override due_at" do
+        parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section.id,
+          due_at: 5.days.from_now,
+          due_at_overridden: true
+        )
+
+        params = {
+          points_possible: 10,
+          due_at: 4.days.from_now,
+          peer_review_overrides: [
+            {
+              course_section_id: section.id,
+              due_at: 4.days.from_now
+            }
+          ]
+        }
+
+        result = api.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+
+        expect(result).to be(false)
+        expect(parent_assignment.errors[:base]).to include(a_string_matching(/Peer review override due date cannot be before parent override due date/))
+      end
+
+      it "returns false when ADHOC override has no matching parent override" do
+        student1 = student_in_course(course:, active_all: true).user
+        student2 = student_in_course(course:, active_all: true).user
+
+        params = {
+          points_possible: 10,
+          due_at: 5.days.from_now,
+          peer_review_overrides: [
+            {
+              student_ids: [student1.id, student2.id],
+              due_at: 6.days.from_now
+            }
+          ]
+        }
+
+        result = api.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+
+        expect(result).to be(false)
+        expect(parent_assignment.errors[:base]).to include(a_string_matching(/ADHOC override not found/i))
+      end
+    end
+  end
 end
