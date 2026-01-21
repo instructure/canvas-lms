@@ -54,6 +54,17 @@ describe Api::V1::AiExperience do
       expect(json["workflow_state"]).to eq @ai_experience.workflow_state
       expect(json["course_id"]).to eq @ai_experience.course_id
     end
+
+    it "includes submission_status with not_started value when provided" do
+      json = api.ai_experience_json(@ai_experience, @teacher, session, { submission_status: "not_started" })
+      expect(json).to have_key(:submission_status)
+      expect(json[:submission_status]).to eq("not_started")
+    end
+
+    it "does not include submission_status when not provided in opts" do
+      json = api.ai_experience_json(@ai_experience, @teacher, session)
+      expect(json).not_to have_key(:submission_status)
+    end
   end
 
   describe "ai_experiences_json" do
