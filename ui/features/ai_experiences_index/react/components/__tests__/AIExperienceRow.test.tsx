@@ -26,6 +26,7 @@ const defaultProps = {
   id: 1,
   title: 'Customer Service Training',
   workflowState: 'published' as const,
+  canUnpublish: true,
   createdAt: '2025-01-15T10:30:00Z',
   onEdit: vi.fn(),
   onTestConversation: vi.fn(),

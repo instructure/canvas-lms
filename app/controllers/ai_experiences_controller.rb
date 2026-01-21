@@ -264,22 +264,52 @@ class AiExperiencesController < ApplicationController
       return render_unauthorized_action
     end
 
-    # Get all students in the course
+    # Get all students in the course with their enrollments preloaded
     students = @context.students.distinct
+
+    # Preload enrollments with sis_pseudonyms to avoid N+1 when calling user_json
+    ActiveRecord::Associations.preload(students, enrollments: :sis_pseudonym)
+
+    # Preload user associations for user_json
+    user_json_preloads(students, false, accounts: true, pseudonyms: true, profile: true)
+
+    # Build enrollment lookup hash: user_id => enrollment
+    enrollments_by_user = students.flat_map(&:enrollments)
+                                  .select { |e| e.course_id == @context.id && e.workflow_state != "deleted" }
+                                  .group_by(&:user_id)
+                                  .transform_values(&:first)
+
+    # Get all latest conversations for all students in one query to avoid N+1
+    # Group by user_id and get the most recent conversation for each
+    student_ids = students.map(&:id)
+    latest_conversations = @experience.ai_conversations
+                                      .where(user_id: student_ids)
+                                      .where.not(workflow_state: "deleted")
+                                      .select("DISTINCT ON (user_id) *")
+                                      .order(:user_id, updated_at: :desc)
+                                      .to_a
+
+    # Preload users on conversations to avoid N+1
+    ActiveRecord::Associations.preload(latest_conversations, :user)
+
+    # Build a hash for quick lookup: user_id => conversation
+    conversations_by_user = latest_conversations.index_by(&:user_id)
 
     # For each student, get their latest conversation for this experience
     conversations = students.map do |student|
-      latest_conversation = @experience.ai_conversations
-                                       .for_user(student.id)
-                                       .where.not(workflow_state: "deleted")
-                                       .order(updated_at: :desc)
-                                       .first
+      latest_conversation = conversations_by_user[student.id]
+      enrollment = enrollments_by_user[student.id]
 
       if latest_conversation
-        ai_conversation_json(latest_conversation, @current_user, session, include_student: true)
+        # Need to manually build student info to pass enrollment
+        student_info = user_json(latest_conversation.user, @current_user, session, ["avatar_url"], @context, nil, [], enrollment)
+        json = api_json(latest_conversation, @current_user, session, {})
+        json[:student] = student_info
+        json
       else
         # Include students without conversations
-        student_info = user_json(student, @current_user, session, ["avatar_url"], @context)
+        # Pass enrollment to user_json to avoid N+1 query for sis_pseudonym
+        student_info = user_json(student, @current_user, session, ["avatar_url"], @context, nil, [], enrollment)
         {
           id: nil,
           user_id: student.id.to_s,

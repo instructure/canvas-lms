@@ -290,4 +290,138 @@ describe AiExperience do
       end
     end
   end
+
+  describe "#can_unpublish?" do
+    let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "published")) }
+    let(:student) { user_factory(active_all: true) }
+    let(:teacher) { user_factory(active_all: true) }
+
+    before do
+      course.enroll_student(student, enrollment_state: "active")
+      course.enroll_teacher(teacher, enrollment_state: "active")
+    end
+
+    context "when there are no conversations" do
+      it "returns true" do
+        expect(experience.can_unpublish?).to be true
+      end
+    end
+
+    context "when there are only teacher conversations" do
+      before do
+        AiConversation.create!(
+          ai_experience: experience,
+          course:,
+          user: teacher,
+          llm_conversation_id: "teacher-conv-1",
+          workflow_state: "active",
+          root_account: course.root_account,
+          account: course.account
+        )
+      end
+
+      it "returns true" do
+        expect(experience.can_unpublish?).to be true
+      end
+    end
+
+    context "when there are student conversations" do
+      before do
+        AiConversation.create!(
+          ai_experience: experience,
+          course:,
+          user: student,
+          llm_conversation_id: "student-conv-1",
+          workflow_state: "active",
+          root_account: course.root_account,
+          account: course.account
+        )
+      end
+
+      it "returns false" do
+        expect(experience.can_unpublish?).to be false
+      end
+    end
+
+    context "when there are deleted student conversations" do
+      before do
+        AiConversation.create!(
+          ai_experience: experience,
+          course:,
+          user: student,
+          llm_conversation_id: "student-conv-deleted",
+          workflow_state: "deleted",
+          root_account: course.root_account,
+          account: course.account
+        )
+      end
+
+      it "returns true" do
+        expect(experience.can_unpublish?).to be true
+      end
+    end
+
+    context "when student enrollment is deleted" do
+      before do
+        enrollment = course.enroll_student(student, enrollment_state: "active")
+        enrollment.destroy
+
+        AiConversation.create!(
+          ai_experience: experience,
+          course:,
+          user: student,
+          llm_conversation_id: "student-conv-1",
+          workflow_state: "active",
+          root_account: course.root_account,
+          account: course.account
+        )
+      end
+
+      it "returns true" do
+        expect(experience.can_unpublish?).to be true
+      end
+    end
+  end
+
+  describe "#unpublish_ok?" do
+    let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "published")) }
+    let(:student) { user_factory(active_all: true) }
+
+    before do
+      course.enroll_student(student, enrollment_state: "active")
+    end
+
+    context "when can_unpublish? is true" do
+      it "allows unpublishing" do
+        experience.workflow_state = "unpublished"
+        expect(experience).to be_valid
+      end
+    end
+
+    context "when can_unpublish? is false" do
+      before do
+        AiConversation.create!(
+          ai_experience: experience,
+          course:,
+          user: student,
+          llm_conversation_id: "student-conv-1",
+          workflow_state: "active",
+          root_account: course.root_account,
+          account: course.account
+        )
+      end
+
+      it "prevents unpublishing" do
+        experience.workflow_state = "unpublished"
+        expect(experience).not_to be_valid
+        expect(experience.errors[:workflow_state]).to include("Can't unpublish if students have started conversations")
+      end
+
+      it "allows publishing" do
+        experience.unpublish!
+        experience.workflow_state = "published"
+        expect(experience).to be_valid
+      end
+    end
+  end
 end

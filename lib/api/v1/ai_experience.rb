@@ -33,6 +33,8 @@ module Api::V1::AiExperience
     json = api_json(ai_experience, user, session, opts.merge(API_JSON_OPTS))
     json[:can_manage] = opts[:can_manage] if opts.key?(:can_manage)
     json[:submission_status] = opts[:submission_status] if opts.key?(:submission_status)
+    # Include can_unpublish if user can manage
+    json[:can_unpublish] = ai_experience.can_unpublish? if opts[:can_manage]
     json
   end
 
