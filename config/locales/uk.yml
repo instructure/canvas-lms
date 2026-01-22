@@ -8006,6 +8006,7 @@ uk:
   generate_item_analysis_report_statuslabel_16e02c8: "Згенерувати пункт аналітичного звіту %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Згенерувати аналітичний звіт студента %{statusLabel}"
   generate_token_393ab5b4: "Згенерувати маркер"
+  generated_e71c6622: Згенеровано
   generated_f26ee56b: "Згенеровано:"
   generating_5b5e20f8: "Генерується:"
   generating_c2aabc02: Генерується...
