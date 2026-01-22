@@ -231,7 +231,9 @@ module Outcomes
           calculation_int: method&.calculation_int,
           points_possible: mastery_scale&.points_possible,
           mastery_points: mastery_scale&.mastery_points,
-          ratings: mastery_scale&.ratings_hash
+          ratings: mastery_scale&.ratings_hash,
+          proficiency_context_type: mastery_scale&.context_type,
+          proficiency_context_id: mastery_scale&.context_id&.to_s
         }
       end
     end
@@ -254,7 +256,7 @@ module Outcomes
     def rating_percents(rollups, context: nil)
       counts = {}
       outcome_proficiency_ratings = if context&.root_account&.feature_enabled?(:account_level_mastery_scales)
-                                      context.resolved_outcome_proficiency.ratings_hash
+                                      context.resolved_outcome_proficiency&.ratings_hash
                                     end
       rollups.each do |rollup|
         rollup.scores.each do |score|
