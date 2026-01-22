@@ -22,6 +22,7 @@ import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeDistributionPopover} from '../OutcomeDistributionPopover'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
 
 describe('OutcomeDistributionPopover', () => {
   const outcome: Outcome = {
@@ -36,12 +37,22 @@ describe('OutcomeDistributionPopover', () => {
     ratings: defaultRatings.map(rating =>
       pick(rating, ['description', 'points', 'color', 'mastery']),
     ),
+    context_type: 'Course',
+    context_id: '5',
   }
 
   const scores = [3, 4, 5, 2, 4]
 
+  const renderWithContext = (component: React.ReactElement) => {
+    return render(
+      <LMGBContext.Provider value={{env: {accountLevelMasteryScalesFF: false}}}>
+        {component}
+      </LMGBContext.Provider>,
+    )
+  }
+
   it('renders the popover with outcome title', () => {
-    const {getByText, getByTestId} = render(
+    const {getByText, getByTestId} = renderWithContext(
       <OutcomeDistributionPopover
         outcome={outcome}
         scores={scores}
@@ -56,7 +67,7 @@ describe('OutcomeDistributionPopover', () => {
 
   it('calls onCloseHandler when close button is clicked', async () => {
     const onCloseHandler = vi.fn()
-    const {getByTestId} = render(
+    const {getByTestId} = renderWithContext(
       <OutcomeDistributionPopover
         outcome={outcome}
         scores={scores}
