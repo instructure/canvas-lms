@@ -25,6 +25,8 @@
 # In docker environment, run:
 #   docker compose run web bundle exec rails runner spec/fixtures/data_generation/generate_data.rb [options]
 
+# rubocop:disable Rails/Exit, Rails/Output
+
 require_relative "../../factories/course_factory"
 require_relative "../../factories/user_factory"
 require_relative "../../factories/quiz_factory"
@@ -44,6 +46,11 @@ def toggle_k5_setting(account, enable = true)
   account.settings[:enable_as_k5_account] = { value: enable, locked: enable }
   account.root_account.settings[:k5_accounts] = enable ? [account.id] : []
   account.root_account.save!
+  account.save!
+end
+
+def toggle_horizon_setting(account, enable = true)
+  account.horizon_account = enable
   account.save!
 end
 
@@ -520,6 +527,215 @@ def generate_mega_course
   print_standard_course_info
 end
 
+def enable_horizon_for_account(account = @root_account)
+  Account.site_admin.enable_feature!(:horizon_course_setting) unless Account.site_admin.feature_enabled?(:horizon_course_setting)
+  toggle_horizon_setting(account, true)
+end
+
+def generate_horizon_hierarchy_with_users(root_is_horizon: false)
+  puts "Generate Horizon/Academic Account Hierarchy with Programs, Users and Courses"
+
+  @root_account.enable_feature!(:horizon_course_setting) unless @root_account.feature_enabled?(:horizon_course_setting)
+
+  if root_is_horizon
+    toggle_horizon_setting(@root_account, enable: true)
+  end
+
+  created_count = { accounts: 0, users: 0, courses: 0, enrollments: 0 }
+  skipped_count = { accounts: 0, users: 0, courses: 0, enrollments: 0 }
+
+  3.times do |i|
+    admin_name = "Root Admin #{i + 1}"
+    admin_user = User.find_by(name: admin_name)
+    if admin_user
+      skipped_count[:users] += 1
+    else
+      admin_user = User.create!(name: admin_name)
+      admin_user.register!
+      created_count[:users] += 1
+    end
+
+    admin_role = Role.get_built_in_role("AccountAdmin", root_account_id: @root_account.id)
+    unless @root_account.account_users.where(user: admin_user, role: admin_role).exists?
+      @root_account.account_users.create!(user: admin_user, role: admin_role)
+    end
+  end
+
+  top_level_accounts = []
+
+  if root_is_horizon
+    10.times do |i|
+      account_name = "Horizon Account #{i + 1}"
+      account = @root_account.sub_accounts.find_by(name: account_name)
+      if account
+        skipped_count[:accounts] += 1
+      else
+        account = @root_account.sub_accounts.create!(name: account_name)
+        created_count[:accounts] += 1
+      end
+      top_level_accounts << { account:, horizon: true }
+
+      admin_name = "#{account.name} Admin"
+      admin_user = User.find_by(name: admin_name)
+      if admin_user
+        skipped_count[:users] += 1
+      else
+        admin_user = User.create!(name: admin_name)
+        admin_user.register!
+        created_count[:users] += 1
+      end
+
+      admin_role = Role.get_built_in_role("AccountAdmin", root_account_id: @root_account.id)
+      unless account.account_users.where(user: admin_user, role: admin_role).exists?
+        account.account_users.create!(user: admin_user, role: admin_role)
+      end
+    end
+  else
+    5.times do |i|
+      account_name = "Horizon Account #{i + 1}"
+      account = @root_account.sub_accounts.find_by(name: account_name)
+      if account
+        skipped_count[:accounts] += 1
+      else
+        account = @root_account.sub_accounts.create!(name: account_name)
+        created_count[:accounts] += 1
+      end
+      toggle_horizon_setting(account, enable: true)
+      top_level_accounts << { account:, horizon: true }
+
+      admin_name = "#{account.name} Admin"
+      admin_user = User.find_by(name: admin_name)
+      if admin_user
+        skipped_count[:users] += 1
+      else
+        admin_user = User.create!(name: admin_name)
+        admin_user.register!
+        created_count[:users] += 1
+      end
+
+      admin_role = Role.get_built_in_role("AccountAdmin", root_account_id: @root_account.id)
+      unless account.account_users.where(user: admin_user, role: admin_role).exists?
+        account.account_users.create!(user: admin_user, role: admin_role)
+      end
+    end
+
+    5.times do |i|
+      account_name = "Academic Account #{i + 1}"
+      account = @root_account.sub_accounts.find_by(name: account_name)
+      if account
+        skipped_count[:accounts] += 1
+      else
+        account = @root_account.sub_accounts.create!(name: account_name)
+        created_count[:accounts] += 1
+      end
+      top_level_accounts << { account:, horizon: false }
+
+      admin_name = "#{account.name} Admin"
+      admin_user = User.find_by(name: admin_name)
+      if admin_user
+        skipped_count[:users] += 1
+      else
+        admin_user = User.create!(name: admin_name)
+        admin_user.register!
+        created_count[:users] += 1
+      end
+
+      admin_role = Role.get_built_in_role("AccountAdmin", root_account_id: @root_account.id)
+      unless account.account_users.where(user: admin_user, role: admin_role).exists?
+        account.account_users.create!(user: admin_user, role: admin_role)
+      end
+    end
+  end
+
+  top_level_accounts.each do |item|
+    parent_account = item[:account]
+
+    5.times do |i|
+      program_name = "#{parent_account.name} - Program #{i + 1}"
+      program_account = parent_account.sub_accounts.find_by(name: program_name)
+      if program_account
+        skipped_count[:accounts] += 1
+      else
+        program_account = parent_account.sub_accounts.create!(
+          name: program_name,
+          root_account: @root_account
+        )
+        created_count[:accounts] += 1
+      end
+
+      admin_name = "#{program_account.name} Admin"
+      admin_user = User.find_by(name: admin_name)
+      if admin_user
+        skipped_count[:users] += 1
+      else
+        admin_user = User.create!(name: admin_name)
+        admin_user.register!
+        created_count[:users] += 1
+      end
+
+      admin_role = Role.get_built_in_role("AccountAdmin", root_account_id: @root_account.id)
+      unless program_account.account_users.where(user: admin_user, role: admin_role).exists?
+        program_account.account_users.create!(user: admin_user, role: admin_role)
+      end
+
+      3.times do |j|
+        teacher_name = "#{program_account.name} Teacher #{j + 1}"
+        teacher = User.find_by(name: teacher_name)
+        if teacher
+          skipped_count[:users] += 1
+        else
+          teacher = User.create!(name: teacher_name)
+          teacher.register!
+          created_count[:users] += 1
+        end
+
+        course_name = "#{program_account.name} - Course #{j + 1}"
+        course = program_account.courses.find_by(name: course_name)
+        if course
+          skipped_count[:courses] += 1
+        else
+          course = program_account.courses.create!(
+            name: course_name,
+            workflow_state: "available",
+            root_account: @root_account
+          )
+          created_count[:courses] += 1
+        end
+
+        if course.enrollments.where(user: teacher, type: "TeacherEnrollment").exists?
+          skipped_count[:enrollments] += 1
+        else
+          course.enroll_teacher(teacher, enrollment_state: "active")
+          created_count[:enrollments] += 1
+        end
+
+        5.times do |k|
+          student_name = "Student #{k + 1} in #{course.name}"
+          student = User.find_by(name: student_name)
+          if student
+            skipped_count[:users] += 1
+          else
+            student = User.create!(name: student_name)
+            student.register!
+            created_count[:users] += 1
+          end
+
+          if course.enrollments.where(user: student, type: "StudentEnrollment").exists?
+            skipped_count[:enrollments] += 1
+          else
+            course.enroll_student(student, enrollment_state: "active")
+            created_count[:enrollments] += 1
+          end
+        end
+      end
+    end
+  end
+
+  puts "\n=== Summary ==="
+  puts "Created: #{created_count[:accounts]} accounts, #{created_count[:users]} users, #{created_count[:courses]} courses, #{created_count[:enrollments]} enrollments"
+  puts "Skipped: #{skipped_count[:accounts]} accounts, #{skipped_count[:users]} users, #{skipped_count[:courses]} courses, #{skipped_count[:enrollments]} enrollments"
+end
+
 def create_all_the_available_data
   save_course_name = @course_name
   @course_name = save_course_name + " (course with students)"
@@ -552,7 +768,7 @@ end
 options = {}
 ARGV << "-h" if ARGV.empty?
 option_parser = OptionParser.new do |opts|
-  opts.banner = "Usage: bin/rails runner spec/fixtures/data_generation/generate_data.rb [-abdgklmprsth] [-c course_name] [-n number_of_students]"
+  opts.banner = "Usage: bin/rails runner spec/fixtures/data_generation/generate_data.rb [-abdgklmprsthHoRz] [-c course_name] [-n number_of_students]"
   opts.on("-a", "--all_data", "Create all the available data with defaults")
   opts.on("-b", "--basic_course", "Course with teacher and students")
   opts.on("-c", "--course_name=COURSENAME", "Course Name")
@@ -569,9 +785,12 @@ option_parser = OptionParser.new do |opts|
   opts.on("-s", "--submissions", "Course and Assignments and Submissions")
   opts.on("-t", "--sections", "Course with Students in Sections")
   opts.on("-o", "--mega_course=MEGACOURSE", Integer, "Mega Course with Learning Objects and Overrides (default: 200)")
+  opts.on("-z", "--enable_horizon", "Enable Horizon for the root account")
+  opts.on("-H", "--horizon_hierarchy", "Create account hierarchy with mixed Horizon/Academic accounts, programs, users, and courses")
+  opts.on("-R", "--root_horizon", "Make root account a Horizon account (use with -H, creates only Horizon accounts)")
   opts.on_tail("-h", "--help", "Help") do
     puts opts
-    exit
+    exit 0
   end
 end
 
@@ -595,7 +814,11 @@ end
 # mega course takes the number of learning objects to create
 @mega_course = options.key?(:mega_course) ? options[:mega_course] : 200
 
+enable_horizon = options.delete(:enable_horizon)
+root_horizon = options.delete(:root_horizon) || false
 options.except!(:course_name, :num_students, :account_id)
+
+enable_horizon_for_account(@root_account) if enable_horizon
 
 if options[:all_data]
   create_all_the_available_data
@@ -632,8 +855,12 @@ options.each_key do |key|
     generate_course_pace_course
   when :mega_course
     generate_mega_course
+  when :horizon_hierarchy
+    generate_horizon_hierarchy_with_users(root_is_horizon: root_horizon)
   else raise "should never get here -- BIG FAIL"
   end
 end
 
 exit 0
+
+# rubocop:enable Rails/Exit, Rails/Output
