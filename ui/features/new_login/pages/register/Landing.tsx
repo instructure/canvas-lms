@@ -24,19 +24,22 @@ import {canvas} from '@instructure/ui-themes'
 import {type ViewOwnProps} from '@instructure/ui-view'
 import React from 'react'
 import {useNavigate} from 'react-router-dom'
-import {useNewLogin} from '../../context'
+import {useNewLogin, useNewLoginData} from '../../context'
 import {ROUTES} from '../../routes/routes'
-import {Card, SignInPrompt} from '../../shared'
+import {Card, MessageAlert, SignInPrompt} from '../../shared'
 
 import iconParent from '../../assets/images/parent.svg'
 import iconStudent from '../../assets/images/student.svg'
 import iconTeacher from '../../assets/images/teacher.svg'
+import {Alert} from '@instructure/ui-alerts'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('new_login')
 
 const Landing = () => {
   const navigate = useNavigate()
   const {isUiActionPending} = useNewLogin()
+  const {customMessageRegistration} = useNewLoginData()
 
   const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
@@ -111,6 +114,8 @@ const Landing = () => {
           <SignInPrompt />
         </Flex.Item>
       </Flex>
+
+      {customMessageRegistration && <MessageAlert message={customMessageRegistration} />}
 
       {renderCards()}
     </Flex>
