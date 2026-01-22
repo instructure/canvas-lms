@@ -404,11 +404,10 @@ describe Lti::ContextControlService do
 
       before { anchor_control }
 
-      it "does not exclude the anchor control" do
-        # the calling code for this method already should deal with
-        # possible duplicate/already existing controls when creating
-        # and should ignore this one too!
-        expect(subject.length).to eq 1
+      it "filters out the anchor control since it already exists" do
+        # We don't touch anchors that already exist, to avoid overwriting their
+        # already set availability.
+        expect(subject.length).to eq 0
       end
     end
 
@@ -472,7 +471,7 @@ describe Lti::ContextControlService do
                                   path: "a#{root_account.id}.a#{subaccount.id}.",
                                   deployment_id: deployment.id,
                                   available: deployment.primary_context_control.available
-                                }
+                                }.with_indifferent_access
                               ])
       end
     end
@@ -505,6 +504,65 @@ describe Lti::ContextControlService do
 
       it "does not try to create anchor again" do
         expect(subject).to be_empty
+      end
+    end
+
+    context "when anchor control already exists" do
+      let(:existing_anchor_control) do
+        Lti::ContextControl.create!(
+          deployment:,
+          account: subaccount,
+          available: false
+        )
+      end
+
+      let(:controls) do
+        [
+          { account_id: subsubaccount.id, deployment_id: deployment.id, available: true }
+        ]
+      end
+
+      it "does not try to create an anchor control there" do
+        existing_anchor_control
+        expect(subject).to be_empty
+      end
+    end
+
+    context "when creating multiple nested controls where some anchors exist and some don't" do
+      # This test ensures that when multiple nested controls need anchors, and some of those
+      # anchors already exist, we:
+      # 1. Preserve the existing anchor control's availability
+      # 2. Still create the new anchor control that doesn't exist yet
+      # 3. Give the new anchor control the correct availability from deployment
+
+      let(:existing_anchor_control) do
+        Lti::ContextControl.create!(
+          deployment:,
+          account: subaccount,
+          available: false
+        )
+      end
+
+      let(:controls) do
+        [
+          # This needs an anchor at (subaccount, deployment) - exists with available: false
+          { account_id: subsubaccount.id, deployment_id: deployment.id, available: true },
+          # This needs an anchor at (other_subaccount, deployment) - DOES NOT EXIST
+          { course_id: other_subaccount_course.id, deployment_id: deployment.id, available: true }
+        ]
+      end
+
+      it "filters out existing anchor but returns new anchor with deployment availability" do
+        existing_anchor_control
+        expect(subject.length).to eq(1)
+
+        anchor_1 = subject.find { |a| a[:account_id] == subaccount.id && a[:deployment_id] == deployment.id }
+        expect(anchor_1).to be_nil
+
+        anchor_2 = subject.find { |a| a[:account_id] == other_subaccount.id && a[:deployment_id] == deployment.id }
+        expect(anchor_2).not_to be_nil
+        expect(anchor_2[:available]).to eq(deployment.primary_context_control.available),
+                                        "Expected new anchor (#{other_subaccount.id}, #{deployment.id}) to use deployment availability"
       end
     end
   end

@@ -982,15 +982,40 @@ describe Lti::ContextControlsController, type: :request do
         it "does not create a new anchor control" do
           expect { subject }.to change { Lti::ContextControl.count }.by(3)
           expect(response).to be_successful
-          expect(response_json.length).to eq(4)
+          expect(response_json.length).to eq(3)
           expect(response_json.map(&:with_indifferent_access)).to match_array(
             [
               hash_including(account_id: other_subsubaccount.id, available: true),
               hash_including(course_id: course.id, available: false),
-              hash_including(account_id: other_subaccount.id, available: root_deployment.primary_context_control.available), # existing anchor is still returned
-              hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available) # anchor
+              hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available)
             ]
           )
+        end
+
+        it "does not modify the existing anchor control's availability" do
+          anchor_control
+          original_available = anchor_control.available
+          expect { subject }.not_to change { anchor_control.reload.available }.from(original_available)
+          expect(response).to be_successful
+        end
+
+        it "does not modify existing unavailable anchor control" do
+          separate_subaccount = account_model(parent_account: account)
+          unavailable_anchor = Lti::ContextControl.create!(
+            account: separate_subaccount,
+            registration:,
+            deployment: root_deployment,
+            available: false
+          )
+
+          deep_account = account_model(parent_account: account_model(parent_account: separate_subaccount))
+
+          post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/bulk",
+               params: [{ account_id: deep_account.id, available: true }],
+               as: :json
+
+          expect(response).to be_successful
+          expect(unavailable_anchor.reload.available).to be(false)
         end
 
         it "tracks the changes" do
@@ -998,16 +1023,17 @@ describe Lti::ContextControlsController, type: :request do
 
           body = response.parsed_body
 
-          controls = Lti::ContextControl.where(id: body.filter { |c| c["id"] != anchor_control.id }.pluck("id"))
+          controls = Lti::ContextControl.where(id: body.pluck("id"))
 
           expected = controls.map do |control|
             ["+", [control.id], control.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)]
           end
-          expected << ["~", [anchor_control.id, "available"], true, false]
 
           expect(Lti::RegistrationHistoryEntry.last.diff["context_controls"]).to match_array(
             expected
           )
+
+          expect(anchor_control.reload.available).to be(true)
         end
       end
     end
