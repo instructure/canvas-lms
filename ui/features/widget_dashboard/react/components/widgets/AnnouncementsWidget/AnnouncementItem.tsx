@@ -30,7 +30,6 @@ import {useQueryClient} from '@tanstack/react-query'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import type {Announcement} from '../../../types'
 import {useToggleAnnouncementReadState} from '../../../hooks/useToggleAnnouncementReadState'
-import {CourseCode} from '../../shared/CourseCode'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {FilterOption} from './utils'
 import {ANNOUNCEMENTS_PAGINATED_KEY} from '../../../constants'
@@ -84,12 +83,11 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
           : I18n.t('"%{title}" marked as unread', {title: announcement.title}),
         type: 'success',
       })
-    } catch (error) {
+    } catch {
       showFlashAlert({
         message: I18n.t("An error ocurred while changing the announcement's read state"),
         type: 'error',
       })
-      console.error('Failed to toggle read state:', error)
     } finally {
       setIsLoading(false)
     }
@@ -205,18 +203,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
                   </Flex>
                 </Flex.Item>
 
-                {/* Row 2: Course code */}
-                {announcement.course?.courseCode && (
-                  <Flex.Item>
-                    <CourseCode
-                      courseId={announcement.course.id}
-                      overrideCode={announcement.course.courseCode}
-                      size="x-small"
-                    />
-                  </Flex.Item>
-                )}
-
-                {/* Row 3: Author name and posted date */}
+                {/* Row 2: Author name and posted date */}
                 <Flex.Item>
                   <Text
                     size="x-small"
@@ -237,6 +224,19 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
                     />
                   </Text>
                 </Flex.Item>
+
+                {/* Row 3: Course name */}
+                {announcement.course?.name && (
+                  <Flex.Item>
+                    <Text
+                      size="x-small"
+                      color="secondary"
+                      data-testid={`course-name-${announcement.id}`}
+                    >
+                      {announcement.course.name}
+                    </Text>
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex.Item>
           </Flex>

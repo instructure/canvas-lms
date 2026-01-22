@@ -82,26 +82,21 @@ async function fetchAllCourseStatistics({
 }: Omit<CourseWorkStatisticsParams, 'courseId'> & {observedUserId?: string | null}): Promise<
   UserEnrollment[]
 > {
-  try {
-    const currentUserId = getCurrentUserId()
+  const currentUserId = getCurrentUserId()
 
-    const result = await executeGraphQLQuery<GraphQLResponse>(USER_COURSE_STATISTICS_QUERY, {
-      userId: currentUserId,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      observedUserId,
-    })
+  const result = await executeGraphQLQuery<GraphQLResponse>(USER_COURSE_STATISTICS_QUERY, {
+    userId: currentUserId,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+    observedUserId,
+  })
 
-    if (!result.legacyNode?.enrollments) {
-      // User has no enrollments - this is a valid state
-      return []
-    }
-
-    return result.legacyNode.enrollments
-  } catch (error) {
-    console.error('Failed to fetch course statistics:', error)
-    throw error
+  if (!result.legacyNode?.enrollments) {
+    // User has no enrollments - this is a valid state
+    return []
   }
+
+  return result.legacyNode.enrollments
 }
 
 function calculateSummaryFromEnrollments(

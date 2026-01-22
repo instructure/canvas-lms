@@ -116,8 +116,8 @@ const DashboardNotifications: React.FC = () => {
       if (!result?.dismissAccountNotification?.errors) {
         setDismissedNotificationIds(prev => new Set([...prev, id]))
       }
-    } catch (err) {
-      console.error('Failed to dismiss notification:', err)
+    } catch {
+      // Silently fail - notification remains visible
     }
   }
 
