@@ -17,10 +17,13 @@
  */
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {DateTimeInput} from '@instructure/ui-date-time-input'
-import {FormMessage} from '@instructure/ui-form-field'
+import {FormFieldGroup, FormMessage} from '@instructure/ui-form-field'
+import {TimeSelect} from '@instructure/ui-time-select'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
+import {combineDateTime} from './utils/utils'
 
 const I18n = createI18nScope('assignment_scheduled_release_policy')
 
@@ -35,28 +38,51 @@ export const SharedScheduledRelease = ({
   postGradesAt,
   handleChange,
 }: SharedScheduledReleaseProps) => {
-  const onChange = (_e: React.SyntheticEvent, isoDate?: string) => {
-    handleChange(isoDate)
+  const onDateChange = (date: Date | null) => {
+    const newDateTime = combineDateTime(date?.toISOString(), postGradesAt)
+    handleChange(newDateTime)
   }
+
+  const onTimeChange = (_e: React.SyntheticEvent, data: {value: string; inputText: string}) => {
+    const newDateTime = combineDateTime(postGradesAt, data.value)
+    handleChange(newDateTime)
+  }
+
+  const dateFormatter = useDateTimeFormat('date.formats.compact')
 
   return (
     <View as="div" margin="medium medium 0" data-testid="shared-scheduled-post-datetime">
-      <DateTimeInput
-        description={<ScreenReaderContent>{I18n.t('Release Date')}</ScreenReaderContent>}
-        datePlaceholder={I18n.t('Choose release date')}
-        dateRenderLabel={I18n.t('Release Date')}
-        timeRenderLabel={I18n.t('Time')}
-        prevMonthLabel={I18n.t('Previous month')}
-        nextMonthLabel={I18n.t('Next month')}
-        onChange={onChange}
+      <FormFieldGroup
+        description={<ScreenReaderContent>{I18n.t('Release Date and Time')}</ScreenReaderContent>}
         layout="stacked"
-        value={postGradesAt ?? undefined}
-        invalidDateTimeMessage={I18n.t('Invalid date!')}
-        messages={errorMessages}
-        allowNonStepInput={true}
-        timeStep={15}
-        isRequired
-      />
+      >
+        <CanvasDateInput2
+          renderLabel={I18n.t('Release Date')}
+          screenReaderLabels={{
+            calendarIcon: I18n.t('Calendar'),
+            nextMonthButton: I18n.t('Next month'),
+            prevMonthButton: I18n.t('Previous month'),
+          }}
+          placeholder={I18n.t('Choose release date')}
+          selectedDate={postGradesAt}
+          formatDate={dateFormatter}
+          onSelectedDateChange={onDateChange}
+          interaction="enabled"
+          invalidDateMessage={I18n.t('Invalid date')}
+          isRequired
+          messages={errorMessages}
+        />
+        <TimeSelect
+          width="100%"
+          renderLabel={I18n.t('Release Time')}
+          placeholder={I18n.t('Choose release time')}
+          value={postGradesAt ?? undefined}
+          step={15}
+          format="LT"
+          isRequired
+          onChange={onTimeChange}
+        />
+      </FormFieldGroup>
     </View>
   )
 }
