@@ -76,6 +76,32 @@ Use `useState` for component-local state.
 - Zustand stores for feature-specific global state
 - React Context for configuration/theme
 
+## GraphQL
+
+### Fragment Naming
+
+**All GraphQL fragment names must be globally unique across the entire codebase.** Use a feature-specific prefix to avoid naming collisions.
+
+Canvas uses GraphQL codegen (`yarn graphql:codegen`) to generate TypeScript types from GraphQL files. The codegen process scans all `.js` and `.ts` files, and duplicate fragment names will cause it to fail.
+
+**Naming convention:**
+```tsx
+// Bad - generic names cause conflicts
+fragment Assignment on Assignment { ... }
+fragment User on User { ... }
+
+// Good - feature-prefixed names are unique
+fragment InboxAssignment on Assignment { ... }
+fragment InboxUser on User { ... }
+
+fragment EditV2Assignment on Assignment { ... }
+fragment DiscussionPostUser on User { ... }
+```
+
+**Example:** The `Assignment` GraphQL type is queried by multiple features (inbox, discussion topics, grade summary, etc.). Each feature should defines its own fragment with only the fields it needs.
+
+When creating new GraphQL fragments, always prefix them with your feature name to ensure uniqueness.
+
 ## Internationalization (i18n)
 
 ```tsx
