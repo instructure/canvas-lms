@@ -245,6 +245,13 @@ rce_a11y_resize:
     Enable the Rich Content Editor to resize editor's size in a way that is accessible.
     This will allow users to resize editor without losing accessibility features.
 
+rce_asr_captioning_improvements:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: RCE ASR Captioning Improvements
+  description: |-
+    Enable RCE ASR Captioning improvements to embedded content from Media Tray.
+
 rce_studio_embed_improvements:
   state: hidden
   applies_to: Course
