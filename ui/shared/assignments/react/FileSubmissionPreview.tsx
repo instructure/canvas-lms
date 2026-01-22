@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {IconDownloadLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import {Attachment, Submission} from './AssignmentsPeerReviewsStudentTypes'
+import {Attachment, Assignment, Submission} from './AssignmentsPeerReviewsStudentTypes'
 import previewUnavailable from '@canvas/assignments/images/PreviewUnavailable.svg'
 import {View} from '@instructure/ui-view'
 import {Img} from '@instructure/ui-img'
@@ -33,8 +33,19 @@ import {List} from '@instructure/ui-list'
 
 const I18n = createI18nScope('peer_reviews_student')
 
+export function buildSubmissionDownloadUrl(
+  courseId: string,
+  assignmentId: string,
+  userId: string,
+  attachmentId: string,
+): string {
+  return `/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}?download=${attachmentId}`
+}
+
 interface FileSubmissionPreviewProps {
   submission: Submission
+  assignment?: Assignment
+  userId?: string
 }
 
 type SelectFileFn = (index: number) => void
@@ -80,7 +91,18 @@ const renderThumbnail = (
   )
 }
 
-const renderFileDetailsTable = (attachments: Attachment[], selectFileFn: SelectFileFn) => {
+const renderFileDetailsTable = (
+  attachments: Attachment[],
+  selectFileFn: SelectFileFn,
+  assignment?: Assignment,
+  userId?: string,
+) => {
+  const downloadUrl =
+    assignment && userId
+      ? (attachmentId: string) =>
+          buildSubmissionDownloadUrl(assignment.courseId, assignment._id, userId, attachmentId)
+      : undefined
+
   return (
     <List
       isUnstyled
@@ -99,6 +121,16 @@ const renderFileDetailsTable = (attachments: Attachment[], selectFileFn: SelectF
           <View margin="0 0 0 xx-small" data-testid="file-size">
             <Text size="x-small">{file.size}</Text>
           </View>
+          {downloadUrl && (
+            <Button
+              size="small"
+              renderIcon={<IconDownloadLine />}
+              href={downloadUrl(file._id)}
+              margin="0 0 0 x-small"
+            >
+              {I18n.t('Download')}
+            </Button>
+          )}
         </List.Item>
       ))}
     </List>
@@ -160,7 +192,7 @@ const renderFilePreview = (selectedFile?: Attachment) => {
   )
 }
 
-const FileSubmissionPreview = ({submission}: FileSubmissionPreviewProps) => {
+const FileSubmissionPreview = ({submission, assignment, userId}: FileSubmissionPreviewProps) => {
   const defaultSelectedFileIndex = 0
   const [selectedFileIndex, setSelectedFileIndex] = useState(defaultSelectedFileIndex)
 
@@ -188,7 +220,7 @@ const FileSubmissionPreview = ({submission}: FileSubmissionPreviewProps) => {
     >
       {submission.attachments.length > 1 && (
         <Flex.Item padding="0" margin="0 0 x-small 0">
-          {renderFileDetailsTable(submission.attachments, selectFile)}
+          {renderFileDetailsTable(submission.attachments, selectFile, assignment, userId)}
         </Flex.Item>
       )}
       <Flex.Item shouldGrow shouldShrink>

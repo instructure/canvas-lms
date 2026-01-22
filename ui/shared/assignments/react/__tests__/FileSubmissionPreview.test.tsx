@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import FileSubmissionPreview from '../FileSubmissionPreview'
-import {Submission} from '../AssignmentsPeerReviewsStudentTypes'
+import {Assignment, Submission} from '../AssignmentsPeerReviewsStudentTypes'
 
 describe('FileSubmissionPreview', () => {
   const mockSubmissionWithSingleFile: Submission = {
@@ -249,6 +249,73 @@ describe('FileSubmissionPreview', () => {
 
       rerender(<FileSubmissionPreview submission={newSubmission} />)
       expect(iframe).toHaveAttribute('src', 'http://example.com/preview/701')
+    })
+  })
+
+  describe('download buttons for peer review', () => {
+    const userId = 'user-123'
+    const mockAssignment: Assignment = {
+      _id: '1',
+      courseId: '100',
+      name: 'Test Assignment',
+    } as Assignment
+
+    it('shows download button for each file when assignment and userId are provided', () => {
+      render(
+        <FileSubmissionPreview
+          submission={mockSubmissionWithMultipleFiles}
+          assignment={mockAssignment}
+          userId={userId}
+        />,
+      )
+
+      const downloadButtons = screen.getAllByText('Download')
+      expect(downloadButtons).toHaveLength(2)
+
+      expect(downloadButtons[0].closest('a')).toHaveAttribute(
+        'href',
+        `/courses/${mockAssignment.courseId}/assignments/${mockAssignment._id}/submissions/${userId}?download=201`,
+      )
+      expect(downloadButtons[1].closest('a')).toHaveAttribute(
+        'href',
+        `/courses/${mockAssignment.courseId}/assignments/${mockAssignment._id}/submissions/${userId}?download=202`,
+      )
+    })
+
+    it('does not show download buttons when assignment or userId are not provided', () => {
+      render(<FileSubmissionPreview submission={mockSubmissionWithMultipleFiles} />)
+
+      const downloadButtons = screen.queryAllByText('Download')
+      expect(downloadButtons).toHaveLength(0)
+    })
+
+    it('shows download button for single file when assignment and userId are provided', () => {
+      const singleFileWithMultipleAttachments = {
+        ...mockSubmissionWithSingleFile,
+        attachments: [
+          mockSubmissionWithSingleFile.attachments![0],
+          {
+            _id: '102',
+            displayName: 'test-file2.pdf',
+            mimeClass: 'pdf',
+            size: '2.3 MB',
+            thumbnailUrl: null,
+            submissionPreviewUrl: 'http://example.com/preview/102',
+            url: 'http://example.com/download/102',
+          },
+        ],
+      }
+
+      render(
+        <FileSubmissionPreview
+          submission={singleFileWithMultipleAttachments}
+          assignment={mockAssignment}
+          userId={userId}
+        />,
+      )
+
+      const downloadButtons = screen.getAllByText('Download')
+      expect(downloadButtons).toHaveLength(2)
     })
   })
 })

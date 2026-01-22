@@ -57,6 +57,7 @@ interface AssignmentSubmissionProps {
   hasSeenPeerReviewModal: boolean
   isReadOnly?: boolean
   isAnonymous: boolean
+  submissionUserId?: string
 }
 
 const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
@@ -71,6 +72,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   hasSeenPeerReviewModal,
   isReadOnly = false,
   isAnonymous,
+  submissionUserId,
 }) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
   const [showComments, setShowComments] = useState(false)
@@ -230,7 +232,13 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
       case 'online_url':
         return renderUrlEntry()
       case 'online_upload':
-        return <FileSubmissionPreview submission={submission} />
+        return (
+          <FileSubmissionPreview
+            submission={submission}
+            assignment={assignment}
+            userId={submissionUserId}
+          />
+        )
       default:
         return renderError(
           I18n.t('Submission type error'),

@@ -2160,7 +2160,7 @@ describe('PeerReviewsStudentView', () => {
           description: '<p>Description</p>',
           courseId: '100',
           peerReviews: {
-            count: 2,        
+            count: 2,
           },
           assessmentRequestsForCurrentUser: [
             {
@@ -2179,13 +2179,13 @@ describe('PeerReviewsStudentView', () => {
           ],
         },
       })
-      
+
       const {getByTestId, getByText} = setup({assignmentId: '31'})
 
       await waitFor(() => {
         expect(getByTestId('peer-review-selector')).toBeInTheDocument()
       })
-      
+
       const user = userEvent.setup()
       await user.click(getByText('Submission'))
 
@@ -2208,7 +2208,7 @@ describe('PeerReviewsStudentView', () => {
           description: '<p>Description</p>',
           courseId: '100',
           peerReviews: {
-            count: 1,        
+            count: 1,
           },
           assessmentRequestsForCurrentUser: [
             {
@@ -2226,13 +2226,13 @@ describe('PeerReviewsStudentView', () => {
           ],
         },
       })
-      
+
       const {getByTestId, getByText, queryByTestId} = setup({assignmentId: '32'})
 
       await waitFor(() => {
         expect(getByTestId('peer-review-selector')).toBeInTheDocument()
       })
-      
+
       const user = userEvent.setup()
       await user.click(getByText('Submission'))
 
@@ -2252,15 +2252,15 @@ describe('PeerReviewsStudentView', () => {
           description: '<p>Description</p>',
           courseId: '100',
           peerReviews: {
-            count: 2,        
+            count: 2,
           },
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
               available: true,
               workflowState: 'assigned',
-              createdAt: '2025-11-01T00:00:00Z',            
-                submission: {
+              createdAt: '2025-11-01T00:00:00Z',
+              submission: {
                 _id: 'sub-1',
                 attempt: 1,
                 body: '<p>Submitted work</p>',
@@ -2269,7 +2269,7 @@ describe('PeerReviewsStudentView', () => {
               },
             },
             {
-              _id: 'ar-2',            
+              _id: 'ar-2',
               available: false,
               workflowState: 'assigned',
               createdAt: '2025-11-02T00:00:00Z',
@@ -2284,7 +2284,7 @@ describe('PeerReviewsStudentView', () => {
           ],
         },
       })
-      
+
       const {getByTestId, getByText} = setup({assignmentId: '33'})
 
       await waitFor(() => {
@@ -2292,8 +2292,8 @@ describe('PeerReviewsStudentView', () => {
       })
 
       const user = userEvent.setup()
-      const selector = getByTestId('peer-review-selector')      
-      
+      const selector = getByTestId('peer-review-selector')
+
       await user.click(getByText('Submission'))
 
       await waitFor(() => {
@@ -2311,6 +2311,204 @@ describe('PeerReviewsStudentView', () => {
           ),
         ).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('Download Submission button', () => {
+    it('shows download button when submission has single file upload', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '100',
+          name: 'File Upload Assignment',
+          courseId: '200',
+          description: '<p>Description</p>',
+          peerReviews: {count: 1},
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymizedUser: {
+                _id: 'anon-user-1',
+                displayName: 'Student 1',
+              },
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                submissionType: 'online_upload',
+                submittedAt: '2025-11-01T12:00:00Z',
+                attachments: [
+                  {
+                    _id: 'attach-1',
+                    displayName: 'document.pdf',
+                    mimeClass: 'pdf',
+                    size: '1.2 MB',
+                    url: 'http://example.com/file.pdf',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '100'})
+
+      await waitFor(() => {
+        expect(getByText('Download Submission')).toBeInTheDocument()
+      })
+
+      const downloadButton = getByText('Download Submission').closest('a')
+      expect(downloadButton).toHaveAttribute(
+        'href',
+        '/courses/200/assignments/100/submissions/anon-user-1?download=attach-1',
+      )
+    })
+
+    it('does not show download button when submission has multiple files', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '101',
+          name: 'Multiple Files Assignment',
+          courseId: '200',
+          description: '<p>Description</p>',
+          peerReviews: {count: 1},
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymizedUser: {
+                _id: 'anon-user-1',
+                displayName: 'Student 1',
+              },
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                submissionType: 'online_upload',
+                submittedAt: '2025-11-01T12:00:00Z',
+                attachments: [
+                  {
+                    _id: 'attach-1',
+                    displayName: 'document1.pdf',
+                    mimeClass: 'pdf',
+                    size: '1.2 MB',
+                    url: 'http://example.com/file1.pdf',
+                  },
+                  {
+                    _id: 'attach-2',
+                    displayName: 'document2.pdf',
+                    mimeClass: 'pdf',
+                    size: '2.3 MB',
+                    url: 'http://example.com/file2.pdf',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      })
+
+      const {queryByTestId, queryByText} = setup({assignmentId: '101'})
+
+      await waitFor(() => {
+        expect(queryByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(queryByText('Download Submission')).not.toBeInTheDocument()
+    })
+
+    it('does not show download button when submission is not file upload', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '102',
+          name: 'Text Entry Assignment',
+          courseId: '200',
+          description: '<p>Description</p>',
+          peerReviews: {count: 1},
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymizedUser: {
+                _id: 'anon-user-1',
+                displayName: 'Student 1',
+              },
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                submissionType: 'online_text_entry',
+                body: '<p>Student submission</p>',
+                submittedAt: '2025-11-01T12:00:00Z',
+              },
+            },
+          ],
+        },
+      })
+
+      const {queryByTestId, queryByText} = setup({assignmentId: '102'})
+
+      await waitFor(() => {
+        expect(queryByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(queryByText('Download Submission')).not.toBeInTheDocument()
+    })
+
+    it('uses anonymousId when anonymizedUser is not available', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '103',
+          name: 'Anonymous Assignment',
+          courseId: '200',
+          description: '<p>Description</p>',
+          peerReviews: {count: 1, anonymousReviews: true},
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymousId: 'anon-id-123',
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                submissionType: 'online_upload',
+                submittedAt: '2025-11-01T12:00:00Z',
+                attachments: [
+                  {
+                    _id: 'attach-1',
+                    displayName: 'document.pdf',
+                    mimeClass: 'pdf',
+                    size: '1.2 MB',
+                    url: 'http://example.com/file.pdf',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '103'})
+
+      await waitFor(() => {
+        expect(getByText('Download Submission')).toBeInTheDocument()
+      })
+
+      const downloadButton = getByText('Download Submission').closest('a')
+      expect(downloadButton).toHaveAttribute(
+        'href',
+        '/courses/200/assignments/103/submissions/anon-id-123?download=attach-1',
+      )
     })
   })
 })
