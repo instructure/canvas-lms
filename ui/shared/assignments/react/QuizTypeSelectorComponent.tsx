@@ -80,17 +80,22 @@ const QuizTypeSelectorContent: React.FC<QuizTypeSelectorContentProps> = ({
             </option>
           ))}
         </select>
-        {isExistingAssignment && (
-          <Tooltip
-            renderTip={I18n.t(
-              'quiz_type_locked_tooltip',
-              'Quiz Type can only be set when creating a new assignment',
-            )}
-            placement="end"
-          >
-            <IconInfoLine />
-          </Tooltip>
-        )}
+        <Tooltip
+          renderTip={
+            isExistingAssignment
+              ? I18n.t(
+                  'quiz_type_locked_tooltip',
+                  'Quiz Type can only be set when creating a new assignment',
+                )
+              : I18n.t(
+                  'quiz_type_locked_after_save_tooltip',
+                  'After saving these settings, the quiz type is locked and cannot be changed.',
+                )
+          }
+          placement="end"
+        >
+          <IconInfoLine />
+        </Tooltip>
       </Flex>
     </div>
   )
