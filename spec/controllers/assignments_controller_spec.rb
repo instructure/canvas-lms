@@ -2121,6 +2121,58 @@ describe AssignmentsController do
       get :show, params: { course_id: @course.id, id: @assignment.id, submitted: 0 }
       expect(flash[:notice]).to match(/Assignment successfully submitted./)
     end
+
+    context "peer review sub-assignment redirect" do
+      let(:parent_assignment) do
+        @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          points_possible: 10
+        )
+      end
+
+      let(:peer_review_sub_assignment) do
+        PeerReviewSubAssignment.create!(
+          context: @course,
+          parent_assignment:,
+          title: "Peer Review",
+          points_possible: 10
+        )
+      end
+
+      context "when feature flag is enabled" do
+        before do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "redirects to parent assignment when accessing peer review sub-assignment" do
+          user_session(@student)
+          get :show, params: { course_id: @course.id, id: peer_review_sub_assignment.id }
+          expect(response).to redirect_to(course_assignment_path(@course, parent_assignment))
+        end
+
+        it "does not redirect for regular assignments" do
+          user_session(@student)
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(response).not_to be_redirect
+        end
+
+        it "does not redirect for deleted peer review sub-assignment" do
+          user_session(@student)
+          peer_review_sub_assignment.destroy
+          get :show, params: { course_id: @course.id, id: peer_review_sub_assignment.id }
+          expect(response).not_to be_redirect
+        end
+      end
+
+      context "when feature flag is disabled" do
+        it "does not redirect peer review sub-assignment" do
+          user_session(@student)
+          get :show, params: { course_id: @course.id, id: peer_review_sub_assignment.id }
+          expect(response).not_to be_redirect
+        end
+      end
+    end
   end
 
   describe "GET 'tool_launch'" do
