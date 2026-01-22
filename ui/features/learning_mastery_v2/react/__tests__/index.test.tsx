@@ -28,6 +28,7 @@ import {Rating, Student, Outcome, StudentRollupData} from '@canvas/outcomes/reac
 import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
 import {saveLearningMasteryGradebookSettings} from '../apiClient'
+import {useMasteryDistribution} from '../hooks/useMasteryDistribution'
 
 vi.mock('../apiClient')
 
@@ -35,6 +36,7 @@ vi.mock('@canvas/outcomes/react/hooks/useRollups')
 vi.mock('../hooks/useGradebookSettings')
 vi.mock('../hooks/useStudents')
 vi.mock('@canvas/outcomes/react/hooks/useContributingScores')
+vi.mock('../hooks/useMasteryDistribution')
 
 vi.mock('@canvas/svg-wrapper', () => ({
   default: ({ariaLabel, ariaHidden}: {ariaLabel?: string; ariaHidden?: boolean}) => (
@@ -161,6 +163,28 @@ describe('LearningMastery', () => {
         })),
       },
     })
+
+    const mockUseMasteryDistribution = useMasteryDistribution as MockedFunction<
+      typeof useMasteryDistribution
+    >
+    mockUseMasteryDistribution.mockReturnValue({
+      data: {
+        outcome_distributions: {
+          '1': {
+            outcome_id: '1',
+            ratings: [
+              {description: 'Exceeds', points: 3, color: '#127A1B', count: 5, student_ids: []},
+              {description: 'Meets', points: 2, color: '#0B874B', count: 10, student_ids: []},
+            ],
+            total_students: 15,
+          },
+        },
+        students: [],
+      },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    } as any)
   })
 
   afterEach(() => {

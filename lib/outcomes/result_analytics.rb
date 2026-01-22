@@ -284,6 +284,155 @@ module Outcomes
       count_arr.map { |v| (100.0 * v / total).round }
     end
 
+    # Public: Calculates distribution counts for each outcome across rollups
+    #
+    # rollups - Array of Rollup objects
+    # outcomes - Array of LearningOutcome objects
+    # context - Course or Account context
+    #
+    # Returns a hash of outcome_id => distribution data with counts and student_ids per rating
+    def mastery_distributions(rollups:, outcomes:, context: nil, opts: {})
+      outcome_proficiency_ratings = if context&.root_account&.feature_enabled?(:account_level_mastery_scales)
+                                      context.resolved_outcome_proficiency.ratings_hash
+                                    end
+
+      distributions = {}
+
+      outcomes.each do |outcome|
+        ratings = outcome_proficiency_ratings || outcome.rubric_criterion[:ratings]&.clone
+
+        if opts[:add_defaults] == "true"
+          # add mastery level and color defaults to rubric_criterion
+          outcome.find_or_set_rating_defaults(ratings, outcome.rubric_criterion[:mastery_points])
+        end
+
+        next unless ratings
+
+        # Sort ratings by points descending (highest first)
+        sorted_ratings = ratings.sort_by { |r| -r[:points] }
+
+        # Initialize counts and student_ids for each rating
+        rating_counts = sorted_ratings.map do |rating|
+          {
+            description: rating[:description],
+            points: rating[:points],
+            color: rating[:color] || "#666666",
+            count: 0,
+            student_ids: []
+          }
+        end
+
+        # Count students in each rating level and track their IDs
+        total_students = 0
+        rollups.each do |rollup|
+          score_obj = rollup.scores.find { |s| s.outcome.id == outcome.id }
+          next unless score_obj&.score
+
+          total_students += 1
+          # Find the rating level for this score
+          idx = sorted_ratings.find_index { |rating| rating[:points] <= score_obj.score }
+          if idx
+            rating_counts[idx][:count] += 1
+            rating_counts[idx][:student_ids] << rollup.context.id.to_s
+          end
+        end
+
+        distributions[outcome.id.to_s] = {
+          outcome_id: outcome.id.to_s,
+          ratings: rating_counts,
+          total_students:
+        }
+      end
+
+      distributions
+    end
+
+    # Public: Calculates distribution counts for contributing scores (alignments)
+    #
+    # outcomes - Array of LearningOutcome objects
+    # users - Array of User objects
+    # context - Course or Account context
+    # results - Array of LearningOutcomeResult objects (both Canvas and OS)
+    # options - Hash of options:
+    #   :only_assignment_alignments - Boolean, filter to only assignments
+    #
+    # Returns nested hash: outcome_id => { alignment_id => distribution data }
+    def alignment_mastery_distributions(outcomes:, users:, context:, results:, alignments_by_outcome:, options: {})
+      outcome_proficiency_ratings = if context&.root_account&.feature_enabled?(:account_level_mastery_scales)
+                                      context.resolved_outcome_proficiency.ratings_hash
+                                    end
+
+      distributions = {}
+
+      outcomes.each do |outcome|
+        alignments = alignments_by_outcome[outcome.id] || []
+        next if alignments.empty?
+
+        ratings = outcome_proficiency_ratings || outcome.rubric_criterion[:ratings]
+        next unless ratings
+
+        sorted_ratings = ratings.sort_by { |r| -r[:points] }
+
+        # Calculate distribution for each alignment
+        alignment_dists = {}
+        alignments.each do |alignment|
+          # Filter results for this specific alignment
+          alignment_results = results.select do |result|
+            result.learning_outcome_id == outcome.id && matches_alignment_for_result?(result, alignment)
+          end
+
+          # Initialize counts and student_ids
+          rating_counts = sorted_ratings.map do |rating|
+            {
+              description: rating[:description],
+              points: rating[:points],
+              color: rating[:color] || "#666666",
+              count: 0,
+              student_ids: []
+            }
+          end
+
+          # Count scores in each rating level and track student IDs
+          total_students = 0
+          alignment_results.each do |result|
+            next unless result.score
+
+            total_students += 1
+            idx = sorted_ratings.find_index { |rating| rating[:points] <= result.score }
+            if idx
+              rating_counts[idx][:count] += 1
+              rating_counts[idx][:student_ids] << result.user_id.to_s
+            end
+          end
+
+          alignment_dists[alignment.prefixed_id] = {
+            alignment_id: alignment.prefixed_id,
+            ratings: rating_counts,
+            total_students:
+          }
+        end
+
+        distributions[outcome.id.to_s] = alignment_dists unless alignment_dists.empty?
+      end
+
+      distributions
+    end
+
+    # Internal: Checks if a result matches an alignment
+    def matches_alignment_for_result?(result, alignment)
+      # Direct content tag match
+      return true if result.alignment&.id == alignment.id
+
+      # Assignment match (handles both Assignment and Quiz)
+      if result.associated_asset.is_a?(Assignment)
+        return result.associated_asset.id == alignment.content_id if alignment.content_type == "Assignment"
+      elsif result.associated_asset.is_a?(Quizzes::Quiz)
+        return result.associated_asset.assignment_id == alignment.content_id if alignment.content_type == "Assignment"
+      end
+
+      false
+    end
+
     class << self
       include ResultAnalytics
     end

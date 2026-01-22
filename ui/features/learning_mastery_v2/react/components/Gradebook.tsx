@@ -36,12 +36,15 @@ import {
   ContributingScoresManager,
 } from '@canvas/outcomes/react/hooks/useContributingScores'
 import {GradebookTable} from './GradebookTable'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 export interface GradebookProps {
   courseId: string
   students: Student[]
   outcomes: Outcome[]
   rollups: StudentRollupData[]
+  outcomeDistributions?: Record<string, OutcomeDistribution>
+  isLoadingDistribution?: boolean
   pagination?: PaginationType
   setCurrentPage: (page: number) => void
   sorting: Sorting
@@ -62,6 +65,8 @@ const GradebookComponent: React.FC<GradebookProps> = ({
   students,
   outcomes: initialOutcomes,
   rollups,
+  outcomeDistributions,
+  isLoadingDistribution = false,
   pagination,
   setCurrentPage,
   sorting,
@@ -106,6 +111,8 @@ const GradebookComponent: React.FC<GradebookProps> = ({
         outcomes={outcomes}
         rollups={rollups}
         sorting={sorting}
+        outcomeDistributions={outcomeDistributions}
+        isLoadingDistribution={isLoadingDistribution}
         gradebookSettings={gradebookSettings}
         onChangeNameDisplayFormat={onChangeNameDisplayFormat}
         contributingScores={contributingScores}

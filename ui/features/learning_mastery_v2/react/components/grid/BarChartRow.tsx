@@ -16,48 +16,52 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {MasteryDistributionChart} from '../charts'
-import {
-  ContributingScoreAlignment,
-  ContributingScoresManager,
-} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {Outcome, Student, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
+import React, {useCallback} from 'react'
+import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {
   BAR_CHART_HEIGHT,
-  COLUMN_PADDING,
-  COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
   STUDENT_COLUMN_WIDTH,
 } from '@canvas/outcomes/react/utils/constants'
-import {getScoresForOutcome, getScoresForAlignment} from '../../utils/scoreUtils'
 import {Column} from '../table/utils'
 import {Row} from '../table/Row'
 import {Cell} from '../table/Cell'
-import {BorderWidth, Shadow} from '@instructure/emotion'
+import {
+  OutcomeDistribution,
+  RatingDistribution,
+} from '@canvas/outcomes/react/types/mastery_distribution'
+import {MasteryDistributionChartCell} from '../charts/MasteryDistributionChartCell'
 
 export interface BarChartRowProps {
-  rollups: StudentRollupData[]
-  students: Student[]
-  contributingScores: ContributingScoresManager
   columns: Column[]
+  outcomeDistributions?: Record<string, OutcomeDistribution>
+  isLoading?: boolean
   handleKeyDown: (event: React.KeyboardEvent, rowIndex: number, colIndex: number) => void
 }
 
 export const BarChartRow: React.FC<BarChartRowProps> = ({
-  rollups,
-  students,
-  contributingScores,
   columns,
+  outcomeDistributions,
+  isLoading = false,
   handleKeyDown,
 }) => {
-  // fixed row index for the bar chart row which is placed above table headers
-  const rowIndex = -2
+  const rowIndex = -2 // Fixed row index for bar chart row
 
-  const commonCellProps = {
-    borderWidth: '0' as BorderWidth,
-    shadow: 'above' as Shadow,
-  }
+  const getDistributionForOutcome = useCallback(
+    (outcomeId: string | number): RatingDistribution[] | undefined => {
+      return outcomeDistributions?.[outcomeId.toString()]?.ratings
+    },
+    [outcomeDistributions],
+  )
+
+  const getDistributionForAlignment = useCallback(
+    (outcomeId: string | number, alignmentId: string): RatingDistribution[] | undefined => {
+      const outcomeDist = outcomeDistributions?.[outcomeId.toString()]
+      return outcomeDist?.alignment_distributions?.[alignmentId]?.ratings
+    },
+    [outcomeDistributions],
+  )
 
   return (
     <Row>
@@ -73,7 +77,6 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
-              {...commonCellProps}
             />
           )
         } else if (column.key.startsWith('outcome-')) {
@@ -85,14 +88,13 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
-              {...commonCellProps}
             >
-              <MasteryDistributionChart
+              <MasteryDistributionChartCell
+                key={`outcomes-chart-${outcome.id}`}
                 outcome={outcome}
-                scores={getScoresForOutcome(rollups, outcome.id)}
-                height={BAR_CHART_HEIGHT}
-                width={COLUMN_WIDTH + COLUMN_PADDING}
-                isPreview={true}
+                distributionData={getDistributionForOutcome(outcome.id)}
+                isLoading={isLoading}
+                loadingTitle="Loading mastery distribution"
               />
             </Cell>
           )
@@ -106,23 +108,19 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
-              {...commonCellProps}
             >
-              <MasteryDistributionChart
+              <MasteryDistributionChartCell
+                key={`alignment-chart-${alignment.alignment_id}`}
                 outcome={outcome}
-                scores={getScoresForAlignment(
-                  contributingScores,
-                  students,
-                  outcome.id,
-                  alignment.alignment_id,
-                )}
-                height={BAR_CHART_HEIGHT}
-                width={COLUMN_WIDTH + COLUMN_PADDING}
-                isPreview={true}
+                distributionData={getDistributionForAlignment(outcome.id, alignment.alignment_id)}
+                isLoading={isLoading}
+                loadingTitle="Loading alignment distribution"
               />
             </Cell>
           )
         }
+
+        return null
       })}
     </Row>
   )
