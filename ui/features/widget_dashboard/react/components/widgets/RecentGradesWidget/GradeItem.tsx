@@ -25,7 +25,6 @@ import {Pill} from '@instructure/ui-pill'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconCompleteSolid, IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {Expandable} from '@instructure/ui-expandable'
-import CourseCode from '../../shared/CourseCode'
 import type {GradeItemProps} from '../../../types'
 import {determineItemType, getTypeIcon} from '../../../utils/assignmentUtils'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
@@ -72,17 +71,18 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
   }
 
   const assignmentTitle = (
-    <Text size="medium" weight="bold" data-testid={`assignment-title-${submission._id}`}>
-      {submission.assignment.name}
-    </Text>
-  )
-
-  const courseCode = (
-    <CourseCode
-      courseId={submission.assignment.course._id}
-      overrideCode={submission.assignment.course.courseCode}
-      size="x-small"
-    />
+    <View>
+      <Text size="medium" weight="bold" data-testid={`assignment-title-${submission._id}`}>
+        {submission.assignment.name}
+      </Text>
+      {submission.assignment.course?.name && (
+        <View as="div">
+          <Text size="small" color="secondary" data-testid={`course-name-${submission._id}`}>
+            {submission.assignment.course.name}
+          </Text>
+        </View>
+      )}
+    </View>
   )
 
   const timestamp = (
@@ -121,7 +121,6 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
       <View as="div" padding="small 0" data-testid={`grade-item-${submission._id}`}>
         <Flex direction="column" gap="x-small">
           <Flex.Item>{assignmentTitle}</Flex.Item>
-          <Flex.Item>{courseCode}</Flex.Item>
           <Flex.Item>{timestamp}</Flex.Item>
           <Flex.Item>
             <Flex direction="row" gap="x-small" alignItems="center">
@@ -157,12 +156,7 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
             <Flex.Item shouldGrow shouldShrink>
               <Flex direction="column">
                 <Flex.Item>{assignmentTitle}</Flex.Item>
-                <Flex.Item>
-                  <Flex direction="row" gap="x-small" alignItems="center" wrap="wrap">
-                    <Flex.Item>{courseCode}</Flex.Item>
-                    <Flex.Item>{timestamp}</Flex.Item>
-                  </Flex>
-                </Flex.Item>
+                <Flex.Item>{timestamp}</Flex.Item>
               </Flex>
             </Flex.Item>
 
