@@ -66,14 +66,20 @@ module BrandableCSS
     "ic-brand-Login-Content-password-text-color" => -> { I18n.t("Login Link Color") },
     "ic-brand-Login-footer-link-color" => -> { I18n.t("Login Footer Link") },
     "ic-brand-Login-footer-link-color-hover" => -> { I18n.t("Login Footer Link Hover") },
-    "ic-brand-Login-instructure-logo" => -> { I18n.t("Login Instructure Logo") }
+    "ic-brand-Login-instructure-logo" => -> { I18n.t("Login Instructure Logo") },
+    "ic-brand-Login-custom-message" => -> { I18n.t("Login Custom Message") },
+    "ic-brand-Discovery-custom-message" => -> { I18n.t("Discovery Custom Message") },
+    "ic-brand-Registration-custom-message" => -> { I18n.t("Registration Custom Message") },
+    "ic-brand-Registration-parent-custom-message" => -> { I18n.t("Parent Registration Custom Message") },
   }.freeze
 
   GROUP_NAMES = {
     "global_branding" => -> { I18n.t("Global Branding") },
     "global_navigation" => -> { I18n.t("Global Navigation") },
     "watermarks" => -> { I18n.t("Watermarks & Other Images") },
-    "login" => -> { I18n.t("Login Screen") }
+    "login" => -> { I18n.t("Login Screen") },
+    "discovery" => -> { I18n.t("Discovery Screen") },
+    "registration" => -> { I18n.t("Registration Screens") }
   }.freeze
 
   HELPER_TEXTS = {
@@ -86,7 +92,11 @@ module BrandableCSS
     "ic-brand-msapplication-tile-square" => -> { I18n.t("558x558 png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)") },
     "ic-brand-msapplication-tile-wide" => -> { I18n.t("558x270 png, jpg, gif") },
     "ic-brand-right-sidebar-logo" => -> { I18n.t("A full-size logo that appears in the right sidebar on the Canvas dashboard. Ideal size is 360 x 140 pixels. Accepted formats: svg, png, jpeg, gif") },
-    "ic-brand-Login-body-bgd-shadow-color" => -> { I18n.t("accepted formats: hex, rgba, rgb, hsl") }
+    "ic-brand-Login-body-bgd-shadow-color" => -> { I18n.t("accepted formats: hex, rgba, rgb, hsl") },
+    "ic-brand-Login-custom-message" => -> { I18n.t("A custom message to display on the login screen (see: /login/canvas).") },
+    "ic-brand-Discovery-custom-message" => -> { I18n.t("A custom message to display on the discovery screen (see: /login/discovery).") },
+    "ic-brand-Registration-custom-message" => -> { I18n.t("A custom message to display on the registration screen (see: /login/canvas/register).") },
+    "ic-brand-Registration-parent-custom-message" => -> { I18n.t("A custom message to display on the parent registration screen (see: /login/canvas/register/parent).") },
   }.freeze
 
   class << self

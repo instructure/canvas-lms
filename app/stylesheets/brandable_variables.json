@@ -241,6 +241,36 @@
         "variable_name": "ic-brand-Login-instructure-logo",
         "type": "color",
         "default": "#ffffff"
+      },
+      {
+        "variable_name": "ic-brand-Login-custom-message",
+        "type": "textarea",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "group_key": "discovery",
+    "variables": [
+      {
+        "variable_name": "ic-brand-Discovery-custom-message",
+        "type": "textarea",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "group_key": "registration",
+    "variables": [
+      {
+        "variable_name": "ic-brand-Registration-custom-message",
+        "type": "textarea",
+        "default": ""
+      },
+      {
+        "variable_name": "ic-brand-Registration-parent-custom-message",
+        "type": "textarea",
+        "default": ""
       }
     ]
   }

@@ -61,22 +61,7 @@ class BrandConfigsController < ApplicationController
 
     variable_schema = default_schema
 
-    # TODO: permanently remove unused theme variables
-    # once the `login_registration_ui_identity` feature is fully adopted and the
-    # new login UI becomes the default:
-    #   1. permanently update the theme editor UI to remove old/unused login
-    #      brand config variables
-    #   2. remove the `login_registration_ui_identity` feature flag check
-    #   3. remove `LoginBrandConfigFilter.filter`, as the filtering will no
-    #      longer be necessary
-    #   4. ensure that only the new login-related brand config variables are
-    #      returned in relevant API responses
-    #   5. update tests
-    # this is a general outline; there may be other areas that need cleanup, so
-    # review the code carefully when making these changes
-    if @domain_root_account.feature_enabled?(:login_registration_ui_identity)
-      variable_schema = Login::LoginBrandConfigFilter.filter(variable_schema)
-    end
+    variable_schema = Login::LoginBrandConfigFilter.filter(variable_schema, @domain_root_account)
 
     js_env brandConfig: brand_config.as_json(include_root: false),
            isDefaultConfig: session[:brand_config]&.[](:type) == :default,
@@ -231,8 +216,23 @@ class BrandConfigsController < ApplicationController
     variables.to_unsafe_h.each_with_object({}) do |(key, value), memo|
       next unless value.present? && (config = BrandableCSS.variables_map[key])
 
-      value = process_file(value) if config["type"] == "image"
-      memo[key] = value
+      if config["type"] == "textarea"
+        if value.match?(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/)
+          raise ActionController::BadRequest, "#{key} contains invalid characters"
+        end
+
+        if value.length > 500
+          raise ActionController::BadRequest, "#{key} cannot exceed 500 characters"
+        end
+
+        sanitized_value = Sanitize.clean(value)
+        memo[key] = sanitized_value
+      elsif config["type"] == "image"
+        value = process_file(value)
+        memo[key] = value
+      else
+        memo[key] = value
+      end
     end
   end
 
