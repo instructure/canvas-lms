@@ -121,8 +121,8 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
       const msg =
         appliedFilters.length > 0
-          ? I18n.t('Filters applied. Accessibility issues updated.')
-          : I18n.t('Filters cleared. Accessibility issues updated.')
+          ? I18n.t('Filter updated. Showing matching resources.')
+          : I18n.t('Filters cleared. Showing all resources.')
 
       setTimeout(() => setAlertMessage(msg), 3000)
     },

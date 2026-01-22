@@ -47,11 +47,11 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
   }, [])
 
   useEffect(() => {
-    if (alertMessage !== null) {
-      const timeout = setTimeout(() => setAlertMessage(null), 3000)
-      return () => clearTimeout(timeout)
-    }
-  }, [alertMessage, setAlertMessage])
+    if (alertMessage === null) return // Don't set timeout for null
+
+    const timeout = setTimeout(() => setAlertMessage(null), 3000)
+    return () => clearTimeout(timeout)
+  }, [alertMessage])
 
   const shouldSearch = (searchString: string) => {
     const searchQueryLength = searchString.trim().length
@@ -61,12 +61,16 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
   const debouncedOnSearchChange = useDebouncedCallback((value: string) => {
     if (shouldSearch(value)) {
       onSearchChange(value).then(result => {
+        if (!result) return // Handle failure case properly
+
         const msg =
           value.length > 0
-            ? I18n.t('Search filter applied. Accessibility issues updated.')
-            : I18n.t('Search filter cleared. Accessibility issues updated.')
+            ? I18n.t('Showing resources matching %{searchTerm}.', {
+                searchTerm: value,
+              })
+            : I18n.t('Search filter cleared. Showing all resources.')
 
-        setTimeout(() => result && setAlertMessage(msg), 1500)
+        setTimeout(() => setAlertMessage(msg), 1500)
       })
     }
   }, 300)
