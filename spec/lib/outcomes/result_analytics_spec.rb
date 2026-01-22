@@ -622,6 +622,13 @@ describe Outcomes::ResultAnalytics do
           percents = ra.rating_percents(rollups, context: @course)
           expect(percents).to eq({ 80 => [67, 0, 33, 0, 0] })
         end
+
+        it "includes proficiency context information in mastery_scale_opts" do
+          outcome_proficiency_model(@course)
+          opts = ra.send(:mastery_scale_opts, @course)
+          expect(opts[:proficiency_context_type]).to eq("Course")
+          expect(opts[:proficiency_context_id]).to eq(@course.id.to_s)
+        end
       end
 
       describe "disabled" do
