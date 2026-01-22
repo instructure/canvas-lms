@@ -27,6 +27,7 @@ require "active_support/core_ext/object/blank"
 module CanvasHttp
   OPEN_TIMEOUT = 5
   READ_TIMEOUT = 30
+  WRITE_TIMEOUT = 10
 
   def self.blocked_ip_ranges
     @blocked_ip_ranges || [
@@ -304,6 +305,7 @@ module CanvasHttp
     http.use_ssl = (uri.scheme == "https")
     http.ssl_timeout = http.open_timeout = OPEN_TIMEOUT
     http.read_timeout = READ_TIMEOUT
+    http.write_timeout = WRITE_TIMEOUT
     # Don't rely on net/http's internal retries, since they swallow errors in a
     # way that can't be detected when streaming responses, leading to duplicate
     # data
