@@ -74,3 +74,27 @@ saml_enforce_one_time_use:
       state: hidden
     production:
       state: hidden
+new_login_ui_custom_labels:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "New Canvas Login UI: Custom Labels"
+  description: Enable custom labels for the new Canvas Login/Registration UI.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
+new_login_ui_identity_discovery_page:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "New Canvas Login UI: Identity Service Discovery Page"
+  description: Enable Identity Service Discovery Page for the new Canvas Login/Registration UI.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
