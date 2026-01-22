@@ -29,6 +29,7 @@ import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover
 import {DragDropConnectorProps} from './DragDropWrapper'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {ColumnHeader} from './ColumnHeader'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -36,14 +37,14 @@ export interface OutcomeHeaderProps extends DragDropConnectorProps {
   outcome: Outcome
   sorting: Sorting
   contributingScoresForOutcome: ContributingScoresForOutcome
-  scores: (number | undefined)[]
+  outcomeDistribution?: OutcomeDistribution
 }
 
 export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
   outcome,
   sorting,
   contributingScoresForOutcome,
-  scores,
+  outcomeDistribution,
 }) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
@@ -117,7 +118,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
       {isODPOpen && (
         <OutcomeDistributionPopover
           outcome={outcome}
-          scores={scores}
+          outcomeDistribution={outcomeDistribution}
           isOpen={isODPOpen}
           onCloseHandler={closeODP}
           renderTrigger={<span />}

@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import {MasteryDistributionChart, MasteryDistributionChartProps} from '../MasteryDistributionChart'
 import {MOCK_OUTCOMES} from '../../../__fixtures__/rollups'
+import {RatingDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 // Mock the BarChart component to simplify testing
 vi.mock('../BarChart', () => ({
@@ -32,37 +33,70 @@ vi.mock('../BarChart', () => ({
 }))
 
 describe('MasteryDistributionChart', () => {
+  const defaultDistributionData = (): RatingDistribution[] => [
+    {
+      description: 'great!',
+      points: 5,
+      color: 'blue',
+      count: 2,
+      student_ids: ['1', '5'],
+    },
+    {
+      description: 'mastery!',
+      points: 3,
+      color: 'green',
+      count: 2,
+      student_ids: ['2', '3'],
+    },
+    {
+      description: 'rating description!',
+      points: 2,
+      color: 'yellow',
+      count: 1,
+      student_ids: ['4'],
+    },
+    {
+      description: 'not great',
+      points: 0,
+      color: 'red',
+      count: 0,
+      student_ids: [],
+    },
+  ]
+
   const defaultProps = (): MasteryDistributionChartProps => ({
     outcome: MOCK_OUTCOMES[0],
-    scores: [5, 3, 3, 2, 5],
+    distributionData: defaultDistributionData(),
     width: '100%',
     height: 400,
   })
 
   it('renders the BarChart component', () => {
-    const {getByTestId} = render(<MasteryDistributionChart {...defaultProps()} />)
-    expect(getByTestId('bar-chart')).toBeInTheDocument()
+    render(<MasteryDistributionChart {...defaultProps()} />)
+    expect(screen.getByTestId('bar-chart')).toBeInTheDocument()
   })
 
-  it('correctly counts scores for each mastery level', () => {
-    const {getByTestId} = render(<MasteryDistributionChart {...defaultProps()} />)
-    const values = JSON.parse(getByTestId('chart-values').textContent || '[]')
+  it('correctly displays counts for each mastery level', () => {
+    render(<MasteryDistributionChart {...defaultProps()} />)
+    const values = JSON.parse(screen.getByTestId('chart-values').textContent || '[]')
 
     expect(values).toHaveLength(4)
-    expect(values.every((v: number) => typeof v === 'number')).toBe(true)
+    expect(values).toEqual([2, 2, 1, 0])
   })
 
-  it('orders mastery levels from highest to lowest points', () => {
-    const {getByTestId} = render(<MasteryDistributionChart {...defaultProps()} />)
-    const labels = JSON.parse(getByTestId('chart-labels').textContent || '[]')
+  it('displays mastery levels in the order provided', () => {
+    render(<MasteryDistributionChart {...defaultProps()} />)
+    const labels = JSON.parse(screen.getByTestId('chart-labels').textContent || '[]')
 
     expect(labels[0]).toBe('great!')
-    expect(labels[labels.length - 1]).toBe('not great')
+    expect(labels[1]).toBe('mastery!')
+    expect(labels[2]).toBe('rating description!')
+    expect(labels[3]).toBe('not great')
   })
 
   it('prepends # to color values that do not start with #', () => {
-    const {getByTestId} = render(<MasteryDistributionChart {...defaultProps()} />)
-    const colors = JSON.parse(getByTestId('chart-colors').textContent || '[]')
+    render(<MasteryDistributionChart {...defaultProps()} />)
+    const colors = JSON.parse(screen.getByTestId('chart-colors').textContent || '[]')
 
     colors.forEach((color: string) => {
       expect(color).toMatch(/^#/)
@@ -72,28 +106,27 @@ describe('MasteryDistributionChart', () => {
   it('handles color values that already start with #', () => {
     const propsWithHashColors = {
       ...defaultProps(),
-      outcome: {
-        ...MOCK_OUTCOMES[0],
-        ratings: [
-          {
-            description: 'Excellent',
-            points: 5,
-            color: '#00FF00',
-            mastery: true,
-          },
-        ],
-      },
+      distributionData: [
+        {
+          description: 'Excellent',
+          points: 5,
+          color: '#00FF00',
+          count: 3,
+          student_ids: ['1', '2', '3'],
+        },
+      ],
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithHashColors} />)
-    const colors = JSON.parse(getByTestId('chart-colors').textContent || '[]')
+    render(<MasteryDistributionChart {...propsWithHashColors} />)
+    const colors = JSON.parse(screen.getByTestId('chart-colors').textContent || '[]')
 
     expect(colors).toEqual(['#00FF00'])
   })
 
-  it('uses fallback color for ratings without color', () => {
+  it('uses fallback color for ratings without color in empty distributionData', () => {
     const propsWithoutColor = {
       ...defaultProps(),
+      distributionData: [],
       outcome: {
         ...MOCK_OUTCOMES[0],
         ratings: [
@@ -107,47 +140,87 @@ describe('MasteryDistributionChart', () => {
       },
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithoutColor} />)
-    const colors = JSON.parse(getByTestId('chart-colors').textContent || '[]')
+    render(<MasteryDistributionChart {...propsWithoutColor} />)
+    const colors = JSON.parse(screen.getByTestId('chart-colors').textContent || '[]')
 
     expect(colors[0]).toMatch(/^#[0-9A-Fa-f]{6}$/)
   })
 
-  it('ignores undefined scores when counting', () => {
-    const propsWithUndefined = {
+  it('displays counts from distributionData', () => {
+    const propsWithCounts = {
       ...defaultProps(),
-      scores: [5, undefined, 3, undefined, 2],
+      distributionData: [
+        {
+          description: 'Level 1',
+          points: 5,
+          color: 'blue',
+          count: 5,
+          student_ids: ['1', '2', '3', '4', '5'],
+        },
+        {
+          description: 'Level 2',
+          points: 3,
+          color: 'green',
+          count: 3,
+          student_ids: ['6', '7', '8'],
+        },
+        {
+          description: 'Level 3',
+          points: 0,
+          color: 'red',
+          count: 2,
+          student_ids: ['9', '10'],
+        },
+      ],
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithUndefined} />)
-    const values = JSON.parse(getByTestId('chart-values').textContent || '[]')
+    render(<MasteryDistributionChart {...propsWithCounts} />)
+    const values = JSON.parse(screen.getByTestId('chart-values').textContent || '[]')
 
-    expect(values).toHaveLength(4)
-    expect(values.reduce((sum: number, v: number) => sum + v, 0)).toBe(3)
+    expect(values).toHaveLength(3)
+    expect(values).toEqual([5, 3, 2])
   })
 
-  it('handles empty scores array', () => {
-    const propsWithEmptyScores = {
+  it('handles empty distributionData by using outcome ratings', () => {
+    const propsWithEmptyData = {
       ...defaultProps(),
-      scores: [],
+      distributionData: [],
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithEmptyScores} />)
-    const values = JSON.parse(getByTestId('chart-values').textContent || '[]')
+    render(<MasteryDistributionChart {...propsWithEmptyData} />)
+    const values = JSON.parse(screen.getByTestId('chart-values').textContent || '[]')
+    const labels = JSON.parse(screen.getByTestId('chart-labels').textContent || '[]')
 
+    // Should create entries from outcome.ratings with 0 counts
     expect(values).toEqual([0, 0, 0, 0])
+    expect(labels).toHaveLength(4)
   })
 
-  it('handles scores array with only undefined values', () => {
-    const propsWithAllUndefined = {
+  it('handles distributionData with zero counts', () => {
+    const propsWithZeroCounts = {
       ...defaultProps(),
-      scores: [undefined, undefined, undefined],
+      distributionData: [
+        {
+          description: 'Level 1',
+          points: 5,
+          color: 'blue',
+          count: 0,
+          student_ids: [],
+        },
+        {
+          description: 'Level 2',
+          points: 3,
+          color: 'green',
+          count: 0,
+          student_ids: [],
+        },
+      ],
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithAllUndefined} />)
-    const values = JSON.parse(getByTestId('chart-values').textContent || '[]')
+    render(<MasteryDistributionChart {...propsWithZeroCounts} />)
+    const values = JSON.parse(screen.getByTestId('chart-values').textContent || '[]')
 
-    expect(values).toEqual([0, 0, 0, 0])
+    expect(values).toEqual([0, 0])
   })
 
   it('passes custom width and height to BarChart', () => {
@@ -157,8 +230,8 @@ describe('MasteryDistributionChart', () => {
       height: 300,
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...customProps} />)
-    expect(getByTestId('bar-chart')).toBeInTheDocument()
+    render(<MasteryDistributionChart {...customProps} />)
+    expect(screen.getByTestId('bar-chart')).toBeInTheDocument()
   })
 
   it('passes showLegend prop to BarChart', () => {
@@ -167,8 +240,8 @@ describe('MasteryDistributionChart', () => {
       showLegend: true,
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithLegend} />)
-    expect(getByTestId('bar-chart')).toBeInTheDocument()
+    render(<MasteryDistributionChart {...propsWithLegend} />)
+    expect(screen.getByTestId('bar-chart')).toBeInTheDocument()
   })
 
   it('passes showXAxisGrid prop to BarChart', () => {
@@ -177,8 +250,8 @@ describe('MasteryDistributionChart', () => {
       showXAxisGrid: false,
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithoutGrid} />)
-    expect(getByTestId('bar-chart')).toBeInTheDocument()
+    render(<MasteryDistributionChart {...propsWithoutGrid} />)
+    expect(screen.getByTestId('bar-chart')).toBeInTheDocument()
   })
 
   it('passes showYAxisGrid prop to BarChart', () => {
@@ -187,8 +260,8 @@ describe('MasteryDistributionChart', () => {
       showYAxisGrid: false,
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithoutGrid} />)
-    expect(getByTestId('bar-chart')).toBeInTheDocument()
+    render(<MasteryDistributionChart {...propsWithoutGrid} />)
+    expect(screen.getByTestId('bar-chart')).toBeInTheDocument()
   })
 
   it('passes isPreview prop to BarChart', () => {
@@ -197,13 +270,14 @@ describe('MasteryDistributionChart', () => {
       isPreview: true,
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithPreview} />)
-    expect(getByTestId('bar-chart')).toBeInTheDocument()
+    render(<MasteryDistributionChart {...propsWithPreview} />)
+    expect(screen.getByTestId('bar-chart')).toBeInTheDocument()
   })
 
-  it('handles ratings without descriptions', () => {
+  it('handles ratings without descriptions by falling back to points', () => {
     const propsWithoutDescriptions = {
       ...defaultProps(),
+      distributionData: [],
       outcome: {
         ...MOCK_OUTCOMES[0],
         ratings: [
@@ -217,20 +291,44 @@ describe('MasteryDistributionChart', () => {
       },
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithoutDescriptions} />)
-    expect(getByTestId('bar-chart')).toBeInTheDocument()
+    render(<MasteryDistributionChart {...propsWithoutDescriptions} />)
+    const labels = JSON.parse(screen.getByTestId('chart-labels').textContent || '[]')
+
+    expect(labels[0]).toBe('3 pts')
   })
 
-  it('correctly assigns scores that fall between rating thresholds', () => {
-    const propsWithInBetweenScores = {
+  it('handles various rating point values', () => {
+    const propsWithVariousPoints = {
       ...defaultProps(),
-      scores: [4.5, 2.5, 0.5],
+      distributionData: [
+        {
+          description: 'High',
+          points: 4.5,
+          color: 'blue',
+          count: 1,
+          student_ids: ['1'],
+        },
+        {
+          description: 'Medium',
+          points: 2.5,
+          color: 'yellow',
+          count: 1,
+          student_ids: ['2'],
+        },
+        {
+          description: 'Low',
+          points: 0.5,
+          color: 'red',
+          count: 1,
+          student_ids: ['3'],
+        },
+      ],
     }
 
-    const {getByTestId} = render(<MasteryDistributionChart {...propsWithInBetweenScores} />)
-    const values = JSON.parse(getByTestId('chart-values').textContent || '[]')
+    render(<MasteryDistributionChart {...propsWithVariousPoints} />)
+    const values = JSON.parse(screen.getByTestId('chart-values').textContent || '[]')
 
-    expect(values).toHaveLength(4)
-    expect(values.every((v: number) => typeof v === 'number')).toBe(true)
+    expect(values).toHaveLength(3)
+    expect(values).toEqual([1, 1, 1])
   })
 })

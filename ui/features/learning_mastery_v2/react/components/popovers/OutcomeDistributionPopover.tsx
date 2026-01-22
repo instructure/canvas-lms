@@ -31,6 +31,7 @@ import {Text} from '@instructure/ui-text'
 import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 import OutcomeContextTag from '@canvas/outcome-context-tag/OutcomeContextTag'
 import {EditMasteryScaleLink} from '../toolbar/EditMasteryScaleLink'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -53,7 +54,7 @@ const getCalculationMethod = (outcome: Outcome): string => {
 
 export interface OutcomeDistributionPopoverProps {
   outcome: Outcome
-  scores: (number | undefined)[]
+  outcomeDistribution?: OutcomeDistribution
   isOpen: boolean
   onCloseHandler: () => void
   renderTrigger: ReactElement
@@ -61,7 +62,7 @@ export interface OutcomeDistributionPopoverProps {
 
 export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProps> = ({
   outcome,
-  scores,
+  outcomeDistribution,
   isOpen,
   onCloseHandler,
   renderTrigger,
@@ -82,12 +83,12 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
     () => (
       <MasteryDistributionChart
         outcome={outcome}
-        scores={scores}
+        distributionData={outcomeDistribution?.ratings ?? []}
         height={280}
         showYAxisGrid={true}
       />
     ),
-    [outcome, scores],
+    [outcome, outcomeDistribution],
   )
 
   return (

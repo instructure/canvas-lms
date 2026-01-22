@@ -64,7 +64,6 @@ describe('OutcomeHeader', () => {
         setSortAlignmentId: vi.fn(),
       },
       contributingScoresForOutcome: mockContributingScoresForOutcome,
-      scores: [3, 4, 5, 2, 4],
     }
   }
 

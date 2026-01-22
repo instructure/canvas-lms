@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import {BarChartRow, BarChartRowProps} from '../BarChartRow'
 import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {MOCK_OUTCOMES, MOCK_STUDENTS, MOCK_ROLLUPS} from '../../../__fixtures__/rollups'
+import {MOCK_OUTCOMES} from '../../../__fixtures__/rollups'
 import {MOCK_ALIGNMENTS} from '../../../__fixtures__/contributingScores'
 import {Column} from '../../table/utils'
 import {
@@ -28,12 +28,35 @@ import {
   STUDENT_COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
 } from '@canvas/outcomes/react/utils/constants'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
-// Mock the MasteryDistributionChart component
-vi.mock('../../charts', () => ({
-  MasteryDistributionChart: ({outcome, scores}: any) => (
-    <div data-testid={`mastery-chart-${outcome.id}`}>
-      <span data-testid={`scores-${outcome.id}`}>{JSON.stringify(scores)}</span>
+const MOCK_OUTCOME_DISTRIBUTIONS: Record<string, OutcomeDistribution> = {
+  '1': {
+    outcome_id: '1',
+    ratings: [
+      {description: 'Exceeds', points: 3, color: '#127A1B', count: 5, student_ids: []},
+      {description: 'Meets', points: 2, color: '#0B874B', count: 10, student_ids: []},
+    ],
+    total_students: 15,
+  },
+  '2': {
+    outcome_id: '2',
+    ratings: [
+      {description: 'Exceeds', points: 3, color: '#127A1B', count: 3, student_ids: []},
+      {description: 'Meets', points: 2, color: '#0B874B', count: 8, student_ids: []},
+    ],
+    total_students: 11,
+  },
+}
+
+// Mock the MasteryDistributionChartCell component
+vi.mock('../../charts/MasteryDistributionChartCell', () => ({
+  MasteryDistributionChartCell: ({outcome, distributionData, isLoading}: any) => (
+    <div data-testid={`mastery-chart-cell-${outcome.id}`}>
+      <span data-testid={`loading-${outcome.id}`}>{String(isLoading)}</span>
+      {distributionData && (
+        <span data-testid={`distribution-${outcome.id}`}>{JSON.stringify(distributionData)}</span>
+      )}
     </div>
   ),
 }))
@@ -92,12 +115,11 @@ describe('BarChartRow', () => {
   }
 
   const defaultProps = (
-    contributingScoresManager: ContributingScoresManager = mockContributingScores,
+    contributingScoresManager?: ContributingScoresManager,
   ): BarChartRowProps => ({
-    rollups: MOCK_ROLLUPS,
-    students: MOCK_STUDENTS,
-    contributingScores: contributingScoresManager,
     columns: generateColumns(contributingScoresManager),
+    outcomeDistributions: MOCK_OUTCOME_DISTRIBUTIONS,
+    isLoading: false,
     handleKeyDown: mockHandleKeyDown,
   })
 
@@ -105,21 +127,21 @@ describe('BarChartRow', () => {
     vi.clearAllMocks()
   })
 
-  it('renders a chart for each outcome', () => {
-    const {getByTestId} = render(<BarChartRow {...defaultProps()} />)
+  it('renders a chart cell for each outcome', () => {
+    render(<BarChartRow {...defaultProps()} />)
 
-    expect(getByTestId('mastery-chart-1')).toBeInTheDocument()
-    expect(getByTestId('mastery-chart-2')).toBeInTheDocument()
+    expect(screen.getByTestId('mastery-chart-cell-1')).toBeInTheDocument()
+    expect(screen.getByTestId('mastery-chart-cell-2')).toBeInTheDocument()
   })
 
-  it('collects scores for each outcome from rollups', () => {
-    const {getByTestId} = render(<BarChartRow {...defaultProps()} />)
+  it('passes distribution data to chart cells', () => {
+    render(<BarChartRow {...defaultProps()} />)
 
-    const scores1 = JSON.parse(getByTestId('scores-1').textContent || '[]')
-    const scores2 = JSON.parse(getByTestId('scores-2').textContent || '[]')
+    const distribution1 = screen.getByTestId('distribution-1')
+    const distribution2 = screen.getByTestId('distribution-2')
 
-    expect(scores1).toEqual([4.5, 2.5, 5.0])
-    expect(scores2).toEqual([3.0, 4.0, 1.0])
+    expect(distribution1).toBeInTheDocument()
+    expect(distribution2).toBeInTheDocument()
   })
 
   it('renders contributing score charts when visible', () => {
@@ -184,55 +206,16 @@ describe('BarChartRow', () => {
     expect(charts).toHaveLength(0)
   })
 
-  it('handles empty rollups array', () => {
+  it('passes isLoading prop to chart cells', () => {
     const props = {
       ...defaultProps(),
-      rollups: [],
+      isLoading: true,
     }
-
-    const {getByTestId} = render(<BarChartRow {...props} />)
-    const scores1 = JSON.parse(getByTestId('scores-1').textContent || '[]')
-
-    // Should return empty arrays for scores
-    expect(scores1).toEqual([])
-  })
-
-  it('handles empty students array', () => {
-    const props = defaultProps()
-    props.students = []
-
-    const {getByTestId} = render(<BarChartRow {...props} />)
-    expect(getByTestId('mastery-chart-1')).toBeInTheDocument()
-  })
-
-  it('extracts scores for alignment when contributing scores are visible', () => {
-    const mockScoresForUserFn = vi.fn(() => [
-      {user_id: '1', alignment_id: 'align-1', score: 85},
-      {user_id: '1', alignment_id: 'align-2', score: 90},
-    ])
-
-    const mockContributingScoresVisible: ContributingScoresManager = {
-      forOutcome: vi.fn(() => ({
-        isVisible: () => true,
-        toggleVisibility: vi.fn(),
-        data: {
-          outcome: {id: '1', title: 'Outcome 1'},
-          alignments: MOCK_ALIGNMENTS,
-          scores: [],
-        },
-        alignments: MOCK_ALIGNMENTS,
-        scoresForUser: mockScoresForUserFn,
-        isLoading: false,
-        error: undefined,
-      })),
-    }
-
-    const props = defaultProps(mockContributingScoresVisible)
 
     render(<BarChartRow {...props} />)
 
-    expect(mockScoresForUserFn).toHaveBeenCalledWith('1')
-    expect(mockScoresForUserFn).toHaveBeenCalledWith('2')
+    expect(screen.getByTestId('loading-1')).toHaveTextContent('true')
+    expect(screen.getByTestId('loading-2')).toHaveTextContent('true')
   })
 
   it('calls handleKeyDown when key is pressed on a cell', () => {
@@ -281,15 +264,19 @@ describe('BarChartRow', () => {
       columns: mixedColumns,
     }
 
-    const {getByTestId} = render(<BarChartRow {...props} />)
+    render(<BarChartRow {...props} />)
 
-    expect(getByTestId('mastery-chart-1')).toBeInTheDocument()
-    expect(getByTestId('mastery-chart-2')).toBeInTheDocument()
+    expect(screen.getByTestId('mastery-chart-cell-1')).toBeInTheDocument()
+    expect(screen.getByTestId('mastery-chart-cell-2')).toBeInTheDocument()
   })
 
-  it('renders with isPreview prop set to true', () => {
-    const {container} = render(<BarChartRow {...defaultProps()} />)
+  it('handles undefined outcomeDistributions prop', () => {
+    const props = {
+      ...defaultProps(),
+      outcomeDistributions: undefined,
+    }
 
+    const {container} = render(<BarChartRow {...props} />)
     const charts = container.querySelectorAll('[data-testid^="mastery-chart-"]')
     expect(charts).toHaveLength(MOCK_OUTCOMES.length)
   })
@@ -313,6 +300,9 @@ describe('BarChartRow', () => {
 
     const props = defaultProps(mockContributingScoresVisible)
 
-    expect(() => render(<BarChartRow {...props} />)).not.toThrow()
+    const {container} = render(<BarChartRow {...props} />)
+
+    const charts = container.querySelectorAll('[data-testid^="mastery-chart-cell-"]')
+    expect(charts.length).toBeGreaterThan(MOCK_OUTCOMES.length)
   })
 })

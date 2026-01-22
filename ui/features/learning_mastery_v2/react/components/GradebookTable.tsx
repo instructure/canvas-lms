@@ -46,16 +46,18 @@ import {BarChartRow} from './grid/BarChartRow'
 import {StudentOutcomeScore} from './grid/StudentOutcomeScore'
 import {keyBy} from 'es-toolkit'
 import {View} from '@instructure/ui-view'
-import {getScoresForOutcome} from '../utils/scoreUtils'
 import {Table} from './table/Table'
 import {ContributingScoreCellContent} from './table/ContributingScoreCellContent'
 import {Column} from './table/utils'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 interface GradebookTableProps {
   courseId: string
   students: Student[]
   outcomes: Outcome[]
   rollups: StudentRollupData[]
+  outcomeDistributions?: Record<string, OutcomeDistribution>
+  isLoadingDistribution?: boolean
   sorting: Sorting
   gradebookSettings?: GradebookSettings
   onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
@@ -80,6 +82,8 @@ export const GradebookTable: React.FC<GradebookTableProps> = ({
   students,
   outcomes,
   rollups,
+  outcomeDistributions,
+  isLoadingDistribution,
   sorting,
   gradebookSettings = DEFAULT_GRADEBOOK_SETTINGS,
   onChangeNameDisplayFormat,
@@ -163,17 +167,16 @@ export const GradebookTable: React.FC<GradebookTableProps> = ({
 
   const renderOutcomeHeader = useCallback(
     (outcome: Outcome, contributingScoreForOutcome: any) => () => {
-      const scores = getScoresForOutcome(rollups, outcome.id)
       return (
         <OutcomeHeader
           outcome={outcome}
-          scores={scores}
+          outcomeDistribution={outcomeDistributions?.[outcome.id.toString()]}
           sorting={sorting}
           contributingScoresForOutcome={contributingScoreForOutcome}
         />
       )
     },
-    [sorting, rollups],
+    [sorting, outcomeDistributions],
   )
 
   const renderOutcomeCell = useCallback(
@@ -319,15 +322,14 @@ export const GradebookTable: React.FC<GradebookTableProps> = ({
     ) => {
       return (
         <BarChartRow
-          rollups={rollups}
-          students={students}
-          contributingScores={contributingScores}
-          columns={columns}
+          columns={_columns}
+          outcomeDistributions={outcomeDistributions}
+          isLoading={isLoadingDistribution}
           handleKeyDown={handleKeyDown}
         />
       )
     },
-    [students, rollups, contributingScores, columns],
+    [outcomeDistributions, isLoadingDistribution],
   )
 
   const handleColumnMove = useCallback(

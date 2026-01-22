@@ -3117,4 +3117,161 @@ describe OutcomeResultsController do
       end
     end
   end
+
+  describe "#mastery_distribution" do
+    before :once do
+      course_with_teacher
+      @outcome = @course.created_learning_outcomes.create!(title: "outcome")
+      @rubric = Rubric.create!(context: @course)
+      @rubric.data = [
+        {
+          points: 3,
+          description: "Outcome row",
+          id: "outcome_123",
+          ratings: [
+            { points: 3, description: "Exceeds", id: "rat1", color: "#00FF00" },
+            { points: 2, description: "Meets", id: "rat2", color: "#FFFF00" },
+            { points: 0, description: "Does Not Meet", id: "rat3", color: "#FF0000" }
+          ],
+          learning_outcome_id: @outcome.id
+        }
+      ]
+      @rubric.save!
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "returns mastery distribution for all students" do
+      students = create_users(Array.new(5) { |i| { name: "Student #{i}" } }, return_type: :record)
+      students.each { |s| @course.enroll_student(s, enrollment_state: "active") }
+
+      # Create an assignment and alignment
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      alignment = @outcome.align(assignment, @course)
+
+      # Create results with different scores
+      students.each_with_index do |student, idx|
+        LearningOutcomeResult.create!(
+          user: student,
+          learning_outcome: @outcome,
+          alignment:,
+          context: @course,
+          score: idx % 3, # Scores: 0, 1, 2, 0, 1
+          possible: 3
+        )
+      end
+
+      get :mastery_distribution, params: {
+        course_id: @course.id,
+        format: :json
+      }
+
+      expect(response).to be_successful
+      json = response.parsed_body
+
+      expect(json["outcome_distributions"]).to be_present
+      expect(json["students"]).to have(5).items
+
+      dist = json["outcome_distributions"][@outcome.id.to_s]
+      expect(dist["total_students"]).to eq(5)
+      expect(dist["ratings"]).to be_an(Array)
+
+      # Verify student_ids are included
+      dist["ratings"].each do |rating|
+        expect(rating).to have_key("student_ids")
+        expect(rating["student_ids"]).to be_an(Array)
+        expect(rating["count"]).to eq(rating["student_ids"].length)
+      end
+    end
+
+    it "includes alignment distributions when requested via include parameter" do
+      assignment = @course.assignments.create!(title: "Test")
+      @outcome.align(assignment, @course)
+
+      get :mastery_distribution, params: {
+        course_id: @course.id,
+        include: ["alignment_distributions"],
+        format: :json
+      }
+
+      expect(response).to be_successful
+      json = response.parsed_body
+
+      # Alignment distributions should be nested within outcome distributions
+      dist = json["outcome_distributions"][@outcome.id.to_s]
+      expect(dist["alignment_distributions"]).to be_present
+      expect(dist["alignment_distributions"]).to be_a(Hash)
+    end
+
+    it "does not include alignment distributions when not requested" do
+      get :mastery_distribution, params: {
+        course_id: @course.id,
+        format: :json
+      }
+
+      expect(response).to be_successful
+      json = response.parsed_body
+
+      # Should not have alignment_distributions key in outcome
+      dist = json["outcome_distributions"][@outcome.id.to_s]
+      expect(dist["alignment_distributions"]).not_to be_present
+    end
+
+    it "respects exclude filters" do
+      get :mastery_distribution, params: {
+        course_id: @course.id,
+        exclude: ["missing_user_rollups"],
+        format: :json
+      }
+
+      expect(response).to be_successful
+    end
+
+    it "filters by specific student IDs when provided" do
+      students = create_users(Array.new(10) { |i| { name: "Student #{i}" } }, return_type: :record)
+      students.each { |s| @course.enroll_student(s, enrollment_state: "active") }
+
+      # Create an assignment and alignment
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      alignment = @outcome.align(assignment, @course)
+
+      # Create results for all students
+      students.each_with_index do |student, idx|
+        LearningOutcomeResult.create!(
+          user: student,
+          learning_outcome: @outcome,
+          alignment:,
+          context: @course,
+          score: idx % 3,
+          possible: 3
+        )
+      end
+
+      # Request distribution for only first 3 students
+      target_student_ids = students.first(3).map(&:id)
+
+      get :mastery_distribution, params: {
+        course_id: @course.id,
+        student_ids: target_student_ids,
+        format: :json
+      }
+
+      expect(response).to be_successful
+      json = response.parsed_body
+
+      # Should only include the 3 requested students
+      expect(json["students"].length).to eq(3)
+      expect(json["students"].pluck("id").map(&:to_i)).to match_array(target_student_ids)
+
+      # Distribution should only count those 3 students
+      dist = json["outcome_distributions"][@outcome.id.to_s]
+      expect(dist["total_students"]).to eq(3)
+
+      # Verify only the requested student IDs are in the distribution
+      all_student_ids_in_dist = dist["ratings"].flat_map { |r| r["student_ids"] }.map(&:to_i)
+      expect(all_student_ids_in_dist).to match_array(target_student_ids)
+    end
+  end
 end

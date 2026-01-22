@@ -17,12 +17,11 @@
  */
 import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Outcome, Rating} from '@canvas/outcomes/react/types/rollup'
-import {findRating} from '@canvas/outcomes/react/utils/ratings'
+import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {svgUrl} from '@canvas/outcomes/react/utils/icons'
 import {BarChart} from './BarChart'
-import {colors} from '@instructure/canvas-theme'
 import type {Chart as ChartJS, Plugin} from 'chart.js'
+import {RatingDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -49,16 +48,9 @@ const loadIcons = (
   )
 }
 
-interface MasteryLevel {
-  description: string
-  color: string
-  count: number
-  points: number
-}
-
 export interface MasteryDistributionChartProps {
   outcome: Outcome
-  scores: (number | undefined)[]
+  distributionData: RatingDistribution[]
   width?: number | string
   height?: number | string
   title?: string
@@ -75,57 +67,9 @@ export interface MasteryDistributionChartProps {
   }
 }
 
-const getMasteryLevelCounts = (
-  ratings: Rating[],
-  scores: (number | undefined)[],
-): MasteryLevel[] => {
-  const sortedRatings = [...ratings].sort((a, b) => b.points - a.points)
-
-  const countsMap = new Map<string, MasteryLevel>()
-
-  sortedRatings.forEach(rating => {
-    const color = rating.color
-      ? rating.color.startsWith('#')
-        ? rating.color
-        : `#${rating.color}`
-      : colors.contrasts.grey4570
-    countsMap.set(rating.description || '', {
-      description: rating.description || I18n.t('Unknown'),
-      color,
-      count: 0,
-      points: rating.points,
-    })
-  })
-
-  scores.forEach(score => {
-    if (score !== undefined) {
-      const rating = findRating(sortedRatings, score)
-      if (rating && rating.description) {
-        const level = countsMap.get(rating.description)
-        if (level) {
-          level.count++
-        }
-      }
-    }
-  })
-
-  const result: MasteryLevel[] = []
-
-  sortedRatings.forEach(rating => {
-    if (rating.description) {
-      const level = countsMap.get(rating.description)
-      if (level) {
-        result.push(level)
-      }
-    }
-  })
-
-  return result
-}
-
 export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> = ({
   outcome,
-  scores,
+  distributionData,
   width = '100%',
   height = 400,
   title,
@@ -138,10 +82,27 @@ export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> =
   const imagesRef = useRef<Map<string, HTMLImageElement>>(new Map())
   const [imagesLoaded, setImagesLoaded] = useState(false)
 
-  const masteryLevels = useMemo(
-    () => getMasteryLevelCounts(outcome.ratings, scores),
-    [outcome.ratings, scores],
-  )
+  const masteryLevels = useMemo(() => {
+    if (distributionData.length === 0 && outcome.ratings) {
+      const sortedRatings = [...outcome.ratings].sort((a, b) => b.points - a.points)
+      return sortedRatings.map(rating => {
+        const color = rating.color || '666666'
+        return {
+          description: rating.description || `${rating.points} pts`,
+          color: color.startsWith('#') ? color : `#${color}`,
+          count: 0,
+          points: rating.points,
+        }
+      })
+    }
+
+    return distributionData.map(rating => ({
+      description: rating.description,
+      color: rating.color.startsWith('#') ? rating.color : `#${rating.color}`,
+      count: rating.count,
+      points: rating.points,
+    }))
+  }, [distributionData, outcome.ratings])
 
   const labels = masteryLevels.map(level => level.description)
   const values = masteryLevels.map(level => level.count)

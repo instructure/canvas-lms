@@ -456,6 +456,161 @@ class OutcomeResultsController < ApplicationController
     render json: contributing_scores_json(@outcome, alignments, all_results, only_assignment_alignments:)
   end
 
+  # @API Get mastery distribution
+  #
+  # Returns the distribution of student scores across mastery levels for all outcomes.
+  # This endpoint fetches data for ALL students (not paginated) to provide accurate
+  # distribution statistics for charts and analytics.
+  #
+  # @argument exclude[] [String]
+  #   Optionally restrict which results are included:
+  #   - "missing_user_rollups": exclude students without any scores
+  #   - "missing_outcome_results": exclude outcomes without any results
+  #
+  # @argument outcome_ids[] [String]
+  #   Optionally restrict to specific outcome IDs
+  #
+  # @argument student_ids[] [String]
+  #   Optionally restrict to specific student IDs. If not provided, all students will be included.
+  #
+  # @argument include[] [String]
+  #   Optionally include additional data:
+  #   - "alignment_distributions": include contributing score distributions for alignments
+  #
+  # @argument only_assignment_alignments [Boolean]
+  #   If true and alignment_distributions is included, only include assignment alignments. Default: false.
+  #
+  # @argument show_unpublished_assignments [Boolean]
+  #   If true, include unpublished assignments in alignment distributions. Default: false.
+  #
+  # @argument add_defaults [Boolean]
+  #   If defaults are requested, then color and mastery level defaults will be
+  #   added to outcome ratings in the result. This will only take effect if
+  #   the Account Level Mastery Scales FF is DISABLED
+  #
+  # @returns MasteryDistributionResponse
+  #
+  # @example_response
+  #   {
+  #     "outcome_distributions": {
+  #       "1": {
+  #         "outcome_id": "1",
+  #         "ratings": [
+  #           {
+  #             "description": "Exceeds Mastery",
+  #             "points": 4.0,
+  #             "color": "#127A1B",
+  #             "count": 5,
+  #             "student_ids": ["1", "3", "7", "12", "15"]
+  #           },
+  #           {
+  #             "description": "Mastery",
+  #             "points": 3.0,
+  #             "color": "#0B874B",
+  #             "count": 12,
+  #             "student_ids": ["2", "4", "5", ...]
+  #           }
+  #         ],
+  #         "total_students": 28,
+  #         "alignment_distributions": {
+  #           "content_tag_123": {
+  #             "alignment_id": "content_tag_123",
+  #             "ratings": [
+  #               {
+  #                 "description": "Exceeds Mastery",
+  #                 "points": 4.0,
+  #                 "color": "#127A1B",
+  #                 "count": 3,
+  #                 "student_ids": ["1", "7", "12"]
+  #               }
+  #             ],
+  #             "total_students": 28
+  #           }
+  #         }
+  #       }
+  #     },
+  #     "students": [
+  #       {
+  #         "id": "1",
+  #         "name": "Student Name",
+  #         "sortable_name": "Name, Student"
+  #       }
+  #     ]
+  #   }
+  def mastery_distribution
+    unless @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
+      reject! "insufficient permissions", :forbidden
+    end
+
+    rollups = user_rollups(all_users: true)
+
+    # Filter by specific student IDs if provided
+    if params[:student_ids].present?
+      student_ids = Api.value_to_array(params[:student_ids]).map(&:to_i)
+      @all_users = @all_users.select { |u| student_ids.include?(u.id) }
+      rollups = rollups.select { |r| student_ids.include?(r.context.id) }
+    end
+
+    outcome_distributions = mastery_distributions(rollups:, outcomes: @outcomes, context: @context, opts: { add_defaults: params[:add_defaults] })
+
+    # Optionally include alignment distributions nested within each outcome (via include[] parameter)
+    includes = Api.value_to_array(params[:include]).uniq
+    if includes.include?("alignment_distributions")
+      only_assignment_alignments = value_to_boolean(params[:only_assignment_alignments])
+      show_unpublished_assignments = value_to_boolean(params[:show_unpublished_assignments])
+
+      # Gather alignments for all outcomes
+      alignments_by_outcome = {}
+      @outcomes.each do |outcome|
+        alignments = find_all_outcome_alignments(outcome, @context)
+
+        # Filter to only assignment alignments if requested
+        if only_assignment_alignments
+          alignments = alignments.select { |a| a.content_type == "Assignment" }
+        end
+
+        # Filter out unpublished assignments if requested
+        unless show_unpublished_assignments
+          alignments = alignments.reject do |alignment|
+            content = alignment.content_tag.content
+            content.is_a?(Assignment) && content.unpublished?
+          end
+        end
+
+        alignments_by_outcome[outcome.id] = alignments unless alignments.empty?
+      end
+
+      # Fetch all results for alignment calculations
+      canvas_results, os_results = find_canvas_os_results(all_users: true)
+      canvas_results = canvas_results.preload(:user, :learning_outcome, alignment: :content)
+      all_results = canvas_results.to_a + (os_results || [])
+
+      # Calculate alignment distributions using shared ResultAnalytics module
+      alignment_distributions = alignment_mastery_distributions(
+        outcomes: @outcomes,
+        users: @all_users,
+        context: @context,
+        results: all_results,
+        alignments_by_outcome:
+      )
+
+      # Merge alignment distributions into their respective outcome distributions
+      alignment_distributions.each do |outcome_id, alignments|
+        if outcome_distributions[outcome_id]
+          outcome_distributions[outcome_id][:alignment_distributions] = alignments
+        end
+      end
+    end
+
+    # Build response
+    response_json = {
+      outcome_distributions:,
+      students: outcome_results_linked_users_json(@all_users, @context)
+    }
+
+    render json: response_json
+  end
+
   # @API Enqueue a delayed Outcome Rollup Calculation Job
   #
   # @argument course_id [String] The course ID for the rollup job
@@ -488,7 +643,7 @@ class OutcomeResultsController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       render json: { error: "Invalid course or student" }, status: :not_found
     rescue => e
-      render json: { error: e.message }, status: :unprocessable_entity
+      render json: { error: e.message }, status: :unprocessable_content
     end
   end
 
@@ -936,6 +1091,8 @@ class OutcomeResultsController < ApplicationController
         reject! "can't include courses unless aggregate is 'course'" if params[:aggregate] != "course"
       when "users"
         reject! "can't include users unless aggregate is not set" if params[:aggregate].present?
+      when "alignment_distributions"
+        # Used by mastery_distribution endpoint, no additional validation needed
       else
         reject! "invalid include: #{include_name}" unless respond_to? include_method_name(include_name), :include_private
       end
