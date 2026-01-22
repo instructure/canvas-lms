@@ -813,5 +813,45 @@ RSpec.describe Lti::Registration do
         end
       end
     end
+
+    context "when context control creation fails" do
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
+      let_once(:registration) { lti_registration_model(account:, developer_key:) }
+
+      before do
+        allow(Lti::ContextControlService).to receive(:create_or_update).and_raise(
+          Lti::ContextControlErrors.new(ActiveModel::Errors.new(Lti::ContextControl.new))
+        )
+      end
+
+      it "rolls back the tool creation" do
+        initial_tool_count = ContextExternalTool.count
+        initial_control_count = Lti::ContextControl.count
+
+        expect do
+          registration.new_external_tool(account)
+        end.to raise_error(Lti::ContextControlErrors)
+
+        expect(ContextExternalTool.count).to eq(initial_tool_count)
+        expect(Lti::ContextControl.count).to eq(initial_control_count)
+      end
+
+      it "does not leave any leftover tools" do
+        expect do
+          expect do
+            registration.new_external_tool(account)
+          end.to raise_error(Lti::ContextControlErrors)
+        end.not_to change { ContextExternalTool.count }
+      end
+
+      it "does not leave any leftover context controls" do
+        expect do
+          expect do
+            registration.new_external_tool(account)
+          end.to raise_error(Lti::ContextControlErrors)
+        end.not_to change { Lti::ContextControl.count }
+      end
+    end
   end
 end

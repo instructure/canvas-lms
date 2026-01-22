@@ -141,45 +141,47 @@ class Lti::Registration < ActiveRecord::Base
     # deleted tools are never updated during a dev key update so can be safely ignored
     tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
 
-    tool = existing_tool || ContextExternalTool.new(context:)
-    Importers::ContextExternalToolImporter.import_from_migration(
-      deployment_configuration(context:),
-      context,
-      item: tool,
-      persist: false
-    )
-    tool.lti_registration = self
-    tool.developer_key = developer_key
-    tool.workflow_state = privacy_level
-    if tool_is_disabled || !enabled
-      tool.workflow_state = ContextExternalTool::DISABLED_STATE
-    end
+    Lti::Registration.transaction do
+      tool = existing_tool || ContextExternalTool.new(context:)
+      Importers::ContextExternalToolImporter.import_from_migration(
+        deployment_configuration(context:),
+        context,
+        item: tool,
+        persist: false
+      )
+      tool.lti_registration = self
+      tool.developer_key = developer_key
+      tool.workflow_state = privacy_level
+      if tool_is_disabled || !enabled
+        tool.workflow_state = ContextExternalTool::DISABLED_STATE
+      end
 
-    if verify_uniqueness
-      tool.check_for_duplication
-    end
+      if verify_uniqueness
+        tool.check_for_duplication
+      end
 
-    if tool.errors.any? || !tool.save
-      raise Lti::ContextExternalToolErrors, tool.errors
-    end
+      if tool.errors.any? || !tool.save
+        raise Lti::ContextExternalToolErrors, tool.errors
+      end
 
-    if existing_tool
-      # Do not update availability when propagating tool changes
-      available = nil
-    end
-    Lti::ContextControlService.create_or_update(
-      {
-        available:,
-        course_id: context.is_a?(Course) ? context.id : nil,
-        account_id: context.is_a?(Account) ? context.id : nil,
-        registration_id: id,
-        deployment_id: tool.id,
-        created_by_id: current_user&.id,
-        updated_by_id: current_user&.id
-      }.compact
-    )
+      if existing_tool
+        # Do not update availability when propagating tool changes
+        available = nil
+      end
+      Lti::ContextControlService.create_or_update(
+        {
+          available:,
+          course_id: context.is_a?(Course) ? context.id : nil,
+          account_id: context.is_a?(Account) ? context.id : nil,
+          registration_id: id,
+          deployment_id: tool.id,
+          created_by_id: current_user&.id,
+          updated_by_id: current_user&.id
+        }.compact
+      )
 
-    tool
+      tool
+    end
   end
 
   # Returns true if this Registration is from a different account than the given account.
