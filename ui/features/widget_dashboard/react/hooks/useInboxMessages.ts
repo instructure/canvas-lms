@@ -126,56 +126,51 @@ function truncateText(text: string, maxLength: number = 80): string {
 }
 
 async function fetchInboxMessages(limit: number, filter: InboxFilter): Promise<InboxMessage[]> {
-  try {
-    const currentUserId = getCurrentUserId()
-    const scope = filter === 'all' ? 'inbox' : filter
+  const currentUserId = getCurrentUserId()
+  const scope = filter === 'all' ? 'inbox' : filter
 
-    const result = await executeGraphQLQuery<GraphQLResponse>(USER_CONVERSATIONS_QUERY, {
-      userId: currentUserId,
-      first: limit,
-      scope,
-    })
+  const result = await executeGraphQLQuery<GraphQLResponse>(USER_CONVERSATIONS_QUERY, {
+    userId: currentUserId,
+    first: limit,
+    scope,
+  })
 
-    if (!result.legacyNode?.conversationsConnection) {
-      return []
-    }
-
-    const conversations = result.legacyNode.conversationsConnection.nodes
-
-    const messages: InboxMessage[] = conversations.map(participantNode => {
-      const conversation = participantNode.conversation
-      const lastMessage = conversation.conversationMessagesConnection.nodes[0]
-
-      const otherParticipants = conversation.conversationParticipantsConnection.nodes
-        .map(node => node.user)
-        .filter(user => user !== null && user._id !== currentUserId)
-
-      const sender = lastMessage?.author || otherParticipants[0]
-
-      return {
-        id: conversation._id,
-        subject: conversation.subject || I18n.t('(No subject)'),
-        lastMessageAt: lastMessage?.createdAt || conversation.updatedAt,
-        messagePreview: lastMessage?.body ? truncateText(lastMessage.body, 80) : '',
-        workflowState: participantNode.workflowState === 'unread' ? 'unread' : 'read',
-        conversationUrl: `/conversations/${conversation._id}`,
-        participants: sender
-          ? [
-              {
-                id: sender._id,
-                name: sender.name,
-                avatarUrl: sender.avatarUrl || undefined,
-              },
-            ]
-          : [],
-      }
-    })
-
-    return messages
-  } catch (error) {
-    console.error('Failed to fetch inbox messages:', error)
-    throw error
+  if (!result.legacyNode?.conversationsConnection) {
+    return []
   }
+
+  const conversations = result.legacyNode.conversationsConnection.nodes
+
+  const messages: InboxMessage[] = conversations.map(participantNode => {
+    const conversation = participantNode.conversation
+    const lastMessage = conversation.conversationMessagesConnection.nodes[0]
+
+    const otherParticipants = conversation.conversationParticipantsConnection.nodes
+      .map(node => node.user)
+      .filter(user => user !== null && user._id !== currentUserId)
+
+    const sender = lastMessage?.author || otherParticipants[0]
+
+    return {
+      id: conversation._id,
+      subject: conversation.subject || I18n.t('(No subject)'),
+      lastMessageAt: lastMessage?.createdAt || conversation.updatedAt,
+      messagePreview: lastMessage?.body ? truncateText(lastMessage.body, 80) : '',
+      workflowState: participantNode.workflowState === 'unread' ? 'unread' : 'read',
+      conversationUrl: `/conversations/${conversation._id}`,
+      participants: sender
+        ? [
+            {
+              id: sender._id,
+              name: sender.name,
+              avatarUrl: sender.avatarUrl || undefined,
+            },
+          ]
+        : [],
+    }
+  })
+
+  return messages
 }
 
 export function useInboxMessages(options: UseInboxMessagesOptions = {}) {

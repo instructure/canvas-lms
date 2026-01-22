@@ -22,7 +22,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import CourseCode from '../../shared/CourseCode'
 import CourseProgressBar from './CourseProgressBar'
 import type {CourseProgress} from '../../../hooks/useProgressOverview'
 
@@ -51,16 +50,13 @@ const CourseProgressItem: React.FC<CourseProgressItemProps> = ({course}) => {
     >
       <Flex direction="column" gap="small">
         <Flex.Item>
-          <Flex justifyItems="space-between" alignItems="center" gap="small">
+          <Flex direction="column" gap="x-small">
             <Flex.Item>
-              <CourseCode courseId={courseId} size="small" useCustomColors={true} />
-            </Flex.Item>
-            <Flex.Item>
-              <Text size="small" color="secondary">
-                |
+              <Text size="medium" weight="bold">
+                {courseName}
               </Text>
             </Flex.Item>
-            <Flex.Item shouldGrow>
+            <Flex.Item>
               <Link
                 href={`/courses/${courseId}`}
                 isWithinText={false}

@@ -314,7 +314,6 @@ describe('RecentGradesWidget', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
-      expect(screen.getByText('CS-401')).toBeInTheDocument()
       expect(screen.getByTestId('grade-status-badge-sub1')).toBeInTheDocument()
       expect(screen.getByTestId('grade-status-badge-sub1')).toHaveTextContent('Graded')
     })
@@ -366,8 +365,8 @@ describe('RecentGradesWidget', () => {
     await userEvent.click(select)
 
     await waitFor(() => {
-      expect(screen.getByText('Advanced Web Development')).toBeInTheDocument()
-      expect(screen.getByText('Computer Science 101')).toBeInTheDocument()
+      expect(screen.getAllByText('Advanced Web Development').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Computer Science 101').length).toBeGreaterThan(0)
     })
   })
 
@@ -412,10 +411,11 @@ describe('RecentGradesWidget', () => {
     await userEvent.click(select)
 
     await waitFor(() => {
-      expect(screen.getByText('Advanced Web Development')).toBeInTheDocument()
+      expect(screen.getAllByText('Advanced Web Development').length).toBeGreaterThan(0)
     })
 
-    await userEvent.click(screen.getByText('Advanced Web Development'))
+    const courseOptions = screen.getAllByText('Advanced Web Development')
+    await userEvent.click(courseOptions[courseOptions.length - 1])
 
     await waitFor(() => {
       expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()

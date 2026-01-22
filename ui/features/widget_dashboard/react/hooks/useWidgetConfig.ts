@@ -110,9 +110,6 @@ export function useWidgetConfig<T>(
       )
       return result
     },
-    onError: error => {
-      console.error('Failed to save widget config preference:', error)
-    },
   })
 
   const handleConfigChange = useCallback(

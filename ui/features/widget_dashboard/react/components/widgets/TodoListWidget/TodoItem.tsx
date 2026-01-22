@@ -25,7 +25,6 @@ import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {IconCheckPlusLine, IconCheckLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import CourseCode from '../../shared/CourseCode'
 import type {PlannerItem} from './types'
 import {formatDate, getPlannableTypeLabel, isOverdue} from './utils'
 import {usePlannerOverride} from './hooks/usePlannerOverride'
@@ -96,27 +95,17 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
               </Flex.Item>
             )}
 
-            {courseId && (
+            {courseId && item.context_name && (
               <Flex.Item>
-                <Flex gap="x-small" alignItems="center" wrap="wrap">
-                  <Flex.Item>
-                    <CourseCode courseId={courseId} size="small" useCustomColors={true} />
-                  </Flex.Item>
-                  <Flex.Item>
-                    <Text size="small" color="secondary">
-                      |
-                    </Text>
-                  </Flex.Item>
-                  <Flex.Item>
-                    <Link
-                      href={`/courses/${courseId}`}
-                      isWithinText={false}
-                      data-testid={`todo-item-course-link-${item.plannable_id}`}
-                    >
-                      <Text size="small">{I18n.t('Go to course')}</Text>
-                    </Link>
-                  </Flex.Item>
-                </Flex>
+                <Link
+                  href={`/courses/${courseId}`}
+                  isWithinText={false}
+                  data-testid={`todo-item-course-link-${item.plannable_id}`}
+                >
+                  <Text size="small" color="secondary">
+                    {item.context_name}
+                  </Text>
+                </Link>
               </Flex.Item>
             )}
 

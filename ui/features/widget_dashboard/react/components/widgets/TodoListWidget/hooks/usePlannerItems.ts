@@ -120,7 +120,9 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
               return newUrls
             })
           })
-          .catch(err => console.error('Failed to load page:', err))
+          .catch(() => {
+            // Silently fail pagination - error will be caught by main query
+          })
           .finally(() => {
             setIsLoadingMore(false)
             loadingPageRef.current = null

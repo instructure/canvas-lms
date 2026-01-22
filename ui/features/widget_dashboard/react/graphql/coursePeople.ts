@@ -101,66 +101,61 @@ export const fetchPaginatedCourseInstructors = async (
   startCursor: string | null
   totalCount: number | null
 }> => {
-  try {
-    const response = await executeGraphQLQuery<CourseInstructorsPaginatedResponse>(
-      COURSE_INSTRUCTORS_PAGINATED_QUERY,
-      {
-        courseIds,
-        first: limit,
-        after,
-        observedUserId,
-      },
-    )
+  const response = await executeGraphQLQuery<CourseInstructorsPaginatedResponse>(
+    COURSE_INSTRUCTORS_PAGINATED_QUERY,
+    {
+      courseIds,
+      first: limit,
+      after,
+      observedUserId,
+    },
+  )
 
-    if (!response?.courseInstructorsConnection) {
-      console.error('Invalid response structure:', response)
-      return {
-        data: [],
-        hasNextPage: false,
-        hasPreviousPage: false,
-        endCursor: null,
-        startCursor: null,
-        totalCount: null,
-      }
-    }
-
-    const {nodes, pageInfo} = response.courseInstructorsConnection
-
-    const instructors: CourseInstructorForComponent[] = nodes
-      .filter(enrollment => enrollment.user?._id)
-      .map(enrollment => ({
-        id: `${enrollment.user._id}-${enrollment.course._id}`,
-        name: enrollment.user.name,
-        sortable_name: enrollment.user.sortableName,
-        short_name: enrollment.user.shortName,
-        avatar_url: enrollment.user.avatarUrl,
-        email: enrollment.user.email,
-        bio: null,
-        course_name: enrollment.course.name,
-        course_code: enrollment.course.courseCode,
-        enrollments: [
-          {
-            id: `${enrollment.user._id}-${enrollment.course._id}`,
-            user_id: enrollment.user._id,
-            course_id: enrollment.course._id,
-            type: enrollment.type,
-            role: enrollment.role.name,
-            role_id: enrollment.role._id,
-            enrollment_state: enrollment.enrollmentState,
-          },
-        ],
-      }))
-
+  if (!response?.courseInstructorsConnection) {
+    console.error('Invalid response structure:', response)
     return {
-      data: instructors,
-      hasNextPage: pageInfo.hasNextPage,
-      hasPreviousPage: pageInfo.hasPreviousPage,
-      endCursor: pageInfo.endCursor,
-      startCursor: pageInfo.startCursor,
-      totalCount: pageInfo.totalCount,
+      data: [],
+      hasNextPage: false,
+      hasPreviousPage: false,
+      endCursor: null,
+      startCursor: null,
+      totalCount: null,
     }
-  } catch (error) {
-    console.error('Error fetching root-level paginated instructors:', error)
-    throw error
+  }
+
+  const {nodes, pageInfo} = response.courseInstructorsConnection
+
+  const instructors: CourseInstructorForComponent[] = nodes
+    .filter(enrollment => enrollment.user?._id)
+    .map(enrollment => ({
+      id: `${enrollment.user._id}-${enrollment.course._id}`,
+      name: enrollment.user.name,
+      sortable_name: enrollment.user.sortableName,
+      short_name: enrollment.user.shortName,
+      avatar_url: enrollment.user.avatarUrl,
+      email: enrollment.user.email,
+      bio: null,
+      course_name: enrollment.course.name,
+      course_code: enrollment.course.courseCode,
+      enrollments: [
+        {
+          id: `${enrollment.user._id}-${enrollment.course._id}`,
+          user_id: enrollment.user._id,
+          course_id: enrollment.course._id,
+          type: enrollment.type,
+          role: enrollment.role.name,
+          role_id: enrollment.role._id,
+          enrollment_state: enrollment.enrollmentState,
+        },
+      ],
+    }))
+
+  return {
+    data: instructors,
+    hasNextPage: pageInfo.hasNextPage,
+    hasPreviousPage: pageInfo.hasPreviousPage,
+    endCursor: pageInfo.endCursor,
+    startCursor: pageInfo.startCursor,
+    totalCount: pageInfo.totalCount,
   }
 }

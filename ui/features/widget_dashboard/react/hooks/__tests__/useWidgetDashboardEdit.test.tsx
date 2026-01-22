@@ -216,10 +216,6 @@ describe('useWidgetDashboardEdit', () => {
       await waitFor(() => {
         expect(result.current.saveError).toBe('Invalid widget configuration')
         expect(result.current.isEditMode).toBe(true)
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          'Failed to save widget layout:',
-          expect.any(Error),
-        )
       })
 
       consoleErrorSpy.mockRestore()

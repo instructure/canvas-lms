@@ -68,8 +68,7 @@ const CoursesTab: React.FC = () => {
             render(dashboardCardsElement, containerRef.current!)
           })
         }
-      } catch (err) {
-        console.error('Error rendering dashboard cards:', err)
+      } catch {
         setError("Cards couldn't load")
       }
     }
