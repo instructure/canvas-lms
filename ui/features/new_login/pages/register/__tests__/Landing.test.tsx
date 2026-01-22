@@ -19,7 +19,12 @@
 import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
-import {NewLoginDataProvider, NewLoginProvider,useNewLogin} from '../../../context'
+import {
+  NewLoginDataProvider,
+  NewLoginProvider,
+  useNewLogin,
+  useNewLoginData,
+} from '../../../context'
 import Landing from '../Landing'
 
 const mockNavigate = vi.fn()
@@ -31,15 +36,16 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-
 vi.mock('../../../context', async () => {
   const originalModule = await vi.importActual('../../../context')
   return {
     ...originalModule,
     useNewLogin: vi.fn(() => ({isUiActionPending: false})),
+    useNewLoginData: vi.fn(() => ({customMessageRegistration: undefined})), // default
   }
 })
 const mockUseNewLogin = vi.mocked(useNewLogin)
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
 
 describe('Landing', () => {
   afterEach(() => {
@@ -113,5 +119,26 @@ describe('Landing', () => {
     const teacherCard = screen.getByLabelText('Create Teacher Account')
     fireEvent.click(teacherCard)
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it('does not render custom message Alert when customMessageRegistration is undefined', () => {
+    mockUseNewLoginData.mockReturnValueOnce({
+      customMessageRegistration: undefined,
+      isDataLoading: false,
+    })
+    renderLanding()
+    expect(screen.queryByTestId('custom-message-alert')).not.toBeInTheDocument()
+  })
+
+  it('renders custom message Alert when customMessageRegistration is set', () => {
+    const customMsg = 'Welcome to your institution!'
+    mockUseNewLoginData.mockReturnValueOnce({
+      customMessageRegistration: customMsg,
+      isDataLoading: false,
+    })
+    renderLanding()
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveTextContent(customMsg)
   })
 })

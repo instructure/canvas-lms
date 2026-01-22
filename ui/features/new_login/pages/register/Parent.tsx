@@ -28,9 +28,10 @@ import React, {useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../../context'
 import {usePasswordValidator, useSafeBackNavigation, useServerErrorsMap} from '../../hooks'
 import {createParentAccount} from '../../services'
-import {SignInPrompt, TermsAndPolicyCheckbox} from '../../shared'
+import {MessageAlert, SignInPrompt, TermsAndPolicyCheckbox} from '../../shared'
 import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('new_login')
 
@@ -45,8 +46,14 @@ const ERROR_MESSAGES = {
 
 const Parent = () => {
   const {isUiActionPending, setIsUiActionPending} = useNewLogin()
-  const {passwordPolicy, privacyPolicyUrl, recaptchaKey, termsOfUseUrl, termsRequired} =
-    useNewLoginData()
+  const {
+    passwordPolicy,
+    privacyPolicyUrl,
+    recaptchaKey,
+    termsOfUseUrl,
+    termsRequired,
+    customMessageRegistrationParent,
+  } = useNewLoginData()
   const validatePassword = usePasswordValidator(passwordPolicy)
   const serverErrorsMap = useServerErrorsMap()
 
@@ -320,6 +327,10 @@ const Parent = () => {
           <SignInPrompt />
         </Flex.Item>
       </Flex>
+
+      {customMessageRegistrationParent && (
+        <MessageAlert message={customMessageRegistrationParent} />
+      )}
 
       <form onSubmit={handleCreateParent} noValidate={true}>
         <Flex direction="column" gap="large">
