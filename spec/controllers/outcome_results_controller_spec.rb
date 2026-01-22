@@ -404,6 +404,45 @@ describe OutcomeResultsController do
       end
     end
 
+    describe "retrieving outcome group_id" do
+      it "returns group_id for each outcome in the response" do
+        user_session(@teacher)
+        outcome_group = @course.root_outcome_group.child_outcome_groups.create!(title: "Test Group", context: @course)
+        outcome1 = @course.created_learning_outcomes.create!(title: "outcome 1")
+        outcome_group.add_outcome(outcome1)
+
+        get "rollups",
+            params: { course_id: @course.id,
+                      include: ["outcomes"] },
+            format: "json"
+        expect(response).to be_successful
+        json = parse_response(response)
+        outcomes = json["linked"]["outcomes"]
+
+        outcome_json = outcomes.find { |o| o["id"] == outcome1.id }
+        expect(outcome_json).not_to be_nil
+        expect(outcome_json["group_id"]).to eq outcome_group.id.to_s
+      end
+
+      it "includes group_id for outcomes in root group" do
+        user_session(@teacher)
+        root_group = @course.root_outcome_group
+
+        get "rollups",
+            params: { course_id: @course.id,
+                      include: ["outcomes"] },
+            format: "json"
+        expect(response).to be_successful
+        json = parse_response(response)
+        outcomes = json["linked"]["outcomes"]
+
+        # @outcome is added to root_outcome_group in context_outcome helper
+        outcome_json = outcomes.find { |o| o["id"] == @outcome.id }
+        expect(outcome_json).not_to be_nil
+        expect(outcome_json["group_id"]).to eq root_group.id.to_s
+      end
+    end
+
     it "validates aggregate_stat parameter" do
       user_session(@teacher)
       get "rollups",

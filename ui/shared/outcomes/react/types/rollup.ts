@@ -38,6 +38,7 @@ export interface Outcome {
   ratings: Rating[]
   proficiency_context_type?: string
   proficiency_context_id?: string
+  group_id?: string
 }
 
 export interface Score {

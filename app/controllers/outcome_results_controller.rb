@@ -845,7 +845,7 @@ class OutcomeResultsController < ApplicationController
   def include_outcomes
     percents = {}
     percents = rating_percents(user_rollups(all_users: true), context: @context) if params[:rating_percents] == "true"
-    outcome_results_include_outcomes_json(@outcomes, @context, percents)
+    outcome_results_include_outcomes_json(@outcomes, @context, percents, @outcome_links)
   end
 
   def include_outcome_groups

@@ -22,15 +22,15 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
-import {IconArrowOpenEndLine, IconInfoLine} from '@instructure/ui-icons'
+import {IconInfoLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {MasteryDistributionChart} from '../charts'
 import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
 import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 import OutcomeContextTag from '@canvas/outcome-context-tag/OutcomeContextTag'
+import {EditMasteryScaleLink} from '../toolbar/EditMasteryScaleLink'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -71,7 +71,6 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   const calculationMethod = getCalculationMethod(outcome)
 
   // When the feature flag is on, use proficiency context for mastery scale
-  // Otherwise, use outcome context (legacy behavior)
   const masteryScaleContextType = accountLevelMasteryScalesFF
     ? outcome.proficiency_context_type
     : outcome.context_type
@@ -217,15 +216,12 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
             </Flex.Item>
             {showInfo && (
               <Flex.Item margin="0 xx-small 0 0">
-                <Link
-                  data-testid="configure-mastery-link"
-                  href="outcomes"
-                  isWithinText={false}
-                  renderIcon={<IconArrowOpenEndLine size="x-small" />}
-                  iconPlacement="end"
-                >
-                  <Text size="small">{I18n.t('Configure Mastery')}</Text>
-                </Link>
+                <EditMasteryScaleLink
+                  outcome={outcome}
+                  accountLevelMasteryScalesFF={accountLevelMasteryScalesFF ?? false}
+                  masteryScaleContextType={masteryScaleContextType}
+                  masteryScaleContextId={masteryScaleContextId}
+                />
               </Flex.Item>
             )}
           </Flex>
