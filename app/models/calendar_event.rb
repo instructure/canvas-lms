@@ -746,6 +746,19 @@ class CalendarEvent < ActiveRecord::Base
     can :delete
   end
 
+  # effective_context_code is hardwritten, but context is shard dependant so sometimes we want to globalize it
+  def sharded_effective_context_code
+    return nil unless effective_context_code
+
+    codes = effective_context_code.split(",")
+    result = codes.map do |code|
+      type, id = code.split("_", 2)
+      global_id = Shard.global_id_for(id, shard)
+      "#{type}_#{global_id}"
+    end
+    result.join(",")
+  end
+
   class IcalEvent
     include Api
     include Rails.application.routes.url_helpers

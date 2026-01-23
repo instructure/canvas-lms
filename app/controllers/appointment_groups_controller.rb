@@ -594,18 +594,12 @@ class AppointmentGroupsController < ApplicationController
   def next_appointment
     ids = Array(params[:appointment_group_ids])
 
-    # Support cross-shard appointment groups
     appointment_groups = if ids.any?
-                           ids_by_shard = ids.group_by { |id| Shard.shard_for(id.to_i) }
-                           ids_by_shard.flat_map do |shard, shard_ids|
-                             shard.activate do
-                               local_ids = shard_ids.map(&:to_i)
-                               AppointmentGroup.current
-                                               .reservable_by(@current_user)
-                                               .where(id: local_ids)
-                                               .preload(appointments: :child_events)
-                                               .to_a
-                             end
+                           Shard.partition_by_shard(ids.map(&:to_i)) do |shard_ids|
+                             AppointmentGroup.current
+                                             .reservable_by(@current_user)
+                                             .where(id: shard_ids)
+                                             .preload(appointments: :child_events)
                            end
                          else
                            AppointmentGroup.current.reservable_by(@current_user).preload(appointments: :child_events).to_a
@@ -651,12 +645,8 @@ class AppointmentGroupsController < ApplicationController
   end
 
   def get_appointment_group
-    id = params[:id].to_i
-    shard = Shard.shard_for(id)
-    shard.activate do
-      @group = AppointmentGroup.find(id)
-      @context = @group.contexts_for_user(@current_user).first
-    end
+    @group = AppointmentGroup.find(params[:id])
+    @context = @group.contexts_for_user(@current_user).first # FIXME
   end
 
   def appointment_group_params

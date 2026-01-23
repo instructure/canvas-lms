@@ -83,8 +83,8 @@ describe('CommonEvent', () => {
       },
       ['course_97700000000059053'],
     )
-    expect(event.isOnCalendar('course_59053')).toBeTruthy()
     expect(event.isOnCalendar('course_97700000000059053')).toBeTruthy()
+    expect(event.isOnCalendar('course_59053')).toBeFalsy()
     expect(event.isOnCalendar('course_59054')).toBeFalsy()
     expect(event.isOnCalendar('course_590')).toBeFalsy()
   })
@@ -108,33 +108,33 @@ describe('CommonEvent', () => {
     expect(event).not.toBeNull()
   })
 
-  test('matches local context when API returns global context code', () => {
+  test('matches context when API returns consistent IDs', () => {
     const event = commonEventFactory(
       {
         title: 'Cross-shard appointment',
         start_at: '2026-01-26T18:00:00Z',
         effective_context_code: 'course_97700000000059053',
-        context_code: 'course_59053',
+        context_code: 'course_97700000000059053',
         all_context_codes: 'course_97700000000059053',
         appointment_group_id: '2',
         appointment_group_url: 'http://localhost:3000/api/v1/appointment_groups/2',
       },
-      [{asset_string: 'course_59053', can_create_calendar_events: true}],
+      [{asset_string: 'course_97700000000059053', can_create_calendar_events: true}],
     )
     expect(event).not.toBeNull()
     expect(event.contextCode()).toBe('course_97700000000059053')
   })
 
-  test('matches local context in multi-context events with global IDs', () => {
+  test('matches context in multi-context events', () => {
     const event = commonEventFactory(
       {
-        title: 'Multi-context with globals',
+        title: 'Multi-context',
         start_at: '2026-01-26T18:00:00Z',
         effective_context_code: 'course_97700000000059053,course_97700000000059054',
         context_code: 'user_2',
         all_context_codes: 'course_97700000000059053,course_97700000000059054',
       },
-      [{asset_string: 'course_59053'}, {asset_string: 'course_59054'}],
+      [{asset_string: 'course_97700000000059053'}, {asset_string: 'course_97700000000059054'}],
     )
     expect(event).not.toBeNull()
   })
