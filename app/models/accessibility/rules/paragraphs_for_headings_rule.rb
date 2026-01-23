@@ -48,10 +48,10 @@ module Accessibility
       end
 
       def fix!(elem, value)
-        return nil unless value == "true"
+        return { changed: nil } unless value == "true"
 
         elem.name = "p"
-        elem
+        { changed: elem }
       end
 
       def display_name

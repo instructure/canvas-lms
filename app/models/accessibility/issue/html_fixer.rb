@@ -34,7 +34,7 @@ module Accessibility
       def apply_fix!(updating_user: nil)
         resource.try(:updating_user=, updating_user)
         html_content = resource.send(self.class.target_attribute(resource))
-        fixed_content, _, error = fix_content(html_content, rule, path, value)
+        fixed_content, _, error, _metadata = fix_content(html_content, rule, path, value)
         if error.nil?
           resource.send("#{self.class.target_attribute(resource)}=", fixed_content)
           resource.save_without_accessibility_scan!
@@ -48,15 +48,15 @@ module Accessibility
         html_content = resource.send(self.class.target_attribute(resource))
 
         if element_only
-          content, fixed_path, error = fix_content_element(html_content, rule, path, value)
+          content, fixed_path, error, metadata = fix_content_element(html_content, rule, path, value)
         else
-          content, fixed_path, error = fix_content(html_content, rule, path, value)
+          content, fixed_path, error, metadata = fix_content(html_content, rule, path, value)
         end
 
         if error.nil?
-          { json: { content:, path: fixed_path }, status: :ok }
+          { json: { content:, path: fixed_path, **metadata }, status: :ok }
         else
-          { json: { content:, path: fixed_path, error: }, status: :bad_request }
+          { json: { content:, path: fixed_path, error:, **metadata }, status: :bad_request }
         end
       end
 
@@ -110,8 +110,10 @@ module Accessibility
         element = find_element_at_path(html_content, path)
         raise "Element not found for path: #{path}" unless element
 
-        # TODO: update all rules fix method to return changed element and content preview
-        changed, content_preview = rule.fix!(element, fix_value)
+        result = rule.fix!(element, fix_value)
+        changed = result[:changed]
+        content_preview = result[:content_preview]
+        metadata = result.except(:changed, :content_preview)
 
         error = changed.nil? ? nil : rule.test(changed)
 
@@ -124,7 +126,7 @@ module Accessibility
                     content_preview || changed&.to_html
                   end
 
-        [content, fixed_path, error]
+        [content, fixed_path, error, metadata]
       rescue => e
         Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.class.id})"
         Rails.logger.error e.backtrace.join("\n")
@@ -140,7 +142,8 @@ module Accessibility
           nil
         end
 
-        [preview_content, nil, e.message]
+        metadata = e.instance_variable_get(:@metadata) || {}
+        [preview_content, nil, e.message, metadata]
       end
     end
   end

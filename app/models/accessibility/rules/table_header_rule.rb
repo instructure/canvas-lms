@@ -70,7 +70,7 @@ module Accessibility
           end
         end
 
-        elem
+        { changed: elem }
       end
 
       def display_name

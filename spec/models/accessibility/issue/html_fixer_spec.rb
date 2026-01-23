@@ -330,7 +330,10 @@ describe Accessibility::Issue::HtmlFixer do
           allow(mock_rule).to receive(:test).and_return(nil)
           allow(mock_rule).to receive(:fix!) do |elem, _value|
             elem.content = "Fixed Content"
-            [elem, "<span id='test-element'>Fixed Content</span><p>Extra context</p>"]
+            {
+              changed: elem,
+              content_preview: "<span id='test-element'>Fixed Content</span><p>Extra context</p>"
+            }
           end
         end
 
@@ -367,7 +370,7 @@ describe Accessibility::Issue::HtmlFixer do
           allow(mock_rule).to receive(:test).and_return(nil)
           allow(mock_rule).to receive(:fix!) do |elem, _value|
             elem.content = "New Text"
-            elem
+            { changed: elem }
           end
         end
 

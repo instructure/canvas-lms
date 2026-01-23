@@ -56,14 +56,14 @@ module Accessibility
         scope_lookup_table = SCOPE_OPTIONS.to_h { |opt| [opt[:label].call, opt[:value]] }
         scope = scope_lookup_table[value]
         if scope
-          return nil if elem["scope"] == scope
+          return { changed: nil } if elem["scope"] == scope
 
           elem["scope"] = scope
         else
           raise StandardError, "Invalid scope value. Valid options are: #{VALID_SCOPES.join(", ")}." unless VALID_SCOPES.include?(value)
         end
 
-        [elem, table_preview(elem)]
+        { changed: elem, content_preview: table_preview(elem) }
       end
 
       def display_name

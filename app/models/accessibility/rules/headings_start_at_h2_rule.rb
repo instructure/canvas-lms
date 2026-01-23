@@ -51,7 +51,7 @@ module Accessibility
         else
           raise ArgumentError, "Invalid value for form: #{value}"
         end
-        elem
+        { changed: elem }
       end
 
       def display_name

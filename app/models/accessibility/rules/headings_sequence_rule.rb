@@ -68,7 +68,7 @@ module Accessibility
         when I18n.t("Remove heading style")
           elem.name = "p"
         end
-        elem
+        { changed: elem }
       end
 
       def display_name

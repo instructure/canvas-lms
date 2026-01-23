@@ -81,13 +81,13 @@ module Accessibility
       color = value
 
       if color.start_with?("#")
-        color.delete_prefix("#").upcase
+        color.upcase
       else
         nil
       end
     end
 
-    def extract_background_color(style_str, default: "FFFFFF")
+    def extract_background_color(style_str, default: "#FFFFFF")
       rule_set = parse_inline_styles(style_str)
       return default unless rule_set
 
