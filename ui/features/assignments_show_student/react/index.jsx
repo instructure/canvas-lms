@@ -23,6 +23,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import ObserverOptions from '@canvas/observer-picker'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import {
   getHandleChangeObservedUser,
   autoFocusObserverPicker,
@@ -38,27 +40,29 @@ const I18n = createI18nScope('assignments_2')
 export default function renderAssignmentsApp(env, elt) {
   const root = createRoot(elt)
   root.render(
-    <ApolloProvider client={client}>
-      <ErrorBoundary
-        errorComponent={({error}) => (
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorSubject={error.message}
-            errorCategory="Assignments 2 Student Error Page"
-            errorMessage={error.message}
-            stack={error.stack}
-          />
-        )}
-      >
-        <AlertManager>
-          <StudentViewQuery
-            assignmentLid={ENV.ASSIGNMENT_ID.toString()}
-            submissionID={ENV.SUBMISSION_ID?.toString()}
-            reviewerSubmissionID={ENV.REVIEWER_SUBMISSION_ID?.toString()}
-          />
-        </AlertManager>
-      </ErrorBoundary>
-    </ApolloProvider>,
+    <QueryClientProvider client={queryClient}>
+      <ApolloProvider client={client}>
+        <ErrorBoundary
+          errorComponent={({error}) => (
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              errorSubject={error.message}
+              errorCategory="Assignments 2 Student Error Page"
+              errorMessage={error.message}
+              stack={error.stack}
+            />
+          )}
+        >
+          <AlertManager>
+            <StudentViewQuery
+              assignmentLid={ENV.ASSIGNMENT_ID.toString()}
+              submissionID={ENV.SUBMISSION_ID?.toString()}
+              reviewerSubmissionID={ENV.REVIEWER_SUBMISSION_ID?.toString()}
+            />
+          </AlertManager>
+        </ErrorBoundary>
+      </ApolloProvider>
+    </QueryClientProvider>,
   )
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
