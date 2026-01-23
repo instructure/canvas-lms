@@ -26,6 +26,12 @@ export interface Attachment {
   url?: string | null
 }
 
+export interface MediaObject {
+  _id: string
+  mediaType: string | null
+  title: string | null
+}
+
 export interface RubricAssessmentRating {
   _id: string
   criterion: {
@@ -60,6 +66,7 @@ export interface Submission {
   } | null
   anonymousId?: string | null
   submittedAt?: string | null
+  mediaObject?: MediaObject | null
 }
 
 export interface PeerReviewDates {

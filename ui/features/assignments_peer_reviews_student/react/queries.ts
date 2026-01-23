@@ -80,6 +80,11 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
           submissionType
           url
           submittedAt
+          mediaObject {
+            _id
+            mediaType
+            title
+          }
           attachments {
             _id
             displayName

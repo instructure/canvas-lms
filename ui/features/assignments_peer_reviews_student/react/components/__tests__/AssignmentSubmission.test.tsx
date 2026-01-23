@@ -95,6 +95,14 @@ vi.mock('@canvas/rubrics/react/RubricAssessment/constants', () => ({
   RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY: () => 'rubric_view_mode',
 }))
 
+vi.mock('../MediaRecordingSubmissionDisplay', () => ({
+  MediaRecordingSubmissionDisplay: (props: any) => (
+    <div data-testid="media-recording-submission-display" data-media-id={props.mediaObject?._id}>
+      Mocked Media Recording Display
+    </div>
+  ),
+}))
+
 describe('AssignmentSubmission', () => {
   afterEach(() => {
     cleanup()
@@ -476,6 +484,55 @@ describe('AssignmentSubmission', () => {
       )
 
       expect(screen.getByTestId('canvadocs-pane')).toBeInTheDocument()
+    })
+  })
+
+  describe('media_recording submissions', () => {
+    const createMediaObject = () => ({
+      _id: 'media-123',
+      mediaType: 'video',
+      title: 'Test Video Recording',
+    })
+
+    it('renders media recording submission display', () => {
+      const submission = createSubmission({
+        submissionType: 'media_recording',
+        mediaObject: createMediaObject(),
+      })
+      render(<AssignmentSubmission {...createDefaultProps({submission})} />)
+
+      expect(screen.getByTestId('media-recording-submission-display')).toBeInTheDocument()
+    })
+
+    it('passes mediaObject to MediaRecordingSubmissionDisplay', () => {
+      const mediaObject = createMediaObject()
+      const submission = createSubmission({
+        submissionType: 'media_recording',
+        mediaObject,
+      })
+      render(<AssignmentSubmission {...createDefaultProps({submission})} />)
+
+      const display = screen.getByTestId('media-recording-submission-display')
+      expect(display).toHaveAttribute('data-media-id', 'media-123')
+    })
+
+    it('renders error when mediaObject is missing', () => {
+      const submission = createSubmission({
+        submissionType: 'media_recording',
+        mediaObject: null,
+      })
+      render(<AssignmentSubmission {...createDefaultProps({submission})} />)
+
+      expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
+
+    it('renders error when mediaObject is undefined', () => {
+      const submission = createSubmission({
+        submissionType: 'media_recording',
+      })
+      render(<AssignmentSubmission {...createDefaultProps({submission})} />)
+
+      expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
   })
 
