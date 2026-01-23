@@ -71,7 +71,10 @@ module NewQuizzes
         # Parameters not included in VariableExpander
         resource_link_id:,
         resource_link_title:,
-        launch_presentation_return_url: return_url
+        launch_presentation_return_url: return_url,
+
+        # UI version (extracted from launch URL in Consul)
+        ui_version: Services::NewQuizzes.ui_version
       }.merge(standard_params)
 
       # Assignment-specific outcome service parameters
