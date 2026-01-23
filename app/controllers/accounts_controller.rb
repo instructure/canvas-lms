@@ -361,6 +361,38 @@ class AccountsController < ApplicationController
     end
   end
 
+  # @API List horizon accounts
+  # A paginated list of horizon accounts that the current user can view or manage.
+  # Returns all accounts with the horizon_account setting enabled. If there are any
+  # horizon accounts and the user has access to Site Admin, Site Admin will also be
+  # included in the results.
+  #
+  # Typically, students and even teachers will get an empty list in response,
+  # only account admins can view the accounts that they are in.
+  #
+  # @argument include[] [String, "lti_guid"|"registration_settings"|"services"|"course_count"|"sub_account_count"|"site_admin"]
+  #   Array of additional information to include.
+  #
+  #   "lti_guid":: the 'tool_consumer_instance_guid' that will be sent for this account on LTI launches
+  #   "registration_settings":: returns info about the privacy policy and terms of use
+  #   "services":: returns services and whether they are enabled (requires account management permissions)
+  #   "course_count":: returns the number of courses directly under each account
+  #   "sub_account_count":: returns the number of sub-accounts directly under each account
+  #   "site_admin":: returns true if the account is the Site Admin account (only included if true)
+  #
+  # @returns [Account]
+  def horizon_accounts
+    @accounts = if @current_user
+                  Api.paginate(@current_user.all_paginatable_horizon_accounts, self, api_v1_horizon_accounts_url)
+                else
+                  []
+                end
+    ActiveRecord::Associations.preload(@accounts, :root_account)
+
+    includes = params[:include] || params[:includes]
+    render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+  end
+
   # @API Get accounts that admins can manage
   # A paginated list of accounts where the current user has permission to create
   # or manage courses. List will be empty for students and teachers as only admins

@@ -1934,6 +1934,7 @@ CanvasRails::Application.routes.draw do
       get "accounts", action: :index, as: :accounts
       get "course_accounts", action: :course_accounts, as: :course_accounts
       get "manageable_accounts", action: :manageable_accounts, as: :manageable_accounts
+      get "horizon_accounts", action: :horizon_accounts, as: :horizon_accounts
       get "course_creation_accounts", action: :course_creation_accounts, as: :course_creation_accounts
       get "accounts/:id", action: :show, as: :account
       put "accounts/:id", action: :update

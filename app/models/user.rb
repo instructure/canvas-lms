@@ -3657,10 +3657,53 @@ class User < ActiveRecord::Base
     Rails.cache.delete(adminable_accounts_cache_key)
   end
 
+  def adminable_horizon_accounts_cache_key
+    ["adminable_horizon_accounts_1", self, ApplicationController.region].cache_key
+  end
+
+  def clear_adminable_horizon_accounts_cache!
+    Rails.cache.delete(adminable_horizon_accounts_cache_key)
+  end
+
   def adminable_accounts_scope(shard_scope: in_region_associated_shards)
     # i couldn't get EXISTS (?) to work multi-shard, so this is happening instead
     account_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
     Account.active.where(id: account_ids)
+  end
+
+  def adminable_horizon_accounts_scope(shard_scope: in_region_associated_shards)
+    adminable_accounts_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
+    root_accounts = Account.active.where(
+      id: Account.active
+               .where(id: adminable_accounts_ids)
+               .select(Arel.sql("DISTINCT COALESCE(NULLIF(root_account_id, 0), id)"))
+    )
+
+    horizon_account_ids = Set.new
+    adminable_accounts_set = Set.new(adminable_accounts_ids)
+
+    root_accounts.each do |root_account|
+      root_account.shard.activate do
+        horizon_parent_ids = root_account.settings[:horizon_account_ids] || []
+
+        next if horizon_parent_ids.empty?
+
+        all_horizon_accounts = Account.multi_parent_sub_accounts_recursive(horizon_parent_ids)
+        all_horizon_ids = all_horizon_accounts.pluck(:id)
+
+        matching_ids = Set.new(all_horizon_ids) & adminable_accounts_set
+
+        matching_ids.each do |local_id|
+          horizon_account_ids.add(Shard.global_id_for(local_id, root_account.shard))
+        end
+      end
+    end
+
+    if horizon_account_ids.any? && account_users.active.where(account: Account.site_admin).exists?
+      horizon_account_ids.add(Account.site_admin.global_id)
+    end
+
+    Account.active.where(id: horizon_account_ids.to_a)
   end
 
   def adminable_accounts
@@ -3671,8 +3714,20 @@ class User < ActiveRecord::Base
     end
   end
 
+  def adminable_horizon_accounts
+    @adminable_horizon_accounts ||= shard.activate do
+      Rails.cache.fetch(adminable_horizon_accounts_cache_key) do
+        adminable_horizon_accounts_scope.order(:id).to_a
+      end
+    end
+  end
+
   def all_paginatable_accounts
     ShardedBookmarkedCollection.build(Account::Bookmarker, adminable_accounts_scope.order(:name, :id))
+  end
+
+  def all_paginatable_horizon_accounts
+    ShardedBookmarkedCollection.build(Account::Bookmarker, adminable_horizon_accounts_scope.order(:name, :id))
   end
 
   def all_pseudonyms_loaded?

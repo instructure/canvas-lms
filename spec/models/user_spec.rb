@@ -3731,6 +3731,150 @@ describe User do
     end
   end
 
+  describe "#adminable_horizon_accounts_scope" do
+    it "returns horizon accounts the user can administer" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account2 = Account.create!(name: "Account 2")
+      account3 = Account.create!(name: "Account 3")
+
+      account1.account_users.create!(user:)
+      account2.account_users.create!(user:)
+      # User does not have access to account3
+
+      # Mark account1 and account2 as horizon accounts
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+      account2.settings[:horizon_account_ids] = [account2.id]
+      account2.save!
+      # Mark account3 as horizon account, but user doesn't have access
+      account3.settings[:horizon_account_ids] = [account3.id]
+      account3.save!
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to match_array [account1, account2]
+    end
+
+    it "returns empty when no horizon_account_ids are configured" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to be_empty
+    end
+
+    it "includes site admin when user has access and there are horizon accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      Account.site_admin.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to include(Account.site_admin)
+      expect(result).to include(account1)
+    end
+
+    it "does not include site admin when user has access but no horizon accounts" do
+      user = user_model
+      Account.site_admin.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to be_empty
+    end
+
+    it "does not include site admin when user does not have access" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).not_to include(Account.site_admin)
+      expect(result).to include(account1)
+    end
+
+    it "includes sub-accounts when user is admin on a sub-account of horizon-enabled parent" do
+      user = user_model
+      root = Account.create!(name: "Root")
+      sub_account = Account.create!(name: "Sub Account", parent_account: root, root_account: root)
+
+      # Enable horizon on root
+      root.settings[:horizon_account_ids] = [root.id]
+      root.save!
+
+      # User is admin on sub-account (not on root)
+      sub_account.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+
+      # User should see the sub-account because it inherits horizon from root
+      expect(result).to include(sub_account)
+      expect(result).not_to include(root) # User is NOT admin on root
+    end
+
+    it "includes multiple levels of sub-accounts in horizon hierarchy" do
+      user = user_model
+      root = Account.create!(name: "Root")
+      sub1 = Account.create!(name: "Sub 1", parent_account: root, root_account: root)
+      sub2 = Account.create!(name: "Sub 2", parent_account: sub1, root_account: root)
+
+      # Enable horizon on root
+      root.settings[:horizon_account_ids] = [root.id]
+      root.save!
+
+      # User is admin on multiple levels
+      sub1.account_users.create!(user:)
+      sub2.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+
+      # User should see both sub-accounts
+      expect(result).to include(sub1, sub2)
+      expect(result.size).to eq(2)
+    end
+  end
+
+  describe "adminable_horizon_accounts" do
+    it "returns cached horizon accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      expect(user.adminable_horizon_accounts.map(&:id)).to eq [account1.id]
+    end
+
+    it "excludes deleted accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+      account1.destroy
+
+      expect(user.adminable_horizon_accounts).to be_empty
+    end
+
+    it "only includes accounts in horizon_account_ids that user has admin access to" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account2 = Account.create!(name: "Account 2")
+      account1.account_users.create!(user:)
+      # User does not have access to account2
+      account1.settings[:horizon_account_ids] = [account1.id, account2.id]
+      account1.save!
+
+      # User only has access to account1, not account2, so only account1 should be returned
+      expect(user.adminable_horizon_accounts.map(&:id)).to eq [account1.id]
+    end
+  end
+
   describe "all_pseudonyms" do
     specs_require_sharding
 

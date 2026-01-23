@@ -1966,6 +1966,8 @@
 - verb: PUT
   path: '/api/v1/groups/:group_id/users/:user_id'
 - verb: GET
+  path: '/api/v1/horizon_accounts'
+- verb: GET
   path: '/api/v1/immersive_reader/authenticate'
 - verb: POST
   path: '/api/v1/inst_access_tokens'
