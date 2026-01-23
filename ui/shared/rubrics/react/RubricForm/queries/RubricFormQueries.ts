@@ -186,7 +186,21 @@ export const saveRubric = async (
     }
   })
 
-  const rubricAssociationTypeId = rubric.associationTypeId ?? assignmentId ?? accountId ?? courseId
+  let rubricAssociationTypeId = rubric.associationTypeId
+
+  if (!rubricAssociationTypeId) {
+    if (rubric.associationType === 'Assignment') {
+      rubricAssociationTypeId = assignmentId
+    } else if (rubric.associationType === 'Course') {
+      rubricAssociationTypeId = courseId
+    } else if (rubric.associationType === 'Account') {
+      rubricAssociationTypeId = accountId
+    }
+  }
+
+  if (!rubricAssociationTypeId) {
+    throw new Error('Missing rubric association type ID')
+  }
 
   const response = await fetch(url, {
     method,
