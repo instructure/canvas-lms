@@ -58,7 +58,7 @@ export const useAccessibilityScansPolling = () => {
   const shouldPoll = scansNeedingPolling.length > 0
 
   useQuery({
-    queryKey: ['resourceAccessibilityScan', scansNeedingPolling],
+    queryKey: ['resourceAccessibilityScan'],
     queryFn: async () => {
       // Double-check we have scans to poll (should be guaranteed by enabled flag)
       if (scansNeedingPolling.length === 0) {
@@ -91,8 +91,14 @@ export const useAccessibilityScansPolling = () => {
 
         setAccessibilityScans(newScans)
 
-        // Refetch dashboard summary when scan states change
-        doFetchAccessibilityIssuesSummary({})
+        // Only refetch summary if any scans are in finished state (completed or failed)
+        const hasFinishedScans = updatedScans.some(
+          scan => scan.workflowState === 'completed' || scan.workflowState === 'failed',
+        )
+
+        if (hasFinishedScans) {
+          doFetchAccessibilityIssuesSummary({})
+        }
 
         return updatedScans
       }
