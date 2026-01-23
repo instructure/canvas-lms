@@ -16,84 +16,55 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# We don't currently import context controls, as that would allow teachers to modify
-# Context Controls, which they shouldn't have permission to do! We might revisit this
-# in the future and let admins make this a toggleable feature, but for now it is
-# always disabled.
 module Importers
   class LtiContextControlImporter < Importer
     self.item_class = Lti::ContextControl
 
     class << self
       def process_migration(data, migration)
-        controls = data["lti_context_controls"] || []
-        controls.each do |control|
-          next unless import_control?(control, migration)
+        return [] unless data["lti_context_controls"].present?
 
-          import_from_migration(control, migration.context, migration)
+        controls = data["lti_context_controls"]
+        preloaded_tools = migration.context.context_external_tools
+                                   .where(migration_id: controls.pluck("deployment_migration_id").compact)
+                                   .group_by(&:migration_id)
+        controls.each do |control|
+          tool = preloaded_tools[control["deployment_migration_id"]]&.first
+          next unless import_control?(control, tool, migration)
+
+          import_from_migration(control, tool, migration.context, migration)
         rescue => e
           migration.add_import_warning(t("#migration.lti_context_control_type", "LTI Context Control"),
-                                       control[:url],
+                                       control[:migration_id],
                                        e)
         end
       end
 
       private
 
-      def import_from_migration(hash, context, migration)
-        # We have to do URL matching here, as it's possible that this course
-        # copy is across different institutions, so a matching tool wouldn't
-        # have the same ID as the one in the source course. We can skip a lot of
-        # the work though if the preferred_tool is available for use in this
-        # context.
-        # We have to ignore availability checks as it's possible that this context control
-        # is going to enable the tool in the course, but otherwise the tool isn't available,
-        # either because it was just copied or it's set to not available at a higher context.
-        matching_tool = Lti::ToolFinder.from_url(hash["deployment_url"],
-                                                 context,
-                                                 only_1_3: true,
-                                                 preferred_tool_id: hash["preferred_deployment_id"],
-                                                 check_availability: false)
-
-        if matching_tool.nil?
-          migration.add_import_warning(t("#migration.lti_context_control_type", "LTI Context Control"),
-                                       hash["deployment_url"],
-                                       t("#migration.lti_context_control_no_tool",
-                                         "Unable to find a matching tool for the context control. Please ensure that a tool with a matching URL is available in the course."))
-          return
-        end
-
-        if Lti::ContextControl.active.where(course: context, deployment: matching_tool, registration: matching_tool.lti_registration).exists?
-          migration.add_import_warning(t("#migration.lti_context_control_type", "LTI Context Control"),
-                                       hash["deployment_url"],
-                                       t("#migration.lti_context_control_exists",
-                                         "A context control for the tool with the given URL already exists. Skipping import for this control."))
-          return
-        end
-
-        registration_id = matching_tool.lti_registration.id || matching_tool.developer_key.lti_registration.id
-
-        Lti::ContextControlService.create_or_update({
-                                                      course_id: context.id,
-                                                      deployment_id: matching_tool.id,
-                                                      registration_id:,
-                                                      workflow_state: "active",
-                                                      available: hash["available"],
-                                                      updated_by: migration.user,
-                                                    },
-                                                    comment: "Imported from migration")
+      def import_from_migration(hash, matching_tool, context, migration)
+        Lti::ContextControlService
+          .create_or_update({
+                              course_id: context.id,
+                              deployment_id: matching_tool.id,
+                              registration_id: matching_tool.lti_registration_id || matching_tool.developer_key.lti_registration_id,
+                              workflow_state: "active",
+                              available: hash["available"],
+                              updated_by: migration.user,
+                            },
+                            comment: "Imported from migration")
       end
 
-      def import_control?(control, migration)
-        if control["deployment_migration_id"].present?
-          # The tool is being imported as well, so we can use the migration ID
-          # to check if we should import this control.
-          migration.import_object?("context_external_tools", control["deployment_migration_id"])
-        else
-          # The control was not associated with a course level tool, so default to course
-          # settings.
-          migration.import_object?("course_settings", "")
-        end
+      def import_control?(control, matching_tool, migration)
+        # Only controls that are associated with a tool that's also being imported
+        # are allowed to be imported. This is a bit of a workaround/hack around permissions,
+        # as it ensures we don't suddenly break everybody's workflow of copying tools around
+        # while still making sure that teachers can't modify controls associated with
+        # account/sub-account level tools.
+        control["deployment_migration_id"].present? &&
+          matching_tool&.active? &&
+          (migration.import_object?("context_external_tools", control["deployment_migration_id"]) ||
+            migration.import_object?("external_tools", control["deployment_migration_id"]))
       end
     end
   end
