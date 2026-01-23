@@ -666,4 +666,87 @@ describe('LLMConversationView', () => {
       })
     })
   })
+
+  describe('input focus behavior', () => {
+    it('focuses text input after AI response arrives', async () => {
+      const mockMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: mockMessages})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', () => {
+          return HttpResponse.json({
+            id: '1',
+            messages: [
+              ...mockMessages,
+              {role: 'User', text: 'Test', timestamp: new Date()},
+              {role: 'Assistant', text: 'Response', timestamp: new Date()},
+            ],
+          })
+        }),
+      )
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
+      })
+
+      vi.clearAllMocks()
+
+      const input = screen.getByPlaceholderText('Your answer...')
+      fireEvent.change(input, {target: {value: 'Test'}})
+      fireEvent.click(screen.getByText('Send'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Response')).toBeInTheDocument()
+      })
+
+      expect(HTMLElement.prototype.focus).toHaveBeenCalled()
+    })
+
+    it('focuses text input after errors', async () => {
+      const initialMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: initialMessages})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', () => {
+          return HttpResponse.json({error: 'Failed'}, {status: 503})
+        }),
+      )
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
+      })
+
+      vi.clearAllMocks()
+
+      const input = screen.getByPlaceholderText('Your answer...')
+      fireEvent.change(input, {target: {value: 'Test'}})
+      fireEvent.click(screen.getByText('Send'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed to send message. Please try again.')).toBeInTheDocument()
+      })
+
+      expect(HTMLElement.prototype.focus).toHaveBeenCalled()
+    })
+  })
 })
