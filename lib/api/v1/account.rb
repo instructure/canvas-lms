@@ -52,6 +52,7 @@ module Api::V1::Account
       hash["sis_import_id"] = account.sis_batch_id if !account.root_account? && account.root_account.grants_right?(user, session, :manage_sis)
       hash["integration_id"] = account.integration_id if !account.root_account? && account.root_account.grants_any_right?(user, :read_sis, :manage_sis)
       hash["lti_guid"] = account.lti_guid if includes.include?("lti_guid")
+      hash["site_admin"] = true if includes.include?("site_admin") && account.site_admin?
       hash["course_template_id"] = account.course_template_id
       if includes.include?("registration_settings")
         hash["registration_settings"] = {
@@ -72,6 +73,10 @@ module Api::V1::Account
       hash["sub_account_count"] = account.sub_account_count if includes.include?("sub_account_count")
 
       hash["global_id"] = account.global_id if includes.include?("global_id")
+      if includes.include?("horizon_account")
+        horizon_setting = account.horizon_account
+        hash["horizon_account"] = !!(horizon_setting && horizon_setting[:value])
+      end
 
       Api::V1::Account.extensions.each do |extension|
         hash = extension.extend_account_json(hash, account, user, session, includes)
