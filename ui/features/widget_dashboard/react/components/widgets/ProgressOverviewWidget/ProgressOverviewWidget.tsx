@@ -22,6 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseProgressItem from './CourseProgressItem'
+import ProgressLegend from './ProgressLegend'
 import {useProgressOverviewPaginated} from '../../../hooks/useProgressOverview'
 import type {BaseWidgetProps} from '../../../types'
 
@@ -61,19 +62,24 @@ const ProgressOverviewWidget: React.FC<BaseWidgetProps> = ({
         ariaLabel: I18n.t('Progress overview pagination'),
       }}
     >
-      {hasNoCourses ? (
-        <View as="div" padding="medium" textAlign="center">
-          <Text size="medium" data-testid="no-courses-message">
-            {I18n.t('No courses found')}
-          </Text>
+      <>
+        {hasNoCourses ? (
+          <View as="div" padding="medium" textAlign="center">
+            <Text size="medium" data-testid="no-courses-message">
+              {I18n.t('No courses found')}
+            </Text>
+          </View>
+        ) : (
+          <View as="div">
+            {courses?.map(course => (
+              <CourseProgressItem key={course.courseId} course={course} />
+            ))}
+          </View>
+        )}
+        <View as="div" padding="small 0 0 small">
+          <ProgressLegend />
         </View>
-      ) : (
-        <View as="div">
-          {courses?.map(course => (
-            <CourseProgressItem key={course.courseId} course={course} />
-          ))}
-        </View>
-      )}
+      </>
     </TemplateWidget>
   )
 }

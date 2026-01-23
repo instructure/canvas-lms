@@ -384,4 +384,14 @@ describe('ProgressOverviewWidget', () => {
 
     cleanup()
   })
+
+  it('renders progress legend', async () => {
+    const {cleanup} = setup()
+
+    await waitFor(() => {
+      expect(screen.getByTestId('progress-legend')).toBeInTheDocument()
+    })
+
+    cleanup()
+  })
 })
