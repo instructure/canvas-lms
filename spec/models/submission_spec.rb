@@ -10693,6 +10693,43 @@ describe Submission do
     end
   end
 
+  describe "#peer_reviewer_for?" do
+    before do
+      student_in_course(active_all: true)
+      @peer_reviewer = user_factory
+      @course.enroll_student(@peer_reviewer).accept!
+      @assignment = @course.assignments.build(
+        title: "Peer Reviews",
+        submission_types: "online_text_entry",
+        peer_reviews: true
+      )
+      @assignment.save!
+      @submission = @assignment.submission_for_student(@student)
+      @submission.assessment_requests.create!(
+        user: @student,
+        assessor: @peer_reviewer,
+        assessor_asset: @submission
+      )
+    end
+
+    it "caches false values to prevent N+1 queries" do
+      # Expect peer_reviewer? to be called only once, not on subsequent calls
+      expect(@submission).to receive(:peer_reviewer?).with(@student).once.and_call_original
+
+      # Call multiple times - should only query once
+      expect(@submission.peer_reviewer_for?(@student)).to be false
+      expect(@submission.peer_reviewer_for?(@student)).to be false
+      expect(@submission.peer_reviewer_for?(@student)).to be false
+    end
+
+    it "caches true values" do
+      expect(@submission).to receive(:peer_reviewer?).with(@peer_reviewer).once.and_call_original
+
+      expect(@submission.peer_reviewer_for?(@peer_reviewer)).to be true
+      expect(@submission.peer_reviewer_for?(@peer_reviewer)).to be true
+    end
+  end
+
   describe "send_timing_data_if_needed" do
     it "calls Statsd when a classic quiz is manually graded" do
       expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 600.0, 1.0, tags: { quiz_type: "classic_quiz" })

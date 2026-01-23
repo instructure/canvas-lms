@@ -25,7 +25,7 @@ import {colors, spacing} from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconCompleteSolid, IconDownloadLine} from '@instructure/ui-icons'
+import {IconDownloadLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text as UIText} from '@instructure/ui-text'
@@ -110,7 +110,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
                 {I18n.t('Document Processors')}
               </Table.ColHeader>
             )}
-            <Table.ColHeader id="upload-success" width="1rem" themeOverride={cellTheme} />
+            <Table.ColHeader id="download-file" width="1rem" themeOverride={cellTheme} />
           </Table.Row>
         </Table.Head>
         <Table.Body>
@@ -121,12 +121,19 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
                   ? renderThumbnail(file, index)
                   : renderIcon(file, index)}
               </Table.Cell>
-              <Table.Cell themeOverride={cellTheme}>
-                <Link onClick={() => selectFile(index)}>
+              {submission.attachments.length > 1 ? (
+                <Table.Cell themeOverride={cellTheme}>
+                  <Link onClick={() => selectFile(index)}>
+                    {elideString(file.displayName || file.name)}
+                  </Link>
+                  <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
+                </Table.Cell>
+              ) : (
+                <Table.Cell themeOverride={cellTheme}>
                   {elideString(file.displayName || file.name)}
-                </Link>
-                <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
-              </Table.Cell>
+                  <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
+                </Table.Cell>
+              )}
               <Table.Cell themeOverride={cellTheme} data-testid="file-size">
                 {file.size}
               </Table.Cell>
@@ -148,8 +155,15 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
                   />
                 </Table.Cell>
               )}
-              <Table.Cell themeOverride={cellTheme}>
-                <IconCompleteSolid color="success" />
+              <Table.Cell themeOverride={cellTheme} data-testid="download-file">
+                <Button
+                  size="small"
+                  renderIcon={IconDownloadLine}
+                  href={file.url}
+                  disabled={!file.url}
+                >
+                  {I18n.t('Download')}
+                </Button>
               </Table.Cell>
             </Table.Row>
           ))}
@@ -200,23 +214,13 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
         <div
           style={{
             textAlign: 'center',
-            padding: `${spacing.medium} 0 0 0`,
+            padding: `${spacing.medium} 0 ${spacing.medium} 0`,
             borderLeft: `1px solid ${colors.contrasts.grey1214}`,
           }}
         >
           <div style={{display: 'block'}}>
             {renderUnavailablePreview(I18n.t('Preview Unavailable'))}
             {selectedFile.displayName}
-            <div style={{display: 'block'}}>
-              <Button
-                margin="medium auto"
-                renderIcon={IconDownloadLine}
-                href={selectedFile.url}
-                disabled={!selectedFile.url}
-              >
-                {I18n.t('Download')}
-              </Button>
-            </div>
           </div>
         </div>
       )
@@ -239,7 +243,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
     if (submission.attachments.length) {
       return (
         <Flex data-testid="file-preview" direction="column" width="100%" alignItems="stretch">
-          {submission.attachments.length > 1 && (
+          {submission.attachments.length > 0 && (
             <Flex.Item padding="0 x-large x-large">{renderFileDetailsTable()}</Flex.Item>
           )}
           <Flex.Item>{renderFilePreview()}</Flex.Item>

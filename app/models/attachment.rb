@@ -1436,6 +1436,18 @@ class Attachment < ActiveRecord::Base
     # grader
     return true if assignment.grants_right?(user, session, :grade)
 
+    # peer reviewer
+    if user && assignment.peer_reviews
+      # Find submissions associated with this attachment through AttachmentAssociation
+      attachment_assocs = AttachmentAssociation.where(attachment_id: id, context_type: "Submission")
+      attachment_assocs.each do |assoc|
+        submission = assoc.context
+        if submission&.assignment == assignment && submission.peer_reviewer_for?(user)
+          return true
+        end
+      end
+    end
+
     # submitter (or observer of submitter)
     assignment.shard.activate do
       # Search submissions for the user, or any user they are observing

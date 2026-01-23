@@ -666,6 +666,16 @@ class Submission < ActiveRecord::Base
       assessment_requests.map(&:assessor_id).include?(user.id)
   end
 
+  # Cached version of peer_reviewer? to prevent N+1 queries when checking
+  # multiple times for the same user (e.g., when loading multiple file attachments)
+  def peer_reviewer_for?(user)
+    @_peer_reviewer_cache ||= {}
+    user_id = user&.id
+    return @_peer_reviewer_cache[user_id] if @_peer_reviewer_cache.key?(user_id)
+
+    @_peer_reviewer_cache[user_id] = peer_reviewer?(user)
+  end
+
   def can_view_details?(user)
     return false unless grants_right?(user, :read)
     return true unless assignment.anonymize_students?
