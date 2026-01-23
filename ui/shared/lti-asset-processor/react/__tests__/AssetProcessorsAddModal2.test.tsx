@@ -145,6 +145,13 @@ describe('AssetProcessorsAddModal', () => {
           expect(cards).toHaveLength(4)
           const foundCard = cards.find(card => card.textContent?.includes(tool!.name))
           expect(foundCard).toBeDefined()
+
+          toolsForType(type).forEach(t => {
+            if (t.context_name) {
+              expect(getByText(`Installed in: ${t.context_name}`)).toBeInTheDocument()
+            }
+          })
+
           return foundCard
         },
         {timeout: 3000},
@@ -169,10 +176,12 @@ describe('AssetProcessorsAddModal', () => {
       expect(validResponse.tool_id).toBe(tool_id)
 
       const mockHECM = handleExternalContentMessages as any
-      mockHECM.mockImplementation(({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
-        setTimeout(() => onDeepLinkingResponse(validResponse), 0)
-        return () => {}
-      })
+      mockHECM.mockImplementation(
+        ({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
+          setTimeout(() => onDeepLinkingResponse(validResponse), 0)
+          return () => {}
+        },
+      )
 
       render(
         <MockedQueryClientProvider client={queryClient}>
@@ -207,10 +216,12 @@ describe('AssetProcessorsAddModal', () => {
       expect(matchingTool).not.toBeUndefined()
 
       const mockHECM = handleExternalContentMessages as any
-      mockHECM.mockImplementation(({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
-        setTimeout(() => onDeepLinkingResponse(mockInvalidDeepLinkResponse), 0)
-        return () => {}
-      })
+      mockHECM.mockImplementation(
+        ({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
+          setTimeout(() => onDeepLinkingResponse(mockInvalidDeepLinkResponse), 0)
+          return () => {}
+        },
+      )
 
       render(
         <MockedQueryClientProvider client={queryClient}>

@@ -302,6 +302,40 @@ module Lti
         expect(json_next.count).to eq 3
         json
       end
+
+      it "includes context_name when include_context_name parameter is true" do
+        tool = new_valid_external_tool(account, true)
+        course_with_teacher(active_all: true, user: user_with_pseudonym, account:)
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+                        { controller: "lti/lti_apps",
+                          action: "launch_definitions",
+                          format: "json",
+                          placements: %w[resource_selection],
+                          course_id: @course.id.to_s,
+                          include_context_name: "true" })
+
+        tool_def = json.find { |j| j["definition_id"] == tool.id }
+        expect(tool_def).not_to be_nil
+        expect(tool_def).to have_key("context_name")
+        expect(tool_def["context_name"]).to eq account.name
+      end
+
+      it "excludes context_name by default" do
+        tool = new_valid_external_tool(account, true)
+        course_with_teacher(active_all: true, user: user_with_pseudonym, account:)
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+                        { controller: "lti/lti_apps",
+                          action: "launch_definitions",
+                          format: "json",
+                          placements: %w[resource_selection],
+                          course_id: @course.id.to_s })
+
+        tool_def = json.find { |j| j["definition_id"] == tool.id }
+        expect(tool_def).not_to be_nil
+        expect(tool_def).not_to have_key("context_name")
+      end
     end
 
     describe "#index" do

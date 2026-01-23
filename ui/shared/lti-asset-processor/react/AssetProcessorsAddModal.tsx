@@ -40,6 +40,7 @@ import {AssetProcessorsCard} from './AssetProcessorsCards'
 import {useAssetProcessorsToolsList} from './hooks/useAssetProcessorsToolsList'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
+import {ToolContextName} from './ToolContextName'
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -176,7 +177,9 @@ function AssetProcessorsAddModalBodyToolList({
                 description={tool.description}
                 margin="small"
                 onClick={() => launchTool(tool)}
-              />
+              >
+                <ToolContextName tool={tool} />
+              </AssetProcessorsCard>
             </Flex.Item>
           )
         })}

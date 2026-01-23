@@ -32,7 +32,7 @@ const queryFn = async ({queryKey}: {queryKey: [string, number, string]}) => {
   const placement = queryKey[2]
   const {response, json} = await doFetchApi<LtiLaunchDefinition[]>({
     path: `/api/v1/courses/${courseId}/lti_apps/launch_definitions`,
-    params: {'placements[]': placement},
+    params: {'placements[]': placement, include_context_name: true},
   })
   if (!response.ok) {
     throw new Error(response.statusText)
