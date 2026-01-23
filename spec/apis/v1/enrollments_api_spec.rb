@@ -3883,5 +3883,55 @@ describe EnrollmentsApiController, type: :request do
                        }
       expect(response).to have_http_status :bad_request
     end
+
+    it "applies a custom course-level role via enrollment_role_id" do
+      admin = account_admin_user(active_all: true)
+      user = user_with_pseudonym(name: "User One")
+      custom_role = Account.default.roles.build(name: "bulk_custom_teacher")
+      custom_role.base_role_type = "TeacherEnrollment"
+      custom_role.save!
+
+      json = api_call_as_user admin,
+                              :post,
+                              @path,
+                              @path_options,
+                              {
+                                user_ids: [user.id],
+                                course_ids: [@course.id],
+                                enrollment_type: "TeacherEnrollment",
+                                enrollment_role_id: custom_role.id
+                              }
+
+      run_jobs
+
+      expect(response).to be_successful
+      expect(Progress.find(json["id"]).results[:errors]).to be_empty
+      enrollment = Enrollment.find_by!(course: @course, user:)
+      expect(enrollment.type).to eq "TeacherEnrollment"
+      expect(enrollment.role_id).to eq custom_role.id
+    end
+
+    it "returns bad request when enrollment_type does not match the role base type" do
+      admin = account_admin_user(active_all: true)
+      user = user_with_pseudonym(name: "User One")
+      custom_role = Account.default.roles.build(name: "bulk_custom_teacher_mismatch")
+      custom_role.base_role_type = "TeacherEnrollment"
+      custom_role.save!
+
+      api_call_as_user admin,
+                       :post,
+                       @path,
+                       @path_options,
+                       {
+                         user_ids: [user.id],
+                         course_ids: [@course.id],
+                         enrollment_type: "StudentEnrollment",
+                         enrollment_role_id: custom_role.id
+                       }
+
+      expect(response).to have_http_status :bad_request
+      body = JSON.parse(response.body)
+      expect(body["errors"]).to eq "The specified type must match the base type for the role"
+    end
   end
 end
