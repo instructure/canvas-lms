@@ -40,6 +40,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useRubricAssessment} from '../hooks/useRubricAssessment'
 import {RubricPanel} from './RubricPanel'
 import {CommentsPanel} from './CommentsPanel'
+import {MediaRecordingSubmissionDisplay} from './MediaRecordingSubmissionDisplay'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -242,6 +243,16 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
         )
       case 'student_annotation':
         return <StudentAnnotationPreview submission={submission} />
+      case 'media_recording': {
+        if (!submission.mediaObject?._id) {
+          return renderError(
+            I18n.t('Media Recording Error'),
+            I18n.t('Student Peer Review Submission Error Page.'),
+            I18n.t('The media recording is missing or unavailable.'),
+          )
+        }
+        return <MediaRecordingSubmissionDisplay mediaObject={submission.mediaObject} />
+      }
       default:
         return renderError(
           I18n.t('Submission type error'),
