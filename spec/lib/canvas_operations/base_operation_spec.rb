@@ -228,6 +228,14 @@ RSpec.describe CanvasOperations::BaseOperation do
       operation_instance.run(progress)
     end
 
+    it "manually sets workflow_state to completed when progress.complete returns false" do
+      allow(progress).to receive(:complete).and_return(false)
+
+      operation_instance.run(progress)
+
+      expect(progress.workflow_state).to eq("completed")
+    end
+
     it "emits an event notifying the run is starting and completing" do
       expect(InstStatsd::Statsd).to receive(:event).with(
         "my_operation started",
@@ -290,6 +298,12 @@ RSpec.describe CanvasOperations::BaseOperation do
         expect do
           operation_instance.run(progress)
         end.not_to raise_error
+      end
+
+      it "stores the error message in results" do
+        operation_instance.run(progress)
+
+        expect(operation_instance.results[:error]).to eq("Invalid target")
       end
     end
   end
