@@ -19,6 +19,9 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {render, waitFor, within} from '@testing-library/react'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
@@ -67,18 +70,18 @@ describe('StudentContent Non-Digital Submissions', () => {
 
   it('renders the assignment details', async () => {
     const {getAllByText} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(getAllByText(/this is my assignment/)).not.toHaveLength(0)
   })
 
   it('does not render the interface for submitting to the assignment', async () => {
     const {queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(queryByTestId('assignment-2-student-content-tabs')).not.toBeInTheDocument()
   })
@@ -89,9 +92,9 @@ describe('StudentContent Non-Digital Submissions', () => {
     // in this case, LTI_TOOL is null
 
     const {getByTestId, queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     const submissionDetailsLink = getByTestId('view-submission-link')
     expect(submissionDetailsLink).toBeInTheDocument()
@@ -103,9 +106,9 @@ describe('StudentContent Non-Digital Submissions', () => {
     props.submission.state = 'unsubmitted'
 
     const {queryByTestId, getByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
 
     expect(queryByTestId('view-submission-link')).not.toBeInTheDocument()
@@ -117,9 +120,9 @@ describe('StudentContent Non-Digital Submissions', () => {
     props.assignment.submissionTypes = ['file_upload']
 
     const {queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
 
     expect(queryByTestId('view-submission-link')).not.toBeInTheDocument()
@@ -131,9 +134,9 @@ describe('StudentContent Non-Digital Submissions', () => {
     props.submission.state = 'graded'
     window.ENV.LTI_TOOL = 'true'
     const {getByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     const lti_external_tool = getByTestId('lti-external-tool')
     expect(lti_external_tool).toBeInTheDocument()
@@ -149,18 +152,18 @@ describe('StudentContent Non-Digital Submissions', () => {
     }
 
     const {getByRole} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(getByRole('button', {name: 'Mark as done'})).toBeInTheDocument()
   })
 
   it('does not render a "Mark as Done" button if the assignment lacks mark-as-done requirements', async () => {
     const {queryByRole} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(queryByRole('button', {name: 'Mark as done'})).not.toBeInTheDocument()
   })
@@ -200,9 +203,11 @@ describe('StudentContent Non-Digital Submissions', () => {
     ]
 
     const {findByText} = render(
-      <MockedProvider mocks={mocks}>
-        <StudentContent {...props} />
-      </MockedProvider>,
+      <QueryClientProvider client={queryClient}>
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </QueryClientProvider>,
     )
 
     expect(await findByText('View Rubric')).toBeInTheDocument()
@@ -223,9 +228,9 @@ describe('StudentContent Non-Digital Submissions', () => {
       })
 
       const {getByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
 
@@ -238,9 +243,9 @@ describe('StudentContent Non-Digital Submissions', () => {
       ContextModuleApi.getContextModuleData.mockResolvedValue({})
 
       const {queryByRole} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
 
