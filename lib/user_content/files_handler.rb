@@ -91,13 +91,13 @@ module UserContent
       end
 
       def path
-        if Attachment.relative_context?(attachment.context_type)
+        if match.media_iframe_url?
+          "media_attachment_iframe_url"
+        elsif Attachment.relative_context?(attachment.context_type)
           if match.preview?
             "#{attachment.context_type.downcase}_file_preview_url"
           elsif match.download? || match.download_frd?
             "#{attachment.context_type.downcase}_file_download_url"
-          elsif match.media_iframe_url?
-            "media_attachment_iframe_url"
           else
             "#{attachment.context_type.downcase}_file_url"
           end

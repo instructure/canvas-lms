@@ -128,6 +128,24 @@ describe UserContent::FilesHandler do
           expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key("verifier")
         end
       end
+
+      context "when URL is a media_attachments_iframe with /download in path" do
+        let(:uri_match) do
+          UserContent::FilesHandler::UriMatch.new(
+            UserContent::HtmlRewriter::UriMatch.new(
+              "/media_attachments_iframe/#{attachment.id}/download?wrap=1",
+              "media_attachments_iframe",
+              Attachment,
+              attachment.id,
+              "/download?wrap=1"
+            )
+          )
+        end
+
+        it "returns media_attachment_iframe_url" do
+          expect(processed_url).to match(%r{^/media_attachments_iframe/#{attachment.id}})
+        end
+      end
     end
   end
 
