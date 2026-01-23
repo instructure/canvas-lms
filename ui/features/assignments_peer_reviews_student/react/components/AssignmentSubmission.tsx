@@ -35,6 +35,7 @@ import {IconDiscussionLine, IconRubricLine} from '@instructure/ui-icons'
 import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-modules/utils/miscHelpers'
 import UrlSubmissionDisplay from '@canvas/assignments/react/UrlSubmissionDisplay'
 import FileSubmissionPreview from '@canvas/assignments/react/FileSubmissionPreview'
+import StudentAnnotationPreview from '@canvas/assignments/react/StudentAnnotationPreview'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useRubricAssessment} from '../hooks/useRubricAssessment'
 import {RubricPanel} from './RubricPanel'
@@ -239,6 +240,8 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             userId={submissionUserId}
           />
         )
+      case 'student_annotation':
+        return <StudentAnnotationPreview submission={submission} />
       default:
         return renderError(
           I18n.t('Submission type error'),

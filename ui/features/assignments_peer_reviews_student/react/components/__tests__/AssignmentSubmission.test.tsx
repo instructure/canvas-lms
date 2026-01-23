@@ -29,6 +29,15 @@ vi.mock('@canvas/util/jquery/apiUserContent', () => ({
   },
 }))
 
+vi.mock('@canvas/assignments/react/StudentAnnotationPreview', () => ({
+  __esModule: true,
+  default: (props: any) => (
+    <div data-testid="canvadocs-pane" data-props={JSON.stringify(props)}>
+      Mocked Student Annotation Preview
+    </div>
+  ),
+}))
+
 let mockOnSuccessfulPeerReview: (() => void) | null = null
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
@@ -428,6 +437,45 @@ describe('AssignmentSubmission', () => {
       )
 
       expect(screen.getByText('No Submission')).toBeInTheDocument()
+    })
+  })
+
+  describe('student_annotation submissions', () => {
+    it('renders student annotation preview', () => {
+      const assignment = createAssignment()
+      const submission = createSubmission({
+        submissionType: 'student_annotation',
+        state: 'submitted',
+      })
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission,
+            assignment,
+          })}
+        />,
+      )
+
+      expect(screen.getByTestId('canvadocs-pane')).toBeInTheDocument()
+    })
+
+    it('renders student annotation preview for graded submissions', () => {
+      const assignment = createAssignment()
+      const submission = createSubmission({
+        submissionType: 'student_annotation',
+        state: 'graded',
+        attempt: 2,
+      })
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({
+            submission,
+            assignment,
+          })}
+        />,
+      )
+
+      expect(screen.getByTestId('canvadocs-pane')).toBeInTheDocument()
     })
   })
 
