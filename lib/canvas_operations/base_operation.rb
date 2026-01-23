@@ -144,6 +144,8 @@ module CanvasOperations
       log_message("Operation failed due to invalid operation target: #{e.message}", level: :error)
       log_message("Note that the above error is being rescued; if this is a migration, other migrations can still continue.", level: :info)
 
+      results[:error] = e.message
+
       fail_with_error!
     end
 
@@ -257,7 +259,11 @@ module CanvasOperations
         return
       end
 
-      progress.complete
+      completed = progress.complete
+
+      # If the operation is not running in the context of a delayed job, we need to manually set the workflow state to
+      # completed because the progress never transitioned from queued to running automatically.
+      progress.workflow_state = "completed" unless completed
       progress.update!(results:)
     end
 
