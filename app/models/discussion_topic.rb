@@ -1008,6 +1008,10 @@ class DiscussionTopic < ActiveRecord::Base
     where("title ILIKE ?", "#{title}%")
   }
 
+  scope :scannable, lambda {
+    active.only_discussion_topics.where(assignment_id: nil)
+  }
+
   alias_attribute :available_until, :lock_at
 
   def available_from
@@ -2325,10 +2329,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def a11y_scannable_attributes
-    %i[title message workflow_state]
+    %i[title message workflow_state assignment_id]
   end
 
   def excluded_from_accessibility_scan?
-    !Account.site_admin.feature_enabled?(:a11y_checker_additional_resources) || is_announcement
+    !Account.site_admin.feature_enabled?(:a11y_checker_additional_resources) || is_announcement || graded?
   end
 end

@@ -4726,7 +4726,7 @@ class Course < ActiveRecord::Base
   def exceeds_accessibility_scan_limit?
     wiki_page_count = wiki_pages.not_deleted.count
     assignment_count = assignments.active.not_excluded_from_accessibility_scan.count
-    discussion_topic_count = discussion_topics.count
+    discussion_topic_count = discussion_topics.scannable.count
 
     total = wiki_page_count + assignment_count + discussion_topic_count
     total > MAX_ACCESSIBILITY_SCAN_RESOURCES

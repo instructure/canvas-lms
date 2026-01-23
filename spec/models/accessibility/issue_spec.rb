@@ -33,10 +33,12 @@ describe Accessibility::Issue do
       active_assignments = double("ActiveAssignments")
       not_excluded_assignments = double("NotExcludedAssignments")
 
+      discussion_topics = double("DiscussionTopics")
+
       allow(context_double).to receive_messages(
         wiki_pages:,
         assignments:,
-        discussion_topics: [],
+        discussion_topics:,
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: false
       )
@@ -46,6 +48,8 @@ describe Accessibility::Issue do
       allow(assignments).to receive(:active).and_return(active_assignments)
       allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
       allow(not_excluded_assignments).to receive(:order).and_return([])
+
+      allow(discussion_topics).to receive(:scannable).and_return([])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -62,16 +66,20 @@ describe Accessibility::Issue do
       active_assignments = double("ActiveAssignments")
       not_excluded_assignments = double("NotExcludedAssignments")
 
+      discussion_topics = double("DiscussionTopics")
+
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments:,
-        discussion_topics: [],
+        discussion_topics:,
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: false
       )
       allow(assignments).to receive(:active).and_return(active_assignments)
       allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
       allow(not_excluded_assignments).to receive(:order).and_return([assignment])
+
+      allow(discussion_topics).to receive(:scannable).and_return([])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -84,13 +92,17 @@ describe Accessibility::Issue do
     it "returns issues for discussion topics" do
       discussion_topic = double("DiscussionTopic", id: 3, message: "<div>message</div>", title: "Discussion 1", published?: true, updated_at: Time.zone.now)
 
+      discussion_topics = double("DiscussionTopics")
+
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments: double("Assignments", active: double(not_excluded_from_accessibility_scan: double(order: []))),
-        discussion_topics: [discussion_topic],
+        discussion_topics:,
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: false
       )
+
+      allow(discussion_topics).to receive(:scannable).and_return([discussion_topic])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -118,15 +130,19 @@ describe Accessibility::Issue do
       attachments_collection = double("AttachmentsCollection")
       not_deleted_attachments_relation = double("NotDeletedAttachmentsRelation")
 
+      discussion_topics = double("DiscussionTopics")
+
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments: double("Assignments", active: double(not_excluded_from_accessibility_scan: double(order: []))),
-        discussion_topics: [],
+        discussion_topics:,
         attachments: attachments_collection,
         exceeds_accessibility_scan_limit?: false
       )
       allow(attachments_collection).to receive(:not_deleted).and_return(not_deleted_attachments_relation)
       allow(not_deleted_attachments_relation).to receive(:order).and_return([attachment_pdf, attachment_other])
+
+      allow(discussion_topics).to receive(:scannable).and_return([])
 
       allow(Rails.application.routes.url_helpers).to receive(:course_files_url) do |_, options|
         case options[:preview]
@@ -168,10 +184,12 @@ describe Accessibility::Issue do
       active_assignments = double("ActiveAssignments")
       not_excluded_assignments = double("NotExcludedAssignments")
 
+      discussion_topics = double("DiscussionTopics")
+
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments:,
-        discussion_topics: [],
+        discussion_topics:,
         attachments: double("Attachments", not_deleted: double(order: [])),
         exceeds_accessibility_scan_limit?: true
       )
@@ -179,6 +197,8 @@ describe Accessibility::Issue do
       allow(assignments).to receive(:active).and_return(active_assignments)
       allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
       allow(not_excluded_assignments).to receive(:order).and_return([])
+
+      allow(discussion_topics).to receive(:scannable).and_return([])
 
       result = described_class.new(context: context_double).generate
       expect(result[:accessibility_scan_disabled]).to be true

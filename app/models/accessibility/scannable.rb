@@ -21,9 +21,13 @@ module Accessibility
     extend ActiveSupport::Concern
 
     included do
-      before_save :capture_content_changes
+      before_save :capture_changed_a11y_attributes
 
       after_commit :reset_a11y_content_changed_flag, on: [:create, :update]
+
+      after_commit :normalize_graded_discussion_topic_scan,
+                   on: :update,
+                   if: :needs_normalizing?
 
       after_commit :trigger_accessibility_scan_on_create,
                    on: :create,
@@ -56,7 +60,7 @@ module Accessibility
 
     private
 
-    def capture_content_changes
+    def capture_changed_a11y_attributes
       # In case of multiple saves in one transaction, we have to keep track
       # Whether there was any change to the a11y_scannable_attributes during any of the saves
       # This will essentially address the below scenario to work well
@@ -69,11 +73,9 @@ module Accessibility
       # Capture content changes before they're lost by subsequent touch operations.
       # Rails' dirty tracking gets cleared when associations touch the parent record,
       # so we store the change state here to check later in after_commit.
-      @capture_content_changes ||= if a11y_scannable_attributes.present?
-                                     a11y_scannable_attributes.any? { |attr| send("#{attr}_changed?") }
-                                   else
-                                     false
-                                   end
+      @capture_changed_a11y_attributes ||= Set.new
+
+      a11y_scannable_attributes.each { |attr| @capture_changed_a11y_attributes << attr if send("#{attr}_changed?") }
     end
 
     def should_run_accessibility_scan?
@@ -97,7 +99,7 @@ module Accessibility
     end
 
     def trigger_accessibility_scan_on_update
-      return unless @capture_content_changes.present?
+      return unless @capture_changed_a11y_attributes.present?
 
       Accessibility::ResourceScannerService.call(resource: self)
     end
@@ -115,7 +117,37 @@ module Accessibility
     end
 
     def reset_a11y_content_changed_flag
-      @capture_content_changes = false
+      @capture_changed_a11y_attributes = Set.new
+    end
+
+    # We only ever need to normalize if the resource we update is a
+    # Discussion Topic and the attribute that changed was the assignment_id
+    # This indicates that the graded? state was toggled on the discussion topic
+    # Currently, this is only needed for Discussion Topics,
+    # However, if we need to extend this, consider moving it to an abstract level
+    def needs_normalizing?
+      a11y_checker_enabled? &&
+        Account.site_admin.feature_enabled?(:a11y_checker_additional_resources) &&
+        any_completed_accessibility_scan? &&
+        !deleted? &&
+        is_a?(DiscussionTopic) &&
+        !is_announcement &&
+        @capture_changed_a11y_attributes.include?(:assignment_id)
+    end
+
+    # Because of the multiple saves in one transaction,
+    # We cannot determine how we toggled the graded discussion because of stale data
+    # We would have to reload the object, which leads to all sorts of problems
+    # That's why we're doing this in the after_commit hook
+    # Using fresh data from the database
+    def normalize_graded_discussion_topic_scan
+      topic = DiscussionTopic.find(id)
+
+      if topic.graded?
+        AccessibilityResourceScan.where(context: topic).destroy_all
+      else
+        Accessibility::ResourceScannerService.call(resource: topic)
+      end
     end
   end
 end

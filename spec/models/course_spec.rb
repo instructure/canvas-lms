@@ -9340,7 +9340,7 @@ describe Course do
         allow(course.wiki_pages).to receive(:not_deleted).and_return(double(count: wiki_count))
         active_assignments = double(not_excluded_from_accessibility_scan: double(count: assignment_count))
         allow(course.assignments).to receive(:active).and_return(active_assignments)
-        allow(course).to receive(:discussion_topics).and_return(double(count: discussion_topic_count))
+        allow(course.discussion_topics).to receive(:scannable).and_return(double(count: discussion_topic_count))
       end
 
       context "when total resources exceed limit" do

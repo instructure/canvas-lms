@@ -4306,6 +4306,38 @@ describe DiscussionTopic do
     let(:irrelevant_attributes_for_scan) { { lock_at: 1.week.ago } }
   end
 
+  describe ".not_excluded_from_accessibility_scan" do
+    let(:course) { course_model }
+    let!(:regular_topic) { discussion_topic_model(context: course) }
+    let!(:unpublished_topic) { discussion_topic_model(context: course, workflow_state: "unpublished") }
+    let!(:deleted_topic) { discussion_topic_model(context: course).tap(&:destroy!) }
+    let!(:announcement) { course.announcements.create!(title: "Announcement", message: "Test") }
+    let!(:graded_discussion) do
+      assignment = course.assignments.create!(title: "Graded Discussion")
+      course.discussion_topics.create!(title: "Graded Discussion", assignment:)
+    end
+
+    it "includes regular discussion topics" do
+      expect(course.discussion_topics.scannable).to include(regular_topic)
+    end
+
+    it "includes unpublished discussion topics" do
+      expect(course.discussion_topics.scannable).to include(unpublished_topic)
+    end
+
+    it "excludes deleted discussion topics" do
+      expect(course.discussion_topics.scannable).not_to include(deleted_topic)
+    end
+
+    it "excludes announcements" do
+      expect(course.discussion_topics.scannable).not_to include(announcement)
+    end
+
+    it "excludes graded discussions" do
+      expect(course.discussion_topics.scannable).not_to include(graded_discussion)
+    end
+  end
+
   describe "accessibility scanning with a11y_checker_additional_resources feature flag" do
     let(:course) { course_model }
 
@@ -4382,11 +4414,202 @@ describe DiscussionTopic do
 
           announcement.update!(message: "Updated message")
         end
+      end
 
-        it "returns true for excluded_from_accessibility_scan?" do
-          announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+      context "when topic is graded" do
+        it "does not trigger accessibility scan on create" do
+          expect(Accessibility::ResourceScannerService).not_to receive(:call).with(resource: an_instance_of(DiscussionTopic))
 
-          expect(announcement.send(:excluded_from_accessibility_scan?)).to be true
+          DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic")
+        end
+
+        it "does not trigger accessibility scan on update" do
+          graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic")
+
+          expect(Accessibility::ResourceScannerService).not_to receive(:call).with(resource: an_instance_of(DiscussionTopic))
+
+          graded_topic.update!(message: "Updated message")
+        end
+
+        it "removes its own accessibility scan when the topic becomes graded but assignment scan is created" do
+          assignment = Assignment.create!(context: @course, title: "My Assignment")
+          topic = DiscussionTopic.create!(title: "Test Topic", message: "Test message", course:)
+
+          expect { topic.update!(assignment:) }.to change { AccessibilityResourceScan.where(context: topic).count }.from(1).to(0)
+        end
+
+        it "triggers scan for itself when discussion topic becomes ungraded" do
+          graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic")
+
+          expect { graded_topic.update!(assignment: nil) }.to change { AccessibilityResourceScan.where(context: graded_topic).count }.from(0).to(1)
+        end
+
+        context "when a11y_checker_additional_resources is disabled" do
+          before do
+            Account.site_admin.disable_feature!(:a11y_checker_additional_resources)
+          end
+
+          it "does not normalize when topic becomes graded" do
+            assignment_obj = Assignment.create!(context: course, title: "My Assignment")
+            topic = DiscussionTopic.create!(title: "Test Topic", message: "Test message", course:)
+
+            # Manually create a scan for the topic
+            AccessibilityResourceScan.where(context: topic).delete_all
+            AccessibilityResourceScan.create!(context: topic, course:)
+
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+
+            # Make topic graded
+            topic.update!(assignment: assignment_obj)
+
+            # Topic scan should NOT be removed (normalization disabled)
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+          end
+
+          it "does not normalize when topic becomes ungraded" do
+            graded_topic = DiscussionTopic.create_graded_topic!(course:, title: "My Graded Topic")
+
+            expect(AccessibilityResourceScan.where(context: graded_topic).count).to eq(0)
+
+            # Make topic ungraded
+            graded_topic.update!(assignment: nil)
+
+            # Topic scan should NOT be created (normalization disabled)
+            expect(AccessibilityResourceScan.where(context: graded_topic).count).to eq(0)
+          end
+        end
+
+        context "when a11y_checker is disabled" do
+          before do
+            course.root_account.disable_feature!(:a11y_checker)
+          end
+
+          it "does not normalize when topic becomes graded" do
+            assignment_obj = Assignment.create!(context: course, title: "My Assignment")
+            topic = DiscussionTopic.create!(title: "Test Topic", message: "Test message", course:)
+
+            # Manually create a scan for the topic
+            AccessibilityResourceScan.where(context: topic).delete_all
+            AccessibilityResourceScan.create!(context: topic, course:)
+
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+
+            # Make topic graded
+            topic.update!(assignment: assignment_obj)
+
+            # Topic scan should NOT be removed (normalization disabled)
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+          end
+
+          it "does not normalize when topic becomes ungraded" do
+            graded_topic = DiscussionTopic.create_graded_topic!(course:, title: "My Graded Topic")
+
+            expect(AccessibilityResourceScan.where(context: graded_topic).count).to eq(0)
+
+            # Make topic ungraded
+            graded_topic.update!(assignment: nil)
+
+            # Topic scan should NOT be created (normalization disabled)
+            expect(AccessibilityResourceScan.where(context: graded_topic).count).to eq(0)
+          end
+        end
+
+        context "when a11y_checker_eap is disabled" do
+          before do
+            course.disable_feature!(:a11y_checker_eap)
+          end
+
+          it "does not normalize when topic becomes graded" do
+            assignment_obj = Assignment.create!(context: course, title: "My Assignment")
+            topic = DiscussionTopic.create!(title: "Test Topic", message: "Test message", course:)
+
+            # Manually create a scan for the topic
+            AccessibilityResourceScan.where(context: topic).delete_all
+            AccessibilityResourceScan.create!(context: topic, course:)
+
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+
+            # Make topic graded
+            topic.update!(assignment: assignment_obj)
+
+            # Topic scan should NOT be removed (normalization disabled)
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+          end
+
+          it "does not normalize when topic becomes ungraded" do
+            graded_topic = DiscussionTopic.create_graded_topic!(course:, title: "My Graded Topic")
+
+            expect(AccessibilityResourceScan.where(context: graded_topic).count).to eq(0)
+
+            # Make topic ungraded
+            graded_topic.update!(assignment: nil)
+
+            # Topic scan should NOT be created (normalization disabled)
+            expect(AccessibilityResourceScan.where(context: graded_topic).count).to eq(0)
+          end
+        end
+
+        context "when no completed course scan exists" do
+          before do
+            # Remove completed course scan
+            Progress.where(tag: Accessibility::CourseScanService::SCAN_TAG, context: course).destroy_all
+          end
+
+          it "does not normalize when topic becomes graded" do
+            assignment_obj = Assignment.create!(context: course, title: "My Assignment")
+            topic = DiscussionTopic.create!(title: "Test Topic", message: "Test message", course:)
+
+            # Manually create a scan for the topic
+            AccessibilityResourceScan.where(context: topic).delete_all
+            AccessibilityResourceScan.create!(context: topic, course:)
+
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+
+            # Make topic graded
+            topic.update!(assignment: assignment_obj)
+
+            # Topic scan should NOT be removed (normalization disabled)
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+          end
+
+          it "does not normalize when topic becomes ungraded" do
+            graded_topic = DiscussionTopic.create_graded_topic!(course:, title: "My Graded Topic")
+
+            expect(AccessibilityResourceScan.where(context: graded_topic).count).to eq(0)
+
+            # Make topic ungraded
+            graded_topic.update!(assignment: nil)
+
+            # Topic scan should NOT be created (normalization disabled)
+            expect(AccessibilityResourceScan.where(context: graded_topic).count).to eq(0)
+          end
+        end
+
+        context "when topic is deleted during transition" do
+          it "does not normalize when deleted topic's assignment_id changes" do
+            assignment_obj = Assignment.create!(context: course, title: "My Assignment")
+            topic = DiscussionTopic.create!(title: "Test Topic", message: "Test message", course:)
+
+            # Manually create a scan for the topic
+            AccessibilityResourceScan.where(context: topic).delete_all
+            AccessibilityResourceScan.create!(context: topic, course:)
+
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(1)
+
+            # Delete the topic first
+            topic.destroy
+            topic.reload
+            expect(topic.deleted?).to be true
+
+            # Scan should be removed by the deletion callback
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(0)
+
+            # Try to make it graded while deleted - should not raise error
+            expect { topic.update!(assignment: assignment_obj) }.not_to raise_error
+
+            # Scan should still be 0 (normalization was skipped for deleted topic)
+            expect(AccessibilityResourceScan.where(context: topic).count).to eq(0)
+          end
         end
       end
     end
