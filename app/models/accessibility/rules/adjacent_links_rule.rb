@@ -41,11 +41,11 @@ module Accessibility
       end
 
       def fix!(elem, value)
-        return nil if test(elem).nil?
-        return nil unless value == "true" || elem.tag_name == "a"
+        return { changed: nil } if test(elem).nil?
+        return { changed: nil } unless value == "true" || elem.tag_name == "a"
 
         next_elem = get_adjacent_link(elem)
-        return elem unless next_elem
+        return { changed: elem } unless next_elem
 
         left_image = self.class.single_child_image(elem)
         right_image = self.class.single_child_image(next_elem)
@@ -68,7 +68,7 @@ module Accessibility
 
         html = elem.to_html
         html += elem.next_sibling.to_html if elem.next_sibling
-        [elem, html]
+        { changed: elem, content_preview: html }
       end
 
       def display_name

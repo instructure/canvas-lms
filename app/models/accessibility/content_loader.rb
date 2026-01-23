@@ -32,7 +32,12 @@ module Accessibility
     end
 
     def content
-      @path.present? ? extract_element_from_content : full_document
+      if @path.present?
+        html, metadata = extract_element_from_content
+        { content: html, metadata: }
+      else
+        { content: full_document, metadata: {} }
+      end
     end
 
     def full_document
@@ -46,7 +51,9 @@ module Accessibility
 
       raise ElementNotFoundError, "Element not found at path: #{@path}" unless element
 
-      generate_preview_html(element)
+      html = generate_preview_html(element)
+      metadata = extract_metadata(element)
+      [html, metadata]
     end
 
     private
@@ -71,6 +78,15 @@ module Accessibility
       return element.to_html unless rule
 
       rule.issue_preview(element) || element.to_html
+    end
+
+    def extract_metadata(element)
+      return {} unless @rule_id
+
+      rule = Accessibility::Rule.registry[@rule_id]
+      return {} unless rule
+
+      rule.respond_to?(:issue_metadata) ? rule.issue_metadata(element) : {}
     end
   end
 end

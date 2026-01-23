@@ -53,7 +53,7 @@ module Accessibility
           TableCaptionRuleHelper.prepend(elem, caption)
         end
         caption.content = value
-        elem
+        { changed: elem }
       end
 
       def display_name

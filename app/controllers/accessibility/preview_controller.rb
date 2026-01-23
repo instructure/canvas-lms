@@ -27,7 +27,8 @@ module Accessibility
       return head :bad_request unless params[:issue_id].present?
 
       content_loader = Accessibility::ContentLoader.new(issue_id: params[:issue_id])
-      render json: { content: content_loader.content }
+      result = content_loader.content
+      render json: { content: result[:content], **result[:metadata] }
     rescue Accessibility::ContentLoader::ElementNotFoundError, ActiveRecord::RecordNotFound => e
       render json: { error: e.message }, status: :not_found
     rescue Accessibility::ContentLoader::UnsupportedResourceTypeError => e

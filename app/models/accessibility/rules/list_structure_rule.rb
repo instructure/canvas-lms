@@ -61,9 +61,9 @@ module Accessibility
       end
 
       def fix!(elem, value)
-        return nil unless self.class.list?(elem) && value == "true"
+        return { changed: nil } unless self.class.list?(elem) && value == "true"
 
-        fix_list_by_type(elem)
+        { changed: fix_list_by_type(elem) }
       end
 
       def fix_list_by_type(elem)

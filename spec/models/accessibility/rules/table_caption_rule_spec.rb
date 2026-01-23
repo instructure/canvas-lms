@@ -87,8 +87,9 @@ describe Accessibility::Rules::TableCaptionRule do
       result = rule.fix!(table_element, "Weekly Mushroom Schedule")
 
       expect(result).not_to be_nil
-      expect(result).to eq(table_element)
-      expect(result.at_css("caption").content).to eq("Weekly Mushroom Schedule")
+      expect(result).to be_a(Hash)
+      expect(result[:changed]).to eq(table_element)
+      expect(table_element.at_css("caption").content).to eq("Weekly Mushroom Schedule")
     end
   end
 
