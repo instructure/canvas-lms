@@ -128,7 +128,7 @@ function truncateText(text: string, maxLength: number = 80): string {
 async function fetchInboxMessages(limit: number, filter: InboxFilter): Promise<InboxMessage[]> {
   try {
     const currentUserId = getCurrentUserId()
-    const scope = filter === 'all' ? undefined : filter
+    const scope = filter === 'all' ? 'inbox' : filter
 
     const result = await executeGraphQLQuery<GraphQLResponse>(USER_CONVERSATIONS_QUERY, {
       userId: currentUserId,
