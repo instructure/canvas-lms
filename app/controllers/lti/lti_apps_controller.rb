@@ -59,6 +59,11 @@ module Lti
   #         "description": "Placement-specific config for given placements",
   #         "example": { "assignment_selection": { "type": "Lti::PlacementLaunchDefinition" } },
   #         "type": "object"
+  #       },
+  #       "context_name": {
+  #         "description": "The name of the account or course where the tool is deployed. Only included if requested via include_context_name parameter.",
+  #         "example": "My Institution",
+  #         "type": "string"
   #       }
   #     }
   #   }
@@ -110,6 +115,7 @@ module Lti
     #
     # @argument placements[Array] The placements to return launch definitions for. If not provided, an empty list will be returned.
     # @argument only_visible[Boolean] If true, only return launch definitions that are visible to the current user. Defaults to true.
+    # @argument include_context_name[Boolean] If true, includes the deployment context name (account or course) of the tool definition in the response. This helps distinguish between tools with identical names deployed at different levels of the context hierarchy. Defaults to false.
     def launch_definitions
       placements = params["placements"] || []
       if authorized_for_launch_definitions(@context, @current_user, placements)
@@ -134,7 +140,7 @@ module Lti
           format.json do
             cancel_cache_buster
             expires_in 10.minutes
-            render json: AppLaunchCollator.launch_definitions(launch_defs, placements)
+            render json: AppLaunchCollator.launch_definitions(launch_defs, placements, include_context_name: value_to_boolean(params[:include_context_name]))
           end
         end
       end

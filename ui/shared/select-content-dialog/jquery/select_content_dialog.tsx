@@ -88,6 +88,11 @@ type SelectContentPlacementType =
 export type LtiLaunchDefinition = {
   definition_type: 'ContextExternalTool' | 'Lti::MessageHandler'
   definition_id: string
+  /**
+   * Context name where the tool is deployed.
+   * Only present when include_context_name=true is passed to the API. (AssetProcessor)
+   */
+  context_name?: string
   name: string
   url: string
   description: string
