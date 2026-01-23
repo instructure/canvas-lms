@@ -87,7 +87,7 @@ class Accessibility::CourseScanService < ApplicationService
     scan_resources(@course.assignments.active.not_excluded_from_accessibility_scan.except(:order), :assignment_id)
 
     if Account.site_admin.feature_enabled?(:a11y_checker_additional_resources)
-      scan_resources(@course.discussion_topics.except(:order), :discussion_topic_id)
+      scan_resources(@course.discussion_topics.scannable.except(:order), :discussion_topic_id)
     end
   end
 

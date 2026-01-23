@@ -185,6 +185,11 @@ describe Accessibility::CourseScanService do
       let!(:discussion_topic1) { discussion_topic_model(context: course) }
       let!(:discussion_topic2) { discussion_topic_model(context: course) }
       let!(:discussion_topic3) { discussion_topic_model(context: course) }
+      let!(:announcement) { course.announcements.create!(title: "Test Announcement", message: "Test message") }
+      let!(:graded_discussion) do
+        assignment = course.assignments.create!(title: "Graded Discussion")
+        course.discussion_topics.create!(title: "Graded Discussion", assignment:)
+      end
 
       before do
         discussion_topic2.unpublish!
@@ -204,6 +209,14 @@ describe Accessibility::CourseScanService do
 
         it "does not scan the deleted discussion topic" do
           expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic3)
+        end
+
+        it "does not scan announcements" do
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: announcement)
+        end
+
+        it "does not scan graded discussions" do
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: graded_discussion)
         end
       end
 
