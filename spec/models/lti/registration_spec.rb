@@ -813,5 +813,113 @@ RSpec.describe Lti::Registration do
         end
       end
     end
+
+    context "when context control creation fails" do
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
+      let_once(:registration) { lti_registration_model(account:, developer_key:) }
+
+      before do
+        allow(Lti::ContextControlService).to receive(:create_or_update).and_raise(
+          Lti::ContextControlErrors.new(ActiveModel::Errors.new(Lti::ContextControl.new))
+        )
+      end
+
+      it "rolls back the tool creation" do
+        initial_tool_count = ContextExternalTool.count
+        initial_control_count = Lti::ContextControl.count
+
+        expect do
+          registration.new_external_tool(account)
+        end.to raise_error(Lti::ContextControlErrors)
+
+        expect(ContextExternalTool.count).to eq(initial_tool_count)
+        expect(Lti::ContextControl.count).to eq(initial_control_count)
+      end
+
+      it "does not leave any leftover tools" do
+        expect do
+          expect do
+            registration.new_external_tool(account)
+          end.to raise_error(Lti::ContextControlErrors)
+        end.not_to change { ContextExternalTool.count }
+      end
+
+      it "does not leave any leftover context controls" do
+        expect do
+          expect do
+            registration.new_external_tool(account)
+          end.to raise_error(Lti::ContextControlErrors)
+        end.not_to change { Lti::ContextControl.count }
+      end
+    end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      let_once(:shard2_root_account) { @shard2.activate { account_model } }
+      let_once(:shard2_registration) do
+        @shard2.activate do
+          lti_tool_configuration_model(account: shard2_root_account).lti_registration
+        end
+      end
+
+      it "creates the tool on the context's shard" do
+        tool = shard2_registration.new_external_tool(shard2_root_account)
+        expect(tool.shard).to eq(@shard2)
+      end
+
+      it "creates the context control on the context's shard" do
+        tool = shard2_registration.new_external_tool(shard2_root_account)
+        expect(tool.primary_context_control.shard).to eq(@shard2)
+      end
+
+      it "creates the registration history entry on the context's shard" do
+        initial_shard2_count = @shard2.activate { Lti::RegistrationHistoryEntry.count }
+        initial_default_count = Shard.default.activate { Lti::RegistrationHistoryEntry.count }
+
+        shard2_registration.new_external_tool(shard2_root_account)
+
+        @shard2.activate do
+          expect(Lti::RegistrationHistoryEntry.count).to eq(initial_shard2_count + 1)
+        end
+
+        Shard.default.activate do
+          expect(Lti::RegistrationHistoryEntry.count).to eq(initial_default_count)
+        end
+      end
+
+      context "with subaccount" do
+        let_once(:shard2_subaccount) do
+          @shard2.activate { account_model(parent_account: shard2_root_account) }
+        end
+
+        it "creates the tool on the subaccount's shard" do
+          tool = shard2_registration.new_external_tool(shard2_subaccount)
+          expect(tool.shard).to eq(@shard2)
+        end
+
+        it "creates the context control on the subaccount's shard" do
+          tool = shard2_registration.new_external_tool(shard2_subaccount)
+          expect(tool.primary_context_control.shard).to eq(@shard2)
+        end
+      end
+
+      context "with course" do
+        let_once(:shard2_course) do
+          @shard2.activate { course_model(account: shard2_root_account) }
+        end
+
+        it "creates the tool on the course's shard" do
+          tool = shard2_registration.new_external_tool(shard2_course)
+          expect(tool.shard).to eq(@shard2)
+        end
+
+        it "creates the context control on the course's shard" do
+          tool = shard2_registration.new_external_tool(shard2_course)
+          expect(tool.primary_context_control.shard).to eq(@shard2)
+        end
+      end
+    end
   end
 end
