@@ -81,23 +81,50 @@ module Types
       load_association(:folder)
     end
 
-    field :url, Types::UrlType, null: true
-    def url
+    field :url, Types::UrlType, null: true, extras: [:parent]
+    def url(parent:)
       return if object.locked_for?(current_user, check_policies: true)
 
-      opts = {
-        download: "1",
-        download_frd: "1",
-        host: context[:request].host_with_port,
-        protocol: context[:request].protocol,
-        location: (context[:asset_location] if context[:domain_root_account]&.feature_enabled?(:file_association_access))
-      }
+      # Check if this file belongs to a peer review submission
+      if parent.is_a?(Submission)
+        assignment = parent.assignment
 
-      unless context[:domain_root_account]&.feature_enabled?(:disable_adding_uuid_verifier_in_api)
-        opts[:verifier] = object.uuid if context[:in_app]
+        # Check if current user is a peer reviewer (cached to prevent N+1
+        # when multiple files are loaded for the same submission)
+        is_peer_reviewer = assignment&.peer_reviews && parent.peer_reviewer_for?(current_user)
+
+        # Use anonymous route for anonymous peer reviews
+        # This follows the same pattern as SpeedGrader (speed_grader.html.erb line 177-180)
+        if is_peer_reviewer
+          if assignment.anonymous_peer_reviews
+            return GraphQLHelpers::UrlHelpers.url_for(
+              controller: "submissions/anonymous_downloads",
+              action: "show",
+              course_id: assignment.context_id,
+              assignment_id: assignment.id,
+              anonymous_id: parent.anonymous_id,
+              download: object.id,
+              host: context[:request].host_with_port,
+              protocol: context[:request].protocol,
+              only_path: false
+            )
+          else
+            return GraphQLHelpers::UrlHelpers.url_for(
+              controller: "submissions/downloads",
+              action: "show",
+              course_id: assignment.context_id,
+              assignment_id: assignment.id,
+              id: parent.user_id,
+              download: object.id,
+              host: context[:request].host_with_port,
+              protocol: context[:request].protocol,
+              only_path: false
+            )
+          end
+        end
       end
 
-      GraphQLHelpers::UrlHelpers.file_download_url(object, opts)
+      build_standard_file_url
     end
 
     field :submission_preview_url, Types::UrlType, null: true, extras: [:parent] do
@@ -131,6 +158,22 @@ module Types
     end
 
     private
+
+    def build_standard_file_url
+      opts = {
+        download: "1",
+        download_frd: "1",
+        host: context[:request].host_with_port,
+        protocol: context[:request].protocol,
+        location: (context[:asset_location] if context[:domain_root_account]&.feature_enabled?(:file_association_access))
+      }
+
+      unless context[:domain_root_account]&.feature_enabled?(:disable_adding_uuid_verifier_in_api)
+        opts[:verifier] = object.uuid if context[:in_app]
+      end
+
+      GraphQLHelpers::UrlHelpers.file_download_url(object, opts)
+    end
 
     def load_submission_associations(submission)
       Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
