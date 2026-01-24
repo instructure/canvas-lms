@@ -2507,7 +2507,111 @@ describe('PeerReviewsStudentView', () => {
       const downloadButton = getByText('Download Submission').closest('a')
       expect(downloadButton).toHaveAttribute(
         'href',
-        '/courses/200/assignments/103/submissions/anon-id-123?download=attach-1',
+        '/courses/200/assignments/103/anonymous_submissions/anon-id-123?download=attach-1',
+      )
+    })
+
+    it('uses anonymous_submissions path when anonymousReviews is true', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '104',
+          name: 'Anonymous Peer Review',
+          courseId: '200',
+          description: '<p>Description</p>',
+          peerReviews: {count: 1, anonymousReviews: true},
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymizedUser: {
+                _id: 'user-123',
+                displayName: 'Student 1',
+              },
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                submissionType: 'online_upload',
+                submittedAt: '2025-11-01T12:00:00Z',
+                attachments: [
+                  {
+                    _id: 'attach-1',
+                    displayName: 'document.pdf',
+                    mimeClass: 'pdf',
+                    size: '1.2 MB',
+                    url: 'http://example.com/file.pdf',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '104'})
+
+      await waitFor(() => {
+        expect(getByText('Download Submission')).toBeInTheDocument()
+      })
+
+      const downloadButton = getByText('Download Submission').closest('a')
+      expect(downloadButton).toHaveAttribute(
+        'href',
+        '/courses/200/assignments/104/anonymous_submissions/user-123?download=attach-1',
+      )
+    })
+
+    it('uses regular submissions path when anonymousReviews is false', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '105',
+          name: 'Non-Anonymous Peer Review',
+          courseId: '200',
+          description: '<p>Description</p>',
+          peerReviews: {count: 1, anonymousReviews: false},
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+              anonymizedUser: {
+                _id: 'user-456',
+                displayName: 'Student 2',
+              },
+              submission: {
+                _id: 'sub-1',
+                attempt: 1,
+                submissionType: 'online_upload',
+                submittedAt: '2025-11-01T12:00:00Z',
+                attachments: [
+                  {
+                    _id: 'attach-1',
+                    displayName: 'document.pdf',
+                    mimeClass: 'pdf',
+                    size: '1.2 MB',
+                    url: 'http://example.com/file.pdf',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      })
+
+      const {getByText} = setup({assignmentId: '105'})
+
+      await waitFor(() => {
+        expect(getByText('Download Submission')).toBeInTheDocument()
+      })
+
+      const downloadButton = getByText('Download Submission').closest('a')
+      expect(downloadButton).toHaveAttribute(
+        'href',
+        '/courses/200/assignments/105/submissions/user-456?download=attach-1',
       )
     })
   })

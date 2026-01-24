@@ -38,8 +38,9 @@ export function buildSubmissionDownloadUrl(
   assignmentId: string,
   userId: string,
   attachmentId: string,
+  isAnonymous: boolean,
 ): string {
-  return `/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}?download=${attachmentId}`
+  return `/courses/${courseId}/assignments/${assignmentId}/${isAnonymous ? 'anonymous_submissions' : 'submissions'}/${userId}?download=${attachmentId}`
 }
 
 interface FileSubmissionPreviewProps {
@@ -100,7 +101,13 @@ const renderFileDetailsTable = (
   const downloadUrl =
     assignment && userId
       ? (attachmentId: string) =>
-          buildSubmissionDownloadUrl(assignment.courseId, assignment._id, userId, attachmentId)
+          buildSubmissionDownloadUrl(
+            assignment.courseId,
+            assignment._id,
+            userId,
+            attachmentId,
+            assignment.peerReviews?.anonymousReviews ?? false,
+          )
       : undefined
 
   return (
@@ -162,19 +169,9 @@ const renderFilePreview = (selectedFile?: Attachment) => {
 
   if (!selectedFile.submissionPreviewUrl) {
     return (
-      <View display="block" textAlign="center" padding="medium" borderWidth="none none none small">
+      <View display="block" textAlign="center" padding="xx-large medium" height={'100%'}>
         {renderUnavailablePreview(I18n.t('Preview Unavailable'))}
         <Text>{selectedFile.displayName}</Text>
-        <View display="block">
-          <Button
-            margin="medium auto"
-            renderIcon={<IconDownloadLine />}
-            href={selectedFile.url ?? ''}
-            disabled={!selectedFile.url}
-          >
-            {I18n.t('Download')}
-          </Button>
-        </View>
       </View>
     )
   }
