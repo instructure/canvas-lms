@@ -169,7 +169,7 @@ describe "peer review student landing page" do
       @assignment.assign_peer_review(@student1, @student2)
     end
 
-    it "shows toggle comments button in submission view", custom_timeout: 30 do
+    it "shows comments panel by default in submission view", custom_timeout: 30 do
       visit_peer_reviews_page(@course.id, @assignment.id)
 
       submission_tab = f("div[id='tab-submission']")
@@ -178,25 +178,11 @@ describe "peer review student landing page" do
 
       toggle_button = f("button[data-testid='toggle-comments-button']")
       expect(toggle_button).to be_displayed
-      expect(toggle_button.text).to include("Show Comments")
-    end
-
-    it "opens comments tray when toggle button is clicked", custom_timeout: 30 do
-      visit_peer_reviews_page(@course.id, @assignment.id)
-
-      submission_tab = f("div[id='tab-submission']")
-      submission_tab.click
-      wait_for_ajaximations
-
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
-
-      expect(f("h2")).to include_text("Peer Comments")
       expect(toggle_button.text).to include("Hide Comments")
+      expect(f("h2")).to include_text("Peer Comments")
     end
 
-    it "closes comments tray when toggle button is clicked again", custom_timeout: 30 do
+    it "hides comments tray when toggle button is clicked", custom_timeout: 30 do
       visit_peer_reviews_page(@course.id, @assignment.id)
 
       submission_tab = f("div[id='tab-submission']")
@@ -204,11 +190,6 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
-
-      expect(f("h2")).to include_text("Peer Comments")
-
       toggle_button.click
       wait_for_ajaximations
 
@@ -216,7 +197,7 @@ describe "peer review student landing page" do
       expect(f("div[id='submission']")).not_to contain_css("div[data-testid='comments-container']")
     end
 
-    it "allows user to submit a comment", custom_timeout: 30 do
+    it "shows comments tray when toggle button is clicked again", custom_timeout: 30 do
       visit_peer_reviews_page(@course.id, @assignment.id)
 
       submission_tab = f("div[id='tab-submission']")
@@ -225,6 +206,22 @@ describe "peer review student landing page" do
 
       toggle_button = f("button[data-testid='toggle-comments-button']")
       toggle_button.click
+      wait_for_ajaximations
+
+      expect(toggle_button.text).to include("Show Comments")
+
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(toggle_button.text).to include("Hide Comments")
+      expect(f("h2")).to include_text("Peer Comments")
+    end
+
+    it "allows user to submit a comment", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
       wait_for_ajaximations
 
       comment_textarea = f("textarea[data-testid='comment-text-input']")
@@ -260,9 +257,6 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
-
       expect(f("h2")).to include_text("Peer Comments")
 
       selector = f("input[data-testid='peer-review-selector']")
@@ -285,10 +279,6 @@ describe "peer review student landing page" do
       submission_tab.click
       wait_for_ajaximations
 
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
-
       comment_textarea = f("textarea[data-testid='comment-text-input']")
       comment_textarea.send_keys("Completing this peer review with a comment")
       wait_for_ajaximations
@@ -307,10 +297,6 @@ describe "peer review student landing page" do
 
       submission_tab = f("div[id='tab-submission']")
       submission_tab.click
-      wait_for_ajaximations
-
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
       wait_for_ajaximations
 
       comment_textarea = f("textarea[data-testid='comment-text-input']")
@@ -342,10 +328,10 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       toggle_button = f("button[data-testid='toggle-comments-button']")
+
+      # Just hide and show comments without submitting
       toggle_button.click
       wait_for_ajaximations
-
-      # Just open and close comments without submitting
       toggle_button.click
       wait_for_ajaximations
 
@@ -364,10 +350,6 @@ describe "peer review student landing page" do
 
       selector = f("input[data-testid='peer-review-selector']")
       expect(selector.attribute("value")).to eq("Peer Review (1 of 2)")
-
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
 
       comment_textarea = f("textarea[data-testid='comment-text-input']")
       comment_textarea.send_keys("First peer review comment")
@@ -406,10 +388,6 @@ describe "peer review student landing page" do
       submission_tab.click
       wait_for_ajaximations
 
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
-
       comment_textarea = f("textarea[data-testid='comment-text-input']")
       comment_textarea.send_keys("First peer review comment")
       wait_for_ajaximations
@@ -434,10 +412,6 @@ describe "peer review student landing page" do
 
       selector = f("input[data-testid='peer-review-selector']")
       expect(selector.attribute("value")).to eq("Peer Review (1 of 2)")
-
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
 
       comment_textarea = f("textarea[data-testid='comment-text-input']")
       comment_textarea.send_keys("First peer review comment")
@@ -477,10 +451,6 @@ describe "peer review student landing page" do
       submission_tab.click
       wait_for_ajaximations
 
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
-
       comment_textarea = f("textarea[data-testid='comment-text-input']")
       comment_textarea.send_keys("Peer review comment")
       wait_for_ajaximations
@@ -518,10 +488,6 @@ describe "peer review student landing page" do
 
       selector = f("input[data-testid='peer-review-selector']")
       expect(selector.attribute("value")).to eq("Peer Review (1 of 5)")
-
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
 
       comment_textarea = f("textarea[data-testid='comment-text-input']")
       comment_textarea.send_keys("First peer review comment")
@@ -604,10 +570,6 @@ describe "peer review student landing page" do
 
       selector = f("input[data-testid='peer-review-selector']")
       expect(selector.attribute("value")).to eq("Peer Review (1 of 2)")
-
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
-      wait_for_ajaximations
 
       comment_textarea = f("textarea[data-testid='comment-text-input']")
       comment_textarea.send_keys("First peer review")
@@ -744,10 +706,6 @@ describe "peer review student landing page" do
 
       submission_tab = f("div[id='tab-submission']")
       submission_tab.click
-      wait_for_ajaximations
-
-      toggle_comments_button = f("button[data-testid='toggle-comments-button']")
-      toggle_comments_button.click
       wait_for_ajaximations
 
       expect(f("h2")).to include_text("Peer Comments")
@@ -1063,10 +1021,6 @@ describe "peer review student landing page" do
 
       submission_tab = f("div[id='tab-submission']")
       submission_tab.click
-      wait_for_ajaximations
-
-      toggle_button = f("button[data-testid='toggle-comments-button']")
-      toggle_button.click
       wait_for_ajaximations
 
       expect(f("body")).to include_text("This was submitted before lock date")

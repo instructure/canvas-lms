@@ -75,7 +75,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   submissionUserId,
 }) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
-  const [showComments, setShowComments] = useState(false)
+  const [showComments, setShowComments] = useState(true)
   const [showRubric, setShowRubric] = useState(false)
   const [peerReviewCommentCompleted, setPeerReviewCommentCompleted] =
     useState(isPeerReviewCompleted)

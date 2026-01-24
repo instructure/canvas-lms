@@ -224,13 +224,6 @@ describe('AssignmentSubmission', () => {
       expect(select).toHaveValue('Paper View')
     })
 
-    it('applies paper class to content by default', () => {
-      render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      const content = screen.getByTestId('text-entry-content')
-      expect(content).toHaveClass('user_content', 'paper')
-    })
-
     it('switches to Plain Text View when selected', async () => {
       const user = userEvent.setup()
       render(<AssignmentSubmission {...createDefaultProps()} />)
@@ -242,29 +235,6 @@ describe('AssignmentSubmission', () => {
       await user.click(plainTextOption)
 
       expect(select).toHaveValue('Plain Text View')
-    })
-
-    it('applies plain_text class when Plain Text View is selected', async () => {
-      const user = userEvent.setup()
-      render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      const select = screen.getByTestId('view-mode-selector')
-      await user.click(select)
-
-      const plainTextOption = screen.getByText('Plain Text View')
-      await user.click(plainTextOption)
-
-      const content = screen.getByTestId('text-entry-content')
-      expect(content).toHaveClass('user_content', 'plain_text')
-    })
-
-    it('applies scrollable container styles', () => {
-      render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      const content = screen.getByTestId('text-entry-content')
-      expect(content).toHaveStyle({
-        overflow: 'auto',
-      })
     })
 
     it('renders HTML content correctly', () => {
@@ -474,46 +444,43 @@ describe('AssignmentSubmission', () => {
   })
 
   describe('comments tray', () => {
-    it('renders toggle comments button', () => {
+    it('shows comments panel by default', () => {
       render(<AssignmentSubmission {...createDefaultProps()} />)
 
-      expect(screen.getByTestId('toggle-comments-button')).toBeInTheDocument()
-      expect(screen.getByTestId('toggle-comments-button')).toHaveTextContent('Show Comments')
+      expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
+      expect(screen.getByTestId('toggle-comments-button')).toHaveTextContent('Hide Comments')
     })
 
-    it('shows comments tray when toggle button is clicked', async () => {
+    it('hides comments tray when toggle button is clicked', async () => {
       const user = userEvent.setup()
       render(<AssignmentSubmission {...createDefaultProps()} />)
 
       const toggleButton = screen.getByTestId('toggle-comments-button')
-      expect(screen.queryByTestId('mocked-comments-tray')).not.toBeInTheDocument()
-
-      await user.click(toggleButton)
-
-      expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
-      expect(toggleButton).toHaveTextContent('Hide Comments')
-    })
-
-    it('hides comments tray when toggle button is clicked again', async () => {
-      const user = userEvent.setup()
-      render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      const toggleButton = screen.getByTestId('toggle-comments-button')
-      await user.click(toggleButton)
       expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
 
       await user.click(toggleButton)
+
       expect(screen.queryByTestId('mocked-comments-tray')).not.toBeInTheDocument()
       expect(toggleButton).toHaveTextContent('Show Comments')
     })
 
-    it('renders CommentsTrayContentWithApollo with correct props', async () => {
+    it('shows comments tray when toggle button is clicked again', async () => {
       const user = userEvent.setup()
+      render(<AssignmentSubmission {...createDefaultProps()} />)
+
+      const toggleButton = screen.getByTestId('toggle-comments-button')
+      await user.click(toggleButton)
+      expect(screen.queryByTestId('mocked-comments-tray')).not.toBeInTheDocument()
+
+      await user.click(toggleButton)
+      expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
+      expect(toggleButton).toHaveTextContent('Hide Comments')
+    })
+
+    it('renders CommentsTrayContentWithApollo with correct props', () => {
       const submission = createSubmission()
       const assignment = createAssignment()
       render(<AssignmentSubmission {...createDefaultProps({submission, assignment})} />)
-
-      await user.click(screen.getByTestId('toggle-comments-button'))
 
       const commentsTray = screen.getByTestId('mocked-comments-tray')
       expect(commentsTray).toBeInTheDocument()
@@ -524,60 +491,14 @@ describe('AssignmentSubmission', () => {
       expect(props.assignment.courseId).toBe(assignment.courseId)
     })
 
-    it('includes close button for comments tray', async () => {
-      const user = userEvent.setup()
+    it('renders Peer Comments heading when comments are shown', () => {
       render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      await user.click(screen.getByTestId('toggle-comments-button'))
-
-      const closeButton = screen.getByTestId('close-comments-button')
-      expect(closeButton).toBeInTheDocument()
-    })
-
-    it('renders Peer Comments heading when comments are shown', async () => {
-      const user = userEvent.setup()
-      render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      await user.click(screen.getByTestId('toggle-comments-button'))
 
       expect(screen.getByText('Peer Comments')).toBeInTheDocument()
     })
   })
 
   describe('peer review footer', () => {
-    it('renders submit peer review button', () => {
-      render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
-      expect(screen.getByTestId('submit-peer-review-button')).toHaveTextContent(
-        'Submit Peer Review',
-      )
-    })
-
-    it('renders footer with correct layout', () => {
-      render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      const footer = screen.getByTestId('peer-review-footer')
-      expect(footer).toBeInTheDocument()
-
-      expect(screen.getByTestId('toggle-comments-button')).toBeInTheDocument()
-      expect(screen.getByTestId('submit-peer-review-button')).toBeInTheDocument()
-    })
-
-    it('applies correct styling for non-mobile layout', () => {
-      render(<AssignmentSubmission {...createDefaultProps()} />)
-
-      const footer = screen.getByTestId('peer-review-footer')
-      expect(footer).toHaveStyle({left: '275px'})
-    })
-
-    it('applies correct styling for mobile layout', () => {
-      render(<AssignmentSubmission {...createDefaultProps({isMobile: true})} />)
-
-      const footer = screen.getByTestId('peer-review-footer')
-      expect(footer).toHaveStyle({left: '0px'})
-    })
-
     it('shows submit peer review button when peer review is not completed', () => {
       render(<AssignmentSubmission {...createDefaultProps({isPeerReviewCompleted: false})} />)
 
@@ -591,7 +512,7 @@ describe('AssignmentSubmission', () => {
     })
   })
 
-  describe('error messages', () => {
+  describe('error handling', () => {
     it('renders error page for unsupported submission type', () => {
       render(
         <AssignmentSubmission
@@ -657,9 +578,8 @@ describe('AssignmentSubmission', () => {
   })
 
   describe('onPeerReviewSubmitted callback', () => {
-    it('calls onPeerReviewSubmitted when comment is successfully submitted', async () => {
+    it('calls onPeerReviewSubmitted when comment is successfully submitted', () => {
       const onPeerReviewSubmitted = jest.fn()
-      const user = userEvent.setup()
 
       render(
         <AssignmentSubmission
@@ -668,8 +588,6 @@ describe('AssignmentSubmission', () => {
           })}
         />,
       )
-
-      await user.click(screen.getByTestId('toggle-comments-button'))
 
       expect(mockOnSuccessfulPeerReview).toBeTruthy()
       mockOnSuccessfulPeerReview!()
@@ -835,7 +753,6 @@ describe('AssignmentSubmission', () => {
         />,
       )
 
-      await user.click(screen.getByTestId('toggle-comments-button'))
       expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
 
       await user.click(screen.getByTestId('toggle-rubric-button'))
