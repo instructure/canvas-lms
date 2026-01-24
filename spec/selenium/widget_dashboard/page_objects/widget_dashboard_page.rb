@@ -246,6 +246,27 @@ module WidgetDashboardPage
     "#{add_widget_modal_selector} [data-testid='close-button']"
   end
 
+  # Inbox widget selectors
+  def inbox_filter_select_selector
+    "[data-testid='inbox-filter-select']"
+  end
+
+  def inbox_message_item_prefix_selector
+    "[data-testid*='message-item-']"
+  end
+
+  def inbox_message_item_selector(message_id)
+    "[data-testid='message-item-#{message_id}']"
+  end
+
+  def inbox_no_messages_message_selector
+    "[data-testid='no-messages-message']"
+  end
+
+  def inbox_show_all_messages_link_selector
+    "[data-testid='show-all-messages-link']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -476,6 +497,27 @@ module WidgetDashboardPage
     f(add_widget_modal_close_button_selector)
   end
 
+  # Inbox widget elements
+  def inbox_filter_select
+    f(inbox_filter_select_selector)
+  end
+
+  def all_inbox_message_items
+    ff(inbox_message_item_prefix_selector)
+  end
+
+  def inbox_message_item(message_id)
+    f(inbox_message_item_selector(message_id))
+  end
+
+  def inbox_no_messages_message
+    f(inbox_no_messages_message_selector)
+  end
+
+  def inbox_show_all_messages_link
+    f(inbox_show_all_messages_link_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -560,5 +602,21 @@ module WidgetDashboardPage
     column_2_widgets = all_widget_on_column(2)
     expect(column_1_widgets.length).to eq(2)
     expect(column_2_widgets.length).to eq(2)
+  end
+
+  def filter_inbox_messages_by(filter_value)
+    expect(inbox_filter_select).to be_displayed
+    inbox_filter_select.click
+    click_INSTUI_Select_option(inbox_filter_select_selector, filter_value)
+    wait_for_ajaximations
+  end
+
+  def click_inbox_show_all_messages_link
+    expect(inbox_show_all_messages_link).to be_displayed
+    inbox_show_all_messages_link.click
+  end
+
+  def verify_inbox_message_count(expected_count)
+    expect(all_inbox_message_items.size).to eq(expected_count)
   end
 end
