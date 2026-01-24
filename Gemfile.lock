@@ -1112,7 +1112,7 @@ GEM
     rubycas-client (2.3.9)
       activesupport
     rubyzip (3.0.2)
-    saml2 (3.3.0)
+    saml2 (3.3.1)
       activesupport (>= 3.2, < 8.2)
       nokogiri (>= 1.5.8, < 2.0)
       nokogiri-xmlsec-instructure (~> 0.9, >= 0.9.5)

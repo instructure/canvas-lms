@@ -186,6 +186,8 @@ export const saveRubric = async (
     }
   })
 
+  const rubricAssociationTypeId = rubric.associationTypeId ?? assignmentId ?? accountId ?? courseId
+
   const response = await fetch(url, {
     method,
     headers: {
@@ -206,7 +208,7 @@ export const saveRubric = async (
       rubric_association_id: rubricAssociationId,
       rubric_association: {
         id: rubricAssociationId,
-        association_id: assignmentId ?? accountId ?? courseId,
+        association_id: rubricAssociationTypeId,
         association_type: rubric.associationType,
         purpose: rubric.associationType === 'Assignment' ? 'grading' : 'bookmark',
         hide_points: hidePoints ? 1 : 0,
