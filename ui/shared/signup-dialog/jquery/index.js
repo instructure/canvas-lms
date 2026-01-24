@@ -51,7 +51,7 @@ const termsHtml = function (arg) {
   const privacy_policy_url = arg.privacy_policy_url
   return I18n.t(
     'teacher_dialog.agree_to_terms_and_pp',
-    'You agree to the *terms of use* and acknowledge the **privacy policy**.',
+    'You agree to the *Acceptable Use Policy* and acknowledge the **Privacy Policy**.',
     {
       wrappers: [
         '<a href="' + htmlEscape(terms_of_use_url) + '" target="_blank">$1</a>',
@@ -76,6 +76,8 @@ const signupDialog = function (id, title, path) {
     terms_required: ENV.ACCOUNT.terms_required,
     recaptcha: ENV.ACCOUNT.recaptcha_key,
     terms_html: termsHtml(ENV.ACCOUNT),
+    terms_url: ENV.ACCOUNT.terms_of_use_url,
+    privacy_url: ENV.ACCOUNT.privacy_policy_url,
     path,
     require_email: ENV.ACCOUNT.registration_settings.require_email,
   })

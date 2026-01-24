@@ -204,7 +204,7 @@ describe('useFetchNewLoginData', () => {
       'all',
       'recaptcha_key_value',
       'true',
-      'https://example.com/terms-of-use',
+      '/acceptable_use_policy',
       'https://example.com/privacy',
       'true',
       JSON.stringify({
@@ -234,7 +234,7 @@ describe('useFetchNewLoginData', () => {
       selfRegistrationType: 'all',
       recaptchaKey: 'recaptcha_key_value',
       termsRequired: true,
-      termsOfUseUrl: 'https://example.com/terms-of-use',
+      termsOfUseUrl: '/acceptable_use_policy',
       privacyPolicyUrl: 'https://example.com/privacy',
       requireEmail: true,
       passwordPolicy: {
