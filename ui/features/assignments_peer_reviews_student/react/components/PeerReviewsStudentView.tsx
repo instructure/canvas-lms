@@ -346,6 +346,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
                         data.assignment._id,
                         submissionUserId,
                         selectedAssessment.submission.attachments[0]._id,
+                        data.assignment.peerReviews?.anonymousReviews ?? false,
                       )}
                     >
                       {I18n.t('Download Submission')}

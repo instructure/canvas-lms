@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import FileSubmissionPreview from '../FileSubmissionPreview'
+import FileSubmissionPreview, {buildSubmissionDownloadUrl} from '../FileSubmissionPreview'
 import {Assignment, Submission} from '../AssignmentsPeerReviewsStudentTypes'
 
 describe('FileSubmissionPreview', () => {
@@ -176,14 +176,10 @@ describe('FileSubmissionPreview', () => {
   })
 
   describe('without preview URL', () => {
-    it('shows preview unavailable message and download button', () => {
+    it('shows preview unavailable message', () => {
       render(<FileSubmissionPreview submission={mockSubmissionNoPreview} />)
       expect(screen.getByText('Preview Unavailable')).toBeInTheDocument()
       expect(screen.getByText('file.zip')).toBeInTheDocument()
-
-      const downloadButton = screen.getByText('Download')
-      expect(downloadButton).toBeInTheDocument()
-      expect(downloadButton.closest('a')).toHaveAttribute('href', 'http://example.com/download/401')
     })
   })
 
@@ -316,6 +312,90 @@ describe('FileSubmissionPreview', () => {
 
       const downloadButtons = screen.getAllByText('Download')
       expect(downloadButtons).toHaveLength(2)
+    })
+
+    it('generates anonymous submission URLs when anonymousReviews is true', () => {
+      const anonymousAssignment: Assignment = {
+        _id: '1',
+        courseId: '100',
+        name: 'Test Assignment',
+        peerReviews: {
+          anonymousReviews: true,
+        },
+      } as Assignment
+
+      render(
+        <FileSubmissionPreview
+          submission={mockSubmissionWithMultipleFiles}
+          assignment={anonymousAssignment}
+          userId={userId}
+        />,
+      )
+
+      const downloadButtons = screen.getAllByText('Download')
+      expect(downloadButtons).toHaveLength(2)
+
+      expect(downloadButtons[0].closest('a')).toHaveAttribute(
+        'href',
+        `/courses/${anonymousAssignment.courseId}/assignments/${anonymousAssignment._id}/anonymous_submissions/${userId}?download=201`,
+      )
+      expect(downloadButtons[1].closest('a')).toHaveAttribute(
+        'href',
+        `/courses/${anonymousAssignment.courseId}/assignments/${anonymousAssignment._id}/anonymous_submissions/${userId}?download=202`,
+      )
+    })
+
+    it('generates regular submission URLs when anonymousReviews is false', () => {
+      const nonAnonymousAssignment: Assignment = {
+        _id: '1',
+        courseId: '100',
+        name: 'Test Assignment',
+        peerReviews: {
+          anonymousReviews: false,
+        },
+      } as Assignment
+
+      render(
+        <FileSubmissionPreview
+          submission={mockSubmissionWithMultipleFiles}
+          assignment={nonAnonymousAssignment}
+          userId={userId}
+        />,
+      )
+
+      const downloadButtons = screen.getAllByText('Download')
+      expect(downloadButtons).toHaveLength(2)
+
+      expect(downloadButtons[0].closest('a')).toHaveAttribute(
+        'href',
+        `/courses/${nonAnonymousAssignment.courseId}/assignments/${nonAnonymousAssignment._id}/submissions/${userId}?download=201`,
+      )
+      expect(downloadButtons[1].closest('a')).toHaveAttribute(
+        'href',
+        `/courses/${nonAnonymousAssignment.courseId}/assignments/${nonAnonymousAssignment._id}/submissions/${userId}?download=202`,
+      )
+    })
+  })
+
+  describe('buildSubmissionDownloadUrl', () => {
+    it('generates anonymous submission URL when isAnonymous is true', () => {
+      const url = buildSubmissionDownloadUrl('course-1', 'assignment-1', 'user-1', 'attach-1', true)
+      expect(url).toBe(
+        '/courses/course-1/assignments/assignment-1/anonymous_submissions/user-1?download=attach-1',
+      )
+    })
+
+    it('generates regular submission URL when isAnonymous is false', () => {
+      const url = buildSubmissionDownloadUrl(
+        'course-1',
+        'assignment-1',
+        'user-1',
+        'attach-1',
+        false,
+      )
+      expect(url).toBe(
+        '/courses/course-1/assignments/assignment-1/submissions/user-1?download=attach-1',
+      )
     })
   })
 })
