@@ -20,7 +20,7 @@
 
 module LegalInformationHelper
   def terms_of_use_url
-    Setting.get("terms_of_use_url", "http://www.canvaslms.com/policies/terms-of-use")
+    Setting.get("terms_of_use_url", "/acceptable_use_policy")
   end
 
   def privacy_policy_url
