@@ -283,23 +283,15 @@ describe "course sections" do
   context "cross-list sections" do
     it "shows error if user inputs an invalid course id" do
       get "/courses/#{@course.id}/sections/#{@section.id}"
-      f(".crosslist_link").click
-      cl_form = f("#crosslist_course_form")
-      replace_content(cl_form.find_element(:id, "course_id"), 99_999)
-      submit_form(cl_form)
+      f("[data-testid='crosslist-trigger-button']").click
       wait_for_ajaximations
 
-      expect(f("#course_id_errors")).to include_text('Course ID "99999" not authorized for cross-listing')
-    end
-
-    it "shows error if user tries to submit without any values" do
-      get "/courses/#{@course.id}/sections/#{@section.id}"
-      f(".crosslist_link").click
-      cl_form = f("#crosslist_course_form")
-      submit_form(cl_form)
+      course_id_input = f("[data-testid='course-id-input']")
+      replace_content(course_id_input, 99_999)
+      course_id_input.send_keys(:tab) # Trigger blur to confirm the course
       wait_for_ajaximations
 
-      expect(f("#course_autocomplete_id_lookup_errors")).to include_text("Not a valid course name")
+      expect(fj('[data-testid="crosslist-modal"]:contains("Course ID \"99999\" not authorized")')).to be_present
     end
   end
 
