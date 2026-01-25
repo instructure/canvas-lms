@@ -19,7 +19,7 @@
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -30,60 +30,55 @@ interface IssuesCounterProps {
 export const IssuesCounter: React.FC<IssuesCounterProps> = ({count}: IssuesCounterProps) => {
   const I18n = createI18nScope('accessibility_checker')
   return (
-    <AccessibleContent
-      alt={I18n.t(
-        {
-          one: '1 Total Issue',
-          other: '%{count} Total Issues',
-          zero: 'No Issues',
-        },
-        {count},
-      )}
+    <Flex
+      direction="column"
+      height="100%"
+      alignItems="center"
+      justifyItems="center"
+      textAlign="center"
     >
-      <Flex
-        direction="column"
-        height="100%"
-        alignItems="center"
-        justifyItems="center"
-        textAlign="center"
-      >
-        <Flex.Item>
-          <Heading
-            level="h2"
-            data-testid="counter-number"
-            themeOverride={(_componentTheme, currentTheme) => ({
-              primaryColor:
-                count > 0
-                  ? currentTheme.colors.primitives.orange57
-                  : currentTheme.colors.primitives.green57,
-            })}
-            color="primary"
-            variant="titleSection"
-          >
-            {count + ''}
-          </Heading>
-        </Flex.Item>
-        <Flex.Item>
-          <Heading
-            level="h2"
-            data-testid="counter-description"
-            themeOverride={{
-              h2FontSize: '1rem',
-              h2FontWeight: 400,
-              lineHeight: '1.5rem',
-            }}
-          >
+      <Flex.Item>
+        <Heading level="h2" as="h2">
+          <ScreenReaderContent>
             {I18n.t(
               {
-                one: 'Total Issue',
-                other: 'Total Issues',
-                zero: 'Total Issues',
+                one: '1 Total Issue',
+                other: '%{count} Total Issues',
+                zero: 'No Issues',
               },
               {count},
             )}
-          </Heading>
-        </Flex.Item>
-      </Flex>
-    </AccessibleContent>
+          </ScreenReaderContent>
+        </Heading>
+        <Text
+          data-testid="counter-number"
+          as="div"
+          aria-hidden="true"
+          themeOverride={(_componentTheme, currentTheme) => ({
+            primaryColor:
+              count > 0
+                ? currentTheme.colors.primitives.orange57
+                : currentTheme.colors.primitives.green57,
+          })}
+          color="primary"
+          size="x-large"
+          weight="bold"
+        >
+          {count + ''}
+        </Text>
+      </Flex.Item>
+      <Flex.Item>
+        <Text data-testid="counter-description" as="div" aria-hidden="true" size="medium">
+          {I18n.t(
+            {
+              one: 'Total Issue',
+              other: 'Total Issues',
+              zero: 'Total Issues',
+            },
+            {count},
+          )}
+        </Text>
+      </Flex.Item>
+    </Flex>
   )
 }
