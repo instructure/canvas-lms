@@ -78,6 +78,7 @@ export default function UncrosslistForm({
         display="block"
         textAlign="start"
         renderIcon={<IconOffLine />}
+        margin="xx-small 0"
         data-testid="uncrosslist-trigger-button"
       >
         {I18n.t('De-Cross-List this Section')}
