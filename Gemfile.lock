@@ -782,8 +782,8 @@ GEM
       thor
     msgpack (1.8.0)
     multi_json (1.15.0)
-    multi_xml (0.7.2)
-      bigdecimal (~> 3.1)
+    multi_xml (0.8.1)
+      bigdecimal (>= 3.1, < 5)
     multipart-post (2.4.1)
     mustache (1.1.1)
     net-http (0.6.0)
