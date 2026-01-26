@@ -46,6 +46,9 @@ function transformSharedCourseDataToCourseGrade(sharedCourse: SharedCourseData):
     currentGrade: sharedCourse.currentGrade,
     gradingScheme: sharedCourse.gradingScheme,
     lastUpdated: new Date(sharedCourse.lastUpdated),
+    courseColor: sharedCourse.courseColor,
+    term: sharedCourse.term,
+    image: sharedCourse.image,
   }
 }
 

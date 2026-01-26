@@ -54,6 +54,25 @@ export const createGradebookHandler = (courseId: string) => () => {
   window.open(URL_PATTERNS.GRADEBOOK.replace('{courseId}', courseId), '_blank')
 }
 
+export const getAccessibleTextColor = (backgroundColor: string): string => {
+  const color = backgroundColor.replace('#', '').toLowerCase()
+  const r = parseInt(color.substring(0, 2), 16)
+  const g = parseInt(color.substring(2, 4), 16)
+  const b = parseInt(color.substring(4, 6), 16)
+
+  const getLuminance = (r: number, g: number, b: number) => {
+    const [rs, gs, bs] = [r, g, b].map(c => {
+      c = c / 255
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+    })
+    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs
+  }
+
+  const backgroundLuminance = getLuminance(r, g, b)
+  const contrastWithWhite = 1.05 / (backgroundLuminance + 0.05)
+  return contrastWithWhite >= 4.5 ? '#FFFFFF' : '#000000'
+}
+
 export const convertToLetterGrade = (
   numericGrade: number,
   gradingStandardData: Array<[string, number]>,

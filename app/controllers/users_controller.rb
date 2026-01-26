@@ -3542,13 +3542,18 @@ class UsersController < ApplicationController
         end
       end
 
+      nickname = @current_user.course_nickname(course)
       {
         courseId: course.id.to_s,
         courseCode: course.course_code || "N/A",
-        courseName: course.name,
+        courseName: nickname || course.name,
+        originalName: course.name,
         currentGrade: display_grade,
         gradingScheme: grading_scheme,
-        lastUpdated: last_updated&.iso8601
+        lastUpdated: last_updated&.iso8601,
+        courseColor: @current_user.custom_colors[course.asset_string],
+        term: course.enrollment_term&.name,
+        image: course.image
       }
     end
 

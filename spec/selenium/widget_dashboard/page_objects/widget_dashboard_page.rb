@@ -445,8 +445,12 @@ module WidgetDashboardPage
     f(course_last_updated_selector(course_id))
   end
 
+  def course_grade_hidden?(course_id)
+    course_grade_text(course_id).text == "•••"
+  end
+
   def all_course_grade_items
-    ff("[data-testid*='hide-single-grade-button-']")
+    ff("[data-testid*='course-grade-card-']")
   end
 
   def course_work_summary_stats(label)
