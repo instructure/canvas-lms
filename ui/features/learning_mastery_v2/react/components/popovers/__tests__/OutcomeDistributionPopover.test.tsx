@@ -73,4 +73,90 @@ describe('OutcomeDistributionPopover', () => {
 
     expect(onCloseHandler).toHaveBeenCalledTimes(1)
   })
+
+  it('toggles outcome info section when info button is clicked', async () => {
+    const {getByTestId, queryByTestId} = render(
+      <OutcomeDistributionPopover
+        outcome={outcome}
+        scores={scores}
+        isOpen={true}
+        onCloseHandler={vi.fn()}
+        renderTrigger={<button>Trigger</button>}
+      />,
+    )
+
+    expect(queryByTestId('outcome-info-section')).not.toBeInTheDocument()
+
+    const infoButton = getByTestId('outcome-distribution-popover-info-button')
+    fireEvent.click(infoButton)
+
+    await waitFor(() => {
+      expect(queryByTestId('outcome-info-section')).toBeInTheDocument()
+    })
+
+    fireEvent.click(infoButton)
+
+    await waitFor(() => {
+      expect(queryByTestId('outcome-info-section')).not.toBeInTheDocument()
+    })
+  })
+
+  it('displays configure mastery link when info is shown', async () => {
+    const {getByTestId, queryByTestId} = render(
+      <OutcomeDistributionPopover
+        outcome={outcome}
+        scores={scores}
+        isOpen={true}
+        onCloseHandler={vi.fn()}
+        renderTrigger={<button>Trigger</button>}
+      />,
+    )
+
+    expect(queryByTestId('configure-mastery-link')).not.toBeInTheDocument()
+
+    const infoButton = getByTestId('outcome-distribution-popover-info-button')
+    fireEvent.click(infoButton)
+
+    await waitFor(() => {
+      expect(queryByTestId('configure-mastery-link')).toBeInTheDocument()
+    })
+  })
+
+  it('displays the calculation method correctly', async () => {
+    const {getByTestId, getByText} = render(
+      <OutcomeDistributionPopover
+        outcome={outcome}
+        scores={scores}
+        isOpen={true}
+        onCloseHandler={vi.fn()}
+        renderTrigger={<button>Trigger</button>}
+      />,
+    )
+
+    const infoButton = getByTestId('outcome-distribution-popover-info-button')
+    fireEvent.click(infoButton)
+
+    await waitFor(() => {
+      expect(getByText('Weighted Average')).toBeInTheDocument()
+    })
+  })
+
+  it('displays mastery scale points', async () => {
+    const {getByTestId, getByText} = render(
+      <OutcomeDistributionPopover
+        outcome={outcome}
+        scores={scores}
+        isOpen={true}
+        onCloseHandler={vi.fn()}
+        renderTrigger={<button>Trigger</button>}
+      />,
+    )
+
+    const infoButton = getByTestId('outcome-distribution-popover-info-button')
+    fireEvent.click(infoButton)
+
+    await waitFor(() => {
+      expect(getByText('5 Point')).toBeInTheDocument()
+    })
+  })
 })
