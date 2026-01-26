@@ -28,6 +28,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :accessibility_resource_scans
     set_replica_identity :account_users
     set_replica_identity :accounts
+    set_replica_identity :allocation_rules
     set_replica_identity :asset_user_accesses
     set_replica_identity :auto_grade_results
     set_replica_identity :blackout_dates
@@ -77,6 +78,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :lti_overlay_versions
     set_replica_identity :lti_registrations
     set_replica_identity :lti_registration_account_bindings
+    set_replica_identity :lti_registration_history_entries
     set_replica_identity :lti_registration_update_requests
     set_replica_identity :lti_resource_links
     set_replica_identity :lti_results
@@ -84,6 +86,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :microsoft_sync_groups
     set_replica_identity :microsoft_sync_partial_sync_changes
     set_replica_identity :microsoft_sync_user_mappings
+    set_replica_identity :oauth_client_configs
     set_replica_identity :originality_reports
     set_replica_identity :outcome_rollups
     set_replica_identity :pseudonyms
