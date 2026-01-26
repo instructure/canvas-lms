@@ -1022,7 +1022,7 @@ GEM
       chunky_png (~> 1.0)
       rqrcode_core (~> 2.0)
     rqrcode_core (2.1.0)
-    rrule (0.6.0)
+    rrule (0.7.0)
       activesupport (>= 2.3)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
