@@ -29,13 +29,19 @@ import {Alert} from '@instructure/ui-alerts'
 import {IconPlayLine, IconXLine, IconRefreshLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {LLMConversationMessage, LLMConversationViewProps} from '../../types'
+import type {
+  LLMConversationMessage,
+  LLMConversationViewProps,
+  ConversationProgress,
+} from '../../types'
+import ConversationProgressComponent from './ConversationProgress'
 
 const I18n = createI18nScope('ai_experiences')
 
 interface ConversationResponse {
   id: string
   messages: LLMConversationMessage[]
+  progress?: ConversationProgress
 }
 
 const LLMConversationView: React.FC<LLMConversationViewProps> = ({
@@ -50,9 +56,11 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   scenario: _scenario,
   isExpanded = false,
   onToggleExpanded,
+  isTeacherPreview = false,
 }) => {
   const [messages, setMessages] = useState<LLMConversationMessage[]>([])
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [progress, setProgress] = useState<ConversationProgress | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isInitializing, setIsInitializing] = useState(false)
@@ -133,6 +141,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
       if (activeConversation?.id && activeConversation?.messages) {
         setConversationId(activeConversation.id)
         setMessages(activeConversation.messages)
+        setProgress(activeConversation.progress || null)
         setError(null)
       } else {
         // No active conversation, create a new one
@@ -144,6 +153,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
         if (newConversation?.id && newConversation?.messages) {
           setConversationId(newConversation.id)
           setMessages(newConversation.messages)
+          setProgress(newConversation.progress || null)
           setError(null)
         }
       }
@@ -181,6 +191,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
       if (json?.messages) {
         setMessages(json.messages)
+        setProgress(json.progress || null)
         setError(null)
       }
     } catch (error) {
@@ -207,14 +218,20 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
     try {
       // Create a new conversation (server will automatically complete any existing active conversation)
-      const {json} = await doFetchApi<ConversationResponse>({
+      const {json, response} = await doFetchApi<ConversationResponse>({
         path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
         method: 'POST',
       })
 
+      if (!response?.ok) {
+        setError(I18n.t('Failed to restart conversation. Please try again.'))
+        return
+      }
+
       if (json?.id && json?.messages) {
         setConversationId(json.id)
         setMessages(json.messages)
+        setProgress(json.progress || null)
         setError(null)
       }
     } catch (error) {
@@ -257,16 +274,25 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           }
         }}
       >
-        <Flex gap="small" alignItems="center">
-          <IconPlayLine size="small" />
-          <View>
-            <Heading level="h3" margin="0 0 xx-small 0">
-              {I18n.t('Preview')}
-            </Heading>
-            <Text size="small">
-              {I18n.t('Here, you can have a chat with the AI just like a student would.')}
-            </Text>
-          </View>
+        <Flex gap="small" alignItems="center" justifyItems="space-between">
+          <Flex gap="small" alignItems="center">
+            <IconPlayLine size="small" />
+            <View>
+              <Heading level="h3" margin="0 0 xx-small 0">
+                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
+              </Heading>
+              <Text size="small">
+                {isTeacherPreview
+                  ? I18n.t('Here, you can have a chat with the AI just like a student would.')
+                  : I18n.t('Start the experience by having a conversation with the AI. Good luck!')}
+              </Text>
+            </View>
+          </Flex>
+          {progress && (
+            <View as="div" minWidth="200px">
+              <ConversationProgressComponent progress={progress} />
+            </View>
+          )}
         </Flex>
       </View>
     )
@@ -308,10 +334,12 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             </IconButton>
             <View>
               <Heading level="h3" margin="0 0 xx-small 0">
-                {I18n.t('Preview')}
+                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
               </Heading>
               <Text size="small">
-                {I18n.t('Here, you can have a chat with the AI just like a student would.')}
+                {isTeacherPreview
+                  ? I18n.t('Here, you can have a chat with the AI just like a student would.')
+                  : I18n.t('Start the experience by having a conversation with the AI. Good luck!')}
               </Text>
             </View>
           </Flex>
@@ -324,6 +352,11 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             {I18n.t('Restart')}
           </Button>
         </Flex>
+        {progress && (
+          <View as="div" margin="small 0 0 0">
+            <ConversationProgressComponent progress={progress} />
+          </View>
+        )}
       </View>
 
       {/* Chat conversation section */}

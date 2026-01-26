@@ -76,17 +76,31 @@ describe('LLMConversationView', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders collapsed state when not expanded', () => {
-    render(<LLMConversationView {...defaultProps} isExpanded={false} />)
+  it('renders collapsed state when not expanded (teacher preview)', () => {
+    render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={true} />)
     expect(screen.getByText('Preview')).toBeInTheDocument()
     expect(
       screen.getByText('Here, you can have a chat with the AI just like a student would.'),
     ).toBeInTheDocument()
   })
 
-  it('renders expanded state when expanded', () => {
-    render(<LLMConversationView {...defaultProps} />)
+  it('renders collapsed state when not expanded (student view)', () => {
+    render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={false} />)
+    expect(screen.getByText('Conversation')).toBeInTheDocument()
+    expect(
+      screen.getByText('Start the experience by having a conversation with the AI. Good luck!'),
+    ).toBeInTheDocument()
+  })
+
+  it('renders expanded state when expanded (teacher preview)', () => {
+    render(<LLMConversationView {...defaultProps} isTeacherPreview={true} />)
     expect(screen.getByText('Preview')).toBeInTheDocument()
+    expect(screen.getByText('Restart')).toBeInTheDocument()
+  })
+
+  it('renders expanded state when expanded (student view)', () => {
+    render(<LLMConversationView {...defaultProps} isTeacherPreview={false} />)
+    expect(screen.getByText('Conversation')).toBeInTheDocument()
     expect(screen.getByText('Restart')).toBeInTheDocument()
   })
 
@@ -101,6 +115,7 @@ describe('LLMConversationView', () => {
       <LLMConversationView
         {...defaultProps}
         isExpanded={false}
+        isTeacherPreview={true}
         onToggleExpanded={onToggleExpanded}
       />,
     )
@@ -140,7 +155,7 @@ describe('LLMConversationView', () => {
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello! How can I help you?')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello!.*How can I help you\?/i)[0]).toBeInTheDocument()
     })
   })
 
@@ -168,9 +183,9 @@ describe('LLMConversationView', () => {
       // First message is hidden (starting prompt)
       expect(screen.queryByText('Starting prompt')).not.toBeInTheDocument()
       // Others are visible
-      expect(screen.getByText('Hello!')).toBeInTheDocument()
-      expect(screen.getByText('Hi there')).toBeInTheDocument()
-      expect(screen.getByText('How can I help?')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello!/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/Hi there/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/How can I help\?/i)[0]).toBeInTheDocument()
     })
   })
 
@@ -210,7 +225,7 @@ describe('LLMConversationView', () => {
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText('Your answer...')
@@ -270,7 +285,7 @@ describe('LLMConversationView', () => {
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText('Your answer...')
@@ -307,7 +322,7 @@ describe('LLMConversationView', () => {
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const restartButton = screen.getByText('Restart')
@@ -462,7 +477,7 @@ describe('LLMConversationView', () => {
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const input = screen.getByPlaceholderText('Your answer...')
@@ -522,7 +537,7 @@ describe('LLMConversationView', () => {
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const input = screen.getByPlaceholderText('Your answer...')
@@ -564,7 +579,7 @@ describe('LLMConversationView', () => {
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const restartButton = screen.getByText('Restart')
@@ -647,7 +662,7 @@ describe('LLMConversationView', () => {
         expect(
           screen.queryByText('Failed to start conversation. Please try again.'),
         ).not.toBeInTheDocument()
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
     })
   })

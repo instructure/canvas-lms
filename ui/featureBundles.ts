@@ -31,6 +31,7 @@ const featureBundles: {
   account_settings: () => import('./features/account_settings/index'),
   admin_split: () => import('./features/admin_split/index'),
   ai_experiences_show: () => import('./features/ai_experiences_show/index'),
+  ai_experiences_ai_conversations: () => import('./features/ai_experiences_ai_conversations/index'),
   analytics_hub: () => import('./features/analytics_hub/index'),
   announcements_on_home_page: () => import('./features/announcements_on_home_page/index'),
   announcements: () => import('./features/announcements/index'),

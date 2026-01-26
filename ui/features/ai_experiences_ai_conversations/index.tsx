@@ -16,24 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface AIExperience {
-  id?: string
-  title: string
-  description: string
-  facts: string
-  learning_objective: string
-  pedagogical_guidance: string
-  account_id?: string
-  course_id?: string | number
-  root_account_id?: string
-  workflow_state: 'published' | 'unpublished'
-  created_at?: string
-  updated_at?: string
-  can_manage: boolean
-  can_unpublish?: boolean
-}
+import ready from '@instructure/ready'
 
-export interface EnvAiExperiences {
-  AI_EXPERIENCE: AIExperience
-  NAVBAR_HEIGHT: number
-}
+ready(() => {
+  import('./react')
+})

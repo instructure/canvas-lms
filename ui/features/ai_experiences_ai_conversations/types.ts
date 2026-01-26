@@ -16,16 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type AiExperience = {
-  id: number
+export interface StudentConversation {
+  id: string | null
+  user_id: string
+  llm_conversation_id?: string
+  workflow_state?: 'active' | 'completed' | 'deleted'
+  created_at?: string
+  updated_at?: string
+  has_conversation?: boolean
+  student: {
+    id: string
+    name: string
+    avatar_url?: string
+  }
+}
+
+export interface ConversationMessage {
+  role: 'user' | 'assistant' | 'User' | 'Assistant'
+  content?: string
+  text?: string
+  timestamp?: string
+}
+
+export interface ConversationDetail extends StudentConversation {
+  messages: ConversationMessage[]
+  progress?: {
+    status: string
+    [key: string]: any
+  }
+}
+
+export interface AIExperience {
+  id: string
+  course_id: string | number
   title: string
   description?: string
-  workflow_state: 'published' | 'unpublished'
   facts?: string
   learning_objective?: string
   pedagogical_guidance?: string
-  created_at: string
-  can_manage?: boolean
-  can_unpublish?: boolean
-  submission_status?: 'not_started' | 'in_progress' | 'submitted'
+  can_manage: boolean
 }

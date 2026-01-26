@@ -607,6 +607,8 @@
   path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id'
 - verb: POST
   path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages'
 - verb: DELETE
@@ -615,6 +617,10 @@
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:id/ai_conversations'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:id/ai_conversations/:conversation_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/:id/edit'
 - verb: GET

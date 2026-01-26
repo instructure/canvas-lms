@@ -104,7 +104,7 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
               onChange={onChange('learning_objective')}
               required
               placeholder={I18n.t(
-                'What the student should be able to explain or demonstrate after this activity.',
+                'Enter each objective on a new line or separated by semicolons.\nExample:\n- Understand photosynthesis\n- Explain cellular respiration\n- Describe ATP production',
               )}
               resize="vertical"
               height="120px"
