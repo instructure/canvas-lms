@@ -54,7 +54,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.6)
-    rubyzip (3.0.2)
+    rubyzip (3.2.2)
     securerandom (0.4.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
