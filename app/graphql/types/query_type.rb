@@ -69,13 +69,22 @@ module Types
                "a graphql or legacy id",
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
+      argument :include_types,
+               [Types::AssignmentTypeEnum],
+               "Types of assignments to include. Defaults to [ASSIGNMENT] for backward compatibility. " \
+               "Note: This parameter is ignored when using sisId lookup.",
+               required: false,
+               default_value: ["Assignment"]
       argument :sis_id, String, "an id from the original SIS system", required: false
     end
-    def assignment(id: nil, sis_id: nil)
+    def assignment(id: nil, sis_id: nil, include_types: ["Assignment"])
       raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
-      return GraphQLNodeLoader.load("Assignment", id, context) if id
 
-      GraphQLNodeLoader.load("AssignmentBySis", sis_id, context) if sis_id
+      if id
+        GraphQLNodeLoader.load("AbstractAssignment", { id:, include_types: }, context)
+      elsif sis_id
+        GraphQLNodeLoader.load("AssignmentBySis", sis_id, context)
+      end
     end
 
     field :peer_review_sub_assignment, Types::PeerReviewSubAssignmentType, null: true do

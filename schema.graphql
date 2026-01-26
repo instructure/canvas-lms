@@ -588,6 +588,11 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   ): AssignmentOverrideConnection
 
   """
+  Discriminator indicating the actual type of this assignment
+  """
+  assignmentType: AssignmentTypeEnum!
+
+  """
   Returns empty array if visible to everyone
   """
   assignmentVisibility: [ID!]
@@ -832,6 +837,16 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   onlyVisibleToOverrides: Boolean!
   originalityReportVisibility: String
+
+  """
+  The parent assignment (only for PeerReviewSubAssignment)
+  """
+  parentAssignment: Assignment
+
+  """
+  The parent assignment ID (only for PeerReviewSubAssignment)
+  """
+  parentAssignmentId: ID
   peerReviewSubAssignment: PeerReviewSubAssignment
   peerReviews: PeerReviews
 
@@ -1378,6 +1393,21 @@ Specify a sort order for the results
 input AssignmentTargetSortOrder {
   direction: OrderDirection
   field: AssignmentTargetSortField!
+}
+
+"""
+Assignment subtypes for filtering queries and discriminating response types
+"""
+enum AssignmentTypeEnum {
+  """
+  Standard assignment
+  """
+  ASSIGNMENT
+
+  """
+  Peer review sub-assignment
+  """
+  PEER_REVIEW_SUB_ASSIGNMENT
 }
 
 input AssignmentUpdate {
@@ -7842,6 +7872,11 @@ type PeerReviewSubAssignment implements AssignedDates & LegacyIDInterface & Modu
   ): AssignmentOverrideConnection
 
   """
+  Discriminator indicating the actual type of this assignment
+  """
+  assignmentType: AssignmentTypeEnum!
+
+  """
   Returns empty array if visible to everyone
   """
   assignmentVisibility: [ID!]
@@ -8644,6 +8679,12 @@ type Query {
     a graphql or legacy id
     """
     id: ID
+
+    """
+    Types of assignments to include. Defaults to [ASSIGNMENT] for backward
+    compatibility. Note: This parameter is ignored when using sisId lookup.
+    """
+    includeTypes: [AssignmentTypeEnum!] = [ASSIGNMENT]
 
     """
     an id from the original SIS system
