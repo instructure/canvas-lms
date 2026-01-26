@@ -20,7 +20,7 @@
 class ImpossibleCredentialsError < ArgumentError; end
 
 class Pseudonym < ActiveRecord::Base
-  self.ignored_columns += %w[auth_type login_attribute verification_token]
+  self.ignored_columns += %w[auth_type]
 
   # this field is used for audit logging.
   # if a request is deleting a pseudonym, it should set this value
