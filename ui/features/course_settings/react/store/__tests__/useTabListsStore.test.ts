@@ -19,7 +19,7 @@
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {useTabListsStore, type NavigationTab} from '../useTabListsStore'
 
-function createTab(
+function makeExistingTab(
   id: number | string,
   label: string,
   props: Partial<Omit<NavigationTab, 'type' | 'externalId' | 'internalId'>> = {},
@@ -41,13 +41,13 @@ function tabToEnvTab(tab: NavigationTab) {
 
 describe('useTabListsStore', () => {
   const mockTabs: NavigationTab[] = [
-    createTab(1, 'Home', {hidden: false}),
-    createTab(2, 'Assignments', {hidden: false}),
-    createTab(3, 'Quizzes', {hidden: false}),
-    createTab('context_external_tool_1', 'External Tool', {hidden: false}),
-    createTab(4, 'Grades', {hidden: true}),
-    createTab(5, 'People', {hidden: true}),
-    createTab('context_external_tool_2', 'Another Tool', {hidden: true}),
+    makeExistingTab(1, 'Home', {hidden: false}),
+    makeExistingTab(2, 'Assignments', {hidden: false}),
+    makeExistingTab(3, 'Quizzes', {hidden: false}),
+    makeExistingTab('context_external_tool_1', 'External Tool', {hidden: false}),
+    makeExistingTab(4, 'Grades', {hidden: true}),
+    makeExistingTab(5, 'People', {hidden: true}),
+    makeExistingTab('context_external_tool_2', 'Another Tool', {hidden: true}),
   ]
 
   beforeEach(() => {
@@ -286,14 +286,14 @@ describe('useTabListsStore', () => {
 
   describe('moveUsingTrayResult', () => {
     const mockTabsWithImmovable: NavigationTab[] = [
-      createTab(1, 'Immovable Home', {hidden: false, immovable: true}),
-      createTab(2, 'Assignments', {hidden: false}),
-      createTab(3, 'Quizzes', {hidden: false}),
-      createTab(4, 'Discussions', {hidden: false}),
-      createTab(5, 'Grades', {hidden: false}),
-      createTab(6, 'People', {hidden: false}),
-      createTab(7, 'Pages', {hidden: false}),
-      createTab(8, 'Files', {hidden: true}),
+      makeExistingTab(1, 'Immovable Home', {hidden: false, immovable: true}),
+      makeExistingTab(2, 'Assignments', {hidden: false}),
+      makeExistingTab(3, 'Quizzes', {hidden: false}),
+      makeExistingTab(4, 'Discussions', {hidden: false}),
+      makeExistingTab(5, 'Grades', {hidden: false}),
+      makeExistingTab(6, 'People', {hidden: false}),
+      makeExistingTab(7, 'Pages', {hidden: false}),
+      makeExistingTab(8, 'Files', {hidden: true}),
     ]
 
     beforeEach(() => {
@@ -390,7 +390,7 @@ describe('useTabListsStore', () => {
         ...mockTabsWithImmovable.slice(0, 3), // Keep first 3 enabled (including immovable)
         ...mockTabsWithImmovable
           .slice(3)
-          .map(tab => createTab(tab.externalId!, tab.label, {...tab, hidden: true})), // Rest disabled
+          .map(tab => makeExistingTab(tab.externalId!, tab.label, {...tab, hidden: true})), // Rest disabled
       ]
 
       fakeENV.setup({
@@ -454,10 +454,10 @@ describe('useTabListsStore', () => {
 
     it('should add movable tabs to end when enabled list has only immovable tabs and destination index is 0', () => {
       useTabListsStore.setState({
-        enabledTabs: [createTab(1, 'Immovable', {hidden: false, immovable: true})],
+        enabledTabs: [makeExistingTab(1, 'Immovable', {hidden: false, immovable: true})],
         disabledTabs: [
-          createTab(3, 'Assignments', {hidden: true}), // tab to move
-          createTab(4, 'Quizzes', {hidden: true}),
+          makeExistingTab(3, 'Assignments', {hidden: true}), // tab to move
+          makeExistingTab(4, 'Quizzes', {hidden: true}),
         ],
       })
 
@@ -505,7 +505,7 @@ describe('useTabListsStore', () => {
     })
 
     it('should preserve tab properties when moving between lists', () => {
-      const tabWithProps = createTab(1, 'Home', {
+      const tabWithProps = makeExistingTab(1, 'Home', {
         hidden: false,
         css_class: 'home-icon',
         external: false,
@@ -558,17 +558,17 @@ describe('useTabListsStore', () => {
       const result = tabsToSave()
 
       expect(result[0]).toEqual({id: 1})
-      const newTabs = result.slice(1).filter(t => t.id === undefined)
+      const newTabs = result.slice(1).filter(t => !('id' in t))
       expect(newTabs).toHaveLength(2)
       expect(newTabs[0]).toMatchObject({
-        id: undefined,
         label: 'Link 1',
-        linkUrl: 'https://one.com',
+        href: 'nav_menu_link_url',
+        args: ['https://one.com'],
       })
       expect(newTabs[1]).toMatchObject({
-        id: undefined,
         label: 'Link 2',
-        linkUrl: 'https://two.com',
+        href: 'nav_menu_link_url',
+        args: ['https://two.com'],
         hidden: true,
       })
     })
@@ -586,7 +586,8 @@ describe('useTabListsStore', () => {
       expect(newTab.externalId).toBeUndefined()
       expect(newTab.internalId).toBeTruthy()
       expect(newTab.label).toBe('Test Link')
-      expect(newTab.linkUrl).toBe('https://test.com')
+      expect(newTab.href).toBe('nav_menu_link_url')
+      expect(newTab.args).toEqual(['https://test.com'])
     })
   })
 })

@@ -3690,15 +3690,21 @@ class Course < ActiveRecord::Base
       tabs = (elementary_subject_course? && !course_subject_tabs) ? [] : tab_configuration.compact
       home_tab = default_tabs.find { |t| t[:id] == TAB_HOME }
       settings_tab = default_tabs.find { |t| t[:id] == TAB_SETTINGS }
-      external_tabs = if opts[:include_external]
-                        external_tool_tabs(opts, user) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
-                      else
-                        []
-                      end
-      item_banks_tab = Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(external_tabs)
+      external_tool_tabs = if opts[:include_external]
+                             external_tool_tabs(opts, user) +
+                               Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
+                           else
+                             []
+                           end
+      item_banks_tab = Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(external_tool_tabs)
+      external_tabs = external_tool_tabs
+      if opts[:include_external] && root_account.feature_enabled?(:nav_menu_links)
+        external_tabs += NavMenuLinkTabs.course_tabs(self)
+      end
 
       tabs = tabs.map do |tab|
-        default_tab = default_tabs.find { |t| t[:id] == tab[:id] } || external_tabs.find { |t| t[:id] == tab[:id] }
+        default_tab = default_tabs.find { |t| t[:id] == tab[:id] } ||
+                      external_tabs.find { |t| t[:id] == tab[:id] }
         next unless default_tab
 
         tab[:label] = default_tab[:label]
@@ -3754,13 +3760,15 @@ class Course < ActiveRecord::Base
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }
       if course_subject_tabs
-        # Don't show Settings or AI Experiences, ensure that all external tools are at the bottom (with the exception of Groups, which
-        # should stick to the end unless it has been re-ordered)
+        # Don't show Settings or AI Experiences, ensure that all
+        # external tool and nav menu links tools are at the bottom
+        # (with the exception of Groups, which should stick to the
+        # end unless it has been re-ordered)
         tabs.delete_if { |t| t[:id] == TAB_AI_EXPERIENCES }
-        lti_tabs = tabs.filter { |t| t[:external] }
-        tabs -= lti_tabs
+        ext_tabs = tabs.filter { |t| t[:external] }
+        tabs -= ext_tabs
         groups_tab = tabs.pop if tabs.last&.dig(:id) == TAB_GROUPS && !opts[:for_reordering]
-        tabs += lti_tabs
+        tabs += ext_tabs
         tabs << groups_tab if groups_tab
       else
         # Ensure that Settings is always at the bottom

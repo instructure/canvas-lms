@@ -276,7 +276,8 @@ describe('CourseNavigationSettings', () => {
           hidden: false,
           disabled_message: '',
           immovable: false,
-          linkUrl: 'https://example.com',
+          href: 'nav_menu_link_url',
+          args: ['https://example.com'],
           type: 'existing' as const,
           externalId: 101,
           internalId: '101',
@@ -290,7 +291,8 @@ describe('CourseNavigationSettings', () => {
           hidden: true,
           disabled_message: '',
           immovable: false,
-          linkUrl: 'https://test.com',
+          href: 'nav_menu_link_url',
+          args: ['https://test.com'],
           type: 'existing' as const,
           externalId: 102,
           internalId: '102',
@@ -427,8 +429,20 @@ describe('CourseNavigationSettings', () => {
       // Set up complex test scenario with immovable tabs mixed in
       useTabListsStore.setState({
         enabledTabs: [
-          {type: 'existing', externalId: 1, internalId: '1', label: 'Home', immovable: true}, // immovable
-          {type: 'existing', externalId: 2, internalId: '2', label: 'Syllabus', immovable: true}, // immovable
+          {
+            type: 'existing',
+            externalId: 1,
+            internalId: '1',
+            label: 'Home',
+            immovable: true,
+          },
+          {
+            type: 'existing',
+            externalId: 2,
+            internalId: '2',
+            label: 'Syllabus',
+            immovable: true,
+          },
           {
             type: 'existing',
             externalId: 3,
@@ -436,9 +450,27 @@ describe('CourseNavigationSettings', () => {
             label: 'Assignments',
             immovable: false,
           },
-          {type: 'existing', externalId: 4, internalId: '4', label: 'Grades', immovable: false},
-          {type: 'existing', externalId: 5, internalId: '5', label: 'Calendar', immovable: true}, // immovable
-          {type: 'existing', externalId: 6, internalId: '6', label: 'Files', immovable: false},
+          {
+            type: 'existing',
+            externalId: 4,
+            internalId: '4',
+            label: 'Grades',
+            immovable: false,
+          },
+          {
+            type: 'existing',
+            externalId: 5,
+            internalId: '5',
+            label: 'Calendar',
+            immovable: true,
+          },
+          {
+            type: 'existing',
+            externalId: 6,
+            internalId: '6',
+            label: 'Files',
+            immovable: false,
+          },
         ],
         disabledTabs: [
           {
@@ -454,8 +486,14 @@ describe('CourseNavigationSettings', () => {
             internalId: '8',
             label: 'Announcements',
             immovable: true,
-          }, // immovable
-          {type: 'existing', externalId: 9, internalId: '9', label: 'Quizzes', immovable: false},
+          },
+          {
+            type: 'existing',
+            externalId: 9,
+            internalId: '9',
+            label: 'Quizzes',
+            immovable: false,
+          },
         ],
       })
     })

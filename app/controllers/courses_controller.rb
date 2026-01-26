@@ -1913,7 +1913,11 @@ class CoursesController < ApplicationController
   def update_nav
     get_context
     if authorized_action(@context, @current_user, :update)
-      @context.tab_configuration = JSON.parse(params[:tabs_json]).compact
+      @context.tab_configuration = NavMenuLinkTabs.create_and_delete_links(
+        context: @context,
+        nav_type: "course",
+        tabs: JSON.parse(params[:tabs_json]).compact
+      )
       @context.save
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_details_url) }
@@ -1985,7 +1989,7 @@ class CoursesController < ApplicationController
       else
         # Redirects back to HTTP_REFERER if it exists (so if you accept from an assignent page it will put
         # you back on the same page you were looking at). Otherwise, it redirects back to the course homepage
-        redirect_back(fallback_location: course_url(@context.id))
+        redirect_back_or_to(course_url(@context.id))
       end
     elsif (!@current_user && enrollment.user.registered?) || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
@@ -3828,7 +3832,7 @@ class CoursesController < ApplicationController
 
     assignment_ids = effective_due_dates_params[:assignment_ids]
     unless validate_assignment_ids(assignment_ids)
-      return render json: { errors: t("%{assignment_ids} param is invalid", assignment_ids: "assignment_ids") }, status: :unprocessable_entity
+      return render json: { errors: t("%{assignment_ids} param is invalid", assignment_ids: "assignment_ids") }, status: :unprocessable_content
     end
 
     due_dates = if assignment_ids.present?
@@ -4503,7 +4507,7 @@ class CoursesController < ApplicationController
     if @context.save
       render json: course_json(@context, @current_user, session, [], nil)
     else
-      render json: @context.errors, status: :unprocessable_entity
+      render json: @context.errors, status: :unprocessable_content
     end
   end
 
