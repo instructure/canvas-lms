@@ -37,7 +37,7 @@ GEM
     logger (1.7.0)
     minitest (6.0.1)
       prism (~> 1.5)
-    prism (1.5.1)
+    prism (1.8.0)
     rake (13.3.0)
     securerandom (0.4.1)
     timeout (0.4.3)
