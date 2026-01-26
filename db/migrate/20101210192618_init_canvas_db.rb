@@ -409,6 +409,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, default: "active", null: false
       t.references :updated_by, foreign_key: { to_table: :users }, index: { where: "updated_by_id IS NOT NULL" }
       t.timestamps
+      t.references :accessibility_resource_scan, null: false, foreign_key: true
 
       t.check_constraint <<~SQL.squish, name: "chk_require_context"
         (wiki_page_id IS NOT NULL AND assignment_id IS NULL AND attachment_id IS NULL) OR
@@ -424,17 +425,28 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :accessibility_resource_scans do |t|
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
       t.references :course, null: false, foreign_key: true
-      t.references :context, polymorphic: %i[wiki_page assignment attachment], foreign_key: true, check_constraint: false
+      t.references :context,
+                   polymorphic: %i[wiki_page assignment attachment],
+                   foreign_key: true,
+                   check_constraint: false,
+                   index: { unique: true }
       t.string :error_message, limit: 255
       t.string :workflow_state, default: "queued", null: false
       t.timestamps
+      t.string :resource_name, limit: 255, index: true
+      t.string :resource_workflow_state, default: "unpublished", null: false, index: true
+      t.integer :issue_count, default: 0, null: false, index: true
+      t.timestamp :resource_updated_at, index: { where: "resource_updated_at IS NOT NULL" }
 
       t.check_constraint <<~SQL.squish, name: "chk_require_context"
         (wiki_page_id IS NOT NULL AND assignment_id IS NULL AND attachment_id IS NULL) OR
         (wiki_page_id IS NULL AND assignment_id IS NOT NULL AND attachment_id IS NULL) OR
         (wiki_page_id IS NULL AND assignment_id IS NULL AND attachment_id IS NOT NULL)
       SQL
-      t.check_constraint "workflow_state IN ('queued', 'in_progress', 'completed', 'failed')", name: "chk_workflow_state_enum"
+      t.check_constraint "workflow_state IN ('queued', 'in_progress', 'completed', 'failed')",
+                         name: "chk_workflow_state_enum"
+      t.check_constraint "resource_workflow_state IN ('unpublished', 'published')",
+                         name: "chk_resource_workflow_state_enum"
 
       t.replica_identity_index
     end
@@ -637,6 +649,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :uuid, limit: 255
       t.references :rubric_association, foreign_key: true
       t.references :assessor, null: false, foreign_key: { to_table: :users }
+      t.references :peer_review_sub_assignment, foreign_key: { to_table: :assignments }
 
       t.index [:assessor_asset_id, :assessor_asset_type], name: "aa_id_and_aa_type"
       t.index [:asset_id, :asset_type]
@@ -990,7 +1003,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
         EXECUTE PROCEDURE #{connection.quote_table_name("attachment_before_insert_verify_active_folder__tr_fn")}()
     SQL
 
-    create_enum :enum_attachment_associations_field_name, ["syllabus_body"]
     create_table :attachment_associations do |t|
       t.references :attachment
       t.bigint :context_id
@@ -998,7 +1010,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account
       t.timestamps null: false, default: -> { "now()" }
       t.references :user, foreign_key: true
-      t.enum :field_name, enum_type: "#{Shard.current.name}.enum_attachment_associations_field_name"
       t.string :context_concern, limit: 255
 
       t.index [:context_id, :context_type], name: "attachment_associations_a_id_a_type"
@@ -1319,6 +1330,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :comment, null: false
       t.timestamps precision: 6
       t.string :workflow_state, null: false, default: "active"
+      t.references :assignment, foreign_key: true
 
       t.index :user_id,
               where: "workflow_state <> 'deleted'",
@@ -2021,6 +2033,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :is_anonymous_author, default: false, null: false
       t.references :quoted_entry, foreign_key: { to_table: :discussion_entries }
       t.datetime :edited_at, precision: 6
+      t.string :pin_type
+      t.references :pinned_by, foreign_key: { to_table: :users }
 
       t.replica_identity_index
       t.index %i[root_entry_id workflow_state created_at], name: "index_discussion_entries_root_entry"
@@ -2726,10 +2740,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :group_and_membership_importers do |t|
-      t.references :group_category, null: false, foreign_key: true
+      t.references :group_category, foreign_key: true
       t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
       t.string :workflow_state, null: false, default: "active"
       t.timestamps precision: nil
+      t.references :course, foreign_key: true
     end
 
     create_table :inbox_settings do |t|
@@ -3149,7 +3164,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :lti_overlay_versions do |t|
       t.belongs_to :account, null: false, foreign_key: true
       t.belongs_to :lti_overlay, null: false, foreign_key: { to_table: :lti_overlays }
-      t.belongs_to :created_by, null: false, foreign_key: { to_table: :users }
+      t.belongs_to :created_by, foreign_key: { to_table: :users }
       t.jsonb :diff, null: false
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
@@ -4865,17 +4880,25 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :submission_texts do |t|
-      t.references :submission, null: false, foreign_key: true, index: false
-      t.references :attachment, null: false, foreign_key: true
+      t.references :submission, null: false, foreign_key: true
+      t.references :attachment, foreign_key: true
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
       t.text :text, null: false, limit: 16_777_215
       t.integer :attempt, null: false, check: { constraint_name: "chk_attempt_positive", expression: "attempt > 0" }
       t.boolean :contains_images, null: false, default: false
       t.timestamps
+      t.string :submission_type
 
       t.replica_identity_index
-      t.index %i[submission_id attachment_id attempt], unique: true, name: "index_on_sub_attach_attempt"
+      t.index %i[submission_id attachment_id attempt],
+              unique: true,
+              name: "index_on_sub_attempt_attach",
+              where: "attachment_id IS NOT NULL"
+      t.index %I[submission_id attempt],
+              unique: true,
+              name: "index_on_sub_attempt",
+              where: "attachment_id IS NULL"
     end
 
     create_table :submission_versions do |t|

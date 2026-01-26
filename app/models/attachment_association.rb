@@ -19,8 +19,6 @@
 #
 
 class AttachmentAssociation < ActiveRecord::Base
-  self.ignored_columns += %w[field_name]
-
   belongs_to :attachment
   belongs_to :context, polymorphic: [
     :account,
