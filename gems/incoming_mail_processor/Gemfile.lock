@@ -172,7 +172,7 @@ GEM
     mini_mime (1.1.5)
     minitest (6.0.1)
       prism (~> 1.5)
-    net-imap (0.5.11)
+    net-imap (0.6.2)
       date
       net-protocol
     net-pop (0.1.2)
