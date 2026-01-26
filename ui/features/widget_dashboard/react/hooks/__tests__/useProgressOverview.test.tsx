@@ -27,34 +27,49 @@ import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
 const mockCourses = [
   {
-    course: {
-      _id: '1',
-      name: 'Course 1',
-      courseCode: 'C1',
-      submissionStatistics: {
-        submittedAndGradedCount: 5,
-        submittedNotGradedCount: 2,
-        missingSubmissionsCount: 1,
-        submissionsDueCount: 3,
-      },
+    _id: '1',
+    name: 'Course 1',
+    courseCode: 'C1',
+    submissionStatistics: {
+      submittedAndGradedCount: 5,
+      submittedNotGradedCount: 2,
+      missingSubmissionsCount: 1,
+      submissionsDueCount: 3,
     },
   },
   {
-    course: {
-      _id: '2',
-      name: 'Course 2',
-      courseCode: 'C2',
-      submissionStatistics: {
-        submittedAndGradedCount: 3,
-        submittedNotGradedCount: 1,
-        missingSubmissionsCount: 2,
-        submissionsDueCount: 4,
-      },
+    _id: '2',
+    name: 'Course 2',
+    courseCode: 'C2',
+    submissionStatistics: {
+      submittedAndGradedCount: 3,
+      submittedNotGradedCount: 1,
+      missingSubmissionsCount: 2,
+      submissionsDueCount: 4,
     },
   },
 ]
 
-const createWrapper = () => {
+const mockSharedCourseData = [
+  {
+    courseId: '1',
+    courseCode: 'C1',
+    courseName: 'Course 1',
+    currentGrade: 85,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: '2025-01-01T00:00:00Z',
+  },
+  {
+    courseId: '2',
+    courseCode: 'C2',
+    courseName: 'Course 2',
+    currentGrade: 90,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: '2025-01-02T00:00:00Z',
+  },
+]
+
+const createWrapper = (sharedCourseData = mockSharedCourseData) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -66,28 +81,18 @@ const createWrapper = () => {
 
   return ({children}: {children: React.ReactNode}) => (
     <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider>{children}</WidgetDashboardProvider>
+      <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
+        {children}
+      </WidgetDashboardProvider>
     </QueryClientProvider>
   )
 }
 
 const server = setupServer(
-  graphql.query('GetUserProgressOverview', () => {
+  graphql.query('GetProgressOverview', () => {
     return HttpResponse.json({
       data: {
-        legacyNode: {
-          _id: '123',
-          enrollmentsConnection: {
-            nodes: mockCourses,
-            pageInfo: {
-              hasNextPage: false,
-              hasPreviousPage: false,
-              startCursor: null,
-              endCursor: null,
-              totalCount: 2,
-            },
-          },
-        },
+        courses: mockCourses,
       },
     })
   }),
@@ -126,30 +131,40 @@ describe('useProgressOverviewPaginated', () => {
   })
 
   it('calculates total pages correctly', async () => {
+    // Create 12 mock courses
+    const manyCourses = Array.from({length: 12}, (_, i) => ({
+      _id: `${i + 1}`,
+      name: `Course ${i + 1}`,
+      courseCode: `C${i + 1}`,
+      submissionStatistics: {
+        submittedAndGradedCount: 5,
+        submittedNotGradedCount: 2,
+        missingSubmissionsCount: 1,
+        submissionsDueCount: 3,
+      },
+    }))
+
+    const manySharedCourses = Array.from({length: 12}, (_, i) => ({
+      courseId: `${i + 1}`,
+      courseCode: `C${i + 1}`,
+      courseName: `Course ${i + 1}`,
+      currentGrade: 85,
+      gradingScheme: 'percentage' as const,
+      lastUpdated: '2025-01-01T00:00:00Z',
+    }))
+
     server.use(
-      graphql.query('GetUserProgressOverview', () => {
+      graphql.query('GetProgressOverview', () => {
         return HttpResponse.json({
           data: {
-            legacyNode: {
-              _id: '123',
-              enrollmentsConnection: {
-                nodes: mockCourses,
-                pageInfo: {
-                  hasNextPage: true,
-                  hasPreviousPage: false,
-                  startCursor: null,
-                  endCursor: 'cursor1',
-                  totalCount: 12,
-                },
-              },
-            },
+            courses: manyCourses,
           },
         })
       }),
     )
 
     const {result} = renderHook(() => useProgressOverviewPaginated(), {
-      wrapper: createWrapper(),
+      wrapper: createWrapper(manySharedCourses),
     })
 
     await waitFor(() => {
@@ -161,53 +176,39 @@ describe('useProgressOverviewPaginated', () => {
   })
 
   it('handles page navigation', async () => {
-    const page1Data = {
-      data: {
-        legacyNode: {
-          _id: '123',
-          enrollmentsConnection: {
-            nodes: [mockCourses[0]],
-            pageInfo: {
-              hasNextPage: true,
-              hasPreviousPage: false,
-              startCursor: null,
-              endCursor: 'cursor1',
-              totalCount: 10,
-            },
-          },
-        },
+    const tenCourses = Array.from({length: 10}, (_, i) => ({
+      _id: `${i + 1}`,
+      name: `Course ${i + 1}`,
+      courseCode: `C${i + 1}`,
+      submissionStatistics: {
+        submittedAndGradedCount: 5,
+        submittedNotGradedCount: 2,
+        missingSubmissionsCount: 1,
+        submissionsDueCount: 3,
       },
-    }
+    }))
 
-    const page2Data = {
-      data: {
-        legacyNode: {
-          _id: '123',
-          enrollmentsConnection: {
-            nodes: [mockCourses[1]],
-            pageInfo: {
-              hasNextPage: false,
-              hasPreviousPage: true,
-              startCursor: 'cursor1',
-              endCursor: null,
-              totalCount: 10,
-            },
-          },
-        },
-      },
-    }
+    const tenSharedCourses = Array.from({length: 10}, (_, i) => ({
+      courseId: `${i + 1}`,
+      courseCode: `C${i + 1}`,
+      courseName: `Course ${i + 1}`,
+      currentGrade: 85,
+      gradingScheme: 'percentage' as const,
+      lastUpdated: '2025-01-01T00:00:00Z',
+    }))
 
     server.use(
-      graphql.query('GetUserProgressOverview', ({variables}) => {
-        if (variables.after) {
-          return HttpResponse.json(page2Data)
-        }
-        return HttpResponse.json(page1Data)
+      graphql.query('GetProgressOverview', () => {
+        return HttpResponse.json({
+          data: {
+            courses: tenCourses,
+          },
+        })
       }),
     )
 
     const {result} = renderHook(() => useProgressOverviewPaginated(), {
-      wrapper: createWrapper(),
+      wrapper: createWrapper(tenSharedCourses),
     })
 
     await waitFor(() => {
@@ -216,42 +217,32 @@ describe('useProgressOverviewPaginated', () => {
 
     expect(result.current.currentPageIndex).toBe(0)
     expect(result.current.data?.[0].courseId).toBe('1')
+    expect(result.current.data).toHaveLength(5)
 
     result.current.goToPage(2)
 
     await waitFor(() => {
       expect(result.current.currentPageIndex).toBe(1)
     })
+
+    expect(result.current.data?.[0].courseId).toBe('6')
+    expect(result.current.data).toHaveLength(5)
   })
 
   it('filters out courses with null submissionStatistics', async () => {
     server.use(
-      graphql.query('GetUserProgressOverview', () => {
+      graphql.query('GetProgressOverview', () => {
         return HttpResponse.json({
           data: {
-            legacyNode: {
-              _id: '123',
-              enrollmentsConnection: {
-                nodes: [
-                  mockCourses[0],
-                  {
-                    course: {
-                      _id: '3',
-                      name: 'Course Without Stats',
-                      courseCode: 'C3',
-                      submissionStatistics: null,
-                    },
-                  },
-                ],
-                pageInfo: {
-                  hasNextPage: false,
-                  hasPreviousPage: false,
-                  startCursor: null,
-                  endCursor: null,
-                  totalCount: 1,
-                },
+            courses: [
+              mockCourses[0],
+              {
+                _id: '3',
+                name: 'Course Without Stats',
+                courseCode: 'C3',
+                submissionStatistics: null,
               },
-            },
+            ],
           },
         })
       }),
@@ -271,29 +262,17 @@ describe('useProgressOverviewPaginated', () => {
 
   it('handles empty results', async () => {
     server.use(
-      graphql.query('GetUserProgressOverview', () => {
+      graphql.query('GetProgressOverview', () => {
         return HttpResponse.json({
           data: {
-            legacyNode: {
-              _id: '123',
-              enrollmentsConnection: {
-                nodes: [],
-                pageInfo: {
-                  hasNextPage: false,
-                  hasPreviousPage: false,
-                  startCursor: null,
-                  endCursor: null,
-                  totalCount: 0,
-                },
-              },
-            },
+            courses: [],
           },
         })
       }),
     )
 
     const {result} = renderHook(() => useProgressOverviewPaginated(), {
-      wrapper: createWrapper(),
+      wrapper: createWrapper([]),
     })
 
     await waitFor(() => {
@@ -306,7 +285,7 @@ describe('useProgressOverviewPaginated', () => {
 
   it('handles errors', async () => {
     server.use(
-      graphql.query('GetUserProgressOverview', () => {
+      graphql.query('GetProgressOverview', () => {
         return HttpResponse.json({errors: [{message: 'Failed to fetch'}]}, {status: 500})
       }),
     )
@@ -323,8 +302,40 @@ describe('useProgressOverviewPaginated', () => {
   })
 
   it('resets pagination correctly', async () => {
+    // Create 10 courses so we have multiple pages to navigate
+    const tenCourses = Array.from({length: 10}, (_, i) => ({
+      _id: `${i + 1}`,
+      name: `Course ${i + 1}`,
+      courseCode: `C${i + 1}`,
+      submissionStatistics: {
+        submittedAndGradedCount: 5,
+        submittedNotGradedCount: 2,
+        missingSubmissionsCount: 1,
+        submissionsDueCount: 3,
+      },
+    }))
+
+    const tenSharedCourses = Array.from({length: 10}, (_, i) => ({
+      courseId: `${i + 1}`,
+      courseCode: `C${i + 1}`,
+      courseName: `Course ${i + 1}`,
+      currentGrade: 85,
+      gradingScheme: 'percentage' as const,
+      lastUpdated: '2025-01-01T00:00:00Z',
+    }))
+
+    server.use(
+      graphql.query('GetProgressOverview', () => {
+        return HttpResponse.json({
+          data: {
+            courses: tenCourses,
+          },
+        })
+      }),
+    )
+
     const {result} = renderHook(() => useProgressOverviewPaginated(), {
-      wrapper: createWrapper(),
+      wrapper: createWrapper(tenSharedCourses),
     })
 
     await waitFor(() => {
