@@ -253,7 +253,7 @@ GEM
     stringio (3.2.0)
     thor (1.5.0)
     timecop (0.9.10)
-    timeout (0.4.3)
+    timeout (0.6.0)
     tsort (0.2.0)
     twitter-text (3.1.0)
       idn-ruby
