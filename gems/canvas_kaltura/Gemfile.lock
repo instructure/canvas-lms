@@ -180,9 +180,9 @@ GEM
       tsort
     redis (5.4.1)
       redis-client (>= 0.22.0)
-    redis-client (0.26.1)
+    redis-client (0.26.4)
       connection_pool
-    redis-cluster-client (0.13.6)
+    redis-cluster-client (0.13.7)
       redis-client (~> 0.24)
     redis-clustering (5.4.1)
       redis (= 5.4.1)
