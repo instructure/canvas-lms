@@ -4,7 +4,6 @@ PATH
     i18n_extraction (0.0.1)
       activesupport
       i18nliner (~> 0.1)
-      ruby_parser (~> 3.7)
       sexp_processor (~> 4.14, >= 4.14.1)
 
 GEM

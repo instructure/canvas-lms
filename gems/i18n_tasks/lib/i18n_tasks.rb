@@ -20,7 +20,6 @@
 require "utf8_cleaner"
 require "i18n"
 require "sexp_processor"
-require "ruby_parser"
 require "json"
 
 module I18nTasks

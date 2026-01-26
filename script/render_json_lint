@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "ruby_parser"
+require "prism"
 
 def deep_inspect(expr, &)
   return unless expr.is_a?(Sexp)
@@ -26,7 +26,7 @@ end
 errored = false
 controllers = Dir.glob("app/controllers/*.rb") + Dir.glob("vendor/plugins/*/app/controllers/*.rb")
 controllers.each do |file|
-  deep_inspect(RubyParser.new.parse(File.read(file))) do |expr|
+  deep_inspect(Prism::Translation::RubyParser.new.parse(File.read(file))) do |expr|
     if bad_to_json_in_render?(expr)
       puts "ERROR (in #{file} near #{expr.line}): call to `to_json' on value for `render json'. Use `as_json' instead."
       errored = true
