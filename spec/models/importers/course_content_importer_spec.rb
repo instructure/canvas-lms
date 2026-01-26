@@ -1211,6 +1211,46 @@ describe Course do
       end.not_to change { Lti::ContextControl.count }
     end
   end
+
+  describe "tab configuration import" do
+    before :once do
+      @copy_from = course_factory
+      @copy_to = course_factory
+    end
+
+    it "filters out nav menu link tabs during import" do
+      # Course copy not handled yet for Nav Menu Link tabs. See INTEROP-9293
+      link = NavMenuLink.create!(
+        context: @copy_from,
+        nav_type: "course",
+        label: "External Link",
+        url: "https://example.com"
+      )
+
+      # Set up tab configuration with nav menu link
+      @copy_from.tab_configuration = [
+        { "id" => "assignments" },
+        { "id" => "nav_menu_link_#{link.id}", "hidden" => true },
+        { "id" => "discussions" }
+      ]
+      @copy_from.save!
+
+      # Perform the import
+      migration = @copy_to.content_migrations.create!
+      data = {
+        "all_course_settings" => true,
+        :course => {
+          tab_configuration: @copy_from.tab_configuration
+        }
+      }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+
+      # Nav menu link should not be included in copied tab configuration
+      copied_tab_ids = @copy_to.tab_configuration.pluck("id")
+      expect(copied_tab_ids.select { it.start_with?("nav_menu_link_") }).to be_empty
+      expect(copied_tab_ids).to include("assignments", "discussions")
+    end
+  end
 end
 
 def from_file_path(path, course)

@@ -20,6 +20,16 @@ import {create} from 'zustand'
 import {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {v4 as uuidv4} from 'uuid'
 
+// Used for "href" value in Nav Menu Link type tabs, corresponds to method
+// which SectionTabPresenter#path calls via `send`. See also backend uses of
+// NavMenuLinkTabs::TAB_HREF_VALUE
+const NAV_MENU_LINK_HREF = 'nav_menu_link_url'
+
+type NavMenuLinkTabHrefAndArgs = {
+  href: typeof NAV_MENU_LINK_HREF
+  args: [string]
+}
+
 declare const ENV: EnvCommon & {
   COURSE_SETTINGS_NAVIGATION_TABS?: EnvNavigationTab[]
 }
@@ -29,12 +39,13 @@ declare const ENV: EnvCommon & {
 export type NavigationTab = Omit<EnvNavigationTab, 'id'> & {
   // MoveItemTray also requires every item to have a string unique id
   internalId: string
-} & // existing tab (link or otherwise)
-  (
+} & ( // existing tab (link or otherwise)
     | {type: 'existing'; externalId: number | string}
     // new unsaved link tab
-    | {type: 'newLink'; externalId?: never; linkUrl: string}
+    | ({type: 'newLink'; externalId?: never} & NavMenuLinkTabHrefAndArgs)
   )
+
+export const isLinkTab = (tab: NavigationTab) => tab.href === NAV_MENU_LINK_HREF
 
 // The Navigation Tab as provided from the ENV variable
 type EnvNavigationTab = {
@@ -47,24 +58,22 @@ type EnvNavigationTab = {
   href?: string
   position?: number
   immovable?: boolean
-  linkUrl?: string
+  args?: unknown
 }
 
-export type CourseNavigationTabToSave = {
-  hidden?: boolean
-} & // Existing tab
-(
-  | {id: number | string}
+export type CourseNavigationTabToSave =
+  // Existing tab
+  | {id: number | string; hidden?: boolean}
   // New link tab
-  | {id: undefined; label: string; linkUrl: string}
-)
+  | ({hidden?: boolean; label: string} & NavMenuLinkTabHrefAndArgs)
 
 function newLinkItem({text, url}: {text: string; url: string}): NavigationTab {
   return {
     type: 'newLink',
     internalId: uuidv4(),
     label: text,
-    linkUrl: url,
+    href: NAV_MENU_LINK_HREF,
+    args: [url],
   }
 }
 
@@ -124,12 +133,11 @@ function moveBetweenLists(
 }
 
 function navigationTabFromEnv(tab: EnvNavigationTab): NavigationTab {
-  const {id, linkUrl, ...rest} = tab
+  const {id, ...rest} = tab
   return {
     ...rest,
     type: 'existing',
     externalId: id,
-    linkUrl,
     internalId: tab.id.toString(),
   }
 }
@@ -137,11 +145,8 @@ function navigationTabFromEnv(tab: EnvNavigationTab): NavigationTab {
 function makeTabToSave(tab: NavigationTab): CourseNavigationTabToSave {
   let result: CourseNavigationTabToSave
   if (tab.type === 'newLink') {
-    result = {
-      id: undefined,
-      label: tab.label,
-      linkUrl: tab.linkUrl,
-    }
+    const {args, href, label} = tab
+    result = {args, href, label}
   } else {
     // The update_nav requires numeric IDs to of type number, not string, in the
     // request JSON

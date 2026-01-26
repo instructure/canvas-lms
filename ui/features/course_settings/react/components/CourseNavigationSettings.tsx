@@ -44,6 +44,7 @@ import MoveItemTray from '@canvas/move-item-tray/react'
 import {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {
   CourseNavigationTabToSave,
+  isLinkTab,
   useTabListsStore,
   type MoveItemTrayResult,
   type NavigationTab,
@@ -254,7 +255,7 @@ const NavItem = React.memo(
           </View>
           <View as="div" display="inline-block" padding="small 0" margin="0 auto 0 0">
             <Flex alignItems="center" gap="x-small">
-              {tab.linkUrl && (
+              {isLinkTab(tab) && (
                 <Flex.Item>
                   <IconLinkLine size="x-small" />
                 </Flex.Item>

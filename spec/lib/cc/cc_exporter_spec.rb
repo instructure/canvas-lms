@@ -1010,6 +1010,25 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
+    it "filters out nav menu links from tab_configuration during export" do
+      # Nav Menu Links for Course Copy not implemented yet (see INTEROP-9293)
+      @course.root_account.enable_feature!(:nav_menu_links)
+      link = NavMenuLink.create!(context: @course, nav_type: "course", label: "Link", url: "https://example.com")
+      @course.tab_configuration = [
+        { "id" => Course::TAB_HOME },
+        { "id" => "nav_menu_link_#{link.id}" }
+      ]
+      @course.save!
+
+      run_export
+
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/course_settings.xml"))
+      tab_config = JSON.parse(doc.at_css("tab_configuration").text)
+
+      expect(tab_config.none? { |t| t["id"].to_s.start_with?("nav_menu_link_") }).to be true
+      expect(tab_config.pluck("id")).to include(Course::TAB_HOME)
+    end
+
     it "does not export syllabus if not selected" do
       @course.syllabus_body = "<p>Bodylicious</p>"
 

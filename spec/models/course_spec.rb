@@ -3169,6 +3169,74 @@ describe Course do
         expect(@course.tabs_available(@user).filter_map { |t| t[:label] }.length).to eql(tab_ids.length)
       end
 
+      describe "nav menu links" do
+        before do
+          @course.root_account.enable_feature!(:nav_menu_links)
+          link
+        end
+
+        let(:link) do
+          NavMenuLink.create!(
+            context: @course,
+            nav_type: "course",
+            label: "External Resource",
+            url: "https://example.com"
+          )
+        end
+
+        it "includes nav menu link tabs when feature flag is enabled" do
+          tabs = @course.tabs_available(@user, include_external: true)
+          nav_link_tab = tabs.find { |t| t[:id] == "nav_menu_link_#{link.id}" }
+
+          expect(nav_link_tab[:label]).to eq("External Resource")
+          expect(nav_link_tab[:href]).to eq(:nav_menu_link_url)
+          expect(nav_link_tab[:args]).to eq(["https://example.com"])
+          expect(nav_link_tab[:external]).to be true
+          expect(nav_link_tab[:target]).to eq("_blank")
+        end
+
+        it "does not include nav menu links when feature flag is disabled" do
+          @course.root_account.disable_feature!(:nav_menu_links)
+          tabs = @course.tabs_available(@user)
+          expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
+        end
+
+        it "does not include nav menu links when include_external is false" do
+          tabs = @course.tabs_available(@user, include_external: false)
+          expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
+        end
+
+        it "puts nav menu links in the correct place" do
+          @course.tab_configuration = [
+            { "id" => Course::TAB_HOME },
+            { "id" => Course::TAB_ASSIGNMENTS },
+            { "id" => "nav_menu_link_#{link.id}" }
+          ]
+          @course.save!
+          tabs = @course.tabs_available(@user)
+          expect(tabs.pluck(:id)[0...3]).to eq([
+                                                 Course::TAB_HOME,
+                                                 Course::TAB_ASSIGNMENTS,
+                                                 "nav_menu_link_#{link.id}",
+                                               ])
+        end
+
+        it "does not include hidden nav menu link tabs unless for_reordering is used" do
+          @course.tab_configuration = [
+            { "id" => Course::TAB_HOME },
+            { "id" => Course::TAB_ASSIGNMENTS },
+            { "id" => "nav_menu_link_#{link.id}", "hidden" => true }
+          ]
+          @course.save!
+          tabs = @course.tabs_available(@user)
+          expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
+
+          tabs = @course.tabs_available(@user, for_reordering: true)
+          nav_link_tab = tabs.find { |t| t[:id] == "nav_menu_link_#{link.id}" }
+          expect(nav_link_tab[:hidden]).to be true
+        end
+      end
+
       it "handles hidden_unused correctly for discussions" do
         tabs = @course.uncached_tabs_available(@teacher, include_hidden_unused: true)
         dtab = tabs.detect { |t| t[:id] == Course::TAB_DISCUSSIONS }

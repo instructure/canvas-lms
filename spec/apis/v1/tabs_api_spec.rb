@@ -198,6 +198,24 @@ describe TabsController, type: :request do
       expect(json.pluck("id")).to include "home"
     end
 
+    it "includes nav menu links" do
+      course_with_teacher(active_all: true)
+
+      link = NavMenuLink.create!(context: @course, nav_type: "course", label: "Test Link", url: "https://example.com")
+      @course.tab_configuration = [{ "id" => "nav_menu_link_#{link.id}" }]
+      @course.save!
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/tabs",
+                      { controller: "tabs", action: "index", course_id: @course.to_param, format: "json" },
+                      { include: ["external"] })
+
+      tab = json.find { |t| t["id"] == "nav_menu_link_#{link.id}" }
+      expect(tab["type"]).to eq "external"
+      expect(tab["html_url"]).to eq "https://example.com"
+      expect(tab).not_to have_key("url") # Should not have sessionless_launch url
+    end
+
     it "includes external tools" do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.new({
