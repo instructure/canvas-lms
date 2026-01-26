@@ -60,7 +60,7 @@ GEM
     timeout (0.6.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uri (1.0.4)
+    uri (1.1.1)
 
 PLATFORMS
   aarch64-linux

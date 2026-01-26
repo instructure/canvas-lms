@@ -109,7 +109,7 @@ GEM
     trailblazer-option (0.1.2)
     tsort (0.2.0)
     uber (0.1.0)
-    uri (1.0.4)
+    uri (1.1.1)
     webmock (3.25.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)

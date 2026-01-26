@@ -263,7 +263,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.9.1)
-    uri (1.0.4)
+    uri (1.1.1)
     useragent (0.16.11)
     webrick (1.9.1)
     zeitwerk (2.7.3)
