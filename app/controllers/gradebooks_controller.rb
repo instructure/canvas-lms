@@ -102,12 +102,12 @@ class GradebooksController < ApplicationController
                   .where(user_id: @presenter.student_id, assignment_id: @context.assignments.active)
                   .select(:cached_due_date, :grading_period_id, :assignment_id, :user_id)
                   .each_with_object({}) do |submission, hsh|
-          hsh[submission.assignment_id] = {
-            submission.user_id => {
-              due_at: submission.cached_due_date,
-              grading_period_id: submission.grading_period_id,
-            }
-          }
+                    hsh[submission.assignment_id] = {
+                      submission.user_id => {
+                        due_at: submission.cached_due_date,
+                        grading_period_id: submission.grading_period_id,
+                      }
+                    }
         end
     end
 

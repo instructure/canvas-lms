@@ -42,23 +42,23 @@ module DataFixup::AddRoleOverridesForPermissionCombination
           .where(permission: permissions)
           .group_by(&:context)
           .each do |context, overrides|
-        new_overrides, old_overrides = overrides.partition { |ro| ro.permission == new_permission.to_s }
-        next if new_overrides.any? || old_overrides.empty?
+            new_overrides, old_overrides = overrides.partition { |ro| ro.permission == new_permission.to_s }
+            next if new_overrides.any? || old_overrides.empty?
 
-        all_enabled = old_permissions.all? do |permission|
-          override = old_overrides.find { |ro| ro.permission == permission.to_s }
-          if override
-            override.enabled
-          else
-            RoleOverride.permissions[permission][:true_for].include?(role.base_role_type)
-          end
-        end
+            all_enabled = old_permissions.all? do |permission|
+              override = old_overrides.find { |ro| ro.permission == permission.to_s }
+              if override
+                override.enabled
+              else
+                RoleOverride.permissions[permission][:true_for].include?(role.base_role_type)
+              end
+            end
 
-        if all_enabled
-          create_role_override(context:, role:, new_permission:, enabled: true, prototype_role_overrides: old_overrides)
-        elsif old_overrides.any? { |ro| !ro.enabled }
-          create_role_override(context:, role:, new_permission:, enabled: false, prototype_role_overrides: old_overrides)
-        end
+            if all_enabled
+              create_role_override(context:, role:, new_permission:, enabled: true, prototype_role_overrides: old_overrides)
+            elsif old_overrides.any? { |ro| !ro.enabled }
+              create_role_override(context:, role:, new_permission:, enabled: false, prototype_role_overrides: old_overrides)
+            end
       end
     end
   end

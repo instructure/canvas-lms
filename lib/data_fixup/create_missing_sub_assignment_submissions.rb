@@ -25,7 +25,7 @@ module DataFixup
                    .where(assignments: { context_type: "Course" })
                    .preload(:parent_assignment)
                    .find_each do |sub_assignment|
-        process_sub_assignment(sub_assignment)
+                     process_sub_assignment(sub_assignment)
       end
     end
 

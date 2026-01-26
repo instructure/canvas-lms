@@ -36,12 +36,12 @@ module Lti
                 .map(&:context_external_tool)
                 .uniq
                 .select do |tool|
-        next unless tool.eula_enabled?
-        next if tool.asset_processor_eula_required == false
-        next unless tool.developer_key.scopes.include?(TokenScopes::LTI_EULA_USER_SCOPE)
-        next if user.lti_asset_processor_eula_acceptances.active.find_by(context_external_tool_id: tool.id)&.accepted == true
+                  next unless tool.eula_enabled?
+                  next if tool.asset_processor_eula_required == false
+                  next unless tool.developer_key.scopes.include?(TokenScopes::LTI_EULA_USER_SCOPE)
+                  next if user.lti_asset_processor_eula_acceptances.active.find_by(context_external_tool_id: tool.id)&.accepted == true
 
-        true
+                  true
       end.map { |tool| launch_url(tool) }
     end
 

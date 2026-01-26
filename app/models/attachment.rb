@@ -1769,9 +1769,9 @@ class Attachment < ActiveRecord::Base
         .where(attachments: { id: attachments, context_type: "User" })
         .where.not(attachments: { uuid: nil })
         .in_batches do |batch|
-      batch_ids = batch.pluck(:id)
-      batch.update_all(avatar_image_url: nil)
-      Canvas::LiveEvents.delay_if_production.users_bulk_updated(batch_ids)
+          batch_ids = batch.pluck(:id)
+          batch.update_all(avatar_image_url: nil)
+          Canvas::LiveEvents.delay_if_production.users_bulk_updated(batch_ids)
     end
     while SubmissionDraftAttachment.where(attachment_id: attachments).limit(1000).destroy_all.count > 0 do end
 

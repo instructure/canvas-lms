@@ -1528,16 +1528,16 @@ class ContentMigration < ActiveRecord::Base
                          .joins(association_name)
                          .pluck(*src_fields)
                          .each do |src_results|
-            src = src_fields.zip(src_results).to_h
-            src[:id] = src[:content_id]
-            mig_id = src[:migration_id]
-            next unless mig_id_to_dest_id[mig_id]
+                           src = src_fields.zip(src_results).to_h
+                           src[:id] = src[:content_id]
+                           mig_id = src[:migration_id]
+                           next unless mig_id_to_dest_id[mig_id]
 
-            add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id][:id]
-            src_assignment_id = mig_id_to_dest_id[mig_id][:shell_id] && src[:assignment_id]
-            next unless src_assignment_id
+                           add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id][:id]
+                           src_assignment_id = mig_id_to_dest_id[mig_id][:shell_id] && src[:assignment_id]
+                           next unless src_assignment_id
 
-            add_asset_pair_to_mapping(mapping, "assignments", mig_id, { id: src_assignment_id }, { id: mig_id_to_dest_id[mig_id][:shell_id] })
+                           add_asset_pair_to_mapping(mapping, "assignments", mig_id, { id: src_assignment_id }, { id: mig_id_to_dest_id[mig_id][:shell_id] })
           end
         end
       else
@@ -1625,7 +1625,7 @@ class ContentMigration < ActiveRecord::Base
                        .where(migration_id: mig_id_to_dest_id.keys)
                        .pluck(:content_id, :migration_id)
                        .each do |src_id, mig_id|
-          mapping[asset_type][src_id] = mig_id_to_dest_id[mig_id]
+                         mapping[asset_type][src_id] = mig_id_to_dest_id[mig_id]
         end
       else
         source_course.shard.activate do

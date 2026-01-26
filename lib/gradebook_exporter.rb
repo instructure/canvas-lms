@@ -273,9 +273,9 @@ class GradebookExporter
                                      .where(user_id: student_ids.uniq)
                                      .pluck(:assignment_id, :user_id)
                                      .each_with_object(Hash.new { |hash, key| hash[key] = Set.new }) do |ids, reducer|
-          assignment_key = ids.first
-          student_key = ids.second
-          reducer[assignment_key].add(student_key)
+                                       assignment_key = ids.first
+                                       student_key = ids.second
+                                       reducer[assignment_key].add(student_key)
         end
 
         # Custom Columns, custom_column_data are hashes

@@ -178,7 +178,7 @@ module CanvasCache
         # Redis::Distributed manually wraps every command, and not all of those
         # wrappers support kwargs, so we have to add the failsafe here
         ::Redis::Distributed.instance_methods.each do |m|
-          next unless ::Redis::Commands.instance_methods.include?(m)
+          next unless ::Redis::Commands.method_defined?(m)
           next if ::Redis::Distributed.instance_method(m).parameters.any? { |type, _name| type == :keyrest }
 
           def_failsafe_method(Distributed, m)

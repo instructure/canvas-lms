@@ -571,7 +571,7 @@ module Api::V1::Assignment
                                             end
 
     ex_value = settings.delete(:exclude_value)
-    settings[:exclude_small_matches_value] = ex_value.present? ? ex_value.to_i : nil
+    settings[:exclude_small_matches_value] = ex_value.presence&.to_i
 
     settings.slice(*API_ALLOWED_TURNITIN_SETTINGS)
   end
