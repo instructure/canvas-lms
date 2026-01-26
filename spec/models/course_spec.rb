@@ -4582,8 +4582,8 @@ describe Course do
 
         it "generates valid csv without a grading standard" do
           @course.recompute_student_scores_without_send_later
-          expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq [
-            [@ase.map(&:id), <<~CSV, "text/csv"]]
+          expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq(
+            [[@ase.map(&:id), <<~CSV, "text/csv"]])
               publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id,student_sis_id,enrollment_id,enrollment_status,score
               #{@user.id},U1,#{@course.id},,#{@ase[0].course_section_id},,#{@ase[0].user.id},,#{@ase[0].id},active,95.0
               #{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,65.0
@@ -4600,8 +4600,8 @@ describe Course do
 
         it "generates valid csv without a publishing pseudonym" do
           @course.recompute_student_scores_without_send_later
-          expect(@course.generate_grade_publishing_csv_output(@ase, @user, nil)).to eq [
-            [@ase.map(&:id), <<~CSV, "text/csv"]]
+          expect(@course.generate_grade_publishing_csv_output(@ase, @user, nil)).to eq(
+            [[@ase.map(&:id), <<~CSV, "text/csv"]])
               publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id,student_sis_id,enrollment_id,enrollment_status,score
               #{@user.id},,#{@course.id},,#{@ase[0].course_section_id},,#{@ase[0].user.id},,#{@ase[0].id},active,95.0
               #{@user.id},,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,65.0
@@ -4620,8 +4620,8 @@ describe Course do
           @course_section.sis_source_id = "section1"
           @course_section.save!
           @course.recompute_student_scores_without_send_later
-          expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq [
-            [@ase.map(&:id), <<~CSV, "text/csv"]]
+          expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq(
+            [[@ase.map(&:id), <<~CSV, "text/csv"]])
               publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id,student_sis_id,enrollment_id,enrollment_status,score
               #{@user.id},U1,#{@course.id},,#{@ase[0].course_section_id},section1,#{@ase[0].user.id},,#{@ase[0].id},active,95.0
               #{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},section1,#{@ase[1].user.id},,#{@ase[1].id},active,65.0
@@ -4640,8 +4640,8 @@ describe Course do
           @course.grading_standard_id = 0
           @course.save!
           @course.recompute_student_scores_without_send_later
-          expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq [
-            [@ase.map(&:id), <<~CSV, "text/csv"]]
+          expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq(
+            [[@ase.map(&:id), <<~CSV, "text/csv"]])
               publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id,student_sis_id,enrollment_id,enrollment_status,score,grade
               #{@user.id},U1,#{@course.id},,#{@ase[0].course_section_id},,#{@ase[0].user.id},,#{@ase[0].id},active,95.0,A
               #{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,65.0,D
@@ -4666,8 +4666,8 @@ describe Course do
           @ase[3].scores.update_all(final_score: nil)
           @ase[4].scores.update_all(final_score: nil)
 
-          expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq [
-            [@ase.map(&:id) - [@ase[1].id, @ase[3].id, @ase[4].id], <<~CSV, "text/csv"]]
+          expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq(
+            [[@ase.map(&:id) - [@ase[1].id, @ase[3].id, @ase[4].id], <<~CSV, "text/csv"]])
               publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id,student_sis_id,enrollment_id,enrollment_status,score,grade
               #{@user.id},U1,#{@course.id},,#{@ase[0].course_section_id},,#{@ase[0].user.id},,#{@ase[0].id},active,95.0,A
               #{@user.id},U1,#{@course.id},,#{@ase[2].course_section_id},,#{@ase[2].user.id},,#{@ase[2].id},active,0.0,F
