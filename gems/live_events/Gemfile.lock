@@ -85,7 +85,7 @@ GEM
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
-    prism (1.5.1)
+    prism (1.8.0)
     psych (5.2.6)
       date
       stringio
