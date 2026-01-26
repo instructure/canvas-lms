@@ -33,7 +33,7 @@ GEM
     docile (1.4.1)
     drb (2.2.3)
     erb (6.0.1)
-    i18n (1.14.7)
+    i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     io-console (0.8.1)
     irb (1.15.2)

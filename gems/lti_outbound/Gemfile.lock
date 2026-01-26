@@ -32,7 +32,7 @@ GEM
     drb (2.2.3)
     hashie (5.1.0)
       logger
-    i18n (1.14.7)
+    i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     logger (1.7.0)
     minitest (5.26.0)
