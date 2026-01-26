@@ -22,7 +22,7 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    io-console (0.8.1)
+    io-console (0.8.2)
     irb (1.15.2)
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
