@@ -213,11 +213,10 @@ lti_apps_page_instructors:
       state: hidden
 lti_asset_processor:
   state: hidden
-  shadow: true
   applies_to: RootAccount
-  display_name: Enable tools to use Asset Processor-related services and placements
+  display_name: Enable tools to use Document Processor-related services and placements
   description: |-
-    This feature enables LTI tools to create Asset Processors and use services and placements associated
+    This feature enables LTI tools to create Document Processors and use services and placements associated
     with the 1EdTech Asset Processor specifications.
   environments:
     development:
