@@ -1218,7 +1218,7 @@ GEM
       parser
       rspec
       testrail_client
-    thor (1.4.0)
+    thor (1.5.0)
     thread_safe (0.3.6)
     timecop (0.9.10)
     timeout (0.4.3)

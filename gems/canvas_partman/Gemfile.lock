@@ -146,7 +146,7 @@ GEM
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
     stringio (3.2.0)
-    thor (1.4.0)
+    thor (1.5.0)
     timeout (0.4.3)
     tsort (0.2.0)
     tzinfo (2.0.6)
