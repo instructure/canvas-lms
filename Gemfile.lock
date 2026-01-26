@@ -704,7 +704,7 @@ GEM
     iso8601 (0.13.0)
     jira_ref_parser (1.0.1)
     jmespath (1.6.2)
-    json (2.15.0)
+    json (2.18.0)
     json-jwt (1.16.7)
       activesupport (>= 4.2)
       aes_key_wrap
