@@ -74,7 +74,7 @@ const FeedbackQuestionTile: React.FC = () => {
             {selectedQuestion.question}
           </Text>
         </Flex.Item>
-        <Flex.Item>
+        <Flex.Item overflowY="visible">
           <Link
             href={FEEDBACK_FORM_URL}
             isWithinText={false}

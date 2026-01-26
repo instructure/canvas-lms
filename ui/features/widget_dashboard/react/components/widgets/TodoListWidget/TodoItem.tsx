@@ -75,7 +75,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
               </Text>
             </Flex.Item>
 
-            <Flex.Item>
+            <Flex.Item overflowY="visible">
               <Link
                 href={item.html_url}
                 isWithinText={false}
@@ -96,7 +96,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
             )}
 
             {courseId && item.context_name && (
-              <Flex.Item>
+              <Flex.Item overflowY="visible">
                 <Link
                   href={`/courses/${courseId}`}
                   isWithinText={false}
