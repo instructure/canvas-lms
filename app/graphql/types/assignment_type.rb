@@ -19,6 +19,10 @@
 #
 
 module Types
+  # This type represents both Assignment and PeerReviewSubAssignment models
+  # (STI subclasses of AbstractAssignment). Use the `assignment_type` field
+  # to discriminate between them. By default you will only get Assignment
+  # objects unless you specifically query for PeerReviewSubAssignment objects.
   class AssignmentType < ApplicationObjectType
     graphql_name "Assignment"
 
@@ -296,6 +300,34 @@ module Types
 
     global_id_field :id
 
+    field :assignment_type,
+          AssignmentTypeEnum,
+          null: false,
+          description: "Discriminator indicating the actual type of this assignment"
+    def assignment_type
+      object.class.name
+    end
+
+    field :parent_assignment,
+          AssignmentType,
+          null: true,
+          description: "The parent assignment (only for PeerReviewSubAssignment)"
+    def parent_assignment
+      return nil unless object.is_a?(PeerReviewSubAssignment)
+
+      load_association(:parent_assignment)
+    end
+
+    field :parent_assignment_id,
+          ID,
+          null: true,
+          description: "The parent assignment ID (only for PeerReviewSubAssignment)"
+    def parent_assignment_id
+      return nil unless object.is_a?(PeerReviewSubAssignment)
+
+      object.parent_assignment_id
+    end
+
     field :name, String, null: true
 
     field :points_possible,
@@ -388,6 +420,7 @@ module Types
     # the constant directly would create a loading deadlock
     field :peer_review_sub_assignment, "Types::PeerReviewSubAssignmentType", null: true
     def peer_review_sub_assignment
+      return nil unless object.is_a?(Assignment)
       return nil unless assignment.grants_right?(current_user, session, :grade)
       return nil unless assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       return nil unless assignment.peer_reviews
@@ -769,6 +802,7 @@ module Types
     end
     def my_sub_assignment_submissions_connection
       return nil if current_user.nil?
+      return nil unless object.is_a?(Assignment)
 
       load_association(:sub_assignment_submissions).then do |submissions|
         submissions.active.where(user_id: current_user)
@@ -792,8 +826,8 @@ module Types
 
       scope = submissions_connection(filter:, order_by:)
       Promise.all([
-                    Loaders::AssociationLoader.for(Assignment, :submissions).load(assignment),
-                    Loaders::AssociationLoader.for(Assignment, :context).load(assignment)
+                    Loaders::AssociationLoader.for(AbstractAssignment, :submissions).load(assignment),
+                    Loaders::AssociationLoader.for(AbstractAssignment, :context).load(assignment)
                   ]).then do
         students = assignment.representatives(user: current_user)
         scope.where(user_id: students)
@@ -992,6 +1026,7 @@ module Types
       description "Allocation rules if peer review is enabled"
     end
     def allocation_rules
+      return nil unless object.is_a?(Assignment)
       return nil unless assignment.grants_right?(current_user, :grade) &&
                         assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
                         assignment.peer_reviews
