@@ -151,3 +151,5 @@ owned_globs:
 - spec/views/discussion_topics/show.html.erb_spec.rb
 - spec/views/shared/_discussion_entry.html.erb_spec.rb
 - ui/features/conversations/**/*
+github:
+  team: ''
