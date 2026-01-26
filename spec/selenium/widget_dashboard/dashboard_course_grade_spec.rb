@@ -47,12 +47,12 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
       expect(course_grade_text(@course2.id)).to be_displayed
       hide_single_grade_button(@course1.id).click
       expect(show_single_grade_button(@course1.id)).to be_displayed
-      expect(element_exists?(course_grade_text_selector(@course1.id))).to be_falsey
+      expect(course_grade_hidden?(@course1.id)).to be_truthy
       expect(course_grade_text(@course2.id)).to be_displayed
 
       show_single_grade_button(@course1.id).click
       expect(hide_single_grade_button(@course1.id)).to be_displayed
-      expect(course_grade_text(@course1.id)).to be_displayed
+      expect(course_grade_hidden?(@course1.id)).to be_falsey
       expect(course_grade_text(@course2.id)).to be_displayed
     end
 
@@ -64,13 +64,13 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
       expect(course_grade_text(@course2.id)).to be_displayed
       force_click_native(hide_all_grades_checkbox_selector)
       expect(show_all_grades_checkbox).to be_displayed
-      expect(element_exists?(course_grade_text_selector(@course1.id))).to be_falsey
-      expect(element_exists?(course_grade_text_selector(@course2.id))).to be_falsey
+      expect(course_grade_hidden?(@course1.id)).to be_truthy
+      expect(course_grade_hidden?(@course2.id)).to be_truthy
 
       force_click_native(show_all_grades_checkbox_selector)
       expect(hide_all_grades_checkbox).to be_displayed
-      expect(course_grade_text(@course1.id)).to be_displayed
-      expect(course_grade_text(@course2.id)).to be_displayed
+      expect(course_grade_hidden?(@course1.id)).to be_falsey
+      expect(course_grade_hidden?(@course2.id)).to be_falsey
     end
 
     it "navigates to the course gradebook when clicking view gradebook link" do
@@ -111,13 +111,13 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
       expect(updated_last_updated_text).not_to be_empty
     end
 
-    it "does not display last updated timestamp when grade is N/A" do
+    it "does not display grade badge for courses without grades" do
       course_with_student(user: @student, active_all: true, course_name: "No Grades Course")
       ungraded_course = @course
 
       go_to_dashboard
 
-      expect(course_grade_text(ungraded_course.id).text).to eq("N/A")
+      expect(element_exists?(course_grade_text_selector(ungraded_course.id))).to be_falsey
       expect(element_exists?(course_last_updated_selector(ungraded_course.id))).to be_falsey
     end
   end

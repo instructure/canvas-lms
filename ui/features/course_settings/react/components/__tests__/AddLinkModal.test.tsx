@@ -126,15 +126,16 @@ describe('AddLinkModal', () => {
   })
 
   it('does not show text error until field is blurred', async () => {
-    await user.clear(textInput)
+    // Directly change the value to empty without causing blur
+    fireEvent.change(textInput, {target: {value: ''}})
 
     // Error should NOT appear yet
     expect(
       screen.queryByText('Please enter text between 1 and 50 characters long'),
     ).not.toBeInTheDocument()
 
-    // Blur the field
-    await user.tab()
+    // Blur the field by triggering blur event directly
+    fireEvent.blur(textInput)
 
     // Now error should appear
     expect(
