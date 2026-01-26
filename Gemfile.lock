@@ -666,11 +666,11 @@ GEM
     ice_cube (0.17.0)
     ice_nine (0.11.2)
     idn-ruby (0.1.5)
-    ims-lti (2.3.5)
+    ims-lti (2.3.6)
       addressable (~> 2.5, >= 2.5.1)
       builder (~> 3.2)
       faraday (< 3.0)
-      json-jwt (~> 1.16.6)
+      json-jwt (~> 1.17)
       rexml
       simple_oauth (~> 0.3.1)
     inst-jobs (3.3.2)
@@ -707,7 +707,7 @@ GEM
     jira_ref_parser (1.0.1)
     jmespath (1.6.2)
     json (2.18.0)
-    json-jwt (1.16.7)
+    json-jwt (1.17.0)
       activesupport (>= 4.2)
       aes_key_wrap
       base64
