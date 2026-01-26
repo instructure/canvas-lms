@@ -443,7 +443,7 @@ GEM
     bluecloth (2.2.0)
     bootsnap (1.21.1)
       msgpack (~> 1.2)
-    brakeman (7.1.0)
+    brakeman (7.1.2)
       racc
     brotli (0.7.0)
     browser (6.2.0)
