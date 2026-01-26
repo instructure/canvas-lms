@@ -436,7 +436,7 @@ GEM
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
     base64 (0.3.0)
-    bcrypt (3.1.20)
+    bcrypt (3.1.21)
     benchmark (0.4.1)
     bigdecimal (3.3.1)
     bindata (2.5.1)
