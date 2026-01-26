@@ -30,7 +30,7 @@ GEM
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
     base64 (0.3.0)
-    benchmark (0.4.1)
+    benchmark (0.5.0)
     bigdecimal (3.3.1)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.4)
