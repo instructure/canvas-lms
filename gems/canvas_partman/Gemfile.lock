@@ -90,7 +90,7 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.8.0)
-    psych (5.2.6)
+    psych (5.3.1)
       date
       stringio
     racc (1.8.1)
