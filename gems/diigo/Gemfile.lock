@@ -21,7 +21,7 @@ GEM
     nokogiri (1.19.0-x86_64-linux-gnu)
       racc (~> 1.4)
     racc (1.8.1)
-    rake (13.3.0)
+    rake (13.3.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)

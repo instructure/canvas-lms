@@ -39,7 +39,7 @@ GEM
     minitest (6.0.1)
       prism (~> 1.5)
     prism (1.8.0)
-    rake (13.3.0)
+    rake (13.3.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)

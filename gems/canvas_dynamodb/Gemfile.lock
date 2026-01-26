@@ -34,7 +34,7 @@ GEM
     docile (1.4.1)
     jmespath (1.6.2)
     logger (1.7.0)
-    rake (13.3.0)
+    rake (13.3.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)

@@ -12,7 +12,7 @@ GEM
     docile (1.4.1)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    rake (13.3.0)
+    rake (13.3.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)

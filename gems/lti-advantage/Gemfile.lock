@@ -56,7 +56,7 @@ GEM
     net-http (0.9.1)
       uri (>= 0.11.1)
     prism (1.8.0)
-    rake (13.3.0)
+    rake (13.3.1)
     redcarpet (3.6.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
