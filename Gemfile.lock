@@ -622,7 +622,7 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    graphql (2.5.13)
+    graphql (2.5.18)
       base64
       fiber-storage
       logger
