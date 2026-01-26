@@ -140,8 +140,8 @@ GEM
     mime-types-data (3.2025.0924)
     minitest (6.0.1)
       prism (~> 1.5)
-    net-http (0.6.0)
-      uri
+    net-http (0.9.1)
+      uri (>= 0.11.1)
     nokogiri (1.18.10-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.18.10-arm64-darwin)

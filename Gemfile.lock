@@ -786,8 +786,8 @@ GEM
       bigdecimal (>= 3.1, < 5)
     multipart-post (2.4.1)
     mustache (1.1.1)
-    net-http (0.6.0)
-      uri
+    net-http (0.9.1)
+      uri (>= 0.11.1)
     net-imap (0.5.11)
       date
       net-protocol
