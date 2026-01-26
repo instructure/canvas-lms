@@ -920,7 +920,7 @@ GEM
       prawn (>= 1.3.0, < 3.0.0)
     prettyprint (0.2.0)
     prism (1.8.0)
-    process_executer (4.0.0)
+    process_executer (4.0.2)
       track_open_instances (~> 0.1)
     promise.rb (0.7.4)
     prosopite (2.1.2)
