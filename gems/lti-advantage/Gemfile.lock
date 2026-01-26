@@ -8,9 +8,9 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (8.0.3)
-      activesupport (= 8.0.3)
-    activesupport (8.0.3)
+    activemodel (8.0.4)
+      activesupport (= 8.0.4)
+    activesupport (8.0.4)
       base64
       benchmark (>= 0.3)
       bigdecimal
