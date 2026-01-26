@@ -32,8 +32,8 @@ GEM
       activerecord (>= 5.2)
       activesupport (>= 5.2)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1175.0)
-    aws-sdk-core (3.234.0)
+    aws-partitions (1.1209.0)
+    aws-sdk-core (3.241.4)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -41,8 +41,8 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kinesis (1.88.0)
-      aws-sdk-core (~> 3, >= 3.234.0)
+    aws-sdk-kinesis (1.96.0)
+      aws-sdk-core (~> 3, >= 3.241.4)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
