@@ -497,8 +497,8 @@ GEM
       msgpack
     datadog-ruby_core_source (3.4.1)
     date (3.5.1)
-    db-query-matchers (0.14.0)
-      activesupport (>= 4.0, < 8.1)
+    db-query-matchers (0.15.0)
+      activesupport (>= 4.0)
       rspec (>= 3.0)
     debug (1.11.0)
       irb (~> 1.10)
