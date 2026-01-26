@@ -92,12 +92,12 @@ module Canvas::Vault
     private
 
     def addr
-      return ENV["VAULT_ADDR"] if ENV["VAULT_ADDR"].present?
-
       if config[:addr_path]
         File.read(config[:addr_path]).chomp
       elsif config[:addr]
         config[:addr]
+      elsif ENV["VAULT_ADDR"].present?
+        ENV["VAULT_ADDR"]
       end
     end
 

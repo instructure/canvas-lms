@@ -62,29 +62,30 @@ module Canvas
         ENV.delete("VAULT_ADDR")
       end
 
-      it "uses VAULT_ADDR environment variable over config file addr" do
+      it "uses config file addr over VAULT_ADDR environment variable" do
         ENV["VAULT_ADDR"] = "http://vault-from-env:8200"
         allow(described_class).to receive(:config).and_return(static_config)
 
-        # static_config has addr set, but env var takes precedence
-        expect(described_class.api_client.address).to eq("http://vault-from-env:8200")
+        # config addr takes precedence over env var
+        expect(described_class.api_client.address).to eq(addr)
         expect(static_config[:addr]).to eq(addr) # confirm config had a value
       end
 
-      it "uses VAULT_ADDR over addr_path file" do
+      it "uses addr_path file over VAULT_ADDR" do
         ENV["VAULT_ADDR"] = "http://vault-from-env:8200"
         allow(described_class).to receive(:config).and_return(path_config)
         allow(File).to receive(:read).with(token_path).and_return(token)
-        # File.read for addr_path should not be called
+        allow(File).to receive(:read).with(addr_path).and_return("http://vault-from-file:8200")
 
-        expect(described_class.api_client.address).to eq("http://vault-from-env:8200")
+        expect(described_class.api_client.address).to eq("http://vault-from-file:8200")
       end
 
-      it "falls back to config addr when VAULT_ADDR is not set" do
-        ENV.delete("VAULT_ADDR")
-        allow(described_class).to receive(:config).and_return(static_config)
+      it "falls back to VAULT_ADDR when config addr is not set" do
+        ENV["VAULT_ADDR"] = "http://vault-from-env:8200"
+        config_without_addr = { token:, kv_mount: "app-canvas" }
+        allow(described_class).to receive(:config).and_return(config_without_addr)
 
-        expect(described_class.api_client.address).to eq(addr)
+        expect(described_class.api_client.address).to eq("http://vault-from-env:8200")
       end
 
       it "falls back to addr_path file when VAULT_ADDR is not set" do
