@@ -28,8 +28,10 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :accessibility_resource_scans
     set_replica_identity :account_users
     set_replica_identity :accounts
+    set_replica_identity :ai_experiences
     set_replica_identity :allocation_rules
     set_replica_identity :asset_user_accesses
+    set_replica_identity :auditor_account_user_records
     set_replica_identity :auto_grade_results
     set_replica_identity :blackout_dates
     set_replica_identity :block_editors
@@ -71,6 +73,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :lti_asset_processors
     set_replica_identity :lti_asset_reports
     set_replica_identity :lti_context_controls
+    set_replica_identity :lti_import_histories
     set_replica_identity :lti_ims_registrations
     set_replica_identity :lti_line_items
     set_replica_identity :lti_notice_handlers
@@ -95,6 +98,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :rubric_assessment_imports
     set_replica_identity :rubric_criteria
     set_replica_identity :rubric_imports
+    set_replica_identity :scheduled_posts
     set_replica_identity :standard_grade_statuses
     set_replica_identity :submission_texts
     set_replica_identity :temporary_enrollment_pairings
