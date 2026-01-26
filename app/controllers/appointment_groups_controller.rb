@@ -372,7 +372,7 @@ class AppointmentGroupsController < ApplicationController
   #        -F 'appointment_group[new_appointments][1][]=2012-07-19T23:00:00Z' \
   #        -H "Authorization: Bearer <token>"
   def create
-    # @request_shard = Shard.current
+    @request_shard = Shard.current
     contexts = get_contexts
     # Don't let people create new appointment groups for concluded courses.  Ideally
     # we would have a check on update as well but there may be existing ones and
