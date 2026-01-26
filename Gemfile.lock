@@ -945,7 +945,7 @@ GEM
     rack3-brotli (1.0.1)
       brotli (~> 0.3)
       rack (~> 3.0)
-    rackup (2.2.1)
+    rackup (2.3.1)
       rack (>= 3)
     rails (8.0.3)
       actioncable (= 8.0.3)
