@@ -1055,7 +1055,7 @@ GEM
       rspec (>= 2.0)
     rspec_junit_formatter (0.6.0)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rss (0.3.1)
+    rss (0.3.2)
       rexml
     rubocop (1.81.1)
       json (~> 2.3)
