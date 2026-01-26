@@ -577,7 +577,7 @@ GEM
     gergich (2.2.1)
       httparty (~> 0.17)
       sqlite3 (>= 1.4, < 3.0)
-    git (4.0.5)
+    git (4.3.0)
       activesupport (>= 5.0)
       addressable (~> 2.8)
       process_executer (~> 4.0)
