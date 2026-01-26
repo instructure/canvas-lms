@@ -993,6 +993,8 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
+    readline (0.0.4)
+      reline
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
@@ -1222,9 +1224,10 @@ GEM
     thread_safe (0.3.6)
     timecop (0.9.10)
     timeout (0.6.0)
-    tins (1.44.1)
+    tins (1.51.1)
       bigdecimal
       mize (~> 0.6)
+      readline
       sync
     track_open_instances (0.1.15)
     trailblazer-option (0.1.2)
