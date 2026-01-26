@@ -40,7 +40,7 @@ GEM
     prism (1.8.0)
     rake (13.3.1)
     securerandom (0.4.1)
-    timeout (0.4.3)
+    timeout (0.6.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (1.0.4)
