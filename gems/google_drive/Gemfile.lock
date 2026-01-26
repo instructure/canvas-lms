@@ -104,7 +104,7 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 4.0)
       multi_json (~> 1.10)
-    stringio (3.1.7)
+    stringio (3.2.0)
     timecop (0.9.10)
     trailblazer-option (0.1.2)
     tsort (0.2.0)

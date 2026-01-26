@@ -42,7 +42,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.6)
-    stringio (3.1.7)
+    stringio (3.2.0)
     tsort (0.2.0)
 
 PLATFORMS
