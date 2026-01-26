@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {BarChart} from './BarChart'
-export type {BarChartProps} from './BarChart'
-export {MasteryDistributionChart} from './MasteryDistributionChart'
-export type {MasteryDistributionChartProps} from './MasteryDistributionChart'
+export {OutcomeDistributionPopover} from './OutcomeDistributionPopover'
+export type {OutcomeDistributionPopoverProps} from './OutcomeDistributionPopover'

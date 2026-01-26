@@ -24,7 +24,7 @@ import {
 } from '@canvas/outcomes/react/utils/constants'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import React, {Fragment, useCallback} from 'react'
+import React, {Fragment} from 'react'
 import {MasteryDistributionChart} from '../charts'
 import {
   ContributingScoreAlignment,
@@ -32,6 +32,7 @@ import {
 } from '../../hooks/useContributingScores'
 import {Outcome, Student, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 import {colors} from '@instructure/canvas-theme'
+import {getScoresForOutcome, getScoresForAlignment} from '../../utils/scoreUtils'
 
 export interface BarChartRowProps {
   barChartRowRef: React.MutableRefObject<HTMLElement | null>
@@ -48,39 +49,6 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
   contributingScores,
   barChartRowRef,
 }) => {
-  // TODO: fetch aggregate scores for outcome and alignments for all pages
-  // https://instructure.atlassian.net/browse/OUTC-534
-  const getScoresForOutcome = useCallback(
-    (outcomeId: string | number) => {
-      return rollups.map(rollup => {
-        const outcomeRollup = rollup.outcomeRollups.find(
-          or => or.outcomeId.toString() === outcomeId.toString(),
-        )
-        return outcomeRollup?.score
-      })
-    },
-    [rollups],
-  )
-
-  const getScoresForAlignment = useCallback(
-    (outcomeId: string | number, alignmentId: string) => {
-      const contributingScoreForOutcome = contributingScores.forOutcome(outcomeId)
-      if (!contributingScoreForOutcome.data) return []
-
-      return students.map(student => {
-        const scoresForUser = contributingScoreForOutcome.scoresForUser(student.id)
-        const alignment = contributingScoreForOutcome.alignments?.find(
-          a => a.alignment_id === alignmentId,
-        )
-        if (!alignment) return undefined
-
-        const alignmentIndex = contributingScoreForOutcome.alignments?.indexOf(alignment) ?? -1
-        return scoresForUser[alignmentIndex]?.score
-      })
-    },
-    [contributingScores, students],
-  )
-
   return (
     <Flex>
       <Flex.Item
@@ -113,7 +81,7 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               >
                 <MasteryDistributionChart
                   outcome={outcome}
-                  scores={getScoresForOutcome(outcome.id)}
+                  scores={getScoresForOutcome(rollups, outcome.id)}
                   height={BAR_CHART_HEIGHT}
                   width={COLUMN_WIDTH + COLUMN_PADDING}
                   isPreview={true}
@@ -131,7 +99,12 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
                     >
                       <MasteryDistributionChart
                         outcome={outcome}
-                        scores={getScoresForAlignment(outcome.id, alignment.alignment_id)}
+                        scores={getScoresForAlignment(
+                          contributingScores,
+                          students,
+                          outcome.id,
+                          alignment.alignment_id,
+                        )}
                         height={BAR_CHART_HEIGHT}
                         width={COLUMN_WIDTH + COLUMN_PADDING}
                         isPreview={true}

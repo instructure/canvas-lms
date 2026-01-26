@@ -64,6 +64,7 @@ describe('OutcomeHeader', () => {
         setSortAlignmentId: vi.fn(),
       },
       contributingScoresForOutcome: mockContributingScoresForOutcome,
+      scores: [3, 4, 5, 2, 4],
     }
   }
 
@@ -89,5 +90,12 @@ describe('OutcomeHeader', () => {
     fireEvent.click(getByText('Sort Outcome Column'))
     fireEvent.click(getByText('Outcome Info'))
     expect(getByTestId('outcome-description-modal')).toBeInTheDocument()
+  })
+
+  it('renders the outcome distribution popover when option is selected', () => {
+    const {getByText, getByTestId} = render(<OutcomeHeader {...defaultProps()} />)
+    fireEvent.click(getByText('Sort Outcome Column'))
+    fireEvent.click(getByText('Show Outcome Distribution'))
+    expect(getByTestId('outcome-distribution-popover')).toBeInTheDocument()
   })
 })

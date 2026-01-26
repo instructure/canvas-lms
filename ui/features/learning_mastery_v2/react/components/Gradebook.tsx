@@ -48,6 +48,7 @@ import DragDropWrapper from './grid/DragDropWrapper'
 import {ContributingScoreAlignment, ContributingScoresManager} from '../hooks/useContributingScores'
 import {ContributingScoreHeader} from './grid/ContributingScoreHeader'
 import {BarChartRow} from './grid/BarChartRow'
+import {getScoresForOutcome} from '../utils/scoreUtils'
 
 export interface GradebookProps {
   courseId: string
@@ -171,6 +172,8 @@ const GradebookComponent: React.FC<GradebookProps> = ({
             >
               {outcomes.map((outcome, index) => {
                 const contributingScoreForOutcome = contributingScores.forOutcome(outcome.id)
+                const scores = getScoresForOutcome(rollups, outcome.id)
+
                 return (
                   <Fragment key={outcome.id}>
                     <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}>
@@ -182,6 +185,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
                         outcome={outcome}
                         sorting={sorting}
                         contributingScoresForOutcome={contributingScoreForOutcome}
+                        scores={scores}
                         onMove={handleOutcomeMove}
                         onDragEnd={handleOutcomeDragEnd}
                       />
