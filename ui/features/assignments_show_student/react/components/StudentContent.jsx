@@ -271,6 +271,8 @@ function renderContentBaseOnAvailability(
             </View>
           )}
         </Flex>
+        <LtiToolIframe assignment={assignment} submission={submission} />
+        <div id="assignment_external_tools" />
         {assignment.expectsSubmission ? (
           <ContentTabs
             assignment={assignment}
@@ -285,8 +287,6 @@ function renderContentBaseOnAvailability(
             submission={submission}
           />
         )}
-        <LtiToolIframe assignment={assignment} submission={submission} />
-        <div id="assignment_external_tools" />
         {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && (
           <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />
         )}
