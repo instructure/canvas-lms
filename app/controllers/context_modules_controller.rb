@@ -685,7 +685,7 @@ class ContextModulesController < ApplicationController
         ActiveRecord::Associations.preload(tags, content: [:context, :external_tool_tag])
       end
 
-      preload_assignments_and_quizzes(all_tags, user_is_admin)
+      preload_assignments_quizzes_and_peer_reviews(all_tags, user_is_admin)
 
       assignment_ids = []
       quiz_ids = []
@@ -712,12 +712,52 @@ class ContextModulesController < ApplicationController
       end
       submitted_assignment_ids ||= []
       submitted_quiz_ids ||= []
+
+      # Preload peer review submissions and excused status
+      submitted_peer_review_ids = []
+      excused_peer_review_ids = []
+      if @context.feature_enabled?(:peer_review_allocation_and_grading) && @current_user
+        peer_review_sub_ids = []
+        all_tags.each do |tag|
+          if tag.can_have_assignment? && tag.assignment&.peer_reviews? && tag.assignment.peer_review_sub_assignment
+            peer_review_sub_ids << tag.assignment.peer_review_sub_assignment.id
+          end
+        end
+
+        if peer_review_sub_ids.any?
+          peer_review_key = Digest::SHA256.hexdigest(peer_review_sub_ids.sort.join(","))
+          submitted_peer_review_ids = Rails.cache.fetch_with_batched_keys(
+            "submitted_peer_review_ids/#{peer_review_key}",
+            batch_object: @current_user,
+            batched_keys: :submissions
+          ) do
+            @current_user.submissions.shard(@context.shard)
+                         .having_submission.where(assignment_id: peer_review_sub_ids).pluck(:assignment_id)
+          end
+
+          excused_peer_review_ids = Rails.cache.fetch_with_batched_keys(
+            "excused_peer_review_ids/#{peer_review_key}",
+            batch_object: @current_user,
+            batched_keys: :submissions
+          ) do
+            @current_user.submissions.shard(@context.shard)
+                         .where(assignment_id: peer_review_sub_ids, excused: true).pluck(:assignment_id)
+          end
+        end
+      end
+
       all_tags.each do |tag|
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
+                         peer_review_sub = tag.assignment.peer_review_sub_assignment
+                         peer_review_has_submission = peer_review_sub && submitted_peer_review_ids.include?(peer_review_sub.id)
+                         peer_review_is_excused = peer_review_sub && excused_peer_review_ids.include?(peer_review_sub.id)
+
                          tag.assignment.context_module_tag_info(@current_user,
                                                                 @context,
                                                                 user_is_admin:,
-                                                                has_submission: submitted_assignment_ids.include?(tag.assignment.id))
+                                                                has_submission: submitted_assignment_ids.include?(tag.assignment.id),
+                                                                peer_review_has_submission:,
+                                                                peer_review_is_excused:)
                        elsif tag.content_type_quiz?
                          tag.content.context_module_tag_info(@current_user,
                                                              @context,
@@ -1196,7 +1236,7 @@ class ContextModulesController < ApplicationController
 
   private
 
-  def preload_assignments_and_quizzes(tags, user_is_admin)
+  def preload_assignments_quizzes_and_peer_reviews(tags, user_is_admin)
     assignment_tags = tags.select(&:can_have_assignment?)
     return unless assignment_tags.any?
 
@@ -1206,6 +1246,19 @@ class ContextModulesController < ApplicationController
     DatesOverridable.preload_override_data_for_objects(content_with_assignments.map(&:assignment))
     override_preload_types = %w[Assignment Quizzes::Quiz WikiPage DiscussionTopic].freeze
     DatesOverridable.preload_override_data_for_objects(tags.select { |ct| override_preload_types.include?(ct.content_type) }.map(&:content))
+
+    peer_review_subs = []
+    if @context.feature_enabled?(:peer_review_allocation_and_grading)
+      assignment_tags_with_peer_reviews = assignment_tags.select { |tag| tag.assignment&.peer_reviews? }
+
+      if assignment_tags_with_peer_reviews.any?
+        assignments_with_peer_reviews = assignment_tags_with_peer_reviews.map(&:assignment)
+        ActiveRecord::Associations.preload(assignments_with_peer_reviews, :peer_review_sub_assignment)
+
+        peer_review_subs = assignments_with_peer_reviews.filter_map(&:peer_review_sub_assignment)
+        DatesOverridable.preload_override_data_for_objects(peer_review_subs) if peer_review_subs.any?
+      end
+    end
 
     if user_is_admin && should_preload_override_data?
       assignments = assignment_tags.filter_map(&:assignment)
@@ -1220,7 +1273,9 @@ class ContextModulesController < ApplicationController
         preload_has_too_many_overrides(sub_assignments, :assignment_id)
       end
 
-      overrideables = (assignments + plain_quizzes + sub_assignments).reject(&:has_too_many_overrides)
+      preload_has_too_many_overrides(peer_review_subs, :assignment_id) if peer_review_subs.any?
+
+      overrideables = (assignments + plain_quizzes + sub_assignments + peer_review_subs).reject(&:has_too_many_overrides)
 
       if overrideables.any?
         ActiveRecord::Associations.preload(overrideables, :assignment_overrides)
