@@ -28,8 +28,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     mini_mime (1.1.5)
-    multi_xml (0.7.2)
-      bigdecimal (~> 3.1)
+    multi_xml (0.8.1)
+      bigdecimal (>= 3.1, < 5)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
