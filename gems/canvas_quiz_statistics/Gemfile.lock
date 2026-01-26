@@ -50,7 +50,7 @@ GEM
     diff-lcs (1.6.2)
     docile (1.4.1)
     drb (2.2.3)
-    erb (5.1.1)
+    erb (6.0.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
