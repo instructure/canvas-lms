@@ -177,9 +177,18 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
           >
             {conversations.map(conv => {
               const identifier = conv.id || `user_${conv.user_id}`
+              const hasConversation = Boolean(conv.id)
+              const displayName = hasConversation
+                ? `✓ ${conv.student.name}`
+                : `${conv.student.name} (No conversation)`
               return (
-                <SimpleSelect.Option key={identifier} id={identifier} value={identifier}>
-                  {conv.student.name}
+                <SimpleSelect.Option
+                  key={identifier}
+                  id={identifier}
+                  value={identifier}
+                  isDisabled={!hasConversation}
+                >
+                  {displayName}
                 </SimpleSelect.Option>
               )
             })}
@@ -202,7 +211,10 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
                   <Flex.Item>
                     <Text>
                       {I18n.t('%{count} Messages by AI', {count: aiMessageCount})} •{' '}
-                      {I18n.t('%{count} Messages by student', {count: studentMessageCount})}
+                      {I18n.t('%{count} Messages by %{name}', {
+                        count: studentMessageCount,
+                        name: selectedStudentData?.student.name || 'student',
+                      })}
                     </Text>
                   </Flex.Item>
                   <Flex.Item>
@@ -279,7 +291,10 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
                   <Flex.Item>
                     <Text>
                       {I18n.t('%{count} Messages by AI', {count: aiMessageCount})} •{' '}
-                      {I18n.t('%{count} Messages by student', {count: studentMessageCount})}
+                      {I18n.t('%{count} Messages by %{name}', {
+                        count: studentMessageCount,
+                        name: selectedStudentData?.student.name || 'student',
+                      })}
                     </Text>
                   </Flex.Item>
                   <Flex.Item>
