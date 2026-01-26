@@ -468,7 +468,7 @@ GEM
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.5.11249)
-    code_teams (1.1.0)
+    code_teams (1.2.0)
       sorbet-runtime
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
