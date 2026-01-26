@@ -80,7 +80,7 @@ GEM
     sexp_processor (4.17.5)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uri (1.0.4)
+    uri (1.1.1)
     ya2yaml (0.31)
 
 PLATFORMS
