@@ -854,9 +854,10 @@ GEM
       thor (>= 0.20, < 2.0)
     pact-messages (0.2.0)
       pact (~> 1.9)
-    pact-mock_service (3.12.3)
+    pact-mock_service (3.12.4)
       find_a_port (~> 1.0.1)
       json
+      logger (< 2.0)
       pact-support (~> 1.16, >= 1.16.4)
       rack (>= 3.0, < 4.0)
       rackup (~> 2.0)
