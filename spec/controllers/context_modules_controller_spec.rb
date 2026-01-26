@@ -2000,6 +2000,243 @@ describe ContextModulesController do
       json = json_parse(response.body)
       expect(json[@tag.id.to_s]["mc_objectives"]).to eq(ext_data[:objectives])
     end
+
+    context "with peer reviews" do
+      before :once do
+        course_with_student(active_all: true)
+        @course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+        @mod = @course.context_modules.create!
+        @assign = @course.assignments.create!(
+          title: "Peer Review Assignment",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 3,
+          due_at: 1.day.from_now
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: @assign,
+          points_possible: 5,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        @tag = @mod.add_item(type: "assignment", id: @assign.id)
+      end
+
+      it "includes peer review data when feature flag is enabled" do
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).to have_key("peer_review")
+        peer_review = tag_info["peer_review"]
+        expect(peer_review).to have_key("id")
+        expect(peer_review).to have_key("points_possible")
+        expect(peer_review).to have_key("due_date")
+      end
+
+      it "does not include peer review data when feature flag is disabled" do
+        @course.root_account.disable_feature!(:peer_review_allocation_and_grading)
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).not_to have_key("peer_review")
+      end
+
+      it "does not include peer review data for admin when feature flag is disabled" do
+        @course.root_account.disable_feature!(:peer_review_allocation_and_grading)
+        teacher_in_course(active_all: true, course: @course)
+        user_session(@teacher)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).not_to have_key("peer_review")
+      end
+
+      it "includes peer review due date in ISO8601 format" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        target_date = Time.zone.parse("2025-12-17 06:59:59")
+        peer_review_sub.update!(
+          unlock_at: target_date - 1.day,
+          due_at: target_date,
+          lock_at: target_date + 1.day
+        )
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["due_date"]).to eq("2025-12-17T06:59:59Z")
+      end
+
+      it "includes peer review points_possible" do
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["points_possible"]).to eq(5)
+      end
+
+      it "marks peer review as past_due when not submitted" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        past_due_date = 1.day.ago
+        peer_review_sub.update!(
+          unlock_at: past_due_date - 2.days,
+          due_at: past_due_date,
+          lock_at: 1.day.from_now
+        )
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["past_due"]).to be true
+      end
+
+      it "does not mark peer review as past_due when submitted" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        past_due_date = 1.day.ago
+        peer_review_sub.update!(
+          unlock_at: past_due_date - 2.days,
+          due_at: past_due_date,
+          lock_at: 1.day.from_now
+        )
+        peer_review_sub.submit_homework(@student, submission_type: "online_text_entry", body: "review")
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["past_due"]).to be_falsey
+      end
+
+      it "does not mark peer review as past_due when excused" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        past_due_date = 1.day.ago
+        peer_review_sub.update!(
+          unlock_at: past_due_date - 2.days,
+          due_at: past_due_date,
+          lock_at: 1.day.from_now
+        )
+        submission = peer_review_sub.submissions.find_or_create_by!(user: @student)
+        submission.update!(excused: true)
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["past_due"]).to be_falsey
+      end
+
+      it "includes vdd_tooltip for peer reviews with multiple overrides" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        section1 = @course.course_sections.create!(name: "Section A")
+        section2 = @course.course_sections.create!(name: "Section B")
+
+        override_date1 = 2.days.from_now
+        override_date2 = 3.days.from_now
+
+        parent_override1 = @assign.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id
+        )
+        parent_override2 = @assign.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id
+        )
+
+        peer_review_sub.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          parent_override_id: parent_override1.id,
+          unlock_at: override_date1 - 1.day,
+          due_at: override_date1,
+          lock_at: override_date1 + 2.days
+        )
+        peer_review_sub.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          parent_override_id: parent_override2.id,
+          unlock_at: override_date2 - 1.day,
+          due_at: override_date2,
+          lock_at: override_date2 + 2.days
+        )
+
+        teacher_in_course(active_all: true, course: @course)
+        user_session(@teacher)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review).to be_present
+        expect(peer_review["id"]).to eq(peer_review_sub.id)
+        expect(peer_review["points_possible"]).to eq(5.0)
+        expect(peer_review).to have_key("vdd_tooltip")
+        expect(peer_review["vdd_tooltip"]).to have_key("due_dates")
+        expect(peer_review["vdd_tooltip"]["due_dates"].length).to be >= 2
+      end
+
+      it "does not include peer review data when no peer_review_sub_assignment exists" do
+        @assign.reload
+        @assign.peer_review_sub_assignment.destroy!
+        @assign.reload
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).not_to have_key("peer_review")
+      end
+
+      it "does not include peer review data for assignments without peer_reviews enabled" do
+        @assign.update!(peer_reviews: false)
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).not_to have_key("peer_review")
+      end
+    end
   end
 
   describe "GET show" do

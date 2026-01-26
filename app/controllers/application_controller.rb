@@ -3274,7 +3274,7 @@ class ApplicationController < ActionController::Base
     # 2. courses_controller (context of this will be Account)
     # discussion_checkpoints_enabled? works for either context
     account_has_discussion_checkpoints_enabled = @context.discussion_checkpoints_enabled?
-
+    course_has_peer_reviews_enabled = @context.is_a?(Course) && @context.feature_enabled?(:peer_review_allocation_and_grading)
     prefetch_xhr(api_v1_course_assignment_groups_url(
                    @context,
                    include: [
@@ -3283,7 +3283,8 @@ class ApplicationController < ActionController::Base
                      account_has_discussion_checkpoints_enabled && "checkpoints",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
-                     peer_reviews_for_a2_enabled? && "assessment_requests"
+                     peer_reviews_for_a2_enabled? && "assessment_requests",
+                     course_has_peer_reviews_enabled && "peer_review"
                    ].compact_blank,
                    exclude_response_fields: ["description", "rubric"],
                    exclude_assignment_submission_types: ["wiki_page"],

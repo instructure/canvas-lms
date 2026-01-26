@@ -1050,4 +1050,474 @@ describe "preload_override_data_for_objects" do
       expect(@page1.preloaded_all_overrides).to eq [ao4, ao5]
     end
   end
+
+  describe "#override_aware_due_date_hash with peer reviews" do
+    let(:course) { course_factory(active_all: true) }
+    let(:teacher) { teacher_in_course(course:, active_all: true).user }
+    let(:student) { student_in_course(course:, active_all: true).user }
+
+    context "with regular assignments without peer reviews" do
+      it "does not include unlock_at and lock_at in the hash" do
+        assignment = course.assignments.create!(
+          title: "Regular Assignment",
+          peer_reviews: false,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        hash = assignment.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash).to have_key(:due_date)
+        expect(hash).not_to have_key(:unlock_at)
+        expect(hash).not_to have_key(:lock_at)
+      end
+    end
+
+    context "with assignments that have peer reviews enabled" do
+      it "includes unlock_at and lock_at in the hash" do
+        assignment = course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        hash = assignment.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash).to have_key(:due_date)
+        expect(hash).to have_key(:unlock_at)
+        expect(hash).to have_key(:lock_at)
+      end
+
+      it "includes unlock_at and lock_at even when values are nil" do
+        assignment = course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          due_at: 2.days.from_now
+        )
+
+        hash = assignment.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash).to have_key(:unlock_at)
+        expect(hash).to have_key(:lock_at)
+        expect(hash[:unlock_at]).to be_nil
+        expect(hash[:lock_at]).to be_nil
+      end
+    end
+
+    context "with peer review sub-assignments" do
+      it "includes unlock_at and lock_at in the hash" do
+        course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 3.days.from_now,
+          unlock_at: 2.days.from_now,
+          lock_at: 4.days.from_now
+        )
+
+        peer_review_sub = assignment.reload.peer_review_sub_assignment
+        hash = peer_review_sub.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash).to have_key(:due_date)
+        expect(hash).to have_key(:unlock_at)
+        expect(hash).to have_key(:lock_at)
+      end
+    end
+
+    context "with section overrides" do
+      it "includes unlock_at and lock_at for assignments with peer reviews" do
+        section = course.course_sections.create!(name: "Section A")
+        student_in_section(section, user: student)
+
+        assignment = course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          due_at: 2.days.from_now
+        )
+
+        override = assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section.id,
+          due_at: 3.days.from_now,
+          unlock_at: 2.days.from_now,
+          lock_at: 4.days.from_now
+        )
+
+        hash = assignment.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash[:unlock_at]).to eq(override.unlock_at)
+        expect(hash[:lock_at]).to eq(override.lock_at)
+      end
+    end
+  end
+
+  describe "#context_module_tag_info with peer reviews" do
+    let(:course) { course_factory(active_all: true) }
+    let(:teacher) { teacher_in_course(course:, active_all: true).user }
+    let(:student) { student_in_course(course:, active_all: true).user }
+
+    before do
+      course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    context "with assignments that have peer reviews" do
+      it "includes peer_review hash in tag_info" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true,
+          due_at: 1.day.from_now
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info).to have_key(:peer_review)
+        expect(tag_info[:peer_review]).to have_key(:id)
+        expect(tag_info[:peer_review]).to have_key(:points_possible)
+        expect(tag_info[:peer_review]).to have_key(:peer_review_count)
+        expect(tag_info[:peer_review]).to have_key(:due_date)
+      end
+
+      it "includes unlock_at and lock_at in peer_review hash" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true,
+          due_at: 1.day.from_now
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info[:peer_review]).to have_key(:unlock_at)
+        expect(tag_info[:peer_review]).to have_key(:lock_at)
+      end
+
+      it "converts due_date to ISO8601 format" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        due_date = Time.zone.parse("2025-12-17 06:59:59")
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: due_date
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info[:peer_review][:due_date]).to eq("2025-12-17T06:59:59Z")
+      end
+
+      it "converts unlock_at and lock_at to ISO8601 format" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        due_date = Time.zone.parse("2025-12-17 06:59:59")
+        unlock_date = Time.zone.parse("2025-12-16 06:59:59")
+        lock_date = Time.zone.parse("2025-12-18 06:59:59")
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: due_date,
+          unlock_at: unlock_date,
+          lock_at: lock_date
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info[:peer_review][:unlock_at]).to eq("2025-12-16T06:59:59Z")
+        expect(tag_info[:peer_review][:lock_at]).to eq("2025-12-18T06:59:59Z")
+      end
+
+      it "marks peer review as past_due when not submitted and due date passed" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        past_due_date = 1.day.ago
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: past_due_date,
+          unlock_at: past_due_date - 1.day,
+          lock_at: 1.day.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false,
+          peer_review_has_submission: false
+        )
+
+        expect(tag_info[:peer_review][:past_due]).to be true
+      end
+
+      it "does not mark as past_due when peer_review_has_submission is true" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        past_due_date = 1.day.ago
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: past_due_date,
+          unlock_at: past_due_date - 1.day,
+          lock_at: 1.day.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false,
+          peer_review_has_submission: true
+        )
+
+        expect(tag_info[:peer_review][:past_due]).to be_falsey
+      end
+
+      it "does not mark as past_due when peer_review_is_excused is true" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        past_due_date = 1.day.ago
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: past_due_date,
+          unlock_at: past_due_date - 1.day,
+          lock_at: 1.day.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false,
+          peer_review_has_submission: false,
+          peer_review_is_excused: true
+        )
+
+        expect(tag_info[:peer_review][:past_due]).to be_falsey
+      end
+
+      it "does not include peer_review when feature flag is disabled" do
+        course.root_account.disable_feature!(:peer_review_allocation_and_grading)
+
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info).not_to have_key(:peer_review)
+      end
+
+      it "does not include peer_review for admin when feature flag is disabled" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 2.days.from_now
+        )
+
+        assignment.reload
+
+        course.disable_feature!(:peer_review_allocation_and_grading)
+
+        tag_info = assignment.context_module_tag_info(
+          teacher,
+          course,
+          user_is_admin: true,
+          has_submission: false
+        )
+
+        expect(tag_info).not_to have_key(:peer_review)
+      end
+
+      it "does not include peer_review when assignment has no peer reviews" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: false
+        )
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info).not_to have_key(:peer_review)
+      end
+
+      it "does not include peer_review when no peer_review_sub_assignment exists" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info).not_to have_key(:peer_review)
+      end
+
+      it "includes vdd_tooltip for peer reviews with multiple overrides" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 2.days.from_now
+        )
+
+        peer_review_sub = assignment.reload.peer_review_sub_assignment
+        section1 = course.course_sections.create!(name: "Section A")
+        section2 = course.course_sections.create!(name: "Section B")
+
+        parent_override1 = assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id
+        )
+
+        parent_override2 = assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id
+        )
+
+        peer_review_sub.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          parent_override_id: parent_override1.id,
+          due_at: 2.days.from_now
+        )
+
+        peer_review_sub.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          parent_override_id: parent_override2.id,
+          due_at: 3.days.from_now
+        )
+
+        tag_info = assignment.context_module_tag_info(
+          teacher,
+          course,
+          user_is_admin: true,
+          has_submission: false
+        )
+
+        expect(tag_info[:peer_review]).to have_key(:vdd_tooltip)
+        expect(tag_info[:peer_review][:vdd_tooltip]).to have_key(:due_dates)
+      end
+    end
+  end
+
+  describe ".preload_overrides with peer reviews" do
+    it "includes PeerReviewSubAssignment objects in preloading" do
+      course = course_factory(active_all: true)
+      course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+
+      assignment = course.assignments.create!(
+        title: "Assignment",
+        peer_reviews: true
+      )
+
+      PeerReview::PeerReviewCreatorService.call(
+        parent_assignment: assignment,
+        points_possible: 5
+      )
+
+      peer_review_sub = assignment.reload.peer_review_sub_assignment
+      learning_objects = [assignment, peer_review_sub]
+
+      expect do
+        DatesOverridable.preload_overrides(learning_objects)
+      end.not_to raise_error
+    end
+  end
 end

@@ -3986,4 +3986,39 @@ RSpec.describe ApplicationController, "#render_native_new_quizzes" do
 
     controller.send(:render_native_new_quizzes)
   end
+
+  describe "#set_js_assignment_data peer_review inclusion logic" do
+    let(:course) { course_factory(active_all: true) }
+    let(:account) { Account.default }
+
+    it "evaluates to true when context is a Course and feature flag is enabled" do
+      course.enable_feature!(:peer_review_allocation_and_grading)
+      controller.instance_variable_set(:@context, course)
+
+      course_has_peer_reviews_enabled = controller.instance_variable_get(:@context).is_a?(Course) &&
+                                        controller.instance_variable_get(:@context).feature_enabled?(:peer_review_allocation_and_grading)
+
+      expect(course_has_peer_reviews_enabled).to be true
+    end
+
+    it "evaluates to false when context is a Course and feature flag is disabled" do
+      course.disable_feature!(:peer_review_allocation_and_grading)
+      controller.instance_variable_set(:@context, course)
+
+      course_has_peer_reviews_enabled = controller.instance_variable_get(:@context).is_a?(Course) &&
+                                        controller.instance_variable_get(:@context).feature_enabled?(:peer_review_allocation_and_grading)
+
+      expect(course_has_peer_reviews_enabled).to be false
+    end
+
+    it "evaluates to false when context is not a Course even if feature flag is enabled" do
+      account.enable_feature!(:peer_review_allocation_and_grading)
+      controller.instance_variable_set(:@context, account)
+
+      course_has_peer_reviews_enabled = controller.instance_variable_get(:@context).is_a?(Course) &&
+                                        controller.instance_variable_get(:@context).feature_enabled?(:peer_review_allocation_and_grading)
+
+      expect(course_has_peer_reviews_enabled).to be false
+    end
+  end
 end
