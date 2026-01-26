@@ -148,7 +148,15 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
               {loadingProgress ? (
                 <Spinner renderTitle={I18n.t('Loading progress')} size="x-small" />
               ) : (
-                <Pill color={submissionStatus === 'in_progress' ? 'success' : undefined}>
+                <Pill
+                  color={
+                    submissionStatus === 'submitted'
+                      ? 'success'
+                      : submissionStatus === 'in_progress'
+                        ? 'info'
+                        : undefined
+                  }
+                >
                   {submissionStatus === 'not_started' && I18n.t('Not Started')}
                   {submissionStatus === 'in_progress' &&
                     I18n.t('In Progress (%{percentage}%)', {
