@@ -11,7 +11,7 @@ GEM
     diff-lcs (1.6.2)
     folio-pagination (0.0.12)
     mini_portile2 (2.8.9)
-    rake (13.3.0)
+    rake (13.3.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)

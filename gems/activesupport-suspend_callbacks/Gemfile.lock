@@ -50,7 +50,7 @@ GEM
     psych (5.3.1)
       date
       stringio
-    rake (13.3.0)
+    rake (13.3.1)
     rdoc (6.15.0)
       erb
       psych (>= 4.0.0)
