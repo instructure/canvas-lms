@@ -60,7 +60,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     logger (1.7.0)
-    minitest (5.26.0)
+    minitest (6.0.1)
+      prism (~> 1.5)
     nokogiri (1.18.10-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.18.10-arm64-darwin)
@@ -72,6 +73,7 @@ GEM
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
+    prism (1.5.1)
     psych (5.2.6)
       date
       stringio

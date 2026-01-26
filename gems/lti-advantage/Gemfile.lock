@@ -51,9 +51,11 @@ GEM
       faraday (~> 2.0)
       faraday-follow_redirects
     logger (1.7.0)
-    minitest (5.26.0)
+    minitest (6.0.1)
+      prism (~> 1.5)
     net-http (0.6.0)
       uri
+    prism (1.5.1)
     rake (13.3.0)
     redcarpet (3.6.1)
     rspec (3.13.1)
