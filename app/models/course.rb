@@ -4570,7 +4570,7 @@ class Course < ActiveRecord::Base
                .where.not(matching_post_policies_scope.arel.exists)
                .preload(:post_policy)
                .each do |assignment|
-      assignment.ensure_post_policy(post_manually:)
+                 assignment.ensure_post_policy(post_manually:)
     end
   end
 

@@ -477,20 +477,20 @@ module Interfaces::SubmissionInterface
               :status
             )
             .map do |asset_string, data|
-        Loaders::AssetStringLoader
-          .load(asset_string.to_s)
-          .then do |target|
-            next if target.nil?
+              Loaders::AssetStringLoader
+                .load(asset_string.to_s)
+                .then do |target|
+                  next if target.nil?
 
-            {
-              target:,
-              asset_string:,
-              report_url: data[:report_url],
-              score: data[:similarity_score],
-              status: data[:status],
-              state: data[:state],
-            }
-          end
+                  {
+                    target:,
+                    asset_string:,
+                    report_url: data[:report_url],
+                    score: data[:similarity_score],
+                    status: data[:status],
+                    state: data[:state],
+                  }
+                end
       end
     Promise.all(promises).then(&:compact)
   end
