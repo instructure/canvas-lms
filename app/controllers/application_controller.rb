@@ -391,6 +391,20 @@ class ApplicationController < ActionController::Base
                                     elsif @context.is_a?(Course)
                                       @context.account.horizon_account?
                                     end
+        if load_usage_metrics? && @domain_root_account&.feature_enabled?(:pendo_extended)
+          @js_env[:USAGE_METRICS_METADATA] ||= {}
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_id] = effective_account_id(@context)
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_name] = effective_account_name(@context)
+
+          if @context.is_a?(Course)
+            @js_env[:USAGE_METRICS_METADATA][:course_id] = @context.id
+            @js_env[:USAGE_METRICS_METADATA][:course_long_name] = "#{@context.name} - #{@context.short_name}"
+            @js_env[:USAGE_METRICS_METADATA][:course_sis_source_id] = @context.sis_source_id
+            @js_env[:USAGE_METRICS_METADATA][:course_sis_batch_id] = @context.sis_batch_id
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_id] = @context.enrollment_term_id
+          end
+        end
+
         if @context.is_a?(Course)
           @js_env[:FEATURES][:youtube_overlay] = @context.account.feature_enabled?(:youtube_overlay)
           @js_env[:FEATURES][:rce_studio_embed_improvements] = @context.feature_enabled?(:rce_studio_embed_improvements)
@@ -520,6 +534,7 @@ class ApplicationController < ActionController::Base
     modules_requirements_allow_percentage
     non_scoring_rubrics
     open_tools_in_new_tab
+    pendo_extended
     product_tours
     rce_lite_enabled_speedgrader_comments
     rce_transform_loaded_content
@@ -2663,6 +2678,18 @@ class ApplicationController < ActionController::Base
     feature_enabled?(feature) && service_enabled?(feature)
   end
   helper_method :feature_and_service_enabled?
+
+  def effective_account_name(context)
+    if context.is_a?(Account)
+      context.name
+    elsif context.is_a?(Course)
+      context.account.name
+    elsif context.respond_to?(:context)
+      effective_account_name(context.context)
+    else
+      @domain_root_account&.name
+    end
+  end
 
   def random_lti_tool_form_id
     rand(0..999).to_s

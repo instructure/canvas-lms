@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Visitor} from '@pendo/agent'
+import {getPrimaryRole} from './utils'
+
 let whenPendoReady: Promise<any> | null = null
 
 export async function initializePendo() {
@@ -39,14 +42,30 @@ function init(): Promise<any> | null {
 
   // Lazy-load Pendo only when needed (e.g., in browser)
   return import('@pendo/agent').then(({initialize, Replay, VocPortal}) => {
+    const visitorData: Visitor = {
+      id: ENV.current_user_usage_metrics_id,
+      canvasRoles: ENV.current_user_roles,
+      locale: ENV.LOCALE || 'en',
+    }
+
+    if (ENV.FEATURES?.pendo_extended) {
+      visitorData.canvasPrimaryUserRole = getPrimaryRole(ENV.current_user_roles)
+      if (ENV.USAGE_METRICS_METADATA) {
+        visitorData.canvasSubAccountId = ENV.USAGE_METRICS_METADATA.sub_account_id
+        visitorData.canvasSubAccountName = ENV.USAGE_METRICS_METADATA.sub_account_name
+        visitorData.canvasCourseId = ENV.USAGE_METRICS_METADATA.course_id
+        visitorData.canvasCourseLongName = ENV.USAGE_METRICS_METADATA.course_long_name
+        visitorData.canvasCourseSisSourceId = ENV.USAGE_METRICS_METADATA.course_sis_source_id
+        visitorData.canvasCourseSisBatchId = ENV.USAGE_METRICS_METADATA.course_sis_batch_id
+        visitorData.canvasCourseEnrollmentTermId =
+          ENV.USAGE_METRICS_METADATA.course_enrollment_term_id
+      }
+    }
+
     return initialize({
       apiKey: ENV.PENDO_APP_ID,
       env: 'io',
-      visitor: {
-        id: ENV.current_user_usage_metrics_id,
-        canvasRoles: ENV.current_user_roles,
-        locale: ENV.LOCALE || 'en',
-      },
+      visitor: visitorData,
       account: {
         id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
         surveyOptOut: !ENV.FEATURES['account_survey_notifications'],
