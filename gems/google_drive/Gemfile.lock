@@ -20,7 +20,7 @@ GEM
       reline (>= 0.3.8)
     declarative (0.0.20)
     diff-lcs (1.6.2)
-    erb (5.1.1)
+    erb (6.0.1)
     faraday (2.14.0)
       faraday-net_http (>= 2.0, < 3.5)
       json

@@ -529,7 +529,7 @@ GEM
     dumb_delegator (1.1.0)
     encrypted_cookie_store-instructure (1.2.15)
       actionpack (>= 4.2, < 8.1)
-    erb (5.1.1)
+    erb (6.0.1)
     erubi (1.13.1)
     escape_code (0.2)
     et-orbi (1.4.0)

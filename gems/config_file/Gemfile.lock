@@ -49,7 +49,7 @@ GEM
       reline (>= 0.3.8)
     diff-lcs (1.6.2)
     drb (2.2.3)
-    erb (5.1.1)
+    erb (6.0.1)
     erubi (1.13.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
