@@ -47,6 +47,7 @@ import {EnvUserMerge} from './EnvUserMerge'
 import {EnvWikiPages} from './EnvWikiPages'
 import {EnvAuthentication} from './EnvAuthentication'
 import {EnvWidgetDashboard} from './EnvWidgetDashboard'
+import {EnvUsageMetrics} from './EnvUsageMetrics'
 
 /**
  * Top level ENV variable.
@@ -92,5 +93,6 @@ export type GlobalEnv =
         EnvAuthentication &
         EnvWidgetDashboard &
         EnvNewQuizzes &
-        EnvNotices
+        EnvNotices &
+        EnvUsageMetrics
     >

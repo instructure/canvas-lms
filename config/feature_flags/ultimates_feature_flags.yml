@@ -1,0 +1,8 @@
+---
+pendo_extended:
+  applies_to: Account
+  type: setting
+  state: hidden
+  display_name: Pendo Extended Metadata
+  description: When enabled, includes additional metadata information for Pendo
+  shadow: true
