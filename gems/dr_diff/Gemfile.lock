@@ -9,7 +9,7 @@ GEM
   specs:
     bigdecimal (3.3.1)
     csv (3.3.5)
-    date (3.4.1)
+    date (3.5.1)
     debug (1.11.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
