@@ -328,7 +328,7 @@ GEM
     active_model_serializers (0.9.9)
       activemodel (>= 3.2)
       concurrent-ruby (~> 1.0)
-    active_record_query_trace (1.8.3)
+    active_record_query_trace (1.9)
       activerecord (>= 6.0.0)
     activejob (8.0.4)
       activesupport (= 8.0.4)
