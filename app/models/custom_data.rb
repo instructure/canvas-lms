@@ -39,7 +39,6 @@ class CustomData < ActiveRecord::Base
   end
 
   self.table_name = "custom_data"
-  self.ignored_columns += ["data"]
 
   belongs_to :user
 
