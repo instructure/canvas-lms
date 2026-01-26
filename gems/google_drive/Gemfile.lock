@@ -52,7 +52,7 @@ GEM
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
     hashdiff (1.2.1)
-    io-console (0.8.1)
+    io-console (0.8.2)
     irb (1.15.2)
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
