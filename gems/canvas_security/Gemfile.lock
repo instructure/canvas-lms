@@ -226,7 +226,7 @@ GEM
       rspec-support (~> 3.13.0)
     rspec-support (3.13.6)
     securerandom (0.4.1)
-    sorbet-runtime (0.5.12216)
+    sorbet-runtime (0.6.12897)
     stringio (3.1.7)
     thor (1.4.0)
     timecop (0.9.10)
