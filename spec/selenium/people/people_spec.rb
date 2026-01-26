@@ -251,7 +251,7 @@ describe "people" do
       f("#people-options .Button").click
       fln("View Registered Services").click
       fln("Link web services to my account").click
-      expect(f("#unregistered_services")).to be_displayed
+      expect(f("#unregistered_services")).to be_present
     end
 
     it "makes a new set of student groups" do
