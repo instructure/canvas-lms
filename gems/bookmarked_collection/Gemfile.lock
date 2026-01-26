@@ -80,7 +80,7 @@ GEM
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     io-console (0.8.2)
-    irb (1.15.2)
+    irb (1.16.0)
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
@@ -134,7 +134,7 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    reline (0.6.2)
+    reline (0.6.3)
       io-console (~> 0.5)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
