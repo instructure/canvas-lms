@@ -79,11 +79,11 @@ describe('TodoItem', () => {
     expect(button).toBeEnabled()
   })
 
-  it('displays course code when available', () => {
+  it('displays course link when available', () => {
     const item = mockPlannerItems[0]
     renderWithProvider(<TodoItem item={item} />)
 
-    expect(screen.getByText('BIO101')).toBeInTheDocument()
+    expect(screen.getByText('Biology 101')).toBeInTheDocument()
   })
 
   it('displays points possible when available', () => {
@@ -107,11 +107,11 @@ describe('TodoItem', () => {
     expect(screen.getByText('Assignment')).toBeInTheDocument()
   })
 
-  it('displays course code as pill when course_id is present', () => {
+  it('displays course link when course_id is present', () => {
     const item = mockPlannerItems[0]
     renderWithProvider(<TodoItem item={item} />)
 
-    expect(screen.getByText('BIO101')).toBeInTheDocument()
+    expect(screen.getByText('Biology 101')).toBeInTheDocument()
   })
 
   it('displays description when available', () => {
@@ -140,24 +140,27 @@ describe('TodoItem', () => {
     expect(screen.queryByText(/description/i)).not.toBeInTheDocument()
   })
 
-  it('displays "Go to course" link when course_id is present', () => {
+  it('displays course name link when course_id is present', () => {
     const item = mockPlannerItems[0]
     renderWithProvider(<TodoItem item={item} />)
 
     const courseLink = screen.getByTestId(`todo-item-course-link-${item.plannable_id}`)
     expect(courseLink).toBeInTheDocument()
     expect(courseLink).toHaveAttribute('href', '/courses/1')
-    expect(courseLink).toHaveTextContent('Go to course')
+    expect(courseLink).toHaveTextContent('Biology 101')
   })
 
-  it('does not display "Go to course" link when course_id is not present', () => {
+  it('does not display course name link when course_id is not present', () => {
     const itemWithoutCourse = {
       ...mockPlannerItems[0],
       course_id: undefined,
+      context_name: undefined,
     }
     renderWithProvider(<TodoItem item={itemWithoutCourse} />)
 
-    expect(screen.queryByText('Go to course')).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId(`todo-item-course-link-${mockPlannerItems[0].plannable_id}`),
+    ).not.toBeInTheDocument()
   })
 
   describe('checkbox display', () => {

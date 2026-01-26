@@ -32,6 +32,7 @@ interface Submission {
   _id: string
   score: number | null
   grade: string | null
+  excused: boolean
   submittedAt: string | null
   gradedAt: string | null
   state: string
@@ -40,6 +41,7 @@ interface Submission {
     name: string
     htmlUrl: string
     pointsPossible: number | null
+    gradingType: string
     submissionTypes: string[]
     quiz: {_id: string; title: string} | null
     discussion: {_id: string; title: string} | null
@@ -93,6 +95,7 @@ const RECENT_GRADES_QUERY = gql`
             _id
             score
             grade
+            excused
             submittedAt
             gradedAt
             state
@@ -101,6 +104,7 @@ const RECENT_GRADES_QUERY = gql`
               name
               htmlUrl
               pointsPossible
+              gradingType
               submissionTypes
               quiz {
                 _id
@@ -194,12 +198,14 @@ export async function fetchRecentGradesPage(
     gradedAt: submission.gradedAt,
     score: submission.score,
     grade: submission.grade,
+    excused: submission.excused,
     state: submission.state,
     assignment: {
       _id: submission.assignment._id,
       name: submission.assignment.name,
       htmlUrl: submission.assignment.htmlUrl,
       pointsPossible: submission.assignment.pointsPossible,
+      gradingType: submission.assignment.gradingType,
       submissionTypes: submission.assignment.submissionTypes,
       quiz: submission.assignment.quiz,
       discussion: submission.assignment.discussion,

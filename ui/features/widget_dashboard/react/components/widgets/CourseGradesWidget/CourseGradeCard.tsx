@@ -25,7 +25,6 @@ import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import type {CourseGradeCardProps} from '../../../types'
 import {formatUpdatedDate, convertToLetterGrade} from './utils'
-import {CourseCode} from '../../shared/CourseCode'
 import {CourseName} from '../../shared/CourseName'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -63,22 +62,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       aria-label={courseName}
     >
       <Flex direction="column" width="100%" height="100%">
-        <Flex.Item
-          padding="0"
-          margin="small 0 small xx-small"
-          overflowX="visible"
-          overflowY="visible"
-        >
-          <CourseCode
-            courseId={courseId}
-            overrideCode={courseCode}
-            gridIndex={gridIndex}
-            size="x-small"
-            maxWidth="14rem"
-          />
-        </Flex.Item>
-
-        <Flex.Item height="3rem" padding="0 0 0 xx-small" overflowY="hidden" overflowX="hidden">
+        <Flex.Item height="3rem" padding="small 0 0 xx-small" overflowY="hidden" overflowX="hidden">
           <View height="100%" overflowY="hidden">
             <CourseName courseName={courseName} />
           </View>
@@ -86,7 +70,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
 
         <Flex.Item shouldGrow padding="0 0 0 xx-small" overflowY="visible">
           <Flex direction="column" gap="0" height="100%">
-            <Flex.Item height="1.5rem">
+            <Flex.Item>
               {lastUpdated && currentGrade !== null && (
                 <Text
                   size="small"
@@ -97,9 +81,9 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                 </Text>
               )}
             </Flex.Item>
-            <Flex.Item overflowX="visible" overflowY="visible">
-              <Flex>
-                <Flex.Item overflowX="visible" overflowY="visible">
+            <Flex.Item>
+              <Flex wrap="wrap" gap="x-small">
+                <Flex.Item>
                   <Link
                     href={`/courses/${courseId}/grades`}
                     isWithinText={false}
@@ -109,7 +93,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                     <Text size="small">{I18n.t('View gradebook')}</Text>
                   </Link>
                 </Flex.Item>
-                <Flex.Item padding="0 small" overflowX="visible" overflowY="visible">
+                <Flex.Item>
                   <Text
                     color="secondary"
                     themeOverride={{
@@ -119,7 +103,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                     |
                   </Text>
                 </Flex.Item>
-                <Flex.Item overflowX="visible" overflowY="visible">
+                <Flex.Item>
                   <Link
                     href={`/courses/${courseId}`}
                     isWithinText={false}
@@ -142,13 +126,15 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
               borderColorPrimary: '#E8EAEC',
             }}
           >
-            <Flex direction="row" justifyItems="start" alignItems="center" height="60px">
-              <Flex.Item
-                shouldGrow
-                padding="0 0 0 xx-small"
-                overflowX="visible"
-                overflowY="visible"
-              >
+            <Flex
+              direction="row"
+              wrap="wrap"
+              justifyItems="start"
+              alignItems="center"
+              gap="small"
+              padding="small 0"
+            >
+              <Flex.Item shouldGrow padding="0 0 0 xx-small">
                 <Button
                   color="secondary"
                   size="small"

@@ -3543,6 +3543,16 @@ describe UsersController do
           get "user_dashboard"
           expect(assigns[:js_bundles].flatten).to include :widget_dashboard
         end
+
+        it "does not show widget dashboard when feature is disabled even if user preference is true" do
+          Account.default.disable_feature!(:widget_dashboard)
+          user_session(@student)
+          @student.preferences[:widget_dashboard_user_preference] = true
+          @student.save!
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+        end
       end
     end
   end

@@ -133,12 +133,14 @@ export interface RecentGradeSubmission {
   gradedAt: string | null
   score: number | null
   grade: string | null
+  excused: boolean
   state: string
   assignment: {
     _id: string
     name: string
     htmlUrl: string
     pointsPossible: number | null
+    gradingType: string
     submissionTypes: string[]
     quiz: {_id: string; title: string} | null
     discussion: {_id: string; title: string} | null
@@ -168,4 +170,45 @@ export interface InboxMessage {
   workflowState: 'read' | 'unread' | 'archived'
   conversationUrl: string
   participants: ConversationParticipant[]
+}
+
+export interface RubricCriterion {
+  _id: string
+  description: string | null
+  longDescription: string | null
+  points: number | null
+}
+
+export interface RubricAssessmentRating {
+  _id: string | null
+  criterion: RubricCriterion | null
+  description: string | null
+  points: number | null
+  comments: string | null
+  commentsHtml: string | null
+}
+
+export interface RubricAssessment {
+  _id: string
+  score: number | null
+  assessmentRatings: RubricAssessmentRating[]
+}
+
+export interface SubmissionCommentAuthor {
+  _id: string
+  name: string
+}
+
+export interface SubmissionComment {
+  _id: string
+  comment: string | null
+  htmlComment: string | null
+  author: SubmissionCommentAuthor | null
+  createdAt: string
+}
+
+export interface SubmissionDetails {
+  rubricAssessments: RubricAssessment[]
+  comments: SubmissionComment[]
+  totalCommentsCount: number
 }

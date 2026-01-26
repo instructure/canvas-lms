@@ -40,9 +40,6 @@ export function useTabState(defaultTab: TabId = TAB_IDS.DASHBOARD) {
       )
       return result
     },
-    onError: error => {
-      console.error('Failed to save tab preference:', error)
-    },
   })
 
   const handleTabChange = useCallback(

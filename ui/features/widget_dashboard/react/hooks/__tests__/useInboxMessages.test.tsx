@@ -198,7 +198,7 @@ describe('useInboxMessages', () => {
   it('handles all filter', async () => {
     server.use(
       graphql.query('GetUserConversations', ({variables}) => {
-        expect(variables.scope).toBeUndefined()
+        expect(variables.scope).toBe('inbox')
         expect(variables.first).toBe(5)
         return HttpResponse.json(mockConversationResponse)
       }),
@@ -209,6 +209,20 @@ describe('useInboxMessages', () => {
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
     })
+
+    cleanup()
+  })
+
+  it('returns both read and unread messages with all filter', async () => {
+    const {result, cleanup} = setup({}, {filter: 'all'})
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(result.current.data).toHaveLength(2)
+    expect(result.current.data?.[0].workflowState).toBe('unread')
+    expect(result.current.data?.[1].workflowState).toBe('read')
 
     cleanup()
   })

@@ -30,7 +30,6 @@ import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseInstructorsPaginated} from '../../../hooks/useCourseInstructors'
-import {CourseCode} from '../../shared/CourseCode'
 import {DEFAULT_PAGE_SIZE} from '../../../constants/pagination'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -140,12 +139,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                 <List isUnstyled margin="0">
                   {instructors.map(instructor => (
                     <List.Item key={instructor.id} margin="0">
-                      <Flex
-                        gap="small"
-                        padding="xxx-small 0"
-                        role="group"
-                        aria-label={instructor.name}
-                      >
+                      <Flex gap="small" padding="small 0" role="group" aria-label={instructor.name}>
                         <Flex.Item>
                           <Avatar
                             name={instructor.name}
@@ -159,13 +153,11 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                             <Text size="medium" weight="bold" lineHeight="condensed">
                               {instructor.name}
                             </Text>
-                            {instructor.course_code && (
-                              <View as="div" margin="xxx-small 0 0 0">
-                                <CourseCode
-                                  courseId={instructor.enrollments[0]?.course_id}
-                                  overrideCode={instructor.course_code}
-                                  size="x-small"
-                                />
+                            {instructor.course_name && (
+                              <View as="div">
+                                <Text size="x-small" color="secondary">
+                                  {instructor.course_name}
+                                </Text>
                               </View>
                             )}
                             <View as="div">

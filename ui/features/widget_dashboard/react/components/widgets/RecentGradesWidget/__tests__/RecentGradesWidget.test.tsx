@@ -54,6 +54,7 @@ const mockGradedSubmissions = [
     _id: 'sub1',
     score: 95,
     grade: 'A',
+    excused: false,
     submittedAt: '2025-11-28T10:00:00Z',
     gradedAt: '2025-11-30T14:30:00Z',
     state: 'graded',
@@ -62,6 +63,7 @@ const mockGradedSubmissions = [
       name: 'Introduction to React Hooks',
       htmlUrl: '/courses/1/assignments/101',
       pointsPossible: 100,
+      gradingType: 'letter_grade',
       submissionTypes: ['online_text_entry'],
       quiz: null,
       discussion: null,
@@ -76,6 +78,7 @@ const mockGradedSubmissions = [
     _id: 'sub2',
     score: 88,
     grade: 'B+',
+    excused: false,
     submittedAt: '2025-11-27T09:00:00Z',
     gradedAt: '2025-11-29T16:45:00Z',
     state: 'graded',
@@ -84,6 +87,7 @@ const mockGradedSubmissions = [
       name: 'Data Structures Quiz',
       htmlUrl: '/courses/2/assignments/102',
       pointsPossible: 100,
+      gradingType: 'letter_grade',
       submissionTypes: ['online_quiz'],
       quiz: {_id: '102', title: 'Data Structures Quiz'},
       discussion: null,
@@ -98,6 +102,7 @@ const mockGradedSubmissions = [
     _id: 'sub3',
     score: 92,
     grade: 'A-',
+    excused: false,
     submittedAt: '2025-11-26T11:30:00Z',
     gradedAt: '2025-11-28T10:15:00Z',
     state: 'graded',
@@ -106,6 +111,7 @@ const mockGradedSubmissions = [
       name: 'Essay on Modern Literature',
       htmlUrl: '/courses/3/assignments/103',
       pointsPossible: 100,
+      gradingType: 'letter_grade',
       submissionTypes: ['online_text_entry'],
       quiz: null,
       discussion: null,
@@ -120,6 +126,7 @@ const mockGradedSubmissions = [
     _id: 'sub4',
     score: 78,
     grade: 'C+',
+    excused: false,
     submittedAt: '2025-11-25T15:00:00Z',
     gradedAt: '2025-11-27T09:00:00Z',
     state: 'graded',
@@ -128,6 +135,7 @@ const mockGradedSubmissions = [
       name: 'Calculus Problem Set 5',
       htmlUrl: '/courses/4/assignments/104',
       pointsPossible: 100,
+      gradingType: 'letter_grade',
       submissionTypes: ['online_text_entry'],
       quiz: null,
       discussion: null,
@@ -142,6 +150,7 @@ const mockGradedSubmissions = [
     _id: 'sub5',
     score: 90,
     grade: 'A-',
+    excused: false,
     submittedAt: '2025-11-24T13:00:00Z',
     gradedAt: '2025-11-26T11:30:00Z',
     state: 'graded',
@@ -150,6 +159,7 @@ const mockGradedSubmissions = [
       name: 'Lab Report: Chemical Reactions',
       htmlUrl: '/courses/5/assignments/105',
       pointsPossible: 100,
+      gradingType: 'letter_grade',
       submissionTypes: ['online_upload'],
       quiz: null,
       discussion: null,
@@ -164,6 +174,7 @@ const mockGradedSubmissions = [
     _id: 'sub6',
     score: 85,
     grade: 'B',
+    excused: false,
     submittedAt: '2025-11-23T10:00:00Z',
     gradedAt: '2025-11-25T14:00:00Z',
     state: 'graded',
@@ -172,6 +183,7 @@ const mockGradedSubmissions = [
       name: 'History Presentation',
       htmlUrl: '/courses/6/assignments/106',
       pointsPossible: 100,
+      gradingType: 'letter_grade',
       submissionTypes: ['online_upload'],
       quiz: null,
       discussion: null,
@@ -302,7 +314,6 @@ describe('RecentGradesWidget', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
-      expect(screen.getByText('CS-401')).toBeInTheDocument()
       expect(screen.getByTestId('grade-status-badge-sub1')).toBeInTheDocument()
       expect(screen.getByTestId('grade-status-badge-sub1')).toHaveTextContent('Graded')
     })
@@ -354,8 +365,8 @@ describe('RecentGradesWidget', () => {
     await userEvent.click(select)
 
     await waitFor(() => {
-      expect(screen.getByText('Advanced Web Development')).toBeInTheDocument()
-      expect(screen.getByText('Computer Science 101')).toBeInTheDocument()
+      expect(screen.getAllByText('Advanced Web Development').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Computer Science 101').length).toBeGreaterThan(0)
     })
   })
 
@@ -400,10 +411,11 @@ describe('RecentGradesWidget', () => {
     await userEvent.click(select)
 
     await waitFor(() => {
-      expect(screen.getByText('Advanced Web Development')).toBeInTheDocument()
+      expect(screen.getAllByText('Advanced Web Development').length).toBeGreaterThan(0)
     })
 
-    await userEvent.click(screen.getByText('Advanced Web Development'))
+    const courseOptions = screen.getAllByText('Advanced Web Development')
+    await userEvent.click(courseOptions[courseOptions.length - 1])
 
     await waitFor(() => {
       expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
@@ -518,5 +530,102 @@ describe('RecentGradesWidget', () => {
     await waitFor(() => {
       expect(screen.getByText(/GraphQL Error/i)).toBeInTheDocument()
     })
+  })
+
+  it('expands grade details when expand button is clicked', async () => {
+    const user = userEvent.setup()
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+    })
+
+    const expandButton = screen.getByTestId('expand-grade-sub1')
+    expect(expandButton).toBeInTheDocument()
+
+    await user.click(expandButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('expanded-grade-view-sub1')).toBeInTheDocument()
+    })
+  })
+
+  it('collapses grade details when collapse button is clicked', async () => {
+    const user = userEvent.setup()
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Introduction to React Hooks')).toBeInTheDocument()
+    })
+
+    const expandButton = screen.getByTestId('expand-grade-sub1')
+    await user.click(expandButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('expanded-grade-view-sub1')).toBeInTheDocument()
+    })
+
+    await user.click(expandButton)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('expanded-grade-view-sub1')).not.toBeInTheDocument()
+    })
+  })
+
+  it('does not show expand button for ungraded items', async () => {
+    server.use(
+      http.post('/api/graphql', async () => {
+        return HttpResponse.json({
+          data: {
+            legacyNode: {
+              _id: '1',
+              courseWorkSubmissionsConnection: {
+                nodes: [
+                  {
+                    _id: 'sub-ungraded',
+                    score: null,
+                    grade: null,
+                    submittedAt: '2025-11-28T10:00:00Z',
+                    gradedAt: null,
+                    state: 'submitted',
+                    assignment: {
+                      _id: '201',
+                      name: 'Ungraded Assignment',
+                      htmlUrl: '/courses/1/assignments/201',
+                      pointsPossible: 100,
+                      gradingType: 'points',
+                      submissionTypes: ['online_text_entry'],
+                      quiz: null,
+                      discussion: null,
+                      course: {
+                        _id: '1',
+                        name: 'Test Course',
+                        courseCode: 'TEST-101',
+                      },
+                    },
+                  },
+                ],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  endCursor: null,
+                  startCursor: null,
+                  totalCount: 1,
+                },
+              },
+            },
+          },
+        })
+      }),
+    )
+
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Ungraded Assignment')).toBeInTheDocument()
+      expect(screen.getByTestId('grade-status-badge-sub-ungraded')).toHaveTextContent('Not graded')
+    })
+
+    expect(screen.queryByTestId('expand-grade-sub-ungraded')).not.toBeInTheDocument()
   })
 })

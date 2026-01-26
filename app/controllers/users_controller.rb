@@ -3560,7 +3560,7 @@ class UsersController < ApplicationController
 
     # Single feature flag lookup to avoid redundant queries
     flag = @domain_root_account&.lookup_feature_flag(:widget_dashboard)
-    return false unless flag
+    return false unless flag&.enabled? || flag&.can_override?
 
     # Check if feature is locked on (cannot be overridden)
     force_on = flag.enabled? && !flag.can_override?

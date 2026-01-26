@@ -135,12 +135,11 @@ const EnrollmentInvitation: React.FC<EnrollmentInvitationProps> = ({
           type: 'error',
         })
       }
-    } catch (error) {
+    } catch {
       showFlashAlert({
         message: I18n.t('An error occurred while accepting the invitation'),
         type: 'error',
       })
-      console.error('Error accepting invitation:', error)
     }
   }, [acceptMutation, invitation.uuid, invitation.id, onAccept])
 
@@ -163,12 +162,11 @@ const EnrollmentInvitation: React.FC<EnrollmentInvitationProps> = ({
           type: 'error',
         })
       }
-    } catch (error) {
+    } catch {
       showFlashAlert({
         message: I18n.t('An error occurred while declining the invitation'),
         type: 'error',
       })
-      console.error('Error rejecting invitation:', error)
     }
   }, [rejectMutation, invitation.uuid, invitation.id, onReject])
 
