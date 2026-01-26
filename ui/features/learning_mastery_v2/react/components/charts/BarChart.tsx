@@ -26,6 +26,7 @@ import {
   Tooltip,
   Legend,
   ChartConfiguration,
+  Plugin,
 } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend)
@@ -38,15 +39,25 @@ export interface BarChartProps {
   backgroundColor?: string | string[]
   borderColor?: string | string[]
   borderWidth?: number
+  borderRadius?: {
+    topLeft?: number
+    topRight?: number
+    bottomLeft?: number
+    bottomRight?: number
+  }
   datasetLabel?: string
   title?: string
   xAxisLabel?: string
   yAxisLabel?: string
   indexAxis?: 'x' | 'y'
   showLegend?: boolean
-  showGrid?: boolean
+  showXAxisGrid?: boolean
+  showYAxisGrid?: boolean
+  showXAxisTicks?: boolean
+  showYAxisTicks?: boolean
+  gridColor?: string
   maintainAspectRatio?: boolean
-  isPreview?: boolean
+  plugins?: Plugin<'bar'>[]
   padding?: {
     left?: number
     right?: number
@@ -63,16 +74,21 @@ export const BarChart: React.FC<BarChartProps> = ({
   backgroundColor,
   borderColor,
   borderWidth = 1,
+  borderRadius = {topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0},
   datasetLabel = 'Data',
   title,
   xAxisLabel,
   yAxisLabel,
   indexAxis = 'x',
   showLegend = true,
-  showGrid = true,
+  showXAxisGrid = false,
+  showYAxisGrid = false,
+  showXAxisTicks = false,
+  showYAxisTicks = false,
+  gridColor = 'rgba(0, 0, 0, 0.1)',
   maintainAspectRatio = false,
-  isPreview = false,
-  padding = {left: 28, right: 30, top: 12, bottom: 12},
+  plugins = [],
+  padding,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const chartRef = useRef<ChartJS<'bar'> | null>(null)
@@ -90,22 +106,17 @@ export const BarChart: React.FC<BarChartProps> = ({
     const config: ChartConfiguration<'bar'> = {
       type: 'bar',
       data: {
-        labels: isPreview ? labels.map(() => '') : labels,
+        labels,
         datasets: [
           {
-            label: isPreview ? '' : datasetLabel,
+            label: datasetLabel,
             data: values,
             backgroundColor,
             borderColor,
             borderWidth,
             categoryPercentage: 1.0,
-            barPercentage: 0.9,
-            borderRadius: {
-              topLeft: 1,
-              topRight: 1,
-              bottomLeft: 0,
-              bottomRight: 0,
-            },
+            barPercentage: 0.85,
+            borderRadius,
           },
         ],
       },
@@ -114,55 +125,53 @@ export const BarChart: React.FC<BarChartProps> = ({
         responsive: true,
         maintainAspectRatio,
         layout: {
-          padding: {
-            left: padding.left ?? 6,
-            right: padding.right ?? 8,
-            top: padding.top ?? 12,
-            bottom: padding.bottom ?? 12,
-          },
+          padding,
         },
         plugins: {
           legend: {
-            display: isPreview ? false : showLegend,
+            display: showLegend,
             position: 'top',
           },
           title: {
-            display: isPreview ? false : !!title,
+            display: !!title,
             text: title || '',
           },
         },
         scales: {
           x: {
             grid: {
-              display: isPreview ? false : showGrid,
+              display: showXAxisGrid,
               drawBorder: false,
               offset: true,
+              color: gridColor,
             },
             title: {
-              display: isPreview ? false : !!xAxisLabel,
+              display: !!xAxisLabel,
               text: xAxisLabel || '',
             },
             ticks: {
-              display: isPreview ? false : !!xAxisLabel,
+              display: showXAxisTicks,
             },
             offset: true,
           },
           y: {
             grid: {
-              display: isPreview ? false : showGrid,
+              display: showYAxisGrid,
               drawBorder: false,
+              color: gridColor,
             },
             title: {
               display: false,
               text: yAxisLabel || '',
             },
             ticks: {
-              display: isPreview ? false : !!yAxisLabel,
+              display: showYAxisTicks,
             },
             beginAtZero: true,
           },
         },
       },
+      plugins,
     }
 
     chartRef.current = new ChartJS(ctx, config)
@@ -179,15 +188,20 @@ export const BarChart: React.FC<BarChartProps> = ({
     backgroundColor,
     borderColor,
     borderWidth,
+    borderRadius,
     datasetLabel,
     title,
     xAxisLabel,
     yAxisLabel,
     indexAxis,
     showLegend,
-    showGrid,
+    showXAxisGrid,
+    showYAxisGrid,
+    showXAxisTicks,
+    showYAxisTicks,
+    gridColor,
     maintainAspectRatio,
-    isPreview,
+    plugins,
     padding,
   ])
 

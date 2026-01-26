@@ -171,10 +171,20 @@ describe('MasteryDistributionChart', () => {
     expect(getByTestId('bar-chart')).toBeInTheDocument()
   })
 
-  it('passes showGrid prop to BarChart', () => {
+  it('passes showXAxisGrid prop to BarChart', () => {
     const propsWithoutGrid = {
       ...defaultProps(),
-      showGrid: false,
+      showXAxisGrid: false,
+    }
+
+    const {getByTestId} = render(<MasteryDistributionChart {...propsWithoutGrid} />)
+    expect(getByTestId('bar-chart')).toBeInTheDocument()
+  })
+
+  it('passes showYAxisGrid prop to BarChart', () => {
+    const propsWithoutGrid = {
+      ...defaultProps(),
+      showYAxisGrid: false,
     }
 
     const {getByTestId} = render(<MasteryDistributionChart {...propsWithoutGrid} />)

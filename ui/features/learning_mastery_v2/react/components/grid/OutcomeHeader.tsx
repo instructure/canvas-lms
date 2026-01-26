@@ -25,6 +25,7 @@ import {SortBy, SortOrder} from '@canvas/outcomes/react/utils/constants'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
+import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
 import {DragDropConnectorProps} from './DragDropWrapper'
 import {ContributingScoresForOutcome} from '../../hooks/useContributingScores'
 import {DraggableColumnHeader} from './DraggableColumnHeader'
@@ -35,6 +36,7 @@ export interface OutcomeHeaderProps extends DragDropConnectorProps {
   outcome: Outcome
   sorting: Sorting
   contributingScoresForOutcome: ContributingScoresForOutcome
+  scores: (number | undefined)[]
 }
 
 export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
@@ -44,9 +46,12 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
   connectDropTarget,
   isDragging,
   contributingScoresForOutcome,
+  scores,
 }) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
+  // ODP => OutcomeDistributionPopover
+  const [isODPOpen, openODP, closeODP] = useModal() as [boolean, () => void, () => void]
 
   const isCurrentlySelected =
     sorting.sortBy === SortBy.Outcome && sorting.sortOutcomeId === String(outcome.id)
@@ -94,7 +99,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
           : I18n.t('Show Contributing Scores')}
       </Menu.Item>
       <Menu.Item onClick={openODModal}>{I18n.t('Outcome Info')}</Menu.Item>
-      <Menu.Item>{I18n.t('Show Outcome Distribution')}</Menu.Item>
+      <Menu.Item onClick={openODP}>{I18n.t('Show Outcome Distribution')}</Menu.Item>
     </Menu.Group>
   )
 
@@ -114,6 +119,16 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
         isOpen={isODModalOpen}
         onCloseHandler={closeODModal}
       />
+
+      {isODPOpen && (
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          scores={scores}
+          isOpen={isODPOpen}
+          onCloseHandler={closeODP}
+          renderTrigger={<span />}
+        />
+      )}
     </>
   )
 }
