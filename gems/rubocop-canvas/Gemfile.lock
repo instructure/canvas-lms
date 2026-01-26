@@ -171,7 +171,7 @@ GEM
       rubocop-ast (>= 1.44.0, < 2.0)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
-    stringio (3.1.7)
+    stringio (3.2.0)
     thor (1.4.0)
     timeout (0.4.3)
     tsort (0.2.0)

@@ -1192,7 +1192,7 @@ GEM
       rspec (~> 3.8)
     string_pattern (2.3.0)
       regexp_parser (~> 2.5, >= 2.5.0)
-    stringio (3.1.7)
+    stringio (3.2.0)
     swagger_yard (1.1.1)
       parslet
       yard

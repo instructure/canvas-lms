@@ -156,7 +156,7 @@ GEM
     sqlite3 (2.9.0-arm64-darwin)
     sqlite3 (2.9.0-x86_64-darwin)
     sqlite3 (2.9.0-x86_64-linux-gnu)
-    stringio (3.1.7)
+    stringio (3.2.0)
     thor (1.4.0)
     timeout (0.4.3)
     tsort (0.2.0)
