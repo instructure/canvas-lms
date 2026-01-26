@@ -91,7 +91,7 @@ GEM
       stringio
     racc (1.8.1)
     rake (13.3.1)
-    rdoc (6.15.0)
+    rdoc (7.1.0)
       erb
       psych (>= 4.0.0)
       tsort
