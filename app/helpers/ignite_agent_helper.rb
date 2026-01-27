@@ -40,6 +40,8 @@ module IgniteAgentHelper
   end
 
   def show_ignite_agent_button?
+    return false if @assignment&.quiz_lti? # hide it for New Quizzes
+
     ALLOWED_PAGES.include?("#{controller_path}##{action_name}")
   end
 end
