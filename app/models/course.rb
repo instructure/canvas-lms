@@ -354,6 +354,7 @@ class Course < ActiveRecord::Base
   after_save :update_enrollment_states_if_necessary
   after_save :clear_caches_if_necessary
   after_save :log_published_assignment_count
+  after_save :remove_course_pacing_overrides_if_disabled
   after_commit :update_cached_due_dates
 
   after_create :set_default_post_policy
@@ -614,6 +615,21 @@ class Course < ActiveRecord::Base
     return if just_published # Don't decrement on publish
 
     InstStatsd::Statsd.decrement(settings_before_last_save[:enable_course_paces] ? "course.paced.has_end_date" : "course.unpaced.has_end_date") if had_end_date
+  end
+
+  def remove_course_pacing_overrides_if_disabled
+    return unless root_account&.feature_enabled?(:course_pace_remove_overrides_on_disable)
+    return unless saved_changes[:settings]
+
+    old_settings = saved_changes[:settings][0] || {}
+    new_settings = saved_changes[:settings][1] || {}
+
+    return unless old_settings[:enable_course_paces] == true && new_settings[:enable_course_paces] == false
+
+    CoursePacing::RemoveOverridesService.delay_if_production(
+      priority: Delayed::LOW_PRIORITY,
+      n_strand: ["course_pacing_remove_overrides", global_root_account_id]
+    ).call(id)
   end
 
   def module_based?
