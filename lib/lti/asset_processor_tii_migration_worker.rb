@@ -31,6 +31,7 @@ module Lti
       @email = email
       @coordinator_id = coordinator_id
       @results = { proxies: {}, coordinator_id: @coordinator_id }
+      @migrated_tool_proxies = []
     end
 
     def perform(progress)
@@ -42,6 +43,16 @@ module Lti
         end
       end
       save_migration_report
+
+      # Clean up subscriptions for migrated tool proxies
+      # Can be rolled back with tool_proxy.manage_subscription
+      @migrated_tool_proxies.each do |tp|
+        tp.delete_subscription
+      rescue => e
+        capture_and_log_exception(e)
+        add_proxy_error(tp, "Unexpected error deleting subscriptions of ToolProxy ID=#{tp.id}")
+      end
+
       @progress.set_results(@results.except(:actl_errors, :actl_warnings)) # actl_errors can be large, exclude from progress results
 
       if @coordinator_id.present?
@@ -83,6 +94,7 @@ module Lti
             add_proxy_error(tool_proxy, "Tool creation failed for Tool Proxy ID=#{tool_proxy.global_id}")
             next
           end
+          @migrated_tool_proxies << tool_proxy
         end
 
         ap_migration_status, ap = create_asset_processor_from_actl(actl, tool_proxy)
