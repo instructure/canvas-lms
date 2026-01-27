@@ -422,9 +422,15 @@ module Types
 
         filter ||= {}
 
+        all_assignment_ids = if filter[:include_peer_review_submissions] && course.feature_enabled?(:peer_review_allocation_and_grading)
+                               AbstractAssignment.assignment_or_peer_review.published.where(context: course).pluck(:id)
+                             else
+                               course.assignments.published.reorder(nil).pluck(:id)
+                             end
+
         submissions = Submission.active.joins(:assignment).where(
           user_id: allowed_user_ids,
-          assignment_id: course.assignments.published.reorder(nil).select(:id),
+          assignment_id: all_assignment_ids,
           workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
         )
 
