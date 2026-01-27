@@ -1102,6 +1102,136 @@ describe Types::QueryType do
       end
     end
 
+    describe "enrollment_types filter" do
+      before(:once) do
+        @filter_course = Course.create!(name: "Filter Course", workflow_state: "available")
+        @filter_student = user_factory(name: "Filter Student")
+        @filter_course.enroll_student(@filter_student, enrollment_state: "active")
+
+        @filter_teacher1 = user_factory(name: "Filter Teacher 1")
+        @filter_teacher2 = user_factory(name: "Filter Teacher 2")
+        @filter_ta1 = user_factory(name: "Filter TA 1")
+        @filter_ta2 = user_factory(name: "Filter TA 2")
+
+        @filter_course.enroll_teacher(@filter_teacher1).accept!
+        @filter_course.enroll_teacher(@filter_teacher2).accept!
+        @filter_course.enroll_ta(@filter_ta1).accept!
+        @filter_course.enroll_ta(@filter_ta2).accept!
+      end
+
+      let(:filter_query) do
+        <<~GQL
+          query($courseIds: [ID!]!, $enrollmentTypes: [String!]) {
+            courseInstructorsConnection(courseIds: $courseIds, enrollmentTypes: $enrollmentTypes) {
+              nodes {
+                user {
+                  _id
+                  name
+                }
+                type
+              }
+            }
+          }
+        GQL
+      end
+
+      it "filters to only teachers when enrollmentTypes is [TeacherEnrollment]" do
+        result = CanvasSchema.execute(
+          filter_query,
+          variables: { courseIds: [@filter_course.id.to_s], enrollmentTypes: ["TeacherEnrollment"] },
+          context: { current_user: @filter_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(nodes.length).to eq(2)
+
+        instructor_names = nodes.pluck("user").pluck("name").sort
+        expect(instructor_names).to eq(["Filter Teacher 1", "Filter Teacher 2"])
+
+        types = nodes.pluck("type").uniq
+        expect(types).to eq(["TeacherEnrollment"])
+      end
+
+      it "filters to only TAs when enrollmentTypes is [TaEnrollment]" do
+        result = CanvasSchema.execute(
+          filter_query,
+          variables: { courseIds: [@filter_course.id.to_s], enrollmentTypes: ["TaEnrollment"] },
+          context: { current_user: @filter_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(nodes.length).to eq(2)
+
+        instructor_names = nodes.pluck("user").pluck("name").sort
+        expect(instructor_names).to eq(["Filter TA 1", "Filter TA 2"])
+
+        types = nodes.pluck("type").uniq
+        expect(types).to eq(["TaEnrollment"])
+      end
+
+      it "returns both teachers and TAs when enrollmentTypes includes both types" do
+        result = CanvasSchema.execute(
+          filter_query,
+          variables: {
+            courseIds: [@filter_course.id.to_s],
+            enrollmentTypes: ["TeacherEnrollment", "TaEnrollment"]
+          },
+          context: { current_user: @filter_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(nodes.length).to eq(4)
+
+        instructor_names = nodes.pluck("user").pluck("name").sort
+        expect(instructor_names).to eq(["Filter TA 1", "Filter TA 2", "Filter Teacher 1", "Filter Teacher 2"])
+
+        types = nodes.pluck("type").uniq.sort
+        expect(types).to eq(["TaEnrollment", "TeacherEnrollment"])
+      end
+
+      it "returns both teachers and TAs when enrollmentTypes is not provided" do
+        result = CanvasSchema.execute(
+          filter_query,
+          variables: { courseIds: [@filter_course.id.to_s] },
+          context: { current_user: @filter_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(nodes.length).to eq(4)
+
+        instructor_names = nodes.pluck("user").pluck("name").sort
+        expect(instructor_names).to eq(["Filter TA 1", "Filter TA 2", "Filter Teacher 1", "Filter Teacher 2"])
+      end
+
+      it "returns both teachers and TAs when enrollmentTypes is empty array" do
+        result = CanvasSchema.execute(
+          filter_query,
+          variables: { courseIds: [@filter_course.id.to_s], enrollmentTypes: [] },
+          context: { current_user: @filter_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(nodes.length).to eq(4)
+
+        instructor_names = nodes.pluck("user").pluck("name").sort
+        expect(instructor_names).to eq(["Filter TA 1", "Filter TA 2", "Filter Teacher 1", "Filter Teacher 2"])
+      end
+
+      it "does not include invalid enrollment types" do
+        result = CanvasSchema.execute(
+          filter_query,
+          variables: { courseIds: [@filter_course.id.to_s], enrollmentTypes: ["InvalidType", "TeacherEnrollment"] },
+          context: { current_user: @filter_student }
+        )
+
+        nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(nodes.length).to eq(2)
+
+        types = nodes.pluck("type").uniq
+        expect(types).to eq(["TeacherEnrollment"])
+      end
+    end
+
     describe "enrollment priority and deduplication" do
       before(:once) do
         @priority_course = Course.create!(name: "Priority Course", workflow_state: "available")
