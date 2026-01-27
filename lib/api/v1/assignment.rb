@@ -252,6 +252,9 @@ module Api::V1::Assignment
     # For peer review sub-assignments, use the parent assignment in the URL
     assignment_for_url = (assignment.is_a?(PeerReviewSubAssignment) && assignment.parent_assignment) ? assignment.parent_assignment : assignment
     hash["html_url"] = course_assignment_url(assignment.context_id, assignment_for_url)
+    if assignment.can_view_speed_grader?(user)
+      hash["speed_grader_url"] = speed_grader_course_gradebook_url(assignment.context, assignment_id: assignment.id)
+    end
     if can_manage
       hash["has_overrides"] = assignment.has_overrides?
     end
