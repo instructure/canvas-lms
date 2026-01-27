@@ -4401,16 +4401,16 @@ describe DiscussionTopic do
       end
 
       context "when topic is announcement" do
-        it "does not trigger accessibility scan on create" do
-          expect(Accessibility::ResourceScannerService).not_to receive(:call)
+        it "triggers accessibility scan on create" do
+          expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: an_instance_of(Announcement))
 
           Announcement.create!(title: "Test Announcement", message: "Test message", course:)
         end
 
-        it "does not trigger accessibility scan on update" do
+        it "triggers accessibility scan on update" do
           announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
 
-          expect(Accessibility::ResourceScannerService).not_to receive(:call)
+          expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: an_instance_of(Announcement))
 
           announcement.update!(message: "Updated message")
         end

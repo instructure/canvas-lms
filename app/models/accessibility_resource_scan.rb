@@ -42,6 +42,18 @@ class AccessibilityResourceScan < ActiveRecord::Base
   scope :open, -> { where(closed_at: nil) }
   scope :closed, -> { where.not(closed_at: nil) }
 
+  # This is necessary because Canvas's polymorphic associations don't correctly handle STI types.
+  # In case of Announcements, the discussion_topic_id is filled Instead of the announcement_id
+  # This is because Rails always uses the base_class to determine the type of the resource
+  # Which is DiscussionTopic for Announcements because of the STI.
+  def self.for_resource(resource)
+    if resource.is_a?(Announcement)
+      where(announcement_id: resource.id)
+    else
+      where(context: resource)
+    end
+  end
+
   def closed?
     closed_at.present?
   end
@@ -86,6 +98,8 @@ class AccessibilityResourceScan < ActiveRecord::Base
       url_helpers.course_assignment_path(course_id, context_id)
     when "Attachment"
       url_helpers.course_files_path(course_id, preview: context_id)
+    when "Announcement"
+      url_helpers.course_announcement_path(course_id, context_id)
     when "DiscussionTopic"
       url_helpers.course_discussion_topic_path(course_id, context_id)
     end

@@ -232,6 +232,41 @@ describe AccessibilityResourceScan do
     end
   end
 
+  describe ".for_resource" do
+    let(:course) { course_model }
+
+    context "when resource is an Announcement" do
+      let(:announcement) { course.announcements.create!(title: "Test", message: "Test") }
+      let!(:scan) { accessibility_resource_scan_model(context: announcement) }
+
+      it "returns the correct scan using announcement_id" do
+        result = described_class.for_resource(announcement).first
+        expect(result).to eq(scan)
+        expect(result.announcement_id).to eq(announcement.id)
+        expect(result.discussion_topic_id).to be_nil
+      end
+    end
+
+    context "when resource is not an Announcement" do
+      let(:wiki_page) { wiki_page_model(course:) }
+      let!(:scan) { accessibility_resource_scan_model(context: wiki_page) }
+
+      it "returns the correct scan using standard polymorphic" do
+        result = described_class.for_resource(wiki_page).first
+        expect(result).to eq(scan)
+        expect(result.wiki_page_id).to eq(wiki_page.id)
+      end
+    end
+
+    it "can be chained with other scopes" do
+      announcement = course.announcements.create!(title: "Test", message: "Test")
+      scan = accessibility_resource_scan_model(context: announcement, workflow_state: "completed")
+
+      result = described_class.for_resource(announcement).where(workflow_state: "completed").first
+      expect(result).to eq(scan)
+    end
+  end
+
   describe "#update_issue_count!" do
     let(:scan) { accessibility_resource_scan_model }
 

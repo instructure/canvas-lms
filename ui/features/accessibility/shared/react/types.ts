@@ -25,6 +25,7 @@ export enum ContentItemType {
   Assignment = 'Assignment',
   Attachment = 'attachment',
   DiscussionTopic = 'DiscussionTopic',
+  Announcement = 'Announcement',
 }
 
 /* export const ContentTypeToKey = {
@@ -84,6 +85,7 @@ export enum ResourceType {
   Assignment = 'Assignment',
   Attachment = 'Attachment',
   DiscussionTopic = 'DiscussionTopic',
+  Announcement = 'Announcement',
 }
 
 export interface AccessibilityResourceScan extends HasId {

@@ -88,6 +88,7 @@ class Accessibility::CourseScanService < ApplicationService
 
     if Account.site_admin.feature_enabled?(:a11y_checker_additional_resources)
       scan_resources(@course.discussion_topics.scannable.except(:order), :discussion_topic_id)
+      scan_resources(@course.announcements.active.except(:order), :announcement_id)
     end
   end
 
