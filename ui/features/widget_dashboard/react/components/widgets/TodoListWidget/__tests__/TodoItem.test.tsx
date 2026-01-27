@@ -245,5 +245,53 @@ describe('TodoItem', () => {
 
       expect(screen.getByText('Mark Lab Report: Cell Structure as incomplete')).toBeInTheDocument()
     })
+
+    it('shows assignment as complete when submitted', () => {
+      const submittedItem = {
+        ...mockPlannerItems[0],
+        submissions: {
+          submitted: true,
+          excused: false,
+          graded: false,
+          late: false,
+          missing: false,
+          needs_grading: false,
+          has_feedback: false,
+          redo_request: false,
+        },
+        planner_override: null,
+      }
+      renderWithProvider(<TodoItem item={submittedItem} />)
+
+      const button = screen.getByTestId(`todo-checkbox-${submittedItem.plannable_id}`)
+      expect(button).toBeInTheDocument()
+      expect(screen.getByText('Mark Lab Report: Cell Structure as incomplete')).toBeInTheDocument()
+
+      const link = screen.getByTestId(`todo-link-${submittedItem.plannable_id}`)
+      const titleText = link.querySelector('span')
+      expect(titleText).toHaveAttribute('color', 'secondary')
+    })
+
+    it('shows assignment as incomplete when redo requested', () => {
+      const redoItem = {
+        ...mockPlannerItems[0],
+        submissions: {
+          submitted: true,
+          excused: false,
+          graded: false,
+          late: false,
+          missing: false,
+          needs_grading: false,
+          has_feedback: false,
+          redo_request: true,
+        },
+        planner_override: null,
+      }
+      renderWithProvider(<TodoItem item={redoItem} />)
+
+      const button = screen.getByTestId(`todo-checkbox-${redoItem.plannable_id}`)
+      expect(button).toBeInTheDocument()
+      expect(screen.getByText('Mark Lab Report: Cell Structure as complete')).toBeInTheDocument()
+    })
   })
 })
