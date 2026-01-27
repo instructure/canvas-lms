@@ -42,6 +42,10 @@ class DiscussionTopicsTestCourseApi
   def course_assignment_url(*args)
     "course_assignment_url(#{args.inspect[1..-2]})"
   end
+
+  def speed_grader_course_gradebook_url(*args)
+    "speed_grader_course_gradebook_url(#{args.inspect[1..-2]})"
+  end
 end
 
 describe Api::V1::DiscussionTopics do

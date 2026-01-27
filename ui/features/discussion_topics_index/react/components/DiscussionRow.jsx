@@ -47,6 +47,7 @@ import {
   IconPinLine,
   IconPinSolid,
   IconPublishSolid,
+  IconSpeedGraderLine,
   IconTrashSolid,
   IconUnlockLine,
   IconUnpublishedLine,
@@ -198,7 +199,10 @@ class DiscussionRow extends Component {
     }
   }
 
-  onManageDiscussion = (e, {action, id, menuTool}) => {
+  onManageDiscussion = (e, param) => {
+    if (!param) return
+
+    const {action, id, menuTool} = param
     switch (action) {
       case 'duplicate':
         this.props.duplicateDiscussion(id)
@@ -642,24 +646,23 @@ class DiscussionRow extends Component {
 
     if (
       ENV.show_additional_speed_grader_links &&
-      this.props.discussion.assignment &&
-      this.props.discussion.published
+      this.props.discussion.assignment?.speed_grader_url
     ) {
-      const assignmentId = this.props.discussion.assignment.id
       menuList.push(
-        this.createMenuItem(
-          'speed-grader-link',
-          <a
-            href={`gradebook/speed_grader?assignment_id=${assignmentId}`}
-            className="icon-speed-grader"
-            style={{color: 'inherit', textDecoration: 'none'}}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {I18n.t('SpeedGrader')}
-          </a>,
-          I18n.t('Navigate to SpeedGrader for %{title} assignment', {title: discussionTitle}),
-        ),
+        <Menu.Item
+          key="speed-grader-link"
+          id="speed-grader-link-discussion-menu-option"
+          href={this.props.discussion.assignment.speed_grader_url}
+          target="_blank"
+        >
+          <span aria-hidden="true">
+            <IconSpeedGraderLine />
+            &nbsp;&nbsp;{I18n.t('SpeedGrader')}
+          </span>
+          <ScreenReaderContent>
+            {I18n.t('Navigate to SpeedGrader for %{title} assignment', {title: discussionTitle})}
+          </ScreenReaderContent>
+        </Menu.Item>,
       )
     }
 

@@ -45,6 +45,10 @@ class AssignmentApiHarness
     "/course/#{course.id}/quizzes/#{quiz.id}/submissions?zip=1"
   end
 
+  def speed_grader_course_gradebook_url(course, assignment_id:)
+    "/course/#{course.id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
+  end
+
   def strong_anything
     ArbitraryStrongishParams::ANYTHING
   end
