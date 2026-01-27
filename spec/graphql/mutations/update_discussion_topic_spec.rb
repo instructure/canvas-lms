@@ -1986,8 +1986,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         )
       end
 
-      it "does not trigger accessibility scan when announcement title is updated" do
-        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+      it "triggers accessibility scan when announcement title is updated" do
+        expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @announcement)
 
         result = run_mutation(
           id: @announcement.id,
@@ -1999,8 +1999,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         expect(@announcement.title).to eq "Updated Announcement Title"
       end
 
-      it "does not trigger accessibility scan when announcement message is updated" do
-        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+      it "triggers accessibility scan when announcement message is updated" do
+        expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @announcement)
 
         result = run_mutation(
           id: @announcement.id,
@@ -2012,17 +2012,18 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         expect(@announcement.message).to include "Updated announcement message"
       end
 
-      it "does not trigger accessibility scan when announcement workflow_state is updated" do
-        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+      it "triggers accessibility scan when announcement workflow_state is updated" do
+        @announcement.update!(workflow_state: "post_delayed")
+        expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @announcement)
 
         result = run_mutation(
           id: @announcement.id,
-          locked: true
+          published: true
         )
 
         expect(result["errors"]).to be_nil
         @announcement.reload
-        expect(@announcement.locked).to be true
+        expect(@announcement.workflow_state).to eq "active"
       end
     end
 

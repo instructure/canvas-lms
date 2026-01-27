@@ -79,6 +79,7 @@ export const artifactTypeOptions = [
   {value: 'wiki_page', label: I18n.t('Pages')},
   {value: 'assignment', label: I18n.t('Assignments')},
   {value: 'discussion_topic', label: I18n.t('Discussion topics'), requiresFeatureFlag: true},
+  {value: 'announcement', label: I18n.t('Announcements'), requiresFeatureFlag: true},
 ]
 
 export const stateOptions = [

@@ -181,11 +181,13 @@ describe Accessibility::CourseScanService do
       end
     end
 
-    context "when scanning discussion topics" do
+    context "when scanning additional resources" do
       let!(:discussion_topic1) { discussion_topic_model(context: course) }
       let!(:discussion_topic2) { discussion_topic_model(context: course) }
       let!(:discussion_topic3) { discussion_topic_model(context: course) }
       let!(:announcement) { course.announcements.create!(title: "Test Announcement", message: "Test message") }
+      let!(:delayed_announcement) { course.announcements.create!(title: "Test Announcement", message: "Test message", workflow_state: "post_delayed") }
+      let!(:deleted_announcement) { course.announcements.create!(title: "Test Announcement", message: "Test message") }
       let!(:graded_discussion) do
         assignment = course.assignments.create!(title: "Graded Discussion")
         course.discussion_topics.create!(title: "Graded Discussion", assignment:)
@@ -194,6 +196,7 @@ describe Accessibility::CourseScanService do
       before do
         discussion_topic2.unpublish!
         discussion_topic3.destroy!
+        deleted_announcement.destroy!
       end
 
       context "when a11y_checker_additional_resources feature flag is enabled" do
@@ -211,12 +214,36 @@ describe Accessibility::CourseScanService do
           expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic3)
         end
 
-        it "does not scan announcements" do
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: announcement)
+        it "scans announcements and delayed announcements" do
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: announcement)
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: delayed_announcement)
+        end
+
+        it "does not scan deleted announcements" do
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: deleted_announcement)
         end
 
         it "does not scan graded discussions" do
           expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: graded_discussion)
+        end
+
+        it "creates scan records with announcement_id filled and not discussion_topic_id" do
+          allow(Accessibility::ResourceScannerService).to receive(:call).and_call_original
+          allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource).and_wrap_original do |_, scan:|
+            scan.update!(
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
+
+          subject.scan_course
+
+          scan = AccessibilityResourceScan.find_by(announcement_id: announcement.id)
+          expect(scan.announcement_id).to eq(announcement.id)
+          expect(scan.discussion_topic_id).to be_nil
+          expect(scan.context).to eq(announcement)
+          expect(scan.context_type).to eq("Announcement")
         end
       end
 
@@ -230,6 +257,12 @@ describe Accessibility::CourseScanService do
           expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic2)
           expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic3)
         end
+
+        it "does not scan any announcements" do
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: announcement)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: delayed_announcement)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: deleted_announcement)
+        end
       end
     end
 
@@ -241,6 +274,7 @@ describe Accessibility::CourseScanService do
       let!(:wiki_page) { wiki_page_model(course:) }
       let!(:assignment) { assignment_model(course:) }
       let!(:discussion_topic) { discussion_topic_model(context: course) }
+      let!(:announcement) { course.announcements.create!(title: "Test Announcement", message: "Test message") }
 
       context "when there is no previous scan" do
         it "scans the wiki page" do
@@ -256,6 +290,11 @@ describe Accessibility::CourseScanService do
         it "scans the discussion topic" do
           subject.scan_course
           expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: discussion_topic)
+        end
+
+        it "scans the announcement" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: announcement)
         end
       end
 
@@ -289,6 +328,15 @@ describe Accessibility::CourseScanService do
               issue_count: 0
             )
           end
+          Timecop.freeze(announcement.updated_at + 1.hour) do
+            AccessibilityResourceScan.create!(
+              course:,
+              context: announcement,
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
         end
 
         it "does not scan the wiki page" do
@@ -304,6 +352,11 @@ describe Accessibility::CourseScanService do
         it "does not scan the discussion topic" do
           subject.scan_course
           expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic)
+        end
+
+        it "does not scan the announcement" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: announcement)
         end
       end
 
@@ -337,6 +390,15 @@ describe Accessibility::CourseScanService do
               issue_count: 0
             )
           end
+          Timecop.freeze(announcement.updated_at - 1.hour) do
+            AccessibilityResourceScan.create!(
+              course:,
+              context: announcement,
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
         end
 
         it "scans the wiki page" do
@@ -352,6 +414,11 @@ describe Accessibility::CourseScanService do
         it "scans the discussion topic" do
           subject.scan_course
           expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: discussion_topic)
+        end
+
+        it "scans the announcement" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: announcement)
         end
       end
 

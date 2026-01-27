@@ -9504,12 +9504,14 @@ describe Course do
         active_assignments = double(not_excluded_from_accessibility_scan: double(count: assignment_count))
         allow(course.assignments).to receive(:active).and_return(active_assignments)
         allow(course.discussion_topics).to receive(:scannable).and_return(double(count: discussion_topic_count))
+        allow(course.announcements).to receive(:active).and_return(double(count: announcement_count))
       end
 
       context "when total resources exceed limit" do
         let(:wiki_count) { 500 }
         let(:assignment_count) { 300 }
         let(:discussion_topic_count) { 300 }
+        let(:announcement_count) { 200 }
 
         it "returns true" do
           expect(course.exceeds_accessibility_scan_limit?).to be true
@@ -9520,6 +9522,7 @@ describe Course do
         let(:wiki_count) { 500 }
         let(:assignment_count) { 200 }
         let(:discussion_topic_count) { 200 }
+        let(:announcement_count) { 50 }
 
         it "returns false" do
           expect(course.exceeds_accessibility_scan_limit?).to be false
@@ -9529,7 +9532,8 @@ describe Course do
       context "when total resources equal limit" do
         let(:wiki_count) { 500 }
         let(:assignment_count) { 200 }
-        let(:discussion_topic_count) { 300 }
+        let(:discussion_topic_count) { 200 }
+        let(:announcement_count) { 100 }
 
         it "returns false" do
           expect(course.exceeds_accessibility_scan_limit?).to be false

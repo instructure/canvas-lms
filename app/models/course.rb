@@ -4809,8 +4809,9 @@ class Course < ActiveRecord::Base
     wiki_page_count = wiki_pages.not_deleted.count
     assignment_count = assignments.active.not_excluded_from_accessibility_scan.count
     discussion_topic_count = discussion_topics.scannable.count
+    announcement_count = announcements.active.count
 
-    total = wiki_page_count + assignment_count + discussion_topic_count
+    total = wiki_page_count + assignment_count + discussion_topic_count + announcement_count
     total > MAX_ACCESSIBILITY_SCAN_RESOURCES
   end
 
