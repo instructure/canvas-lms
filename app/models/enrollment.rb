@@ -584,6 +584,8 @@ class Enrollment < ActiveRecord::Base
       else
         user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, "invited_enrollments2"].cache_key) }
       end
+
+      Rails.cache.delete([user, "invited_enrollments", ApplicationController.region].cache_key)
     end
   end
 
