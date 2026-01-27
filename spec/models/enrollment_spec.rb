@@ -1922,6 +1922,19 @@ describe Enrollment do
           @enrollment.save!
           @enrollment.accept
         end
+
+        it "clears the user invitation cache when accepting" do
+          @enrollment.workflow_state = "invited"
+          @enrollment.save!
+
+          invitations_before = @user.cached_invitations
+          expect(invitations_before).to include(@enrollment)
+
+          @enrollment.accept!
+
+          invitations_after = @user.cached_invitations
+          expect(invitations_after).not_to include(@enrollment)
+        end
       end
 
       context "as a teacher" do
