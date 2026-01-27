@@ -8694,6 +8694,11 @@ type Query {
     courseIds: [ID!]!
 
     """
+    Filter by enrollment types (TeacherEnrollment, TaEnrollment)
+    """
+    enrollmentTypes: [String!]
+
+    """
     Returns the first _n_ elements from the list.
     """
     first: Int

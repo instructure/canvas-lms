@@ -73,6 +73,22 @@ module WidgetDashboardPage
     "[data-testid='message-button-#{account_id}-#{course_id}']"
   end
 
+  def course_filter_select_selector
+    "[data-testid='course-filter-select']"
+  end
+
+  def role_filter_select_selector
+    "[data-testid='role-filter-select']"
+  end
+
+  def people_course_filter_select_selector
+    "#{widget_container_selector("people")} [data-testid='course-filter-select']"
+  end
+
+  def people_role_filter_select_selector
+    "#{widget_container_selector("people")} [data-testid='role-filter-select']"
+  end
+
   def send_message_to_modal_selector(teacher_name)
     "span[role = 'dialog'][aria-label='Send Message to #{teacher_name}']"
   end
@@ -321,6 +337,18 @@ module WidgetDashboardPage
     f(message_instructor_button_selector(account_id, course_id))
   end
 
+  def course_filter_select
+    f(course_filter_select_selector)
+  end
+
+  def role_filter_select
+    f(role_filter_select_selector)
+  end
+
+  def filter_option(option_text)
+    fj(filter_option_selector(option_text))
+  end
+
   def send_message_to_modal(teacher_name)
     f(send_message_to_modal_selector(teacher_name))
   end
@@ -531,6 +559,16 @@ module WidgetDashboardPage
       click_INSTUI_Select_option(course_work_course_filter_select_selector, filter_value)
     when :date
       click_INSTUI_Select_option(course_work_date_filter_select_selector, filter_value)
+    end
+    wait_for_ajaximations
+  end
+
+  def filter_people_by(filter_type, filter_value)
+    case filter_type
+    when :course
+      click_INSTUI_Select_option(people_course_filter_select_selector, filter_value)
+    when :role
+      click_INSTUI_Select_option(people_role_filter_select_selector, filter_value)
     end
     wait_for_ajaximations
   end

@@ -22,6 +22,8 @@ module Types
   class QueryType < ApplicationObjectType
     include GraphQL::Types::Relay::HasNodeField
 
+    ALLOWED_INSTRUCTOR_TYPES = ["TeacherEnrollment", "TaEnrollment"].freeze
+
     field :legacy_node, GraphQL::Types::Relay::Node, null: true do
       description "Fetches an object given its type and legacy ID"
       argument :_id, ID, required: true
@@ -176,9 +178,10 @@ module Types
                "Course IDs to get instructors for",
                required: true,
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
+      argument :enrollment_types, [String], "Filter by enrollment types (TeacherEnrollment, TaEnrollment)", required: false
       argument :observed_user_id, ID, "ID of the observed user", required: false
     end
-    def course_instructors_connection(course_ids:, observed_user_id: nil, **_args)
+    def course_instructors_connection(course_ids:, observed_user_id: nil, enrollment_types: nil, **_args)
       return Enrollment.none unless current_user
 
       user_course_ids = if observed_user_id.present?
@@ -198,11 +201,17 @@ module Types
 
       # Optimized approach: use a subquery for deduplication, then sort for display
       # This eliminates one level of joins compared to the previous double-subquery approach
+      types_to_filter = if enrollment_types.present?
+                          enrollment_types & ALLOWED_INSTRUCTOR_TYPES
+                        else
+                          ALLOWED_INSTRUCTOR_TYPES
+                        end
+      types_to_filter = ALLOWED_INSTRUCTOR_TYPES if types_to_filter.empty?
       deduplicated_ids = Enrollment
                          .joins(:enrollment_state)
                          .current
                          .where(course_id: course_ids)
-                         .where(type: ["TeacherEnrollment", "TaEnrollment"])
+                         .where(type: types_to_filter)
                          .where(enrollment_states: { restricted_access: false, state: "active" })
                          .where(courses: { workflow_state: "available" })
                          .where("courses.conclude_at IS NULL OR courses.conclude_at > ?", Time.now.utc)
