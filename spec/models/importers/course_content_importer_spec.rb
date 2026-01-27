@@ -1118,6 +1118,99 @@ describe Course do
       expect(Importers::CourseContentImporter.any_shift_date_missing?(options)).to be true
     end
   end
+
+  describe "LTI context control creation during external tool import" do
+    let_once(:lti_registration) { lti_registration_with_tool(account: course.account) }
+    let_once(:developer_key) { lti_registration.developer_key }
+    let_once(:course) { course_factory }
+
+    it "creates context control when migration has tool but no associated control" do
+      migration = course.content_migrations.create!(user: user_model)
+
+      data = {
+        "external_tools" => [
+          {
+            "migration_id" => "test_tool_1",
+            "title" => "Test LTI 1.3 Tool",
+            "url" => "http://example.com/launch",
+            "lti_version" => "1.3",
+            "settings" => { "client_id" => developer_key.global_id }
+          }
+        ]
+      }
+
+      params = { "copy" => { "external_tools" => { "test_tool_1" => true } } }
+      migration.migration_settings[:migration_ids_to_import] = params
+
+      expect do
+        Importers::CourseContentImporter.import_content(course, data, params, migration)
+      end.to change { Lti::ContextControl.count }.by(1)
+
+      control = Lti::ContextControl.last
+      expect(control.course_id).to eq course.id
+      expect(control.registration_id).to eq developer_key.lti_registration.id
+      # Defaults to available if no control was present.
+      expect(control.available).to be true
+    end
+
+    it "uses the primary context control info from the file if present" do
+      migration = course.content_migrations.create!(user: user_model)
+
+      data = {
+        "external_tools" => [
+          {
+            "migration_id" => "test_tool_1",
+            "title" => "Test LTI 1.3 Tool",
+            "url" => "http://example.com/launch",
+            "lti_version" => "1.3",
+            "settings" => { "client_id" => developer_key.global_id }
+          }
+        ],
+        "lti_context_controls" => [
+          {
+            "deployment_migration_id" => "test_tool_1",
+            "available" => false
+          }
+        ]
+      }
+
+      params = { "copy" => { "external_tools" => { "test_tool_1" => true } } }
+      migration.migration_settings[:migration_ids_to_import] = params
+
+      # Should only create one control, not two (one from the migration data, not a default one)
+      expect do
+        Importers::CourseContentImporter.import_content(course, data, params, migration)
+      end.to change { Lti::ContextControl.count }.by(1)
+
+      control = Lti::ContextControl.last
+      # Uses the availability from the migration data, not the default (true)
+      expect(control.available).to be false
+    end
+
+    it "does not create context control for LTI 1.1 tools" do
+      migration = course.content_migrations.create!(user: user_model)
+
+      data = {
+        "external_tools" => [
+          {
+            "migration_id" => "test_tool_1",
+            "title" => "Test LTI 1.1 Tool",
+            "url" => "http://example.com/launch",
+            "lti_version" => "1.1",
+            "consumer_key" => "test_key",
+            "shared_secret" => "test_secret"
+          }
+        ]
+      }
+
+      params = { "copy" => { "external_tools" => { "test_tool_1" => true } } }
+      migration.migration_settings[:migration_ids_to_import] = params
+
+      expect do
+        Importers::CourseContentImporter.import_content(course, data, params, migration)
+      end.not_to change { Lti::ContextControl.count }
+    end
+  end
 end
 
 def from_file_path(path, course)
