@@ -351,7 +351,8 @@ describe ContentMigration do
                                              global_identifiers: true,
                                              for_content_export: true)
       end
-      let(:dev_key) { DeveloperKey.create! }
+      let(:lti_registration) { lti_registration_with_tool(account: course.account) }
+      let(:dev_key) { lti_registration.developer_key }
       let(:tool) do
         # ContentMigrations change things that were nil to their default values,
         # like an empty array or hash. This changes the identity hash, so we
@@ -440,7 +441,7 @@ describe ContentMigration do
         let(:assignments) do
           assignments = []
           3.times do |i|
-            dev_key = DeveloperKey.create!
+            dev_key = lti_registration_with_tool(account: course.account).developer_key
             tool = external_tool_1_3_model(context: course,
                                            opts: {
                                              developer_key: dev_key,
