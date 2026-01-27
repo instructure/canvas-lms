@@ -8512,6 +8512,67 @@ describe Course do
     end
   end
 
+  describe "removing course pacing overrides on disable" do
+    before do
+      @course = course_model
+      @course.enable_course_paces = true
+      @course.save!
+      @course.offer!
+
+      @assignment = @course.assignments.create!(title: "Test Assignment")
+      @student = user_model
+      @course.enroll_student(@student, enrollment_state: "active")
+
+      @override = @assignment.assignment_overrides.create!(
+        title: "Course Pacing",
+        set_type: "ADHOC",
+        due_at_overridden: true,
+        due_at: 1.day.from_now
+      )
+      @override.assignment_override_students.create!(user: @student)
+    end
+
+    context "when feature flag is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_pace_remove_overrides_on_disable)
+      end
+
+      it "queues a job to remove course pacing overrides when course pacing is disabled" do
+        expect(CoursePacing::RemoveOverridesService).to receive(:delay_if_production).and_return(CoursePacing::RemoveOverridesService)
+        expect(CoursePacing::RemoveOverridesService).to receive(:call).with(@course.id)
+
+        @course.update!(enable_course_paces: false)
+      end
+
+      it "does not queue a job when course pacing is enabled" do
+        @course.enable_course_paces = false
+        @course.save!
+
+        expect(CoursePacing::RemoveOverridesService).not_to receive(:delay_if_production)
+
+        @course.update!(enable_course_paces: true)
+      end
+
+      it "does not queue a job when course pacing setting is not changed" do
+        expect(CoursePacing::RemoveOverridesService).not_to receive(:delay_if_production)
+
+        @course.update!(name: "New Name")
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_pace_remove_overrides_on_disable)
+      end
+
+      it "does not queue a job to remove overrides" do
+        expect(CoursePacing::RemoveOverridesService).not_to receive(:delay_if_production)
+
+        @course.update!(enable_course_paces: false)
+      end
+    end
+  end
+
   describe "#batch_update_context_modules" do
     before do
       @course = course_model
