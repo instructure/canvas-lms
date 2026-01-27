@@ -151,6 +151,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       it "successfully migrates tool proxy and creates asset processor" do
         product_family
+        tool_proxy.update_columns(subscription_id: "test-subscription-123")
         actl
         success_response = double("response", is_a?: true, code: "200", body: "success")
         allow(CanvasHttp).to receive(:post).and_return(success_response)
@@ -189,6 +190,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         expect(test_progress.results).to be_present
         expect(test_progress.results[:proxies]).to be_present
         expect(test_progress).to be_completed
+
+        expect(tool_proxy.reload.subscription_id).to be_nil
       end
     end
 
@@ -436,6 +439,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       it "marks progress as failed when tool proxy migration has errors" do
         product_family
+        tool_proxy.update_columns(subscription_id: "test-subscription-789")
         actl
         allow(worker).to receive(:find_tii_asset_processor_deployments).and_raise(StandardError, "Deployment error")
 
@@ -443,6 +447,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
         expect(test_progress).to be_failed
         expect(test_progress).not_to be_completed
+        expect(tool_proxy.reload.subscription_id).to eq("test-subscription-789")
       end
 
       it "marks progress as failed when unexpected exception occurs during migration" do
