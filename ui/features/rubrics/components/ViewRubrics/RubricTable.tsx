@@ -34,7 +34,6 @@ const {Head, Row, Cell, ColHeader, Body} = Table
 
 export type RubricTableProps = {
   active: boolean
-  canImportExportRubrics: boolean
   canManageRubrics: boolean
   handleArchiveRubricChange: (rubricId: string) => void
   handleCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>, rubricId: string) => void
@@ -47,7 +46,6 @@ export type RubricTableProps = {
 export const RubricTable = ({
   active,
   canManageRubrics,
-  canImportExportRubrics,
   handleArchiveRubricChange,
   handleCheckboxChange,
   onLocationsClick,
@@ -145,19 +143,17 @@ export const RubricTable = ({
           <Row key={rubric.id} data-testid={`rubric-row-${rubric.id}`}>
             <Cell data-testid={`rubric-title-${index}`}>
               <Flex direction="row" alignItems="center">
-                {canImportExportRubrics && (
-                  <Flex.Item margin="0 small 0 0">
-                    <Checkbox
-                      label={
-                        <ScreenReaderContent>{`${I18n.t('Select')} ${rubric.title}`}</ScreenReaderContent>
-                      }
-                      value={rubric.id}
-                      onChange={event => handleCheckboxChange(event, rubric.id)}
-                      checked={selectedRubricIds.includes(rubric.id)}
-                      data-testid={`rubric-select-checkbox-${rubric.id}`}
-                    />
-                  </Flex.Item>
-                )}
+                <Flex.Item margin="0 small 0 0">
+                  <Checkbox
+                    label={
+                      <ScreenReaderContent>{`${I18n.t('Select')} ${rubric.title}`}</ScreenReaderContent>
+                    }
+                    value={rubric.id}
+                    onChange={event => handleCheckboxChange(event, rubric.id)}
+                    checked={selectedRubricIds.includes(rubric.id)}
+                    data-testid={`rubric-select-checkbox-${rubric.id}`}
+                  />
+                </Flex.Item>
                 <Flex.Item>
                   <Link
                     forceButtonRole={true}
