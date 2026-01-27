@@ -214,4 +214,36 @@ describe('PeerReviewWidget', () => {
       expect(screen.queryByText('Allocation Tray Content')).not.toBeInTheDocument()
     })
   })
+
+  describe('Tray Interaction', () => {
+    it('closes configuration tray when allocation tray is opened', async () => {
+      renderWithQueryClient()
+
+      const viewConfigButton = screen.getByTestId('view-configuration-button')
+      await user.click(viewConfigButton)
+
+      expect(screen.getByText('Config Tray Content')).toBeInTheDocument()
+
+      const allocateButton = screen.getByTestId('allocate-peer-reviews-button')
+      await user.click(allocateButton)
+
+      expect(screen.queryByText('Config Tray Content')).not.toBeInTheDocument()
+      expect(screen.getByText('Allocation Tray Content')).toBeInTheDocument()
+    })
+
+    it('closes allocation tray when configuration tray is opened', async () => {
+      renderWithQueryClient()
+
+      const allocateButton = screen.getByTestId('allocate-peer-reviews-button')
+      await user.click(allocateButton)
+
+      expect(screen.getByText('Allocation Tray Content')).toBeInTheDocument()
+
+      const viewConfigButton = screen.getByTestId('view-configuration-button')
+      await user.click(viewConfigButton)
+
+      expect(screen.queryByText('Allocation Tray Content')).not.toBeInTheDocument()
+      expect(screen.getByText('Config Tray Content')).toBeInTheDocument()
+    })
+  })
 })
