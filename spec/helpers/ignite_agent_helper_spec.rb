@@ -106,5 +106,21 @@ describe IgniteAgentHelper do
 
       expect(show_ignite_agent_button?).to be false
     end
+
+    it "returns false for New Quizzes (quiz_lti assignments)" do
+      assignment = double("Assignment", quiz_lti?: true)
+      instance_variable_set(:@assignment, assignment)
+      allow(controller).to receive_messages(controller_path: "assignments", action_name: "show")
+
+      expect(show_ignite_agent_button?).to be false
+    end
+
+    it "returns true for regular assignments on whitelisted pages" do
+      assignment = double("Assignment", quiz_lti?: false)
+      instance_variable_set(:@assignment, assignment)
+      allow(controller).to receive_messages(controller_path: "assignments", action_name: "show")
+
+      expect(show_ignite_agent_button?).to be true
+    end
   end
 end
