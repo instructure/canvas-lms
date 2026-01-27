@@ -375,3 +375,8 @@ $page-dark: #ebeff2;
 #lmgb-average-filter {
   margin-#{direction(right)}: 10px;
 }
+
+#learning-mastery-gradebook-table {
+  border-spacing: 2px 0;
+  border-collapse: separate;
+}

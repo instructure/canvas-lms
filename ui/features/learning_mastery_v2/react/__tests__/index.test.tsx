@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cleanup, render, waitFor} from '@testing-library/react'
+import {cleanup, render, waitFor, screen} from '@testing-library/react'
 import {type MockedFunction} from 'vitest'
 import LearningMastery from '../index'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
@@ -171,51 +171,51 @@ describe('LearningMastery', () => {
   it('renders a loading spinner when useRollups.isLoading is true', async () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({isLoading: true}))
-    const {getByText} = render(<LearningMastery {...defaultProps()} />)
-    expect(getByText('Loading')).toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.getByText('Loading')).toBeInTheDocument()
   })
 
   it('renders the gradebook menu on the page', async () => {
-    const {getByTestId} = render(<LearningMastery {...defaultProps()} />)
-    expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
   })
 
   it('renders the export button on the page', async () => {
-    const {getByText} = render(<LearningMastery {...defaultProps()} />)
-    expect(getByText('Export')).toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.getByText('Export')).toBeInTheDocument()
   })
 
   it('does not render the export button on load error', async () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: ''}))
-    const {queryByText} = render(<LearningMastery {...defaultProps()} />)
-    expect(queryByText('Export')).not.toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.queryByText('Export')).not.toBeInTheDocument()
   })
 
   it('does not render the gradebook body on the page if loading failed', async () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: ''}))
-    const {queryByTestId} = render(<LearningMastery {...defaultProps()} />)
-    expect(queryByTestId('gradebook-body')).not.toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.queryByTestId('gradebook-body')).not.toBeInTheDocument()
   })
 
   it('renders generic error page if loading failed, while still rendering the gradebook menu', async () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: 'Banana Error'}))
-    const {getByTestId, getByText} = render(<LearningMastery {...defaultProps()} />)
-    expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
-    expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+    expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
   it('renders each student, outcome, rollup from the response', async () => {
-    const {getByText} = render(<LearningMastery {...defaultProps()} />)
+    render(<LearningMastery {...defaultProps()} />)
 
     await waitFor(() => {
-      expect(getByText(students[0].name)).toBeInTheDocument()
+      expect(screen.getByText(students[0].name)).toBeInTheDocument()
     })
 
-    expect(getByText(outcomes[0].title)).toBeInTheDocument()
-    expect(getByText('rating description!')).toBeInTheDocument()
+    expect(screen.getByText(outcomes[0].title)).toBeInTheDocument()
+    expect(screen.getByText('rating description!')).toBeInTheDocument()
   })
 
   it('calls useRollups with the provided courseId', () => {
