@@ -28,7 +28,7 @@ import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
 import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
 import {DragDropConnectorProps} from './DragDropWrapper'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {DraggableColumnHeader} from './DraggableColumnHeader'
+import {ColumnHeader} from './ColumnHeader'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -42,9 +42,6 @@ export interface OutcomeHeaderProps extends DragDropConnectorProps {
 export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
   outcome,
   sorting,
-  connectDragSource,
-  connectDropTarget,
-  isDragging,
   contributingScoresForOutcome,
   scores,
 }) => {
@@ -105,13 +102,10 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
 
   return (
     <>
-      <DraggableColumnHeader
+      <ColumnHeader
         title={outcome.title}
         optionsMenuTriggerLabel={I18n.t('Sort Outcome Column')}
         optionsMenuItems={[sortMenuGroup, <Menu.Separator key="separator" />, displayMenuGroup]}
-        connectDragSource={connectDragSource}
-        connectDropTarget={connectDropTarget}
-        isDragging={isDragging}
       />
 
       <OutcomeDescriptionModal

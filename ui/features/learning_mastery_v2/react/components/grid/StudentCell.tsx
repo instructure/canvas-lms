@@ -19,8 +19,6 @@
 import React from 'react'
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
-import {Link} from '@instructure/ui-link'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {Outcome, Student, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 import {SecondaryInfoDisplay, NameDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {Text} from '@instructure/ui-text'
@@ -84,7 +82,7 @@ export const StudentCell: React.FC<StudentCellProps> = ({
         </Flex.Item>
       )}
       <Flex.Item as="div" size={displayNameWidth} padding="none x-small">
-        <Flex direction="column">
+        <Flex direction="column" textAlign="start">
           <StudentCellPopover
             key={student.id}
             student={student}

@@ -153,9 +153,7 @@ describe('Gradebook', () => {
     ]
     const props = defaultProps({outcomes: customOutcomes})
     const {container} = renderWithQueryClient(<Gradebook {...props} />)
-    const outcomeHeaders = container.querySelectorAll(
-      '#outcomes-header [data-testid="column-header"]',
-    )
+    const outcomeHeaders = container.querySelectorAll('[data-testid^="outcome-header"]')
 
     expect(outcomeHeaders).toHaveLength(4)
     expect(outcomeHeaders[0]).toHaveTextContent('First Outcome')
@@ -316,9 +314,7 @@ describe('Gradebook', () => {
       const props = defaultProps({contributingScores: mockContributingScoresNoAlignments})
       const {container} = renderWithQueryClient(<Gradebook {...props} />)
 
-      const allHeaders = container.querySelectorAll(
-        '#outcomes-header [data-testid="column-header"]',
-      )
+      const allHeaders = container.querySelectorAll('[data-testid^="outcome-header"]')
       expect(allHeaders).toHaveLength(2)
     })
 
@@ -342,9 +338,7 @@ describe('Gradebook', () => {
       const props = defaultProps({contributingScores: mockContributingScoresEmptyAlignments})
       const {container} = renderWithQueryClient(<Gradebook {...props} />)
 
-      const allHeaders = container.querySelectorAll(
-        '#outcomes-header [data-testid="column-header"]',
-      )
+      const allHeaders = container.querySelectorAll('[data-testid^="outcome-header"]')
       expect(allHeaders).toHaveLength(2)
     })
 

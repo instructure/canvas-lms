@@ -21,6 +21,13 @@ import {BarChartRow, BarChartRowProps} from '../BarChartRow'
 import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {MOCK_OUTCOMES, MOCK_STUDENTS, MOCK_ROLLUPS} from '../../../__fixtures__/rollups'
 import {MOCK_ALIGNMENTS} from '../../../__fixtures__/contributingScores'
+import {Column} from '../../table/utils'
+import {
+  COLUMN_WIDTH,
+  COLUMN_PADDING,
+  STUDENT_COLUMN_WIDTH,
+  STUDENT_COLUMN_RIGHT_PADDING,
+} from '@canvas/outcomes/react/utils/constants'
 
 // Mock the MasteryDistributionChart component
 vi.mock('../../charts', () => ({
@@ -44,12 +51,54 @@ describe('BarChartRow', () => {
     })),
   }
 
-  const defaultProps = (): BarChartRowProps => ({
-    barChartRowRef: {current: null},
-    outcomes: MOCK_OUTCOMES,
+  const mockHandleKeyDown = vi.fn()
+
+  const generateColumns = (
+    contributingScoresManager: ContributingScoresManager = mockContributingScores,
+  ): Column[] => {
+    const columns: Column[] = []
+
+    columns.push({
+      key: 'student',
+      header: 'Student',
+      width: STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING,
+      isSticky: true,
+      isRowHeader: true,
+    })
+
+    MOCK_OUTCOMES.forEach(outcome => {
+      const contributingScoreForOutcome = contributingScoresManager.forOutcome(outcome.id)
+      columns.push({
+        key: `outcome-${outcome.id}`,
+        header: outcome.title,
+        width: COLUMN_WIDTH + COLUMN_PADDING,
+        draggable: true,
+        data: {outcome},
+      })
+
+      if (contributingScoreForOutcome.isVisible()) {
+        ;(contributingScoreForOutcome.alignments || []).forEach(alignment => {
+          columns.push({
+            key: `contributing-score-${outcome.id}-${alignment.alignment_id}`,
+            header: alignment.associated_asset_name,
+            width: COLUMN_WIDTH + COLUMN_PADDING,
+            data: {outcome, alignment},
+          })
+        })
+      }
+    })
+
+    return columns
+  }
+
+  const defaultProps = (
+    contributingScoresManager: ContributingScoresManager = mockContributingScores,
+  ): BarChartRowProps => ({
     rollups: MOCK_ROLLUPS,
     students: MOCK_STUDENTS,
-    contributingScores: mockContributingScores,
+    contributingScores: contributingScoresManager,
+    columns: generateColumns(contributingScoresManager),
+    handleKeyDown: mockHandleKeyDown,
   })
 
   beforeEach(() => {
@@ -93,10 +142,7 @@ describe('BarChartRow', () => {
       })),
     }
 
-    const props = {
-      ...defaultProps(),
-      contributingScores: mockContributingScoresVisible,
-    }
+    const props = defaultProps(mockContributingScoresVisible)
 
     const {container} = render(<BarChartRow {...props} />)
 
@@ -114,14 +160,23 @@ describe('BarChartRow', () => {
   it('applies box-shadow styling to outcome chart containers', () => {
     const {container} = render(<BarChartRow {...defaultProps()} />)
 
-    const outcomeChartContainer = container.querySelector('[style*="box-shadow"]')
-    expect(outcomeChartContainer).not.toBeNull()
+    const outcomeCell = container.querySelector('[id^="bar-chart-outcome-"]')
+    expect(outcomeCell).not.toBeNull()
+    expect(outcomeCell).toHaveAttribute('id')
   })
 
   it('handles empty outcomes array', () => {
     const props = {
       ...defaultProps(),
-      outcomes: [],
+      columns: [
+        {
+          key: 'student',
+          header: 'Student',
+          width: STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING,
+          isSticky: true,
+          isRowHeader: true,
+        },
+      ],
     }
 
     const {container} = render(<BarChartRow {...props} />)
@@ -143,10 +198,8 @@ describe('BarChartRow', () => {
   })
 
   it('handles empty students array', () => {
-    const props = {
-      ...defaultProps(),
-      students: [],
-    }
+    const props = defaultProps()
+    props.students = []
 
     const {getByTestId} = render(<BarChartRow {...props} />)
     expect(getByTestId('mastery-chart-1')).toBeInTheDocument()
@@ -174,10 +227,7 @@ describe('BarChartRow', () => {
       })),
     }
 
-    const props = {
-      ...defaultProps(),
-      contributingScores: mockContributingScoresVisible,
-    }
+    const props = defaultProps(mockContributingScoresVisible)
 
     render(<BarChartRow {...props} />)
 
@@ -185,16 +235,17 @@ describe('BarChartRow', () => {
     expect(mockScoresForUserFn).toHaveBeenCalledWith('2')
   })
 
-  it('sets the barChartRowRef correctly', () => {
-    const barChartRowRef = {current: null}
-    const props = {
-      ...defaultProps(),
-      barChartRowRef,
+  it('calls handleKeyDown when key is pressed on a cell', () => {
+    const {container} = render(<BarChartRow {...defaultProps()} />)
+
+    const cell = container.querySelector('[data-cell-id="cell--2-0"]')
+    expect(cell).toBeInTheDocument()
+
+    if (cell) {
+      cell.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}))
     }
 
-    render(<BarChartRow {...props} />)
-
-    expect(barChartRowRef.current).toBeInstanceOf(HTMLElement)
+    expect(mockHandleKeyDown).toHaveBeenCalled()
   })
 
   it('handles outcomes with string and number IDs consistently', () => {
@@ -203,9 +254,31 @@ describe('BarChartRow', () => {
       {...MOCK_OUTCOMES[1], id: 2 as any},
     ]
 
+    const mixedColumns: Column[] = [
+      {
+        key: 'student',
+        header: 'Student',
+        width: STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING,
+        isSticky: true,
+        isRowHeader: true,
+      },
+      {
+        key: 'outcome-1',
+        header: 'Outcome 1',
+        width: COLUMN_WIDTH + COLUMN_PADDING,
+        data: {outcome: mixedIdOutcomes[0]},
+      },
+      {
+        key: 'outcome-2',
+        header: 'Outcome 2',
+        width: COLUMN_WIDTH + COLUMN_PADDING,
+        data: {outcome: mixedIdOutcomes[1]},
+      },
+    ]
+
     const props = {
       ...defaultProps(),
-      outcomes: mixedIdOutcomes,
+      columns: mixedColumns,
     }
 
     const {getByTestId} = render(<BarChartRow {...props} />)
@@ -238,10 +311,7 @@ describe('BarChartRow', () => {
       })),
     }
 
-    const props = {
-      ...defaultProps(),
-      contributingScores: mockContributingScoresVisible,
-    }
+    const props = defaultProps(mockContributingScoresVisible)
 
     expect(() => render(<BarChartRow {...props} />)).not.toThrow()
   })

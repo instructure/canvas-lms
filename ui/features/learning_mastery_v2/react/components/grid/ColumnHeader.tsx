@@ -39,13 +39,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   columnWidth = COLUMN_WIDTH,
 }) => {
   return (
-    <View
-      background="secondary"
-      as="div"
-      width={columnWidth}
-      borderWidth="large 0 medium 0"
-      data-testid="column-header"
-    >
+    <View background="secondary" as="div" width={columnWidth} data-testid="column-header">
       <Flex
         alignItems="center"
         justifyItems="space-between"
