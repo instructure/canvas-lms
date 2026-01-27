@@ -27,10 +27,11 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Pill} from '@instructure/ui-pill'
-import {IconAiColoredSolid} from '@instructure/ui-icons'
+import {IconAiColoredSolid, IconFullScreenLine} from '@instructure/ui-icons'
 import {AIExperience} from '../../types'
 import {useStudentConversations, useConversationDetail} from '../hooks/useAIConversations'
 import type {LLMConversationMessage} from '@canvas/ai-experiences/types'
+import FocusMode from '@canvas/ai-experiences/react/components/FocusMode'
 
 const I18n = createI18nScope('ai_experiences_ai_conversations')
 
@@ -55,6 +56,7 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
     getIdentifierFromHash,
   )
   const [selectedTab, setSelectedTab] = useState<number>(0)
+  const [isFocusModeOpen, setIsFocusModeOpen] = useState(false)
 
   // Find the selected student data and determine if they have a conversation
   const selectedStudentData = conversations.find(
@@ -102,6 +104,55 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
   const aiMessageCount = messages.filter(m => m.role === 'Assistant').length
   const studentMessageCount = Math.max(0, messages.filter(m => m.role === 'User').length - 1)
 
+  const renderMessages = (inFocusMode = false) => {
+    const messageContent = messages.slice(1).map((message, index) => {
+      const isUser = message.role === 'User'
+      return (
+        <View key={index} as="div" margin="0 0 medium 0" textAlign={isUser ? 'end' : 'start'}>
+          <View
+            as="div"
+            display="inline-block"
+            maxWidth="70%"
+            padding="small medium"
+            background={isUser ? 'primary' : 'primary'}
+            borderRadius="medium"
+            textAlign="start"
+          >
+            <Text>{message.text}</Text>
+          </View>
+        </View>
+      )
+    })
+
+    if (inFocusMode) {
+      return (
+        <View
+          as="div"
+          padding="medium"
+          background="secondary"
+          borderRadius="medium"
+          overflowY="auto"
+          style={{flex: 1, boxSizing: 'border-box'}}
+        >
+          {messageContent}
+        </View>
+      )
+    }
+
+    return (
+      <View
+        as="div"
+        padding="medium"
+        background="secondary"
+        borderRadius="medium"
+        height="calc(100vh - 400px)"
+        overflowY="auto"
+      >
+        {messageContent}
+      </View>
+    )
+  }
+
   return (
     <View as="div" margin="medium">
       <View as="div" margin="0 0 medium 0">
@@ -126,9 +177,18 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
           >
             {conversations.map(conv => {
               const identifier = conv.id || `user_${conv.user_id}`
+              const hasConversation = Boolean(conv.id)
+              const displayName = hasConversation
+                ? `✓ ${conv.student.name}`
+                : `${conv.student.name} (No conversation)`
               return (
-                <SimpleSelect.Option key={identifier} id={identifier} value={identifier}>
-                  {conv.student.name}
+                <SimpleSelect.Option
+                  key={identifier}
+                  id={identifier}
+                  value={identifier}
+                  isDisabled={!hasConversation}
+                >
+                  {displayName}
                 </SimpleSelect.Option>
               )
             })}
@@ -146,19 +206,34 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
         {selectedIdentifier && hasConversation && conversation && (
           <>
             <Flex.Item padding="0 0 medium 0">
-              <Flex gap="small" alignItems="center">
+              <Flex gap="small" alignItems="center" justifyItems="space-between">
+                <Flex gap="small" alignItems="center">
+                  <Flex.Item>
+                    <Text>
+                      {I18n.t('%{count} Messages by AI', {count: aiMessageCount})} •{' '}
+                      {I18n.t('%{count} Messages by %{name}', {
+                        count: studentMessageCount,
+                        name: selectedStudentData?.student.name || 'student',
+                      })}
+                    </Text>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Pill>
+                      {I18n.t('Last Updated %{date}', {
+                        date: new Date(conversation.updated_at || '').toLocaleString(),
+                      })}
+                    </Pill>
+                  </Flex.Item>
+                </Flex>
                 <Flex.Item>
-                  <Text>
-                    {I18n.t('%{count} Messages by AI', {count: aiMessageCount})} •{' '}
-                    {I18n.t('%{count} Messages by student', {count: studentMessageCount})}
-                  </Text>
-                </Flex.Item>
-                <Flex.Item>
-                  <Pill>
-                    {I18n.t('Last Updated %{date}', {
-                      date: new Date(conversation.updated_at || '').toLocaleString(),
-                    })}
-                  </Pill>
+                  <Button
+                    data-testid="ai-conversations-focus-mode-button"
+                    onClick={() => setIsFocusModeOpen(true)}
+                    size="medium"
+                    renderIcon={<IconFullScreenLine />}
+                  >
+                    {I18n.t('Focus Mode')}
+                  </Button>
                 </Flex.Item>
               </Flex>
             </Flex.Item>
@@ -175,38 +250,7 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
                       <Spinner renderTitle={I18n.t('Loading conversation')} />
                     </View>
                   ) : (
-                    <View
-                      as="div"
-                      padding="medium"
-                      background="secondary"
-                      borderRadius="medium"
-                      height="calc(100vh - 400px)"
-                      overflowY="auto"
-                    >
-                      {messages.slice(1).map((message, index) => {
-                        const isUser = message.role === 'User'
-                        return (
-                          <View
-                            key={index}
-                            as="div"
-                            margin="0 0 medium 0"
-                            textAlign={isUser ? 'end' : 'start'}
-                          >
-                            <View
-                              as="div"
-                              display="inline-block"
-                              maxWidth="70%"
-                              padding="small medium"
-                              background={isUser ? 'primary' : 'primary'}
-                              borderRadius="medium"
-                              textAlign="start"
-                            >
-                              <Text>{message.text}</Text>
-                            </View>
-                          </View>
-                        )
-                      })}
-                    </View>
+                    renderMessages()
                   )}
                 </Tabs.Panel>
 
@@ -232,6 +276,84 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
           </View>
         )}
       </Flex>
+
+      {/* Focus Mode */}
+      {selectedIdentifier && hasConversation && conversation && (
+        <FocusMode
+          isOpen={isFocusModeOpen}
+          onClose={() => setIsFocusModeOpen(false)}
+          title={aiExperience.title}
+        >
+          <Flex direction="column" height="100%" style={{overflow: 'hidden'}}>
+            <Flex.Item>
+              <View as="div" margin="0 0 medium 0">
+                <Flex gap="small" alignItems="center">
+                  <Flex.Item>
+                    <Text>
+                      {I18n.t('%{count} Messages by AI', {count: aiMessageCount})} •{' '}
+                      {I18n.t('%{count} Messages by %{name}', {
+                        count: studentMessageCount,
+                        name: selectedStudentData?.student.name || 'student',
+                      })}
+                    </Text>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Pill>
+                      {I18n.t('Last Updated %{date}', {
+                        date: new Date(conversation.updated_at || '').toLocaleString(),
+                      })}
+                    </Pill>
+                  </Flex.Item>
+                </Flex>
+              </View>
+            </Flex.Item>
+
+            <Flex.Item
+              shouldGrow
+              shouldShrink
+              style={{display: 'flex', flexDirection: 'column', overflow: 'hidden'}}
+            >
+              <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+                <Tabs
+                  onRequestTabChange={(_e, {index}) => setSelectedTab(index)}
+                  style={{height: '100%', display: 'flex', flexDirection: 'column'}}
+                >
+                  <Tabs.Panel
+                    id="conversation-tab-focus"
+                    renderTitle={I18n.t('Conversation')}
+                    isSelected={selectedTab === 0}
+                    style={{flex: '1 1 auto', display: 'flex', flexDirection: 'column'}}
+                  >
+                    {isLoadingConversation ? (
+                      <Flex
+                        as="div"
+                        padding="large"
+                        height="100%"
+                        alignItems="center"
+                        justifyItems="center"
+                      >
+                        <Spinner renderTitle={I18n.t('Loading conversation')} />
+                      </Flex>
+                    ) : (
+                      renderMessages(true)
+                    )}
+                  </Tabs.Panel>
+
+                  <Tabs.Panel
+                    id="ai-analysis-tab-focus"
+                    renderTitle={I18n.t('AI analysis')}
+                    isSelected={selectedTab === 1}
+                  >
+                    <View as="div" padding="large" textAlign="center">
+                      <Text color="secondary">{I18n.t('AI analysis coming soon')}</Text>
+                    </View>
+                  </Tabs.Panel>
+                </Tabs>
+              </div>
+            </Flex.Item>
+          </Flex>
+        </FocusMode>
+      )}
     </View>
   )
 }

@@ -164,9 +164,9 @@ describe('AIConversationsPage', () => {
     await user.click(dropdown)
 
     await waitFor(() => {
-      expect(screen.getByText('Student One')).toBeInTheDocument()
-      expect(screen.getByText('Student Two')).toBeInTheDocument()
-      expect(screen.getByText('Student Three')).toBeInTheDocument()
+      expect(screen.getByText('✓ Student One')).toBeInTheDocument()
+      expect(screen.getByText('✓ Student Two')).toBeInTheDocument()
+      expect(screen.getByText('Student Three (No conversation)')).toBeInTheDocument()
     })
   })
 
@@ -184,10 +184,41 @@ describe('AIConversationsPage', () => {
 
     await waitFor(() => {
       // All three students should be in the dropdown including the one without a conversation
-      expect(screen.getByText('Student One')).toBeInTheDocument()
-      expect(screen.getByText('Student Two')).toBeInTheDocument()
-      expect(screen.getByText('Student Three')).toBeInTheDocument()
+      expect(screen.getByText('✓ Student One')).toBeInTheDocument()
+      expect(screen.getByText('✓ Student Two')).toBeInTheDocument()
+      expect(screen.getByText('Student Three (No conversation)')).toBeInTheDocument()
     })
+  })
+
+  it('disables dropdown options for students without conversations', async () => {
+    const user = userEvent.setup()
+    render(<AIConversationsPage aiExperience={mockAiExperience} courseId="123" />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Student')).toBeInTheDocument()
+    })
+
+    // Click dropdown to open it
+    const dropdown = screen.getByLabelText('Student')
+    await user.click(dropdown)
+
+    await waitFor(() => {
+      expect(screen.getByText('Student Three (No conversation)')).toBeInTheDocument()
+    })
+
+    // Find the option for Student Three (who has no conversation)
+    const studentThreeOption = screen
+      .getByText('Student Three (No conversation)')
+      .closest('span[role="option"]')
+    expect(studentThreeOption).toHaveAttribute('aria-disabled', 'true')
+
+    // Verify students with conversations are not disabled and have checkmarks
+    const studentOneOption = screen.getByText('✓ Student One').closest('span[role="option"]')
+    expect(studentOneOption).not.toHaveAttribute('aria-disabled', 'true')
+
+    // Verify the visual differences
+    expect(screen.getByText('✓ Student One')).toBeInTheDocument()
+    expect(screen.getByText('Student Three (No conversation)')).toBeInTheDocument()
   })
 
   it('shows placeholder when no student is selected', async () => {
@@ -241,7 +272,7 @@ describe('AIConversationsPage', () => {
     await waitFor(() => {
       expect(screen.getByText(/2 Messages by AI/)).toBeInTheDocument()
       // Student count excludes first User message (trigger message)
-      expect(screen.getByText(/1 Messages by student/)).toBeInTheDocument()
+      expect(screen.getByText(/1 Messages by Student One/)).toBeInTheDocument()
     })
 
     // Clean up
@@ -290,10 +321,10 @@ describe('AIConversationsPage', () => {
     await user.click(dropdown)
 
     await waitFor(() => {
-      expect(screen.getByText('Student One')).toBeInTheDocument()
+      expect(screen.getByText('✓ Student One')).toBeInTheDocument()
     })
 
-    const studentOption = screen.getByText('Student One')
+    const studentOption = screen.getByText('✓ Student One')
     await user.click(studentOption)
 
     await waitFor(() => {
