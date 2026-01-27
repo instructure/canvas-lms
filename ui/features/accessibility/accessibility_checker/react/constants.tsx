@@ -76,6 +76,7 @@ export const issueTypeOptions: {value: keyof FilterGroupMapping | IssueRuleType;
 export const artifactTypeOptions = [
   {value: 'wiki_page', label: I18n.t('Pages')},
   {value: 'assignment', label: I18n.t('Assignments')},
+  {value: 'discussion_topic', label: I18n.t('Discussion topics')},
 ]
 
 export const stateOptions = [
