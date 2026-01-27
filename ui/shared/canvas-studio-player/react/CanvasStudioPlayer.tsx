@@ -153,6 +153,15 @@ export default function CanvasStudioPlayer({
   const [containerHeight, setContainerHeight] = useState(explicitSize?.height || 0)
   const [isLoading, setIsLoading] = useState(true)
   const [canAddCaptions, setCanAddCaptions] = useState(false)
+
+  useEffect(() => {
+    if (media_id && media_id !== mediaId) {
+      setMediaId(media_id)
+      setMediaSources([])
+      setRetryAttempt(0)
+    }
+  }, [media_id, mediaId])
+
   // the ability to set these makes testing easier
   // hint: set these values in a conditional breakpoint in
   // media_player_iframe_content.js where the CanvasStudioPlayer is rendered
