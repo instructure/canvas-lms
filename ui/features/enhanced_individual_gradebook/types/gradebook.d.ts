@@ -122,6 +122,8 @@ export type SortableAssignment = AssignmentConnection & {
   sortableName: string
   sortableDueDate: number
   gradingPeriodId?: string | null
+  isPeerReviewSubAssignment?: boolean
+  parentAssignmentId?: string
 }
 
 export type AssignmentSortContext = {

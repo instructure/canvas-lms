@@ -10411,6 +10411,7 @@ type SubmissionEdge {
 input SubmissionFilterInput {
   dueBetween: DateTimeRange
   gradedSince: DateTime
+  includePeerReviewSubmissions: Boolean = false
   sectionIds: [ID!]
   states: [SubmissionState!] = [submitted, pending_review, graded]
   submittedSince: DateTime

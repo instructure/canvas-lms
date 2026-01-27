@@ -110,6 +110,7 @@ export default function AssignmentInformation({
     online_upload: I18n.t('Online upload'),
     media_recording: I18n.t('Media recording'),
     student_annotation: I18n.t('Student annotation'),
+    peer_review: I18n.t('Peer review'),
   }
 
   const readableSubmissionTypes = submissionTypes

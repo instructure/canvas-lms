@@ -65,36 +65,78 @@ export function mapAssignmentGroupQueryResults(
   return assignmentGroup.reduce(
     (prev, curr) => {
       const assignments = curr.assignmentsConnection.nodes
-      const mappedAssignments: SortableAssignment[] = assignments.map(assignment =>
-        mapToSortableAssignment(
-          assignment,
-          curr.position,
-          assignmentGradingPeriodMap[assignment.id],
-        ),
-      )
+      const mappedAssignments: SortableAssignment[] = []
+
+      // Flatten peer review sub assignments into the list, right after their parent
+      assignments.forEach(assignment => {
+        mappedAssignments.push(
+          mapToSortableAssignment(
+            assignment,
+            curr.position,
+            assignmentGradingPeriodMap[assignment.id],
+          ),
+        )
+
+        // If this assignment has a peer review sub assignment, add it right after the parent
+        if (assignment.peerReviewSubAssignment) {
+          mappedAssignments.push(
+            mapToSortableAssignment(
+              assignment.peerReviewSubAssignment as AssignmentConnection,
+              curr.position,
+              assignmentGradingPeriodMap[assignment.id],
+              {
+                isPeerReviewSubAssignment: true,
+                parentAssignmentId: assignment.id,
+                parentAssignmentName: assignment.name, // Use parent's name for sorting
+              },
+            ),
+          )
+        }
+      })
+
       prev.mappedAssignments.push(...mappedAssignments)
 
       const assignmentGroupGradingPeriods: string[] = []
 
       let totalGroupPoints = 0
+      const assignmentGroupAssignments = []
+
+      for (const assignment of curr.assignmentsConnection.nodes) {
+        totalGroupPoints += assignment.pointsPossible
+        const currentAssignmentGradingPeriod = assignmentGradingPeriodMap[assignment.id]
+        if (currentAssignmentGradingPeriod) {
+          assignmentGroupGradingPeriods.push(currentAssignmentGradingPeriod)
+        }
+
+        // Add parent assignment
+        assignmentGroupAssignments.push({
+          id: assignment.id,
+          name: assignment.name,
+          points_possible: assignment.pointsPossible,
+          submission_types: assignment.submissionTypes,
+          anonymize_students: assignment.anonymizeStudents,
+          omit_from_final_grade: assignment.omitFromFinalGrade,
+          workflow_state: assignment.workflowState,
+        })
+
+        // Add peer review sub assignment if it exists
+        if (assignment.peerReviewSubAssignment) {
+          totalGroupPoints += assignment.peerReviewSubAssignment.pointsPossible
+          assignmentGroupAssignments.push({
+            id: assignment.peerReviewSubAssignment.id,
+            name: assignment.peerReviewSubAssignment.name,
+            points_possible: assignment.peerReviewSubAssignment.pointsPossible,
+            submission_types: assignment.peerReviewSubAssignment.submissionTypes,
+            anonymize_students: assignment.peerReviewSubAssignment.anonymizeStudents,
+            omit_from_final_grade: assignment.peerReviewSubAssignment.omitFromFinalGrade,
+            workflow_state: assignment.peerReviewSubAssignment.workflowState,
+          })
+        }
+      }
+
       prev.mappedAssignmentGroupMap[curr.id] = {
         name: curr.name,
-        assignments: curr.assignmentsConnection.nodes.map(assignment => {
-          totalGroupPoints += assignment.pointsPossible
-          const currentAssignmentGradingPeriod = assignmentGradingPeriodMap[assignment.id]
-          if (currentAssignmentGradingPeriod) {
-            assignmentGroupGradingPeriods.push(currentAssignmentGradingPeriod)
-          }
-          return {
-            id: assignment.id,
-            name: assignment.name,
-            points_possible: assignment.pointsPossible,
-            submission_types: assignment.submissionTypes,
-            anonymize_students: assignment.anonymizeStudents,
-            omit_from_final_grade: assignment.omitFromFinalGrade,
-            workflow_state: assignment.workflowState,
-          }
-        }),
+        assignments: assignmentGroupAssignments,
         group_weight: curr.groupWeight,
         rules: {
           drop_lowest: curr.rules.dropLowest,
@@ -177,7 +219,7 @@ export function sortAssignments(
     case GradebookSortOrder.DueDate:
       return sortBy(assignments, ['sortableDueDate', 'sortableName'])
     case GradebookSortOrder.AssignmentGroup:
-      return sortBy(assignments, ['assignmentGroupPosition', 'sortableName'])
+      return sortBy(assignments, ['assignmentGroupPosition', 'position', 'sortableName'])
     default:
       return assignments
   }
@@ -194,7 +236,18 @@ export function filterAssignmentsByStudent(
     },
     {} as {[key: string]: boolean},
   )
-  return assignments.filter(assignment => assignmentIdMap[assignment.id])
+  return assignments.filter(assignment => {
+    // For peer review sub assignments, check if the parent assignment has a submission
+    if (assignment.isPeerReviewSubAssignment) {
+      if (!assignment.parentAssignmentId) {
+        throw new Error(
+          `Peer review sub assignment ${assignment.id} is missing parentAssignmentId`,
+        )
+      }
+      return assignmentIdMap[assignment.parentAssignmentId]
+    }
+    return assignmentIdMap[assignment.id]
+  })
 }
 
 // This logic was taken directly from ui/features/screenreader_gradebook/jquery/AssignmentDetailsDialog.js
@@ -476,16 +529,35 @@ function mapToSortableAssignment(
   assignment: AssignmentConnection,
   assignmentGroupPosition: number,
   gradingPeriodId?: string | null,
+  options?: {
+    isPeerReviewSubAssignment?: boolean
+    parentAssignmentId?: string
+    parentAssignmentName?: string
+  },
 ): SortableAssignment {
   // Used sort date logic from screenreader_gradebook_controller.js
   // @ts-expect-error
   const sortableDueDate = assignment.dueAt ? +tz.parse(assignment.dueAt) / 1000 : Number.MAX_VALUE
+  const displayName = assignment.name
+
+  // For sorting: append assignment ID to make identical names sort uniquely
+  // For peer reviews: use parent's name+ID, then append another null to sort right after parent
+  const sortableName =
+    options?.isPeerReviewSubAssignment && options.parentAssignmentName && options.parentAssignmentId
+      ? `${options.parentAssignmentName.toLowerCase()}\x00${options.parentAssignmentId}\x00` // parent name + parent ID + null to sort after parent
+      : `${displayName.toLowerCase()}\x00${assignment.id}` // name + ID for unique sort key
+
   return {
     ...assignment,
-    sortableName: assignment.name.toLowerCase(),
+    name: displayName,
+    sortableName,
     sortableDueDate,
     assignmentGroupPosition,
     gradingPeriodId,
+    ...(options?.isPeerReviewSubAssignment && {
+      isPeerReviewSubAssignment: true,
+      parentAssignmentId: options.parentAssignmentId,
+    }),
   }
 }
 
