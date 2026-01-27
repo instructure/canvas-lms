@@ -299,17 +299,6 @@ enhanced_rubrics:
       state: allowed
     development:
       state: allowed
-enhanced_rubrics_copy_to:
-  state: hidden
-  applies_to: SiteAdmin
-  root_opt_in: true
-  display_name: Enhanced Rubrics Copy To
-  description: This functionality allows copying rubrics between courses from the enhanced rubrics UI and also assigning them directly to an assignment.
-  environments:
-    ci:
-      state: allowed
-    development:
-      state: allowed
 multiselect_gradebook_filters:
   state: hidden
   applies_to: SiteAdmin
@@ -366,17 +355,6 @@ speedgrader_studio_media_capture:
   applies_to: SiteAdmin
   display_name: SpeedGrader Studio Media Capture
   description: This feature provides the ability to capture media in SpeedGrader using Studio Screen Capture.
-  environments:
-    ci:
-      state: allowed
-    development:
-      state: allowed
-rubric_imports_exports:
-  state: hidden
-  applies_to: SiteAdmin
-  root_opt_in: true
-  display_name: Rubric Imports and Exports
-  description: This feature allows users to import and export rubrics from CSV and XML files from Enhanced Rubrics.
   environments:
     ci:
       state: allowed
