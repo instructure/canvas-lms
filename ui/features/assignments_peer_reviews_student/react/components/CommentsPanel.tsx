@@ -39,6 +39,7 @@ interface CommentsPanelProps {
   onClose: () => void
   onSuccessfulPeerReview: () => void
   isReadOnly?: boolean
+  suppressSuccessAlert?: boolean
 }
 
 export const CommentsPanel: React.FC<CommentsPanelProps> = ({
@@ -50,6 +51,7 @@ export const CommentsPanel: React.FC<CommentsPanelProps> = ({
   onClose,
   onSuccessfulPeerReview,
   isReadOnly = false,
+  suppressSuccessAlert = false,
 }) => {
   return (
     <Flex.Item
@@ -90,6 +92,7 @@ export const CommentsPanel: React.FC<CommentsPanelProps> = ({
             onSuccessfulPeerReview={onSuccessfulPeerReview}
             usePeerReviewModal={false}
             isReadOnly={isReadOnly}
+            suppressSuccessAlert={suppressSuccessAlert}
           />
         </Flex.Item>
       </Flex>

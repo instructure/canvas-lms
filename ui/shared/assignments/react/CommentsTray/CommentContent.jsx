@@ -190,16 +190,19 @@ export default function CommentContent(props) {
   return (
     <>
       {placeholder}
-      {props.isPeerReviewEnabled && !props.assignment.rubric && hasCompletedPeerReview() && (
-        <Alert
-          variant="success"
-          renderCloseButtonLabel="Close"
-          margin="0 medium medium"
-          transition="none"
-        >
-          {peerReviewCompleteText}
-        </Alert>
-      )}
+      {props.isPeerReviewEnabled &&
+        !props.assignment.rubric &&
+        hasCompletedPeerReview() &&
+        !props.suppressSuccessAlert && (
+          <Alert
+            variant="success"
+            renderCloseButtonLabel="Close"
+            margin="0 medium medium"
+            transition="none"
+          >
+            {peerReviewCompleteText}
+          </Alert>
+        )}
       {[...props.comments]
         .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
         .map(comment => (
@@ -218,8 +221,10 @@ CommentContent.propTypes = {
   submission: Submission.shape.isRequired,
   isPeerReviewEnabled: bool,
   reviewerSubmission: Submission.shape,
+  suppressSuccessAlert: bool,
 }
 
 CommentContent.defaultProps = {
   isPeerReviewEnabled: false,
+  suppressSuccessAlert: false,
 }

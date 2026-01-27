@@ -299,6 +299,8 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
               onPeerReviewSubmitted()
             }}
             isReadOnly={isReadOnly}
+            // Suppress the success alert since the modal and peer review container already provide completion feedback
+            suppressSuccessAlert={true}
           />
         )}
       </Flex>

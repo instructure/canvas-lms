@@ -48,6 +48,7 @@ interface CommentsTrayContentWithApolloProps {
   onSuccessfulPeerReview: () => void
   usePeerReviewModal?: boolean
   isReadOnly: boolean
+  suppressSuccessAlert?: boolean
 }
 
 /**
