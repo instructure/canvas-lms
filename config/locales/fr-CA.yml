@@ -34362,7 +34362,7 @@ fr-CA:
   this_is_a_message_for_name_7abf1e39: "C'est un message adressé à *%{name}*"
   this_is_a_message_from_12e8e10e: "Il s'agit d'un message de "
   this_is_a_message_from_canvas_administration_dbd63778: "Ceci est un message de *l’administration Canvas*"
-  this_is_a_message_from_name_ec0cdfac: "C’est un message de *%{name}*"
+  this_is_a_message_from_name_ec0cdfac: "C’est un message envoyé par *%{name}*"
   this_is_a_modal_for_ai_facts_ccf694e1: "Il s’agit d’une fenêtre modale pour les faits d’IA"
   this_is_a_new_course_pace_and_all_changes_are_unpu_78532778: "Il s’agit d’un nouveau rythme de cours et toutes les modifications ne sont pas publiées. Publier pour enregistrer les modifications et créer le rythme."
   this_is_a_new_navbar_being_implemented_with_react__5342e82a: "Il s’agit d’une nouvelle barre de navigation mise en place avec react router à l’esprit."
