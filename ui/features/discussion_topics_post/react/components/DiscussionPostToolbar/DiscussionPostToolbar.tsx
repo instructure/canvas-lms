@@ -120,19 +120,11 @@ export const DiscussionPostToolbar = props => {
   const handleClose = () => setShowAssignToTray(false)
 
   const toggleTranslateText = () => {
-    // @ts-expect-error TS2339 (typescriptify)
-    if (ENV.ai_translation_improvements) {
-      // If translations module is visible and discussion is translated open the modal
-      if (showTranslationControl) {
-        isTranslateAll ? setModalOpen(true) : setShowTranslationControl(false)
-      } else {
-        setShowTranslationControl(true)
-      }
+    // If translations module is visible and discussion is translated open the modal
+    if (showTranslationControl) {
+      isTranslateAll ? setModalOpen(true) : setShowTranslationControl(false)
     } else {
-      // Update local state
-      setShowTranslate(!showTranslate)
-      // Update context
-      setShowTranslationControl(!showTranslate)
+      setShowTranslationControl(true)
     }
   }
 
@@ -153,8 +145,7 @@ export const DiscussionPostToolbar = props => {
         aria-pressed={showTranslationControl}
         aria-label={I18n.t('Ignite AI %{improvedText}', {improvedText})}
       >
-        {/* @ts-expect-error TS2339 (typescriptify) */}
-        {ENV.ai_translation_improvements ? improvedText : text}
+        {improvedText}
       </Button>
     )
   }

@@ -992,31 +992,13 @@ describe "Discussion Topic Show" do
   context "nutrition facts functionality" do
     before do
       @course.enable_feature!(:translation)
+      allow(Translation).to receive(:available?).and_return(true)
     end
 
-    context "when cedar_translation feature flag is enabled" do
-      before do
-        @course.root_account.enable_feature!(:cedar_translation)
-        allow(CedarClient).to receive(:enabled?).and_return(true)
-      end
-
-      it "loads nutrition facts element with content in the DOM" do
-        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_ajaximations
-        expect(element_exists?("#nutrition_facts_trigger")).to be_truthy
-      end
-    end
-
-    context "when cedar_translation feature flag is disabled" do
-      before do
-        @course.root_account.disable_feature!(:cedar_translation)
-      end
-
-      it "does not mount nutrition facts content" do
-        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_ajaximations
-        expect(element_exists?("#nutrition_facts_trigger")).to be_falsey
-      end
+    it "loads nutrition facts element with content in the DOM" do
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajaximations
+      expect(element_exists?("#nutrition_facts_trigger")).to be_truthy
     end
   end
 end

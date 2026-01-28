@@ -227,7 +227,6 @@ describe('DiscussionPostToolbar', () => {
       })
 
       it('does render the new button label if the flag is on', () => {
-        ENV.ai_translation_improvements = true
         const {getByText} = setup({isAnnouncement: true}, null, {
           translationLanguages: {current: ['en', 'es']},
         })
@@ -235,15 +234,7 @@ describe('DiscussionPostToolbar', () => {
       })
     })
 
-    describe('when the improvement flag is turned on', () => {
-      beforeEach(() => {
-        ENV.ai_translation_improvements = true
-      })
-
-      afterEach(() => {
-        ENV.ai_translation_improvements = false
-      })
-
+    describe('translation controls', () => {
       it('does render the translate button with improved text', () => {
         const {getByText} = setup(null, null, {
           translationLanguages: {current: ['en', 'es']},

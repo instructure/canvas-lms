@@ -222,9 +222,6 @@ class DiscussionTopicsApiController < ApplicationController
     when InstLLMHelper::RateLimitExceededError
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
       render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed (%{limit}) for now. Please try again later.", limit: e.limit) }, status: :too_many_requests)
-    when InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError
-      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
-      render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed for now. Please try again later.") }, status: :too_many_requests)
     when InstructureMiscPlugin::Extensions::CedarClient::CedarClientError
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.cedar_client")
       Canvas::Errors.capture_exception(:discussion_summary, e, :error)

@@ -47,7 +47,6 @@ import {
 } from './KeyboardShortcuts/useKeyboardShortcut'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
-import {TranslationControls} from './components/TranslationControls/TranslationControls'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
 import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
@@ -596,16 +595,10 @@ const DiscussionTopicManager = props => {
                             breakpoints={props.breakpoints}
                           />
                         )}
-                        {/* @ts-expect-error TS2339 (typescriptify) */}
-                        {showTranslationControl && ENV.ai_translation_improvements && (
+                        {showTranslationControl && (
                           <DiscussionTranslationModuleContainer
                             isAnnouncement={discussionTopicQuery.data.legacyNode?.isAnnouncement}
                           />
-                        )}
-                        {/* @ts-expect-error TS2339 (typescriptify) */}
-                        {showTranslationControl && !ENV.ai_translation_improvements && (
-                          // @ts-expect-error TS2322 (typescriptify)
-                          <TranslationControls onSetSelectedLanguage={translateAll} />
                         )}
                         <DiscussionTopicContainer
                           discussionTopic={discussionTopicQuery.data.legacyNode}

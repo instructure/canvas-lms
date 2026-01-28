@@ -44,12 +44,9 @@ export const TranslationControls = forwardRef((props, ref) => {
     if (!result) return
 
     // @ts-expect-error TS2339 (typescriptify)
-    if (ENV.ai_translation_improvements) {
-      // @ts-expect-error TS2339 (typescriptify)
-      props.onSetIsLanguageNotSelectedError(false)
-      // @ts-expect-error TS2339 (typescriptify)
-      props.onSetIsLanguageAlreadyActiveError(false)
-    }
+    props.onSetIsLanguageNotSelectedError(false)
+    // @ts-expect-error TS2339 (typescriptify)
+    props.onSetIsLanguageAlreadyActiveError(false)
 
     // @ts-expect-error TS2339 (typescriptify)
     props.onSetSelectedLanguage(value)

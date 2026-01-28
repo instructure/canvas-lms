@@ -49,7 +49,7 @@ module Types
 
     field :preferred_language, Types::PreferredLanguageType, null: true
     def preferred_language
-      return nil unless Translation::CedarTranslator.languages.pluck(:id).include?(object.preferred_language)
+      return nil unless Translation.languages.pluck(:id).include?(object.preferred_language)
 
       object.preferred_language
     end
