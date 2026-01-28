@@ -170,7 +170,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setIsFormLocked(false)
 
         setTimeout(
-          () => setAssertiveAlertMessage(I18n.t('Issue preview updated with fixed version')),
+          () => setAssertiveAlertMessage(I18n.t('Problem area updated with fixed version')),
           1500,
         )
       },
@@ -194,7 +194,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setIsRemediated(false)
         setIsFormLocked(false)
 
-        setTimeout(() => setAssertiveAlertMessage(I18n.t('Issue preview fix undone')), 1500)
+        setTimeout(() => setAssertiveAlertMessage(I18n.t('Problem area fix undone')), 1500)
       },
       error => {
         if (error) {
@@ -476,7 +476,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                     </Link>
                   </Flex>
                 </Flex>
-                <View as="section" aria-label={I18n.t('Issue preview')}>
+                <View as="section" aria-label={I18n.t('Problem area')}>
                   <Preview
                     ref={previewRef}
                     issue={currentIssue}
