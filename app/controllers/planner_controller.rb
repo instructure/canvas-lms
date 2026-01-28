@@ -503,7 +503,8 @@ class PlannerController < ApplicationController
       end
       next nil if shard_context_codes.blank?
 
-      scope = sharded_relation.for_user_and_context_codes(@user, shard_context_codes)
+      section_codes = @user.section_context_codes(shard_context_codes, false, include_concluded: false)
+      scope = sharded_relation.for_user_and_context_codes(@user, shard_context_codes, section_codes)
       apply_completion_filter(scope, @user, completion_filter)
     end
 
