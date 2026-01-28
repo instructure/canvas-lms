@@ -24,10 +24,12 @@ import {
   GetEnrollmentsParams,
   GetEnrollmentsResult,
 } from './getEnrollments'
+import PQueue from 'p-queue'
 
 type GetAllEnrollmentsParams = {
   queryParams: Pick<GetEnrollmentsParams, 'courseId' | 'userIds'>
   headers?: Record<string, string>
+  queue?: PQueue
 } & GetAllPagesCallbacks<GetEnrollmentsResult>
 
 export const getAllEnrollments = ({

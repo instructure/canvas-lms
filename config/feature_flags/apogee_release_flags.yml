@@ -515,3 +515,10 @@ use_comment_library_v2:
   display_name: Use Enhanced Comment Library in SpeedGrader
   description: |
     Enables the new Comment Library experience in SpeedGrader.
+use_queue_for_rate_limiting_gradebook_requests:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Use Queue for Rate Limiting Gradebook GraphQL Requests
+  description: |
+    This feature enables the use of a queue to limit the number of concurrent GraphQL requests made
+    when loading data in the Gradebook.

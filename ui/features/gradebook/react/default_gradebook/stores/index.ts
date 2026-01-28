@@ -34,6 +34,8 @@ import rubricAssessmentExport, {
   type RubricAssessmentExportState,
 } from './rubricAssessmentExportState'
 import {v4 as uuidv4} from 'uuid'
+import PQueue from 'p-queue'
+import GRADEBOOK_GRAPHQL_CONFIG from './graphql/config'
 
 const defaultPerformanceControls = new PerformanceControls()
 
@@ -47,6 +49,9 @@ type State = {
   courseId: string
   flashMessages: FlashMessage[]
   correlationId: string
+  queue: PQueue
+  useQueueForRateLimiting: boolean
+  returnQueueIfDefined: () => PQueue | undefined
 }
 
 export type GradebookStore = State &
@@ -62,6 +67,12 @@ export type GradebookStore = State &
 
 const store = create<GradebookStore>((set, get) => ({
   performanceControls: defaultPerformanceControls,
+
+  queue: new PQueue({concurrency: GRADEBOOK_GRAPHQL_CONFIG.concurrency}),
+
+  useQueueForRateLimiting: false,
+
+  returnQueueIfDefined: () => (get().useQueueForRateLimiting ? get().queue : undefined),
 
   dispatch: defaultDispatch,
 
