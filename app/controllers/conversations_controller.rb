@@ -324,6 +324,8 @@ class ConversationsController < ApplicationController
                  apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
                  conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q"),
                  react_inbox_labels: Account.site_admin.feature_enabled?(:react_inbox_labels),
+                 # TODO: clean :inbox_sis_id_for_duplicates flag after release, VICE-5840
+                 inbox_sis_id_for_duplicates: Account.site_admin.feature_enabled?(:inbox_sis_id_for_duplicates),
                  inbox_translation_languages: @domain_root_account.feature_enabled?(:translate_inbox_messages) ? Translation.languages : [],
                  inbox_translation_enabled: @domain_root_account.feature_enabled?(:translate_inbox_messages),
                  cedar_translation: true, # KEPT TO AVOID P4 on release,  VICE-5844

@@ -245,12 +245,33 @@ export const AddressBookContainer = props => {
           : [],
         observerEnrollments: u?.observerEnrollmentsConnection?.nodes || [],
         itemType: USER_TYPE,
+        sisId: u.sisId,
       }
     })
 
     // Ensure contextData and userData are not null.
     contextData = contextData || []
     userData = userData || []
+
+    // Detect duplicate names and only include sisId for duplicates
+    if (userData.length > 0) {
+      const nameCountMap = {}
+
+      userData.forEach(user => {
+        const normalizedName = (user.name || '').trim().toLowerCase()
+        nameCountMap[normalizedName] = (nameCountMap[normalizedName] || 0) + 1
+      })
+
+      // Only keep sisId for users with duplicate names
+      userData = userData.map(user => {
+        const normalizedName = (user.name || '').trim().toLowerCase()
+        const hasDuplicateName = nameCountMap[normalizedName] > 1
+        return {
+          ...user,
+          sisId: hasDuplicateName ? user.sisId : undefined,
+        }
+      })
+    }
 
     // Set isLast property to the last items in contextData and userData if they are not loading.
     // this is used to know which menu item will trigger a fetchMore call.
