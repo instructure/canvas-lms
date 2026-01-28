@@ -619,6 +619,166 @@ describe('PeerReviewsStudentView', () => {
     })
   })
 
+  describe('Loading state during allocation', () => {
+    it('shows page content after allocation completes and refetch finishes', async () => {
+      let callCount = 0
+      mockExecuteQuery.mockImplementation(() => {
+        callCount++
+        if (callCount === 1) {
+          // First query - needs allocation
+          return Promise.resolve({
+            assignment: {
+              _id: '51',
+              name: 'Test Assignment',
+              dueAt: '2025-12-31T23:59:59Z',
+              description: '<p>Description</p>',
+              courseId: '100',
+              peerReviews: {
+                count: 3,
+              },
+              assignedToDates: null,
+              assessmentRequestsForCurrentUser: [
+                {
+                  _id: 'ar-1',
+                  available: true,
+                  workflowState: 'assigned',
+                  createdAt: '2025-11-01T00:00:00Z',
+                },
+              ],
+            },
+          })
+        } else {
+          // Refetch after allocation - now has all reviews
+          return Promise.resolve({
+            assignment: {
+              _id: '51',
+              name: 'Test Assignment',
+              dueAt: '2025-12-31T23:59:59Z',
+              description: '<p>Description</p>',
+              courseId: '100',
+              peerReviews: {
+                count: 3,
+              },
+              assignedToDates: null,
+              assessmentRequestsForCurrentUser: [
+                {
+                  _id: 'ar-1',
+                  available: true,
+                  workflowState: 'assigned',
+                  createdAt: '2025-11-01T00:00:00Z',
+                },
+                {
+                  _id: 'ar-2',
+                  available: true,
+                  workflowState: 'assigned',
+                  createdAt: '2025-11-02T00:00:00Z',
+                },
+                {
+                  _id: 'ar-3',
+                  available: true,
+                  workflowState: 'assigned',
+                  createdAt: '2025-11-03T00:00:00Z',
+                },
+              ],
+            },
+          })
+        }
+      })
+
+      const {getByTestId, queryByTestId} = setup({assignmentId: '51'})
+
+      expect(queryByTestId('peer-review-selector')).not.toBeInTheDocument()
+
+      await waitFor(() => {
+        expect(mockMutate).toHaveBeenCalled()
+      })
+
+      // After refetch completes, page content should be visible
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+    })
+
+    it('keeps page content visible when refetching after peer review submission', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          _id: '52',
+          name: 'Test Assignment',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+            },
+            {
+              _id: 'ar-2',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-02T00:00:00Z',
+            },
+          ],
+        },
+      })
+
+      const {getByTestId, queryByText} = setup({assignmentId: '52'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      // Trigger a refetch by invalidating queries (simulating peer review submission)
+      queryClient.invalidateQueries({queryKey: ['peerReviewAssignment', '52']})
+
+      expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+    })
+
+    it('shows page content immediately when allocation is not needed', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '53',
+          name: 'No Allocation Needed',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          courseId: '100',
+          peerReviews: {
+            count: 2,
+          },
+          assignedToDates: null,
+          assessmentRequestsForCurrentUser: [
+            {
+              _id: 'ar-1',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-01T00:00:00Z',
+            },
+            {
+              _id: 'ar-2',
+              available: true,
+              workflowState: 'assigned',
+              createdAt: '2025-11-02T00:00:00Z',
+            },
+          ],
+        },
+      })
+
+      const {getByTestId} = setup({assignmentId: '53'})
+
+      await waitFor(() => {
+        expect(getByTestId('peer-review-selector')).toBeInTheDocument()
+      })
+
+      expect(mockMutate).not.toHaveBeenCalled()
+    })
+  })
+
   describe('Tab switching', () => {
     it('switches between Assignment Details and Submission tabs', async () => {
       mockExecuteQuery.mockResolvedValueOnce({
