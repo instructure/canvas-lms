@@ -193,6 +193,42 @@ describe PlannerController do
         expect(event_ids).not_to include my_event_id
       end
 
+      it "does not show section calendar events from concluded enrollments" do
+        section_a = @course.course_sections.create!(name: "Section A")
+        section_b = @course.course_sections.create!(name: "Section B")
+
+        parent_event = @course.calendar_events.build(
+          title: "Section Event",
+          child_event_data: {
+            "0" => { start_at: 1.day.from_now.iso8601, end_at: (1.day.from_now + 1.hour).iso8601, context_code: section_a.asset_string },
+            "1" => { start_at: 2.days.from_now.iso8601, end_at: (2.days.from_now + 1.hour).iso8601, context_code: section_b.asset_string }
+          }
+        )
+        parent_event.updating_user = @teacher
+        parent_event.save!
+
+        section_a_event = section_a.calendar_events.where(parent_calendar_event_id: parent_event).first
+        section_b_event = section_b.calendar_events.where(parent_calendar_event_id: parent_event).first
+
+        @student.enrollments.destroy_all
+        section_a_enrollment = @course.enroll_student(@student, section: section_a, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get :index
+        json = json_parse(response.body)
+        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
+        expect(event_ids).to include section_a_event.id
+        expect(event_ids).not_to include section_b_event.id
+
+        section_a_enrollment.complete!
+        @course.enroll_student(@student, section: section_b, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get :index
+        json = json_parse(response.body)
+        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
+        expect(event_ids).not_to include section_a_event.id
+        expect(event_ids).to include section_b_event.id
+      end
+
       it "shows appointment group reservations" do
         ag = appointment_group_model(title: "appointment group")
         ap = appointment_participant_model(participant: @student, course: @course, appointment_group: ag)
