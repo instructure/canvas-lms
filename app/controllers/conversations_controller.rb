@@ -319,15 +319,14 @@ class ConversationsController < ApplicationController
         hash[:INBOX_AUTO_RESPONSE_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) &&
                                              @domain_root_account.enable_inbox_auto_response? &&
                                              (!is_student || (is_student && !@domain_root_account.disable_inbox_auto_response_for_students?))
-        translation_flags = Translation.get_translation_flags(@domain_root_account.feature_enabled?(:translate_inbox_messages), @domain_root_account)
         js_env({
                  CONVERSATIONS: hash,
                  apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
                  conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q"),
                  react_inbox_labels: Account.site_admin.feature_enabled?(:react_inbox_labels),
-                 inbox_translation_languages: @domain_root_account.feature_enabled?(:translate_inbox_messages) ? Translation.languages(translation_flags) : [],
+                 inbox_translation_languages: @domain_root_account.feature_enabled?(:translate_inbox_messages) ? Translation.languages : [],
                  inbox_translation_enabled: @domain_root_account.feature_enabled?(:translate_inbox_messages),
-                 cedar_translation: @domain_root_account.feature_enabled?(:cedar_translation)
+                 cedar_translation: true, # KEPT TO AVOID P4 on release,  VICE-5844
                })
         @page_title = t("Inbox")
         InstStatsd::Statsd.distributed_increment("inbox.visit.react")

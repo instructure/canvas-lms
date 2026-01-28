@@ -30,7 +30,6 @@ describe('useTranslationQueue', () => {
   }
 
   it('runs only up to MAX_CONCURRENT_TRANSLATIONS', () => {
-    window.ENV.ai_translation_improvements = true
     const {result} = renderHook(() => useTranslationQueue())
 
     const done = []
@@ -55,7 +54,6 @@ describe('useTranslationQueue', () => {
   })
 
   it('starts next job from queue after one finishes', async () => {
-    window.ENV.ai_translation_improvements = true
     const {result} = renderHook(() => useTranslationQueue())
 
     const done = []
@@ -85,27 +83,8 @@ describe('useTranslationQueue', () => {
     expect(result.current.getQueueLength()).toBe(1)
   })
 
-  it('runs all immediately when translation improvements flag is off', () => {
-    window.ENV.ai_translation_improvements = false
-    const {result} = renderHook(() => useTranslationQueue())
-
-    const done = []
-    const jobs = Array.from({length: 10}, (_, i) => createMockJob(`job${i}`, done))
-
-    act(() => {
-      jobs.forEach(job => result.current.enqueueTranslation(job))
-    })
-
-    for (const job of jobs) {
-      expect(job).toHaveBeenCalled()
-    }
-
-    expect(result.current.getQueueLength()).toBe(0)
-  })
-
   describe('clearQueue', () => {
     it('aborts all queued jobs', () => {
-      window.ENV.ai_translation_improvements = true
       const {result} = renderHook(() => useTranslationQueue())
 
       const done = []
@@ -143,7 +122,6 @@ describe('useTranslationQueue', () => {
     })
 
     it('aborts active jobs', () => {
-      window.ENV.ai_translation_improvements = true
       const {result} = renderHook(() => useTranslationQueue())
 
       const signals = []
@@ -173,7 +151,6 @@ describe('useTranslationQueue', () => {
     })
 
     it('prevents aborted jobs from updating state', async () => {
-      window.ENV.ai_translation_improvements = true
       const {result} = renderHook(() => useTranslationQueue())
 
       let capturedSignal = null
@@ -211,7 +188,6 @@ describe('useTranslationQueue', () => {
     })
 
     it('clears both queued and active jobs together', () => {
-      window.ENV.ai_translation_improvements = true
       const {result} = renderHook(() => useTranslationQueue())
 
       const signals = []
