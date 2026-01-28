@@ -33,63 +33,62 @@ describe IgniteAgentHelper do
 
   describe "#add_ignite_agent_bundle?" do
     let_once(:account) { Account.default }
+    let_once(:user) { account_admin_user }
 
     before do
-      instance_variable_set(:@domain_root_account, account)
+      Account.current_domain_root_account = account
+      instance_variable_set(:@current_user, user)
     end
 
-    it "returns false when preview param is true" do
-      allow(controller).to receive(:params).and_return({ preview: "true" })
+    context "when preview param is true" do
+      before do
+        allow(controller).to receive(:params).and_return({ preview: "true" })
+      end
 
-      expect(add_ignite_agent_bundle?).to be false
+      it "returns false" do
+        expect(add_ignite_agent_bundle?).to be false
+      end
     end
 
-    it "returns false on oauth2_provider confirm page" do
-      allow(controller).to receive_messages(controller_name: "oauth2_provider", action_name: "confirm", params: {})
+    context "when on a oauth2_provider confirm page" do
+      before do
+        allow(controller).to receive_messages(controller_name: "oauth2_provider", action_name: "confirm", params: {})
+      end
 
-      expect(add_ignite_agent_bundle?).to be false
+      it "returns false" do
+        expect(add_ignite_agent_bundle?).to be false
+      end
     end
 
-    context "with legacy ignite_agent_enabled feature flag" do
+    context "when current user is nil" do
+      before do
+        instance_variable_set(:@current_user, nil)
+      end
+
+      it "returns false" do
+        expect(add_ignite_agent_bundle?).to be false
+      end
+    end
+
+    context "with oak_for_users feature flag" do
       before do
         account.enable_feature!(:ignite_agent_enabled)
-        instance_variable_set(:@domain_root_account, account)
       end
 
-      it "returns true when user has manage_account_settings permission" do
-        admin_user = account_admin_user
-        instance_variable_set(:@current_user, admin_user)
+      context "when oak_for_users is disabled" do
+        before do
+          user.disable_feature!(:oak_for_users)
+        end
 
-        expect(add_ignite_agent_bundle?).to be true
+        it "returns false" do
+          expect(add_ignite_agent_bundle?).to be false
+        end
       end
 
-      it "returns true when user has ignite_agent_enabled_for_user feature flag" do
-        user = user_model
-        user.enable_feature!(:ignite_agent_enabled_for_user)
-        instance_variable_set(:@current_user, user)
-
-        expect(add_ignite_agent_bundle?).to be true
-      end
-    end
-
-    context "with oak_for_admins feature flag" do
-      before do
-        account.enable_feature!(:oak_for_admins)
-      end
-
-      it "returns true when user has access_oak permissions" do
-        admin_user =
-          account_admin_user_with_role_changes(
-            role_changes: {
-              manage_account_settings: false,
-              access_oak: true
-            },
-            account:,
-            role: Role.get_built_in_role("AccountMembership", root_account_id: account)
-          )
-        instance_variable_set(:@current_user, admin_user)
-
-        expect(add_ignite_agent_bundle?).to be true
+      context "when oak_for_users is not set (defaults to allowed)" do
+        it "returns true" do
+          expect(add_ignite_agent_bundle?).to be true
+        end
       end
     end
   end

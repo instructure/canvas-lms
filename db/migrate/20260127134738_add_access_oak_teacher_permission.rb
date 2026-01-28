@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2025 - present Instructure, Inc.
+# Copyright (C) 2026 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,24 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module IgniteAgentHelper
-  ALLOWED_PAGES = begin
-    config_path = Rails.root.join("config/ignite_agent_pages.yml")
-    config = YAML.load_file(config_path)
-    config["allowed_pages"] || []
-  end.freeze
+class AddAccessOakTeacherPermission < ActiveRecord::Migration[8.0]
+  tag :postdeploy
 
-  def add_ignite_agent_bundle?
-    return false if params[:preview] == "true"
-    return false if controller_name == "oauth2_provider"
-    return false unless @current_user&.feature_enabled?(:oak_for_users)
-
-    true
-  end
-
-  def show_ignite_agent_button?
-    return false if @assignment&.quiz_lti? # hide it for New Quizzes
-
-    ALLOWED_PAGES.include?("#{controller_path}##{action_name}")
+  def up
+    DataFixup::AddRoleOverridesForNewPermission
+      .delay_if_production(priority: Delayed::LOW_PRIORITY)
+      .run(:manage_account_settings, :access_oak_teacher)
   end
 end
