@@ -294,4 +294,38 @@ describe('TodoItem', () => {
       expect(screen.getByText('Mark Lab Report: Cell Structure as complete')).toBeInTheDocument()
     })
   })
+
+  describe('announcement display', () => {
+    it('shows "Posted" date for announcements without overdue styling', () => {
+      const announcementItem = {
+        ...mockPlannerItems[0],
+        plannable_type: 'announcement' as const,
+        plannable_date: '2026-01-22T18:00:00Z',
+        plannable: {
+          ...mockPlannerItems[0].plannable,
+          title: 'Important Announcement',
+        },
+      }
+      renderWithProvider(<TodoItem item={announcementItem} />)
+
+      expect(screen.getByText(/Posted/)).toBeInTheDocument()
+      expect(screen.queryByText('Overdue')).not.toBeInTheDocument()
+    })
+
+    it('does not apply danger color to announcement date', () => {
+      const announcementItem = {
+        ...mockPlannerItems[0],
+        plannable_type: 'announcement' as const,
+        plannable_date: '2020-01-01T00:00:00Z',
+        plannable: {
+          ...mockPlannerItems[0].plannable,
+          title: 'Old Announcement',
+        },
+      }
+      renderWithProvider(<TodoItem item={announcementItem} />)
+
+      const postedText = screen.getByText(/Posted/)
+      expect(postedText).toHaveAttribute('color', 'secondary')
+    })
+  })
 })
