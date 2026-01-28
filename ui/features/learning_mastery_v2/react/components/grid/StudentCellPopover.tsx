@@ -89,24 +89,20 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
     return <Text size="legend" color="secondary">{`${t('Last Login')}: ${dateText}`}</Text>
   }
 
-  const ResultIcon: React.FC<{url: string; alt: string}> = ({url, alt}) => {
-    return (
-      <>
-        <Img width="100%" height="100%" src={url} alt={alt} />
-        <ScreenReaderContent>{alt}</ScreenReaderContent>
-      </>
-    )
+  const ResultIcon: React.FC<{url: string}> = ({url}) => {
+    return <Img width="100%" height="100%" src={url} />
   }
 
   const renderScores = () => (
     <View>
       <Flex direction="row" alignItems="center" gap="x-small" margin="small none">
         <Flex.Item width="1.7rem">
-          <ResultIcon url={scores?.averageIconURL || ''} alt={scores?.averageText || ''} />
+          <ResultIcon url={scores?.averageIconURL || ''} />
         </Flex.Item>
         <Flex.Item>
-          {scores?.grossAverage && <Text>{`${scores.grossAverage.toFixed(1)} `}</Text>}
-          <Text size="small">{scores?.averageText}</Text>
+          <Text size="small">
+            {`${scores?.grossAverage && scores.grossAverage.toFixed(1) + ' '}${scores?.averageText}`}
+          </Text>
         </Flex.Item>
       </Flex>
       <Flex gap="small" margin="small small small none">
@@ -116,10 +112,13 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
             .map(bucket => (
               <Flex key={bucket.name} direction="row" alignItems="center" gap="xx-small">
                 <Flex.Item width="1.4rem">
-                  <ResultIcon url={bucket.iconURL} alt={bucket.name} />
+                  <ResultIcon url={bucket.iconURL} />
                 </Flex.Item>
                 <Flex.Item>
-                  <Text size="medium">{bucket.count}</Text>
+                  <ScreenReaderContent>{`${bucket.name} ${bucket.count}`}</ScreenReaderContent>
+                  <Text size="medium" aria-hidden="true">
+                    {bucket.count}
+                  </Text>
                 </Flex.Item>
               </Flex>
             ))}
@@ -144,7 +143,6 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
           <Flex gap="small" alignItems="start">
             <Flex.Item>
               <Avatar
-                alt={studentName}
                 as="div"
                 size="large"
                 name={studentName}
