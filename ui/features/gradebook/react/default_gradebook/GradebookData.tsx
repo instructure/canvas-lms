@@ -116,6 +116,7 @@ export default function GradebookData(props: Props) {
       hasModules: props.gradebookEnv.has_modules,
       allowFinalGradeOverride: props.gradebookEnv.course_settings.allow_final_grade_override,
       reorderCustomColumnsUrl: props.gradebookEnv.reorder_custom_columns_url,
+      useQueueForRateLimiting: props.gradebookEnv.use_queue_for_rate_limiting_gradebook_requests,
     })
 
     // Add correlationId to URL for Referer header tracking
@@ -141,6 +142,7 @@ export default function GradebookData(props: Props) {
     props.gradebookEnv.custom_grade_statuses_enabled,
     props.gradebookEnv.custom_grade_statuses,
     props.gradebookEnv.multiselect_gradebook_filters_enabled,
+    props.gradebookEnv.use_queue_for_rate_limiting_gradebook_requests,
   ])
 
   // Data loading logic goes here

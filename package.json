@@ -155,6 +155,7 @@
     "moment-timezone": "^0.5.48",
     "nanoid": "3.3.8",
     "normalize-scroll-left": "^0.2",
+    "p-queue": "9.1.0",
     "page": "^1.11",
     "parse-decimal-number": "1.0.0",
     "prop-types": "^15",
