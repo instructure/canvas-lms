@@ -136,6 +136,11 @@ export interface PreviewResponse {
   path?: string
 }
 
+export interface ColorContrastPreviewResponse extends PreviewResponse {
+  background: string
+  foreground: string
+}
+
 export type FormValue = any
 
 export type Severity = 'High' | 'Medium' | 'Low'
