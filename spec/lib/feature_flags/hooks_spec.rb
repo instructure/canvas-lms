@@ -574,7 +574,7 @@ describe FeatureFlags::Hooks do
     end
   end
 
-  describe "oak_flag_visible_on_hook" do
+  describe "oak_visible_on_hook" do
     let(:context) { double("Context") }
     let(:current_shard) { double("Shard", database_server: double(config: { region: "us-east-1" })) }
     let(:oak_predicate) { instance_double(FeatureFlags::OakPredicate) }
@@ -588,13 +588,66 @@ describe FeatureFlags::Hooks do
     it "creates a new OakPredicate with context and region" do
       expect(FeatureFlags::OakPredicate).to receive(:new).with(context, "us-east-1")
 
-      FeatureFlags::Hooks.oak_flag_visible_on_hook(context)
+      FeatureFlags::Hooks.oak_visible_on_hook(context)
     end
 
     it "calls .call on the OakPredicate instance" do
       expect(oak_predicate).to receive(:call)
 
-      FeatureFlags::Hooks.oak_flag_visible_on_hook(context)
+      FeatureFlags::Hooks.oak_visible_on_hook(context)
+    end
+  end
+
+  describe "oak_for_users_visible_on_hook" do
+    let(:context) { double("Context") }
+    let(:domain_root_account) { double("Account") }
+
+    before do
+      allow(Account).to receive(:current_domain_root_account).and_return(domain_root_account)
+      allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(true)
+      allow(Oak::PermissionChecker).to receive(:user_permitted?).and_return(true)
+    end
+
+    context "when oak_visible_on_hook returns false" do
+      before do
+        allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(false)
+      end
+
+      it "returns false without checking permission" do
+        expect(Oak::PermissionChecker).not_to receive(:user_permitted?)
+
+        result = FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
+
+        expect(result).to be false
+      end
+    end
+
+    context "when oak_visible_on_hook returns true" do
+      before do
+        allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(true)
+      end
+
+      it "checks user_permitted? with proper parameters" do
+        expect(Oak::PermissionChecker).to receive(:user_permitted?).with(context, domain_root_account)
+
+        FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
+      end
+
+      it "returns true when user has oak permission" do
+        allow(Oak::PermissionChecker).to receive(:user_permitted?).and_return(true)
+
+        result = FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
+
+        expect(result).to be true
+      end
+
+      it "returns false when user does not have oak permission" do
+        allow(Oak::PermissionChecker).to receive(:user_permitted?).and_return(false)
+
+        result = FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
+
+        expect(result).to be false
+      end
     end
   end
 end
