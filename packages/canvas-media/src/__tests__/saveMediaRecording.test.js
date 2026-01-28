@@ -23,6 +23,7 @@ import saveMediaRecording, {
   saveClosedCaptionsForAttachment,
 } from '../saveMediaRecording'
 import {vi} from 'vitest'
+import {waitFor} from '@testing-library/dom'
 
 // Mock K5Uploader
 vi.mock('@instructure/k5uploader', () => {
@@ -178,8 +179,9 @@ describe('saveMediaRecording', () => {
       () => {},
     ).then(async uploader => {
       uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
-      await new Promise(setTimeout)
-      expect(capturedRequest.user_entered_title).toEqual('my awesome video')
+      await waitFor(() => {
+        expect(capturedRequest.user_entered_title).toEqual('my awesome video')
+      })
     })
   })
 
@@ -202,8 +204,9 @@ describe('saveMediaRecording', () => {
       () => {},
     ).then(async uploader => {
       uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
-      await new Promise(setTimeout)
-      expect(capturedRequest.user_entered_title).toEqual('hi')
+      await waitFor(() => {
+        expect(capturedRequest.user_entered_title).toEqual('hi')
+      })
     })
   })
 
@@ -227,8 +230,9 @@ describe('saveMediaRecording', () => {
       progressFunction,
     ).then(async uploader => {
       uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
-      await new Promise(setTimeout)
-      expect(capturedRequest.type).toEqual('video/mp4')
+      await waitFor(() => {
+        expect(capturedRequest.type).toEqual('video/mp4')
+      })
     })
   })
 
@@ -244,13 +248,14 @@ describe('saveMediaRecording', () => {
     return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction2, progressFunction).then(
       async uploader => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
-        await new Promise(setTimeout)
-        expect(doneFunction2).toHaveBeenCalledTimes(1)
-        expect(doneFunction2.mock.calls[0][1]).toEqual({
-          mediaObject: {data: 'media object data'},
-          uploadedFile: {file: 'thing'},
+        await waitFor(() => {
+          expect(doneFunction2).toHaveBeenCalledTimes(1)
+          expect(doneFunction2.mock.calls[0][1]).toEqual({
+            mediaObject: {data: 'media object data'},
+            uploadedFile: {file: 'thing'},
+          })
+          expect(doneFunction2.mock.calls[0][0]).toBe(null)
         })
-        expect(doneFunction2.mock.calls[0][0]).toBe(null)
       },
     )
   })
@@ -269,9 +274,10 @@ describe('saveMediaRecording', () => {
     return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction2, progressFunction).then(
       async uploader => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
-        await new Promise(setTimeout)
-        expect(doneFunction2).toHaveBeenCalledTimes(1)
-        expect(doneFunction2.mock.calls[0][0].message).toBe('Request failed with status code 500')
+        await waitFor(() => {
+          expect(doneFunction2).toHaveBeenCalledTimes(1)
+          expect(doneFunction2.mock.calls[0][0].message).toBe('Request failed with status code 500')
+        })
       },
     )
   })
@@ -291,9 +297,10 @@ describe('saveMediaRecording', () => {
     return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction2, progressFunction).then(
       async uploader => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
-        await new Promise(setTimeout)
-        expect(doneFunction2).toHaveBeenCalledTimes(1)
-        expect(doneFunction2.mock.calls[0][0].message).toBe('Request failed with status code 500')
+        await waitFor(() => {
+          expect(doneFunction2).toHaveBeenCalledTimes(1)
+          expect(doneFunction2.mock.calls[0][0].message).toBe('Request failed with status code 500')
+        })
       },
     )
   })
