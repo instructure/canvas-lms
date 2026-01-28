@@ -87,7 +87,7 @@ const RescanAction = ({item, onRescan}: ScanStateCellProps) => {
 
   return (
     <Flex.Item textAlign="start">
-      <Button id="accessibility-checker-rescan-button" size="small" onClick={handleClick}>
+      <Button data-pendo="resource-rescan-button" size="small" onClick={handleClick}>
         <AccessibleContent alt={I18n.t('Rescan issues for %{name}', {name: item.resourceName})}>
           {I18n.t('Rescan')}
         </AccessibleContent>
