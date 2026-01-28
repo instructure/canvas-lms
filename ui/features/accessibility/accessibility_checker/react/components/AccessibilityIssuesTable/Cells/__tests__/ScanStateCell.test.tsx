@@ -184,7 +184,7 @@ describe('ScanStateCell', () => {
 
       const {container} = render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
 
-      expect(container.querySelector('#accessibility-checker-rescan-button')).toBeInTheDocument()
+      expect(container.querySelector('[data-pendo="resource-rescan-button"]')).toBeInTheDocument()
     })
 
     it('renders failed scan explanation tooltip', () => {
@@ -213,7 +213,7 @@ describe('ScanStateCell', () => {
       )
 
       const rescanButton = container.querySelector(
-        '#accessibility-checker-rescan-button',
+        '[data-pendo="resource-rescan-button"]',
       ) as HTMLElement
       rescanButton.click()
 
@@ -221,7 +221,7 @@ describe('ScanStateCell', () => {
       expect(mockOnRescan).toHaveBeenCalledTimes(1)
     })
 
-    it('has unique ID for Pendo analytics on rescan button', () => {
+    it('has data-pendo attribute on rescan button', () => {
       const baseFailedItem = {
         workflowState: ScanWorkflowState.Failed,
         errorMessage: 'other error',
@@ -229,9 +229,8 @@ describe('ScanStateCell', () => {
 
       const {container} = render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
 
-      const rescanButton = container.querySelector('#accessibility-checker-rescan-button')
-      expect(rescanButton).toBeInTheDocument()
-      expect(rescanButton).toHaveAttribute('id', 'accessibility-checker-rescan-button')
+      const rescanButton = container.querySelector('[data-pendo="resource-rescan-button"]')
+      expect(rescanButton).toHaveAttribute('data-pendo', 'resource-rescan-button')
     })
   })
 })

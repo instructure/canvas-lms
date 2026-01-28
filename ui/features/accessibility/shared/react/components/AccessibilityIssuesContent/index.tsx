@@ -58,6 +58,7 @@ import SuccessView from './SuccessView'
 import CloseRemediationView from './CloseRemediationView'
 import WhyMattersPopover from './WhyMattersPopover'
 import {ProblemArea} from './ProblemArea/ProblemArea'
+import {useA11yTracking} from '../../hooks/useA11yTracking'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -90,17 +91,20 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
   const [issues, setIssues] = useState<AccessibilityIssue[]>(item.issues || [])
   const [allIssuesSkipped, setAllIssuesSkipped] = useState<boolean>(false)
+  const previousTotalRef = useRef<number | undefined>()
 
   const {setSelectedItem} = useAccessibilityCheckerContext()
   const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
+  const {trackA11yIssueEvent, trackA11yEvent} = useA11yTracking()
 
-  const [accessibilityScans, nextResource, filters, isCloseIssuesEnabled] =
+  const [accessibilityScans, nextResource, filters, isCloseIssuesEnabled, issuesSummary] =
     useAccessibilityScansStore(
       useShallow(state => [
         state.accessibilityScans,
         state.nextResource,
         state.filters,
         state.isCloseIssuesEnabled,
+        state.issuesSummary,
       ]),
     )
 
@@ -141,12 +145,23 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   }, 1000)
 
   const handleSkip = useCallback(() => {
+    if (currentIssue) {
+      trackA11yIssueEvent('IssueSkipped', item.resourceType, currentIssue.ruleId)
+    }
+
     if (isCloseIssuesEnabled && currentIssueIndex === issues.length - 1) {
       setAllIssuesSkipped(true)
     } else {
       setCurrentIssueIndex(prev => Math.min(prev + 1, issues.length - 1))
     }
-  }, [isCloseIssuesEnabled, currentIssueIndex, issues.length])
+  }, [
+    isCloseIssuesEnabled,
+    currentIssueIndex,
+    issues.length,
+    currentIssue,
+    item.resourceType,
+    trackA11yIssueEvent,
+  ])
 
   const handlePrevious = useCallback(() => {
     setCurrentIssueIndex(prev => Math.max(prev - 1, 0))
@@ -257,6 +272,8 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const handleSaveAndNext = useCallback(async () => {
     if (!currentIssue) return
 
+    trackA11yIssueEvent('IssueFixed', item.resourceType, currentIssue.ruleId)
+
     try {
       const formValue = formRef.current?.getValue()
 
@@ -283,8 +300,15 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
 
       const newScan = convertKeysToCamelCase(newScanResponse.json!) as AccessibilityResourceScan
       const newScanIssues = newScan.issues ?? []
+      const hadIssuesBefore = issues.length > 0
 
       setIssues(newScanIssues)
+
+      if (hadIssuesBefore && newScanIssues.length === 0) {
+        const courseId = window.ENV.current_context?.id
+
+        trackA11yEvent('ResourceRemediated', {resourceId: item.resourceId, courseId})
+      }
 
       if (accessibilityScans) {
         const updatedOrderedTableData = updateCountPropertyForItem(accessibilityScans, newScan)
@@ -320,6 +344,8 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     updateCountPropertyForItem,
     doFetchAccessibilityIssuesSummary,
     filters,
+    trackA11yIssueEvent,
+    trackA11yEvent,
   ])
 
   const handleApplyAndSaveAndNext = useCallback(() => {
@@ -412,6 +438,18 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     setFormError(null)
     setIsSaveButtonEnabled(true)
   }, [currentIssue])
+
+  useEffect(() => {
+    const previousTotal = previousTotalRef.current
+    const currentTotal = issuesSummary?.total
+
+    if (previousTotal !== undefined && previousTotal > 0 && currentTotal === 0) {
+      const courseId = window.ENV.current_context?.id
+      trackA11yEvent('CourseRemediated', {courseId: courseId || 'unknown'})
+    }
+
+    previousTotalRef.current = currentTotal
+  }, [issuesSummary?.total, trackA11yEvent])
 
   if (allIssuesSkipped && isCloseIssuesEnabled) {
     return (
@@ -506,6 +544,13 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                       target="_blank"
                       iconPlacement="end"
                       renderIcon={<IconExternalLinkLine size="x-small" />}
+                      onClick={() =>
+                        trackA11yIssueEvent(
+                          'PageViewOpened',
+                          item.resourceType,
+                          currentIssue.ruleId,
+                        )
+                      }
                     >
                       {I18n.t('Open Page')}
                       <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
@@ -516,6 +561,13 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                       target="_blank"
                       iconPlacement="end"
                       renderIcon={<IconExternalLinkLine size="x-small" />}
+                      onClick={() =>
+                        trackA11yIssueEvent(
+                          'PageEditorOpened',
+                          item.resourceType,
+                          currentIssue.ruleId,
+                        )
+                      }
                     >
                       {I18n.t('Edit Page')}
                       <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>

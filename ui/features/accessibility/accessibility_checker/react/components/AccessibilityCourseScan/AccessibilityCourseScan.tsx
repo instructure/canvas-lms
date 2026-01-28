@@ -31,6 +31,7 @@ import {ScanHandler} from './components/ScanHandler'
 import {accessibilityScanQuery, createAccessibilityScanMutation} from './utils/api'
 import {type CourseScanProps} from './types'
 import {ACCESSIBILITY_SCAN_QUERY_KEY, QUERY_LAST_SCAN, CREATE_SCAN} from './constants'
+import {useA11yTracking} from '../../../../shared/react/hooks/useA11yTracking'
 
 const I18n = createI18nScope('accessibility_scan')
 
@@ -53,6 +54,7 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
 }) => {
   const queryClient = useQueryClient()
   const [isMutationLoading, setIsMutationLoading] = useState(false)
+  const {trackA11yEvent} = useA11yTracking()
 
   const {isLoading, isError, data} = useQuery({
     queryKey: [ACCESSIBILITY_SCAN_QUERY_KEY, QUERY_LAST_SCAN, courseId],
@@ -84,6 +86,8 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
 
   const handleCourseScan = () => {
     setIsMutationLoading(true)
+
+    trackA11yEvent('CourseScanned', {courseId})
 
     const url = new URL(window.location.href)
     if (url.searchParams.has('page')) {

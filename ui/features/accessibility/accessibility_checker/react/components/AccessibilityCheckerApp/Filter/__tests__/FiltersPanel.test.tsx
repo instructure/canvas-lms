@@ -321,6 +321,16 @@ describe('FiltersPanel', () => {
   })
 
   describe('apply filters button', () => {
+    it('has data-pendo attribute', async () => {
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+      await userEvent.click(toggleButton!)
+
+      const applyButton = screen.getByTestId('apply-filters-button')
+      expect(applyButton).toHaveAttribute('data-pendo', 'apply-filters-button')
+    })
+
     it('calls onFilterChange with current filter selections when apply is clicked', async () => {
       render(<FiltersPanel {...defaultProps} />)
 

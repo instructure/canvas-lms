@@ -384,6 +384,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                   <Flex.Item>
                     <Button
                       data-testid="apply-filters-button"
+                      data-pendo="apply-filters-button"
                       size="medium"
                       onClick={handleApply}
                       color="primary"
