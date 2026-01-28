@@ -18,6 +18,7 @@
 
 import {mapValues} from 'es-toolkit/compat'
 import {NextPageInfo} from './PaginatedResult'
+import PQueue from 'p-queue'
 
 export type GetAllPagesCallbacks<TPage, TError = unknown> = {
   onError?: (error: TError) => Promise<void> | void
@@ -30,18 +31,21 @@ export type GetAllPagesReturnValue<TResult> = Promise<{
   onErrorCallbacks: Promise<void>[]
 }>
 
-type GetAllPagesSingleParams<TPage, TResult, TError = unknown> = {
+type GetAllPagesCommonParams<TPage, TResult, TError = unknown> = {
   flattenPages: (pages: TPage[]) => TResult
+  queue?: PQueue
+} & GetAllPagesCallbacks<TPage, TError>
+
+type GetAllPagesSingleParams<TPage, TResult, TError = unknown> = {
   getPageInfo: (result: TPage) => NextPageInfo
   query: (after: string) => Promise<TPage>
   isMulti?: false
-} & GetAllPagesCallbacks<TPage, TError>
+} & GetAllPagesCommonParams<TPage, TResult, TError>
 type GetAllPagesMultiParams<TPage, TResult, TError = unknown> = {
-  flattenPages: (pages: TPage[]) => TResult
   getPageInfo: (result: TPage) => Record<string, NextPageInfo>
   query: (after: Record<string, string | null>) => Promise<TPage>
   isMulti: true
-} & GetAllPagesCallbacks<TPage, TError>
+} & GetAllPagesCommonParams<TPage, TResult, TError>
 
 type GetAllPagesParams<TPage, TResult, TError = unknown> =
   | GetAllPagesSingleParams<TPage, TResult, TError>
@@ -64,7 +68,8 @@ export const getAllPages = async <TPage, TResult, TError = unknown>(
 
   while (hasNextPage) {
     try {
-      const res = await (params.isMulti ? params.query(multiAfter) : params.query(singleAfter))
+      const cb = () => (params.isMulti ? params.query(multiAfter) : params.query(singleAfter))
+      const res = params.queue ? await params.queue.add(cb) : await cb()
       pages.push(res)
 
       if (params.isMulti) {
