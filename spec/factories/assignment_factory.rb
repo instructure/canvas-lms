@@ -40,6 +40,10 @@ module Factories
     }
   end
 
+  def allow_valid_assignment_attributes(opts)
+    opts.except(:user, :late)
+  end
+
   def assignment_with_override(opts = {})
     assignment_model(opts)
     @override = @a.assignment_overrides.build

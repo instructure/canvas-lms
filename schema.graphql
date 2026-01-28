@@ -832,7 +832,7 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   onlyVisibleToOverrides: Boolean!
   originalityReportVisibility: String
-  peerReviewSubAssignment: Assignment
+  peerReviewSubAssignment: PeerReviewSubAssignment
   peerReviews: PeerReviews
 
   """
@@ -3502,6 +3502,7 @@ type CustomGradeStatus implements LegacyIDInterface & Node {
   """
   _id: ID!
   color: String!
+  icon: String
   id: ID!
   name: String!
 }
@@ -7342,6 +7343,7 @@ enum NodeType {
   OutcomeCalculationMethod
   OutcomeProficiency
   Page
+  PeerReviewSubAssignment
   PostPolicy
   Progress
   Rubric
@@ -7728,6 +7730,472 @@ type PeerReviewStatus {
   Number of peer reviews the student has been allocated
   """
   mustReviewCount: Int!
+}
+
+type PeerReviewSubAssignment implements AssignedDates & LegacyIDInterface & ModuleItemInterface & Node & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+
+  """
+  Allocation rules if peer review is enabled
+  """
+  allocationRules: AssignmentAllocationRules
+  allowGoogleDocsSubmission: Boolean
+
+  """
+  Whether the current user can provide a provisional grade for this assignment
+  """
+  allowProvisionalGrading: AllowProvisionalGradingType!
+
+  """
+  The number of submission attempts a student can make for this assignment. null implies unlimited.
+  """
+  allowedAttempts: Int
+
+  """
+  permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])
+  """
+  allowedExtensions: [String!]
+  anonymizeStudents: Boolean
+  anonymousGrading: Boolean
+  anonymousInstructorAnnotations: Boolean
+  anonymousStudentIdentities: [AnonymousStudentIdentity!]
+  assessmentRequestsForCurrentUser: [AssessmentRequest!]
+
+  """
+  Assessment requests for a specific user where they are the assessor (peer reviewer)
+  """
+  assessmentRequestsForUser(userId: ID!): [AssessmentRequest!]
+  assignedStudents(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: AssignedStudentsFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): UserConnection
+
+  """
+  Standardized date hash visible to current user
+  """
+  assignedToDates: [DateHash!]
+  assignmentGroup: AssignmentGroup
+  assignmentGroupId: ID
+  assignmentOverrides(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): AssignmentOverrideConnection
+  assignmentTargetConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+    orderBy: AssignmentTargetSortOrder
+  ): AssignmentOverrideConnection
+
+  """
+  Returns empty array if visible to everyone
+  """
+  assignmentVisibility: [ID!]
+
+  """
+  Errors related to the assignment
+  """
+  autoGradeAssignmentErrors: [String!]!
+
+  """
+  Issues related to the assignment
+  """
+  autoGradeAssignmentIssues: EligibilityIssue
+  canDuplicate: Boolean
+  canManageAssignTo: Boolean
+  canUnpublish: Boolean
+
+  """
+  specifies that the current user can update the rubric self-assessment.
+  """
+  canUpdateRubricSelfAssessment: Boolean
+
+  """
+  A list of checkpoints (also known as sub_assignments) that are associated with this assignment
+  """
+  checkpoints: [Checkpoint!]
+  course: Course
+  courseId: ID
+  createdAt: DateTime
+  description: String
+  discussion: Discussion
+
+  """
+  when this assignment is due
+  """
+  dueAt(
+    """
+    When true, return the overridden dates.
+
+    Not all roles have permission to view un-overridden dates (in which
+    case the overridden dates will be returned)
+    """
+    applyOverrides: Boolean = true
+  ): DateTime
+  dueDateRequired: Boolean
+  expectsExternalSubmission: Boolean
+  expectsSubmission: Boolean
+
+  """
+  specifies that students are being graded as a group (as opposed to being graded individually).
+  """
+  gradeAsGroup: Boolean!
+  gradeByQuestionEnabled: Boolean!
+
+  """
+  If this is a group assignment, boolean flag indicating whether or not students will be graded individually.
+  """
+  gradeGroupStudentsIndividually: Boolean
+  graded: Boolean
+
+  """
+  If true, the assignment has at least one graded submission
+  """
+  gradedSubmissionsExist: Boolean
+
+  """
+  Grader identities if moderated assignment
+  """
+  graderIdentitiesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): GraderIdentityConnection
+  gradesPublished: Boolean
+  gradesPublishedAt: String
+  gradingPeriodId: String
+
+  """
+  The grading role of the current user for this assignment. Returns null if the
+  user does not have sufficient grading permissions.
+  """
+  gradingRole: GradingRole
+  gradingStandard: GradingStandard
+  gradingStandardId: ID
+  gradingType: GradingType
+  groupCategoryId: Int
+  groupSet: GroupSet
+
+  """
+  returns submissions grouped to one submission object per group
+  """
+  groupSubmissionsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionSearchFilterInput
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+    orderBy: [SubmissionSearchOrder!]
+  ): SubmissionConnection
+
+  """
+  specifies that this assignment is a group assignment
+  """
+  hasGroupCategory: Boolean!
+  hasMultipleDueDates: Boolean
+
+  """
+  Indicates if the assignment has LTI 2.0 plagiarism detection tool configured
+  """
+  hasPlagiarismTool: Boolean!
+  hasRubric: Boolean!
+
+  """
+  Boolean: returns true if the assignment is checkpointed. A checkpointed
+  assignment has checkpoints ( also known as sub_assignments)
+  """
+  hasSubAssignments: Boolean!
+
+  """
+  If true, the assignment has been submitted to by at least one student
+  """
+  hasSubmittedSubmissions: Boolean
+  htmlUrl: URL
+  id: ID!
+  importantDates: Boolean
+  inClosedGradingPeriod: Boolean
+  isLockedByMasterCourse: Boolean!
+
+  """
+  Assignment is connected to a New Quiz
+  """
+  isNewQuiz: Boolean!
+
+  """
+  the lock date (assignment is locked after this date)
+  """
+  lockAt(
+    """
+    When true, return the overridden dates.
+
+    Not all roles have permission to view un-overridden dates (in which
+    case the overridden dates will be returned)
+    """
+    applyOverrides: Boolean = true
+  ): DateTime
+  lockInfo: LockInfo
+  ltiAssetProcessorsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): LtiAssetProcessorConnection
+  moderatedGrading: ModeratedGrading
+  moderatedGradingEnabled: Boolean
+  moduleItems: [ModuleItem!]
+  modules: [Module!]
+  muted: Boolean
+
+  """
+  submissions for sub-assignments belonging to the current user
+  """
+  mySubAssignmentSubmissionsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): SubmissionConnection
+  name: String
+  needsGradingCount: Int
+  newQuizzesAnonymousParticipants: Boolean
+  nonDigitalSubmission: Boolean
+
+  """
+  If true, the assignment will be omitted from the student's final grade
+  """
+  omitFromFinalGrade: Boolean
+
+  """
+  specifies that this assignment is only assigned to students for whom an
+         `AssignmentOverride` applies.
+  """
+  onlyVisibleToOverrides: Boolean!
+  originalityReportVisibility: String
+  parentAssignment: Assignment!
+  parentAssignmentId: ID!
+  peerReviewSubAssignment: PeerReviewSubAssignment
+  peerReviews: PeerReviews
+
+  """
+  the assignment is out of this many points
+  """
+  pointsPossible: Float
+
+  """
+  determines the order this assignment is displayed in in its assignment group
+  """
+  position: Int
+  postManually: Boolean
+  postPolicy: PostPolicy
+
+  """
+  present if Sync Grades to SIS feature is enabled
+  """
+  postToSis: Boolean
+
+  """
+  Indicates if the user is locked out of provisional grading for this assignment.
+  """
+  provisionalGradingLocked: Boolean!
+  published: Boolean
+  quiz: Quiz
+
+  """
+  Is the current user restricted from viewing quantitative data
+  """
+  restrictQuantitativeData(
+    """
+    Check extra permissions in RQD method
+    """
+    checkExtraPermissions: Boolean
+  ): Boolean
+  rubric: Rubric
+  rubricAssessment: AssignmentRubricAssessment
+  rubricAssociation: RubricAssociation
+
+  """
+  specifies that students can self-assess using the assignment rubric.
+  """
+  rubricSelfAssessmentEnabled: Boolean
+  rubricUpdateUrl: String
+  scheduledPost: ScheduledPost
+  scoreStatistic: AssignmentScoreStatistic
+  sisId: String
+  state: AssignmentState!
+  submissionTypes: [SubmissionType!]
+
+  """
+  submissions for this assignment
+  """
+  submissionsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionSearchFilterInput
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+    orderBy: [SubmissionSearchOrder!]
+  ): SubmissionConnection
+  submissionsDownloads: Int
+  supportsGradeByQuestion: Boolean!
+
+  """
+  internal use
+  """
+  suppressAssignment: Boolean!
+  timeZoneEdited: String
+  title: String
+  totalGradedSubmissions: Int
+  totalSubmissions: Int
+  type: String
+
+  """
+  the unlock date (assignment is unlocked after this date)
+  """
+  unlockAt(
+    """
+    When true, return the overridden dates.
+
+    Not all roles have permission to view un-overridden dates (in which
+    case the overridden dates will be returned)
+    """
+    applyOverrides: Boolean = true
+  ): DateTime
+  updatedAt: DateTime
+
+  """
+  specifies all other variables that can determine visiblity.
+  """
+  visibleToEveryone: Boolean!
 }
 
 """
@@ -8351,6 +8819,12 @@ type Query {
     """
     id: ID!
   ): OutcomeProficiency
+  peerReviewSubAssignment(
+    """
+    a graphql or legacy id
+    """
+    id: ID!
+  ): PeerReviewSubAssignment
 
   """
   Rubric
@@ -8929,6 +9403,7 @@ Autogenerated return type of SaveRubricAssessment.
 type SaveRubricAssessmentPayload {
   errors: [ValidationError!]
   rubricAssessment: RubricAssessment
+  rubricAssociation: RubricAssociation
   submission: Submission
 }
 
@@ -9449,6 +9924,14 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     includeDraftComments: Boolean = false
 
     """
+    When true and include_draft_comments is true, draft comments from other teachers will be included.
+    Only applies to users with grading permissions (teachers, TAs, etc).
+    When false, only the current user's draft comments are included.
+    Students never see draft comments from others regardless of this setting.
+    """
+    includeDraftsFromOthers: Boolean = false
+
+    """
     When true, provisional comments that the current user has permission to see will be returned.
     The Moderator has permission to see all provisional comments.
     Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
@@ -9881,6 +10364,14 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
     includeDraftComments: Boolean = false
 
     """
+    When true and include_draft_comments is true, draft comments from other teachers will be included.
+    Only applies to users with grading permissions (teachers, TAs, etc).
+    When false, only the current user's draft comments are included.
+    Students never see draft comments from others regardless of this setting.
+    """
+    includeDraftsFromOthers: Boolean = false
+
+    """
     When true, provisional comments that the current user has permission to see will be returned.
     The Moderator has permission to see all provisional comments.
     Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
@@ -10105,6 +10596,14 @@ interface SubmissionInterface {
     """
     first: Int
     includeDraftComments: Boolean = false
+
+    """
+    When true and include_draft_comments is true, draft comments from other teachers will be included.
+    Only applies to users with grading permissions (teachers, TAs, etc).
+    When false, only the current user's draft comments are included.
+    Students never see draft comments from others regardless of this setting.
+    """
+    includeDraftsFromOthers: Boolean = false
 
     """
     When true, provisional comments that the current user has permission to see will be returned.
@@ -10424,6 +10923,7 @@ enum SubmissionType {
   online_text_entry
   online_upload
   online_url
+  peer_review
   student_annotation
   wiki_page
 }

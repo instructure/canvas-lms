@@ -21,7 +21,7 @@ import {screen, render, fireEvent, waitFor} from '@testing-library/react'
 import storeCreator from '../store/store'
 import actions from '../actions/developerKeysActions'
 import InheritanceStateControl from '../InheritanceStateControl'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm as confirmDialog} from '@canvas/instui-bindings/react/Confirm'
 import $ from 'jquery'
 
 vi.mock('@canvas/instui-bindings/react/Confirm')
@@ -141,7 +141,7 @@ describe('InheritanceStateControl', () => {
   })
 
   it('updates the state when the RadioInput is clicked', async () => {
-    confirm.mockImplementation(() => Promise.resolve(true))
+    confirmDialog.mockImplementation(() => Promise.resolve(true))
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -185,7 +185,7 @@ describe('InheritanceStateControl', () => {
   }
 
   it('updates the state when the Checkbox is clicked', async () => {
-    confirm.mockImplementation(() => Promise.resolve(true))
+    confirmDialog.mockImplementation(() => Promise.resolve(true))
     const {key, store} = createStoreAndDevKey()
 
     renderInheritanceStateControl(key, store)
@@ -202,7 +202,7 @@ describe('InheritanceStateControl', () => {
   })
 
   it('does nothing if cancel is clicked in the confirmation modal', async () => {
-    confirm.mockImplementation(() => Promise.resolve(false))
+    confirmDialog.mockImplementation(() => Promise.resolve(false))
     const {key, store} = createStoreAndDevKey()
 
     renderInheritanceStateControl(key, store)
@@ -345,5 +345,27 @@ describe('InheritanceStateControl', () => {
     )
 
     expect(allowRadioInput.checked).toBe(true)
+  })
+
+  describe('when devKeysReadOnly is true', () => {
+    let originalEnv
+
+    beforeEach(() => {
+      originalEnv = window.ENV
+      window.ENV = {...originalEnv, devKeysReadOnly: true}
+    })
+
+    afterEach(() => {
+      window.ENV = originalEnv
+    })
+
+    it('disables radio group for site admin context', () => {
+      const radioInputs = componentNode(mockDevKey('on', true), siteAdminCTX).querySelectorAll(
+        'input[type="radio"]',
+      )
+      radioInputs.forEach(input => {
+        expect(input.disabled).toBe(true)
+      })
+    })
   })
 })

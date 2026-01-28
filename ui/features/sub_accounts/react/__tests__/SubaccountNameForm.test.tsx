@@ -18,8 +18,11 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import SubaccountNameForm from '../SubaccountNameForm'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import userEvent from '@testing-library/user-event'
+
+const server = setupServer()
 
 describe('SubaccountNameForm', () => {
   const props = {
@@ -36,10 +39,12 @@ describe('SubaccountNameForm', () => {
     course_count: 0,
   }
 
-  beforeEach(() => {
-    fetchMock.restore()
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
     vi.resetAllMocks()
   })
+  afterAll(() => server.close())
 
   it('renders an input with submission buttons', () => {
     const {getByTestId} = render(<SubaccountNameForm {...props} />)
@@ -58,30 +63,44 @@ describe('SubaccountNameForm', () => {
   })
 
   it('creates new subaccount when passed in name is blank', async () => {
-    const path = `/accounts/${props.accountId}/sub_accounts`
     const user = userEvent.setup()
     const onSuccess = vi.fn()
+    let postCalled = false
+    server.use(
+      http.post(`/accounts/${props.accountId}/sub_accounts`, () => {
+        postCalled = true
+        return HttpResponse.json(updatedAccount)
+      }),
+    )
     const {getByTestId} = render(
       <SubaccountNameForm {...props} onSuccess={onSuccess} accountName="" />,
     )
-    fetchMock.post(path, updatedAccount)
 
     fireEvent.change(getByTestId('account-name-input'), {target: {value: 'New Name'}})
     await user.click(getByTestId('save-button'))
-    await waitFor(() => expect(fetchMock.called(path, 'POST')).toBe(true))
-    expect(onSuccess).toBeCalledTimes(1)
+    await waitFor(() => {
+      expect(postCalled).toBe(true)
+      expect(onSuccess).toBeCalledTimes(1)
+    })
   })
 
   it('updates existing subaccount when passed in name is not blank', async () => {
-    const path = `/accounts/${props.accountId}`
     const user = userEvent.setup()
     const onSuccess = vi.fn()
+    let putCalled = false
+    server.use(
+      http.put(`/accounts/${props.accountId}`, () => {
+        putCalled = true
+        return HttpResponse.json({account: updatedAccount})
+      }),
+    )
     const {getByTestId} = render(<SubaccountNameForm {...props} onSuccess={onSuccess} />)
-    fetchMock.put(path, {account: updatedAccount})
 
     await user.click(getByTestId('save-button'))
-    await waitFor(() => expect(fetchMock.called(path, 'PUT')).toBe(true))
-    expect(onSuccess).toBeCalledTimes(1)
+    await waitFor(() => {
+      expect(putCalled).toBe(true)
+      expect(onSuccess).toBeCalledTimes(1)
+    })
   })
 
   it('triggers callback when cancelling', async () => {

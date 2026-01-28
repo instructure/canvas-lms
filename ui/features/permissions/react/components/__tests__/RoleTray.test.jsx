@@ -62,7 +62,7 @@ function makeDefaultProps() {
   }
 }
 
-it.skip('renders assigned permissions if any are present', () => {
+it('renders assigned permissions if any are present', () => {
   const props = makeDefaultProps()
   props.unassignedPermissions = []
   const {getByText} = render(<RoleTray {...props} />)
@@ -78,7 +78,7 @@ it('does not render assigned or unassigned permissions if none are present', () 
   expect(queryByText('Unassigned Permissions')).not.toBeInTheDocument()
 })
 
-it.skip('renders unassigned permissions if any are present', () => {
+it('renders unassigned permissions if any are present', () => {
   const props = makeDefaultProps()
   props.assignedPermissions = []
   const {getByText} = render(<RoleTray {...props} />)

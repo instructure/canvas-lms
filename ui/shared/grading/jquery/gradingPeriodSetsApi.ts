@@ -36,9 +36,7 @@ const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
 const createUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore - untyped id parameter
-const updateUrl = id => replaceTags(ENV.GRADING_PERIOD_SET_UPDATE_URL, 'id', id)
+const updateUrl = (id: string) => replaceTags(ENV.GRADING_PERIOD_SET_UPDATE_URL ?? '', 'id', id)
 
 const serializeSet = (set: CamelizedGradingPeriodSet) => {
   const gradingPeriodSetAttrs = {
@@ -65,9 +63,7 @@ const baseDeserializeSet = (set: GradingPeriodSet): CamelizedGradingPeriodSet =>
   enrollmentTermIDs: undefined,
 })
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore - untyped set parameter
-const gradingPeriodSetTitle = set => {
+const gradingPeriodSetTitle = (set: GradingPeriodSet): string => {
   if (set.title && set.title.trim()) {
     return set.title.trim()
   } else {
@@ -105,17 +101,13 @@ export default {
     })
   },
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore - untyped set parameter
-  create(set) {
+  create(set: CamelizedGradingPeriodSet) {
     return axios
       .post(createUrl(), serializeSet(set))
       .then(response => deserializeSet(response.data.grading_period_set))
   },
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore - untyped set parameter
-  update(set) {
+  update(set: CamelizedGradingPeriodSet) {
     return axios.patch(updateUrl(set.id), serializeSet(set)).then(_response => set)
   },
 }

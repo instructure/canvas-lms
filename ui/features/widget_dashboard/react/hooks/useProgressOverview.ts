@@ -103,36 +103,28 @@ const USER_PROGRESS_OVERVIEW_QUERY = gql`
 `
 
 async function fetchProgressOverview(observedUserId?: string | null): Promise<CourseProgress[]> {
-  try {
-    const currentUserId = getCurrentUserId()
+  const currentUserId = getCurrentUserId()
 
-    const result = await executeGraphQLQuery<GraphQLResponse>(USER_PROGRESS_OVERVIEW_QUERY, {
-      userId: currentUserId,
-      observedUserId,
-    })
+  const result = await executeGraphQLQuery<GraphQLResponse>(USER_PROGRESS_OVERVIEW_QUERY, {
+    userId: currentUserId,
+    observedUserId,
+  })
 
-    if (!result.legacyNode?.enrollmentsConnection?.nodes) {
-      return []
-    }
-
-    return result.legacyNode.enrollmentsConnection.nodes
-      .filter(enrollment => enrollment.course.submissionStatistics !== null)
-      .map(enrollment => ({
-        courseId: enrollment.course._id,
-        courseName: enrollment.course.name,
-        courseCode: enrollment.course.courseCode,
-        submittedAndGradedCount:
-          enrollment.course.submissionStatistics?.submittedAndGradedCount ?? 0,
-        submittedNotGradedCount:
-          enrollment.course.submissionStatistics?.submittedNotGradedCount ?? 0,
-        missingSubmissionsCount:
-          enrollment.course.submissionStatistics?.missingSubmissionsCount ?? 0,
-        submissionsDueCount: enrollment.course.submissionStatistics?.submissionsDueCount ?? 0,
-      }))
-  } catch (error) {
-    console.error('Failed to fetch progress overview:', error)
-    throw error
+  if (!result.legacyNode?.enrollmentsConnection?.nodes) {
+    return []
   }
+
+  return result.legacyNode.enrollmentsConnection.nodes
+    .filter(enrollment => enrollment.course.submissionStatistics !== null)
+    .map(enrollment => ({
+      courseId: enrollment.course._id,
+      courseName: enrollment.course.name,
+      courseCode: enrollment.course.courseCode,
+      submittedAndGradedCount: enrollment.course.submissionStatistics?.submittedAndGradedCount ?? 0,
+      submittedNotGradedCount: enrollment.course.submissionStatistics?.submittedNotGradedCount ?? 0,
+      missingSubmissionsCount: enrollment.course.submissionStatistics?.missingSubmissionsCount ?? 0,
+      submissionsDueCount: enrollment.course.submissionStatistics?.submissionsDueCount ?? 0,
+    }))
 }
 
 export function useProgressOverview() {

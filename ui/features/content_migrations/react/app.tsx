@@ -26,8 +26,6 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
-type MigrationsResponse = {json: ContentMigrationItem[]}
-
 export const App = () => {
   const [migrations, setMigrations] = useState<ContentMigrationItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -37,14 +35,14 @@ export const App = () => {
 
   const fetchNext = useCallback(async () => {
     setIsLoading(true)
-    doFetchApi({
+    doFetchApi<ContentMigrationItem[]>({
       path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
       params: {per_page: perPage, page: pageRef.current},
     })
-      // @ts-expect-error
-      .then((response: MigrationsResponse) => {
-        setMigrations(prevMigrations => [...prevMigrations, ...response.json])
-        lastFetchCountRef.current = response.json.length
+      .then(response => {
+        const json = response.json ?? []
+        setMigrations(prevMigrations => [...prevMigrations, ...json])
+        lastFetchCountRef.current = json.length
         pageRef.current = pageRef.current + 1
       })
       .catch(showFlashError(I18n.t("Couldn't load previous content migrations")))

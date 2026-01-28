@@ -702,9 +702,30 @@ describe Checkpoints::SubmissionAggregatorService do
         expect(submission.workflow_state).to eq "graded"
       end
 
-      it "sets the workflow_state to 'unsubmitted' when checkpoint states don't match" do
+      it "sets the workflow_state to 'pending_review' when a checkpoint is submitted and needs grading" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
           @topic.reply_to_topic_checkpoint.submit_homework(@student, submission_type: "discussion_topic")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.workflow_state).to eq "pending_review"
+      end
+
+      it "sets the workflow_state to 'pending_review' when both checkpoints need grading" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          @topic.reply_to_topic_checkpoint.submit_homework(@student, submission_type: "discussion_topic")
+          @topic.reply_to_entry_checkpoint.submit_homework(@student, submission_type: "discussion_topic")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.workflow_state).to eq "pending_review"
+      end
+
+      it "sets the workflow_state to 'unsubmitted' when states don't match and no checkpoint needs grading" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         end
 
         success = service_call

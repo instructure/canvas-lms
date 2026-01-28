@@ -136,11 +136,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def attachment_info(user, attachment)
-    annotators = [submission.user, scorer]
-    annotators << source_provisional_grade.scorer if source_provisional_grade
     url_opts = {
       enable_annotations: true,
-      moderated_grading_allow_list: annotators.map { |u| u.moderated_grading_ids(true) }
     }
 
     {

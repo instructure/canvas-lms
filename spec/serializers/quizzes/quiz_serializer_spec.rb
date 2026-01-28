@@ -129,6 +129,33 @@ describe Quizzes::QuizSerializer do
     end
   end
 
+  describe "skip_description" do
+    it "excludes description when skip_description is true" do
+      json = quiz_serializer({
+                               serializer_options: {
+                                 skip_description: true
+                               }
+                             }).as_json[:quiz]
+      expect(json).not_to have_key :description
+    end
+
+    it "includes description when skip_description is false" do
+      json = quiz_serializer({
+                               serializer_options: {
+                                 skip_description: false
+                               }
+                             }).as_json[:quiz]
+      expect(json).to have_key :description
+      expect(json[:description]).to eq quiz.description
+    end
+
+    it "includes description when skip_description is not provided" do
+      json = quiz_serializer.as_json[:quiz]
+      expect(json).to have_key :description
+      expect(json[:description]).to eq quiz.description
+    end
+  end
+
   it "serializes speed_grader_url" do
     # No assignment, so it should be nil
     expect(json[:speed_grader_url]).to be_nil

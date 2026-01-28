@@ -105,6 +105,7 @@ export function getInitialGridDisplaySettings(
     showSeparateFirstLastNames: settings.show_separate_first_last_names === 'true',
     viewUngradedAsZero: settings.view_ungraded_as_zero === 'true',
     viewHiddenGradesIndicator: settings.view_hidden_grades_indicator === 'true',
+    viewStatusForColorblindness: settings.view_status_for_colorblindness === 'true',
   }
 }
 

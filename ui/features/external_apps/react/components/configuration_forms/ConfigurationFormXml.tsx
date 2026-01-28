@@ -229,8 +229,7 @@ export default class ConfigurationFormXml extends React.Component<
                 required
                 ref={this.xmlRef}
                 onChange={this.handleXmlChange}
-                // @ts-expect-error
-                onPaste={this.handleXmlPaste}
+                onPaste={this.handleXmlPaste as unknown as never}
                 // Initially 12 rows of text, will grow if needed
                 height="12rem"
                 resize="vertical"

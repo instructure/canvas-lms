@@ -91,8 +91,7 @@ export default function GroupNavigationSelector(props: Props) {
 
     // we don't want anything after index 4 (i.e. a specific discussion or announcement)
     const newPath = path.length >= 5 ? path.slice(0, 4) : path
-    // @ts-expect-error
-    window.location = newPath.join('/')
+    window.location.href = newPath.join('/')
   }
 
   return (

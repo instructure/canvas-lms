@@ -140,7 +140,8 @@ describe "Importing Rubrics" do
       r = Rubric.where(migration_id: data[:migration_id]).first
       expect(r.association_count).to eq 0
 
-      Importers::RubricImporter.process_rubric_association_count(data)
+      allow(migration).to receive(:imported_migration_items_by_class).with(Rubric).and_return([r])
+      Importers::RubricImporter.process_rubric_association_count(migration)
 
       assignment.reload
       expect(assignment.rubric_association.purpose).to eq "grading"

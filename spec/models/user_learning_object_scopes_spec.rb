@@ -155,7 +155,7 @@ describe UserLearningObjectScopes do
         SubmissionLifecycleManager.recompute(@quiz.assignment)
         list = @student.assignments_for_student("submitting", contexts: [@course])
         expect(list.size).to be 1
-        expect(list.first.title).to eq "Test Assignment"
+        expect(list.first.title).to eq "Test Quiz"
       end
 
       it "includes assignments with unlock_at in the past" do
@@ -164,7 +164,7 @@ describe UserLearningObjectScopes do
         SubmissionLifecycleManager.recompute(@quiz.assignment)
         list = @student.assignments_for_student("submitting", contexts: [@course])
         expect(list.size).to be 1
-        expect(list.first.title).to eq "Test Assignment"
+        expect(list.first.title).to eq "Test Quiz"
       end
 
       it "includes assignments with lock_at in the future" do
@@ -173,7 +173,7 @@ describe UserLearningObjectScopes do
         SubmissionLifecycleManager.recompute(@quiz.assignment)
         list = @student.assignments_for_student("submitting", contexts: [@course])
         expect(list.size).to be 1
-        expect(list.first.title).to eq "Test Assignment"
+        expect(list.first.title).to eq "Test Quiz"
       end
 
       it "does not include assignments where unlock_at is in future" do
@@ -1365,6 +1365,53 @@ describe UserLearningObjectScopes do
         expect(@student.wiki_pages_needing_viewing(**@opts, course_ids: [], group_ids: []).order(:id)).to eq []
         opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
         expect(@student.wiki_pages_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]
+      end
+    end
+
+    context "performance optimization with todo_date filtering" do
+      before do
+        course_with_student(active_all: true)
+      end
+
+      it "does not call visibility service when no pages have todo_dates in user's courses" do
+        @course.wiki_pages.create!(title: "No date")
+        @course.wiki_pages.create!(title: "Future date", todo_date: 1.year.from_now)
+
+        expect(WikiPageVisibility::WikiPageVisibilityService)
+          .not_to receive(:wiki_pages_visible_to_students)
+
+        pages = @student.wiki_pages_needing_viewing(
+          due_after: 1.day.from_now,
+          due_before: 1.week.from_now,
+          scope_only: true,
+          course_ids: [@course.id]
+        )
+
+        expect(pages).to be_empty
+      end
+
+      it "only passes wiki pages with todo dates to visibility service" do
+        page1 = @course.wiki_pages.create!(title: "Page 1", todo_date: 3.days.from_now)
+        page2 = @course.wiki_pages.create!(title: "Page 2", todo_date: 4.days.from_now)
+        @course.wiki_pages.create!(title: "Future", todo_date: 1.year.from_now)
+        @course.wiki_pages.create!(title: "No date")
+
+        # Expect only the pages with todo dates in range to be passed to service
+        expect(WikiPageVisibility::WikiPageVisibilityService)
+          .to receive(:wiki_pages_visible_to_students)
+          .with(hash_including(
+                  wiki_page_ids: match_array([page1.id, page2.id]),
+                  user_ids: @student,
+                  course_ids: [@course.id]
+                ))
+          .and_call_original
+
+        @student.wiki_pages_needing_viewing(
+          due_after: 1.day.from_now,
+          due_before: 1.week.from_now,
+          scope_only: true,
+          course_ids: [@course.id]
+        )
       end
     end
   end

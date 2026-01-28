@@ -22,7 +22,7 @@ class AccessibilityResourceScan < ActiveRecord::Base
   resolves_root_account through: :course
 
   belongs_to :course
-  belongs_to :context, polymorphic: %i[assignment attachment wiki_page], separate_columns: true, optional: false
+  belongs_to :context, polymorphic: %i[assignment attachment wiki_page discussion_topic announcement], separate_columns: true, optional: true
 
   has_many :accessibility_issues, dependent: :destroy
 
@@ -33,6 +33,9 @@ class AccessibilityResourceScan < ActiveRecord::Base
   validates :wiki_page_id, uniqueness: true, allow_nil: true
   validates :assignment_id, uniqueness: true, allow_nil: true
   validates :attachment_id, uniqueness: true, allow_nil: true
+  validates :discussion_topic_id, uniqueness: true, allow_nil: true
+  validates :announcement_id, uniqueness: true, allow_nil: true
+  validate :validate_syllabus_or_context
 
   scope :running, -> { where(workflow_state: %w[queued in_progress]) }
   scope :for_course, ->(course) { where(course:) }
@@ -53,6 +56,14 @@ class AccessibilityResourceScan < ActiveRecord::Base
       url_helpers.course_assignment_path(course_id, context_id)
     when "Attachment"
       url_helpers.course_files_path(course_id, preview: context_id)
+    end
+  end
+
+  private
+
+  def validate_syllabus_or_context
+    if is_syllabus == context.present?
+      errors.add(:base, "is_syllabus and context must be mutually exclusive")
     end
   end
 end

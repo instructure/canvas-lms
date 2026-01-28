@@ -67,10 +67,8 @@ export default function GroupsTray() {
               <Link isWithinText={false} href={`/groups/${group.id}`}>
                 {group.name}
               </Link>
-              {/* @ts-expect-error */}
               {group.context_type === 'Course' && (
                 <Text as="div" size="x-small" weight="light">
-                  {/* @ts-expect-error */}
                   {group.context_name}
                 </Text>
               )}

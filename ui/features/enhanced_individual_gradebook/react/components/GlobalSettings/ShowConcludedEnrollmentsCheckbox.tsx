@@ -36,16 +36,17 @@ export default function ShowConcludedEnrollmentsCheckbox({
 }: Props) {
   const handleShowConcludedEnrollmentsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
-    doFetchApi({
-      method: 'PUT',
-      // @ts-expect-error
-      path: settingsUpdateUrl,
-      body: {
-        gradebook_settings: {
-          show_concluded_enrollments: checked ? 'true' : 'false',
+    if (settingsUpdateUrl) {
+      doFetchApi({
+        method: 'PUT',
+        path: settingsUpdateUrl,
+        body: {
+          gradebook_settings: {
+            show_concluded_enrollments: checked ? 'true' : 'false',
+          },
         },
-      },
-    })
+      })
+    }
     handleCheckboxChange('showConcludedEnrollments', checked)
   }
 

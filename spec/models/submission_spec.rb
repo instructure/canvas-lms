@@ -2748,6 +2748,85 @@ describe Submission do
         @course.account.save!
         expect(@submission.grants_right?(@student, :comment)).to be false
       end
+
+      context "for peer reviewers" do
+        before(:once) do
+          @assignment.update!(peer_reviews: true, submission_types: "online_text_entry")
+          @peer_reviewer = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+          @peer_reviewer_submission = @assignment.submissions.find_by(user: @peer_reviewer)
+          AssessmentRequest.create!(
+            assessor: @peer_reviewer,
+            assessor_asset: @peer_reviewer_submission,
+            asset: @submission,
+            user: @student
+          )
+        end
+
+        context "when peer_review_allocation_and_grading feature is disabled" do
+          before do
+            @course.root_account.disable_feature!(:peer_review_allocation_and_grading)
+          end
+
+          it "allows peer reviewer to read and comment when they have submitted" do
+            @assignment.submit_homework(@peer_reviewer, body: "my submission")
+            expect(@submission.grants_right?(@peer_reviewer, :read)).to be true
+            expect(@submission.grants_right?(@peer_reviewer, :comment)).to be true
+            expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be true
+          end
+
+          it "does not allow peer reviewer to read and comment when they have not submitted" do
+            expect(@submission.grants_right?(@peer_reviewer, :read)).to be false
+            expect(@submission.grants_right?(@peer_reviewer, :comment)).to be false
+            expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be false
+          end
+        end
+
+        context "when peer_review_allocation_and_grading feature is enabled" do
+          before do
+            @course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+          end
+
+          context "when peer_review_submission_required is false" do
+            before do
+              @assignment.update!(peer_review_submission_required: false)
+              @submission.reload
+            end
+
+            it "allows peer reviewer to read and comment even without submission" do
+              expect(@submission.grants_right?(@peer_reviewer, :read)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :comment)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be true
+            end
+
+            it "allows peer reviewer to read and comment with submission" do
+              @assignment.submit_homework(@peer_reviewer, body: "my submission")
+              expect(@submission.grants_right?(@peer_reviewer, :read)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :comment)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be true
+            end
+          end
+
+          context "when peer_review_submission_required is true" do
+            before do
+              @assignment.update!(peer_review_submission_required: true)
+              @submission.reload
+            end
+
+            it "allows peer reviewer to read and comment when they have submitted" do
+              @assignment.submit_homework(@peer_reviewer, body: "my submission")
+              expect(@submission.grants_right?(@peer_reviewer, :read)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :comment)).to be true
+              expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be true
+            end
+
+            it "does not allow peer reviewer to read and comment when they have not submitted" do
+              expect(@submission.grants_right?(@peer_reviewer, :read)).to be false
+              expect(@submission.grants_right?(@peer_reviewer, :comment)).to be false
+              expect(@submission.grants_right?(@peer_reviewer, :make_group_comment)).to be false
+            end
+          end
+        end
+      end
     end
 
     describe "can :download" do
@@ -3530,6 +3609,40 @@ describe Submission do
         submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments:)
         submission.update!(attachment_id: single_attachment)
         expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id) + [single_attachment.id]
+      end
+    end
+
+    describe "#originality_data with CPF migration" do
+      it "returns empty hash when cpf_migrated? is true" do
+        submission.assignment.assignment_configuration_tool_lookups.create!(
+          tool_product_code: "turnitin-lti",
+          tool_vendor_code: "turnitin.com",
+          tool_resource_type_code: "resource-type-code",
+          tool_type: "Lti::MessageHandler"
+        )
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(true)
+
+        originality_report.originality_report_url = "http://example.com"
+        originality_report.save!
+
+        expect(submission.originality_data).to eq({})
+      end
+
+      it "returns originality data when cpf_migrated? is false" do
+        submission.assignment.assignment_configuration_tool_lookups.create!(
+          tool_product_code: "turnitin-lti",
+          tool_vendor_code: "turnitin.com",
+          tool_resource_type_code: "resource-type-code",
+          tool_type: "Lti::MessageHandler"
+        )
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(false)
+
+        originality_report.originality_report_url = "http://example.com"
+        originality_report.save!
+
+        result = submission.originality_data
+        expect(result).to include(attachment.asset_string)
+        expect(result[attachment.asset_string][:report_url]).to eq originality_report.originality_report_url
       end
     end
 
@@ -9788,6 +9901,38 @@ describe Submission do
           submission.extra_attempts = 10
           expect(submission).to_not be_valid
         end
+      end
+    end
+  end
+
+  describe "submission_type_is_valid" do
+    describe "peer_review submission type" do
+      it "is valid without body field" do
+        parent_assignment = @course.assignments.create!
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        submission = peer_review_sub_assignment.submit_homework(
+          @user,
+          submission_type: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        expect(submission).to be_valid
+        expect(submission.body).to be_nil
+      end
+
+      it "is valid with empty body" do
+        parent_assignment = @course.assignments.create!
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        submission = peer_review_sub_assignment.submit_homework(
+          @user,
+          submission_type: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE,
+          body: ""
+        )
+        expect(submission).to be_valid
       end
     end
   end

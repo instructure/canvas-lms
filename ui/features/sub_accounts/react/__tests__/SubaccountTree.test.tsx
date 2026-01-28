@@ -18,11 +18,13 @@
 
 import {render, waitFor} from '@testing-library/react'
 import SubaccountTree from '../SubaccountTree'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import userEvent from '@testing-library/user-event'
-import type {AccountWithCounts} from '../types'
 import {QueryClient} from '@tanstack/react-query'
 import {SubaccountProvider} from '../util'
+
+const server = setupServer()
 
 const rootAccount = {
   id: '1',
@@ -43,11 +45,6 @@ const props = {
   defaultExpanded: true,
 }
 
-// Use regex matcher to handle different parameter orderings
-const SUBACCOUNT_FETCH_MATCHER = (account: AccountWithCounts) => {
-  return new RegExp(`/api/v1/accounts/${account.id}/sub_accounts`)
-}
-
 const renderSubaccountTree = (overrides = {}) => {
   const mergedProps = {...props, ...overrides}
   return render(
@@ -59,8 +56,11 @@ const renderSubaccountTree = (overrides = {}) => {
 
 describe('SubaccountTree', () => {
   const queryClient = new QueryClient()
+  let subAccountFetched = false
+
+  beforeAll(() => server.listen())
   beforeEach(() => {
-    fetchMock.restore()
+    subAccountFetched = false
     vi.clearAllMocks()
     queryClient.clear()
     // Clear sessionStorage to avoid cached data interfering with tests
@@ -68,18 +68,26 @@ describe('SubaccountTree', () => {
   })
 
   afterEach(() => {
+    server.resetHandlers()
     queryClient.clear()
     sessionStorage.clear()
   })
 
+  afterAll(() => server.close())
+
   // the only time this doesn't happen automatically is if the subaccount count is over 100
   it('fetches sub-accounts and expands collapses', async () => {
     const user = userEvent.setup()
-    fetchMock.get(SUBACCOUNT_FETCH_MATCHER(rootAccount), subAccounts)
+    server.use(
+      http.get(`/api/v1/accounts/${rootAccount.id}/sub_accounts`, () => {
+        subAccountFetched = true
+        return HttpResponse.json(subAccounts)
+      }),
+    )
     const {getByText, getByTestId, queryByText} = renderSubaccountTree()
 
     await waitFor(() => {
-      expect(fetchMock.called(SUBACCOUNT_FETCH_MATCHER(rootAccount), 'GET')).toBe(true)
+      expect(subAccountFetched).toBe(true)
       expect(getByText('Root Account')).toBeInTheDocument()
       expect(getByText('Child 1')).toBeInTheDocument()
       expect(getByText('Child 2')).toBeInTheDocument()
@@ -98,12 +106,19 @@ describe('SubaccountTree', () => {
 
   it('does not fetch more subaccounts if subaccount count is 0', async () => {
     const account = {...rootAccount, sub_account_count: 0}
-    fetchMock.get(SUBACCOUNT_FETCH_MATCHER(rootAccount), subAccounts)
+    server.use(
+      http.get(`/api/v1/accounts/${rootAccount.id}/sub_accounts`, () => {
+        subAccountFetched = true
+        return HttpResponse.json(subAccounts)
+      }),
+    )
     const {getByText} = renderSubaccountTree({rootAccount: account})
 
     await waitFor(() => {
-      expect(fetchMock.called(SUBACCOUNT_FETCH_MATCHER(rootAccount), 'GET')).toBe(false)
       expect(getByText('Root Account')).toBeInTheDocument()
     })
+    // Give a moment for any potential fetch to happen
+    await new Promise(resolve => setTimeout(resolve, 100))
+    expect(subAccountFetched).toBe(false)
   })
 })

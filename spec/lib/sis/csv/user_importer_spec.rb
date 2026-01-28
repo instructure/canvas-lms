@@ -652,6 +652,19 @@ describe SIS::CSV::UserImporter do
     expect(Pseudonym.count).to eq(p_count + 1)
   end
 
+  it "skips a row with invalid Unicode characters in login_id (rather than failing the entire import)" do
+    @account.shard.update!(settings: { "pseudonyms_normalized" => true }) unless @account.shard.is_a?(Switchman::DefaultShard)
+
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user1,user1\ufffd,User,Uno,user1@example.com,active",
+      "user2,user2,User,Dos,user2@example.com,active"
+    )
+    expect(importer.batch.workflow_state).to eq "imported_with_messages"
+    expect(importer.batch.processing_warnings.map(&:last)).to eq(["Invalid Unicode characters in login_id 'user1\ufffd'; skipping"])
+    expect(@account.pseudonyms.where(unique_id: "user2")).to exist
+  end
+
   it "does not allow a secondary user account to change its login id to some other registered login id" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",

@@ -22,12 +22,14 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Outcome, Student} from '../../../types/rollup'
+import {Outcome, Student, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 import {View} from '@instructure/ui-view'
 import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
 import {AssignmentSection} from './AssignmentSection'
 import {NavigatorProps} from './Navigator'
 import {StudentSection} from './StudentSection'
+import {OutcomeResultSection} from './OutcomeResultSection'
+import {CommentsSection} from './CommentsSection'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -44,6 +46,8 @@ export interface StudentAssignmentDetailTrayProps {
   }
   assignmentNavigator: NavigatorProps
   studentNavigator: NavigatorProps
+  rollups: StudentRollupData[]
+  outcomes: Outcome[]
 }
 
 const TrayHeader = ({title, onClose}: {title: string; onClose: () => void}) => (
@@ -75,6 +79,8 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
   assignment,
   assignmentNavigator,
   studentNavigator,
+  rollups,
+  outcomes,
 }) => {
   return (
     <Tray
@@ -110,6 +116,15 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
           onNext={studentNavigator.onNext}
         />
         <hr />
+        <OutcomeResultSection
+          courseId={courseId}
+          studentId={student.id}
+          assignmentId={assignment.id}
+          rollups={rollups}
+          outcomes={outcomes}
+        />
+        <hr />
+        <CommentsSection courseId={courseId} assignmentId={assignment.id} studentId={student.id} />
       </Flex>
     </Tray>
   )

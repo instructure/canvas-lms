@@ -23,9 +23,9 @@ import MessageListActionContainer from '../MessageListActionContainer'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {setupServer} from 'msw/node'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import * as utils from '../../../util/utils'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('../../../util/utils', async () => {
   const actual = await vi.importActual('../../../util/utils')
@@ -54,18 +54,21 @@ describe('MessageListActionContainer', () => {
     })
   })
 
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mswClient.cache.reset()
+    fakeENV.setup({current_user_id: '1'})
+  })
+
   afterEach(() => {
+    cleanup()
     server.resetHandlers()
+    fakeENV.teardown()
+    vi.clearAllMocks()
   })
 
   afterAll(() => {
     server.close()
-  })
-
-  beforeEach(() => {
-    window.ENV = {
-      current_user_id: 1,
-    }
   })
 
   const setup = overrideProps => {
@@ -99,9 +102,10 @@ describe('MessageListActionContainer', () => {
     })
 
     it('should render All Courses option', async () => {
+      const user = userEvent.setup()
       const {findByTestId, findByText} = setup()
       const courseDropdown = await findByTestId('course-select')
-      fireEvent.click(courseDropdown)
+      await user.click(courseDropdown)
       expect(await findByText('All Courses')).toBeInTheDocument()
     })
 
@@ -114,20 +118,23 @@ describe('MessageListActionContainer', () => {
     })
 
     it('should render concluded courses', async () => {
-      const {findByTestId, queryAllByText} = setup()
+      const user = userEvent.setup()
+      const {findByTestId, findAllByText} = setup()
       const courseDropdown = await findByTestId('course-select')
-      fireEvent.click(courseDropdown)
-      expect(await queryAllByText('Ipsum')).toHaveLength(4)
+      await user.click(courseDropdown)
+      expect(await findAllByText('Ipsum')).toHaveLength(4)
     })
 
     it('should render concluded groups in list action container', async () => {
-      const {findByTestId, queryByText} = setup()
+      const user = userEvent.setup()
+      const {findByTestId, findByText} = setup()
       const courseDropdown = await findByTestId('course-select')
-      fireEvent.click(courseDropdown)
-      expect(await queryByText('concluded_group')).toBeInTheDocument()
+      await user.click(courseDropdown)
+      expect(await findByText('concluded_group')).toBeInTheDocument()
     })
 
     it('should call onCourseFilterSelect when course selected', async () => {
+      const user = userEvent.setup()
       const mock = vi.fn()
 
       const component = setup({
@@ -135,16 +142,17 @@ describe('MessageListActionContainer', () => {
       })
 
       const courseDropdown = await component.findByTestId('course-select')
-      fireEvent.click(courseDropdown)
+      await user.click(courseDropdown)
 
-      const options = await component.findAllByText('Ipsum')
+      const options = await component.findAllByText('Ipsum', {}, {timeout: 5000})
       expect(options).toHaveLength(4)
-      fireEvent.click(options[0])
+      await user.click(options[0])
 
       expect(mock.mock.calls).toHaveLength(1)
     })
 
     it('should callback to update mailbox when event fires', async () => {
+      const user = userEvent.setup()
       const mock = vi.fn()
 
       const component = setup({
@@ -152,16 +160,17 @@ describe('MessageListActionContainer', () => {
       })
 
       const mailboxDropdown = await component.findByLabelText('Mailbox Selection')
-      fireEvent.click(mailboxDropdown)
+      await user.click(mailboxDropdown)
 
       const option = await component.findByText('Sent')
       expect(option).toBeTruthy()
-      fireEvent.click(option)
+      await user.click(option)
 
       expect(mock.mock.calls).toHaveLength(1)
     })
 
     it('should call onSelectMailbox when mailbox changed', async () => {
+      const user = userEvent.setup()
       const mock = vi.fn()
 
       const component = setup({
@@ -169,11 +178,11 @@ describe('MessageListActionContainer', () => {
       })
 
       const mailboxDropdown = await component.findByLabelText('Mailbox Selection')
-      fireEvent.click(mailboxDropdown)
+      await user.click(mailboxDropdown)
 
       const option = await component.findByText('Sent')
       expect(option).toBeTruthy()
-      fireEvent.click(option)
+      await user.click(option)
 
       expect(mock.mock.calls).toHaveLength(1)
     })
@@ -281,6 +290,7 @@ describe('MessageListActionContainer', () => {
   })
 
   it('should trigger archive function when archiving', async () => {
+    const user = userEvent.setup()
     const archiveMock = vi.fn()
 
     const component = setup({
@@ -289,12 +299,13 @@ describe('MessageListActionContainer', () => {
       onArchive: archiveMock,
     })
     const archiveButton = await component.findByTestId('archive')
-    fireEvent.click(archiveButton)
+    await user.click(archiveButton)
 
     expect(archiveMock).toHaveBeenCalled()
   })
 
   it('should trigger archive function when unarchiving', async () => {
+    const user = userEvent.setup()
     const unArchiveMock = vi.fn()
     const component = setup({
       archiveDisabled: false,
@@ -304,11 +315,12 @@ describe('MessageListActionContainer', () => {
     })
 
     const unarchBtn = await component.findByTestId('unarchive')
-    fireEvent.click(unarchBtn)
+    await user.click(unarchBtn)
     expect(unArchiveMock).toHaveBeenCalled()
   })
 
   it('should trigger delete function', async () => {
+    const user = userEvent.setup()
     const deleteMock = vi.fn()
     const component = setup({
       deleteDisabled: false,
@@ -317,7 +329,7 @@ describe('MessageListActionContainer', () => {
     })
 
     const deleteBtn = await component.findByTestId('delete')
-    fireEvent.click(deleteBtn)
+    await user.click(deleteBtn)
     expect(deleteMock).toHaveBeenCalled()
   })
 })

@@ -235,4 +235,104 @@ describe AssignmentsHelper do
       student_peer_review_url(course, assignment, assessment)
     end
   end
+
+  describe "#show_peer_review_widget?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      assignment_model(course: @course, peer_reviews: true)
+      @context = @course
+      @current_user = @teacher
+    end
+
+    it "returns false when context is a horizon course" do
+      allow(self).to receive(:can_do).and_return(true)
+      allow(@context).to receive(:horizon_course?).and_return(true)
+      expect(show_peer_review_widget?).to be_falsey
+    end
+
+    it "returns false when user cannot grade the assignment" do
+      allow(self).to receive(:can_do).with(@assignment, @student, :grade).and_return(false)
+      @current_user = @student
+      expect(show_peer_review_widget?).to be_falsey
+    end
+
+    it "returns false when peer_review_allocation_and_grading feature is disabled" do
+      allow(self).to receive(:can_do).and_return(true)
+      allow(@context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(false)
+      expect(show_peer_review_widget?).to be_falsey
+    end
+
+    it "returns false when assignment does not have peer reviews" do
+      allow(self).to receive(:can_do).and_return(true)
+      @assignment.update!(peer_reviews: false)
+      expect(show_peer_review_widget?).to be_falsey
+    end
+
+    it "returns true when all conditions are met" do
+      @can_grade = true
+      allow(@context).to receive(:horizon_course?).and_return(false)
+      allow(@context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(true)
+      expect(show_peer_review_widget?).to be_truthy
+    end
+  end
+
+  describe "#show_rubric_section?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      assignment_model(course: @course)
+      @context = @course
+      @current_user = @teacher
+    end
+
+    it "returns false when context is a horizon course" do
+      allow(self).to receive(:can_do).and_return(true)
+      allow(@context).to receive(:horizon_course?).and_return(true)
+      expect(show_rubric_section?).to be_falsey
+    end
+
+    it "returns false when user cannot update the assignment" do
+      allow(self).to receive(:can_do).with(@assignment, @student, :update).and_return(false)
+      @current_user = @student
+      expect(show_rubric_section?).to be_falsey
+    end
+
+    it "returns true when all conditions are met" do
+      allow(self).to receive(:can_do).and_return(true)
+      allow(@context).to receive(:horizon_course?).and_return(false)
+      expect(show_rubric_section?).to be_truthy
+    end
+  end
+
+  describe "#show_legacy_peer_reviews_link?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      assignment_model(course: @course, peer_reviews: true)
+      @context = @course
+    end
+
+    it "returns false when @can_grade is false" do
+      @can_grade = false
+      expect(show_legacy_peer_reviews_link?).to be_falsey
+    end
+
+    it "returns false when assignment does not have peer reviews" do
+      @can_grade = true
+      @assignment.update!(peer_reviews: false)
+      expect(show_legacy_peer_reviews_link?).to be_falsey
+    end
+
+    it "returns false when peer_review_allocation_and_grading feature is enabled" do
+      @can_grade = true
+      allow(@assignment.context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(true)
+      expect(show_legacy_peer_reviews_link?).to be_falsey
+    end
+
+    it "returns true when all conditions are met" do
+      @can_grade = true
+      allow(@assignment.context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(false)
+      expect(show_legacy_peer_reviews_link?).to be_truthy
+    end
+  end
 end

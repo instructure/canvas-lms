@@ -160,6 +160,7 @@ export type GridDisplaySettings = {
   showSeparateFirstLastNames: boolean
   hideAssignmentGroupTotals: boolean
   viewHiddenGradesIndicator: boolean
+  viewStatusForColorblindness: boolean
 }
 
 export type GridLocation = {

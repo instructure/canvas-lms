@@ -3232,6 +3232,7 @@ uk:
   big_blue_button_conference: 
     recording_setting: Запис
     recording_setting_enabled_description: "Дозволити запис для цієї конференції"
+  bio_a519d807: Біо
   blackboard: 
     no_manifest: "Цей Blackboard .zip не має файлу imsmanifest.xml в кореневому каталозі."
   blank_38df4238: порожній
@@ -4003,6 +4004,7 @@ uk:
   close_grade_info_58ef5a20: "Закрити інформацію оцінки"
   close_move_tray_8609e988: "закрити панель переміщення"
   close_opportunity_center_popup_9907d981: "Закрити спливаюче вікно Центру можливостей"
+  close_rubric_a0fc8166: "Закрити рубрику"
   close_sidebar_10b0fbb4: "Закрити бічну панель"
   close_submission_tray_c4988fa8: "Закрити панель подання"
   closed_for_comments_e395b42f: "Закрито для коментарів"
@@ -5464,6 +5466,13 @@ uk:
   course_name_is_required_90919349: "Ім'я курсу обов'язкове"
   course_name_successfully_added_48116a50: "%{course_name} було успішно додано!"
   course_navigation_dd035109: "Навігація курсу"
+  course_navigation_settings: 
+    buttons: 
+      save: Зберегти
+    drag_details: "Відключення більшості сторінок змусить студентів, які відвідують ці сторінки, бути перенаправленими на головну сторінку курсу."
+    drag_to_hide: "Перетягніть елементи сюди, щоб приховати їх від студентів."
+    help: 
+      edit_navigation: "Перетягніть елементи, щоб змінити їх порядок в навігації цього курсу."
   course_not_found_c248a721: "Курс не знайдено"
   course_option_links_a79d263d: "Посилання на опції курсу"
   course_outcomes_7dc1cbc7: "Результати курсу"
@@ -5639,6 +5648,13 @@ uk:
         content: Вміст
         due_dates: "Відповідні дати"
         points: Бали
+    navigation_form: 
+      drag_details: "Відключення більшості сторінок змусить студентів, які відвідують ці сторінки, бути перенаправленими на головну сторінку курсу."
+      drag_to_hide: "Перетягніть елементи сюди, щоб приховати їх від студентів."
+      help: 
+        edit_navigation: "Перетягніть елементи, щоб змінити їх порядок в навігації цього курсу."
+      titles: 
+        edit_navigation: "Редагування навігації курсу"
     notices: 
       concluded: "Курс успішно завершено"
       deleted: "Курс успішно видалено"
@@ -7990,6 +8006,7 @@ uk:
   generate_item_analysis_report_statuslabel_16e02c8: "Згенерувати пункт аналітичного звіту %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Згенерувати аналітичний звіт студента %{statusLabel}"
   generate_token_393ab5b4: "Згенерувати маркер"
+  generated_e71c6622: Згенеровано
   generated_f26ee56b: "Згенеровано:"
   generating_5b5e20f8: "Генерується:"
   generating_c2aabc02: Генерується...
@@ -8051,6 +8068,7 @@ uk:
       warning: Попередження
   grade_distribution_e52c9256: "Розподіл оцінок"
   grade_export_title: "Експорт оцінок"
+  grade_f949a691: "%{grade}%"
   grade_for_name_b9df168a: "Оцінка за: %{name}"
   grade_grade_7e52dd1c: "Оцінка: %{grade}"
   grade_high_to_low_1cea0381: "Оцінка - від більшої до меншої"
@@ -8919,6 +8937,7 @@ uk:
   hide_e057ff36: Приховати
   hide_groups_navigation_menu_62e8b3d0: "Сховати меню навігації груп"
   hide_navigation_menu_f0b3e90: "Сховати меню навігації "
+  hide_rubric_27903c8: "Приховати рубрику"
   hide_score_total_for_assessment_results_d0ef117f: "Приховати загальну кількість балів за результатами оцінки"
   hide_sidebar_2b5b3776: "Сховати бічну панель"
   hide_student_names_3e59e862: "Приховати імена студентів"
@@ -12129,6 +12148,7 @@ uk:
   not_submitted_7d05fdb4: "Не відправлено"
   not_synced_529cbf29: "Не синхронізовано"
   not_synced_message_a343fe5e: "Не синхронізовано: %{message}"
+  not_yet_available_9aa23a77: "Ще недоступний"
   not_yet_completed_345a0bca: "Ще не завершено "
   not_yet_graded_8b655a7: "Ще не оцінений"
   note_8b73ce09: Примітка
@@ -13469,6 +13489,7 @@ uk:
   print_d0e3d53f: Розрдрукувати
   priority_dd4381ee: Пріоритет
   privacy_290109ea: Приватність
+  privacy_notice_7eff08fe: Конфіденційність
   privacy_policy_c68f482a: "Політика конфіденційності"
   private_copyrighted_3cac9686: "Приватний (Захищено авторським правом)"
   proceed_f3d33864: Продовжувати

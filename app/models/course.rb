@@ -327,6 +327,8 @@ class Course < ActiveRecord::Base
   has_many :accessibility_issues, dependent: :destroy
   has_many :allocation_rules, dependent: :destroy
 
+  has_one :accessibility_course_statistic, dependent: :destroy
+
   prepend Profile::Association
 
   before_create :set_restrict_quantitative_data_when_needed
@@ -3538,8 +3540,9 @@ class Course < ActiveRecord::Base
     end
 
     # Add AI Experiences tab before Settings if feature flag is enabled
-    # AI Experiences is currently using assignment permissions until granular ai experiences permissions are created
-    if feature_enabled?(:ai_experiences) && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+    # Tab is visible to all users, but functionality differs based on permissions
+    # Teachers can create/edit/delete, students can only view published experiences
+    if feature_enabled?(:ai_experiences)
       settings_index = default_tabs.index { |t| t[:id] == TAB_SETTINGS }
       settings_index ||= default_tabs.length
       default_tabs.insert(settings_index, {
@@ -4660,7 +4663,6 @@ class Course < ActiveRecord::Base
 
   def horizon_back_to_units_enabled?
     horizon_course? &&
-      root_account.feature_enabled?(:horizon_course_redesign) &&
       root_account.feature_enabled?(:horizon_course_academic_switcher)
   end
 

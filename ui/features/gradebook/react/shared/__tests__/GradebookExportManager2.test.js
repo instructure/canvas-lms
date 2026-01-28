@@ -73,7 +73,8 @@ describe('GradebookExportManager - monitoringUrl', () => {
   let subject
 
   beforeEach(() => {
-    subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
+    // Create a fresh copy to avoid mutation between tests
+    subject = new GradebookExportManager(exportingUrl, currentUserId, {...workingExport})
     subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
   })
@@ -82,8 +83,7 @@ describe('GradebookExportManager - monitoringUrl', () => {
     subject = undefined
   })
 
-  // fickle with --randomize
-  test.skip('returns an appropriate url if all relevant pieces are present', () => {
+  test('returns an appropriate url if all relevant pieces are present', () => {
     expect(subject.monitoringUrl()).toBe(`${monitoringBase}/progressId`)
   })
 
@@ -102,7 +102,8 @@ describe('GradebookExportManager - attachmentUrl', () => {
   let subject
 
   beforeEach(() => {
-    subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
+    // Create a fresh copy to avoid mutation between tests
+    subject = new GradebookExportManager(exportingUrl, currentUserId, {...workingExport})
     subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
   })
@@ -111,8 +112,7 @@ describe('GradebookExportManager - attachmentUrl', () => {
     subject = undefined
   })
 
-  // fickle with --randomize
-  test.skip('returns an appropriate url if all relevant pieces are present', () => {
+  test('returns an appropriate url if all relevant pieces are present', () => {
     expect(subject.attachmentUrl()).toBe(`${attachmentBase}/attachmentId`)
   })
 
@@ -135,7 +135,7 @@ describe('GradebookExportManager - startExport', () => {
 
     // Initial request to start the export
     server.use(
-      http.post('*', () =>
+      http.post('*/api/v1/gradebook_exports', () =>
         HttpResponse.json({
           progress_id: 'newProgressId',
           attachment_id: 'newAttachmentId',
@@ -184,23 +184,30 @@ describe('GradebookExportManager - startExport', () => {
   })
 
   test('clears any new export and returns a rejected promise if no monitoring is possible', async () => {
-    vi.spyOn(GradebookExportManager.prototype, 'monitoringUrl').mockReturnValue(undefined)
+    const monitoringSpy = vi
+      .spyOn(GradebookExportManager.prototype, 'monitoringUrl')
+      .mockReturnValue(undefined)
 
-    await expect(
-      subject.startExport(
-        undefined,
-        () => [],
-        false,
-        () => [],
-      ),
-    ).rejects.toEqual('No way to monitor gradebook exports provided!')
+    try {
+      await expect(
+        subject.startExport(
+          undefined,
+          () => [],
+          false,
+          () => [],
+        ),
+      ).rejects.toEqual('No way to monitor gradebook exports provided!')
 
-    expect(subject.export).toBeUndefined()
+      expect(subject.export).toBeUndefined()
+    } finally {
+      monitoringSpy.mockRestore()
+    }
   })
 
-  // fickle - mock setup issues with monitoringUrl
-  test.skip('starts polling for progress and returns a rejected promise on progress failure', async () => {
+  test('starts polling for progress and returns a rejected promise on progress failure', async () => {
     subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
+    subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
+    subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
 
     // Override the progress endpoint to return failed
     server.use(
@@ -225,9 +232,10 @@ describe('GradebookExportManager - startExport', () => {
     }
   })
 
-  // fickle - mock setup issues with monitoringUrl
-  test.skip('starts polling for progress and returns a rejected promise on unknown progress status', async () => {
+  test('starts polling for progress and returns a rejected promise on unknown progress status', async () => {
     subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
+    subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
+    subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
 
     server.use(
       http.get('*/api/v1/progress/*', () =>
@@ -248,11 +256,12 @@ describe('GradebookExportManager - startExport', () => {
     ).rejects.toMatch(/Error exporting gradebook: Unknown workflow state/)
   })
 
-  // fickle - mock setup issues with monitoringUrl
-  test.skip('starts polling for progress and returns a fulfilled promise on progress completion', async () => {
+  test('starts polling for progress and returns a fulfilled promise on progress completion', async () => {
     const expectedAttachmentUrl = `${attachmentBase}/newAttachmentId`
 
     subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
+    subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
+    subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
 
     // Default handler already returns completed status
     server.use(

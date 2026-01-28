@@ -23,7 +23,7 @@ import moment from 'moment-timezone'
 // Use dynamic dates relative to current date to avoid year/day failures
 const CURRENT_TIME = '2025-01-01T13:00:40-07:00'
 const TWO_YEARS_FROM_NOW = moment(CURRENT_TIME).add(2, 'years').toISOString()
-import {act, render, waitForElementToBeRemoved, waitFor} from '@testing-library/react'
+import {act, cleanup, render, waitForElementToBeRemoved, waitFor} from '@testing-library/react'
 
 import ImportantDates from '../ImportantDates'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
@@ -61,6 +61,7 @@ describe('ImportantDates', () => {
   })
 
   afterEach(() => {
+    cleanup()
     vi.useRealTimers()
     fetchMock.restore()
     destroyContainer()

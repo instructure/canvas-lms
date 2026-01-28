@@ -54,8 +54,7 @@ export default class GradeOverrideInfo {
     return this._attr.valid
   }
 
-  // @ts-expect-error
-  equals(gradeOverrideInfo) {
+  equals(gradeOverrideInfo: GradeOverrideInfo) {
     return this.grade?.equals(gradeOverrideInfo.grade)
   }
 }

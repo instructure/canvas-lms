@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Pill} from '@instructure/ui-pill'
 import type {PillProps} from '@instructure/ui-pill'
 
@@ -29,8 +29,7 @@ export const renderFrontPagePill = (el: HTMLElement, props?: PillProps) => {
     delete props.children
   }
   if (frontPageContainer) {
-    const root = createRoot(frontPageContainer)
-    root.render(<Pill {...props}>{children}</Pill>)
+    render(<Pill {...props}>{children}</Pill>, frontPageContainer)
   }
 
   return <Pill {...props}>{children}</Pill>

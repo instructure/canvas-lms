@@ -423,7 +423,6 @@ describe('FileFolderTable', () => {
   })
 
   describe('FileFolderTable - delete behavior', () => {
-    // TODO: the scope of this test overextends unit test
     it.skip('opens delete modal when delete button is clicked', async () => {
       const user = userEvent.setup()
       renderComponent({rows: [FAKE_FILES[0]]})
@@ -439,7 +438,6 @@ describe('FileFolderTable', () => {
       ).toBeInTheDocument()
     })
 
-    // TODO: the scope of this test overextends unit test
     it.skip('renders flash success when items are deleted successfully', async () => {
       const user = userEvent.setup()
       server.use(
@@ -461,7 +459,6 @@ describe('FileFolderTable', () => {
       expect(showFlashSuccess).toHaveBeenCalledWith('1 item deleted successfully.')
     })
 
-    // TODO: the scope of this test overextends unit test
     it.skip('renders flash error when delete fails', async () => {
       const user = userEvent.setup()
       server.use(

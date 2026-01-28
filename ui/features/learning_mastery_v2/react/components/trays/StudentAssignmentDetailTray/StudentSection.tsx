@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Navigator} from './Navigator'
 import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
 import {Avatar} from '@instructure/ui-avatar'
-import {Student} from '../../../types/rollup'
+import {Student} from '@canvas/outcomes/react/types/rollup'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

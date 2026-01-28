@@ -40,7 +40,7 @@ vi.mock('@canvas/lazy-load', () => ({
     fn().then(mod => {
       Component = mod.default
     })
-    return props => Component ? <Component {...props} /> : null
+    return props => (Component ? <Component {...props} /> : null)
   },
 }))
 
@@ -60,7 +60,6 @@ describe('ContentTabs', () => {
     window.INST.editorButtons = []
 
     // Mock URL.createObjectURL for file handling if not already mocked
-    // (Vitest setup already provides this mock, Jest may not)
     if (typeof URL.createObjectURL !== 'function') {
       try {
         Object.defineProperty(URL, 'createObjectURL', {

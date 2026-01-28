@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -25,6 +23,10 @@ import {
   postMessageExternalContentReady,
   postMessageExternalContentCancel,
   type Service,
+  type ExternalContentReady,
+  type ExternalContentReadyInnerData,
+  type Lti1p1ContentItem,
+  type MessageHandlerCleanupFunction,
 } from '../messages'
 
 describe('1.1 content item messages', () => {
@@ -33,7 +35,10 @@ describe('1.1 content item messages', () => {
       DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://canvas.test',
     }
 
-    function sendPostMessage(data, origin = env.DEEP_LINKING_POST_MESSAGE_ORIGIN) {
+    function sendPostMessage(
+      data: Record<string, unknown>,
+      origin = env.DEEP_LINKING_POST_MESSAGE_ORIGIN,
+    ) {
       fireEvent(
         window,
         new MessageEvent('message', {
@@ -63,10 +68,10 @@ describe('1.1 content item messages', () => {
       ...props,
     })
 
-    let ready: () => void
-    let onDeepLinkingResponse: () => void
+    let ready: (data: ExternalContentReady) => void
+    let onDeepLinkingResponse: (data: unknown) => void
     let cancel: () => void
-    let remove: () => void | undefined
+    let remove: MessageHandlerCleanupFunction | undefined
     beforeEach(() => {
       ready = vi.fn()
       cancel = vi.fn()
@@ -161,23 +166,29 @@ describe('1.1 content item messages', () => {
   })
 
   describe('sending messages', () => {
-    let originalEnv
+    let originalEnv: typeof window.ENV
 
     beforeEach(() => {
       originalEnv = window.ENV
-      window.ENV = {...ENV, DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://canvas.test'}
+      window.ENV = {...window.ENV, DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://canvas.test'}
     })
     afterEach(() => (window.ENV = originalEnv))
 
     describe('postMessageExternalContentReady', () => {
       it('posts message to window', () => {
-        const window = {postMessage: vi.fn()}
-        const eventData = {
-          contentItems: [{url: 'test'}],
-          service: 'equella',
+        const postMessageFn = vi.fn()
+        const mockWindow: Window = Object.assign(Object.create(Window.prototype), {
+          postMessage: postMessageFn,
+        })
+        const contentItem: Lti1p1ContentItem = {url: 'test', '@type': 'FileItem'}
+        const service: Service = 'equella'
+        const eventData: ExternalContentReadyInnerData = {
+          contentItems: [contentItem],
+          service,
+          service_id: '1',
         }
-        postMessageExternalContentReady(window, eventData)
-        expect(window.postMessage).toHaveBeenCalledWith(
+        postMessageExternalContentReady(mockWindow, eventData)
+        expect(postMessageFn).toHaveBeenCalledWith(
           {subject: 'externalContentReady', ...eventData},
           'http://canvas.test',
         )
@@ -186,9 +197,12 @@ describe('1.1 content item messages', () => {
 
     describe('postMessageExternalContentCancel', () => {
       it('posts message to window', () => {
-        const window = {postMessage: vi.fn()}
-        postMessageExternalContentCancel(window)
-        expect(window.postMessage).toHaveBeenCalledWith(
+        const postMessageFn = vi.fn()
+        const mockWindow: Window = Object.assign(Object.create(Window.prototype), {
+          postMessage: postMessageFn,
+        })
+        postMessageExternalContentCancel(mockWindow)
+        expect(postMessageFn).toHaveBeenCalledWith(
           {subject: 'externalContentCancel'},
           'http://canvas.test',
         )

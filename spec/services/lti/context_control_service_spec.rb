@@ -555,6 +555,10 @@ describe Lti::ContextControlService do
       it "has the correct display path" do
         expect(subject.dig(control.id, :display_path)).to eq []
       end
+
+      it "has the context name" do
+        expect(subject.dig(control.id, :context_name)).to eq(course.name)
+      end
     end
 
     context "with one account-level control" do
@@ -583,6 +587,10 @@ describe Lti::ContextControlService do
 
       it "has a depth of 0" do
         expect(subject.dig(control.id, :depth)).to eq 0
+      end
+
+      it "has the account's name" do
+        expect(subject.dig(control.id, :context_name)).to eq(account.name)
       end
     end
 
@@ -648,6 +656,13 @@ describe Lti::ContextControlService do
         expect(subject.dig(control1.id, :display_path)).to eq []
         expect(subject.dig(control2.id, :display_path)).to eq []
         expect(subject.dig(control3.id, :display_path)).to eq []
+      end
+
+      it "finds the context name for all controls" do
+        # These are all preloaded, so should match directly
+        expect(subject.dig(control1.id, :context_name)).to eq(control1.context_name)
+        expect(subject.dig(control2.id, :context_name)).to eq(control2.context_name)
+        expect(subject.dig(control3.id, :context_name)).to eq(control3.context_name)
       end
     end
 

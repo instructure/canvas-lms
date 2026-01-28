@@ -4186,6 +4186,31 @@ describe User do
     end
   end
 
+  describe "check_accounts_any_right?" do
+    it "returns false for empty rights array" do
+      user1 = user_factory
+      user2 = user_factory
+      expect(user1.check_accounts_any_right?(user2)).to be false
+    end
+
+    it "returns false when user is nil" do
+      user1 = user_factory
+      expect(user1.check_accounts_any_right?(nil, :manage_students)).to be false
+    end
+
+    it "returns true when any of multiple rights is granted" do
+      target = user_factory
+      seeker = account_admin_user_with_role_changes(role_changes: { view_user_logins: true, manage_user_logins: false })
+      expect(target.check_accounts_any_right?(seeker, :view_user_logins, :manage_user_logins)).to be true
+    end
+
+    it "returns false when none of multiple rights are granted" do
+      target = user_factory
+      seeker = account_admin_user_with_role_changes(role_changes: { view_user_logins: false, manage_user_logins: false })
+      expect(target.check_accounts_any_right?(seeker, :view_user_logins, :manage_user_logins)).to be false
+    end
+  end
+
   describe "cached_course_ids_for_observed_user" do
     before :once do
       @observer = user_factory(active_all: true)
@@ -4894,6 +4919,54 @@ describe User do
         expect(@user.user_can_edit_profile?).to be false
       end
     end
+
+    describe "user_can_edit_bio?" do
+      it "returns false when users_can_edit_profile is false" do
+        @pseudonym.account.settings[:users_can_edit_profile] = false
+        @pseudonym.account.settings[:users_can_edit_bio] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_bio?).to be false
+      end
+
+      it "allows editing bio if both settings are true" do
+        @pseudonym.account.settings[:users_can_edit_profile] = true
+        @pseudonym.account.settings[:users_can_edit_bio] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_bio?).to be true
+      end
+    end
+
+    describe "user_can_edit_profile_links?" do
+      it "returns false when users_can_edit_profile is false" do
+        @pseudonym.account.settings[:users_can_edit_profile] = false
+        @pseudonym.account.settings[:users_can_edit_profile_links] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_profile_links?).to be false
+      end
+
+      it "allows editing profile links if both settings are true" do
+        @pseudonym.account.settings[:users_can_edit_profile] = true
+        @pseudonym.account.settings[:users_can_edit_profile_links] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_profile_links?).to be true
+      end
+    end
+
+    describe "user_can_edit_title?" do
+      it "returns false when users_can_edit_profile is false" do
+        @pseudonym.account.settings[:users_can_edit_profile] = false
+        @pseudonym.account.settings[:users_can_edit_title] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_title?).to be false
+      end
+
+      it "allows editing title if both settings are true" do
+        @pseudonym.account.settings[:users_can_edit_profile] = true
+        @pseudonym.account.settings[:users_can_edit_title] = true
+        @pseudonym.account.save!
+        expect(@user.user_can_edit_title?).to be true
+      end
+    end
   end
 
   describe "user_can_edit_comm_channels?" do
@@ -5083,8 +5156,8 @@ describe User do
         root_account.set_feature_flag!(:widget_dashboard, "allowed_on")
       end
 
-      it "returns true" do
-        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      it "returns false (requires opt-in)" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be false
       end
     end
 
@@ -5093,8 +5166,8 @@ describe User do
         root_account.enable_feature!(:widget_dashboard)
       end
 
-      it "returns true" do
-        expect(user.prefers_widget_dashboard?(root_account)).to be true
+      it "returns false (controller force_on logic handles locked state)" do
+        expect(user.prefers_widget_dashboard?(root_account)).to be false
       end
     end
 
@@ -5152,11 +5225,16 @@ describe User do
         domain_root_account.enable_feature!(:widget_dashboard)
       end
 
-      # Now should return true based on domain_root_account only
+      # Should still return false when preference is nil (requires explicit opt-in)
       # The cross-shard account's feature flag should be ignored
+      expect(user.prefers_widget_dashboard?(domain_root_account)).to be false
+
+      # Verify user preference override works (explicitly opt in)
+      user.preferences[:widget_dashboard_user_preference] = true
+      user.save!
       expect(user.prefers_widget_dashboard?(domain_root_account)).to be true
 
-      # Verify user preference override still works
+      # Verify user preference override works (explicitly opt out)
       user.preferences[:widget_dashboard_user_preference] = false
       user.save!
       expect(user.prefers_widget_dashboard?(domain_root_account)).to be false

@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {paceContextsActions} from '../pace_contexts'
 import {
   PACE_CONTEXTS_SECTIONS_RESPONSE,
@@ -26,19 +27,36 @@ import {
   PACE_CONTEXTS_DEFAULT_STATE,
 } from '../../__tests__/fixtures'
 
-const SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10`
-const STUDENT_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10`
+const server = setupServer()
+
+// Track API calls
+let sectionApiCalled = false
+let studentApiCalled = false
 
 const dispatch = vi.fn()
 
 describe('Pace contexts actions', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
     vi.clearAllMocks()
-    fetchMock.restore()
+    server.resetHandlers()
+    sectionApiCalled = false
+    studentApiCalled = false
   })
 
   it('fetches section pace contexts', async () => {
-    fetchMock.get(SECTION_CONTEXTS_API, PACE_CONTEXTS_SECTIONS_RESPONSE)
+    server.use(
+      http.get('/api/v1/courses/:courseId/pace_contexts', ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('type') === 'section') {
+          sectionApiCalled = true
+          return HttpResponse.json(PACE_CONTEXTS_SECTIONS_RESPONSE)
+        }
+        return HttpResponse.json({})
+      }),
+    )
     const thunkedAction: any = paceContextsActions.fetchPaceContexts({
       contextType: 'section',
       page: 1,
@@ -48,11 +66,20 @@ describe('Pace contexts actions', () => {
       paceContexts: PACE_CONTEXTS_DEFAULT_STATE,
     })
     await thunkedAction(dispatch, getState)
-    expect(fetchMock.called(SECTION_CONTEXTS_API, 'GET')).toBe(true)
+    expect(sectionApiCalled).toBe(true)
   })
 
   it('fetches student pace contexts', async () => {
-    fetchMock.get(STUDENT_CONTEXTS_API, PACE_CONTEXTS_STUDENTS_RESPONSE)
+    server.use(
+      http.get('/api/v1/courses/:courseId/pace_contexts', ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('type') === 'student_enrollment') {
+          studentApiCalled = true
+          return HttpResponse.json(PACE_CONTEXTS_STUDENTS_RESPONSE)
+        }
+        return HttpResponse.json({})
+      }),
+    )
     const thunkedAction: any = paceContextsActions.fetchPaceContexts({
       contextType: 'student_enrollment',
       page: 1,
@@ -62,6 +89,6 @@ describe('Pace contexts actions', () => {
       paceContexts: PACE_CONTEXTS_DEFAULT_STATE,
     })
     await thunkedAction(dispatch, getState)
-    expect(fetchMock.called(STUDENT_CONTEXTS_API, 'GET')).toBe(true)
+    expect(studentApiCalled).toBe(true)
   })
 })

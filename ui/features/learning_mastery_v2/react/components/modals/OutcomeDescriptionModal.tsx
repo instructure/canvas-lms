@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 import {Link} from '@instructure/ui-link'
-import {Outcome} from '../../types/rollup'
+import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import OutcomeContextTag from '@canvas/outcome-context-tag'
 
 const I18n = createI18nScope('OutcomeDescriptionModal')

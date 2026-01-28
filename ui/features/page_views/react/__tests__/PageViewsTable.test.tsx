@@ -73,7 +73,6 @@ function createPaginationMock(
 // expect the component under test to fall back to its manual formatting. Putting
 // this check in so that tests don't later fail if/when JS-DOM implements it.
 const INTERACTION_TIME = 249 // 4 minutes 9 seconds
-// @ts-expect-error
 const FORMATTED_TIME = typeof Intl.DurationFormat === 'function' ? '4m 9s' : '4:09'
 
 function Subject(props: PageViewsTableProps): React.JSX.Element {
@@ -193,7 +192,7 @@ describe('PageViewsTable', () => {
   })
 
   describe('pagination', () => {
-    it.skip('renders pagination component with correct buttons', async () => {
+    it('renders pagination component with correct buttons', async () => {
       // arrange
       const id = '127'
       const {resolver} = createPaginationMock(id, {maxPages: 2})
@@ -210,7 +209,7 @@ describe('PageViewsTable', () => {
       })
     })
 
-    it.skip('navigates to next page when pagination button is clicked', async () => {
+    it('navigates to next page when pagination button is clicked', async () => {
       // arrange
       const id = '128'
       const {resolver} = createPaginationMock(id, {maxPages: 3})

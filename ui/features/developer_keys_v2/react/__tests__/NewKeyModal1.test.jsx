@@ -623,6 +623,30 @@ describe('NewKeyModal', () => {
           expect(createOrEditStub).toHaveBeenCalled()
           expect(successfulSaveStub).not.toHaveBeenCalledTimes(1)
         })
+
+        describe('when devKeysReadOnly is true', () => {
+          beforeEach(() => {
+            fakeENV.setup({
+              validLtiScopes: {},
+              devKeysReadOnly: true,
+            })
+          })
+
+          it('disables the save button', () => {
+            const {wrapper} = createWrapper()
+            const saveButton = wrapper.getByRole('button', {name: 'Save'})
+            expect(saveButton).toBeDisabled()
+          })
+
+          it('shows tooltip explaining lack of permissions', () => {
+            const {wrapper} = createWrapper()
+            const saveButton = wrapper.getByRole('button', {name: 'Save'})
+            expect(saveButton).toHaveAttribute(
+              'title',
+              'You do not have permission to create or modify developer keys in this account',
+            )
+          })
+        })
       })
     })
   })

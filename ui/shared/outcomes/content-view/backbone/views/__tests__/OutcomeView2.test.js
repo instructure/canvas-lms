@@ -91,7 +91,7 @@ describe('OutcomeView', () => {
   })
 
   describe('Assessment Banners', () => {
-    it.skip('shows warning text when viewing an assessed account outcome in its native context', () => {
+    it('shows warning text when viewing an assessed account outcome in its native context', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -111,13 +111,13 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('does not show warning text if outcome view is read-only', () => {
+    it('does not show warning text if outcome view is read-only', () => {
       const view = createView({model: newOutcome({assessed: true}, {}), readOnly: true})
       expect(view.$('.outcome-assessed-info-banner')).toHaveLength(0)
       view.remove()
     })
 
-    it.skip('displays informative banner when outcome has been assessed', () => {
+    it('displays informative banner when outcome has been assessed', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -135,7 +135,7 @@ describe('OutcomeView', () => {
       view.remove()
     })
 
-    it.skip('does not display banner when outcome is not assessed', () => {
+    it('does not display banner when outcome is not assessed', () => {
       const view = createView({
         model: newOutcome(
           {
@@ -151,21 +151,21 @@ describe('OutcomeView', () => {
   })
 
   describe('Form Field Modifications', () => {
-    it.skip('returns true for calculation method when modified', () => {
+    it('returns true for calculation method when modified', () => {
       const view = createView({model: newOutcome(), state: 'edit'})
       view.edit($.Event())
       view.$('#calculation_method').val('latest').trigger('change')
       expect(view.getModifiedFields(view.getFormData()).scoringMethod).toBeTruthy()
     })
 
-    it.skip('returns true for calculationInt when modified', () => {
+    it('returns true for calculationInt when modified', () => {
       const view = createView({model: newOutcome(), state: 'edit'})
       view.edit($.Event())
       view.$('#calculation_int').val(2).trigger('change')
       expect(view.getModifiedFields(view.getFormData()).scoringMethod).toBeTruthy()
     })
 
-    it.skip('returns false when calculationInt changed but not used', () => {
+    it('returns false when calculationInt changed but not used', () => {
       const view = createView({
         model: newOutcome({calculation_method: 'latest', calculation_int: null}),
         state: 'edit',
@@ -177,7 +177,7 @@ describe('OutcomeView', () => {
       expect(view.getModifiedFields(view.getFormData()).scoringMethod).toBeFalsy()
     })
 
-    it.skip('returns true for mastery points when modified', () => {
+    it('returns true for mastery points when modified', () => {
       const view = createView({model: newOutcome(), state: 'edit'})
       view.edit($.Event())
       view.$('.mastery_points').val(100).trigger('keyup')
@@ -186,58 +186,7 @@ describe('OutcomeView', () => {
   })
 
   describe('Calculation Method Changes', () => {
-    it.skip('sets calculation int intelligently when calc method is changed', async () => {
-      const view = createView({
-        model: newOutcome({calculation_method: 'highest'}),
-        state: 'edit',
-      })
-
-      view.edit($.Event())
-      await waitFrames(30)
-
-      expect(view.$('#calculation_method')).toHaveLength(1)
-
-      view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(30)
-
-      const calcIntField = view.$('#calculation_int')
-      expect(calcIntField).toHaveLength(1)
-
-      await new Promise(resolve => setTimeout(resolve, 50))
-
-      const calcIntValue = calcIntField.val()
-      expect(calcIntValue).toBeDefined()
-      expect(calcIntValue).toBe('5')
-
-      view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(30)
-      await new Promise(resolve => setTimeout(resolve, 50))
-      expect(view.$('#calculation_int').val()).toBe('65')
-
-      view.$('#calculation_method').val('n_mastery').trigger('change')
-      await waitFrames(30)
-      await new Promise(resolve => setTimeout(resolve, 50))
-      expect(view.$('#calculation_int').val()).toBe('5')
-
-      view.$('#calculation_int').val('4').trigger('change')
-      await waitFrames(30)
-      expect(view.$('#calculation_int').val()).toBe('4')
-
-      view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(30)
-      await new Promise(resolve => setTimeout(resolve, 50))
-      expect(view.$('#calculation_int').val()).toBe('65')
-
-      view.$('#calculation_method').val('highest').trigger('change')
-      await waitFrames(30)
-      view.$('#calculation_method').val('decaying_average').trigger('change')
-      await waitFrames(30)
-      await new Promise(resolve => setTimeout(resolve, 50))
-      expect(view.$('#calculation_int').val()).toBe('65')
-      view.remove()
-    })
-
-    it.skip('does not change calc int to 65 when starting as n mastery and 5', async () => {
+    it('does not change calc int to 65 when starting as n mastery and 5', async () => {
       const view = createView({
         model: newOutcome({
           calculation_method: 'n_mastery',
@@ -269,7 +218,7 @@ describe('OutcomeView', () => {
       console.warn.mockRestore()
     })
 
-    it.skip('shows confirmation dialog when outcome calculation is modified', () => {
+    it('shows confirmation dialog when outcome calculation is modified', () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
@@ -293,7 +242,7 @@ describe('OutcomeView', () => {
       })
     })
 
-    it.skip('saves without dialog when outcome calculation is changed but no rubrics aligned and not assessed', async () => {
+    it('saves without dialog when outcome calculation is changed but no rubrics aligned and not assessed', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: false, native: true, has_updateable_rubrics: false},

@@ -200,7 +200,7 @@ const AccessTokenDetails = ({
                   'Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate access tokens and *use the Canvas Open API* to come up with your own integrations.',
                   {
                     wrapper:
-                      '<a href="https://canvas.instructure.com/doc/api/index.html" class="external" target="_blank" rel="noreferrer noopener">$1</a>',
+                      '<a href="https://developerdocs.instructure.com/services/canvas" class="external" target="_blank" rel="noreferrer noopener">$1</a>',
                   },
                 ),
               ),

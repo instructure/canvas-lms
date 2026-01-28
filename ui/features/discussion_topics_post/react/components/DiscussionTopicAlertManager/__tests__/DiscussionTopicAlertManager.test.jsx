@@ -64,6 +64,55 @@ describe('DiscussionTopicAlertManager', () => {
     expect(container.queryByTestId('post-required-for-peer-review')).not.toBeInTheDocument()
   })
 
+  describe('Checkpointed discussions with peer review', () => {
+    it('should render alert when reply to topic is not submitted', () => {
+      const container = setup({
+        userHasEntry: false,
+        discussionTopic: Discussion.mock({
+          assignment: Assignment.mock({
+            assessmentRequestsForCurrentUser: [{}],
+            checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+          }),
+        }),
+        replyToTopicSubmission: {},
+        replyToEntrySubmission: {submissionStatus: 'submitted'},
+      })
+      expect(container.getByTestId('post-required-for-peer-review')).toBeTruthy()
+      expect(container.getByText(/You must complete all discussion requirements/i)).toBeTruthy()
+    })
+
+    it('should render alert when reply to entry is not submitted', () => {
+      const container = setup({
+        userHasEntry: true,
+        discussionTopic: Discussion.mock({
+          assignment: Assignment.mock({
+            assessmentRequestsForCurrentUser: [{}],
+            checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+          }),
+        }),
+        replyToTopicSubmission: {submissionStatus: 'submitted'},
+        replyToEntrySubmission: {},
+      })
+      expect(container.getByTestId('post-required-for-peer-review')).toBeTruthy()
+      expect(container.getByText(/You must complete all discussion requirements/i)).toBeTruthy()
+    })
+
+    it('should NOT render alert when both checkpoints are submitted', () => {
+      const container = setup({
+        userHasEntry: true,
+        discussionTopic: Discussion.mock({
+          assignment: Assignment.mock({
+            assessmentRequestsForCurrentUser: [{}],
+            checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+          }),
+        }),
+        replyToTopicSubmission: {submissionStatus: 'submitted'},
+        replyToEntrySubmission: {submissionStatus: 'submitted'},
+      })
+      expect(container.queryByTestId('post-required-for-peer-review')).not.toBeInTheDocument()
+    })
+  })
+
   it('should render differentiated group topics alert', () => {
     const container = setup({
       userHasEntry: false,

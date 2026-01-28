@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState, type PropsWithChildren} from 'react'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
@@ -39,10 +39,13 @@ type CustomRecurrenceErrorState = {
   errorMessage: string
 }
 
-class CustomRecurrenceErrorBoundary extends React.Component {
+class CustomRecurrenceErrorBoundary extends React.Component<
+  PropsWithChildren,
+  CustomRecurrenceErrorState
+> {
   state: CustomRecurrenceErrorState
 
-  constructor(props: any) {
+  constructor(props: PropsWithChildren) {
     super(props)
     this.state = {
       hasError: false,
@@ -66,7 +69,6 @@ class CustomRecurrenceErrorBoundary extends React.Component {
         </div>
       )
     }
-    // @ts-expect-error
     return this.props.children
   }
 }

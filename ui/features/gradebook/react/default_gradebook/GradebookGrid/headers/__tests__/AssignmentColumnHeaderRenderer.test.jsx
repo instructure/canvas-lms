@@ -446,7 +446,8 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
         expect(component.props.hideGradesAction.hasGradesOrPostableComments).toBe(false)
       })
 
-      it.skip('sets hasGradesOrCommentsToHide to true if at least one submission has a posted_at date', () => {
+      it('sets hasGradesOrCommentsToHide to true if at least one submission has a posted_at date', () => {
+        submission.posted_at = new Date('Wed Oct 1 1997')
         gradebook.gotChunkOfStudents([student])
         renderComponent()
         expect(component.props.hideGradesAction.hasGradesOrCommentsToHide).toBe(true)
@@ -638,7 +639,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
       expect(studentProp.isTestStudent).toBe(false)
     })
 
-    it.skip('getCurrentlyShownStudents() fetches students using visibleStudentsThatCanSeeAssignment', () => {
+    it('getCurrentlyShownStudents() fetches students using visibleStudentsThatCanSeeAssignment', () => {
       buildGradebook()
       gradebook.visibleStudentsThatCanSeeAssignment = vi
         .fn()
@@ -646,7 +647,7 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
 
       renderComponent()
       const visibleStudents = component.props.getCurrentlyShownStudents()
-      expect(Object.keys(visibleStudents)).toEqual([student.id])
+      expect(visibleStudents.map(s => s.id)).toEqual([student.id])
     })
 
     it('includes a callback for keyDown events', () => {
@@ -657,13 +658,13 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledTimes(1)
     })
 
-    it.skip('calls Gradebook#handleHeaderKeyDown with a given event', () => {
+    it('calls Gradebook#handleHeaderKeyDown with a given event', () => {
       buildGradebook()
       const exampleEvent = new Event('example')
       gradebook.handleHeaderKeyDown = vi.fn()
       renderComponent()
       component.props.onHeaderKeyDown(exampleEvent)
-      expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(exampleEvent)
+      expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(exampleEvent, column.id)
     })
 
     it('calls Gradebook#handleHeaderKeyDown with the column id', () => {
@@ -674,12 +675,15 @@ describe('GradebookGrid AssignmentColumnHeaderRenderer', () => {
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(expect.any(Object), column.id)
     })
 
-    it.skip('includes a callback for closing the column header menu', () => {
+    it('includes a callback for closing the column header menu', () => {
+      vi.useFakeTimers()
       buildGradebook()
       gradebook.handleColumnHeaderMenuClose = vi.fn()
       renderComponent()
       component.props.onMenuDismiss()
+      vi.runAllTimers()
       expect(gradebook.handleColumnHeaderMenuClose).toHaveBeenCalledTimes(1)
+      vi.useRealTimers()
     })
 
     it('does not call the menu close handler synchronously', () => {

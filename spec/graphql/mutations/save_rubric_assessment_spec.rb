@@ -131,6 +131,8 @@ describe Mutations::SaveRubricAssessment do
       expect(rubric_assessments.count).to eq(1)
       expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["_id"]).to eq(rubric_assessments.first.id.to_s)
       expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["score"]).to eq(10)
+
+      expect(result["data"]["saveRubricAssessment"]["rubricAssociation"]["_id"]).to eq(@rubric_association.id.to_s)
     end
 
     it "saves an existing rubric assessment and returns updated submission" do
@@ -158,6 +160,8 @@ describe Mutations::SaveRubricAssessment do
       expect(rubric_assessments.count).to eq(1)
       expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["_id"]).to eq(rubric_assessments.first.id.to_s)
       expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["score"]).to eq(10)
+
+      expect(result["data"]["saveRubricAssessment"]["rubricAssociation"]["_id"]).to eq(@rubric_association.id.to_s)
     end
 
     it "follow:s actions from two teachers should only create one assessment" do
@@ -354,6 +358,9 @@ describe Mutations::SaveRubricAssessment do
           rubricAssessment {
             _id
             score
+          }
+          rubricAssociation {
+            _id
           }
           errors {
             attribute

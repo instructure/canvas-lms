@@ -452,15 +452,12 @@ export function TempEnrollAssign(props: Props) {
     let success: boolean = false
     try {
       setErrorMsg('')
-      // @ts-expect-error
-      const pairingPromises = []
+      const pairingPromises: Promise<TemporaryEnrollmentPairing>[] = []
       enrollmentProps.forEach(() => {
         pairingPromises.push(createTemporaryEnrollmentPairing(ENV.ACCOUNT_ID, stateChoice))
       })
-      const temporaryEnrollmentPairings: TemporaryEnrollmentPairing[] = await Promise.all(
-        // @ts-expect-error
-        pairingPromises,
-      )
+      const temporaryEnrollmentPairings: TemporaryEnrollmentPairing[] =
+        await Promise.all(pairingPromises)
 
       if (props.tempEnrollmentsPairing && props.tempEnrollmentsPairing.length >= 1) {
         // delete any enrollments that were not selected
@@ -555,8 +552,7 @@ export function TempEnrollAssign(props: Props) {
           <Flex.Item overflowY="visible">
             <Button
               onClick={handleGoBack}
-              // @ts-expect-error
-              renderIcon={IconArrowOpenStartLine}
+              renderIcon={<IconArrowOpenStartLine />}
               {...analyticProps('Back')}
             >
               {I18n.t('Back')}

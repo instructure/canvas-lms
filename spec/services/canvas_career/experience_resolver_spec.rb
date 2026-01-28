@@ -23,7 +23,6 @@ module CanvasCareer
     before :once do
       @root_account = Account.default
       @root_account.enable_feature!(:horizon_course_setting)
-      @root_account.enable_feature!(:horizon_learning_provider_app_for_courses)
 
       @career_subaccount = @root_account.sub_accounts.create!
       @career_subaccount.horizon_account = true
@@ -117,11 +116,6 @@ module CanvasCareer
 
           it "returns ACADEMIC in non-horizon courses" do
             expect(ExperienceResolver.new(@user, @course_academic, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
-          end
-
-          it "returns ACADEMIC when horizon_learning_provider_app_for_courses flag is disabled" do
-            @root_account.disable_feature!(:horizon_learning_provider_app_for_courses)
-            expect(ExperienceResolver.new(@user, @course_career, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
           end
         end
 

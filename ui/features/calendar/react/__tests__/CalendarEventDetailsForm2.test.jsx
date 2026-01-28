@@ -152,8 +152,9 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
     changeValue(component, 'edit-calendar-event-form-date', '')
     fireEvent.blur(component.getByTestId('edit-calendar-event-form-date'))
+    // Accept both US format (Mon, Jan 6, 2026) and international format (Mon, 6 Jan 2026)
     expect(component.getByTestId('edit-calendar-event-form-date').value).toMatch(
-      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{4}$/,
+      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (\d{1,2} )?(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ?(\d{1,2},?)? ?\d{4}$/,
     )
 
     const errMessage = component.queryByText('This date is invalid.')

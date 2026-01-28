@@ -933,7 +933,7 @@ const ItemAssignToTrayContent = ({
           )}
         </Alert>
       )}
-      {!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides && (
+      {!ENV?.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides && (
         <DifferentiationTagConverterMessage
           courseId={courseId}
           learningObjectId={String(itemContentId)}

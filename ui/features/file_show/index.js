@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
+import {loadDocPreview} from '@instructure/canvas-rce/enhance-user-content'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import ready from '@instructure/ready'
 

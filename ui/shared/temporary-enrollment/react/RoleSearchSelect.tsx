@@ -89,8 +89,7 @@ export default function RoleSearchSelect(props: Props) {
       type: 'newError' | 'hint' | 'success' | 'screenreader-only'
       text: React.ReactNode
     }>
-    // @ts-expect-error
-  >([{}])
+  >([])
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [selectedOptionId, setSelectedOptionId] = useState(null)
   const [highlightedOptionId, setHighlightedOptionId] = useState(null)
@@ -138,8 +137,7 @@ export default function RoleSearchSelect(props: Props) {
       setMessages([{type: 'hint', text: noResultsLabel}])
       return
     }
-    // @ts-expect-error
-    setMessages([{}])
+    setMessages([])
   }
 
   const handleRequestHideOptions = (event: any) => {

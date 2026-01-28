@@ -160,6 +160,23 @@ describe CoursePaceDueDatesCalculator do
         )
       end
 
+      it "ignores calendar event blackout dates with nil start_at and end_at" do
+        @course.calendar_events.create!(
+          title: "Invalid Blackout Date",
+          blackout_date: true,
+          start_at: nil,
+          end_at: nil
+        )
+
+        expect do
+          @calculator.get_due_dates(@course_pace_module_items)
+        end.not_to raise_error
+
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-01") }
+        )
+      end
+
       it "correctly calculates due dates when the enrollment start date is just after midnight UTC" do
         @course.update! time_zone: "Mountain Time (US & Canada)"
         Time.use_zone(@course.time_zone) do

@@ -16,48 +16,70 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {renderHook} from '@testing-library/react-hooks/dom'
+import {waitFor} from '@testing-library/react'
 import useModuleCourseSearchApi from '../useModuleCourseSearchApi'
 
-function setupCourseModulesResponse() {
-  const response = [
-    {
-      id: '1',
-      name: 'Module Fire',
-    },
-    {
-      id: '2',
-      name: 'Module Water',
-    },
-  ]
-  fetchMock.mock('path:/api/v1/courses/1/modules', response)
-  return response
-}
+const server = setupServer()
+
+const response = [
+  {
+    id: '1',
+    name: 'Module Fire',
+  },
+  {
+    id: '2',
+    name: 'Module Water',
+  },
+]
 
 describe('useModuleCourseSearchApi', () => {
+  let lastRequestUrl
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    lastRequestUrl = undefined
+  })
+
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('fetches and reports results', async () => {
-    setupCourseModulesResponse()
+    server.use(
+      http.get('/api/v1/courses/1/modules', () => {
+        return HttpResponse.json(response)
+      }),
+    )
+
     const success = vi.fn()
     const error = vi.fn()
     renderHook(() => useModuleCourseSearchApi({success, params: {contextId: 1}}))
-    await fetchMock.flush(true)
+    await waitFor(() => {
+      expect(success).toHaveBeenCalledWith([
+        expect.objectContaining({id: '1', name: 'Module Fire'}),
+        expect.objectContaining({id: '2', name: 'Module Water'}),
+      ])
+    })
     expect(error).not.toHaveBeenCalled()
-    expect(success).toHaveBeenCalledWith([
-      expect.objectContaining({id: '1', name: 'Module Fire'}),
-      expect.objectContaining({id: '2', name: 'Module Water'}),
-    ])
   })
 
   it('passes "per_page" query param on to the xhr call', async () => {
-    setupCourseModulesResponse()
+    server.use(
+      http.get('/api/v1/courses/1/modules', ({request}) => {
+        lastRequestUrl = request.url
+        return HttpResponse.json(response)
+      }),
+    )
+
     const success = vi.fn()
     renderHook(() => useModuleCourseSearchApi({success, params: {contextId: 1, per_page: 50}}))
-    await fetchMock.flush(true)
-    expect(fetchMock.lastCall()[0]).toBe('/api/v1/courses/1/modules?per_page=50')
+    await waitFor(() => {
+      expect(lastRequestUrl).toContain('/api/v1/courses/1/modules?per_page=50')
+    })
   })
 })

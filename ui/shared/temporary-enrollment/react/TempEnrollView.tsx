@@ -327,8 +327,7 @@ export function TempEnrollView(props: Props) {
                     onClick={handleAddNewClick}
                     aria-label={I18n.t('Create temporary enrollment')}
                     {...analyticProps('Create')}
-                    // @ts-expect-error
-                    renderIcon={IconPlusLine}
+                    renderIcon={<IconPlusLine />}
                   >
                     {I18n.t('Recipient')}
                   </Button>

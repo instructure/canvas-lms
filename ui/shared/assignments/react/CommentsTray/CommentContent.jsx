@@ -174,12 +174,18 @@ export default function CommentContent(props) {
     }
   }
   const hasCompletedPeerReview = () => {
-    const {reviewerSubmission, submission} = props
-    if (!reviewerSubmission) return false
+    const {reviewerSubmission, submission, assignment} = props
+    if (assignment.assessmentRequestsForCurrentUser) {
+      const assignedAssessments = assignment.assessmentRequestsForCurrentUser
+      const matchingAssessment = assignedAssessments.find(x => x.submission._id === submission._id)
+      return matchingAssessment?.workflowState === 'completed'
+    } else {
+      if (!reviewerSubmission) return false
 
-    const {assignedAssessments} = reviewerSubmission
-    const matchingAssessment = assignedAssessments.find(x => x.assetId === submission._id)
-    return matchingAssessment?.workflowState === 'completed'
+      const {assignedAssessments} = reviewerSubmission
+      const matchingAssessment = assignedAssessments.find(x => x.assetId === submission._id)
+      return matchingAssessment?.workflowState === 'completed'
+    }
   }
   return (
     <>

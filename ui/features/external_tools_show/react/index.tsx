@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import {
   RubricAssignmentContainer,
   RubricSelfAssessmentSettingsWrapper,
@@ -50,18 +51,19 @@ type ENVType = {
 declare const ENV: ENVType
 
 // Keep track of React roots
-const roots = new Map()
+const roots = new Map<string, Root>()
 
-function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
+function createOrUpdateRoot(elementId: string, component: React.ReactElement) {
   const container = document.getElementById(elementId)
   if (!container) return
 
   let root = roots.get(elementId)
   if (!root) {
-    root = createRoot(container)
+    root = render(component, container)
     roots.set(elementId, root)
+  } else {
+    rerender(root, component)
   }
-  root.render(component)
 }
 
 $(() => {

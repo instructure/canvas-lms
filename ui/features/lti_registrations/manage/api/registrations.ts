@@ -305,7 +305,7 @@ export type CreateRegistration = (
   overlay?: LtiConfigurationOverlay,
   unifiedToolId?: string,
   adminNickname?: string,
-) => Promise<ApiResult<unknown>>
+) => Promise<ApiResult<LtiRegistrationWithConfiguration>>
 
 /**
  * Creates an LTI registration
@@ -313,7 +313,7 @@ export type CreateRegistration = (
  * @param internalConfig The internal configuration to use
  * @param overlay An overlay to apply to the internal configuration
  * @param unifiedToolId The unified tool id for the registration
- * @returns An ApiResult with an unknown value. The value should be ignored.
+ * @returns An ApiResult with the created registration including its ID
  */
 export const createRegistration: CreateRegistration = (
   accountId,
@@ -322,7 +322,7 @@ export const createRegistration: CreateRegistration = (
   unifiedToolId,
   adminNickname,
 ) =>
-  parseFetchResult(z.unknown())(
+  parseFetchResult(ZLtiRegistrationWithConfiguration)(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations`, {
       ...defaultFetchOptions({
         headers: {

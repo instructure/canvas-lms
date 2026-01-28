@@ -639,7 +639,7 @@ GEM
     headless (2.3.1)
     highline (3.1.2)
       reline
-    httparty (0.23.1)
+    httparty (0.24.0)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -1112,7 +1112,7 @@ GEM
     rubycas-client (2.3.9)
       activesupport
     rubyzip (3.0.2)
-    saml2 (3.3.0)
+    saml2 (3.3.1)
       activesupport (>= 3.2, < 8.2)
       nokogiri (>= 1.5.8, < 2.0)
       nokogiri-xmlsec-instructure (~> 0.9, >= 0.9.5)
@@ -1361,7 +1361,7 @@ DEPENDENCIES
   headless (= 2.3.1)
   highline (~> 3.0)
   html_text_helper!
-  httparty (~> 0.21)
+  httparty (~> 0.24)
   i18n_extraction!
   i18n_tasks!
   i18nliner (~> 0.2.4)

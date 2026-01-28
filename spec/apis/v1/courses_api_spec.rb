@@ -711,6 +711,7 @@ describe CoursesController, type: :request do
                                                   a_hash_including({ "id" => "grades" }),
                                                   a_hash_including({ "id" => "people" }),
                                                   a_hash_including({ "id" => "syllabus" }),
+                                                  a_hash_including({ "id" => "ai_experiences" }),
                                                 ])
     end
 
@@ -834,6 +835,46 @@ describe CoursesController, type: :request do
                                   format: "json" })
         entry = json.detect { |course| course["id"] == @course.id }
         expect(entry["sis_course_id"]).to eq "TEST-SIS-ONE.2011"
+      end
+
+      context "with temporary enrollments enabled" do
+        before :once do
+          Account.default.enable_feature! :temporary_enrollments
+        end
+
+        it "forbids a limited account admin lacking permission to :read the student or add temporary enrollments" do
+          limited_admin = account_admin_user(account: Account.default,
+                                             role: custom_account_role("limited", account: Account.default))
+          api_call_as_user(limited_admin,
+                           :get,
+                           "/api/v1/users/#{@student.id}/courses",
+                           { user_id: @student.to_param,
+                             controller: "courses",
+                             action: "user_index",
+                             format: "json" },
+                           {},
+                           {},
+                           { expected_status: 403 })
+        end
+
+        it "allows a limited account admin having permission to add temporary enrollments" do
+          role = custom_account_role("less_limited", account: Account.default)
+          role.role_overrides.create!(account: Account.default,
+                                      permission: :temporary_enrollments_add,
+                                      enabled: true)
+          less_limited_admin = account_admin_user(account: Account.default,
+                                                  role:)
+          api_call_as_user(less_limited_admin,
+                           :get,
+                           "/api/v1/users/#{@student.id}/courses",
+                           { user_id: @student.to_param,
+                             controller: "courses",
+                             action: "user_index",
+                             format: "json" },
+                           {},
+                           {},
+                           { expected_status: 200 })
+        end
       end
 
       it "returns course progress for the subject" do

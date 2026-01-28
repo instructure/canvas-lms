@@ -459,12 +459,12 @@ describe('enhanceUserContent()', () => {
     })
   })
 
-  describe('customEnhanceFunc', () => {
+  describe('customEnhance function', () => {
     it('is called if provided', () => {
-      subject('<p>hello world</p>')
-      const customFunc = jest.fn()
-      enhanceUserContent(document, {customEnhanceFunc: customFunc})
-      expect(customFunc).toHaveBeenCalledTimes(1)
+      subject('<p>fhello world</p>')
+      const customEnhance = jest.fn()
+      enhanceUserContent(document, {customEnhance})
+      expect(customEnhance).toHaveBeenCalledTimes(1)
     })
   })
 

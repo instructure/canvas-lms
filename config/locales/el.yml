@@ -2819,6 +2819,7 @@ el:
   big_blue_button_conference: 
     recording_setting: Εγγράφεται
     recording_setting_enabled_description: "Ενεργοποίηση της εγγραφής για αυτή τη συνεδρία"
+  bio_a519d807: Βιογραφικό
   blackboard: 
     no_manifest: "Το zip αρχείο Blackboard δεν περιέχει αρχείο imsmanifest.xml στον κατάλογο ρίζας."
   blank_38df4238: κενό
@@ -3442,6 +3443,7 @@ el:
   close_and_return_to_canvas_80544344: "Κλείσιμο και επιστροφή στο Canvas"
   close_d634289d: Κλείσιμο
   close_for_comments_37783f56: "Κλεισμένο για Σχόλια"
+  close_rubric_a0fc8166: "Κλείσιμο Ρουμπρίκας"
   closed_for_comments_e395b42f: "Κλεισμένο για Σχόλια"
   collaboration_was_deleted_9cf9934b: "Η συνεργασία διαγράφηκε"
   collaborations: 
@@ -4672,6 +4674,13 @@ el:
   course_name_is_required_90919349: "Απαιτείται όνομα μαθήματος"
   course_name_successfully_added_48116a50: "Το μάθημα %{course_name} προστέθηκε επιτυχώς!"
   course_navigation_dd035109: "Πλοήγηση στο μάθημα"
+  course_navigation_settings: 
+    buttons: 
+      save: Αποθήκευση
+    drag_details: "Η απενεργοποίηση των περισσότερων σελίδων θα έχει ως αποτέλεσμα την ανακατεύθυνση των σπουδαστών που επισκέπτονται αυτές τις σελίδες στην αρχική σελίδα του μαθήματος."
+    drag_to_hide: "Μεταφορά αντικειμένων εδώ, για να τα αποκρύψετε από μαθητές."
+    help: 
+      edit_navigation: "Σύρετε και αποθέστε στοιχεία για να τα επανατοποθετήσετε στην πλοήγηση του μαθήματος."
   course_option_links_a79d263d: "Σύνδεσμοι προς τις επιλογές των μαθημάτων"
   course_outcomes_7dc1cbc7: "Αποτελέσματα Μαθήματος"
   course_pages_449f1dd4: "Σελίδες Μαθήματος"
@@ -4829,6 +4838,13 @@ el:
     master_course_restrictions: 
       labels: 
         due_dates: "Καταληκτικές Ημερομηνίες"
+    navigation_form: 
+      drag_details: "Η απενεργοποίηση των περισσότερων σελίδων θα έχει ως αποτέλεσμα την ανακατεύθυνση των σπουδαστών που επισκέπτονται αυτές τις σελίδες στην αρχική σελίδα του μαθήματος."
+      drag_to_hide: "Μεταφορά αντικειμένων εδώ, για να τα αποκρύψετε από μαθητές."
+      help: 
+        edit_navigation: "Σύρετε και αποθέστε στοιχεία για να τα επανατοποθετήσετε στην πλοήγηση του μαθήματος."
+      titles: 
+        edit_navigation: "Επεξεργασία Πλοήγησης στο Μάθημα"
     notices: 
       concluded: "Το μάθημα ολοκληρώθηκε επιτυχώς"
       deleted: "Το μάθημα διαγράφηκε επιτυχώς"
@@ -6747,6 +6763,7 @@ el:
   generate_44e33e72: Δημιουργία
   generate_epub_80e89ea4: "Δημιουργία ePub"
   generate_token_393ab5b4: "Δημιουργία Token"
+  generated_e71c6622: Δημιουργήθηκε
   generated_f26ee56b: "Δημιουργήθηκε:"
   generating_5b5e20f8: "Δημιουργία:"
   generating_c2aabc02: Δημιουργία...
@@ -6788,6 +6805,7 @@ el:
       warning: Προειδοποίηση
   grade_distribution_e52c9256: "Κατανομή Βαθμών"
   grade_export_title: "Εξαγωγή Βαθμών"
+  grade_f949a691: "%{grade}%"
   grade_grade_7e52dd1c: "Βαθμός: %{grade}"
   grade_summary: 
     graph_title: "Μέση βαθμολογία %{mean}, Υψηλή βαθμολογία %{high}, Χαμηλή βαθμολογία %{low}"
@@ -7529,6 +7547,7 @@ el:
   hide_correct_answers_at_b1a59408: "Απόκρυψη Σωστών Απαντήσεων Σε"
   hide_courses_without_enrollments_6df4dfad: "Απόκρυψη μαθημάτων στα οποία δεν υπάρχουν εγγραφές"
   hide_e057ff36: Απόκρυψη
+  hide_rubric_27903c8: "Απόκρυψη Ρουμπρίκας"
   hide_score_total_for_assessment_results_d0ef117f: "Απόκρυψη της συνολικής βαθμολογίας των αποτελεσμάτων αξιολόγησης"
   hide_student_names_3e59e862: "Απόκρυψη Ονομάτων των Μαθητών"
   high_contrast_description: |-
@@ -10260,6 +10279,7 @@ el:
   not_installed_37a21a76: "Δεν εγκαταστάθηκε"
   not_published_73f7079: "Μη δημοσιευμένο"
   not_synced_529cbf29: "Δεν έχει συγχρονιστεί"
+  not_yet_available_9aa23a77: "Δεν είναι ακόμα διαθέσιμο"
   not_yet_completed_345a0bca: "Δεν έχει ολοκληρωθεί ακόμη"
   not_yet_graded_8b655a7: "Δεν έχει βαθμολογηθεί ακόμη"
   note_8b73ce09: Σημείωση
@@ -11417,6 +11437,7 @@ el:
   primary_color_button_disabled_9081ddff: "Το κουμπί βασικού χρώματος έχει απενεργοποιηθεί"
   priority_dd4381ee: Προτεραιότητα
   privacy_290109ea: Απόρρητο
+  privacy_notice_7eff08fe: "Σημείωση περί Απορρήτου"
   privacy_policy_c68f482a: "Πολιτική Απορρήτου"
   private_copyrighted_3cac9686: "Ιδιωτική (Προστατευόμενη)"
   process_as_ui_changes_8e34ed2a: "Επεξεργασία ως αλλαγές UI"

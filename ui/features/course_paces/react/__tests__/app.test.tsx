@@ -20,8 +20,11 @@ import React from 'react'
 import {renderConnected} from './utils'
 import {PRIMARY_PACE} from './fixtures'
 import {App, type ResponsiveComponentProps} from '../app'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 const pollForPublishStatus = vi.fn()
 const setBlueprintLocked = vi.fn()
@@ -40,6 +43,9 @@ const defaultProps: ResponsiveComponentProps = {
   hidePaceModal: vi.fn(),
 }
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
 beforeEach(() => {
   fakeENV.setup({
     VALID_DATE_RANGE: {
@@ -52,12 +58,16 @@ beforeEach(() => {
 afterEach(() => {
   vi.clearAllMocks()
   fakeENV.teardown()
-  fetchMock.reset()
+  server.resetHandlers()
 })
 
 describe('App', () => {
   it('renders empty state if supplied shell course pace', () => {
-    fetchMock.get(/\/api\/v1\/courses\/30\/pace_contexts.*/, {})
+    server.use(
+      http.get('/api/v1/courses/:courseId/pace_contexts', () => {
+        return HttpResponse.json({})
+      }),
+    )
     const {getByRole} = renderConnected(
       <App
         {...defaultProps}

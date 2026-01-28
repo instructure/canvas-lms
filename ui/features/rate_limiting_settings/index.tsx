@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 import RateLimitingSettingsApp from './react/RateLimitingSettingsApp'
@@ -27,7 +27,6 @@ ready(() => {
 
   const container = document.getElementById('rate_limiting_settings_mount')
   if (container) {
-    const root = createRoot(container)
-    root.render(<RateLimitingSettingsApp />)
+    render(<RateLimitingSettingsApp />, container)
   }
 })

@@ -4469,6 +4469,7 @@ fa:
     create_time: "زمان ایجاد کنید"
     recording_setting: "در حال ضبط"
     recording_setting_enabled_description: "فعالسازی ضبط برای این کنفرانس"
+  bio_a519d807: "شرح حال"
   blackboard: 
     no_manifest: "این Blackboard .zip هیچ فایل imsmanifest.xml در دایرکتوری ریشه ندارد."
   blackout_dates_4a140a72: "تاریخ های خاموشی"
@@ -5530,6 +5531,7 @@ fa:
   close_for_comments_ce0e5d00: "بستن امکان ارسال نظر"
   close_grade_info_58ef5a20: "بستن اطلاعات نمره"
   close_move_tray_8609e988: "بستن سینی انتقال"
+  close_rubric_a0fc8166: "بستن دستورالعمل ارزیابی"
   close_sidebar_10b0fbb4: "بستن نوار کناری"
   close_student_details_2f6900: "بستن جزئیات دانشجو"
   close_submission_tray_c4988fa8: "بستن سینی موارد ارسالی"
@@ -7427,6 +7429,14 @@ fa:
   course_name_is_required_90919349: "نام درس لازم است"
   course_name_successfully_added_48116a50: "%{course_name} با موفقیت افزوده شد!"
   course_navigation_dd035109: "پیمایش درس"
+  course_navigation_settings: 
+    buttons: 
+      save: "ذخیره سازی"
+    drag_details: "غیرفعال کردن اکثر صفحه ها باعث می شود دانشجویانی که از این صفحه ها بازدید می کنند به صفحه ی اصلی درس هدایت شوند."
+    drag_to_hide: "موردها را اینجا بکشید تا آنها را از دانشجویان مخفی کنید."
+    help: 
+      edit_navigation: "برای مرتب کردن دوباره مورد ها در پیمایش درس، آنها را بکشید و رها کنید."
+      edit_navigation_k5: "موارد را بکشید و رها کنید تا آنها را در پیمایش موضوع مجدداً مرتب کنید."
   course_not_found_c248a721: "درس  یافت نشد"
   course_notification_settings_d9821d36: "تنظیمات اعلان دوره"
   course_notification_settings_error_page_c0512c17: "صفحه خطای تنظیمات اعلان دوره"
@@ -7721,6 +7731,15 @@ fa:
         content: محتوا
         due_dates: "تاریخ‌های مهلت"
         points: امتیازها
+    navigation_form: 
+      drag_details: "غیرفعال کردن اکثر صفحه ها باعث می شود دانشجویانی که از این صفحه ها بازدید می کنند به صفحه ی اصلی درس هدایت شوند."
+      drag_to_hide: "موردها را اینجا بکشید تا آنها را از دانشجویان مخفی کنید."
+      help: 
+        edit_navigation: "برای مرتب کردن دوباره مورد ها در پیمایش درس، آنها را بکشید و رها کنید."
+        edit_navigation_info_k5: "اگر فعال باشد، ابزارهای LTI همیشه به ترتیبی که شما انتخاب می‌کنید، در آخر و در زیر برگه منابع ظاهر می‌شوند."
+        edit_navigation_k5: "موارد را بکشید و رها کنید تا آنها را در پیمایش موضوع مجدداً مرتب کنید."
+      titles: 
+        edit_navigation: "ویرایش پیمایش درس"
     notices: 
       backup_restored: "نسخه پشتیبان با موفقیت بازیابی شد!"
       concluded: "درس با موفقیت خاتمه یافت"
@@ -11029,6 +11048,7 @@ fa:
   generate_item_analysis_report_statuslabel_16e02c8: "ایجاد گزارش تحلیل مورد %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "ایجاد گزارش تحلیل دانشجو %{statusLabel}"
   generate_token_393ab5b4: "ایجاد نشانه"
+  generated_e71c6622: "ایجاد شد"
   generated_f26ee56b: "ایجاد شد:"
   generating_5b5e20f8: "در حال ایجاد:"
   generating_c2aabc02: "در حال ایجاد..."
@@ -11111,6 +11131,7 @@ fa:
       warning: هشدار
   grade_distribution_e52c9256: "توزیع نمره"
   grade_export_title: "صدور نمره"
+  grade_f949a691: "%{grade}%"
   grade_for_course_ccc8513c: "نمره برای %{course}"
   grade_for_missing_submissions_56f91c83: "نمره برای موارد ارسالی موجود نیست"
   grade_for_name_b9df168a: "نمره برای: %{name}"
@@ -12589,6 +12610,7 @@ fa:
   hide_outcomes_with_no_results_7e4ce06f: "مخفی کردن خروجی های بدون نتیجه"
   hide_params_eadf0961: "پنهان کردن پارامترها"
   hide_projections_9d4ed1e1: "مخفی کردن پیش بینی ها"
+  hide_rubric_27903c8: "مخفی کردن دستورالعمل ارزیابی"
   hide_score_total_for_assessment_results_d0ef117f: "مخفی کردن کل نمره برای نتایج ارزیابی"
   hide_sidebar_2b5b3776: "مخفی کردن نوار کناری"
   hide_student_names_3e59e862: "مخفی کردن نام دانشجویان"
@@ -16739,6 +16761,7 @@ fa:
   not_synced_message_a343fe5e: "همگام نشده است: %{message}"
   not_visible_in_student_files_22f11883: "در پرونده های دانشجویی قابل مشاهده نیست"
   not_yet_assessed_9362f199: "هنوز ارزیابی نشده است"
+  not_yet_available_9aa23a77: "هنوز در دسترس نیست"
   not_yet_completed_345a0bca: "هنوز تکمیل نشده است"
   not_yet_graded_40475341: "هنوز نمره گذاری نشده"
   not_yet_graded_8b655a7: "هنوز نمره گذاری نشده"
@@ -18425,6 +18448,7 @@ fa:
   priority_dd4381ee: اولویت
   privacy_290109ea: "حریم خصوصی"
   privacy_level_f0ec09a3: "سطح حریم خصوصی"
+  privacy_notice_7eff08fe: "اطلاعیه حریم خصوصی"
   privacy_policy_c68f482a: "سیاست حریم خصوصی"
   private_3883d133: خصوصی
   private_copyrighted_3cac9686: "خصوصی (دارای حق تکثیر)"

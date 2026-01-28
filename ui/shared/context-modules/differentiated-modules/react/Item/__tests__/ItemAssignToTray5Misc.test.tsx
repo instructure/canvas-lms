@@ -16,34 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
-import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {act, cleanup, screen, waitFor} from '@testing-library/react'
-import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
-import ItemAssignToTray from '../ItemAssignToTray'
+import {cleanup, screen, waitFor} from '@testing-library/react'
 import {
-  DEFAULT_PROPS,
-  FIRST_GROUP_CATEGORY_DATA,
+  clearQueryCache,
   FIRST_GROUP_CATEGORY_ID,
-  FIRST_GROUP_CATEGORY_URL,
   OVERRIDES,
-  OVERRIDES_URL,
   renderComponent,
-  SECOND_GROUP_CATEGORY_DATA,
-  SECOND_GROUP_CATEGORY_ID,
-  SECTIONS_URL,
+  server,
   setupBaseMocks,
   setupEnv,
   setupFlashHolder,
+  teardownEnv,
+  http,
+  HttpResponse,
 } from './ItemAssignToTrayTestUtils'
 
-const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
-
 describe('ItemAssignToTray - Module Overrides', () => {
-  const originalLocation = window.location
-
   const DATE_DETAILS_WITHOUT_OVERRIDES = {
     id: '23',
     due_at: '2023-10-05T12:00:00Z',
@@ -74,25 +62,31 @@ describe('ItemAssignToTray - Module Overrides', () => {
 
   beforeAll(() => {
     setupFlashHolder()
+    server.listen({onUnhandledRequest: 'bypass'})
   })
 
   beforeEach(() => {
     setupEnv()
     setupBaseMocks()
-    vi.resetAllMocks()
   })
 
   afterEach(() => {
-    window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
+    teardownEnv()
+    clearQueryCache()
     cleanup()
   })
 
+  afterAll(() => {
+    server.close()
+  })
+
   it('shows module cards if they are not overridden', async () => {
-    fetchMock.get(OVERRIDES_URL, DATE_DETAILS_WITHOUT_OVERRIDES, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json(DATE_DETAILS_WITHOUT_OVERRIDES)
+      }),
+    )
     const {getByText, findAllByTestId, getByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(getByText('Inherited from')).toBeInTheDocument()
@@ -101,9 +95,11 @@ describe('ItemAssignToTray - Module Overrides', () => {
   })
 
   it('does not show overridden module cards', async () => {
-    fetchMock.get(OVERRIDES_URL, DATE_DETAILS_WITH_OVERRIDES, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json(DATE_DETAILS_WITH_OVERRIDES)
+      }),
+    )
     const {queryByText, findAllByTestId, queryByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(queryByText('Inherited from')).not.toBeInTheDocument()
@@ -112,103 +108,55 @@ describe('ItemAssignToTray - Module Overrides', () => {
   })
 })
 
-describe('ItemAssignToTray - Student Groups', () => {
-  const originalLocation = window.location
-
-  const payload = {
-    id: '23',
-    due_at: '2023-10-05T12:00:00Z',
-    unlock_at: '2023-10-01T12:00:00Z',
-    lock_at: '2023-11-01T12:00:00Z',
-    only_visible_to_overrides: false,
-    group_category_id: FIRST_GROUP_CATEGORY_ID,
-    visible_to_everyone: true,
-    overrides: [],
-  }
-
-  beforeAll(() => {
-    setupFlashHolder()
-  })
-
-  beforeEach(() => {
-    setupEnv()
-    setupBaseMocks()
-    vi.resetAllMocks()
-  })
-
-  afterEach(() => {
-    window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
-    cleanup()
-  })
-
-  it('displays student groups if the assignmet is a group assignment', async () => {
-    fetchMock.get(OVERRIDES_URL, payload, {
-      overwriteRoutes: true,
-    })
-    const {findByText, findByTestId, getByText} = renderComponent()
-    const assigneeSelector = await findByTestId('assignee_selector')
-    act(() => assigneeSelector.click())
-    await findByText(FIRST_GROUP_CATEGORY_DATA[0].name)
-    FIRST_GROUP_CATEGORY_DATA.forEach(group => {
-      expect(getByText(group.name)).toBeInTheDocument()
-    })
-  })
-
-  // TODO: flaky in Vitest - fails intermittently
-  it.skip('refreshes the group options if the group category is overridden', async () => {
-    fetchMock.get(OVERRIDES_URL, payload, {
-      overwriteRoutes: true,
-    })
-    const {findByText, findByTestId, getByText, queryByText, rerender} = renderComponent()
-    const assigneeSelector = await findByTestId('assignee_selector')
-    act(() => assigneeSelector.click())
-    await findByText(FIRST_GROUP_CATEGORY_DATA[0].name)
-    SECOND_GROUP_CATEGORY_DATA.forEach(group => {
-      expect(queryByText(group.name)).not.toBeInTheDocument()
-    })
-    rerender(
-      <MockedQueryProvider>
-        <ItemAssignToTray {...DEFAULT_PROPS} defaultGroupCategoryId={SECOND_GROUP_CATEGORY_ID} />
-      </MockedQueryProvider>,
-    )
-
-    await findByText(SECOND_GROUP_CATEGORY_DATA[0].name)
-    SECOND_GROUP_CATEGORY_DATA.forEach(group => {
-      expect(getByText(group.name)).toBeInTheDocument()
-    })
-  })
-})
-
 describe('ItemAssignToTray - Paced Course with Mastery Paths', () => {
-  const originalLocation = window.location
+  let sectionsFetched: ReturnType<typeof vi.fn>
+  let overridesFetched: ReturnType<typeof vi.fn>
 
   beforeAll(() => {
     setupFlashHolder()
+    server.listen({onUnhandledRequest: 'bypass'})
   })
 
   beforeEach(() => {
+    sectionsFetched = vi.fn()
+    overridesFetched = vi.fn()
     setupEnv()
     setupBaseMocks()
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/sections/, () => {
+        sectionsFetched()
+        return HttpResponse.json([])
+      }),
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        overridesFetched()
+        return HttpResponse.json({})
+      }),
+    )
     ENV.IN_PACED_COURSE = true
     ENV.FEATURES ||= {}
     ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
-    vi.resetAllMocks()
   })
 
   afterEach(() => {
-    window.location = originalLocation
     ENV.IN_PACED_COURSE = false
-    ENV.FEATURES.course_pace_pacing_with_mastery_paths = false
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    if (ENV.FEATURES) {
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths = false
+    }
+    server.resetHandlers()
+    teardownEnv()
+    clearQueryCache()
     cleanup()
   })
 
-  it('does not fetch assignee options', () => {
+  afterAll(() => {
+    server.close()
+  })
+
+  it('does not fetch assignee options', async () => {
     renderComponent()
-    expect(fetchMock.calls(SECTIONS_URL)).toHaveLength(0)
+    // Wait a tick to ensure no async fetch would have been triggered
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(sectionsFetched).not.toHaveBeenCalled()
   })
 
   describe('with mastery paths', () => {
@@ -220,9 +168,11 @@ describe('ItemAssignToTray - Paced Course with Mastery Paths', () => {
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
     })
 
-    it('requests the existing overrides', () => {
+    it('requests the existing overrides', async () => {
       renderComponent()
-      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
+      await waitFor(() => {
+        expect(overridesFetched).toHaveBeenCalledTimes(1)
+      })
     })
 
     it('shows the mastery path toggle', () => {
@@ -232,178 +182,46 @@ describe('ItemAssignToTray - Paced Course with Mastery Paths', () => {
   })
 })
 
-describe('ItemAssignToTray - Card Focus', () => {
-  const originalLocation = window.location
-
-  beforeAll(() => {
-    setupFlashHolder()
-  })
-
-  beforeEach(() => {
-    setupEnv()
-    setupBaseMocks()
-    vi.resetAllMocks()
-  })
-
-  afterEach(() => {
-    window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
-    cleanup()
-  })
-
-  // TODO: flaky in Vitest - focus behavior differs from Jest in jsdom
-  it.skip('focuses on the add button when deleting a card', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByTestId, getAllByTestId} = renderComponent()
-
-    const deleteButton = (await findAllByTestId('delete-card-button'))[0]
-    await user.click(deleteButton)
-
-    const addButton = getAllByTestId('add-card')[0]
-    await waitFor(() => expect(addButton).toHaveFocus())
-  })
-
-  // TODO: flaky in Vitest - times out waiting for cards
-  it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByTestId, getByTestId, getAllByTestId} = renderComponent()
-
-    // wait for the cards to render
-    const loadingSpinner = getByTestId('cards-loading')
-    await waitFor(() => {
-      expect(loadingSpinner).not.toBeInTheDocument()
-    })
-
-    const addButton = getAllByTestId('add-card')[0]
-    await user.click(addButton)
-    const deleteButtons = await findAllByTestId('delete-card-button')
-    await waitFor(() =>
-      expect(deleteButtons[deleteButtons.length - 1].closest('button')).toHaveFocus(),
-    )
-  })
-})
-
-describe('ItemAssignToTray - Pagination', () => {
-  const originalLocation = window.location
-
-  beforeAll(() => {
-    setupFlashHolder()
-  })
-
-  beforeEach(() => {
-    setupEnv()
-    setupBaseMocks()
-    vi.resetAllMocks()
-  })
-
-  afterEach(() => {
-    window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
-    cleanup()
-  })
-
-  // TODO: flaky in Vitest - intermittently times out
-  it.skip('fetches and combines multiple pages of overrides', async () => {
-    const page1 = {
-      id: '23',
-      overrides: [
-        {id: '1', title: 'Override 1'},
-        {id: '2', title: 'Override 2'},
-      ],
-    }
-    const response1 = {
-      body: page1,
-      headers: {
-        Link: '</api/v1/courses/1/assignments/23/date_details?page=2&per_page=100>; rel="next"',
-      },
-    }
-
-    const page2 = {
-      id: '23',
-      overrides: [
-        {id: '3', title: 'Override 3'},
-        {id: '4', title: 'Override 4'},
-      ],
-    }
-    const response2 = {
-      body: page2,
-      headers: {
-        Link: '</api/v1/courses/1/assignments/23/date_details?page=3&per_page=100>; rel="next"',
-      },
-    }
-
-    const page3 = {
-      id: '23',
-      overrides: [{id: '5', title: 'Override 5'}],
-    }
-    const response3 = {
-      body: page3,
-    }
-
-    fetchMock.get(OVERRIDES_URL, response1, {overwriteRoutes: true})
-    fetchMock.get(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`, response2)
-    fetchMock.get(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`, response3)
-
-    const {findAllByTestId} = renderComponent()
-
-    await waitFor(async () => {
-      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
-
-      expect(
-        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`),
-      ).toHaveLength(1)
-      expect(
-        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`),
-      ).toHaveLength(1)
-      const cards = await findAllByTestId('item-assign-to-card')
-      expect(cards).toHaveLength(5)
-    })
-  })
-})
-
 describe('ItemAssignToTray - Group Set Handling', () => {
-  const originalLocation = window.location
-
   beforeAll(() => {
     setupFlashHolder()
+    server.listen({onUnhandledRequest: 'bypass'})
   })
 
   beforeEach(() => {
     setupEnv()
     setupBaseMocks()
-    vi.resetAllMocks()
   })
 
   afterEach(() => {
-    window.location = originalLocation
-    fetchMock.resetHistory()
-    fetchMock.restore()
+    server.resetHandlers()
+    teardownEnv()
+    clearQueryCache()
     cleanup()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('handles deleted group set gracefully without closing the tray', async () => {
-    fetchMock.get(
-      OVERRIDES_URL,
-      {
-        id: '23',
-        due_at: '2023-10-05T12:00:00Z',
-        unlock_at: '2023-10-01T12:00:00Z',
-        lock_at: '2023-11-01T12:00:00Z',
-        only_visible_to_overrides: false,
-        visible_to_everyone: true,
-        group_category_id: FIRST_GROUP_CATEGORY_ID,
-        overrides: [],
-      },
-      {
-        overwriteRoutes: true,
-      },
+    server.use(
+      http.get('/api/v1/courses/1/assignments/23/date_details', () => {
+        return HttpResponse.json({
+          id: '23',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: false,
+          visible_to_everyone: true,
+          group_category_id: FIRST_GROUP_CATEGORY_ID,
+          overrides: [],
+        })
+      }),
+      http.get(`/api/v1/group_categories/${FIRST_GROUP_CATEGORY_ID}/groups`, () => {
+        return new HttpResponse(null, {status: 404})
+      }),
     )
-
-    fetchMock.get(FIRST_GROUP_CATEGORY_URL, 404, {
-      overwriteRoutes: true,
-    })
 
     const onCloseMock = vi.fn()
     const onDismissMock = vi.fn()

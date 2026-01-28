@@ -2915,6 +2915,7 @@ hy:
   big_blue_button_conference: 
     recording_setting: Ձայնագրում
     recording_setting_enabled_description: "Միացնել այս կոնֆերանսի ձայնագրման ֆունկցիան"
+  bio_a519d807: "Կենսագրական տվյալներ"
   blackboard: 
     no_manifest: "Blackboard համակարգի zip արխիվը արմատային կատալոգում չունի imsmanifest.xml ֆայլ:"
   blue_daf8fea9: Կապույտ
@@ -3568,6 +3569,7 @@ hy:
   close_d634289d: Փակել
   close_for_comments_37783f56: "Փակ է մեկնաբանությունների համար"
   close_for_comments_ce0e5d00: "Մեկնաբանությունների համար փակել"
+  close_rubric_a0fc8166: "Փակել ռուբրիկը"
   closed_for_comments_e395b42f: "Փակ է մեկնաբանությունների համար"
   collaboration: 
     default_title: "Առանց անվանման համատեղ աշխատանք"
@@ -4942,6 +4944,13 @@ hy:
   course_name_is_required_90919349: "Դասընթացի անվանումը պարտադիր է "
   course_name_successfully_added_48116a50: "%{course_name} դասընթացը հաջողությամբ ավելացվել է:"
   course_navigation_dd035109: "Նավարկում դասընթացում"
+  course_navigation_settings: 
+    buttons: 
+      save: Պահպանել
+    drag_details: "Էջերի մեծ մասի անջատման արդյունքում այդ էջերը այցելած ունկնդիրները համար կբացվի դասընթացի հիմնական էջը: "
+    drag_to_hide: "Քաշելով տեղափոխեք տարրերն այստեղ՝ ունկնդիրներից դրանք թաքցնելու համար: "
+    help: 
+      edit_navigation: "Դասընթացի նավարկման մեջ տարրերի վերադասավորման համար անհրաժեշտ է քաշել եւ տեղափոխել դրանք: "
   course_outcomes_7dc1cbc7: "Դասընթացի արդյունքներ"
   course_pages_449f1dd4: "Դասընթացի էջեր"
   course_people_3058c948: "Դասընթացն անցնող մարդիկ"
@@ -5165,6 +5174,13 @@ hy:
       select_student: "Ընտրել ունկնդրին"
     links: 
       student_progress: "Դիտել կատարման ընթացքը"
+    navigation_form: 
+      drag_details: "Էջերի մեծ մասի անջատման արդյունքում այդ էջերը այցելած ունկնդիրները համար կբացվի դասընթացի հիմնական էջը: "
+      drag_to_hide: "Քաշելով տեղափոխեք տարրերն այստեղ՝ ունկնդիրներից դրանք թաքցնելու համար: "
+      help: 
+        edit_navigation: "Դասընթացի նավարկման մեջ տարրերի վերադասավորման համար անհրաժեշտ է քաշել եւ տեղափոխել դրանք: "
+      titles: 
+        edit_navigation: "Խմբագրել դասընթացում նավարկումը"
     notices: 
       backup_restored: "Պահուստային տարբերակը հաջողությամբ վերականգնվել է:"
       concluded: "Դասընթացը հաջողությամբ ավարտված է "
@@ -7371,6 +7387,7 @@ hy:
   generate_44e33e72: Ստեղծել
   generate_epub_80e89ea4: "Գեներացնել ePub-ը"
   generate_token_393ab5b4: "Ստեղծել token"
+  generated_e71c6622: "Ստեղծված է"
   generated_f26ee56b: Գեներացված.
   generating_5b5e20f8: "Գեներացվում է."
   generating_c2aabc02: "Գեներացվում է..."
@@ -7415,6 +7432,7 @@ hy:
       warning: Նախազգուշացում
   grade_distribution_e52c9256: "Գնահատականների բաշխում"
   grade_export_title: "Գնահատականների արտահանում"
+  grade_f949a691: "%{grade}%"
   grade_grade_7e52dd1c: "Գնահատական՝  %{grade}"
   grade_summary: 
     graph_title: "Միջին %{mean}, բարձր %{high}, ցածր %{low}"
@@ -8525,6 +8543,7 @@ hy:
   hide_courses_without_enrollments_6df4dfad: "Թաքցնել գրանցում չունեցող դասընթացները"
   hide_e057ff36: Թաքցնել
   hide_notes_column_7749f408: "Թաքցնել նշումների սյունակը"
+  hide_rubric_27903c8: "Թաքցնել ռուբրիկը"
   hide_score_total_for_assessment_results_d0ef117f: "Անտեսանելի դարձնել ընդհանուր միավորները ստուգման արդյունքների համար"
   hide_student_names_3e59e862: "Թաքցնել ունկնդիրների անունները"
   high_score_267b6641: "Բարձր գնահատական"
@@ -11505,6 +11524,7 @@ hy:
   not_graded_e027c866: "Գնահատված չէ"
   not_installed_37a21a76: "Տեղադրված չէ"
   not_now_97efd947: "Ոչ հիմա"
+  not_yet_available_9aa23a77: "առայժմ հասանելի չէ"
   not_yet_completed_345a0bca: "Դեռեւս ավարտված չէ"
   not_yet_graded_8b655a7: "Դեռևս գնահատված չէ"
   note_length_cannot_exceed_maxlength_characters_82798b1: "Նշումը չի կարող գերազանցել %{maxLength} նիշը"
@@ -12686,6 +12706,7 @@ hy:
   primary_color_button_disabled_9081ddff: "Առաջնային գույնի կոճակը անջատվել է"
   priority_dd4381ee: Առաջնահերթություն
   privacy_290109ea: Գաղտնիություն
+  privacy_notice_7eff08fe: "Գաղտնիության նշում"
   privacy_policy_c68f482a: "Գաղտնիության պահպանման քաղաքականություն"
   private_copyrighted_3cac9686: "Մասնավոր (պաշտպանված է հեղինակային իրավունքով)"
   process_as_ui_changes_8e34ed2a: "Մշակվում են  որպես UI փոփոխություններ "

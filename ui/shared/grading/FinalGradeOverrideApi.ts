@@ -93,20 +93,26 @@ export function updateFinalGradeOverride(
     }
   `
 
-  return (
-    createClient()
-      .mutate({mutation})
-      // @ts-expect-error
-      .then(response => {
-        const {overrideScore, customGradeStatusId} = response.data.setOverrideScore.grades
-        return overrideScore != null ? {percentage: overrideScore, customGradeStatusId} : null
+  type SetOverrideScoreResponse = {
+    setOverrideScore: {
+      grades: {
+        overrideScore: number | null
+        customGradeStatusId: string | null
+      }
+    }
+  }
+
+  return createClient()
+    .mutate({mutation})
+    .then((response: {data?: SetOverrideScoreResponse | null}) => {
+      const {overrideScore, customGradeStatusId} = response.data!.setOverrideScore.grades
+      return overrideScore != null ? {percentage: overrideScore, customGradeStatusId} : null
+    })
+    .catch((/* error */) => {
+      showFlashAlert({
+        message: I18n.t('There was a problem overriding the grade.'),
+        type: 'error',
+        err: null,
       })
-      .catch((/* error */) => {
-        showFlashAlert({
-          message: I18n.t('There was a problem overriding the grade.'),
-          type: 'error',
-          err: null,
-        })
-      })
-  )
+    })
 }

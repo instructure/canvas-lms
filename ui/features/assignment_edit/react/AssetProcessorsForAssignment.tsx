@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 import {useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -51,10 +51,11 @@ export function attach({
   container,
   ...elemParams
 }: {container: HTMLElement} & AssetProcessorsForAssignmentProps) {
-  createRoot(container).render(
+  render(
     <QueryClientProvider client={queryClient}>
       <AssetProcessorsForAssignment {...elemParams} />
     </QueryClientProvider>,
+    container,
   )
 }
 

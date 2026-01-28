@@ -164,7 +164,7 @@ module Importers
             migration.update_import_progress(80)
           end
 
-          Importers::RubricImporter.process_rubric_association_count(data)
+          Importers::RubricImporter.process_rubric_association_count(migration)
           migration.update_import_progress(83)
 
           module_id = migration.migration_settings[:insert_into_module_id].presence

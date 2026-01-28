@@ -532,8 +532,7 @@ export const GradingSchemesSelector = ({
                   <View as="div" margin="none none none small" withVisualDebug={false}>
                     <Button
                       onClick={openGradingSchemeCreateModal}
-                      // @ts-expect-error
-                      renderIcon={IconAddLine}
+                      renderIcon={() => <IconAddLine />}
                       data-testid="grading-schemes-selector-new-grading-scheme-button"
                     >
                       {I18n.t('New Grading Scheme')}

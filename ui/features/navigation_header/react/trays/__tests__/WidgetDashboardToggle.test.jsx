@@ -19,18 +19,22 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import WidgetDashboardToggle from '../WidgetDashboardToggle'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+const server = setupServer()
+
 describe('WidgetDashboardToggle', () => {
-  let route
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     fakeENV.setup({
       current_user_id: '1',
     })
-    route = `/api/v1/users/${window.ENV.current_user_id}/settings`
   })
 
   afterEach(() => {
@@ -38,17 +42,22 @@ describe('WidgetDashboardToggle', () => {
   })
 
   describe('when widget dashboard is off', () => {
+    let capturedRequests
+
     beforeEach(() => {
+      capturedRequests = []
       fakeENV.setup({
         current_user_id: '1',
       })
-      fetchMock.put(route, {
-        widget_dashboard_user_preference: true,
-      })
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.put('/api/v1/users/:userId/settings', async ({request}) => {
+          const body = await request.json()
+          capturedRequests.push(body)
+          return HttpResponse.json({
+            widget_dashboard_user_preference: true,
+          })
+        }),
+      )
     })
 
     it('shows a toggle in the "off" position', () => {
@@ -62,9 +71,8 @@ describe('WidgetDashboardToggle', () => {
       const {getByRole} = render(<WidgetDashboardToggle />)
       const toggle = getByRole('checkbox')
       await userEvent.click(toggle)
-      expect(fetchMock.calls(route)).toHaveLength(1)
-      const response = JSON.parse(fetchMock.calls(route)[0][1].body)
-      expect(response).toMatchObject({
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0]).toMatchObject({
         widget_dashboard_user_preference: true,
       })
     })
@@ -81,18 +89,23 @@ describe('WidgetDashboardToggle', () => {
   })
 
   describe('when widget dashboard is on', () => {
+    let capturedRequests
+
     beforeEach(() => {
+      capturedRequests = []
       fakeENV.setup({
         current_user_id: '1',
         widget_dashboard_overridable: true,
       })
-      fetchMock.put(route, {
-        widget_dashboard_user_preference: false,
-      })
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.put('/api/v1/users/:userId/settings', async ({request}) => {
+          const body = await request.json()
+          capturedRequests.push(body)
+          return HttpResponse.json({
+            widget_dashboard_user_preference: false,
+          })
+        }),
+      )
     })
 
     it('shows a toggle in the "on" position', () => {
@@ -106,9 +119,8 @@ describe('WidgetDashboardToggle', () => {
       const {getByRole} = render(<WidgetDashboardToggle />)
       const toggle = getByRole('checkbox')
       await userEvent.click(toggle)
-      expect(fetchMock.calls(route)).toHaveLength(1)
-      const response = JSON.parse(fetchMock.calls(route)[0][1].body)
-      expect(response).toMatchObject({
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0]).toMatchObject({
         widget_dashboard_user_preference: false,
       })
     })
@@ -125,17 +137,16 @@ describe('WidgetDashboardToggle', () => {
   })
 
   describe('sad path', () => {
-    const badResponse = {
-      status: 400,
-      body: {error: 'something terrible happened'},
-    }
-
     beforeEach(() => {
       fakeENV.setup({
         current_user_id: '1',
         widget_dashboard_overridable: false,
       })
-      fetchMock.put(route, badResponse, {overwriteRoutes: true})
+      server.use(
+        http.put('/api/v1/users/:userId/settings', () => {
+          return HttpResponse.json({error: 'something terrible happened'}, {status: 400})
+        }),
+      )
       const liveRegion = document.createElement('div')
       liveRegion.id = 'flash_screenreader_holder'
       liveRegion.setAttribute('role', 'alert')
@@ -147,8 +158,6 @@ describe('WidgetDashboardToggle', () => {
       if (liveRegion) {
         liveRegion.remove()
       }
-      fetchMock.restore()
-      fakeENV.teardown()
     })
 
     it('puts up a flash when bad data comes back from the API call', async () => {

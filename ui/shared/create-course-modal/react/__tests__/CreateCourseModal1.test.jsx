@@ -17,14 +17,18 @@
  */
 
 import React from 'react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import {render, waitFor, act, cleanup} from '@testing-library/react'
+import {render, waitFor, cleanup} from '@testing-library/react'
 
 import {CreateCourseModal} from '../CreateCourseModal'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 injectGlobalAlertContainers()
+
+const server = setupServer()
 
 const MANAGEABLE_COURSES = [
   {
@@ -77,20 +81,10 @@ const MCC_ACCOUNT = {
   workflow_state: 'active',
 }
 
-const MANAGEABLE_COURSES_URL = '/api/v1/manageable_accounts?per_page=100'
-const TEACHER_ENROLLMENTS_URL = encodeURI(
-  '/api/v1/users/self/courses?per_page=100&include[]=account&enrollment_type=teacher',
-)
-const STUDENT_ENROLLMENTS_URL = encodeURI(
-  '/api/v1/users/self/courses?per_page=100&include[]=account',
-)
-const MCC_ACCOUNT_URL = 'api/v1/manually_created_courses_account'
-
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never}
 
 describe('CreateCourseModal (1)', () => {
   const setModalOpen = vi.fn()
-  let originalEnv
 
   const getProps = (overrides = {}) => ({
     isModalOpen: true,
@@ -101,30 +95,54 @@ describe('CreateCourseModal (1)', () => {
     ...overrides,
   })
 
-  beforeEach(() => {
-    originalEnv = JSON.parse(JSON.stringify(window.ENV))
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
+  })
 
-    // mock requests that are made, but not explicitly tested, to clean up console warnings
-    fetchMock.get('/api/v1/users/self/courses?homeroom=true&per_page=100', 200)
-    fetchMock.get('begin:/api/v1/accounts/', 200)
-    fetchMock.post('begin:/api/v1/accounts/', 200)
+  afterAll(() => {
+    server.close()
+  })
+
+  beforeEach(() => {
+    fakeENV.setup()
+    setModalOpen.mockClear()
+
+    // Default handlers for common requests
+    server.use(
+      http.get('/api/v1/users/self/courses', ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('homeroom') === 'true') {
+          return HttpResponse.json([])
+        }
+        return HttpResponse.json([])
+      }),
+      http.get('/api/v1/accounts/:accountId/courses', () => HttpResponse.json([])),
+      http.post('/api/v1/accounts/:accountId/courses', () =>
+        HttpResponse.json({id: '123', name: 'New Course'}),
+      ),
+    )
   })
 
   afterEach(() => {
     cleanup()
-    window.ENV = originalEnv
-    fetchMock.reset()
-    fetchMock.restore()
+    server.resetHandlers()
+    fakeENV.teardown()
   })
 
   it('shows a spinner with correct title while loading accounts', async () => {
-    fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
+    server.use(
+      http.get('/api/v1/manageable_accounts', async () => {
+        // Delay to ensure we can see the loading state
+        await new Promise(resolve => setTimeout(resolve, 50))
+        return HttpResponse.json(MANAGEABLE_COURSES)
+      }),
+    )
     const {getByText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByText('Loading accounts...')).toBeInTheDocument())
   })
 
   it('shows form fields for account and subject name and homeroom sync after loading accounts', async () => {
-    fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
+    server.use(http.get('/api/v1/manageable_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)))
     const {getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => {
       expect(
@@ -139,17 +157,16 @@ describe('CreateCourseModal (1)', () => {
 
   it('closes the modal when clicking cancel', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
+    server.use(http.get('/api/v1/manageable_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)))
     const {getByText, getByRole} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByRole('button', {name: 'Cancel'})).not.toBeDisabled())
     await user.click(getByText('Cancel'))
     expect(setModalOpen).toHaveBeenCalledWith(false)
   })
 
-  // fickle
-  it.skip('disables the create button without a subject name and account', async () => {
+  it('disables the create button without a subject name and account', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
+    server.use(http.get('/api/v1/manageable_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)))
     const {getByText, getByLabelText, getByRole} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     const createButton = getByRole('button', {name: 'Create'})
@@ -158,11 +175,11 @@ describe('CreateCourseModal (1)', () => {
     expect(createButton).toBeDisabled()
     await user.click(getByLabelText('Which account will this subject be associated with?'))
     await user.click(getByText('Elementary'))
-    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
-    expect(createButton).not.toBeDisabled()
+    // Wait for the button to be enabled after account selection completes
+    await waitFor(() => expect(createButton).not.toBeDisabled())
   })
 
-  it.skip('includes all received accounts in the select, handling pagination correctly', async () => {
+  it('includes all received accounts in the select, handling pagination correctly', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const accountsPage1 = []
     for (let i = 0; i < 50; i++) {
@@ -181,12 +198,20 @@ describe('CreateCourseModal (1)', () => {
         name: '52',
       },
     ]
-    const response1 = {
-      headers: {Link: '</api/v1/manageable_accounts?page=2&per_page=100>; rel="next"'},
-      body: accountsPage1,
-    }
-    fetchMock.mock(MANAGEABLE_COURSES_URL, response1)
-    fetchMock.get('/api/v1/manageable_accounts?per_page=100&page=2', accountsPage2)
+
+    server.use(
+      http.get('/api/v1/manageable_accounts', ({request}) => {
+        const url = new URL(request.url)
+        const page = url.searchParams.get('page')
+        if (page === '2') {
+          return HttpResponse.json(accountsPage2)
+        }
+        return HttpResponse.json(accountsPage1, {
+          headers: {Link: '</api/v1/manageable_accounts?page=2&per_page=100>; rel="next"'},
+        })
+      }),
+    )
+
     const {getByText, getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     await user.click(getByLabelText('Which account will this subject be associated with?'))
@@ -198,12 +223,10 @@ describe('CreateCourseModal (1)', () => {
     })
   })
 
+  // TODO: Test fails with "Cannot read properties of undefined (reading 'homeroom_course')" error
   it.skip('creates new subject and enrolls user in that subject', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
-    fetchMock.post(encodeURI('/api/v1/accounts/6/courses?course[name]=Science&enroll_me=true'), {
-      id: '14',
-    })
+    server.use(http.get('/api/v1/manageable_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)))
     const {getByText, getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     await user.click(getByLabelText('Which account will this subject be associated with?'))
@@ -214,18 +237,23 @@ describe('CreateCourseModal (1)', () => {
     expect(getByText('Creating new subject...')).toBeInTheDocument()
   })
 
-  it.skip('shows an error message if subject creation fails', async () => {
+  it('shows an error message if subject creation fails', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
-    fetchMock.post(encodeURI('/api/v1/accounts/5/courses?course[name]=Math&enroll_me=true'), 500)
+    server.use(
+      http.get('/api/v1/manageable_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)),
+      http.post('/api/v1/accounts/:accountId/courses', () =>
+        HttpResponse.json({error: 'Server error'}, {status: 500}),
+      ),
+    )
     const {getByText, getByLabelText, getAllByText, getByRole} = render(
       <CreateCourseModal {...getProps()} />,
     )
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     await user.click(getByLabelText('Which account will this subject be associated with?'))
     await user.click(getByText('CS'))
-    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     await user.type(getByLabelText('Subject Name'), 'Math')
+    // Wait for the button to be enabled after both account selection and name entry
+    await waitFor(() => expect(getByRole('button', {name: 'Create'})).not.toBeDisabled())
     await user.click(getByText('Create'))
     await waitFor(() => expect(getAllByText('Error creating new subject')[0]).toBeInTheDocument())
     expect(getByRole('button', {name: 'Cancel'})).not.toBeDisabled()
@@ -233,18 +261,40 @@ describe('CreateCourseModal (1)', () => {
 
   describe('with teacher permission', () => {
     it('fetches accounts from enrollments api', async () => {
-      fetchMock.get(TEACHER_ENROLLMENTS_URL, ENROLLMENTS)
+      server.use(
+        http.get('/api/v1/users/self/courses', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('enrollment_type') === 'teacher') {
+            return HttpResponse.json(ENROLLMENTS)
+          }
+          if (url.searchParams.get('homeroom') === 'true') {
+            return HttpResponse.json([])
+          }
+          return HttpResponse.json([])
+        }),
+      )
       const {getByText, getByLabelText} = render(
         <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
       await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
-      act(() => getByLabelText('Which account will this subject be associated with?').click())
+      await getByLabelText('Which account will this subject be associated with?').click()
       expect(getByText('Orange Elementary')).toBeInTheDocument()
       expect(getByText('Clark HS')).toBeInTheDocument()
     })
 
     it('hides the account select if there is only one enrollment', async () => {
-      fetchMock.get(TEACHER_ENROLLMENTS_URL, [ENROLLMENTS[0]])
+      server.use(
+        http.get('/api/v1/users/self/courses', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('enrollment_type') === 'teacher') {
+            return HttpResponse.json([ENROLLMENTS[0]])
+          }
+          if (url.searchParams.get('homeroom') === 'true') {
+            return HttpResponse.json([])
+          }
+          return HttpResponse.json([])
+        }),
+      )
       const {queryByText, getByLabelText} = render(
         <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
@@ -255,25 +305,38 @@ describe('CreateCourseModal (1)', () => {
     })
 
     it("doesn't break if the user has restricted enrollments", async () => {
-      fetchMock.get(TEACHER_ENROLLMENTS_URL, [
-        ...ENROLLMENTS,
-        {
-          id: 1033,
-          access_restricted_by_date: true,
-        },
-      ])
+      server.use(
+        http.get('/api/v1/users/self/courses', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('enrollment_type') === 'teacher') {
+            return HttpResponse.json([
+              ...ENROLLMENTS,
+              {
+                id: 1033,
+                access_restricted_by_date: true,
+              },
+            ])
+          }
+          if (url.searchParams.get('homeroom') === 'true') {
+            return HttpResponse.json([])
+          }
+          return HttpResponse.json([])
+        }),
+      )
       const {getByLabelText, queryByText, getByText} = render(
         <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
       await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
       expect(queryByText('Unable to get accounts')).not.toBeInTheDocument()
-      act(() => getByLabelText('Which account will this subject be associated with?').click())
+      await getByLabelText('Which account will this subject be associated with?').click()
       expect(getByText('Orange Elementary')).toBeInTheDocument()
       expect(getByText('Clark HS')).toBeInTheDocument()
     })
 
     it('fetches accounts from the manually_created_courses_account api if restrictToMCCAccount is true', async () => {
-      fetchMock.get(MCC_ACCOUNT_URL, MCC_ACCOUNT)
+      server.use(
+        http.get('/api/v1/manually_created_courses_account', () => HttpResponse.json(MCC_ACCOUNT)),
+      )
       const {getByLabelText, queryByText} = render(
         <CreateCourseModal {...getProps({permissions: 'teacher', restrictToMCCAccount: true})} />,
       )
@@ -286,7 +349,15 @@ describe('CreateCourseModal (1)', () => {
 
   describe('with student permission', () => {
     beforeEach(() => {
-      fetchMock.get(STUDENT_ENROLLMENTS_URL, ENROLLMENTS)
+      server.use(
+        http.get('/api/v1/users/self/courses', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('homeroom') === 'true') {
+            return HttpResponse.json([])
+          }
+          return HttpResponse.json(ENROLLMENTS)
+        }),
+      )
     })
 
     it('fetches accounts from enrollments api', async () => {
@@ -294,7 +365,7 @@ describe('CreateCourseModal (1)', () => {
         <CreateCourseModal {...getProps({permissions: 'student'})} />,
       )
       expect(await findByLabelText('Subject Name')).toBeInTheDocument()
-      act(() => getByLabelText('Which account will this subject be associated with?').click())
+      await getByLabelText('Which account will this subject be associated with?').click()
       expect(getByText('Orange Elementary')).toBeInTheDocument()
     })
 
@@ -310,7 +381,9 @@ describe('CreateCourseModal (1)', () => {
     })
 
     it('fetches accounts from the manually_created_courses_account api if restrictToMCCAccount is true', async () => {
-      fetchMock.get(MCC_ACCOUNT_URL, MCC_ACCOUNT)
+      server.use(
+        http.get('/api/v1/manually_created_courses_account', () => HttpResponse.json(MCC_ACCOUNT)),
+      )
       const {getByLabelText, queryByText} = render(
         <CreateCourseModal {...getProps({permissions: 'student', restrictToMCCAccount: true})} />,
       )
@@ -323,7 +396,9 @@ describe('CreateCourseModal (1)', () => {
 
   describe('with no_enrollments permission', () => {
     beforeEach(() => {
-      fetchMock.get(MCC_ACCOUNT_URL, MCC_ACCOUNT)
+      server.use(
+        http.get('/api/v1/manually_created_courses_account', () => HttpResponse.json(MCC_ACCOUNT)),
+      )
     })
 
     it('uses the manually_created_courses_account api to get the right account', async () => {
@@ -349,7 +424,9 @@ describe('CreateCourseModal (1)', () => {
 
   describe('with isK5User set to false', () => {
     beforeEach(() => {
-      fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
+      server.use(
+        http.get('/api/v1/manageable_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)),
+      )
     })
 
     it('does not show the homeroom sync options', async () => {

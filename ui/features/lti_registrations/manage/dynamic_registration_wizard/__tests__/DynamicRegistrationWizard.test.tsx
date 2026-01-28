@@ -152,6 +152,7 @@ describe('DynamicRegistrationWizard', () => {
     )
     const reg = mockRegistration({
       configuration: mockToolConfiguration({
+        title: 'Test Registration',
         scopes: [
           'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
           'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',
@@ -300,17 +301,22 @@ describe('DynamicRegistrationWizard', () => {
       expect(await screen.findByText(/Icon URLs/i)).toBeInTheDocument()
     })
 
-    it('skips the icon confirmation screen if the tool has no placements with icons', async () => {
+    it('renders the icon confirmation screen even if the tool has no placements with icons', async () => {
       reg = mockRegistration({
         configuration: mockToolConfiguration(),
       })
       await setup()
       await userEvent.click(screen.getByText(/^Next$/i).closest('button')!)
+      expect(
+        screen.getByText(/Choose the tool's default icon and its icon on the Apps page/i),
+      ).toBeInTheDocument()
+      await userEvent.click(screen.getByText(/^Next$/i).closest('button')!)
       expect(screen.getByText(/Review/i, {selector: 'h3'})).toBeInTheDocument()
 
-      expect(screen.queryByText(/Icon URLs/i)).not.toBeInTheDocument()
       await userEvent.click(screen.getByText(/^Previous$/i).closest('button')!)
-      expect(screen.getByText(/^Nickname$/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/^Choose the tool's default icon and its icon on the Apps page/i),
+      ).toBeInTheDocument()
     })
   })
 })

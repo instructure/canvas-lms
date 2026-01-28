@@ -22,7 +22,7 @@ import GradeFormatHelper from '../GradeFormatHelper'
 
 const I18n = createI18nScope('sharedGradeFormatHelper')
 
-describe.skip('GradeFormatHelper#formatGrade', () => {
+describe('GradeFormatHelper#formatGrade', () => {
   let translateString
 
   beforeEach(() => {
@@ -32,7 +32,7 @@ describe.skip('GradeFormatHelper#formatGrade', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('formats numerical integer grades using I18n#n', () => {
@@ -58,22 +58,22 @@ describe.skip('GradeFormatHelper#formatGrade', () => {
   })
 
   it('formats pass_fail grades: complete', () => {
-    vi.spyOn(I18n, 't').mockImplementation(() => '* complete')
+    vi.spyOn(I18n.constructor.prototype, 't').mockImplementation(() => '* complete')
     expect(GradeFormatHelper.formatGrade('complete')).toBe('* complete')
   })
 
   it('formats pass_fail grades: pass', () => {
-    vi.spyOn(I18n, 't').mockImplementation(() => '* complete')
+    vi.spyOn(I18n.constructor.prototype, 't').mockImplementation(() => '* complete')
     expect(GradeFormatHelper.formatGrade('pass')).toBe('* complete')
   })
 
   it('formats pass_fail grades: incomplete', () => {
-    vi.spyOn(I18n, 't').mockImplementation(() => '* incomplete')
+    vi.spyOn(I18n.constructor.prototype, 't').mockImplementation(() => '* incomplete')
     expect(GradeFormatHelper.formatGrade('incomplete')).toBe('* incomplete')
   })
 
   it('formats pass_fail grades: fail', () => {
-    vi.spyOn(I18n, 't').mockImplementation(() => '* incomplete')
+    vi.spyOn(I18n.constructor.prototype, 't').mockImplementation(() => '* incomplete')
     expect(GradeFormatHelper.formatGrade('fail')).toBe('* incomplete')
   })
 
@@ -186,7 +186,11 @@ describe.skip('GradeFormatHelper#formatGrade', () => {
   })
 })
 
-describe.skip('GradeFormatHelper#delocalizeGrade', () => {
+describe('GradeFormatHelper#delocalizeGrade', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('returns input value when input is not a string', () => {
     expect(GradeFormatHelper.delocalizeGrade(1)).toBe(1)
     expect(GradeFormatHelper.delocalizeGrade(NaN)).toBeNaN()
@@ -214,9 +218,9 @@ describe.skip('GradeFormatHelper#delocalizeGrade', () => {
   })
 })
 
-describe.skip('GradeFormatHelper#parseGrade', () => {
+describe('GradeFormatHelper#parseGrade', () => {
   afterEach(() => {
-    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('parses stringified grades', () => {

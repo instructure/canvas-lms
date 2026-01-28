@@ -109,7 +109,7 @@ describe('CreateTodoModal', () => {
     expect(screen.getByTestId('create-todo-course-select')).toBeInTheDocument()
   })
 
-  it.skip('resets form after successful submission', async () => {
+  it('resets form after successful submission', async () => {
     const user = userEvent.setup()
     render(<CreateTodoModal {...defaultProps} />)
 

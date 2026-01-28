@@ -55,11 +55,12 @@ export default function MessageStudentsWhoModal({
 }: MessageStudentsWhoModalProps) {
   const {userId} = gradebookOptions
 
-  // @ts-expect-error
-  const messageWhoAssignment: CamelizedAssignment = {
+  const messageWhoAssignment = {
     ...assignment,
     muted: false,
-  }
+    newQuizzesAnonymousParticipants: false,
+    hasRubric: null,
+  } as CamelizedAssignment
 
   const submissionMap = useMemo(() => {
     return submissions.reduce(

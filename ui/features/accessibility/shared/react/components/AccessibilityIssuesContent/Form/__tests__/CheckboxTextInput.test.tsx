@@ -62,7 +62,7 @@ beforeEach(() => {
   server.resetHandlers()
   vi.resetAllMocks()
   ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-    const state = {aiGenerationEnabled: true}
+    const state = {isAiAltTextGenerationEnabled: true}
     return selector(state)
   })
 })
@@ -176,6 +176,7 @@ describe('CheckboxTextInput', () => {
         form: {
           ...defaultProps.issue.form,
           canGenerateFix: true,
+          isCanvasImage: true,
           generateButtonLabel: 'Generate Alt Text',
         },
       },
@@ -186,7 +187,33 @@ describe('CheckboxTextInput', () => {
         <CheckboxTextInput {...propsWithGenerateOption} />
       </AccessibilityCheckerContext.Provider>,
     )
-    expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
+    const button = screen.getByTestId('generate-alt-text-button')
+    expect(button).toBeInTheDocument()
+    expect(button).not.toBeDisabled()
+  })
+
+  it('shows generate button as disabled when isCanvasImage is false', () => {
+    const propsWithGenerateDisabled = {
+      ...defaultProps,
+      issue: {
+        ...defaultProps.issue,
+        form: {
+          ...defaultProps.issue.form,
+          canGenerateFix: true,
+          isCanvasImage: false,
+          generateButtonLabel: 'Generate Alt Text',
+        },
+      },
+    }
+
+    render(
+      <AccessibilityCheckerContext.Provider value={mockContextValue}>
+        <CheckboxTextInput {...propsWithGenerateDisabled} />
+      </AccessibilityCheckerContext.Provider>,
+    )
+    const button = screen.getByTestId('generate-alt-text-button')
+    expect(button).toBeInTheDocument()
+    expect(button).toBeDisabled()
   })
 
   it('calls API and updates value when generate button is clicked', async () => {
@@ -197,6 +224,7 @@ describe('CheckboxTextInput', () => {
         form: {
           ...defaultProps.issue.form,
           canGenerateFix: true,
+          isCanvasImage: true,
           generateButtonLabel: 'Generate Alt Text',
         },
       },
@@ -207,7 +235,7 @@ describe('CheckboxTextInput', () => {
     let generateCalled = false
     server.use(
       // Match both /generate and //generate (double slash from URL construction)
-      http.post('**/generate', () => {
+      http.post('**/generate/alt_text', () => {
         generateCalled = true
         return HttpResponse.json({
           value: mockGeneratedText,
@@ -222,7 +250,7 @@ describe('CheckboxTextInput', () => {
     )
 
     // Click the generate button
-    const generateButton = screen.getByText('Generate Alt Text')
+    const generateButton = screen.getByTestId('generate-alt-text-button')
     fireEvent.click(generateButton)
 
     // Verify loading indicator appears
@@ -243,6 +271,7 @@ describe('CheckboxTextInput', () => {
         form: {
           ...defaultProps.issue.form,
           canGenerateFix: true,
+          isCanvasImage: true,
           generateButtonLabel: 'Generate Alt Text',
         },
       },
@@ -266,7 +295,7 @@ describe('CheckboxTextInput', () => {
     )
 
     // Click the generate button
-    const generateButton = screen.getByText('Generate Alt Text')
+    const generateButton = screen.getByTestId('generate-alt-text-button')
     fireEvent.click(generateButton)
 
     // Verify loading indicator appears
@@ -397,7 +426,7 @@ describe('CheckboxTextInput', () => {
   describe('AI generation feature flag', () => {
     it('shows generate button when feature flag is enabled', () => {
       ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-        const state = {aiGenerationEnabled: true}
+        const state = {isAiAltTextGenerationEnabled: true}
         return selector(state)
       })
 
@@ -408,6 +437,7 @@ describe('CheckboxTextInput', () => {
           form: {
             ...defaultProps.issue.form,
             canGenerateFix: true,
+            isCanvasImage: true,
             generateButtonLabel: 'Generate Alt Text',
           },
         },
@@ -419,12 +449,12 @@ describe('CheckboxTextInput', () => {
         </AccessibilityCheckerContext.Provider>,
       )
 
-      expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
+      expect(screen.getByTestId('generate-alt-text-button')).toBeInTheDocument()
     })
 
     it('hides generate button when feature flag is disabled', () => {
       ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-        const state = {aiGenerationEnabled: false}
+        const state = {isAiAltTextGenerationEnabled: false}
         return selector(state)
       })
 
@@ -435,6 +465,7 @@ describe('CheckboxTextInput', () => {
           form: {
             ...defaultProps.issue.form,
             canGenerateFix: true,
+            isCanvasImage: true,
             generateButtonLabel: 'Generate Alt Text',
           },
         },
@@ -446,7 +477,7 @@ describe('CheckboxTextInput', () => {
         </AccessibilityCheckerContext.Provider>,
       )
 
-      expect(screen.queryByText('Generate Alt Text')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('generate-alt-text-button')).not.toBeInTheDocument()
     })
   })
 
@@ -473,6 +504,7 @@ describe('CheckboxTextInput', () => {
           form: {
             ...defaultProps.issue.form,
             canGenerateFix: true,
+            isCanvasImage: true,
             generateButtonLabel: 'Generate Alt Text',
           },
         },
@@ -485,7 +517,7 @@ describe('CheckboxTextInput', () => {
         </AccessibilityCheckerContext.Provider>,
       )
 
-      expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
+      expect(screen.getByTestId('generate-alt-text-button')).toBeInTheDocument()
       expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
     })
   })
@@ -500,6 +532,32 @@ describe('CheckboxTextInput', () => {
 
       const textarea = screen.getByTestId('checkbox-text-input-form')
       expect(textarea).toBeDisabled()
+    })
+
+    it('keeps generate button visible but disabled when isDisabled is true', () => {
+      const propsWithGenerate = {
+        ...defaultProps,
+        isDisabled: true,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            isCanvasImage: true,
+            generateButtonLabel: 'Generate Alt Text',
+          },
+        },
+      }
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput {...propsWithGenerate} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      const button = screen.getByTestId('generate-alt-text-button')
+      expect(button).toBeInTheDocument()
+      expect(button).toBeDisabled()
     })
   })
 })

@@ -252,7 +252,7 @@
       </table>
     <% end %>
 
-    <% if can_do(@assignment, @current_user, :update) && !@context.horizon_course? %>
+    <% if show_rubric_section? %>
       <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
         <div id="enhanced-rubric-assignment-edit-mount-point"></div>
         <% unless @current_user_submission&.has_submission? && @domain_root_account&.feature_enabled?(:lti_before_assignment_results) %>
@@ -270,9 +270,9 @@
           </a>
         </div>
       <% end %>
-      <% if @context.feature_enabled?(:peer_review_allocation_and_grading) && @assignment.has_peer_reviews? %>
-        <div id="peer-review-assignment-widget-mount-point"></div>
-      <% end %>
+    <% end %>
+    <% if show_peer_review_widget? %>
+      <div id="peer-review-assignment-widget-mount-point"></div>
     <% end %>
 
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>

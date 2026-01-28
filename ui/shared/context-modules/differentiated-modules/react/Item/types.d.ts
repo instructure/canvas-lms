@@ -77,6 +77,43 @@ export interface DateDetailsOverride {
   noop_id?: number
   unassign_item: boolean
   non_collaborative?: boolean
+  peer_review_override_id?: string | null
+  peer_review_available_from?: string | null
+  peer_review_due_at?: string | null
+  peer_review_available_to?: string | null
+  peer_review_default_dates?: boolean
+}
+
+export interface PeerReviewDates {
+  id?: string
+  due_at?: string | null
+  unlock_at?: string | null
+  lock_at?: string | null
+}
+
+export type BackendDateDetailsOverride = DateDetailsOverride & {
+  peer_review_dates?: PeerReviewDates
+}
+
+export type AssignmentOnlyOverride = Omit<
+  DateDetailsOverride,
+  | 'peer_review_override_id'
+  | 'peer_review_available_from'
+  | 'peer_review_due_at'
+  | 'peer_review_available_to'
+  | 'peer_review_default_dates'
+>
+
+export interface PeerReviewOverride {
+  id?: string
+  course_section_id?: string | null
+  student_ids?: string[]
+  course_id?: string | null
+  group_id?: string
+  due_at: string | null
+  unlock_at: string | null
+  lock_at: string | null
+  unassign_item: boolean
 }
 
 export interface ItemAssignToCardSpec {
@@ -94,6 +131,7 @@ export interface ItemAssignToCardSpec {
   peer_review_available_from: string | null
   peer_review_due_at: string | null
   peer_review_available_to: string | null
+  peer_review_override_id?: string | null
   selectedAssigneeIds: string[]
   initialAssigneeOptions?: AssigneeOption[]
   defaultOptions?: string[]
@@ -110,8 +148,16 @@ export interface DateDetails extends BaseDateDetails {
   blueprint_date_locks?: DateLockTypes[]
 }
 
+export interface PeerReviewPayload {
+  unlock_at?: string | null
+  due_at?: string | null
+  lock_at?: string | null
+  peer_review_overrides?: PeerReviewOverride[]
+}
+
 export interface DateDetailsPayload extends BaseDateDetails {
   assignment_overrides: DateDetailsOverride[]
+  peer_review?: PeerReviewPayload
 }
 
 export interface FetchDueDatesResponse {
@@ -147,4 +193,14 @@ export type UseFetchAssigneesResult = {
   isLoading: boolean
   loadedAssignees: boolean
   setSearchTerm
+}
+
+export type AssignmentWithPeerReviewPayload = {
+  assignmentOverrides: AssignmentOnlyOverride[]
+  peerReview?: {
+    unlock_at?: string | null
+    due_at?: string | null
+    lock_at?: string | null
+    peer_review_overrides?: PeerReviewOverride[]
+  }
 }

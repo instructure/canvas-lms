@@ -77,6 +77,7 @@ describe Accessibility::CourseScanService do
       service_instance = instance_double(described_class)
       allow(described_class).to receive(:new).with(course:).and_return(service_instance)
       allow(service_instance).to receive(:scan_course)
+      allow(service_instance).to receive(:queue_course_statistics)
 
       described_class.scan(progress)
 
@@ -86,6 +87,24 @@ describe Accessibility::CourseScanService do
     it "completes the progress" do
       described_class.scan(progress)
       expect(progress.reload).to be_completed
+    end
+
+    context "when a11y_checker_account_statistics feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+      end
+
+      it "queues course statistics calculation after scan completes" do
+        expect(Accessibility::CourseStatisticCalculatorService).to receive(:queue_calculation).with(course)
+        described_class.scan(progress)
+      end
+    end
+
+    context "when a11y_checker_account_statistics feature flag is disabled" do
+      it "does not queue course statistics calculation" do
+        expect(Accessibility::CourseStatisticCalculatorService).not_to receive(:queue_calculation)
+        described_class.scan(progress)
+      end
     end
 
     context "when an error occurs" do

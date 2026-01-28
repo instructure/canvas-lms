@@ -252,4 +252,78 @@ describe('differentiatedModulesCardActions', () => {
       expect(result[0].student_ids).toEqual([1, 2])
     })
   })
+
+  describe('setOverrideInitializer', () => {
+    it('includes peer review dates in override template', () => {
+      const dates = {
+        due_at: new Date(2026, 0, 20),
+        peer_review_due_at: new Date(2026, 0, 20),
+        peer_review_available_from: new Date(2026, 0, 15),
+        peer_review_available_to: new Date(2026, 0, 25),
+      }
+
+      CardActions.setOverrideInitializer('row-1', dates)
+      const override = CardActions.newOverrideForCard({course_section_id: '456'})
+
+      expect(override.peer_review_due_at).toEqual(new Date(2026, 0, 20))
+      expect(override.peer_review_available_from).toEqual(new Date(2026, 0, 15))
+      expect(override.peer_review_available_to).toEqual(new Date(2026, 0, 25))
+    })
+
+    it('handles missing peer review dates gracefully', () => {
+      const dates = {
+        due_at: new Date(2026, 0, 20),
+      }
+
+      CardActions.setOverrideInitializer('row-1', dates)
+      const override = CardActions.newOverrideForCard({course_section_id: '456'})
+
+      expect(override.peer_review_due_at).toBeUndefined()
+      expect(override.peer_review_available_from).toBeUndefined()
+      expect(override.peer_review_available_to).toBeUndefined()
+    })
+
+    it('copies peer review dates to multiple overrides for multi-assignee cards', () => {
+      const dates = {
+        due_at: new Date(2026, 0, 20),
+        peer_review_due_at: new Date(2026, 0, 20),
+        peer_review_available_from: new Date(2026, 0, 15),
+        peer_review_available_to: new Date(2026, 0, 25),
+      }
+
+      CardActions.setOverrideInitializer('row-1', dates)
+
+      const sectionOverride = CardActions.newOverrideForCard({course_section_id: '2'})
+      const groupOverride = CardActions.newOverrideForCard({
+        group_id: '3',
+        non_collaborative: true,
+      })
+      const studentOverride = CardActions.newOverrideForCard({student_ids: ['456']})
+
+      expect(sectionOverride.peer_review_due_at).toEqual(new Date(2026, 0, 20))
+      expect(groupOverride.peer_review_due_at).toEqual(new Date(2026, 0, 20))
+      expect(studentOverride.peer_review_due_at).toEqual(new Date(2026, 0, 20))
+    })
+
+    it('includes all standard date fields along with peer review dates', () => {
+      const dates = {
+        due_at: new Date(2026, 0, 20),
+        unlock_at: new Date(2026, 0, 15),
+        lock_at: new Date(2026, 0, 25),
+        peer_review_due_at: new Date(2026, 0, 22),
+        peer_review_available_from: new Date(2026, 0, 20),
+        peer_review_available_to: new Date(2026, 0, 26),
+      }
+
+      CardActions.setOverrideInitializer('row-1', dates)
+      const override = CardActions.newOverrideForCard({course_section_id: '456'})
+
+      expect(override.due_at).toEqual(new Date(2026, 0, 20))
+      expect(override.unlock_at).toEqual(new Date(2026, 0, 15))
+      expect(override.lock_at).toEqual(new Date(2026, 0, 25))
+      expect(override.peer_review_due_at).toEqual(new Date(2026, 0, 22))
+      expect(override.peer_review_available_from).toEqual(new Date(2026, 0, 20))
+      expect(override.peer_review_available_to).toEqual(new Date(2026, 0, 26))
+    })
+  })
 })

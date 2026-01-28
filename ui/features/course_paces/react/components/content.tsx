@@ -279,5 +279,5 @@ export default connect(mapStateToProps, {
   setSelectedContext: paceContextsActions.setSelectedContext,
   setSelectedModalContext: uiActions.setSelectedPaceContext,
   syncPublishingPaces: paceContextsActions.syncPublishingPaces,
-  // @ts-expect-error
+  // @ts-expect-error Redux connect type incompatibility
 })(PaceContent)

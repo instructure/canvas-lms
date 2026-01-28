@@ -71,11 +71,11 @@ pipeline {
           extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
             def runnerStages = [:]
 
-            for (int i = 0; i < jsStage.JEST_NODE_COUNT; i++) {
+            for (int i = 0; i < jsStage.VITEST_NODE_COUNT; i++) {
               String index = i
-              extendedStage("Runner - Jest ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+              extendedStage("Runner - Vitest ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.vitestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
                 def tests = [:]
-                callableWithDelegate(jsStage.queueJestDistribution(index))(tests)
+                callableWithDelegate(jsStage.queueVitestDistribution(index))(tests)
                 parallel(tests)
               }
             }

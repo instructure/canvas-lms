@@ -114,8 +114,9 @@ describe('SubmissionManager', () => {
       window.ENV = oldEnv
     })
 
-    it('is present when there are assigned assessments', async () => {
-      const {getByText, getByRole, findByText} = render(
+    it('is present when there are assigned assessments and peer_review_allocation_and_grading is false', async () => {
+      window.ENV.peer_review_allocation_and_grading = false
+      const {getByText, findByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
@@ -130,7 +131,7 @@ describe('SubmissionManager', () => {
         vi.runOnlyPendingTimers()
       })
 
-      const peerReviewButton = getByRole('button', {name: 'Peer Review'})
+      const peerReviewButton = getByText('Peer Review').closest('button')
       expect(peerReviewButton).toBeInTheDocument()
       expect(await findByText('Your work has been submitted.')).toBeTruthy()
       expect(await findByText('Check back later to view feedback.')).toBeTruthy()
@@ -144,10 +145,9 @@ describe('SubmissionManager', () => {
       expect(await findByText(`Peer submissions ready for review: ${availableTotal}`)).toBeTruthy()
     })
 
-    it('is not present when there are no assigned assessments', async () => {
-      props.submission.assignedAssessments = []
-
-      const {getByText, queryByRole} = render(
+    it('does not show peer review details when peer_review_allocation_and_grading is true', async () => {
+      window.ENV.peer_review_allocation_and_grading = true
+      const {getByText, queryByText, findByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
@@ -162,7 +162,41 @@ describe('SubmissionManager', () => {
         vi.runOnlyPendingTimers()
       })
 
-      const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
+      const peerReviewButton = queryByText('Peer Review')
+      expect(peerReviewButton).not.toBeInTheDocument()
+      expect(await findByText('Your work has been submitted.')).toBeTruthy()
+      expect(await findByText('Check back later to view feedback.')).toBeTruthy()
+      const assignedAssessmentsTotal = props.submission.assignedAssessments.filter(
+        a => a.workflowState === 'assigned',
+      ).length
+      const availableTotal = availableReviewCount(props.submission.assignedAssessments)
+      expect(
+        queryByText(`You have ${assignedAssessmentsTotal} Peer Review to complete.`),
+      ).not.toBeInTheDocument()
+      expect(
+        queryByText(`Peer submissions ready for review: ${availableTotal}`),
+      ).not.toBeInTheDocument()
+    })
+
+    it('is not present when there are no assigned assessments', async () => {
+      props.submission.assignedAssessments = []
+
+      const {getByText, queryByText} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        </AlertManagerContext.Provider>,
+      )
+
+      const submitButton = getByText('Submit Assignment')
+      fireEvent.click(submitButton)
+
+      await act(async () => {
+        vi.runOnlyPendingTimers()
+      })
+
+      const peerReviewButton = queryByText('Peer Review')
       expect(peerReviewButton).not.toBeInTheDocument()
     })
 
@@ -222,7 +256,7 @@ describe('SubmissionManager', () => {
         ],
       }
 
-      const {getByText, queryByRole} = render(
+      const {getByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
@@ -237,7 +271,7 @@ describe('SubmissionManager', () => {
         vi.runOnlyPendingTimers()
       })
 
-      const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
+      const peerReviewButton = getByText('Peer Review').closest('button')
       fireEvent.click(peerReviewButton)
 
       const availableAssessment = props.submission.assignedAssessments[1]
@@ -247,7 +281,7 @@ describe('SubmissionManager', () => {
     })
 
     it('redirects to the corresponding url when the anonymous peer reviews option is enabled and the "Peer Review" button is clicked', async () => {
-      const {getByText, queryByRole} = render(
+      const {getByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
@@ -262,7 +296,7 @@ describe('SubmissionManager', () => {
         vi.runOnlyPendingTimers()
       })
 
-      const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
+      const peerReviewButton = getByText('Peer Review').closest('button')
       fireEvent.click(peerReviewButton)
 
       const availableAssessment = props.submission.assignedAssessments[1]
@@ -339,12 +373,10 @@ describe('SubmissionManager', () => {
       const submitButton = getByTestId('submit-button')
       fireEvent.click(submitButton)
 
-      const confirmationDialog = await screen.findByRole('dialog', {label: 'Delete your work?'})
-      expect(confirmationDialog).toHaveTextContent('You are submitting a Text submission')
+      const cancelButton = await screen.findByTestId('cancel-button')
+      const confirmButton = screen.getByTestId('confirm-button')
 
-      const cancelButton = within(confirmationDialog).getByTestId('cancel-button')
-      const confirmButton = within(confirmationDialog).getByTestId('confirm-button')
-
+      expect(screen.getByText(/You are submitting a Text submission/)).toBeInTheDocument()
       expect(cancelButton).toBeInTheDocument()
       expect(cancelButton).toHaveTextContent('Cancel')
       expect(confirmButton).toBeInTheDocument()

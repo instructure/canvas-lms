@@ -16,108 +16,121 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render} from '@testing-library/react'
-import {createRoot, Root} from 'react-dom/client'
+import {act, fireEvent, screen, waitFor} from '@testing-library/react'
+import {render} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import WikiPage from '../../../../shared/wiki/backbone/models/WikiPage'
-import WikiPageIndexItemView from '../../backbone/views/WikiPageIndexItemView'
 import renderWikiPageIndexEditModal, {WikiPageIndexEditModalProps} from '../WikiPageIndexEditModal'
 import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
 
-const wikiPageModel = new (WikiPage as any)({page_id: 1, title: 'hi'})
-wikiPageModel.initialize({url: 'page-1'}, {contextAssetString: 'course_1'})
-
-const viewElement = new (WikiPageIndexItemView as any)({
-  model: wikiPageModel,
-  editModalRoot: createRoot(document.createElement('div')),
-})
+const createWikiPageModel = () => {
+  const model = new (WikiPage as any)({page_id: 1, title: 'hi'})
+  model.initialize({url: 'page-1'}, {contextAssetString: 'course_1'})
+  return model
+}
 
 const getProps = (
+  model: any,
   overrides?: Partial<WikiPageIndexEditModalProps>,
 ): WikiPageIndexEditModalProps => ({
-  model: wikiPageModel as any, // WikiPage is a Backbone model
+  model: model as any, // WikiPage is a Backbone model
   modalOpen: true,
   closeModal: vi.fn(),
   ...overrides,
 })
 
 describe('renderWikiPageTitle', () => {
+  let container: HTMLDivElement
+  let root: Root
+
+  beforeEach(() => {
+    container = document.createElement('div')
+    document.body.appendChild(container)
+    root = render(<></>, container)
+  })
+
   afterEach(() => {
+    act(() => {
+      root.unmount()
+    })
+    container.remove()
     vi.restoreAllMocks()
   })
 
   it('sets the wiki page title to the input', () => {
-    const props = getProps()
-    const component = renderWikiPageIndexEditModal(
-      (viewElement as any).editModalRoot as Root,
-      props,
-    )
-    const {getByTestId} = render(component)
+    const wikiPageModel = createWikiPageModel()
+    const props = getProps(wikiPageModel)
+    act(() => {
+      renderWikiPageIndexEditModal(root, props)
+    })
 
-    expect(getByTestId('page-title-input')).toHaveValue('hi')
+    expect(screen.getByTestId('page-title-input')).toHaveValue('hi')
   })
 
   it('saves a new title', () => {
-    const props = getProps()
+    const wikiPageModel = createWikiPageModel()
+    const props = getProps(wikiPageModel)
     vi.spyOn(props.model, 'set').mockImplementation(() => {})
     const spy = vi.spyOn(props.model, 'save').mockImplementation(() => Promise.resolve())
-    const component = renderWikiPageIndexEditModal(
-      (viewElement as any).editModalRoot as Root,
-      props,
-    )
-    const {getByTestId} = render(component)
+    act(() => {
+      renderWikiPageIndexEditModal(root, props)
+    })
 
-    fireEvent.change(getByTestId('page-title-input'), {target: {value: 'hello'}})
-    getByTestId('save-button').click()
+    fireEvent.change(screen.getByTestId('page-title-input'), {target: {value: 'hello'}})
+    screen.getByTestId('save-button').click()
 
     expect(spy).toHaveBeenCalled()
   })
 
-  it.skip('saves on enter', () => {
-    const props = getProps()
+  it('saves on enter', () => {
+    const wikiPageModel = createWikiPageModel()
+    const props = getProps(wikiPageModel)
     vi.spyOn(props.model, 'set').mockImplementation(() => {})
     const spy = vi.spyOn(props.model, 'save').mockImplementation(() => Promise.resolve())
-    const component = renderWikiPageIndexEditModal(
-      (viewElement as any).editModalRoot as Root,
-      props,
-    )
-    const {getByTestId} = render(component)
+    act(() => {
+      renderWikiPageIndexEditModal(root, props)
+    })
 
-    const input = getByTestId('page-title-input')
+    const input = screen.getByTestId('page-title-input')
     fireEvent.change(input, {target: {value: 'hello'}})
     fireEvent.submit(input)
 
     expect(spy).toHaveBeenCalled()
   })
 
-  it.skip('errors if the title is blank', () => {
-    const props = getProps()
-    const component = renderWikiPageIndexEditModal(
-      (viewElement as any).editModalRoot as Root,
-      props,
-    )
-    const {getByTestId, getByText} = render(component)
+  it('errors if the title is blank', async () => {
+    const wikiPageModel = createWikiPageModel()
+    const props = getProps(wikiPageModel)
+    act(() => {
+      renderWikiPageIndexEditModal(root, props)
+    })
 
-    const input = getByTestId('page-title-input')
+    const input = screen.getByTestId('page-title-input')
     fireEvent.change(input, {target: {value: ''}})
-    getByTestId('save-button').click()
+    screen.getByTestId('save-button').click()
 
+    await waitFor(() => {
+      expect(screen.getByText('A title is required')).toBeInTheDocument()
+    })
     expect(input).toHaveFocus()
-    expect(getByText('A title is required')).toBeInTheDocument()
   })
 
-  it.skip('errors if the title is too long', () => {
-    const props = getProps()
-    const component = renderWikiPageIndexEditModal(
-      (viewElement as any).editModalRoot as Root,
-      props,
-    )
-    const {getByTestId, getByText} = render(component)
+  it('errors if the title is too long', async () => {
+    const wikiPageModel = createWikiPageModel()
+    const props = getProps(wikiPageModel)
+    act(() => {
+      renderWikiPageIndexEditModal(root, props)
+    })
 
-    const input = getByTestId('page-title-input')
+    const input = screen.getByTestId('page-title-input')
     fireEvent.change(input, {target: {value: 'a'.repeat(TITLE_MAX_LENGTH + 1)}})
-    getByTestId('save-button').click()
+    screen.getByTestId('save-button').click()
 
+    await waitFor(() => {
+      expect(
+        screen.getByText(`Title can't exceed ${TITLE_MAX_LENGTH} characters`),
+      ).toBeInTheDocument()
+    })
     expect(input).toHaveFocus()
-    expect(getByText(`Title can't exceed ${TITLE_MAX_LENGTH} characters`)).toBeInTheDocument()
   })
 })

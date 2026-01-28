@@ -1950,6 +1950,28 @@ describe LearningObjectDatesController do
         put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
         expect(response).to be_unauthorized
       end
+
+      context "with checkpoints" do
+        it "does not crash if sub_assignments' descriptions don't match the discussion topic message with file link" do
+          # currently after a course copy, the sub-assignment description still has migration placerholder links in it
+          # this gets updated during the date update when the discussion resync the sub-assignments
+          attachment_model(context: @course, uploaded_data: fixture_file_upload("cn_image.jpg"))
+          message = <<~HTML
+            <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview">
+          HTML
+          graded_discussion_topic_with_checkpoints(context: @course, message:, updating_user: @teacher)
+
+          @topic.reload
+          @topic.sub_assignments.update_all(description: "different")
+          AttachmentAssociation.where(context: @topic.sub_assignments).destroy_all
+
+          put :update, params: { course_id: @course.id, discussion_topic_id: @topic.id, unlock_at: "2019-01-02T05:00:00Z" }
+          expect(response).to be_no_content
+          @topic.reload
+          expect(@topic.sub_assignments.pluck(:description)).to all(eq @topic.message)
+          expect(AttachmentAssociation.where(context: @topic.sub_assignments).pluck(:attachment_id)).to match_array([@attachment.id, @attachment.id])
+        end
+      end
     end
 
     context "ungraded discussions" do

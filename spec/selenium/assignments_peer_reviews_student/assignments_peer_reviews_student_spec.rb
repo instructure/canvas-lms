@@ -47,7 +47,8 @@ describe "peer review student landing page" do
                                      automatic_peer_reviews: false,
                                      peer_review_count: 2,
                                      points_possible: 10,
-                                     submission_types: "online_text_entry"
+                                     submission_types: "online_text_entry",
+                                     peer_review_submission_required: false
                                    })
 
     @assignment.submit_homework(@student1, body: "student 1 attempt", submission_type: "online_text_entry")
@@ -124,7 +125,8 @@ describe "peer review student landing page" do
                                                      peer_reviews: true,
                                                      automatic_peer_reviews: false,
                                                      points_possible: 10,
-                                                     submission_types: "online_text_entry"
+                                                     submission_types: "online_text_entry",
+                                                     peer_review_submission_required: false
                                                    })
 
       visit_peer_reviews_page(@course.id, no_peer_review_assignment.id)
@@ -159,6 +161,347 @@ describe "peer review student landing page" do
 
       expect(f("body")).to include_text("Ready to Review")
       expect(f("body")).to include_text("Completed Peer Reviews")
+    end
+  end
+
+  context "comments tray integration" do
+    before do
+      @assignment.assign_peer_review(@student1, @student2)
+    end
+
+    it "shows toggle comments button in submission view", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      expect(toggle_button).to be_displayed
+      expect(toggle_button.text).to include("Show Comments")
+    end
+
+    it "opens comments tray when toggle button is clicked", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Comments")
+      expect(toggle_button.text).to include("Hide Comments")
+    end
+
+    it "closes comments tray when toggle button is clicked again", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Comments")
+
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(toggle_button.text).to include("Show Comments")
+      expect(f("div[id='submission']")).not_to contain_css("div[data-testid='comments-container']")
+    end
+
+    it "allows user to submit a comment", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("This is a peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("This is a peer review comment")
+    end
+
+    it "displays submit peer review button", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      expect(submit_button).to be_displayed
+      expect(submit_button.text).to include("Submit Peer Review")
+    end
+
+    it "maintains comments tray state when switching between peer reviews", custom_timeout: 30 do
+      @assignment.assign_peer_review(@student1, @student3)
+
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Comments")
+
+      selector = f("input[data-testid='peer-review-selector']")
+      click_INSTUI_Select_option(selector, "Peer Review (2 of 2)")
+      wait_for_ajaximations
+
+      expect(toggle_button.text).to include("Hide Comments")
+    end
+  end
+
+  context "peer review comment completion" do
+    before do
+      @assessment_request = @assignment.assign_peer_review(@student1, @student2)
+    end
+
+    it "marks assessment request as completed when comment is submitted", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("Completing this peer review with a comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      @assessment_request.reload
+      expect(@assessment_request.workflow_state).to eq("completed")
+    end
+
+    it "persists assessment request completion state after page reload", custom_timeout: 30 do
+      @assignment.assign_peer_review(@student1, @student3)
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("Test comment for persistence")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      # Reload the page
+      visit_peer_reviews_page(@course.id, @assignment.id)
+      wait_for_ajaximations
+
+      keep_trying_until { @assessment_request.reload.workflow_state == "completed" }
+      selector = f("input[data-testid='peer-review-selector']")
+      selector.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("Completed Peer Reviews")
+      expect(f("body")).to include_text("Ready to Review")
+    end
+
+    it "does not mark assessment request as completed when only viewing without commenting", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      # Just open and close comments without submitting
+      toggle_button.click
+      wait_for_ajaximations
+
+      @assessment_request.reload
+      expect(@assessment_request.workflow_state).to eq("assigned")
+    end
+  end
+
+  context "submit peer review button" do
+    it "switches to next peer review after submitting first review", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      selector = f("input[data-testid='peer-review-selector']")
+      expect(selector.attribute("value")).to eq("Peer Review (1 of 2)")
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("First peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(selector.attribute("value")).to eq("Peer Review (2 of 2)")
+    end
+
+    it "shows error alert when attempting to submit without leaving a comment", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("Before you can submit this peer review, you must leave a comment for your peer.")
+    end
+
+    it "shows peer review modal after completing all peer reviews", custom_timeout: 30 do
+      @assignment.update(peer_review_count: 1)
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("First peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("You have completed your Peer Reviews!")
+    end
+
+    it "navigates through multiple peer reviews and shows modal after completing all", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      selector = f("input[data-testid='peer-review-selector']")
+      expect(selector.attribute("value")).to eq("Peer Review (1 of 2)")
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("First peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(selector.attribute("value")).to eq("Peer Review (2 of 2)")
+      expect(f("body")).not_to include_text("You have completed your Peer Reviews!")
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("Second peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("You have completed your Peer Reviews!")
+    end
+
+    it "hides submit button after modal is shown", custom_timeout: 30 do
+      @assignment.update(peer_review_count: 1)
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_button = f("button[data-testid='toggle-comments-button']")
+      toggle_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("Peer review comment")
+      wait_for_ajaximations
+
+      send_button = fj("button:contains('Send Comment')")
+      send_button.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      expect(f("body")).to include_text("You have completed your Peer Reviews!")
+
+      # Wait for modal animation to complete and close button to be clickable
+      close_button = fj("button:contains('Close')")
+      wait_for_animations
+      driver.action.move_to(close_button).click.perform
+      wait_for_ajaximations
+
+      expect(f("div[id='submission']")).not_to contain_css("button[data-testid='submit-peer-review-button']")
     end
   end
 end

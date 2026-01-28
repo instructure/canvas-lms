@@ -23,7 +23,12 @@ import bridge from '../../../../bridge'
 import {asVideoElement} from '../../shared/ContentSelection'
 import {findMediaPlayerIframe} from '../../shared/iframeUtils'
 import VideoOptionsTray from '.'
-import {isStudioEmbeddedMedia, parseStudioOptions, updateStudioEmbedOptions, validateStudioEmbedOptions} from '../../shared/StudioLtiSupportUtils'
+import {
+  isStudioEmbeddedMedia,
+  parseStudioOptions,
+  updateStudioEmbedOptions,
+  validateStudioEmbedOptions,
+} from '../../shared/StudioLtiSupportUtils'
 import RCEGlobals from '../../../RCEGlobals'
 import formatMessage from '../../../../format-message'
 
@@ -56,6 +61,7 @@ export default class TrayController {
     this._isOpen = false
     this._shouldOpen = false
     this._renderId = 0
+    this._skipFocusOnExit = false
     this._announcer = this.createAnnouncer()
   }
 
@@ -104,8 +110,9 @@ export default class TrayController {
     this._announcer.textContent = ''
   }
 
-  hideTrayForEditor(editor) {
+  hideTrayForEditor(editor, skipFocusOnExit = false) {
     if (this._editor === editor) {
+      this._skipFocusOnExit = skipFocusOnExit
       this._dismissTray()
     }
   }
@@ -197,7 +204,7 @@ export default class TrayController {
   }
 
   _dismissTray() {
-    if (this.$videoContainer) {
+    if (this.$videoContainer && !this._skipFocusOnExit) {
       this._editor?.selection?.select(this.$videoContainer)
     }
     this._shouldOpen = false
@@ -247,7 +254,10 @@ export default class TrayController {
           this._isOpen = true
         }}
         onExited={() => {
-          bridge.focusActiveEditor(false)
+          if (!this._skipFocusOnExit) {
+            bridge.focusActiveEditor(false)
+          }
+          this._skipFocusOnExit = false
           this._isOpen = false
           this._subtitleListener?.abort()
         }}

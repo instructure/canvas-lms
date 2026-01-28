@@ -123,7 +123,7 @@ class SubAssignment < AbstractAssignment
     has_sub_assignments = parent_assignment.sub_assignments.active.exists?
     return if has_sub_assignments == parent_assignment.has_sub_assignments
 
-    parent_assignment.update!(has_sub_assignments:)
+    parent_assignment.update!(has_sub_assignments:, updating_user:)
   end
 
   def sync_with_parent

@@ -122,6 +122,325 @@ describe GradebookExporter do
       end
     end
 
+    describe "#sort_by_id_order" do
+      let(:exporter) { GradebookExporter.new(@course, @teacher, {}) }
+
+      context "with custom id order" do
+        it "sorts collection by provided ID order" do
+          items = [
+            double(id: 1, name: "First"),
+            double(id: 2, name: "Second"),
+            double(id: 3, name: "Third")
+          ]
+          id_order = [3, 1, 2]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:id)).to eq([3, 1, 2])
+        end
+
+        it "handles string IDs by converting to integers" do
+          items = [
+            double(id: 1, name: "First"),
+            double(id: 2, name: "Second"),
+            double(id: 3, name: "Third")
+          ]
+          id_order = %w[3 1 2]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:id)).to eq([3, 1, 2])
+        end
+
+        it "places items in custom order first, then remaining items sorted by ID" do
+          items = [
+            double(id: 4, name: "Fourth"),
+            double(id: 1, name: "First"),
+            double(id: 3, name: "Third"),
+            double(id: 2, name: "Second")
+          ]
+          id_order = [3, 1]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          # Items in order come first: [3, 1]
+          # Items not in order sorted by ID: [2, 4]
+          expect(result.map(&:id)).to eq([3, 1, 2, 4])
+        end
+
+        it "handles duplicate IDs in order by using ID as tie-breaker" do
+          items = [
+            double(id: 1, name: "First"),
+            double(id: 2, name: "Second")
+          ]
+          id_order = [1, 1, 2]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:id)).to eq([1, 2])
+        end
+
+        it "works with custom accessor using method name" do
+          items = [
+            double(user_id: 10, name: "User A"),
+            double(user_id: 20, name: "User B"),
+            double(user_id: 30, name: "User C")
+          ]
+          id_order = [30, 10, 20]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: :user_id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:user_id)).to eq([30, 10, 20])
+        end
+
+        it "works with proc accessor" do
+          items = [
+            { id: 1, name: "First" },
+            { id: 2, name: "Second" },
+            { id: 3, name: "Third" }
+          ]
+          id_order = [2, 3, 1]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order:,
+                                 id_accessor: ->(item) { item[:id] },
+                                 fallback_sort: ->(item) { item[:name] })
+
+          expect(result.pluck(:id)).to eq([2, 3, 1])
+        end
+      end
+
+      context "without custom id order" do
+        it "uses fallback sort with nil id_order" do
+          items = [
+            double(id: 3, name: "Charlie"),
+            double(id: 1, name: "Alice"),
+            double(id: 2, name: "Bob")
+          ]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order: nil,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:name)).to eq(%w[Alice Bob Charlie])
+        end
+
+        it "uses fallback sort with empty id_order" do
+          items = [
+            double(id: 3, name: "Charlie"),
+            double(id: 1, name: "Alice"),
+            double(id: 2, name: "Bob")
+          ]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order: [],
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { item.name })
+
+          expect(result.map(&:name)).to eq(%w[Alice Bob Charlie])
+        end
+
+        it "uses fallback sort with multiple sort keys" do
+          items = [
+            double(id: 1, group: "B", position: 2),
+            double(id: 2, group: "A", position: 1),
+            double(id: 3, group: "A", position: 2),
+            double(id: 4, group: "B", position: 1)
+          ]
+
+          result = exporter.send(:sort_by_id_order,
+                                 items,
+                                 id_order: nil,
+                                 id_accessor: :id,
+                                 fallback_sort: ->(item) { [item.group, item.position] })
+
+          expect(result.map(&:id)).to eq([2, 3, 4, 1])
+        end
+      end
+    end
+
+    describe "student order" do
+      let!(:test_course) { course_model(grading_standard_id: 0) }
+      let!(:test_teacher) { course_with_teacher(course: test_course, active_all: true).user }
+      let!(:student_a) { student_in_course(course: test_course, name: "Alice Anderson", active_all: true).user }
+      let!(:student_b) { student_in_course(course: test_course, name: "Bob Brown", active_all: true).user }
+      let!(:student_c) { student_in_course(course: test_course, name: "Charlie Chen", active_all: true).user }
+      let!(:assignment) { test_course.assignments.create!(name: "Test Assignment") }
+
+      def student_ids_from_csv(csv)
+        rows = CSV.parse(csv, headers: true)
+        # Skip first row after headers (points possible row)
+        rows.drop(1).filter_map { |row| row["ID"]&.to_i }
+      end
+
+      context "when student_order is provided" do
+        it "returns students in the specified student_order" do
+          exporter_options = {
+            current_view: true,
+            student_order: [student_c.id, student_a.id, student_b.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          expect(student_ids).to eq([student_c.id, student_a.id, student_b.id])
+        end
+
+        it "accepts student_order as an array of strings" do
+          exporter_options = {
+            current_view: true,
+            student_order: [student_b.id.to_s, student_c.id.to_s, student_a.id.to_s],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          expect(student_ids).to eq([student_b.id, student_c.id, student_a.id])
+        end
+
+        it "filters to only students in student_order when current_view is true" do
+          exporter_options = {
+            current_view: true,
+            student_order: [student_a.id, student_c.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          expect(student_ids).to eq([student_a.id, student_c.id])
+          expect(student_ids).not_to include(student_b.id)
+        end
+
+        it "includes all students but respects order when current_view is false" do
+          exporter_options = {
+            current_view: false,
+            student_order: [student_c.id, student_a.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Should have all 3 students
+          expect(student_ids.length).to eq(3)
+          # First two should be in specified order
+          expect(student_ids[0]).to eq(student_c.id)
+          expect(student_ids[1]).to eq(student_a.id)
+          # Third student comes after (by user_id)
+          expect(student_ids[2]).to eq(student_b.id)
+        end
+
+        it "handles students with identical sortable names in custom order" do
+          # Create two students with identical names (the original EVAL-5639 scenario)
+          student_d = student_in_course(course: test_course, name: "John Smith", active_all: true).user
+          student_e = student_in_course(course: test_course, name: "John Smith", active_all: true).user
+
+          exporter_options = {
+            current_view: true,
+            student_order: [student_e.id, student_d.id, student_a.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Should maintain the exact custom order, not alphabetical
+          expect(student_ids).to eq([student_e.id, student_d.id, student_a.id])
+        end
+      end
+
+      context "when student_order is not provided" do
+        it "returns students sorted alphabetically by sortable_name" do
+          exporter_options = {
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          rows = CSV.parse(csv, headers: true)
+
+          # Skip first row after headers (points possible row)
+          student_names = rows.drop(1).filter_map { |row| row["Student"] }
+
+          # Should be in alphabetical order
+          expect(student_names[0]).to include("Anderson")  # Alice
+          expect(student_names[1]).to include("Brown")     # Bob
+          expect(student_names[2]).to include("Chen")      # Charlie
+        end
+
+        it "returns no students when student_order is empty with current_view" do
+          exporter_options = {
+            current_view: true,
+            student_order: [],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Should have no students (filtered out by current_view logic)
+          expect(student_ids).to be_empty
+        end
+
+        it "uses user_id as secondary sort for students with identical sortable names" do
+          # Create two students with identical names
+          student_d = student_in_course(course: test_course, name: "John Smith", active_all: true).user
+          student_e = student_in_course(course: test_course, name: "John Smith", active_all: true).user
+
+          exporter_options = {
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Find the two John Smiths in the result
+          john_smith_ids = [student_d.id, student_e.id].sort
+          result_john_ids = student_ids.select { |id| john_smith_ids.include?(id) }
+
+          # Should be sorted by user_id (ascending) as secondary sort
+          expect(result_john_ids).to eq(john_smith_ids)
+        end
+      end
+
+      context "with test students" do
+        it "keeps test students after real students with same ordering applied" do
+          test_student = test_course.student_view_student
+
+          exporter_options = {
+            current_view: false,
+            student_order: [student_c.id, student_a.id, student_b.id, test_student.id],
+            assignment_order: [assignment.id]
+          }
+          csv = GradebookExporter.new(test_course, test_teacher, exporter_options).to_csv
+          student_ids = student_ids_from_csv(csv)
+
+          # Real students come first in custom order
+          expect(student_ids[0..2]).to eq([student_c.id, student_a.id, student_b.id])
+          # Test student comes last
+          expect(student_ids.last).to eq(test_student.id)
+        end
+      end
+    end
+
     describe "custom columns" do
       before(:once) do
         first_column = @course.custom_gradebook_columns.create! title: "Custom Column 1"

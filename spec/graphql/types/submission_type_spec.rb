@@ -559,10 +559,23 @@ describe Types::SubmissionType do
         ).to eq [@comment2.id.to_s]
       end
 
-      it "does not return draft comments for other users when expecting drafts" do
+      it "does not return draft comments from other users by default when expecting drafts" do
         other_teacher = teacher_in_course(course: @course).user
         expect(
           submission_type.resolve("commentsConnection(includeDraftComments: true) { nodes { _id }}", current_user: other_teacher)
+        ).to eq [@comment2.id.to_s]
+      end
+
+      it "returns draft comments from other teachers when includeDraftsFromOthers is true" do
+        other_teacher = teacher_in_course(course: @course).user
+        expect(
+          submission_type.resolve("commentsConnection(includeDraftComments: true, includeDraftsFromOthers: true) { nodes { _id }}", current_user: other_teacher)
+        ).to eq [@comment2.id.to_s, @draft_comment.id.to_s]
+      end
+
+      it "does not return draft comments from other teachers for students even with includeDraftsFromOthers" do
+        expect(
+          submission_type.resolve("commentsConnection(includeDraftComments: true, includeDraftsFromOthers: true) { nodes { _id }}", current_user: @student)
         ).to eq [@comment2.id.to_s]
       end
     end

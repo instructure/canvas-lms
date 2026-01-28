@@ -17,7 +17,7 @@
  */
 
 import {render, fireEvent} from '@testing-library/react'
-import {SecondaryInfoDisplay} from '../../../utils/constants'
+import {SecondaryInfoDisplay} from '@canvas/outcomes/react/utils/constants'
 import {SecondaryInfoSelector, SecondaryInfoSelectorProps} from '../SecondaryInfoSelector'
 
 describe('SecondaryInfoSelector', () => {

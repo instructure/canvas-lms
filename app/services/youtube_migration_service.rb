@@ -50,6 +50,9 @@ class YoutubeMigrationService
   CONVERT_TAG = "youtube_embed_convert"
   BULK_CONVERT_TAG = "youtube_embed_bulk_convert"
   STUDIO_LTI_TOOL_DOMAIN = "arc.instructure.com"
+  STUCK_SCAN_THRESHOLD = 1.hour
+  TIMEOUT_THRESHOLD = 3.hours
+  MAX_RETRIES = 3
 
   class EmbedNotFoundError < StandardError; end
   class UnsupportedResourceTypeError < StandardError; end
@@ -602,65 +605,49 @@ class YoutubeMigrationService
 
     case resource_type
     when "WikiPage"
-      page = course.wiki_pages.find(resource_id)
-      page.body = replace_youtube_embed_in_html(page.body, embed, new_html)
-      page.skip_attachment_association_update = true
-      page.save!
+      resource = course.wiki_pages.find(resource_id)
+      resource.body = replace_youtube_embed_in_html(resource.body, embed, new_html)
     when "Assignment"
-      assignment = course.assignments.find(resource_id)
-      assignment.description = replace_youtube_embed_in_html(assignment.description, embed, new_html)
-      assignment.skip_attachment_association_update = true
-      assignment.save!
+      resource = course.assignments.find(resource_id)
+      resource.description = replace_youtube_embed_in_html(resource.description, embed, new_html)
     when "DiscussionTopic"
-      topic = course.discussion_topics.find(resource_id)
-      topic.message = replace_youtube_embed_in_html(topic.message, embed, new_html)
-      topic.skip_attachment_association_update = true
-      topic.save!
+      resource = course.discussion_topics.find(resource_id)
+      resource.message = replace_youtube_embed_in_html(resource.message, embed, new_html)
     when "Announcement"
-      announcement = course.announcements.find(resource_id)
-      announcement.message = replace_youtube_embed_in_html(announcement.message, embed, new_html)
-      announcement.skip_attachment_association_update = true
-      announcement.save!
+      resource = course.announcements.find(resource_id)
+      resource.message = replace_youtube_embed_in_html(resource.message, embed, new_html)
     when "DiscussionEntry"
-      entry = DiscussionEntry.find(resource_id)
-      entry.message = replace_youtube_embed_in_html(entry.message, embed, new_html)
-      entry.skip_attachment_association_update = true
-      entry.save!
+      resource = DiscussionEntry.find(resource_id)
+      resource.message = replace_youtube_embed_in_html(resource.message, embed, new_html)
     when "CalendarEvent"
-      event = course.calendar_events.find(resource_id)
-      event.description = replace_youtube_embed_in_html(event.description, embed, new_html)
-      event.skip_attachment_association_update = true
-      event.save!
+      resource = course.calendar_events.find(resource_id)
+      resource.description = replace_youtube_embed_in_html(resource.description, embed, new_html)
     when "Course"
-      course.syllabus_body = replace_youtube_embed_in_html(course.syllabus_body, embed, new_html)
-      course.skip_attachment_association_update = true
-      course.save!
+      resource = course
+      resource.syllabus_body = replace_youtube_embed_in_html(resource.syllabus_body, embed, new_html)
     when "AssessmentQuestion"
       # AssessmentQuestion does not include LinkedAttachmentHandler
-      assessment_question = course.assessment_questions.find(resource_id)
-      question_data = assessment_question.question_data.dup
+      resource = course.assessment_questions.find(resource_id)
+      question_data = resource.question_data.dup
       question_data[field] = replace_youtube_embed_in_html(question_data[field], embed, new_html) if question_data[field]
-      assessment_question.question_data = question_data
-      assessment_question.save!
+      resource.question_data = question_data
     when "Quizzes::QuizQuestion"
-      quiz_question = Quizzes::QuizQuestion.find(resource_id)
-      question_data = quiz_question.question_data.dup
+      resource = Quizzes::QuizQuestion.find(resource_id)
+      question_data = resource.question_data.dup
       question_data[field] = replace_youtube_embed_in_html(question_data[field], embed, new_html) if question_data[field]
-      quiz_question.question_data = question_data
-      quiz_question.skip_attachment_association_update = true
-      quiz_question.save!
+      resource.question_data = question_data
     when "Quizzes::Quiz"
-      quiz = course.quizzes.find(resource_id)
+      resource = course.quizzes.find(resource_id)
       if field == :description
-        quiz.description = replace_youtube_embed_in_html(quiz.description, embed, new_html)
-        quiz.skip_attachment_association_update = true
-        quiz.save!
+        resource.description = replace_youtube_embed_in_html(resource.description, embed, new_html)
       else
         raise "Quiz field #{field} not supported for conversion"
       end
     else
       raise "Unsupported resource type for conversion: #{resource_type}"
     end
+    resource.skip_attachment_association_update = true
+    resource.save!
   end
 
   def replace_youtube_embed_in_html(html, embed, new_html)
@@ -783,5 +770,71 @@ class YoutubeMigrationService
     stuck_progress.set_results(results)
 
     stuck_progress.complete!
+  end
+
+  def self.process_stuck_scans
+    Rails.logger.info("[YouTube Scan Retry] Checking for stuck scans")
+    return unless Account.site_admin.feature_enabled?(:new_quizzes_scanning_youtube_links)
+
+    stuck_scans = Progress.where(
+      tag: SCAN_TAG,
+      workflow_state: "waiting_for_external_tool",
+      context_type: "Course"
+    ).where(created_at: ..STUCK_SCAN_THRESHOLD.ago).preload(:context)
+
+    Rails.logger.info("[YouTube Scan Retry] Found #{stuck_scans.count} stuck scans")
+
+    stuck_scans.find_each do |progress|
+      progress.with_lock do
+        # Re-check state after acquiring lock to prevent race conditions
+        next unless progress.waiting_for_external_tool?
+
+        if progress.created_at <= TIMEOUT_THRESHOLD.ago || progress.results&.dig(:retry_count).to_i >= MAX_RETRIES
+          timeout_scan(progress)
+        else
+          Rails.logger.info("[YouTube Scan Retry] Should retry scan? #{should_retry_scan?(progress)}")
+          retry_scan(progress) if should_retry_scan?(progress)
+        end
+      end
+    rescue => e
+      Canvas::Errors.capture_exception(:youtube_scan_retry, e, {
+                                         progress_id: progress.id,
+                                         course_id: progress.context_id
+                                       })
+    end
+  end
+
+  def self.should_retry_scan?(progress)
+    results = progress.results || {}
+    last_retry = results[:last_retry_at]
+
+    return true if last_retry.nil?
+
+    Time.parse(last_retry.to_s).utc < STUCK_SCAN_THRESHOLD.ago
+  end
+
+  def self.retry_scan(progress)
+    results = (progress.results || {}).dup
+    results[:retry_count] = (results[:retry_count] || 0) + 1
+    results[:last_retry_at] = Time.now.utc
+
+    progress.set_results(results)
+
+    call_external_tool(progress.context, progress.id)
+
+    Rails.logger.info("[YouTube Scan Retry] Re-emitted Live Event for scan_id=#{progress.id}, course_id=#{progress.context_id}, retry_count=#{results[:retry_count]}")
+  end
+
+  def self.timeout_scan(progress)
+    results = (progress.results || {}).dup
+    results[:new_quizzes_scan_status] = "timeout"
+    results[:error] = "Timed out waiting for New Quizzes scan results after 3 hours"
+    results[:completed_at] = Time.now.utc
+    results[:timeout_at] = Time.now.utc
+
+    progress.set_results(results)
+    progress.complete!
+
+    Rails.logger.warn("[YouTube Scan Retry] Timed out scan_id=#{progress.id}, course_id=#{progress.context_id}")
   end
 end

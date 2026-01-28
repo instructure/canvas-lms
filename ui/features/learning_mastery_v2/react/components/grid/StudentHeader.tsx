@@ -21,8 +21,13 @@ import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowDownLine, IconArrowUpLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
-import {SortOrder, SortBy, NameDisplayFormat, STUDENT_COLUMN_WIDTH} from '../../utils/constants'
-import {Sorting} from '../../types/shapes'
+import {
+  SortOrder,
+  SortBy,
+  NameDisplayFormat,
+  STUDENT_COLUMN_WIDTH,
+} from '@canvas/outcomes/react/utils/constants'
+import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {ColumnHeader} from './ColumnHeader'
 
 const I18n = createI18nScope('learning_mastery_gradebook')

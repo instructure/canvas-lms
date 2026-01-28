@@ -33,6 +33,7 @@ import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import '@canvas/jquery/jquery.instructure_forms'
 import sanitizeData from '../../../forms/sanitizeData'
 import {showPostToSisFlashAlert, combinedDates} from '../../util/differentiatedModulesUtil'
+import {getAssignmentAndPeerReviewOverrides} from '../../../context-modules/differentiated-modules/utils/assignToHelper'
 
 const I18n = createI18nScope('DueDateOverrideView')
 
@@ -380,8 +381,21 @@ DueDateOverrideView.prototype.showError = function (element, message) {
 // ==============================
 
 DueDateOverrideView.prototype.setNewOverridesCollection = function (newOverrides, importantDates) {
-  this.resetOverrides(newOverrides)
-  return this.model.assignment.importantDates(importantDates)
+  const hasPeerReviews = this.model.assignment.get('peer_reviews')
+  const peerReviewAllocationAndGradingEnabled = ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
+
+  if (hasPeerReviews && peerReviewAllocationAndGradingEnabled) {
+    const {assignmentOverrides, peerReview} = getAssignmentAndPeerReviewOverrides(newOverrides)
+
+    this.resetOverrides(assignmentOverrides)
+    if (peerReview && Object.keys(peerReview).length > 0) {
+      this.model.assignment.set('peer_review_data', peerReview)
+    }
+  } else {
+    this.resetOverrides(newOverrides)
+  }
+
+  this.model.assignment.importantDates(importantDates)
 }
 
 DueDateOverrideView.prototype.resetOverrides = function (overrides) {

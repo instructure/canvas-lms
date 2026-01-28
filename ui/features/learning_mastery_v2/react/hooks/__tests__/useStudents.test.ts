@@ -19,7 +19,7 @@
 import {renderHook} from '@testing-library/react-hooks'
 import {useStudents} from '../useStudents'
 import * as apiClient from '../../apiClient'
-import {Student} from '../../types/rollup'
+import {Student} from '@canvas/outcomes/react/types/rollup'
 
 vi.mock('../../apiClient')
 
@@ -181,8 +181,7 @@ describe('useStudents', () => {
   })
 
   it('clears previous error on new request', async () => {
-    vi
-      .spyOn(apiClient, 'loadCourseUsers')
+    vi.spyOn(apiClient, 'loadCourseUsers')
       .mockRejectedValueOnce(new Error('First error'))
       .mockResolvedValueOnce({
         status: 200,

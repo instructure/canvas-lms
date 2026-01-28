@@ -55,8 +55,10 @@ export const useGradingSchemeCreate = (): {
         if (!result.response.ok) {
           throw new Error(result.response.statusText)
         }
+        if (!result.json) {
+          throw new Error('No data received from server')
+        }
         setCreateGradingSchemeStatus(ApiCallStatus.COMPLETED)
-        // @ts-expect-error
         return result.json
       } catch (err) {
         setCreateGradingSchemeStatus(ApiCallStatus.FAILED)

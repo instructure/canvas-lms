@@ -463,6 +463,7 @@ describe('GradeSummary GradeActions', () => {
           expect(statusInfo.status).toBe(GradeActions.SUCCESS)
         })
 
+        // Test expects 0 API calls but receives 1 - mock interaction issue with Vitest
         test.skip('does not re-select the provisional grade through the api', async () => {
           await selectAndResolve()
           expect(GradesApi.selectProvisionalGrade).toHaveBeenCalledTimes(0)

@@ -240,6 +240,98 @@ RSpec.describe PeerReviewSubAssignment do
         expect(peer_review_sub_assignment.workflow_state).to eq("deleted")
       end
     end
+
+    describe "#sync_submission_types_with_grading_type" do
+      it "sets submission_types to 'peer_review' when grading_type is 'points'" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(
+          parent_assignment:,
+          grading_type: "points"
+        )
+        # .valid? triggers the before_validation callback without persisting to database
+        peer_review_sub_assignment.valid?
+        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+      end
+
+      it "sets submission_types to 'not_graded' when grading_type is 'not_graded'" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(
+          parent_assignment:,
+          grading_type: "not_graded"
+        )
+        peer_review_sub_assignment.valid?
+        expect(peer_review_sub_assignment.submission_types).to eq("not_graded")
+      end
+
+      it "auto-corrects invalid submission_types to 'peer_review' based on grading_type" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(
+          parent_assignment:,
+          submission_types: "online_text_entry",
+          grading_type: "points"
+        )
+        peer_review_sub_assignment.valid?
+        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+      end
+
+      it "auto-corrects invalid submission_types to 'not_graded' based on grading_type" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(
+          parent_assignment:,
+          submission_types: "online_upload",
+          grading_type: "not_graded"
+        )
+        peer_review_sub_assignment.valid?
+        expect(peer_review_sub_assignment.submission_types).to eq("not_graded")
+      end
+
+      it "updates submission_types when grading_type changes to 'not_graded'" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          grading_type: "points"
+        )
+        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+
+        peer_review_sub_assignment.grading_type = "not_graded"
+        peer_review_sub_assignment.valid?
+        expect(peer_review_sub_assignment.submission_types).to eq("not_graded")
+      end
+
+      it "updates submission_types when grading_type changes from 'not_graded' to 'points'" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          grading_type: "not_graded"
+        )
+        expect(peer_review_sub_assignment.submission_types).to eq("not_graded")
+
+        peer_review_sub_assignment.grading_type = "points"
+        peer_review_sub_assignment.valid?
+        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+      end
+
+      it "defaults to 'peer_review' when grading_type is not specified" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(parent_assignment:)
+        peer_review_sub_assignment.valid?
+        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+      end
+
+      it "overrides manually set submission_types with value based on grading_type" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.new(
+          parent_assignment:,
+          submission_types: "external_tool",
+          grading_type: "points"
+        )
+        peer_review_sub_assignment.valid?
+        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+      end
+
+      it "handles all grading types correctly" do
+        %w[points percent letter_grade gpa_scale pass_fail].each do |grading_type|
+          peer_review_sub_assignment = PeerReviewSubAssignment.new(
+            parent_assignment:,
+            grading_type:
+          )
+          peer_review_sub_assignment.valid?
+          expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+        end
+      end
+    end
   end
 
   describe "#checkpoint?" do

@@ -60,7 +60,8 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Alert} from '@instructure/ui-alerts'
 import {canvasHighContrast, canvas} from '@instructure/ui-themes'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import {usePeerReviewSettings} from './hooks/usePeerReviewSettings'
@@ -68,16 +69,17 @@ const I18n = createI18nScope('peer_review_details')
 const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
 const {colors: instui10Colors} = baseTheme
 const inputOverride = {mediumHeight: '1.75rem', mediumFontSize: '0.875rem'}
-const roots = new Map()
-function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
+const roots = new Map<string, Root>()
+function createOrUpdateRoot(elementId: string, component: React.ReactElement) {
   const container = document.getElementById(elementId)
   if (!container) return
   let root = roots.get(elementId)
   if (!root) {
-    root = createRoot(container)
+    root = render(component, container)
     roots.set(elementId, root)
+  } else {
+    rerender(root, component)
   }
-  root.render(component)
 }
 const hasValidGroupCategory = (assignment: AssignmentModel): boolean => {
   const groupCategoryId = assignment.groupCategoryId()
@@ -361,7 +363,7 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
               id="assignment_peer_reviews_checkbox"
               name="peer_reviews"
               checked={peerReviewChecked}
-              disabled={!peerReviewEnabled}
+              disabled={!peerReviewEnabled || hasPeerReviewSubmissions}
               onChange={handlePeerReviewCheck}
               label={I18n.t('Require Peer Reviews')}
               size="small"
@@ -460,7 +462,7 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
             <Flex.Item as="div" padding="small">
               <Alert variant="warning">
                 {I18n.t(
-                  'Students have already submitted peer reviews, so reviews required and points cannot be changed.',
+                  'Students have already submitted peer reviews, so peer reviews cannot be disabled and reviews required and points cannot be changed.',
                 )}
               </Alert>
             </Flex.Item>

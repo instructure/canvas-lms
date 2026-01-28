@@ -192,6 +192,9 @@ export const ASSIGNED_STUDENTS_QUERY = gql`
 export const ALLOCATION_RULES_QUERY = gql`
   query GetAllocationRules($assignmentId: ID!, $after: String, $searchTerm: String) {
     assignment(id: $assignmentId) {
+      peerReviews {
+        count
+      }
       allocationRules {
         rulesConnection(first: 20, after: $after, filter: { searchTerm: $searchTerm }) {
           nodes {

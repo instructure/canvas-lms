@@ -815,9 +815,17 @@ function DiscussionTopicForm({
   }
 
   const renderLabelWithPublishStatus = () => {
+    const hasValidationError = titleValidationMessages.some(message => message.type === 'error')
+    const asteriskColor = hasValidationError ? 'danger' : 'secondary'
+
     return (
       <Flex justifyItems="space-between">
-        <Flex.Item>{I18n.t('Topic Title')}</Flex.Item>
+        <Flex.Item>
+          {I18n.t('Topic Title')}
+          <Text color={asteriskColor} margin="0 0 0 xxSmall">
+            *
+          </Text>
+        </Flex.Item>
         {!isAnnouncement && !instUINavEnabled() && (
           <Flex.Item style={{marginLeft: '1rem', whiteSpace: 'nowrap'}}>
             {getPublishStatus()}
@@ -1039,6 +1047,7 @@ function DiscussionTopicForm({
             autoFocus={true}
             width={inputWidth}
             disabled={ENV?.DISCUSSION_CONTENT_LOCKED}
+            aria-required="true"
           />
           <View>
             {!ENV?.DISCUSSION_CONTENT_LOCKED ? (

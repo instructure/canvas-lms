@@ -18,7 +18,7 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
-import {DisplayFilter} from '../../utils/constants'
+import {DisplayFilter} from '@canvas/outcomes/react/utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

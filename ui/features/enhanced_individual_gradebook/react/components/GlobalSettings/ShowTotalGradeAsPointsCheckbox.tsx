@@ -35,14 +35,15 @@ export default function ShowTotalGradesAsPointsCheckbox({
 }: Props) {
   const handleShowTotalGradeAsPointsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
-    doFetchApi({
-      method: 'PUT',
-      // @ts-expect-error
-      path: settingUpdateUrl,
-      body: {
-        show_total_grade_as_points: checked,
-      },
-    })
+    if (settingUpdateUrl) {
+      doFetchApi({
+        method: 'PUT',
+        path: settingUpdateUrl,
+        body: {
+          show_total_grade_as_points: checked,
+        },
+      })
+    }
     handleCheckboxChange('showTotalGradeAsPoints', checked)
   }
 

@@ -280,13 +280,55 @@ describe ProfileController do
       expect(@user.profile.title).to eql "!!!"
     end
 
+    it "does not change profile title if not allowed" do
+      account = Account.default
+      account.settings = { users_can_edit_profile: true, users_can_edit_title: false }
+      account.save!
+
+      put "update_profile",
+          params: { user: { short_name: "Monsturd", name: "Jenkins" },
+                    user_profile: { title: "not_allowed" } },
+          format: "json"
+      expect(response).to be_successful
+      @user.reload
+      expect(@user.profile.title).not_to eql "not_allowed"
+    end
+
+    it "does not change profile bio if not allowed" do
+      account = Account.default
+      account.settings = { users_can_edit_profile: true, users_can_edit_bio: false }
+      account.save!
+
+      put "update_profile",
+          params: { user: { short_name: "Monsturd", name: "Jenkins" },
+                    user_profile: { bio: "not_allowed" } },
+          format: "json"
+      expect(response).to be_successful
+      @user.reload
+      expect(@user.profile.bio).not_to eql "not_allowed"
+    end
+
+    it "does not change profile links if not allowed" do
+      account = Account.default
+      account.settings = { users_can_edit_profile: true, users_can_edit_profile_links: false }
+      account.save!
+
+      put "update_profile",
+          params: { link_urls: ["example.com", "foo.com", "", "///////invalid"],
+                    link_titles: ["Example.com", "Foo", "", "invalid"] },
+          format: "json"
+      expect(response).to be_successful
+
+      @user.reload
+      expect(@user.profile.links).to be_empty
+    end
+
     it "does not let you change your short_name information if you are not allowed" do
       account = Account.default
-      account.settings = { users_can_edit_name: false }
+      account.settings = { users_can_edit_name: false, users_can_edit_bio: true, users_can_edit_title: true }
       account.save!
 
       old_name = @user.short_name
-      old_title = @user.profile.title
       put "update_profile",
           params: { user: { short_name: "Monsturd", name: "Jenkins" },
                     user_profile: { bio: "...", title: "!!!" } },
@@ -297,7 +339,7 @@ describe ProfileController do
       expect(@user.short_name).to eql old_name
       expect(@user.name).not_to eql "Jenkins"
       expect(@user.profile.bio).to eql "..."
-      expect(@user.profile.title).to eql old_title
+      expect(@user.profile.title).to eql "!!!"
     end
 
     it "does not let you change your profile information if you are not allowed" do

@@ -30,6 +30,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience} from '../../types'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
+import AIExperiencePublishButton from './AIExperiencePublishButton'
 
 const I18n = createI18nScope('ai_experiences_show')
 
@@ -38,6 +39,8 @@ interface AIExperienceShowProps {
 }
 
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
+  const canManage = aiExperience.can_manage
+  const [workflowState, setWorkflowState] = useState(aiExperience.workflow_state)
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     const shouldPreview = params.get('preview') === 'true'
@@ -86,45 +89,69 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
             {aiExperience.title}
           </Heading>
         </Flex.Item>
-        <Flex.Item>
-          <Menu
-            placement="bottom end"
-            trigger={
-              <IconButton
-                screenReaderLabel={I18n.t('AI Experience settings')}
-                withBackground={false}
-                withBorder={false}
-              >
-                <IconMoreLine />
-              </IconButton>
-            }
-          >
-            <Menu.Item data-testid="ai-experience-show-edit-menu-item" onSelect={handleEdit}>
-              {I18n.t('Edit')}
-            </Menu.Item>
-            <Menu.Item
-              data-testid="ai-experience-show-run-chat-simulation-menu-item"
-              disabled={true}
-            >
-              <Flex justifyItems="space-between" gap="small">
-                <Flex.Item>
-                  <Text>{I18n.t('Run chat simulation')}</Text>
-                </Flex.Item>
-                <Flex.Item>
-                  <Text size="small" color="secondary">
-                    {I18n.t('Coming soon')}
-                  </Text>
-                </Flex.Item>
-              </Flex>
-            </Menu.Item>
-            <Menu.Item
-              data-testid="ai-experience-show-delete-menu-item"
-              onSelect={() => setIsDeleteModalOpen(true)}
-            >
-              {I18n.t('Delete')}
-            </Menu.Item>
-          </Menu>
-        </Flex.Item>
+        {canManage && (
+          <Flex.Item>
+            <Flex gap="small">
+              <Flex.Item>
+                <AIExperiencePublishButton
+                  experienceId={aiExperience.id!}
+                  courseId={aiExperience.course_id!}
+                  isPublished={workflowState === 'published'}
+                  canUnpublish={aiExperience.can_unpublish ?? true}
+                  onPublishChange={setWorkflowState}
+                />
+              </Flex.Item>
+              <Flex.Item>
+                <Button
+                  color="primary"
+                  href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/ai_conversations`}
+                  data-testid="ai-experience-show-ai-conversations-button"
+                >
+                  {I18n.t('AI Conversations')}
+                </Button>
+              </Flex.Item>
+              <Flex.Item>
+                <Menu
+                  placement="bottom end"
+                  trigger={
+                    <IconButton
+                      screenReaderLabel={I18n.t('AI Experience settings')}
+                      withBackground={false}
+                      withBorder={false}
+                    >
+                      <IconMoreLine />
+                    </IconButton>
+                  }
+                >
+                  <Menu.Item data-testid="ai-experience-show-edit-menu-item" onSelect={handleEdit}>
+                    {I18n.t('Edit')}
+                  </Menu.Item>
+                  <Menu.Item
+                    data-testid="ai-experience-show-run-chat-simulation-menu-item"
+                    disabled={true}
+                  >
+                    <Flex justifyItems="space-between" gap="small">
+                      <Flex.Item>
+                        <Text>{I18n.t('Run chat simulation')}</Text>
+                      </Flex.Item>
+                      <Flex.Item>
+                        <Text size="small" color="secondary">
+                          {I18n.t('Coming soon')}
+                        </Text>
+                      </Flex.Item>
+                    </Flex>
+                  </Menu.Item>
+                  <Menu.Item
+                    data-testid="ai-experience-show-delete-menu-item"
+                    onSelect={() => setIsDeleteModalOpen(true)}
+                  >
+                    {I18n.t('Delete')}
+                  </Menu.Item>
+                </Menu>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        )}
       </Flex>
 
       {aiExperience.description && (
@@ -149,6 +176,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         scenario={aiExperience.pedagogical_guidance}
         isExpanded={isPreviewExpanded}
         onToggleExpanded={() => setIsPreviewExpanded(!isPreviewExpanded)}
+        isTeacherPreview={canManage}
       />
 
       <Heading level="h2" margin="large 0 0 0">

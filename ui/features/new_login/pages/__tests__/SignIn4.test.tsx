@@ -129,23 +129,10 @@ describe('SignIn', () => {
       })
     })
 
-    // Skip: Tests internal error state - requires testing actual error message rendering instead
-    it.skip('shows username error state and clears password when login fails due to invalid credentials', async () => {
+    it('shows username error state and clears password when login fails due to invalid credentials', async () => {
+      ;(windowPathname as ReturnType<typeof vi.fn>).mockReturnValue('/login/canvas')
       // mock login request to simulate 400 Invalid Credentials error
       ;(performSignIn as ReturnType<typeof vi.fn>).mockRejectedValueOnce({response: {status: 400}})
-      // initial context state before login attempt
-      ;(useNewLogin as ReturnType<typeof vi.fn>).mockReturnValue({
-        isUiActionPending: false,
-        setIsUiActionPending: vi.fn(),
-        otpRequired: false,
-        setOtpRequired: vi.fn(),
-        rememberMe: false,
-        setRememberMe: vi.fn(),
-        showForgotPassword: false,
-        setShowForgotPassword: vi.fn(),
-        otpCommunicationChannelId: null,
-        setOtpCommunicationChannelId: vi.fn(),
-      })
       setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
@@ -162,19 +149,6 @@ describe('SignIn', () => {
           false,
           '/login/canvas',
         )
-      })
-      // update context to simulate re-render with loginFailed=true
-      ;(useNewLogin as ReturnType<typeof vi.fn>).mockReturnValue({
-        isUiActionPending: false,
-        setIsUiActionPending: vi.fn(),
-        otpRequired: false,
-        setOtpRequired: vi.fn(),
-        rememberMe: false,
-        setRememberMe: vi.fn(),
-        showForgotPassword: false,
-        setShowForgotPassword: vi.fn(),
-        otpCommunicationChannelId: null,
-        setOtpCommunicationChannelId: vi.fn(),
       })
       // check form-field validation error states
       const usernameError = await screen.findByText(
@@ -194,8 +168,7 @@ describe('SignIn', () => {
       expect(rememberMeCheckbox).not.toBeChecked()
     })
 
-    // Skip: Tests internal context state instead of API behavior - should verify performSignIn args
-    it.skip('passes the correct "Remember Me" value when checked', async () => {
+    it('passes the correct "Remember Me" value when checked', async () => {
       ;(windowPathname as ReturnType<typeof vi.fn>).mockReturnValue('/login/canvas')
 
       // Mock the useNewLogin hook to return rememberMe: true when checkbox is clicked
@@ -245,8 +218,7 @@ describe('SignIn', () => {
       })
     })
 
-    // Skip: Tests internal context state instead of API behavior - should verify performSignIn args
-    it.skip('passes the correct "Remember Me" value when unchecked', async () => {
+    it('passes the correct "Remember Me" value when unchecked', async () => {
       ;(windowPathname as ReturnType<typeof vi.fn>).mockReturnValue('/login/canvas')
       setup()
       const usernameInput = screen.getByTestId('username-input')

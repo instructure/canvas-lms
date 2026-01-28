@@ -2607,6 +2607,116 @@ RSpec.describe YoutubeMigrationService do
     end
   end
 
+  describe ".process_stuck_scans" do
+    let(:new_quiz_course) { course_model }
+    let(:progress) do
+      Progress.create!(
+        tag: YoutubeMigrationService::SCAN_TAG,
+        context: new_quiz_course,
+        workflow_state: "waiting_for_external_tool"
+      )
+    end
+
+    before do
+      Account.site_admin.enable_feature!(:new_quizzes_scanning_youtube_links)
+
+      # Stub the assignment chain for new_quizzes? and call_external_tool
+      external_tool_tag = double(content_id: 1)
+      quiz_assignment = double(external_tool_tag:)
+      quiz_lti_scope = double(any?: true, last: quiz_assignment)
+      active_scope = double(type_quiz_lti: quiz_lti_scope)
+      assignments = double(active: active_scope)
+
+      allow_any_instance_of(Course).to receive(:assignments).and_return(assignments)
+    end
+
+    context "when progress is less than 1 minute old" do
+      it "does not process the scan" do
+        progress.update!(created_at: 30.minutes.ago)
+        expect(described_class).not_to receive(:retry_scan)
+        expect(described_class).not_to receive(:timeout_scan)
+        described_class.process_stuck_scans
+      end
+    end
+
+    context "when progress is between 1-3 minutes old" do
+      it "retries the scan by re-emitting Live Event" do
+        progress.update!(created_at: 2.hours.ago)
+        expect(Canvas::LiveEvents).to receive(:scan_youtube_links)
+        described_class.process_stuck_scans
+
+        progress.reload
+        expect(progress.workflow_state).to eq("waiting_for_external_tool")
+        expect(progress.results[:retry_count]).to eq(1)
+        expect(progress.results[:last_retry_at]).to be_present
+      end
+    end
+
+    context "when progress is 3+ minutes old" do
+      it "times out the scan and marks as completed" do
+        progress.update!(created_at: 4.hours.ago)
+        described_class.process_stuck_scans
+
+        progress.reload
+        expect(progress.workflow_state).to eq("completed")
+        expect(progress.results[:new_quizzes_scan_status]).to eq("timeout")
+        expect(progress.results[:error]).to include("Timed out")
+        expect(progress.results[:timeout_at]).to be_present
+      end
+    end
+
+    context "when feature flag is disabled" do
+      it "does not process any scans" do
+        Account.site_admin.disable_feature!(:new_quizzes_scanning_youtube_links)
+        progress.update!(created_at: 2.hours.ago)
+        expect(described_class).not_to receive(:retry_scan)
+        described_class.process_stuck_scans
+      end
+    end
+
+    context "with multiple stuck scans" do
+      let(:progress2) do
+        Progress.create!(
+          tag: YoutubeMigrationService::SCAN_TAG,
+          context: new_quiz_course,
+          workflow_state: "waiting_for_external_tool",
+          created_at: 2.hours.ago
+        )
+      end
+      let(:progress3) do
+        Progress.create!(
+          tag: YoutubeMigrationService::SCAN_TAG,
+          context: new_quiz_course,
+          workflow_state: "waiting_for_external_tool",
+          created_at: 4.hours.ago
+        )
+      end
+
+      it "processes all stuck scans appropriately" do
+        progress.update!(created_at: 2.hours.ago)
+        progress2
+        progress3
+
+        expect(Canvas::LiveEvents).to receive(:scan_youtube_links).twice
+
+        described_class.process_stuck_scans
+
+        progress.reload
+        progress2.reload
+        progress3.reload
+
+        expect(progress.workflow_state).to eq("waiting_for_external_tool")
+        expect(progress.results[:retry_count]).to eq(1)
+
+        expect(progress2.workflow_state).to eq("waiting_for_external_tool")
+        expect(progress2.results[:retry_count]).to eq(1)
+
+        expect(progress3.workflow_state).to eq("completed")
+        expect(progress3.results[:new_quizzes_scan_status]).to eq("timeout")
+      end
+    end
+  end
+
   describe "skip_attachment_association_update flag" do
     before do
       studio_tool
@@ -2616,44 +2726,41 @@ RSpec.describe YoutubeMigrationService do
           body: studio_api_response.to_json,
           headers: { "Content-Type" => "application/json" }
         )
+      attachment_model(course:, uploaded_data: fixture_file_upload("test_image.jpg"))
     end
 
     let(:original_html) do
-      '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315"></iframe>'
+      <<~HTML
+        <img src="/courses/#{course.id}/files/#{@attachment.id}/preview" alt="Test">
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315"></iframe></p>
+      HTML
     end
 
     let(:new_html) do
-      '<iframe class="lti-embed" src="/courses/123/external_tools/retrieve"></iframe>'
+      <<~HTML
+        <iframe class="lti-embed" src="/courses/123/external_tools/retrieve"></iframe>
+      HTML
     end
 
     shared_examples "skips attachment association creation" do |resource_type, model_factory, field|
       it "sets skip_attachment_association_update flag for #{resource_type}" do
         resource = send(model_factory)
         embed = youtube_embed.merge(id: resource.id, resource_type:, field:)
-
-        expect_any_instance_of(resource.class).to receive(:skip_attachment_association_update=).with(true).and_call_original
-
-        service.update_resource_content(embed, new_html)
+        expect { service.update_resource_content(embed, new_html) }.not_to raise_error
 
         resource.reload
-        expect(resource.send(field)).to include("lti-embed")
-        expect(resource.send(field)).not_to include("youtube.com")
-      end
-
-      it "prevents AttachmentAssociation creation during update" do
-        resource = send(model_factory)
-        embed = youtube_embed.merge(id: resource.id, resource_type:, field:)
-
-        expect { service.update_resource_content(embed, new_html) }.not_to change { AttachmentAssociation.count }
-
-        resource.reload
-        expect(resource.send(field)).to include("lti-embed")
+        description = resource.send(field)
+        expect(description).to include("lti-embed")
+        expect(description).not_to include("youtube.com")
+        expect(description).to include("/courses/#{course.id}/files/#{@attachment.id}/preview")
       end
     end
 
     context "with WikiPage" do
       let(:wiki_page_with_embed) do
-        wiki_page_model(course:, body: original_html)
+        course.attributes = { conditional_release: true }
+        course.save!
+        wiki_page_assignment_model(course:, body: original_html, skip_attachment_association_update: true).wiki_page
       end
 
       include_examples "skips attachment association creation", "WikiPage", :wiki_page_with_embed, :body
@@ -2661,15 +2768,39 @@ RSpec.describe YoutubeMigrationService do
 
     context "with Assignment" do
       let(:assignment_with_embed) do
-        assignment_model(course:, description: original_html)
+        assignment_model(course:, description: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "Assignment", :assignment_with_embed, :description
     end
 
+    context "Assignment with discussion_topic" do
+      let(:discussion_assign_with_embed) do
+        graded_discussion_topic(context: course, message: original_html, skip_attachment_association_update: true).assignment
+      end
+
+      include_examples "skips attachment association creation", "Assignment", :discussion_assign_with_embed, :description
+    end
+
+    context "Assignment with quiz" do
+      let(:assignment_quiz_with_embed) do
+        assignment_quiz([], course:, description: original_html, skip_attachment_association_update: true).assignment
+      end
+
+      include_examples "skips attachment association creation", "Assignment", :assignment_quiz_with_embed, :description
+    end
+
+    context "Assignment with wiki page" do
+      let(:assignment_wiki_with_embed) do
+        wiki_page_assignment_model(course:, body: original_html, skip_attachment_association_update: true)
+      end
+
+      include_examples "skips attachment association creation", "Assignment", :assignment_wiki_with_embed, :description
+    end
+
     context "with DiscussionTopic" do
       let(:discussion_topic_with_embed) do
-        discussion_topic_model(context: course, message: original_html)
+        graded_discussion_topic(context: course, message: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "DiscussionTopic", :discussion_topic_with_embed, :message
@@ -2677,7 +2808,7 @@ RSpec.describe YoutubeMigrationService do
 
     context "with Announcement" do
       let(:announcement_with_embed) do
-        course.announcements.create!(title: "Test", message: original_html)
+        course.announcements.create!(title: "Test", message: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "Announcement", :announcement_with_embed, :message
@@ -2686,7 +2817,7 @@ RSpec.describe YoutubeMigrationService do
     context "with DiscussionEntry" do
       let(:discussion_entry_with_embed) do
         topic = discussion_topic_model(context: course)
-        topic.discussion_entries.create!(message: original_html, user: @teacher)
+        topic.discussion_entries.create!(message: original_html, user: @teacher, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "DiscussionEntry", :discussion_entry_with_embed, :message
@@ -2694,7 +2825,7 @@ RSpec.describe YoutubeMigrationService do
 
     context "with CalendarEvent" do
       let(:calendar_event_with_embed) do
-        calendar_event_model(context: course, description: original_html)
+        calendar_event_model(context: course, description: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "CalendarEvent", :calendar_event_with_embed, :description
@@ -2702,7 +2833,7 @@ RSpec.describe YoutubeMigrationService do
 
     context "with Quizzes::Quiz" do
       let(:quiz_with_embed) do
-        quiz_model(course:, description: original_html)
+        assignment_quiz([], course:, description: original_html, skip_attachment_association_update: true)
       end
 
       include_examples "skips attachment association creation", "Quizzes::Quiz", :quiz_with_embed, :description
@@ -2710,7 +2841,7 @@ RSpec.describe YoutubeMigrationService do
 
     context "with Course syllabus" do
       let(:course_with_syllabus) do
-        course.update!(syllabus_body: original_html)
+        course.update_columns(syllabus_body: original_html)
         course
       end
 

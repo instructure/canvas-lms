@@ -133,7 +133,7 @@ describe('ToggleShowByView', function () {
     document.documentElement.removeAttribute('lang')
   })
 
-  test.skip('should be accessible', async () => {
+  test('should be accessible', async () => {
     const view = createView(true)
     await isAccessible(view, {a11yReport: true})
   })

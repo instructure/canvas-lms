@@ -13,9 +13,11 @@ ams_course_integration:
   display_name: Assessment Management Service Integration
   description: Enables integration with the Assessment Management Service (AMS) for accounts and courses.
 
-ams_enhanced_rubrics:
+ams_advanced_content_organization:
   state: hidden
   shadow: true
   applies_to: RootAccount
-  display_name: AMS Enhanced Rubrics
-  description: Enables Canvas Enhanced Rubrics in Assessment Management Service (AMS).
+  display_name: AMS Experimental Advanced Content Organization
+  description: >-
+    Advanced content organization features in the Assessment Management Service (AMS).
+    This may change or break at any time and is not intended for most accounts.

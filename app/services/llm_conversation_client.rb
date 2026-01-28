@@ -75,24 +75,39 @@ class LLMConversationClient
   end
 
   def starting_messages
-    # Create a new conversation with prompt_code and conversation_context_id
+    # Create a new conversation with auto_initialize: true
+    # This will create the conversation and immediately generate the first message and response
     conversation = create_conversation
     @conversation_id = conversation["id"]
 
-    # The conversation has first_message (the interpolated input_template)
-    # We need to send it to get the AI's response
-    first_message = conversation["first_message"]
+    Rails.logger.info "=== LLMConversationClient#starting_messages DEBUG ==="
+    Rails.logger.info "Conversation ID: #{@conversation_id}"
+    Rails.logger.info "Conversation has learning_objective_progress: #{conversation["learning_objective_progress"].present?}"
+    Rails.logger.info "Conversation learning_objective_progress: #{conversation["learning_objective_progress"].inspect}"
 
-    # Send the first message to get LLM response
-    llm_response = add_message_to_conversation(first_message, "User")
+    # With auto_initialize, messages already exist - just fetch them
+    messages_data = messages
 
-    {
+    Rails.logger.info "Messages data progress: #{messages_data[:progress].inspect}"
+
+    # If messages don't have progress, get it from the conversation object
+    progress = messages_data[:progress]
+    if progress.nil? && conversation["learning_objective_progress"]
+      Rails.logger.info "Extracting progress from conversation object"
+      progress = extract_progress_from_data(conversation["learning_objective_progress"])
+      Rails.logger.info "Extracted progress: #{progress.inspect}"
+    end
+
+    result = {
       conversation_id: @conversation_id,
-      messages: [
-        { role: "User", text: first_message },
-        { role: "Assistant", text: llm_response }
-      ]
+      messages: messages_data[:messages],
+      progress:
     }
+
+    Rails.logger.info "Final result progress: #{result[:progress].inspect}"
+    Rails.logger.info "=== END DEBUG ==="
+
+    result
   end
 
   def continue_conversation(messages:, new_user_message:)
@@ -100,11 +115,12 @@ class LLMConversationClient
     llm_response = add_message_to_conversation(new_user_message, "User")
 
     messages << { role: "User", text: new_user_message }
-    messages << { role: "Assistant", text: llm_response }
+    messages << { role: "Assistant", text: llm_response[:text] }
 
     {
       conversation_id: @conversation_id,
-      messages:
+      messages:,
+      progress: llm_response[:progress]
     }
   end
 
@@ -119,13 +135,50 @@ class LLMConversationClient
 
     messages_data = response["data"]
 
+    # Extract progress from the last message (if available)
+    progress = nil
+    if messages_data.any? && messages_data.last["learning_objective_progress"]
+      progress = extract_progress_from_data(messages_data.last["learning_objective_progress"])
+    end
+
     # Convert llm-conversation message format to our format
-    messages_data.map do |msg|
+    formatted_messages = messages_data.map do |msg|
       {
         role: msg["is_llm_message"] ? "Assistant" : "User",
         text: msg["text"]
       }
     end
+
+    {
+      messages: formatted_messages,
+      progress:
+    }
+  end
+
+  def messages_with_conversation_progress
+    raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
+
+    # Get messages first
+    messages_result = messages
+
+    # If no progress on messages, fetch from conversation object
+    progress = messages_result[:progress]
+    if progress.nil?
+      conversation_response = make_request(
+        method: :get,
+        path: "/conversations/#{@conversation_id}",
+        error_message: "Failed to get conversation"
+      )
+
+      if conversation_response["data"] && conversation_response["data"]["learning_objective_progress"]
+        progress = extract_progress_from_data(conversation_response["data"]["learning_objective_progress"])
+      end
+    end
+
+    {
+      messages: messages_result[:messages],
+      progress:
+    }
   end
 
   private
@@ -178,7 +231,8 @@ class LLMConversationClient
       account_id: @root_account_uuid || "default",
       user_id: @current_user&.uuid || "anonymous",
       prompt_code: PROMPT_CODE,
-      workflow_state: "active"
+      workflow_state: "active",
+      auto_initialize: true
     }
 
     # Add conversation_context_id if provided
@@ -208,7 +262,8 @@ class LLMConversationClient
 
     payload = {
       role:,
-      text: message_text
+      text: message_text,
+      include_progress: true
     }
 
     response = make_request(
@@ -218,6 +273,32 @@ class LLMConversationClient
       error_message: "Failed to add message"
     )
 
-    response["data"]["text"]
+    response_data = response["data"]
+
+    # Extract progress if available
+    progress = nil
+    if response_data["learning_objective_progress"]
+      progress = extract_progress_from_data(response_data["learning_objective_progress"])
+    end
+
+    {
+      text: response_data["text"],
+      progress:
+    }
+  end
+
+  def extract_progress_from_data(progress_data)
+    return nil unless progress_data
+
+    objectives = progress_data["objectives"] || []
+    covered_count = objectives.count { |obj| obj["status"] == "covered" }
+    total_count = objectives.length
+
+    {
+      current: covered_count,
+      total: total_count,
+      percentage: total_count.positive? ? ((covered_count.to_f / total_count) * 100).round : 0,
+      objectives:
+    }
   end
 end

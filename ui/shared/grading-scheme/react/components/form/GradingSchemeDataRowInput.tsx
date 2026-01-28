@@ -310,10 +310,8 @@ export const GradingSchemeDataRowInput = ({
                   )}
                   onClick={onRowAddRequested}
                   elementRef={buttonRef => {
-                    if (!buttonRef) return
-                    // @ts-expect-error
+                    if (!buttonRef || !(buttonRef instanceof HTMLElement)) return
                     buttonRef.onmouseover = () => setAddButtonHovering(true)
-                    // @ts-expect-error
                     buttonRef.onmouseout = () => setAddButtonHovering(false)
                   }}
                   margin="0 small 0 0"

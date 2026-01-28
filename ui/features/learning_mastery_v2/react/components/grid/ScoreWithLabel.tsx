@@ -19,7 +19,7 @@ import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {ScoreDisplayFormat} from '../../utils/constants'
+import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 
 export interface ScoreWithLabelProps {
   score?: number

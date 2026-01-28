@@ -90,7 +90,6 @@ module CanvasCareer
         horizon_account? && learning_provider_in_context?
       elsif @context.is_a?(Course)
         horizon_course? &&
-          @domain_root_account.feature_enabled?(:horizon_learning_provider_app_for_courses) &&
           learning_provider_in_context? &&
           (user_preference.prefers_learning_provider? || !learner_in_context?)
       else # contextless

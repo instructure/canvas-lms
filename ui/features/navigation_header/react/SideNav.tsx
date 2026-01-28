@@ -108,8 +108,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     })
   }
 
-  // @ts-expect-error
-  const handleActiveTray = useCallback((tray, showActiveTray = false) => {
+  const handleActiveTray = useCallback((tray: string | null, showActiveTray = false) => {
     if (showActiveTray) {
       dispatch({type: 'SET_ACTIVE_TRAY', payload: tray})
     }
@@ -459,7 +458,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
               <Badge
                 count={unreadReleaseNotesCount}
                 formatOutput={(count: string) =>
-                  (unreadReleaseNotesCount || 0) > 0 ? (
+                  (unreadReleaseNotesCount || 0) > 0 && !releaseNotesBadgeDisabled ? (
                     <AccessibleContent
                       alt={I18n.t(
                         {
@@ -480,7 +479,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
               </Badge>
             }
             label={I18n.t('Help')}
-            href="https://help.instructure.com/"
+            href="https://community.instructure.com/"
             onClick={event => {
               event.preventDefault()
               handleActiveTray('help', true)

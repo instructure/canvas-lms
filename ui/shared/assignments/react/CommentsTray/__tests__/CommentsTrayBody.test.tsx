@@ -20,22 +20,19 @@
 
 import $ from 'jquery'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ApolloClient, gql} from '@apollo/client'
+import {MockedProvider} from '@apollo/client/testing'
+import {createCache} from '@canvas/apollo-v3'
+import {COMPLETED_PEER_REVIEW_TEXT} from '@canvas/assignments/helpers/PeerReviewHelpers'
 import CommentContent from '../CommentContent'
 import CommentsTrayBody from '../CommentsTrayBody'
-import {
-  CREATE_SUBMISSION_COMMENT,
-  MARK_SUBMISSION_COMMENT_READ,
-} from '@canvas/assignments/graphql/student/Mutations'
+import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import {ApolloClient, gql} from '@apollo/client'
-import {createCache} from '@canvas/apollo-v3'
-import {MockedProvider} from '@apollo/client/testing'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
-import {COMPLETED_PEER_REVIEW_TEXT} from '@canvas/assignments/helpers/PeerReviewHelpers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}) {
   const variables = {
@@ -91,19 +88,8 @@ async function mockComments(overrides = {}) {
   return queryResult.result.data?.submissionComments.commentsConnection.nodes
 }
 
-async function mockMarkSubmissionCommentsRead(overrides) {
-  return {
-    request: {
-      query: MARK_SUBMISSION_COMMENT_READ,
-      variables: {commentIds: ['1'], submissionId: '1'},
-    },
-    ...overrides,
-  }
-}
-
 let mockedSetOnFailure: (alertMessage: string) => void
 let mockedSetOnSuccess: (alertMessage: string) => void
-const originalENV = window.ENV
 
 function mockContext(children, mocks = []) {
   return (
@@ -151,289 +137,22 @@ const getDefaultPropsWithReviewerSubmission = async (workflowState: string) => {
 
 describe('CommentsTrayBody', () => {
   beforeAll(() => {
-    ENV.current_user = {id: '1'}
+    fakeENV.setup({current_user: {id: '1'}})
     $('body').append('<div role="alert" id=flash_screenreader_holder />')
   })
 
+  afterAll(() => {
+    fakeENV.teardown()
+  })
+
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {...originalENV, RICH_CONTENT_APP_HOST: '', JWT: '123'}
+    fakeENV.setup({current_user: {id: '1'}, RICH_CONTENT_APP_HOST: '', JWT: '123'})
     mockedSetOnFailure = vi.fn().mockResolvedValue({})
     mockedSetOnSuccess = vi.fn().mockResolvedValue({})
   })
 
   afterEach(() => {
-    // @ts-expect-error
-    window.ENV = originalENV
-  })
-
-  describe('read/unread comments', () => {
-    it('marks submission comments as read after timeout', async () => {
-      vi.useFakeTimers()
-
-      const props = await mockAssignmentAndSubmission([
-        {
-          Submission: {unreadCommentCount: 1},
-        },
-      ])
-      const overrides = {
-        SubmissionCommentConnection: {
-          nodes: [{read: false}],
-        },
-      }
-
-      const mockMutation = vi.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
-      const mocks = [
-        await mockSubmissionCommentQuery(overrides),
-        await mockMarkSubmissionCommentsRead({newData: () => mockMutation()}),
-      ]
-
-      render(mockContext(<CommentsTrayBody {...props} />, mocks))
-
-      await act(() => vi.runAllTimers())
-
-      await waitFor(() => expect(mockMutation).toHaveBeenCalledWith(), {timeout: 3000})
-    })
-
-    it('does not mark submission comments as read for observers', async () => {
-      vi.useFakeTimers()
-
-      const props = await mockAssignmentAndSubmission({
-        // @ts-expect-error
-        Submission: {unreadCommentCount: 1},
-      })
-      const overrides = {
-        SubmissionCommentConnection: {
-          nodes: [{read: false}],
-        },
-      }
-
-      const mockMutation = vi.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
-      const mocks = [
-        await mockSubmissionCommentQuery(overrides),
-        await mockMarkSubmissionCommentsRead({newData: () => mockMutation()}),
-      ]
-
-      render(
-        mockContext(
-          // @ts-expect-error
-          <StudentViewContext.Provider value={{isObserver: true, allowChangesToSubmission: false}}>
-            <MockedProvider mocks={mocks}>
-              <CommentsTrayBody {...props} />
-            </MockedProvider>
-          </StudentViewContext.Provider>,
-        ),
-      )
-
-      await act(() => vi.runAllTimers())
-
-      expect(mockMutation).not.toHaveBeenCalled()
-    })
-
-    it('renders an error when submission comments fail to be marked as read', async () => {
-      vi.useFakeTimers()
-
-      const props = await mockAssignmentAndSubmission([
-        {
-          Submission: {unreadCommentCount: 1},
-        },
-      ])
-      const overrides = {
-        SubmissionCommentConnection: {
-          nodes: [{read: false}],
-        },
-      }
-      const mocks = [
-        await mockSubmissionCommentQuery(overrides),
-        await mockMarkSubmissionCommentsRead({error: new Error('it failed!')}),
-      ]
-
-      render(mockContext(<CommentsTrayBody {...props} />, mocks))
-
-      await act(() => vi.advanceTimersByTime(3000))
-      await act(() => vi.runAllTimers())
-
-      expect(mockedSetOnFailure).toHaveBeenCalledWith(
-        'There was a problem marking submission comments as read',
-      )
-    })
-
-    it('alerts the screen reader when submission comments are marked as read', async () => {
-      vi.useFakeTimers()
-
-      const props = await mockAssignmentAndSubmission([
-        {
-          Submission: {unreadCommentCount: 1},
-        },
-      ])
-      const overrides = {
-        SubmissionCommentConnection: {
-          nodes: [{read: false}],
-        },
-      }
-
-      const result = await mockQuery(MARK_SUBMISSION_COMMENT_READ, [], {
-        commentIds: ['1'],
-        submissionId: '1',
-      })
-
-      const mocks = [
-        await mockSubmissionCommentQuery(overrides),
-        await mockMarkSubmissionCommentsRead({result}),
-      ]
-
-      render(mockContext(<CommentsTrayBody {...props} />, mocks))
-
-      await act(() => vi.advanceTimersByTime(3000))
-      await act(() => vi.runAllTimers())
-
-      expect(mockedSetOnSuccess).toHaveBeenCalledWith(
-        'All submission comments have been marked as read',
-      )
-    })
-  })
-
-  describe('group assignments', () => {
-    // fickle. EVAL-3667
-    it('renders warning that comments will be sent to the whole group for group assignments', async () => {
-      const mocks = [await mockSubmissionCommentQuery()]
-      const props = await mockAssignmentAndSubmission([
-        {
-          Assignment: {
-            gradeGroupStudentsIndividually: false,
-            groupCategoryId: '1',
-            groupSet: {
-              _id: '1',
-              name: 'sample-group-set',
-            },
-            submissionTypes: ['online_text_entry', 'online_upload'],
-          },
-          Submission: {
-            ...SubmissionMocks.onlineUploadReadyToSubmit,
-          },
-        },
-      ])
-      const {queryByText} = render(
-        // @ts-expect-error
-        <StudentViewContext.Provider
-          value={{
-            allowChangesToSubmission: true,
-            allowPeerReviewComments: true,
-            isObserver: false,
-          }}
-        >
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        </StudentViewContext.Provider>,
-      )
-      await waitFor(() =>
-        expect(queryByText('All comments are sent to the whole group.')).toBeInTheDocument(),
-      )
-    })
-
-    it('does not render warning for grade students individually group assignments', async () => {
-      const mocks = [await mockSubmissionCommentQuery()]
-      const props = await mockAssignmentAndSubmission([
-        {
-          Assignment: {
-            gradeGroupStudentsIndividually: true,
-            groupCategoryId: '1',
-            groupSet: {
-              _id: '1',
-              name: 'sample-group-set',
-            },
-            submissionTypes: ['online_text_entry', 'online_upload'],
-          },
-          Submission: {
-            ...SubmissionMocks.onlineUploadReadyToSubmit,
-          },
-        },
-      ])
-      const {queryByText} = render(
-        // @ts-expect-error
-        <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        </StudentViewContext.Provider>,
-      )
-      await waitFor(() =>
-        expect(queryByText('All comments are sent to the whole group.')).not.toBeInTheDocument(),
-      )
-    })
-
-    it('does not render group comment warning for non-group assignments', async () => {
-      const mocks = [await mockSubmissionCommentQuery()]
-      const props = await mockAssignmentAndSubmission()
-      const {queryByText} = render(
-        // @ts-expect-error
-        <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        </StudentViewContext.Provider>,
-      )
-      await waitFor(() =>
-        expect(queryByText('All comments are sent to the whole group.')).not.toBeInTheDocument(),
-      )
-    })
-  })
-
-  describe('hidden submissions', () => {
-    it('does not render a "Send a comment" message when no comments', async () => {
-      const props = await mockAssignmentAndSubmission()
-      props.submission.gradeHidden = true
-      props.comments = []
-      const commentProps = {...props, comments: []}
-
-      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
-
-      expect(
-        queryByText("This is where you can leave a comment and view your instructor's feedback."),
-      ).toBeNull()
-    })
-
-    it('renders a message with image if there are no comments', async () => {
-      const mocks = [await mockSubmissionCommentQuery()]
-      const props = await mockAssignmentAndSubmission()
-      props.submission.gradeHidden = true
-      const {getByText, getByTestId} = render(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>,
-      )
-
-      await waitFor(() =>
-        expect(
-          getByText('You may not see all comments for this assignment until grades are posted.'),
-        ).toBeInTheDocument(),
-      )
-      expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
-    })
-
-    it('renders a message (no image) if there are comments', async () => {
-      const overrides = {
-        SubmissionCommentConnection: {
-          nodes: [{_id: '1'}, {_id: '2'}],
-        },
-      }
-      const mocks = [await mockSubmissionCommentQuery(overrides)]
-      const props = await mockAssignmentAndSubmission()
-      props.submission.gradeHidden = true
-      const {getByText, queryByTestId} = render(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>,
-      )
-
-      await waitFor(() =>
-        expect(
-          getByText('You may not see all comments for this assignment until grades are posted.'),
-        ).toBeInTheDocument(),
-      )
-      expect(queryByTestId('svg-placeholder-container')).toBeNull()
-    })
+    fakeENV.teardown()
   })
 
   it('renders error alert when data returned from mutation fails', async () => {
@@ -1013,6 +732,25 @@ describe('CommentsTrayBody', () => {
       props.isPeerReviewEnabled = true
       props.assignment.rubric = {}
       const {findByPlaceholderText, getByText, queryByTestId} = render(
+        mockContext(<CommentsTrayBody {...props} />, mocks),
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(queryByTestId('peer-review-prompt-modal')).not.toBeInTheDocument()
+    })
+
+    it('does not show peer review modal when usePeerReviewModal is false', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
+      props.isPeerReviewEnabled = true
+      props.usePeerReviewModal = false
+      props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
+      const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
         mockContext(<CommentsTrayBody {...props} />, mocks),
       )
       const textArea = await findByPlaceholderText('Submit a Comment')

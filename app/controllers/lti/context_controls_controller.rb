@@ -130,28 +130,45 @@ module Lti
     include Api::V1::Lti::ContextControl
 
     module ContextControlsBookmarker
+      # Sorts courses before their associated parent accounts. Example:
+      # [a1.a3.a4, a1.a3.c22] becomes [11.13.14, 11.13.022], which when ordered naturally
+      # becomes [11.13.022, 11.13.14]
+      CONTEXT_ORDERING_SQL = Arel.sql("REPLACE(REPLACE(path, 'a', '1'), 'c', '0')")
+      ORDER_CLAUSE = [:deployment_id, CONTEXT_ORDERING_SQL, :path].freeze
+
       def self.bookmark_for(context_controls)
-        [context_controls.deployment_id, context_controls.path]
+        [
+          context_controls.deployment_id,
+          context_controls.path.tr("c", "0").tr("a", "1"),
+        ]
       end
 
       def self.validate(bookmark)
         return false unless bookmark.is_a?(Array) && bookmark.length == 2
 
-        bookmark.first.is_a?(Integer) && bookmark.second.is_a?(String)
+        deployment_id, ordered_path = bookmark
+
+        deployment_id.is_a?(Integer) &&
+          ordered_path.is_a?(String)
       end
 
       def self.restrict_scope(scope, pager)
         if pager.current_bookmark
           comparison = (pager.include_bookmark ? ">=" : ">")
-          deployment_id, path = pager.current_bookmark
+          deployment_id, ordered_path = pager.current_bookmark
+
+          sql = <<~SQL.squish
+            (deployment_id > :deployment_id) OR
+            (deployment_id = :deployment_id AND #{CONTEXT_ORDERING_SQL} #{comparison} :ordered_path)
+          SQL
+
           scope = scope.where(
-            "(deployment_id > ?) OR (deployment_id = ? AND path #{comparison} ?)",
-            deployment_id,
-            deployment_id,
-            path
+            sql,
+            deployment_id:,
+            ordered_path:
           )
         end
-        scope.order(:deployment_id, :path)
+        scope.order(*ORDER_CLAUSE)
       end
     end
 
@@ -192,10 +209,14 @@ module Lti
                .active
                .where(registration:, root_account: @account)
                .where.not(context_external_tools: { workflow_state: ["deleted"] })
-               .order(:deployment_id, :path)
+               .order(*ContextControlsBookmarker::ORDER_CLAUSE)
       )
 
-      paginated = Api.paginate(bookmarked, self, api_v1_lti_context_controls_index_url, per_page: controls_page_size)
+      paginated = Api.paginate(bookmarked,
+                               self,
+                               api_v1_lti_context_controls_index_url,
+                               per_page: Api.per_page_for(self,
+                                                          default: CONTROLS_DEFAULT_LIST_PAGE_SIZE))
 
       render json: (
         paginated
@@ -208,15 +229,6 @@ module Lti
     rescue => e
       report_error(e)
       raise e
-    end
-
-    def controls_page_size
-      per_page = params[:per_page].to_i
-      if per_page <= 0
-        CONTROLS_DEFAULT_LIST_PAGE_SIZE
-      else
-        [per_page, CONTROLS_MAX_LIST_PAGE_SIZE].min
-      end
     end
 
     # @API Show LTI Context Control
@@ -420,7 +432,9 @@ module Lti
         end
       end
 
-      controls = Lti::ContextControl.where(id: ids).preload(:account, :course, :created_by, :updated_by).order(id: :asc)
+      controls = Lti::ContextControl.where(id: ids)
+                                    # Used by serializer for users' names.
+                                    .preload(:created_by, :updated_by).order(id: :asc)
       calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls)
 
       invalidate_navigation_cache_for_deployments(

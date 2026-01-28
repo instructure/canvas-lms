@@ -19,18 +19,43 @@
 
 module Api::V1::AiExperience
   include Api::V1::Json
+  include Api::V1::User
 
   API_JSON_OPTS = {
     only: %w[id title description facts learning_objective pedagogical_guidance workflow_state course_id created_at updated_at]
   }.freeze
 
+  CONVERSATION_JSON_OPTS = {
+    only: %w[id llm_conversation_id workflow_state created_at updated_at user_id]
+  }.freeze
+
   def ai_experience_json(ai_experience, user, session, opts = {})
-    api_json(ai_experience, user, session, opts.merge(API_JSON_OPTS))
+    json = api_json(ai_experience, user, session, opts.merge(API_JSON_OPTS))
+    json[:can_manage] = opts[:can_manage] if opts.key?(:can_manage)
+    json[:submission_status] = opts[:submission_status] if opts.key?(:submission_status)
+    # Include can_unpublish if user can manage
+    json[:can_unpublish] = ai_experience.can_unpublish? if opts[:can_manage]
+    json
   end
 
   def ai_experiences_json(ai_experiences, user, session, opts = {})
     ai_experiences.map do |ai_experience|
       ai_experience_json(ai_experience, user, session, opts)
     end
+  end
+
+  def ai_conversation_json(conversation, user, session, opts = {})
+    json = api_json(conversation, user, session, opts.merge(CONVERSATION_JSON_OPTS))
+
+    # Include student information if requested (for teacher view)
+    if opts[:include_student] && conversation.user
+      json[:student] = user_json(conversation.user, user, session, ["avatar_url"], @context)
+    end
+
+    # Include messages and progress if provided
+    json[:messages] = opts[:messages] if opts[:messages]
+    json[:progress] = opts[:progress] if opts[:progress]
+
+    json
   end
 end

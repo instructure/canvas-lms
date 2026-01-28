@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import ConfirmCommunicationChannel, {
   type ConfirmCommunicationChannelProps,
@@ -28,14 +29,19 @@ vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(),
 }))
 
+const server = setupServer()
+
 describe('ConfirmCommunicationChannel', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    fetchMock.restore()
+    server.resetHandlers()
     vi.clearAllMocks()
     vi.restoreAllMocks()
   })
@@ -91,7 +97,11 @@ describe('ConfirmCommunicationChannel', () => {
 
   it('should call onSubmit after a successful response', async () => {
     const code = '1234'
-    fetchMock.post(`/register/${code}`, 200, {overwriteRoutes: true})
+    server.use(
+      http.post(`/register/${code}`, () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
     const {getByLabelText} = render(<ConfirmCommunicationChannel {...props} />)
     const codeInput = getByLabelText('Code')
     const confirm = getByLabelText('Confirm')
@@ -106,7 +116,11 @@ describe('ConfirmCommunicationChannel', () => {
 
   it('should call onError after a failed response', async () => {
     const code = '1234'
-    fetchMock.post(`/register/${code}`, 500, {overwriteRoutes: true})
+    server.use(
+      http.post(`/register/${code}`, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     const {getByLabelText} = render(<ConfirmCommunicationChannel {...props} />)
     const codeInput = getByLabelText('Code')
     const confirm = getByLabelText('Confirm')

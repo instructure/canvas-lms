@@ -381,9 +381,6 @@ describe('CommentTextArea', () => {
     expect(labelElement.getAttribute('for')).toBe(textArea.getAttribute('id'))
   })
 
-  // LS-1339 created to figure out why this is failing
-  // since updating @instructure/ui-media-player to v7
-  // TODO: Fix in EVAL-2482
   it.skip('notifies users when a submission comments with files is sent', async () => {
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
     uploadFileModule.submissionCommentAttachmentsUpload = () => [
@@ -427,9 +424,6 @@ describe('CommentTextArea', () => {
     await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent'))
   })
 
-  // LS-1339 created to figure out why this is failing
-  // since updating @instructure/ui-media-player to v7
-  // TODO: Fix in EVAL-2482
   it.skip('users cannot send submission comments with not files or text', async () => {
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
     uploadFileModule.submissionCommentAttachmentsUpload = () => [
@@ -457,9 +451,6 @@ describe('CommentTextArea', () => {
     expect(await waitFor(() => queryAllByText('Submission comment sent'))).toHaveLength(0)
   })
 
-  // LS-1339 created to figure out why this is failing
-  // since updating @instructure/ui-media-player to v7
-  // TODO: Fix in EVAL-2482
   it.skip('notifies users of error when file fails to upload', async () => {
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
     uploadFileModule.submissionCommentAttachmentsUpload = () => {

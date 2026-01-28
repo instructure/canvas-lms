@@ -42,7 +42,7 @@
  */
 
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode, legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-link'
@@ -250,7 +250,7 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
   }
 
   function closeAlert(atNode: Element) {
-    ReactDOM.unmountComponentAtNode(atNode)
+    legacyUnmountComponentAtNode(atNode)
     atNode.remove()
   }
 
@@ -270,7 +270,7 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
   }
 
   function renderAlert(parent: Element) {
-    ReactDOM.render(
+    legacyRender(
       <FlashAlert
         message={message}
         timeout={ENV.flashAlertTimeout ?? timeout}

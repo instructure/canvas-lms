@@ -1487,6 +1487,9 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "Mediendatei wird verarbeitet. Versuchen Sie es später noch einmal."
     },
+    "media_options_saved_560c4ec8": {
+        "message": "Medienoptionen gespeichert."
+    },
     "media_title_2112243b": {
         "message": "Medien-Titel"
     },

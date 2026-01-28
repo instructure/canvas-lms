@@ -404,6 +404,19 @@ lti_registrations_history:
       state: allowed_on
     ci:
       state: allowed_on
+lti_registrations_templates:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Support Inherited Apps in LTI Apps Page
+  description: |-
+    When enabled, allows apps inherited from Site Admin to be edited on the Apps page, and will
+    create local copies of inherited apps.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_registrations_next:
   state: hidden
   shadow: true
@@ -547,6 +560,20 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
+modify_site_admin_developer_keys_permission:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: 'Enforce "Developer Keys -- Modify Site Admin Keys" Permission'
+  description: |-
+    Enforce the modify_site_admin_developer_keys permission, which prevents
+    Site Admin users without the permission from modifying global Developer
+    Keys.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 nav_menu_links:
   state: hidden
   shadow: true

@@ -34,8 +34,6 @@ describe('LaunchSettings', () => {
       <LaunchSettingsConfirmationWrapper
         internalConfig={config}
         overlayStore={overlayStore}
-        onPreviousClicked={vi.fn()}
-        onNextClicked={vi.fn()}
         reviewing={false}
       />,
     )
@@ -78,8 +76,6 @@ describe('LaunchSettings', () => {
       <LaunchSettingsConfirmationWrapper
         internalConfig={config}
         overlayStore={overlayStore}
-        onPreviousClicked={vi.fn()}
-        onNextClicked={vi.fn()}
         reviewing={false}
       />,
     )
@@ -135,8 +131,6 @@ it('renders a popover on hovering over the custom fields info button', async () 
     <LaunchSettingsConfirmationWrapper
       internalConfig={config}
       overlayStore={overlayStore}
-      onPreviousClicked={vi.fn()}
-      onNextClicked={vi.fn()}
       reviewing={false}
     />,
   )
@@ -160,52 +154,4 @@ it('renders a popover on hovering over the custom fields info button', async () 
     )
     expect(customFieldsDocLink).toBeInTheDocument()
   })
-})
-
-it('focuses invalid inputs if any fields are invalid', async () => {
-  const user = userEvent.setup()
-  const config = mockInternalConfiguration({
-    redirect_uris: ['https://example.com/launch'],
-    domain: 'example.com',
-    public_jwk_url: 'https://example.com/jwks',
-  })
-  const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
-  const onNextClicked = vi.fn()
-  render(
-    <LaunchSettingsConfirmationWrapper
-      internalConfig={config}
-      overlayStore={overlayStore}
-      onPreviousClicked={vi.fn()}
-      onNextClicked={onNextClicked}
-      reviewing={false}
-    />,
-  )
-  const nextButton = screen.getByRole('button', {name: /Next/i})
-  const redirectURIs = screen.getByLabelText(/Redirect URIs/i)
-  await user.clear(redirectURIs)
-  await user.paste('http:<<<>>')
-  await user.tab()
-  // Small delay to ensure validation runs
-  await new Promise(resolve => setTimeout(resolve, 10))
-  await user.click(nextButton)
-  expect(onNextClicked).not.toHaveBeenCalled()
-  expect(redirectURIs).toHaveFocus()
-
-  await user.clear(redirectURIs)
-  await user.paste('https://example.com/launch')
-
-  const domain = screen.getByLabelText('Domain')
-  await user.clear(domain)
-  await user.paste('domain00---.com.')
-  await user.tab()
-  // Small delay to ensure validation runs
-  await new Promise(resolve => setTimeout(resolve, 10))
-  await user.click(nextButton)
-  expect(onNextClicked).not.toHaveBeenCalled()
-  expect(domain).toHaveFocus()
-
-  await user.clear(domain)
-  await user.paste('example.com')
-  await user.click(nextButton)
-  expect(onNextClicked).toHaveBeenCalled()
 })

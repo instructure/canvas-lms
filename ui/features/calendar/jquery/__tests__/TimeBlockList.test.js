@@ -32,9 +32,9 @@ let me
 let $splitter
 let jsdomAlert
 
-describe.skip('TimeBlockList', () => {
+describe('TimeBlockList', () => {
   beforeEach(() => {
-    const wrappedDate = str => $.fullCalendar.moment(new Date(str))
+    const wrappedDate = str => fcUtil.wrap(new Date(str))
 
     $holder = $('<table>').appendTo('#fixtures')
     $splitter = $('<a>').appendTo('#fixtures')
@@ -46,7 +46,7 @@ describe.skip('TimeBlockList', () => {
       [wrappedDate(`2/3/${nextYear} 11:15`), wrappedDate(`2/3/${nextYear} 15:01`), true],
       [wrappedDate(`2/3/${nextYear} 16:00`), wrappedDate(`2/3/${nextYear} 19:00`)],
     ]
-    blankRow = {date: fcUtil.wrap(new Date(2017, 2, 3))}
+    blankRow = {date: fcUtil.wrap(new Date(2050, 2, 3))}
     me = new TimeBlockList($holder, $splitter, blocks, blankRow)
     jsdomAlert = window.alert
     window.alert = () => {}
@@ -117,7 +117,7 @@ describe.skip('TimeBlockList', () => {
   })
 })
 
-describe.skip('TimeBlockList with no time blocks', () => {
+describe('TimeBlockList with no time blocks', () => {
   beforeEach(() => {
     $holder = $('<table>').appendTo('#fixtures')
     $splitter = $('<a>').appendTo('#fixtures')

@@ -87,8 +87,8 @@ export const WidgetDashboardEditProvider: React.FC<{children: React.ReactNode}> 
         await saveMutation.mutateAsync(config)
         setIsEditMode(false)
         setIsDirty(false)
-      } catch (error) {
-        console.error('Failed to save widget layout:', error)
+      } catch {
+        // Error is handled by mutation onError callback
       }
     },
     [saveMutation],

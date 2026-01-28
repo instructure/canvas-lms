@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render as realRender, fireEvent, act} from '@testing-library/react'
+import {cleanup, render as realRender, fireEvent, act} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
 import {createCache} from '@canvas/apollo-v3'
 import GroupEditModal from '../GroupEditModal'
@@ -71,6 +71,8 @@ describe('GroupEditModal', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    cleanup()
+    cache.reset()
   })
 
   it('renders component with content', async () => {

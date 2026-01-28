@@ -19,12 +19,22 @@
 import * as apiClient from '../apiClient'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import axios from '@canvas/axios'
+
+vi.mock('@canvas/axios')
+const mockedAxios = axios
 
 const server = setupServer()
 
 describe('apiClient', () => {
   beforeAll(() => {
     server.listen()
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockedAxios.get.mockResolvedValue({data: {}, status: 200})
+    mockedAxios.post.mockResolvedValue({data: {}, status: 200})
   })
 
   afterEach(() => {
@@ -41,38 +51,28 @@ describe('apiClient', () => {
     const learningOutcomeGroupId = 1
     const apiRouteRoot = `/api/v1${contextRoot}/outcome_imports`
 
-    async function executeTest(apiRoute, apiClientCall) {
-      let capturedUrl
-      server.use(
-        http.all('*', ({request}) => {
-          capturedUrl = request.url
-          return new HttpResponse(JSON.stringify({}), {
-            status: 200,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-        }),
-      )
-
+    async function executeTest(apiRoute, apiClientCall, method = 'get') {
       await apiClientCall()
-      // Extract pathname and search from the full URL
-      const url = new URL(capturedUrl)
-      const fullPath = url.pathname + url.search
-      expect(fullPath).toEqual(apiRoute)
+      const mockMethod = method === 'post' ? mockedAxios.post : mockedAxios.get
+      expect(mockMethod).toHaveBeenCalled()
+      const calledUrl = mockMethod.mock.calls[0][0]
+      expect(calledUrl).toEqual(apiRoute)
     }
 
-    it.skip('calls the correct route for createImport without specifying a group', async () => {
-      await executeTest(`${apiRouteRoot}/?import_type=instructure_csv`, () =>
-        apiClient.createImport(contextRoot, new File([''], 'test.csv')),
+    it('calls the correct route for createImport without specifying a group', async () => {
+      await executeTest(
+        `${apiRouteRoot}/?import_type=instructure_csv`,
+        () => apiClient.createImport(contextRoot, new File([''], 'test.csv')),
+        'post',
       )
     })
 
-    it.skip('calls the correct route for createImport within a group', async () => {
+    it('calls the correct route for createImport within a group', async () => {
       await executeTest(
         `${apiRouteRoot}/group/${learningOutcomeGroupId}?import_type=instructure_csv`,
         () =>
           apiClient.createImport(contextRoot, new File([''], 'test.csv'), learningOutcomeGroupId),
+        'post',
       )
     })
 

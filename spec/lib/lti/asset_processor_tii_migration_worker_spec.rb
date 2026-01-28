@@ -588,14 +588,25 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       worker.instance_variable_set(:@progress, test_progress)
     end
 
-    it "adds error when multiple deployments found in context hierarchy" do
+    it "throws error when multiple deployments found in the context" do
       # Create two deployments with the same developer key and context controls
       tii_registration.new_external_tool(course)
-      tii_registration.new_external_tool(sub_account)
+      tii_registration.new_external_tool(course)
       worker.send(:initialize_proxy_results, course_tool_proxy)
       worker.send(:migrate_tool_proxy, course_tool_proxy)
       results = worker.instance_variable_get(:@results)
       expect(results[:proxies][course_tool_proxy.id][:errors].first).to match(/Multiple TII AP deployments found/)
+    end
+
+    it "throws no error when multiple deployments found in context hierarchy, but only one is matching the context" do
+      # Create two deployments with the same developer key and context controls
+      tii_registration.new_external_tool(course)
+      tii_registration.new_external_tool(sub_account)
+      allow(worker).to receive(:tii_tp_migration)
+      worker.send(:initialize_proxy_results, course_tool_proxy)
+      worker.send(:migrate_tool_proxy, course_tool_proxy)
+      results = worker.instance_variable_get(:@results)
+      expect(results[:proxies][course_tool_proxy.id][:errors]).to be_empty
     end
 
     it "adds error when deployment found in parent context but not in tool proxy context" do
@@ -1369,6 +1380,590 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       }
 
       expect(worker.send(:any_error_occurred?)).to be true
+    end
+
+    it "returns true when actl errors present" do
+      results = worker.instance_variable_get(:@results)
+      results[:proxies] = {}
+      results[:actl_errors] = { 1 => ["ACTL error"] }
+
+      expect(worker.send(:any_error_occurred?)).to be true
+    end
+  end
+
+  describe "#migrate_reports" do
+    let(:assignment) { assignment_model(course:) }
+    let(:submission) { submission_model(assignment:, user: user_model) }
+    let(:resource_handler) do
+      Lti::ResourceHandler.create!(
+        resource_type_code: "resource",
+        name: "Test Resource",
+        tool_proxy:
+      )
+    end
+    let(:message_handler) do
+      Lti::MessageHandler.create!(
+        message_type: "basic-lti-launch-request",
+        launch_path: "http://example.com/launch",
+        resource_handler:,
+        tool_proxy:
+      )
+    end
+    let(:actl) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: described_class::TII_TOOL_VENDOR_CODE,
+        tool_product_code: described_class::TII_TOOL_PRODUCT_CODE,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+    end
+    let(:asset_processor) do
+      Lti::AssetProcessor.create!(
+        assignment:,
+        context_external_tool: external_tool_1_3_model(context: sub_account)
+      )
+    end
+
+    it "returns failed status when no asset processor is provided" do
+      status, count = worker.send(:migrate_reports, actl, tool_proxy, nil)
+
+      expect(status).to eq(:failed)
+      expect(count).to eq(0)
+    end
+
+    it "returns success status when no reports exist" do
+      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+
+      expect(status).to eq(:success)
+      expect(count).to eq(0)
+    end
+
+    it "migrates a single originality report" do
+      attachment = attachment_model(context: course)
+      OriginalityReport.create!(
+        attachment:,
+        submission:,
+        originality_score: 75.5,
+        workflow_state: "scored"
+      )
+
+      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+
+      expect(status).to eq(:success)
+      expect(count).to eq(1)
+      expect(Lti::AssetReport.count).to eq(1)
+
+      asset_report = Lti::AssetReport.last
+      expect(asset_report.asset_processor).to eq(asset_processor)
+      expect(asset_report.result).to eq("75.5%")
+      expect(asset_report.report_type).to eq(described_class::MIGRATED_ASSET_REPORT_TYPE)
+      expect(asset_report.title).to eq("Turnitin Similarity")
+    end
+
+    it "migrates multiple originality reports for different submissions" do
+      submission1 = submission
+      submission2 = submission_model(assignment:, user: user_model)
+      attachment1 = attachment_model(context: course)
+      attachment2 = attachment_model(context: course)
+
+      OriginalityReport.create!(
+        attachment: attachment1,
+        submission: submission1,
+        originality_score: 25,
+        workflow_state: "scored"
+      )
+      OriginalityReport.create!(
+        attachment: attachment2,
+        submission: submission2,
+        originality_score: 50,
+        workflow_state: "scored"
+      )
+
+      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+
+      expect(status).to eq(:success)
+      expect(count).to eq(2)
+      expect(Lti::AssetReport.count).to eq(2)
+    end
+
+    it "only migrates the most recent report for each submission/attachment combination" do
+      attachment = attachment_model(context: course)
+
+      # Create older report
+      OriginalityReport.create!(
+        attachment:,
+        submission:,
+        originality_score: 30,
+        workflow_state: "scored",
+        created_at: 2.days.ago
+      )
+
+      # Create newer report
+      OriginalityReport.create!(
+        attachment:,
+        submission:,
+        originality_score: 75,
+        workflow_state: "scored",
+        created_at: 1.day.ago
+      )
+
+      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+
+      expect(status).to eq(:success)
+      expect(count).to eq(1)
+      expect(Lti::AssetReport.count).to eq(1)
+
+      asset_report = Lti::AssetReport.last
+      expect(asset_report.result).to eq("75.0%")
+    end
+
+    it "handles exceptions during report migration and returns partially_failed status" do
+      attachment = attachment_model(context: course)
+      report1 = OriginalityReport.create!(
+        attachment:,
+        submission:,
+        originality_score: 75,
+        workflow_state: "scored"
+      )
+
+      submission2 = submission_model(assignment:, user: user_model)
+      attachment2 = attachment_model(context: course)
+      OriginalityReport.create!(
+        attachment: attachment2,
+        submission: submission2,
+        originality_score: 50,
+        workflow_state: "scored"
+      )
+
+      # Make first report migration fail
+      allow(worker).to receive(:migrate_report).and_wrap_original do |method, *args|
+        if args[1] == report1
+          raise StandardError, "Test error"
+        else
+          method.call(*args)
+        end
+      end
+
+      allow(Canvas::Errors).to receive(:capture_exception)
+
+      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+
+      expect(status).to eq(:partially_failed)
+      expect(count).to eq(1)
+      expect(Canvas::Errors).to have_received(:capture_exception).once
+    end
+
+    it "returns failed status when all report migrations fail" do
+      attachment = attachment_model(context: course)
+      OriginalityReport.create!(
+        attachment:,
+        submission:,
+        originality_score: 75,
+        workflow_state: "scored"
+      )
+
+      allow(worker).to receive(:migrate_report).and_raise(StandardError, "Test error")
+      allow(Canvas::Errors).to receive(:capture_exception)
+
+      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+
+      expect(status).to eq(:failed)
+      expect(count).to eq(0)
+    end
+  end
+
+  describe "#migrate_report" do
+    let(:assignment) { assignment_model(course:) }
+    let(:user) { user_model }
+    let(:submission) { submission_model(assignment:, user:) }
+    let(:resource_handler) do
+      Lti::ResourceHandler.create!(
+        resource_type_code: "resource",
+        name: "Test Resource",
+        tool_proxy:
+      )
+    end
+    let(:message_handler) do
+      Lti::MessageHandler.create!(
+        message_type: "basic-lti-launch-request",
+        launch_path: "http://example.com/launch",
+        resource_handler:,
+        tool_proxy:
+      )
+    end
+    let(:actl) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: described_class::TII_TOOL_VENDOR_CODE,
+        tool_product_code: described_class::TII_TOOL_PRODUCT_CODE,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+    end
+    let(:asset_processor) do
+      Lti::AssetProcessor.create!(
+        assignment:,
+        context_external_tool: external_tool_1_3_model(context: sub_account)
+      )
+    end
+
+    context "with attachment-based report" do
+      it "creates asset report with all required fields" do
+        attachment = attachment_model(context: course)
+        cpf_report = OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 75.5,
+          workflow_state: "scored"
+        )
+
+        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+
+        expect(Lti::AssetReport.count).to eq(1)
+        asset_report = Lti::AssetReport.last
+        expect(asset_report.asset_processor).to eq(asset_processor)
+        expect(asset_report.asset.attachment).to eq(attachment)
+        expect(asset_report.asset.submission).to eq(submission)
+        expect(asset_report.result).to eq("75.5%")
+        expect(asset_report.report_type).to eq(described_class::MIGRATED_ASSET_REPORT_TYPE)
+        expect(asset_report.title).to eq("Turnitin Similarity")
+        expect(asset_report.processing_progress).to eq(Lti::AssetReport::PROGRESS_PROCESSED)
+        expect(asset_report.priority).to eq(Lti::AssetReport::PRIORITY_TIME_CRITICAL)
+      end
+
+      it "sets correct indication color based on similarity score" do
+        attachment = attachment_model(context: course)
+        cpf_report = OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 85,
+          workflow_state: "scored"
+        )
+
+        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+
+        asset_report = Lti::AssetReport.last
+        expect(asset_report.indication_color).to be_present
+        expect(asset_report.indication_alt).to be_present
+      end
+
+      it "sets correct indication color for low similarity score" do
+        attachment = attachment_model(context: course)
+        cpf_report = OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 15,
+          workflow_state: "scored"
+        )
+
+        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+
+        asset_report = Lti::AssetReport.last
+        expect(asset_report.indication_color).to eq("#00AC18")
+        expect(asset_report.indication_alt).to eq("Low similarity - acceptable")
+      end
+
+      it "stores custom_sourcedid in extensions when present" do
+        attachment = attachment_model(context: course)
+        cpf_report = OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 50,
+          workflow_state: "scored"
+        )
+
+        # Mock extract_custom_sourcedid to return a value
+        allow(worker).to receive(:extract_custom_sourcedid).and_return("abc123")
+
+        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+
+        asset_report = Lti::AssetReport.last
+        expect(asset_report.extensions["https://www.instructure.com/legacy_custom_sourcedid"]).to eq("abc123")
+      end
+
+      it "adds warning when custom_sourcedid is missing" do
+        attachment = attachment_model(context: course)
+        cpf_report = OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 50,
+          workflow_state: "scored"
+        )
+
+        worker.send(:initialize_proxy_results, tool_proxy)
+        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+
+        results = worker.instance_variable_get(:@results)
+        warnings = results[:actl_warnings][actl.id]
+        expect(warnings).to include("No custom_sourcedid found on report")
+      end
+
+      it "replaces existing report for the same asset" do
+        attachment = attachment_model(context: course)
+
+        # First migration
+        first_cpf_report = OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 50,
+          workflow_state: "scored"
+        )
+
+        worker.send(:migrate_report, actl, first_cpf_report, asset_processor)
+
+        expect(Lti::AssetReport.active.count).to eq(1)
+        first_asset_report_id = Lti::AssetReport.last.id
+
+        # Second migration with newer report - should replace the first
+        second_cpf_report = OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 75,
+          workflow_state: "scored"
+        )
+        second_cpf_report.update_column(:updated_at, 1.hour.from_now)
+
+        worker.send(:migrate_report, actl, second_cpf_report, asset_processor)
+
+        # Should delete older report and create new one (soft delete)
+        expect(Lti::AssetReport.active.exists?(first_asset_report_id)).to be false
+        expect(Lti::AssetReport.active.count).to eq(1)
+
+        new_report = Lti::AssetReport.active.last
+        expect(new_report.result).to eq("75.0%")
+      end
+    end
+
+    context "with text-entry report (no attachment)" do
+      it "raises error when submission attempt cannot be found" do
+        cpf_report = OriginalityReport.create!(
+          submission:,
+          originality_score: 75,
+          workflow_state: "scored",
+          submission_time: 1.day.ago
+        )
+
+        expect do
+          worker.send(:migrate_report, actl, cpf_report, asset_processor)
+        end.to raise_error("Cannot find submission attempt for report ID=#{cpf_report.id}")
+      end
+
+      it "creates asset report with submission attempt when found" do
+        cpf_report = OriginalityReport.create!(
+          submission:,
+          originality_score: 60,
+          workflow_state: "scored",
+          submission_time: 1.day.ago
+        )
+
+        # Mock find_attempt_for_report to return a valid attempt
+        allow(worker).to receive(:find_attempt_for_report).with(cpf_report).and_return(1)
+
+        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+
+        expect(Lti::AssetReport.count).to eq(1)
+        asset_report = Lti::AssetReport.last
+        expect(asset_report.asset_processor).to eq(asset_processor)
+        expect(asset_report.asset.submission).to eq(submission)
+        expect(asset_report.asset.submission_attempt).to eq(1)
+        expect(asset_report.result).to eq("60.0%")
+        expect(asset_report.report_type).to eq(described_class::MIGRATED_ASSET_REPORT_TYPE)
+      end
+    end
+
+    context "visible_to_owner setting" do
+      it "sets visible_to_owner based on turnitin_settings" do
+        attachment = attachment_model(context: course)
+        assignment.update!(turnitin_settings: { s_view_report: "1" })
+        cpf_report = OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 50,
+          workflow_state: "scored"
+        )
+
+        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+
+        asset_report = Lti::AssetReport.last
+        expect(asset_report.visible_to_owner).to be true
+      end
+    end
+  end
+
+  describe "#priority_from_cpf_report" do
+    it "returns TIME_CRITICAL priority for error state" do
+      report = double("report", workflow_state: "error", originality_score: nil)
+      priority = worker.send(:priority_from_cpf_report, report)
+      expect(priority).to eq(Lti::AssetReport::PRIORITY_TIME_CRITICAL)
+    end
+
+    it "returns TIME_CRITICAL priority for score >= 75" do
+      report = double("report", workflow_state: "scored", originality_score: 80)
+      priority = worker.send(:priority_from_cpf_report, report)
+      expect(priority).to eq(Lti::AssetReport::PRIORITY_TIME_CRITICAL)
+    end
+
+    it "returns SEMI_TIME_CRITICAL priority for score >= 50 and < 75" do
+      report = double("report", workflow_state: "scored", originality_score: 60)
+      priority = worker.send(:priority_from_cpf_report, report)
+      expect(priority).to eq(Lti::AssetReport::PRIORITY_SEMI_TIME_CRITICAL)
+    end
+
+    it "returns NOT_TIME_CRITICAL priority for score >= 25 and < 50" do
+      report = double("report", workflow_state: "scored", originality_score: 35)
+      priority = worker.send(:priority_from_cpf_report, report)
+      expect(priority).to eq(Lti::AssetReport::PRIORITY_NOT_TIME_CRITICAL)
+    end
+
+    it "returns GOOD priority for score < 25" do
+      report = double("report", workflow_state: "scored", originality_score: 10)
+      priority = worker.send(:priority_from_cpf_report, report)
+      expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
+    end
+
+    it "returns GOOD priority for scored state with no score" do
+      report = double("report", workflow_state: "scored", originality_score: nil)
+      priority = worker.send(:priority_from_cpf_report, report)
+      expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
+    end
+
+    it "returns GOOD priority for pending state" do
+      report = double("report", workflow_state: "pending", originality_score: nil)
+      priority = worker.send(:priority_from_cpf_report, report)
+      expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
+    end
+  end
+
+  describe "#processing_progress_from_cpf_report" do
+    it "returns PROCESSING for pending state" do
+      report = double("report", workflow_state: "pending")
+      progress = worker.send(:processing_progress_from_cpf_report, report)
+      expect(progress).to eq(Lti::AssetReport::PROGRESS_PROCESSING)
+    end
+
+    it "returns FAILED for error state" do
+      report = double("report", workflow_state: "error")
+      progress = worker.send(:processing_progress_from_cpf_report, report)
+      expect(progress).to eq(Lti::AssetReport::PROGRESS_FAILED)
+    end
+
+    it "returns PROCESSED for scored state" do
+      report = double("report", workflow_state: "scored")
+      progress = worker.send(:processing_progress_from_cpf_report, report)
+      expect(progress).to eq(Lti::AssetReport::PROGRESS_PROCESSED)
+    end
+
+    it "returns NOT_READY for other states" do
+      report = double("report", workflow_state: "unknown")
+      progress = worker.send(:processing_progress_from_cpf_report, report)
+      expect(progress).to eq(Lti::AssetReport::PROGRESS_NOT_READY)
+    end
+  end
+
+  describe "#extract_custom_sourcedid" do
+    it "extracts custom_sourcedid from resource_url" do
+      report = double("report")
+      lti_link = double("lti_link", resource_url: "https://example.com/launch?custom_sourcedid=abc123&other=param")
+      allow(report).to receive(:lti_link).and_return(lti_link)
+
+      sourcedid = worker.send(:extract_custom_sourcedid, report)
+      expect(sourcedid).to eq("abc123")
+    end
+
+    it "returns nil when resource_url is nil" do
+      report = double("report")
+      lti_link = double("lti_link", resource_url: nil)
+      allow(report).to receive(:lti_link).and_return(lti_link)
+
+      sourcedid = worker.send(:extract_custom_sourcedid, report)
+      expect(sourcedid).to be_nil
+    end
+
+    it "returns nil when lti_link is nil" do
+      report = double("report", lti_link: nil)
+
+      sourcedid = worker.send(:extract_custom_sourcedid, report)
+      expect(sourcedid).to be_nil
+    end
+
+    it "returns nil when custom_sourcedid is not present" do
+      report = double("report")
+      lti_link = double("lti_link", resource_url: "https://example.com/launch?other=param")
+      allow(report).to receive(:lti_link).and_return(lti_link)
+
+      sourcedid = worker.send(:extract_custom_sourcedid, report)
+      expect(sourcedid).to be_nil
+    end
+
+    it "returns nil for invalid URI" do
+      report = double("report")
+      lti_link = double("lti_link", resource_url: "not a valid uri")
+      allow(report).to receive(:lti_link).and_return(lti_link)
+
+      sourcedid = worker.send(:extract_custom_sourcedid, report)
+      expect(sourcedid).to be_nil
+    end
+  end
+
+  describe "#calc_indications_from_cpf_report" do
+    it "returns red indication for very high similarity (failure)" do
+      report = double("report", originality_score: 95)
+      allow(Turnitin).to receive(:state_from_similarity_score).with(95).and_return("failure")
+
+      color, alt = worker.send(:calc_indications_from_cpf_report, report)
+      expect(color).to eq("#8B1A1A")
+      expect(alt).to eq("Very high similarity - immediate attention required")
+    end
+
+    it "returns red indication for high similarity (problem)" do
+      report = double("report", originality_score: 80)
+      allow(Turnitin).to receive(:state_from_similarity_score).with(80).and_return("problem")
+
+      color, alt = worker.send(:calc_indications_from_cpf_report, report)
+      expect(color).to eq("#EE0612")
+      expect(alt).to eq("High similarity - attention needed")
+    end
+
+    it "returns orange indication for medium similarity (warning)" do
+      report = double("report", originality_score: 60)
+      allow(Turnitin).to receive(:state_from_similarity_score).with(60).and_return("warning")
+
+      color, alt = worker.send(:calc_indications_from_cpf_report, report)
+      expect(color).to eq("#FC5E13")
+      expect(alt).to eq("Medium similarity - review recommended")
+    end
+
+    it "returns green indication for low similarity (acceptable)" do
+      report = double("report", originality_score: 15)
+      allow(Turnitin).to receive(:state_from_similarity_score).with(15).and_return("acceptable")
+
+      color, alt = worker.send(:calc_indications_from_cpf_report, report)
+      expect(color).to eq("#00AC18")
+      expect(alt).to eq("Low similarity - acceptable")
+    end
+
+    it "returns green indication for no similarity (none)" do
+      report = double("report", originality_score: 0)
+      allow(Turnitin).to receive(:state_from_similarity_score).with(0).and_return("none")
+
+      color, alt = worker.send(:calc_indications_from_cpf_report, report)
+      expect(color).to eq("#00AC18")
+      expect(alt).to eq("No matching content found")
+    end
+
+    it "returns nil values when originality_score is not present" do
+      report = double("report", originality_score: nil)
+
+      color, alt = worker.send(:calc_indications_from_cpf_report, report)
+      expect(color).to be_nil
+      expect(alt).to be_nil
     end
   end
 end

@@ -18,9 +18,9 @@
 
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import axios from '@canvas/axios'
-import useRollups from '../useRollups'
-import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../../utils/constants'
-import {Outcome, Rating, Student} from '../../types/rollup'
+import useRollups from '@canvas/outcomes/react/hooks/useRollups'
+import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '@canvas/outcomes/react/utils/constants'
+import {Outcome, Rating, Student} from '@canvas/outcomes/react/types/rollup'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 
 vi.mock('@canvas/axios')

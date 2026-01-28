@@ -21,7 +21,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {OutcomeArrangement} from '../../utils/constants'
+import {OutcomeArrangement} from '@canvas/outcomes/react/utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

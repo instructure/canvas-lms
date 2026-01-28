@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render as realRender, fireEvent, act} from '@testing-library/react'
+import {render as realRender, fireEvent, act, waitFor, cleanup} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
 import {within} from '@testing-library/dom'
 import {pick} from 'es-toolkit/compat'
@@ -30,10 +30,9 @@ import {
 } from '@canvas/outcomes/mocks/Management'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 injectGlobalAlertContainers()
-
-vi.useFakeTimers()
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: vi.fn(() => vi.fn(() => {})),
@@ -67,13 +66,40 @@ describe('OutcomeEditModal', () => {
   })
 
   beforeEach(() => {
+    vi.useFakeTimers()
+    fakeENV.setup()
     onCloseHandlerMock = vi.fn()
     onEditLearningOutcomeHandlerMock = vi.fn()
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Clear any pending timers before cleanup
+    vi.clearAllTimers()
+
+    // Cleanup React components
+    cleanup()
+
+    // Clear document focus
+    if (document.activeElement && document.activeElement !== document.body) {
+      document.activeElement.blur()
+    }
+
+    // Reset mocks and ENV
     vi.clearAllMocks()
+    vi.restoreAllMocks()
+    fakeENV.teardown()
+
+    // Restore real timers
+    vi.useRealTimers()
   })
+
+  const waitForRceToLoad = async queryByTestId => {
+    await act(async () => vi.runAllTimers())
+    await act(async () => vi.runAllTimers())
+    while (queryByTestId('rce-loading-spinner')) {
+      await act(async () => vi.runAllTimers())
+    }
+  }
 
   const renderWithProvider = ({
     overrides = {},
@@ -216,10 +242,10 @@ describe('OutcomeEditModal', () => {
         description: 'Updated description',
         displayName: 'Updated friendly name',
       })
-      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+      const {getByText, getByDisplayValue, getByLabelText, queryByTestId} = renderWithProvider({
         mockOverrides: mocks,
       })
-      await act(async () => vi.runOnlyPendingTimers())
+      await waitForRceToLoad(queryByTestId)
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
       fireEvent.change(getByDisplayValue('Outcome description'), {
         target: {value: 'Updated description'},
@@ -240,11 +266,11 @@ describe('OutcomeEditModal', () => {
         title: 'Outcome',
         displayName: 'Updated friendly name',
       })
-      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+      const {getByText, getByDisplayValue, getByLabelText, queryByTestId} = renderWithProvider({
         mockOverrides: mocks,
         overrides: {outcome: {...outcome, _id: '3'}},
       })
-      await act(async () => vi.runOnlyPendingTimers())
+      await waitForRceToLoad(queryByTestId)
       fireEvent.change(getByDisplayValue('Outcome description'), {
         target: {value: null},
       })
@@ -263,11 +289,11 @@ describe('OutcomeEditModal', () => {
         description: '',
         displayName: 'Friendly name',
       })
-      const {getByText, getByLabelText, getByDisplayValue} = renderWithProvider({
+      const {getByText, getByLabelText, getByDisplayValue, queryByTestId} = renderWithProvider({
         mockOverrides: mocks,
         overrides: {outcome: {...outcome, _id: '2'}},
       })
-      await act(async () => vi.runOnlyPendingTimers())
+      await waitForRceToLoad(queryByTestId)
       fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Friendly name'}})
       fireEvent.change(getByDisplayValue('Outcome description'), {
         target: {value: null},
@@ -411,7 +437,7 @@ describe('OutcomeEditModal', () => {
           calculationInt: null,
           individualCalculation: true,
         })
-        const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+        const {getByText, getByDisplayValue, getByLabelText, queryByTestId} = renderWithProvider({
           env: {
             contextType: 'Account',
             contextId: '1',
@@ -419,7 +445,7 @@ describe('OutcomeEditModal', () => {
           },
           mockOverrides: mocks,
         })
-        await act(async () => vi.runOnlyPendingTimers())
+        await waitForRceToLoad(queryByTestId)
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
         fireEvent.change(getByLabelText('Friendly Name'), {
           target: {value: 'Updated friendly outcome name'},
@@ -446,7 +472,7 @@ describe('OutcomeEditModal', () => {
             .map(rating => pick(rating, ['description', 'points'])),
           individualRatings: true,
         })
-        const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+        const {getByText, getByDisplayValue, getByLabelText, queryByTestId} = renderWithProvider({
           env: {
             contextType: 'Account',
             contextId: '1',
@@ -454,7 +480,7 @@ describe('OutcomeEditModal', () => {
           },
           mockOverrides: mocks,
         })
-        await act(async () => vi.runOnlyPendingTimers())
+        await waitForRceToLoad(queryByTestId)
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
         fireEvent.change(getByLabelText('Friendly Name'), {
           target: {value: 'Updated friendly outcome name'},

@@ -19,8 +19,6 @@
 
 class PeerReview::PeerReviewSubmitterService < ApplicationService
   DEFAULT_PEER_REVIEW_COUNT = 0
-  PEER_REVIEW_SUBMISSION_TYPE = "online_text_entry"
-  PEER_REVIEW_SUBMISSION_BODY = "peer_review" # Placeholder text for peer review submission
 
   def initialize(parent_assignment: nil, assessor: nil)
     super()
@@ -107,8 +105,7 @@ class PeerReview::PeerReviewSubmitterService < ApplicationService
   def create_peer_review_submission(user)
     peer_review_sub_assignment.submit_homework(
       user,
-      submission_type: PEER_REVIEW_SUBMISSION_TYPE,
-      body: PEER_REVIEW_SUBMISSION_BODY,
+      submission_type: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE,
       submitted_at: peer_reviews_submitted_at
     )
   end

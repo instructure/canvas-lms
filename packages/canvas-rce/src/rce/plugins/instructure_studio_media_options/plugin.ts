@@ -151,6 +151,7 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       onAction() {
         if (!studioTrayController.isOpen) {
           studioTrayController.showTrayForEditor(ed)
+          ed.focus()
         }
       },
       icon: 'options-icon',
@@ -186,6 +187,12 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       position: 'node',
       predicate: isStudioEmbeddedMedia,
       scope: 'node',
+    })
+
+    ed.on('NodeChange', (e: Events.NodeChangeEvent) => {
+      if (isStudioEmbeddedMedia(e.element) && studioTrayController.isOpen) {
+        studioTrayController.hideTrayForEditor(ed, true)
+      }
     })
   } else {
     ed.ui.registry.addButton('studio-media-options', {

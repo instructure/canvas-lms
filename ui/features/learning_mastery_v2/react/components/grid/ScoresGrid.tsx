@@ -19,8 +19,13 @@ import React, {useMemo, Fragment} from 'react'
 import {keyBy} from 'es-toolkit/compat'
 import {Flex} from '@instructure/ui-flex'
 import {StudentOutcomeScore} from './StudentOutcomeScore'
-import {Student, Outcome, StudentRollupData, OutcomeRollup} from '../../types/rollup'
-import {ScoreDisplayFormat} from '../../utils/constants'
+import {
+  Student,
+  Outcome,
+  StudentRollupData,
+  OutcomeRollup,
+} from '@canvas/outcomes/react/types/rollup'
+import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {
   ContributingScoreAlignment,
   ContributingScoresManager,

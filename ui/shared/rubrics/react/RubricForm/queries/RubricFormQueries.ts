@@ -265,7 +265,7 @@ export const generateCriteria = async (
       generate_options: {
         criteria_count: generateCriteriaProps.criteriaCount,
         rating_count: generateCriteriaProps.ratingCount,
-        points_per_criterion: generateCriteriaProps.pointsPerCriterion,
+        total_points: generateCriteriaProps.totalPoints,
         use_range: generateCriteriaProps.useRange,
         additional_prompt_info: generateCriteriaProps.additionalPromptInfo,
         grade_level: generateCriteriaProps.gradeLevel,
@@ -322,14 +322,14 @@ export const regenerateCriteria = async (
       generate_options: {
         criteria_count: generateFormOptions?.criteriaCount,
         rating_count: generateFormOptions?.ratingCount,
-        points_per_criterion: generateFormOptions?.pointsPerCriterion,
+        total_points: generateFormOptions?.totalPoints,
         use_range: generateFormOptions?.useRange,
         grade_level: generateFormOptions?.gradeLevel,
+        standard: generateFormOptions?.standard,
       },
       regenerate_options: {
         criterion_id: criterionId,
         additional_user_prompt: additionalPrompt,
-        standard: generateFormOptions?.standard,
       },
     }),
   })

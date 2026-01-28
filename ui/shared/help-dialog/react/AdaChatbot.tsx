@@ -359,4 +359,18 @@ function AdaChatbot({onDialogClose}: AdaChatbotProps) {
   return null
 }
 
+// Test helper to reset module state between tests
+export function _resetForTesting(): void {
+  adaReadyPromise = null
+  adaScriptLoadPromise = null
+  isRestoringDrawer = false
+  isOpeningAda = false
+  adaEventsBound = false
+}
+
+// Test helper to pre-cache script load promise (prevents real network requests in tests)
+export function _setScriptLoadedForTesting(): void {
+  adaScriptLoadPromise = Promise.resolve()
+}
+
 export default AdaChatbot

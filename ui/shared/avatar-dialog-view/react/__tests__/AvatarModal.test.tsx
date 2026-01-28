@@ -18,10 +18,17 @@
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import AvatarModal from '../AvatarModal'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
+
+// Track API calls
+let preflightCalled = false
 
 describe('AvatarModal', () => {
   beforeAll(() => {
+    server.listen()
     fakeENV.setup({
       folder_id: '123',
       current_user_id: false,
@@ -29,10 +36,12 @@ describe('AvatarModal', () => {
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
+    preflightCalled = false
   })
 
   afterAll(() => {
+    server.close()
     fakeENV.teardown()
   })
 
@@ -60,12 +69,17 @@ describe('AvatarModal', () => {
   it('initializes preflight request when saving', async () => {
     // since no image is uploaded, we don't get past the preflight request
     const preflightPath = '/files/pending'
-    fetchMock.post(preflightPath, 200)
+    server.use(
+      http.post(preflightPath, () => {
+        preflightCalled = true
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
 
     const {getAllByText, getByTestId} = render(<AvatarModal onClose={vi.fn()} />)
     fireEvent.click(getByTestId('save-avatar-button'))
     await waitFor(() => {
-      expect(fetchMock.called(preflightPath)).toBe(true)
+      expect(preflightCalled).toBe(true)
     })
     // error shown when no image was uploaded; SR + alert text
     expect(getAllByText('Failed to get image')).toHaveLength(2)

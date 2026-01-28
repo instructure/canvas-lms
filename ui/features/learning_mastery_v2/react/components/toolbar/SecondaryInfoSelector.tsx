@@ -18,7 +18,7 @@
 import React from 'react'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {SecondaryInfoDisplay} from '../../utils/constants'
+import {SecondaryInfoDisplay} from '@canvas/outcomes/react/utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

@@ -6,3 +6,11 @@ discussion_summary:
   display_name: IgniteAI Summaries for Discussions
   description: Summarize discussions using AI.
   beta: true
+
+discussion_summary_with_cedar:
+  state: hidden
+  applies_to: RootAccount
+  shadow: true
+  display_name: Discussion Summary with Cedar
+  description: |-
+    Routes Discussion Summary requests through Cedar instead of directly to Bedrock calls.

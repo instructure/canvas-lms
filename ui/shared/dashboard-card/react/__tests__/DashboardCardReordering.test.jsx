@@ -20,10 +20,13 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {DragDropContext} from 'react-dnd'
 import TestBackend from 'react-dnd-test-backend'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 import getDroppableDashboardCardBox from '../getDroppableDashboardCardBox'
 import DashboardCard from '../DashboardCard'
+
+const server = setupServer()
 
 const CARDS = [
   {
@@ -57,25 +60,29 @@ const CARDS = [
 describe('DraggableDashboardCard', () => {
   let oldEnv
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     oldEnv = window.ENV
     window.ENV = {
       current_user_id: 1,
     }
     // Mock activity stream for all courses
-    CARDS.forEach(card => {
-      fetchMock.get(`/api/v1/courses/${card.id}/activity_stream/summary`, [])
+    server.use(
+      http.get('/api/v1/courses/:courseId/activity_stream/summary', () => {
+        return HttpResponse.json([])
+      }),
       // Mock color setting requests with any hexcode parameter
-      fetchMock.put(
-        new RegExp(`/api/v1/users/1/colors/course_${card.id}\\?hexcode=[0-9A-Fa-f]{6}`),
-        {},
-      )
-    })
+      http.put('/api/v1/users/:userId/colors/:assetString', () => {
+        return HttpResponse.json({})
+      }),
+    )
   })
 
   afterEach(() => {
     window.ENV = oldEnv
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   const renderWithDnd = component => {

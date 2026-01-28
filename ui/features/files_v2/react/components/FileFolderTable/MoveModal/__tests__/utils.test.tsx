@@ -18,8 +18,11 @@
 
 import {addNewFoldersToCollection, parseAllPagesResponse, sendMoveRequests} from '../utils'
 import {FAKE_FOLDERS, FAKE_FILES} from '../../../../../fixtures/fakeData'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {ResolvedName} from '../../../FilesHeader/UploadButton/FileOptions'
+
+const server = setupServer()
 
 describe('MoveModal utils', () => {
   describe('addNewFoldersToCollection', () => {
@@ -80,25 +83,31 @@ describe('MoveModal utils', () => {
   })
 
   describe('sendMoveRequests', () => {
+    let requestUrls: string[] = []
+
+    beforeAll(() => server.listen())
+    afterAll(() => server.close())
+
     beforeEach(() => {
-      fetchMock.reset()
+      requestUrls = []
     })
 
     afterEach(() => {
+      server.resetHandlers()
       vi.restoreAllMocks()
     })
 
     it('sends move requests for all selected items', async () => {
-      fetchMock.put(`/api/v1/files/178`, {
-        status: 200,
-        headers: {'Content-Type': 'application/json'},
-        body: {parent_folder_id: FAKE_FILES[0].id},
-      })
-      fetchMock.put(`/api/v1/files/179`, {
-        status: 200,
-        headers: {'Content-Type': 'application/json'},
-        body: {parent_folder_id: FAKE_FILES[0].id},
-      })
+      server.use(
+        http.put(`/api/v1/files/178`, ({request}) => {
+          requestUrls.push(request.url)
+          return HttpResponse.json({parent_folder_id: FAKE_FILES[0].id})
+        }),
+        http.put(`/api/v1/files/179`, ({request}) => {
+          requestUrls.push(request.url)
+          return HttpResponse.json({parent_folder_id: FAKE_FILES[0].id})
+        }),
+      )
       const selectedFolder = FAKE_FOLDERS[0]
       const selectedItems = [
         {file: FAKE_FILES[0], dup: 'error', name: 'File 1', expandZip: false},
@@ -106,34 +115,35 @@ describe('MoveModal utils', () => {
       ]
 
       await sendMoveRequests(selectedFolder, undefined, selectedItems as unknown as ResolvedName[])
-      expect(fetchMock.calls()).toHaveLength(2)
-      expect(fetchMock.calls()[0][0]).toContain(`/api/v1/files/178`)
-      expect(fetchMock.calls()[1][0]).toContain(`/api/v1/files/179`)
+      expect(requestUrls).toHaveLength(2)
+      expect(requestUrls[0]).toContain(`/api/v1/files/178`)
+      expect(requestUrls[1]).toContain(`/api/v1/files/179`)
     })
 
     it('sends move requests for folders', async () => {
-      fetchMock.put(`/api/v1/folders/44`, {
-        status: 200,
-        headers: {'Content-Type': 'application/json'},
-        body: {parent_folder_id: FAKE_FOLDERS[0].id},
-      })
+      server.use(
+        http.put(`/api/v1/folders/44`, ({request}) => {
+          requestUrls.push(request.url)
+          return HttpResponse.json({parent_folder_id: FAKE_FOLDERS[0].id})
+        }),
+      )
       const selectedFolder = FAKE_FOLDERS[0]
       const selectedItems = [
         {file: FAKE_FOLDERS[1], dup: 'overwrite', name: 'Folder X', expandZip: false},
       ]
       await sendMoveRequests(selectedFolder, undefined, selectedItems)
-      expect(fetchMock.calls()).toHaveLength(1)
-      expect(fetchMock.calls()[0][0]).toContain(`/api/v1/folders/44`)
+      expect(requestUrls).toHaveLength(1)
+      expect(requestUrls[0]).toContain(`/api/v1/folders/44`)
     })
 
     it('handles 409 conflict (name collision) for files', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-      fetchMock.put(`/api/v1/files/181`, {
-        status: 409,
-        headers: {'Content-Type': 'application/json'},
-        body: {parent_folder_id: FAKE_FILES[0].id},
-      })
+      server.use(
+        http.put(`/api/v1/files/181`, () => {
+          return HttpResponse.json({parent_folder_id: FAKE_FILES[0].id}, {status: 409})
+        }),
+      )
 
       const selectedFolder = FAKE_FOLDERS[0]
       const selectedItems = [
@@ -157,7 +167,7 @@ describe('MoveModal utils', () => {
     it('resolves immediately if selectedItems is empty', async () => {
       const selectedFolder = FAKE_FOLDERS[0]
       await expect(sendMoveRequests(selectedFolder, undefined, [])).resolves.toBeUndefined()
-      expect(fetchMock.calls()).toHaveLength(0)
+      expect(requestUrls).toHaveLength(0)
     })
   })
 })

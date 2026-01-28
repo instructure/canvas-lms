@@ -84,8 +84,7 @@ function ManageTempEnrollButton(props: ManageTempEnrollButtonProps) {
         <Button
           onClick={toggleEditMode}
           textAlign="start"
-          // @ts-expect-error
-          renderIcon={IconCalendarClockLine}
+          renderIcon={<IconCalendarClockLine />}
           display="block"
           color="success"
           margin="x-small 0"

@@ -41,7 +41,7 @@ if Rails.application.config.force_ssl
   base_config[:same_site] = :none
   base_config[:secure] = true
 end
-config = base_config.merge((ConfigFile.load("session_store").dup || {}).symbolize_keys)
+config = base_config.merge((Canvas.load_config_from_consul("session_store", failsafe_cache: true) || {}).symbolize_keys)
 
 # :expire_after is the "true" option, and :expires is a legacy option, but is applied
 # to the cookie after :expire_after is, so by setting it to nil, we force the lesser

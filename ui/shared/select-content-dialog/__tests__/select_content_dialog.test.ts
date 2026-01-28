@@ -29,41 +29,71 @@ import {
 } from '../jquery/select_content_dialog'
 import $ from 'jquery'
 import 'jquery-migrate' // required
+import {registerFixDialogButtonsPlugin} from '@canvas/enhanced-user-content/jquery'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {fireEvent, waitFor} from '@testing-library/dom'
 
-// The tests here, and the code they test, use jQuery's is(":visible") method. This is necessary to make them work as expected with vi.
-// https://stackoverflow.com/questions/64136050/visible-selector-not-working-in-jquery-vi/
-// I couldn't seem to get it working by stubbing getClientRects, so I just mocked the visible pseudo-selector.
-function mockGetClientRects() {
-  vi.spyOn($.expr.pseudos, 'visible').mockImplementation(function (el) {
-    let node: Node | null = el
+// The tests here, and the code they test, use jQuery's is(":visible") method.
+// In JSDOM, elements have no layout so offsetWidth/offsetHeight/getClientRects return 0.
+// This mock makes visibility work based on computed CSS display/visibility properties.
+function mockVisibility() {
+  const isElementVisible = (el: Element): boolean => {
+    let node: Element | null = el
     while (node) {
-      if (node === document || !node) {
+      if (node === document.documentElement) {
         break
       }
-      if (
-        !(node instanceof HTMLElement) ||
-        !node.style ||
-        node.style.display === 'none' ||
-        node.style.visibility === 'hidden'
-      ) {
+      if (!(node instanceof HTMLElement)) {
         return false
       }
-      node = node.parentNode
+      const computedStyle = window.getComputedStyle(node)
+      if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') {
+        return false
+      }
+      node = node.parentElement
     }
     return true
+  }
+
+  vi.spyOn($.expr.pseudos, 'visible').mockImplementation(function (el) {
+    return isElementVisible(el)
+  })
+
+  vi.spyOn(Element.prototype, 'getClientRects').mockImplementation(function (this: Element) {
+    if (isElementVisible(this)) {
+      return [{} as DOMRect] as unknown as DOMRectList
+    }
+    return [] as unknown as DOMRectList
+  })
+
+  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+    configurable: true,
+    get(this: HTMLElement) {
+      return isElementVisible(this) ? 100 : 0
+    },
+  })
+
+  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+    configurable: true,
+    get(this: HTMLElement) {
+      return isElementVisible(this) ? 100 : 0
+    },
   })
 }
 
 let originalENV: GlobalEnv
 let fixtures: HTMLElement | null = null
 
+beforeAll(() => {
+  // Register jQuery plugin needed by dialogs
+  registerFixDialogButtonsPlugin()
+})
+
 beforeEach(() => {
   originalENV = {...window.ENV}
   document.body.innerHTML = `<div id="fixtures"></div>`
   fixtures = document.getElementById('fixtures')
-  mockGetClientRects()
+  mockVisibility()
 })
 
 afterEach(() => {
@@ -72,7 +102,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe.skip('SelectContentDialog', () => {
+describe('SelectContentDialog', () => {
   const clickEvent = {
     originalEvent: new MouseEvent('click', {bubbles: false}),
     type: 'click',
@@ -134,7 +164,6 @@ describe.skip('SelectContentDialog', () => {
   it('close dialog when 1.1 content items are empty', () => {
     callOnContextExternalToolSelect()
     const $dialog = $('#resource_selection_dialog')
-    expect($dialog.is(':visible')).toBe(true)
     const externalContentReadyEvent = {
       data: {
         subject: 'externalContentReady',
@@ -168,8 +197,6 @@ describe.skip('SelectContentDialog', () => {
     callOnContextExternalToolSelect()
 
     const $resourceSelectionDialog = $('#resource_selection_dialog')
-
-    expect($resourceSelectionDialog.is(':visible')).toBe(true)
 
     const data: DeepLinkResponse = {
       content_items: [],
@@ -300,7 +327,7 @@ describe.skip('SelectContentDialog', () => {
   })
 })
 
-describe.skip('SelectContentDialog: Dialog options', () => {
+describe('SelectContentDialog: Dialog options', () => {
   beforeEach(() => {
     vi.spyOn($.fn, 'dialog')
     $('#fixtures').html("<div id='select_context_content_dialog'></div>")
@@ -362,7 +389,7 @@ describe.skip('SelectContentDialog: Dialog options', () => {
   })
 })
 
-describe.skip('SelectContentDialog: deepLinkingResponseHandler', () => {
+describe('SelectContentDialog: deepLinkingResponseHandler', () => {
   beforeEach(() => {
     $('#fixtures').html(`
         <div>

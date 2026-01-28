@@ -35,6 +35,7 @@ import {
   removeOverriddenAssignees,
   processModuleOverrides,
 } from '../util/differentiatedModulesUtil'
+import {markPeerReviewDefaultDates} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 import {uid} from '@instructure/uid'
 import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
@@ -296,7 +297,12 @@ const AssignToContent = ({
     resetOverrides(newOverrides, withoutModuleOverrides)
 
     const noModuleOverrides = newOverrides.filter(o => !o.context_module_id)
-    onSync(noModuleOverrides, stagedImportantDates)
+    const overridesWithDefaultDates = markPeerReviewDefaultDates(
+      noModuleOverrides,
+      defaultSectionId,
+    )
+
+    onSync(overridesWithDefaultDates, stagedImportantDates)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stagedCards, stagedOverrides])
 
@@ -369,6 +375,7 @@ const AssignToContent = ({
         peer_review_available_from: dates.peer_review_available_from,
         peer_review_available_to: dates.peer_review_available_to,
         peer_review_due_at: dates.peer_review_due_at,
+        peer_review_override_id: dates.peer_review_override_id,
         lock_at: dates.lock_at,
         selectedAssigneeIds: uniqueIds,
         initialAssigneeOptions,

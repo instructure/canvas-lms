@@ -201,8 +201,9 @@ module K5ScheduleTabPageObject
   end
 
   def click_missing_items
-    driver.execute_script("arguments[0].scrollIntoView()", items_missing)
-    items_missing.click
+    element = items_missing
+    driver.execute_script("arguments[0].scrollIntoView()", element)
+    driver.execute_script("arguments[0].click()", element)
   end
 
   def click_next_week_button

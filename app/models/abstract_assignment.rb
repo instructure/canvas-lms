@@ -43,7 +43,7 @@ class AbstractAssignment < ActiveRecord::Base
   ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].to_set.freeze
   POINTED_GRADING_TYPES = %w[points percent letter_grade gpa_scale].to_set.freeze
 
-  OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page].freeze
+  OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page peer_review].freeze
   SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page ams].freeze
   LTI_EULA_SERVICE = "vnd.Canvas.Eula"
   AUDITABLE_ATTRIBUTES = %w[
@@ -442,7 +442,7 @@ class AbstractAssignment < ActiveRecord::Base
                    }]
                  end,
           replies_required: result.discussion_topic.reply_to_entry_required_count || nil,
-          saving_user: opts[:user]
+          updating_user: opts[:user]
         )
         new_sub_assignment.duplicate_of = sub_assignment
         new_sub_assignment.save!
@@ -1305,22 +1305,24 @@ class AbstractAssignment < ActiveRecord::Base
       quiz.workflow_state = "created" if quiz.deleted?
       quiz.saved_by = :assignment
       quiz.workflow_state = published? ? "available" : "unpublished"
+      quiz.skip_attachment_association_update = skip_attachment_association_update
       quiz.updating_user = updating_user
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && !%i[discussion_topic sub_assignment].include?(@saved_by)
-      topic = discussion_topic || context.discussion_topics.build(user: @updating_user)
+      topic = discussion_topic || context.discussion_topics.build(user: updating_user)
       topic.message = description
       save_submittable(topic)
       self.discussion_topic = topic
     elsif context.conditional_release? &&
           self.submission_types == "wiki_page" && @saved_by != :wiki_page
-      page = wiki_page || context.wiki_pages.build(user: @updating_user)
+      page = wiki_page || context.wiki_pages.build(user: updating_user)
       save_submittable(page)
       self.wiki_page = page
     end
   end
 
   def save_submittable(submittable)
+    submittable.skip_attachment_association_update = skip_attachment_association_update
     submittable.updating_user = updating_user
     submittable.assignment_id = id
     submittable.title = self.title
@@ -2363,7 +2365,14 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def tool_settings_tool
-    tool_settings_tools.first
+    tool = tool_settings_tools.first
+
+    # Hide migrated message handlers without deleting the association
+    if tool.is_a?(Lti::MessageHandler) && cpf_migration_started?
+      nil
+    else
+      tool
+    end
   end
 
   def tool_settings_tool=(tool)
@@ -3536,6 +3545,8 @@ class AbstractAssignment < ActiveRecord::Base
       t "submission_types.on_paper", "on paper"
     when "external_tool"
       t "submission_types.external_tool", "an external tool"
+    when "peer_review"
+      t "submission_types.peer_review", "a peer review"
     else
       nil
     end
@@ -4150,8 +4161,6 @@ class AbstractAssignment < ActiveRecord::Base
   # If you're going to be checking this for multiple assignments, you may want
   # to call .preload_unposted_anonymous_submissions on the lot of them first
   def anonymize_students?
-    return true if anonymous_participants?
-
     return false unless anonymous_grading?
 
     # Only anonymize students for moderated assignments if grades have not been published.
@@ -4405,7 +4414,9 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def accepts_submission_type?(submission_type)
-    if submission_type == "basic_lti_launch"
+    if submission_type == "peer_review"
+      is_a?(PeerReviewSubAssignment)
+    elsif submission_type == "basic_lti_launch"
       submission_types =~ /online|external_tool/
     else
       submission_types_array.include?(submission_type)
@@ -4476,6 +4487,25 @@ class AbstractAssignment < ActiveRecord::Base
   def anonymous_participants=(enabled)
     self.settings ||= {}
     self.settings["new_quizzes"] = (settings["new_quizzes"] || {}).merge({ "anonymous_participants" => ActiveModel::Type::Boolean.new.cast(enabled) || false })
+  end
+
+  # Returns true if the migration Canvas Plagiarism Platform (LTI2 / CPF) configuration to LTI1.3 Asset Processor has been started
+  def cpf_migration_started?
+    return false if assignment_configuration_tool_lookups.empty?
+
+    assignment_configuration_tool_lookups.first&.migration_started? || false
+  end
+
+  # Returns true if the Canvas Plagiarism Platform (LTI2 / CPF) configuration has been migrated to LTI1.3 Asset Processor
+  def cpf_migrated?
+    return false if assignment_configuration_tool_lookups.empty?
+
+    assignment_configuration_tool_lookups.first&.migrated? || false
+  end
+
+  # Returns true if the assignment has a non-migrated CPF tool configuration
+  def has_non_migrated_tool?
+    assignment_configuration_tool_lookup_ids.present? && !cpf_migrated?
   end
 
   private

@@ -79,10 +79,8 @@ const ProductDetail = (props: ProductDetailProps) => {
   const {product, isLoading, isError} = useProduct({
     productId: currentProductId,
   })
-  // @ts-expect-error
-  useAppendBreadcrumb(product?.name, previousPath, !!product?.name)
-  // @ts-expect-error
-  const productDescription = stripHtmlTags(product?.description)
+  useAppendBreadcrumb(product?.name ?? '', previousPath, !!product?.name)
+  const productDescription = stripHtmlTags(product?.description ?? '')
 
   useEffect(() => {
     if (window.pendo && typeof window.pendo.track === 'function' && product?.id && product?.name) {

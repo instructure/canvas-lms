@@ -361,12 +361,16 @@ module AccountReports
           "user_access_tokens_csv" => {
             title: proc { I18n.t(:user_access_tokens_title, "User Access Tokens") },
             description_partial: true,
-            parameters_partial: "include_only_deleted_parameter",
+            parameters_partial: "user_access_tokens_csv_parameters",
             parameters: {
+              exclude_deleted_and_expired: {
+                required: false,
+                description: "Exclude deleted and expired access tokens"
+              },
               include_deleted: {
                 required: false,
-                description: "Include deleted objects"
-              }
+                description: "Include access tokens from deleted users"
+              },
             }
           },
           "lti_report_csv" => {

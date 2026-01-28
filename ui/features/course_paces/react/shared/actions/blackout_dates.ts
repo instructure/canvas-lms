@@ -60,8 +60,12 @@ const thunkActions = {
       const course_id = getState().coursePace.course_id
       dispatch(regularActions.blackoutDatesSyncing())
 
-      // @ts-expect-error
-      return BlackoutDatesApi.sync(course_id)
+      const syncResult = BlackoutDatesApi.sync(course_id)
+      if (!syncResult) {
+        dispatch(regularActions.blackoutDatesSyncFailed())
+        return Promise.reject(new Error('No course_id provided'))
+      }
+      return syncResult
         .then(() => {
           const remainingCalendarEvents = BlackoutDatesApi.calendarEventsSync(
             blackoutDates,

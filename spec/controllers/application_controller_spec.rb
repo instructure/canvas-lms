@@ -256,9 +256,9 @@ RSpec.describe ApplicationController do
             expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
           end
 
-          it "is set to true when feature flag is in 'allowed_on' state and user has no preference" do
+          it "is set to false when feature flag is in 'allowed_on' state and user has no preference (requires opt-in)" do
             Account.default.set_feature_flag!(:widget_dashboard, "allowed_on")
-            expect(controller.js_env[:widget_dashboard_overridable]).to be true
+            expect(controller.js_env[:widget_dashboard_overridable]).to be false
           end
 
           it "is not set when feature flag is in 'on' state" do
@@ -683,6 +683,31 @@ RSpec.describe ApplicationController do
         it "is set to the dark theme url if career is enabled" do
           allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(true)
           expect(@controller.js_env[:CAREER_DARK_THEME_URL]).to eq "https://dark-theme.url"
+        end
+      end
+
+      describe "translation file preloading" do
+        before do
+          allow(controller).to receive(:api_request?).and_return(false)
+        end
+
+        it "does not preload translation file for English locale" do
+          I18n.with_locale(:en) do
+            controller.js_env({})
+            expect(controller.instance_variable_get(:@content_for_head)).to be_nil
+          end
+        end
+
+        it "preloads translation file for non-english locale" do
+          I18n.with_locale(:fr) do
+            controller.js_env({})
+            content_for_head = controller.instance_variable_get(:@content_for_head)
+            expect(content_for_head).not_to be_nil
+            expect(content_for_head.first).to include('rel="preload"')
+            expect(content_for_head.first).to include('as="fetch"')
+            expect(content_for_head.first).to include('type="application/json"')
+            expect(content_for_head.first).to match(%r{translations/fr.*\.json})
+          end
         end
       end
     end
@@ -3341,6 +3366,38 @@ RSpec.describe ApplicationController do
       end
     end
   end
+
+  describe "#preload_translation_file" do
+    before do
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+      allow(controller).to receive_messages(api_request?: false, helpers: double(preload_link_tag: "<link>"))
+    end
+
+    it "handles null @js_env" do
+      expect { controller.send(:preload_translation_file) }.not_to raise_error
+      expect(controller.instance_variable_get(:@content_for_head)).to be_nil
+    end
+
+    it "handles unset @js_env[:LOCALES]" do
+      controller.instance_variable_set(:@js_env, {})
+      expect { controller.send(:preload_translation_file) }.not_to raise_error
+      expect(controller.instance_variable_get(:@content_for_head)).to be_nil
+    end
+
+    it "does not add preload link for en locale" do
+      controller.instance_variable_set(:@js_env, { LOCALES: ["en"], LOCALE_TRANSLATION_FILE: "/translations/en.json" })
+      controller.send(:preload_translation_file)
+      expect(controller.instance_variable_get(:@content_for_head)).to be_nil
+    end
+
+    it "adds preload link for non-en locale" do
+      controller.instance_variable_set(:@js_env, { LOCALES: ["fr"], LOCALE_TRANSLATION_FILE: "/translations/fr.json" })
+      controller.send(:preload_translation_file)
+      content_for_head = controller.instance_variable_get(:@content_for_head)
+      expect(content_for_head).not_to be_nil
+      expect(content_for_head).to include("<link>")
+    end
+  end
 end
 
 describe WikiPagesController do
@@ -3859,65 +3916,74 @@ RSpec.describe ApplicationController, "#cached_js_env_account_features" do
   end
 end
 
-RSpec.describe ApplicationController, "#add_ignite_agent_bundle?" do
-  let_once(:account) { Account.default }
+RSpec.describe ApplicationController, "#render_native_new_quizzes" do
+  let(:course) { course_model }
+  let(:assignment) { assignment_model(context: course) }
+  let(:teacher) { teacher_in_course(course:, active_all: true).user }
+  let(:tool) do
+    course.context_external_tools.create!(
+      name: "New Quizzes",
+      url: "http://example.com/launch",
+      consumer_key: "key",
+      shared_secret: "secret",
+      tool_id: "Quizzes 2"
+    )
+  end
+  let(:request_mock) do
+    double(path: "/courses/3/assignments/9/moderation/1")
+  end
 
   before do
-    controller.instance_variable_set(:@domain_root_account, account)
-    allow(controller).to receive(:session).and_return({})
+    user_session(teacher)
+    allow(controller).to receive(:add_new_quizzes_bundle)
+    allow(controller).to receive(:add_body_class)
+    allow(controller).to receive(:render)
+    allow(controller).to receive(:js_env).and_call_original
+    controller.instance_variable_set(:@context, course)
+    controller.instance_variable_set(:@assignment, assignment)
+    controller.instance_variable_set(:@tool, tool)
+    controller.instance_variable_set(:@current_user, teacher)
+    controller.instance_variable_set(:@domain_root_account, Account.default)
+    allow(controller).to receive(:request).and_return(request_mock)
   end
 
-  it "returns false when preview param is true" do
-    allow(controller).to receive(:params).and_return({ preview: "true" })
+  it "sets basename in js_env when full_path param is present" do
+    allow(controller).to receive(:params).and_return({ full_path: "/moderation/1" })
+    launch_data = { test: "data" }
+    allow_any_instance_of(NewQuizzes::LaunchDataBuilder).to receive(:build_with_signature).and_return(launch_data)
 
-    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+    expect(controller).to receive(:js_env) do |data|
+      expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/assignments/9")
+      expect(data[:NEW_QUIZZES][:test]).to eq("data")
+    end
+
+    controller.send(:render_native_new_quizzes)
   end
 
-  it "returns false on oauth2_provider confirm page" do
-    allow(controller).to receive_messages(controller_name: "oauth2_provider", action_name: "confirm", params: {})
+  it "uses request path as basename when full_path param is not present" do
+    allow(controller).to receive(:params).and_return({})
+    launch_data = { test: "data" }
+    allow_any_instance_of(NewQuizzes::LaunchDataBuilder).to receive(:build_with_signature).and_return(launch_data)
 
-    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+    expect(controller).to receive(:js_env) do |data|
+      expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/assignments/9/moderation/1")
+      expect(data[:NEW_QUIZZES][:test]).to eq("data")
+    end
+
+    controller.send(:render_native_new_quizzes)
   end
 
-  context "with legacy ignite_agent_enabled feature flag" do
-    before do
-      account.enable_feature!(:ignite_agent_enabled)
+  it "preserves other NEW_QUIZZES data in js_env" do
+    allow(controller).to receive(:params).and_return({ full_path: "/moderation/1" })
+    launch_data = { test: "data", other: "value" }
+    allow_any_instance_of(NewQuizzes::LaunchDataBuilder).to receive(:build_with_signature).and_return(launch_data)
+
+    expect(controller).to receive(:js_env) do |data|
+      expect(data[:NEW_QUIZZES][:test]).to eq("data")
+      expect(data[:NEW_QUIZZES][:other]).to eq("value")
+      expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/assignments/9")
     end
 
-    it "returns true when user has manage_account_settings permission" do
-      admin_user = account_admin_user
-      controller.instance_variable_set(:@current_user, admin_user)
-
-      expect(controller.send(:add_ignite_agent_bundle?)).to be true
-    end
-
-    it "returns true when user has ignite_agent_enabled_for_user feature flag" do
-      user = user_model
-      user.enable_feature!(:ignite_agent_enabled_for_user)
-      controller.instance_variable_set(:@current_user, user)
-
-      expect(controller.send(:add_ignite_agent_bundle?)).to be true
-    end
-  end
-
-  context "with oak_for_admins feature flag" do
-    before do
-      account.enable_feature!(:oak_for_admins)
-    end
-
-    it "returns true when user has access_oak permissions" do
-      admin_user =
-        account_admin_user_with_role_changes(
-          role_changes: {
-            manage_account_settings: false,
-            access_oak: true
-          },
-          account:,
-          role: Role.get_built_in_role("AccountMembership", root_account_id: account)
-        )
-      controller.instance_variable_set(:@current_user, admin_user)
-
-      expect(controller.send(:add_ignite_agent_bundle?)).to be true
-    end
+    controller.send(:render_native_new_quizzes)
   end
 end

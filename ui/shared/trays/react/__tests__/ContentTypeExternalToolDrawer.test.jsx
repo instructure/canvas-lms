@@ -86,18 +86,18 @@ describe('ContentTypeExternalToolDrawer', () => {
     )
   }
 
-  it.skip('labels page content with LTI title', () => {
+  it('labels page content with LTI title', () => {
     const {getByLabelText} = renderTray()
     expect(getByLabelText(pageContentTitle)).toBeInTheDocument()
   })
 
-  it.skip('calls onDismiss when close button is clicked', () => {
+  it('calls onDismiss when close button is clicked', () => {
     const {getByText} = renderTray()
     fireEvent.click(getByText('Close'))
     expect(onDismiss.mock.calls).toHaveLength(1)
   })
 
-  it.skip('includes page content', () => {
+  it('includes page content', () => {
     const {getByText} = renderTray()
     expect(getByText('page-content-text')).toBeInTheDocument()
   })
@@ -114,7 +114,7 @@ describe('ContentTypeExternalToolDrawer', () => {
       delete tool.icon_url
     })
 
-    it.skip('renders an icon', () => {
+    it('renders an icon', () => {
       const {getByAltText} = renderTray()
       expect(getByAltText('First LTI Icon')).toHaveAttribute('src', icon_url)
     })
@@ -137,7 +137,7 @@ describe('ContentTypeExternalToolDrawer', () => {
         vi.clearAllMocks()
       })
 
-      it.skip('sets the width to 100vw on mobile view', () => {
+      it('sets the width to 100vw on mobile view', () => {
         useBreakpoints.mockReturnValue({
           isMaxMobile: true,
           isMaxTablet: true,
@@ -146,7 +146,7 @@ describe('ContentTypeExternalToolDrawer', () => {
         expect(getByTestId('drawer-header')).toHaveStyle('width: 100vw')
       })
 
-      it.skip('sets the width to 100vw on tablet view', () => {
+      it('sets the width to 100vw on tablet view', () => {
         useBreakpoints.mockReturnValue({
           isMaxMobile: false,
           isMaxTablet: true,
@@ -155,7 +155,7 @@ describe('ContentTypeExternalToolDrawer', () => {
         expect(getByTestId('drawer-header')).toHaveStyle('width: 100vw')
       })
 
-      it.skip('sets the width to 33vw on desktop view', () => {
+      it('sets the width to 33vw on desktop view', () => {
         useBreakpoints.mockReturnValue({
           isMaxMobile: false,
           isMaxTablet: false,
@@ -170,12 +170,12 @@ describe('ContentTypeExternalToolDrawer', () => {
           allow_fullscreen: true,
         }
 
-        it.skip('does not render the fullscreen button if allow_fullscreen is false', () => {
+        it('does not render the fullscreen button if allow_fullscreen is false', () => {
           const {queryByTestId} = renderTray({tool: {...tool, allow_fullscreen: false}})
           expect(queryByTestId('fullscreen-button')).not.toBeInTheDocument()
         })
 
-        it.skip('does not render the fullscreen button on mobile view', () => {
+        it('does not render the fullscreen button on mobile view', () => {
           useBreakpoints.mockReturnValue({
             isMaxMobile: true,
             isMaxTablet: true,
@@ -184,13 +184,13 @@ describe('ContentTypeExternalToolDrawer', () => {
           expect(queryByTestId('fullscreen-button')).not.toBeInTheDocument()
         })
 
-        it.skip('renders the fullscreen button on desktop view when enabled', () => {
+        it('renders the fullscreen button on desktop view when enabled', () => {
           useBreakpoints.mockReturnValue({isDesktop: true})
           const {getByTestId} = renderTray({tool: toolWithFullscreen})
           expect(getByTestId('fullscreen-button')).toBeInTheDocument()
         })
 
-        it.skip('toggles drawer width and button state on click', () => {
+        it('toggles drawer width and button state on click', () => {
           useBreakpoints.mockReturnValue({isDesktop: true})
           const mockNavToggle = document.createElement('div')
           Object.defineProperty(mockNavToggle, 'getBoundingClientRect', {
@@ -214,7 +214,7 @@ describe('ContentTypeExternalToolDrawer', () => {
           expect(drawerHeader).toHaveStyle('width: 33vw')
         })
 
-        it.skip('resets fullscreen state when the drawer is closed and reopened', async () => {
+        it('resets fullscreen state when the drawer is closed and reopened', async () => {
           useBreakpoints.mockReturnValue({
             isMaxMobile: false,
             isMaxTablet: false,
@@ -276,7 +276,7 @@ describe('ContentTypeExternalToolDrawer', () => {
         vi.clearAllMocks()
       })
 
-      it.skip('sets the width to 320px regardless of viewport', () => {
+      it('sets the width to 320px regardless of viewport', () => {
         useBreakpoints.mockReturnValue({
           isMaxMobile: false,
           isMaxTablet: false,
@@ -296,13 +296,13 @@ describe('ContentTypeExternalToolDrawer', () => {
       fireEvent(window, new MessageEvent('message', {data, origin, source}))
     }
 
-    it.skip('calls onExternalContentReady when it receives an externalContentReady postMessage', () => {
+    it('calls onExternalContentReady when it receives an externalContentReady postMessage', () => {
       renderTray()
       sendPostMessage({subject: 'externalContentReady'})
       expect(onExternalContentReady).toHaveBeenCalledTimes(1)
     })
 
-    it.skip('calls onDismiss when it receives an lti.close message from the tool', async () => {
+    it('calls onDismiss when it receives an lti.close message from the tool', async () => {
       monitorLtiMessages()
       const {findByTestId} = renderTray()
       const {contentWindow} = await findByTestId('ltiIframe')
@@ -320,7 +320,7 @@ describe('ContentTypeExternalToolDrawer', () => {
     })
     afterAll(() => (window.ENV = origEnv))
 
-    it.skip('constructs src url and contains allowances', () => {
+    it('constructs src url and contains allowances', () => {
       expect(tool.base_url).not.toContain('?')
       const {getByTestId} = renderTray()
       const iframe = getByTestId('ltiIframe')
@@ -331,7 +331,7 @@ describe('ContentTypeExternalToolDrawer', () => {
     })
   })
 
-  it.skip('does not render ToolLaunchIframe when there is no tool', () => {
+  it('does not render ToolLaunchIframe when there is no tool', () => {
     const {queryByTestId} = render(
       <ContentTypeExternalToolDrawer
         tool={null}
@@ -358,7 +358,7 @@ describe('ContentTypeExternalToolDrawer', () => {
 
     afterAll(() => (window.ENV = origEnv))
 
-    it.skip('releases the mutex after reparenting content', () => {
+    it('releases the mutex after reparenting content', () => {
       expect(MutexManager.mutexes[mutex]).toBeDefined()
 
       renderTray()

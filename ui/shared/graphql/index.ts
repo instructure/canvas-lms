@@ -21,14 +21,22 @@ import getCookie from '@instructure/get-cookie'
 import type {Variables} from 'graphql-request'
 import type {TypedDocumentNode} from '@graphql-typed-document-node/core'
 
-export const graphqlDefaults = {
+/**
+ * Returns fresh GraphQL defaults including a current CSRF token.
+ *
+ * IMPORTANT: This must be a function (not a static object) to ensure the CSRF
+ * token is read from cookies on every request. If this were a static object,
+ * the token would be cached at module load time, causing 422 errors when the
+ * session is renewed or cookies are deleted.
+ */
+export const getGraphqlDefaults = () => ({
   url: `${window.location.origin}/api/graphql`,
   requestHeaders: {
     'X-Requested-With': 'XMLHttpRequest',
     'GraphQL-Metrics': 'true',
     'X-CSRF-Token': String(getCookie('_csrf_token')),
   },
-}
+})
 
 /**
  * Execute a GraphQL query
@@ -44,8 +52,10 @@ export const executeQuery = async <TResult, TVariables extends Variables = Varia
   variables: TVariables,
   customHeaders?: Record<string, string>,
 ): Promise<TResult> => {
-  const requestHeaders = customHeaders
-    ? {...graphqlDefaults.requestHeaders, ...customHeaders}
-    : graphqlDefaults.requestHeaders
-  return request<TResult>(graphqlDefaults.url, query, variables, requestHeaders)
+  const graphqlDefaults = getGraphqlDefaults()
+
+  return request<TResult>(graphqlDefaults.url, query, variables, {
+    ...graphqlDefaults.requestHeaders,
+    ...customHeaders,
+  })
 }

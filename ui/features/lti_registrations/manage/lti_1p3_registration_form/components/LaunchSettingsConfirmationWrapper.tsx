@@ -16,49 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
-import {
-  getInputIdForField,
-  validateLaunchSettings,
-} from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
-import {Footer} from '../../registration_wizard_forms/Footer'
 import {LaunchSettingsConfirmation} from '../../registration_wizard_forms/LaunchSettingsConfirmation'
 
 export type LaunchSettingsConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
   reviewing: boolean
-  onPreviousClicked: () => void
-  onNextClicked: () => void
+  hasClickedNext?: boolean
 }
 export const LaunchSettingsConfirmationWrapper = (
   props: LaunchSettingsConfirmationWrapperProps,
 ) => {
-  const [hasClickedNext, setHasClickedNext] = React.useState(false)
-  const onNextClicked = React.useCallback(() => {
-    // if there are any errors, don't proceed
-    const errors = validateLaunchSettings(props.overlayStore.getState().state.launchSettings)
-    if (errors.length > 0) {
-      document.getElementById(getInputIdForField(errors[0].field))?.focus()
-      setHasClickedNext(true)
-    } else {
-      props.onNextClicked()
-    }
-  }, [props.onNextClicked, props.overlayStore])
   return (
-    <>
-      <RegistrationModalBody>
-        <LaunchSettingsConfirmation {...props} hasClickedNext={hasClickedNext} />
-      </RegistrationModalBody>
-      <Footer
-        currentScreen="first"
-        reviewing={props.reviewing}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={props.onPreviousClicked}
-      ></Footer>
-    </>
+    <RegistrationModalBody>
+      <LaunchSettingsConfirmation {...props} hasClickedNext={props.hasClickedNext ?? false} />
+    </RegistrationModalBody>
   )
 }

@@ -52,7 +52,12 @@ export const MediaPreviewModal = ({
       <Modal.Body padding="none">
         <div>
           {ENV.FEATURES?.consolidated_media_player_iframe ? (
-            <CanvasMediaPlayer type="video" is_attachment={true} attachment_id={attachmentId} />
+            <CanvasMediaPlayer
+              type="video"
+              media_id=""
+              is_attachment={true}
+              attachment_id={attachmentId}
+            />
           ) : (
             <CanvasStudioPlayer
               media_id=""

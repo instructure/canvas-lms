@@ -148,12 +148,16 @@ describe RubricLLMService do
           rebuild_regenerated_ratings(criterion_data, criterion_id, points)
         end
 
-        def public_build_criterion_from_llm(data, options)
-          build_criterion_from_llm(data, options)
+        def public_build_criterion_from_llm(data, criterion_points, use_range)
+          build_criterion_from_llm(data, criterion_points, use_range)
         end
 
-        def public_rebuild_regenerated_criterion(data, options)
-          rebuild_regenerated_criterion(data, options)
+        def public_rebuild_regenerated_criterion(data, criterion_points, use_range)
+          rebuild_regenerated_criterion(data, criterion_points, use_range)
+        end
+
+        def public_calculate_points_per_criterion(total_points, criteria_count)
+          calculate_points_per_criterion(total_points, criteria_count)
         end
       end.new(rubric)
     end
@@ -250,14 +254,14 @@ describe RubricLLMService do
       )
 
       expect do
-        criteria = service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 4, points_per_criterion: 20, use_range: true, grade_level: "higher-ed")
+        criteria = service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 4, total_points: 20, use_range: true, grade_level: "higher-ed")
         expect(criteria.size).to eq 2
 
         first = criteria.first
         expect(first[:description]).to eq "Argument Quality"
         expect(first[:long_description]).to eq "Strength and clarity of the central claim."
         expect(first[:criterion_use_range]).to be true
-        expect(first[:points]).to eq 20 # max rating points after sorting
+        expect(first[:points]).to eq 10 # max rating points after sorting
         expect(first[:ratings].size).to eq 4
 
         # Ratings should be sorted by points descending, then description
@@ -365,7 +369,7 @@ describe RubricLLMService do
         criteria = service.regenerate_criteria_via_llm(
           assignment,
           { criteria: existing_criteria },
-          { criteria_count: 3, rating_count: 3, points_per_criterion: 20, use_range: false, grade_level: "higher-ed" }
+          { criteria_count: 3, rating_count: 3, total_points: 20, use_range: false, grade_level: "higher-ed" }
         )
 
         expect(criteria.size).to eq 3
@@ -374,8 +378,9 @@ describe RubricLLMService do
         new_third = criteria.detect { |c| c[:description] == "New Criterion 3" }
         expect(new_third).to be_present
         expect(new_third[:id]).not_to match(/^_new_c_/) # was transformed into a unique real ID
+        expect(new_third[:points]).to eq 6.66
         expect(new_third[:ratings].size).to eq 3
-        expect(new_third[:ratings].pluck(:points)).to eq [20, 10, 0]
+        expect(new_third[:ratings].pluck(:points)).to eq [6.66, 3.33, 0]
         # ratings sorted by points desc (then description)
         expect(new_third[:ratings].pluck(:points)).to eq new_third[:ratings].pluck(:points).sort.reverse
       end
@@ -410,7 +415,7 @@ describe RubricLLMService do
         criteria = service.regenerate_criteria_via_llm(
           assignment,
           { criteria: existing_criteria, criterion_id: "c1" },
-          { criteria_count: 3, rating_count: 3, points_per_criterion: 20, use_range: false }
+          { criteria_count: 3, rating_count: 3, total_points: 20, use_range: false }
         )
 
         expect(criteria.size).to eq 3
@@ -1126,6 +1131,202 @@ describe RubricLLMService do
     end
   end
 
+  describe "#calculate_points_per_criterion" do
+    include_context "service with access to private methods"
+
+    it "returns a hash mapping criterion indices to point values" do
+      result = service_with_access.public_calculate_points_per_criterion(100, 5)
+      expect(result).to be_a(Hash)
+      expect(result.keys).to eq([0, 1, 2, 3, 4])
+    end
+
+    it "distributes points evenly across criteria" do
+      result = service_with_access.public_calculate_points_per_criterion(100, 5)
+      expect(result).to eq({
+                             0 => 20.0,
+                             1 => 20.0,
+                             2 => 20.0,
+                             3 => 20.0,
+                             4 => 20.0
+                           })
+    end
+
+    it "adjusts last criterion to account for rounding errors" do
+      # 100 / 3 = 33.33 (per criterion)
+      # First two: 33.33 each (66.66 total)
+      # Last: 100 - 66.66 = 33.34 (to ensure exact total)
+      result = service_with_access.public_calculate_points_per_criterion(100.0, 3)
+      expect(result).to eq({
+                             0 => 33.33,
+                             1 => 33.33,
+                             2 => 33.34
+                           })
+      expect(result.values.sum).to eq(100.0)
+    end
+
+    it "handles single criterion" do
+      result = service_with_access.public_calculate_points_per_criterion(50, 1)
+      expect(result).to eq({ 0 => 50.0 })
+    end
+
+    it "handles two criteria" do
+      result = service_with_access.public_calculate_points_per_criterion(100, 2)
+      expect(result).to eq({
+                             0 => 50.0,
+                             1 => 50.0
+                           })
+    end
+
+    it "rounds to specified precision (2 decimal places)" do
+      result = service_with_access.public_calculate_points_per_criterion(10.0, 3)
+      expect(result[0]).to eq(3.33)
+      expect(result[1]).to eq(3.33)
+      expect(result[2]).to eq(3.34) # Last criterion gets remainder
+    end
+
+    it "ensures total points sum exactly to the input" do
+      result = service_with_access.public_calculate_points_per_criterion(100.0, 7)
+      total = result.values.sum
+      expect(total).to eq(100.0)
+    end
+
+    it "handles fractional total_points" do
+      result = service_with_access.public_calculate_points_per_criterion(33.5, 4)
+      expect(result[0]).to eq(8.38)
+      expect(result[1]).to eq(8.38)
+      expect(result[2]).to eq(8.38)
+      expect(result[3]).to eq(8.36) # Last gets remainder: 33.5 - 25.14
+      expect(result.values.sum).to eq(33.5)
+    end
+
+    it "handles zero total_points" do
+      result = service_with_access.public_calculate_points_per_criterion(0, 5)
+      expect(result).to eq({
+                             0 => 0.0,
+                             1 => 0.0,
+                             2 => 0.0,
+                             3 => 0.0,
+                             4 => 0.0
+                           })
+    end
+
+    it "handles negative total_points" do
+      result = service_with_access.public_calculate_points_per_criterion(-20, 4)
+      expect(result[0]).to eq(-5.0)
+      expect(result[1]).to eq(-5.0)
+      expect(result[2]).to eq(-5.0)
+      expect(result[3]).to eq(-5.0)
+      expect(result.values.sum).to eq(-20.0)
+    end
+
+    it "handles large number of criteria" do
+      result = service_with_access.public_calculate_points_per_criterion(100.0, 1000)
+      expect(result[0]).to eq(0.1)
+      expect(result[999]).to be_within(0.01).of(0.1)
+      expect(result.values.sum).to be_within(0.01).of(100.0)
+    end
+
+    it "handles very small total_points" do
+      result = service_with_access.public_calculate_points_per_criterion(0.01, 5)
+      # 0.01 / 5 = 0.002, rounds to 0.0
+      expect(result[0]).to eq(0.0)
+      expect(result[1]).to eq(0.0)
+      expect(result[2]).to eq(0.0)
+      expect(result[3]).to eq(0.0)
+      # Last criterion gets the remainder
+      expect(result[4]).to eq(0.01)
+    end
+
+    it "handles very large total_points" do
+      result = service_with_access.public_calculate_points_per_criterion(1_000_000, 5)
+      expect(result).to eq({
+                             0 => 200_000.0,
+                             1 => 200_000.0,
+                             2 => 200_000.0,
+                             3 => 200_000.0,
+                             4 => 200_000.0
+                           })
+    end
+
+    it "handles edge case with 7 criteria and 100 points" do
+      result = service_with_access.public_calculate_points_per_criterion(100.0, 7)
+      # 100 / 7 = 14.285714..., rounds to 14.29
+      expect(result[0]).to eq(14.29)
+      expect(result[1]).to eq(14.29)
+      expect(result[2]).to eq(14.29)
+      expect(result[3]).to eq(14.29)
+      expect(result[4]).to eq(14.29)
+      expect(result[5]).to eq(14.29)
+      # Last criterion: 100 - (14.29 * 6) = 100 - 85.74 = 14.26
+      expect(result[6]).to eq(14.26)
+      expect(result.values.sum).to eq(100.0)
+    end
+
+    it "handles uneven distribution with remainder going to last criterion" do
+      result = service_with_access.public_calculate_points_per_criterion(50.0, 6)
+      # 50 / 6 = 8.333..., rounds to 8.33
+      expect(result[0]).to eq(8.33)
+      expect(result[1]).to eq(8.33)
+      expect(result[2]).to eq(8.33)
+      expect(result[3]).to eq(8.33)
+      expect(result[4]).to eq(8.33)
+      # Last: 50 - (8.33 * 5) = 50 - 41.65 = 8.35
+      expect(result[5]).to eq(8.35)
+      expect(result.values.sum).to eq(50.0)
+    end
+
+    it "maintains precision with decimal points" do
+      result = service_with_access.public_calculate_points_per_criterion(99.99, 3)
+      # 99.99 / 3 = 33.33
+      expect(result[0]).to eq(33.33)
+      expect(result[1]).to eq(33.33)
+      # Last: 99.99 - 66.66 = 33.33
+      expect(result[2]).to eq(33.33)
+      expect(result.values.sum).to eq(99.99)
+    end
+
+    context "with precision verification" do
+      it "verifies ROUNDING_PRECISION is 2" do
+        expect(RubricLLMService::ROUNDING_PRECISION).to eq(2)
+      end
+
+      it "applies rounding precision correctly to each criterion" do
+        result = service_with_access.public_calculate_points_per_criterion(100.0, 6)
+        # 100 / 6 = 16.666666..., rounds to 16.67
+        expect(result[0]).to eq(16.67)
+        expect(result[1]).to eq(16.67)
+        expect(result[2]).to eq(16.67)
+        expect(result[3]).to eq(16.67)
+        expect(result[4]).to eq(16.67)
+        # Last: 100 - (16.67 * 5) = 100 - 83.35 = 16.65
+        expect(result[5]).to eq(16.65)
+      end
+
+      it "verifies rounded values are not truncated" do
+        result = service_with_access.public_calculate_points_per_criterion(100.0, 6)
+        # Verify rounding up occurred (16.67, not 16.66)
+        expect(result[0]).to eq(16.67)
+        expect(result[0]).not_to eq(16.66)
+      end
+    end
+
+    context "ensures total equals input exactly" do
+      it "with various criteria counts" do
+        [2, 3, 5, 7, 11, 13].each do |count|
+          result = service_with_access.public_calculate_points_per_criterion(100.0, count)
+          expect(result.values.sum).to eq(100.0), "Failed for #{count} criteria"
+        end
+      end
+
+      it "with various total points" do
+        [10, 25, 50, 75, 100, 150, 200].each do |points|
+          result = service_with_access.public_calculate_points_per_criterion(points, 3)
+          expect(result.values.sum).to eq(points.to_f), "Failed for #{points} points"
+        end
+      end
+    end
+  end
+
   describe "Criterion Building" do
     include_context "service with access to private methods"
 
@@ -1141,7 +1342,7 @@ describe RubricLLMService do
           ]
         }
 
-        result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 12, use_range: true })
+        result = service_with_access.public_build_criterion_from_llm(criterion_data, 12.0, true)
 
         expect(result[:description]).to eq("Valid Name")
         expect(result[:long_description]).to eq("Description")
@@ -1160,7 +1361,7 @@ describe RubricLLMService do
               ratings: [{ title: "Good", description: "Good work" }]
             }
 
-            result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 10 })
+            result = service_with_access.public_build_criterion_from_llm(criterion_data, 10.0, false)
             expect(result[:description]).to eq("No Description")
           end
         end
@@ -1172,7 +1373,7 @@ describe RubricLLMService do
             ratings: [{ title: "Good", description: "Good work" }]
           }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 10 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, 10.0, false)
           expect(result[:description]).to eq("Valid Name")
         end
 
@@ -1186,14 +1387,14 @@ describe RubricLLMService do
             ]
           }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 12 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, 12.0, false)
           expect(result[:ratings].pluck(:description)).to all(eq("No Description"))
         end
 
         it "handles zero ratings" do
           criterion_data = { name: "Criterion", ratings: [] }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 10 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, 10.0, false)
 
           expect(result[:ratings]).to be_empty
           expect(result[:points]).to eq(0)
@@ -1205,7 +1406,7 @@ describe RubricLLMService do
             ratings: [{ title: "Only Rating" }]
           }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 10 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, 10.0, false)
 
           expect(result[:ratings].size).to eq(1)
           expect(result[:ratings].first[:points]).to eq(10)
@@ -1218,12 +1419,12 @@ describe RubricLLMService do
             ratings: Array.new(7) { |i| { title: "Rating #{i + 1}" } }
           }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 18 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, 18.0, false)
 
           points = result[:ratings].pluck(:points)
           expect(points.size).to eq(7)
           expect(points.first).to eq(18)  # max points
-          expect(points.last).to eq(0)    # min points (rounded)
+          expect(points.last).to eq(0)    # min points
           expect(points).to eq(points.sort.reverse) # descending order
         end
 
@@ -1237,13 +1438,13 @@ describe RubricLLMService do
             ]
           }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 7 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, 7.0, false)
 
           points = result[:ratings].pluck(:points)
-          expect(points).to eq([7, 4, 0]) # 7, 3.5 rounded to 4, 0
+          expect(points).to eq([7, 3.5, 0])
         end
 
-        it "handles zero points_per_criterion" do
+        it "handles zero total_points" do
           criterion_data = {
             name: "Criterion",
             ratings: [
@@ -1252,14 +1453,14 @@ describe RubricLLMService do
             ]
           }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 0 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, 0.0, false)
 
           points = result[:ratings].pluck(:points)
           expect(points).to eq([0, 0])
           expect(result[:points]).to eq(0)
         end
 
-        it "handles negative points_per_criterion" do
+        it "handles negative total_points" do
           criterion_data = {
             name: "Criterion",
             ratings: [
@@ -1268,10 +1469,10 @@ describe RubricLLMService do
             ]
           }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: -10 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, -5.0, false)
 
           points = result[:ratings].pluck(:points)
-          expect(points).to eq([0, -10]) # Ratings get sorted by points descending: -10 - (-10*0) = -10, -10 - (-10*1) = 0, sorted = [0, -10]
+          expect(points).to eq([0.0, -5.0]) # Ratings get sorted by points descending: -10 - (-10*0) = -10, -10 - (-10*1) = 0, sorted = [0, -10]
         end
 
         it "handles very small fractional points" do
@@ -1284,11 +1485,11 @@ describe RubricLLMService do
             ]
           }
 
-          result = service_with_access.public_build_criterion_from_llm(criterion_data, { points_per_criterion: 0.01 })
+          result = service_with_access.public_build_criterion_from_llm(criterion_data, 0.01, false)
 
           points = result[:ratings].pluck(:points)
-          expect(points).to all(be_a(Integer)) # should be rounded
-          expect(points.first).to eq(0) # 0.01 rounds to 0
+          expect(points).to all(be_a(Float))
+          expect(points.first).to eq(0.01)
         end
       end
 
@@ -1296,9 +1497,9 @@ describe RubricLLMService do
         it "handles truthy use_range values" do
           criterion_data = { name: "Test", ratings: [] }
 
-          result1 = service_with_access.public_build_criterion_from_llm(criterion_data, { use_range: true })
-          result2 = service_with_access.public_build_criterion_from_llm(criterion_data, { use_range: "yes" })
-          result3 = service_with_access.public_build_criterion_from_llm(criterion_data, { use_range: 1 })
+          result1 = service_with_access.public_build_criterion_from_llm(criterion_data, 0.0, true)
+          result2 = service_with_access.public_build_criterion_from_llm(criterion_data, 0.0, "yes")
+          result3 = service_with_access.public_build_criterion_from_llm(criterion_data, 0.0, 1)
 
           expect(result1[:criterion_use_range]).to be true
           expect(result2[:criterion_use_range]).to be true
@@ -1308,9 +1509,9 @@ describe RubricLLMService do
         it "handles falsy use_range values" do
           criterion_data = { name: "Test", ratings: [] }
 
-          result1 = service_with_access.public_build_criterion_from_llm(criterion_data, { use_range: false })
-          result2 = service_with_access.public_build_criterion_from_llm(criterion_data, { use_range: nil })
-          result3 = service_with_access.public_build_criterion_from_llm(criterion_data, {}) # missing key defaults to false
+          result1 = service_with_access.public_build_criterion_from_llm(criterion_data, 0.0, false)
+          result2 = service_with_access.public_build_criterion_from_llm(criterion_data, 0.0, nil)
+          result3 = service_with_access.public_build_criterion_from_llm(criterion_data, 0.0, false) # missing key defaults to false
 
           expect(result1[:criterion_use_range]).to be false
           expect(result2[:criterion_use_range]).to be false
@@ -1332,7 +1533,7 @@ describe RubricLLMService do
           ]
         }
 
-        result = service_with_access.public_rebuild_regenerated_criterion(criterion_data, { points_per_criterion: 10, use_range: false })
+        result = service_with_access.public_rebuild_regenerated_criterion(criterion_data, 10.0, false)
 
         expect(result[:description]).to eq("Valid Description")
         expect(result[:long_description]).to eq("Long description")
@@ -1350,7 +1551,7 @@ describe RubricLLMService do
             ratings: []
           }
 
-          result = service_with_access.public_rebuild_regenerated_criterion(criterion_data, { points_per_criterion: 10, use_range: false })
+          result = service_with_access.public_rebuild_regenerated_criterion(criterion_data, 10.0, false)
           expect(result[:description]).to eq("No Description")
         end
       end
@@ -1362,7 +1563,7 @@ describe RubricLLMService do
           ratings: []
         }
 
-        result = service_with_access.public_rebuild_regenerated_criterion(criterion_data, { points_per_criterion: 10, use_range: false })
+        result = service_with_access.public_rebuild_regenerated_criterion(criterion_data, 10.0, false)
         expect(result[:description]).to eq("Valid Description")
       end
     end
@@ -1398,7 +1599,7 @@ describe RubricLLMService do
         expect(CedarClient).to receive(:conversation).and_raise(Timeout::Error.new("Connection timed out"))
 
         expect do
-          service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, points_per_criterion: 10)
+          service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, total_points: 10)
         end.to raise_error(Timeout::Error)
       end
 
@@ -1406,7 +1607,7 @@ describe RubricLLMService do
         expect(CedarClient).to receive(:conversation).and_raise(SocketError.new("getaddrinfo: Name or service not known"))
 
         expect do
-          service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, points_per_criterion: 10)
+          service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, total_points: 10)
         end.to raise_error(SocketError)
       end
 
@@ -1414,7 +1615,7 @@ describe RubricLLMService do
         expect(CedarClient).to receive(:conversation).and_raise(RuntimeError.new("HTTP client error"))
 
         expect do
-          service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, points_per_criterion: 10)
+          service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, total_points: 10)
         end.to raise_error(RuntimeError, "HTTP client error")
       end
 
@@ -1448,7 +1649,7 @@ describe RubricLLMService do
         )
 
         expect do
-          service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, points_per_criterion: 10)
+          service.generate_criteria_via_llm(assignment, criteria_count: 2, rating_count: 3, total_points: 10)
         end.to raise_error(ActiveRecord::NotNullViolation)
       end
 
@@ -1458,7 +1659,7 @@ describe RubricLLMService do
         )
 
         expect do
-          service.generate_criteria_via_llm(assignment, criteria_count: 1, rating_count: 2, points_per_criterion: 10)
+          service.generate_criteria_via_llm(assignment, criteria_count: 1, rating_count: 2, total_points: 10)
         end.to raise_error(JSON::ParserError)
       end
 
@@ -1468,7 +1669,7 @@ describe RubricLLMService do
         )
 
         expect do
-          service.generate_criteria_via_llm(assignment, criteria_count: 1, rating_count: 2, points_per_criterion: 10)
+          service.generate_criteria_via_llm(assignment, criteria_count: 1, rating_count: 2, total_points: 10)
         end.to raise_error(JSON::ParserError)
       end
     end

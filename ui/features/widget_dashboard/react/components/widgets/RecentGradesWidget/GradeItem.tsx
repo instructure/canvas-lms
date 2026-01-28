@@ -16,18 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconCompleteSolid, IconArrowOpenDownLine} from '@instructure/ui-icons'
-import CourseCode from '../../shared/CourseCode'
+import {IconCompleteSolid, IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
+import {Expandable} from '@instructure/ui-expandable'
 import type {GradeItemProps} from '../../../types'
 import {determineItemType, getTypeIcon} from '../../../utils/assignmentUtils'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
+import {ExpandedGradeView} from './ExpandedGradeView'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -58,24 +59,30 @@ const formatTimeAgo = (dateString: string | null): string => {
   }
 }
 
-const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
+export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
   const {isMobile} = useResponsiveContext()
+  const [isExpanded, setIsExpanded] = useState(false)
   const isGraded = submission.gradedAt !== null
   const timeAgoText = formatTimeAgo(submission.gradedAt)
   const itemType = determineItemType(submission.assignment)
 
-  const assignmentTitle = (
-    <Text size="medium" weight="bold" data-testid={`assignment-title-${submission._id}`}>
-      {submission.assignment.name}
-    </Text>
-  )
+  const handleToggleExpand = () => {
+    setIsExpanded(!isExpanded)
+  }
 
-  const courseCode = (
-    <CourseCode
-      courseId={submission.assignment.course._id}
-      overrideCode={submission.assignment.course.courseCode}
-      size="x-small"
-    />
+  const assignmentTitle = (
+    <View>
+      <Text size="medium" weight="bold" data-testid={`assignment-title-${submission._id}`}>
+        {submission.assignment.name}
+      </Text>
+      {submission.assignment.course?.name && (
+        <View as="div">
+          <Text size="small" color="secondary" data-testid={`course-name-${submission._id}`}>
+            {submission.assignment.course.name}
+          </Text>
+        </View>
+      )}
+    </View>
   )
 
   const timestamp = (
@@ -94,66 +101,84 @@ const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
     </Pill>
   )
 
-  const expandButton = (
+  const expandButton = isGraded ? (
     <IconButton
-      screenReaderLabel={I18n.t('Expand grade details')}
+      screenReaderLabel={
+        isExpanded ? I18n.t('Collapse grade details') : I18n.t('Expand grade details')
+      }
       size="small"
       withBackground={false}
       withBorder={false}
+      onClick={handleToggleExpand}
       data-testid={`expand-grade-${submission._id}`}
     >
-      <IconArrowOpenDownLine />
+      {isExpanded ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
     </IconButton>
-  )
+  ) : null
 
   if (isMobile) {
     return (
       <View as="div" padding="small 0" data-testid={`grade-item-${submission._id}`}>
         <Flex direction="column" gap="x-small">
           <Flex.Item>{assignmentTitle}</Flex.Item>
-          <Flex.Item>{courseCode}</Flex.Item>
           <Flex.Item>{timestamp}</Flex.Item>
           <Flex.Item>
             <Flex direction="row" gap="x-small" alignItems="center">
               <Flex.Item>{statusPill}</Flex.Item>
-              <Flex.Item>{expandButton}</Flex.Item>
+              {expandButton && <Flex.Item>{expandButton}</Flex.Item>}
             </Flex>
           </Flex.Item>
+          {isExpanded && (
+            <Flex.Item>
+              <Expandable expanded={isExpanded} onToggle={handleToggleExpand}>
+                {({expanded}) => (
+                  <div>{expanded && <ExpandedGradeView submission={submission} />}</div>
+                )}
+              </Expandable>
+            </Flex.Item>
+          )}
         </Flex>
       </View>
     )
   }
 
   return (
-    <View as="div" padding="small 0" data-testid={`grade-item-${submission._id}`}>
-      <Flex gap="small" alignItems="center">
-        <Flex.Item>
-          <View as="div" background="secondary" borderRadius="medium" padding="small">
-            {getTypeIcon(itemType, isMobile)}
-          </View>
-        </Flex.Item>
-
-        <Flex.Item shouldGrow shouldShrink>
-          <Flex direction="column" gap="x-small">
-            <Flex.Item>{assignmentTitle}</Flex.Item>
+    <View as="div" data-testid={`grade-item-${submission._id}`}>
+      <Flex direction="column" gap="x-small">
+        <Flex.Item padding="small">
+          <Flex gap="small" alignItems="center">
             <Flex.Item>
-              <Flex direction="row" gap="x-small" alignItems="center" wrap="wrap">
-                <Flex.Item>{courseCode}</Flex.Item>
+              <View as="div" background="secondary" borderRadius="medium" padding="small">
+                {getTypeIcon(itemType, isMobile)}
+              </View>
+            </Flex.Item>
+
+            <Flex.Item shouldGrow shouldShrink>
+              <Flex direction="column">
+                <Flex.Item>{assignmentTitle}</Flex.Item>
                 <Flex.Item>{timestamp}</Flex.Item>
+              </Flex>
+            </Flex.Item>
+
+            <Flex.Item align="center">
+              <Flex direction="row" gap="x-small" alignItems="center">
+                <Flex.Item>{statusPill}</Flex.Item>
+                {expandButton && <Flex.Item>{expandButton}</Flex.Item>}
               </Flex>
             </Flex.Item>
           </Flex>
         </Flex.Item>
 
-        <Flex.Item align="center">
-          <Flex direction="row" gap="x-small" alignItems="center">
-            <Flex.Item>{statusPill}</Flex.Item>
-            <Flex.Item>{expandButton}</Flex.Item>
-          </Flex>
-        </Flex.Item>
+        {isExpanded && (
+          <Flex.Item>
+            <Expandable expanded={isExpanded} onToggle={handleToggleExpand}>
+              {({expanded}) => (
+                <div>{expanded && <ExpandedGradeView submission={submission} />}</div>
+              )}
+            </Expandable>
+          </Flex.Item>
+        )}
       </Flex>
     </View>
   )
 }
-
-export default GradeItem

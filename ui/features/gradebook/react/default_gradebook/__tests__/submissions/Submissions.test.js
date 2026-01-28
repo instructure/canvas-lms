@@ -254,10 +254,10 @@ describe('Gradebook > Submissions', () => {
       expect(getAssignment('2301').assignment_visibility).toEqual([])
     })
 
-    test.skip('does nothing when the assignment is not loaded in Gradebook', () => {
+    test('does nothing when the assignment is not loaded in Gradebook', () => {
       studentSubmissions[0].submissions[1].assignment_id = '2309'
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      expect(getAssignment('2309')).toBeNull()
+      expect(getAssignment('2309')).toBeUndefined()
     })
   })
 
@@ -401,8 +401,12 @@ describe('Gradebook > Submissions', () => {
 
   describe('#updateSubmission()', () => {
     let submission
+    let formatGradeSpy
 
     beforeEach(() => {
+      // Create spy once per test, ensuring clean state
+      formatGradeSpy = vi.spyOn(GradeFormatHelper, 'formatGrade')
+
       gradebook = createGradebook()
       gradebook.students = {1101: {id: '1101'}}
 
@@ -421,45 +425,45 @@ describe('Gradebook > Submissions', () => {
       }
     })
 
+    afterEach(() => {
+      formatGradeSpy.mockRestore()
+    })
+
     function getSubmission() {
       return gradebook.getSubmission('1101', '2301')
     }
 
     test('formats the grade for the submission', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      expect(GradeFormatHelper.formatGrade).toHaveBeenCalledTimes(1)
+      expect(formatGradeSpy).toHaveBeenCalledTimes(1)
     })
 
     test('includes the grade when formatting the grade', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const grade = GradeFormatHelper.formatGrade.mock.calls[0][0]
+      const grade = formatGradeSpy.mock.calls[0][0]
       expect(grade).toBe('123.45')
     })
 
     test('includes the grading type when formatting the grade', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const options = GradeFormatHelper.formatGrade.mock.calls[0][1]
+      const options = formatGradeSpy.mock.calls[0][1]
       expect(options.gradingType).toBe('percent')
     })
 
     test('does not delocalize when formatting the grade', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const options = GradeFormatHelper.formatGrade.mock.calls[0][1]
+      const options = formatGradeSpy.mock.calls[0][1]
       expect(options.delocalize).toBe(false)
     })
 
     test('sets the formatted grade on submission', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade').mockReturnValue('123.45%')
+      formatGradeSpy.mockReturnValue('123.45%')
       gradebook.updateSubmission(submission)
       expect(getSubmission().grade).toBe('123.45%')
     })
 
     test('sets the raw grade on submission', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade').mockReturnValue('123.45%')
+      formatGradeSpy.mockReturnValue('123.45%')
       gradebook.updateSubmission(submission)
       expect(getSubmission().rawGrade).toBe('123.45')
     })
@@ -482,13 +486,18 @@ describe('Gradebook > Submissions', () => {
       expect(getSubmission().hidden).toBe(false)
     })
 
+    // TODO: formatGrade is now being called even when assignment hasn't loaded. Behavior may have
+    // changed, or test expectations are outdated. Needs investigation.
     test.skip('does not format grades when the assignment has not loaded', () => {
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
+      const spy = vi.spyOn(GradeFormatHelper, 'formatGrade')
       delete gradebook.assignments[2301]
       gradebook.updateSubmission(submission)
-      expect(GradeFormatHelper.formatGrade).not.toHaveBeenCalled()
+      expect(spy).not.toHaveBeenCalled()
+      spy.mockRestore()
     })
 
+    // TODO: formatGrade is now being called for pass_fail grading types. Behavior may have
+    // changed, or test expectations are outdated. Needs investigation.
     test.skip('does not format grades for Complete/Incomplete assignments', () => {
       /*
        * When the grades ('complete', 'incomplete') for these assignments
@@ -497,10 +506,11 @@ describe('Gradebook > Submissions', () => {
        * this from happening. Eventually, grades will be purely the persisted,
        * data values from the database. And formatting will occur only in the UI.
        */
-      vi.spyOn(GradeFormatHelper, 'formatGrade')
+      const spy = vi.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.assignments[2301].grading_type = 'pass_fail'
       gradebook.updateSubmission(submission)
-      expect(GradeFormatHelper.formatGrade).not.toHaveBeenCalled()
+      expect(spy).not.toHaveBeenCalled()
+      spy.mockRestore()
     })
   })
 

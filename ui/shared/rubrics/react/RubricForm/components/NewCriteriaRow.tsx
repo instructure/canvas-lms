@@ -48,7 +48,7 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion, onAddOutcome}: NewCri
         </Flex.Item>
         <Flex.Item margin="0 small" align="start" shouldGrow={true}>
           <Button
-            // @ts-expect-error
+            // @ts-expect-error - InstUI Button renderIcon prop type mismatch
             renderIcon={IconEditLine}
             onClick={onEditCriterion}
             data-testid="add-criterion-button"
@@ -57,7 +57,7 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion, onAddOutcome}: NewCri
           </Button>
           <Button
             id="create-from-outcome"
-            // @ts-expect-error
+            // @ts-expect-error - InstUI Button renderIcon prop type mismatch
             renderIcon={IconOutcomesLine}
             margin="0 0 0 small"
             onClick={onAddOutcome}

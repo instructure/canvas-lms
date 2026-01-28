@@ -161,36 +161,29 @@ describe('RubricForm AI Regenerate Progress Test', () => {
       },
     )
 
-    const {getByTestId, queryByText} = renderComponent({
+    const {getByTestId, findByTestId, findByText, queryByText} = renderComponent({
       aiRubricsEnabled: true,
       assignmentId: '1',
       courseId: '1',
     })
 
     // Generate initial criteria via AI
-    const generateButton = getByTestId('generate-criteria-button')
-    fireEvent.click(generateButton)
+    fireEvent.click(getByTestId('generate-criteria-button'))
 
-    // Advance timers to trigger the initial progress callback
+    // Advance timers to trigger the progress callback
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(100)
+      await vi.advanceTimersByTimeAsync(50)
     })
 
-    // Wait for criteria to be generated - should show the header with regenerate button
-    await waitFor(() => {
-      expect(getByTestId('generate-criteria-header')).toBeInTheDocument()
-    })
-
-    // Get the regenerate button from the generated criteria header
-    const generateCriteriaHeader = getByTestId('generate-criteria-header')
+    // Wait for criteria to be generated - use findBy which combines waitFor with getBy
+    const generateCriteriaHeader = await findByTestId('generate-criteria-header')
     const regenerateButton = within(generateCriteriaHeader).getByTestId('regenerate-criteria-button')
 
-    // Open regenerate modal (this is for "all criteria", not single criterion)
+    // Open regenerate modal
     fireEvent.click(regenerateButton)
 
-    await waitFor(() => {
-      expect(queryByText('Regenerate Criteria')).toBeInTheDocument()
-    })
+    // Wait for modal to appear
+    await findByText('Regenerate Criteria')
 
     // Submit the regeneration
     const submitButton = getByTestId('regenerate-criteria-submit-button')
@@ -199,16 +192,12 @@ describe('RubricForm AI Regenerate Progress Test', () => {
 
     // Advance timers to trigger the regenerate progress callback
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(100)
+      await vi.advanceTimersByTimeAsync(50)
     })
 
-    // Wait for the dialog to close
+    // Wait for the dialog to close and verify the regenerate button is disabled
     await waitFor(() => {
       expect(queryByText('Regenerate Criteria')).not.toBeInTheDocument()
-    })
-
-    // While progress is running, the regenerate button should be disabled
-    await waitFor(() => {
       const headerAfterRegenerate = getByTestId('generate-criteria-header')
       const buttonAfterRegenerate = within(headerAfterRegenerate).getByTestId(
         'regenerate-criteria-button',

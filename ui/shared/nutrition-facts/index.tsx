@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom/client'
 import {createPortal} from 'react-dom'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import {captureException} from '@sentry/browser'
 import {AiInfo} from '@instructure.ai/aiinfo'
@@ -78,10 +78,12 @@ const ResponsiveNutritionFacts = (feature: string) => {
 export const mountNutritionFacts = (feature: string) => {
   ready(() => {
     try {
+      const element = ResponsiveNutritionFacts(feature)
+      if (!element) return
+
       const wrapperDiv = document.createElement('div')
       document.body.appendChild(wrapperDiv)
-      const root = ReactDOM.createRoot(wrapperDiv)
-      root.render(ResponsiveNutritionFacts(feature))
+      render(element, wrapperDiv)
     } catch (error) {
       captureException(error)
     }

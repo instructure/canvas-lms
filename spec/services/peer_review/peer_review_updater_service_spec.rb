@@ -551,7 +551,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         expect(result.description).to eq(parent_assignment.description)
         expect(result.peer_review_count).to eq(parent_assignment.peer_review_count)
         expect(result.peer_reviews).to eq(parent_assignment.peer_reviews)
-        expect(result.submission_types).to eq("online_text_entry")
+        expect(result.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
       end
 
       it "suspends due date caching when inherited attributes are synced" do

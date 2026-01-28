@@ -19,7 +19,10 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentExternalTools from '../AssignmentExternalTools'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 var toolDefinitions = [
   {
@@ -71,16 +74,25 @@ vi.mock('jquery', async () => {
     ajax: {status: 200, data: toolDefinitions},
   }
 })
-fetchMock.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
 
 describe('AssignmentExternalTools', () => {
   let wrapper
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
+    server.use(
+      http.get('/api/v1/courses/1/lti_apps/launch_definitions', () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
   })
 
   afterEach(() => {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
+    server.resetHandlers()
   })
 
   test('it renders', () => {

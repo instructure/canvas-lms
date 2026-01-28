@@ -40,7 +40,11 @@ import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('OutcomeManagement')
 
-const unmount = mount => ReactDOM.unmountComponentAtNode(mount)
+const unmount = mount => {
+  if (mount && mount.nodeType === Node.ELEMENT_NODE) {
+    ReactDOM.unmountComponentAtNode(mount)
+  }
+}
 
 export const OutcomePanel = () => {
   useEffect(() => {
@@ -65,10 +69,6 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const [isImporting, setIsImporting] = useState(false)
   const [createdOutcomeGroupIds, setCreatedOutcomeGroupIds] = useState([])
   const [lhsGroupId, setLhsGroupId] = useState(null)
-  const [selectedIndex, setSelectedIndex] = useState(() => {
-    const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
-    return window.location.hash in tabs ? tabs[window.location.hash] : 0
-  })
   const [targetGroupIdsToRefetch, setTargetGroupIdsToRefetch] = useState([])
   const [importsTargetGroup, setImportsTargetGroup] = useState({})
   const isMobileView = !breakpoints?.tablet
@@ -79,6 +79,16 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const alignmentTabIndex = accountLevelMasteryScalesFF ? 3 : 1
   const shouldDisplayReportingTab = lmgbStudentReportingFF && canManage && contextType === 'Course'
   const reportingTabIndex = accountLevelMasteryScalesFF ? 4 : 2
+  const [selectedIndex, setSelectedIndex] = useState(() => {
+    const tabs = {
+      '#mastery_scale': 1,
+      '#mastery_calculation': 2,
+      '#alignments': shouldDisplayAlignmentsTab ? alignmentTabIndex : null,
+      '#reporting': shouldDisplayReportingTab ? reportingTabIndex : null,
+    }
+    const hash = window.location.hash
+    return hash in tabs && tabs[hash] !== null ? tabs[hash] : 0
+  })
 
   const onSetImportRef = useCallback(node => {
     setImportRef(node)
@@ -254,7 +264,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             renderTitle={I18n.t('Reporting')}
             isSelected={selectedIndex === reportingTabIndex}
             id="reporting"
-            padding={isMobileView ? 'small none none' : 'small'}
+            padding="0"
           >
             <ScreenReaderContent as="h2">{I18n.t('Reporting Tab Content')}</ScreenReaderContent>
             <Reporting />

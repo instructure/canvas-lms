@@ -274,13 +274,20 @@ export interface EnvCommon {
 
   BLUEPRINT_COURSES_DATA: BlueprintCoursesData | undefined
   AI_FEEDBACK_LINK?: string
+
+  /**
+   * Used by ContentTypeExternalToolDrawer for mutex management
+   */
+  INIT_DRAWER_LAYOUT_MUTEX?: string
 }
 
 /**
  * From ApplicationController#JS_ENV_SITE_ADMIN_FEATURES
  */
 export type SiteAdminFeatureId =
-  | 'a11y_checker_ai_generation'
+  | 'a11y_checker_ai_alt_text_generation'
+  | 'a11y_checker_ai_table_caption_generation'
+  | 'a11y_checker_additional_resources'
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
   | 'courses_popout_sisid'
@@ -316,6 +323,7 @@ export type SiteAdminFeatureId =
 export type RootAccountFeatureId =
   | 'account_level_mastery_scales'
   | 'ams_root_account_integration'
+  | 'ams_advanced_content_organization'
   | 'api_rate_limits'
   | 'buttons_and_icons_root_account'
   | 'canvas_apps_sub_account_access'

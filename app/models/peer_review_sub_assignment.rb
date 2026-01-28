@@ -22,6 +22,8 @@ class PeerReviewSubAssignment < AbstractAssignment
   belongs_to :parent_assignment, class_name: "Assignment", inverse_of: :peer_review_sub_assignment
   has_many :assessment_requests, dependent: :nullify
 
+  PEER_REVIEW_SUBMISSION_TYPE = "peer_review"
+
   SYNCABLE_ATTRIBUTES = %w[
     anonymous_peer_reviews
     assignment_group_id
@@ -50,6 +52,8 @@ class PeerReviewSubAssignment < AbstractAssignment
   validate  :context_matches_parent_assignment, if: :context_explicitly_provided?
   validate  :parent_assignment_not_discussion_topic_or_external_tool
   validate  :points_possible_changes_ok?
+
+  before_validation :sync_submission_types_with_grading_type
 
   after_initialize :set_default_context
   after_save :unlink_assessment_requests, if: :soft_deleted?
@@ -134,5 +138,9 @@ class PeerReviewSubAssignment < AbstractAssignment
       errors.add :points_possible,
                  I18n.t("Students have already submitted peer reviews, so reviews required and points cannot be changed.")
     end
+  end
+
+  def sync_submission_types_with_grading_type
+    self.submission_types = (grading_type == "not_graded") ? "not_graded" : PEER_REVIEW_SUBMISSION_TYPE
   end
 end

@@ -264,6 +264,9 @@ export interface AssignedStudentsVariables {
 
 export interface AllocationRulesData {
   assignment: {
+    peerReviews?: {
+      count: number
+    }
     allocationRules: {
       rulesConnection: {
         nodes: AllocationRuleType[]
@@ -282,11 +285,13 @@ export interface GraphQLPageData {
   hasNextPage: boolean
   endCursor: string | null
   totalCount: number | null
+  requiredPeerReviewsCount?: number
 }
 
 export interface UseAllocationRulesResult {
   rules: AllocationRuleType[]
   totalCount: number | null
+  requiredPeerReviewsCount: number
   loading: boolean
   error: any
   refetch: (page: number) => Promise<{rules: AllocationRuleType[]; totalCount: number | null}>

@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {act, cleanup, render as testingLibraryRender} from '@testing-library/react'
+import {render as testingLibraryRender} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
+import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {resetPlanner} from '@canvas/planner'
 import {createPlannerMocks, defaultK5DashboardProps as defaultProps, defaultEnv} from './mocks'
-import fetchMock from 'fetch-mock'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
@@ -37,7 +37,12 @@ vi.mock('@canvas/observer-picker/react/utils', async importOriginal => {
 const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
-const server = setupServer(...createPlannerMocks())
+const server = setupServer(
+  ...createPlannerMocks(),
+  http.get(/\/api\/v1\/announcements.*/, () => HttpResponse.json([])),
+  http.get('/api/v1/calendar_events', () => HttpResponse.json([])),
+  http.put(/\/api\/v1\/users\/\d+\/colors.*/, () => HttpResponse.json({})),
+)
 
 describe('K5Dashboard Schedule Section', () => {
   beforeAll(() => server.listen())
@@ -45,11 +50,6 @@ describe('K5Dashboard Schedule Section', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    vi.useFakeTimers({shouldAdvanceTime: true})
-    fetchMock.get(/\/api\/v1\/announcements/, [])
-    fetchMock.get(/\/api\/v1\/calendar_events/, [])
-    fetchMock.put(/.*\/api\/v1\/users\/\d+\/colors/, {})
-    fetchMock.spy()
     global.ENV = defaultEnv
     fetchShowK5Dashboard.mockImplementation(() =>
       Promise.resolve({show_k5_dashboard: true, use_classic_font: false}),
@@ -57,29 +57,22 @@ describe('K5Dashboard Schedule Section', () => {
   })
 
   afterEach(async () => {
-    // Unmount components first to trigger cleanup
-    cleanup()
-    // Run all pending timers to complete InstUI transitions before teardown
-    await act(async () => {
-      vi.runAllTimers()
-    })
-    vi.useRealTimers()
     global.ENV = {}
     resetPlanner()
-    fetchMock.reset()
+    // Wait a bit for any pending transitions to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
   })
 
-  // FOO-3831 - skipped due to fake timers + MSW causing hangs in Vitest
-  it.skip('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
+  it('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
     const {findByTestId} = render(
       <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />,
     )
     const jumpToNavButton = await findByTestId('jump-to-weekly-nav-button')
     expect(jumpToNavButton).not.toBeVisible()
-    act(() => jumpToNavButton.focus())
+    jumpToNavButton.focus()
     expect(jumpToNavButton).toBeVisible()
-    act(() => jumpToNavButton.click())
+    jumpToNavButton.click()
     expect(document.activeElement.id).toBe('weekly-header-active-button')
     expect(jumpToNavButton).not.toBeVisible()
-  }, 15000)
+  })
 })

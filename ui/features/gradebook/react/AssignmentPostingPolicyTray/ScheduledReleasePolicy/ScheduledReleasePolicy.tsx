@@ -22,7 +22,6 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {useEffect, useState} from 'react'
 import {SeparateScheduledRelease} from './SeparateScheduledRelease'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SharedScheduledRelease} from './SharedScheduleRelease'
 import {FormMessage} from '@instructure/ui-form-field'
 
@@ -36,11 +35,7 @@ export type ScheduledRelease = {
 
 type ScheduledReleasePolicyProps = ScheduledRelease & {
   errorMessages: {grades: FormMessage[]; comments: FormMessage[]}
-  handleChangeWithErrors: (
-    changes: Partial<ScheduledRelease>,
-    gradeErrors: FormMessage[],
-    commentErrors: FormMessage[],
-  ) => void
+  handleChange: (changes: Partial<ScheduledRelease>) => void
 }
 
 export const ScheduledReleasePolicy = ({
@@ -48,7 +43,7 @@ export const ScheduledReleasePolicy = ({
   scheduledPostMode,
   postCommentsAt,
   postGradesAt,
-  handleChangeWithErrors,
+  handleChange,
 }: ScheduledReleasePolicyProps) => {
   const inputs = [
     {
@@ -67,28 +62,20 @@ export const ScheduledReleasePolicy = ({
   }, [scheduledPostMode])
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    handleChangeWithErrors(
-      {
-        scheduledPostMode: event.target.checked ? inputs[0].value : undefined,
-        postCommentsAt: undefined,
-        postGradesAt: undefined,
-      },
-      [],
-      [],
-    )
+    handleChange({
+      scheduledPostMode: event.target.checked ? inputs[0].value : undefined,
+      postCommentsAt: undefined,
+      postGradesAt: undefined,
+    })
   }
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedValue(event.target.value)
     const postCommentsAtDate = event.target.value === 'shared' ? postGradesAt : postCommentsAt
-    handleChangeWithErrors(
-      {
-        scheduledPostMode: event.target.value,
-        postCommentsAt: postCommentsAtDate,
-        postGradesAt,
-      },
-      [],
-      [],
-    )
+    handleChange({
+      scheduledPostMode: event.target.value,
+      postCommentsAt: postCommentsAtDate,
+      postGradesAt,
+    })
   }
   return (
     <View as="div" margin="medium 0 0 medium" data-testid="scheduled-release-policy">
@@ -120,12 +107,8 @@ export const ScheduledReleasePolicy = ({
             <SharedScheduledRelease
               errorMessages={errorMessages.grades}
               postGradesAt={postGradesAt}
-              handleChange={(postGradesAt?: string, gradeErrors?: FormMessage[]) => {
-                handleChangeWithErrors(
-                  {postGradesAt, postCommentsAt: postGradesAt, scheduledPostMode},
-                  gradeErrors ?? [],
-                  [],
-                )
+              handleChange={(postGradesAt?: string) => {
+                handleChange({postGradesAt, postCommentsAt: postGradesAt, scheduledPostMode})
               }}
             />
           )}
@@ -135,8 +118,8 @@ export const ScheduledReleasePolicy = ({
               gradeErrorMessages={errorMessages.grades}
               postCommentsAt={postCommentsAt}
               postGradesAt={postGradesAt}
-              handleChange={(changes, gradeErrors, commentErrors) => {
-                handleChangeWithErrors({...changes, scheduledPostMode}, gradeErrors, commentErrors)
+              handleChange={changes => {
+                handleChange({...changes, scheduledPostMode})
               }}
             />
           )}

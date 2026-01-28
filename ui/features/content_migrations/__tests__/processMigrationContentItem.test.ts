@@ -19,9 +19,17 @@
 import $ from 'jquery'
 import processMigrationContentItem from '../processMigrationContentItem'
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
+import {
+  postMessageExternalContentReady,
+  postMessageExternalContentCancel,
+} from '@canvas/external-tools/messages'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('@canvas/deep-linking/processors/processSingleContentItem')
+vi.mock('@canvas/external-tools/messages', () => ({
+  postMessageExternalContentReady: vi.fn(),
+  postMessageExternalContentCancel: vi.fn(),
+}))
 
 interface ContentItem {
   type: string
@@ -51,6 +59,7 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
+  vi.clearAllMocks()
   vi.spyOn($, 'flashMessage').mockImplementation(() => {})
   vi.spyOn($, 'flashError').mockImplementation(() => {})
   vi.mocked(processSingleContentItem).mockReturnValue({
@@ -58,6 +67,10 @@ beforeEach(() => {
     url: 'http://example.com/file.txt',
     text: 'Test File',
   })
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 afterAll(() => {
@@ -90,9 +103,12 @@ function event(overrides: EventOptions = {}): MessageEvent {
   } as MessageEvent
 }
 
-it.skip('process the content item', () => {
+it('processes the content item and posts external content ready message', () => {
   processMigrationContentItem(event())
-  expect($.flashMessage).toHaveBeenCalled()
+  expect(postMessageExternalContentReady).toHaveBeenCalledWith(window, {
+    contentItems: [{text: 'Test File', url: 'http://example.com/file.txt'}],
+  })
+  expect(postMessageExternalContentCancel).not.toHaveBeenCalled()
   expect($.flashError).not.toHaveBeenCalled()
 })
 

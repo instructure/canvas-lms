@@ -19,13 +19,16 @@
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {RenameModal} from '../RenameModal'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../fixtures/fakeData'
 import {userEvent} from '@testing-library/user-event'
 import {Folder, File} from '../../../interfaces/File'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {RowsProvider} from '../../contexts/RowsContext'
 import {mockRowsContext} from '../FileFolderTable/__tests__/testUtils'
+
+const server = setupServer()
 
 const defaultProps: {
   isOpen: boolean
@@ -46,12 +49,20 @@ const renderComponent = (props = {}) => {
 }
 
 describe('RenameModal', () => {
+  let lastCallBody: string | undefined
+  let callCount = 0
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     vi.clearAllMocks()
+    lastCallBody = undefined
+    callCount = 0
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     destroyContainer()
   })
 
@@ -59,11 +70,15 @@ describe('RenameModal', () => {
     beforeEach(() => {
       defaultProps.renamingItem = FAKE_FILES[0]
 
-      fetchMock.put(`/api/v1/files/${FAKE_FILES[0].id}`, {
-        status: 200,
-        headers: {'Content-Type': 'application/json'},
-        body: '',
-      })
+      server.use(
+        http.put(`/api/v1/files/${FAKE_FILES[0].id}`, async ({request}) => {
+          callCount++
+          lastCallBody = await request.text()
+          return HttpResponse.json('', {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
     })
 
     it('does not send api call when name is the same', async () => {
@@ -72,7 +87,7 @@ describe('RenameModal', () => {
       expect(await screen.findByText(`Rename`)).toBeInTheDocument()
       await user.click(screen.getByRole('button', {name: 'Save'}))
       await waitFor(() => {
-        expect(fetchMock.calls()).toHaveLength(0)
+        expect(callCount).toBe(0)
       })
       expect(defaultProps.onClose).toHaveBeenCalled()
     })
@@ -102,6 +117,14 @@ describe('RenameModal', () => {
     })
 
     it('successfully saves a valid new filename', async () => {
+      let requestUrl: string | undefined
+      server.use(
+        http.put(`/api/v1/files/${FAKE_FILES[0].id}`, ({request}) => {
+          requestUrl = request.url
+          return HttpResponse.json('')
+        }),
+      )
+
       const user = userEvent.setup()
       renderComponent()
       const input = screen.getByLabelText('File Name *')
@@ -110,15 +133,17 @@ describe('RenameModal', () => {
       await user.click(screen.getByRole('button', {name: 'Save'}))
 
       await waitFor(() => {
-        expect(fetchMock.calls()[0][0]).toBe(`/api/v1/files/${defaultProps.renamingItem.id}`)
+        expect(requestUrl).toContain(`/api/v1/files/${defaultProps.renamingItem.id}`)
       })
     })
 
     it('displays loading spinner when submitting', async () => {
       const user = userEvent.setup()
-      fetchMock.put(`/api/v1/files/${FAKE_FILES[0].id}`, new Promise(() => {}), {
-        overwriteRoutes: true,
-      })
+      server.use(
+        http.put(`/api/v1/files/${FAKE_FILES[0].id}`, () => {
+          return new Promise(() => {}) // Never resolves
+        }),
+      )
       renderComponent()
       const input = screen.getByRole('textbox', {name: 'File Name'})
       await user.clear(input)
@@ -131,7 +156,11 @@ describe('RenameModal', () => {
 
     it('does not close when there is an error', async () => {
       const user = userEvent.setup()
-      fetchMock.put(`/api/v1/files/${FAKE_FILES[0].id}`, 500, {overwriteRoutes: true})
+      server.use(
+        http.put(`/api/v1/files/${FAKE_FILES[0].id}`, () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
       renderComponent()
       const input = screen.getByRole('textbox', {name: 'File Name'})
       await user.clear(input)
@@ -141,6 +170,14 @@ describe('RenameModal', () => {
     })
 
     it('submits on enter', async () => {
+      let requestUrl: string | undefined
+      server.use(
+        http.put(`/api/v1/files/${FAKE_FILES[0].id}`, ({request}) => {
+          requestUrl = request.url
+          return HttpResponse.json('')
+        }),
+      )
+
       const user = userEvent.setup()
       renderComponent()
       const input = screen.getByRole('textbox', {name: 'File Name'})
@@ -148,11 +185,18 @@ describe('RenameModal', () => {
       await user.type(input, 'anothervalidfilename')
       await user.type(input, '{enter}')
       await waitFor(() => {
-        expect(fetchMock.calls()[0][0]).toBe(`/api/v1/files/${defaultProps.renamingItem.id}`)
+        expect(requestUrl).toContain(`/api/v1/files/${defaultProps.renamingItem.id}`)
       })
     })
 
     it('allows a file name longer than 255 characters', async () => {
+      server.use(
+        http.put(`/api/v1/files/${FAKE_FILES[0].id}`, async ({request}) => {
+          lastCallBody = await request.text()
+          return HttpResponse.json('')
+        }),
+      )
+
       const user = userEvent.setup()
       renderComponent()
       const input = screen.getByLabelText('File Name *')
@@ -160,7 +204,9 @@ describe('RenameModal', () => {
       // userEvent.type is flaky with long strings
       fireEvent.change(input, {target: {value: name}})
       await user.click(screen.getByRole('button', {name: 'Save'}))
-      expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
+      await waitFor(() => {
+        expect(lastCallBody).toEqual(`{"name":"${name}"}`)
+      })
     })
   })
 
@@ -168,11 +214,15 @@ describe('RenameModal', () => {
     beforeEach(() => {
       defaultProps.renamingItem = FAKE_FOLDERS[0]
 
-      fetchMock.put(`/api/v1/folders/${FAKE_FOLDERS[0].id}`, {
-        status: 200,
-        headers: {'Content-Type': 'application/json'},
-        body: '',
-      })
+      server.use(
+        http.put(`/api/v1/folders/${FAKE_FOLDERS[0].id}`, async ({request}) => {
+          callCount++
+          lastCallBody = await request.text()
+          return HttpResponse.json('', {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
     })
 
     it('does not send api call when name is the same', async () => {
@@ -181,7 +231,7 @@ describe('RenameModal', () => {
       expect(await screen.findByText(`Rename`)).toBeInTheDocument()
       await user.click(screen.getByRole('button', {name: 'Save'}))
       await waitFor(() => {
-        expect(fetchMock.calls()).toHaveLength(0)
+        expect(callCount).toBe(0)
       })
       expect(defaultProps.onClose).toHaveBeenCalled()
     })
@@ -211,6 +261,14 @@ describe('RenameModal', () => {
     })
 
     it('successfully saves a valid new folder name', async () => {
+      let requestUrl: string | undefined
+      server.use(
+        http.put(`/api/v1/folders/${FAKE_FOLDERS[0].id}`, ({request}) => {
+          requestUrl = request.url
+          return HttpResponse.json('')
+        }),
+      )
+
       const user = userEvent.setup()
       renderComponent()
       const input = screen.getByLabelText('Folder Name *')
@@ -218,7 +276,7 @@ describe('RenameModal', () => {
       await user.type(input, 'validfoldername')
       await user.click(screen.getByRole('button', {name: 'Save'}))
       await waitFor(() => {
-        expect(fetchMock.calls()[0][0]).toBe(`/api/v1/folders/${defaultProps.renamingItem.id}`)
+        expect(requestUrl).toContain(`/api/v1/folders/${defaultProps.renamingItem.id}`)
       })
     })
 
@@ -236,6 +294,13 @@ describe('RenameModal', () => {
     })
 
     it('does allow a folder name of 255 characters', async () => {
+      server.use(
+        http.put(`/api/v1/folders/${FAKE_FOLDERS[0].id}`, async ({request}) => {
+          lastCallBody = await request.text()
+          return HttpResponse.json('')
+        }),
+      )
+
       const user = userEvent.setup()
       renderComponent()
       const input = screen.getByLabelText('Folder Name *')
@@ -243,7 +308,9 @@ describe('RenameModal', () => {
       // userEvent.type is flaky with long strings
       fireEvent.change(input, {target: {value: name}})
       await user.click(screen.getByRole('button', {name: 'Save'}))
-      expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
+      await waitFor(() => {
+        expect(lastCallBody).toEqual(`{"name":"${name}"}`)
+      })
     })
   })
 })

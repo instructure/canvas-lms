@@ -358,6 +358,40 @@ describe GradeSummaryPresenter do
       expect(submission.submission_comments[0].read?(@student)).to be true
       expect(submission.submission_comments[1].read?(@student)).to be false
     end
+
+    it "properly preloads rubric assessments and their associations" do
+      assignment = @course.assignments.create!(points_possible: 10)
+      rubric = rubric_model(context: @course)
+      rubric_association = rubric.associate_with(assignment, @course, purpose: "grading", use_for_grading: true)
+      submission = assignment.grade_student(@student, grade: 10, grader: @teacher).first
+
+      assessment = RubricAssessment.create!(
+        rubric:,
+        rubric_association:,
+        user: @student,
+        assessor: @teacher,
+        artifact: submission,
+        assessment_type: "grading"
+      )
+
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+
+      # Access the rubric assessment and its associations to ensure they're preloaded
+      # This would raise a strict loading error if not properly preloaded
+      expect do
+        presenter.submissions.each do |s|
+          s.rubric_assessments.each do |ra|
+            ra.user
+            ra.rubric_association.context
+            ra.rubric_association.association_object
+          end
+        end
+      end.not_to raise_error
+
+      # Verify the assessment is actually there
+      submission_with_assessment = presenter.submissions.find { |s| s.id == submission.id }
+      expect(submission_with_assessment.rubric_assessments).to include(assessment)
+    end
   end
 
   describe "#assignments" do

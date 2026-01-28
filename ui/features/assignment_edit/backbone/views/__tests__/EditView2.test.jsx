@@ -32,7 +32,8 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
 
 // Mock the horizon utils module
@@ -45,6 +46,22 @@ const currentOrigin = window.location.origin
 
 // Mock RCE initialization
 EditView.prototype._attachEditorToDescription = () => {}
+
+// MSW server setup
+const server = setupServer(
+  http.get('/api/v1/courses/1/settings', () => {
+    return HttpResponse.json({})
+  }),
+  http.get('/api/v1/courses/1/sections', () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions.*/, () => {
+    return HttpResponse.json([])
+  }),
+  http.post(/.*\/api\/graphql/, () => {
+    return HttpResponse.json({})
+  }),
+)
 
 const editView = (assignmentOpts = {}) => {
   const defaultAssignmentOpts = {
@@ -105,8 +122,11 @@ const disableCheckbox = id => {
   document.getElementById(id).disabled = true
 }
 
-describe.skip('EditView', () => {
+describe('EditView', () => {
   let fixtures
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     fixtures = document.createElement('div')
@@ -143,10 +163,6 @@ describe.skip('EditView', () => {
       return url
     })
 
-    fetchMock.get('/api/v1/courses/1/settings', {})
-    fetchMock.get('/api/v1/courses/1/sections?per_page=100', [])
-    fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions*/, [])
-    fetchMock.post(/.*\/api\/graphql/, {})
     RCELoader.RCE = null
     return RCELoader.loadRCE()
   })
@@ -157,7 +173,7 @@ describe.skip('EditView', () => {
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
     fixtures.remove()
-    fetchMock.reset()
+    server.resetHandlers()
     vi.clearAllMocks()
   })
 
@@ -277,14 +293,6 @@ describe.skip('EditView', () => {
   })
 
   describe('#togglePeerReviewsAndGroupCategoryEnabled', () => {
-    beforeEach(() => {
-      fetchMock.mock('*', {})
-    })
-
-    afterEach(() => {
-      fetchMock.reset()
-    })
-
     it('locks down group category after students submit', () => {
       const view = editView({has_submitted_submissions: true})
       expect(view.$('.group_category_locked_explanation').length).toBeTruthy()

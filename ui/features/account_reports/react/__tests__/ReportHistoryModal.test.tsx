@@ -18,11 +18,14 @@
 
 import React from 'react'
 import {render, within} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import ReportHistoryModal from '../components/ReportHistoryModal'
 import {QueryClient} from '@tanstack/react-query'
 import {AccountReport} from '@canvas/account_reports/types'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+
+const server = setupServer()
 
 function renderWithQueryClient(ui: React.ReactElement) {
   const client = new QueryClient()
@@ -63,15 +66,19 @@ const mockHistory = [
 ]
 
 describe('ReportHistoryModal', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   it('fetches and renders report history', async () => {
-    fetchMock.get('/api/v1/accounts/123/reports/report_1', {
-      body: mockHistory,
-      status: 200,
-    })
+    server.use(
+      http.get('/api/v1/accounts/123/reports/report_1', () => {
+        return HttpResponse.json(mockHistory)
+      }),
+    )
 
     const {getByTestId, findByTestId} = renderWithQueryClient(
       <ReportHistoryModal accountId="123" report="report_1" closeModal={vi.fn()} />,
@@ -92,10 +99,11 @@ describe('ReportHistoryModal', () => {
   })
 
   it('includes dynamic update if present', async () => {
-    fetchMock.get('/api/v1/accounts/123/reports/report_1', {
-      body: mockHistory,
-      status: 200,
-    })
+    server.use(
+      http.get('/api/v1/accounts/123/reports/report_1', () => {
+        return HttpResponse.json(mockHistory)
+      }),
+    )
 
     const updatedReport: AccountReport = {
       id: '2',
@@ -130,7 +138,12 @@ describe('ReportHistoryModal', () => {
   })
 
   it('renders a loading spinner while fetching', async () => {
-    fetchMock.get('/api/v1/accounts/123/reports/report_1', new Promise(() => {})) // Simulate a pending request
+    server.use(
+      http.get('/api/v1/accounts/123/reports/report_1', () => {
+        // Simulate a pending request that never resolves
+        return new Promise(() => {})
+      }),
+    )
 
     const {findByLabelText} = renderWithQueryClient(
       <ReportHistoryModal accountId="123" report="report_1" closeModal={vi.fn()} />,

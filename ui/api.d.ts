@@ -691,6 +691,8 @@ export type AccessibleGroup = Readonly<{
   name: string
   can_access?: boolean
   concluded: boolean
+  context_type?: string
+  context_name?: string
 }>
 
 // '/help_links',

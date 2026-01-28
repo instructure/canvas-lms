@@ -158,12 +158,12 @@ describe('GradebookGrid StudentColumnHeaderRenderer', () => {
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledTimes(1)
     })
 
-    it.skip('calls Gradebook#handleHeaderKeyDown with a given event', () => {
+    it('calls Gradebook#handleHeaderKeyDown with a given event', () => {
       const exampleEvent = new Event('example')
       gradebook.handleHeaderKeyDown = vi.fn()
       renderComponent()
       component.props.onHeaderKeyDown(exampleEvent)
-      expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(exampleEvent)
+      expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(exampleEvent, 'student')
     })
 
     it('calls Gradebook#handleHeaderKeyDown with the column id', () => {

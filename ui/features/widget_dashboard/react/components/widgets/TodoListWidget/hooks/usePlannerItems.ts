@@ -29,6 +29,12 @@ interface UsePlannerItemsOptions {
   startDate?: string
   endDate?: string
   order?: 'asc' | 'desc'
+  filter?:
+    | 'new_activity'
+    | 'ungraded_todo_items'
+    | 'all_ungraded_todo_items'
+    | 'incomplete_items'
+    | 'complete_items'
 }
 
 interface UsePlannerItemsResult {
@@ -43,7 +49,7 @@ interface UsePlannerItemsResult {
 }
 
 export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlannerItemsResult {
-  const {perPage = 5, startDate, endDate, order = 'asc'} = options
+  const {perPage = 5, startDate, endDate, order = 'asc', filter} = options
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
   const [allPages, setAllPages] = useState<PlannerItem[][]>([])
   const [nextUrls, setNextUrls] = useState<(string | null)[]>([])
@@ -58,9 +64,10 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
 
     if (startDate) params.start_date = startDate
     if (endDate) params.end_date = endDate
+    if (filter) params.filter = filter
 
     return params
-  }, [perPage, startDate, endDate, order])
+  }, [perPage, startDate, endDate, order, filter])
 
   const {
     data,
@@ -113,7 +120,9 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
               return newUrls
             })
           })
-          .catch(err => console.error('Failed to load page:', err))
+          .catch(() => {
+            // Silently fail pagination - error will be caught by main query
+          })
           .finally(() => {
             setIsLoadingMore(false)
             loadingPageRef.current = null

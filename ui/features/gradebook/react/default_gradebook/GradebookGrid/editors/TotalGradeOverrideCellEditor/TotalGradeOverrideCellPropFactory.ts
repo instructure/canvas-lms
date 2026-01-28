@@ -40,7 +40,6 @@ export default class TotalGradeOverrideCellPropFactory {
 
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: this._gradebook.getCourseGradingScheme(),
-      // @ts-expect-error
       restrictPointsBasedInput: true,
     })
 

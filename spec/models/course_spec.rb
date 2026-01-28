@@ -52,6 +52,17 @@ describe Course do
       it_behaves_like "a learning outcome context"
     end
 
+    describe "accessibility_course_statistic association" do
+      it "has one accessibility course statistic" do
+        @course.save!
+        stat = AccessibilityCourseStatistic.create!(
+          course: @course,
+          active_issue_count: 5
+        )
+        expect(@course.accessibility_course_statistic).to eq(stat)
+      end
+    end
+
     it "re-runs SubmissionLifecycleManager if enrollment term changes" do
       @course.save!
       @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
@@ -2933,14 +2944,17 @@ describe Course do
           expect(ai_tab).to be_nil
         end
 
-        it "does not include AI Experiences tab when user lacks permissions" do
+        it "includes AI Experiences tab for students when feature flag is enabled" do
           student = user_factory(active_all: true)
           @course.enroll_student(student, enrollment_state: "active")
 
           tabs = @course.tabs_available(student)
           ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
 
-          expect(ai_tab).to be_nil
+          # Tab is visible to all users when feature flag is enabled
+          # Permission checks happen at controller level for what content they can see
+          expect(ai_tab).not_to be_nil
+          expect(ai_tab[:label]).to eq("AI Experiences")
         end
 
         it "includes AI Experiences tab for users with manage_course_content permissions" do
@@ -3131,10 +3145,17 @@ describe Course do
         expect(dtab[:hidden_unused]).to be_falsey
       end
 
-      it "does not hide tabs for completed teacher enrollments" do
-        @user.enrollments.where(course_id: @course).first.complete!
-        tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to eql(default_tab_ids)
+      # TODO: Remove this context when ai_experiences hits GA
+      context "without ai_experiences feature" do
+        before do
+          @course.root_account.disable_feature!(:ai_experiences)
+        end
+
+        it "does not hide tabs for completed teacher enrollments" do
+          @user.enrollments.where(course_id: @course).first.complete!
+          tab_ids = @course.tabs_available(@user).pluck(:id)
+          expect(tab_ids).to eql(default_tab_ids)
+        end
       end
 
       it "does not include Announcements without read_announcements rights" do
@@ -3510,12 +3531,19 @@ describe Course do
         end
       end
 
-      it "returns K-6 tabs if feature flag is enabled for students" do
-        @course.enable_feature!(:canvas_k6_theme)
-        tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_GRADES]
-      ensure
-        @course.disable_feature!(:canvas_k6_theme)
+      # TODO: Remove this context when ai_experiences hits GA
+      context "without ai_experiences feature" do
+        before do
+          @course.root_account.disable_feature!(:ai_experiences)
+        end
+
+        it "returns K-6 tabs if feature flag is enabled for students" do
+          @course.enable_feature!(:canvas_k6_theme)
+          tab_ids = @course.tabs_available(@user).pluck(:id)
+          expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_GRADES]
+        ensure
+          @course.disable_feature!(:canvas_k6_theme)
+        end
       end
 
       it "hides unused tabs if not an admin" do

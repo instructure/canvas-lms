@@ -40,7 +40,7 @@ afterEach(() => {
   fakeENV.teardown()
 })
 
-it.skip('searchPermissions dispatches updatePermissionsSearch', done => {
+it('searchPermissions dispatches updatePermissionsSearch', () => {
   const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
   const dispatchMock = vi.fn()
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
@@ -58,10 +58,9 @@ it.skip('searchPermissions dispatches updatePermissionsSearch', done => {
 
   expect(dispatchMock).toHaveBeenCalledTimes(1)
   expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
-  done()
 })
 
-it.skip('searchPermissions announces when search is complete', () => {
+it('searchPermissions announces when search is complete', () => {
   const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
   const dispatchMock = vi.fn()
   const flashMock = vi.spyOn($, 'screenReaderFlashMessageExclusive')

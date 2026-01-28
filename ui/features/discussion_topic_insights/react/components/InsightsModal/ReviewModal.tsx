@@ -102,10 +102,10 @@ const ReviewModal = () => {
         <Flex justifyItems="space-between" alignItems="center">
           <Heading>{I18n.t('Review Evaluation')}</Heading>
           <IconButton
-            // @ts-expect-error
-            ref={closeButtonRef}
-            placement="end"
-            offset="medium"
+            elementRef={(el: Element | null) => {
+              ;(closeButtonRef as React.MutableRefObject<HTMLButtonElement | null>).current =
+                el as HTMLButtonElement | null
+            }}
             onClick={handleClose}
             screenReaderLabel={I18n.t('Close')}
             withBackground={false}

@@ -21,8 +21,8 @@ import {render, fireEvent} from '@testing-library/react'
 import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
-import {Outcome} from '../../../types/rollup'
-import {SortOrder, SortBy} from '../../../utils/constants'
+import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
 import {ContributingScoresForOutcome} from '../../../hooks/useContributingScores'
 
 describe('OutcomeHeader', () => {

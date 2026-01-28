@@ -20,12 +20,16 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {editView} from './utils'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 // Suppress React warnings
 const originalConsoleError = console.error
 const originalConsoleWarn = console.warn
 beforeAll(() => {
+  server.listen()
   console.error = (...args) => {
     if (
       typeof args[0] === 'string' &&
@@ -47,6 +51,7 @@ beforeAll(() => {
 })
 
 afterAll(() => {
+  server.close()
   console.error = originalConsoleError
   console.warn = originalConsoleWarn
 })
@@ -71,19 +76,28 @@ describe('EditView', () => {
       ENV.SETTINGS = {suppress_assignments: false}
 
       // Mock API endpoints
-      fetchMock
-        .get('http://api/folders?contextType=user&contextId=1', 200)
-        .get('path:/api/session', 200)
-        .get('path:/api/v1/courses/1/lti_apps/launch_definitions', {
-          tools: [],
-        })
-        .post('path:/api/graphql', {data: {}})
-        .get('*', 200) // Catch any other requests
+      server.use(
+        http.get('http://api/folders', () => {
+          return new HttpResponse(null, {status: 200})
+        }),
+        http.get('/api/session', () => {
+          return new HttpResponse(null, {status: 200})
+        }),
+        http.get('/api/v1/courses/1/lti_apps/launch_definitions', () => {
+          return HttpResponse.json({tools: []})
+        }),
+        http.post('/api/graphql', () => {
+          return HttpResponse.json({data: {}})
+        }),
+        http.get('*', () => {
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
     })
 
     afterEach(() => {
       fakeENV.teardown()
-      fetchMock.restore()
+      server.resetHandlers()
     })
 
     it('renders usage rights control when CAN_ATTACH is true', () => {

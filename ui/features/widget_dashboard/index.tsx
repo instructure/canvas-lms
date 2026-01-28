@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import WidgetDashboardContainer from './react/WidgetDashboardContainer'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -44,8 +44,7 @@ ready(() => {
   const container = document.getElementById('content')
 
   if (container) {
-    const root = createRoot(container)
-    root.render(
+    render(
       <ErrorBoundary
         errorComponent={
           <GenericErrorPage
@@ -81,6 +80,7 @@ ready(() => {
           </WidgetDashboardProvider>
         </QueryClientProvider>
       </ErrorBoundary>,
+      container,
     )
   }
 })

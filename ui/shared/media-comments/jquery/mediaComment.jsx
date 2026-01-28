@@ -25,10 +25,14 @@ import {map, values} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import sanitizeUrl from '@canvas/util/sanitizeUrl'
 import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
-import React from 'react'
+import {Suspense, lazy} from 'react'
 import {createRoot} from 'react-dom/client'
-import CanvasStudioPlayer from '@canvas/canvas-studio-player'
-import {MediaPlayer} from '@instructure/ui-media-player'
+import {Spinner} from '@instructure/ui-spinner'
+
+const MediaPlayer = lazy(() =>
+  import('@instructure/ui-media-player').then(module => ({default: module.MediaPlayer})),
+)
+const CanvasStudioPlayer = lazy(() => import('@canvas/canvas-studio-player'))
 
 const I18n = createI18nScope('jquery_media_comments')
 
@@ -235,13 +239,15 @@ const mediaCommentActions = {
           if (ENV.FEATURES?.consolidated_media_player) {
             const root = createRoot(holder[0])
             root.render(
-              <CanvasStudioPlayer
-                media_id={id}
-                attachment_id={attachmentId}
-                explicitSize={{width: width, height: height}}
-                hideUploadCaptions={!sourcesAndTracks.can_add_captions}
-                type={mediaType === 'audio' ? 'audio' : 'video'}
-              />,
+              <Suspense fallback={<Spinner renderTitle={I18n.t('Loading')} size="small" />}>
+                <CanvasStudioPlayer
+                  media_id={id}
+                  attachment_id={attachmentId}
+                  explicitSize={{width: width, height: height}}
+                  hideUploadCaptions={!sourcesAndTracks.can_add_captions}
+                  type={mediaType === 'audio' ? 'audio' : 'video'}
+                />
+              </Suspense>,
             )
             holder.data('reactRoot', root)
             return
@@ -413,12 +419,14 @@ const mediaCommentActions = {
 
             if (isNewPlayerEnabled()) {
               const mediaPlayer = ENV.FEATURES?.consolidated_media_player ? (
-                <CanvasStudioPlayer
-                  media_id={id}
-                  explicitSize={{width: width, height: height}}
-                  hideUploadCaptions={!sourcesAndTracks.can_add_captions}
-                  type={mediaType === 'audio' ? 'audio' : 'video'}
-                />
+                <Suspense fallback={<Spinner renderTitle={I18n.t('Loading')} size="small" />}>
+                  <CanvasStudioPlayer
+                    media_id={id}
+                    explicitSize={{width: width, height: height}}
+                    hideUploadCaptions={!sourcesAndTracks.can_add_captions}
+                    type={mediaType === 'audio' ? 'audio' : 'video'}
+                  />
+                </Suspense>
               ) : (
                 <div
                   style={{
@@ -426,11 +434,13 @@ const mediaCommentActions = {
                     maxWidth: width,
                   }}
                 >
-                  <MediaPlayer
-                    tracks={sourcesAndTracks.tracks}
-                    sources={sourcesAndTracks.sources}
-                    captionPosition="bottom"
-                  />
+                  <Suspense fallback={<Spinner renderTitle={I18n.t('Loading')} size="small" />}>
+                    <MediaPlayer
+                      tracks={sourcesAndTracks.tracks}
+                      sources={sourcesAndTracks.sources}
+                      captionPosition="bottom"
+                    />
+                  </Suspense>
                 </div>
               )
 

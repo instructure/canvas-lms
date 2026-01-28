@@ -5324,6 +5324,7 @@ tr:
     recording_setting: Kaydediliyor
     recording_setting_enabled_description: "Bu canlı ders için kaydı etkinleştir"
   billing_country_code_as_reported_by_salesforce_625bbb4e: "Salesforce tarafından bildirilen fatura ülke kodu"
+  bio_a519d807: Hakkımda
   blackboard: 
     no_manifest: "Bu Blackboard .zip uzantılı dosyasının içeriği ana dizininde imsmanifest.xml dosyası bulunamadı."
   blackout_date_5fc44c2b: "Karartma tarihi"
@@ -6685,6 +6686,7 @@ tr:
   close_opportunity_center_popup_9907d981: "Anonim Kip Açık:"
   close_picker_256aca8a: "Seçiciyi Kapat"
   close_preview_2fd61cda: "Anonim moderasyonlu ödevler, notlar yayımlanana kadar sessizden çıkarılamaz."
+  close_rubric_a0fc8166: "Değerlendirme Listesini Kapat"
   close_settings_tray_7b3084c2: "Anonim Kapalı"
   close_sidebar_10b0fbb4: "Kenar çubuğunu kapat"
   close_student_details_2f6900: "Anonim Açık"
@@ -8810,6 +8812,14 @@ tr:
   course_name_successfully_added_48116a50: "%{course_name} başarıyla eklendi!"
   course_navigation_dd035109: "Ders Gezinme Menüsü"
   course_navigation_default_9f015ac9: "Araçla ilişkili not defterinde ödev verileri oluşturabilir ve görüntüleyebilir"
+  course_navigation_settings: 
+    buttons: 
+      save: Kaydet
+    drag_details: "Çoğu sayfanın etkisizleştirilmesi bu sayfayı ziyaret eden öğrencilerin dersin ana sayfasına yönlendirilmesine neden olacaktır."
+    drag_to_hide: "Öğrencilerden gizlemek için öğeleri buraya sürükleyin."
+    help: 
+      edit_navigation: "Ders menüsündeki öğeleri yeniden sıralamak için sürükleyip bırakın."
+      edit_navigation_k5: "Kullanıcının kullanıcı hesap ayrıntılarını değiştirmesine izin verir."
   course_nicknames_csv_92e325a7: "Araçla ilişkili not defterinde ödev verileri oluşturabilir ve görüntüleyebilir."
   course_not_found_c248a721: "Ders bulunamadı"
   course_notification_settings_d9821d36: "Ders Bildirim Ayarları"
@@ -9135,6 +9145,15 @@ tr:
         content: İçerik
         due_dates: "Bitiş Tarihi"
         points: Puanlar
+    navigation_form: 
+      drag_details: "Çoğu sayfanın etkisizleştirilmesi bu sayfayı ziyaret eden öğrencilerin dersin ana sayfasına yönlendirilmesine neden olacaktır."
+      drag_to_hide: "Öğrencilerden gizlemek için öğeleri buraya sürükleyin."
+      help: 
+        edit_navigation: "Ders menüsündeki öğeleri yeniden sıralamak için sürükleyip bırakın."
+        edit_navigation_info_k5: "Kullanıcının, oran sınırı değerlerini ve yorumları değiştirmek de dahil olmak üzere mevcut oran sınırı ayarlarını değiştirmesine izin verir."
+        edit_navigation_k5: "Kullanıcının kullanıcı hesap ayrıntılarını değiştirmesine izin verir."
+      titles: 
+        edit_navigation: "Ders Gezinme Menüsünü Düzenle"
     notices: 
       backup_restored: "Yedek Başarı ile Yeniden Yüklendi!"
       concluded: "Ders başarılı bir şekilde sonlandırıldı"
@@ -9724,6 +9743,7 @@ tr:
   crowdsourced: true
   crumbs: 
     access_report: "Erişim Raporu"
+    ai_conversations: "Yapay Zekâ Sohbetleri"
     ai_experiences: "Yapay Zeka Deneyimleri"
     announcements: Duyurular
     apps: Uygulamalar
@@ -13464,6 +13484,7 @@ tr:
   generate_item_analysis_report_statuslabel_16e02c8: "Madde analiz raporu oluştur %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Öğrenci analiz raporu oluştur %{statusLabel}"
   generate_token_393ab5b4: "Token Üret"
+  generated_e71c6622: Oluşturulan
   generated_f26ee56b: "Oluşturulan:"
   generated_icon_d004f211: "Oluşturulan simge"
   generated_summary_63857c79: "Oluşturulan özet"
@@ -15103,6 +15124,7 @@ tr:
   hide_outcomes_with_no_results_7e4ce06f: "Sonuç içermeyen öğrenme çıktılarını gizle"
   hide_params_eadf0961: "Parametreleri gizle"
   hide_revision_history_4111f3d1: "Revizyon geçmişini gizle"
+  hide_rubric_27903c8: "Değerlendirme Listesini Gizle"
   hide_rubric_score_total_from_students_a2b2274a: "Rubrik toplam puanını öğrencilerden gizle"
   hide_score_total_for_assessment_results_d0ef117f: "Sınav sonuçlarından toplam puanları gizle"
   hide_sidebar_2b5b3776: "Paneli Gizle"
@@ -20582,6 +20604,7 @@ tr:
   not_valid_after_81c9faec: "Şu tarihten sonra geçerli değil"
   not_valid_before_9ad2d22d: "Şu tarihten önce geçerli değil"
   not_yet_assessed_9362f199: "Henüz değerlendirilmedi"
+  not_yet_available_9aa23a77: "Henüz Mevcut Değildir"
   not_yet_completed_345a0bca: "Henüz tamamlanmadı"
   not_yet_ed60d582: "Henüz değerlendirilmedi"
   not_yet_graded_40475341: "Boş notlar hesaplamaya dâhil edilmez; yalnızca bir gönderim olduğunda geçici notlar uygulanır."
@@ -22046,6 +22069,7 @@ tr:
   print_d0e3d53f: Yazdır
   priority_dd4381ee: Öncelik
   privacy_290109ea: Gizlilik
+  privacy_notice_7eff08fe: "Gizlilik Bildirimi"
   privacy_policy_c68f482a: "Gizlilik Sözleşmesi"
   private_3883d133: Özel
   private_copyrighted_3cac9686: "Özel (Telif Hakkı Saklı)"

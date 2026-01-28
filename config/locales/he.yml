@@ -3534,6 +3534,7 @@ he:
   big_blue_button_conference: 
     recording_setting: מקליט
     recording_setting_enabled_description: "הפעלת אפשרות הקלטה בשיחת ועידה זו"
+  bio_a519d807: "קורות חיים"
   blackboard: 
     no_manifest: "קובץ ה Blackboard בפורמט zip הזה אינו כולל את הקבץ imsmanifest.xml  בתיקית הבסיס."
   blank_38df4238: "תו ריק"
@@ -4358,6 +4359,7 @@ he:
   close_grade_info_58ef5a20: "סגור/י את המידע על ציונים"
   close_move_tray_8609e988: "סגירת העברת תיבה"
   close_opportunity_center_popup_9907d981: "חלון קופץ של סגירת מרכז ההזדמנויות"
+  close_rubric_a0fc8166: "סגירת רובריקה"
   close_sidebar_10b0fbb4: "סגירת סרגל-צד"
   close_submission_tray_c4988fa8: "סגירת תיבת הגשות"
   closed_for_comments_e395b42f: "סגור להערות"
@@ -5938,6 +5940,13 @@ he:
   course_name_is_required_90919349: "נדרש שם קורס"
   course_name_successfully_added_48116a50: "%{course_name} נתווסף בהצלחה!"
   course_navigation_dd035109: "ניווט בקורס"
+  course_navigation_settings: 
+    buttons: 
+      save: "שמירה "
+    drag_details: "הפיכת רוב הדפים ללא פעילים יגרום לתלמידים אשר ביקרו בדפים אלו להתנתב לדף הבית של הקורס."
+    drag_to_hide: "גרור/י פריטים לכאן כדי להסתירם מתלמידים"
+    help: 
+      edit_navigation: "גרור ושחרר פריטים כדי לארגנם מחדש בסרגל ניווט של הקורס."
   course_not_found_c248a721: "הקורס לא נמצא"
   course_option_links_a79d263d: "קישורי אפשרויות הקורס"
   course_outcomes_7dc1cbc7: "תוצאות מצופות בקורס"
@@ -6176,6 +6185,13 @@ he:
         content: תוכן
         due_dates: "תאריכי יעד"
         points: ניקוד
+    navigation_form: 
+      drag_details: "הפיכת רוב הדפים ללא פעילים יגרום לתלמידים אשר ביקרו בדפים אלו להתנתב לדף הבית של הקורס."
+      drag_to_hide: "גרור/י פריטים לכאן כדי להסתירם מתלמידים"
+      help: 
+        edit_navigation: "גרור ושחרר פריטים כדי לארגנם מחדש בסרגל ניווט של הקורס."
+      titles: 
+        edit_navigation: "עריכת ניווט הקורס"
     notices: 
       backup_restored: "השיחזור מגיבוי נסתיים בהצלחה!"
       concluded: "הקורס נסתיים וסוכם בהצלחה"
@@ -8794,6 +8810,7 @@ he:
   generate_item_analysis_report_statuslabel_16e02c8: "הפקת דוח ניתוח פריטים %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "הפקת דוח ניתוח תלמידים %{statusLabel}"
   generate_token_393ab5b4: "יצירת אסימון "
+  generated_e71c6622: חולל
   generated_f26ee56b: "נוצר:"
   generating_5b5e20f8: "מייצר:"
   generating_c2aabc02: "מייצר:"
@@ -8858,6 +8875,7 @@ he:
       warning: אזהרה
   grade_distribution_e52c9256: "התפלגות ציונים"
   grade_export_title: "ייצוא ציונים"
+  grade_f949a691: "%{grade}%"
   grade_for_name_b9df168a: "הערכה של: %{name}"
   grade_grade_7e52dd1c: "ציון: %{grade}"
   grade_high_to_low_1cea0381: "הערכה - מהגבוה לנמוך"
@@ -10211,6 +10229,7 @@ he:
   hide_groups_navigation_menu_62e8b3d0: "הסתרת תפריט ניווט קבוצות"
   hide_navigation_menu_f0b3e90: "הסתרת תפריט ניווט"
   hide_notes_column_7749f408: "הסתרת עמודת ההערות"
+  hide_rubric_27903c8: "הסתרת רובריקה"
   hide_score_total_for_assessment_results_d0ef117f: "הסתרת הציון הכולל של תוצאות ההערכה"
   hide_sidebar_2b5b3776: "הסתרת ניווט צידי"
   hide_student_names_3e59e862: "הסתרת שמות תלמידים"
@@ -13561,6 +13580,7 @@ he:
   not_starred_no_subject_click_to_star_dc91380: "'לא הודגש בכוכבית \"(אין נושא)\", הקלק/י להדגיש."
   not_starred_subject_click_to_star_4ea6eb64: "'לא הודגש בכוכבית \"%{subject}\", הקלק/י להדגיש."
   not_submitted_7d05fdb4: "לא הוגש"
+  not_yet_available_9aa23a77: "עדיין לא זמין"
   not_yet_completed_345a0bca: "טרם הושלם"
   not_yet_graded_8b655a7: "טרם בוצעה הערכה"
   note_8b73ce09: הערה
@@ -14964,6 +14984,7 @@ he:
   print_d0e3d53f: הדפסה
   priority_dd4381ee: עדיפות
   privacy_290109ea: פרטיות
+  privacy_notice_7eff08fe: "הערת צנעת הפרט"
   privacy_policy_c68f482a: "מדיניות פרטיות"
   private_copyrighted_3cac9686: "פרטי (מוגן בזכויות יוצרים)"
   process_as_ui_changes_8e34ed2a: "עבד כשינויי UI"

@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {renderHook, act} from '@testing-library/react-hooks'
+import {renderHook} from '@testing-library/react-hooks'
+import {waitFor} from '@testing-library/react'
 import useLaunchConversionJobHook, {
   CONVERSION_JOB_COMPLETE,
   CONVERSION_JOB_FAILED,
@@ -26,12 +27,30 @@ import useLaunchConversionJobHook, {
 } from '../LaunchConversionJobHook'
 import axios from 'axios'
 
+const {mockPut, mockGet} = vi.hoisted(() => ({
+  mockPut: vi.fn(),
+  mockGet: vi.fn(),
+}))
+
 vi.mock('axios', () => ({
-  put: vi.fn(() => Promise.resolve({status: 204})),
-  get: vi.fn(() => Promise.resolve({status: 200, data: {progress: 0, workflow_state: 'queued'}})),
+  default: {
+    put: mockPut,
+    get: mockGet,
+  },
 }))
 
 describe('useLaunchConversionJobHook', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.useFakeTimers()
+    mockPut.mockResolvedValue({status: 204})
+    mockGet.mockResolvedValue({status: 200, data: {progress: 0, workflow_state: 'queued'}})
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('should return initial state', () => {
     const {result} = renderHook(() => useLaunchConversionJobHook('1', false))
 
@@ -41,71 +60,58 @@ describe('useLaunchConversionJobHook', () => {
     expect(result.current.conversionJobError).toBeNull()
   })
 
-  it.skip('should update conversion job state when launchConversionJob is called', async () => {
-    const {result, waitForNextUpdate} = renderHook(() => useLaunchConversionJobHook('1', false))
+  it('should update conversion job state when launchConversionJob is called', async () => {
+    const {result} = renderHook(() => useLaunchConversionJobHook('1', false))
 
-    act(() => {
-      result.current.launchConversionJob()
-    })
-
-    await waitForNextUpdate()
+    await result.current.launchConversionJob()
 
     expect(result.current.conversionJobState).toBe(CONVERSION_JOB_QUEUED)
     expect(result.current.conversionJobProgress).toBe(0)
   })
 
-  it.skip('returns conversion job progress and state when polling job progress', async () => {
-    ;(axios.get as any).mockResolvedValueOnce({
+  it('returns conversion job progress and state when polling job progress', async () => {
+    mockGet.mockResolvedValue({
       status: 200,
       data: {progress: 30, workflow_state: 'running'},
     })
-    const {result, waitForNextUpdate} = renderHook(() => useLaunchConversionJobHook('1', true))
+    const {result} = renderHook(() => useLaunchConversionJobHook('1', true))
 
-    act(() => {
-      result.current.launchConversionJob()
+    // Advance timer to trigger the polling interval
+    await vi.advanceTimersByTimeAsync(1000)
+
+    await waitFor(() => {
+      expect(result.current.conversionJobState).toBe(CONVERSION_JOB_RUNNING)
+      expect(result.current.conversionJobProgress).toBe(30)
     })
-
-    // update twice to simulate polling
-    await waitForNextUpdate()
-    await waitForNextUpdate()
-
-    expect(result.current.conversionJobState).toBe(CONVERSION_JOB_RUNNING)
-    expect(result.current.conversionJobProgress).toBe(30)
   })
 
-  it.skip('returns success state when job completes', async () => {
-    ;(axios.get as any).mockResolvedValueOnce({
+  it('returns success state when job completes', async () => {
+    mockGet.mockResolvedValue({
       status: 200,
       data: {progress: 100, workflow_state: 'completed'},
     })
-    const {result, waitForNextUpdate} = renderHook(() => useLaunchConversionJobHook('1', true))
+    const {result} = renderHook(() => useLaunchConversionJobHook('1', true))
 
-    act(() => {
-      result.current.launchConversionJob()
+    // Advance timer to trigger the polling interval
+    await vi.advanceTimersByTimeAsync(1000)
+
+    await waitFor(() => {
+      expect(result.current.conversionJobState).toBe(CONVERSION_JOB_COMPLETE)
+      expect(result.current.conversionJobProgress).toBe(100)
     })
-
-    // update twice to simulate polling
-    await waitForNextUpdate()
-    await waitForNextUpdate()
-
-    expect(result.current.conversionJobState).toBe(CONVERSION_JOB_COMPLETE)
-    expect(result.current.conversionJobProgress).toBe(100)
   })
 
-  it.skip('returns error state when job fails', async () => {
-    ;(axios.get as any).mockRejectedValueOnce(new Error('Network Error'))
-    const {result, waitForNextUpdate} = renderHook(() => useLaunchConversionJobHook('1', true))
+  it('returns error state when job fails', async () => {
+    mockGet.mockRejectedValue(new Error('Network Error'))
+    const {result} = renderHook(() => useLaunchConversionJobHook('1', true))
 
-    act(() => {
-      result.current.launchConversionJob()
+    // Advance timer to trigger the polling interval
+    await vi.advanceTimersByTimeAsync(1000)
+
+    await waitFor(() => {
+      expect(result.current.conversionJobState).toBe(CONVERSION_JOB_FAILED)
+      expect(result.current.conversionJobError).toBe('An error occurred while fetching job progress.')
+      expect(result.current.conversionJobProgress).toBe(0)
     })
-
-    // update twice to simulate polling
-    await waitForNextUpdate()
-    await waitForNextUpdate()
-
-    expect(result.current.conversionJobState).toBe(CONVERSION_JOB_FAILED)
-    expect(result.current.conversionJobError).toBe('An error occurred while fetching job progress.')
-    expect(result.current.conversionJobProgress).toBe(0)
   })
 })

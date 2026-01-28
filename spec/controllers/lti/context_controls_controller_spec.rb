@@ -289,6 +289,94 @@ describe Lti::ContextControlsController, type: :request do
           controls = response_json.find { |d| d["id"] == deployment.id }["context_controls"]
           expect(controls.pluck("id")).not_to include(other_control.id)
         end
+
+        it "sorts child course exceptions before child sub-account exceptions at the same level" do
+          sub_sub_account = account_model(parent_account: subaccount)
+          another_sub_course = course_model(account: subaccount)
+
+          sub_sub_account_control = Lti::ContextControl.create!(account: sub_sub_account, registration:, deployment:)
+          course_control = Lti::ContextControl.create!(course: another_sub_course, registration:, deployment:)
+
+          subject
+
+          deployment_json = response_json.find { |d| d["id"] == deployment.id }
+          control_ids = deployment_json["context_controls"].pluck("id")
+
+          course_index = control_ids.index(course_control.id)
+          sub_account_index = control_ids.index(sub_sub_account_control.id)
+
+          expect(course_index).to be < sub_account_index
+        end
+
+        it "ensures exceptions are ordered by parent account, not just logical depth" do
+          sub_sub_account = account_model(parent_account: subaccount)
+          other_sub_sub_account = account_model(parent_account: subaccount)
+          another_sub_course = course_model(account: sub_sub_account)
+
+          sub_account_control = Lti::ContextControl.create!(account: subaccount, registration:, deployment:)
+          sub_sub_account_control = Lti::ContextControl.create!(account: sub_sub_account, registration:, deployment:)
+          course_control = Lti::ContextControl.create!(course: another_sub_course, registration:, deployment:)
+          sub_sub_account_control_2 = Lti::ContextControl.create!(account: other_sub_sub_account, registration:, deployment:)
+
+          subject
+
+          deployment_json = response_json.find { |d| d["id"] == deployment.id }
+          control_ids = deployment_json["context_controls"].pluck("id")
+
+          sub_account_index = control_ids.index(sub_account_control.id)
+          sub_sub_account_index = control_ids.index(sub_sub_account_control.id)
+          course_index = control_ids.index(course_control.id)
+          other_sub_sub_index = control_ids.index(sub_sub_account_control_2.id)
+
+          expect(sub_account_index).to be < sub_sub_account_index
+          expect(sub_sub_account_index).to be < course_index
+          expect(course_index).to be < other_sub_sub_index
+        end
+
+        it "paginates correctly with mixed courses and accounts at the same level" do
+          courses = []
+          accounts = []
+
+          5.times do |i|
+            courses << course_model(account: subaccount, name: "Course #{i}")
+            accounts << account_model(parent_account: subaccount, name: "Sub-Account #{i}")
+          end
+
+          course_controls = courses.map { |c| Lti::ContextControl.create!(course: c, registration:, deployment:) }
+          account_controls = accounts.map { |a| Lti::ContextControl.create!(account: a, registration:, deployment:) }
+
+          # Fetch with small page size to force pagination. 14 controls total at this point:
+          # 3 from each of the three deployments, one in the sub-course, then 10 we just made.
+          get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls", params: { per_page: 7 }
+          expect(response).to be_successful
+
+          all_controls = []
+          deployment_json = response.parsed_body.find { |d| d["id"] == deployment.id }
+          all_controls.concat(deployment_json["context_controls"]) if deployment_json
+
+          links = Api.parse_pagination_links(response.headers["Link"])
+          next_link = links.detect { |link| link[:rel] == "next" }
+
+          get next_link[:uri].to_s
+          expect(response).to be_successful
+
+          links = Api.parse_pagination_links(response.headers["Link"])
+
+          expect(links.detect { it[:rel] == "next" }).to be_nil
+          deployment_json = response.parsed_body.find { |d| d["id"] == deployment.id }
+          all_controls.concat(deployment_json["context_controls"]) if deployment_json
+          all_control_ids = all_controls.pluck("id")
+
+          expect(all_control_ids).to include(*(course_controls.map(&:id) + account_controls.map(&:id)))
+
+          course_control_ids = course_controls.map(&:id)
+          account_control_ids = account_controls.map(&:id)
+
+          last_course_index = all_control_ids.rindex { |id| course_control_ids.include?(id) }
+          first_account_index = all_control_ids.index { |id| account_control_ids.include?(id) }
+
+          expect(last_course_index).to be < first_account_index
+        end
       end
     end
 

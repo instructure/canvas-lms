@@ -720,6 +720,15 @@ class ActiveRecord::Base
     override
   end
 
+  def self.preserve_overrides(preserved_keys:)
+    config_hash = configurations.configurations.first.instance_variable_get(:@configuration_hash)
+    preserved_values = preserved_keys.zip(config_hash.values_at(*preserved_keys)).to_h
+
+    yield
+  ensure
+    override_db_configs(preserved_values)
+  end
+
   def insert(on_conflict: -> { raise ActiveRecord::RecordNotUnique })
     validate!
 

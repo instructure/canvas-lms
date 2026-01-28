@@ -30,8 +30,7 @@ ready(() => {
       .textContent!
     const published = el.getAttribute('data-published') === 'true'
     const root = ReactDOM.createRoot(el)
-    // @ts-expect-error
-    el.reactRoot = root
+    ;(el as Element & {reactRoot?: ReactDOM.Root}).reactRoot = root
     root.render(
       <ContextModulesPublishIcon
         courseId={courseId}

@@ -33,6 +33,7 @@ interface ApplyButtonProps {
   onUndo: () => void
   isApplied: boolean
   isLoading: boolean
+  isDisabled?: boolean
 }
 
 const I18n = createI18nScope('accessibility_checker')
@@ -44,6 +45,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
   undoMessage,
   isApplied,
   isLoading,
+  isDisabled = false,
 }: ApplyButtonProps) => {
   const undoButtonRef = useRef<HTMLButtonElement | null>(null)
   const applyButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -99,7 +101,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
         data-testid="apply-button"
         elementRef={e => (applyButtonRef.current = e as HTMLButtonElement)}
         color="primary"
-        interaction={isLoading ? 'disabled' : 'enabled'}
+        interaction={isLoading || isDisabled ? 'disabled' : 'enabled'}
         onClick={handleApply}
       >
         {isLoading ? (

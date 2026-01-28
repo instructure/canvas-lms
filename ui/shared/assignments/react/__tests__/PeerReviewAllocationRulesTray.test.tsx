@@ -54,6 +54,25 @@ vi.mock('../CreateEditAllocationRuleModal', () => {
 
 const mockExecuteQuery = vi.mocked(executeQuery)
 
+const createMockResponse = (
+  rules: AllocationRuleType[] = [],
+  count: number | null = null,
+  peerReviewsCount = 2,
+) => ({
+  assignment: {
+    peerReviews: {
+      count: peerReviewsCount,
+    },
+    allocationRules: {
+      rulesConnection: {
+        nodes: rules,
+        pageInfo: {hasNextPage: false, endCursor: null},
+      },
+      count: count !== null ? count : rules.length,
+    },
+  },
+})
+
 const mockAllocationRules: AllocationRuleType[] = [
   {
     _id: '1',
@@ -147,17 +166,7 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   describe('Tray visibility', () => {
     it('renders the tray when isTrayOpen is true', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -169,17 +178,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('does not render tray content when isTrayOpen is false', () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} isTrayOpen={false} />)
 
@@ -190,17 +189,7 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   describe('Header section', () => {
     beforeEach(async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
       await waitFor(() => {
         expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
@@ -225,17 +214,7 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   describe('Navigation section', () => {
     beforeEach(async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
       await waitFor(() => {
         expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
@@ -258,17 +237,7 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   describe('Add Rule section', () => {
     it('renders the Add Rule button if canEdit is true', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} canEdit={true} />)
 
@@ -280,17 +249,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('Add Rule button is not rendered when canEdit is false', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -305,17 +264,7 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   describe('Empty state', () => {
     beforeEach(async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
       await waitFor(() => {
         expect(screen.getByText('Create New Rules')).toBeInTheDocument()
@@ -364,17 +313,7 @@ describe('PeerReviewAllocationRulesTray', () => {
         },
       })
 
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: mockAllocationRules.length,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse(mockAllocationRules))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -385,17 +324,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('opens create modal when Add Rule button is clicked', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} canEdit={true} />)
 
@@ -440,17 +369,7 @@ describe('PeerReviewAllocationRulesTray', () => {
         },
       }))
 
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: rules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 12,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse(rules, 12))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -460,17 +379,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('hides pagination when all rules fit on one page', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules.slice(0, 2),
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 2,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse(mockAllocationRules.slice(0, 2), 2))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -511,17 +420,7 @@ describe('PeerReviewAllocationRulesTray', () => {
         },
       }))
 
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: rules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 10,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse(rules, 10))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -545,17 +444,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('displays search input when rules exist', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: mockAllocationRules.length,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse(mockAllocationRules))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -565,17 +454,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('does not display search input when no rules exist and no search value', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -599,17 +478,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('renders aria-live region with correct attributes', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -623,17 +492,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('initially renders with empty screen reader announcement', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -646,17 +505,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('uses polite aria-live to avoid interrupting current screen reader speech', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -670,17 +519,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('clears timeout on unmount to prevent memory leaks', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: [],
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: 0,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse([], 0))
 
       const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout')
 
@@ -711,29 +550,14 @@ describe('PeerReviewAllocationRulesTray', () => {
       mockExecuteQuery.mockImplementation(() => {
         callCount++
         if (callCount === 1) {
-          return Promise.resolve({
-            assignment: {
-              allocationRules: {
-                rulesConnection: {
-                  nodes: mockAllocationRules,
-                  pageInfo: {hasNextPage: false, endCursor: null},
-                },
-                count: mockAllocationRules.length,
-              },
-            },
-          })
+          return Promise.resolve(createMockResponse(mockAllocationRules))
         } else {
-          return Promise.resolve({
-            assignment: {
-              allocationRules: {
-                rulesConnection: {
-                  nodes: mockAllocationRules.filter(rule => rule.assessor.name.includes('John')),
-                  pageInfo: {hasNextPage: false, endCursor: null},
-                },
-                count: 1,
-              },
-            },
-          })
+          return Promise.resolve(
+            createMockResponse(
+              mockAllocationRules.filter(rule => rule.assessor.name.includes('John')),
+              1,
+            ),
+          )
         }
       })
 
@@ -767,17 +591,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('renders rules in a list with proper role', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: mockAllocationRules.length,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse(mockAllocationRules))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
@@ -793,17 +607,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
 
     it('renders each rule as a list item with descriptive aria-label', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: mockAllocationRules.length,
-          },
-        },
-      })
+      mockExecuteQuery.mockResolvedValue(createMockResponse(mockAllocationRules))
 
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 

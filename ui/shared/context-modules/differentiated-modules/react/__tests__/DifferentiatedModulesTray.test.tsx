@@ -21,16 +21,33 @@ import {render, waitFor} from '@testing-library/react'
 import DifferentiatedModulesTray, {
   type DifferentiatedModulesTrayProps,
 } from '../DifferentiatedModulesTray'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+const server = setupServer()
+
 describe('DifferentiatedModulesTray', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
     fakeENV.setup()
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, () => {
+        return HttpResponse.json([])
+      }),
+    )
   })
 
   afterEach(() => {
     fakeENV.teardown()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   const props: DifferentiatedModulesTrayProps = {
@@ -44,8 +61,6 @@ describe('DifferentiatedModulesTray', () => {
 
   const renderComponent = (overrides = {}) =>
     render(<DifferentiatedModulesTray {...props} {...overrides} />)
-
-  const OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
 
   it('calls onDismiss when close button is clicked', () => {
     const onDismiss = vi.fn()
@@ -98,13 +113,17 @@ describe('DifferentiatedModulesTray', () => {
   })
 
   describe('In a paced course', () => {
-    beforeEach(() => {
-      ENV.IN_PACED_COURSE = true
-      fetchMock.getOnce(OVERRIDES_URL, [])
-    })
+    let overridesFetched: ReturnType<typeof vi.fn>
 
-    afterEach(() => {
-      fetchMock.restore()
+    beforeEach(() => {
+      overridesFetched = vi.fn()
+      ENV.IN_PACED_COURSE = true
+      server.use(
+        http.get(/\/api\/v1\/courses\/.+\/modules\/.+\/assignment_overrides/, () => {
+          overridesFetched()
+          return HttpResponse.json([])
+        }),
+      )
     })
 
     it('shows the course pacing notice', () => {
@@ -119,7 +138,7 @@ describe('DifferentiatedModulesTray', () => {
 
     it('does not fetch assignment overrides', () => {
       renderComponent()
-      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(0)
+      expect(overridesFetched).not.toHaveBeenCalled()
     })
   })
 })

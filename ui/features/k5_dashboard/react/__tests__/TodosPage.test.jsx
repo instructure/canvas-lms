@@ -18,14 +18,26 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {MOCK_TODOS} from './mocks'
 import {TodosPage, sortTodos} from '../TodosPage'
 
-const FETCH_TODOS_URL = /\/api\/v1\/users\/self\/todo.*/
+// Response variables that can be modified per-test
+let todosResponse = MOCK_TODOS
+let todosStatus = 200
+
+const server = setupServer(
+  http.get('/api/v1/users/self/todo', () => {
+    if (todosStatus !== 200) {
+      return new HttpResponse(null, {status: todosStatus})
+    }
+    return HttpResponse.json(todosResponse)
+  }),
+)
 
 const getProps = overrides => ({
   timeZone: 'America/Denver',
@@ -34,15 +46,21 @@ const getProps = overrides => ({
   ...overrides,
 })
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
+afterEach(() => {
+  server.resetHandlers()
+})
+
 describe('TodosPage', () => {
   beforeEach(() => {
     fakeENV.setup()
-    // Use overwriteRoutes to avoid duplicate route errors when running with --randomize
-    fetchMock.get(FETCH_TODOS_URL, MOCK_TODOS, {overwriteRoutes: true})
+    todosResponse = MOCK_TODOS
+    todosStatus = 200
   })
 
   afterEach(() => {
-    fetchMock.restore()
     // Clear flash alerts between tests
     destroyContainer()
     fakeENV.teardown()
@@ -78,7 +96,7 @@ describe('TodosPage', () => {
   })
 
   it('renders an error if loading todos fails', async () => {
-    fetchMock.get(FETCH_TODOS_URL, 500, {overwriteRoutes: true})
+    todosStatus = 500
     const {findAllByText} = render(<TodosPage {...getProps()} />)
     expect((await findAllByText('Failed to load todos'))[0]).toBeInTheDocument()
   })
@@ -92,7 +110,8 @@ describe('TodosPage', () => {
 
 describe('Empty todos', () => {
   beforeEach(() => {
-    fetchMock.get(FETCH_TODOS_URL, [])
+    todosResponse = []
+    todosStatus = 200
   })
 
   it('shows an empty state if there are no todos', async () => {

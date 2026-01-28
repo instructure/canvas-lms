@@ -29,7 +29,6 @@ import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_ev
 import CyoeStats from '@canvas/conditional-release-stats/react/index'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
 import '@canvas/jquery/jquery.disableWhileLoading'

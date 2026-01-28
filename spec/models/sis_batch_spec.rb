@@ -232,6 +232,44 @@ describe SisBatch do
     expect(@row).to eq({ "user_id" => "user_1", "login_id" => "user_1", "status" => "active" })
   end
 
+  it "does not deduplicate CSVs if the number of duplicates are below threshold" do
+    batch = create_csv_data([%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active
+                               course_1,course_1,course_1,term_1,active)])
+    batch.process_without_send_later
+    atts = Attachment.where(context: batch)
+    expect(atts.pluck(:filename)).to match_array %w[csv_0.csv]
+    expect(atts.last.open.read).to eq(%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active
+                               course_1,course_1,course_1,term_1,active))
+  end
+
+  it "deduplicates standalone csvs" do
+    stub_const("SIS::CSV::ImportRefactored::DEDUP_THRESHOLD", 1)
+    batch = create_csv_data([%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active
+                               course_1,course_1,course_1,term_1,active)])
+    batch.process_without_send_later
+    atts = Attachment.where(context: batch)
+    expect(atts.pluck(:filename)).to match_array %w[csv_0.csv csv_0_deduplicated.csv]
+    expect(atts.last.open.read).to eq(%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active\n))
+  end
+
+  it "deduplicates csvs in zip files" do
+    stub_const("SIS::CSV::ImportRefactored::DEDUP_THRESHOLD", 1)
+    batch = create_csv_data([%(user_id,login_id,status
+                               user_1,user_1,active),
+                             %(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active
+                               course_1,course_1,course_1,term_1,active)])
+    batch.process_without_send_later
+    atts = Attachment.where(context: batch)
+    expect(atts.pluck(:filename)).to match_array %w[sisfile.zip csv_0.csv csv_1_deduplicated.csv]
+    expect(atts.last.open.read).to eq(%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active\n))
+  end
+
   it "is able to preload downloadable attachments" do
     batch1 = process_csv_data([%(user_id,password,login_id,status,ssha_password
                                 user_1,supersecurepwdude,user_1,active,hunter2),

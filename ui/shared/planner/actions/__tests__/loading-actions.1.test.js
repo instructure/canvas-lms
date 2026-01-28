@@ -23,7 +23,8 @@ import {initialize as alertInitialize} from '../../utilities/alertUtils'
 
 vi.mock('../../utilities/apiUtils', async () => ({
   ...(await vi.importActual('../../utilities/apiUtils')),
-  getContextCodesFromState: (await vi.importActual('../../utilities/apiUtils')).getContextCodesFromState,
+  getContextCodesFromState: (await vi.importActual('../../utilities/apiUtils'))
+    .getContextCodesFromState,
   findNextLink: vi.fn(),
   transformApiToInternalItem: vi.fn(response => ({
     ...response,
@@ -82,7 +83,7 @@ describe('api actions', () => {
   })
 
   describe('sendFetchRequest', () => {
-    it.skip('fetches from the specified moment if there is no next url in the loadingOptions', async () => {
+    it('fetches from the specified moment if there is no next url in the loadingOptions', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
       let capturedUrl
       server.use(
@@ -106,7 +107,7 @@ describe('api actions', () => {
       )
     })
 
-    it.skip('fetches using futureNextUrl if specified', async () => {
+    it('fetches using futureNextUrl if specified', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
       let capturedUrl
       server.use(
@@ -128,7 +129,7 @@ describe('api actions', () => {
       expect(url.pathname).toBe('/next/url')
     })
 
-    it.skip('sends past parameters if loading into the past', async () => {
+    it('sends past parameters if loading into the past', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
       let capturedUrl
       server.use(
@@ -153,7 +154,7 @@ describe('api actions', () => {
       )
     })
 
-    it.skip('sends pastNextUrl if loading into the past', async () => {
+    it('sends pastNextUrl if loading into the past', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
       let capturedUrl
       server.use(
@@ -176,7 +177,7 @@ describe('api actions', () => {
       expect(url.pathname).toBe('/past/next/url')
     })
 
-    it.skip('transforms the results', async () => {
+    it('transforms the results', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
       server.use(
         http.get('*', () => {
@@ -196,7 +197,7 @@ describe('api actions', () => {
   })
 
   describe('getPlannerItems', () => {
-    it.skip('dispatches START_LOADING_ITEMS, getFirstNewActivityDate, and starts the saga', async () => {
+    it('dispatches START_LOADING_ITEMS, getFirstNewActivityDate, and starts the saga', async () => {
       const mockDispatch = vi.fn(() => Promise.resolve({data: []}))
       const mockMoment = moment()
       server.use(
@@ -226,7 +227,7 @@ describe('api actions', () => {
   })
 
   describe('getFirstNewActivityDate', () => {
-    it.skip('sends deep past, filter, and order parameters', async () => {
+    it('sends deep past, filter, and order parameters', async () => {
       const mockDispatch = vi.fn(() => Promise.resolve({data: []}))
       const mockMoment = moment.tz('Asia/Tokyo').startOf('day')
       let capturedUrl

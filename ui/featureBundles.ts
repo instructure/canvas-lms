@@ -20,15 +20,18 @@ const featureBundles: {
   [bundle: string]: () => Promise<unknown>
 } = {
   // TODO: move these into ui/boot/initializers/router.tsx
+  accessibility_checker: () => import('./features/accessibility/accessibility_checker/index'),
+  accessibility_course_statistics: () =>
+    import('./features/accessibility/accessibility_course_statistics/index'),
   account_admin_tools: () => import('./features/account_admin_tools/index'),
   account_calendar_settings: () => import('./features/account_calendar_settings/index'),
   account_course_user_search: () => import('./features/account_course_user_search/index'),
   account_notification_settings: () => import('./features/account_notification_settings/index'),
   account_search: () => import('./features/account_search/index'),
   account_settings: () => import('./features/account_settings/index'),
-  accessibility_checker: () => import('./features/accessibility/accessibility_checker/index'),
   admin_split: () => import('./features/admin_split/index'),
   ai_experiences_show: () => import('./features/ai_experiences_show/index'),
+  ai_experiences_ai_conversations: () => import('./features/ai_experiences_ai_conversations/index'),
   analytics_hub: () => import('./features/analytics_hub/index'),
   announcements_on_home_page: () => import('./features/announcements_on_home_page/index'),
   announcements: () => import('./features/announcements/index'),

@@ -499,6 +499,101 @@ describe DiscussionTopicsApiController do
 
       expect(response).to be_unprocessable
     end
+
+    context "with discussion_summary_with_cedar feature flag" do
+      before do
+        @course.account.root_account.enable_feature!(:discussion_summary_with_cedar)
+
+        mock_response = Struct.new(:response, :input_tokens, :output_tokens, keyword_init: true).new(
+          response: "cedar summary",
+          input_tokens: 100,
+          output_tokens: 200
+        )
+        stub_const("CedarClient", Class.new do
+          define_singleton_method(:prompt) do |*|
+            mock_response
+          end
+        end)
+      end
+
+      it "routes to Cedar when feature flag is enabled" do
+        expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+        expect(LLMConfigs).to receive(:config_for).twice.and_return(
+          LLMConfig.new(
+            name: "raw-V1_A",
+            model_id: "model",
+            template: "<CONTENT_PLACEHOLDER>"
+          )
+        )
+
+        expect(@inst_llm).not_to receive(:chat)
+
+        post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+        expect(response).to be_successful
+      end
+
+      it "passes correct parameters to Cedar" do
+        calls = []
+        stub_const("CedarClient", Class.new do
+          define_singleton_method(:prompt) do |args|
+            calls << args
+            raise "Expected model to eq 'model'" unless args[:model] == "model"
+            raise "Expected feature_slug to eq 'discussion-summary'" unless args[:feature_slug] == "discussion-summary"
+            raise "Expected prompt to be present" unless args[:prompt].present?
+
+            Struct.new(:response, :input_tokens, :output_tokens, keyword_init: true).new(
+              response: "cedar summary",
+              input_tokens: 100,
+              output_tokens: 200
+            )
+          end
+        end)
+
+        expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+        expect(LLMConfigs).to receive(:config_for).twice.and_return(
+          LLMConfig.new(
+            name: "raw-V1_A",
+            model_id: "model",
+            template: "<CONTENT_PLACEHOLDER>"
+          )
+        )
+
+        post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+        expect(response).to be_successful
+        expect(calls.length).to eq(2)
+      end
+
+      it "falls back to Bedrock when feature flag is disabled" do
+        @course.account.root_account.disable_feature!(:discussion_summary_with_cedar)
+
+        expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+        expect(LLMConfigs).to receive(:config_for).twice.and_return(
+          LLMConfig.new(
+            name: "raw-V1_A",
+            model_id: "model",
+            template: "<CONTENT_PLACEHOLDER>"
+          )
+        )
+
+        expect(@inst_llm).to receive(:chat).twice.and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "bedrock summary" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+        expect(response).to be_successful
+      end
+    end
   end
 
   context "summary_feedback" do

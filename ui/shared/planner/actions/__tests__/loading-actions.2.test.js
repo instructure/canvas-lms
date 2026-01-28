@@ -25,7 +25,8 @@ import configureStore from '../../store/configureStore'
 
 vi.mock('../../utilities/apiUtils', async () => ({
   ...(await vi.importActual('../../utilities/apiUtils')),
-  getContextCodesFromState: (await vi.importActual('../../utilities/apiUtils')).getContextCodesFromState,
+  getContextCodesFromState: (await vi.importActual('../../utilities/apiUtils'))
+    .getContextCodesFromState,
   findNextLink: vi.fn(),
   transformApiToInternalItem: vi.fn(response => ({
     ...response,
@@ -74,7 +75,7 @@ describe('api actions', () => {
       srAlertCallback() {},
     })
   })
-  describe.skip('weekly planner', () => {
+  describe('weekly planner', () => {
     let mockDispatch
     let weeklyState
     beforeAll(() => {

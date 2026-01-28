@@ -244,26 +244,7 @@ module Api::V1::OutcomeResults
 
   # Internal: returns hash for rollup score links
   def serialize_rollup_score_links(score)
-    links = { outcome: score.outcome.id.to_s }
-    if defined?(params) && params[:contributing_scores] == "true"
-      links[:contributing_scores] = serialize_contributing_scores(score.outcome_results)
-    end
-    links
-  end
-
-  # Internal: returns an Array of serialized contributing scores
-  def serialize_contributing_scores(contributing_scores)
-    contributing_scores.map { |score| serialize_contributing_score(score) }
-  end
-
-  # Internal: returns hash for contributing score
-  def serialize_contributing_score(score)
-    {
-      association_id: score.association_id,
-      association_type: score.association_type,
-      title: score.title,
-      score: score.score
-    }
+    { outcome: score.outcome.id.to_s }
   end
 
   def outcome_results_rollups_csv(current_user, _context, rollups, outcomes, outcome_paths)

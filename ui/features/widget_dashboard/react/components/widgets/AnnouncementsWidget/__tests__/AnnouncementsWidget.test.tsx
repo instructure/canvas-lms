@@ -722,7 +722,7 @@ describe('AnnouncementsWidget', () => {
     cleanup()
   })
 
-  it('renders course code pills from shared course data lookup', async () => {
+  it('renders announcements without course code pills', async () => {
     server.use(
       graphql.query('GetUserAnnouncements', ({variables}) => {
         return HttpResponse.json(getMockResponseForReadState(variables.readState))
@@ -737,7 +737,7 @@ describe('AnnouncementsWidget', () => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('ENG 201')).toBeInTheDocument()
+    expect(screen.queryByText('ENG 201')).not.toBeInTheDocument()
 
     cleanup()
   })

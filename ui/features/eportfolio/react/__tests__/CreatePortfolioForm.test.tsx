@@ -18,12 +18,22 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import CreatePortfolioForm from '../CreatePortfolioForm'
 
+const server = setupServer()
+
+// Track API calls
+let postCalled = false
+
 describe('CreatePortfolioForm', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
+    postCalled = false
   })
 
   it('displays form when clicking add button', () => {
@@ -60,6 +70,13 @@ describe('CreatePortfolioForm', () => {
   })
 
   it('makes POST request when submitting', async () => {
+    server.use(
+      http.post('/eportfolios', () => {
+        postCalled = true
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
+
     const mountNode = document.createElement('div')
     const {getByTestId, getByText} = render(
       <React.Fragment>
@@ -68,15 +85,12 @@ describe('CreatePortfolioForm', () => {
       </React.Fragment>,
     )
 
-    const path = encodeURI('/eportfolios?include_redirect=true')
-    fetchMock.post(path, {status: 200})
-
     getByTestId('add-portfolio-button').click()
     const textInput = getByTestId('portfolio-name-field')
     fireEvent.change(textInput, {target: {value: 'Test Portfolio'}})
     const saveButton = getByText('Submit')
     saveButton.click()
-    await waitFor(() => expect(fetchMock.called(path, 'POST')).toBe(true))
+    await waitFor(() => expect(postCalled).toBe(true))
   })
 
   it('hides form when cancelling ', () => {

@@ -129,7 +129,7 @@ function display_next_steps {
     Dev & Friends: http://instructure.github.io/
     Canvas Guides: https://guides.instructure.com/
     Vimeo channel: https://vimeo.com/canvaslms
-    API docs:      https://canvas.instructure.com/doc/api/index.html
+    API docs:      https://developerdocs.instructure.com/services/canvas
     Mailing list:  http://groups.google.com/group/canvas-lms-users
     IRC:           https://web.libera.chat/#canvas-lms
 

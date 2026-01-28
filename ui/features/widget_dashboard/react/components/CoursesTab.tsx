@@ -64,13 +64,11 @@ const CoursesTab: React.FC = () => {
 
         containerRef.current.innerHTML = ''
         if (React.isValidElement(dashboardCardsElement)) {
-          import('react-dom/client').then(({createRoot}) => {
-            const root = createRoot(containerRef.current!)
-            root.render(dashboardCardsElement)
+          import('@canvas/react').then(({render}) => {
+            render(dashboardCardsElement, containerRef.current!)
           })
         }
-      } catch (err) {
-        console.error('Error rendering dashboard cards:', err)
+      } catch {
         setError("Cards couldn't load")
       }
     }

@@ -86,7 +86,7 @@ class AccessibilityIssuesController < ApplicationController
       @issue.context,
       @issue.node_path,
       sanitized_value
-    ).apply_fix!
+    ).apply_fix!(updating_user: @current_user)
 
     if fix_response[:status] != :ok
       render json: fix_response[:json], status: fix_response[:status]

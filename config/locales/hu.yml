@@ -4618,6 +4618,7 @@ hu:
     recording_setting: Felvétel
     recording_setting_enabled_description: "A konferencia felvételének engedélyezése"
   billing_country_code_as_reported_by_salesforce_625bbb4e: "A Salesforce által jelentett számlázási országkód"
+  bio_a519d807: "Életrajz, bemutatkozás"
   blackboard: 
     no_manifest: "Ennek a Blackboard .zip-nek nem található imsmanifest.xml fájl a gyökérkönyvtárában."
   blackout_date_5fc44c2b: "Tilalmi dátum"
@@ -5756,6 +5757,7 @@ hu:
   close_help_dialog_653a6549: "Súgó párbeszéd bezárása"
   close_move_tray_8609e988: "zárja be a mozgó tálcát"
   close_opportunity_center_popup_9907d981: "A Lehetőségek popup ablak bezárása"
+  close_rubric_a0fc8166: "Értékelőtábla bezárása"
   close_sidebar_10b0fbb4: "Oldalsáv bezárása"
   close_student_details_2f6900: "A tanuló adatainak bezárása"
   close_submission_tray_c4988fa8: "Zárja be a benyújtási tálcát"
@@ -7668,6 +7670,11 @@ hu:
   course_name_is_required_90919349: "A kurzusnév megadása kötelező"
   course_name_successfully_added_48116a50: " %{course_name} sikeresen hozzáadva!"
   course_navigation_dd035109: Kurzusnavigáció
+  course_navigation_settings: 
+    drag_details: "Az oldal letiltása azt fogja eredményezni a legtöbb esetben, hogy a látogatók a kurzus kezdőlapjára lesznek átirányítva."
+    help: 
+      edit_navigation: "Az átrendezéshez ragadja meg és mozgassa el az elemeket."
+      edit_navigation_k5: "Húzza át az elemeket, hogy átrendezhesse őket a navigációban."
   course_nicknames_csv_92e325a7: "Kurzus becenevek CSV"
   course_not_found_c248a721: "Kurzus nem található"
   course_notification_settings_d9821d36: "A kurzus értesítési beállításai"
@@ -7915,6 +7922,14 @@ hu:
         content: Tartalom
         due_dates: Határidők
         points: Pontok
+    navigation_form: 
+      drag_details: "Az oldal letiltása azt fogja eredményezni a legtöbb esetben, hogy a látogatók a kurzus kezdőlapjára lesznek átirányítva."
+      help: 
+        edit_navigation: "Az átrendezéshez ragadja meg és mozgassa el az elemeket."
+        edit_navigation_info_k5: "Ha engedélyezve van, az LTI-eszközök mindig utoljára jelennek meg az Erőforrások lapon a kiválasztott sorrendben."
+        edit_navigation_k5: "Húzza át az elemeket, hogy átrendezhesse őket a navigációban."
+      titles: 
+        edit_navigation: "Kurzusnavigáció szerkesztése"
     notices: 
       concluded: "A kurzus sikeresen le lett zárva"
       deleted: "A kurzus sikeresen törölve lett"
@@ -11380,6 +11395,7 @@ hu:
   generate_item_analysis_report_statuslabel_16e02c8: "Elemanalízis-jelentés generálása %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Hallgatói elemzési jelentés generálása %{statusLabel}"
   generate_token_393ab5b4: "Token generálása"
+  generated_e71c6622: Generálva
   generated_f26ee56b: "Generálva: "
   generating_5b5e20f8: "Generálás: "
   generating_c2aabc02: Generálás...
@@ -11488,6 +11504,7 @@ hu:
       warning: Figyelmeztetés
   grade_distribution_e52c9256: Értékeléseloszlás
   grade_export_title: Osztályzatexportálás
+  grade_f949a691: "%{grade}%"
   grade_for_4c87a353: "Osztályzat ehhez"
   grade_for_assignment_acd954e9: "%{assignment} osztályzata"
   grade_for_ce7621f0: "osztályzat ehhez"
@@ -12535,6 +12552,7 @@ hu:
   hide_outcomes_with_no_results_7e4ce06f: "Érték nélküli eredmények elrejtése"
   hide_params_eadf0961: "Paraméterek elrejtése"
   hide_projections_9d4ed1e1: "Kivetítések elrejtése"
+  hide_rubric_27903c8: "Értékelőtábla elrejtése"
   hide_score_total_for_assessment_results_d0ef117f: "Teljes pontszám elrejtése az értékelési eredményekben"
   hide_sidebar_2b5b3776: "Oldalsáv elrejtése"
   hide_student_names_3e59e862: "Hallgatók nevének elrejtése"
@@ -17248,6 +17266,7 @@ hu:
   not_valid_after_81c9faec: "Nem érvényes ezután"
   not_valid_before_9ad2d22d: "Nem érvényes ezelőtt"
   not_yet_assessed_9362f199: "Még nem értékelték"
+  not_yet_available_9aa23a77: "Még nem elérhető"
   not_yet_completed_345a0bca: "Még befejezetlen"
   not_yet_graded_40475341: "Még nem értékelt"
   not_yet_graded_8b655a7: "Még nincs értékelve"
@@ -19185,6 +19204,7 @@ hu:
   priority_dd4381ee: Prioritás
   privacy_290109ea: Adatvédelem
   privacy_level_f0ec09a3: "Adatvédelmi szint"
+  privacy_notice_7eff08fe: "Adatvédelmi figyelmeztetés"
   privacy_policy_c68f482a: "Adatvédelmi irányelvek"
   private_3883d133: Privát
   private_copyrighted_3cac9686: "Magán (jogvédett)"

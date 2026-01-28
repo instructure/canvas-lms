@@ -149,6 +149,12 @@ development:
       #   ddb_endpoint: 'http://dynamo:8000/'
       #   ddb_table_name: 'canvas-release-notes'
       #   vault_credential_path: 'sts/testaccount/sts/canvas-release-notes'
+      # To work with global lookups, ensure you have vault_contents.yml
+      # with the example contents. Also see docker-compose/dynamodb.override.yml
+      # global_lookups.yml: |
+      #   ddb_endpoint: 'http://dynamo:8000/'
+      #   ddb_table_name: 'canvas-global-lookups'
+      #   vault_credential_path: 'sts/testaccount/sts/canvas-global-lookups'
       # feature_analytics:
       #   cache_expiry: '86400'
       #   sampling_rate: '0.0'

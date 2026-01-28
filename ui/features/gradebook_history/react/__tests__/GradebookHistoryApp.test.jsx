@@ -53,18 +53,18 @@ describe('GradebookHistoryApp', () => {
     expect(heading).toBeInTheDocument()
   })
 
-  it.skip('renders SearchForm component', () => {
+  it('renders SearchForm component', () => {
     const {getByTestId} = render(<GradebookHistoryApp courseUrl="/courseUrl" />)
     expect(getByTestId('search-form')).toBeInTheDocument()
   })
 
-  it.skip('renders SearchResults component', () => {
+  it('renders SearchResults component', () => {
     const {getByTestId} = render(<GradebookHistoryApp courseUrl="/courseUrl" />)
     expect(getByTestId('search-results')).toBeInTheDocument()
   })
 
   describe('GradebookMenu', () => {
-    it.skip('is passed the provided courseUrl prop', () => {
+    it('is passed the provided courseUrl prop', () => {
       const {getByTestId} = render(
         <GradebookHistoryApp courseUrl="/courseUrl" learningMasteryEnabled={true} />,
       )
@@ -72,7 +72,7 @@ describe('GradebookHistoryApp', () => {
       expect(menu).toHaveAttribute('data-course-url', '/courseUrl')
     })
 
-    it.skip('is passed the provided learningMasteryEnabled prop', () => {
+    it('is passed the provided learningMasteryEnabled prop', () => {
       const {getByTestId} = render(
         <GradebookHistoryApp courseUrl="/courseUrl" learningMasteryEnabled={false} />,
       )

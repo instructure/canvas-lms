@@ -19,8 +19,11 @@
 import '@instructure/canvas-theme'
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse, delay} from 'msw'
+import {setupServer} from 'msw/node'
 import LLMConversationView from '../components/LLMConversationView'
+
+const server = setupServer()
 
 const defaultProps = {
   isOpen: true,
@@ -36,25 +39,36 @@ const defaultProps = {
 }
 
 describe('LLMConversationView', () => {
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'error'})
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
-    fetchMock.restore()
     // Mock scrollIntoView which is not available in JSDOM
     Element.prototype.scrollIntoView = vi.fn()
     // Mock focus which is used for accessibility
     HTMLElement.prototype.focus = vi.fn()
 
     // Default mocks for most tests - can be overridden in individual tests
-    // Mock get active conversation (returns empty - no active conversation)
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {})
-    // Mock create new conversation
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations', {
-      id: '1',
-      messages: [],
-    })
+    server.use(
+      // Mock get active conversation (returns empty - no active conversation)
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      // Mock create new conversation
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: []})
+      }),
+    )
   })
 
   afterEach(() => {
     vi.clearAllMocks()
+    server.resetHandlers()
   })
 
   it('does not render when closed', () => {
@@ -62,17 +76,31 @@ describe('LLMConversationView', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders collapsed state when not expanded', () => {
-    render(<LLMConversationView {...defaultProps} isExpanded={false} />)
+  it('renders collapsed state when not expanded (teacher preview)', () => {
+    render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={true} />)
     expect(screen.getByText('Preview')).toBeInTheDocument()
     expect(
       screen.getByText('Here, you can have a chat with the AI just like a student would.'),
     ).toBeInTheDocument()
   })
 
-  it('renders expanded state when expanded', () => {
-    render(<LLMConversationView {...defaultProps} />)
+  it('renders collapsed state when not expanded (student view)', () => {
+    render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={false} />)
+    expect(screen.getByText('Conversation')).toBeInTheDocument()
+    expect(
+      screen.getByText('Start the experience by having a conversation with the AI. Good luck!'),
+    ).toBeInTheDocument()
+  })
+
+  it('renders expanded state when expanded (teacher preview)', () => {
+    render(<LLMConversationView {...defaultProps} isTeacherPreview={true} />)
     expect(screen.getByText('Preview')).toBeInTheDocument()
+    expect(screen.getByText('Restart')).toBeInTheDocument()
+  })
+
+  it('renders expanded state when expanded (student view)', () => {
+    render(<LLMConversationView {...defaultProps} isTeacherPreview={false} />)
+    expect(screen.getByText('Conversation')).toBeInTheDocument()
     expect(screen.getByText('Restart')).toBeInTheDocument()
   })
 
@@ -87,6 +115,7 @@ describe('LLMConversationView', () => {
       <LLMConversationView
         {...defaultProps}
         isExpanded={false}
+        isTeacherPreview={true}
         onToggleExpanded={onToggleExpanded}
       />,
     )
@@ -114,17 +143,19 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: mockMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: mockMessages})
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello! How can I help you?')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello!.*How can I help you\?/i)[0]).toBeInTheDocument()
     })
   })
 
@@ -137,11 +168,13 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: mockMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: mockMessages})
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
@@ -150,9 +183,9 @@ describe('LLMConversationView', () => {
       // First message is hidden (starting prompt)
       expect(screen.queryByText('Starting prompt')).not.toBeInTheDocument()
       // Others are visible
-      expect(screen.getByText('Hello!')).toBeInTheDocument()
-      expect(screen.getByText('Hi there')).toBeInTheDocument()
-      expect(screen.getByText('How can I help?')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello!/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/Hi there/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/How can I help\?/i)[0]).toBeInTheDocument()
     })
   })
 
@@ -170,27 +203,29 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: initialMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: initialMessages})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', () => {
+        return HttpResponse.json({
+          id: '1',
+          messages: [
+            ...initialMessages,
+            {role: 'User', text: 'Test message', timestamp: new Date()},
+            {role: 'Assistant', text: 'Response', timestamp: new Date()},
+          ],
+        })
+      }),
     )
-
-    // Mock post message
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', {
-      id: '1',
-      messages: [
-        ...initialMessages,
-        {role: 'User', text: 'Test message', timestamp: new Date()},
-        {role: 'Assistant', text: 'Response', timestamp: new Date()},
-      ],
-    })
 
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText('Your answer...')
@@ -228,27 +263,29 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: initialMessages},
-      {overwriteRoutes: true},
-    )
-
-    // Mock post message with delay
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations/1/messages',
-      {
-        id: '1',
-        messages: [...initialMessages, {role: 'User', text: 'New message', timestamp: new Date()}],
-      },
-      {delay: 100},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: initialMessages})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', async () => {
+        await delay(100)
+        return HttpResponse.json({
+          id: '1',
+          messages: [
+            ...initialMessages,
+            {role: 'User', text: 'New message', timestamp: new Date()},
+          ],
+        })
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText('Your answer...')
@@ -269,18 +306,23 @@ describe('LLMConversationView', () => {
       {role: 'Assistant', text: 'Hello', timestamp: new Date()},
     ]
 
+    let localApiCallCount = 0
+
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: mockMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        localApiCallCount++
+        return HttpResponse.json({id: '1', messages: mockMessages})
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Hello')).toBeInTheDocument()
+      expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
     const restartButton = screen.getByText('Restart')
@@ -288,7 +330,7 @@ describe('LLMConversationView', () => {
 
     // Should re-initialize conversation
     await waitFor(() => {
-      expect(fetchMock.calls().length).toBeGreaterThan(1)
+      expect(localApiCallCount).toBeGreaterThan(1)
     })
   })
 
@@ -300,11 +342,13 @@ describe('LLMConversationView', () => {
     ]
 
     // Override default mocks with custom messages
-    fetchMock.get('/api/v1/courses/123/ai_experiences/1/conversations', {}, {overwriteRoutes: true})
-    fetchMock.post(
-      '/api/v1/courses/123/ai_experiences/1/conversations',
-      {id: '1', messages: mockMessages},
-      {overwriteRoutes: true},
+    server.use(
+      http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+        return HttpResponse.json({id: '1', messages: mockMessages})
+      }),
     )
 
     render(<LLMConversationView {...defaultProps} />)
@@ -343,15 +387,13 @@ describe('LLMConversationView', () => {
       ]
 
       // Override default mocks with custom messages
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: mockMessages},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: mockMessages})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -370,15 +412,13 @@ describe('LLMConversationView', () => {
       ]
 
       // Override default mocks with custom messages
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: mockMessages},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: mockMessages})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -391,15 +431,14 @@ describe('LLMConversationView', () => {
 
     it('announces "Initializing conversation..." when initializing', () => {
       // Override with delayed response
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: []},
-        {delay: 100, overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', async () => {
+          await delay(100)
+          return HttpResponse.json({id: '1', messages: []})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -415,35 +454,30 @@ describe('LLMConversationView', () => {
       ]
 
       // Override default mocks with custom messages
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: initialMessages},
-        {overwriteRoutes: true},
-      )
-
-      // Mock post message with delay
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations/1/messages',
-        {
-          id: '1',
-          messages: [
-            ...initialMessages,
-            {role: 'User', text: 'Test', timestamp: new Date()},
-            {role: 'Assistant', text: 'Response', timestamp: new Date()},
-          ],
-        },
-        {delay: 100},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: initialMessages})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', async () => {
+          await delay(100)
+          return HttpResponse.json({
+            id: '1',
+            messages: [
+              ...initialMessages,
+              {role: 'User', text: 'Test', timestamp: new Date()},
+              {role: 'Assistant', text: 'Response', timestamp: new Date()},
+            ],
+          })
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const input = screen.getByPlaceholderText('Your answer...')
@@ -463,15 +497,13 @@ describe('LLMConversationView', () => {
   describe('error handling', () => {
     it('displays error alert when conversation initialization fails', async () => {
       // Override with error response
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {status: 503, body: {error: 'Service unavailable'}},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({error: 'Service unavailable'}, {status: 503})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -490,26 +522,22 @@ describe('LLMConversationView', () => {
       ]
 
       // Override default mocks with custom messages
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: initialMessages})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', () => {
+          return HttpResponse.json({error: 'Failed to send'}, {status: 503})
+        }),
       )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: initialMessages},
-        {overwriteRoutes: true},
-      )
-      // Mock post message failure
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', {
-        status: 503,
-        body: {error: 'Failed to send'},
-      })
 
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const input = screen.getByPlaceholderText('Your answer...')
@@ -532,29 +560,26 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      // Mock get active conversation
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      // Mock create conversation (first call - success)
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {id: '1', messages: initialMessages},
-        {repeat: 1, overwriteRoutes: true},
-      )
-      // Mock create conversation (second call for restart - failure)
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {status: 503, body: {error: 'Failed to restart'}},
-        {repeat: 1, overwriteRoutes: false},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post(
+          '/api/v1/courses/123/ai_experiences/1/conversations',
+          () => {
+            return HttpResponse.json({id: '1', messages: initialMessages})
+          },
+          {once: true},
+        ),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
       const restartButton = screen.getByText('Restart')
@@ -569,15 +594,13 @@ describe('LLMConversationView', () => {
 
     it('allows dismissing error alerts', async () => {
       // Override with error response
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {status: 503, body: {error: 'Service unavailable'}},
-        {overwriteRoutes: true},
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({error: 'Service unavailable'}, {status: 503})
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -599,29 +622,27 @@ describe('LLMConversationView', () => {
     })
 
     it('clears error when retrying after failure', async () => {
-      // Mock get active conversation
-      fetchMock.get(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {},
-        {overwriteRoutes: true},
-      )
-      // Mock create conversation (first call - failure)
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {status: 503, body: {error: 'Failed'}},
-        {repeat: 1, overwriteRoutes: true},
-      )
-      // Mock create conversation (second call - success)
-      fetchMock.post(
-        '/api/v1/courses/123/ai_experiences/1/conversations',
-        {
-          id: '1',
-          messages: [
-            {role: 'User', text: 'Start', timestamp: new Date()},
-            {role: 'Assistant', text: 'Hello', timestamp: new Date()},
-          ],
-        },
-        {repeat: 1, overwriteRoutes: false},
+      const initialMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      let shouldSucceed = false
+
+      server.resetHandlers()
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          if (!shouldSucceed) {
+            return HttpResponse.json({error: 'Failed'}, {status: 503})
+          }
+          return HttpResponse.json({
+            id: '1',
+            messages: initialMessages,
+          })
+        }),
       )
 
       render(<LLMConversationView {...defaultProps} />)
@@ -632,7 +653,8 @@ describe('LLMConversationView', () => {
         ).toBeInTheDocument()
       })
 
-      // Trigger restart which should clear the error
+      shouldSucceed = true
+
       const restartButton = screen.getByText('Restart')
       fireEvent.click(restartButton)
 
@@ -640,8 +662,91 @@ describe('LLMConversationView', () => {
         expect(
           screen.queryByText('Failed to start conversation. Please try again.'),
         ).not.toBeInTheDocument()
-        expect(screen.getByText('Hello')).toBeInTheDocument()
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('input focus behavior', () => {
+    it('focuses text input after AI response arrives', async () => {
+      const mockMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: mockMessages})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', () => {
+          return HttpResponse.json({
+            id: '1',
+            messages: [
+              ...mockMessages,
+              {role: 'User', text: 'Test', timestamp: new Date()},
+              {role: 'Assistant', text: 'Response', timestamp: new Date()},
+            ],
+          })
+        }),
+      )
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
+      })
+
+      vi.clearAllMocks()
+
+      const input = screen.getByPlaceholderText('Your answer...')
+      fireEvent.change(input, {target: {value: 'Test'}})
+      fireEvent.click(screen.getByText('Send'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Response')).toBeInTheDocument()
+      })
+
+      expect(HTMLElement.prototype.focus).toHaveBeenCalled()
+    })
+
+    it('focuses text input after errors', async () => {
+      const initialMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: initialMessages})
+        }),
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations/1/messages', () => {
+          return HttpResponse.json({error: 'Failed'}, {status: 503})
+        }),
+      )
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
+      })
+
+      vi.clearAllMocks()
+
+      const input = screen.getByPlaceholderText('Your answer...')
+      fireEvent.change(input, {target: {value: 'Test'}})
+      fireEvent.click(screen.getByText('Send'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed to send message. Please try again.')).toBeInTheDocument()
+      })
+
+      expect(HTMLElement.prototype.focus).toHaveBeenCalled()
     })
   })
 })

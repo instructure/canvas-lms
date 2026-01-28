@@ -30,12 +30,15 @@ describe('fuzzy-relative-time::', () => {
   const thenceYear = (year: number) => thenceDay(365.25 * year)
 
   // fromNow accepts either a Date object in the past or future,
-  // or a numeric value of milliseconds representing same
+  // or a numeric value of milliseconds representing same,
+  // or a parseable date string.
   it('throws on bad arguments', () => {
-    expect(() => fromNow('junk')).toThrow()
-    expect(() => fromNow(new Date('junk'))).toThrow()
-    expect(() => fromNow(new Date('2020-03-15T12:34:56Z'))).not.toThrow()
-    expect(() => fromNow(1584275696000)).not.toThrow()
+    expect(() => fromNow('2020-03-15T12:34:56Z')).not.toThrow() // valid string
+    expect(() => fromNow('junk')).toThrow() // invalid string
+    expect(() => fromNow(new Date('junk'))).toThrow() // invalid Date
+    expect(() => fromNow(new Date('2020-03-15T12:34:56Z'))).not.toThrow() // valid Date
+    expect(() => fromNow(1584275696000)).not.toThrow() // valid msec
+    expect(() => fromNow({})).toThrow() // invalid type
   })
 
   it('handles msec values too', () => {

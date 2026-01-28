@@ -49,7 +49,7 @@ describe('TruncateWithTooltip', () => {
     expect(screen.getByText('This is some text')).toBeInTheDocument()
   })
 
-  it.skip('shows TruncateText if text is not truncated', () => {
+  it('shows TruncateText if text is not truncated', () => {
     renderTruncateWithTooltip('TruncateText')
 
     expect(screen.getByText('TruncateText')).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('TruncateWithTooltip', () => {
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 
-  it.skip('shows Tooltip for truncated text', () => {
+  it('shows Tooltip for truncated text', () => {
     const {ref} = renderTruncateWithTooltip('Tooltip', '100px')
 
     ref.current.setState({isTruncated: true})

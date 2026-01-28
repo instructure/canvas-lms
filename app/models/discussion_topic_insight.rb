@@ -73,15 +73,20 @@ class DiscussionTopicInsight < ActiveRecord::Base
 
       while attempts < max_attempts
         attempts += 1
-        response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: prompt }],
-          **options.symbolize_keys
-        )
 
         begin
-          parsed_response = JSON.parse(response.message[:content])
-          validate_llm_response(parsed_response, batch.length)
+          if Account.site_admin.feature_enabled?(:discussion_insights_with_cedar) && CedarClient.enabled?
+            response = call_cedar_for_insight(prompt, llm_config)
+            parsed_response = JSON.parse(response)
+          else
+            response = InstLLMHelper.client(llm_config.model_id).chat(
+              [{ role: "user", content: prompt }],
+              **options.symbolize_keys
+            )
+            parsed_response = JSON.parse(response.message[:content])
+          end
 
+          validate_llm_response(parsed_response, batch.length)
           break
         rescue JSON::ParserError, ArgumentError => e
           Rails.logger.error("Attempt #{attempts}/#{max_attempts}: Failed to parse or validate LLM response: #{e.message}")
@@ -110,6 +115,26 @@ class DiscussionTopicInsight < ActiveRecord::Base
   rescue => e
     update!(workflow_state: "failed")
     Rails.logger.error("Failed to generate discussion topic insights for topic #{discussion_topic.id}: #{e}")
+    raise
+  end
+
+  def call_cedar_for_insight(prompt, llm_config)
+    response = CedarClient.prompt(
+      prompt:,
+      model: llm_config.model_id,
+      feature_slug: "discussion-insights",
+      root_account_uuid: root_account.uuid,
+      current_user: user
+    )
+    response.response
+  rescue InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError => e
+    Rails.logger.error("Cedar rate limit exceeded: #{e.message}")
+    raise
+  rescue InstructureMiscPlugin::Extensions::CedarClient::ValidationError => e
+    Rails.logger.error("Cedar validation error: #{e.message}")
+    raise ArgumentError, "Invalid Cedar request: #{e.message}"
+  rescue InstructureMiscPlugin::Extensions::CedarClient::CedarClientError => e
+    Rails.logger.error("Cedar API error: #{e.message}")
     raise
   end
 

@@ -22,6 +22,7 @@ import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const render = (children: unknown) =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
@@ -58,18 +59,24 @@ const profileTabs = [
 
 describe('ProfileTray', () => {
   beforeEach(() => {
-    window.ENV = {
-      // @ts-expect-error
+    fakeENV.setup({
       current_user: {
+        id: '1',
+        anonymous_id: 'anon1',
         display_name: 'Sample Student',
+        avatar_image_url: '',
+        html_url: '/users/1',
+        pronouns: null,
+        fake_student: false,
         avatar_is_fallback: true,
       },
       current_user_roles: [],
-    }
+    })
   })
 
   afterEach(() => {
     queryClient.removeQueries()
+    fakeENV.teardown()
   })
 
   it('renders the component', () => {
@@ -109,10 +116,10 @@ describe('ProfileTray', () => {
   it('renders the unread count badge on Shared Content', () => {
     queryClient.setQueryData(['profile'], profileTabs)
     queryClient.setQueryData(['unread_count', 'content_shares'], 12)
-    const {container} = render(<ProfileTray />)
-    // @ts-expect-error
-    const elt = container.firstChild.querySelector('a[href="/shared"]')
-    domGetByText(elt, '12 unread.')
+    const {getByRole} = render(<ProfileTray />)
+    const link = getByRole('link', {name: /Shared Content/})
+    expect(link).toBeInTheDocument()
+    domGetByText(link, '12 unread.')
   })
 
   it('renders the Accessibility Settings section', () => {

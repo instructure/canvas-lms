@@ -3430,6 +3430,24 @@ describe UsersController do
         expect(assigns[:js_env][:DASHBOARD_FEATURES][:widget_dashboard_customization]).to be false
       end
 
+      it "includes platform_ui_unified_widgets_dashboard in DASHBOARD_FEATURES when enabled" do
+        course_with_student_logged_in(active_all: true)
+        @user.preferences[:widget_dashboard_user_preference] = true
+        @user.save!
+        Account.site_admin.enable_feature!(:platform_ui_unified_widgets_dashboard)
+        get "user_dashboard"
+        expect(assigns[:js_env][:DASHBOARD_FEATURES][:platform_ui_unified_widgets_dashboard]).to be true
+      end
+
+      it "does not include platform_ui_unified_widgets_dashboard in DASHBOARD_FEATURES when disabled" do
+        course_with_student_logged_in(active_all: true)
+        @user.preferences[:widget_dashboard_user_preference] = true
+        @user.save!
+        Account.site_admin.disable_feature!(:platform_ui_unified_widgets_dashboard)
+        get "user_dashboard"
+        expect(assigns[:js_env][:DASHBOARD_FEATURES][:platform_ui_unified_widgets_dashboard]).to be false
+      end
+
       describe "dashboard routing" do
         before :once do
           @observer = user_factory(active_all: true)
@@ -3524,6 +3542,16 @@ describe UsersController do
           @student.save!
           get "user_dashboard"
           expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+        end
+
+        it "does not show widget dashboard when feature is disabled even if user preference is true" do
+          Account.default.disable_feature!(:widget_dashboard)
+          user_session(@student)
+          @student.preferences[:widget_dashboard_user_preference] = true
+          @student.save!
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
         end
       end
     end

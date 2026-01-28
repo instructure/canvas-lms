@@ -235,10 +235,15 @@ export function setExpandAllButton() {
 }
 
 export function setExpandAllButtonHandler(lazy_load_callback) {
-  $('#expand_collapse_all').click(function () {
+  $('#expand_collapse_all').click(function (event) {
+    if ($(this).attr('aria-disabled') === 'true') {
+      event.preventDefault()
+      return false
+    }
+
     const shouldExpand = $(this).data('expand')
     if (shouldExpand) {
-      $('#expand_collapse_all').prop('disabled', true)
+      $('#expand_collapse_all').attr('aria-disabled', 'true')
     }
 
     if (ENV.FEATURES.instui_header) {
@@ -301,7 +306,7 @@ export function setExpandAllButtonHandler(lazy_load_callback) {
       if (shouldExpand && lazy_load_callback) {
         lazy_load_callback(shouldExpand, collapsedModuleIds)
       } else {
-        $(this).prop('disabled', false)
+        $(this).attr('aria-disabled', 'false')
       }
     })
   })

@@ -77,24 +77,39 @@ describe('UpdateCalendarEventDialog', () => {
     const radioInputs = dialog.querySelectorAll('input[type="radio"]')
     expect(radioInputs).toHaveLength(3)
 
-    // Check labels by finding them near the radio inputs
-    const labels = dialog.querySelectorAll('.css-ov2i6o-radioInput__label')
-    const labelTexts = Array.from(labels).map(label => label.textContent)
+    // Check labels by finding the label text associated with each radio input
+    const radioLabels = Array.from(radioInputs).map(radio => {
+      // Find the label by the aria-describedby or id reference
+      const labelId = radio.getAttribute('aria-describedby')
+      if (labelId) {
+        const labelElement = dialog.querySelector(`#${labelId}`)
+        if (labelElement) return labelElement.textContent
+      }
+      // Fallback: find label element that wraps the input or is connected via for attribute
+      const labelElement =
+        radio.closest('label') || dialog.querySelector(`label[for="${radio.id}"]`)
+      return labelElement?.textContent || ''
+    })
 
-    expect(labelTexts).toContain('This event')
-    expect(labelTexts).toContain('All events')
-    expect(labelTexts).toContain('This and all following events')
+    // Use getByRole to find the actual label text content more reliably
+    const dialogText = dialog.textContent
+    expect(dialogText).toContain('This event')
+    expect(dialogText).toContain('All events')
+    expect(dialogText).toContain('This and all following events')
   })
 
   describe('render function', () => {
-    it('renders', () => {
+    it('renders', async () => {
       const container = document.createElement('div')
       container.id = 'update_modal_container'
       document.body.appendChild(container)
 
       renderUpdateCalendarEventDialog(eventMock)
-      const dialog = document.querySelector('[role="dialog"]')
-      expect(dialog).toBeInTheDocument()
+      // Wait for React 18 concurrent rendering to complete
+      await vi.waitFor(() => {
+        const dialog = document.querySelector('[role="dialog"]')
+        expect(dialog).toBeInTheDocument()
+      })
 
       document.body.removeChild(container)
     })

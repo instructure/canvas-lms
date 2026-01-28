@@ -19,12 +19,15 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {StudentCell, StudentCellProps} from '../StudentCell'
-import {Student} from '../../../types/rollup'
-import {SecondaryInfoDisplay, NameDisplayFormat} from '../../../utils/constants'
+import {Student} from '@canvas/outcomes/react/types/rollup'
+import {SecondaryInfoDisplay, NameDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_STUDENTS} from '../../../__fixtures__/rollups'
+
+const server = setupServer()
 
 // Helper to render with QueryClientProvider
 const renderWithQueryClient = (ui: React.ReactElement) => {
@@ -39,9 +42,9 @@ const renderWithQueryClient = (ui: React.ReactElement) => {
 }
 
 describe('StudentCell', () => {
-  afterEach(() => {
-    fetchMock.restore()
-  })
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
 
   const defaultProps = (props: Partial<StudentCellProps> = {}): StudentCellProps => ({
     student: {
@@ -71,15 +74,19 @@ describe('StudentCell', () => {
     const props = defaultProps()
 
     // Mock the API call for user details
-    fetchMock.get(`/api/v1/courses/${props.courseId}/users/${props.student.id}/lmgb_user_details`, {
-      course: {
-        name: 'Test Course',
-      },
-      user: {
-        sections: [{id: 1, name: 'Section 1'}],
-        last_login: '2024-01-01T12:00:00Z',
-      },
-    })
+    server.use(
+      http.get('/api/v1/courses/:courseId/users/:userId/lmgb_user_details', () => {
+        return HttpResponse.json({
+          course: {
+            name: 'Test Course',
+          },
+          user: {
+            sections: [{id: 1, name: 'Section 1'}],
+            last_login: '2024-01-01T12:00:00Z',
+          },
+        })
+      }),
+    )
 
     const {getByTestId} = renderWithQueryClient(<StudentCell {...props} />)
     const link = getByTestId('student-cell-link')

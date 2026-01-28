@@ -100,6 +100,7 @@ describe('DueDateTokenWrapper', () => {
     expect(publiusOptions[1]).toHaveTextContent('Publius (pub123)')
   })
 
+  // TODO: handleTokenAdd is never called during input changes - test logic may be incorrect
   it.skip('calls handleInput and fetchStudents on input changes', async () => {
     const {container} = render(<DueDateTokenWrapper {...props} />)
     const input = container.querySelector('.ic-tokeninput-input')
@@ -136,6 +137,7 @@ describe('DueDateTokenWrapper', () => {
     expect(student).toBeInTheDocument()
   })
 
+  // TODO: handleTokenAdd is never called on Enter - may need waitFor or different interaction pattern
   it.skip('calls handleTokenAdd when a token is added', async () => {
     const {container} = render(<DueDateTokenWrapper {...props} />)
     const input = container.querySelector('.ic-tokeninput-input')
@@ -204,6 +206,7 @@ describe('Disabled DueDateTokenWrapper', () => {
     vi.clearAllMocks()
   })
 
+  // TODO: input element not found when disabled - selector may be wrong or component doesn't render input
   it.skip('renders a disabled token input', () => {
     const {container} = render(<DueDateTokenWrapper {...props} />)
     const input = container.querySelector('.ic-tokeninput-input')

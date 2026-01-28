@@ -223,7 +223,7 @@ export default class ItemView extends Backbone.View {
   }
 
   canDelete() {
-    return this.model.get('permissions').delete
+    return this.model.get('permissions')?.delete
   }
 
   onDelete(e) {

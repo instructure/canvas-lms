@@ -17,38 +17,19 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, within} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
-import {
-  OutcomePanel,
-  OutcomeManagementWithoutGraphql as OutcomeManagement,
-} from '../OutcomeManagement'
-import {
-  masteryCalculationGraphqlMocks,
-  masteryScalesGraphqlMocks,
-  outcomeGroupsMocks,
-} from '@canvas/outcomes/mocks/Outcomes'
+import {OutcomeManagementWithoutGraphql as OutcomeManagement} from '../OutcomeManagement'
+import {outcomeGroupsMocks} from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo-v3'
 import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress,
 } from '@canvas/outcomes/react/OutcomesImporter'
-import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
-import {windowConfirm} from '@canvas/util/globalUtils'
-import {useAllPages} from '@canvas/query'
-
-vi.mock('@canvas/query', () => ({
-  useAllPages: vi.fn(),
-}))
 
 vi.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
   showOutcomesImporter: vi.fn(() => vi.fn(() => {})),
   showOutcomesImporterIfInProgress: vi.fn(() => vi.fn(() => {})),
-}))
-
-vi.mock('@canvas/util/globalUtils', async () => ({
-  ...await vi.importActual('@canvas/util/globalUtils'),
-  windowConfirm: vi.fn(() => true),
 }))
 
 describe('OutcomeManagement', () => {
@@ -63,82 +44,6 @@ describe('OutcomeManagement', () => {
     vi.clearAllMocks()
     vi.useRealTimers()
   })
-
-  /*
-    This test takes an average of 5.5 seconds to run.
-    For now, we are increaseing the timeout interval to 7.5 seconds
-  */
-  // OUT-6972 (10/23/2024)
-  it('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
-    const rceEnv = {
-      RICH_CONTENT_CAN_UPLOAD_FILES: true,
-      RICH_CONTENT_APP_HOST: 'rce-host',
-      JWT: 'test-jwt',
-      current_user_id: '1',
-    }
-    window.ENV = {
-      context_asset_string: 'course_2',
-      CONTEXT_URL_ROOT: '/course/2',
-      IMPROVED_OUTCOMES_MANAGEMENT: true,
-      PERMISSIONS: {
-        manage_proficiency_calculations: true,
-        manage_outcomes: true,
-      },
-      current_user: {id: '1'},
-      ...rceEnv,
-    }
-    const mocks = [
-      ...courseMocks({childGroupsCount: 2}),
-      ...groupMocks({
-        title: 'Course folder 0',
-        groupId: '200',
-        parentOutcomeGroupTitle: 'Root course folder',
-        parentOutcomeGroupId: '2',
-      }),
-      ...groupDetailMocks({
-        title: 'Course folder 0',
-        groupId: '200',
-        contextType: 'Course',
-        contextId: '2',
-        withMorePage: false,
-      }),
-      ...groupMocks({
-        groupId: '300',
-        childGroupOffset: 400,
-        parentOutcomeGroupTitle: 'Course folder 0',
-        parentOutcomeGroupId: '200',
-      }),
-      ...groupDetailMocks({
-        groupId: '300',
-        contextType: 'Course',
-        contextId: '2',
-        withMorePage: false,
-      }),
-    ]
-    const {findByText, findByTestId, getByTestId} = render(
-      <MockedProvider cache={cache} mocks={mocks}>
-        <OutcomeManagement breakpoints={{tablet: true}} />
-      </MockedProvider>,
-    )
-    await act(async () => vi.runAllTimers())
-
-    // Select a group in the lsh
-    const cf0 = await findByText('Course folder 0')
-    fireEvent.click(cf0)
-    await act(async () => vi.runAllTimers())
-
-    // The easy way to determine if lsh is passing to ManagementHeader is
-    // to open the create outcome modal and check if the lhs group was loaded
-    // by checking if the child of the lhs group is there
-    fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
-    await act(async () => vi.runAllTimers())
-    // there's something weird going on in the test here that while we find the modal
-    // .toBeInTheDocument() fails, even though a findBy for it fails before ^that click.
-    // We can test that the elements expected to be within it exist.
-    const modal = await findByTestId('createOutcomeModal')
-    expect(within(modal).getByText('Course folder 0')).not.toBeNull()
-    expect(within(modal).getByText('Group 200 folder 0')).not.toBeNull()
-  }, 7500) // Increase time to 7.5 seconds
 
   const sharedExamples = () => {
     beforeEach(() => {
@@ -248,140 +153,6 @@ describe('OutcomeManagement', () => {
       expect(getByText('Manage')).toBeInTheDocument()
       expect(queryByText('Mastery')).not.toBeInTheDocument()
       expect(queryByText('Calculation')).not.toBeInTheDocument()
-    })
-
-    describe('Changes confirmation', () => {
-      let originalAddEventListener, unloadEventListener
-
-      beforeAll(() => {
-        originalAddEventListener = window.addEventListener
-        window.addEventListener = (eventName, callback) => {
-          if (eventName === 'beforeunload') {
-            unloadEventListener = callback
-          }
-        }
-      })
-
-      beforeEach(() => {
-        vi.clearAllMocks()
-      })
-
-      afterAll(() => {
-        window.addEventListener = originalAddEventListener
-        unloadEventListener = null
-      })
-
-      it("Doesn't ask to confirm tab change when there is not change", () => {
-        useAllPages.mockReturnValue({
-          data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
-          isError: false,
-          isLoading: false,
-        })
-        const {getByText} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        fireEvent.click(getByText('Mastery'))
-        fireEvent.click(getByText('Calculation'))
-
-        expect(windowConfirm).not.toHaveBeenCalled()
-      })
-
-      it('Asks to confirm tab change when there is changes', async () => {
-        useAllPages.mockReturnValue({
-          data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
-          isError: false,
-          isLoading: false,
-        })
-        const {getByText, getByLabelText, getByTestId} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        fireEvent.click(getByText('Calculation'))
-        await act(async () => vi.runAllTimers())
-        fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
-        fireEvent.click(getByText('Mastery'))
-        await act(async () => vi.runAllTimers())
-        expect(windowConfirm).toHaveBeenCalledWith(
-          'Are you sure you want to proceed? Changes you made will not be saved.',
-        )
-        expect(getByTestId('masteryScales')).toBeInTheDocument()
-      })
-
-      it("Doesn't change tabs when doesn't confirm", async () => {
-        // mock decline from user
-        windowConfirm.mockImplementationOnce(() => false)
-
-        const {getByText, getByLabelText, queryByTestId} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        fireEvent.click(getByText('Calculation'))
-        await act(async () => vi.runAllTimers())
-        fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
-        fireEvent.click(getByText('Mastery'))
-        expect(queryByTestId('masteryScales')).not.toBeInTheDocument()
-      })
-
-      it("Allows to leave page when doesn't have changes", async () => {
-        const {getByText} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        const calculationButton = getByText('Calculation')
-        fireEvent.click(calculationButton)
-
-        await act(async () => vi.runAllTimers())
-
-        const e = vi.fn()
-        e.preventDefault = vi.fn()
-        unloadEventListener(e)
-        expect(e.preventDefault).not.toHaveBeenCalled()
-      })
-
-      it("Doesn't Allow to leave page when has changes", async () => {
-        const {getByText, getByLabelText} = render(
-          <MockedProvider
-            cache={cache}
-            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
-          >
-            <OutcomeManagement />
-          </MockedProvider>,
-        )
-
-        const calculationButton = getByText('Calculation')
-        fireEvent.click(calculationButton)
-
-        await act(async () => vi.runAllTimers())
-
-        const parameter = getByLabelText(/Parameter/)
-        fireEvent.input(parameter, {target: {value: '88'}})
-
-        const e = vi.fn()
-        e.preventDefault = vi.fn()
-        unloadEventListener(e)
-        expect(e.preventDefault).toHaveBeenCalled()
-      })
     })
   }
 
@@ -495,29 +266,5 @@ describe('OutcomeManagement', () => {
 
     sharedExamples()
     courseOnlyTests()
-  })
-})
-
-describe('OutcomePanel', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="outcomes" style="display:none">Outcomes Tab</div>'
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    document.body.innerHTML = ''
-  })
-
-  it('sets style on mount', () => {
-    render(<OutcomePanel />)
-    vi.runAllTimers()
-    expect(document.getElementById('outcomes').style.display).toEqual('block')
-  })
-
-  it('sets style on unmount', () => {
-    const {unmount} = render(<OutcomePanel />)
-    unmount()
-    vi.runAllTimers()
-    expect(document.getElementById('outcomes').style.display).toEqual('none')
   })
 })

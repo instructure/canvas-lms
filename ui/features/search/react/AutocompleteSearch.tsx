@@ -82,7 +82,9 @@ export default function AutocompleteSearch(props: Props) {
     // no match found, return selected option label to input
     else if (selectedOptionId) {
       const selectedOption = getOptionById(selectedOptionId)
-      setInputValue(selectedOption || '')
+      if (selectedOption) {
+        setInputValue(selectedOption)
+      }
     }
     // input value is from highlighted option, not user input
     // clear input, reset options
@@ -182,7 +184,7 @@ export default function AutocompleteSearch(props: Props) {
           />
         )
       }
-      isShowingOptions={isShowingOptions}
+      isShowingOptions={isShowingOptions && filteredOptions.length > 0}
       inputValue={inputValue}
       onBlur={() => handleBlur()}
       onInputChange={(_e, value) => handleInputChange(value)}

@@ -198,12 +198,12 @@ describe('GradeSummary Header', () => {
     })
 
     // fickle
-    it.skip('receives the releaseGradesStatus as a prop', () => {
+    it('receives the releaseGradesStatus as a prop', () => {
       mountComponent()
       act(() => {
         store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.STARTED))
       })
-      const button = screen.getByRole('button', {name: /release grades/i})
+      const button = screen.getByRole('button', {name: /releasing grades/i})
       expect(button).toHaveAttribute('aria-readonly', 'true')
     })
 
@@ -216,7 +216,7 @@ describe('GradeSummary Header', () => {
       })
     })
 
-    it.skip('releases grades when dialog is confirmed', async () => {
+    it('releases grades when dialog is confirmed', async () => {
       const user = userEvent.setup({delay: null})
       windowConfirm.mockImplementation(() => true)
       mountComponent()
@@ -313,7 +313,7 @@ describe('GradeSummary Header', () => {
       expect(windowConfirm).toHaveBeenCalledTimes(1)
     })
 
-    it.skip('unmutes the assignment when dialog is confirmed', async () => {
+    it('unmutes the assignment when dialog is confirmed', async () => {
       const user = userEvent.setup({delay: null})
       windowConfirm.mockImplementation(() => true)
       mountComponent()
@@ -322,7 +322,7 @@ describe('GradeSummary Header', () => {
       expect(vi.mocked(AssignmentActions.unmuteAssignment)).toHaveBeenCalled()
     })
 
-    it.skip('does not unmute the assignment when dialog is dismissed', async () => {
+    it('does not unmute the assignment when dialog is dismissed', async () => {
       windowConfirm.mockImplementation(() => false)
       const user = userEvent.setup({delay: null})
       mountComponent()

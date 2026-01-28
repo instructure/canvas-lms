@@ -46,7 +46,7 @@ export function NewQuizzesApp() {
         const module: RemoteModule = await import('newquizzes/appInjector')
 
         if (typeof module.render === 'function') {
-          const basename = window.location.pathname
+          const basename = quizzesData.basename || window.location.pathname
 
           module.render(mountPoint.current, {
             ...quizzesData,

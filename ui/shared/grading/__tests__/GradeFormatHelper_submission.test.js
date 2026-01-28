@@ -22,7 +22,7 @@ import GradeFormatHelper from '../GradeFormatHelper'
 
 const I18n = createI18nScope('sharedGradeFormatHelper')
 
-describe.skip('GradeFormatHelper.formatSubmissionGrade', () => {
+describe('GradeFormatHelper.formatSubmissionGrade', () => {
   let options
   let submission
   const translateString = I18n.t
@@ -56,7 +56,7 @@ describe.skip('GradeFormatHelper.formatSubmissionGrade', () => {
 
   it('translates "Excused"', () => {
     submission.excused = true
-    vi.spyOn(I18n, 't').mockReturnValue('EXCUSED')
+    vi.spyOn(I18n.constructor.prototype, 't').mockReturnValue('EXCUSED')
     expect(GradeFormatHelper.formatSubmissionGrade(submission)).toBe('EXCUSED')
   })
 

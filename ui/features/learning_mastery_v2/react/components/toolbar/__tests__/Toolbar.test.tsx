@@ -17,7 +17,7 @@
  */
 import {cleanup, render, waitFor} from '@testing-library/react'
 import {Toolbar, ToolbarProps} from '../Toolbar'
-import {DEFAULT_GRADEBOOK_SETTINGS} from '../../../utils/constants'
+import {DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 
 const makeProps = (props = {}): ToolbarProps => ({
   courseId: '123',

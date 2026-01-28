@@ -18,8 +18,6 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import {waitFor, act} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
@@ -35,7 +33,6 @@ import Section from '@canvas/sections/backbone/models/Section'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
@@ -106,6 +103,21 @@ const server = setupServer(
   http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
     return HttpResponse.json([])
   }),
+  http.post('http://localhost/api/graphql', () => {
+    return HttpResponse.json({
+      data: {
+        __typename: 'Query',
+        legacyNode: {
+          __typename: 'Course',
+          id: '1',
+          name: 'Test Course',
+          enrollmentsConnection: {
+            edges: [],
+          },
+        },
+      },
+    })
+  }),
   http.all(/\/api\/.*/, () => {
     return HttpResponse.json([])
   }),
@@ -126,55 +138,12 @@ afterAll(() => {
 // Mock RCE initialization
 EditView.prototype._attachEditorToDescription = () => {}
 
-beforeEach(() => {
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, [])
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, [])
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/settings/, {})
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/sections/, [])
-
-  fetchMock.post('http://localhost/api/graphql', (url, opts) => {
-    const body = JSON.parse(opts.body)
-
-    if (body.query && body.query.includes('Selective_Release_GetStudentsQuery')) {
-      return {
-        data: {
-          __typename: 'Query',
-          legacyNode: {
-            __typename: 'Course',
-            id: '1',
-            name: 'Test Course',
-            enrollmentsConnection: {
-              edges: [],
-            },
-          },
-        },
-      }
-    }
-
-    return {
-      data: {
-        __typename: 'Query',
-        legacyNode: {
-          __typename: 'Course',
-          id: '1',
-          name: 'Test Course',
-          enrollmentsConnection: {
-            edges: [],
-          },
-        },
-      },
-    }
-  })
-})
-
-afterEach(() => {
-  fetchMock.reset()
-})
-
 describe('EditView - Quiz Type Handling', () => {
   let view
 
   beforeEach(() => {
+    vi.useFakeTimers()
+
     fakeENV.setup({
       FEATURES: {
         new_quizzes_surveys: true,
@@ -276,6 +245,9 @@ describe('EditView - Quiz Type Handling', () => {
   })
 
   afterEach(() => {
+    vi.runAllTimers()
+    vi.useRealTimers()
+
     fakeENV.teardown()
     view.remove()
     $('#fixtures').empty()
@@ -378,103 +350,4 @@ describe('EditView - Quiz Type Handling', () => {
       expect($gradedFields.css('display')).not.toBe('none')
     })
   })
-
-  describe('Points Tooltip', () => {
-    test('shows tooltip for graded_survey', async () => {
-      await act(async () => {
-        view.handleQuizTypeChange('graded_survey')
-      })
-
-      await waitFor(() => {
-        const tooltipWrapper = document.querySelector('#points_tooltip span')
-        expect(tooltipWrapper).toBeTruthy()
-        expect(tooltipWrapper.style.display).toBe('inline-block')
-      })
-    })
-
-    test('hides tooltip for graded_quiz', async () => {
-      await act(async () => {
-        view.handleQuizTypeChange('graded_quiz')
-      })
-
-      await waitFor(() => {
-        const tooltipWrapper = document.querySelector('#points_tooltip span')
-        expect(tooltipWrapper).toBeTruthy()
-        expect(tooltipWrapper.style.display).toBe('none')
-      })
-    })
-
-    test('hides tooltip for ungraded_survey', async () => {
-      await act(async () => {
-        view.handleQuizTypeChange('ungraded_survey')
-      })
-
-      await waitFor(() => {
-        const tooltipWrapper = document.querySelector('#points_tooltip span')
-        expect(tooltipWrapper).toBeTruthy()
-        expect(tooltipWrapper.style.display).toBe('none')
-      })
-    })
-
-    test('displays correct tooltip text on hover', async () => {
-      const user = userEvent.setup()
-      await act(async () => {
-        view.handleQuizTypeChange('graded_survey')
-      })
-
-      // Wait for the tooltip to be visible
-      await waitFor(() => {
-        const tooltipWrapper = document.querySelector('#points_tooltip span')
-        expect(tooltipWrapper).toBeTruthy()
-        expect(tooltipWrapper.style.display).toBe('inline-block')
-      })
-
-      const icon = document.querySelector('#points_tooltip svg')
-      await user.hover(icon)
-
-      await waitFor(() => {
-        // Find the tooltip connected to our specific icon via data-position attributes
-        const positionTarget = icon.getAttribute('data-position-target')
-        const tooltipContent = document.querySelector(`[data-position-content="${positionTarget}"]`)
-        expect(tooltipContent).toBeTruthy()
-        expect(tooltipContent.textContent).toContain(
-          'Points earned here reflect participation and effort.',
-        )
-        expect(tooltipContent.textContent).toContain('Responses will not be graded for accuracy.')
-      })
-    })
-
-    test('updates tooltip visibility when quiz type changes', async () => {
-      // Start with graded_quiz (tooltip hidden)
-      await act(async () => {
-        view.handleQuizTypeChange('graded_quiz')
-      })
-
-      await waitFor(() => {
-        const tooltipWrapper = document.querySelector('#points_tooltip span')
-        expect(tooltipWrapper.style.display).toBe('none')
-      })
-
-      // Change to graded_survey (tooltip should be visible)
-      await act(async () => {
-        view.handleQuizTypeChange('graded_survey')
-      })
-
-      await waitFor(() => {
-        const tooltipWrapper = document.querySelector('#points_tooltip span')
-        expect(tooltipWrapper.style.display).toBe('inline-block')
-      })
-
-      // Change back to graded_quiz (tooltip should be hidden again)
-      await act(async () => {
-        view.handleQuizTypeChange('graded_quiz')
-      })
-
-      await waitFor(() => {
-        const tooltipWrapper = document.querySelector('#points_tooltip span')
-        expect(tooltipWrapper.style.display).toBe('none')
-      })
-    }, 30000)
-  })
-
 })

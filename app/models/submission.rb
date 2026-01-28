@@ -634,7 +634,13 @@ class Submission < ActiveRecord::Base
     end
     can :read_grade
 
-    given { |user| peer_reviewer?(user) && !!assignment&.submitted?(user:) }
+    given do |user|
+      peer_reviewer?(user) && if assignment&.context&.feature_enabled?(:peer_review_allocation_and_grading)
+                                !assignment.peer_review_submission_required || !!assignment.submitted?(user:)
+                              else
+                                !!assignment&.submitted?(user:)
+                              end
+    end
     can :read and can :comment and can :make_group_comment
 
     given { |user, session| can_view_plagiarism_report("turnitin", user, session) }
@@ -930,6 +936,8 @@ class Submission < ActiveRecord::Base
   # This method pulls data from the OriginalityReport table
   # Preload OriginalityReport before using this method in a collection of submissions
   def originality_data
+    return {} if assignment.cpf_migrated?
+
     data = originality_reports_for_display.each_with_object({}) do |originality_report, hash|
       hash[originality_report.asset_key] = {
         similarity_score: originality_report.originality_score&.round(2),

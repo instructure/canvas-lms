@@ -19,7 +19,7 @@
 import {useState, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {loadCourseUsers} from '../apiClient'
-import {Student} from '../types/rollup'
+import {Student} from '@canvas/outcomes/react/types/rollup'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

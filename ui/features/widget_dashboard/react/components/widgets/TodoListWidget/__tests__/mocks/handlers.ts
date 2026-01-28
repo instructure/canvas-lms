@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {http, HttpResponse} from 'msw'
+import {http, HttpResponse, graphql} from 'msw'
 import {mockPlannerItems} from './data'
 import type {PlannerOverride} from '../../types'
 
@@ -157,3 +157,17 @@ export const errorCreatePlannerNoteHandler = http.post('/api/v1/planner_notes', 
 export const validationErrorPlannerNoteHandler = http.post('/api/v1/planner_notes', () => {
   return HttpResponse.json({errors: {title: [{message: 'Title is required'}]}}, {status: 400})
 })
+
+export const widgetConfigHandlers = [
+  graphql.mutation('UpdateWidgetDashboardConfig', ({variables}) => {
+    return HttpResponse.json({
+      data: {
+        updateWidgetDashboardConfig: {
+          widgetId: variables.widgetId,
+          filters: variables.filters,
+          errors: null,
+        },
+      },
+    })
+  }),
+]
