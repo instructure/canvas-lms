@@ -50,7 +50,7 @@ export const AccessibilityIssuesTableRow = ({item, isMobile}: Props) => {
   return (
     <Table.Row key={`${item.resourceType}-${item.id}`} data-testid={`issue-row-${item.id}`}>
       <Table.Cell themeOverride={baseCellThemeOverride} textAlign="start">
-        <Link href={item.resourceUrl}>
+        <Link data-pendo="navigate-to-resource-url" href={item.resourceUrl}>
           <Text lineHeight="lineHeight150">{item.resourceName}</Text>
         </Link>
       </Table.Cell>

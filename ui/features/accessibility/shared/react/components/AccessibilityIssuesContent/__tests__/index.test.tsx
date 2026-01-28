@@ -31,6 +31,29 @@ const mockClose = vi.fn()
 
 const baseItem = multiIssueItem
 
+const createMockState = (overrides = {}) => {
+  const defaultState = {
+    accessibilityScans: null,
+    nextResource: {index: -1, item: null},
+    filters: null,
+    isCloseIssuesEnabled: true,
+    issuesSummary: undefined,
+    setAccessibilityScans: vi.fn(),
+    setNextResource: vi.fn(),
+    setLoadingOfSummary: vi.fn(),
+    setErrorOfSummary: vi.fn(),
+    setLoading: vi.fn(),
+  }
+  return {...defaultState, ...overrides}
+}
+
+const setupMockStore = (stateOverrides = {}) => {
+  ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
+    const state = createMockState(stateOverrides)
+    return selector ? selector(state) : state
+  })
+}
+
 // Helper function to convert camelCase to snake_case
 // This mimics the backend API response format
 const convertToSnakeCase = (obj: any): any => {
@@ -81,7 +104,20 @@ const server = setupServer(
     }
     return new HttpResponse(null, {status: 404})
   }),
+
+  http.get('/', ({request}: {request: Request}) => {
+    const url = new URL(request.url)
+    if (url.searchParams.has('filters')) {
+      return HttpResponse.json({total: 0, by_type: {}})
+    }
+    return new HttpResponse(null, {status: 404})
+  }),
 )
+
+const {mockTrackA11yIssueEvent, mockTrackA11yEvent} = vi.hoisted(() => ({
+  mockTrackA11yIssueEvent: vi.fn(),
+  mockTrackA11yEvent: vi.fn(),
+}))
 
 vi.mock('use-debounce', () => ({
   __esModule: true,
@@ -89,6 +125,13 @@ vi.mock('use-debounce', () => ({
 }))
 
 vi.mock('../../../stores/AccessibilityScansStore')
+
+vi.mock('../../../hooks/useA11yTracking', () => ({
+  useA11yTracking: () => ({
+    trackA11yIssueEvent: mockTrackA11yIssueEvent,
+    trackA11yEvent: mockTrackA11yEvent,
+  }),
+}))
 
 describe('AccessibilityIssuesDrawerContent', () => {
   let queryClient: QueryClient
@@ -105,20 +148,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
         queries: {retry: false},
       },
     })
-    ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-      const state = {
-        accessibilityScans: null,
-        nextResource: {index: -1, item: null},
-        filters: null,
-        isCloseIssuesEnabled: true,
-        setAccessibilityScans: vi.fn(),
-        setNextResource: vi.fn(),
-        setLoadingOfSummary: vi.fn(),
-        setErrorOfSummary: vi.fn(),
-        setLoading: vi.fn(),
-      }
-      return selector ? selector(state) : state
-    })
+    setupMockStore()
   })
 
   afterEach(() => {
@@ -307,6 +337,213 @@ describe('AccessibilityIssuesDrawerContent', () => {
       // and the Preview component's error parsing that is difficult to replicate with MSW.
       // The error handling code paths are still present in the component but are tested
       // implicitly - if they break, other tests would fail.
+    })
+  })
+
+  describe('Pendo tracking', () => {
+    describe('IssueSkipped event', () => {
+      it('calls trackA11yIssueEvent with correct data when Skip button is clicked', async () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const skipButton = screen.getByTestId('skip-button')
+        await userEvent.click(skipButton)
+
+        expect(mockTrackA11yIssueEvent).toHaveBeenCalledWith(
+          'IssueSkipped',
+          'WikiPage',
+          'adjacent-links',
+        )
+      })
+    })
+
+    describe('IssueFixed event', () => {
+      it('calls trackA11yIssueEvent when Save & Next button is clicked', async () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const apply = screen.getByTestId('apply-button')
+        await userEvent.click(apply)
+
+        await waitFor(() => {
+          expect(screen.getByTestId('save-and-next-button')).toBeEnabled()
+        })
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        await userEvent.click(saveAndNext)
+
+        await waitFor(() => {
+          expect(mockTrackA11yIssueEvent).toHaveBeenCalledWith(
+            'IssueFixed',
+            'WikiPage',
+            'adjacent-links',
+          )
+        })
+      })
+    })
+
+    describe('ResourceRemediated event', () => {
+      beforeEach(() => {
+        window.ENV = {current_context: {id: '123'}} as any
+      })
+
+      it('calls trackA11yEvent when last issue is resolved', async () => {
+        const singleIssueItem = {
+          ...baseItem,
+          issueCount: 1,
+          issues: [baseItem.issues![0]],
+        }
+
+        server.use(
+          http.post('**/accessibility/scan', () => {
+            return HttpResponse.json(
+              convertToSnakeCase({
+                ...singleIssueItem,
+                issueCount: 0,
+                issues: [],
+              }),
+            )
+          }),
+        )
+
+        render(<AccessibilityIssuesDrawerContent item={singleIssueItem} onClose={mockClose} />)
+
+        const apply = screen.getByTestId('apply-button')
+        await userEvent.click(apply)
+
+        await waitFor(() => {
+          expect(screen.getByTestId('save-and-next-button')).toBeEnabled()
+        })
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        await userEvent.click(saveAndNext)
+
+        await waitFor(() => {
+          expect(mockTrackA11yEvent).toHaveBeenCalledWith('ResourceRemediated', {
+            resourceId: singleIssueItem.resourceId,
+            courseId: '123',
+          })
+        })
+      })
+
+      it('does not call trackA11yEvent when issues still remain', async () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const apply = screen.getByTestId('apply-button')
+        await userEvent.click(apply)
+
+        await waitFor(() => {
+          expect(screen.getByTestId('save-and-next-button')).toBeEnabled()
+        })
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        await userEvent.click(saveAndNext)
+
+        await waitFor(() => {
+          expect(screen.getByText(/Issue 1\/1:/)).toBeInTheDocument()
+        })
+
+        const resourceRemediatedCalls = mockTrackA11yEvent.mock.calls.filter(
+          (call: any) => call[0] === 'ResourceRemediated',
+        )
+        expect(resourceRemediatedCalls).toHaveLength(0)
+      })
+    })
+
+    describe('Open Page link click event', () => {
+      it('calls trackA11yIssueEvent when Open Page link is clicked', async () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const openPageLink = await screen.findByText('Open Page')
+
+        await userEvent.click(openPageLink)
+
+        expect(mockTrackA11yIssueEvent).toHaveBeenCalledWith(
+          'PageViewOpened',
+          'WikiPage',
+          'adjacent-links',
+        )
+      })
+    })
+
+    describe('Edit Page link click event', () => {
+      it('calls trackA11yIssueEvent when Edit Page link is clicked', async () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const editPageLink = screen.getByText('Edit Page')
+
+        await userEvent.click(editPageLink)
+
+        expect(mockTrackA11yIssueEvent).toHaveBeenCalledWith(
+          'PageEditorOpened',
+          'WikiPage',
+          'adjacent-links',
+        )
+      })
+    })
+
+    describe('CourseRemediated event', () => {
+      beforeEach(() => {
+        window.ENV = {current_context: {id: '123'}} as any
+      })
+
+      it('calls trackA11yEvent when issuesSummary.total transitions from >0 to 0', async () => {
+        setupMockStore({issuesSummary: {total: 1, byRuleType: {['img-alt']: 1}}})
+        const {rerender} = render(
+          <AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />,
+        )
+
+        setupMockStore({issuesSummary: {total: 0, byRuleType: {}}})
+        rerender(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        await waitFor(() => {
+          expect(mockTrackA11yEvent).toHaveBeenCalledWith('CourseRemediated', {
+            courseId: '123',
+          })
+        })
+      })
+
+      it('does not call trackA11yEvent on initial mount', async () => {
+        setupMockStore({issuesSummary: {total: 0, byRuleType: {}}})
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const allRemediatedCalls = mockTrackA11yEvent.mock.calls.filter(
+          (call: any) => call[0] === 'CourseRemediated',
+        )
+        expect(allRemediatedCalls).toHaveLength(0)
+      })
+
+      it('does not call trackA11yEvent when total stays above 0', async () => {
+        setupMockStore({issuesSummary: {total: 5, byRuleType: {['img-alt']: 5}}})
+        const {rerender} = render(
+          <AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />,
+        )
+
+        setupMockStore({issuesSummary: {total: 4, byRuleType: {['img-alt']: 4}}})
+        rerender(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        await waitFor(() => {
+          const allRemediatedCalls = mockTrackA11yEvent.mock.calls.filter(
+            (call: any) => call[0] === 'CourseRemediated',
+          )
+          expect(allRemediatedCalls).toHaveLength(0)
+        })
+      })
+
+      it('does not call trackA11yEvent when previousTotal was already 0', async () => {
+        setupMockStore({issuesSummary: {total: 0, byRuleType: {}}})
+        const {rerender} = render(
+          <AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />,
+        )
+
+        setupMockStore({issuesSummary: {total: 0, byRuleType: {}}})
+        rerender(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        await waitFor(() => {
+          const allRemediatedCalls = mockTrackA11yEvent.mock.calls.filter(
+            (call: any) => call[0] === 'CourseRemediated',
+          )
+          expect(allRemediatedCalls).toHaveLength(0)
+        })
+      })
     })
   })
 })
