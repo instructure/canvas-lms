@@ -60,6 +60,17 @@ export function formatDate(dateString: string | undefined): string {
   }
 }
 
+export function formatAnnouncementDate(dateString: string | undefined): string {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }
+  return I18n.t('Posted %{date}', {date: date.toLocaleDateString(undefined, dateOptions)})
+}
+
 export function getPlannableTypeLabel(type: PlannableType): string {
   switch (type) {
     case 'assignment':
