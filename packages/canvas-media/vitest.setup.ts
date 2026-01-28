@@ -3,6 +3,18 @@ import {vi} from 'vitest'
 
 vi.stubGlobal('DataTransferItem', class DataTransferItem {})
 
+// Mock ResizeObserver for TruncateText component
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+// Mock HTMLCanvasElement for TruncateText component
+HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+  measureText: vi.fn(() => ({width: 100})),
+})) as any
+
 if (typeof window.URL.createObjectURL === 'undefined') {
   Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})
 }

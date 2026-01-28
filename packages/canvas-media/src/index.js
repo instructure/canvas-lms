@@ -18,6 +18,7 @@
 
 import UploadMedia from './UploadMedia'
 import ClosedCaptionCreator from './ClosedCaptionCreator'
+import ClosedCaptionCreatorV2 from './ClosedCaptionCreatorV2'
 import RocketSVG from './RocketSVG'
 import useComputerPanelFocus from './useComputerPanelFocus'
 import {isAudio, isVideo, isPreviewable, sizeMediaPlayer} from './shared/utils'
@@ -36,6 +37,7 @@ import * as CONSTANTS from './shared/constants'
 export {
   UploadMedia as default,
   ClosedCaptionCreator as ClosedCaptionPanel,
+  ClosedCaptionCreatorV2 as ClosedCaptionPanelV2,
   RocketSVG,
   useComputerPanelFocus,
   isAudio,

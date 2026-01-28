@@ -31,7 +31,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {StoreProvider} from '../../shared/StoreContext'
-import {ClosedCaptionPanel} from '@instructure/canvas-media'
+import {ClosedCaptionPanel, ClosedCaptionPanelV2} from '@instructure/canvas-media'
 import {
   CUSTOM,
   MIN_WIDTH_VIDEO,
@@ -79,6 +79,7 @@ export default function VideoOptionsTray({
 }) {
   const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
   const isEmbedImprovements = RCEGlobals.getFeatures()?.rce_studio_embed_improvements
+  const isAsrCaptioningImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
   const currentWidth = videoOptions.appliedWidth || naturalWidth
@@ -355,19 +356,40 @@ export default function VideoOptionsTray({
                       )}
                       {!isStudio && !editLocked && (
                         <Flex.Item padding="small">
-                          <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
-                            <ClosedCaptionPanel
-                              subtitles={subtitles.map(st => ({
-                                locale: st.locale,
-                                inherited: st.inherited,
-                                file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
-                              }))}
-                              uploadMediaTranslations={Bridge.uploadMediaTranslations}
-                              userLocale={Bridge.userLocale}
-                              updateSubtitles={handleUpdateSubtitles}
-                              liveRegion={getLiveRegion}
-                              mountNode={instuiPopupMountNodeFn}
-                            />
+                          <FormFieldGroup
+                            description={
+                              isAsrCaptioningImprovements
+                                ? formatMessage('Caption Manager')
+                                : formatMessage('Closed Captions/Subtitles')
+                            }
+                          >
+                            {!isAsrCaptioningImprovements && (
+                              <ClosedCaptionPanel
+                                subtitles={subtitles.map(st => ({
+                                  locale: st.locale,
+                                  inherited: st.inherited,
+                                  file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
+                                }))}
+                                uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                                userLocale={Bridge.userLocale}
+                                updateSubtitles={handleUpdateSubtitles}
+                                liveRegion={getLiveRegion}
+                                mountNode={instuiPopupMountNodeFn}
+                              />
+                            )}
+                            {isAsrCaptioningImprovements && (
+                              <ClosedCaptionPanelV2
+                                subtitles={subtitles.map(st => ({
+                                  locale: st.locale,
+                                  inherited: st.inherited,
+                                  file: {name: st.language || st.locale},
+                                }))}
+                                uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                                userLocale={Bridge.userLocale}
+                                onUpdateSubtitles={handleUpdateSubtitles}
+                                liveRegion={getLiveRegion}
+                              />
+                            )}
                           </FormFieldGroup>
                         </Flex.Item>
                       )}

@@ -488,6 +488,7 @@ class ApplicationController < ActionController::Base
     new_quizzes_surveys
     permanent_page_links
     rce_a11y_resize
+    rce_asr_captioning_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases
