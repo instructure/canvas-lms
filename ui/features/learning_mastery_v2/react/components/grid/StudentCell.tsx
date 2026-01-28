@@ -72,7 +72,6 @@ export const StudentCell: React.FC<StudentCellProps> = ({
       {showStudentAvatar && (
         <Flex.Item as="div" size="25%" textAlign="center">
           <Avatar
-            alt={studentName}
             as="div"
             size="x-small"
             name={studentName}
