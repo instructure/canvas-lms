@@ -29,8 +29,8 @@
 # Vault Address (environment variable alternative):
 #   VAULT_ADDR=https://vault.example.com:8200
 #
-# This standard HashiCorp environment variable takes precedence over
-# addr/addr_path configuration, useful for Kubernetes deployments.
+# This standard HashiCorp environment variable will be used if it is set,
+# useful for Kubernetes deployments.
 
 # if you don't want to run vault, you can make use
 # of a "vault_contents.yml" file in this directory and

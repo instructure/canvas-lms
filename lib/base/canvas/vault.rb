@@ -62,6 +62,9 @@ module Canvas::Vault
       end
       cached_data
     rescue => e
+      # autoloading probably isn't set up yet; load Canvas::Errors explicitly so that we
+      # don't mask the original error
+      require_dependency "canvas/errors"
       Canvas::Errors.capture_exception(:vault, e)
       stale_value = LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + path)
       return stale_value if stale_value.present?
@@ -94,7 +97,7 @@ module Canvas::Vault
     def addr
       if config[:addr_path]
         File.read(config[:addr_path]).chomp
-      elsif config[:addr]
+      elsif config.key?(:addr)
         config[:addr]
       elsif ENV["VAULT_ADDR"].present?
         ENV["VAULT_ADDR"]
