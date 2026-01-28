@@ -58,7 +58,11 @@ module Accessibility
       def form(elem)
         style_str = elem.attribute("style")&.value.to_s
         background = extract_background_color(style_str)
-        foreground = extract_color(style_str, "color") || "#000000"
+        foreground = if WCAGColorContrast.ratio("000000", background.delete_prefix("#")) >= CONTRAST_THRESHOLD
+                       "#000000"
+                     else
+                       "#FFFFFF"
+                     end
 
         Accessibility::Forms::ColorPickerField.new(
           title_label: I18n.t("Contrast Ratio"),

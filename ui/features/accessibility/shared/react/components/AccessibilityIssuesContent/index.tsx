@@ -53,9 +53,10 @@ import {getCourseBasedPath, getResourceScanPath} from '../../utils/query'
 import ApplyButton from './ApplyButton'
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
-import Preview, {PreviewHandle} from './Preview'
+import {PreviewHandle} from './Preview'
 import SuccessView from './SuccessView'
 import WhyMattersPopover from './WhyMattersPopover'
+import {ProblemArea} from './ProblemArea/ProblemArea'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -476,24 +477,18 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                     </Link>
                   </Flex>
                 </Flex>
-                <View as="section" aria-label={I18n.t('Problem area')}>
-                  <Preview
-                    ref={previewRef}
-                    issue={currentIssue}
-                    resourceId={item.resourceId}
-                    itemType={item.resourceType}
-                  />
-                </View>
+
+                <ProblemArea previewRef={previewRef} item={item} issue={currentIssue} />
               </Flex>
-              {currentIssue.form.type !== FormType.ColorPicker && (
-                <View as="section" margin="medium 0">
-                  <Heading level="h4" variant="titleCardMini">
-                    {I18n.t('Issue description')}
-                  </Heading>
-                  <br aria-hidden={true} />
-                  <Text weight="weightRegular">{currentIssue.message}</Text>
-                </View>
-              )}
+
+              <View as="section" margin="medium 0">
+                <Heading level="h4" variant="titleCardMini">
+                  {I18n.t('Issue description')}
+                </Heading>
+                <br aria-hidden={true} />
+                <Text weight="weightRegular">{currentIssue.message}</Text>
+              </View>
+
               <View as="section" margin="medium 0">
                 <Form
                   key={currentIssue.id}
