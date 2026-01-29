@@ -46,6 +46,7 @@ const RecentGradesWidget: React.FC<BaseWidgetProps> = ({
     totalPages,
     goToPage,
     isLoading: isLoadingData,
+    isPaginationLoading,
     error: errorData,
     refetch,
   } = useRecentGrades({
@@ -95,6 +96,10 @@ const RecentGradesWidget: React.FC<BaseWidgetProps> = ({
       onRetry={handleRetry}
       loadingText={I18n.t('Loading recent grades...')}
       pagination={paginationProps}
+      loadingOverlay={{
+        isLoading: isPaginationLoading,
+        ariaLabel: I18n.t('Loading grades'),
+      }}
       footerActions={
         <View as="div" textAlign="center">
           <Link href="/grades" isWithinText={false} data-testid="view-all-grades-link">

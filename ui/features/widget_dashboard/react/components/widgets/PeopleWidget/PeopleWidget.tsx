@@ -82,6 +82,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
     totalPages,
     goToPage,
     isLoading: instructorsLoading,
+    isPaginationLoading: instructorsPaginationLoading,
     error: instructorsError,
   } = useCourseInstructorsPaginated({
     courseIds: instructorCourseIds,
@@ -142,8 +143,11 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
         currentPage: currentPageIndex + 1,
         totalPages,
         onPageChange: goToPage,
-        isLoading: instructorsLoading,
         ariaLabel: I18n.t('Instructors pagination'),
+      }}
+      loadingOverlay={{
+        isLoading: instructorsPaginationLoading,
+        ariaLabel: I18n.t('Loading instructors'),
       }}
     >
       <Flex direction="column" height="100%">

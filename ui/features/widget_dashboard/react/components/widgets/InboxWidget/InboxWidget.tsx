@@ -34,7 +34,16 @@ const I18n = createI18nScope('widget_dashboard')
 
 const InboxWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false, dragHandleProps}) => {
   const [filter, setFilter] = useWidgetConfig<InboxFilter>(widget.id, 'filter', 'unread')
-  const {data: messages = [], isLoading, error, refetch} = useInboxMessages({limit: 5, filter})
+  const {
+    data: messages = [],
+    isLoading,
+    isFilterLoading,
+    error,
+    refetch,
+  } = useInboxMessages({
+    limit: 5,
+    filter,
+  })
 
   const handleFilterChange = (newFilter: InboxFilter) => {
     setFilter(newFilter)
@@ -104,6 +113,10 @@ const InboxWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false, dra
       onRetry={handleRetry}
       loadingText={I18n.t('Loading messages...')}
       actions={renderActions()}
+      loadingOverlay={{
+        isLoading: isFilterLoading,
+        ariaLabel: I18n.t('Loading messages'),
+      }}
     >
       <Flex direction="column" gap="small">
         <Flex.Item overflowX="visible" overflowY="visible">
