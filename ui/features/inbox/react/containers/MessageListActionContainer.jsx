@@ -66,15 +66,17 @@ const MessageListActionContainer = props => {
     data?.legacyNode?.favoriteCoursesConnection?.nodes,
   )
 
-  const moreCourses = []
-  const concludedCourses = uniqueCourses.filter(course => {
-    if (course.concluded !== true) {
-      moreCourses.push(course)
-      return false
-    } else {
-      return true
-    }
-  })
+  const { concludedCourses, moreCourses } = uniqueCourses.reduce(
+    (acc, course) => {
+      if (course.concluded === true) {
+        acc.concludedCourses.push(course)
+      } else {
+        acc.moreCourses.push(course)
+      }
+      return acc
+    },
+    { concludedCourses: [], moreCourses: [] }
+  )
 
   const courseSelectorOptions = {
     allCourses: [
