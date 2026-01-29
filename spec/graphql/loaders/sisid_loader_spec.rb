@@ -35,11 +35,11 @@ describe Loaders::SISIDLoader do
 
   context "multiple accounts on a single shard" do
     # shared across accounts on a single shard
-    sis_source_id = "12345"
+    let(:sis_source_id) { "12345" }
 
     # unique to each account
-    sis_source_id_account_1 = "111-111"
-    sis_source_id_account_2 = "222-222"
+    let(:sis_source_id_account_1) { "111-111" }
+    let(:sis_source_id_account_2) { "222-222" }
 
     before do
       # create accounts on same shard

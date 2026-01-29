@@ -1553,7 +1553,7 @@ describe EnrollmentsApiController, type: :request do
         describe "grading period scores" do
           let(:observer) { User.create! }
 
-          student_grade = lambda do |json|
+          def student_grade(json)
             student_json = json.find do |e|
               e["type"] == "StudentEnrollment"
             end
@@ -1571,30 +1571,29 @@ describe EnrollmentsApiController, type: :request do
 
           it "returns grades for the requested grading period for courses" do
             json = api_call(:get, @path, @params)
-            expect(student_grade.call(json)).to eq 50
+            expect(student_grade(json)).to eq 50
 
             @params[:grading_period_id] = @first_grading_period.id
             json = api_call(:get, @path, @params)
-            expect(student_grade.call(json)).to eq 100
+            expect(student_grade(json)).to eq 100
 
             @params[:grading_period_id] = @last_grading_period.id
             json = api_call(:get, @path, @params)
-            expect(student_grade.call(json)).to eq 0
+            expect(student_grade(json)).to eq 0
           end
 
           it "includes observee grades when observed_users are requested" do
             @course.enroll_user(observer, "ObserverEnrollment", associated_user_id: @student.id)
             @params[:include] = ["observed_users"]
             json = api_call_as_user(observer, :get, @path, @params)
-            expect(student_grade.call(json)).to eq 50
+            expect(student_grade(json)).to eq 50
 
             @params[:grading_period_id] = @first_grading_period.id
             json = api_call_as_user(observer, :get, @path, @params)
-            expect(student_grade.call(json)).to eq 100
-
+            expect(student_grade(json)).to eq 100
             @params[:grading_period_id] = @last_grading_period.id
             json = api_call_as_user(observer, :get, @path, @params)
-            expect(student_grade.call(json)).to eq 0
+            expect(student_grade(json)).to eq 0
           end
         end
       end

@@ -755,9 +755,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes/:quiz_id/submssions/:id/time" do
-    now = Time.now.utc
-    around(:once_and_each) do |block|
-      Timecop.freeze(now) { block.call }
+    let_once(:now) { Time.zone.now }
+    around(:once_and_each) do |example|
+      Timecop.freeze(now) { example.call }
     end
 
     before :once do
@@ -765,8 +765,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       @user = @student
 
       @quiz_submission = @quiz.generate_submission(@student)
-      @quiz_submission.update_attribute(:end_at, now + 1.hour)
-      Quizzes::QuizSubmission.where(id: @quiz_submission).update_all(updated_at: now - 1.hour)
+      @quiz_submission.update_attribute(:end_at, 1.hour.from_now)
+      Quizzes::QuizSubmission.where(id: @quiz_submission).update_all(updated_at: 1.hour.ago)
     end
 
     it "gives times for the quiz" do

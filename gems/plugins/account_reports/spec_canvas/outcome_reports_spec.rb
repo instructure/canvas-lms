@@ -649,21 +649,27 @@ describe "Outcome Reports" do
 
       context ":outcome_service_results_to_canvas" do
         # Column indexes
-        student_name = 0
-        assessment_title = 3
-        assessment_type = 5
-        outcome = 8
-        question = 12
-        question_id = 13
-        course = 14
+        let(:student_name) { 0 }
+        let(:assessment_title) { 3 }
+        let(:assessment_type) { 5 }
+        let(:outcome) { 8 }
+        let(:question) { 12 }
+        let(:question_id) { 13 }
+        let(:course) { 14 }
 
         # These columns are added/modified to the report when writing the csv file
-        outcome_score = 11
-        learning_outcome_points_possible = 22
-        learning_outcome_mastery_score = 23
-        learning_outcome_mastered = 24
-        learning_outcome_rating = 25
-        learning_outcome_rating_points = 26
+        let(:outcome_score) { 11 }
+        let(:learning_outcome_points_possible) { 22 }
+        let(:learning_outcome_mastery_score) { 23 }
+        let(:learning_outcome_mastered) { 24 }
+        let(:learning_outcome_rating) { 25 }
+        let(:learning_outcome_rating_points) { 26 }
+
+        let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+        let(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
+        let(:assignment_ids) { @new_quiz.id.to_s }
+        let(:outcome_ids) { @outcome.id.to_s }
+        let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
         def mock_os_result(user, outcome, quiz, submission_date, attempts = nil)
           if attempts.nil?
@@ -693,12 +699,6 @@ describe "Outcome Reports" do
              submitted_at: submission_date,
              mastery: nil },]
         end
-
-        let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
-        let(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
-        let(:assignment_ids) { @new_quiz.id.to_s }
-        let(:outcome_ids) { @outcome.id.to_s }
-        let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
         it "filters out users that do not have results" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")

@@ -821,8 +821,8 @@ describe LearningOutcome do
         ]
 
         calc_method.each do |method|
-          invalid_value_error = "not a valid value for this calculation method"
-          unused_value_error = "A calculation value is not used with this calculation method"
+          let(:invalid_value_error) { "not a valid value for this calculation method" }
+          let(:unused_value_error) { "A calculation value is not used with this calculation method" }
 
           it "rejects creation of a learning outcome with an illegal calculation_int for calculation_method of '#{method}'" do
             @outcome = @course.created_learning_outcomes.create(

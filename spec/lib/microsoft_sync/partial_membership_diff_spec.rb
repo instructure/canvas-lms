@@ -132,21 +132,20 @@ describe MicrosoftSync::PartialMembershipDiff do
     diff
   end
 
-  expected_actions =
-    {
-      m_X: %i[remove_member],
-      m_M: %i[add_member],
-      m_O: [],
-      m_MO: %i[add_member],
-      o_X: %i[remove_member remove_owner],
-      o_M: %i[remove_owner add_member],
-      o_O: %i[add_member add_owner],
-      o_MO: %i[add_member add_owner],
-      mo_X: %i[remove_member remove_owner],
-      mo_M: %i[remove_owner add_member],
-      mo_O: %i[add_member add_owner],
-      mo_MO: %i[add_member add_owner],
-    }.transform_values(&:freeze).freeze
+  expected_actions = { # rubocop:disable RSpec/LeakyLocalVariable
+    m_X: %i[remove_member],
+    m_M: %i[add_member],
+    m_O: [],
+    m_MO: %i[add_member],
+    o_X: %i[remove_member remove_owner],
+    o_M: %i[remove_owner add_member],
+    o_O: %i[add_member add_owner],
+    o_MO: %i[add_member add_owner],
+    mo_X: %i[remove_member remove_owner],
+    mo_M: %i[remove_owner add_member],
+    mo_O: %i[add_member add_owner],
+    mo_MO: %i[add_member add_owner],
+  }.transform_values(&:freeze).freeze
 
   [20, 4].each do |slice_len|
     context "with a slice size of #{slice_len}" do
