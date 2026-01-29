@@ -111,7 +111,7 @@ describe Lti::DataServicesController do
 
         it "raises an unprocessable_entity" do
           send_request
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
 
@@ -196,7 +196,7 @@ describe Lti::DataServicesController do
 
         it "raises an unprocessable_entity" do
           send_request
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
 

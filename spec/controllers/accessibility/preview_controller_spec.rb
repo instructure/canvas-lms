@@ -202,7 +202,7 @@ RSpec.describe Accessibility::PreviewController do
         )
 
         get :show, params:, format: :json
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["error"]).to include("Unsupported resource type")
       end
     end

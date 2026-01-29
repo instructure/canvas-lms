@@ -104,7 +104,7 @@ describe TranslationController do
       it "renders a same-language error response" do
         post :translate, params: { course_id: @course.id, inputs: params }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Translation is identical to source language." } })
       end
     end
@@ -126,7 +126,7 @@ describe TranslationController do
       it "renders an unsupported language pair error" do
         post :translate, params: { course_id: @course.id, inputs: params }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Translation from English to Spanish is not supported." } })
       end
     end
@@ -143,7 +143,7 @@ describe TranslationController do
       it "renders a low confidence error response" do
         post :translate, params: { course_id: @course.id, inputs: params }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Couldn’t identify source language." } })
       end
     end
@@ -163,7 +163,7 @@ describe TranslationController do
         it "renders a text size limit exceeded error response" do
           post :translate, params: { course_id: @course.id, inputs: params }
 
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Translation failed because the text is longer than the character limit (5000)." } })
         end
       end
@@ -177,7 +177,7 @@ describe TranslationController do
         it "renders the correct JSON response with translationErrorTextTooLong" do
           post :translate_paragraph, params: { course_id: @course.id, inputs: params }
 
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body.deep_symbolize_keys).to eq({ translationErrorTextTooLong: { type: "error", message: "Translation failed because the text is longer than the character limit (5000)." } })
         end
       end

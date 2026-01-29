@@ -2556,7 +2556,7 @@ describe DiscussionTopicsController do
                      .merge(assignment_params(@course))
         expect(DiscussionTopic.count).to eq 0
         post("create", params: obj_params, format: :json)
-        expect(response).to have_http_status :unprocessable_entity
+        expect(response).to have_http_status :unprocessable_content
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -2848,7 +2848,7 @@ describe DiscussionTopicsController do
             specific_sections: section2.id,
             title: "Updated Topic",
           })
-      expect(response).to have_http_status :unprocessable_entity
+      expect(response).to have_http_status :unprocessable_content
       expect(DiscussionTopic.count).to eq 2
       expect(DiscussionTopicSectionVisibility.count).to eq 0
     end

@@ -229,7 +229,7 @@ describe AuthenticationProvidersController do
       account.authentication_providers.create!(linkedin)
 
       post "create", format: :json, params: { account_id: account.id }.merge(linkedin)
-      expect(response).to have_http_status :unprocessable_entity
+      expect(response).to have_http_status :unprocessable_content
     end
 
     context "when the auth provider type is restorable" do
@@ -263,7 +263,7 @@ describe AuthenticationProvidersController do
       context "and an active existing provider of the same type exists" do
         before { account.authentication_providers.create!(params.merge(workflow_state: "active")) }
 
-        it { is_expected.to have_http_status :unprocessable_entity }
+        it { is_expected.to have_http_status :unprocessable_content }
 
         it "indicates an active auth provider of the type already exists" do
           create_provider
