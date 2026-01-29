@@ -24,14 +24,14 @@ describe Login::OtpHelper do
   let(:dummy_class) { Class.new { include Login::OtpHelper } }
   let(:dummy_instance) { dummy_class.new }
   let(:session) { {} }
-  let(:pseudonym) { double("Pseudonym") }
-  let(:authentication_provider) { double("AuthenticationProvider", otp_via_sms?: true) }
-  let(:account) { double("Account", canvas_authentication?: true, canvas_authentication_provider: authentication_provider) }
+  let(:pseudonym) { instance_double(Pseudonym) }
+  let(:authentication_provider) { instance_double(AuthenticationProvider, otp_via_sms?: true) }
+  let(:account) { instance_double(Account, canvas_authentication?: true, canvas_authentication_provider: authentication_provider) }
   let(:region) { "us-west-2" }
 
   # create a stubbed database server with a region
   def stub_database_server(region)
-    database_server = double("database_server")
+    database_server = instance_double(DatabaseServer)
     allow(database_server).to receive(:region).and_return(region)
     database_server
   end
@@ -41,7 +41,7 @@ describe Login::OtpHelper do
     dummy_instance.instance_variable_set(:@current_pseudonym, pseudonym)
     allow(pseudonym).to receive_messages(authentication_provider:, account:)
 
-    shard = double("Shard")
+    shard = instance_double(Shard)
     allow(Shard).to receive(:current).and_return(shard)
     allow(shard).to receive(:database_server).and_return(stub_database_server(region))
   end

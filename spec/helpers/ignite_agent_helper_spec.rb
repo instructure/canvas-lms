@@ -108,7 +108,7 @@ describe IgniteAgentHelper do
     end
 
     it "returns false for New Quizzes (quiz_lti assignments)" do
-      assignment = double("Assignment", quiz_lti?: true)
+      assignment = instance_double(Assignment, quiz_lti?: true)
       instance_variable_set(:@assignment, assignment)
       allow(controller).to receive_messages(controller_path: "assignments", action_name: "show")
 
@@ -116,7 +116,7 @@ describe IgniteAgentHelper do
     end
 
     it "returns true for regular assignments on whitelisted pages" do
-      assignment = double("Assignment", quiz_lti?: false)
+      assignment = instance_double(Assignment, quiz_lti?: false)
       instance_variable_set(:@assignment, assignment)
       allow(controller).to receive_messages(controller_path: "assignments", action_name: "show")
 
