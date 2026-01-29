@@ -176,6 +176,15 @@ intelligent_insights_accessibility_insights:
   root_opt_in: true
   beta: true
   shadow: true
+intelligent_insights_modernisation:
+  state: hidden
+  applies_to: Account
+  display_name:  Intelligent Insights - Modernisation
+  description:
+    intelligent-insights-modernisation: Enables the Intelligent Insights - Modernisation feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
