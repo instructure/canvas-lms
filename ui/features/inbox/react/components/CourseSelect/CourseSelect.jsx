@@ -143,7 +143,7 @@ const CourseSelect = props => {
     if (!option) return // prevent selecting of empty options
 
     const contextName = option.contextName
-    const actualId = id === 'all_courses' ? null : id
+    const actualId = id === ALL_COURSES_ID ? null : id
 
     props.onCourseFilterSelect({contextID: actualId, contextName})
     setSelectedOptionId(actualId)
