@@ -341,6 +341,7 @@ export default (
             queryParams: {userIds: userIdChunk, courseId},
             headers: {'Correlation-Id': get().correlationId},
             onError: flashSubmissionLoadError,
+            queue: get().returnQueueIfDefined(),
           })
           const submissionsByUserId = groupBy(data.map(transformSubmission), 'user_id')
 
@@ -363,6 +364,7 @@ export default (
         queryParams: {userIds: userIds, courseId},
         headers: {'Correlation-Id': get().correlationId},
         onError: flashStudentLoadError,
+        queue: get().returnQueueIfDefined(),
       })
       await onEnrollmentSuccess(users.course.usersConnection.nodes, enrollments)
     }
@@ -376,6 +378,7 @@ export default (
       headers: {'Correlation-Id': get().correlationId},
       onSuccess: onUserPageSuccess,
       onError: flashStudentLoadError,
+      queue: get().returnQueueIfDefined(),
     })
     await Promise.all([...onSuccessCallbacks, ...onErrorCallbacks])
 

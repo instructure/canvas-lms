@@ -24,6 +24,7 @@ import {
   Submission,
 } from './getSubmissions'
 import {decode} from '../buildGraphQLQuery'
+import PQueue from 'p-queue'
 
 // Gradebook does not respect anonymous assignments, and groups submissions by userId
 // Thus we are not returning an array of submissions, but the userId is coming from the
@@ -42,6 +43,7 @@ const flattenPages = (pages: GetSubmissionsResult[]): Submission[] => {
 type GetAllSubmissionsParams = {
   queryParams: Pick<GetSubmissionsParams, 'courseId' | 'userIds'>
   headers?: Record<string, string>
+  queue?: PQueue
 } & GetAllPagesCallbacks<GetSubmissionsResult>
 export const getAllSubmissions = ({
   queryParams,
