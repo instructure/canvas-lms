@@ -3982,4 +3982,8 @@ class User < ActiveRecord::Base
   def all_attachments_frd
     Attachment.where(user: self).or(Attachment.where(context: self))
   end
+
+  def all_calendar_events
+    CalendarEvent.where(user: self).or(CalendarEvent.where(context: self))
+  end
 end
