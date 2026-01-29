@@ -129,7 +129,7 @@ describe TatlTael::Linters::CopyrightLinter do
         Dir.chdir(fixture_base_type) do
           context fixture_base_type do # e.g. context "coffee" do
             Dir.glob("*").each do |fixture_variant| # e.g. "invalid--missing.coffee"
-              fixture_variant_name = fixture_variant.split(".").first # e.g. "invalid--missing"
+              fixture_variant_name = fixture_variant.split(".").first # e.g. "invalid--missing" # rubocop:disable RSpec/LeakyLocalVariable
               next if fixture_variant_name.split("--").last == "auto-corrected"
 
               context fixture_variant_name do # e.g. context "invalid--missing" do

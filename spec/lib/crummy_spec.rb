@@ -45,23 +45,20 @@ describe "CrummyController" do
   end
 
   context "name proc" do
-    name_run = false
-    name_run_proc = proc do
-      if name_run
-        "B"
-      else
-        name_run = true
-        "A"
+    it "reevaluates the proc on each run" do
+      name_run = false
+      name_run_proc = proc do
+        if name_run
+          "B"
+        else
+          name_run = true
+          "A"
+        end
       end
-    end
 
-    let(:crummy_name_controller) do
-      Class.new(crummy_controller) do
+      crummy_name_controller = Class.new(crummy_controller) do
         add_crumb(name_run_proc, "http://")
       end
-    end
-
-    it "reevaluates the proc on each run" do
       # first run should add crumb "A"
       a = crummy_name_controller.new
       a.run_filter_blocks
@@ -77,23 +74,21 @@ describe "CrummyController" do
   end
 
   context "url proc" do
-    url_run = false
-    url_run_proc = proc do
-      if url_run
-        "http://b"
-      else
-        url_run = true
-        "http://a"
+    it "reevaluates the proc on each run" do
+      url_run = false
+      url_run_proc = proc do
+        if url_run
+          "http://b"
+        else
+          url_run = true
+          "http://a"
+        end
       end
-    end
 
-    let(:crummy_url_controller) do
-      Class.new(crummy_controller) do
+      crummy_url_controller = Class.new(crummy_controller) do
         add_crumb("Name", &url_run_proc)
       end
-    end
 
-    it "reevaluates the proc on each run" do
       # first run should add crumb "A"
       a = crummy_url_controller.new
       a.run_filter_blocks

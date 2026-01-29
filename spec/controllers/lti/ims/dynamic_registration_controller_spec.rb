@@ -23,6 +23,9 @@ require "lib/lti/ims/advantage_access_token_shared_context"
 describe Lti::IMS::DynamicRegistrationController do
   include_context "advantage access token context"
 
+  let_once(:openapi_location) { File.join(File.dirname(__FILE__), "openapi", "dynamic_registration.yml").freeze }
+  let_once(:openapi_spec) { YAML.load_file(openapi_location).freeze }
+
   let(:controller_routes) do
     dynamic_registration_routes = []
     CanvasRails::Application.routes.routes.each do |route|
@@ -32,13 +35,8 @@ describe Lti::IMS::DynamicRegistrationController do
     dynamic_registration_routes
   end
 
-  openapi_location = File.join(File.dirname(__FILE__), "openapi", "dynamic_registration.yml")
-  openapi_spec = YAML.load_file(openapi_location)
-
-  verifier = OpenApiSpecHelper::SchemaVerifier.new(openapi_spec)
-
   after do
-    verifier.verify(request, response) if response.sent?
+    OpenApiSpecHelper::SchemaVerifier.new(openapi_spec).verify(request, response) if response.sent?
   end
 
   it "has openapi documentation for each of our controller routes" do
@@ -997,7 +995,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
     it "returns unauthorized if jwt is issued for other user" do
       expired_jwt = Canvas::Security.create_jwt({
-                                                  user_id: 123,
+                                                  user_id: @admin.id + 1,
                                                   root_account_global_id: Account.default.id
                                                 },
                                                 5.minutes.from_now)

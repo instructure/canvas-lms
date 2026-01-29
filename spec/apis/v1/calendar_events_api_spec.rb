@@ -39,42 +39,44 @@ describe CalendarEventsApiController, type: :request do
   end
 
   context "events" do
-    expected_fields = %w[
-      all_context_codes
-      all_day
-      all_day_date
-      blackout_date
-      child_events
-      child_events_count
-      comments
-      context_code
-      created_at
-      description
-      duplicates
-      end_at
-      hidden
-      html_url
-      id
-      location_address
-      location_name
-      parent_event_id
-      start_at
-      title
-      type
-      updated_at
-      url
-      workflow_state
-      context_name
-      context_color
-      important_dates
-      series_uuid
-      rrule
-    ]
-    expected_slot_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code])
-    expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
-    expected_reserved_fields = (expected_slot_fields + ["reserved", "reserve_comments"])
-    expected_reservation_fields = expected_reservation_event_fields - ["child_events"]
-    expected_series_fields = expected_fields + ["series_head", "series_natural_language"]
+    let(:expected_fields) do
+      %w[
+        all_context_codes
+        all_day
+        all_day_date
+        blackout_date
+        child_events
+        child_events_count
+        comments
+        context_code
+        created_at
+        description
+        duplicates
+        end_at
+        hidden
+        html_url
+        id
+        location_address
+        location_name
+        parent_event_id
+        start_at
+        title
+        type
+        updated_at
+        url
+        workflow_state
+        context_name
+        context_color
+        important_dates
+        series_uuid
+        rrule
+      ].freeze
+    end
+    let(:expected_slot_fields) { (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code]) }
+    let(:expected_reservation_event_fields) { (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type]) }
+    let(:expected_reserved_fields) { (expected_slot_fields + ["reserved", "reserve_comments"]) }
+    let(:expected_reservation_fields) { expected_reservation_event_fields - ["child_events"] }
+    let(:expected_series_fields) { expected_fields + ["series_head", "series_natural_language"] }
 
     context "returns events" do
       it "when start after and end before the given range dates" do
@@ -3196,27 +3198,29 @@ describe CalendarEventsApiController, type: :request do
   end
 
   context "assignments" do
-    expected_fields = %w[
-      all_day
-      all_day_date
-      assignment
-      context_code
-      created_at
-      description
-      end_at
-      html_url
-      id
-      start_at
-      title
-      type
-      updated_at
-      url
-      workflow_state
-      context_name
-      context_color
-      important_dates
-      submission_types
-    ]
+    let(:expected_fields) do
+      %w[
+        all_day
+        all_day_date
+        assignment
+        context_code
+        created_at
+        description
+        end_at
+        html_url
+        id
+        start_at
+        title
+        type
+        updated_at
+        url
+        workflow_state
+        context_name
+        context_color
+        important_dates
+        submission_types
+      ].freeze
+    end
 
     it "returns assignments within the given date range" do
       @course.assignments.create(title: "1", due_at: "2012-01-07 12:00:00")
@@ -4842,27 +4846,29 @@ describe CalendarEventsApiController, type: :request do
       @checkpoint_2 = create_checkpoint(topic: @topic, type: "reply_to_entry", due_at: "2024-08-02 12:00:00")
     end
 
-    expected_sub_assignment_fields = %w[
-      all_day
-      all_day_date
-      sub_assignment
-      context_code
-      created_at
-      description
-      end_at
-      html_url
-      id
-      start_at
-      title
-      type
-      updated_at
-      url
-      workflow_state
-      context_name
-      context_color
-      important_dates
-      submission_types
-    ]
+    let(:expected_sub_assignment_fields) do
+      %w[
+        all_day
+        all_day_date
+        sub_assignment
+        context_code
+        created_at
+        description
+        end_at
+        html_url
+        id
+        start_at
+        title
+        type
+        updated_at
+        url
+        workflow_state
+        context_name
+        context_color
+        important_dates
+        submission_types
+      ]
+    end
 
     context "discussion_checkpoints feature flag" do
       context "when feature flag is enabled" do

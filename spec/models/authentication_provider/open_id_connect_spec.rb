@@ -236,14 +236,16 @@ describe AuthenticationProvider::OpenIDConnect do
     end
 
     describe "token validation" do
-      base_payload = {
-        sub: "some-login-attribute",
-        aud: "client",
-        iat: Time.now.to_i,
-        exp: Time.now.to_i + 30,
-        iss: "issuer",
-        nonce: "nonce"
-      }.freeze
+      let(:base_payload) do
+        {
+          sub: "some-login-attribute",
+          aud: "client",
+          iat: Time.now.to_i,
+          exp: Time.now.to_i + 30,
+          iss: "issuer",
+          nonce: "nonce"
+        }.freeze
+      end
 
       it "passes a valid token" do
         id_token = Canvas::Security.create_jwt(base_payload, nil, subject.client_secret)
@@ -257,17 +259,18 @@ describe AuthenticationProvider::OpenIDConnect do
 
       def self.bad_token_spec(description, payload)
         it "validates #{description}" do
+          payload = instance_eval(&payload)
           id_token = Canvas::Security.create_jwt(payload, nil, subject.client_secret)
           expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
         end
       end
 
-      bad_token_spec("the audience claim for self", base_payload.merge(aud: "someone_else"))
-      bad_token_spec("the issuer claim", base_payload.merge(iss: "someone_else"))
-      bad_token_spec("exp is provided", base_payload.except(:exp))
-      bad_token_spec("exp is valid", base_payload.merge(exp: 10))
-      bad_token_spec("nonce is provided", base_payload.except(:nonce))
-      bad_token_spec("nonce is valid", base_payload.merge(nonce: "wrong"))
+      bad_token_spec("the audience claim for self", proc { base_payload.merge(aud: "someone_else") })
+      bad_token_spec("the issuer claim", proc { base_payload.merge(iss: "someone_else") })
+      bad_token_spec("exp is provided", proc { base_payload.except(:exp) })
+      bad_token_spec("exp is valid", proc { base_payload.merge(exp: 10) })
+      bad_token_spec("nonce is provided", proc { base_payload.except(:nonce) })
+      bad_token_spec("nonce is valid", proc { base_payload.merge(nonce: "wrong") })
 
       it "validates the signature" do
         id_token = Canvas::Security.create_jwt(base_payload, nil, "wrong_key")

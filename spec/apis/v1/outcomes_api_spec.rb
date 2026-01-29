@@ -597,15 +597,13 @@ describe "Outcomes API", type: :request do
             @outcome.save!
           end
 
-          method_to_int = {
+          {
             "decaying_average" => { good: 67, bad: 125 },
             "n_mastery" => { good: 7, bad: 11 },
             "highest" => { good: nil, bad: 4 },
             "latest" => { good: nil, bad: 79 },
             "average" => { good: nil, bad: 59 },
-          }
-
-          method_to_int.each do |method, int|
+          }.each do |method, int|
             it "does not allow updating the calculation_int to an illegal value for the calculation_method '#{method}'" do
               expect do
                 api_call(:put,
@@ -694,18 +692,13 @@ describe "Outcomes API", type: :request do
         end
 
         context "sensible error message for an incorrect calculation_int" do
-          method_to_int = {
+          {
             "decaying_average" => 77,
             "n_mastery" => 4,
             "highest" => nil,
             "latest" => nil,
             "average" => nil,
-          }
-          norm_error_message = "not a valid value for this calculation method"
-          no_calc_int_error_message = "A calculation value is not used with this calculation method"
-          bad_calc_int = 1500
-
-          method_to_int.each do |method, int|
+          }.each do |method, int|
             it "returns a sensible error message for an incorrect calculation_int when calculation_method is #{method}" do
               @outcome.calculation_method = method
               @outcome.calculation_int = int
@@ -724,7 +717,7 @@ describe "Outcomes API", type: :request do
                                 description: "New Description",
                                 vendor_guid: "vendorguid9000",
                                 # :calculation_method => bad_calc_method,
-                                calculation_int: bad_calc_int },
+                                calculation_int: 1500 },
                               {}, # Empty headers dict
                               { expected_status: 400 })
 
@@ -737,9 +730,9 @@ describe "Outcomes API", type: :request do
               # make sure there's no errors except on calculation_method
               expect(json["errors"].except("calculation_int")).to be_empty
               if calc_method_no_int.include?(method)
-                expect(json["errors"]["calculation_int"][0]["message"]).to include(no_calc_int_error_message)
+                expect(json["errors"]["calculation_int"][0]["message"]).to include("A calculation value is not used with this calculation method")
               else
-                expect(json["errors"]["calculation_int"][0]["message"]).to include(norm_error_message)
+                expect(json["errors"]["calculation_int"][0]["message"]).to include("not a valid value for this calculation method")
               end
             end
           end

@@ -5534,15 +5534,14 @@ describe Submission do
        online_text_entry
        online_url
        media_recording].each do |sub_type|
-      should_not_be_missing = submissions_that_cant_be_missing.include?(sub_type)
-      expected_status = should_not_be_missing ? "false" : "true"
-      it "returns #{expected_status} when late_policy_status is nil and submission_type is #{sub_type}" do
+      should_be_missing = submissions_that_cant_be_missing.exclude?(sub_type) # rubocop:disable RSpec/LeakyLocalVariable
+      it "returns #{should_be_missing} when late_policy_status is nil and submission_type is #{sub_type}" do
         @another_assignment.update(submission_types: sub_type)
 
-        if should_not_be_missing
-          expect(@another_submission.reload).not_to be_missing
-        else
+        if should_be_missing
           expect(@another_submission.reload).to be_missing
+        else
+          expect(@another_submission.reload).not_to be_missing
         end
       end
     end
