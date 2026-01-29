@@ -434,8 +434,8 @@ describe Api::V1::Course do
     subject { result }
 
     let(:hash) { {} }
-    let(:course) { double(feed_code: 573, id: 42, syllabus_body: "syllabus text").as_null_object }
-    let(:course_json) { double.as_null_object }
+    let(:course) { instance_double(Course, feed_code: 573, id: 42, syllabus_body: "syllabus text", method_missing: nil) }
+    let(:course_json) { instance_double(Api::V1::CourseJson).as_null_object }
     let(:api) { TestCourseApi.new }
 
     let(:result) do
@@ -461,7 +461,7 @@ describe Api::V1::Course do
     end
 
     describe "when the include options are all set off" do
-      let(:course_json) { double(include_syllabus: false, include_url: false) }
+      let(:course_json) { instance_double(Api::V1::CourseJson, include_syllabus: false, include_url: false) }
 
       describe "#syllabus_body" do
         subject { super().syllabus_body }
@@ -477,7 +477,7 @@ describe Api::V1::Course do
     end
 
     describe "when everything is included" do
-      let(:course_json) { double(include_syllabus: true, include_url: true) }
+      let(:course_json) { instance_double(Api::V1::CourseJson, include_syllabus: true, include_url: true) }
 
       describe "#syllabus_body" do
         subject { super().syllabus_body }
@@ -3617,7 +3617,7 @@ describe CoursesController, type: :request do
       end
 
       it "is not paginated (for legacy reasons)" do
-        controller = double
+        controller = instance_double(CoursesController)
         allow(controller).to receive(:params).and_return({})
         course_with_teacher(active_all: true)
         num = Api.per_page_for(controller) + 1 # get the default api per page value

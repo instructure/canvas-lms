@@ -1576,7 +1576,7 @@ describe "Submissions API", type: :request do
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
     media_object(media_id: "54321", context: student1, user: student1)
-    mock_kaltura = double("CanvasKaltura::ClientV3")
+    mock_kaltura = instance_double(CanvasKaltura::ClientV3)
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
     expect(mock_kaltura).to receive(:media_sources).and_return([{ height: "240",
                                                                   bitrate: "382",

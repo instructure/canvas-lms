@@ -1167,8 +1167,8 @@ describe "Accounts API", type: :request do
     end
 
     describe "horizon_account setting" do
-      let(:pine_client_mock) { double("PineClient") }
-      let(:redwood_client_mock) { double("RedwoodClient") }
+      let(:pine_client_mock) { class_double(PineClient) }
+      let(:redwood_client_mock) { class_double(RedwoodClient) }
 
       before do
         # Enable the horizon_course_setting feature flag
