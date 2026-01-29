@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {List} from '@instructure/ui-list'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMessageLine} from '@instructure/ui-icons'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 import MessageStudents from '@canvas/message-students-modal/react'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import PeopleFilters, {type RoleFilterOption, isValidRoleFilterOption} from './PeopleFilters'
@@ -168,7 +169,13 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                 <List isUnstyled margin="0">
                   {instructors.map(instructor => (
                     <List.Item key={instructor.id} margin="0">
-                      <Flex gap="small" padding="small 0" role="group" aria-label={instructor.name}>
+                      <Flex
+                        gap="small"
+                        padding="small 0"
+                        role="group"
+                        aria-label={instructor.name}
+                        alignItems="start"
+                      >
                         <Flex.Item>
                           <Avatar
                             name={instructor.name}
@@ -182,31 +189,70 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                             <Text size="medium" weight="bold" lineHeight="condensed">
                               {instructor.name}
                             </Text>
-                            {instructor.course_name && (
-                              <View as="div">
-                                <Text size="x-small" color="secondary">
-                                  {instructor.course_name}
-                                </Text>
-                              </View>
-                            )}
-                            <View as="div">
-                              <Text size="x-small" color="secondary">
-                                {instructor.enrollments
-                                  .map(enrollment => {
-                                    const role =
-                                      enrollment.type === 'TeacherEnrollment'
-                                        ? I18n.t('Teacher')
-                                        : I18n.t('Teaching Assistant')
-                                    return role
-                                  })
-                                  .join(', ')}
-                              </Text>
-                            </View>
                             {instructor.email && (
                               <View as="div">
-                                <Text size="x-small" color="secondary">
-                                  {instructor.email}
-                                </Text>
+                                <Text size="small">{instructor.email}</Text>
+                              </View>
+                            )}
+                            {instructor.enrollments.length === 1 ? (
+                              <>
+                                <View as="div">
+                                  <Text size="small">{instructor.course_name}</Text>
+                                </View>
+                                <View as="div">
+                                  <Text size="small">
+                                    {instructor.enrollments[0].type === 'TeacherEnrollment'
+                                      ? I18n.t('Teacher')
+                                      : I18n.t('Teaching Assistant')}
+                                  </Text>
+                                </View>
+                              </>
+                            ) : (
+                              <View as="div" margin="xx-small 0 0 0">
+                                <ToggleDetails
+                                  summary={
+                                    <Text size="small">
+                                      {I18n.t(
+                                        {
+                                          one: '1 enrollment',
+                                          other: '%{count} enrollments',
+                                        },
+                                        {count: instructor.enrollments.length},
+                                      )}
+                                    </Text>
+                                  }
+                                  size="small"
+                                >
+                                  <View as="div" borderWidth="small 0 0 0" padding="x-small 0 0 0">
+                                    <View
+                                      as="ul"
+                                      margin="0"
+                                      padding="0"
+                                      elementRef={(el: any) => {
+                                        if (el) {
+                                          el.style.listStyleType = 'disc'
+                                        }
+                                      }}
+                                    >
+                                      {instructor.enrollments.map(enrollment => {
+                                        const role =
+                                          enrollment.type === 'TeacherEnrollment'
+                                            ? I18n.t('Teacher')
+                                            : I18n.t('Teaching Assistant')
+                                        return (
+                                          <li key={enrollment.id}>
+                                            <Text size="small">
+                                              {I18n.t('%{role} in %{course}', {
+                                                role,
+                                                course: enrollment.course_name,
+                                              })}
+                                            </Text>
+                                          </li>
+                                        )
+                                      })}
+                                    </View>
+                                  </View>
+                                </ToggleDetails>
                               </View>
                             )}
                           </View>

@@ -85,17 +85,21 @@ const server = setupServer(
                 avatarUrl: 'https://example.com/avatar.jpg',
                 email: 'john@example.com',
               },
-              course: {
-                _id: '789',
-                name: 'Computer Science 101',
-                courseCode: 'CS101',
-              },
-              type: 'TeacherEnrollment',
-              role: {
-                _id: '1',
-                name: 'TeacherEnrollment',
-              },
-              enrollmentState: 'active',
+              enrollments: [
+                {
+                  course: {
+                    _id: '789',
+                    name: 'Computer Science 101',
+                    courseCode: 'CS101',
+                  },
+                  type: 'TeacherEnrollment',
+                  role: {
+                    _id: '1',
+                    name: 'TeacherEnrollment',
+                  },
+                  enrollmentState: 'active',
+                },
+              ],
             },
           ],
           pageInfo: {
@@ -272,10 +276,14 @@ describe('PeopleWidget', () => {
                       avatarUrl: 'https://example.com/alice.jpg',
                       email: 'alice@example.com',
                     },
-                    course: {_id: '100', name: 'Math 101', courseCode: 'MATH101'},
-                    type: 'TeacherEnrollment',
-                    role: {_id: '1', name: 'TeacherEnrollment'},
-                    enrollmentState: 'active',
+                    enrollments: [
+                      {
+                        course: {_id: '100', name: 'Math 101', courseCode: 'MATH101'},
+                        type: 'TeacherEnrollment',
+                        role: {_id: '1', name: 'TeacherEnrollment'},
+                        enrollmentState: 'active',
+                      },
+                    ],
                   },
                   {
                     user: {
@@ -286,10 +294,14 @@ describe('PeopleWidget', () => {
                       avatarUrl: 'https://example.com/bob.jpg',
                       email: 'bob@example.com',
                     },
-                    course: {_id: '100', name: 'Math 101', courseCode: 'MATH101'},
-                    type: 'TaEnrollment',
-                    role: {_id: '2', name: 'TaEnrollment'},
-                    enrollmentState: 'active',
+                    enrollments: [
+                      {
+                        course: {_id: '100', name: 'Math 101', courseCode: 'MATH101'},
+                        type: 'TaEnrollment',
+                        role: {_id: '2', name: 'TaEnrollment'},
+                        enrollmentState: 'active',
+                      },
+                    ],
                   },
                 ],
                 pageInfo: {
@@ -398,10 +410,14 @@ describe('PeopleWidget', () => {
                       avatarUrl: null,
                       email: 'inst1@example.com',
                     },
-                    course: {_id: '100', name: 'Course 1', courseCode: 'C1'},
-                    type: 'TeacherEnrollment',
-                    role: {_id: '1', name: 'TeacherEnrollment'},
-                    enrollmentState: 'active',
+                    enrollments: [
+                      {
+                        course: {_id: '100', name: 'Course 1', courseCode: 'C1'},
+                        type: 'TeacherEnrollment',
+                        role: {_id: '1', name: 'TeacherEnrollment'},
+                        enrollmentState: 'active',
+                      },
+                    ],
                   },
                 ],
                 pageInfo: {
@@ -458,10 +474,14 @@ describe('PeopleWidget', () => {
                       avatarUrl: null,
                       email: null,
                     },
-                    course: {_id: '100', name: 'Course 1', courseCode: 'C1'},
-                    type: 'TeacherEnrollment',
-                    role: {_id: '1', name: 'TeacherEnrollment'},
-                    enrollmentState: 'active',
+                    enrollments: [
+                      {
+                        course: {_id: '100', name: 'Course 1', courseCode: 'C1'},
+                        type: 'TeacherEnrollment',
+                        role: {_id: '1', name: 'TeacherEnrollment'},
+                        enrollmentState: 'active',
+                      },
+                    ],
                   },
                 ],
                 pageInfo: {

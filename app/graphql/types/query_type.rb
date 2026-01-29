@@ -180,8 +180,11 @@ module Types
                   end&.map(&:course)
     end
 
-    field :course_instructors_connection, EnrollmentType.connection_type, null: true do
-      description "Paginated instructor enrollments across multiple courses"
+    InstructorWithEnrollments = Struct.new(:user, :enrollments, keyword_init: true)
+    InstructorEnrollmentInfo = Struct.new(:course, :type, :role, :state, keyword_init: true)
+
+    field :course_instructors_connection, InstructorWithEnrollmentsType.connection_type, null: true do
+      description "Paginated instructors with their enrollments across multiple courses"
       argument :course_ids,
                [ID],
                "Course IDs to get instructors for",
@@ -191,11 +194,11 @@ module Types
       argument :observed_user_id, ID, "ID of the observed user", required: false
     end
     def course_instructors_connection(course_ids:, observed_user_id: nil, enrollment_types: nil, **_args)
-      return Enrollment.none unless current_user
+      return [] unless current_user
 
       user_course_ids = if observed_user_id.present?
                           observed_user = User.find_by(id: observed_user_id)
-                          return Enrollment.none unless observed_user
+                          return [] unless observed_user
 
                           current_user.cached_course_ids_for_observed_user(observed_user).map(&:to_s)
                         else
@@ -208,34 +211,68 @@ module Types
                      course_ids & user_course_ids
                    end
 
-      # Optimized approach: use a subquery for deduplication, then sort for display
-      # This eliminates one level of joins compared to the previous double-subquery approach
       types_to_filter = if enrollment_types.present?
                           enrollment_types & ALLOWED_INSTRUCTOR_TYPES
                         else
                           ALLOWED_INSTRUCTOR_TYPES
                         end
       types_to_filter = ALLOWED_INSTRUCTOR_TYPES if types_to_filter.empty?
-      deduplicated_ids = Enrollment
-                         .joins(:enrollment_state)
-                         .current
-                         .where(course_id: course_ids)
-                         .where(type: types_to_filter)
-                         .where(enrollment_states: { restricted_access: false, state: "active" })
-                         .where(courses: { workflow_state: "available" })
-                         .where("courses.conclude_at IS NULL OR courses.conclude_at > ?", Time.now.utc)
-                         .select("DISTINCT ON (enrollments.course_id, enrollments.user_id) enrollments.id")
-                         .order(
-                           Arel.sql("enrollments.course_id"),
-                           Arel.sql("enrollments.user_id"),
-                           Enrollment.state_by_date_rank_sql,
-                           Arel.sql("enrollments.id")
-                         )
 
-      # Now join to users and courses only once for the final result set
-      Enrollment.where(id: deduplicated_ids)
-                .joins(:user, :course)
-                .order("courses.name ASC, users.sortable_name ASC")
+      deduplicated_ids_subquery = Enrollment
+                                  .joins(:enrollment_state)
+                                  .current
+                                  .where(course_id: course_ids)
+                                  .where(type: types_to_filter)
+                                  .where(enrollment_states: { restricted_access: false, state: "active" })
+                                  .where(courses: { workflow_state: "available" })
+                                  .where("courses.conclude_at IS NULL OR courses.conclude_at > ?", Time.now.utc)
+                                  .select("DISTINCT ON (enrollments.course_id, enrollments.user_id) enrollments.id")
+                                  .order(
+                                    Arel.sql("enrollments.course_id"),
+                                    Arel.sql("enrollments.user_id"),
+                                    Enrollment.state_by_date_rank_sql,
+                                    Arel.sql("enrollments.id")
+                                  )
+
+      grouped_results = Enrollment
+                        .joins(:user, :course, :role)
+                        .where(id: deduplicated_ids_subquery)
+                        .group("users.id, users.sortable_name")
+                        .order("users.sortable_name ASC")
+                        .pluck(
+                          Arel.sql("users.id"),
+                          Arel.sql("json_agg(json_build_object(
+                            'course_id', courses.id,
+                            'type', enrollments.type,
+                            'role_id', roles.id,
+                            'state', enrollments.workflow_state
+                          ) ORDER BY courses.name)")
+                        )
+
+      return [] if grouped_results.empty?
+
+      user_ids = grouped_results.map(&:first)
+      all_enrollment_data = grouped_results.flat_map { |_, json| json }
+      course_ids_needed = all_enrollment_data.pluck("course_id").uniq
+      role_ids_needed = all_enrollment_data.pluck("role_id").uniq
+
+      users_by_id = User.where(id: user_ids).index_by(&:id)
+      courses_by_id = Course.where(id: course_ids_needed).index_by(&:id)
+      roles_by_id = Role.where(id: role_ids_needed).index_by(&:id)
+
+      grouped_results.map do |user_id, enrollments_data|
+        InstructorWithEnrollments.new(
+          user: users_by_id[user_id],
+          enrollments: enrollments_data.map do |e|
+            InstructorEnrollmentInfo.new(
+              course: courses_by_id[e["course_id"]],
+              type: e["type"],
+              role: roles_by_id[e["role_id"]],
+              state: e["state"]
+            )
+          end
+        )
+      end
     end
 
     field :courses,
