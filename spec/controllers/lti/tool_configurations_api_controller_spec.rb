@@ -187,7 +187,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       end
 
-      it { is_expected.to have_http_status :unprocessable_entity }
+      it { is_expected.to have_http_status :unprocessable_content }
 
       it "responds with helpful error message" do
         subject

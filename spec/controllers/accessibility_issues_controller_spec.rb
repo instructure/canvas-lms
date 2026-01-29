@@ -66,7 +66,7 @@ describe AccessibilityIssuesController do
       end
 
       it "returns a 422 status" do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "renders an error message" do
@@ -87,7 +87,7 @@ describe AccessibilityIssuesController do
         end
 
         it "returns a 422 status" do
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it "renders an error message" do
@@ -108,7 +108,7 @@ describe AccessibilityIssuesController do
         end
 
         it "returns a 422 status" do
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it "renders an error message" do
@@ -129,7 +129,7 @@ describe AccessibilityIssuesController do
         end
 
         it "returns a 422 status" do
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it "renders an error message" do

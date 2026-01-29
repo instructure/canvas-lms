@@ -629,7 +629,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0)).to eq("Exactly one context must be present")
       end
     end
@@ -639,14 +639,14 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0)).to eq("Either account_id or course_id must be present.")
       end
 
       context "with existing control" do
         it "returns 422" do
           subject
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response_json["errors"]).to include(
             "Either account_id or course_id must be present."
           )
@@ -684,7 +684,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "No active deployment found for the root account."
         )
@@ -699,7 +699,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "Context must belong to the deployment's context"
         )
@@ -739,7 +739,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "A context control for this deployment and context already exists."
         )
@@ -833,7 +833,7 @@ describe Lti::ContextControlsController, type: :request do
     context "with empty params" do
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Invalid parameters. Expected an array of context control parameters.")
       end
     end
@@ -843,7 +843,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Invalid parameters. Expected an array of context control parameters.")
       end
     end
@@ -1025,7 +1025,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Cannot create multiple context controls for the same context")
       end
     end
@@ -1042,7 +1042,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Either account_id or course_id must be present for each context control")
       end
     end
@@ -1059,7 +1059,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Either account_id or course_id must be present for each context control, but not both")
       end
     end
@@ -1186,7 +1186,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "Cannot create more than #{max_size} context controls at once"
         )
@@ -1205,7 +1205,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0, "message")).to eq(
           "Context must belong to the deployment's context"
         )
@@ -1222,7 +1222,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0, "message")).to eq(
           "Context must belong to the deployment's context"
         )
@@ -1237,7 +1237,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include(
           "No active deployment found for the root account."
         )
@@ -1395,7 +1395,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns a 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Cannot delete primary control for deployment")
       end
 
