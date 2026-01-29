@@ -27,12 +27,13 @@ import {CloseButton} from '@instructure/ui-buttons'
 const I18n = createI18nScope('conversations_2')
 
 export const ALL_COURSES_ID = 'all_courses'
+const ALL_COURSES_KEY = 'allCourses'
 
 const filterOptions = (value, options) => {
   const filteredOptions = {}
   Object.keys(options).forEach(key => {
-    if (key === 'allCourses') {
-      // if provided, allCourses should always be present
+    if (key === ALL_COURSES_KEY) {
+      // if provided, ALL_COURSES_KEY should always be present
       filteredOptions[key] = options[key]
     } else {
       filteredOptions[key] = options[key]?.filter(
@@ -199,7 +200,7 @@ const CourseSelect = props => {
         return I18n.t('Concluded Courses')
       case 'groups':
         return I18n.t('Groups')
-      case 'allCourses':
+      case ALL_COURSES_KEY:
         return I18n.t('Courses')
     }
   }
