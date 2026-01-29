@@ -568,7 +568,7 @@ describe Lti::ContextControlsController, type: :request do
 
     before { root_deployment }
 
-    include_examples "navigation cache invalidation"
+    it_behaves_like "navigation cache invalidation"
 
     it "creates a new control" do
       expect { subject }.to change { Lti::ContextControl.count }.by(1)
@@ -861,7 +861,7 @@ describe Lti::ContextControlsController, type: :request do
       let(:subaccount2) { account_model(parent_account: account) }
       let(:subdeployment) { registration.new_external_tool(subaccount).tap(&:save!) }
 
-      include_examples "navigation cache invalidation"
+      it_behaves_like "navigation cache invalidation"
 
       it "creates context controls" do
         subdeployment
@@ -1287,7 +1287,7 @@ describe Lti::ContextControlsController, type: :request do
     let(:registration_id) { registration.id }
 
     context "with the lti_registrations_next feature flag enabled" do
-      include_examples "navigation cache invalidation"
+      it_behaves_like "navigation cache invalidation"
 
       it "updates the context control" do
         expect(control.available).to be true
@@ -1375,7 +1375,7 @@ describe Lti::ContextControlsController, type: :request do
     let(:registration_id) { registration.id }
     let(:control_id) { control.id }
 
-    include_examples "navigation cache invalidation"
+    it_behaves_like "navigation cache invalidation"
 
     it "deletes and returns the context control" do
       subject
