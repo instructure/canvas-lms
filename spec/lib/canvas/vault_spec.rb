@@ -129,11 +129,17 @@ module Canvas
       context "IAM auth config" do
         let(:iam_token) { "s.iam_generated_token" }
         let(:lease_duration) { 3600 }
+        let(:mock_credentials) { instance_double(Aws::Credentials) }
 
         before do
           allow(described_class).to receive(:config).and_return(static_config)
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
           ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
+
+          # Mock AWS credential provider chain to avoid real AWS calls
+          mock_chain = instance_double(Aws::CredentialProviderChain)
+          allow(Aws::CredentialProviderChain).to receive(:new).and_return(mock_chain)
+          allow(mock_chain).to receive(:resolve).and_return(mock_credentials)
         end
 
         after do
@@ -156,7 +162,7 @@ module Canvas
           mock_auth = double("auth")
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_auth_client)
           allow(mock_auth_client).to receive(:auth).and_return(mock_auth)
-          allow(mock_auth).to receive(:aws_iam).with(role: "canvas-role", mount: "aws").and_return(mock_secret)
+          allow(mock_auth).to receive(:aws_iam).with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws").and_return(mock_secret)
 
           # Second call to Vault::Client.new is for the final client (with token)
           mock_final_client = instance_double(::Vault::Client, token: iam_token)
@@ -170,9 +176,15 @@ module Canvas
     describe "IAM authentication" do
       let(:iam_token) { "s.iam_generated_token" }
       let(:lease_duration) { 3600 }
+      let(:mock_credentials) { instance_double(Aws::Credentials) }
 
       before do
         allow(described_class).to receive(:config).and_return(static_config)
+
+        # Mock AWS credential provider chain to avoid real AWS calls
+        mock_chain = instance_double(Aws::CredentialProviderChain)
+        allow(Aws::CredentialProviderChain).to receive(:new).and_return(mock_chain)
+        allow(mock_chain).to receive(:resolve).and_return(mock_credentials)
       end
 
       after do
@@ -228,7 +240,7 @@ module Canvas
           mock_auth = double("auth")
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
-          allow(mock_auth).to receive(:aws_iam).with(role: "canvas-role", mount: "aws").and_return(mock_secret)
+          allow(mock_auth).to receive(:aws_iam).with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws").and_return(mock_secret)
 
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
           ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
@@ -255,7 +267,7 @@ module Canvas
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
           allow(mock_auth).to receive(:aws_iam)
-            .with(role: "canvas-role", mount: "custom-aws-path")
+            .with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "custom-aws-path")
             .and_return(mock_secret)
 
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
@@ -280,7 +292,7 @@ module Canvas
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
           allow(mock_auth).to receive(:aws_iam)
-            .with(role: "canvas-role", mount: "aws", iam_server_id_header_value: "vault.example.com")
+            .with("canvas-role", mock_credentials, "vault.example.com", "https://sts.amazonaws.com", "aws")
             .and_return(mock_secret)
 
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
@@ -302,7 +314,9 @@ module Canvas
           mock_auth = double("auth")
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
-          allow(mock_auth).to receive(:aws_iam).and_raise(::Vault::HTTPError.new(addr, double(code: "403")))
+          allow(mock_auth).to receive(:aws_iam)
+            .with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws")
+            .and_raise(::Vault::HTTPError.new(addr, double(code: "403")))
 
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
           ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
@@ -317,7 +331,9 @@ module Canvas
           mock_auth = double("auth")
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
-          allow(mock_auth).to receive(:aws_iam).and_raise(::Vault::HTTPError.new(addr, double(code: "403")))
+          allow(mock_auth).to receive(:aws_iam)
+            .with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws")
+            .and_raise(::Vault::HTTPError.new(addr, double(code: "403")))
 
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
           ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
@@ -362,7 +378,7 @@ module Canvas
           mock_auth = double("auth")
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
-          allow(mock_auth).to receive(:aws_iam).with(role: "canvas-role", mount: "aws").and_return(mock_secret)
+          allow(mock_auth).to receive(:aws_iam).with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws").and_return(mock_secret)
 
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
           ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
