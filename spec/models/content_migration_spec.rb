@@ -2235,7 +2235,7 @@ describe ContentMigration do
         before { subscription.create_content_tag_for!(assignment) }
 
         context "without downstream changes" do
-          include_examples "processes asset processor deletion", :deleted
+          it_behaves_like "processes asset processor deletion", :deleted
         end
 
         context "with downstream changes and not locked" do
@@ -2244,7 +2244,7 @@ describe ContentMigration do
             content_tag.update!(downstream_changes: ["content"])
           end
 
-          include_examples "processes asset processor deletion", :active
+          it_behaves_like "processes asset processor deletion", :active
         end
 
         context "with downstream changes but locked" do
@@ -2255,7 +2255,7 @@ describe ContentMigration do
             allow_any_instance_of(Assignment).to receive(:editing_restricted?).with(:any).and_return(true)
           end
 
-          include_examples "processes asset processor deletion", :deleted
+          it_behaves_like "processes asset processor deletion", :deleted
         end
       end
 
@@ -2282,7 +2282,7 @@ describe ContentMigration do
             discussion_content_tag.update!(downstream_changes: ["content"])
           end
 
-          include_examples "processes asset processor deletion", :active
+          it_behaves_like "processes asset processor deletion", :active
         end
 
         context "with downstream changes but locked" do
@@ -2293,7 +2293,7 @@ describe ContentMigration do
             allow_any_instance_of(DiscussionTopic).to receive(:editing_restricted?).with(:any).and_return(true)
           end
 
-          include_examples "processes asset processor deletion", :deleted
+          it_behaves_like "processes asset processor deletion", :deleted
         end
       end
     end

@@ -116,7 +116,7 @@ describe DiscussionEntry do
           entry.save!
         end
 
-        include_examples "does not send notifications"
+        it_behaves_like "does not send notifications"
       end
 
       describe "on update" do
@@ -160,7 +160,7 @@ describe DiscussionEntry do
           entry.update!(attachment:)
         end
 
-        include_examples "does not send notifications"
+        it_behaves_like "does not send notifications"
       end
 
       describe "on destroy" do
@@ -182,7 +182,7 @@ describe DiscussionEntry do
           entry.destroy
         end
 
-        include_examples "does not send notifications"
+        it_behaves_like "does not send notifications"
       end
 
       describe "on restore" do
@@ -207,7 +207,7 @@ describe DiscussionEntry do
           entry.restore
         end
 
-        include_examples "does not send notifications"
+        it_behaves_like "does not send notifications"
       end
     end
   end
