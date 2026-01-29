@@ -67,6 +67,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         justifyItems="space-between"
         padding="medium 0 0 0"
         data-testid="lmgb-menu-and-settings"
+        wrap="wrap"
       >
         <Flex alignItems="center" data-testid="lmgb-gradebook-menu">
           <Text size="xx-large" weight="bold">
