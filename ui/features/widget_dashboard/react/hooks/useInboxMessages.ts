@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@tanstack/react-query'
+import {useQuery, keepPreviousData} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
@@ -178,12 +178,13 @@ export function useInboxMessages(options: UseInboxMessagesOptions = {}) {
 
   const queryKey = [INBOX_MESSAGES_KEY, limit, filter]
 
-  const query = useQuery({
+  const {data, isLoading, isFetching, error, refetch} = useQuery({
     ...createUserQueryConfig(queryKey, QUERY_CONFIG.STALE_TIME.STATISTICS),
     queryFn: () => fetchInboxMessages(limit, filter),
     retry: QUERY_CONFIG.RETRY.DISABLED,
     persister: widgetDashboardPersister,
     refetchOnMount: false,
+    placeholderData: keepPreviousData,
   })
 
   useBroadcastQuery({
@@ -191,5 +192,13 @@ export function useInboxMessages(options: UseInboxMessagesOptions = {}) {
     broadcastChannel: 'widget-dashboard',
   })
 
-  return query
+  const isFilterLoading = isFetching && !!data
+
+  return {
+    data,
+    isLoading,
+    isFilterLoading,
+    error,
+    refetch,
+  }
 }

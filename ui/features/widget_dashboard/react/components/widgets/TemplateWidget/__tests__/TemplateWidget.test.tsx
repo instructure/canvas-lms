@@ -234,6 +234,84 @@ describe('TemplateWidget', () => {
     expect(screen.queryByLabelText('Test Pagination')).not.toBeInTheDocument()
   })
 
+  it('does not show overlay during initial load', () => {
+    const loadingOverlay = {
+      isLoading: true,
+      ariaLabel: 'Loading data',
+    }
+    const props = buildDefaultProps({loadingOverlay, isLoading: true})
+    setup(props)
+
+    expect(screen.queryByText('Test content')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument()
+    expect(screen.getByText('Loading widget data...')).toBeInTheDocument()
+  })
+
+  it('shows overlay when data refresh changes from not loading to loading', () => {
+    const loadingOverlay = {
+      isLoading: false,
+      ariaLabel: 'Loading data',
+    }
+    const props = buildDefaultProps({loadingOverlay})
+    const {rerender} = setup(props)
+
+    expect(screen.getByText('Test content')).toBeInTheDocument()
+    expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument()
+
+    const updatedLoadingOverlay = {isLoading: true, ariaLabel: 'Loading data'}
+    const updatedProps = buildDefaultProps({loadingOverlay: updatedLoadingOverlay})
+
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {retry: false},
+        mutations: {retry: false},
+      },
+    })
+
+    rerender(
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <ResponsiveProvider matches={['desktop']}>
+                <TemplateWidget {...updatedProps}>
+                  <div>Test content</div>
+                </TemplateWidget>
+              </ResponsiveProvider>
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>,
+    )
+
+    expect(screen.getByText('Test content')).toBeInTheDocument()
+    expect(screen.getByTestId('loading-overlay')).toBeInTheDocument()
+  })
+
+  it('shows overlay with loadingOverlay prop', () => {
+    const loadingOverlay = {
+      isLoading: true,
+      ariaLabel: 'Loading filter results',
+    }
+    const props = buildDefaultProps({loadingOverlay})
+    setup(props)
+
+    expect(screen.getByText('Test content')).toBeInTheDocument()
+    expect(screen.getByTestId('loading-overlay')).toBeInTheDocument()
+  })
+
+  it('does not show overlay when loadingOverlay.isLoading is false', () => {
+    const loadingOverlay = {
+      isLoading: false,
+      ariaLabel: 'Loading filter results',
+    }
+    const props = buildDefaultProps({loadingOverlay})
+    setup(props)
+
+    expect(screen.getByText('Test content')).toBeInTheDocument()
+    expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument()
+  })
+
   it('handles widget with no title properly', () => {
     const widgetWithNoTitle = {...mockWidget, title: ''}
     const props = buildDefaultProps({widget: widgetWithNoTitle})
