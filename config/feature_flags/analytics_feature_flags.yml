@@ -95,6 +95,15 @@ k20_course_readiness_criteria_set_results_preview:
   root_opt_in: true
   beta: true
   shadow: true
+k20_course_readiness_top_level_dashboard:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Top Level Dashboard
+  description:
+    k20_course_readiness_top_level_dashboard: Enables the Intelligent Insights - Course Readiness - Top Level Dashboard feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_criteria_set_preview:
   state: hidden
   applies_to: Account
