@@ -61,12 +61,14 @@ interface LearningMasteryContentProps {
   courseId: string
   contextURL: string
   accountLevelMasteryScalesFF: boolean
+  instuiNavFF?: boolean
 }
 
 const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
   courseId,
   contextURL,
   accountLevelMasteryScalesFF,
+  instuiNavFF,
 }) => {
   const {
     settings: gradebookSettings,
@@ -228,6 +230,7 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         gradebookSettings={gradebookSettings}
         setGradebookSettings={handleGradebookSettingsChange}
         isSavingSettings={isSavingSettings}
+        hideHeading={instuiNavFF}
       />
       {pagination && (
         <SearchWrapper
@@ -279,6 +282,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           courseId={courseId}
           contextURL={contextURL ?? ''}
           accountLevelMasteryScalesFF={accountLevelMasteryScalesFF ?? false}
+          instuiNavFF={ENV.FEATURES?.instui_nav}
         />
       </LMGBContext.Provider>
     </QueryClientProvider>
