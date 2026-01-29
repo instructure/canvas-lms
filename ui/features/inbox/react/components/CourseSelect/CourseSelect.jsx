@@ -28,6 +28,10 @@ const I18n = createI18nScope('conversations_2')
 
 export const ALL_COURSES_ID = 'all_courses'
 
+const appendCourseNameWithCode = (courseName, courseCode) => {
+  return `${courseName ?? ''}${courseCode ? `(${courseCode})` : ''}`
+}
+
 const filterOptions = (value, options) => {
   const filteredOptions = {}
   Object.keys(options).forEach(key => {
@@ -37,8 +41,7 @@ const filterOptions = (value, options) => {
     } else {
       filteredOptions[key] = options[key]?.filter(
         option =>
-          option.contextName.toLowerCase().includes(value.toLowerCase()) ||
-          option.courseNickname?.toLowerCase().includes(value.toLowerCase()),
+          appendCourseNameWithCode(option.contextName || option.courseNickname, option.courseCode).toLowerCase().includes(value.toLowerCase())
       )
     }
   })
@@ -54,7 +57,7 @@ const getOptionById = (id, options) => {
 const getCourseName = (courseAssetString, options) => {
   if (courseAssetString) {
     const courseInfo = getOptionById(courseAssetString, options)
-    return courseInfo ? courseInfo.contextName : ''
+    return courseInfo ? appendCourseNameWithCode(courseInfo.contextName, courseInfo.courseCode) : ''
   } else {
     return ''
   }
@@ -215,7 +218,7 @@ const CourseSelect = props => {
               isHighlighted={option.assetString === highlightedOptionId}
               isSelected={option.assetString === selectedOptionId}
             >
-              {option.courseNickname || option.contextName}
+              {appendCourseNameWithCode(option.courseNickname || option.contextName, option.courseCode)}
               <ScreenReaderContent>
                 {I18n.t(` in %{listHeading}`, {listHeading: getGroupLabel(key)})}
               </ScreenReaderContent>

@@ -24,6 +24,7 @@ export const Course = {
     fragment InboxCourse on Course {
       _id
       courseNickname
+      courseCode
       contextName: name
       assetString
     }
@@ -32,6 +33,7 @@ export const Course = {
   shape: shape({
     _id: string,
     courseNickname: string,
+    courseCode: string,
     contextName: string,
     assetString: string,
   }),
@@ -39,11 +41,13 @@ export const Course = {
   mock: ({
     _id = '195',
     courseNickname = 'Ipsum',
+    courseCode = 'CS101',
     contextName = 'XavierSchool',
     assetString = 'course_195',
   } = {}) => ({
     _id,
     courseNickname,
+    courseCode,
     contextName,
     assetString,
     __typename: 'Course',
