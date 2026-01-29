@@ -514,7 +514,7 @@ RSpec.describe YoutubeMigrationService do
 
       context "when resource_type is a New Quizzes resource" do
         YoutubeMigrationService::NEW_QUIZZES_RESOURCES.each do |type|
-          include_examples "passes for New Quizzes resource", type
+          it_behaves_like "passes for New Quizzes resource", type
         end
       end
     end
@@ -2763,7 +2763,7 @@ RSpec.describe YoutubeMigrationService do
         wiki_page_assignment_model(course:, body: original_html, skip_attachment_association_update: true).wiki_page
       end
 
-      include_examples "skips attachment association creation", "WikiPage", :wiki_page_with_embed, :body
+      it_behaves_like "skips attachment association creation", "WikiPage", :wiki_page_with_embed, :body
     end
 
     context "with Assignment" do
@@ -2771,7 +2771,7 @@ RSpec.describe YoutubeMigrationService do
         assignment_model(course:, description: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "Assignment", :assignment_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Assignment", :assignment_with_embed, :description
     end
 
     context "Assignment with discussion_topic" do
@@ -2779,7 +2779,7 @@ RSpec.describe YoutubeMigrationService do
         graded_discussion_topic(context: course, message: original_html, skip_attachment_association_update: true).assignment
       end
 
-      include_examples "skips attachment association creation", "Assignment", :discussion_assign_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Assignment", :discussion_assign_with_embed, :description
     end
 
     context "Assignment with quiz" do
@@ -2787,7 +2787,7 @@ RSpec.describe YoutubeMigrationService do
         assignment_quiz([], course:, description: original_html, skip_attachment_association_update: true).assignment
       end
 
-      include_examples "skips attachment association creation", "Assignment", :assignment_quiz_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Assignment", :assignment_quiz_with_embed, :description
     end
 
     context "Assignment with wiki page" do
@@ -2795,7 +2795,7 @@ RSpec.describe YoutubeMigrationService do
         wiki_page_assignment_model(course:, body: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "Assignment", :assignment_wiki_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Assignment", :assignment_wiki_with_embed, :description
     end
 
     context "with DiscussionTopic" do
@@ -2803,7 +2803,7 @@ RSpec.describe YoutubeMigrationService do
         graded_discussion_topic(context: course, message: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "DiscussionTopic", :discussion_topic_with_embed, :message
+      it_behaves_like "skips attachment association creation", "DiscussionTopic", :discussion_topic_with_embed, :message
     end
 
     context "with Announcement" do
@@ -2811,7 +2811,7 @@ RSpec.describe YoutubeMigrationService do
         course.announcements.create!(title: "Test", message: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "Announcement", :announcement_with_embed, :message
+      it_behaves_like "skips attachment association creation", "Announcement", :announcement_with_embed, :message
     end
 
     context "with DiscussionEntry" do
@@ -2820,7 +2820,7 @@ RSpec.describe YoutubeMigrationService do
         topic.discussion_entries.create!(message: original_html, user: @teacher, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "DiscussionEntry", :discussion_entry_with_embed, :message
+      it_behaves_like "skips attachment association creation", "DiscussionEntry", :discussion_entry_with_embed, :message
     end
 
     context "with CalendarEvent" do
@@ -2828,7 +2828,7 @@ RSpec.describe YoutubeMigrationService do
         calendar_event_model(context: course, description: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "CalendarEvent", :calendar_event_with_embed, :description
+      it_behaves_like "skips attachment association creation", "CalendarEvent", :calendar_event_with_embed, :description
     end
 
     context "with Quizzes::Quiz" do
@@ -2836,7 +2836,7 @@ RSpec.describe YoutubeMigrationService do
         assignment_quiz([], course:, description: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "Quizzes::Quiz", :quiz_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Quizzes::Quiz", :quiz_with_embed, :description
     end
 
     context "with Course syllabus" do
@@ -2845,7 +2845,7 @@ RSpec.describe YoutubeMigrationService do
         course
       end
 
-      include_examples "skips attachment association creation", "Course", :course_with_syllabus, :syllabus_body
+      it_behaves_like "skips attachment association creation", "Course", :course_with_syllabus, :syllabus_body
     end
   end
 end

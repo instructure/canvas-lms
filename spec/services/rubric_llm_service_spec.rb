@@ -287,7 +287,7 @@ describe RubricLLMService do
     describe "validations" do
       let(:method_args) { [criteria_count: 2] }
 
-      include_examples "validates rubric user and assignment", :generate_criteria_via_llm
+      it_behaves_like "validates rubric user and assignment", :generate_criteria_via_llm
     end
   end
 
@@ -438,7 +438,7 @@ describe RubricLLMService do
 
       let(:method_args) { [{ criteria: existing_criteria }, {}] }
 
-      include_examples "validates rubric user and assignment", :regenerate_criteria_via_llm
+      it_behaves_like "validates rubric user and assignment", :regenerate_criteria_via_llm
 
       it "raises when no <RUBRIC_DATA> block is found" do
         expect(CedarClient).to receive(:prompt).and_return(
