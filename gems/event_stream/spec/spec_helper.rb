@@ -21,7 +21,7 @@ begin
   require "../../spec/coverage_tool"
   CoverageTool.start("event_stream-gem")
 rescue LoadError => e
-  puts "Error: #{e}"
+  warn "Error: #{e}"
 end
 
 require "event_stream"

@@ -44,8 +44,6 @@ describe Loaders::AssociationLoader do
     a1 = Assignment.find(@a1.id)
     a2 = Assignment.find(@a2.id)
 
-    puts @query_count
-
     expect do
       GraphQL::Batch.batch do
         Loaders::AssociationLoader.for(Assignment, :context).load(a1).then do |course|
