@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import K5Course from './react/K5Course'
 import {registerK5Theme} from '@canvas/k5/react/k5-theme'
@@ -27,7 +27,7 @@ registerK5Theme()
 ready(() => {
   const courseContainer = document.getElementById('course-dashboard-container')
   if (courseContainer) {
-    ReactDOM.render(
+    legacyRender(
       <K5Course
         canManage={ENV.PERMISSIONS.manage}
         canManageGroups={ENV.PERMISSIONS.manage_groups}

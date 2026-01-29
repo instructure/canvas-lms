@@ -28,7 +28,7 @@ export interface EntryCountResponse {
 }
 
 export const GET_ENTRY_COUNT = gql`
-  query GetDiscussionTopic($discussionTopicId: ID!) {
+  query GetDiscussionTopicEntryCount($discussionTopicId: ID!) {
     legacyNode(_id: $discussionTopicId, type: Discussion) {
       ... on Discussion {
         _id

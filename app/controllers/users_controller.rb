@@ -305,7 +305,7 @@ class UsersController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid]
+    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid ui_invoked]
     includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
     include_deleted_users = value_to_boolean(params[:include_deleted_users])
     includes << "deleted_pseudonyms" if include_deleted_users
@@ -350,8 +350,9 @@ class UsersController < ApplicationController
     users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
 
     page_opts = { total_entries: nil }
-    if in_app?
+    if in_app? || includes.include?("ui_invoked")
       page_opts = {} # let Folio calculate total entries
+      includes.delete("ui_invoked")
     elsif params[:sort] == "id"
       # for a more efficient way to retrieve many pages in bulk
       users = BookmarkedCollection.wrap(Plannable::Bookmarker.new(User, params[:order] == "desc", :id),
@@ -3311,7 +3312,6 @@ class UsersController < ApplicationController
     save_user = @recaptcha_errors.nil? && @user.valid? && @pseudonym.valid? && (@invalid_observee_creds.nil? & @invalid_observee_code.nil?)
 
     message_sent = User.transaction do
-      handle_instructure_identity(save_user)
       if save_user
         # saving the user takes care of the @pseudonym and @cc, so we can't call
         # save_without_session_maintenance directly. we don't want to auto-log-in
@@ -3389,8 +3389,6 @@ class UsersController < ApplicationController
       render json: errors, status: :bad_request
     end
   end
-
-  def handle_instructure_identity(will_be_saving_user) end
 
   def perform_sis_reactivation(sis_user_id)
     @pseudonym = @context.pseudonyms.where(sis_user_id:, workflow_state: "deleted").first

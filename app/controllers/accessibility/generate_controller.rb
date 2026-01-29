@@ -26,12 +26,17 @@ module Accessibility
     before_action :check_alt_text_feature, only: [:create_image_alt_text]
 
     def create_table_caption
-      InstLLMHelper.with_rate_limit(user: @current_user, llm_config: LLMConfigs.config_for("alt_text_generate")) do
-        response = Accessibility::Issue.new(context: @context).generate_fix(params[:rule], params[:content_type], params[:content_id], params[:path], params[:value])
-        render json: response[:json], status: response[:status]
-      end
-    rescue InstLLMHelper::RateLimitExceededError
-      render json: { error: I18n.t("Endpoint rate limit exceeded.") }, status: :too_many_requests
+      caption = Accessibility::AiGenerationService.new(
+        content_type: params[:content_type],
+        content_id: params[:content_id],
+        path: params[:path],
+        context: @context,
+        current_user: @current_user,
+        domain_root_account: @domain_root_account
+      ).generate_table_caption
+      render json: { value: caption }, status: :ok
+    rescue Accessibility::AiGenerationService::InvalidParameterError
+      render json: { error: "Table not found" }, status: :bad_request
     end
 
     def create_image_alt_text

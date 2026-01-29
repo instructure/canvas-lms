@@ -560,18 +560,18 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
+      let callCount = 0
+
+      server.resetHandlers()
       server.use(
         http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
           return HttpResponse.json({})
         }),
-        http.post(
-          '/api/v1/courses/123/ai_experiences/1/conversations',
-          () => {
-            return HttpResponse.json({id: '1', messages: initialMessages})
-          },
-          {once: true},
-        ),
         http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          callCount++
+          if (callCount === 1) {
+            return HttpResponse.json({id: '1', messages: initialMessages})
+          }
           return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
         }),
       )

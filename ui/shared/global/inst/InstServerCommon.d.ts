@@ -25,7 +25,6 @@ export type InstServerCommon = InstServerCommonBasic & InstServerCommonKaltura
  */
 export type InstServerCommonBasic = {
   environment?: string
-  equellaEnabled?: boolean
   disableGooglePreviews?: boolean
   logPageViews?: boolean
   editorButtons?: EditorToolInfo[]

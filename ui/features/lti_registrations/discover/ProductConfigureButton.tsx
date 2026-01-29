@@ -39,6 +39,7 @@ import {
   type JsonFetchStatus,
 } from '../manage/registration_wizard/RegistrationWizardModalState'
 import type {LtiRegistrationWithConfiguration} from '../manage/model/LtiRegistration'
+import {LtiRegistrationId} from '../manage/model/LtiRegistrationId'
 
 export type ConfigureButtonProps = {
   buttonWidth: 'block' | 'inline-block'
@@ -74,7 +75,7 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
   const navigate = useNavigate()
 
   const onSuccessfulInstall = React.useCallback(
-    (registrationId: string) => {
+    (registrationId: LtiRegistrationId) => {
       if (window.ENV.FEATURES.lti_registrations_next) {
         navigate(`/manage/${registrationId}`)
       } else {

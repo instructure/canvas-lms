@@ -363,11 +363,7 @@ $(document).ready(function () {
     })
   })
 
-  $(
-    '#enable_equella, ' +
-      '#account_settings_sis_syncing_value, ' +
-      '#account_settings_sis_default_grade_export_value',
-  )
+  $('#account_settings_sis_syncing_value, ' + '#account_settings_sis_default_grade_export_value')
     .change(function () {
       const $myFieldset = $('#' + $(this).attr('id') + '_settings')
       const iAmChecked = $(this).prop('checked')

@@ -465,6 +465,35 @@ RSpec.describe Mutations::CreateConversation do
     expect(c.tags.sort).to eql [@course1.asset_string, @course2.asset_string, @course3.asset_string, @group1.asset_string, @group3.asset_string].sort
   end
 
+  it "rejects recipients from different course context" do
+    course_with_teacher_logged_in(active_all: true)
+    course1 = @course
+    course2 = course_factory(active_all: true)
+
+    student1 = User.create
+    enrollment1 = course1.enroll_student(student1)
+    enrollment1.workflow_state = "active"
+    enrollment1.save
+
+    student2 = User.create
+    enrollment2 = course2.enroll_student(student2)
+    enrollment2.workflow_state = "active"
+    enrollment2.save
+
+    result = run_mutation(
+      {
+        recipients: [course2.asset_string],
+        body: "test message",
+        group_conversation: true,
+        context_code: course1.asset_string
+      },
+      @user
+    )
+
+    expect(result.dig("data", "createConversation", "conversations")).to be_nil
+    expect(result.dig("data", "createConversation", "errors", 0, "message")).to eq("Invalid recipients")
+  end
+
   context "non_collaborative groups" do
     before(:once) do
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }

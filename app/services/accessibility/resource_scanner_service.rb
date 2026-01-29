@@ -31,7 +31,8 @@ class Accessibility::ResourceScannerService < ApplicationService
   end
 
   def call
-    return if scan_already_queued_or_in_progress?
+    queued_or_in_progress_scan = find_queued_or_in_progress_scan
+    return queued_or_in_progress_scan if queued_or_in_progress_scan
 
     scan = first_or_initialize_scan
     delay(
@@ -39,6 +40,7 @@ class Accessibility::ResourceScannerService < ApplicationService
       singleton: "#{SCAN_TAG}_#{@resource.global_id}",
       priority: Delayed::LOW_PRIORITY
     ).scan_resource(scan:)
+    scan
   end
 
   def call_sync
@@ -70,12 +72,13 @@ class Accessibility::ResourceScannerService < ApplicationService
 
     issues = scan_resource_for_issues
 
-    scan.accessibility_issues.active.delete_all
+    scan.accessibility_issues.rescannable.delete_all
     scan.accessibility_issues.create!(issues) if issues.any?
 
     scan.update(
       workflow_state: "completed",
-      issue_count: issues.count
+      issue_count: issues.count,
+      closed_at: nil
     )
     queue_course_statistics(scan.course)
     log_to_datadog(scan)
@@ -115,6 +118,8 @@ class Accessibility::ResourceScannerService < ApplicationService
       InstStatsd::Statsd.distributed_increment("accessibility.pages_scanned", tags:)
     elsif scan.assignment_id?
       InstStatsd::Statsd.distributed_increment("accessibility.assignments_scanned", tags:)
+    elsif scan.discussion_topic_id?
+      InstStatsd::Statsd.distributed_increment("accessibility.discussion_topics_scanned", tags:)
     end
 
     if scan.failed?
@@ -123,10 +128,10 @@ class Accessibility::ResourceScannerService < ApplicationService
     end
   end
 
-  def scan_already_queued_or_in_progress?
+  def find_queued_or_in_progress_scan
     AccessibilityResourceScan.where(context: @resource)
                              .where(workflow_state: %w[queued in_progress])
-                             .exists?
+                             .first
   end
 
   def over_size_limit?
@@ -137,6 +142,8 @@ class Accessibility::ResourceScannerService < ApplicationService
       (@resource.description&.size || 0) > MAX_HTML_SIZE
     when Attachment
       @resource.size > MAX_PDF_SIZE
+    when DiscussionTopic
+      (@resource.message&.size || 0) > MAX_HTML_SIZE
     else
       false
     end
@@ -165,7 +172,7 @@ class Accessibility::ResourceScannerService < ApplicationService
 
   def resource_workflow_state
     case @resource
-    when WikiPage
+    when WikiPage, DiscussionTopic
       @resource.active? ? "published" : "unpublished"
     when Assignment
       @resource.published? ? "published" : "unpublished"
@@ -184,6 +191,8 @@ class Accessibility::ResourceScannerService < ApplicationService
                    check_content_accessibility(@resource.description.to_s)
                  when Attachment
                    check_pdf_accessibility(@resource)
+                 when DiscussionTopic
+                   check_content_accessibility(@resource.message.to_s)
                  else
                    raise ArgumentError, "Unsupported resource type: #{@resource.class.name}"
                  end

@@ -190,16 +190,10 @@ type TokenRowProps = {
 const TokenRow = memo(({token}: TokenRowProps) => {
   const deleteToken = useDeleteToken(token.user_id)
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
-  const createdAtFormatted = format(token.created_at, 'date.formats.full')
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
-  const lastUsedAtFormattedValue = format(token.last_used_at, 'date.formats.full')
+  const createdAtFormatted = format(token.created_at, 'date.formats.full', undefined)
+  const lastUsedAtFormattedValue = format(token.last_used_at, 'date.formats.full', undefined)
   const lastUsedAtFormatted = token.last_used_at ? lastUsedAtFormattedValue : null
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
-  const expiresAtFormattedValue = format(token.expires_at, 'date.formats.full')
+  const expiresAtFormattedValue = format(token.expires_at, 'date.formats.full', undefined)
   const expiresAtFormatted = token.expires_at ? expiresAtFormattedValue : null
 
   return (

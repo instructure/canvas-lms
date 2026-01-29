@@ -28,6 +28,7 @@ import {
   SUBMISSION_HISTORIES_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import {MockedProvider} from '@apollo/client/testing'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import StudentViewQuery from '../components/StudentViewQuery'
@@ -88,9 +89,11 @@ describe('student view integration tests', () => {
       const overrides = [{Assignment: {name: 'Test Assignment', rubric: null}}]
       const mocks = [await createPublicAssignmentMocks(overrides)]
       const {findAllByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       expect((await findAllByText('Test Assignment'))[0]).toBeInTheDocument()
     })
@@ -104,9 +107,11 @@ describe('student view integration tests', () => {
       ]
       const mocks = [await createPublicAssignmentMocks(overrides)]
       const {findByTestId} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       // Wait for the assignment to load
@@ -125,9 +130,11 @@ describe('student view integration tests', () => {
       const overrides = [{Assignment: {name: 'Test Assignment'}}]
       const mocks = [await createPublicAssignmentMocks(overrides)]
       const {queryByRole} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       expect(queryByRole('button', {name: 'View Rubric'})).not.toBeInTheDocument()
@@ -176,9 +183,11 @@ describe('student view integration tests', () => {
 
       const mocks = await createGraphqlMocks({Submission: {state: 'unsubmitted'}})
       const {findByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       expect(
         await findByText('You must submit your own work before you can review your peers.'),
@@ -193,9 +202,11 @@ describe('student view integration tests', () => {
 
       const mocks = await createGraphqlMocks({Submission: {state: 'submitted'}})
       const {findByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       expect(
         await findByText('There are no submissions available to review just yet.'),
@@ -210,9 +221,11 @@ describe('student view integration tests', () => {
 
       const mocks = await createGraphqlMocks()
       const {queryByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       expect(
         queryByText('You must submit your own work before you can review your peers.'),
@@ -230,9 +243,11 @@ describe('student view integration tests', () => {
 
       const mocks = await createGraphqlMocks()
       const {queryByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       expect(
         queryByText('You must submit your own work before you can review your peers.'),

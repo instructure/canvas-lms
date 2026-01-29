@@ -180,6 +180,7 @@ export type GradebookOptions = {
   student_groups: StudentGroupCategoryMap
   user_asset_string: string
   performance_improvements_for_gradebook: boolean
+  use_queue_for_rate_limiting_gradebook_requests: boolean
   teacher_notes: {
     hidden: boolean
     id: string

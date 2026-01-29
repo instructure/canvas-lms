@@ -99,6 +99,37 @@ class WebConference < ActiveRecord::Base
     settings&.[](:lti_settings)
   end
 
+  def invite_all_enabled?
+    settings[:invite_all] == true
+  end
+
+  def invite_all_enabled=(value)
+    settings[:invite_all] = value
+    settings_will_change!
+  end
+
+  def remove_observers_enabled?
+    settings[:remove_observers] == true
+  end
+
+  def remove_observers_enabled=(value)
+    settings[:remove_observers] = value
+    settings_will_change!
+  end
+
+  def add_new_enrollment_user(user_id)
+    return unless invite_all_enabled?
+    return unless user_id
+
+    # Respect remove_observers if enabled
+    if remove_observers_enabled? && context.is_a?(Course)
+      observer_ids = context.observers.pluck(:id)
+      return if observer_ids.include?(user_id)
+    end
+
+    invite_users_from_context([user_id])
+  end
+
   def lti_tool_valid
     tool_id = settings.dig(:lti_settings, :tool_id)
     if tool_id.blank?

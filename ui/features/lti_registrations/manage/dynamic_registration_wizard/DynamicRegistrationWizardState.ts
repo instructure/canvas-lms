@@ -31,6 +31,7 @@ import {
   type ApiResult,
   isUnsuccessful,
   isSuccessful,
+  combineAllApiResults,
 } from '../../common/lib/apiResult/ApiResult'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
@@ -45,6 +46,7 @@ import {
   Lti1p3RegistrationOverlayStateError,
 } from '../registration_overlay/validateLti1p3RegistrationOverlayState'
 import {type Lti1p3RegistrationOverlayState} from '../registration_overlay/Lti1p3RegistrationOverlayState'
+import {LtiRegistrationUpdateRequestId} from '../model/lti_ims_registration/LtiRegistrationUpdateRequestId'
 /**
  * Steps are:
  * 1. Open modal, prompting for url
@@ -65,12 +67,14 @@ export interface DynamicRegistrationActions {
    *    can be a account id, shard-relative id, or the string 'site_admin'
    * @param dynamicRegistrationUrl The url to use for dynamic registration
    * @param unifiedToolId Included in token if provided
+   * @param updatingRegistrationId The id of the registration to update
    * @returns
    */
   loadRegistrationToken: (
     accountId: AccountId,
     dynamicRegistrationUrl: string,
     unifiedToolId?: UnifiedToolId,
+    updatingRegistrationId?: LtiRegistrationId,
   ) => void
 
   /**
@@ -102,6 +106,14 @@ export interface DynamicRegistrationActions {
     registrationId: LtiRegistrationId,
     adminNickname: string,
     onSuccess: (registrationId: LtiRegistrationId) => void,
+  ) => Promise<unknown>
+
+  applyRegistrationUpdateRequest: (
+    accountId: AccountId,
+    registrationId: LtiRegistrationId,
+    registrationUpdateRequestId: LtiRegistrationUpdateRequestId,
+    overlay: LtiConfigurationOverlay,
+    onSuccess: () => void,
   ) => Promise<unknown>
 
   /**
@@ -365,11 +377,17 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
         accountId: AccountId,
         dynamicRegistrationUrl: string,
         unifiedToolId?: UnifiedToolId,
+        updatingRegistrationId?: LtiRegistrationId,
       ) => {
         set(stateFor({_type: 'RequestingToken'}))
 
         service
-          .fetchRegistrationToken(accountId, dynamicRegistrationUrl, unifiedToolId)
+          .fetchRegistrationToken(
+            accountId,
+            dynamicRegistrationUrl,
+            unifiedToolId,
+            updatingRegistrationId,
+          )
           .then(resp => {
             if (isSuccessful(resp)) {
               set(stateFor({_type: 'WaitingForTool', registrationToken: resp.data}))
@@ -488,6 +506,28 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
             return updating(state.registration, state.overlayStore)
           }),
         )
+      },
+      applyRegistrationUpdateRequest: async (
+        accountId: AccountId,
+        registrationId: LtiRegistrationId,
+        registrationUpdateRequestId: LtiRegistrationUpdateRequestId,
+        overlay: LtiConfigurationOverlay,
+        onSuccess: () => void,
+      ) => {
+        set(stateFrom('Updating')(state => updating(state.registration, state.overlayStore)))
+
+        const result = await service.applyLtiRegistrationUpdateRequest(
+          accountId,
+          registrationId,
+          registrationUpdateRequestId,
+          overlay,
+        )
+
+        if (isSuccessful(result)) {
+          onSuccess()
+        } else {
+          set(stateFor(errorState(formatApiResultError(result))))
+        }
       },
       deleteKey: async (
         prevState: ReviewingStateType,

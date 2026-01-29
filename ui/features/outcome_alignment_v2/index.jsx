@@ -19,14 +19,14 @@
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import OutcomeAlignmentDeleteLink from './react/OutcomeAlignmentDeleteLink'
 
 ready(() => {
   $('li.alignment').each((_, li) => {
     const $div = $(li).find('div.links')[0]
 
-    ReactDOM.render(
+    legacyRender(
       <OutcomeAlignmentDeleteLink
         has_rubric_association={$(li).data('has-rubric-association')}
         url={$(li).data('url')}

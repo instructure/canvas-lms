@@ -391,6 +391,20 @@ class ApplicationController < ActionController::Base
                                     elsif @context.is_a?(Course)
                                       @context.account.horizon_account?
                                     end
+        if load_usage_metrics? && @domain_root_account&.feature_enabled?(:pendo_extended)
+          @js_env[:USAGE_METRICS_METADATA] ||= {}
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_id] = effective_account_id(@context)
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_name] = effective_account_name(@context)
+
+          if @context.is_a?(Course)
+            @js_env[:USAGE_METRICS_METADATA][:course_id] = @context.id
+            @js_env[:USAGE_METRICS_METADATA][:course_long_name] = "#{@context.name} - #{@context.short_name}"
+            @js_env[:USAGE_METRICS_METADATA][:course_sis_source_id] = @context.sis_source_id
+            @js_env[:USAGE_METRICS_METADATA][:course_sis_batch_id] = @context.sis_batch_id
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_id] = @context.enrollment_term_id
+          end
+        end
+
         if @context.is_a?(Course)
           @js_env[:FEATURES][:youtube_overlay] = @context.account.feature_enabled?(:youtube_overlay)
           @js_env[:FEATURES][:rce_studio_embed_improvements] = @context.feature_enabled?(:rce_studio_embed_improvements)
@@ -475,11 +489,9 @@ class ApplicationController < ActionController::Base
     scheduled_feedback_releases
     speedgrader_studio_media_capture
     student_access_token_management
-    top_navigation_placement_a11y_fixes
     validate_call_to_action
     block_content_editor_ai_alt_text
     ux_list_concluded_courses_in_bp
-    assign_to_in_edit_pages_rewrite
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
@@ -500,7 +512,6 @@ class ApplicationController < ActionController::Base
     disable_iframe_sandbox_file_show
     extended_submission_state
     file_verifiers_for_quiz_links
-    increased_top_nav_pane_size
     instui_nav
     login_registration_ui_identity
     lti_apps_page_ai_translation
@@ -520,6 +531,7 @@ class ApplicationController < ActionController::Base
     modules_requirements_allow_percentage
     non_scoring_rubrics
     open_tools_in_new_tab
+    pendo_extended
     product_tours
     rce_lite_enabled_speedgrader_comments
     rce_transform_loaded_content
@@ -2300,7 +2312,11 @@ class ApplicationController < ActionController::Base
         render "context_modules/lock_explanation"
       else
         tag.context_module_action(@current_user, :read)
-        render "context_modules/url_show"
+        if tag.new_tab && params[:follow_redirect] && Account.site_admin.feature_enabled?(:module_external_url_seamless_redirect)
+          redirect_to tag.url, allow_other_host: true
+        else
+          render "context_modules/url_show"
+        end
       end
     elsif tag.content_type == "ContextExternalTool"
       timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -2489,6 +2505,7 @@ class ApplicationController < ActionController::Base
     end
     named_context_url(@context, :context_external_content_success_url, "external_tool_redirect", include_host: true)
   end
+  public :set_return_url
 
   def lti_launch_params(adapter)
     adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool), lti_turnitin_outcomes_placement_url(@tool.id))
@@ -2663,6 +2680,18 @@ class ApplicationController < ActionController::Base
     feature_enabled?(feature) && service_enabled?(feature)
   end
   helper_method :feature_and_service_enabled?
+
+  def effective_account_name(context)
+    if context.is_a?(Account)
+      context.name
+    elsif context.is_a?(Course)
+      context.account.name
+    elsif context.respond_to?(:context)
+      effective_account_name(context.context)
+    else
+      @domain_root_account&.name
+    end
+  end
 
   def random_lti_tool_form_id
     rand(0..999).to_s

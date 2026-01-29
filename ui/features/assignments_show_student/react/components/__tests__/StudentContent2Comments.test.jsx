@@ -19,6 +19,8 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {fireEvent, render} from '@testing-library/react'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
@@ -80,9 +82,11 @@ describe('StudentContent Comments Tray', () => {
     const mocks = await makeMocks()
     const props = await mockAssignmentAndSubmission()
     const {findByText} = render(
-      <MockedProvider mocks={mocks}>
-        <StudentContent {...props} />
-      </MockedProvider>,
+      <QueryClientProvider client={queryClient}>
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </QueryClientProvider>,
     )
     fireEvent.click(await findByText(/add comment/i))
     expect(await findByText(/attempt 1 feedback/i)).toBeInTheDocument()
@@ -92,9 +96,11 @@ describe('StudentContent Comments Tray', () => {
     const mocks = await makeMocks()
     const props = await mockAssignmentAndSubmission()
     const {getAllByTitle, getByText} = render(
-      <MockedProvider mocks={mocks}>
-        <StudentContent {...props} />
-      </MockedProvider>,
+      <QueryClientProvider client={queryClient}>
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </QueryClientProvider>,
     )
     fireEvent.click(getByText('Add Comment'))
     expect(getAllByTitle('Loading')[0]).toBeInTheDocument()
@@ -106,9 +112,11 @@ describe('StudentContent Comments Tray', () => {
     const mocks = await makeMocks()
     const props = await mockAssignmentAndSubmission()
     const {findByText} = render(
-      <MockedProvider mocks={mocks}>
-        <StudentContent {...props} />
-      </MockedProvider>,
+      <QueryClientProvider client={queryClient}>
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </QueryClientProvider>,
     )
 
     expect(await findByText(/attempt 1 feedback/i)).toBeInTheDocument()
@@ -120,9 +128,11 @@ describe('StudentContent Comments Tray', () => {
     const mocks = await makeMocks()
     const props = await mockAssignmentAndSubmission()
     const {queryByText} = render(
-      <MockedProvider mocks={mocks}>
-        <StudentContent {...props} />
-      </MockedProvider>,
+      <QueryClientProvider client={queryClient}>
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </QueryClientProvider>,
     )
 
     await new Promise(resolve => setTimeout(resolve, 100))

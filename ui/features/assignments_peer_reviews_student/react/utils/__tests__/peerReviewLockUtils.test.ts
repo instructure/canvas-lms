@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getPeerReviewUnlockDate, isPeerReviewLocked} from '../peerReviewLockUtils'
+import {
+  getPeerReviewUnlockDate,
+  isPeerReviewLocked,
+  getPeerReviewLockDate,
+  isPeerReviewPastLockDate,
+} from '../peerReviewLockUtils'
 import {Assignment} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 
 describe('peerReviewLockUtils', () => {
@@ -29,7 +34,7 @@ describe('peerReviewLockUtils', () => {
     nonDigitalSubmission: false,
     pointsPossible: 10,
     courseId: '1',
-    peerReviews: {count: 2, submissionRequired: true},
+    peerReviews: {count: 2, submissionRequired: true, pointsPossible: null, anonymousReviews: false},
     submissionsConnection: null,
     assignedToDates: null,
     assessmentRequestsForCurrentUser: null,
@@ -188,6 +193,134 @@ describe('peerReviewLockUtils', () => {
         ],
       })
       expect(isPeerReviewLocked(assignment)).toBe(true)
+    })
+  })
+
+  describe('getPeerReviewLockDate', () => {
+    it('returns null when assignedToDates is null', () => {
+      const assignment = mockAssignment()
+      expect(getPeerReviewLockDate(assignment)).toBeNull()
+    })
+
+    it('returns null when peerReviewDates is null', () => {
+      const assignment = mockAssignment({
+        assignedToDates: [
+          {
+            dueAt: '2020-10-15T16:00:00Z',
+            peerReviewDates: null,
+          },
+        ],
+      })
+      expect(getPeerReviewLockDate(assignment)).toBeNull()
+    })
+
+    it('returns peer review lock date when it is set', () => {
+      const lockDate = '2020-10-31T18:00:00Z'
+      const assignment = mockAssignment({
+        assignedToDates: [
+          {
+            dueAt: '2020-10-10T16:00:00Z',
+            peerReviewDates: {
+              unlockAt: '2020-10-15T16:00:00Z',
+              dueAt: null,
+              lockAt: lockDate,
+            },
+          },
+        ],
+      })
+      expect(getPeerReviewLockDate(assignment)).toBe(lockDate)
+    })
+
+    it('returns null when peer review lock date is not set', () => {
+      const assignment = mockAssignment({
+        assignedToDates: [
+          {
+            dueAt: '2020-10-10T16:00:00Z',
+            peerReviewDates: {
+              unlockAt: '2020-10-15T16:00:00Z',
+              dueAt: null,
+              lockAt: null,
+            },
+          },
+        ],
+      })
+      expect(getPeerReviewLockDate(assignment)).toBeNull()
+    })
+  })
+
+  describe('isPeerReviewPastLockDate', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+      jest.setSystemTime(new Date('2020-10-01T12:00:00Z'))
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it('returns false when assignedToDates is null', () => {
+      const assignment = mockAssignment()
+      expect(isPeerReviewPastLockDate(assignment)).toBe(false)
+    })
+
+    it('returns false when lock date is null', () => {
+      const assignment = mockAssignment({
+        assignedToDates: [
+          {
+            dueAt: '2020-10-10T16:00:00Z',
+            peerReviewDates: {
+              unlockAt: '2020-09-30T06:00:00Z',
+              dueAt: null,
+              lockAt: null,
+            },
+          },
+        ],
+      })
+      expect(isPeerReviewPastLockDate(assignment)).toBe(false)
+    })
+
+    it('returns true when current time is after peer review lock date', () => {
+      const assignment = mockAssignment({
+        assignedToDates: [
+          {
+            dueAt: '2020-10-10T16:00:00Z',
+            peerReviewDates: {
+              unlockAt: '2020-09-20T06:00:00Z',
+              dueAt: null,
+              lockAt: '2020-09-30T18:00:00Z',
+            },
+          },
+        ],
+      })
+      expect(isPeerReviewPastLockDate(assignment)).toBe(true)
+    })
+
+    it('returns false when current time is before peer review lock date', () => {
+      const assignment = mockAssignment({
+        assignedToDates: [
+          {
+            dueAt: '2020-10-10T16:00:00Z',
+            peerReviewDates: {
+              unlockAt: '2020-09-20T06:00:00Z',
+              dueAt: null,
+              lockAt: '2020-10-31T18:00:00Z',
+            },
+          },
+        ],
+      })
+      expect(isPeerReviewPastLockDate(assignment)).toBe(false)
+    })
+
+    it('returns false when peerReviewDates is null', () => {
+      const assignment = mockAssignment({
+        assignedToDates: [
+          {
+            dueAt: '2020-10-10T16:00:00Z',
+            peerReviewDates: null,
+          },
+        ],
+      })
+      expect(isPeerReviewPastLockDate(assignment)).toBe(false)
     })
   })
 })

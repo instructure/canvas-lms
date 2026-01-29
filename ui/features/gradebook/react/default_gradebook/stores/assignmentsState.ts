@@ -295,6 +295,7 @@ export default (
     const {data: assignmentGroups} = await getAllAssignmentGroups({
       queryParams: {courseId: get().courseId},
       headers: {'Correlation-Id': get().correlationId},
+      queue: get().returnQueueIfDefined(),
     })
     const assignmentGroupIds = assignmentGroups.map(group => group._id)
     const limit = pLimit(GRADEBOOK_GRAPHQL_CONFIG.maxAssignmentRequestCount)
@@ -311,6 +312,7 @@ export default (
               getAllAssignments({
                 queryParams: {assignmentGroupId, gradingPeriodId},
                 headers: {'Correlation-Id': get().correlationId},
+                queue: get().returnQueueIfDefined(),
               }),
             ),
           )

@@ -867,12 +867,6 @@
                 </div>
               <% end %>
             <% end %>
-            <% unless @account.site_admin? %>
-              <div>
-                <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
-                <label for="enable_equella"><%= t 'labels.equella', 'Equella' %></label>
-              </div>
-            <% end %>
             <% if @account.grants_right?(@current_user, :manage_site_settings) %>
               <div>
                 <%= settings.check_box :enable_turnitin, :checked => @account.settings[:enable_turnitin] %>
@@ -911,25 +905,6 @@
         <% end %>
 
         <% unless @account.site_admin? %>
-          <fieldset id="enable_equella_settings" style="display: none;">
-            <legend><%= t(:equella_settings_title, "Equella Settings") %></legend>
-            <%= f.fields_for :settings do |settings| %>
-              <table class="formtable">
-                <tr>
-                  <td style="vertical-align: top;"><%= settings.label :equella_endpoint, :en => "Equella Endpoint" %></td>
-                  <td>
-                    <%= settings.text_field :equella_endpoint, :value => @account.settings[:equella_endpoint] %>
-                    <div style="font-size: 0.9em;"><%= t(:equall_endpoint_help, "This is the URL to your equella service.  It will probably look something like \"%{sample_url}\".", :sample_url => "http://oer.equella.com/signon.do") %></div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= settings.blabel :equella_teaser, :en => "Equella Comments" %></td>
-                  <td><%= settings.text_area :equella_teaser, :style => "width: 90%; height: 75px;", :value => @account.settings[:equella_teaser] %></td>
-                </tr>
-              </table>
-            <% end %>
-          </fieldset>
-
           <fieldset id="turnitin_settings">
             <legend><%= t("Similarity Detection Platform") %></legend>
             <table class="formtable narrow">

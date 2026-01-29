@@ -21,6 +21,7 @@ import {render, screen, cleanup} from '@testing-library/react'
 import CustomForbiddenWordsSection from '../CustomForbiddenWordsSection'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 vi.mock('../apiClient')
 
@@ -44,17 +45,12 @@ const server = setupServer(
 describe('CustomForbiddenWordsSection Component', () => {
   beforeAll(() => {
     server.listen()
-    if (!window.ENV) {
-      // @ts-expect-error
-      window.ENV = {}
-    }
-    window.ENV.DOMAIN_ROOT_ACCOUNT_ID = '1'
+    fakeEnv.setup({DOMAIN_ROOT_ACCOUNT_ID: '1'})
   })
 
   afterAll(() => {
     server.close()
-    // @ts-expect-error
-    delete window.ENV.DOMAIN_ROOT_ACCOUNT_ID
+    fakeEnv.teardown()
   })
 
   afterEach(() => {
@@ -63,8 +59,7 @@ describe('CustomForbiddenWordsSection Component', () => {
   })
 
   describe('when no file is uploaded', () => {
-
-    it('shows “Upload” button but not “Current Custom List”', async () => {
+    it('shows "Upload" button but not "Current Custom List"', async () => {
       render(
         // @ts-expect-error
         <CustomForbiddenWordsSection

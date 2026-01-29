@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/client/testing'
 import {render, fireEvent} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import StudentContent from '../StudentContent'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -104,11 +104,11 @@ describe('Assignment Student Content View', () => {
       props.assignment = {...props.assignment, ...assignmentOverrides}
 
       return render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
             <StudentContent {...props} />
           </AlertManagerContext.Provider>
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
     }
 

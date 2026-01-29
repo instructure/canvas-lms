@@ -138,7 +138,7 @@ describe('TurnitinAPMigrationModal Actions', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationReady])
+          return HttpResponse.json({accounts: [mockMigrationReady], coordinator_progress: null})
         },
       ),
       http.post(
@@ -156,8 +156,8 @@ describe('TurnitinAPMigrationModal Actions', () => {
       expect(screen.getByText('Business School')).toBeInTheDocument()
     })
 
-    // Click migrate button without enabling email
-    const migrateButton = screen.getByRole('button', {name: /Migrate/i})
+    // Click migrate button without enabling email (not "Migrate All")
+    const migrateButton = screen.getByRole('button', {name: /^Migrate$/i})
     await user.click(migrateButton)
 
     // Verify no body was sent in the request
@@ -175,7 +175,7 @@ describe('TurnitinAPMigrationModal Actions', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationReady])
+          return HttpResponse.json({accounts: [mockMigrationReady], coordinator_progress: null})
         },
       ),
       http.post(
@@ -208,8 +208,8 @@ describe('TurnitinAPMigrationModal Actions', () => {
     const emailInput = screen.getByPlaceholderText(/Enter email address/i)
     await user.type(emailInput, testEmail)
 
-    // Click migrate button
-    const migrateButton = screen.getByRole('button', {name: /Migrate/i})
+    // Click migrate button (not "Migrate All")
+    const migrateButton = screen.getByRole('button', {name: /^Migrate$/i})
     await user.click(migrateButton)
 
     // Verify email was included in the request
@@ -226,7 +226,7 @@ describe('TurnitinAPMigrationModal Actions', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json(mockMigrations)
+          return HttpResponse.json({accounts: mockMigrations, coordinator_progress: null})
         },
       ),
     )
@@ -256,7 +256,7 @@ describe('TurnitinAPMigrationModal Actions', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json(mockMigrations)
+          return HttpResponse.json({accounts: mockMigrations, coordinator_progress: null})
         },
       ),
     )
@@ -285,7 +285,7 @@ describe('TurnitinAPMigrationModal Actions', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([mockMigrationReady])
+          return HttpResponse.json({accounts: [mockMigrationReady], coordinator_progress: null})
         },
       ),
       http.post(
@@ -302,13 +302,468 @@ describe('TurnitinAPMigrationModal Actions', () => {
       expect(screen.getByText('Business School')).toBeInTheDocument()
     })
 
-    const migrateButton = screen.getByRole('button', {name: /Migrate/i})
+    const migrateButton = screen.getByRole('button', {name: /^Migrate$/i})
     await user.click(migrateButton)
 
     // The mutation should be triggered
     await waitFor(() => {
       // After successful mutation, the query should refetch
       expect(screen.getByText('Business School')).toBeInTheDocument()
+    })
+  })
+
+  describe('Migrate All functionality', () => {
+    it('should show "Migrate All" button when eligible migrations exist', async () => {
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockMigrationReady, mockMigrationFailed],
+              coordinator_progress: null,
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: /Migrate All/i})).toBeInTheDocument()
+      })
+    })
+
+    it('should hide "Migrate All" button when all migrations are completed or running', async () => {
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockMigrationRunning, mockMigrationCompleted],
+              coordinator_progress: null,
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByText('Engineering Department')).toBeInTheDocument()
+      })
+
+      expect(screen.queryByRole('button', {name: /Migrate All/i})).not.toBeInTheDocument()
+    })
+
+    it('should hide "Migrate All" button when there is only one eligible migration', async () => {
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({accounts: [mockMigrationReady], coordinator_progress: null})
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByText('Business School')).toBeInTheDocument()
+      })
+
+      expect(screen.queryByRole('button', {name: /Migrate All/i})).not.toBeInTheDocument()
+    })
+
+    it('should call migrate_all endpoint when "Migrate All" is clicked', async () => {
+      const user = userEvent.setup()
+      let migrateAllCalled = false
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockMigrationReady, mockMigrationFailed],
+              coordinator_progress: null,
+            })
+          },
+        ),
+        http.post(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations/migrate_all`,
+          () => {
+            migrateAllCalled = true
+            return HttpResponse.json({
+              message: 'Started migration for 2 accounts',
+              progress_ids: [1001, 1002],
+              account_ids: ['1', '4'],
+              bulk_migration_id: 'test-uuid',
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: /Migrate All/i})).toBeInTheDocument()
+      })
+
+      const migrateAllButton = screen.getByRole('button', {name: /Migrate All/i})
+      await user.click(migrateAllButton)
+
+      await waitFor(() => {
+        expect(migrateAllCalled).toBe(true)
+      })
+    })
+
+    it('should include email in migrate_all request when checkbox is checked', async () => {
+      const user = userEvent.setup()
+      let capturedRequestBody: any = null
+      const testEmail = 'test@example.com'
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockMigrationReady, mockMigrationFailed],
+              coordinator_progress: null,
+            })
+          },
+        ),
+        http.post(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations/migrate_all`,
+          async ({request}) => {
+            capturedRequestBody = await request.json()
+            return HttpResponse.json({
+              message: 'Started migration for 2 accounts',
+              progress_ids: [1001, 1002],
+              account_ids: ['1', '4'],
+              bulk_migration_id: 'test-uuid',
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: /Migrate All/i})).toBeInTheDocument()
+      })
+
+      // Enable email notification checkbox
+      const checkbox = screen.getByRole('checkbox', {
+        name: /Email report upon completion of a migration/i,
+      })
+      await user.click(checkbox)
+
+      // Fill in email address
+      const emailInput = screen.getByPlaceholderText(/Enter email address/i)
+      await user.type(emailInput, testEmail)
+
+      // Click Migrate All button
+      const migrateAllButton = screen.getByRole('button', {name: /Migrate All/i})
+      await user.click(migrateAllButton)
+
+      await waitFor(() => {
+        expect(capturedRequestBody).toEqual({email: testEmail})
+      })
+    })
+
+    it('should not include email in migrate_all request when checkbox is unchecked', async () => {
+      const user = userEvent.setup()
+      let capturedRequestBody: any = null
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockMigrationReady, mockMigrationFailed],
+              coordinator_progress: null,
+            })
+          },
+        ),
+        http.post(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations/migrate_all`,
+          async ({request}) => {
+            capturedRequestBody = await request.text()
+            return HttpResponse.json({
+              message: 'Started migration for 2 accounts',
+              progress_ids: [1001, 1002],
+              account_ids: ['1', '4'],
+              bulk_migration_id: 'test-uuid',
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: /Migrate All/i})).toBeInTheDocument()
+      })
+
+      // Click Migrate All button without enabling email
+      const migrateAllButton = screen.getByRole('button', {name: /Migrate All/i})
+      await user.click(migrateAllButton)
+
+      await waitFor(() => {
+        expect(capturedRequestBody).toBe('')
+      })
+    })
+
+    it('should disable "Migrate All" button when email validation fails', async () => {
+      const user = userEvent.setup()
+      let migrateAllCalled = false
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockMigrationReady, mockMigrationFailed],
+              coordinator_progress: null,
+            })
+          },
+        ),
+        http.post(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations/migrate_all`,
+          () => {
+            migrateAllCalled = true
+            return HttpResponse.json({
+              message: 'Started migration for 2 accounts',
+              progress_ids: [1001, 1002],
+              account_ids: ['1', '4'],
+              bulk_migration_id: 'test-uuid',
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: /Migrate All/i})).toBeInTheDocument()
+      })
+
+      // Enable email notification checkbox
+      const checkbox = screen.getByRole('checkbox', {
+        name: /Email report upon completion of a migration/i,
+      })
+      await user.click(checkbox)
+
+      // Enter invalid email (no @)
+      const emailInput = screen.getByPlaceholderText(/Enter email address/i)
+      await user.type(emailInput, 'invalidemail')
+
+      // Try to click Migrate All button - should not trigger mutation due to disabled state
+      const migrateAllButton = screen.getByRole('button', {name: /Migrate All/i})
+      await user.click(migrateAllButton)
+
+      // Wait a bit to ensure the mutation doesn't fire
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Verify the migrate_all endpoint was not called
+      expect(migrateAllCalled).toBe(false)
+    })
+
+    it('should show "Migrating All..." text during pending state', async () => {
+      const user = userEvent.setup()
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockMigrationReady, mockMigrationFailed],
+              coordinator_progress: null,
+            })
+          },
+        ),
+        http.post(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations/migrate_all`,
+          async () => {
+            // Delay response to simulate loading state
+            await new Promise(resolve => setTimeout(resolve, 100))
+            return HttpResponse.json({
+              message: 'Started migration for 2 accounts',
+              progress_ids: [1001, 1002],
+              account_ids: ['1', '4'],
+              bulk_migration_id: 'test-uuid',
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: /Migrate All/i})).toBeInTheDocument()
+      })
+
+      const migrateAllButton = screen.getByRole('button', {name: /Migrate All/i})
+      await user.click(migrateAllButton)
+
+      // Should show "Migrating All..." during pending state
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: /Migrating All.../i})).toBeInTheDocument()
+      })
+    })
+
+    it('should show consolidated report link when coordinator progress is completed', async () => {
+      const consolidatedReportUrl = 'https://example.com/consolidated_report.csv'
+      const mockCompletedAccount1 = {
+        ...mockMigrationCompleted,
+        account_id: '20',
+        account_name: 'Completed Account 1',
+      }
+      const mockCompletedAccount2 = {
+        ...mockMigrationCompleted,
+        account_id: '21',
+        account_name: 'Completed Account 2',
+      }
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockCompletedAccount1, mockCompletedAccount2],
+              coordinator_progress: {
+                id: 'coordinator-123',
+                workflow_state: 'completed',
+                consolidated_report_url: consolidatedReportUrl,
+              },
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByText('Download Consolidated Report')).toBeInTheDocument()
+      })
+
+      const consolidatedLink = screen.getByText('Download Consolidated Report')
+      expect(consolidatedLink).toHaveAttribute('href', consolidatedReportUrl)
+      expect(consolidatedLink).toHaveAttribute('target', '_blank')
+    })
+
+    it('should not show Migrate All button when consolidated report is available', async () => {
+      const mockCompletedAccount3 = {
+        ...mockMigrationCompleted,
+        account_id: '22',
+        account_name: 'Completed Account 3',
+      }
+      const mockCompletedAccount4 = {
+        ...mockMigrationCompleted,
+        account_id: '23',
+        account_name: 'Completed Account 4',
+      }
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockCompletedAccount3, mockCompletedAccount4],
+              coordinator_progress: {
+                id: 'coordinator-123',
+                workflow_state: 'completed',
+                consolidated_report_url: 'https://example.com/report.csv',
+              },
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByText('Download Consolidated Report')).toBeInTheDocument()
+      })
+
+      expect(screen.queryByRole('button', {name: /Migrate All/i})).not.toBeInTheDocument()
+    })
+
+    it('should show disabled "Migrate All" button when coordinator is running', async () => {
+      const mockRunningAccount1 = {
+        ...mockMigrationRunning,
+        account_id: '10',
+        account_name: 'Running Account 1',
+      }
+      const mockRunningAccount2 = {
+        ...mockMigrationRunning,
+        account_id: '11',
+        account_name: 'Running Account 2',
+      }
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockRunningAccount1, mockRunningAccount2],
+              coordinator_progress: {
+                id: 'coordinator-123',
+                workflow_state: 'running',
+                consolidated_report_url: null,
+              },
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByText('Running Account 1')).toBeInTheDocument()
+      })
+
+      const migrateAllButton = screen.getByRole('button', {name: /Migrating All.../i})
+      expect(migrateAllButton).toBeInTheDocument()
+      expect(migrateAllButton).toHaveAttribute('type', 'button')
+    })
+
+    it('should show disabled "Migrate All" button when coordinator is queued', async () => {
+      const mockQueuedAccount1 = {
+        ...mockMigrationReady,
+        account_id: '12',
+        account_name: 'Queued Account 1',
+      }
+      const mockQueuedAccount2 = {
+        ...mockMigrationReady,
+        account_id: '13',
+        account_name: 'Queued Account 2',
+      }
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
+          () => {
+            return HttpResponse.json({
+              accounts: [mockQueuedAccount1, mockQueuedAccount2],
+              coordinator_progress: {
+                id: 'coordinator-123',
+                workflow_state: 'queued',
+                consolidated_report_url: null,
+              },
+            })
+          },
+        ),
+      )
+
+      render(<TurnitinAPMigrationModal {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByText('Queued Account 1')).toBeInTheDocument()
+      })
+
+      const migrateAllButton = screen.getByRole('button', {name: /Migrating All.../i})
+      expect(migrateAllButton).toBeInTheDocument()
+      expect(migrateAllButton).toHaveAttribute('type', 'button')
     })
   })
 })

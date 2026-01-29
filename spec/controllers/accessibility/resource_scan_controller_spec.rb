@@ -69,6 +69,38 @@ describe Accessibility::ResourceScanController do
   end
 
   describe "GET #index" do
+    context "with discussion topics" do
+      before do
+        accessibility_resource_scan_model(
+          course:,
+          context: discussion_topic_model(context: course),
+          workflow_state: "completed",
+          resource_name: "Discussion Topic Resource",
+          resource_workflow_state: :published,
+          issue_count: 1,
+          resource_updated_at: 1.day.ago
+        )
+      end
+
+      it "includes discussion topic scans" do
+        get :index, params: { course_id: course.id }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        resource_types = json.pluck("resource_type")
+        expect(resource_types).to include("DiscussionTopic")
+      end
+
+      it "sorts discussion topics by resource_type" do
+        get :index, params: { course_id: course.id, sort: "resource_type", direction: "asc" }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        discussion_scan = json.find { |scan| scan["resource_type"] == "DiscussionTopic" }
+        expect(discussion_scan).to be_present
+      end
+    end
+
     %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].each do |sort_param|
       it "sorts by #{sort_param} ascending and descending" do
         # Ascending order
@@ -157,6 +189,7 @@ describe Accessibility::ResourceScanController do
           "resource_url" => "/courses/#{course.id}/pages/#{wiki_page.id}",
           "workflow_state" => "completed",
           "error_message" => "",
+          "closed_at" => nil,
           "issue_count" => 1,
           "issues" => [
             {
@@ -226,6 +259,28 @@ describe Accessibility::ResourceScanController do
           json = response.parsed_body
           expect(json.length).to eq(1)
           expect(json.all? { |scan| scan["resource_type"] == "Assignment" }).to be true
+        end
+
+        context "with discussion topics" do
+          before do
+            accessibility_resource_scan_model(
+              course:,
+              context: discussion_topic_model(context: course),
+              workflow_state: "completed",
+              resource_name: "Discussion",
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
+
+          it "filters by discussion_topic resource type" do
+            get :index, params: { course_id: course.id, filters: { artifactTypes: ["discussion_topic"] } }, format: :json
+            expect(response).to have_http_status(:ok)
+
+            json = response.parsed_body
+            expect(json.length).to eq(1)
+            expect(json.first["resource_type"]).to eq("DiscussionTopic")
+          end
         end
 
         it "filters by workflow states" do
@@ -559,6 +614,99 @@ describe Accessibility::ResourceScanController do
 
       # Clean up setting
       Setting.remove("accessibility_resource_scan_poll_max_ids")
+    end
+  end
+
+  describe "PATCH #close_issues" do
+    let(:user) { user_model }
+    let(:wiki_page) { wiki_page_model(course:) }
+    let(:scan) do
+      accessibility_resource_scan_model(
+        course:,
+        context: wiki_page,
+        workflow_state: "completed"
+      )
+    end
+
+    before do
+      allow_any_instance_of(described_class).to receive(:require_user) do
+        controller.instance_variable_set(:@current_user, user)
+        true
+      end
+      allow_any_instance_of(described_class).to receive(:check_authorized_action) do
+        controller.instance_variable_set(:@context, course)
+        true
+      end
+      allow_any_instance_of(described_class).to receive(:check_close_issues_feature_flag).and_return(true)
+    end
+
+    context "when a11y_checker_close_issues feature flag disabled" do
+      it "renders forbidden" do
+        expect(Accessibility::BulkCloseIssuesService).not_to receive(:call)
+
+        allow_any_instance_of(described_class).to receive(:check_close_issues_feature_flag).and_call_original
+        # allow(course).to receive(:a11y_checker_enabled?).and_return(false)
+
+        patch :close_issues, params: { course_id: course.id, id: scan.id, close: true }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    it "returns 200 and calls service with correct params" do
+      expect(Accessibility::BulkCloseIssuesService).to receive(:call).with(
+        scan:,
+        user_id: user.id,
+        close: true
+      )
+
+      patch :close_issues, params: { course_id: course.id, id: scan.id, close: true }, format: :json
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "returns 404 when scan does not exist" do
+      patch :close_issues, params: { course_id: course.id, id: 999_999, close: true }, format: :json
+      expect(response).to have_http_status(:not_found)
+
+      json = response.parsed_body
+      expect(json["error"]).to eq("Scan not found")
+    end
+
+    it "returns 404 when scan belongs to different course" do
+      other_course = course_model
+      other_scan = accessibility_resource_scan_model(
+        course: other_course,
+        context: wiki_page_model(course: other_course),
+        workflow_state: "completed"
+      )
+
+      patch :close_issues, params: { course_id: course.id, id: other_scan.id, close: true }, format: :json
+      expect(response).to have_http_status(:not_found)
+
+      json = response.parsed_body
+      expect(json["error"]).to eq("Scan not found")
+    end
+
+    it "returns 422 when service raises exception" do
+      allow(Accessibility::BulkCloseIssuesService).to receive(:call).and_raise(StandardError, "Something went wrong")
+
+      patch :close_issues, params: { course_id: course.id, id: scan.id, close: true }, format: :json
+      expect(response).to have_http_status(:unprocessable_content)
+
+      json = response.parsed_body
+      expect(json["error"]).to eq("Something went wrong")
+    end
+
+    it "returns scan attributes in response" do
+      allow(Accessibility::BulkCloseIssuesService).to receive(:call)
+
+      patch :close_issues, params: { course_id: course.id, id: scan.id, close: true }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      expect(json).to have_key("id")
+      expect(json).to have_key("resource_id")
+      expect(json).to have_key("workflow_state")
+      expect(json).to have_key("closed_at")
     end
   end
 end

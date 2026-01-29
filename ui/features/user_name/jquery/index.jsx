@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
@@ -43,7 +43,6 @@ ready(function () {
       return
     }
 
-    const root = createRoot(mountPoint)
     const userId = ENV.USER_ID
     const canManageUserDetails = ENV.PERMISSIONS.can_manage_user_details
     const timezones = ENV.TIMEZONES
@@ -51,12 +50,7 @@ ready(function () {
     const userDetails = $('#name_and_email .user_details').getTemplateData({
       textValues: ['name', 'email', 'short_name', 'sortable_name', 'time_zone'],
     })
-    const closeModal = () => {
-      root.unmount()
-      event.target.focus()
-    }
-
-    root.render(
+    const root = render(
       <EditUserDetails
         userId={userId}
         userDetails={{
@@ -69,10 +63,15 @@ ready(function () {
         onSubmit={data => {
           $('#name_and_email .user_details').fillTemplateData({data})
 
-          closeModal()
+          root.unmount()
+          event.target.focus()
         }}
-        onClose={() => closeModal()}
+        onClose={() => {
+          root.unmount()
+          event.target.focus()
+        }}
       />,
+      mountPoint,
     )
   })
   $('.remove_avatar_picture_link').on('click', async function (event) {

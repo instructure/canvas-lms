@@ -272,6 +272,12 @@ export interface EnvCommon {
    */
   top_navigation_tools: Tool[]
 
+  /**
+   * Used by ui/features/assignment_index/react/IndexMenu.tsx
+   * Set in ApplicationController#js_env
+   */
+  assignment_index_menu_tools?: Tool[]
+
   BLUEPRINT_COURSES_DATA: BlueprintCoursesData | undefined
   AI_FEEDBACK_LINK?: string
 
@@ -312,7 +318,6 @@ export type SiteAdminFeatureId =
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
   | 'student_access_token_management'
-  | 'top_navigation_placement_a11y_fixes'
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
@@ -338,7 +343,6 @@ export type RootAccountFeatureId =
   | 'create_course_subaccount_picker'
   | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
-  | 'increased_top_nav_pane_size'
   | 'instui_nav'
   | 'login_registration_ui_identity'
   | 'lti_apps_page_ai_translation'
@@ -356,6 +360,7 @@ export type RootAccountFeatureId =
   | 'modules_requirements_allow_percentage'
   | 'non_scoring_rubrics'
   | 'open_tools_in_new_tab'
+  | 'pendo_extended'
   | 'product_tours'
   | 'rce_lite_enabled_speedgrader_comments'
   | 'rce_studio_embed_improvements'

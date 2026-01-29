@@ -17,6 +17,9 @@
  */
 
 const GRADEBOOK_GRAPHQL_CONFIG = {
+  // if useQueueForRateLimiting is true, this concurrency will be used for the PQueue instance
+  // limiting the number of concurrent requests to the GraphQL endpoint
+  concurrency: 15,
   // Number of users to fetch per page in the gradebook
   usersPageSize: 50,
   // Maximum number of assignments to request concurrently

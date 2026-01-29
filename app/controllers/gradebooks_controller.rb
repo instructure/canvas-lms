@@ -102,12 +102,12 @@ class GradebooksController < ApplicationController
                   .where(user_id: @presenter.student_id, assignment_id: @context.assignments.active)
                   .select(:cached_due_date, :grading_period_id, :assignment_id, :user_id)
                   .each_with_object({}) do |submission, hsh|
-          hsh[submission.assignment_id] = {
-            submission.user_id => {
-              due_at: submission.cached_due_date,
-              grading_period_id: submission.grading_period_id,
-            }
-          }
+                    hsh[submission.assignment_id] = {
+                      submission.user_id => {
+                        due_at: submission.cached_due_date,
+                        grading_period_id: submission.grading_period_id,
+                      }
+                    }
         end
     end
 
@@ -254,7 +254,7 @@ class GradebooksController < ApplicationController
       }
       assignment_order = allowed_orders.fetch(params.fetch(:assignment_order), :due_at)
       @current_user.set_preference(:course_grades_assignment_order, @context.id, assignment_order)
-      redirect_back(fallback_location: course_grades_url(@context))
+      redirect_back_or_to(course_grades_url(@context))
     end
   end
 
@@ -591,6 +591,7 @@ class GradebooksController < ApplicationController
       user_asset_string: @current_user&.asset_string,
       performance_improvements_for_gradebook: @context.feature_enabled?(:performance_improvements_for_gradebook) &&
                                               Services::PlatformServiceGradebook.use_graphql?(@context.account.global_id, @context.global_id),
+      use_queue_for_rate_limiting_gradebook_requests: Account.site_admin.feature_enabled?(:use_queue_for_rate_limiting_gradebook_requests),
       version: params.fetch(:version, nil),
       assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
       grading_periods_filter_dates_enabled: Account.site_admin.feature_enabled?(:grading_periods_filter_dates),
@@ -914,7 +915,12 @@ class GradebooksController < ApplicationController
             if params.key?(:sub_assignment_tag) && @context.discussion_checkpoints_enabled?
               submission[:sub_assignment_tag] = params[:sub_assignment_tag]
             end
-            subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
+
+            opts = submission.merge(
+              skip_grader_check: is_default_grade_for_missing,
+              async_grade_group: value_to_boolean(params.fetch(:async_grade_group, false))
+            )
+            subs = @assignment.grade_student(@user, opts)
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
           end
@@ -1109,6 +1115,9 @@ class GradebooksController < ApplicationController
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
         FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED: @context.filter_speed_grader_by_student_group?,
+        # create_tc_warning is provided by instructure_misc_plugin (separate repo)
+        # Check defensively if available
+        fixed_warnings: [respond_to?(:create_tc_warning, true) ? create_tc_warning : nil].compact,
         context_url: named_context_url(@context, :context_grades_url),
         course_id: @context.id,
         late_policy: @context.late_policy&.as_json(include_root: false),

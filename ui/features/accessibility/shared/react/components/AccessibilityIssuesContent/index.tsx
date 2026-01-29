@@ -53,9 +53,10 @@ import {getCourseBasedPath, getResourceScanPath} from '../../utils/query'
 import ApplyButton from './ApplyButton'
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
-import Preview, {PreviewHandle} from './Preview'
+import {PreviewHandle} from './Preview'
 import SuccessView from './SuccessView'
 import WhyMattersPopover from './WhyMattersPopover'
+import {ProblemArea} from './ProblemArea/ProblemArea'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -170,7 +171,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setIsFormLocked(false)
 
         setTimeout(
-          () => setAssertiveAlertMessage(I18n.t('Issue preview updated with fixed version')),
+          () => setAssertiveAlertMessage(I18n.t('Problem area updated with fixed version')),
           1500,
         )
       },
@@ -194,7 +195,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setIsRemediated(false)
         setIsFormLocked(false)
 
-        setTimeout(() => setAssertiveAlertMessage(I18n.t('Issue preview fix undone')), 1500)
+        setTimeout(() => setAssertiveAlertMessage(I18n.t('Problem area fix undone')), 1500)
       },
       error => {
         if (error) {
@@ -476,24 +477,18 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                     </Link>
                   </Flex>
                 </Flex>
-                <View as="section" aria-label={I18n.t('Issue preview')}>
-                  <Preview
-                    ref={previewRef}
-                    issue={currentIssue}
-                    resourceId={item.resourceId}
-                    itemType={item.resourceType}
-                  />
-                </View>
+
+                <ProblemArea previewRef={previewRef} item={item} issue={currentIssue} />
               </Flex>
-              {currentIssue.form.type !== FormType.ColorPicker && (
-                <View as="section" margin="medium 0">
-                  <Heading level="h4" variant="titleCardMini">
-                    {I18n.t('Issue description')}
-                  </Heading>
-                  <br aria-hidden={true} />
-                  <Text weight="weightRegular">{currentIssue.message}</Text>
-                </View>
-              )}
+
+              <View as="section" margin="medium 0">
+                <Heading level="h4" variant="titleCardMini">
+                  {I18n.t('Issue description')}
+                </Heading>
+                <br aria-hidden={true} />
+                <Text weight="weightRegular">{currentIssue.message}</Text>
+              </View>
+
               <View as="section" margin="medium 0">
                 <Form
                   key={currentIssue.id}

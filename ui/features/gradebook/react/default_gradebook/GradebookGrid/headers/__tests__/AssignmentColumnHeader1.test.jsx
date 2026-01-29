@@ -407,18 +407,18 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
       props.assignment.htmlUrl = 'http://localhost/assignments/2300'
     })
 
-    test('SpeedGrader link includes peer_review parameter for peer review sub assignments', () => {
+    test('SpeedGrader link does not include peer_review parameter for peer review sub assignments', () => {
       mountAndOpenOptionsMenu()
       const speedGraderLink = getSpeedGraderLink()
       expect(speedGraderLink).toBeDefined()
-      expect(speedGraderLink.href).toMatch(/peer_review=true/)
+      expect(speedGraderLink.href).not.toMatch(/peer_review=true/)
     })
 
-    test('SpeedGrader link uses parent assignment ID for peer review sub assignments', () => {
+    test('SpeedGrader link uses sub-assignment ID for peer review sub assignments', () => {
       mountAndOpenOptionsMenu()
       const speedGraderLink = getSpeedGraderLink()
       expect(speedGraderLink).toBeDefined()
-      expect(speedGraderLink.href).toMatch(/assignment_id=2300/)
+      expect(speedGraderLink.href).toMatch(/assignment_id=2301/)
     })
 
     test('assignment link points to parent assignment for peer review sub assignments', () => {

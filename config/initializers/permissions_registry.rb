@@ -2166,6 +2166,14 @@ BASE_PERMISSIONS = {
     account_only: true,
     account_allows: ->(a) { a.feature_enabled?(:intelligent_insights_rsi_report) }
   },
+  view_accessibility_insights: {
+    label: -> { I18n.t("Accessibility Insights") },
+    group: :view_advanced_analytics,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: true,
+    account_allows: ->(a) { a.feature_enabled?(:intelligent_insights_accessibility_insights) }
+  },
   manage_impact: {
     label: -> { I18n.t("Impact - Manage") },
     available_to: %w[AccountAdmin AccountMembership],

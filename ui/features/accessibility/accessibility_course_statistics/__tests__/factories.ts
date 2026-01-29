@@ -69,3 +69,7 @@ export const createMockCourses = (count: number, overrides?: Partial<Course>): C
       ...overrides,
     }),
   )
+
+export const createMockLinkHeaderString = (lastPage: number, accountId = '123'): string => {
+  return `</api/v1/accounts/${accountId}/courses?page=${lastPage}&per_page=14>; rel="last"`
+}

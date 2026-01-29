@@ -20,6 +20,9 @@ import React from 'react'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import CommentsTray, {TrayContent} from '@canvas/assignments/react/CommentsTray'
 import {Submission, Assignment} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 
 const apolloClient = createClient()
 
@@ -44,6 +47,8 @@ interface CommentsTrayContentWithApolloProps {
   open: boolean
   onSuccessfulPeerReview: () => void
   usePeerReviewModal?: boolean
+  isReadOnly: boolean
+  suppressSuccessAlert?: boolean
 }
 
 /**
@@ -76,13 +81,20 @@ const CommentsTrayContentWithApollo: React.FC<CommentsTrayContentWithApolloProps
     assignment: assignmentWithEnv,
   }
 
+  const studentViewContextValue = {
+    ...StudentViewContextDefaults,
+    allowPeerReviewComments: !props.isReadOnly,
+  }
+
   return (
     <ApolloProvider client={apolloClient}>
-      {props.renderTray ? (
-        <CommentsTray {...formattedProps} />
-      ) : (
-        <TrayContent {...formattedProps} />
-      )}
+      <StudentViewContext.Provider value={studentViewContextValue}>
+        {props.renderTray ? (
+          <CommentsTray {...formattedProps} />
+        ) : (
+          <TrayContent {...formattedProps} />
+        )}
+      </StudentViewContext.Provider>
     </ApolloProvider>
   )
 }

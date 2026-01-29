@@ -21,6 +21,10 @@ import PeerReviewDueDateTimeInput from './PeerReviewDueDateTimeInput'
 import PeerReviewAvailableFromDateTimeInput from './PeerReviewAvailableFromDateTimeInput'
 import PeerReviewAvailableToDateTimeInput from './PeerReviewAvailableToDateTimeInput'
 import type {DateLockTypes, CustomDateTimeInputProps} from '../types'
+import {
+  useSettingDependency,
+  SETTING_MESSAGES,
+} from '@canvas/assignments/react/hooks/useSettingDependency'
 
 type PeerReviewSelectorProps = CustomDateTimeInputProps & {
   assignmentDueDate: string | null
@@ -74,33 +78,29 @@ const PeerReviewSelector = ({
   }
 
   useEffect(() => {
-    // Check initial state
     checkPeerReviewState()
-
-    const handlePeerReviewToggle = (event: MessageEvent) => {
-      if (event.data?.subject === 'ASGMT.togglePeerReviews') {
-        // When we receive the toggle event, check the actual checkbox state
-        // This handles cases where moderated grading enables/disables the checkbox
-        setTimeout(checkPeerReviewState, 0)
-      }
-    }
 
     const handleCheckboxChange = () => {
       checkPeerReviewState()
     }
 
-    // Listen for peer review toggle messages from EditView
-    window.addEventListener('message', handlePeerReviewToggle as EventListener)
-
-    // Listen for changes to the checkbox itself
     const checkbox = document.getElementById('assignment_peer_reviews_checkbox')
     checkbox?.addEventListener('change', handleCheckboxChange)
 
     return () => {
-      window.removeEventListener('message', handlePeerReviewToggle as EventListener)
       checkbox?.removeEventListener('change', handleCheckboxChange)
     }
   }, [])
+
+  useSettingDependency(SETTING_MESSAGES.TOGGLE_PEER_REVIEWS, {
+    onDisabled: () => {
+      setPeerReviewEnabled(false)
+    },
+    onEnabled: () => {
+      // Ensure DOM state is settled before checking
+      requestAnimationFrame(checkPeerReviewState)
+    },
+  })
 
   // Clear peer review dates when assignment due date is cleared
   const prevAssignmentDueDateRef = useRef(assignmentDueDate)

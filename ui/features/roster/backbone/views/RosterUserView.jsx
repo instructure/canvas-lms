@@ -24,7 +24,7 @@ import EditSectionsModal from '../../react/EditSectionsModal'
 import EditRolesModal from '../../react/EditRolesModal'
 import InvitationsView from './InvitationsView'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {Avatar} from '@instructure/ui-avatar'
 import LinkToStudents from '../../react/LinkToStudents'
 import {nanoid} from 'nanoid'
@@ -221,9 +221,6 @@ export default class RosterUserView extends View {
   editSections() {
     const mountPoint = document.getElementById('edit_sections_mount_point')
     if (mountPoint) {
-      if (editSectionsRoot === null) {
-        editSectionsRoot = createRoot(mountPoint)
-      }
       const enrollments = this.model.sectionEditableEnrollments()
       const excludeSections = enrollments.map(enrollment => {
         const section = ENV.SECTIONS.find(s => s.id === enrollment.course_section_id)
@@ -240,15 +237,20 @@ export default class RosterUserView extends View {
         }
       })
       const filteredExcludeSections = excludeSections.filter(section => section !== null)
-      editSectionsRoot.render(
+      const component = (
         <EditSectionsModal
           onClose={() => {
-            editSectionsRoot.render(null)
+            rerender(editSectionsRoot, null)
           }}
           onUpdate={sections => this.updateSections(sections)}
           excludeSections={filteredExcludeSections}
-        />,
+        />
       )
+      if (editSectionsRoot === null) {
+        editSectionsRoot = render(component, mountPoint)
+      } else {
+        rerender(editSectionsRoot, component)
+      }
     }
   }
 
@@ -301,7 +303,6 @@ export default class RosterUserView extends View {
 
   linkToStudents() {
     const mountPoint = document.getElementById('link_to_students_mount_point')
-    linkToStudentsRoot = createRoot(mountPoint)
     const observer = this.model.attributes
     const observerEnrollmentsWithObservedUser = observer.enrollments.filter(
       enrollment => enrollment.type === 'ObserverEnrollment' && enrollment.observed_user,
@@ -309,7 +310,7 @@ export default class RosterUserView extends View {
     const initialObservees = this.getUniqueObservees(observerEnrollmentsWithObservedUser)
     const course = ENV.current_context
 
-    linkToStudentsRoot.render(
+    const component = (
       <LinkToStudents
         observer={observer}
         initialObservees={initialObservees}
@@ -318,32 +319,38 @@ export default class RosterUserView extends View {
           this.updateEnrollments(addedEnrollments, removedEnrollments)
         }}
         onClose={() => {
-          linkToStudentsRoot.render(null)
+          rerender(linkToStudentsRoot, null)
         }}
-      />,
+      />
     )
+    if (linkToStudentsRoot === null) {
+      linkToStudentsRoot = render(component, mountPoint)
+    } else {
+      rerender(linkToStudentsRoot, component)
+    }
   }
 
   editRoles() {
-    if (editRolesRoot === null) {
-      const mountPoint = document.getElementById('edit_roles_mount_point')
-      editRolesRoot = createRoot(mountPoint)
-    }
-
+    const mountPoint = document.getElementById('edit_roles_mount_point')
     const availableRoles = ENV.ALL_ROLES.filter(role => role.addable_by_user)
-    editRolesRoot.render(
+    const component = (
       <EditRolesModal
         currentEnrollments={this.model.enrollments()}
         availableRoles={availableRoles}
         userId={this.model.get('id')}
         onClose={() => {
-          editRolesRoot.render(null)
+          rerender(editRolesRoot, null)
         }}
         onSubmit={(newEnrollments, deletedEnrollments) => {
           this.updateEnrollments(newEnrollments, deletedEnrollments)
         }}
-      />,
+      />
     )
+    if (editRolesRoot === null) {
+      editRolesRoot = render(component, mountPoint)
+    } else {
+      rerender(editRolesRoot, component)
+    }
   }
 
   deactivateUser() {
@@ -575,16 +582,20 @@ export default class RosterUserView extends View {
       this.userTagModalContainer.unmount()
       this.userTagModalContainer = null
     }
-    if (!this.userTagModalContainer) this.userTagModalContainer = createRoot(el)
-    this.userTagModalContainer.render(
+    const component = (
       <UserTaggedModal
         isOpen={isOpen}
         courseId={ENV.course.id}
         userId={userId}
         userName={userName}
         onClose={onModalClose}
-      />,
+      />
     )
+    if (!this.userTagModalContainer) {
+      this.userTagModalContainer = render(component, el)
+    } else {
+      rerender(this.userTagModalContainer, component)
+    }
   }
 
   focus() {
@@ -598,8 +609,7 @@ export default class RosterUserView extends View {
   afterRender() {
     const container = this.$el.find(`#${this.model.attributes.avatarId}`)[0]
     if (container) {
-      const root = createRoot(container)
-      root.render(
+      const root = render(
         <a href={`users/${this.model.id}`}>
           <Avatar
             name={this.model.attributes.name}
@@ -609,6 +619,7 @@ export default class RosterUserView extends View {
           />
           <span className="screenreader-only">{this.model.attributes.name}</span>
         </a>,
+        container,
       )
       this._reactRoot = root
     }

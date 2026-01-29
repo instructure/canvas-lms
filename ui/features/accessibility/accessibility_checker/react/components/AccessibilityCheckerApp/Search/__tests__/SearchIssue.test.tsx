@@ -147,4 +147,34 @@ describe('SearchIssue Component', () => {
 
     expect(screen.queryByTestId('clear-search-button')).not.toBeInTheDocument()
   })
+
+  it('should use semantic search input type', () => {
+    const mockOnSearchChange = vi.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+
+    const input = screen.getByTestId('issue-search-input')
+
+    expect(input).toHaveAttribute('type', 'search')
+  })
+
+  it('should have accessible label for screen readers', () => {
+    const mockOnSearchChange = vi.fn()
+    const {container} = render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+
+    const label = container.querySelector('label[for="issueSearchInput"]')
+
+    expect(label).toBeInTheDocument()
+    expect(label).toHaveTextContent('Search resource titles')
+  })
+
+  it('should provide hint message for search behavior', () => {
+    const mockOnSearchChange = vi.fn()
+    render(<SearchIssue onSearchChange={mockOnSearchChange} />)
+
+    const hintText = screen.getByText(
+      'Start typing to search. Results will update automatically after 3 characters.',
+    )
+
+    expect(hintText).toBeInTheDocument()
+  })
 })

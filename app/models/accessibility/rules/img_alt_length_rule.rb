@@ -42,7 +42,7 @@ module Accessibility
           checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
           input_label: I18n.t("Alt text"),
           undo_text: I18n.t("Alt text updated"),
-          input_description: I18n.t("Describe what's on the picture."),
+          input_description: I18n.t("Describe what this image is meant to convey."),
           input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
           is_canvas_image: Accessibility::AiGenerationService.extract_attachment_id_from_element(elem).present?,
@@ -60,7 +60,7 @@ module Accessibility
       end
 
       def message
-        I18n.t("Recommended alt text length is under %{max_length} characters. Concise descriptions help screen reader users scan pages efficiently.", max_length: ImgAltRuleHelper::MAX_LENGTH)
+        I18n.t("Recommended alt text length is under %{max_length} characters. Concise descriptions help screen reader users scan pages efficiently. If this image conveys complex information, consider placing it in the image caption or the following paragraph.", max_length: ImgAltRuleHelper::MAX_LENGTH)
       end
 
       def issue_preview(elem)

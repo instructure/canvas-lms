@@ -51,6 +51,7 @@ const baseMockPlannerItems: PlannerItem[] = [
       missing: false,
       needs_grading: false,
       has_feedback: false,
+      redo_request: false,
     },
     planner_override: null,
   },
@@ -101,6 +102,7 @@ const baseMockPlannerItems: PlannerItem[] = [
       missing: false,
       needs_grading: false,
       has_feedback: false,
+      redo_request: false,
     },
     planner_override: null,
   },
@@ -228,6 +230,7 @@ const baseMockPlannerItems: PlannerItem[] = [
       missing: false,
       needs_grading: false,
       has_feedback: false,
+      redo_request: false,
     },
     planner_override: null,
     details: {

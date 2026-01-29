@@ -75,8 +75,7 @@ class ScoreToUngradedManager {
     }
   }
 
-  // @ts-expect-error
-  monitorProcess(resolve, reject) {
+  monitorProcess(resolve: (value: unknown) => void, reject: (reason?: any) => void) {
     if (!this.monitoringUrl()) {
       this.process = undefined
       reject(I18n.t('No way to monitor score to ungraded provided!'))

@@ -74,6 +74,7 @@ describe CareerController do
             horizon_learning_library: false,
             horizon_chart_view: false,
             horizon_native_permissions_page: false,
+            horizon_block_content_editor: false,
             horizon_course_academic_switcher: false,
             horizon_syncable_objects_redesign: false,
             horizon_help_navigation: false

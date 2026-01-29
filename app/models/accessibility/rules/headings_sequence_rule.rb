@@ -52,8 +52,8 @@ module Accessibility
           undo_text: I18n.t("Heading hierarchy is now correct"),
           value: I18n.t("Fix heading hierarchy"),
           options: [
-            I18n.t("Fix heading hierarchy"),
-            I18n.t("Remove heading style")
+            I18n.t("Fix heading level"),
+            I18n.t("Turn into a paragraph")
           ],
           action: I18n.t("Reformat")
         )
@@ -61,24 +61,24 @@ module Accessibility
 
       def fix!(elem, value)
         case value
-        when I18n.t("Fix heading hierarchy")
+        when I18n.t("Fix heading level")
           prior_h = self.class.get_prior_heading(elem)
           h_idx = prior_h ? prior_h.tag_name[1..].to_i : 0
           elem.name = "h#{h_idx + 1}"
-        when I18n.t("Remove heading style")
+        when I18n.t("Turn into a paragraph")
           elem.name = "p"
         end
-        elem
+        { changed: elem }
       end
 
       def display_name
-        I18n.t("Heading order")
+        I18n.t("Skipped heading level")
       end
 
       def message
         I18n.t(
-          "Make sure heading levels follow a logical order (for example, H2, then H3, then H4)." \
-          "This helps screen reader users understand the structure of the page."
+          "This heading is more than one level below the previous heading." \
+          "Heading levels should follow a logical order, for example Heading 2, then H3, then H4."
         )
       end
 

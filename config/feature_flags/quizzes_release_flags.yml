@@ -139,3 +139,9 @@ new_quizzes_native_experience:
   state: hidden
   shadow: true
   applies_to: Course
+new_quizzes_native_experience_respondus:
+  display_name: New Quizzes Native Experience Respondus
+  description: When enabled, New Quizzes in Respondus is rendered as a Federated Module, for better 3rd party integration (i.e., ReadSpeaker)
+  state: hidden
+  shadow: true
+  applies_to: Course

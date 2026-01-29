@@ -567,6 +567,7 @@ CanvasRails::Application.routes.draw do
         post "course_scan" => "accessibility/course_scan#create"
         get "resource_scan" => "accessibility/resource_scan#index"
         get "resource_scan/poll" => "accessibility/resource_scan#poll"
+        patch "resource_scan/:id/close_issues" => "accessibility/resource_scan#close_issues"
         get "issue_summary" => "accessibility/issue_summary#show"
       end
     end
@@ -1472,6 +1473,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/assignments/:assignment_id/retry_alignment_clone", action: :retry_alignment_clone
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
       post "courses/:course_id/assignments/:assignment_id/accessibility/scan", action: :accessibility_scan, as: "assignment_accessibility_scan"
+      post "courses/:course_id/assignments/:assignment_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "assignment_accessibility_queue_scan"
     end
 
     scope(controller: "assignment_extensions") do
@@ -1619,6 +1621,7 @@ CanvasRails::Application.routes.draw do
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights/entries", action: :insight_entries, as: "#{context}_discussion_topic_insight_entries"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights/entries/:entry_id", action: :insight_entry_update, as: "#{context}_discussion_topic_insight_entry_update"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/duplicate", action: :duplicate
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/accessibility/scan", action: :accessibility_scan, as: "#{context}_discussion_topic_accessibility_scan"
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entry_list", action: :entry_list, as: "#{context}_discussion_topic_entry_list"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", action: :add_entry, as: "#{context}_discussion_add_entry"
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", action: :entries, as: "#{context}_discussion_entries"
@@ -2161,6 +2164,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "lti/asset_processor_tii_migrations_api") do
       get "accounts/:account_id/asset_processors/tii_migrations", action: :index
       post "accounts/:account_id/asset_processors/tii_migrations", action: :create
+      post "accounts/:account_id/asset_processors/tii_migrations/migrate_all", action: :migrate_all
     end
 
     scope(controller: :immersive_reader) do
@@ -2269,6 +2273,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/pages_ai/alt_text", action: :ai_generate_alt_text
       post "groups/:group_id/pages_ai/alt_text", action: :ai_generate_alt_text
       post "courses/:course_id/pages/:url_or_id/accessibility/scan", action: :accessibility_scan, as: "pages_accessibility_scan"
+      post "courses/:course_id/pages/:url_or_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "pages_accessibility_queue_scan"
     end
 
     scope(controller: :context_modules_api) do
@@ -2442,6 +2447,12 @@ CanvasRails::Application.routes.draw do
     scope(controller: "live_assessments/results") do
       get "courses/:course_id/live_assessments/:assessment_id/results", action: :index, as: "course_live_assessment_results"
       post "courses/:course_id/live_assessments/:assessment_id/results", action: :create, as: "course_live_assessment_result_create"
+    end
+
+    scope(controller: :assessment_question_banks) do
+      get "question_banks", action: :index, as: "question_banks"
+      get "question_banks/:id", action: :show, as: "question_bank"
+      get "question_banks/:id/questions", action: :questions, as: "question_bank_questions"
     end
 
     scope(controller: "support_helpers/turnitin") do

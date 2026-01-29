@@ -21,3 +21,12 @@ ams_advanced_content_organization:
   description: >-
     Advanced content organization features in the Assessment Management Service (AMS).
     This may change or break at any time and is not intended for most accounts.
+
+ams_add_question_bank_to_quiz_question:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Add Question Bank to Quiz Question
+  description: >-
+    When enabled, the assessment_question_bank_id will be included in the Quiz Questions API response
+    from /api/v1/courses/:course_id/quizzes/:quiz_id/questions.

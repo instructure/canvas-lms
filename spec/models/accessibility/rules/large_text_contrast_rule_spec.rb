@@ -133,4 +133,62 @@ describe Accessibility::Rules::LargeTextContrastRule do
       expect(fixed_html).to include("color: #000000")
     end
   end
+
+  context "when generating form data" do
+    let(:rule) { Accessibility::Rules::LargeTextContrastRule.new }
+
+    it "suggests black text when it meets contrast threshold with background" do
+      input_html = '<h1 style="color: #BBBBBB; background-color: #FFFFFF; font-size: 24px;">Low contrast heading</h1>'
+      document = Nokogiri::HTML::DocumentFragment.parse(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      element = document.at_xpath("./*")
+
+      form_field = rule.form(element)
+      form_hash = form_field.to_h
+
+      expect(form_hash[:value]).to eq("#000000")
+      expect(form_hash[:background_color]).to eq("#FFFFFF")
+      expect(form_hash[:options]).to eq(["large"])
+    end
+
+    it "suggests white text when black text does not meet contrast threshold with background" do
+      input_html = '<h1 style="color: #BBBBBB; background-color: #000000; font-size: 24px;">Low contrast heading</h1>'
+      document = Nokogiri::HTML::DocumentFragment.parse(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      element = document.at_xpath("./*")
+
+      form_field = rule.form(element)
+      form_hash = form_field.to_h
+
+      expect(form_hash[:value]).to eq("#FFFFFF")
+      expect(form_hash[:background_color]).to eq("#000000")
+      expect(form_hash[:options]).to eq(["large"])
+    end
+
+    it "suggests black text for light backgrounds (gray)" do
+      input_html = '<h1 style="color: #BBBBBB; background-color: #EEEEEE; font-size: 24px;">Low contrast heading</h1>'
+      document = Nokogiri::HTML::DocumentFragment.parse(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      element = document.at_xpath("./*")
+
+      form_field = rule.form(element)
+      form_hash = form_field.to_h
+
+      expect(form_hash[:value]).to eq("#000000")
+      expect(form_hash[:background_color]).to eq("#EEEEEE")
+    end
+
+    it "suggests white text for dark backgrounds (dark gray)" do
+      input_html = '<h1 style="color: #BBBBBB; background-color: #333333; font-size: 24px;">Low contrast heading</h1>'
+      document = Nokogiri::HTML::DocumentFragment.parse(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      element = document.at_xpath("./*")
+
+      form_field = rule.form(element)
+      form_hash = form_field.to_h
+
+      expect(form_hash[:value]).to eq("#FFFFFF")
+      expect(form_hash[:background_color]).to eq("#333333")
+    end
+  end
 end

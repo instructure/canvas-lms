@@ -210,7 +210,7 @@ module K5DashboardPageObject
   end
 
   def navigation_item_selector
-    ".navitem"
+    ".course-nav-tabs-list .course-nav-tab"
   end
 
   def new_course_button_selector

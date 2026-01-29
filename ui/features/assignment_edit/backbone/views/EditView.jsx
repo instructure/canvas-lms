@@ -1062,7 +1062,33 @@ EditView.prototype.handleRestrictFileUploadsChange = function () {
 }
 
 EditView.prototype.handleGradingTypeChange = function (gradingType) {
-  this.$gradedAssignmentFields.toggleAccessibly(gradingType !== 'not_graded')
+  const isNotGraded = gradingType === 'not_graded'
+  this.$gradedAssignmentFields.toggleAccessibly(!isNotGraded)
+
+  this.$peerReviewsFields.toggleAccessibly(!isNotGraded)
+  if (isNotGraded) {
+    if (this.$peerReviewsBox.prop('checked')) {
+      this.$peerReviewsBox.prop('checked', false)
+    }
+    window.top.postMessage(
+      {
+        subject: 'ASGMT.togglePeerReviews',
+        enabled: false,
+      },
+      '*',
+    )
+    $('#peer_reviews_details')?.toggleAccessibly(false)
+  } else if (!this.assignment.moderatedGrading()) {
+    window.top.postMessage(
+      {
+        subject: 'ASGMT.togglePeerReviews',
+        enabled: true,
+      },
+      '*',
+    )
+  }
+
+  this.renderModeratedGradingFormFieldGroup()
   return this.handleSubmissionTypeChange(null)
 }
 
@@ -1076,9 +1102,10 @@ EditView.prototype.handleQuizTypeChange = function (quizType) {
     this.$assignmentPointsPossible.val('0')
   }
 
-  const isSurvey = quizType === 'graded_survey' || quizType === 'ungraded_survey'
-  // Hide Assignment Group, Display Grade as, Submission Type and Graded Assignment Fields for surveys
-  this.$assignmentGroupSelector.toggleAccessibly(!isSurvey)
+  const isGradedSurvey = quizType === 'graded_survey'
+  const isSurvey = isUngradedSurvey || isGradedSurvey
+
+  this.$assignmentGroupSelector.toggleAccessibly(!isUngradedSurvey)
   this.$gradingTypeSelector.toggleAccessibly(!isSurvey)
   this.$submissionTypeFields.toggleAccessibly(!isSurvey)
   this.$gradedAssignmentFields.toggleAccessibly(!isSurvey)
@@ -1124,7 +1151,11 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
     this.selectedTool = undefined
   }
   this.$groupCategorySelector.toggleAccessibly(subVal !== 'external_tool' && !isPlacementTool)
-  this.$peerReviewsFields.toggleAccessibly(subVal !== 'external_tool' && !isPlacementTool)
+  const gradingType = $('#assignment_grading_type').val()
+  const isNotGraded = gradingType === 'not_graded'
+  this.$peerReviewsFields.toggleAccessibly(
+    subVal !== 'external_tool' && !isPlacementTool && !isNotGraded,
+  )
   this.$defaultExternalToolContainer.toggleAccessibly(subVal === 'default_external_tool')
   this.$allowedAttemptsContainer.toggleAccessibly(
     subVal === 'online' || subVal === 'external_tool' || isPlacementTool,
@@ -1399,12 +1430,14 @@ EditView.prototype.afterRender = function () {
     this.renderDefaultExternalTool()
   }
 
-  // Hide Assignment Group, Display Grade as, and Submission Type for surveys on initial load
+  // Show/hide fields based on survey type on initial load
   if (this.quizTypeSelector) {
     const currentQuizType = this.assignment.newQuizzesType() || 'graded_quiz'
+    const isGradedSurvey = currentQuizType === 'graded_survey'
+    const isUngradedSurvey = currentQuizType === 'ungraded_survey'
 
-    if (currentQuizType === 'graded_survey' || currentQuizType === 'ungraded_survey') {
-      this.$assignmentGroupSelector.toggleAccessibly(false)
+    if (isGradedSurvey || isUngradedSurvey) {
+      this.$assignmentGroupSelector.toggleAccessibly(isGradedSurvey)
       this.$gradingTypeSelector.toggleAccessibly(false)
       this.$submissionTypeFields.toggleAccessibly(false)
       // Hide graded assignment fields for surveys
@@ -1412,7 +1445,7 @@ EditView.prototype.afterRender = function () {
       this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(true)
     }
 
-    if (currentQuizType === 'ungraded_survey') {
+    if (isUngradedSurvey) {
       this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(false)
       this.$assignmentPointsPossible.val('0')
     }
@@ -1993,10 +2026,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   )?.reactComponentInstance
 
   const invalidInput = sectionViewRef?.focusErrors()
-  // for the case stated in EGG-1507, ad-hoc overrides outside of the course availability
-  // dates show no visible error, but a the card is invalid, the card should be valid
-  // so it should save like everywhere else. until then, we can rely on existence of showError.
-  if (invalidInput && (ENV.FEATURES?.assign_to_in_edit_pages_rewrite || this.showError)) {
+  if (invalidInput) {
     errors.invalid_card = {$input: null, showError: this.showError}
   } else {
     delete errors.invalid_card
@@ -2454,12 +2484,11 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
   }
   let isPeerReviewEnabled
   if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
-    const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-    if (peerReviewCheckbox) {
-      isPeerReviewEnabled = peerReviewCheckbox.checked
+    const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
+    if (peerReviewHidden) {
+      isPeerReviewEnabled = peerReviewHidden.value === 'true'
     } else {
-      // The checkbox has not initialized yet, so we use the value on the assignment
-      isPeerReviewEnabled = this.assignment.peerReviews()
+      isPeerReviewEnabled = this.assignment.peerReviews() || false
     }
   } else {
     isPeerReviewEnabled = !!this.$peerReviewsBox.prop('checked')

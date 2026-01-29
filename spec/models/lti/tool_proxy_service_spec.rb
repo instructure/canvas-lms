@@ -240,12 +240,9 @@ module Lti
         it "handles non-valid placements" do
           tp_json = JSON.parse(tool_proxy_fixture)
           tp_json["tool_profile"]["resource_handler"][0]["message"][0]["enabled_capability"] = ["Canvas.placements.invalid"]
-          begin
-            tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tp_json.to_json, context: account, guid: tool_proxy_guid)
-          rescue Lti::Errors::InvalidToolProxyError => e
-            puts e.message
-          end
-          expect(tool_proxy).to be_nil
+          expect do
+            tool_proxy_service.process_tool_proxy_json(json: tp_json.to_json, context: account, guid: tool_proxy_guid)
+          end.to raise_error(Lti::Errors::InvalidToolProxyError)
         end
       end
 
@@ -391,13 +388,13 @@ module Lti
         tp.security_contract.tp_half_shared_secret = tp_half_secret
         expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }
           .to raise_error(Lti::Errors::InvalidToolProxyError, "Invalid SecurityContract") do |exception|
-          expect(exception.as_json).to eq({
-                                            :invalid_security_contract => [
-                                              :shared_secret,
-                                              :tp_half_shared_secret
-                                            ],
-                                            "error" => "Invalid SecurityContract"
-                                          })
+            expect(exception.as_json).to eq({
+                                              :invalid_security_contract => [
+                                                :shared_secret,
+                                                :tp_half_shared_secret
+                                              ],
+                                              "error" => "Invalid SecurityContract"
+                                            })
         end
       end
     end

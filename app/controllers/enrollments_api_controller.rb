@@ -832,6 +832,9 @@ class EnrollmentsApiController < ApplicationController
   #   Enroll each user as a student, teacher, TA, observer, or designer. If no
   #   value is given, the type will be 'StudentEnrollment'.
   #
+  # @argument enrollment_role_id [Integer]
+  #   Optional custom course-level role id to apply to created enrollments.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/bulk_enrollment \
   #     -X POST \
@@ -853,7 +856,29 @@ class EnrollmentsApiController < ApplicationController
   def bulk_enrollment
     user_ids = params[:user_ids]
     course_ids = params[:course_ids]
-    enrollment_type = params[:enrollment_type] || "StudentEnrollment"
+    enrollment_type = params[:enrollment_type]
+
+    role = nil
+    if params[:enrollment_role_id].present?
+      role = @context.get_role_by_id(params[:enrollment_role_id])
+
+      unless role&.course_role?
+        return render json: { errors: @@errors[:bad_role] }, status: :bad_request
+      end
+
+      if role.inactive?
+        return render json: { errors: @@errors[:inactive_role] }, status: :bad_request
+      end
+
+      enrollment_type ||= role.base_role_type
+
+    end
+
+    enrollment_type ||= "StudentEnrollment"
+
+    if role && enrollment_type != role.base_role_type
+      return render json: { errors: @@errors[:base_type_mismatch] }, status: :bad_request
+    end
 
     unless Enrollment.valid_type?(enrollment_type)
       return render json: { errors: "Invalid enrollment type." }, status: :bad_request
@@ -873,7 +898,8 @@ class EnrollmentsApiController < ApplicationController
     process_params = {
       user_ids:,
       course_ids:,
-      enrollment_type:
+      enrollment_type:,
+      role_id: role&.id
     }
 
     progress.process_job(Enrollment::BulkUpdate.new(@context, @current_user), :bulk_enrollment, { run_at: Time.zone.now, priority: Delayed::NORMAL_PRIORITY }, **process_params)

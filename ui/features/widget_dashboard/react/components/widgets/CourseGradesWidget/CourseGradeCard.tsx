@@ -62,7 +62,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       aria-label={courseName}
     >
       <Flex direction="column" width="100%" height="100%">
-        <Flex.Item height="3rem" padding="small 0 0 xx-small" overflowY="hidden" overflowX="hidden">
+        <Flex.Item height="3rem" padding="small 0 0 xx-small" overflowY="visible">
           <View height="100%" overflowY="hidden">
             <CourseName courseName={courseName} />
           </View>
@@ -81,7 +81,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                 </Text>
               )}
             </Flex.Item>
-            <Flex.Item>
+            <Flex.Item overflowX="visible" overflowY="visible">
               <Flex wrap="wrap" gap="x-small">
                 <Flex.Item>
                   <Link

@@ -73,8 +73,8 @@ module Lti
                                       root_account: control.account&.root_account || control.course&.root_account,
                                       current_user: control.updated_by,
                                       comment:) do
-          control.save!
-          anchor_control&.save!
+            control.save!
+            anchor_control&.save!
         end
       end
 

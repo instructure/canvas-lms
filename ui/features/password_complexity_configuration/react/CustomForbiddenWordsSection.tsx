@@ -171,20 +171,10 @@ const CustomForbiddenWordsSection = ({
             <Checkbox
               checked={customForbiddenWordsEnabled}
               onChange={handleForbiddenWordsToggle}
-              label={I18n.t('Customize forbidden words/terms list')}
+              label={I18n.t('Use custom forbidden words/terms list')}
               data-testid="customForbiddenWordsCheckbox"
               disabled={!forbiddenWordsFileEnabled}
             />
-          </Flex.Item>
-          <Flex.Item>
-            (
-            <Link
-              href="https://github.com/instructure/canvas-lms/blob/master/lib/canvas/security/password_policy.rb#:~:text=DEFAULT_COMMON_PASSWORDS%20%3D%20%25w%5B"
-              target="_blank"
-            >
-              {I18n.t('see default list here')}
-            </Link>
-            )
           </Flex.Item>
         </Flex>
         <View
@@ -195,15 +185,21 @@ const CustomForbiddenWordsSection = ({
         >
           <Text size="small">
             {I18n.t(
-              'Upload a list of forbidden words/terms in addition to the default list. The file should be text file (.txt) with a single word or term per line.',
+              'Optionally upload a .txt file containing your own forbidden words or terms (one per line) to replace the ',
             )}
+            <Link
+              href="https://github.com/instructure/canvas-lms/blob/master/lib/canvas/security/password_policy.rb#:~:text=DEFAULT_COMMON_PASSWORDS%20%3D%20%25w%5B"
+              target="_blank"
+            >
+              {I18n.t('common password list')}
+            </Link>
+            {I18n.t(', if one is configured.')}
           </Text>
           {(!forbiddenWordsUrl || !forbiddenWordsName || !customForbiddenWordsEnabled) && (
             <View as="div" margin="small 0">
               <Button
                 disabled={!customForbiddenWordsEnabled}
-                // @ts-expect-error
-                renderIcon={IconUploadSolid}
+                renderIcon={<IconUploadSolid />}
                 onClick={() => setFileModalOpen(true)}
                 data-testid="uploadButton"
               >

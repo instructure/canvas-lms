@@ -22,10 +22,16 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import SyllabusRevisionsTray from '../SyllabusRevisionsTray'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 const server = setupServer()
 
 vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@canvas/rce/RichContentEditor', () => ({
+  default: {
+    callOnRCE: vi.fn(),
+  },
+}))
 
 describe('SyllabusRevisionsTray', () => {
   const mockVersions = [
@@ -33,11 +39,19 @@ describe('SyllabusRevisionsTray', () => {
       version: 3,
       created_at: '2025-01-03T00:00:00Z',
       syllabus_body: '<p>Current content</p>',
+      edited_by: {
+        id: 1,
+        name: 'John Doe',
+      },
     },
     {
       version: 2,
       created_at: '2025-01-02T00:00:00Z',
       syllabus_body: '<p>Previous content</p>',
+      edited_by: {
+        id: 2,
+        name: 'Jane Smith',
+      },
     },
     {
       version: 1,
@@ -59,6 +73,7 @@ describe('SyllabusRevisionsTray', () => {
     document.body.innerHTML = ''
     vi.mocked(showFlashAlert).mockClear()
     vi.mocked(showFlashError).mockClear()
+    vi.mocked(RichContentEditor.callOnRCE).mockClear()
   })
   afterAll(() => server.close())
 
@@ -286,5 +301,178 @@ describe('SyllabusRevisionsTray', () => {
     rerender(<SyllabusRevisionsTray {...defaultProps} open={false} />)
 
     expect(syllabusElement?.innerHTML).toBe(originalInnerHTML)
+  })
+
+  it('displays user name when edited_by is present', async () => {
+    server.use(
+      http.get('/api/v1/courses/123', () => HttpResponse.json({syllabus_versions: mockVersions})),
+    )
+    render(<SyllabusRevisionsTray {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/by John Doe/)).toBeInTheDocument()
+      expect(screen.getByText(/by Jane Smith/)).toBeInTheDocument()
+    })
+  })
+
+  it('does not display user name when edited_by is not present', async () => {
+    const versionsWithoutUser = [
+      {
+        version: 1,
+        created_at: '2025-01-01T00:00:00Z',
+        syllabus_body: '<p>Old content</p>',
+      },
+    ]
+    server.use(
+      http.get('/api/v1/courses/123', () =>
+        HttpResponse.json({syllabus_versions: versionsWithoutUser}),
+      ),
+    )
+    render(<SyllabusRevisionsTray {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('current-version')).toBeInTheDocument()
+    })
+
+    expect(screen.queryByText(/by /)).not.toBeInTheDocument()
+  })
+
+  describe('edit mode behavior', () => {
+    it('sets editor content when version clicked in edit mode', async () => {
+      document.body.innerHTML = `
+        <div id="course_syllabus"></div>
+        <form id="edit_course_syllabus_form" style="display: block;">
+          <textarea id="course_syllabus_body"></textarea>
+        </form>
+      `
+      server.use(
+        http.get('/api/v1/courses/123', () => HttpResponse.json({syllabus_versions: mockVersions})),
+      )
+      render(<SyllabusRevisionsTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('version-2')).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByTestId('version-2'))
+
+      expect(RichContentEditor.callOnRCE).toHaveBeenCalledWith(
+        expect.anything(),
+        'set_code',
+        '<p>Previous content</p>',
+      )
+    })
+
+    it('does not update page syllabus when version clicked in edit mode', async () => {
+      document.body.innerHTML = `
+        <div id="course_syllabus"><p>Current content</p></div>
+        <form id="edit_course_syllabus_form" style="display: block;">
+          <textarea id="course_syllabus_body"></textarea>
+        </form>
+      `
+      server.use(
+        http.get('/api/v1/courses/123', () => HttpResponse.json({syllabus_versions: mockVersions})),
+      )
+      render(<SyllabusRevisionsTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('version-2')).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByTestId('version-2'))
+
+      const syllabusElement = document.getElementById('course_syllabus')
+      expect(syllabusElement?.innerHTML).toBe('<p>Current content</p>')
+    })
+
+    it('does not restore content when tray closes in edit mode', async () => {
+      document.body.innerHTML = `
+        <div id="course_syllabus"><p>Current content</p></div>
+        <form id="edit_course_syllabus_form" style="display: block;">
+          <textarea id="course_syllabus_body"></textarea>
+        </form>
+      `
+      server.use(
+        http.get('/api/v1/courses/123', () => HttpResponse.json({syllabus_versions: mockVersions})),
+      )
+      const {rerender} = render(<SyllabusRevisionsTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('version-2')).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByTestId('version-2'))
+
+      const syllabusElement = document.getElementById('course_syllabus')
+      const contentBeforeClose = syllabusElement?.innerHTML
+
+      rerender(<SyllabusRevisionsTray {...defaultProps} open={false} />)
+
+      expect(syllabusElement?.innerHTML).toBe(contentBeforeClose)
+    })
+
+    it('updates page syllabus when not in edit mode', async () => {
+      document.body.innerHTML = `
+        <div id="course_syllabus"><p>Current content</p></div>
+        <form id="edit_course_syllabus_form" style="display: none;">
+          <textarea id="course_syllabus_body"></textarea>
+        </form>
+      `
+      server.use(
+        http.get('/api/v1/courses/123', () => HttpResponse.json({syllabus_versions: mockVersions})),
+      )
+      render(<SyllabusRevisionsTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('version-2')).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByTestId('version-2'))
+
+      const syllabusElement = document.getElementById('course_syllabus')
+      expect(syllabusElement?.innerHTML).toBe('<p>Previous content</p>')
+      expect(RichContentEditor.callOnRCE).not.toHaveBeenCalled()
+    })
+  })
+
+  it('displays blank content when clicking a blank version after viewing content version', async () => {
+    document.body.innerHTML = '<div id="course_syllabus"></div>'
+    const versionsWithBlank = [
+      {
+        version: 3,
+        created_at: '2025-01-03T00:00:00Z',
+        syllabus_body: '<p>Current content</p>',
+      },
+      {
+        version: 2,
+        created_at: '2025-01-02T00:00:00Z',
+        syllabus_body: '',
+      },
+      {
+        version: 1,
+        created_at: '2025-01-01T00:00:00Z',
+        syllabus_body: '<p>Old content</p>',
+      },
+    ]
+
+    server.use(
+      http.get('/api/v1/courses/123', () =>
+        HttpResponse.json({syllabus_versions: versionsWithBlank}),
+      ),
+    )
+    render(<SyllabusRevisionsTray {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('version-1')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByTestId('version-1'))
+
+    const syllabusElement = document.getElementById('course_syllabus')
+    expect(syllabusElement?.innerHTML).toBe('<p>Old content</p>')
+
+    fireEvent.click(screen.getByTestId('version-2'))
+
+    expect(syllabusElement?.innerHTML).toBe('')
   })
 })

@@ -23,6 +23,7 @@ import ModulesListStudent from '../ModuleListStudent'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 type ComponentProps = object
 
@@ -64,14 +65,14 @@ describe('ModulesListStudent', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
+    fakeEnv.teardown()
   })
   afterAll(() => server.close())
 
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeEnv.setup({
       TIMEZONE: 'UTC',
-    }
+    })
 
     // Default mocks to prevent warnings
     server.use(

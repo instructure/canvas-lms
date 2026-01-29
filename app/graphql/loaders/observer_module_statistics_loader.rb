@@ -69,7 +69,7 @@ module Loaders
                                       .pluck(:content_type, :content_id, :context_module_id)
                                       .group_by { |arr| arr[0] }
                                       .transform_values do |items|
-        items.group_by { |i| i[1] }.transform_values { |group| group.to_set { |i| i[2] } }
+                                        items.group_by { |i| i[1] }.transform_values { |group| group.to_set { |i| i[2] } }
       end
 
       assignment_ids_by_modules = content_type_groups.each_with_object({}) do |(content_type, content_and_modules_pair), result|
@@ -80,13 +80,13 @@ module Loaders
           DiscussionTopic.where(id: content_and_modules_pair.keys)
                          .where.not(assignment_id: nil)
                          .find_each do |discussion|
-            result[discussion.assignment_id] = content_and_modules_pair[discussion.id]
+                           result[discussion.assignment_id] = content_and_modules_pair[discussion.id]
           end
         when CLASSIC_QUIZ
           Quizzes::Quiz.where(id: content_and_modules_pair.keys)
                        .where.not(assignment_id: nil)
                        .find_each do |quiz|
-            result[quiz.assignment_id] = content_and_modules_pair[quiz.id]
+                         result[quiz.assignment_id] = content_and_modules_pair[quiz.id]
           end
         end
       end

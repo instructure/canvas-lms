@@ -1692,9 +1692,10 @@ modules.initModuleManagement = async function (duplicate) {
     const midSizeModal = window.matchMedia('(min-width: 500px)').matches
     const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
     const responsiveWidth = fullSizeModal ? 770 : midSizeModal ? 500 : 320
+    const responsiveHeight = fullSizeModal ? 550 : Math.min(window.innerHeight * 0.9, 600)
     options.select_button_text = I18n.t('buttons.add_item', 'Add Item')
     options.holder_name = name
-    options.height = 550
+    options.height = responsiveHeight
     options.width = responsiveWidth
     options.dialog_title = I18n.t('titles.add_item', 'Add Item to %{module}', {module: name})
     options.close = function () {
@@ -2183,6 +2184,25 @@ function initContextModuleItems(moduleId) {
     initNewItemMoveHandler($(this))
   })
 
+  const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
+  $module.find('.external_url_link').each(function () {
+    const $link = $(this)
+    const isNewTab = $link.attr('target') === '_blank'
+
+    if (seamlessRedirectEnabled && isNewTab) {
+      let url = $link.attr('data-item-href')
+      if (url) {
+        url += url.includes('?') ? '&follow_redirect=1' : '?follow_redirect=1'
+        $link.attr('href', url)
+      }
+    } else {
+      $link.click(function (event) {
+        Helper.externalUrlLinkClick(event, $(this))
+      })
+    }
+  })
+
   if (ENV.FEATURE_MODULES_PERF) {
     addShowAllOrLess(moduleId)
   }
@@ -2316,8 +2336,23 @@ function initContextModules() {
   // I cannot find anywhere that these classname is added to the modules dom
   // Skipping this when lazy loading items
   if (!ENV.FEATURE_MODULES_PERF) {
-    $('.external_url_link').click(function (event) {
-      Helper.externalUrlLinkClick(event, $(this))
+    const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
+    $('.external_url_link').each(function () {
+      const $link = $(this)
+      const isNewTab = $link.attr('target') === '_blank'
+
+      if (seamlessRedirectEnabled && isNewTab) {
+        let url = $link.attr('data-item-href')
+        if (url) {
+          url += url.includes('?') ? '&follow_redirect=1' : '?follow_redirect=1'
+          $link.attr('href', url)
+        }
+      } else {
+        $link.click(function (event) {
+          Helper.externalUrlLinkClick(event, $(this))
+        })
+      }
     })
 
     renderDatetimeField($('.datetime_field'))

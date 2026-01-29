@@ -24,10 +24,12 @@ import {
   GetAssignmentGroupsParams,
   GetAssignmentGroupsResult,
 } from './getAssignmentGroups'
+import PQueue from 'p-queue'
 
 type GetAllAssignmentGroupsParams = {
   queryParams: Pick<GetAssignmentGroupsParams, 'courseId'>
   headers?: Record<string, string>
+  queue?: PQueue
 } & GetAllPagesCallbacks<GetAssignmentGroupsResult>
 
 export const getAllAssignmentGroups = ({

@@ -84,9 +84,11 @@ class Enrollment < ActiveRecord::Base
   after_commit :update_cached_due_dates
   after_save :update_assignment_overrides_if_needed
   after_create :needs_grading_count_updated, if: :active_student?
+  after_create :associate_user_with_course_shard
   after_update :needs_grading_count_updated, if: :active_student_changed?
 
   after_commit :sync_microsoft_group
+  after_commit :sync_to_invite_all_conferences, if: :should_sync_to_conferences?
   scope :microsoft_sync_relevant, -> { active_or_pending.accepted.not_fake }
   scope :microsoft_sync_irrelevant_but_not_fake, -> { not_fake.where("enrollments.workflow_state IN ('rejected', 'completed', 'inactive', 'invited')") }
 
@@ -106,6 +108,13 @@ class Enrollment < ActiveRecord::Base
 
   def cant_observe_self
     errors.add(:associated_user_id, "Cannot observe yourself") if user_id == associated_user_id
+  end
+
+  def should_sync_to_conferences?
+    saved_change_to_workflow_state? &&
+      workflow_state == "active" &&
+      course.is_a?(Course) &&
+      workflow_state_before_last_save != "active"
   end
 
   def cant_observe_observer
@@ -575,6 +584,8 @@ class Enrollment < ActiveRecord::Base
       else
         user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, "invited_enrollments2"].cache_key) }
       end
+
+      Rails.cache.delete([user, "invited_enrollments", ApplicationController.region].cache_key)
     end
   end
 
@@ -764,6 +775,18 @@ class Enrollment < ActiveRecord::Base
         Favorite.create_or_find_by(user:, context: course)
       end
     end
+  end
+
+  def sync_to_invite_all_conferences
+    return unless course.is_a?(Course)
+
+    course.web_conferences.active.each do |conference|
+      next unless conference.invite_all_enabled?
+
+      conference.add_new_enrollment_user(user_id)
+    end
+  rescue => e
+    Canvas::Errors.capture_exception(:web_conference_sync, e, :info)
   end
 
   workflow do
@@ -1590,6 +1613,13 @@ class Enrollment < ActiveRecord::Base
 
   def enrollments_exist_for_user_in_course?
     Enrollment.active.where(user_id:, course_id:).exists?
+  end
+
+  def associate_user_with_course_shard
+    return unless user && course
+    return if user.shard == course.shard
+
+    user.associate_with_shard(course.shard)
   end
 
   def copy_scores_from_existing_enrollment

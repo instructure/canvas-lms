@@ -156,13 +156,6 @@ describe('AccessibilityIssuesDrawerContent', () => {
     )
   })
 
-  it('wraps Preview component in a semantic region for screen reader navigation', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
-
-    const issuePreviewRegion = screen.getByRole('region', {name: 'Issue preview'})
-    expect(issuePreviewRegion).toBeInTheDocument()
-  })
-
   describe('Save and Next button', () => {
     describe('is enabled', () => {
       it('when the issue is remediated', async () => {

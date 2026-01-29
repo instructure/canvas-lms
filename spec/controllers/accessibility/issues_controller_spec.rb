@@ -86,7 +86,7 @@ describe Accessibility::IssuesController do
             content_type: "Page",
             content_id: resource.id,
             path: ".//h1",
-            value: "Change it to Heading 2"
+            value: "Change heading level to Heading 2"
           }.to_json,
           as: :json
 

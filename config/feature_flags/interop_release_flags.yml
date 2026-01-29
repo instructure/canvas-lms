@@ -61,6 +61,19 @@ csrf_oauth2_fix:
       state: allowed_on
     ci:
       state: allowed_on
+course_settings_navigation_react:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Course Navigation Settings React UI
+  description: |-
+    If enabled, the Course Settings Navigation tab will use the new React-based
+    interface. (This is a prerequisite for the Custom Links feature in courses).
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 custom_variables_booleans_as_strings:
   state: hidden
   shadow: true
@@ -162,17 +175,6 @@ import_numeric_lti_custom_params_as_string:
       state: allowed_on
     ci:
       state: allowed_on
-increased_top_nav_pane_size:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Increased Top Navigation Pane Size
-  description: When enabled, the default size of the Top Navigation pane is larger, and tools can optionally set a parameter to enable expanding the pane to full size.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_target_link_uri_for_assignment_edit_view:
   state: hidden
   shadow: true
@@ -211,11 +213,10 @@ lti_apps_page_instructors:
       state: hidden
 lti_asset_processor:
   state: hidden
-  shadow: true
   applies_to: RootAccount
-  display_name: Enable tools to use Asset Processor-related services and placements
+  display_name: Enable tools to use Document Processor-related services and placements
   description: |-
-    This feature enables LTI tools to create Asset Processors and use services and placements associated
+    This feature enables LTI tools to create Document Processors and use services and placements associated
     with the 1EdTech Asset Processor specifications.
   environments:
     development:
@@ -633,21 +634,6 @@ top_navigation_placement:
   applies_to: RootAccount
   display_name: Top Navigation Placement
   description: Enables top_navigation LTI placement. (LTI 1.3 Only)
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-top_navigation_placement_a11y_fixes:
-  state: hidden
-  shadow: true
-  applies_to: SiteAdmin
-  display_name: Top Navigation Placement Accessibility Tab Order Fix
-  description: |-
-    When enabled, fixes the tab order for View as Student and LTI Tools buttons
-    in the top navigation. View as Student will receive focus before LTI Tools,
-    following logical left-to-right reading order. Requires top_navigation_placement
-    to be enabled.
   environments:
     development:
       state: allowed_on

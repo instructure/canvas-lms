@@ -41,7 +41,12 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
   const typeLabel = getPlannableTypeLabel(item.plannable_type)
   const {toggleComplete, isLoading} = usePlannerOverride()
 
-  const isMarkedComplete = item.planner_override?.marked_complete ?? false
+  const isMarkedComplete =
+    item.planner_override?.marked_complete ||
+    (item.submissions &&
+      typeof item.submissions === 'object' &&
+      item.submissions.submitted &&
+      !item.submissions.redo_request)
 
   // For planner notes, course_id may be in plannable.course_id instead of item.course_id
   const courseId = item.course_id || item.plannable.course_id
@@ -75,7 +80,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
               </Text>
             </Flex.Item>
 
-            <Flex.Item>
+            <Flex.Item overflowY="visible">
               <Link
                 href={item.html_url}
                 isWithinText={false}
@@ -96,7 +101,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
             )}
 
             {courseId && item.context_name && (
-              <Flex.Item>
+              <Flex.Item overflowY="visible">
                 <Link
                   href={`/courses/${courseId}`}
                   isWithinText={false}

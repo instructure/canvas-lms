@@ -152,7 +152,10 @@ GradingTypeSelector.prototype.toJSON = function () {
     nested: this.nested,
     preventNotGraded:
       this.preventNotGraded ||
-      (((ref = this.lockedItems) != null ? ref.points : void 0) && !this.parentModel.isNotGraded()),
+      (((ref = this.lockedItems) != null ? ref.points : void 0) &&
+        !this.parentModel.isNotGraded()) ||
+      (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED &&
+        this.parentModel.hasPeerReviewSubmissions?.()),
     freezeGradingType:
       includes(this.parentModel.frozenAttributes(), 'grading_type') ||
       this.parentModel.inClosedGradingPeriod() ||

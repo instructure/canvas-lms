@@ -19,7 +19,7 @@
 #
 
 shared_context "url validation tests" do
-  def test_url_validation(model)
+  def test_url_validation(model, nullable: true)
     # should add http://
     model.url = "example.com"
     model.save!
@@ -51,7 +51,12 @@ shared_context "url validation tests" do
       model.url = invalid_url
       saved = model.save
       expect([model.url, saved]).to eq [invalid_url, false]
-      expect(model.errors.size).to eq 1
+      if invalid_url.empty? && !nullable
+        # Allow for an additional presence validation
+        expect(model.errors.size).to be >= 1
+      else
+        expect(model.errors.size).to eq 1
+      end
       expect(model.errors.full_messages.join).to match(/not a valid URL/)
     end
 
@@ -72,8 +77,13 @@ shared_context "url validation tests" do
 
     # should support nil urls
     model.url = nil
-    model.save!
-    expect(model.errors.size).to eq 0
+    if nullable
+      model.save!
+      expect(model.errors.size).to eq 0
+    else
+      expect(model.save).to be false
+      expect(model.errors.size).to eq 1
+    end
     expect(model.url).to be_nil
   end
 end

@@ -225,14 +225,14 @@ class GradebookImporter
                                     .select(:id, :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, :updated_at, :workflow_state)
                                     .where(assignment_id: assignment_ids, user_id: user_ids)
                                     .map do |submission|
-      is_gradeable = gradeable?(submission:, is_admin:)
-      score = submission.excused? ? "EX" : submission.score.to_s
-      {
-        user_id: submission.user_id,
-        assignment_id: submission.assignment_id,
-        score:,
-        gradeable: is_gradeable
-      }
+                                      is_gradeable = gradeable?(submission:, is_admin:)
+                                      score = submission.excused? ? "EX" : submission.score.to_s
+                                      {
+                                        user_id: submission.user_id,
+                                        assignment_id: submission.assignment_id,
+                                        score:,
+                                        gradeable: is_gradeable
+                                      }
     end
 
     # cache the score on the existing object

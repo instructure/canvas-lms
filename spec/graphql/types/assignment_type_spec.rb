@@ -2477,6 +2477,70 @@ describe Types::AssignmentType do
         end
       end
     end
+
+    describe "peerReviews pointsPossible field" do
+      let(:peer_review_assignment) do
+        course.assignments.create!(
+          title: "Peer Review Assignment",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+      end
+      let(:peer_review_assignment_type) { GraphQLTypeTester.new(peer_review_assignment, current_user: student) }
+      let(:teacher_peer_review_assignment_type) { GraphQLTypeTester.new(peer_review_assignment, current_user: teacher) }
+
+      before do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      context "with peer_review_sub_assignment" do
+        let!(:peer_review_sub) do
+          service = PeerReview::PeerReviewCreatorService.new(
+            parent_assignment: peer_review_assignment,
+            points_possible: 5
+          )
+          service.call
+
+          peer_review_assignment.reload.peer_review_sub_assignment.tap do |sub|
+            sub.update!(
+              due_at: 2.weeks.from_now,
+              unlock_at: 1.week.from_now,
+              lock_at: 3.weeks.from_now
+            )
+          end
+        end
+
+        it "returns points from peer review sub-assignment" do
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to eq 5
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to eq 5
+        end
+
+        it "handles zero points" do
+          peer_review_sub.update!(points_possible: 0)
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to eq 0
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to eq 0
+        end
+
+        it "returns nil when peer_reviews is disabled" do
+          peer_review_assignment.update!(peer_reviews: false)
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+        end
+
+        it "returns nil when no peer review sub-assignment exists" do
+          peer_review_sub.update!(workflow_state: "deleted")
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+        end
+
+        it "returns nil when feature flag is disabled" do
+          course.disable_feature!(:peer_review_allocation_and_grading)
+          expect(peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+          expect(teacher_peer_review_assignment_type.resolve("peerReviews { pointsPossible }")).to be_nil
+        end
+      end
+    end
   end
 
   describe "N+1 query prevention" do
@@ -3325,6 +3389,281 @@ describe Types::AssignmentType do
         adhoc_override.assignment_override_students.create!(user: student2)
         run_jobs
       end.to change { hideable_count_query }.from(1).to(0)
+    end
+  end
+
+  context "when object is a PeerReviewSubAssignment" do
+    before(:once) do
+      @prsa_course = Course.create!(name: "PRSA Test Course")
+      @prsa_course.offer!
+      @prsa_teacher = teacher_in_course(course: @prsa_course, active_all: true).user
+      @prsa_student = student_in_course(course: @prsa_course, active_all: true).user
+      @prsa_reviewer = student_in_course(course: @prsa_course, active_all: true).user
+      @prsa_course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @prsa_parent_assignment = @prsa_course.assignments.create!(
+        title: "Parent Assignment",
+        peer_reviews: true,
+        peer_review_count: 2,
+        submission_types: "online_text_entry"
+      )
+      @peer_review_sub_assignment = peer_review_model(parent_assignment: @prsa_parent_assignment)
+      @prsa_parent_assignment.submit_homework(@prsa_student, body: "My submission")
+    end
+
+    def execute_query(query_string, user, variables = {})
+      CanvasSchema.execute(
+        query_string,
+        variables:,
+        context: { current_user: user, request: ActionDispatch::TestRequest.create }
+      )
+    end
+
+    describe "Assignment-only fields return nil for PRSA" do
+      it "returns nil for peerReviewSubAssignment field when object is PRSA" do
+        query = <<~GQL
+          query($id: ID!, $includeTypes: [AssignmentTypeEnum!]) {
+            assignment(id: $id, includeTypes: $includeTypes) {
+              _id
+              assignmentType
+              peerReviewSubAssignment {
+                _id
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(
+          query,
+          @prsa_teacher,
+          { id: @peer_review_sub_assignment.id.to_s, includeTypes: ["PEER_REVIEW_SUB_ASSIGNMENT"] }
+        )
+
+        assignment = result.dig("data", "assignment")
+        expect(assignment["assignmentType"]).to eq "PEER_REVIEW_SUB_ASSIGNMENT"
+        expect(assignment["peerReviewSubAssignment"]).to be_nil
+      end
+
+      it "returns nil for allocationRules field when object is PRSA" do
+        query = <<~GQL
+          query($id: ID!, $includeTypes: [AssignmentTypeEnum!]) {
+            assignment(id: $id, includeTypes: $includeTypes) {
+              _id
+              assignmentType
+              allocationRules {
+                count
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(
+          query,
+          @prsa_teacher,
+          { id: @peer_review_sub_assignment.id.to_s, includeTypes: ["PEER_REVIEW_SUB_ASSIGNMENT"] }
+        )
+
+        assignment = result.dig("data", "assignment")
+        expect(assignment["assignmentType"]).to eq "PEER_REVIEW_SUB_ASSIGNMENT"
+        expect(assignment["allocationRules"]).to be_nil
+      end
+
+      it "returns nil for mySubAssignmentSubmissionsConnection field when object is PRSA" do
+        query = <<~GQL
+          query($id: ID!, $includeTypes: [AssignmentTypeEnum!]) {
+            assignment(id: $id, includeTypes: $includeTypes) {
+              _id
+              assignmentType
+              mySubAssignmentSubmissionsConnection {
+                nodes {
+                  _id
+                }
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(
+          query,
+          @prsa_student,
+          { id: @peer_review_sub_assignment.id.to_s, includeTypes: ["PEER_REVIEW_SUB_ASSIGNMENT"] }
+        )
+
+        assignment = result.dig("data", "assignment")
+        expect(assignment["assignmentType"]).to eq "PEER_REVIEW_SUB_ASSIGNMENT"
+        expect(assignment["mySubAssignmentSubmissionsConnection"]).to be_nil
+      end
+    end
+
+    describe "assessmentRequestsForCurrentUser" do
+      before(:once) do
+        @prsa_parent_assignment.assign_peer_review(@prsa_reviewer, @prsa_student)
+      end
+
+      it "returns assessment requests when querying via parent Assignment" do
+        query = <<~GQL
+          query($id: ID!) {
+            assignment(id: $id) {
+              _id
+              assessmentRequestsForCurrentUser {
+                _id
+                user {
+                  _id
+                }
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(query, @prsa_reviewer, { id: @prsa_parent_assignment.id.to_s })
+
+        assignment = result.dig("data", "assignment")
+        requests = assignment["assessmentRequestsForCurrentUser"]
+        expect(requests).not_to be_empty
+        expect(requests.first.dig("user", "_id")).to eq @prsa_student.id.to_s
+      end
+
+      it "returns empty when querying via PRSA (use parent Assignment instead)" do
+        query = <<~GQL
+          query($id: ID!, $includeTypes: [AssignmentTypeEnum!]) {
+            assignment(id: $id, includeTypes: $includeTypes) {
+              _id
+              assignmentType
+              assessmentRequestsForCurrentUser {
+                _id
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(
+          query,
+          @prsa_reviewer,
+          { id: @peer_review_sub_assignment.id.to_s, includeTypes: ["PEER_REVIEW_SUB_ASSIGNMENT"] }
+        )
+
+        assignment = result.dig("data", "assignment")
+        expect(assignment["assignmentType"]).to eq "PEER_REVIEW_SUB_ASSIGNMENT"
+        expect(assignment["assessmentRequestsForCurrentUser"]).to be_empty
+      end
+    end
+
+    describe "parentAssignment field" do
+      it "loads parent assignment with all expected fields" do
+        query = <<~GQL
+          query($id: ID!, $includeTypes: [AssignmentTypeEnum!]) {
+            assignment(id: $id, includeTypes: $includeTypes) {
+              _id
+              assignmentType
+              parentAssignment {
+                _id
+                name
+                pointsPossible
+                state
+                courseId
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(
+          query,
+          @prsa_teacher,
+          { id: @peer_review_sub_assignment.id.to_s, includeTypes: ["PEER_REVIEW_SUB_ASSIGNMENT"] }
+        )
+
+        assignment = result.dig("data", "assignment")
+        parent = assignment["parentAssignment"]
+        expect(parent["_id"]).to eq @prsa_parent_assignment.id.to_s
+        expect(parent["name"]).to eq @prsa_parent_assignment.name
+        expect(parent["pointsPossible"]).to eq @prsa_parent_assignment.points_possible
+        expect(parent["state"]).to eq @prsa_parent_assignment.workflow_state
+        expect(parent["courseId"]).to eq @prsa_course.id.to_s
+      end
+
+      it "returns nil for parentAssignment when object is Assignment" do
+        query = <<~GQL
+          query($id: ID!) {
+            assignment(id: $id) {
+              _id
+              assignmentType
+              parentAssignment {
+                _id
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(query, @prsa_teacher, { id: @prsa_parent_assignment.id.to_s })
+
+        assignment = result.dig("data", "assignment")
+        expect(assignment["assignmentType"]).to eq "ASSIGNMENT"
+        expect(assignment["parentAssignment"]).to be_nil
+      end
+    end
+
+    describe "groupSubmissionsConnection" do
+      before(:once) do
+        @group_category = @prsa_course.group_categories.create!(name: "Project Groups")
+        @group = @group_category.groups.create!(context: @prsa_course, name: "Group 1")
+        @group.add_user(@prsa_student)
+
+        @group_assignment = @prsa_course.assignments.create!(
+          title: "Group Assignment",
+          peer_reviews: true,
+          peer_review_count: 1,
+          submission_types: "online_text_entry",
+          group_category: @group_category
+        )
+        @group_prsa = peer_review_model(parent_assignment: @group_assignment)
+        @group_assignment.submit_homework(@prsa_student, body: "Group submission")
+      end
+
+      it "returns group submissions for parent Assignment" do
+        query = <<~GQL
+          query($id: ID!) {
+            assignment(id: $id) {
+              _id
+              groupSubmissionsConnection {
+                nodes {
+                  _id
+                }
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(query, @prsa_teacher, { id: @group_assignment.id.to_s })
+
+        assignment = result.dig("data", "assignment")
+        expect(assignment["groupSubmissionsConnection"]["nodes"]).not_to be_empty
+      end
+
+      it "is accessible for PRSA (inherits group_category from parent)" do
+        query = <<~GQL
+          query($id: ID!, $includeTypes: [AssignmentTypeEnum!]) {
+            assignment(id: $id, includeTypes: $includeTypes) {
+              _id
+              assignmentType
+              groupSubmissionsConnection {
+                nodes {
+                  _id
+                }
+              }
+            }
+          }
+        GQL
+
+        result = execute_query(
+          query,
+          @prsa_teacher,
+          { id: @group_prsa.id.to_s, includeTypes: ["PEER_REVIEW_SUB_ASSIGNMENT"] }
+        )
+
+        assignment = result.dig("data", "assignment")
+        expect(assignment["assignmentType"]).to eq "PEER_REVIEW_SUB_ASSIGNMENT"
+        expect(assignment["groupSubmissionsConnection"]).not_to be_nil
+      end
     end
   end
 end

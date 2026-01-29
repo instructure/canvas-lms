@@ -62,7 +62,7 @@ const assignmentOverridesNodes = gql`
 `
 
 export const TEACHER_QUERY = gql`
-  query GetAssignment($assignmentLid: ID!) {
+  query GetTeacherAssignment($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {
       __typename
       id

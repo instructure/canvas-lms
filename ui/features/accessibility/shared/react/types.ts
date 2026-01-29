@@ -24,6 +24,7 @@ export enum ContentItemType {
   WikiPage = 'Page',
   Assignment = 'Assignment',
   Attachment = 'attachment',
+  DiscussionTopic = 'DiscussionTopic',
 }
 
 /* export const ContentTypeToKey = {
@@ -82,6 +83,7 @@ export enum ResourceType {
   WikiPage = 'WikiPage',
   Assignment = 'Assignment',
   Attachment = 'Attachment',
+  DiscussionTopic = 'DiscussionTopic',
 }
 
 export interface AccessibilityResourceScan extends HasId {
@@ -132,6 +134,11 @@ export interface ContentItem extends HasId {
 export interface PreviewResponse {
   content: string
   path?: string
+}
+
+export interface ColorContrastPreviewResponse extends PreviewResponse {
+  background: string
+  foreground: string
 }
 
 export type FormValue = any

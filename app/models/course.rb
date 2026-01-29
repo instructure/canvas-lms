@@ -33,7 +33,11 @@ class Course < ActiveRecord::Base
   include CopiedAssets
   include LinkedAttachmentHandler
 
-  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
+  include MasterCourses::Restrictor
+
+  restrict_columns :content, [:syllabus_body]
+
+  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by, :saving_user
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   alias_attribute :short_name, :course_code
@@ -340,6 +344,9 @@ class Course < ActiveRecord::Base
   before_save :set_self_enrollment_code
   before_save :validate_license
   before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
+  before_save :update_syllabus_timestamp
+  before_save :handle_syllabus_master_template_tracking
+  before_save :touch_root_folder_if_necessary
   after_save :handle_horizon_activation, if: :just_became_horizon_course?
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
@@ -359,10 +366,6 @@ class Course < ActiveRecord::Base
   after_update :log_course_format_publish_update, if: :saved_change_to_workflow_state?
   after_update :log_course_pacing_settings_update, if: :change_to_logged_settings?
   after_update :log_rqd_setting_enable_or_disable
-
-  before_update :handle_syllabus_changes_for_master_migration
-
-  before_save :touch_root_folder_if_necessary
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
@@ -380,6 +383,27 @@ class Course < ActiveRecord::Base
 
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
+  before_save :check_if_should_save_original_syllabus_version
+  after_save :save_original_syllabus_version_if_needed
+
+  def check_if_should_save_original_syllabus_version
+    @should_save_original_syllabus_version = syllabus_body_changed? &&
+                                             syllabus_body_was.present? &&
+                                             Account.site_admin&.feature_enabled?(:syllabus_versioning) &&
+                                             unversioned?
+  rescue
+    @should_save_original_syllabus_version = false
+  end
+
+  def save_original_syllabus_version_if_needed
+    return unless @should_save_original_syllabus_version
+
+    original_attributes = attributes.merge("syllabus_body" => syllabus_body_previously_was)
+    versions.create(yaml: original_attributes.except(*simply_versioned_options[:exclude]).to_yaml)
+  rescue => e
+    Rails.logger.warn("Error saving original syllabus version: #{e.message}")
+  end
+
   simply_versioned exclude: SIMPLY_VERSIONED_EXCLUDE_FIELDS,
                    keep: 5,
                    when: lambda { |course|
@@ -390,6 +414,18 @@ class Course < ActiveRecord::Base
                      rescue => e
                        Rails.logger.warn("Error checking syllabus_versioning flag: #{e.message}")
                        false
+                     end
+                   },
+                   on_create: lambda { |course, version|
+                     if course.saving_user
+                       begin
+                         yaml_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+                         yaml_data["user_id"] = course.saving_user.id
+                         version.yaml = yaml_data.to_yaml
+                         version.save
+                       rescue => e
+                         Rails.logger.error("Failed to add user_id to course version: #{e.message}")
+                       end
                      end
                    }
 
@@ -1652,26 +1688,42 @@ class Course < ActiveRecord::Base
     pages.find_each(&:index_in_pine)
   end
 
-  def handle_syllabus_changes_for_master_migration
+  def self.html_fields
+    %w[syllabus_body].freeze
+  end
+
+  # rubocop:disable Naming/PredicatePrefix
+  # Method name matches existing convention used across master courses
+  # Course uses cached lookup since it doesn't have migration_id column
+  def is_child_content?
+    MasterCourses::ChildSubscription.is_child_course?(id)
+  end
+  # rubocop:enable Naming/PredicatePrefix
+
+  def find_child_content_restrictions
+    {}
+  end
+
+  def update_syllabus_timestamp
     if syllabus_body_changed?
       self.syllabus_updated_at = Time.now.utc
-      if @master_migration
-        updating_master_template_id = @master_migration.master_course_subscription.master_template_id
-        # master migration sync
-        self.syllabus_master_template_id ||= updating_master_template_id if syllabus_body_was.blank? # sync if there was no syllabus before
-        if self.syllabus_master_template_id.to_i != updating_master_template_id
-          restore_syllabus_body! # revert the change
-          @master_migration.add_skipped_item(:syllabus)
-        end
-      elsif self.syllabus_master_template_id
-        # local change - remove the template id to prevent future syncs
-        self.syllabus_master_template_id = nil
-      end
     end
   end
 
-  def self.html_fields
-    %w[syllabus_body].freeze
+  def handle_syllabus_master_template_tracking
+    return unless syllabus_body_changed?
+
+    migration = @importing_migration || @master_migration
+    if migration
+      updating_master_template_id = migration.master_course_subscription.master_template_id
+      self.syllabus_master_template_id ||= updating_master_template_id if syllabus_body_was.blank?
+      if self.syllabus_master_template_id.to_i != updating_master_template_id
+        restore_syllabus_body!
+        migration.add_skipped_item(:syllabus)
+      end
+    elsif self.syllabus_master_template_id
+      self.syllabus_master_template_id = nil
+    end
   end
 
   def attachment_associations_enabled?
@@ -3788,16 +3840,6 @@ class Course < ActiveRecord::Base
     enrollment_term.name
   end
 
-  def equella_settings
-    account = self.account
-    while account
-      settings = account.equella_settings
-      return settings if settings
-
-      account = account.parent_account
-    end
-  end
-
   cattr_accessor :settings_options
   self.settings_options = {}
 
@@ -3912,7 +3954,7 @@ class Course < ActiveRecord::Base
   end
 
   def a11y_checker_enabled?
-    account.feature_enabled?(:a11y_checker) && feature_enabled?(:a11y_checker_eap)
+    (account.feature_enabled?(:a11y_checker) && feature_enabled?(:a11y_checker_eap)) || account.feature_enabled?(:a11y_checker_ga1)
   end
 
   def elementary_enabled?
@@ -4528,7 +4570,7 @@ class Course < ActiveRecord::Base
                .where.not(matching_post_policies_scope.arel.exists)
                .preload(:post_policy)
                .each do |assignment|
-      assignment.ensure_post_policy(post_manually:)
+                 assignment.ensure_post_policy(post_manually:)
     end
   end
 
@@ -4684,8 +4726,9 @@ class Course < ActiveRecord::Base
   def exceeds_accessibility_scan_limit?
     wiki_page_count = wiki_pages.not_deleted.count
     assignment_count = assignments.active.not_excluded_from_accessibility_scan.count
+    discussion_topic_count = discussion_topics.count
 
-    total = wiki_page_count + assignment_count
+    total = wiki_page_count + assignment_count + discussion_topic_count
     total > MAX_ACCESSIBILITY_SCAN_RESOURCES
   end
 

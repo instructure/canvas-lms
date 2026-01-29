@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import K5Dashboard from './react/K5Dashboard'
 import {registerK5Theme} from '@canvas/k5/react/k5-theme'
@@ -30,7 +30,7 @@ registerK5Theme()
 ready(() => {
   const dashboardContainer = document.getElementById('dashboard-app-container')
   if (dashboardContainer) {
-    ReactDOM.render(
+    legacyRender(
       <QueryClientProvider client={queryClient}>
         <K5Dashboard
           currentUser={ENV.current_user}

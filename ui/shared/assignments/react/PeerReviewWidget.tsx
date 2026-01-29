@@ -63,7 +63,10 @@ export const PeerReviewWidget = ({assignmentId, courseId}: PeerReviewWidgetProps
             renderIcon={<IconSettingsLine />}
             data-testid="view-configuration-button"
             aria-label={I18n.t('View Peer Review Configuration')}
-            onClick={() => setIsConfigTrayOpen(true)}
+            onClick={() => {
+              setIsAllocationTrayOpen(false)
+              setIsConfigTrayOpen(true)
+            }}
           >
             {I18n.t('View Configuration')}
           </Button>
@@ -71,7 +74,10 @@ export const PeerReviewWidget = ({assignmentId, courseId}: PeerReviewWidgetProps
             margin="0 0 0 small"
             data-testid="allocate-peer-reviews-button"
             aria-label={I18n.t('Open Peer Review Allocation Tray')}
-            onClick={() => setIsAllocationTrayOpen(true)}
+            onClick={() => {
+              setIsConfigTrayOpen(false)
+              setIsAllocationTrayOpen(true)
+            }}
           >
             {I18n.t('Allocate Peer Reviews')}
           </Button>

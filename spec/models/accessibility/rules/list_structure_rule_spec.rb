@@ -141,6 +141,68 @@ describe Accessibility::Rules::ListStructureRule do
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
 
+    it "Preserves HTML entities and tags when splitting by <br>" do
+      input_html = "<p>1. Item with &lt;span&gt; tag <br> 2. Another &amp; item</p>"
+      expected_html = '<ol type="1"><li>Item with &lt;span&gt; tag</li><li>Another &amp; item</li></ol>'
+
+      fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    context "marker cleanup after assembly (matching JS behavior)" do
+      it "Removes markers when nested with trailing space in same text node" do
+        input_html = "<p><strong>1. Text</strong> More</p><p><strong>2. Text</strong> More</p>"
+        expected_html = '<ol type="1"><li><strong>Text</strong> More</li><li><strong>Text</strong> More</li></ol>'
+
+        fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
+
+        expect(fixed_html.delete("\n")).to eq(expected_html)
+      end
+
+      it "Removes markers when multiple elements have markers with trailing space" do
+        input_html = "<p><span>* </span><strong>Item</strong></p><p><span>* </span><strong>Item</strong></p>"
+        expected_html = "<ul><li><span></span><strong>Item</strong></li><li><span></span><strong>Item</strong></li></ul>"
+
+        fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
+
+        expect(fixed_html.delete("\n")).to eq(expected_html)
+      end
+
+      # Known limitation: matches JavaScript behavior
+      it "Does not remove markers isolated without trailing space (JS parity)" do
+        input_html = "<p><span>1.</span> Item</p><p><span>2.</span> Item</p>"
+        # Markers remain because regex requires trailing whitespace
+        expected_html = '<ol type="1"><li><span>1.</span> Item</li><li><span>2.</span> Item</li></ol>'
+
+        fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
+
+        expect(fixed_html.delete("\n")).to eq(expected_html)
+      end
+
+      # Known limitation: matches JavaScript behavior
+      it "Does not remove bullet markers isolated without trailing space (JS parity)" do
+        input_html = "<p><em>*</em> Item</p><p><em>*</em> Item</p>"
+        # Markers remain because regex requires trailing whitespace
+        expected_html = "<ul><li><em>*</em> Item</li><li><em>*</em> Item</li></ul>"
+
+        fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
+
+        expect(fixed_html.delete("\n")).to eq(expected_html)
+      end
+
+      # Known limitation: matches JavaScript behavior
+      it "Does not remove markers in deeply nested elements without trailing space (JS parity)" do
+        input_html = "<p><span><strong>1.</strong></span> Item</p><p><span><strong>2.</strong></span> Item</p>"
+        # Markers remain in deeply nested elements without trailing space
+        expected_html = '<ol type="1"><li><span><strong>1.</strong></span> Item</li><li><span><strong>2.</strong></span> Item</li></ol>'
+
+        fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
+
+        expect(fixed_html.delete("\n")).to eq(expected_html)
+      end
+    end
+
     it "Separates bullet and numbered lists when mixed" do
       input_html = "<p>* Bullet item</p><p>* Bullet item</p><p>* Bullet item</p><p>1. Numbered item</p><p>2. Numbered item</p>"
       expected_html = "<ul><li>Bullet item</li><li>Bullet item</li><li>Bullet item</li></ul><p>1. Numbered item</p><p>2. Numbered item</p>"
@@ -221,6 +283,24 @@ describe Accessibility::Rules::ListStructureRule do
       fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    context "when checking false positives" do
+      it "does not flag text with hyphens after inline formatting" do
+        input_html = "<p><strong>Graph 1</strong> - The graph above shows data.</p>"
+
+        issues = find_issues(:list_structure, input_html, "page-123")
+
+        expect(issues).to be_empty
+      end
+
+      it "does not flag text with period after inline elements" do
+        input_html = "<p>Answer is 10<sup>-2</sup>m. This represents the conversion factor.</p>"
+
+        issues = find_issues(:list_structure, input_html, "page-123")
+
+        expect(issues).to be_empty
+      end
     end
   end
 

@@ -326,7 +326,7 @@ $icon-size: 1.4rem;
 
 #width_resizer_ew.highlight,
 #width_resizer_ns.highlight {
-  background-color: #bbb;
+  background-color: #878787;
   animation-name: yellowFade;
   animation-duration: 4s;
   animation-iteration-count: 1;
@@ -334,7 +334,7 @@ $icon-size: 1.4rem;
 
 @keyframes yellowFade {
   0% {
-      background-color: #bbb;
+      background-color: #878787;
   }
   10% {
       background-color: #FBEC88;
@@ -343,7 +343,7 @@ $icon-size: 1.4rem;
       background-color: #FBEC88;
   }
   100% {
-      background-color: #bbb;
+      background-color: #878787;
   }
 }
 
@@ -1310,7 +1310,7 @@ $dotted-border: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
 
   #width_resizer_ns {
     display: initial;
-    background: #bbb url("/images/splitpane-handle-ns.png") no-repeat scroll 50% 50%;
+    background: #878787 url("/images/splitpane-handle-ns.png") no-repeat scroll 50% 50%;
     border-bottom: 1px solid #838383;
     cursor: ns-resize;
     height: 7px;
@@ -1375,7 +1375,7 @@ $dotted-border: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
   #width_resizer_ew {
     display: initial;
     #{direction(left)}: 0;
-    background: #bbb url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
+    background: #878787 url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
     border-#{direction(right)}: 1px solid #838383;
     bottom: 0;
     cursor: ew-resize;

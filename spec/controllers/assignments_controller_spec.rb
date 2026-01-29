@@ -2121,6 +2121,58 @@ describe AssignmentsController do
       get :show, params: { course_id: @course.id, id: @assignment.id, submitted: 0 }
       expect(flash[:notice]).to match(/Assignment successfully submitted./)
     end
+
+    context "peer review sub-assignment redirect" do
+      let(:parent_assignment) do
+        @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          points_possible: 10
+        )
+      end
+
+      let(:peer_review_sub_assignment) do
+        PeerReviewSubAssignment.create!(
+          context: @course,
+          parent_assignment:,
+          title: "Peer Review",
+          points_possible: 10
+        )
+      end
+
+      context "when feature flag is enabled" do
+        before do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "redirects to parent assignment when accessing peer review sub-assignment" do
+          user_session(@student)
+          get :show, params: { course_id: @course.id, id: peer_review_sub_assignment.id }
+          expect(response).to redirect_to(course_assignment_path(@course, parent_assignment))
+        end
+
+        it "does not redirect for regular assignments" do
+          user_session(@student)
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(response).not_to be_redirect
+        end
+
+        it "does not redirect for deleted peer review sub-assignment" do
+          user_session(@student)
+          peer_review_sub_assignment.destroy
+          get :show, params: { course_id: @course.id, id: peer_review_sub_assignment.id }
+          expect(response).not_to be_redirect
+        end
+      end
+
+      context "when feature flag is disabled" do
+        it "does not redirect peer review sub-assignment" do
+          user_session(@student)
+          get :show, params: { course_id: @course.id, id: peer_review_sub_assignment.id }
+          expect(response).not_to be_redirect
+        end
+      end
+    end
   end
 
   describe "GET 'tool_launch'" do
@@ -3674,6 +3726,19 @@ describe AssignmentsController do
       it "sets the page title to assignment title with Peer Review" do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(assigns[:page_title]).to eq("Peer Review Assignment Peer Review")
+      end
+
+      it "sets restrict_quantitative_data in js_env based on course setting" do
+        @course.root_account.enable_feature! :restrict_quantitative_data
+        @course.restrict_quantitative_data = true
+        @course.save!
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:restrict_quantitative_data]).to be(true)
+
+        @course.restrict_quantitative_data = false
+        @course.save!
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:restrict_quantitative_data]).to be(false)
       end
     end
 

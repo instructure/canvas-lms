@@ -23,7 +23,11 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Tabs} from '@instructure/ui-tabs'
 import {Spinner} from '@instructure/ui-spinner'
+import {Button} from '@instructure/ui-buttons'
+import {IconDownloadLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import numberFormat from '@canvas/i18n/numberFormat'
+import {buildSubmissionDownloadUrl} from '@canvas/assignments/react/FileSubmissionPreview'
 import ErrorShip from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
@@ -36,8 +40,9 @@ import {PeerReviewSelector} from './PeerReviewSelector'
 import AssignmentSubmission from './AssignmentSubmission'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
 import theme from '@instructure/canvas-theme'
-import {isPeerReviewLocked} from '../utils/peerReviewLockUtils'
+import {isPeerReviewLocked, isPeerReviewPastLockDate} from '../utils/peerReviewLockUtils'
 import LockedPeerReview from './LockedPeerReview'
+import UnavailablePeerReview from './UnavailablePeerReview'
 import PeerReviewPromptModal from '@canvas/assignments/react/PeerReviewPromptModal'
 import {COMPLETED_PEER_REVIEW_TEXT} from '@canvas/assignments/helpers/PeerReviewHelpers'
 
@@ -77,9 +82,10 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     if (data?.assignment && !hasCalledAllocate) {
       const assignment = data.assignment
       const isLocked = isPeerReviewLocked(assignment)
+      const isPastLockDate = isPeerReviewPastLockDate(assignment)
 
-      // Don't allocate if the peer review is locked
-      if (isLocked) {
+      // Don't allocate if the peer review is locked or past the lock date
+      if (isLocked || isPastLockDate) {
         return
       }
 
@@ -89,7 +95,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
       const hasSubmitted =
         assignment.submissionsConnection?.nodes &&
         assignment.submissionsConnection.nodes.length > 0 &&
-        assignment.submissionsConnection.nodes[0]?.submissionStatus === 'submitted'
+        assignment.submissionsConnection.nodes[0]?.submittedAt
       const showSubmissionRequiredView = submissionRequired && !hasSubmitted
 
       if (!showSubmissionRequiredView && assessmentRequestsCount < peerReviewsRequired) {
@@ -118,8 +124,16 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
         const nextIndex = assessmentRequests.indexOf(nextAssignedReview)
         setSelectedAssessmentIndex(nextIndex)
       } else {
-        setPeerReviewModalOpen(true)
-        setHasSeenPeerReviewModal(true)
+        const requiredCount = data?.assignment?.peerReviews?.count || 0
+        const allocatedCount = assessmentRequests.length
+
+        if (allocatedCount >= requiredCount) {
+          setPeerReviewModalOpen(true)
+          setHasSeenPeerReviewModal(true)
+        } else {
+          const availableCount = assessmentRequests.filter(a => a.available).length
+          setSelectedAssessmentIndex(availableCount)
+        }
       }
 
       setShouldNavigateToNext(false)
@@ -130,8 +144,13 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     setShouldNavigateToNext(true)
   }
 
-  const handleCommentSubmitted = () => {
+  const handlePeerReviewSubmitted = () => {
     queryClient.invalidateQueries({queryKey: ['peerReviewAssignment', assignmentId]})
+  }
+
+  const isUnavailableReviewSelected = () => {
+    const availableCount = assessmentRequestsForCurrentUser?.filter(a => a.available)?.length || 0
+    return selectedAssessmentIndex >= availableCount
   }
 
   if (isLoading) {
@@ -161,45 +180,75 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     submissionsConnection,
     assignedToDates,
   } = data.assignment
+
   const submissionRequired = peerReviews?.submissionRequired ?? false
   const hasSubmitted =
     submissionsConnection?.nodes &&
     submissionsConnection.nodes.length > 0 &&
-    submissionsConnection.nodes[0]?.submissionStatus === 'submitted'
+    submissionsConnection.nodes[0]?.submittedAt
   const showSubmissionRequiredView = submissionRequired && !hasSubmitted
   const isLocked = isPeerReviewLocked(data.assignment)
+  const isPastLockDate = isPeerReviewPastLockDate(data.assignment)
   const peerReviewDueAt = assignedToDates?.[0]?.peerReviewDates?.dueAt
+  const isAnonymous = data.assignment.peerReviews?.anonymousReviews ?? false
+  const selectedAssessment = assessmentRequestsForCurrentUser?.[selectedAssessmentIndex]
+  const submissionUserId =
+    selectedAssessment?.anonymizedUser?._id || selectedAssessment?.anonymousId || undefined
 
-  const renderHeader = () => (
-    <Flex justifyItems="space-between">
-      <Flex.Item shouldGrow={true}>
-        <Flex direction="column">
-          <Flex.Item>
-            <Text
-              size="x-large"
-              wrap="break-word"
-              data-testid="title"
-              weight={isMobile ? 'normal' : 'light'}
-            >
-              {I18n.t('%{name} Peer Review', {name: name})}
-            </Text>
-          </Flex.Item>
-          {peerReviewDueAt && (
+  const getUnavailableReason = () => {
+    if (selectedAssessment && !selectedAssessment.submission?.submittedAt) {
+      return I18n.t('This student has not yet submitted their work.')
+    }
+  }
+
+  const renderHeader = () => {
+    return (
+      <Flex justifyItems="space-between">
+        <Flex.Item shouldGrow={true}>
+          <Flex direction="column">
             <Flex.Item>
-              <Text size="medium" weight="bold">
-                <FriendlyDatetime
-                  data-testid="due-date"
-                  prefix={I18n.t('Due:')}
-                  format={I18n.t('#date.formats.full_with_weekday')}
-                  dateTime={peerReviewDueAt}
-                />
+              <Text
+                size="x-large"
+                wrap="break-word"
+                data-testid="title"
+                weight={isMobile ? 'normal' : 'light'}
+              >
+                {I18n.t('%{name} Peer Review', {name: name})}
               </Text>
             </Flex.Item>
-          )}
-        </Flex>
-      </Flex.Item>
-    </Flex>
-  )
+            {peerReviewDueAt && (
+              <Flex.Item>
+                <Text size="medium" weight="bold">
+                  <FriendlyDatetime
+                    data-testid="due-date"
+                    prefix={I18n.t('Due:')}
+                    format={I18n.t('#date.formats.full_with_weekday')}
+                    dateTime={peerReviewDueAt}
+                  />
+                </Text>
+              </Flex.Item>
+            )}
+          </Flex>
+        </Flex.Item>
+        {!ENV.restrict_quantitative_data && peerReviews?.pointsPossible != null && (
+          <Flex.Item>
+            <Text size="x-large" data-testid="total-points">
+              {I18n.t(
+                {one: '1 Point Possible', other: '%{formattedPoints} Points Possible'},
+                {
+                  count: peerReviews.pointsPossible,
+                  formattedPoints: numberFormat._format(peerReviews.pointsPossible, {
+                    precision: 2,
+                    strip_insignificant_zeros: true,
+                  }),
+                },
+              )}
+            </Text>
+          </Flex.Item>
+        )}
+      </Flex>
+    )
+  }
 
   const renderBody = () => {
     if (showSubmissionRequiredView) {
@@ -213,6 +262,11 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     if (isLocked) {
       return <LockedPeerReview assignment={data.assignment} />
     }
+
+    const hasAssessmentRequests =
+      assessmentRequestsForCurrentUser && assessmentRequestsForCurrentUser.length > 0
+    // Only hide Submission tab if past lock date AND no peer reviews were assigned (since no more allocations will happen)
+    const showSubmissionTab = !isPastLockDate || hasAssessmentRequests
 
     return (
       <Tabs
@@ -230,30 +284,34 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
             <AssignmentDescription description={description ?? undefined} />
           </View>
         </Tabs.Panel>
-        <Tabs.Panel
-          id="submission"
-          renderTitle={isMobile ? I18n.t('Peer Review') : I18n.t('Submission')}
-          isSelected={selectedTab === 'submission'}
-          padding="0"
-          data-testid="submission-tab"
-        >
-          {assessmentRequestsForCurrentUser &&
-            assessmentRequestsForCurrentUser[selectedAssessmentIndex]?.submission && (
+        {showSubmissionTab && (
+          <Tabs.Panel
+            id="submission"
+            renderTitle={isMobile ? I18n.t('Peer Review') : I18n.t('Submission')}
+            isSelected={selectedTab === 'submission'}
+            padding="0"
+            data-testid="submission-tab"
+          >
+            {isUnavailableReviewSelected() || !selectedAssessment?.submission?.submittedAt ? (
+              <UnavailablePeerReview reason={getUnavailableReason()} />
+            ) : (
               <AssignmentSubmission
-                submission={assessmentRequestsForCurrentUser[selectedAssessmentIndex].submission}
-                isPeerReviewCompleted={
-                  assessmentRequestsForCurrentUser[selectedAssessmentIndex].workflowState ===
-                  'completed'
-                }
+                submission={selectedAssessment.submission!}
+                isPeerReviewCompleted={selectedAssessment.workflowState === 'completed'}
+                rubricAssessment={selectedAssessment.rubricAssessment}
                 assignment={data.assignment}
                 reviewerSubmission={reviewerSubmission}
                 isMobile={isMobile}
                 handleNextPeerReview={handleNextPeerReview}
-                onCommentSubmitted={handleCommentSubmitted}
+                onPeerReviewSubmitted={handlePeerReviewSubmitted}
                 hasSeenPeerReviewModal={hasSeenPeerReviewModal}
+                isReadOnly={isPastLockDate}
+                isAnonymous={isAnonymous}
+                submissionUserId={submissionUserId}
               />
             )}
-        </Tabs.Panel>
+          </Tabs.Panel>
+        )}
       </Tabs>
     )
   }
@@ -263,14 +321,48 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
       <View as="div">
         {renderHeader()}
         <Divider />
+        {isPastLockDate && <LockedPeerReview assignment={data.assignment} isPastLockDate={true} />}
         {data.assignment && !showSubmissionRequiredView && !isLocked && (
           <View as="div">
-            <PeerReviewSelector
-              key={`${assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}
-              assessmentRequests={assessmentRequestsForCurrentUser || []}
-              selectedIndex={selectedAssessmentIndex}
-              onSelectionChange={setSelectedAssessmentIndex}
-            />
+            <Flex gap="small" alignItems="start">
+              <Flex.Item>
+                <PeerReviewSelector
+                  key={`${assessmentRequestsForCurrentUser?.length || 0}-peer-reviews`}
+                  assessmentRequests={assessmentRequestsForCurrentUser || []}
+                  selectedIndex={selectedAssessmentIndex}
+                  onSelectionChange={setSelectedAssessmentIndex}
+                  requiredPeerReviewCount={peerReviews?.count || 0}
+                />
+              </Flex.Item>
+              {submissionUserId &&
+                selectedAssessment?.submission?.submissionType === 'online_upload' &&
+                selectedAssessment.submission?.attachments &&
+                selectedAssessment.submission.attachments.length === 1 && (
+                  <Flex.Item>
+                    <Button
+                      renderIcon={<IconDownloadLine />}
+                      href={buildSubmissionDownloadUrl(
+                        data.assignment.courseId,
+                        data.assignment._id,
+                        submissionUserId,
+                        selectedAssessment.submission.attachments[0]._id,
+                        data.assignment.peerReviews?.anonymousReviews ?? false,
+                      )}
+                    >
+                      {I18n.t('Download Submission')}
+                    </Button>
+                  </Flex.Item>
+                )}
+            </Flex>
+            {!isAnonymous && selectedAssessment?.anonymizedUser && (
+              <View as="div" margin="x-small 0 0 xx-small">
+                <Text size="medium" weight="bold">
+                  {I18n.t('Peer: %{peerName}', {
+                    peerName: selectedAssessment.anonymizedUser.displayName,
+                  })}
+                </Text>
+              </View>
+            )}
           </View>
         )}
         {renderBody()}

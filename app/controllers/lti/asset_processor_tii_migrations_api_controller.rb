@@ -25,41 +25,59 @@ module Lti
     before_action :require_user
     before_action :get_context
     before_action :require_account_context
-    before_action :require_root_account, only: [:index]
+    before_action :require_root_account, only: [:index, :migrate_all]
     before_action :require_manage_lti_registrations
     before_action { require_feature_enabled :lti_asset_processor_tii_migration }
 
     def index
-      render json: fetch_accounts_with_tii_tools
+      render json: {
+        accounts: fetch_accounts_with_tii_tools,
+        coordinator_progress: fetch_coordinator_progress
+      }
     end
 
     def create
-      existing_progress = Progress
-                          .is_pending
-                          .where(context: @context, tag: "lti_tii_ap_migration")
-                          .order(created_at: :desc)
-                          .first
+      progress = create_migration_progress(@context, params[:email])
+      render json: progress_json(progress, @current_user, session)
+    end
 
-      if existing_progress
-        return render json: progress_json(existing_progress, @current_user, session)
+    def migrate_all
+      account_data = fetch_accounts_with_tii_tools
+
+      eligible_account_ids = account_data.filter_map do |data|
+        progress = data[:migration_progress]
+        workflow_state = progress&.dig(:workflow_state)
+
+        data[:account_id] if workflow_state.nil?
       end
 
-      progress = Progress.create!(
+      bulk_migration_id = SecureRandom.uuid
+
+      # Create coordinator Progress record to track bulk migration
+      coordinator = Progress.create!(
         context: @context,
-        tag: "lti_tii_ap_migration",
+        tag: Lti::AssetProcessorTiiMigrationWorker::COORDINATOR_TAG,
         user: @current_user
       )
+      coordinator.set_results({ bulk_migration_id:, email: params[:email] })
+      coordinator.start!
 
-      progress.process_job(
-        Lti::AssetProcessorTiiMigrationWorker.new(@context, params[:email]),
-        :perform,
-        {
-          priority: Delayed::HIGH_PRIORITY,
-          strand: "tii_migration_account_#{@context.global_id}"
-        }
-      )
+      progress_ids = []
 
-      render json: progress_json(progress, @current_user, session)
+      Account.transaction do
+        eligible_account_ids.each do |account_id|
+          account = Account.find(account_id)
+          progress = create_migration_progress(account, params[:email], coordinator.id)
+          progress_ids << progress.id if progress
+        end
+      end
+
+      render json: {
+        progress_ids:,
+        account_ids: eligible_account_ids,
+        bulk_migration_id:,
+        coordinator_id: coordinator.id
+      }
     end
 
     private
@@ -70,6 +88,32 @@ module Lti
 
     def require_manage_lti_registrations
       require_context_with_permission(@context, :manage_lti_registrations)
+    end
+
+    def create_migration_progress(account, email, coordinator_id = nil)
+      existing_progress = Progress
+                          .is_pending
+                          .where(context: account, tag: Lti::AssetProcessorTiiMigrationWorker::PROGRESS_TAG)
+                          .order(created_at: :desc)
+                          .first
+
+      return existing_progress if existing_progress
+
+      progress = Progress.create!(
+        context: account,
+        tag: Lti::AssetProcessorTiiMigrationWorker::PROGRESS_TAG,
+        user: @current_user
+      )
+      progress.set_results({ coordinator_id: }) if coordinator_id
+      progress.process_job(
+        Lti::AssetProcessorTiiMigrationWorker.new(account, email, coordinator_id),
+        :perform,
+        {
+          priority: Delayed::HIGH_PRIORITY,
+          strand: "tii_migration_account_#{account.global_id}"
+        }
+      )
+      progress
     end
 
     def fetch_accounts_with_tii_tools
@@ -131,7 +175,7 @@ module Lti
 
     def batch_find_migration_progress(account_ids)
       Progress
-        .where(context_type: "Account", context_id: account_ids, tag: "lti_tii_ap_migration")
+        .where(context_type: "Account", context_id: account_ids, tag: Lti::AssetProcessorTiiMigrationWorker::PROGRESS_TAG)
         .order(created_at: :asc)
         .index_by(&:context_id)
         .transform_values do |progress|
@@ -145,6 +189,21 @@ module Lti
             }
           }
         end
+    end
+
+    def fetch_coordinator_progress
+      coordinator = Progress
+                    .where(context: @context, tag: Lti::AssetProcessorTiiMigrationWorker::COORDINATOR_TAG)
+                    .order(created_at: :desc)
+                    .first
+
+      return nil unless coordinator
+
+      {
+        id: coordinator.id,
+        workflow_state: coordinator.workflow_state,
+        consolidated_report_url: coordinator.results&.dig(:consolidated_report_url)
+      }
     end
   end
 end

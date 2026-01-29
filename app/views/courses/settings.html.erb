@@ -37,14 +37,6 @@
   master_course = blueprint_subscription&.master_template&.course
 
   can_see_restrict_quantitative_setting = ((@context&.restrict_quantitative_data || @context&.account&.restrict_quantitative_data[:value]) && @context&.root_account&.feature_enabled?(:restrict_quantitative_data))
-
-  if @context.elementary_subject_course?
-    navigation_help_text = t("help.edit_navigation_k5", "Drag and drop items to reorder them in the subject navigation.")
-    disabled_tab_text = t("tab_hidden_if_disabled_k5", "Tab disabled, won't appear in subject navigation")
-  else
-    navigation_help_text = t("help.edit_navigation", "Drag and drop items to reorder them in the course navigation.")
-    disabled_tab_text = t("tab_hidden_if_disabled", "Page disabled, won't appear in navigation")
-  end
 %>
 
 <% provide :right_side do %>
@@ -883,110 +875,22 @@
       'Warning: For improved accessibility in reordering Course Navigation elements, please use the Move To Dialog option found in the menu.') %>
     </div>
 
-    <%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
-      <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
-      <% tabs = sortable_tabs %>
-      <div style="width: 400px; padding-top: 10px">
-        <p style="margin: 0">
-          <%= navigation_help_text %>
-        </p>
-        <% if @context.elementary_subject_course? %>
-          <p style="font-size: 0.8em; margin: 6px 0 0">
-            <%= t("help.edit_navigation_info_k5", "If enabled, LTI tools will always appear last under the Resources tab in the order you choose.") %>
-          </p>
-        <% end %>
-      </div>
-      <% tabs.each do |tab|
-        tab[:disabled_message] = [Course::TAB_GRADES, Course::TAB_DISCUSSIONS].include?(tab[:id]) ? t('tab_cant_disable', "This page can't be disabled, only hidden") : t('tab_disabled', "Page disabled, will redirect to course home page")
-        tab[:disabled_message] = disabled_tab_text if tab[:external] || @context.elementary_subject_course?
-      end %>
-      <h3 class="screenreader-only"><%= t('Enabled Links') %></h3>
-      <ul id="nav_enabled_list" class="nav_list connectedSortable">
-        <li class="disabled" aria-hidden="true" style="height: 1px">
-          <%# This item is just here to serve as an anchor for dragging/dropping if all tabs are disabled %>
-        </li>
-        <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
-          <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if @context.tab_enabled?(tab) %>"
-              id="nav_edit_tab_id_<%= tab[:id] %>"
-          >
-            <div class="draggable_handle">
-              <% if @context.tab_enabled?(tab) %>
-                  <i class="icon-drag-handle"></i>
-              <% else %>
-                &nbsp;
-              <% end %>
-            </div>
-            <div class="navitem_content">
-              <%= tab[:label] %>
-              <span class="disabled_message"><%= tab[:disabled_message] %></span>
-            </div>
-            <% if @context.tab_enabled?(tab) %>
-              <div class="admin-links">
-                <a class="al-trigger al-trigger-gray" role="button" href="#">
-                  <i class="icon-more" aria-hidden="true"></i>
-                  <span class="screenreader-only">
-                    <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
-                  </span>
-                </a>
-                <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
-                  <li role="presentation">
-                    <a href="#" class="icon-x disable_nav_item_link" id="disable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Disable this item"><%= t("Disable") %></a>
-                  </li>
-                  <li role="presentation">
-                    <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item"><%= t("Move") %></a>
-                  </li>
-                </ul>
-              </div>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-
-      <h3 class="screenreader-only"><%= t('Disabled Links') %></h3>
-      <ul id="nav_disabled_list" class="nav_list connectedSortable">
-        <li class="disabled">
-          <%= t('drag_to_hide', %{Drag items here to hide them from students.}) %>
-          <div style="font-size: 0.8em;">
-            <% unless @context.elementary_subject_course? %>
-              <%= t('drag_details', %{Disabling most pages will cause students who visit those pages to be redirected to the course home page.}) %>
-            <% end %>
-          </div>
-        </li>
-        <% tabs.select {|t| t[:hidden] }.each do |tab|  %>
-          <li aria-label="<%= tab[:label] %>"
-              class="navitem enabled"
-              id="nav_edit_tab_id_<%= tab[:id] %>"
-          >
-            <div class="draggable_handle">
-              <i class="icon-drag-handle"></i>
-            </div>
-            <div class="navitem_content">
-              <%= tab[:label] %>
-              <span class="disabled_message"><%= tab[:disabled_message] %></span>
-            </div>
-            <div class="admin-links">
-                <a class="al-trigger al-trigger-gray" role="button" href="#">
-                  <i class="icon-more" aria-hidden="true"></i>
-                  <span class="screenreader-only"><%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
-                  </span>
-                </a>
-
-                <ul id="content-2" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-3">
-                  <li role="presentation">
-                    <a href="#" class="icon-plus enable_nav_item_link" id="enable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Enable this item"><%= t("Enable") %></a>
-                  </li>
-                  <li role="presentation">
-                    <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item"><%= t("Move") %></a>
-                  </li>
-                </ul>
-              </div>
-          </li>
-        <% end %>
-      </ul>
-
-      <p>
-        <button type="submit" class="btn btn-primary"><%= t('#buttons.save', %{Save}) %></button>
-      </p>
+    <%
+      if @context.root_account.feature_enabled?(:course_settings_navigation_react)
+    %>
+      <% js_env(COURSE_SETTINGS_NAVIGATION_TABS: sortable_tabs) %>
+      <%=
+        form_tag(
+          context_url(@context, :context_update_nav_url),
+          id: "course_navigation_settings_form",
+          title: t('titles.edit_navigation', "Edit Course Navigation")
+        ) do
+      %>
+        <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
+      <% end %>
+      <div id="course_navigation_settings_container"></div>
+    <% else %>
+      <%= render :partial => 'navigation_form' %>
     <% end %>
   </div>
   <% end %>

@@ -19,14 +19,18 @@
 import {PlacementsConfirmation} from '../../registration_wizard_forms/PlacementsConfirmation'
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import type {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 import {AllLtiPlacements, InternalOnlyLtiPlacements, LtiPlacement} from '../../model/LtiPlacement'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
+import {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 
 export type PlacementsConfirmationProps = {
   internalConfig: InternalLtiConfiguration
   overlayStore: Lti1p3RegistrationOverlayStore
   supportedPlacements?: Array<LtiPlacement>
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
+  existingRegistration?: LtiRegistrationWithConfiguration
 }
 
 const allPlacements = [...AllLtiPlacements].sort()
@@ -35,6 +39,8 @@ export const PlacementsConfirmationWrapper = ({
   internalConfig,
   overlayStore,
   supportedPlacements,
+  registrationUpdateRequest,
+  existingRegistration,
 }: PlacementsConfirmationProps) => {
   const {state, ...actions} = overlayStore()
 
@@ -54,6 +60,8 @@ export const PlacementsConfirmationWrapper = ({
         topNavigationAllowFullscreen={state.placements.topNavigationAllowFullscreen ?? false}
         onToggleAllowFullscreen={actions.toggleTopNavigationAllowFullscreen}
         onTogglePlacement={actions.togglePlacement}
+        registrationUpdateRequest={registrationUpdateRequest}
+        existingRegistration={existingRegistration}
       />
     </RegistrationModalBody>
   )

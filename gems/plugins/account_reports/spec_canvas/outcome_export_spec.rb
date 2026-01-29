@@ -284,7 +284,7 @@ describe "Outcome Reports" do
           LearningOutcomeGroup.where.not(learning_outcome_group_id: nil).to_a
                               .product(LearningOutcome.all)
                               .each do |group, outcome|
-            expect(row_index(group)).to be < row_index(outcome)
+                                expect(row_index(group)).to be < row_index(outcome)
           end
         end
 

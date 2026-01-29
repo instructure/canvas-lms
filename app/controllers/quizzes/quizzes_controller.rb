@@ -385,7 +385,7 @@ class Quizzes::QuizzesController < ApplicationController
       assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       hash = {
-        ASSIGNMENT_ID: @assignment.present? ? @assignment.id : nil,
+        ASSIGNMENT_ID: @assignment.presence&.id,
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(@quiz.overrides_for(@current_user,
                                                                             ensure_set_not_empty: true),
                                                         @current_user,

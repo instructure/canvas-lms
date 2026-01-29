@@ -250,6 +250,52 @@ describe('OutcomeDescriptionModal', () => {
       renderWithProvider({outcome: outcomeWithDifferentPoints})
       expect(screen.getByText('10 Point')).toBeInTheDocument()
     })
+
+    it('uses outcome context for mastery scale tag when feature flag is off', () => {
+      const env = {
+        contextType: 'Account',
+        contextId: '1',
+        outcomesFriendlyDescriptionFF: false,
+        accountLevelMasteryScalesFF: false,
+        contextURL: '',
+      }
+      renderWithProvider({env})
+      const contextTags = screen.getAllByTestId('outcome-context-tag')
+      expect(contextTags.length).toBeGreaterThan(0)
+    })
+
+    it('uses proficiency context for mastery scale tag when feature flag is on', () => {
+      const outcomeWithProficiencyContext = {
+        ...defaultOutcome,
+        context_type: 'Course',
+        context_id: '5',
+        proficiency_context_type: 'Account',
+        proficiency_context_id: '1',
+      }
+      const env = {
+        contextType: 'Account',
+        contextId: '1',
+        outcomesFriendlyDescriptionFF: false,
+        accountLevelMasteryScalesFF: true,
+        contextURL: '',
+      }
+      renderWithProvider({outcome: outcomeWithProficiencyContext, env})
+      const contextTags = screen.getAllByTestId('outcome-context-tag')
+      expect(contextTags.length).toBeGreaterThan(0)
+    })
+
+    it('falls back to outcome context when proficiency context is missing and feature flag is on', () => {
+      const env = {
+        contextType: 'Account',
+        contextId: '1',
+        outcomesFriendlyDescriptionFF: false,
+        accountLevelMasteryScalesFF: true,
+        contextURL: '',
+      }
+      renderWithProvider({env})
+      const contextTags = screen.getAllByTestId('outcome-context-tag')
+      expect(contextTags.length).toBeGreaterThan(0)
+    })
   })
 
   describe('Conditional Rendering', () => {

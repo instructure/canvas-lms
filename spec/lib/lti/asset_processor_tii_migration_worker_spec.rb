@@ -151,6 +151,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       it "successfully migrates tool proxy and creates asset processor" do
         product_family
+        tool_proxy.update_columns(subscription_id: "test-subscription-123")
         actl
         success_response = double("response", is_a?: true, code: "200", body: "success")
         allow(CanvasHttp).to receive(:post).and_return(success_response)
@@ -189,6 +190,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         expect(test_progress.results).to be_present
         expect(test_progress.results[:proxies]).to be_present
         expect(test_progress).to be_completed
+
+        expect(tool_proxy.reload.subscription_id).to be_nil
       end
     end
 
@@ -339,7 +342,9 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         expect(csv_rows.length).to eq(2) # Header + 1 data row
 
         # Check header
-        expect(csv_rows[0]).to eq(["Assignment ID",
+        expect(csv_rows[0]).to eq(["Account ID",
+                                   "Account Name",
+                                   "Assignment ID",
                                    "Assignment Name",
                                    "Course ID",
                                    "Tool Proxy ID",
@@ -352,15 +357,17 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
         # Check data row
         data_row = csv_rows[1]
-        expect(data_row[0]).to eq(assignment.id.to_s)
-        expect(data_row[1]).to eq(assignment.name)
-        expect(data_row[2]).to eq(course.id.to_s)
-        expect(data_row[3]).to eq(tool_proxy.id.to_s)
-        expect(data_row[4]).to be_present
-        expect(data_row[5]).to eq("created")
-        expect(data_row[6]).to eq("success")
-        expect(data_row[7]).to eq("0")
-        expect(data_row[8]).to eq("")
+        expect(data_row[0]).to eq(assignment.course.account.id.to_s)
+        expect(data_row[1]).to eq(assignment.course.account.name)
+        expect(data_row[2]).to eq(assignment.id.to_s)
+        expect(data_row[3]).to eq(assignment.name)
+        expect(data_row[4]).to eq(course.id.to_s)
+        expect(data_row[5]).to eq(tool_proxy.id.to_s)
+        expect(data_row[6]).to be_present
+        expect(data_row[7]).to eq("created")
+        expect(data_row[8]).to eq("success")
+        expect(data_row[9]).to eq("0")
+        expect(data_row[10]).to eq("")
       end
 
       it "reports assignments skipped due to cet_creation_failed with proper status" do
@@ -389,17 +396,21 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         expect(csv_rows.length).to eq(3) # Header + 2 data rows
 
         first_item = csv_rows[1]
-        expect(first_item[0]).to eq(assignment.id.to_s)
-        expect(first_item[5]).to eq("failed")
-        expect(first_item[6]).to eq("failed")
-        expect(first_item[8]).to include("Unexpected error when migrating Tool Proxy")
+        expect(first_item[0]).to eq(sub_account.id.to_s)
+        expect(first_item[1]).to eq(sub_account.name)
+        expect(first_item[2]).to eq(assignment.id.to_s)
+        expect(first_item[7]).to eq("failed")
+        expect(first_item[8]).to eq("failed")
+        expect(first_item[10]).to include("Unexpected error when migrating Tool Proxy")
 
         second_item = csv_rows[2]
-        expect(second_item[0]).to eq(assignment2.id.to_s)
-        expect(second_item[5]).to eq("failed")
-        expect(second_item[6]).to eq("failed")
-        expect(second_item[7]).to eq("0")
-        expect(second_item[8]).to include("Unexpected error when migrating Tool Proxy")
+        expect(second_item[0]).to eq(sub_account.id.to_s)
+        expect(second_item[1]).to eq(sub_account.name)
+        expect(second_item[2]).to eq(assignment2.id.to_s)
+        expect(second_item[7]).to eq("failed")
+        expect(second_item[8]).to eq("failed")
+        expect(second_item[9]).to eq("0")
+        expect(second_item[10]).to include("Unexpected error when migrating Tool Proxy")
       end
     end
 
@@ -428,6 +439,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       it "marks progress as failed when tool proxy migration has errors" do
         product_family
+        tool_proxy.update_columns(subscription_id: "test-subscription-789")
         actl
         allow(worker).to receive(:find_tii_asset_processor_deployments).and_raise(StandardError, "Deployment error")
 
@@ -435,6 +447,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
         expect(test_progress).to be_failed
         expect(test_progress).not_to be_completed
+        expect(tool_proxy.reload.subscription_id).to eq("test-subscription-789")
       end
 
       it "marks progress as failed when unexpected exception occurs during migration" do
@@ -609,15 +622,18 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       expect(results[:proxies][course_tool_proxy.id][:errors]).to be_empty
     end
 
-    it "adds error when deployment found in parent context but not in tool proxy context" do
+    it "creates new deployment when deployment found in parent context but not in tool proxy context" do
       # Create account-level deployment only (not matching course context)
-      account_deployment = tii_registration.new_external_tool(sub_account)
+      tii_registration.new_external_tool(sub_account)
+      allow(worker).to receive(:tii_tp_migration)
       worker.send(:initialize_proxy_results, course_tool_proxy)
+
       worker.send(:migrate_tool_proxy, course_tool_proxy)
-      expect(course_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+
+      newcet = course_tool_proxy.context.context_external_tools.where(lti_registration: tii_registration).last
+      expect(newcet).not_to be_nil
       results = worker.instance_variable_get(:@results)
-      expect(results[:proxies][course_tool_proxy.id][:errors].first).to match(/but none match the context/)
-      expect(results[:proxies][course_tool_proxy.id][:errors].first).to include("CET ID=#{account_deployment.id}")
+      expect(results[:proxies][course_tool_proxy.id][:errors]).to be_empty
     end
 
     it "creates a new account-level deployment when no deployment is found" do
@@ -1964,6 +1980,251 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
       expect(color).to be_nil
       expect(alt).to be_nil
+    end
+  end
+
+  describe "consolidated email for bulk migrations" do
+    let(:bulk_migration_id) { SecureRandom.uuid }
+    let(:coordinator) do
+      coordinator = Progress.create!(
+        context: root_account,
+        tag: Lti::AssetProcessorTiiMigrationWorker::COORDINATOR_TAG,
+        user: admin_user
+      )
+      coordinator.set_results({ bulk_migration_id:, email: "test@example.com" })
+      coordinator.start!
+      coordinator
+    end
+    let(:sub_account2) { account_model(parent_account: root_account, root_account:) }
+
+    def create_migration_progress(context:, workflow_state:, coordinator_id: nil, attachment_id: nil)
+      progress = Progress.create!(
+        context:,
+        tag: Lti::AssetProcessorTiiMigrationWorker::PROGRESS_TAG,
+        workflow_state:
+      )
+      results = {}
+      results[:coordinator_id] = coordinator_id if coordinator_id
+      results[:migration_report_attachment_id] = attachment_id if attachment_id
+      progress.set_results(results)
+      progress
+    end
+
+    describe "#check_and_send_consolidated_email" do
+      it "waits until all migrations with same coordinator have report" do
+        create_migration_progress(
+          context: sub_account,
+          workflow_state: "completed",
+          coordinator_id: coordinator.id
+        )
+
+        create_migration_progress(
+          context: sub_account2,
+          workflow_state: "running",
+          coordinator_id: coordinator.id
+        )
+
+        worker = described_class.new(sub_account, "test@example.com", coordinator.id)
+        expect(worker).not_to receive(:send_consolidated_report_email)
+        worker.send(:check_and_send_consolidated_email)
+      end
+
+      it "sends consolidated email when all migrations have reports" do
+        report1_csv = "csv1"
+        attachment1 = Attachment.create!(
+          context: sub_account,
+          filename: "report1.csv",
+          uploaded_data: StringIO.new(report1_csv)
+        )
+
+        report2_csv = "csv2"
+        attachment2 = Attachment.create!(
+          context: sub_account2,
+          filename: "report2.csv",
+          uploaded_data: StringIO.new(report2_csv)
+        )
+
+        create_migration_progress(
+          context: sub_account,
+          workflow_state: "completed",
+          coordinator_id: coordinator.id,
+          attachment_id: attachment1.id
+        )
+
+        create_migration_progress(
+          context: sub_account2,
+          workflow_state: "completed",
+          coordinator_id: coordinator.id,
+          attachment_id: attachment2.id
+        )
+
+        worker = described_class.new(sub_account, "test@example.com", coordinator.id)
+        expect(worker).to receive(:send_consolidated_report_email).and_return(true)
+        worker.send(:check_and_send_consolidated_email)
+
+        expect(coordinator.reload.results[:report_created]).to be true
+        expect(coordinator.reload).to be_completed
+      end
+
+      it "does not send email if already sent (report_created flag on coordinator)" do
+        coordinator_with_report_created = Progress.create!(
+          context: root_account,
+          tag: Lti::AssetProcessorTiiMigrationWorker::COORDINATOR_TAG,
+          user: admin_user
+        )
+        coordinator_with_report_created.set_results({ bulk_migration_id: SecureRandom.uuid, email: "test@example.com", report_created: true })
+
+        create_migration_progress(
+          context: sub_account,
+          workflow_state: "completed",
+          coordinator_id: coordinator_with_report_created.id
+        )
+
+        create_migration_progress(
+          context: sub_account2,
+          workflow_state: "completed",
+          coordinator_id: coordinator_with_report_created.id
+        )
+
+        worker = described_class.new(sub_account, "test@example.com", coordinator_with_report_created.id)
+        expect(worker).not_to receive(:send_consolidated_report_email)
+        worker.send(:check_and_send_consolidated_email)
+      end
+    end
+
+    describe "#generate_consolidated_report" do
+      it "concatenates all individual migration reports" do
+        # Create mock CSV content for report 1
+        report1_csv = CSV.generate do |csv|
+          csv << ["Account ID", "Account Name", "Assignment ID", "Assignment Name", "Course ID", "Tool Proxy ID", "Lti 1.3 Tool ID", "Asset Processor Migration", "Asset Report Migration", "Number of Reports Migrated", "Error Message", "Warnings"]
+          csv << [sub_account.id, sub_account.name, "1", "Assignment 1", "100", "tp1", "tool1", "success", "success", "5", "", ""]
+          csv << [sub_account.id, sub_account.name, "2", "Assignment 2", "100", "tp1", "tool1", "success", "success", "3", "", ""]
+        end
+
+        # Create mock CSV content for report 2
+        report2_csv = CSV.generate do |csv|
+          csv << ["Account ID", "Account Name", "Assignment ID", "Assignment Name", "Course ID", "Tool Proxy ID", "Lti 1.3 Tool ID", "Asset Processor Migration", "Asset Report Migration", "Number of Reports Migrated", "Error Message", "Warnings"]
+          csv << [sub_account2.id, sub_account2.name, "3", "Assignment 3", "200", "tp2", "tool2", "success", "success", "2", "", ""]
+        end
+
+        # Create attachments with the CSV content
+        attachment1 = Attachment.create!(
+          context: root_account,
+          filename: "report1.csv",
+          content_type: "text/csv",
+          uploaded_data: StringIO.new(report1_csv)
+        )
+
+        attachment2 = Attachment.create!(
+          context: root_account,
+          filename: "report2.csv",
+          content_type: "text/csv",
+          uploaded_data: StringIO.new(report2_csv)
+        )
+
+        progress1 = create_migration_progress(
+          context: sub_account,
+          workflow_state: "completed",
+          attachment_id: attachment1.id
+        )
+
+        progress2 = create_migration_progress(
+          context: sub_account2,
+          workflow_state: "completed",
+          attachment_id: attachment2.id
+        )
+
+        worker = described_class.new(sub_account, "test@example.com", coordinator.id)
+        csv_content = worker.send(:generate_consolidated_report, [progress1, progress2])
+        rows = CSV.parse(csv_content)
+
+        # Should have: 1 header + 2 rows from report1 + 1 row from report2 = 4 rows
+        expect(rows.length).to eq(4)
+        expect(rows[0]).to eq(["Account ID", "Account Name", "Assignment ID", "Assignment Name", "Course ID", "Tool Proxy ID", "Lti 1.3 Tool ID", "Asset Processor Migration", "Asset Report Migration", "Number of Reports Migrated", "Error Message", "Warnings"])
+
+        # Check data rows include assignments from both reports
+        assignment_ids = rows[1..].pluck(2)
+        expect(assignment_ids).to contain_exactly("1", "2", "3")
+      end
+
+      it "handles missing report attachments gracefully" do
+        progress1 = create_migration_progress(
+          context: sub_account,
+          workflow_state: "completed",
+          attachment_id: nil
+        )
+
+        worker = described_class.new(sub_account, "test@example.com", coordinator.id)
+        csv_content = worker.send(:generate_consolidated_report, [progress1])
+        rows = CSV.parse(csv_content)
+
+        # When no attachments are found, returns empty string which parses to no rows
+        expect(rows.length).to eq(0)
+      end
+    end
+
+    describe "#consolidated_email_body" do
+      it "returns success message when all migrations succeeded" do
+        worker = described_class.new(sub_account, "test@example.com", coordinator.id)
+        body = worker.send(:consolidated_email_body, "http://example.com/report", 3, false)
+        expect(body).to include("completed successfully")
+        expect(body).to include("3 account(s)")
+        expect(body).to include("http://example.com/report")
+      end
+
+      it "returns partial failure message when some migrations failed" do
+        worker = described_class.new(sub_account, "test@example.com", coordinator.id)
+        body = worker.send(:consolidated_email_body, "http://example.com/report", 3, true)
+        expect(body).to include("completed with some failures")
+        expect(body).to include("3 account(s)")
+        expect(body).to include("http://example.com/report")
+      end
+    end
+
+    describe "individual email sending during bulk migration" do
+      before do
+        allow(developer_key).to receive(:global_id).and_return(999)
+        allow(root_account).to receive_messages(
+          turnitin_asset_processor_client_id: developer_key.global_id,
+          feature_enabled?: true
+        )
+      end
+
+      it "skips individual email when coordinator_id is present" do
+        worker = described_class.new(sub_account, "test@example.com", coordinator.id)
+        progress = Progress.create!(context: sub_account, tag: Lti::AssetProcessorTiiMigrationWorker::PROGRESS_TAG)
+        progress.start!
+
+        allow(worker).to receive_messages(
+          prevalidations_successful?: true,
+          actls_for_account_count: 0,
+          migrate_actls: nil,
+          save_migration_report: nil,
+          any_error_occurred?: false
+        )
+        expect(worker).to receive(:check_and_send_consolidated_email)
+        expect(worker).not_to receive(:send_migration_report_email)
+
+        worker.perform(progress)
+      end
+
+      it "sends individual email when coordinator_id is not present" do
+        worker = described_class.new(sub_account, "test@example.com", nil)
+        progress = Progress.create!(context: sub_account, tag: Lti::AssetProcessorTiiMigrationWorker::PROGRESS_TAG)
+        progress.start!
+
+        allow(worker).to receive_messages(
+          prevalidations_successful?: true,
+          actls_for_account_count: 0,
+          migrate_actls: nil,
+          save_migration_report: nil,
+          any_error_occurred?: false
+        )
+        expect(worker).to receive(:send_migration_report_email)
+        expect(worker).not_to receive(:check_and_send_consolidated_email)
+
+        worker.perform(progress)
+      end
     end
   end
 end

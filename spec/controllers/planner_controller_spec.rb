@@ -1156,13 +1156,15 @@ describe PlannerController do
           end
         end
 
-        it "ignores shards other than the current account's" do
+        it "queries items from all shards where user has enrollments" do
+          shard1_announcement = nil
+          shard1_assignment = nil
           @shard1.activate do
-            @another_assignment = @another_course.assignments.create!(title: "title", due_at: 1.day.from_now)
+            shard1_assignment = @another_course.assignments.create!(title: "title", due_at: 1.day.from_now)
             @student = user_with_pseudonym(active_all: true, account: @another_account)
             @another_course.enroll_student(@student, enrollment_state: "active")
             group_with_user(active_all: true, user: @student, context: @another_course)
-            @group.announcements.create!(message: "Hi")
+            shard1_announcement = @group.announcements.create!(message: "Hi")
           end
           group_with_user(active_all: true, user: @student, context: @course)
           announcement = @group.announcements.create!(message: "Hi")
@@ -1171,19 +1173,25 @@ describe PlannerController do
 
           get :index
           response_json = json_parse(response.body)
-          expect(response_json.pluck("plannable_id")).to eq [announcement.id, @assignment.id, @assignment2.id]
+          expect(response_json.pluck("plannable_id")).to match_array([shard1_announcement.id,
+                                                                      shard1_assignment.id,
+                                                                      announcement.id,
+                                                                      @assignment.id,
+                                                                      @assignment2.id])
         end
 
-        it "queries the correct shard-relative context codes for calendar events" do
+        it "does not return items from non-enrolled courses with duplicate local IDs on other shards" do
           @course.enroll_student(@student, enrollment_state: "active")
           @shard1.activate do
             # on the local shard, matching a course id for a course the user is in on their home shard
+            # but user is NOT enrolled in @another_course, so shouldn't see its calendar event
             @another_course.calendar_events.create!(start_at: Time.zone.now)
 
             user_session(@student)
             get :index
             response_json = json_parse(response.body)
-            expect(response_json).to eq []
+            plannable_ids = response_json.pluck("plannable_id")
+            expect(plannable_ids).to match_array([@assignment.id, @assignment2.id])
           end
         end
 

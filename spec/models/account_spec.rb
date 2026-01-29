@@ -245,21 +245,6 @@ describe Account do
     expect { Account.new.courses }.not_to raise_error
   end
 
-  context "equella_settings" do
-    it "responds to :equella_settings" do
-      expect(Account.new).to respond_to(:equella_settings)
-      expect(Account.new.equella_settings).to be_nil
-    end
-
-    it "returns the equella_settings data if defined" do
-      a = Account.new
-      a.equella_endpoint = "http://oer.equella.com/signon.do"
-      expect(a.equella_settings).not_to be_nil
-      expect(a.equella_settings[:endpoint]).to eql("http://oer.equella.com/signon.do")
-      expect(a.equella_settings[:default_action]).not_to be_nil
-    end
-  end
-
   # it "should have an atom feed" do
   # account_model
   # @a.to_atom.should be_is_a(Atom::Entry)
@@ -3344,6 +3329,45 @@ describe Account do
         account.save!
         expect(account).to have_received(:reload_if_cache_stale)
       end
+    end
+  end
+
+  describe "#marked_for_deletion?" do
+    let(:account) { Account.create! }
+
+    it "returns true when account is deleted and external_status is delete_me_frd" do
+      account.workflow_state = "deleted"
+      account.external_status = "delete_me_frd"
+      account.save!
+      expect(account.marked_for_deletion?).to be true
+    end
+
+    it "returns false when account is deleted but external_status is not delete_me_frd" do
+      account.workflow_state = "deleted"
+      account.external_status = "employee_sandbox"
+      account.save!
+      expect(account.marked_for_deletion?).to be false
+    end
+
+    it "returns false when external_status is delete_me_frd but account is not deleted" do
+      account.workflow_state = "active"
+      account.external_status = "delete_me_frd"
+      account.save!
+      expect(account.marked_for_deletion?).to be false
+    end
+
+    it "returns false when account is not deleted and external_status is nil" do
+      account.workflow_state = "active"
+      account.external_status = nil
+      account.save!
+      expect(account.marked_for_deletion?).to be false
+    end
+
+    it "returns false when account is deleted but external_status is nil" do
+      account.workflow_state = "deleted"
+      account.external_status = nil
+      account.save!
+      expect(account.marked_for_deletion?).to be false
     end
   end
 end

@@ -49,14 +49,14 @@ const CourseProgressItem: React.FC<CourseProgressItemProps> = ({course}) => {
       data-testid={`course-progress-item-${courseId}`}
     >
       <Flex direction="column" gap="small">
-        <Flex.Item>
+        <Flex.Item overflowY="visible">
           <Flex direction="column" gap="x-small">
             <Flex.Item>
               <Text size="medium" weight="bold">
                 {courseName}
               </Text>
             </Flex.Item>
-            <Flex.Item>
+            <Flex.Item overflowY="visible">
               <Link
                 href={`/courses/${courseId}`}
                 isWithinText={false}

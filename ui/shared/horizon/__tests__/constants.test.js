@@ -36,6 +36,7 @@ describe('Horizon Constants', () => {
         content_only: 'true',
         instui_theme: 'career',
         force_classic: 'true',
+        hide_global_nav: 'true',
       })
     })
   })
@@ -48,6 +49,7 @@ describe('Horizon Constants', () => {
       expect(url.searchParams.get('content_only')).toBe('true')
       expect(url.searchParams.get('instui_theme')).toBe('career')
       expect(url.searchParams.get('force_classic')).toBe('true')
+      expect(url.searchParams.get('hide_global_nav')).toBe('true')
     })
 
     test('builds URL with horizon parameters and additional params', () => {
@@ -57,6 +59,7 @@ describe('Horizon Constants', () => {
       expect(url.searchParams.get('content_only')).toBe('true')
       expect(url.searchParams.get('instui_theme')).toBe('career')
       expect(url.searchParams.get('force_classic')).toBe('true')
+      expect(url.searchParams.get('hide_global_nav')).toBe('true')
       expect(url.searchParams.get('foo')).toBe('bar')
       expect(url.searchParams.get('baz')).toBe('qux')
     })
@@ -75,6 +78,7 @@ describe('Horizon Constants', () => {
       expect(url.origin).toBe('https://canvas.instructure.com')
       expect(url.pathname).toBe('/courses/1/assignments')
       expect(url.searchParams.get('content_only')).toBe('true')
+      expect(url.searchParams.get('hide_global_nav')).toBe('true')
     })
   })
 
@@ -88,6 +92,7 @@ describe('Horizon Constants', () => {
       expect(url.searchParams.get('content_only')).toBe('true')
       expect(url.searchParams.get('instui_theme')).toBe('career')
       expect(url.searchParams.get('force_classic')).toBe('true')
+      expect(url.searchParams.get('hide_global_nav')).toBe('true')
     })
 
     test('calls buildHorizonUrl with additional params when provided', () => {
@@ -97,6 +102,7 @@ describe('Horizon Constants', () => {
       const url = new URL(expectedUrl)
 
       expect(url.searchParams.get('content_only')).toBe('true')
+      expect(url.searchParams.get('hide_global_nav')).toBe('true')
       expect(url.searchParams.get('display')).toBe('full_width')
     })
 
@@ -123,6 +129,7 @@ describe('Horizon Constants', () => {
       expect(url.searchParams.get('content_only')).toBe('true')
       expect(url.searchParams.get('instui_theme')).toBe('career')
       expect(url.searchParams.get('force_classic')).toBe('true')
+      expect(url.searchParams.get('hide_global_nav')).toBe('true')
     })
 
     test('returns URL with horizon params and additional params when ENV.horizon_course is true', () => {
@@ -132,6 +139,7 @@ describe('Horizon Constants', () => {
       const url = new URL(result)
 
       expect(url.searchParams.get('content_only')).toBe('true')
+      expect(url.searchParams.get('hide_global_nav')).toBe('true')
       expect(url.searchParams.get('quiz_lti')).toBe('true')
     })
 
@@ -153,6 +161,7 @@ describe('Horizon Constants', () => {
       expect(url.searchParams.get('content_only')).toBeNull()
       expect(url.searchParams.get('instui_theme')).toBeNull()
       expect(url.searchParams.get('force_classic')).toBeNull()
+      expect(url.searchParams.get('hide_global_nav')).toBeNull()
     })
 
     test('returns original URL without horizon params when ENV.horizon_course is undefined', () => {
@@ -175,6 +184,7 @@ describe('Horizon Constants', () => {
       expect(url.searchParams.get('content_only')).toBeNull()
       expect(url.searchParams.get('instui_theme')).toBeNull()
       expect(url.searchParams.get('force_classic')).toBeNull()
+      expect(url.searchParams.get('hide_global_nav')).toBeNull()
     })
 
     test('preserves existing query parameters in horizon course', () => {
@@ -186,6 +196,7 @@ describe('Horizon Constants', () => {
       expect(url.searchParams.get('existing')).toBe('param')
       expect(url.searchParams.get('other')).toBe('value')
       expect(url.searchParams.get('content_only')).toBe('true')
+      expect(url.searchParams.get('hide_global_nav')).toBe('true')
     })
 
     test('preserves existing query parameters when not in horizon course with additional params', () => {
@@ -199,6 +210,7 @@ describe('Horizon Constants', () => {
       expect(url.searchParams.get('existing')).toBe('param')
       expect(url.searchParams.get('display')).toBe('full_width')
       expect(url.searchParams.get('content_only')).toBeNull()
+      expect(url.searchParams.get('hide_global_nav')).toBeNull()
     })
   })
 })

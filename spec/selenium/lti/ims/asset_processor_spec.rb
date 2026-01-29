@@ -97,7 +97,7 @@ describe "Asset Processor" do
       )
     end
 
-    it "student accepts EULA when viewing assignment for the first time", skip: "INTEROP-9987 2025-11-04" do
+    it "student accepts EULA when viewing assignment for the first time" do
       user_session(student)
       get("/courses/#{course.id}/assignments/#{assignment.id}")
       wait_for_ajaximations
@@ -105,7 +105,7 @@ describe "Asset Processor" do
       expect(f("[role='dialog']")).to be_displayed
 
       # Switch to the EULA iframe and interact with the tool
-      in_frame(f("iframe[title*='EULA']")) do
+      in_frame(f("iframe[title*='EULA']"), "#eula-accept-btn") do
         wait_for_ajaximations
         button = MockLtiToolUi.eula_accept_button
         expect(button).to be_displayed

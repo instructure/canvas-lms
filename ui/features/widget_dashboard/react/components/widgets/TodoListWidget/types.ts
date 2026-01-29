@@ -48,6 +48,7 @@ export interface SubmissionStatus {
   missing: boolean
   needs_grading: boolean
   has_feedback: boolean
+  redo_request: boolean
 }
 
 export interface Plannable {

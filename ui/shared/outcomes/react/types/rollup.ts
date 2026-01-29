@@ -36,6 +36,9 @@ export interface Outcome {
   points_possible: number
   mastery_points: number
   ratings: Rating[]
+  proficiency_context_type?: string
+  proficiency_context_id?: string
+  group_id?: string
 }
 
 export interface Score {

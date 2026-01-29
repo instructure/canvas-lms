@@ -85,6 +85,10 @@ class Accessibility::CourseScanService < ApplicationService
   def scan_course
     scan_resources(@course.wiki_pages.not_deleted, :wiki_page_id)
     scan_resources(@course.assignments.active.not_excluded_from_accessibility_scan.except(:order), :assignment_id)
+
+    if Account.site_admin.feature_enabled?(:a11y_checker_additional_resources)
+      scan_resources(@course.discussion_topics.except(:order), :discussion_topic_id)
+    end
   end
 
   private
@@ -98,7 +102,9 @@ class Accessibility::CourseScanService < ApplicationService
 
     resources.find_each do |resource|
       last_scan = scans_by_resource_id[resource.id]
-      next unless needs_scan?(resource, last_scan)
+      if Account.site_admin.feature_enabled?(:a11y_checker_course_scan_conditional_resource_scan)
+        next unless needs_scan?(resource, last_scan)
+      end
 
       Accessibility::ResourceScannerService.call(resource:)
     end

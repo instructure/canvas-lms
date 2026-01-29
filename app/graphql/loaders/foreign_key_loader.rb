@@ -51,7 +51,7 @@ class Loaders::ForeignKeyLoader < GraphQL::Batch::Loader
       @scope.where(@column => sharded_ids)
             .group_by { |o| o.send(@column).to_s }
             .each do |id, os|
-        fulfill(Shard.global_id_for(id), os)
+              fulfill(Shard.global_id_for(id), os)
       end
     end
     ids.each do |id|

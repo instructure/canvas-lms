@@ -116,15 +116,51 @@ export function validateRelease(
     // Validate relationship between dates (only if at least one has changed)
     if (gradesDate && commentsDate && gradesDate < commentsDate) {
       errorMessages.grades.push({
-        text: I18n.t('Grades release date must be the same or after comments release date'),
+        text: I18n.t(
+          'Grades release date and time must be the same or after comments release date',
+        ),
         type: 'error',
       })
       errorMessages.comments.push({
-        text: I18n.t('Comments release date must be the same or before grades release date'),
+        text: I18n.t(
+          'Comments release date and time must be the same or before grades release date',
+        ),
         type: 'error',
       })
     }
   }
 
   return errorMessages
+}
+
+export const combineDateTime = (
+  dateString: string | null | undefined,
+  timeString: string | null | undefined,
+): string | undefined => {
+  if (!dateString && !timeString) {
+    return undefined
+  }
+
+  if (!dateString) {
+    dateString = new Date().toISOString()
+  }
+
+  if (!timeString) {
+    const now = new Date()
+    timeString = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+  }
+
+  const dateToCombine = new Date(dateString)
+  const timeToCombine = new Date(timeString)
+
+  const combined = new Date(
+    dateToCombine.getFullYear(),
+    dateToCombine.getMonth(),
+    dateToCombine.getDate(),
+    timeToCombine.getHours(),
+    timeToCombine.getMinutes(),
+    timeToCombine.getSeconds(),
+  )
+
+  return combined.toISOString()
 }

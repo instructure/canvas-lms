@@ -28,35 +28,35 @@ module DataFixup::Lti::MigrateOverlayVersionsToRegistrationHistoryEntries
                        .where(updated_at: ...Time.utc(2025, 9, 25, 7))
                        .preload(lti_overlay: :registration)
                        .in_batches do |batch|
-      history_entries = batch.filter_map do |overlay_version|
-        registration = overlay_version.lti_overlay.registration
-        next unless registration
+                         history_entries = batch.filter_map do |overlay_version|
+                           registration = overlay_version.lti_overlay.registration
+                           next unless registration
 
-        # Convert string-based diff paths to array-based paths
-        converted_diff = convert_diff_paths(overlay_version.diff)
+                           # Convert string-based diff paths to array-based paths
+                           converted_diff = convert_diff_paths(overlay_version.diff)
 
-        {
-          lti_registration_id: registration.id,
-          root_account_id: overlay_version.root_account_id,
-          created_by_id: overlay_version.created_by_id,
-          diff: { overlay: converted_diff },
-          update_type: "manual_edit",
-          created_at: overlay_version.created_at,
-          updated_at: overlay_version.updated_at
-        }
-      # Prevents one bad record from failing the whole batch
-      rescue => e
-        Sentry.with_scope do |scope|
-          scope.set_context("DataFixup::Lti::MigrateOverlayVersionsToRegistrationHistoryEntries", {
-                              overlay_version_global_id: overlay_version.global_id,
-                              error: e.message,
-                            })
-          Sentry.capture_exception(e)
-        end
-        nil
-      end
+                           {
+                             lti_registration_id: registration.id,
+                             root_account_id: overlay_version.root_account_id,
+                             created_by_id: overlay_version.created_by_id,
+                             diff: { overlay: converted_diff },
+                             update_type: "manual_edit",
+                             created_at: overlay_version.created_at,
+                             updated_at: overlay_version.updated_at
+                           }
+                         # Prevents one bad record from failing the whole batch
+                         rescue => e
+                           Sentry.with_scope do |scope|
+                             scope.set_context("DataFixup::Lti::MigrateOverlayVersionsToRegistrationHistoryEntries", {
+                                                 overlay_version_global_id: overlay_version.global_id,
+                                                 error: e.message,
+                                               })
+                             Sentry.capture_exception(e)
+                           end
+                           nil
+                         end
 
-      Lti::RegistrationHistoryEntry.insert_all!(history_entries) if history_entries.any?
+                         Lti::RegistrationHistoryEntry.insert_all!(history_entries) if history_entries.any?
     end
   end
 

@@ -328,6 +328,7 @@ module CC
               meta_field(meta_node, "bank_title", bank.title)
               meta_field(meta_node, "bank_type", bank.context_type) if new_quizzes_bank_migration_enabled?
               meta_field(meta_node, "bank_context_uuid", bank.context&.uuid)
+              meta_field(meta_node, "bank_state", bank.deleted_at ? "deleted" : "active")
             end # meta_node
 
             bank.assessment_questions.active.each do |aq|
