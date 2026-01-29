@@ -198,16 +198,46 @@ describe('LearningMastery', () => {
     fakeENV.teardown()
   })
 
-  it('renders a loading spinner when useRollups.isLoading is true', async () => {
+  it('renders a loading spinner when useRollups.isLoading is true', () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({isLoading: true}))
     render(<LearningMastery {...defaultProps()} />)
     expect(screen.getByText('Loading')).toBeInTheDocument()
   })
 
-  it('renders the gradebook menu on the page', async () => {
+  it('renders the gradebook menu on the page', () => {
     render(<LearningMastery {...defaultProps()} />)
     expect(screen.getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+  })
+
+  it('renders a single h1 for the page when instuiNavFF is disabled', () => {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {
+        outcome_proficiency: {ratings},
+        ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        context_url: '/courses/1',
+      },
+      FEATURES: {instui_nav: false},
+    })
+
+    render(<LearningMastery {...defaultProps()} />)
+    const headings = screen.queryAllByRole('heading', {level: 1})
+    expect(headings).toHaveLength(1)
+  })
+
+  it('renders a single h1 for the page when instuiNavFF is enabled', () => {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {
+        outcome_proficiency: {ratings},
+        ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        context_url: '/courses/1',
+      },
+      FEATURES: {instui_nav: true},
+    })
+
+    render(<LearningMastery {...defaultProps()} />)
+    const headings = screen.queryAllByRole('heading', {level: 1})
+    expect(headings).toHaveLength(1)
   })
 
   it('renders the export button on the page', async () => {
@@ -215,21 +245,21 @@ describe('LearningMastery', () => {
     expect(screen.getByText('Export')).toBeInTheDocument()
   })
 
-  it('does not render the export button on load error', async () => {
+  it('does not render the export button on load error', () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: ''}))
     render(<LearningMastery {...defaultProps()} />)
     expect(screen.queryByText('Export')).not.toBeInTheDocument()
   })
 
-  it('does not render the gradebook body on the page if loading failed', async () => {
+  it('does not render the gradebook body on the page if loading failed', () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: ''}))
     render(<LearningMastery {...defaultProps()} />)
     expect(screen.queryByTestId('gradebook-body')).not.toBeInTheDocument()
   })
 
-  it('renders generic error page if loading failed, while still rendering the gradebook menu', async () => {
+  it('renders generic error page if loading failed, while still rendering the gradebook menu', () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: 'Banana Error'}))
     render(<LearningMastery {...defaultProps()} />)

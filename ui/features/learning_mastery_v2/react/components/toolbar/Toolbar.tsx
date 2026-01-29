@@ -30,6 +30,7 @@ import {ExportCSVButton} from './ExportCSVButton'
 import {SettingsTray} from './SettingsTray'
 import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
 import {mapSettingsToFilters} from '@canvas/outcomes/react/utils/filter'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -46,6 +47,7 @@ export interface ToolbarProps {
   gradebookSettings: GradebookSettings
   setGradebookSettings: (settings: GradebookSettings) => Promise<{success: boolean}>
   isSavingSettings?: boolean
+  hideHeading?: boolean
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -55,6 +57,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   gradebookSettings,
   setGradebookSettings,
   isSavingSettings,
+  hideHeading,
 }) => {
   const [isSettingsTrayOpen, setSettingsTrayOpen] = useState<boolean>(false)
 
@@ -70,9 +73,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         wrap="wrap"
       >
         <Flex alignItems="center" data-testid="lmgb-gradebook-menu">
-          <Text size="xx-large" weight="bold">
-            {I18n.t('Learning Mastery Gradebook')}
-          </Text>
+          {!hideHeading && <Heading level="h1">{I18n.t('Learning Mastery Gradebook')}</Heading>}
           <View padding="xx-small">
             <GradebookMenu
               courseUrl={contextURL ?? ''}
