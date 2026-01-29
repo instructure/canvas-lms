@@ -205,20 +205,20 @@ describe "Student dashboard as observer", :ignore_js_errors do
       go_to_dashboard
       select_observed_student(@student.name)
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(element_exists?(message_instructor_button_selector(@teacher2.id, @course2.id))).to be_falsey
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(element_exists?(message_instructor_button_selector(@teacher2.id))).to be_falsey
 
       select_observed_student(@student2.name)
-      expect(message_instructor_button(@teacher2.id, @course2.id)).to be_displayed
-      expect(element_exists?(message_instructor_button_selector(@teacher1.id, @course1.id))).to be_falsey
+      expect(message_instructor_button(@teacher2.id)).to be_displayed
+      expect(element_exists?(message_instructor_button_selector(@teacher1.id))).to be_falsey
     end
 
     it "sends message to instructor as observer" do
       go_to_dashboard
       select_observed_student(@student.name)
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      message_instructor_button(@teacher1.id, @course1.id).click
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      message_instructor_button(@teacher1.id).click
       wait_for_ajaximations
       expect(message_modal_subject_input).to be_displayed
       message_modal_subject_input.send_keys("Observer")

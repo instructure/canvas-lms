@@ -39,16 +39,16 @@ describe "student dashboard people widget", :ignore_js_errors do
     it "displays teachers and TA" do
       go_to_dashboard
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(message_instructor_button(@teacher2.id, @course2.id)).to be_displayed
-      expect(message_instructor_button(@ta1.id, @course1.id)).to be_displayed
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(message_instructor_button(@teacher2.id)).to be_displayed
+      expect(message_instructor_button(@ta1.id)).to be_displayed
     end
 
     it "can message instructors" do
       go_to_dashboard
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      message_instructor_button(@teacher1.id, @course1.id).click
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      message_instructor_button(@teacher1.id).click
       wait_for_ajaximations
       expect(send_message_to_modal(@teacher1.name)).to be_displayed
       expect(message_modal_subject_input).to be_displayed
@@ -114,26 +114,26 @@ describe "student dashboard people widget", :ignore_js_errors do
     it "filters instructors by role" do
       go_to_dashboard
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(message_instructor_button(@ta1.id, @course1.id)).to be_displayed
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(message_instructor_button(@ta1.id)).to be_displayed
 
       filter_people_by(:role, "Teacher")
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(element_exists?(message_instructor_button_selector(@ta1.id, @course1.id))).to be_falsey
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(element_exists?(message_instructor_button_selector(@ta1.id))).to be_falsey
     end
 
     it "filters instructors by course" do
       go_to_dashboard
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(message_instructor_button(@teacher2.id, @course2.id)).to be_displayed
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(message_instructor_button(@teacher2.id)).to be_displayed
 
       filter_people_by(:course, @course1.name)
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(message_instructor_button(@ta1.id, @course1.id)).to be_displayed
-      expect(element_exists?(message_instructor_button_selector(@teacher2.id, @course2.id))).to be_falsey
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(message_instructor_button(@ta1.id)).to be_displayed
+      expect(element_exists?(message_instructor_button_selector(@teacher2.id))).to be_falsey
     end
 
     it "persists filter selections across page loads" do
@@ -141,14 +141,14 @@ describe "student dashboard people widget", :ignore_js_errors do
 
       filter_people_by(:role, "Teacher")
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(element_exists?(message_instructor_button_selector(@ta1.id, @course1.id))).to be_falsey
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(element_exists?(message_instructor_button_selector(@ta1.id))).to be_falsey
 
       refresh_page
       wait_for_ajaximations
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(element_exists?(message_instructor_button_selector(@ta1.id, @course1.id))).to be_falsey
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(element_exists?(message_instructor_button_selector(@ta1.id))).to be_falsey
     end
   end
 end

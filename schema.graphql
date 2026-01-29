@@ -5581,6 +5581,49 @@ type InboxSettings implements Timestamped {
   userId: ID!
 }
 
+type InstructorEnrollmentInfo {
+  course: Course!
+  enrollmentState: String!
+  role: EnrollmentRole!
+  type: String!
+}
+
+type InstructorWithEnrollments {
+  enrollments: [InstructorEnrollmentInfo!]!
+  user: User!
+}
+
+"""
+The connection type for InstructorWithEnrollments.
+"""
+type InstructorWithEnrollmentsConnection {
+  """
+  A list of edges.
+  """
+  edges: [InstructorWithEnrollmentsEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [InstructorWithEnrollments]
+  pageInfo: TotalCountPageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type InstructorWithEnrollmentsEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: InstructorWithEnrollments
+}
+
 type InternalSetting implements LegacyIDInterface & Node & Timestamped {
   """
   legacy canvas id
@@ -8716,7 +8759,7 @@ type Query {
   ): Course
 
   """
-  Paginated instructor enrollments across multiple courses
+  Paginated instructors with their enrollments across multiple courses
   """
   courseInstructorsConnection(
     """
@@ -8753,7 +8796,7 @@ type Query {
     ID of the observed user
     """
     observedUserId: ID
-  ): EnrollmentConnection
+  ): InstructorWithEnrollmentsConnection
 
   """
   Courses by IDs that are viewable by the current user

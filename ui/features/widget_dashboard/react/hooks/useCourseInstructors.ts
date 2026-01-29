@@ -39,6 +39,8 @@ export interface CourseInstructorForComponent {
     id: string
     user_id: string
     course_id: string
+    course_name: string
+    course_code?: string
     type: 'TeacherEnrollment' | 'TaEnrollment'
     role: string
     role_id: string
