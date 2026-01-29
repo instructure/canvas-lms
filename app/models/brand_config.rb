@@ -90,6 +90,8 @@ class BrandConfig < ActiveRecord::Base
     shard.activate do
       self.class.connection.after_transaction_commit do
         MultiCache.delete(self.class.cache_key_for_md5(shard.id, md5))
+        delay_if_production(singleton: "brand_config_clear_caches_#{shard.id}_#{md5}")
+          .clear_dependent_caches
       end
     end
   end
@@ -268,5 +270,38 @@ class BrandConfig < ActiveRecord::Base
       .where.not(Account.where("brand_config_md5=brand_configs.md5").arel.exists)
       .where.not(SharedBrandConfig.where("brand_config_md5=brand_configs.md5").arel.exists)
       .delete_all
+  end
+
+  # Clear all dependent caches when this BrandConfig changes
+  # This includes:
+  # 1. BrandConfig-level caches: css_and_js_overrides for all child configs
+  # 2. Account-level caches: effective_brand_config for all accounts using this config or its children
+  #
+  # This is necessary because:
+  # - Child BrandConfigs cache css_and_js_overrides which includes parent overrides
+  # - Accounts cache effective_brand_config which determines inheritance chain
+  # - Both must be invalidated when parent BrandConfig changes
+  #
+  # This base implementation only handles same-shard children (the common case)
+  def clear_dependent_caches
+    clear_child_override_caches_recursively(md5)
+    clear_account_chain_caches
+  end
+
+  private
+
+  def clear_child_override_caches_recursively(parent_md5)
+    BrandConfig.where(parent_md5:).find_each do |child_config|
+      Rails.cache.delete([child_config, "css_and_js_overrides"].cache_key)
+      clear_child_override_caches_recursively(child_config.md5)
+    end
+  end
+
+  def clear_account_chain_caches
+    account_ids = Account.where(brand_config_md5: md5).ids
+    shared_config_account_ids = SharedBrandConfig.where(brand_config_md5: md5).pluck(:account_id)
+
+    all_account_ids = (account_ids + shared_config_account_ids).uniq
+    Account.clear_cache_keys(all_account_ids, :brand_config) if all_account_ids.any?
   end
 end
