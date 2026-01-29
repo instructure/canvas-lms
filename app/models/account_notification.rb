@@ -420,7 +420,16 @@ class AccountNotification < ActiveRecord::Base
       end
 
       if roles.include?(nil)
-        users_with_no_enrollments_from_given_accounts = User.joins(:user_account_associations).where(user_account_associations: { account_id: all_account_ids }).where.not(id: Enrollment.active_or_pending_by_date.select(:user_id))
+        users_with_no_enrollments_from_given_accounts = User.joins(:user_account_associations)
+                                                            .where(user_account_associations: { account_id: all_account_ids })
+                                                            .where("NOT EXISTS (
+                                                              SELECT 1
+                                                              FROM #{Enrollment.quoted_table_name} AS e
+                                                              INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON es.enrollment_id = e.id
+                                                              WHERE e.user_id = #{User.quoted_table_name}.id
+                                                                AND es.restricted_access = FALSE
+                                                                AND es.state IN ('active', 'invited', 'pending_invited', 'pending_active')
+                                                            )")
         user_ids += users_with_no_enrollments_from_given_accounts.pluck(:id)
       end
 
