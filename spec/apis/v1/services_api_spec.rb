@@ -68,7 +68,7 @@ describe "Services API", type: :request do
   end
 
   it "returns a new kaltura session" do
-    kal = double("CanvasKaltura::ClientV3")
+    kal = instance_double(CanvasKaltura::ClientV3)
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
     json = api_call(:post,
@@ -85,7 +85,7 @@ describe "Services API", type: :request do
   end
 
   it "returns a new kaltura session with upload config if param provided" do
-    kal = double("CanvasKaltura::ClientV3")
+    kal = instance_double(CanvasKaltura::ClientV3)
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
     json = api_call(:post,

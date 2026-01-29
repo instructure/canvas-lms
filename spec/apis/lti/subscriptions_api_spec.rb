@@ -24,7 +24,7 @@ module Lti
     specs_require_sharding
     include_context "lti2_api_spec_helper"
 
-    let(:controller) { double(lti2_service_name: "vnd.Canvas.webhooksSubscription") }
+    let(:controller) { instance_double(SubscriptionsApiController, lti2_service_name: "vnd.Canvas.webhooksSubscription") }
     let(:subscription_id) { "ab342-c444-29392-e222" }
     let(:test_subscription) { { "RootAccountId" => "1", "Id" => subscription_id } }
 
@@ -34,9 +34,9 @@ module Lti
     let(:create_endpoint) { "/api/lti/subscriptions" }
     let(:index_endpoint) { "/api/lti/subscriptions" }
 
-    let(:ok_response) { double(body: subscription.to_json, code: 200) }
-    let(:not_found_response) { double(body: "{}", code: 404) }
-    let(:delete_response) { double(body: "{}", code: 200) }
+    let(:ok_response) { instance_double(HTTParty::Response, body: subscription.to_json, code: 200) }
+    let(:not_found_response) { instance_double(HTTParty::Response, body: "{}", code: 404) }
+    let(:delete_response) { instance_double(HTTParty::Response, body: "{}", code: 200) }
 
     let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
     let(:subscription) do
@@ -54,7 +54,7 @@ module Lti
 
     describe "#create" do
       let(:test_subscription) { { "RootAccountId" => "1", "foo" => "bar" } }
-      let(:stub_response) { double(code: 200, body: test_subscription.to_json) }
+      let(:stub_response) { instance_double(HTTParty::Response, code: 200, body: test_subscription.to_json) }
 
       before do
         allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
@@ -269,18 +269,16 @@ module Lti
       let(:pagination_key) { { Id: "71d6dfba-0547-477d-b41d-db8cb528c6d1", DeveloperKey: "10000000000001" } }
       let(:pagination_request_headers) { { StartKey: pagination_key.to_json, Authorization: "Bearer #{access_token}" } }
       let(:ok_pagination_response) do
-        double(
-          body: [subscription].to_json,
-          code: 200,
-          headers: { "endkey" => pagination_key.to_json }
-        )
+        instance_double(HTTParty::Response,
+                        body: [subscription].to_json,
+                        code: 200,
+                        headers: { "endkey" => pagination_key.to_json })
       end
       let(:ok_unpaginated_response) do
-        double(
-          body: [subscription].to_json,
-          code: 200,
-          headers: {}
-        )
+        instance_double(HTTParty::Response,
+                        body: [subscription].to_json,
+                        code: 200,
+                        headers: {})
       end
 
       it "shows subscriptions for a tool proxy" do

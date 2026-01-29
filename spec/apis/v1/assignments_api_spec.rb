@@ -3066,7 +3066,7 @@ describe AssignmentsApiController, type: :request do
 
           mock_and_call_create_api_assignment(assignment, assignment_params, {
                                                 additional_mocks:,
-                                                prepare_options: { assignment:, valid: true, overrides: [double("override")] }
+                                                prepare_options: { assignment:, valid: true, overrides: [instance_double(AssignmentOverride)] }
                                               })
 
           expect(call_order).to eq(%i[assignment_with_overrides_created peer_review_created lifecycle_recompute])
@@ -3144,7 +3144,7 @@ describe AssignmentsApiController, type: :request do
           )
 
           allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
-            .and_return({ assignment:, valid: true, overrides: [double("override")] })
+            .and_return({ assignment:, valid: true, overrides: [instance_double(AssignmentOverride)] })
 
           allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_assignment_with_overrides)
             .and_return(:created)
@@ -3895,7 +3895,7 @@ describe AssignmentsApiController, type: :request do
             due_at: params[:due_at],
             unlock_at: params[:unlock_at],
             lock_at: params[:lock_at]
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -3906,7 +3906,7 @@ describe AssignmentsApiController, type: :request do
           expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
             parent_assignment:,
             points_possible: 25
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -3916,7 +3916,7 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
             parent_assignment:
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -3926,7 +3926,7 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
             parent_assignment:
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -3942,7 +3942,7 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
             parent_assignment:
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -3961,7 +3961,7 @@ describe AssignmentsApiController, type: :request do
             points_possible: 30,
             due_at: params[:due_at],
             lock_at: nil
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -3974,7 +3974,7 @@ describe AssignmentsApiController, type: :request do
           expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
             parent_assignment:,
             points_possible: 100
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -3986,7 +3986,7 @@ describe AssignmentsApiController, type: :request do
             expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
               parent_assignment:,
               grading_type:
-            ).and_return(double("peer_review_sub_assignment"))
+            ).and_return(instance_double(PeerReviewSubAssignment))
 
             test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
           end
@@ -4008,7 +4008,7 @@ describe AssignmentsApiController, type: :request do
             due_at: due_date,
             unlock_at: unlock_date,
             lock_at: lock_date
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -4077,7 +4077,7 @@ describe AssignmentsApiController, type: :request do
             ]
           }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_return(peer_review_sub_assignment)
 
           expect(PeerReview::DateOverriderService).to receive(:call).with(
@@ -4092,7 +4092,7 @@ describe AssignmentsApiController, type: :request do
         it "does not call DateOverriderService when peer_review_overrides are not provided" do
           params = { points_possible: 50 }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_return(peer_review_sub_assignment)
 
           expect(PeerReview::DateOverriderService).not_to receive(:call)
@@ -4106,7 +4106,7 @@ describe AssignmentsApiController, type: :request do
             peer_review_overrides: []
           }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_return(peer_review_sub_assignment)
 
           expect(PeerReview::DateOverriderService).to receive(:call).with(
@@ -4127,7 +4127,7 @@ describe AssignmentsApiController, type: :request do
             ]
           }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::DateOverriderService).to receive(:call)
 
           expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
@@ -4147,7 +4147,7 @@ describe AssignmentsApiController, type: :request do
             ]
           }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_return(peer_review_sub_assignment)
           allow(PeerReview::DateOverriderService).to receive(:call)
 
@@ -4542,7 +4542,7 @@ describe AssignmentsApiController, type: :request do
 
         context "when assignment update succeeds and peer review grading feature is enabled" do
           context "when assignment has existing peer review sub assignment" do
-            let(:peer_review_sub_assignment) { double("peer_review_sub_assignment") }
+            let(:peer_review_sub_assignment) { instance_double(PeerReviewSubAssignment) }
 
             before do
               allow(assignment).to receive(:peer_review_sub_assignment).and_return(peer_review_sub_assignment)
@@ -4636,7 +4636,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "raises error when update_api_peer_review_sub_assignment fails (wrapped in transaction)" do
-            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
             peer_reviews = true
             allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
             allow(test_object).to receive(:update_api_peer_review_sub_assignment)
@@ -4648,7 +4648,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "raises error when peer_review_sub_assignment.destroy fails (wrapped in transaction)" do
-            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
             peer_reviews = false
             allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
             allow(peer_review_sub_assignment).to receive(:destroy)
@@ -4669,7 +4669,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "rolls back transaction when update_api_peer_review_sub_assignment returns false" do
-            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
             peer_reviews = true
             allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
             allow(test_object).to receive(:update_api_peer_review_sub_assignment)
@@ -4696,7 +4696,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "reloads peer_review_sub_assignment association when updating existing peer review sub assignment" do
-            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
             peer_reviews = true
             allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
             allow(test_object).to receive(:update_api_peer_review_sub_assignment)
@@ -4707,7 +4707,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "reloads peer_review_sub_assignment association when destroying existing peer review sub assignment" do
-            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
             peer_reviews = false
             allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
             allow(peer_review_sub_assignment).to receive(:destroy)
@@ -4781,7 +4781,7 @@ describe AssignmentsApiController, type: :request do
           before do
             allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
             allow(assignment).to receive_messages(peer_review_sub_assignment: nil, peer_reviews: true)
-            allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_return(double("peer_review_sub_assignment"))
+            allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_return(instance_double(PeerReviewSubAssignment))
             allow(PeerReview::DateOverriderService).to receive(:call)
           end
 
@@ -4875,7 +4875,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "handles peer review creation in transaction" do
-          mock_peer_review_sub = double("peer_review_sub_assignment")
+          mock_peer_review_sub = instance_double(PeerReviewSubAssignment)
 
           allow(test_object).to receive_messages(
             update_api_assignment_with_overrides: :ok,
@@ -4918,7 +4918,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "handles empty peer_review_overrides alongside empty assignment_overrides" do
-            mock_peer_review_sub = double("peer_review_sub_assignment")
+            mock_peer_review_sub = instance_double(PeerReviewSubAssignment)
 
             allow(test_object).to receive(:update_api_assignment_with_overrides)
               .and_return(:ok)
@@ -5095,7 +5095,7 @@ describe AssignmentsApiController, type: :request do
             due_at: params[:due_at],
             unlock_at: params[:unlock_at],
             lock_at: params[:lock_at]
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -5106,7 +5106,7 @@ describe AssignmentsApiController, type: :request do
           expect(PeerReview::PeerReviewUpdaterService).to receive(:call).with(
             parent_assignment:,
             points_possible: 25
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -5116,7 +5116,7 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::PeerReviewUpdaterService).to receive(:call).with(
             parent_assignment:
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -5126,7 +5126,7 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::PeerReviewUpdaterService).to receive(:call).with(
             parent_assignment:
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -5142,7 +5142,7 @@ describe AssignmentsApiController, type: :request do
 
           expect(PeerReview::PeerReviewUpdaterService).to receive(:call).with(
             parent_assignment:
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           test_object.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
         end
@@ -5163,7 +5163,7 @@ describe AssignmentsApiController, type: :request do
             due_at: due_date,
             unlock_at: unlock_date,
             lock_at: lock_date
-          ).and_return(double("peer_review_sub_assignment"))
+          ).and_return(instance_double(PeerReviewSubAssignment))
 
           allow(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
 
@@ -5184,7 +5184,7 @@ describe AssignmentsApiController, type: :request do
             ]
           }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
 
           expect(PeerReview::DateOverriderService).to receive(:call).with(
@@ -5199,7 +5199,7 @@ describe AssignmentsApiController, type: :request do
         it "does not call DateOverriderService when peer_review_overrides are not provided" do
           params = { points_possible: 50 }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
 
           expect(PeerReview::DateOverriderService).not_to receive(:call)
@@ -5213,7 +5213,7 @@ describe AssignmentsApiController, type: :request do
             peer_review_overrides: []
           }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
 
           expect(PeerReview::DateOverriderService).to receive(:call).with(
@@ -5234,7 +5234,7 @@ describe AssignmentsApiController, type: :request do
             ]
           }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::DateOverriderService).to receive(:call)
 
           expect(PeerReview::PeerReviewUpdaterService).to receive(:call).with(
@@ -5254,7 +5254,7 @@ describe AssignmentsApiController, type: :request do
             ]
           }
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
           allow(PeerReview::DateOverriderService).to receive(:call)
 
@@ -5368,7 +5368,7 @@ describe AssignmentsApiController, type: :request do
           }
           error_message = "Unlock date cannot be after lock date"
 
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
+          peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
           allow(PeerReview::DateOverriderService).to receive(:call)
             .and_raise(PeerReview::InvalidDatesError.new(error_message))
@@ -11039,7 +11039,7 @@ describe AssignmentsApiController, type: :request do
                                       workflow_state: "completed",
                                       error_message: nil,
                                       issue_count: 0,
-                                      accessibility_issues: double(select: []))
+                                      accessibility_issues: instance_double(ActiveRecord::Relation, select: []))
 
         expect(Accessibility::ResourceScannerService).to receive(:new)
           .with(resource: @assignment)
