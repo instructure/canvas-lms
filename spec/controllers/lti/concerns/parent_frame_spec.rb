@@ -46,7 +46,7 @@ describe Lti::Concerns::ParentFrame do
   end
 
   let(:request) do
-    double("request", query_parameters: "hello=world")
+    instance_double(ActionDispatch::Request, query_parameters: "hello=world")
   end
 
   before do
@@ -132,7 +132,7 @@ describe Lti::Concerns::ParentFrame do
 
     before do
       controller.instance_variable_set(:@domain_root_account, tool_context)
-      allow(controller).to receive(:request).and_return(double(host: "instructure.com"))
+      allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, host: "instructure.com"))
       allow(tool_context).to receive(:cached_tool_domains).with(internal_service_only: true).and_return(["mytool.example.com"])
     end
 

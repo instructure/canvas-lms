@@ -2334,7 +2334,7 @@ describe CoursesController do
         end
 
         it "syncs enrollments if setting is set" do
-          progress = double("Progress").as_null_object
+          progress = instance_double(Progress).as_null_object
           allow(Progress).to receive(:new).and_return(progress)
           expect(progress).to receive(:process_job)
 
@@ -2350,7 +2350,7 @@ describe CoursesController do
         end
 
         it "does not sync if course is a sis import" do
-          progress = double("Progress").as_null_object
+          progress = instance_double(Progress).as_null_object
           allow(Progress).to receive(:new).and_return(progress)
           expect(progress).not_to receive(:process_job)
 
@@ -5564,19 +5564,19 @@ describe CoursesController do
 
         context "with existing progress" do
           let(:progress) do
-            double("Progress",
-                   id: 123,
-                   workflow_state: "completed",
-                   results: {
-                     resources: {
-                       "WikiPage|1" => { name: "Page 1", type: "WikiPage", embeds: [], count: 1 },
-                       "WikiPage|2" => { name: "Page 2", type: "WikiPage", embeds: [], count: 2 },
-                       "WikiPage|3" => { name: "Page 3", type: "WikiPage", embeds: [], count: 1 },
-                       "WikiPage|4" => { name: "Page 4", type: "WikiPage", embeds: [], count: 3 },
-                       "WikiPage|5" => { name: "Page 5", type: "WikiPage", embeds: [], count: 1 }
-                     },
-                     total_count: 8
-                   })
+            instance_double(Progress,
+                            id: 123,
+                            workflow_state: "completed",
+                            results: {
+                              resources: {
+                                "WikiPage|1" => { name: "Page 1", type: "WikiPage", embeds: [], count: 1 },
+                                "WikiPage|2" => { name: "Page 2", type: "WikiPage", embeds: [], count: 2 },
+                                "WikiPage|3" => { name: "Page 3", type: "WikiPage", embeds: [], count: 1 },
+                                "WikiPage|4" => { name: "Page 4", type: "WikiPage", embeds: [], count: 3 },
+                                "WikiPage|5" => { name: "Page 5", type: "WikiPage", embeds: [], count: 1 }
+                              },
+                              total_count: 8
+                            })
           end
 
           before do
@@ -5668,7 +5668,7 @@ describe CoursesController do
           resource_group_key: "key"
         }
       end
-      let(:progress) { double("Progress", id: 1) }
+      let(:progress) { instance_double(Progress, id: 1) }
 
       before do
         allow(YoutubeMigrationService).to receive(:new).with(@course).and_return(service)

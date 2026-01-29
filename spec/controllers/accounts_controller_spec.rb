@@ -972,7 +972,7 @@ describe AccountsController do
       end
 
       it "calls K5::EnablementService with correct args if enable_as_k5_account is present in params" do
-        set_k5_settings_double = double("set_k5_settings")
+        set_k5_settings_double = instance_double(K5::EnablementService)
         expect(K5::EnablementService).to receive(:new).with(@account).and_return(set_k5_settings_double)
         expect(set_k5_settings_double).to receive(:set_k5_settings).with(true, false)
         post "update", params: { id: @account.id,

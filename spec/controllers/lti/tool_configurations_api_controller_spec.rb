@@ -99,7 +99,8 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
   shared_examples_for "an endpoint that accepts a settings_url" do
     let(:ok_response) do
-      double(
+      instance_double(
+        Net::HTTPSuccess,
         :body => canvas_lti_configuration.to_json,
         :is_a? => true,
         "[]" => "application/json"
@@ -198,7 +199,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     context "when the response is not a success" do
       subject { json_parse["errors"].first["message"] }
 
-      let(:stubbed_response) { double }
+      let(:stubbed_response) { instance_double(Net::HTTPResponse) }
 
       before do
         allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false

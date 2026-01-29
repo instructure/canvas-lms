@@ -89,7 +89,7 @@ describe UsersController do
     before do
       account.account_users.create!(user:)
       allow(Lti::LogService).to receive(:new) do
-        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        instance_double(Lti::LogService, call: nil)
       end
       user_session(user)
     end
@@ -303,7 +303,7 @@ describe UsersController do
   describe "GET oauth" do
     it "sets up oauth for google_drive" do
       state = nil
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive_messages(settings: {}, enabled?: true)
 
       user_factory(active_all: true)
@@ -329,7 +329,7 @@ describe UsersController do
 
   describe "GET oauth_success" do
     it "handles google_drive oauth_success for a logged_in_user" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
@@ -363,7 +363,7 @@ describe UsersController do
     end
 
     it "handles google_drive oauth_success for a non logged in user" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
@@ -387,7 +387,7 @@ describe UsersController do
     end
 
     it "rejects invalid state" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials)
       allow(authorization_mock).to receive_messages(:code= => nil,
@@ -824,7 +824,7 @@ describe UsersController do
         end
 
         it "redirects users to the oauth confirmation when registering through oauth" do
-          redis = double("Redis")
+          redis = instance_double(Redis)
           allow(redis).to receive(:setex)
           allow(redis).to receive(:hmget)
           allow(redis).to receive(:del)
@@ -3894,7 +3894,7 @@ describe UsersController do
       user.access_tokens.create!(purpose: "active mobile token")
       user.access_tokens.create!(purpose: "expired mobile token", permanent_expires_at: 1.day.ago)
 
-      @sns_client = double
+      @sns_client = instance_double(Aws::SNS::Client)
       allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
       allow(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
       user.access_tokens.each_with_index { |ac, i| ac.notification_endpoints.create!(token: "token #{i}") }
