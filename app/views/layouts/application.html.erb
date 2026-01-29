@@ -41,6 +41,7 @@
   js_env notices: flash_notices()
   student_view_text = @context.is_a?(Course) && @context.horizon_course? ? t('View as Learner') : t('View as Student')
   enable_content_view_if_requested
+  enable_hide_global_nav_if_requested
 -%>
 <%= render :partial => "layouts/head" %>
 <%-
@@ -99,8 +100,10 @@
   body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :full_width_everywhere) || @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
   body_classes << "context-#{@context.asset_string}" if @context
   body_classes << "responsive_student_grades_page" if !!@domain_root_account&.feature_enabled?(:responsive_student_grades_page)
+  body_classes << 'content-only' if @content_only
+  body_classes << 'hide-global-nav' if @hide_global_nav
 -%>
-<body class="<%= (@content_only ? (body_classes + ['content-only']) : body_classes).uniq.join(" ") %>">
+<body class="<%= body_classes.uniq.join(" ") %>">
 <%if !@content_only && @current_user && @real_current_user && @real_current_user != @current_user %>
   <div role="alert" class="screenreader-only">
     <% if @current_user.fake_student? %>

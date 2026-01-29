@@ -49,6 +49,34 @@ describe "layouts/application" do
     end
   end
 
+  context "with hide_global_nav=true" do
+    before do
+      allow(controller).to receive(:params).and_return({ hide_global_nav: "true" })
+    end
+
+    it "adds hide-global-nav class to body" do
+      render "layouts/application"
+      expect(doc.at_css("body.hide-global-nav")).to be_present
+    end
+
+    it "still renders the navigation header partial (CSS will hide elements)" do
+      render "layouts/application"
+      # The header should be rendered in HTML (CSS will selectively hide elements)
+      expect(doc.at_css("header#header.ic-app-header")).to be_present
+    end
+
+    it "still renders breadcrumbs (unlike content_only)" do
+      @context = course_factory
+      assign(:context, @context)
+      allow(view).to receive_messages(
+        crumbs: [["Home", "/"], ["Courses", "/courses"]],
+        render_crumbs: "<a href='/'>Home</a>".html_safe
+      )
+      render "layouts/application"
+      expect(doc.at_css(".ic-app-nav-toggle-and-crumbs")).to be_present
+    end
+  end
+
   context "with @show_footer" do
     it "shows footer when true" do
       assign(:show_footer, true)
