@@ -52,6 +52,7 @@ module QuizzesNext::Importers
         lti_assignment_quiz_set << [assignment.global_id, quiz.global_id]
         assignment.workflow_state = "importing"
         assignment.importing_started_at = Time.zone.now
+        assignment.importing = true
         if assignment.quiz_lti!
           assignment.quiz = nil
           assignment.save!
@@ -105,6 +106,7 @@ module QuizzesNext::Importers
       end
       assignment.points_possible = 0
       assignment.omit_from_final_grade = true
+      assignment.importing = true
       assignment.save!
       assignment
     end
