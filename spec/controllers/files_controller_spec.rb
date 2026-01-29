@@ -1399,7 +1399,7 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return("files.test")
         request.host = "files.test"
         @file.update_attribute(:content_type, "text/html")
-        handle = double(read: "hello")
+        handle = instance_double(StringIO, read: "hello")
         allow_any_instantiation_of(@file).to receive(:open).and_return(handle)
         get "show_relative", params: { file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1 }
         expect(response).to be_successful

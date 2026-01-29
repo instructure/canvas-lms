@@ -23,7 +23,7 @@ describe RichContentApiController do
       course_with_teacher(active_course: true)
       @teacher.account.enable_feature!(:ai_text_tools)
 
-      @inst_llm = double("InstLLM::Client")
+      @inst_llm = instance_double(InstLLM::Client)
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
 
       user_session(@teacher)

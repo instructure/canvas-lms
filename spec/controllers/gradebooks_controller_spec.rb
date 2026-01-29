@@ -45,7 +45,7 @@ describe GradebooksController do
         user_session(@student)
         @assignment = @course.assignments.create!(title: "Example Assignment")
         @media_object = MediaObject.create!(media_id: "m-someid", media_type: "video", title: "Example Media Object", context: @course)
-        @mock_kaltura = double("CanvasKaltura::ClientV3")
+        @mock_kaltura = instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
         @media_sources = [{
           height: "240",

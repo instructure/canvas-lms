@@ -278,7 +278,7 @@ RSpec.describe Accessibility::PreviewController do
       context "with rule_id parameter" do
         let!(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<div><h1>Test Header</h1></div>") }
         let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "img-alt", node_path: ".//h1") }
-        let(:mock_rule_instance) { double("RuleInstance") }
+        let(:mock_rule_instance) { instance_double(Accessibility::Rule) }
         let(:mock_rule_registry) { { "img-alt" => mock_rule_instance } }
         let(:params) do
           {
@@ -328,7 +328,7 @@ RSpec.describe Accessibility::PreviewController do
           )
         end
         let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "small-text-contrast", node_path: ".//span") }
-        let(:mock_rule_instance) { double("RuleInstance") }
+        let(:mock_rule_instance) { instance_double(Accessibility::Rules::SmallTextContrastRule) }
         let(:mock_rule_registry) { { "small-text-contrast" => mock_rule_instance } }
         let(:params) do
           {

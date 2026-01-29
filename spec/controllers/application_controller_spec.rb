@@ -28,14 +28,14 @@ RSpec.describe ApplicationController do
 
     describe "#google_drive_connection" do
       before do
-        settings_mock = double
+        settings_mock = instance_double(PluginSetting)
         allow(settings_mock).to receive(:settings).and_return({})
         allow(Canvas::Plugin).to receive(:find).and_return(settings_mock)
       end
 
       it "uses @real_current_user first" do
-        mock_real_current_user = double
-        mock_current_user = double
+        mock_real_current_user = instance_double(User)
+        mock_current_user = instance_double(User)
         controller.instance_variable_set(:@real_current_user, mock_real_current_user)
         controller.instance_variable_set(:@current_user, mock_current_user)
         session[:oauth_gdrive_refresh_token] = "session_token"
@@ -49,7 +49,7 @@ RSpec.describe ApplicationController do
       end
 
       it "uses @current_user second" do
-        mock_current_user = double
+        mock_current_user = instance_double(User)
         controller.instance_variable_set(:@real_current_user, nil)
         controller.instance_variable_set(:@current_user, mock_current_user)
         session[:oauth_gdrive_refresh_token] = "session_token"
@@ -62,15 +62,15 @@ RSpec.describe ApplicationController do
       end
 
       it "queries user services if token isn't in the cache" do
-        mock_current_user = double
+        mock_current_user = instance_double(User)
         controller.instance_variable_set(:@real_current_user, nil)
         controller.instance_variable_set(:@current_user, mock_current_user)
         session[:oauth_gdrive_refresh_token] = "session_token"
         session[:oauth_gdrive_access_token] = "session_secret"
 
-        mock_user_services = double("mock_user_services")
+        mock_user_services = instance_double(ActiveRecord::Relation)
         expect(mock_current_user).to receive(:user_services).and_return(mock_user_services)
-        expect(mock_user_services).to receive(:where).with(service: "google_drive").and_return(double(first: double(token: "user_service_token", secret: "user_service_secret")))
+        expect(mock_user_services).to receive(:where).with(service: "google_drive").and_return(instance_double(ActiveRecord::Relation, first: instance_double(UserService, token: "user_service_token", secret: "user_service_secret")))
 
         expect(GoogleDrive::Connection).to receive(:new).with("user_service_token", "user_service_secret", 30)
         controller.send(:google_drive_connection)
@@ -400,14 +400,14 @@ RSpec.describe ApplicationController do
 
       it "sets the contextual timezone from the context" do
         Time.use_zone("Mountain Time (US & Canada)") do
-          controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil, grants_any_right?: false))
+          controller.instance_variable_set(:@context, instance_double(Course, time_zone: Time.zone, asset_string: "", class_name: nil, grants_any_right?: false))
           controller.js_env({})
           expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/Denver"
         end
       end
 
       context "session_timezone url param is given" do
-        let(:context_double) { double(asset_string: "", class_name: nil, grants_any_right?: false) }
+        let(:context_double) { instance_double(Course, asset_string: "", class_name: nil, grants_any_right?: false) }
 
         before do
           allow(controller).to receive(:params).and_return({ session_timezone: "America/New_York" })
@@ -471,21 +471,22 @@ RSpec.describe ApplicationController do
       end
 
       it "gets appropriate settings from the root account" do
-        root_account = double(global_id: 1,
-                              id: 1,
-                              feature_enabled?: false,
-                              feature_allowed?: false,
-                              service_enabled?: false,
-                              open_registration?: true,
-                              can_add_pronouns?: true,
-                              show_sections_in_course_tray?: true,
-                              settings: {},
-                              cache_key: "key",
-                              uuid: "bleh",
-                              salesforce_id: "blah",
-                              suppress_assignments?: false,
-                              lookup_feature_flag: nil)
-        context = double(a11y_checker_enabled?: true)
+        root_account = instance_double(Account,
+                                       global_id: 1,
+                                       id: 1,
+                                       feature_enabled?: false,
+                                       feature_allowed?: false,
+                                       service_enabled?: false,
+                                       open_registration?: true,
+                                       can_add_pronouns?: true,
+                                       show_sections_in_course_tray?: true,
+                                       settings: {},
+                                       cache_key: "key",
+                                       uuid: "bleh",
+                                       salesforce_id: "blah",
+                                       suppress_assignments?: false,
+                                       lookup_feature_flag: nil)
+        context = instance_double(Course, a11y_checker_enabled?: true)
         allow(context).to receive(:grants_any_right?).and_return(false)
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
@@ -499,21 +500,21 @@ RSpec.describe ApplicationController do
       end
 
       it "disables fun when set" do
-        root_account = double(global_id: 1,
-                              id: 1,
-                              feature_enabled?: false,
-                              feature_allowed?: false,
-                              service_enabled?: false,
-                              open_registration?: true,
-                              can_add_pronouns?: true,
-                              show_sections_in_course_tray?: true,
-                              settings: {},
-                              cache_key: "key",
-                              uuid: "blah",
-                              salesforce_id: "bleh",
-                              enable_content_a11y_checker?: false,
-                              suppress_assignments?: false,
-                              lookup_feature_flag: nil)
+        root_account = instance_double(Account,
+                                       global_id: 1,
+                                       id: 1,
+                                       feature_enabled?: false,
+                                       feature_allowed?: false,
+                                       service_enabled?: false,
+                                       open_registration?: true,
+                                       can_add_pronouns?: true,
+                                       show_sections_in_course_tray?: true,
+                                       settings: {},
+                                       cache_key: "key",
+                                       uuid: "blah",
+                                       salesforce_id: "bleh",
+                                       suppress_assignments?: false,
+                                       lookup_feature_flag: nil)
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -777,7 +778,7 @@ RSpec.describe ApplicationController do
 
     describe "clean_return_to" do
       before do
-        req = double("request obj", protocol: "https://", host_with_port: "canvas.example.com")
+        req = instance_double(ActionDispatch::Request, protocol: "https://", host_with_port: "canvas.example.com")
         allow(controller).to receive(:request).and_return(req)
       end
 
@@ -850,7 +851,7 @@ RSpec.describe ApplicationController do
 
       before do
         # safe_domain_file_url wants to use request.protocol
-        allow(controller).to receive(:request).and_return(double("request", protocol: "", host_with_port: "", url: ""))
+        allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, protocol: "", host_with_port: "", url: ""))
 
         @common_params = { only_path: true }
       end
@@ -1125,7 +1126,7 @@ RSpec.describe ApplicationController do
             interaction_seconds = 12
             created_at = Time.zone.now
             expected_interaction_token = "#{request_id}|#{created_at.iso8601(2)}|#{interaction_seconds}"
-            controller.response = double("response", headers: {})
+            controller.response = instance_double(ActionDispatch::Response, headers: {})
             controller.params[:page_view_token] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpIjoiMzE4NzdmMWMtN2JmYy00Mzg5LThkYWEtM2FkYjQ4ZDk4ODI5IiwidSI6bnVsbCwiYyI6bnVsbH0.IltPMbU08FUf-Kr_5vYzie4HnSW2tW8qFfYJunR9Z4o"
             controller.params[:interaction_seconds] = interaction_seconds
             allow(controller.request).to receive_messages(xhr?: 0, put?: true)
@@ -1156,7 +1157,7 @@ RSpec.describe ApplicationController do
         it "logs error reports to the domain_root_accounts shard" do
           allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request).and_return({})
 
-          req = double
+          req = instance_double(ActionDispatch::Request)
           allow(req).to receive_messages(url: "url",
                                          headers: {},
                                          authorization: nil,
@@ -1790,7 +1791,7 @@ RSpec.describe ApplicationController do
 
         it "logs the launch" do
           allow(Lti::LogService).to receive(:new) do
-            double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+            instance_double(Lti::LogService, call: nil)
           end
 
           controller.send(:content_tag_redirect, course, content_tag, nil)
@@ -2685,7 +2686,7 @@ RSpec.describe ApplicationController do
     it "stringifies the non-strings in the context attributes" do
       current_user_attributes = { global_id: 12_345, time_zone: "asdf" }
 
-      current_user = double(current_user_attributes)
+      current_user = instance_double(User, current_user_attributes)
       controller.instance_variable_set(:@current_user, current_user)
       controller.send(:setup_live_events_context)
       expect(LiveEvents.get_context).to eq({ user_id: "12345", time_zone: "asdf" }.merge(non_conditional_values))
@@ -2725,7 +2726,7 @@ RSpec.describe ApplicationController do
       end
 
       it "adds root account values to the LiveEvent context" do
-        root_account = double(root_account_attributes)
+        root_account = instance_double(Account, root_account_attributes)
         controller.instance_variable_set(:@domain_root_account, root_account)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -2748,7 +2749,7 @@ RSpec.describe ApplicationController do
       end
 
       it "sets the correct attributes on the LiveEvent context" do
-        current_user = double(current_user_attributes)
+        current_user = instance_double(User, current_user_attributes)
         controller.instance_variable_set(:@current_user, current_user)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -2769,7 +2770,7 @@ RSpec.describe ApplicationController do
       end
 
       it "sets the correct attributes on the LiveEvent context" do
-        real_current_user = double(real_current_user_attributes)
+        real_current_user = instance_double(User, real_current_user_attributes)
         controller.instance_variable_set(:@real_current_user, real_current_user)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -2779,7 +2780,7 @@ RSpec.describe ApplicationController do
     context "when an access_token exists" do
       let(:real_access_token_attributes) do
         {
-          developer_key: double(global_id: "1111")
+          developer_key: instance_double(DeveloperKey, global_id: "1111")
         }
       end
 
@@ -2790,7 +2791,7 @@ RSpec.describe ApplicationController do
       end
 
       it "sets the correct attributes on the LiveEvent context" do
-        real_access_token = double(real_access_token_attributes)
+        real_access_token = instance_double(AccessToken, real_access_token_attributes)
         controller.instance_variable_set(:@access_token, real_access_token)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -2815,7 +2816,7 @@ RSpec.describe ApplicationController do
       end
 
       it "sets the correct attributes on the LiveEvent context" do
-        current_pseudonym = double(current_pseudonym_attributes)
+        current_pseudonym = instance_double(Pseudonym, current_pseudonym_attributes)
         controller.instance_variable_set(:@current_pseudonym, current_pseudonym)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -2839,7 +2840,7 @@ RSpec.describe ApplicationController do
       end
 
       it "sets the correct attributes on the LiveEvent context" do
-        canvas_context = double(canvas_context_attributes)
+        canvas_context = instance_double(Course, canvas_context_attributes)
         controller.instance_variable_set(:@context, canvas_context)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -2867,8 +2868,8 @@ RSpec.describe ApplicationController do
     context "when a context_membership exists" do
       context "when the context has a role" do
         it "sets the correct attributes on the LiveEvent context" do
-          stubbed_role = double({ name: "name" })
-          context_membership = double({ role: stubbed_role })
+          stubbed_role = instance_double(Role, { name: "name" })
+          context_membership = instance_double(Enrollment, { role: stubbed_role })
 
           controller.instance_variable_set(:@context_membership, context_membership)
           controller.send(:setup_live_events_context)
@@ -2878,7 +2879,7 @@ RSpec.describe ApplicationController do
 
       context "when the context has a type" do
         it "sets the correct attributes on the LiveEvent context" do
-          context_membership = double({ type: "type" })
+          context_membership = instance_double(Enrollment, { type: "type" })
 
           controller.instance_variable_set(:@context_membership, context_membership)
           controller.send(:setup_live_events_context)
@@ -2888,7 +2889,7 @@ RSpec.describe ApplicationController do
 
       context "when the context has neither a role or type" do
         it "sets the correct attributes on the LiveEvent context" do
-          context_membership = double({ class: Class })
+          context_membership = instance_double(Enrollment, { class: Class })
 
           controller.instance_variable_set(:@context_membership, context_membership)
           controller.send(:setup_live_events_context)
@@ -3302,7 +3303,7 @@ RSpec.describe ApplicationController do
             "/courses/1/quizzes",
             "/courses/1/modules",
           ].each do |path|
-            allow(controller).to receive(:request).and_return(double({ path: }))
+            allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, { path: }))
             expect(controller.send(:should_show_migration_limitation_message)).to be(true)
           end
         end
@@ -3312,7 +3313,7 @@ RSpec.describe ApplicationController do
             "/courses/1/gradebook/speed_grader",
             "/courses/1/assignments/1"
           ].each do |path|
-            allow(controller).to receive(:request).and_return(double({ path: }))
+            allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, { path: }))
             expect(controller.send(:should_show_migration_limitation_message)).to be(false)
           end
         end
@@ -3328,7 +3329,7 @@ RSpec.describe ApplicationController do
             "/courses/1/gradebook/speed_grader",
             "/courses/1/assignments/1"
           ].each do |path|
-            allow(controller).to receive(:request).and_return(double({ path: }))
+            allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, { path: }))
             expect(controller.send(:should_show_migration_limitation_message)).to be(false)
           end
         end
@@ -3357,7 +3358,7 @@ RSpec.describe ApplicationController do
           "/courses/1/some_path",
           "/courses/1/assignments/1"
         ].each do |path|
-          allow(controller).to receive(:request).and_return(double({ path: }))
+          allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, { path: }))
           expect(controller.send(:should_show_migration_limitation_message)).to be(false)
         end
       end
@@ -3433,7 +3434,7 @@ RSpec.describe ApplicationController do
   describe "#preload_translation_file" do
     before do
       controller.instance_variable_set(:@domain_root_account, Account.default)
-      allow(controller).to receive_messages(api_request?: false, helpers: double(preload_link_tag: "<link>"))
+      allow(controller).to receive_messages(api_request?: false, helpers: instance_double(ActionView::Helpers::AssetTagHelper, preload_link_tag: "<link>"))
     end
 
     it "handles null @js_env" do
@@ -3600,16 +3601,16 @@ describe CoursesController do
   end
 
   context "validate_scopes" do
-    let(:account) { double }
+    let(:account) { instance_double(Account) }
 
     before do
       controller.instance_variable_set(:@domain_root_account, account)
     end
 
     it "does not affect session based api requests" do
-      allow(controller).to receive(:request).and_return(double({
-                                                                 params: {}
-                                                               }))
+      allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, {
+                                                                          params: {}
+                                                                        }))
       expect(controller.send(:validate_scopes)).to be_nil
     end
 
@@ -3618,10 +3619,10 @@ describe CoursesController do
       developer_key = DeveloperKey.create!(name: "dev key")
       token = AccessToken.create!(user:, developer_key:)
       controller.instance_variable_set(:@access_token, token)
-      allow(controller).to receive(:request).and_return(double({
-                                                                 params: {},
-                                                                 method: "GET"
-                                                               }))
+      allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, {
+                                                                          params: {},
+                                                                          method: "GET"
+                                                                        }))
       expect(controller.send(:validate_scopes)).to be_nil
     end
 
@@ -3630,11 +3631,11 @@ describe CoursesController do
       developer_key = DeveloperKey.create!(name: "dev key", require_scopes: true)
       token = AccessToken.create!(user:, developer_key:)
       controller.instance_variable_set(:@access_token, token)
-      allow(controller).to receive(:request).and_return(double({
-                                                                 params: {},
-                                                                 method: "GET",
-                                                                 path: "/not_allowed_path"
-                                                               }))
+      allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, {
+                                                                          params: {},
+                                                                          method: "GET",
+                                                                          path: "/not_allowed_path"
+                                                                        }))
       expect { controller.send(:validate_scopes) }.to raise_error(AuthenticationMethods::AccessTokenScopeError)
     end
 
@@ -3645,11 +3646,11 @@ describe CoursesController do
         user = user_model
         token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
-        allow(controller).to receive(:request).and_return(double({
-                                                                   params: {},
-                                                                   method: "GET",
-                                                                   path: "/api/v1/accounts"
-                                                                 }))
+        allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, {
+                                                                            params: {},
+                                                                            method: "GET",
+                                                                            path: "/api/v1/accounts"
+                                                                          }))
         expect(controller.send(:validate_scopes)).to be_nil
       end
 
@@ -3657,11 +3658,11 @@ describe CoursesController do
         user = user_model
         token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
-        allow(controller).to receive(:request).and_return(double({
-                                                                   params: {},
-                                                                   method: "HEAD",
-                                                                   path: "/api/v1/accounts"
-                                                                 }))
+        allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request, {
+                                                                            params: {},
+                                                                            method: "HEAD",
+                                                                            path: "/api/v1/accounts"
+                                                                          }))
         expect(controller.send(:validate_scopes)).to be_nil
       end
 
@@ -3670,10 +3671,10 @@ describe CoursesController do
         token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
         params = { include: ["a"], includes: ["uuid", "b"] }
-        allow(controller).to receive_messages(request: double({
-                                                                method: "GET",
-                                                                path: "/api/v1/accounts"
-                                                              }),
+        allow(controller).to receive_messages(request: instance_double(ActionDispatch::Request, {
+                                                                         method: "GET",
+                                                                         path: "/api/v1/accounts"
+                                                                       }),
                                               params:)
         controller.send(:validate_scopes)
         expect(params).to eq(include: [], includes: ["uuid"])
@@ -3688,10 +3689,10 @@ describe CoursesController do
         token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
         params = { include: ["a"], includes: ["uuid", "b"] }
-        allow(controller).to receive_messages(request: double({
-                                                                method: "GET",
-                                                                path: "/api/v1/accounts"
-                                                              }),
+        allow(controller).to receive_messages(request: instance_double(ActionDispatch::Request, {
+                                                                         method: "GET",
+                                                                         path: "/api/v1/accounts"
+                                                                       }),
                                               params:)
         controller.send(:validate_scopes)
         expect(params).to eq(include: ["a"], includes: ["uuid", "b"])
@@ -3992,7 +3993,7 @@ RSpec.describe ApplicationController, "#render_native_new_quizzes" do
     )
   end
   let(:request_mock) do
-    double(path: "/courses/3/assignments/9/moderation/1")
+    instance_double(ActionDispatch::Request, path: "/courses/3/assignments/9/moderation/1")
   end
 
   before do

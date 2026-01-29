@@ -1995,7 +1995,7 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "when url responds with non-200" do
-        let(:result) { double(class: Net::HTTPBadRequest, code: 400) }
+        let(:result) { instance_double(Net::HTTPBadRequest, class: Net::HTTPBadRequest, code: 400) }
 
         it "returns 422" do
           subject
@@ -2004,7 +2004,7 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "when url responds with non-JSON" do
-        let(:result) { double(class: Net::HTTPSuccess, is_a?: true, body: "invalid json") }
+        let(:result) { instance_double(Net::HTTPSuccess, class: Net::HTTPSuccess, is_a?: true, body: "invalid json") }
 
         it "returns 422" do
           subject
@@ -2013,7 +2013,7 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "when url responds with JSON" do
-        let(:result) { double(class: Net::HTTPSuccess, is_a?: true, body: config.to_json) }
+        let(:result) { instance_double(Net::HTTPSuccess, class: Net::HTTPSuccess, is_a?: true, body: config.to_json) }
 
         context "when configuration is invalid" do
           let(:config) { { title: "Title" } }

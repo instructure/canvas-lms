@@ -307,7 +307,7 @@ describe DiscussionTopicsApiController do
       @topic = @course.discussion_topics.create!(title: "discussion", summary_enabled: true)
       user_session(@teacher)
 
-      @inst_llm = double("InstLLM::Client")
+      @inst_llm = instance_double(InstLLM::Client)
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
     end
 
@@ -787,7 +787,7 @@ describe DiscussionTopicsApiController do
 
     it "creates an insight and submits a job" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
-      expect_any_instance_of(DiscussionTopicInsight).to receive(:delay).and_return(double("DelayedJob", generate: nil))
+      expect_any_instance_of(DiscussionTopicInsight).to receive(:delay).and_return(instance_double(DiscussionTopicInsight, generate: nil))
 
       post "insight_generation", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
@@ -1229,7 +1229,7 @@ describe DiscussionTopicsApiController do
                                       workflow_state: "completed",
                                       error_message: nil,
                                       issue_count: 1,
-                                      accessibility_issues: double(select: []))
+                                      accessibility_issues: instance_double(ActiveRecord::Relation, select: []))
 
         expect(Accessibility::ResourceScannerService).to receive(:new)
           .with(resource: @topic)

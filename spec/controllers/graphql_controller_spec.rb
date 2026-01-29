@@ -342,7 +342,7 @@ describe GraphQLController do
 
       context "on invalid context objects" do
         before do
-          allow(subject).to receive(:subject) { double("dummy subject", pick: ["User", 1]) }
+          allow(subject).to receive(:subject) { instance_double(ActiveRecord::Relation, pick: ["User", 1]) }
         end
 
         it "raises an exception" do

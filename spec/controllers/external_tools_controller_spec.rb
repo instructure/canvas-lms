@@ -443,7 +443,7 @@ describe ExternalToolsController do
         context "logging" do
           before do
             allow(Lti::LogService).to receive(:new) do
-              double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+              instance_double(Lti::LogService, call: nil)
             end
             user_session(@teacher)
           end
@@ -1471,7 +1471,7 @@ describe ExternalToolsController do
     context "logging" do
       before do
         allow(Lti::LogService).to receive(:new) do
-          double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+          instance_double(Lti::LogService, call: nil)
         end
         user_session(@teacher)
       end
@@ -2024,7 +2024,7 @@ describe ExternalToolsController do
 
     it "logs the launch" do
       allow(Lti::LogService).to receive(:new) do
-        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        instance_double(Lti::LogService, call: nil)
       end
 
       user_session(@teacher)
@@ -3537,7 +3537,7 @@ describe ExternalToolsController do
         end
 
         context "when the cross-account request fails" do
-          before { allow(HTTParty).to receive(:get).and_return(double("success?" => false)) }
+          before { allow(HTTParty).to receive(:get).and_return(instance_double(HTTParty::Response, "success?" => false)) }
 
           it "uses the request host" do
             @shard2.activate { get :generate_sessionless_launch, params: }
@@ -3661,7 +3661,7 @@ describe ExternalToolsController do
 
     it "logs the launch" do
       allow(Lti::LogService).to receive(:new) do
-        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        instance_double(Lti::LogService, call: nil)
       end
 
       get :sessionless_launch, params: { course_id: @course.id, verifier: }
@@ -3886,7 +3886,7 @@ describe ExternalToolsController do
       )
     end
     let(:request_mock) do
-      double(path: "/courses/3/external_tools/7/banks")
+      instance_double(ActionDispatch::Request, path: "/courses/3/external_tools/7/banks")
     end
 
     before do
@@ -3937,7 +3937,7 @@ describe ExternalToolsController do
     end
 
     it "correctly handles complex subroutes" do
-      complex_request_mock = double(path: "/courses/3/external_tools/7/banks/item/123")
+      complex_request_mock = instance_double(ActionDispatch::Request, path: "/courses/3/external_tools/7/banks/item/123")
       allow(controller).to receive_messages(request: complex_request_mock, params: { full_path: "/banks/item/123" })
 
       expect(controller).to receive(:js_env) do |data|

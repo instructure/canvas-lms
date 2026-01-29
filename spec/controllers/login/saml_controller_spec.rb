@@ -223,7 +223,7 @@ describe Login::SamlController do
     @pseudonym.save!
 
     saml_response = SAML2::Response.new
-    allow(saml_response).to receive_messages(errors: [], issuer: double(id: "such a lie"))
+    allow(saml_response).to receive_messages(errors: [], issuer: instance_double(SAML2::NameID, id: "such a lie"))
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
       [saml_response, nil]
     )
@@ -271,7 +271,7 @@ describe Login::SamlController do
     @pseudonym.save!
 
     saml_response = SAML2::Response.new
-    allow(saml_response).to receive_messages(errors: [], issuer: nil, assertions: [double(issuer: double(id: "such a lie"))])
+    allow(saml_response).to receive_messages(errors: [], issuer: nil, assertions: [instance_double(SAML2::Assertion, issuer: instance_double(SAML2::NameID, id: "such a lie"))])
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
       [saml_response, nil]
     )
@@ -501,7 +501,7 @@ describe Login::SamlController do
         [saml_response, "https://otheraccount/courses/1"]
       )
 
-      account2 = double
+      account2 = instance_double(Account)
       expect(Account).to receive(:find_by_domain).and_return(account2)
       expect_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(account2, true).and_return(true)
 
@@ -656,7 +656,7 @@ describe Login::SamlController do
 
       it "redirects to login screen with message if no AAC found" do
         saml_response = SAML2::Response.new
-        allow(saml_response).to receive_messages(errors: [], issuer: double(id: "hahahahahahaha"))
+        allow(saml_response).to receive_messages(errors: [], issuer: instance_double(SAML2::NameID, id: "hahahahahahaha"))
         allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
           [saml_response, nil]
         )

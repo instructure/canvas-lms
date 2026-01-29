@@ -540,7 +540,7 @@ describe WikiPagesApiController, type: :request do
                                       workflow_state: "completed",
                                       error_message: nil,
                                       issue_count: 0,
-                                      accessibility_issues: double(select: []))
+                                      accessibility_issues: instance_double(ActiveRecord::Relation, select: []))
 
         expect(Accessibility::ResourceScannerService).to receive(:new)
           .with(resource: @wiki_page)

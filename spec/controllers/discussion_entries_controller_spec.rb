@@ -211,7 +211,7 @@ describe DiscussionEntriesController do
     end
 
     before do
-      @mock_kaltura = double("CanvasKaltura::ClientV3")
+      @mock_kaltura = instance_double(CanvasKaltura::ClientV3)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
       allow(@mock_kaltura).to receive(:media_sources).and_return(
         [{ height: "240",
@@ -415,7 +415,7 @@ describe DiscussionEntriesController do
     end
 
     it "does not error if data is missing and kaltura is unresponsive" do
-      mock_client = double
+      mock_client = instance_double(CanvasKaltura::ClientV3)
       allow(mock_client).to receive(:startSession)
       allow(mock_client).to receive_messages(mediaGet: nil, flavorAssetGetByEntryId: nil, media_sources: nil)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_client)

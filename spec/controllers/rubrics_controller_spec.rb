@@ -1768,10 +1768,10 @@ describe RubricsController do
       context "LLM response error handling" do
         before do
           allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criteria").and_return(
-            double("LLMConfig",
-                   name: "rubric-regenerate-criteriaV2",
-                   model_id: "anthropic.claude-3-haiku-20240307-v1:0",
-                   generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+            instance_double(LLMConfig,
+                            name: "rubric-regenerate-criteriaV2",
+                            model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                            generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
           )
         end
 
@@ -1924,17 +1924,17 @@ describe RubricsController do
 
         # Set up LLM config mocks for both full regeneration and single criterion regeneration
         allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criteria").and_return(
-          double("LLMConfig",
-                 name: "rubric-regenerate-criteriaV2",
-                 model_id: "anthropic.claude-3-haiku-20240307-v1:0",
-                 generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+          instance_double(LLMConfig,
+                          name: "rubric-regenerate-criteriaV2",
+                          model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                          generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
         )
 
         allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criterion").and_return(
-          double("LLMConfig",
-                 name: "rubric-regenerate-criterionV2",
-                 model_id: "anthropic.claude-3-haiku-20240307-v1:0",
-                 generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+          instance_double(LLMConfig,
+                          name: "rubric-regenerate-criterionV2",
+                          model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                          generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
         )
 
         # Set up existing criteria structure for regeneration (3 criteria)
