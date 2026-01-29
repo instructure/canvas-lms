@@ -31,8 +31,8 @@ describe "discussions index" do
   include DiscussionsCommon
 
   context "as a teacher" do
-    discussion1_title = "Meaning of life"
-    discussion2_title = "Meaning of the universe"
+    let_once(:discussion1_title) { "Meaning of life" }
+    let_once(:discussion2_title) { "Meaning of the universe" }
 
     before :once do
       @teacher = user_with_pseudonym(active_user: true)
@@ -452,8 +452,8 @@ describe "discussions index" do
     end
 
     context "when instui nav feature flag on" do
-      page_header_title_all = "Discussions"
-      page_header_title_unread = "Unread Discussions"
+      let(:page_header_title_all) { "Discussions" }
+      let(:page_header_title_unread) { "Unread Discussions" }
 
       before do
         @course.root_account.enable_feature!(:instui_nav)
