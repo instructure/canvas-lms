@@ -209,8 +209,7 @@ describe "RCE next tests", :ignore_js_errors do
             expect(wiki_body_anchor.text).to eq "edit me please"
           end
         rescue Selenium::WebDriver::Error::NoSuchElementError
-          puts "Failed finding the link options button. Bailing out on this spec."
-          expect(true).to be_truthy
+          warn "Failed finding the link options button. Bailing out on this spec."
         end
       end
 
@@ -277,8 +276,7 @@ describe "RCE next tests", :ignore_js_errors do
             expect(wiki_body_anchor).to be_displayed
           end
         rescue Selenium::WebDriver::Error::NoSuchElementError
-          puts "Failed finding the link options button. Bailing out on this spec."
-          expect(true).to be_truthy
+          warn "Failed finding the link options button. Bailing out on this spec."
         end
       end
 
@@ -783,8 +781,7 @@ describe "RCE next tests", :ignore_js_errors do
         click_image_options_button
         expect(image_options_tray).to be_displayed
       rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts "Failed finding the image options button. Bailing out on this spec."
-        expect(true).to be_truthy
+        warn "Failed finding the image options button. Bailing out on this spec."
       end
     end
 
@@ -805,8 +802,7 @@ describe "RCE next tests", :ignore_js_errors do
           expect(wiki_body_anchor).not_to contain_css("src")
         end
       rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts "Failed finding the image options button. Bailing out on this spec."
-        expect(true).to be_truthy
+        warn "Failed finding the image options button. Bailing out on this spec."
       end
     end
 
@@ -828,8 +824,7 @@ describe "RCE next tests", :ignore_js_errors do
           expect(wiki_body_image.attribute("alt")).to include alt_text
         end
       rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts "Failed finding the image options button. Bailing out on this spec."
-        expect(true).to be_truthy
+        warn "Failed finding the image options button. Bailing out on this spec."
       end
     end
 

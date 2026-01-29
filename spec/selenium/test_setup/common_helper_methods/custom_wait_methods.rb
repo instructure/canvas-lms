@@ -52,7 +52,6 @@ module CustomWaitMethods
   # If we're looking for the loading image, we can't just do a normal assertion, because the image
   # could end up getting loaded too quickly.
   def wait_for_transient_element(selector)
-    puts "wait for transient element #{selector}"
     driver.execute_script(<<~JS)
       window.__WAIT_FOR_LOADING_IMAGE = 0
       window.__WAIT_FOR_LOADING_IMAGE_CALLBACK = null
@@ -231,7 +230,7 @@ module CustomWaitMethods
       yield
     rescue => e
       if attempt < max_attempts
-        puts "\t Attempt #{attempt} failed! Retrying..."
+        warn "\t Attempt #{attempt} failed! Retrying..."
         sleep sleep_interval
         retry
       end
@@ -247,7 +246,7 @@ module CustomWaitMethods
     keep_trying_until do
       tiny_frame = disable_implicit_wait { parent.find_element(:css, "iframe") }
     rescue => e
-      puts e.inspect
+      warn e.inspect
       false
     end
     tiny_frame
@@ -263,7 +262,7 @@ module CustomWaitMethods
     keep_trying_until do
       tiny_frame = disable_implicit_wait { element.find_element(:css, "iframe") }
     rescue => e
-      puts e.inspect
+      warn e.inspect
       false
     end
     tiny_frame
@@ -286,7 +285,7 @@ module CustomWaitMethods
     keep_trying_until do
       disable_implicit_wait { driver.find_element(:css, selector) }
     rescue => e
-      puts e.message
+      warn e.message
     end
   end
 
@@ -307,7 +306,7 @@ module CustomWaitMethods
     keep_trying_until do
       disable_implicit_wait { f(".block-editor-editor", parent_element) }
     rescue => e
-      puts e.inspect
+      warn e.inspect
       false
     end
   end
@@ -316,7 +315,7 @@ module CustomWaitMethods
     keep_trying_until do
       disable_implicit_wait { driver.find_element(:css, selector) }
     rescue => e
-      puts e.message
+      warn e.message
     end
   end
 
@@ -325,7 +324,7 @@ module CustomWaitMethods
       disable_implicit_wait { element.click }
       disable_implicit_wait { f(validator).displayed? }
     rescue => e
-      puts e.message
+      warn e.message
     end
   end
 end

@@ -33,7 +33,7 @@ class TestFileManager
       temp_files.each do |temp_file|
         temp_file.unlink if temp_file.respond_to?(:unlink) && File.exist?(temp_file.path)
       rescue => e
-        puts "Error cleaning up temp file: #{e.message}" if defined?(puts)
+        warn "Error cleaning up temp file: #{e.message}" if defined?(warn)
       end
     end
   end
@@ -47,7 +47,7 @@ class TestFileManager
     @temp_files.each do |temp_file|
       temp_file.unlink if temp_file.respond_to?(:unlink) && File.exist?(temp_file.path)
     rescue => e
-      puts "Error cleaning up temp file: #{e.message}" if defined?(puts)
+      warn "Error cleaning up temp file: #{e.message}" if defined?(warn)
     end
     @temp_files = []
   end

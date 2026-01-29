@@ -20,6 +20,8 @@
 require "faker"
 require "colorize"
 
+# rubocop:disable RSpec/Output
+
 # Dependency:
 #  Create Gemfile.d/gradebook_seed_gemfile.rb
 #  add this to gradebook_seed_gemfile.rb:
@@ -153,3 +155,5 @@ teacher.transaction do
   Faker::UniqueGenerator.clear
   puts "Done!"
 end
+
+# rubocop:enable RSpec/Output

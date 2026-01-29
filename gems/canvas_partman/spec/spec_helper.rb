@@ -28,7 +28,7 @@ begin
   require "../../spec/coverage_tool"
   CoverageTool.start("canvas-partman-gem")
 rescue LoadError => e
-  puts "Error: #{e} "
+  warn "Error: #{e}"
 end
 
 module CanvasPartmanTest
@@ -83,7 +83,7 @@ RSpec.configure do |config|
     connection.tables.grep(/^partman_(?:animals|trails)_/).each do |partition_table_name|
       SchemaHelper.drop_table(partition_table_name)
     rescue => e
-      puts "[WARN] Partition table dropping failed: #{e.message}"
+      warn "[WARN] Partition table dropping failed: #{e.message}"
     end
   end
 end

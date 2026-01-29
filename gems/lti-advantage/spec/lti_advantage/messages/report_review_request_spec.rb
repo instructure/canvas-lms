@@ -46,8 +46,6 @@ module LtiAdvantage::Messages
 
     describe "validations" do
       it "is valid with valid params" do
-        puts subject.valid?
-        puts subject.errors.full_messages
         expect(subject).to be_valid
       end
 

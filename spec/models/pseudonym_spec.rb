@@ -986,13 +986,13 @@ describe Pseudonym do
     end
 
     it "finds a valid pseudonym" do
-      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [p]
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [p] # rubocop:disable RSpec/Output
     end
 
     it "doesn't choke on if global lookups is down" do
       expect(GlobalLookups).to receive(:enabled?).and_return(true)
       expect(Pseudonym).to receive(:associated_shards).and_raise("an error")
-      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [p]
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [p] # rubocop:disable RSpec/Output
     end
 
     it "throws an error if your credentials are absurd" do
