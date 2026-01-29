@@ -125,6 +125,7 @@ describe.skip('AssetProcessors', () => {
     let tag = renderHook(() => useAssetProcessorsAddModalState(s => s.state.tag)).result.current
     expect(tag).toBe('closed')
     const addButton = getByText('Add Document Processing App')
+    expect(addButton).toHaveAttribute('aria-haspopup', 'dialog')
     addButton.click()
     tag = renderHook(() => useAssetProcessorsAddModalState(s => s.state.tag)).result.current
     expect(tag).toBe('toolList')

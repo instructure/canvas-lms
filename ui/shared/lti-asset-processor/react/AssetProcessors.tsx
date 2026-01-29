@@ -95,7 +95,12 @@ export function AssetProcessors(props: AssetProcessorsProps) {
           />
           {toolsAvailable && (
             <Flex.Item>
-              <Button color="secondary" onClick={openAddDialog} id="asset-processor-add-button">
+              <Button
+                color="secondary"
+                onClick={openAddDialog}
+                id="asset-processor-add-button"
+                aria-haspopup="dialog"
+              >
                 {I18n.t('Add Document Processing App')}
               </Button>
             </Flex.Item>

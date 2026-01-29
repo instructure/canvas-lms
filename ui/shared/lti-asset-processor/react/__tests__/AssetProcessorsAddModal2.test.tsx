@@ -33,7 +33,6 @@ import {
   mockContributionDeepLinkResponse,
 } from './assetProcessorsTestHelpers'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
-import {useAssetProcessorsToolsList} from '../hooks/useAssetProcessorsToolsList'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -167,6 +166,15 @@ describe('AssetProcessorsAddModal', () => {
       const {selection_width, selection_height} = tool!.placements[type]!
       expect(iframe.style.width).toBe(selection_width + 'px')
       expect(iframe.style.height).toBe(selection_height + 'px')
+
+      await waitFor(() => {
+        const closeButton = document.querySelector(
+          '[data-pendo="asset-processors-add-modal-close-button"]',
+        )
+        if (closeButton) {
+          expect(document.activeElement).toBe(closeButton)
+        }
+      })
     })
 
     it(`handles valid deep linking response for ${type}`, async () => {
@@ -326,6 +334,18 @@ describe('AssetProcessorsAddModal', () => {
         },
         {timeout: 5000},
       )
+
+      await waitFor(
+        () => {
+          const closeButton = document.querySelector(
+            '[data-pendo="asset-processors-add-modal-close-button"]',
+          )
+          if (closeButton) {
+            expect(document.activeElement).toBe(closeButton)
+          }
+        },
+        {timeout: 3000},
+      )
     })
 
     it('launches the tool when Space key is pressed on a card', async () => {
@@ -357,6 +377,15 @@ describe('AssetProcessorsAddModal', () => {
         },
         {timeout: 5000},
       )
+
+      await waitFor(() => {
+        const closeButton = document.querySelector(
+          '[data-pendo="asset-processors-add-modal-close-button"]',
+        )
+        if (closeButton) {
+          expect(document.activeElement).toBe(closeButton)
+        }
+      })
     })
 
     it('does not launch the tool when other keys are pressed on a card', async () => {
