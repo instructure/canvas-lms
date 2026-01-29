@@ -617,7 +617,7 @@ describe Types::CourseType do
           end
         end
 
-        include_examples "userId filter tests"
+        it_behaves_like "userId filter tests"
       end
 
       context "with new quizzes enabled" do
@@ -680,7 +680,7 @@ describe Types::CourseType do
           end
         end
 
-        include_examples "userId filter tests"
+        it_behaves_like "userId filter tests"
       end
     end
 
