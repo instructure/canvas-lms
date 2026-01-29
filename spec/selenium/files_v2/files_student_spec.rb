@@ -28,7 +28,8 @@ describe "better_file_browsing" do
   include FilesCommon
 
   context "as a student" do
-    txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
+    let(:txt_files) { %w[a_file.txt b_file.txt c_file.txt].freeze }
+
     before :once do
       Account.site_admin.enable_feature! :files_a11y_rewrite
       @student = course_with_student(active_all: true).user

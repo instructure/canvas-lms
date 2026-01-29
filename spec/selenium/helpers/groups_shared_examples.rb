@@ -311,7 +311,7 @@ shared_examples "files_page_old_ui" do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  folder_name = "new folder"
+  let(:folder_name) { "new folder" }
 
   it "allows group members to add a new folder", priority: pick_priority(context, student: "1", teacher: "2") do
     get files_page
@@ -392,7 +392,7 @@ shared_examples "files_page_files_rewrite_ui" do |context|
   include SharedExamplesCommon
   include FilesPage
 
-  folder_name = "new folder"
+  let(:folder_name) { "new folder" }
 
   it "allows group members to add a new folder on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
     get files_page

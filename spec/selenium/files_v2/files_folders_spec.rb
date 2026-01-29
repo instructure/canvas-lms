@@ -30,7 +30,8 @@ describe "files index page" do
 
   context "Folders" do
     context("as a teacher") do
-      folder_name = "base folder"
+      let(:folder_name) { "base folder" }
+
       before(:once) do
         course_with_teacher(active_all: true)
       end

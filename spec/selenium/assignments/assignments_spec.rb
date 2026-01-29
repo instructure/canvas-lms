@@ -1745,7 +1745,7 @@ describe "assignments" do
   end
 
   context "with restrict_quantitative_data" do
-    all_options = ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"]
+    let(:all_options) { ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"].freeze }
 
     before do
       course_with_teacher_logged_in

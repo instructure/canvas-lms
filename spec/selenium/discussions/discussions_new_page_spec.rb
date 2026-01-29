@@ -605,8 +605,8 @@ describe "discussions" do
       end
 
       context "when instui_nav feature flag on" do
-        page_header_title_discussion = "Create Discussion"
-        page_header_title_announcement = "Create Announcement"
+        let(:page_header_title_discussion) { "Create Discussion" }
+        let(:page_header_title_announcement) { "Create Announcement" }
 
         before do
           course.root_account.enable_feature!(:instui_nav)
