@@ -1099,6 +1099,10 @@ module ApplicationHelper
     @content_only = Canvas::Plugin.value_to_boolean(params[:content_only])
   end
 
+  def enable_hide_global_nav_if_requested
+    @hide_global_nav = Canvas::Plugin.value_to_boolean(params[:hide_global_nav])
+  end
+
   def link_to_parent_signup(auth_type)
     data = reg_link_data(auth_type)
     link_to(
