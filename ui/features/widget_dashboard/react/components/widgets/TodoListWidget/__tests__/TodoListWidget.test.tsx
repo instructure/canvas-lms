@@ -127,7 +127,7 @@ describe('TodoListWidget', () => {
       expect(screen.getByText('To-do list')).toBeInTheDocument()
     })
 
-    it('renders "+ New" button as enabled', async () => {
+    it('renders "+ New To-do" button as enabled', async () => {
       renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
 
       await waitFor(() => {
@@ -136,7 +136,7 @@ describe('TodoListWidget', () => {
 
       const newButton = screen.getByTestId('new-todo-button')
       expect(newButton).toBeEnabled()
-      expect(newButton).toHaveTextContent('+ New')
+      expect(newButton).toHaveTextContent('+ New To-do')
     })
   })
 

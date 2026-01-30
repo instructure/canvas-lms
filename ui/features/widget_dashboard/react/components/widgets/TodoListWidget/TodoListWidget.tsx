@@ -189,7 +189,7 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
         loadingText={I18n.t('Loading to-do items...')}
         headerActions={
           <Button size="small" onClick={() => setIsModalOpen(true)} data-testid="new-todo-button">
-            {I18n.t('+ New')}
+            {I18n.t('+ New To-do')}
           </Button>
         }
         pagination={{
