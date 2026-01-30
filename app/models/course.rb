@@ -371,6 +371,7 @@ class Course < ActiveRecord::Base
   after_update :log_course_pacing_settings_update, if: :change_to_logged_settings?
   after_update :log_rqd_setting_enable_or_disable
   after_update :queue_remap_enrollment_roles
+
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
@@ -580,6 +581,17 @@ class Course < ActiveRecord::Base
     if saved_change_to_account_id? && !saved_change_to_id?
       Lti::ContextControl.update_paths_for_reparent(self, account_id_before_last_save, account_id)
     end
+  end
+
+  def delete_lti_context_controls
+    updates = { workflow_state: "deleted_with_context", updated_at: Time.current }
+    Lti::ContextControl.where(course_id: id).active.in_batches.update_all(updates)
+  end
+
+  def undelete_lti_context_controls
+    updates = { workflow_state: "active", updated_at: Time.current }
+    # Only restore context controls that were deleted with the context (course)
+    Lti::ContextControl.where(course_id: id, workflow_state: "deleted_with_context").in_batches.update_all(updates)
   end
 
   def update_enrollment_states_if_necessary
@@ -1887,6 +1899,9 @@ class Course < ActiveRecord::Base
       event :offer, transitions_to: :available
       event :complete, transitions_to: :completed
       event :delete, transitions_to: :deleted
+      on_entry do |prior_state, _event|
+        undelete_lti_context_controls if prior_state == :deleted
+      end
     end
 
     state :available do
@@ -1904,6 +1919,7 @@ class Course < ActiveRecord::Base
 
     state :deleted do
       event :undelete, transitions_to: :claimed
+      on_entry { delete_lti_context_controls }
     end
   end
 
@@ -1923,8 +1939,8 @@ class Course < ActiveRecord::Base
     return false if template?
 
     gradebook_filters.in_batches.destroy_all
-    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
+    process_event(:delete)
     save!
   end
 

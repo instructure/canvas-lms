@@ -2324,6 +2324,49 @@ describe Account do
       expect(account_user1.reload.workflow_state).to eq "deleted"
       expect(account_user2.reload.workflow_state).to eq "deleted"
     end
+
+    it "soft-deletes associated LTI context controls" do
+      user = user_model
+
+      registration = lti_registration_with_tool(account: @root_account)
+      deployment = registration.deployments.first
+
+      # But context controls can be on sub-accounts
+      control = Lti::ContextControl.create!(
+        context: @sub_account,
+        registration:,
+        deployment:
+      )
+
+      expect(control.workflow_state).to eq("active")
+
+      @sub_account.destroy(user:)
+
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+    end
+
+    it "restores LTI context controls when account is undeleted" do
+      user = user_model
+
+      registration = lti_registration_with_tool(account: @root_account)
+      deployment = registration.deployments.first
+
+      control = Lti::ContextControl.create!(
+        context: @sub_account,
+        registration:,
+        deployment:
+      )
+
+      # Delete the account
+      @sub_account.destroy(user:)
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+
+      # Undelete the account
+      @sub_account.process_event(:restore)
+      @sub_account.save!
+
+      expect(control.reload.workflow_state).to eq("active")
+    end
   end
 
   context "custom help link validation" do

@@ -48,7 +48,16 @@ class Lti::ContextControl < ActiveRecord::Base
   before_destroy :prevent_primary_deletion
   after_destroy :soft_delete_child_controls
 
-  scope :active, -> { where.not(workflow_state: :deleted) }
+  scope :active, -> { where.not(workflow_state: [:deleted, :deleted_with_context]) }
+
+  # This model has a special "deleted_with_context" workflow state, so its
+  # states need to be defined manually instead of just by including
+  # Canvas::SoftDeletable.
+  workflow do
+    state :active
+    state :deleted
+    state :deleted_with_context
+  end
 
   class << self
     # Generate a path string based on the given account chain.
@@ -204,6 +213,10 @@ class Lti::ContextControl < ActiveRecord::Base
       # of splitting on segments and worrying about that.
       query.order("deployment_id, LENGTH(path) DESC").select("DISTINCT ON (deployment_id) *")
     end
+  end
+
+  def deleted?
+    %w[deleted deleted_with_context].include?(workflow_state)
   end
 
   def self_and_all_parent_paths
