@@ -97,7 +97,8 @@ class AssignmentsController < ApplicationController
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
             new_quizzes_by_default: @context.feature_enabled?(:new_quizzes_by_default),
-            updated_mastery_connect_icon: Account.site_admin.feature_enabled?(:updated_mastery_connect_icon)
+            updated_mastery_connect_icon: Account.site_admin.feature_enabled?(:updated_mastery_connect_icon),
+            peer_review_allocation_and_grading: @context.feature_enabled?(:peer_review_allocation_and_grading)
           },
           grading_scheme: grading_standard.data,
           points_based: grading_standard.points_based?,
