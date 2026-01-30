@@ -25384,6 +25384,7 @@ nn:
   start_a_new_subject_7271b3ec: "Start eit nytt tema"
   start_and_end_date_filter_selections_55bcd8b8: "Filtrer val for Start-og Sluttdato"
   start_assignment_d56256d3: "Start oppgåve"
+  start_at_c29f35f1: Start
   start_at_c7a5789: "Start på:"
   start_at_end_at_b375cbe7: "I %{start_at} - %{end_at}"
   start_auto_refresh_e2feafb2: "Start automatisk oppdatering"
