@@ -260,7 +260,7 @@ describe PandataEvents do
     end
 
     context "with unsuccessful response" do
-      let(:response) { double("response", code: 500, body: "uh oh!") }
+      let(:response) { instance_double(Net::HTTPResponse, code: 500, body: "uh oh!") }
 
       before do
         allow(CanvasHttp).to receive(:post).and_return(response)

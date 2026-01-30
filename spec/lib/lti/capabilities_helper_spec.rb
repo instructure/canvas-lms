@@ -37,12 +37,12 @@ module Lti
         url: "http://www.example.com"
       )
     end
-    let(:substitution_helper) { double.as_null_object }
+    let(:substitution_helper) { instance_double(Lti::SubstitutionsHelper).as_null_object }
     let(:right_now) { Time.zone.now }
     let(:tool) do
-      shard_mock = double("shard")
+      shard_mock = instance_double(Shard)
       allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })
-      m = double("tool")
+      m = instance_double(ContextExternalTool)
       allow(m).to receive_messages(id: 1,
                                    context: root_account,
                                    shard: shard_mock,
@@ -50,11 +50,11 @@ module Lti
       m
     end
     let(:controller) do
-      request_mock = double("request")
+      request_mock = instance_double(ActionDispatch::Request)
       allow(request_mock).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
-      m = double("controller")
+      m = instance_double(ApplicationController)
       allow(m).to receive(:css_url_for).with(:common).and_return("/path/to/common.scss")
-      view_context_mock = double("view_context")
+      view_context_mock = instance_double(ActionView::Base)
       allow(view_context_mock).to receive(:stylesheet_path)
         .and_return(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
       allow(m).to receive_messages(request: request_mock,

@@ -21,8 +21,8 @@
 describe FeatureFlags::UsageMetricsPredicate do
   let(:settings) { nil }
   let(:external_integration_keys) { nil }
-  let(:root_account) { double(settings:, external_integration_keys:) }
-  let(:context) { double(root_account:) }
+  let(:root_account) { instance_double(Account, settings:, external_integration_keys:) }
+  let(:context) { instance_double(Course, root_account:) }
   let(:region) { nil }
   let(:predicate) { FeatureFlags::UsageMetricsPredicate.new context, region }
 
@@ -40,8 +40,8 @@ describe FeatureFlags::UsageMetricsPredicate do
 
   describe "when US billing country and approved US aws region" do
     let(:external_integration_keys) do
-      keys = double
-      allow(keys).to receive(:find_by).with({ key_type: "salesforce_billing_country_code" }) { double(key_value: "US") }
+      keys = class_double(ExternalIntegrationKey)
+      allow(keys).to receive(:find_by).with({ key_type: "salesforce_billing_country_code" }) { instance_double(ExternalIntegrationKey, key_value: "US") }
       keys
     end
     let(:region) { "us-east-1" }

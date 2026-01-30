@@ -454,7 +454,7 @@ describe RequestThrottle do
     def throttled_request(client_identifier = "user:1")
       allow(RequestThrottle).to receive(:enabled?).and_return(true)
       allow(Canvas).to receive(:redis_enabled?).and_return(true)
-      bucket = double("Bucket")
+      bucket = instance_double(RequestThrottle::LeakyBucket)
       expect(RequestThrottle::LeakyBucket).to receive(:new).with(client_identifier, client_overrides).and_return(bucket)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
       expect(bucket).to receive(:full?).and_return(true)
@@ -488,7 +488,7 @@ describe RequestThrottle do
 
     it "does not throttle if disabled" do
       allow(RequestThrottle).to receive(:enabled?).and_return(false)
-      bucket = double("Bucket")
+      bucket = instance_double(RequestThrottle::LeakyBucket)
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1", client_overrides).and_return(bucket)
       expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req["PATH_INFO"]).and_return(1)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
@@ -502,7 +502,7 @@ describe RequestThrottle do
     end
 
     it "does not throttle, but update, if bucket is not full" do
-      bucket = double("Bucket")
+      bucket = instance_double(RequestThrottle::LeakyBucket)
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1", client_overrides).and_return(bucket)
       expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req["PATH_INFO"]).and_return(1)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)

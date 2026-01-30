@@ -33,7 +33,7 @@ describe Api::V1::Quiz do
   end
 
   let(:test_instance) { test_class.new(mock_request) }
-  let(:mock_request) { double("request") }
+  let(:mock_request) { instance_double(ActionDispatch::Request) }
 
   describe "#quiz_client_ip" do
     context "when the feature flag is disabled" do

@@ -21,7 +21,7 @@ module Lti
   module OAuth2
     describe AuthorizationValidator do
       let(:product_family) do
-        product_family_mock = double("product_family")
+        product_family_mock = instance_double(Lti::ProductFamily)
         allow(product_family_mock).to receive(:developer_key).and_return(dev_key)
         product_family_mock
       end
@@ -29,7 +29,7 @@ module Lti
       let(:account) { Account.create! }
 
       let(:tool_proxy) do
-        tool_proxy_mock = double("tool_proxy")
+        tool_proxy_mock = instance_double(Lti::ToolProxy)
         allow(tool_proxy_mock).to receive_messages(guid: "3b7f3b02-b481-4f63-a6b0-129dee85abee",
                                                    shared_secret: "42",
                                                    raw_data: { "enabled_capability" => ["Security.splitSecret"] },

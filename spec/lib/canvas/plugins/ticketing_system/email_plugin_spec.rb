@@ -20,18 +20,12 @@
 module Canvas::Plugins::TicketingSystem
   describe EmailPlugin do
     describe "#export_error" do
-      let(:ticketing) { double }
+      let(:ticketing) { instance_double(Canvas::Plugins::TicketingSystem) }
       let(:plugin) { EmailPlugin.new(ticketing) }
       let(:email_address) { "to-address@example.com" }
       let(:config) { { email_address: } }
-      let(:report) do
-        double(
-          email: "from-address@example.com",
-          to_document: {},
-          raw_report: double,
-          account_id: nil
-        )
-      end
+      let(:raw_error_report) { ErrorReport.new(email: "from-address@example.com") }
+      let(:report) { CustomError.new(raw_error_report) }
 
       it "sends an email to the address in the configuration" do
         expect(Message).to receive(:create!).with(include(to: email_address))

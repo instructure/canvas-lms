@@ -72,8 +72,8 @@ describe MicrosoftSync::SyncerSteps do
 
   def new_http_error(code, headers = {})
     MicrosoftSync::Errors::HTTPInvalidStatus.for(
-      response: double(
-        "response", code:, body: "", headers: HTTParty::Response::Headers.new(headers)
+      response: instance_double(
+        HTTParty::Response, code:, body: "", headers: HTTParty::Response::Headers.new(headers)
       ),
       service: "test",
       tenant: "test"

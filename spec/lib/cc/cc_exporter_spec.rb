@@ -666,18 +666,13 @@ describe "Common Cartridge exporting" do
       @ce.selected_content = { all_quizzes: "1" }
       @ce.save!
 
-      kaltura_session = double("kaltura_session")
+      kaltura_session = instance_double(CanvasKaltura::ClientV3)
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
       allow(kaltura_session).to receive_messages(
         flavorAssetGetPlaylistUrl: "http://www.example.com/blah.mp4",
         flavorAssetGetOriginalAsset: { id: 1, status: "2", fileExt: "mp4" }
       )
-      mock_http_response = Struct.new(:code) do
-        def read_body(stream)
-          stream.puts("lalala")
-        end
-      end
-      allow(CanvasHttp).to receive(:get).and_yield(mock_http_response.new(200))
+      allow(CanvasHttp).to receive(:get).and_yield(FakeHttpResponse.new("200", "lalala"))
 
       run_export
 
@@ -717,7 +712,7 @@ describe "Common Cartridge exporting" do
       @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
       @ce.save!
 
-      client = double("kaltura_client")
+      client = instance_double(CanvasKaltura::ClientV3)
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
       allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
       mp3_path = "http://canvas.example/mp3_path"
@@ -771,7 +766,7 @@ describe "Common Cartridge exporting" do
       @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
       @ce.save!
 
-      client = double("kaltura_client")
+      client = instance_double(CanvasKaltura::ClientV3)
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
       allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
       media_path = "http://www.example.com/blah.mp3"
@@ -825,7 +820,7 @@ describe "Common Cartridge exporting" do
       @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
       @ce.save!
 
-      client = double("kaltura_client")
+      client = instance_double(CanvasKaltura::ClientV3)
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
       allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
       media_path = "http://www.example.com/blah.mp3"
@@ -1113,7 +1108,7 @@ describe "Common Cartridge exporting" do
 
     context "media track export" do
       before do
-        client = double("kaltura_client")
+        client = instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive_messages(new: client)
         allow(client).to receive_messages(
           media_download_url: nil,
@@ -1123,7 +1118,7 @@ describe "Common Cartridge exporting" do
 
       it "exports media tracks" do
         stub_kaltura
-        kaltura_session = double("kaltura_session")
+        kaltura_session = instance_double(CanvasKaltura::ClientV3)
         allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
         allow(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return({ id: 1, status: "2", fileExt: "flv" })
         obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
@@ -1145,7 +1140,7 @@ describe "Common Cartridge exporting" do
 
       it "exports media tracks when there's no attachment associated with the media object (and also get tracks from the original media object if there isn't one for that locale on the attachment)" do
         stub_kaltura
-        kaltura_session = double("kaltura_session")
+        kaltura_session = instance_double(CanvasKaltura::ClientV3)
         allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
         allow(kaltura_session).to receive_messages(
           flavorAssetGetPlaylistUrl: "http://www.example.com/blah.flv",

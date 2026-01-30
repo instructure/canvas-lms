@@ -22,7 +22,7 @@ module Canvas
     describe WorkerInfo do
       subject(:hash) { info.to_h }
 
-      let(:worker) { double(name: "workername") }
+      let(:worker) { instance_double(Delayed::Worker, name: "workername") }
       let(:info) { described_class.new(worker) }
 
       it "tags all exceptions as 'BackgroundJob'" do

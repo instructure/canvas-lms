@@ -202,7 +202,7 @@ describe MicrosoftSync::Errors do
     subject do
       described_class.for(
         service: "my api",
-        response: double(code:, body:, headers: HTTParty::Response::Headers.new(headers)),
+        response: instance_double(HTTParty::Response, code:, body:, headers: HTTParty::Response::Headers.new(headers)),
         tenant: "mytenant"
       )
     end

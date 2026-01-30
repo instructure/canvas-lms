@@ -22,9 +22,9 @@ require_relative "../../apis/lti/lti2_api_spec_helper"
 describe Lti::PlagiarismSubscriptionsHelper do
   include_context "lti2_api_spec_helper"
   let(:test_subscription) { { "RootAccountId" => "1", "foo" => "bar" } }
-  let(:stub_response) { double(code: 200, body: test_subscription.to_json, parsed_response: { "Id" => "test-id" }, ok?: true) }
-  let(:stub_bad_response) { double(code: 200, body: test_subscription.to_json, parsed_response: { "Id" => "test-id" }, ok?: false) }
-  let(:controller) { double(lti2_service_name: "vnd.Canvas.foo") }
+  let(:stub_response) { instance_double(HTTParty::Response, code: 200, body: test_subscription.to_json, parsed_response: { "Id" => "test-id" }, ok?: true) }
+  let(:stub_bad_response) { instance_double(HTTParty::Response, code: 200, body: test_subscription.to_json, parsed_response: { "Id" => "test-id" }, ok?: false) }
+  let(:controller) { instance_double(Lti::UsersApiController, lti2_service_name: "vnd.Canvas.foo") }
   let(:submission_event_endpoint) { "test.com/submission" }
   let(:submission_event_service) do
     {

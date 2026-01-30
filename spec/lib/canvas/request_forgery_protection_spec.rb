@@ -25,20 +25,20 @@ describe Canvas::RequestForgeryProtection do
     raw_headers = { "X-CSRF-Token" => "bogus" }
     raw_headers = ActionDispatch::Request.new(raw_headers)
     headers = ActionDispatch::Http::Headers.new(raw_headers)
-    request = double("request",
-                     cookies_same_site_protection: proc { false },
-                     host_with_port: "example.com:80",
-                     headers:,
-                     get?: false,
-                     head?: false)
+    request = instance_double(ActionDispatch::Request,
+                              cookies_same_site_protection: proc { false },
+                              host_with_port: "example.com:80",
+                              headers:,
+                              get?: false,
+                              head?: false)
     cookies = ActionDispatch::Cookies::CookieJar.new(request)
-    @controller = double("controller",
-                         request:,
-                         cookies:,
-                         protect_against_forgery?: true,
-                         api_request?: false,
-                         in_app?: true,
-                         form_authenticity_param: "bogus")
+    @controller = instance_double(ApplicationController,
+                                  request:,
+                                  cookies:,
+                                  protect_against_forgery?: true,
+                                  api_request?: false,
+                                  in_app?: true,
+                                  form_authenticity_param: "bogus")
     @controller.extend(Canvas::RequestForgeryProtection)
   end
 
@@ -52,8 +52,8 @@ describe Canvas::RequestForgeryProtection do
     it "gives equivalently valid tokens on each call" do
       token1 = @controller.form_authenticity_token
       token2 = @controller.form_authenticity_token
-      expect(CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(@controller.cookies, token1)).to be_truthy
-      expect(CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(@controller.cookies, token2)).to be_truthy
+      expect(CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(@controller.send(:cookies), token1)).to be_truthy
+      expect(CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(@controller.send(:cookies), token2)).to be_truthy
     end
   end
 

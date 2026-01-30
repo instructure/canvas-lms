@@ -214,14 +214,16 @@ describe SubmissionList do
 
       @points = 15.0
 
-      @question = double(id: 1,
-                         question_data: { id: 1,
-                                          regrade_option: "full_credit",
-                                          points_possible: @points },
-                         quiz_group: nil)
+      @question = instance_double(Quizzes::QuizQuestion,
+                                  id: 1,
+                                  question_data: { id: 1,
+                                                   regrade_option: "full_credit",
+                                                   points_possible: @points },
+                                  quiz_group: nil)
 
-      @question_regrade = double(quiz_question: @question,
-                                 regrade_option: "full_credit")
+      @question_regrade = instance_double(Quizzes::QuizQuestionRegrade,
+                                          quiz_question: @question,
+                                          regrade_option: "full_credit")
 
       @answer = { question_id: 1, points: @points, text: "" }
 

@@ -154,7 +154,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         product_family
         tool_proxy.update_columns(subscription_id: "test-subscription-123")
         actl
-        success_response = double("response", is_a?: true, code: "200", body: "success")
+        success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
         allow(CanvasHttp).to receive(:post).and_return(success_response)
         expect(sub_account.context_external_tools.where(lti_registration: tii_registration).count).to eq(0)
         expect(Lti::AssetProcessor.where(assignment:).count).to eq(0)
@@ -689,7 +689,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "adds error and returns early when deployment creation fails with Lti::ContextExternalToolErrors" do
-      errors = double("errors", full_messages: ["Duplicate deployment"])
+      errors = instance_double(ActiveModel::Errors, full_messages: ["Duplicate deployment"])
       allow_any_instance_of(Lti::Registration).to receive(:new_external_tool).and_raise(Lti::ContextExternalToolErrors.new(errors))
       allow(worker).to receive(:tii_tp_migration)
       worker.send(:initialize_proxy_results, tool_proxy)
@@ -741,7 +741,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "accepts valid turnitin.com endpoint" do
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
       worker.send(:initialize_proxy_results, tool_proxy)
       worker.send(:tii_tp_migration, tool_proxy, deployment)
@@ -764,7 +764,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           }
         }
       )
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
       worker.send(:initialize_proxy_results, subdomain_tool_proxy)
       worker.send(:tii_tp_migration, subdomain_tool_proxy, deployment)
@@ -817,7 +817,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "makes HTTP POST request with correct authorization header and payload" do
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
       worker.send(:initialize_proxy_results, tool_proxy)
       worker.send(:tii_tp_migration, tool_proxy, deployment)
@@ -842,8 +842,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "retries once after 2 seconds on HTTP failure" do
-      failure_response = double("response", is_a?: false, code: "500", body: "Internal Server Error")
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      failure_response = instance_double(Net::HTTPResponse, is_a?: false, code: "500", body: "Internal Server Error")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(failure_response, success_response)
       allow(worker).to receive(:sleep)
       worker.send(:initialize_proxy_results, tool_proxy)
@@ -856,7 +856,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "retries once after 2 seconds on exception" do
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       call_count = 0
       allow(CanvasHttp).to receive(:post) do
         call_count += 1
@@ -875,7 +875,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "logs error and returns false after max retries" do
-      failure_response = double("response", is_a?: false, code: "500", body: "Internal Server Error")
+      failure_response = instance_double(Net::HTTPResponse, is_a?: false, code: "500", body: "Internal Server Error")
       allow(CanvasHttp).to receive(:post).and_return(failure_response)
       allow(worker).to receive(:sleep)
       allow(Canvas::Errors).to receive(:capture_exception)
@@ -1267,7 +1267,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       # Ensure no errors in results
       results[:proxies] = {}
 
-      mailer_instance = double("mailer")
+      mailer_instance = instance_double(Mail::Message)
       expect(Mailer).to receive(:create_message) do |message|
         expect(message.to).to eq(email)
         expect(message.subject).to eq("Turnitin Asset Processor Migration Report")
@@ -1289,7 +1289,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       # Ensure no errors in results
       results[:proxies] = {}
 
-      mailer_instance = double("mailer")
+      mailer_instance = instance_double(Mail::Message)
       expect(Mailer).to receive(:create_message) do |message|
         expect(message.body).to include("completed successfully")
         expect(message.body).to include("Turnitin migration from LTI 2.0 to LTI 1.3")
@@ -1309,7 +1309,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       # Add errors to results
       results[:proxies] = { 123 => { errors: ["Test error"] } }
 
-      mailer_instance = double("mailer")
+      mailer_instance = instance_double(Mail::Message)
       expect(Mailer).to receive(:create_message) do |message|
         expect(message.body).to include("completed with errors")
         expect(message.body).to include("Turnitin migration from LTI 2.0 to LTI 1.3")
@@ -1858,43 +1858,43 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
   describe "#priority_from_cpf_report" do
     it "returns TIME_CRITICAL priority for error state" do
-      report = double("report", workflow_state: "error", originality_score: nil)
+      report = instance_double(OriginalityReport, workflow_state: "error", originality_score: nil)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_TIME_CRITICAL)
     end
 
     it "returns TIME_CRITICAL priority for score >= 75" do
-      report = double("report", workflow_state: "scored", originality_score: 80)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: 80)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_TIME_CRITICAL)
     end
 
     it "returns SEMI_TIME_CRITICAL priority for score >= 50 and < 75" do
-      report = double("report", workflow_state: "scored", originality_score: 60)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: 60)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_SEMI_TIME_CRITICAL)
     end
 
     it "returns NOT_TIME_CRITICAL priority for score >= 25 and < 50" do
-      report = double("report", workflow_state: "scored", originality_score: 35)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: 35)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_NOT_TIME_CRITICAL)
     end
 
     it "returns GOOD priority for score < 25" do
-      report = double("report", workflow_state: "scored", originality_score: 10)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: 10)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
     end
 
     it "returns GOOD priority for scored state with no score" do
-      report = double("report", workflow_state: "scored", originality_score: nil)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: nil)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
     end
 
     it "returns GOOD priority for pending state" do
-      report = double("report", workflow_state: "pending", originality_score: nil)
+      report = instance_double(OriginalityReport, workflow_state: "pending", originality_score: nil)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
     end
@@ -1902,25 +1902,25 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
   describe "#processing_progress_from_cpf_report" do
     it "returns PROCESSING for pending state" do
-      report = double("report", workflow_state: "pending")
+      report = instance_double(OriginalityReport, workflow_state: "pending")
       progress = worker.send(:processing_progress_from_cpf_report, report)
       expect(progress).to eq(Lti::AssetReport::PROGRESS_PROCESSING)
     end
 
     it "returns FAILED for error state" do
-      report = double("report", workflow_state: "error")
+      report = instance_double(OriginalityReport, workflow_state: "error")
       progress = worker.send(:processing_progress_from_cpf_report, report)
       expect(progress).to eq(Lti::AssetReport::PROGRESS_FAILED)
     end
 
     it "returns PROCESSED for scored state" do
-      report = double("report", workflow_state: "scored")
+      report = instance_double(OriginalityReport, workflow_state: "scored")
       progress = worker.send(:processing_progress_from_cpf_report, report)
       expect(progress).to eq(Lti::AssetReport::PROGRESS_PROCESSED)
     end
 
     it "returns NOT_READY for other states" do
-      report = double("report", workflow_state: "unknown")
+      report = instance_double(OriginalityReport, workflow_state: "unknown")
       progress = worker.send(:processing_progress_from_cpf_report, report)
       expect(progress).to eq(Lti::AssetReport::PROGRESS_NOT_READY)
     end
@@ -1928,8 +1928,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
   describe "#extract_custom_sourcedid" do
     it "extracts custom_sourcedid from resource_url" do
-      report = double("report")
-      lti_link = double("lti_link", resource_url: "https://example.com/launch?custom_sourcedid=abc123&other=param")
+      report = instance_double(OriginalityReport)
+      lti_link = instance_double(Lti::Link, resource_url: "https://example.com/launch?custom_sourcedid=abc123&other=param")
       allow(report).to receive(:lti_link).and_return(lti_link)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
@@ -1937,8 +1937,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil when resource_url is nil" do
-      report = double("report")
-      lti_link = double("lti_link", resource_url: nil)
+      report = instance_double(OriginalityReport)
+      lti_link = instance_double(Lti::Link, resource_url: nil)
       allow(report).to receive(:lti_link).and_return(lti_link)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
@@ -1946,15 +1946,15 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil when lti_link is nil" do
-      report = double("report", lti_link: nil)
+      report = instance_double(OriginalityReport, lti_link: nil)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
       expect(sourcedid).to be_nil
     end
 
     it "returns nil when custom_sourcedid is not present" do
-      report = double("report")
-      lti_link = double("lti_link", resource_url: "https://example.com/launch?other=param")
+      report = instance_double(OriginalityReport)
+      lti_link = instance_double(Lti::Link, resource_url: "https://example.com/launch?other=param")
       allow(report).to receive(:lti_link).and_return(lti_link)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
@@ -1962,8 +1962,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil for invalid URI" do
-      report = double("report")
-      lti_link = double("lti_link", resource_url: "not a valid uri")
+      report = instance_double(OriginalityReport)
+      lti_link = instance_double(Lti::Link, resource_url: "not a valid uri")
       allow(report).to receive(:lti_link).and_return(lti_link)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
@@ -1973,7 +1973,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
   describe "#calc_indications_from_cpf_report" do
     it "returns red indication for very high similarity (failure)" do
-      report = double("report", originality_score: 95)
+      report = instance_double(OriginalityReport, originality_score: 95)
       allow(Turnitin).to receive(:state_from_similarity_score).with(95).and_return("failure")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -1982,7 +1982,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns red indication for high similarity (problem)" do
-      report = double("report", originality_score: 80)
+      report = instance_double(OriginalityReport, originality_score: 80)
       allow(Turnitin).to receive(:state_from_similarity_score).with(80).and_return("problem")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -1991,7 +1991,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns orange indication for medium similarity (warning)" do
-      report = double("report", originality_score: 60)
+      report = instance_double(OriginalityReport, originality_score: 60)
       allow(Turnitin).to receive(:state_from_similarity_score).with(60).and_return("warning")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -2000,7 +2000,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns green indication for low similarity (acceptable)" do
-      report = double("report", originality_score: 15)
+      report = instance_double(OriginalityReport, originality_score: 15)
       allow(Turnitin).to receive(:state_from_similarity_score).with(15).and_return("acceptable")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -2009,7 +2009,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns green indication for no similarity (none)" do
-      report = double("report", originality_score: 0)
+      report = instance_double(OriginalityReport, originality_score: 0)
       allow(Turnitin).to receive(:state_from_similarity_score).with(0).and_return("none")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -2018,7 +2018,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil values when originality_score is not present" do
-      report = double("report", originality_score: nil)
+      report = instance_double(OriginalityReport, originality_score: nil)
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
       expect(color).to be_nil
@@ -2703,7 +2703,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     it "migrates orphan proxy and deletes its subscription" do
       product_family
       tool_proxy.update_columns(subscription_id: "orphan-sub-123")
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
 
       worker.perform(test_progress)
@@ -2715,7 +2715,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     it "includes orphan proxy rows in CSV report" do
       product_family
       tool_proxy
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
 
       worker.perform(test_progress)
@@ -2752,7 +2752,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         tool_resource_type_code: resource_handler.resource_type_code,
         context_type: "Course"
       )
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
 
       worker.perform(test_progress)

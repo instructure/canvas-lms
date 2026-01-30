@@ -24,7 +24,7 @@ describe Translation do
 
   describe "#available?" do
     context "when CedarClient is defined and enabled" do
-      before { stub_const("CedarClient", double("CedarClient", enabled?: true)) }
+      before { stub_const("CedarClient", class_double(CedarClient, enabled?: true)) }
 
       it "returns true" do
         expect(Translation.available?).to be true
@@ -32,7 +32,7 @@ describe Translation do
     end
 
     context "when CedarClient is defined but not enabled" do
-      before { stub_const("CedarClient", double("CedarClient", enabled?: false)) }
+      before { stub_const("CedarClient", class_double(CedarClient, enabled?: false)) }
 
       it "returns false" do
         expect(Translation.available?).to be false
@@ -47,7 +47,7 @@ describe Translation do
 
     context "when available" do
       before do
-        stub_const("CedarClient", double("CedarClient", enabled?: true))
+        stub_const("CedarClient", class_double(CedarClient, enabled?: true))
         allow(CedarClient).to receive(:translate_text).and_return(
           TranslationResponse.new(
             translation: "Hola, mundo!",
@@ -122,7 +122,7 @@ describe Translation do
 
     context "when available" do
       before do
-        stub_const("CedarClient", double("CedarClient", enabled?: true))
+        stub_const("CedarClient", class_double(CedarClient, enabled?: true))
         allow(CedarClient).to receive(:translate_html).and_return(
           TranslationResponse.new(
             translation: "<p>Hola, mundo!</p>",

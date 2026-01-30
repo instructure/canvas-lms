@@ -39,10 +39,10 @@ module Services
       end
 
       it "includes a generated JWT for the domain, user, context, and workflwos" do
-        user = double("user", global_id: "global id")
-        domain = double("domain")
-        ctx = double("ctx", grants_right?: true)
-        jwt = double("jwt")
+        user = instance_double(User, global_id: "global id")
+        domain = "example.com"
+        ctx = instance_double(Course, grants_right?: true)
+        jwt = "jwt_token"
         allow(CanvasSecurity::ServicesJwt).to receive(:for_user).with(domain,
                                                                       user,
                                                                       include(workflows: [:rich_content, :ui],
@@ -52,10 +52,10 @@ module Services
       end
 
       it "includes a masquerading user if provided" do
-        user = double("user", global_id: "global id")
-        masq_user = double("masq_user", global_id: "other global id")
-        domain = double("domain")
-        jwt = double("jwt")
+        user = instance_double(User, global_id: "global id")
+        masq_user = instance_double(User, global_id: "other global id")
+        domain = "example.com"
+        jwt = "jwt_token"
         allow(CanvasSecurity::ServicesJwt).to receive(:for_user).with(
           domain,
           user,
@@ -66,15 +66,15 @@ module Services
       end
 
       it "does not allow file uploading without context" do
-        user = double("user", global_id: "global id")
+        user = instance_double(User, global_id: "global id")
         env = described_class.env_for(user:)
         expect(env[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be(false)
       end
 
       it "lets context decide if uploading is ok" do
-        user = double("user", global_id: "global id")
-        context1 = double("allowed_context", grants_right?: true)
-        context2 = double("forbidden_context", grants_right?: false)
+        user = instance_double(User, global_id: "global id")
+        context1 = instance_double(Course, grants_right?: true)
+        context2 = instance_double(Course, grants_right?: false)
         env1 = described_class.env_for(user:, context: context1)
         env2 = described_class.env_for(user:, context: context2)
         expect(env1[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be(true)
@@ -91,8 +91,8 @@ module Services
         context "when the user can edit context files" do
           subject { described_class.env_for(user:, context:)[:RICH_CONTENT_CAN_EDIT_FILES] }
 
-          let(:user) { double("user", global_id: "some-global-id") }
-          let(:context) { double("allowed_context", grants_right?: true) }
+          let(:user) { instance_double(User, global_id: "some-global-id") }
+          let(:context) { instance_double(Course, grants_right?: true) }
 
           it { is_expected.to be_truthy }
         end
@@ -100,8 +100,8 @@ module Services
         context "when the user cannot edit context files" do
           subject { described_class.env_for(user:, context:)[:RICH_CONTENT_CAN_EDIT_FILES] }
 
-          let(:user) { double("user", global_id: "some-global-id") }
-          let(:context) { double("allowed_context", grants_right?: false) }
+          let(:user) { instance_double(User, global_id: "some-global-id") }
+          let(:context) { instance_double(Course, grants_right?: false) }
 
           it { is_expected.to be_falsey }
         end

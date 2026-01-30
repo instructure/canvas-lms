@@ -78,10 +78,10 @@ RSpec.describe DataFixup::Lti::BackfillLtiOverlaysFromIMSRegistrations do
   end
 
   it "should set a context when an exception is raised" do
-    fake_scope = double(Sentry::Scope)
+    fake_scope = instance_double(Sentry::Scope)
 
-    expect(fake_scope).to receive(:set_tags).with(ims_registration_global_id: ims_registration.global_id)
-    expect(fake_scope).to receive(:set_context).with("exception", { name: "ArgumentError", message: "ArgumentError" })
+    expect(fake_scope).to receive(:set_tags).with(ims_registration_global_id: ims_registration.global_id).and_return(nil)
+    expect(fake_scope).to receive(:set_context).with("exception", { name: "ArgumentError", message: "ArgumentError" }).and_return(nil)
     expect(Sentry).to receive(:with_scope).and_yield(fake_scope)
     expect(Schemas::Lti::IMS::RegistrationOverlay).to receive(:to_lti_overlay).and_raise(ArgumentError)
     ims_registration

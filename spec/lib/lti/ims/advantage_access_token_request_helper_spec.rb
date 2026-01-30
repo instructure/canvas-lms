@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Lti::IMS::AdvantageAccessTokenRequestHelper do
-  let(:token) { double(Lti::IMS::AdvantageAccessToken) }
+  let(:token) { instance_double(Lti::IMS::AdvantageAccessToken) }
   let(:request) { ActionDispatch::Request.new(Rack::MockRequest.env_for("http://test.host/")) }
 
   let(:subject_token) { described_class.token(request) }

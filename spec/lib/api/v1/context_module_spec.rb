@@ -52,7 +52,7 @@ describe Api::V1::ContextModule do
   end
 
   describe "#module_item_json" do
-    subject { dummy_class.new(double(params: { frame_external_urls: "http://www.instructure.com" })) }
+    subject { dummy_class.new(instance_double(ActionDispatch::Request, params: { frame_external_urls: "http://www.instructure.com" })) }
 
     before do
       course_with_teacher(account: Account.default)
@@ -100,7 +100,7 @@ describe Api::V1::ContextModule do
   end
 
   describe "#module_json" do
-    subject { dummy_class.new(double(params: { frame_external_urls: "http://www.instructure.com" })) }
+    subject { dummy_class.new(instance_double(ActionDispatch::Request, params: { frame_external_urls: "http://www.instructure.com" })) }
 
     before do
       course_with_teacher(account: Account.default)

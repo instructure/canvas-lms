@@ -103,12 +103,10 @@ describe AuthenticationMethods::InstAccessToken do
       end
 
       let(:request) do
-        double(
-          ActionDispatch::Request,
-          authorization:,
-          user_agent:,
-          GET: {}
-        )
+        instance_double(ActionDispatch::Request,
+                        authorization:,
+                        user_agent:,
+                        GET: {})
       end
 
       shared_examples_for "contexts that do not return a tag identifier" do
@@ -218,12 +216,10 @@ describe AuthenticationMethods::InstAccessToken do
       end
 
       let(:request) do
-        double(
-          ActionDispatch::Request,
-          authorization:,
-          user_agent:,
-          GET: {}
-        )
+        instance_double(ActionDispatch::Request,
+                        authorization:,
+                        user_agent:,
+                        GET: {})
       end
 
       shared_examples_for "contexts that do not block" do

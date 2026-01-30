@@ -23,7 +23,7 @@ require_relative "../../../spec_helper"
 module Api
   module Html
     describe MediaTag do
-      let(:doc) { double }
+      let(:doc) { instance_double(Nokogiri::XML::DocumentFragment) }
 
       before do
         stub_const("StubbedNode",
@@ -50,7 +50,7 @@ module Api
         end
 
         describe "for anchor tags" do
-          let(:a_tag) { double(name: "a") }
+          let(:a_tag) { instance_double(Nokogiri::XML::Element, name: "a") }
 
           it "is true with a media_comment id" do
             expect(media_tag(a_tag, "id", "media_comment_123").has_media_comment?).to be(true)
@@ -66,7 +66,7 @@ module Api
         end
 
         describe "for media tags" do
-          let(:tag) { double(name: "video") }
+          let(:tag) { instance_double(Nokogiri::XML::Element, name: "video") }
 
           it "is true with a data-media_comment id" do
             expect(media_tag(tag, "data-media_comment_id", "123").has_media_comment?).to be(true)
@@ -81,18 +81,17 @@ module Api
 
       describe "#as_html5_node" do
         let(:url_helper) do
-          double({
-                   media_object_thumbnail_url: "/media/object/thumbnail",
-                   media_redirect_url: "/media/redirect",
-                   show_media_tracks_url: "media/track/vtt"
-                 })
+          instance_double(Api::Html::UrlProxy,
+                          media_object_thumbnail_url: "/media/object/thumbnail",
+                          media_redirect_url: "/media/redirect",
+                          show_media_tracks_url: "media/track/vtt")
         end
 
         describe "transforming a video node" do
           let(:media_comment_id) { "42" }
           let(:alt_text) { "media alt text" }
           let(:base_tag) do
-            tag = double(name: "video", inner_html: "inner_html")
+            tag = instance_double(Nokogiri::XML::Element, name: "video", inner_html: "inner_html")
             allow(tag).to receive(:[]).with("class").and_return("")
             allow(tag).to receive(:[]).with("data-media_comment_id").and_return(media_comment_id)
             allow(tag).to receive(:[]).with("data-alt").and_return(alt_text)
@@ -110,18 +109,20 @@ module Api
           specify { expect(html5_node["data-media_comment_id"]).to eq("42") }
           specify { expect(html5_node["data-media_comment_type"]).to eq("video") }
           specify { expect(html5_node["controls"]).to eq("controls") }
-          specify { expect(html5_node["poster"]).to eq(url_helper.media_object_thumbnail_url) }
-          specify { expect(html5_node["src"]).to eq(url_helper.media_redirect_url) }
+          specify { expect(html5_node["poster"]).to eq("/media/object/thumbnail") }
+          specify { expect(html5_node["src"]).to eq("/media/redirect") }
           specify { expect(html5_node.inner_html).to eq(base_tag.inner_html) }
           specify { expect(html5_node.tag_name).to eq("video") }
           specify { expect(html5_node["data-alt"]).to eq(alt_text) }
 
           context "when media object has subtitle tracks" do
             let(:media_object) do
-              double(
+              instance_double(
+                MediaObject,
                 id: media_comment_id,
                 media_tracks: [
-                  double(
+                  instance_double(
+                    MediaTrack,
                     kind: "subtitles",
                     locale: "en",
                     id: 1,
@@ -145,7 +146,7 @@ module Api
 
         describe "transforming a audio node" do
           let(:alt_text) { "media alt text" }
-          let(:base_tag) { double(name: "audio", inner_html: "inner_html") }
+          let(:base_tag) { instance_double(Nokogiri::XML::Element, name: "audio", inner_html: "inner_html") }
 
           let(:html5_node) do
             tag = base_tag
@@ -162,7 +163,7 @@ module Api
           specify { expect(html5_node["data-media_comment_type"]).to eq("audio") }
           specify { expect(html5_node["controls"]).to eq("controls") }
           specify { expect(html5_node["poster"]).to be_nil }
-          specify { expect(html5_node["src"]).to eq(url_helper.media_redirect_url) }
+          specify { expect(html5_node["src"]).to eq("/media/redirect") }
           specify { expect(html5_node.inner_html).to eq(base_tag.inner_html) }
           specify { expect(html5_node.tag_name).to eq("audio") }
           specify { expect(html5_node["data-alt"]).to eq(alt_text) }
@@ -171,7 +172,7 @@ module Api
 
       describe "#as_anchor_node" do
         describe "from anchor tag" do
-          let(:base_tag) { double(name: "a", attributes: { "a" => "b", "key" => "val", "class" => "someclass" }) }
+          let(:base_tag) { instance_double(Nokogiri::XML::Element, name: "a", attributes: { "a" => "b", "key" => "val", "class" => "someclass" }) }
 
           let(:anchor_node) do
             tag = base_tag
@@ -182,11 +183,12 @@ module Api
           end
 
           before do
-            mo = double(media_type: "special")
-            allow(mo).to receive(:by_media_id).with("911").and_return(mo)
-            allow(mo).to receive(:preload).with(:media_tracks).and_return(mo)
-            allow(mo).to receive(:first).and_return(mo)
-            allow(MediaObject).to receive_messages(active: mo)
+            mo = instance_double(MediaObject, media_type: "special")
+            relation = class_double(MediaObject).as_stubbed_const
+            allow(relation).to receive(:by_media_id).with("911").and_return(relation)
+            allow(relation).to receive(:preload).with(:media_tracks).and_return(relation)
+            allow(relation).to receive(:first).and_return(mo)
+            allow(MediaObject).to receive_messages(active: relation)
           end
 
           specify { expect(anchor_node.tag_name).to eq("a") }
@@ -197,7 +199,7 @@ module Api
         end
 
         describe "from non-anchor tag" do
-          let(:base_tag) { double(name: "video", attributes: { "a" => "b", "key" => "val" }) }
+          let(:base_tag) { instance_double(Nokogiri::XML::Node, name: "video", attributes: { "a" => "b", "key" => "val" }) }
 
           let(:anchor_node) do
             tag = base_tag
