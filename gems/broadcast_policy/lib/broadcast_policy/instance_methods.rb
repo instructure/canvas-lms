@@ -48,7 +48,7 @@ module BroadcastPolicy
           @changed_attributes[key] = value if value != attributes[key]
         end
 
-        if defined?(ActiveRecord)
+        if defined?(ActiveRecord) && is_a?(ActiveRecord::Base)
           frd_mutations_before_last_save = @mutations_before_last_save
           other_attributes = other.instance_variable_get(:@attributes).deep_dup
           @attributes.send(:attributes).each_key do |key|

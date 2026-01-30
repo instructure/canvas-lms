@@ -22,8 +22,8 @@ require "spec_helper"
 
 describe "BookmarkedCollection::Collection" do
   before do
-    @bookmark = double("bookmark")
-    @bookmarker = double("bookmarker", validate: true, bookmark_for: @bookmark)
+    @bookmark = Object.new
+    @bookmarker = instance_double(BookmarkedCollection::SimpleBookmarker, validate: true, bookmark_for: @bookmark)
     @collection = BookmarkedCollection::Collection.new(@bookmarker)
   end
 
@@ -174,9 +174,9 @@ describe "BookmarkedCollection::Collection" do
 
   describe "#has_more!" do
     before do
-      @item = double("item")
+      @item = Object.new
       @collection << @item
-      @bookmark = double("bookmark")
+      @bookmark = Object.new
     end
 
     it "uses the bookmarker on the last item" do

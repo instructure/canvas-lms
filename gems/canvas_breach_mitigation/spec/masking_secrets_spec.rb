@@ -20,10 +20,6 @@
 require "spec_helper"
 
 describe CanvasBreachMitigation::MaskingSecrets do
-  before do
-    Rails = double("Rails") unless defined? Rails
-  end
-
   let(:masking_secrets) { CanvasBreachMitigation::MaskingSecrets }
 
   describe ".csrf_token" do

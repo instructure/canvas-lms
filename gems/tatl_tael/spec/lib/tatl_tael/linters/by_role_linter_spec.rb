@@ -34,7 +34,7 @@ describe TatlTael::Linters::ByRoleLinter do
       { path: fixture_path, path_from_root: fixture_path, status: }
     end
   end
-  let(:changes) { raw_changes.map { |c| double(c) } }
+  let(:changes) { raw_changes.map { |c| double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
   let(:diff) do
     diff = {}
     VALID_FILES.map do |file|
