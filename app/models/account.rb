@@ -177,7 +177,7 @@ class Account < ActiveRecord::Base
   has_many :report_snapshots
   has_many :external_integration_keys, as: :context, inverse_of: :context, dependent: :destroy
   has_many :shared_brand_configs
-  belongs_to :brand_config, foreign_key: "brand_config_md5", inverse_of: :accounts
+  belongs_to :brand_config, foreign_key: "brand_config_md5", primary_key: "md5", inverse_of: :accounts
   has_many :blackout_dates, as: :context, inverse_of: :context
 
   before_validation :verify_unique_sis_source_id
