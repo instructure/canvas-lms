@@ -30,8 +30,10 @@ import {Pill} from '@instructure/ui-pill'
 import {IconAiColoredSolid, IconFullScreenLine} from '@instructure/ui-icons'
 import {AIExperience} from '../../types'
 import {useStudentConversations, useConversationDetail} from '../hooks/useAIConversations'
+import {useConversationEvaluation} from '../hooks/useConversationEvaluation'
 import type {LLMConversationMessage} from '@canvas/ai-experiences/types'
 import FocusMode from '@canvas/ai-experiences/react/components/FocusMode'
+import {AIAnalysisTab} from './AIAnalysisTab'
 
 const I18n = createI18nScope('ai_experiences_ai_conversations')
 
@@ -71,6 +73,17 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
     selectedConversationId || undefined,
   )
 
+  // Check if evaluation feature is enabled
+  const isEvaluationEnabled = window.ENV.ai_experiences_evaluation_enabled
+
+  // Evaluation hook for AI analysis tab
+  const {
+    evaluation,
+    isLoading: isLoadingEvaluation,
+    error: evaluationError,
+    fetchEvaluation,
+  } = useConversationEvaluation(courseId, aiExperience.id, selectedConversationId ?? undefined)
+
   // Update URL hash when student is selected
   const handleSelectStudent = (_event: React.SyntheticEvent, data: {value?: string | number}) => {
     const identifier = data.value as string
@@ -91,6 +104,32 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
+
+  // Ensure selectedIdentifier is synced when conversations load
+  useEffect(() => {
+    if (conversations.length === 0 || selectedIdentifier) return
+
+    const hashValue = getIdentifierFromHash()
+
+    // If there's a hash value, try to use it
+    if (hashValue) {
+      const exists = conversations.some(conv => (conv.id || `user_${conv.user_id}`) === hashValue)
+      if (exists) {
+        setSelectedIdentifier(hashValue)
+        return
+      }
+    }
+
+    // No valid hash, pre-select a student with a conversation
+    const studentWithConversation = conversations.find(conv => Boolean(conv.id))
+    const studentToSelect = studentWithConversation || conversations[0]
+
+    if (studentToSelect) {
+      const identifier = studentToSelect.id || `user_${studentToSelect.user_id}`
+      setSelectedIdentifier(identifier)
+      window.location.hash = identifier
+    }
+  }, [conversations, selectedIdentifier])
 
   // Convert messages to LLMConversationMessage format
   const messages: LLMConversationMessage[] =
@@ -145,7 +184,7 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
         padding="medium"
         background="secondary"
         borderRadius="medium"
-        height="calc(100vh - 400px)"
+        maxHeight="calc(100vh - 510px)"
         overflowY="auto"
       >
         {messageContent}
@@ -166,9 +205,10 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
         </Flex>
       </View>
 
-      <Flex direction="column" height="100vh">
+      <Flex direction="column">
         <Flex.Item padding="0 0 medium 0">
           <SimpleSelect
+            key={`student-select-${conversations.length}`}
             renderLabel={I18n.t('Student')}
             value={selectedIdentifier}
             onChange={handleSelectStudent}
@@ -206,7 +246,7 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
         {selectedIdentifier && hasConversation && conversation && (
           <>
             <Flex.Item padding="0 0 medium 0">
-              <Flex gap="small" alignItems="center" justifyItems="space-between">
+              <Flex gap="small" alignItems="center" justifyItems="space-between" wrap="wrap">
                 <Flex gap="small" alignItems="center">
                   <Flex.Item>
                     <Text>
@@ -259,9 +299,19 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
                   renderTitle={I18n.t('AI analysis')}
                   isSelected={selectedTab === 1}
                 >
-                  <View as="div" padding="large" textAlign="center">
-                    <Text color="secondary">{I18n.t('AI analysis coming soon')}</Text>
-                  </View>
+                  {isEvaluationEnabled ? (
+                    <AIAnalysisTab
+                      studentName={selectedStudentData?.student?.name}
+                      evaluation={evaluation}
+                      isLoading={isLoadingEvaluation}
+                      error={evaluationError}
+                      onRequestEvaluation={fetchEvaluation}
+                    />
+                  ) : (
+                    <View as="div" padding="large" textAlign="center">
+                      <Text color="secondary">{I18n.t('AI analysis coming soon')}</Text>
+                    </View>
+                  )}
                 </Tabs.Panel>
               </Tabs>
             </Flex.Item>
@@ -344,9 +394,19 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
                     renderTitle={I18n.t('AI analysis')}
                     isSelected={selectedTab === 1}
                   >
-                    <View as="div" padding="large" textAlign="center">
-                      <Text color="secondary">{I18n.t('AI analysis coming soon')}</Text>
-                    </View>
+                    {isEvaluationEnabled ? (
+                      <AIAnalysisTab
+                        studentName={selectedStudentData?.student?.name}
+                        evaluation={evaluation}
+                        isLoading={isLoadingEvaluation}
+                        error={evaluationError}
+                        onRequestEvaluation={fetchEvaluation}
+                      />
+                    ) : (
+                      <View as="div" padding="large" textAlign="center">
+                        <Text color="secondary">{I18n.t('AI analysis coming soon')}</Text>
+                      </View>
+                    )}
                   </Tabs.Panel>
                 </Tabs>
               </div>

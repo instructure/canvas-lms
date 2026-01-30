@@ -221,14 +221,6 @@ describe('AIConversationsPage', () => {
     expect(screen.getByText('Student Three (No conversation)')).toBeInTheDocument()
   })
 
-  it('shows placeholder when no student is selected', async () => {
-    render(<AIConversationsPage aiExperience={mockAiExperience} courseId="123" />)
-
-    await waitFor(() => {
-      expect(screen.getByText('Select a student to view their conversation')).toBeInTheDocument()
-    })
-  })
-
   it('displays helpful message when student without conversation is selected', async () => {
     const user = userEvent.setup()
 
@@ -381,5 +373,139 @@ describe('AIConversationsPage', () => {
 
     // Clean up
     window.location.hash = ''
+  })
+
+  describe('pre-selection logic', () => {
+    beforeEach(() => {
+      // Clear hash before each test
+      window.location.hash = ''
+    })
+
+    afterEach(() => {
+      // Clean up hash after each test
+      window.location.hash = ''
+    })
+
+    it('pre-selects first student with a conversation when no hash is set', async () => {
+      render(<AIConversationsPage aiExperience={mockAiExperience} courseId="123" />)
+
+      await waitFor(() => {
+        // Should pre-select Student One (first student with conversation)
+        expect(window.location.hash).toBe('#conv1')
+        expect(screen.getByText('Hi there!')).toBeInTheDocument()
+      })
+    })
+
+    it('pre-selects first student when no students have conversations', async () => {
+      const conversationsWithoutAny = [
+        {
+          id: null,
+          user_id: 'student1',
+          has_conversation: false,
+          student: {
+            id: 'student1',
+            name: 'Student One',
+            avatar_url: 'https://example.com/avatar1.jpg',
+          },
+        },
+        {
+          id: null,
+          user_id: 'student2',
+          has_conversation: false,
+          student: {
+            id: 'student2',
+            name: 'Student Two',
+            avatar_url: 'https://example.com/avatar2.jpg',
+          },
+        },
+      ]
+
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/ai_conversations', () => {
+          return HttpResponse.json({conversations: conversationsWithoutAny})
+        }),
+      )
+
+      render(<AIConversationsPage aiExperience={mockAiExperience} courseId="123" />)
+
+      await waitFor(() => {
+        // Should pre-select first student even though they don't have a conversation
+        expect(window.location.hash).toBe('#user_student1')
+        expect(
+          screen.getByText('This student has not started a conversation yet'),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('pre-selects student with conversation even if not first in list', async () => {
+      const conversationsReordered = [
+        {
+          id: null,
+          user_id: 'student3',
+          has_conversation: false,
+          student: {
+            id: 'student3',
+            name: 'Student Three',
+            avatar_url: 'https://example.com/avatar3.jpg',
+          },
+        },
+        {
+          id: 'conv2',
+          user_id: 'student2',
+          llm_conversation_id: 'llm2',
+          workflow_state: 'active',
+          created_at: '2025-01-02T00:00:00Z',
+          updated_at: '2025-01-02T01:00:00Z',
+          has_conversation: true,
+          student: {
+            id: 'student2',
+            name: 'Student Two',
+            avatar_url: 'https://example.com/avatar2.jpg',
+          },
+        },
+      ]
+
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/ai_conversations', () => {
+          return HttpResponse.json({conversations: conversationsReordered})
+        }),
+        http.get('/api/v1/courses/123/ai_experiences/1/ai_conversations/conv2', () => {
+          return HttpResponse.json({
+            ...mockConversationDetail,
+            id: 'conv2',
+            user_id: 'student2',
+          })
+        }),
+      )
+
+      render(<AIConversationsPage aiExperience={mockAiExperience} courseId="123" />)
+
+      await waitFor(() => {
+        // Should pre-select Student Two (first student with conversation, even though not first in array)
+        expect(window.location.hash).toBe('#conv2')
+      })
+    })
+
+    it('respects existing hash and does not override it', async () => {
+      // Set hash before rendering
+      window.location.hash = 'conv2'
+
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences/1/ai_conversations/conv2', () => {
+          return HttpResponse.json({
+            ...mockConversationDetail,
+            id: 'conv2',
+            user_id: 'student2',
+          })
+        }),
+      )
+
+      render(<AIConversationsPage aiExperience={mockAiExperience} courseId="123" />)
+
+      await waitFor(() => {
+        // Should keep the existing hash, not change to conv1
+        expect(window.location.hash).toBe('#conv2')
+      })
+    })
   })
 })

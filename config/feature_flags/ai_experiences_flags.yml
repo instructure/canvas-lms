@@ -11,13 +11,18 @@ ai_experiences:
       state: allowed_on
     development:
       state: allowed_on
-ai_experiences_student_view:
+ai_experiences_evaluation:
   state: hidden
   applies_to: Course
   shadow: true
-  display_name: AI Experiences Student View
-  description: Enables the student view for AI Experiences.
+  display_name: AI Experiences Evaluation
+  description: Enables the evaluation feature for AI Experiences conversations.
   touch_context: true
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 ai_experiences_context_file_upload:
   state: hidden
   applies_to: Course
