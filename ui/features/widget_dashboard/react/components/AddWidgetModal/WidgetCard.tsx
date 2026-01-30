@@ -52,6 +52,8 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
       margin="small"
       shadow="resting"
       data-testid={`widget-card-${type}`}
+      role="group"
+      aria-label={displayName}
       themeOverride={{
         backgroundSecondary: '#F9FAFA',
       }}
