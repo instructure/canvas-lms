@@ -272,6 +272,43 @@ RSpec.describe ApplicationController do
             @user.save!
             expect(controller.js_env[:widget_dashboard_overridable]).to be false
           end
+
+          context "enrollment-based eligibility" do
+            before do
+              Account.default.set_feature_flag!(:widget_dashboard, "allowed_on")
+            end
+
+            it "is not set for users with teacher enrollment" do
+              course_with_teacher(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is not set for users with TA enrollment" do
+              course_with_ta(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is not set for users with designer enrollment" do
+              course_with_designer(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is set for users with only student enrollment" do
+              course_with_student(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is set for users with observer enrollment" do
+              course_with_observer(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is not set for users with mixed teacher and student enrollment" do
+              course_with_teacher(user: @user, active_all: true)
+              course_with_student(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+          end
         end
       end
 
