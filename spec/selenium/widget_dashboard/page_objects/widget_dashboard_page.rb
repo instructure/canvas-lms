@@ -283,6 +283,50 @@ module WidgetDashboardPage
     "[data-testid='show-all-messages-link']"
   end
 
+  def recent_grades_widget_selector
+    "[data-testid='widget-container-recent_grades-widget']"
+  end
+
+  def recent_grade_course_name_prefix_selector
+    "[data-testid*='course-name-']"
+  end
+
+  def recent_grade_expand_button_selector(submission_id)
+    "[data-testid='expand-grade-#{submission_id}']"
+  end
+
+  def recent_grade_open_assignment_link_selector(submission_id)
+    "[data-testid='open-assignment-link-#{submission_id}']"
+  end
+
+  def recent_grade_whatif_link_selector(submission_id)
+    "[data-testid='open-whatif-link-#{submission_id}']"
+  end
+
+  def recent_grade_message_instructor_link_selector(submission_id)
+    "[data-testid='message-instructor-link-#{submission_id}']"
+  end
+
+  def recent_grade_view_feedback_link_selector(submission_id)
+    "[data-testid='view-inline-feedback-button-#{submission_id}']"
+  end
+
+  def recent_grade_feedback_section_selector(submission_id)
+    "[data-testid='feedback-section-#{submission_id}']"
+  end
+
+  def recent_grades_course_filter_selector
+    "[data-testid='course-filter-select']"
+  end
+
+  def recent_grades_view_all_link_selector
+    "[data-testid='view-all-grades-link']"
+  end
+
+  def recent_grades_empty_message_selector
+    "[data-testid='recent-grades-list']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -546,6 +590,51 @@ module WidgetDashboardPage
     f(inbox_show_all_messages_link_selector)
   end
 
+  # Recent grades widget elements
+  def recent_grades_widget
+    f(recent_grades_widget_selector)
+  end
+
+  def all_recent_grade_course_name
+    ff(recent_grade_course_name_prefix_selector)
+  end
+
+  def recent_grade_expand_button(submission_id)
+    f(recent_grade_expand_button_selector(submission_id))
+  end
+
+  def recent_grade_open_assignment_link(submission_id)
+    f(recent_grade_open_assignment_link_selector(submission_id))
+  end
+
+  def recent_grade_whatif_link(submission_id)
+    f(recent_grade_whatif_link_selector(submission_id))
+  end
+
+  def recent_grade_message_instructor_link(submission_id)
+    f(recent_grade_message_instructor_link_selector(submission_id))
+  end
+
+  def recent_grade_view_feedback_link(submission_id)
+    f(recent_grade_view_feedback_link_selector(submission_id))
+  end
+
+  def recent_grade_feedback_section(submission_id)
+    f(recent_grade_feedback_section_selector(submission_id))
+  end
+
+  def recent_grades_course_filter
+    f(recent_grades_course_filter_selector)
+  end
+
+  def recent_grades_view_all_link
+    f(recent_grades_view_all_link_selector)
+  end
+
+  def recent_grades_empty_message
+    f(recent_grades_empty_message_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -656,5 +745,17 @@ module WidgetDashboardPage
 
   def verify_inbox_message_count(expected_count)
     expect(all_inbox_message_items.size).to eq(expected_count)
+  end
+
+  def filter_recent_grades_by_course(course_name)
+    expect(recent_grades_course_filter).to be_displayed
+    recent_grades_course_filter.click
+    click_INSTUI_Select_option(recent_grades_course_filter_selector, course_name)
+    wait_for_ajaximations
+  end
+
+  def expand_feedback_on_recent_grade(submission_id)
+    expect(recent_grade_expand_button(submission_id)).to be_displayed
+    recent_grade_expand_button(submission_id).click
   end
 end
