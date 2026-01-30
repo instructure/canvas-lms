@@ -127,16 +127,27 @@ class OAuth2ProviderController < ApplicationController
         render layout: "mobile_auth", action: "confirm_mobile"
       end
     else
+      Rails.logger.error { "OAUTH_SESSION_FAIL[confirm]: session[:oauth2] is nil | #{loggable_session.inspect}" }
       flash[:error] = t("Must submit new OAuth2 request")
       redirect_to login_url
     end
   end
 
   def accept
+    unless session[:oauth2]
+      Rails.logger.error { "OAUTH_SESSION_FAIL[accept]: session[:oauth2] is nil | #{loggable_session.inspect}" }
+    end
     return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
 
     if Account.site_admin.feature_enabled?(:csrf_oauth2_fix)
+      unless session[:oauth2][:custom_csrf_token].present?
+        Rails.logger.error { "OAUTH_SESSION_FAIL[accept-csrf-missing]: #{loggable_session.inspect}" }
+      end
       return render plain: t("Missing custom CSRF token"), status: :bad_request unless session[:oauth2][:custom_csrf_token].present?
+
+      unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
+        Rails.logger.error { "OAUTH_SESSION_FAIL[accept-csrf-invalid]: expected=#{session[:oauth2][:custom_csrf_token]} | got=#{params[:custom_csrf_token]} | #{loggable_session.inspect}" }
+      end
       return render plain: t("Invalid custom CSRF token"), status: :bad_request unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
 
       session[:oauth2][:custom_csrf_token] = nil
@@ -246,5 +257,9 @@ class OAuth2ProviderController < ApplicationController
         mt "Instructure hosts Canvas Commons in the region chosen by your institution, which is the US. This means that when you use Canvas Commons your personal data will be stored and processed in the United States. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
       end
     end
+  end
+
+  def loggable_session
+    session.to_h.except("pseudonym_credentials")
   end
 end

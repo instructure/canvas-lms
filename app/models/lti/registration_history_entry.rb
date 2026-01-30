@@ -281,8 +281,8 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
         account_join = Lti::ContextControl.sanitize_sql(
           <<~SQL.squish
             INNER JOIN (VALUES #{account_values_clause}) AS account_pairs(account_id, deployment_id)
-            ON #{Lti::ContextControl.quoted_table_name}.account_id = account_pairs.account_id::integer
-            AND #{Lti::ContextControl.quoted_table_name}.deployment_id = account_pairs.deployment_id::integer
+            ON #{Lti::ContextControl.quoted_table_name}.account_id = account_pairs.account_id::bigint
+            AND #{Lti::ContextControl.quoted_table_name}.deployment_id = account_pairs.deployment_id::bigint
           SQL
         )
         queries << Lti::ContextControl.joins(account_join)
@@ -293,8 +293,8 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
         course_join = Lti::ContextControl.sanitize_sql(
           <<~SQL.squish
             INNER JOIN (VALUES #{course_values_clause}) AS course_pairs(course_id, deployment_id)
-            ON #{Lti::ContextControl.quoted_table_name}.course_id = course_pairs.course_id::integer
-            AND #{Lti::ContextControl.quoted_table_name}.deployment_id = course_pairs.deployment_id::integer
+            ON #{Lti::ContextControl.quoted_table_name}.course_id = course_pairs.course_id::bigint
+            AND #{Lti::ContextControl.quoted_table_name}.deployment_id = course_pairs.deployment_id::bigint
           SQL
         )
         queries << Lti::ContextControl.joins(course_join)
