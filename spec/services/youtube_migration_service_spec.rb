@@ -131,19 +131,9 @@ RSpec.describe YoutubeMigrationService do
 
       describe "if there are no new quizzes" do
         before do
-          assignment_relation = double("assignment_relation")
-          active_relation = double("active_relation")
-          quiz_relation = double("quiz_relation")
-          except_relation = double("except_relation")
-
-          allow(course).to receive(:assignments).and_return(assignment_relation)
-          allow(assignment_relation).to receive(:active).and_return(active_relation)
-          allow(active_relation).to receive_messages(
-            type_quiz_lti: quiz_relation,
-            except: except_relation
-          )
-          allow(quiz_relation).to receive(:any?).and_return(false)
-          allow(except_relation).to receive(:find_each).and_return([])
+          empty_relation = course.assignments.none
+          allow(course).to receive(:assignments).and_return(empty_relation)
+          allow(empty_relation).to receive_messages(active: empty_relation, type_quiz_lti: empty_relation, except: empty_relation)
         end
 
         it "does not emit a live event" do
@@ -155,27 +145,10 @@ RSpec.describe YoutubeMigrationService do
       end
 
       it "emits a live event with the right parameters" do
-        assignment_relation = double("assignment_relation")
-        active_relation = double("active_relation")
-        quiz_relation = double("quiz_relation")
-        except_relation = double("except_relation")
-        last_assignment = double("last_assignment")
-        external_tool_tag = double("external_tool_tag")
-
-        allow(course).to receive(:assignments).and_return(assignment_relation)
-        allow(assignment_relation).to receive(:active).and_return(active_relation)
-        allow(active_relation).to receive_messages(
-          type_quiz_lti: quiz_relation,
-          except: except_relation
-        )
-        allow(quiz_relation).to receive_messages(
-          any?: true,
-          last: last_assignment
-        )
-        allow(last_assignment).to receive(:external_tool_tag).and_return(external_tool_tag)
-        allow(external_tool_tag).to receive(:content_id).and_return("external_tool_123")
-        allow(except_relation).to receive(:find_each).and_return([])
-        allow(course).to receive_messages(global_id: "course_global_id_123", id: 1)
+        external_tool_tag = instance_double(ContentTag, content_id: "external_tool_123")
+        last_assignment = instance_double(Assignment, external_tool_tag:)
+        relation = class_double(Assignment, any?: true, last: last_assignment).as_null_object
+        allow(course).to receive_messages(global_id: "course_global_id_123", id: 1, assignments: relation)
 
         expect(Canvas::LiveEvents).to receive(:scan_youtube_links) do |payload|
           expect(payload.scan_id).to eq(Progress.last.id)
@@ -2621,11 +2594,9 @@ RSpec.describe YoutubeMigrationService do
       Account.site_admin.enable_feature!(:new_quizzes_scanning_youtube_links)
 
       # Stub the assignment chain for new_quizzes? and call_external_tool
-      external_tool_tag = double(content_id: 1)
-      quiz_assignment = double(external_tool_tag:)
-      quiz_lti_scope = double(any?: true, last: quiz_assignment)
-      active_scope = double(type_quiz_lti: quiz_lti_scope)
-      assignments = double(active: active_scope)
+      external_tool_tag = instance_double(ContentTag, content_id: 1)
+      quiz_assignment = instance_double(Assignment, external_tool_tag:)
+      assignments = class_double(Assignment, any?: true, last: quiz_assignment).as_null_object
 
       allow_any_instance_of(Course).to receive(:assignments).and_return(assignments)
     end

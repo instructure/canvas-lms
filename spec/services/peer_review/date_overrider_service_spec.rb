@@ -631,8 +631,8 @@ RSpec.describe PeerReview::DateOverriderService do
         existing_override1
         existing_override2
         existing_override3
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "partitions overrides correctly" do
@@ -669,8 +669,8 @@ RSpec.describe PeerReview::DateOverriderService do
         existing_override1
         existing_override2
         existing_override3
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "calls only the updater service" do
@@ -697,8 +697,8 @@ RSpec.describe PeerReview::DateOverriderService do
       before do
         existing_override1
         existing_override2
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "calls only the creator service" do
@@ -729,8 +729,8 @@ RSpec.describe PeerReview::DateOverriderService do
       before do
         existing_override1
         existing_override2
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "calls neither service" do
@@ -755,8 +755,8 @@ RSpec.describe PeerReview::DateOverriderService do
       let(:overrides) { [create_override1, create_override2] }
 
       before do
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "calls only the creator service" do

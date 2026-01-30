@@ -75,10 +75,10 @@ describe RubricLLMService do
   shared_context "llm config for regenerate criteria" do
     before do
       allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criteria").and_return(
-        double("LLMConfig",
-               name: "rubric-regenerate-criteriaV2",
-               model_id: "anthropic.claude-3-haiku-20240307-v1:0",
-               generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+        instance_double(LLMConfig,
+                        name: "rubric-regenerate-criteriaV2",
+                        model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                        generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
       )
     end
   end
@@ -86,10 +86,10 @@ describe RubricLLMService do
   shared_context "llm config for regenerate criterion" do
     before do
       allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criterion").and_return(
-        double("LLMConfig",
-               name: "rubric-regenerate-criterionV2",
-               model_id: "anthropic.claude-3-haiku-20240307-v1:0",
-               generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+        instance_double(LLMConfig,
+                        name: "rubric-regenerate-criterionV2",
+                        model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                        generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
       )
     end
   end
@@ -1645,7 +1645,7 @@ describe RubricLLMService do
 
       it "handles unexpected response formats from LLM service" do
         expect(CedarClient).to receive(:conversation).and_return(
-          double("BadResponse", response: nil)
+          cedar_response_struct.new(response: nil)
         )
 
         expect do
@@ -1768,10 +1768,10 @@ describe RubricLLMService do
 
       it "gracefully handles criterion_id that doesn't exist" do
         allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criterion").and_return(
-          double("LLMConfig",
-                 name: "rubric-regenerate-criterionV2",
-                 model_id: "anthropic.claude-3-haiku-20240307-v1:0",
-                 generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+          instance_double(LLMConfig,
+                          name: "rubric-regenerate-criterionV2",
+                          model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                          generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
         )
 
         response_text = <<~TEXT

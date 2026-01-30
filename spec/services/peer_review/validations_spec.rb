@@ -666,7 +666,7 @@ RSpec.describe PeerReview::Validations do
   end
 
   describe "#validate_override_exists" do
-    let(:mock_override) { double("override") }
+    let(:mock_override) { instance_double(AssignmentOverride) }
 
     it "does not raise an error when override is present" do
       expect { service.validate_override_exists(mock_override) }.not_to raise_error
@@ -695,7 +695,7 @@ RSpec.describe PeerReview::Validations do
   end
 
   describe "#validate_section_exists" do
-    let(:mock_section) { double("section") }
+    let(:mock_section) { instance_double(CourseSection) }
 
     it "does not raise an error when section is present" do
       expect { service.validate_section_exists(mock_section) }.not_to raise_error
@@ -724,7 +724,7 @@ RSpec.describe PeerReview::Validations do
   end
 
   describe "#validate_course_exists" do
-    let(:mock_course) { double("course") }
+    let(:mock_course) { instance_double(Course) }
 
     it "does not raise an error when course is present" do
       expect { service.validate_course_exists(mock_course) }.not_to raise_error
@@ -905,7 +905,7 @@ RSpec.describe PeerReview::Validations do
   describe "#validate_adhoc_parent_override_exists" do
     let(:students) { create_users_in_course(course, 3, return_type: :record) }
     let(:student_ids) { students.map(&:id) }
-    let(:mock_parent_override) { double("parent_override") }
+    let(:mock_parent_override) { instance_double(AssignmentOverride) }
 
     it "does not raise an error when parent override is present" do
       expect { service.validate_adhoc_parent_override_exists(mock_parent_override, student_ids) }.not_to raise_error
@@ -954,7 +954,7 @@ RSpec.describe PeerReview::Validations do
 
   describe "#validate_course_parent_override_exists" do
     let(:course_id) { course.id }
-    let(:mock_parent_override) { double("parent_override") }
+    let(:mock_parent_override) { instance_double(AssignmentOverride) }
 
     it "does not raise an error when parent override is present" do
       expect { service.validate_course_parent_override_exists(mock_parent_override, course_id) }.not_to raise_error
@@ -1003,7 +1003,7 @@ RSpec.describe PeerReview::Validations do
     let(:group_category) { course.group_categories.create!(name: "Project Groups") }
     let(:group) { group_category.groups.create!(context: course, name: "Group 1") }
     let(:group_id) { group.id }
-    let(:mock_parent_override) { double("parent_override") }
+    let(:mock_parent_override) { instance_double(AssignmentOverride) }
 
     it "does not raise an error when parent override is present" do
       expect { service.validate_group_parent_override_exists(mock_parent_override, group_id) }.not_to raise_error
@@ -1051,7 +1051,7 @@ RSpec.describe PeerReview::Validations do
   describe "#validate_section_parent_override_exists" do
     let(:section) { add_section("Test Section", course:) }
     let(:section_id) { section.id }
-    let(:mock_parent_override) { double("parent_override") }
+    let(:mock_parent_override) { instance_double(AssignmentOverride) }
 
     it "does not raise an error when parent override is present" do
       expect { service.validate_section_parent_override_exists(mock_parent_override, section_id) }.not_to raise_error
@@ -1098,8 +1098,8 @@ RSpec.describe PeerReview::Validations do
 
   describe "#validate_override_dates_against_parent_override" do
     let(:parent_override) do
-      double(
-        "parent_override",
+      instance_double(
+        AssignmentOverride,
         unlock_at: 1.day.from_now,
         unlock_at_overridden: true,
         due_at: nil,
@@ -1177,8 +1177,8 @@ RSpec.describe PeerReview::Validations do
         )
       end
       let(:parent_override_no_unlock) do
-        double(
-          "parent_override",
+        instance_double(
+          AssignmentOverride,
           unlock_at: nil,
           unlock_at_overridden: false,
           due_at: nil,
@@ -1211,8 +1211,8 @@ RSpec.describe PeerReview::Validations do
         )
       end
       let(:parent_override_no_lock) do
-        double(
-          "parent_override",
+        instance_double(
+          AssignmentOverride,
           unlock_at: 1.day.from_now,
           unlock_at_overridden: true,
           due_at: nil,
@@ -1296,8 +1296,8 @@ RSpec.describe PeerReview::Validations do
 
       it "raises error when string dates violate parent constraints" do
         base_time = Time.zone.now
-        parent_override_with_dates = double(
-          "parent_override",
+        parent_override_with_dates = instance_double(
+          AssignmentOverride,
           unlock_at: base_time + 1.day,
           unlock_at_overridden: true,
           due_at: nil,
@@ -1481,8 +1481,8 @@ RSpec.describe PeerReview::Validations do
 
       context "when validating unlock_at with time precision" do
         let(:parent_override_with_time) do
-          double(
-            "parent_override",
+          instance_double(
+            AssignmentOverride,
             unlock_at: base_time,
             unlock_at_overridden: true,
             due_at: nil,
@@ -1550,8 +1550,8 @@ RSpec.describe PeerReview::Validations do
 
       context "when validating due_at with time precision" do
         let(:parent_override_with_time) do
-          double(
-            "parent_override",
+          instance_double(
+            AssignmentOverride,
             unlock_at: base_time,
             unlock_at_overridden: true,
             due_at: nil,
@@ -1581,8 +1581,8 @@ RSpec.describe PeerReview::Validations do
         end
 
         it "validates unlock_at first when both unlock_at and due_at are before parent unlock_at" do
-          parent_override_late_unlock = double(
-            "parent_override",
+          parent_override_late_unlock = instance_double(
+            AssignmentOverride,
             unlock_at: base_time + 1.week,
             unlock_at_overridden: true,
             due_at: nil,
@@ -1605,8 +1605,8 @@ RSpec.describe PeerReview::Validations do
 
       context "when validating lock_at with time precision" do
         let(:parent_override_with_time) do
-          double(
-            "parent_override",
+          instance_double(
+            AssignmentOverride,
             unlock_at: base_time,
             unlock_at_overridden: true,
             due_at: nil,
@@ -1661,8 +1661,8 @@ RSpec.describe PeerReview::Validations do
 
         it "raises error when dates match but time is later" do
           parent_lock_time = Time.zone.parse("2025-01-29 14:30:00")
-          parent_override_late = double(
-            "parent_override",
+          parent_override_late = instance_double(
+            AssignmentOverride,
             unlock_at: base_time,
             unlock_at_overridden: true,
             due_at: nil,
@@ -1685,8 +1685,8 @@ RSpec.describe PeerReview::Validations do
 
       context "when validating due_at against lock_at with time precision" do
         let(:parent_override_with_time) do
-          double(
-            "parent_override",
+          instance_double(
+            AssignmentOverride,
             unlock_at: base_time,
             unlock_at_overridden: true,
             due_at: nil,
@@ -1733,8 +1733,8 @@ RSpec.describe PeerReview::Validations do
           utc_time = Time.utc(2025, 1, 15, 14, 30, 0)
           pacific_time = Time.find_zone("America/Los_Angeles").parse("2025-01-15 06:30:00")
 
-          parent_override_utc = double(
-            "parent_override",
+          parent_override_utc = instance_double(
+            AssignmentOverride,
             unlock_at: utc_time,
             unlock_at_overridden: true,
             due_at: nil,
@@ -1767,8 +1767,8 @@ RSpec.describe PeerReview::Validations do
           )
         end
         let(:parent_override_with_flag_false) do
-          double(
-            "parent_override",
+          instance_double(
+            AssignmentOverride,
             unlock_at: 2.days.from_now,
             unlock_at_overridden: false,
             due_at: nil,
@@ -1831,8 +1831,8 @@ RSpec.describe PeerReview::Validations do
           )
         end
         let(:parent_override_with_flag_false) do
-          double(
-            "parent_override",
+          instance_double(
+            AssignmentOverride,
             unlock_at: 1.day.from_now,
             unlock_at_overridden: true,
             due_at: nil,
@@ -1895,8 +1895,8 @@ RSpec.describe PeerReview::Validations do
           )
         end
         let(:parent_override_both_flags_false) do
-          double(
-            "parent_override",
+          instance_double(
+            AssignmentOverride,
             unlock_at: 2.days.from_now,
             unlock_at_overridden: false,
             due_at: nil,
@@ -1939,8 +1939,8 @@ RSpec.describe PeerReview::Validations do
     context "boundary conditions with exact date equality" do
       let(:base_time) { Time.zone.parse("2025-01-15 12:00:00") }
       let(:parent_override_with_dates) do
-        double(
-          "parent_override",
+        instance_double(
+          AssignmentOverride,
           unlock_at: base_time,
           unlock_at_overridden: true,
           due_at: nil,
@@ -2114,8 +2114,8 @@ RSpec.describe PeerReview::Validations do
       let(:service_with_due_at) { test_service_class.new(parent_assignment: parent_assignment_with_due_at) }
 
       let(:parent_override_with_due_at) do
-        double(
-          "parent_override",
+        instance_double(
+          AssignmentOverride,
           unlock_at: base_time + 1.day,
           unlock_at_overridden: true,
           due_at: base_time + 1.week,
@@ -2151,8 +2151,8 @@ RSpec.describe PeerReview::Validations do
       end
 
       it "does not raise an error when parent override unlock_at equals due_at" do
-        parent_override_equal_dates = double(
-          "parent_override",
+        parent_override_equal_dates = instance_double(
+          AssignmentOverride,
           unlock_at: base_time + 1.day,
           unlock_at_overridden: true,
           due_at: base_time + 1.day,
@@ -2188,8 +2188,8 @@ RSpec.describe PeerReview::Validations do
       end
 
       it "does not validate against parent due_at when due_at_overridden is false" do
-        parent_override_no_due_at = double(
-          "parent_override",
+        parent_override_no_due_at = instance_double(
+          AssignmentOverride,
           unlock_at: base_time + 1.day,
           unlock_at_overridden: true,
           due_at: base_time + 1.week,
@@ -2301,8 +2301,8 @@ RSpec.describe PeerReview::Validations do
       context "with invalid date combinations" do
         it "does not raise an error when parent unlock_at equals parent due_at" do
           # Use a mock to avoid ActiveRecord validations
-          parent_with_equal_dates = double(
-            "parent_assignment",
+          parent_with_equal_dates = instance_double(
+            Assignment,
             unlock_at: base_time + 1.day,
             due_at: base_time + 1.day,
             lock_at: base_time + 2.weeks
@@ -2320,8 +2320,8 @@ RSpec.describe PeerReview::Validations do
 
         it "raises an error when parent unlock_at is after parent due_at" do
           # Use a mock to avoid ActiveRecord validations
-          parent_with_invalid_dates = double(
-            "parent_assignment",
+          parent_with_invalid_dates = instance_double(
+            Assignment,
             unlock_at: base_time + 1.week,
             due_at: base_time + 1.day,
             lock_at: base_time + 2.weeks
@@ -2358,8 +2358,8 @@ RSpec.describe PeerReview::Validations do
         it "raises an error when child due_at is before parent due_at (with nil unlock_at)" do
           # This scenario can only occur when child unlock_at is nil
           # (otherwise parent_due_at <= child_unlock_at < child_due_at makes it impossible)
-          parent_with_late_due = double(
-            "parent_assignment",
+          parent_with_late_due = instance_double(
+            Assignment,
             unlock_at: base_time + 1.day,
             due_at: base_time + 15.days,
             lock_at: base_time + 3.weeks
@@ -2380,8 +2380,8 @@ RSpec.describe PeerReview::Validations do
 
         it "raises parent unlock/due validation error before child validation errors" do
           # Use a mock to avoid ActiveRecord validations
-          parent_with_invalid_dates = double(
-            "parent_assignment",
+          parent_with_invalid_dates = instance_double(
+            Assignment,
             unlock_at: base_time + 1.week,
             due_at: base_time + 1.day,
             lock_at: base_time + 2.weeks
@@ -2499,8 +2499,8 @@ RSpec.describe PeerReview::Validations do
       context "error message internationalization" do
         it "calls I18n.t for parent unlock/due validation error" do
           # Use a mock to avoid ActiveRecord validations
-          parent_with_invalid_dates = double(
-            "parent_assignment",
+          parent_with_invalid_dates = instance_double(
+            Assignment,
             unlock_at: base_time + 1.week,
             due_at: base_time + 1.day,
             lock_at: base_time + 2.weeks
@@ -2534,8 +2534,8 @@ RSpec.describe PeerReview::Validations do
 
         it "calls I18n.t for child due before parent due error" do
           # This scenario can only occur when child unlock_at is nil
-          parent_with_late_due = double(
-            "parent_assignment",
+          parent_with_late_due = instance_double(
+            Assignment,
             unlock_at: base_time + 1.day,
             due_at: base_time + 15.days,
             lock_at: base_time + 3.weeks
