@@ -86,6 +86,12 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
               disabled={disabled}
               renderIcon={disabled ? undefined : <IconAddLine />}
               display="block"
+              data-testid="add-widget-button"
+              aria-label={
+                disabled
+                  ? I18n.t('%{widgetName} Added', {widgetName: displayName})
+                  : I18n.t('Add %{widgetName}', {widgetName: displayName})
+              }
             >
               {disabled ? I18n.t('Added') : I18n.t('Add')}
             </Button>

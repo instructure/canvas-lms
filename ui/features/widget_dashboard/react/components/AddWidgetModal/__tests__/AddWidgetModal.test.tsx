@@ -103,7 +103,7 @@ describe('AddWidgetModal', () => {
   it('renders Add buttons for all widgets', () => {
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    const addButtons = screen.getAllByTestId('add-widget-button')
     expect(addButtons).toHaveLength(8)
   })
 
@@ -111,7 +111,7 @@ describe('AddWidgetModal', () => {
     const user = userEvent.setup()
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    const addButtons = screen.getAllByTestId('add-widget-button')
     await user.click(addButtons[0])
 
     expect(mockAddWidget).toHaveBeenCalledWith(
@@ -126,7 +126,7 @@ describe('AddWidgetModal', () => {
     const user = userEvent.setup()
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    const addButtons = screen.getAllByTestId('add-widget-button')
     await user.click(addButtons[0])
 
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1)
@@ -170,7 +170,8 @@ describe('AddWidgetModal', () => {
 
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addedButton = screen.getByRole('button', {name: 'Added'})
+    const courseWorkCard = screen.getByTestId('widget-card-course_work_combined')
+    const addedButton = courseWorkCard.querySelector('[data-testid="add-widget-button"]')
     expect(addedButton).toBeDisabled()
   })
 
@@ -195,10 +196,9 @@ describe('AddWidgetModal', () => {
 
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addButtons = screen.getAllByRole('button', {name: 'Add'})
-    addButtons.forEach(button => {
-      expect(button).not.toBeDisabled()
-    })
+    const courseGradesCard = screen.getByTestId('widget-card-course_grades')
+    const addButton = courseGradesCard.querySelector('[data-testid="add-widget-button"]')
+    expect(addButton).not.toBeDisabled()
   })
 
   it('does not call addWidget when clicking disabled button', async () => {
@@ -223,7 +223,9 @@ describe('AddWidgetModal', () => {
     const user = userEvent.setup()
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addedButton = screen.getByRole('button', {name: 'Added'})
+    const courseWorkCard = screen.getByTestId('widget-card-course_work_combined')
+    const addedButton = courseWorkCard.querySelector('[data-testid="add-widget-button"]')
+    if (!addedButton) throw new Error('Added button not found')
     await user.click(addedButton)
 
     expect(mockAddWidget).not.toHaveBeenCalled()
