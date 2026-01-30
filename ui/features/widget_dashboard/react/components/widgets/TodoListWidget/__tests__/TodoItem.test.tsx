@@ -90,14 +90,14 @@ describe('TodoItem', () => {
     const item = mockPlannerItems[0]
     renderWithProvider(<TodoItem item={item} />)
 
-    expect(screen.getByText(/100 pts/)).toBeInTheDocument()
+    expect(screen.getByText(/100 points/)).toBeInTheDocument()
   })
 
   it('does not display points for items without points_possible', () => {
     const item = mockPlannerItems[3]
     renderWithProvider(<TodoItem item={item} />)
 
-    expect(screen.queryByText('pts')).not.toBeInTheDocument()
+    expect(screen.queryByText('points')).not.toBeInTheDocument()
   })
 
   it('displays item type label', () => {

@@ -70,6 +70,8 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
       borderRadius="large"
       background="secondary"
       data-testid={`todo-item-${item.plannable_id}`}
+      role="group"
+      aria-label={item.plannable?.title ?? I18n.t('Unnamed To-Do')}
       themeOverride={{
         backgroundSecondary: '#F9FAFA',
       }}
@@ -126,15 +128,17 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
                 )}
                 {dateText &&
                   item.plannable.points_possible !== undefined &&
-                  item.plannable.points_possible !== null && (
+                  item.plannable.points_possible !== null &&
+                  item.plannable.points_possible > 0 && (
                     <Text size="small" color="secondary">
                       {' | '}
                     </Text>
                   )}
                 {item.plannable.points_possible !== undefined &&
-                  item.plannable.points_possible !== null && (
+                  item.plannable.points_possible !== null &&
+                  item.plannable.points_possible > 0 && (
                     <Text size="small" color="secondary">
-                      {item.plannable.points_possible} pts
+                      {I18n.t('%{points} points', {points: item.plannable.points_possible})}
                     </Text>
                   )}
               </Text>
