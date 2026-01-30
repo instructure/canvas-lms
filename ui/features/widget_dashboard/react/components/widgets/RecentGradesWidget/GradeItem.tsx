@@ -118,7 +118,13 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
 
   if (isMobile) {
     return (
-      <View as="div" padding="small 0" data-testid={`grade-item-${submission._id}`}>
+      <View
+        as="div"
+        padding="small 0"
+        data-testid={`grade-item-${submission._id}`}
+        role="group"
+        aria-label={submission.assignment.name}
+      >
         <Flex direction="column" gap="x-small">
           <Flex.Item>{assignmentTitle}</Flex.Item>
           <Flex.Item>{timestamp}</Flex.Item>
@@ -143,7 +149,12 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
   }
 
   return (
-    <View as="div" data-testid={`grade-item-${submission._id}`}>
+    <View
+      as="div"
+      data-testid={`grade-item-${submission._id}`}
+      role="group"
+      aria-label={submission.assignment.name}
+    >
       <Flex direction="column" gap="x-small">
         <Flex.Item padding="small">
           <Flex gap="small" alignItems="center">
