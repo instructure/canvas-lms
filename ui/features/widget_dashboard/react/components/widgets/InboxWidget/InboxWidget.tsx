@@ -94,7 +94,7 @@ const InboxWidget: React.FC<BaseWidgetProps> = ({widget, isEditMode = false, dra
   const renderActions = () => (
     <View as="div" textAlign="center">
       <Link href="/conversations" isWithinText={false} data-testid="show-all-messages-link">
-        <Text size="small">{I18n.t('Show all messages in inbox')}</Text>
+        <Text size="small">{I18n.t('View all messages in inbox')}</Text>
       </Link>
     </View>
   )
