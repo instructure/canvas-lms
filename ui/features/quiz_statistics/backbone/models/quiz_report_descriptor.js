@@ -71,6 +71,10 @@ export default {
         'Report can not be generated for Survey Quizzes.',
       )
     } else if (report.isGenerated) {
+      // Guard against missing file data during race conditions
+      if (!report.file || !report.file.createdAt) {
+        return I18n.t('generatable', 'Report has never been generated.')
+      }
       return I18n.t('generated_at', 'Generated: %{date}', {
         date: friendlyDatetime(fudgeDateForProfileTimezone(report.file.createdAt)),
       })
