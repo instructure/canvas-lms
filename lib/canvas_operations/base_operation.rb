@@ -133,6 +133,8 @@ module CanvasOperations
 
       run_callbacks :run do
         unless Shard.current == switchman_shard
+          # We intentionally do not call fail_with_error! here because we are on the wrong shard and subclasses may be
+          # making assumptions about what shard the failure callbacks run on.
           raise Errors::WrongShard, "Operation is being run on the wrong shard. Expected #{switchman_shard.id}, got #{Shard.current.id}"
         end
 

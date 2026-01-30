@@ -150,4 +150,87 @@ A data fixup operation and associated files can be generated with `rails g data_
 
 See [`lib/canvas_operations/base_concerns/settings.rb`](lib/canvas_operations/base_concerns/settings.rb) for more details on using operation settings.
 
+### RootAccountOperation
 
+The `RootAccountOperation` class is designed for operations that need to run per root account. This is essential when you need to execute the same operation across multiple accounts with proper isolation and context.
+
+Key features:
+- **Automatic shard binding** based on the root account's shard
+- **PluginSetting context wrapping** via `PluginSetting.with_account` (when available)
+- **Unique singleton job keys** per root account to allow concurrent execution across different accounts
+- **Progress tracking** scoped to each root account
+
+To use this operation, create a subclass of `CanvasOperations::RootAccountOperation`:
+
+```ruby
+class NotifyAccountAdmins < CanvasOperations::RootAccountOperation
+  # define callbacks for your operation
+  before_run :validate_feature_prerequisites
+  after_run :notify_stakeholders
+  after_failure :notify_engineering_team
+
+  def execute
+    admin_count = 0
+    root_account.account_users.active.each do |account_user|
+      send_notification(account_user.user)
+      admin_count += 1
+    end
+
+    results[:admin_count] = admin_count
+    results[:root_account_id] = root_account.global_id
+    log_message("Notified #{admin_count} admins for account #{root_account.global_id}")
+  end
+
+  def validate_feature_prerequisites
+    raise "Prerequisites not met!" unless ...
+  end
+
+  def notify_stakeholders
+    SlackClient.post_message(
+      channel: stakeholder_notification_channel,
+      text: "The following features have been enabled: #{feature_list}"
+    )
+  end
+
+  def notify_engineering_team
+    SlackClient.post_message(
+      channel: "#engineering-alerts",
+      text: "#{name} failed! Please investigate."
+    )
+  end
+
+  private
+
+  def send_notification(user)
+    # Send notification logic here
+  end
+end
+```
+
+Run the operation for a specific account:
+
+```ruby
+NotifyAccountAdmins.new(
+  root_account: Account.find(123),
+).run_later
+```
+
+Run the operation for all active accounts:
+
+```ruby
+Account.root_accounts.active.find_each do |account|
+  NotifyAccountAdmins.new(
+    root_account: account,
+  ).run_later
+end
+```
+
+**Important characteristics:**
+
+- Each account gets its own delayed job with a unique singleton key: `operations/{operation_name}/shards/{shard_id}/accounts/{account_global_id}`
+- Operations for different accounts can run concurrently
+- Operations for the same account are deduplicated (only one pending/running job per account)
+- The delayed job's `shard` and `account` attributes are automatically set correctly
+- Progress records are associated with the root account (not the cluster primary)
+
+See [`lib/canvas_operations/root_account_operation.rb`](../lib/canvas_operations/root_account_operation.rb) for implementation details.
