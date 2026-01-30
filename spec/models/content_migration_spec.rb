@@ -250,7 +250,7 @@ describe ContentMigration do
     end
 
     it "records the job id" do
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
       cm = setup_zip_import(@course)
       test_zip_import(@course, cm)
       expect(cm.reload.migration_settings[:job_ids]).to eq([123])

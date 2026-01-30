@@ -233,7 +233,7 @@ describe BrandConfig do
     describe "with cdn enabled" do
       before do
         expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(true)
-        s3 = double(bucket: nil)
+        s3 = instance_double(Aws::S3::Resource, bucket: nil)
         allow(Aws::S3::Resource).to receive(:new).and_return(s3)
         @upload_expectation = expect(@subaccount_bc.s3_uploader).to receive(:upload_file).exactly(3).times
         expect(File).to receive(:delete).exactly(3).times

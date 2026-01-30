@@ -24,7 +24,7 @@ describe AssignmentConfigurationToolLookup do
 
   let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
   let(:test_id) { SecureRandom.uuid }
-  let(:stub_response) { double(code: 200, parsed_response: { "Id" => test_id }, ok?: true) }
+  let(:stub_response) { instance_double(HTTParty::Response, code: 200, parsed_response: { "Id" => test_id }, ok?: true) }
   let(:assignment) { assignment_model(course:) }
 
   before do

@@ -7729,7 +7729,7 @@ describe Course do
       end
 
       context "when module not exist on the course" do
-        subject { @course.visible_module_items_by_module(@teacher, double("mock", id: "noop")) }
+        subject { @course.visible_module_items_by_module(@teacher, instance_double(ContextModule, id: "noop")) }
 
         it "should return empty list" do
           expect(subject.length).to be(0)
@@ -7753,7 +7753,7 @@ describe Course do
       end
 
       context "when module not exist on the course" do
-        subject { @course.visible_module_items_by_module(@student, double("mock", id: "noop")) }
+        subject { @course.visible_module_items_by_module(@student, instance_double(ContextModule, id: "noop")) }
 
         it "should return empty list" do
           expect(subject.length).to be(0)
@@ -9576,7 +9576,7 @@ describe Course do
     end
 
     let(:regular_account) { Account.create! }
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(enabled?: true, ingest_url: true, ingest_html: true)
@@ -9717,11 +9717,12 @@ describe Course do
 
     describe "#exceeds_accessibility_scan_limit?" do
       before do
-        allow(course.wiki_pages).to receive(:not_deleted).and_return(double(count: wiki_count))
-        active_assignments = double(not_excluded_from_accessibility_scan: double(count: assignment_count))
+        allow(course.wiki_pages).to receive(:not_deleted).and_return(instance_double(ActiveRecord::Relation, count: wiki_count))
+        not_excluded = instance_double(ActiveRecord::Relation, count: assignment_count)
+        active_assignments = class_double(Assignment, not_excluded_from_accessibility_scan: not_excluded)
         allow(course.assignments).to receive(:active).and_return(active_assignments)
-        allow(course.discussion_topics).to receive(:scannable).and_return(double(count: discussion_topic_count))
-        allow(course.announcements).to receive(:active).and_return(double(count: announcement_count))
+        allow(course.discussion_topics).to receive(:scannable).and_return(instance_double(ActiveRecord::Relation, count: discussion_topic_count))
+        allow(course.announcements).to receive(:active).and_return(instance_double(ActiveRecord::Relation, count: announcement_count))
       end
 
       context "when total resources exceed limit" do
@@ -9880,7 +9881,7 @@ describe Course do
         course.restrict_enrollments_to_course_dates = true
       else
         course.restrict_enrollments_to_course_dates = false
-        enrollment_term = double("EnrollmentTerm", start_at:, end_at:)
+        enrollment_term = instance_double(EnrollmentTerm, start_at:, end_at:)
         allow(course).to receive(:enrollment_term).and_return(enrollment_term)
       end
       expect(course.active_now?).to eq(expected)

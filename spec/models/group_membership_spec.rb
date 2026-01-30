@@ -80,8 +80,8 @@ describe GroupMembership do
     it "has a validation error on new record" do
       membership = GroupMembership.new
 
-      allow(membership).to receive_messages(user: double(name: "test user"),
-                                            group: double(name: "test group"),
+      allow(membership).to receive_messages(user: instance_double(User, name: "test user"),
+                                            group: instance_double(Group, name: "test group"),
                                             restricted_self_signup?: true,
                                             has_common_section_with_me?: false)
       expect(membership.save).not_to be_truthy

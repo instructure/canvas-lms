@@ -1248,7 +1248,7 @@ describe Quizzes::Quiz do
   describe "#group_category_id" do
     it "returns the assignment's group category id if it has an assignment" do
       quiz = Quizzes::Quiz.new(title: "Assignment Group Category Quizzes::Quiz")
-      expect(quiz).to receive(:assignment).and_return double(group_category_id: 1)
+      expect(quiz).to receive(:assignment).and_return instance_double(Assignment, group_category_id: 1)
       expect(quiz.group_category_id).to eq 1
     end
 

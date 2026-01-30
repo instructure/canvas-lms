@@ -135,7 +135,7 @@ describe PageView do
 
     let(:params) { { action: "path", controller: "some" } }
     let(:session) { { id: "42" } }
-    let(:request) { double(url: @url || "host.com/some/path", path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0", request_method: "GET") }
+    let(:request) { instance_double(ActionDispatch::Request, url: @url || "host.com/some/path", path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0", request_method: "GET") }
     let(:user) { User.new }
     let(:attributes) { { real_user: user, user: } }
 
@@ -223,11 +223,11 @@ describe PageView do
       pv = PageView.generate(request, attributes)
       pv.update_attribute(:url, "http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET")
       pv.reload
-      expect(pv.url).to eq  "http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]"
+      expect(pv.url).to eq "http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]"
     end
 
     it "forces encoding on string fields" do
-      request = double(url: @url || "host.com/some/path", path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0".encode(Encoding::US_ASCII), request_method: "GET")
+      request = instance_double(ActionDispatch::Request, url: @url || "host.com/some/path", path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0".encode(Encoding::US_ASCII), request_method: "GET")
       pv = PageView.generate(request, attributes)
 
       expect(pv.remote_ip.encoding).to eq Encoding::UTF_8
@@ -357,7 +357,7 @@ describe PageView do
     it "when developer_key_id obtained return app name" do
       @attributes["developer_key_id"] = "10000000000001"
       pv = PageView.from_attributes(@attributes)
-      allow(DeveloperKey).to receive(:find_cached).and_return(double(name: "Test App"))
+      allow(DeveloperKey).to receive(:find_cached).and_return(instance_double(DeveloperKey, name: "Test App"))
 
       expect(pv.app_name).to eq "Test App"
     end

@@ -1642,7 +1642,7 @@ describe WikiPage do
     end
     let(:regular_course) { Course.create! }
     let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive(:enabled?).and_return(true)
@@ -1711,7 +1711,7 @@ describe WikiPage do
       course
     end
     let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive(:enabled?).and_return(true)
@@ -1733,7 +1733,7 @@ describe WikiPage do
   describe "#ingest_to_pine" do
     let(:course) { Course.create! }
     let(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(enabled?: true, ingest_html: true)
@@ -1818,7 +1818,7 @@ describe WikiPage do
       course
     end
     let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
     let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
 
     before do

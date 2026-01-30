@@ -772,7 +772,7 @@ module Lti
           workflow_state: "active"
         )
 
-        psh = double("PlagiarismSubscriptionsHelper")
+        psh = instance_double(Lti::PlagiarismSubscriptionsHelper)
         expect(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
         expect(psh).to receive(:create_subscription).and_return("subscription_id2")
         tool_proxy.context = course_factory(account:)

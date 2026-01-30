@@ -82,11 +82,12 @@ describe Accessibility::Rules::TableCaptionRule do
     end
 
     it "calls the correct method on caption" do
-      elem = double("Element", tag_name: "table")
-      caption = double("Caption", text: "Valid Caption")
-      allow(elem).to receive(:query_selector).with("caption").and_return(caption)
+      doc = Nokogiri::HTML::DocumentFragment.parse("<table><caption>Valid Caption</caption><tr><td>Data</td></tr></table>")
+      extend_nokogiri_with_dom_adapter(doc)
+      elem = doc.at_css("table")
+      caption = elem.at_css("caption")
 
-      expect(caption).to receive(:text).and_return("Valid Caption")
+      expect(caption).to receive(:text).and_call_original
       expect(caption).not_to receive(:text_content)
 
       Accessibility::Rules::TableCaptionRule.new.test(elem)

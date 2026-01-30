@@ -80,14 +80,14 @@ describe DeveloperKey do
 
       context "with plugin configuration available" do
         it "returns the mobile timeout from session settings" do
-          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 45 }))
+          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(instance_double(Canvas::Plugin, settings: { mobile_timeout: 45 }))
           expect(developer_key.tokens_expire_in).to eq(45.minutes)
         end
       end
 
       context "without plugin configuration" do
         it "falls back to the mobile_public_client_token_ttl_days setting" do
-          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: {}))
+          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(instance_double(Canvas::Plugin, settings: {}))
           allow(Setting).to receive(:get).with("mobile_public_client_token_ttl_days", "90").and_return("30")
           expect(developer_key.tokens_expire_in).to eq(30.days)
         end
@@ -101,14 +101,14 @@ describe DeveloperKey do
 
       context "with plugin configuration available" do
         it "returns the mobile timeout from session settings" do
-          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 60 }))
+          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(instance_double(Canvas::Plugin, settings: { mobile_timeout: 60 }))
           expect(developer_key.tokens_expire_in).to eq(60.minutes)
         end
       end
 
       context "without plugin configuration" do
         it "returns nil (no expiration)" do
-          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: {}))
+          allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(instance_double(Canvas::Plugin, settings: {}))
           expect(developer_key.tokens_expire_in).to be_nil
         end
       end

@@ -115,7 +115,7 @@ describe Accessibility::Rule do
 
     context "when element is provided" do
       it "returns the element's HTML" do
-        element = double("Element", to_html: "<div>Test</div>")
+        element = instance_double(Nokogiri::XML::Element, to_html: "<div>Test</div>")
         expect(described_class.new.issue_preview(element)).to eq("<div>Test</div>")
       end
     end

@@ -201,22 +201,22 @@ describe AuthenticationProvider::OpenIDConnect do
     end
 
     it "decodes jwt and extracts subject attribute" do
-      uid = subject.unique_id(double(params: { "id_token" => id_token({ sub: "some-login-attribute" }) }, options: { nonce: }))
+      uid = subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => id_token({ sub: "some-login-attribute" }) }, options: { nonce: }))
       expect(uid).to eq("some-login-attribute")
     end
 
     it "requests more attributes if necessary" do
       subject.userinfo_endpoint = "moar"
       subject.login_attribute = "not_in_id_token"
-      token = double(options: { nonce: }, params: { "id_token" => id_token({ sub: "1" }) })
-      expect(token).to receive(:get).with("moar").and_return(double(parsed: { "not_in_id_token" => "myid", "sub" => "1" }))
+      token = instance_double(OAuth2::AccessToken, options: { nonce: }, params: { "id_token" => id_token({ sub: "1" }) })
+      expect(token).to receive(:get).with("moar").and_return(instance_double(OAuth2::Response, parsed: { "not_in_id_token" => "myid", "sub" => "1" }))
       expect(subject.unique_id(token)).to eq "myid"
     end
 
     it "does not request more attributes if unnecessary, even if userinfo_endpoint is present" do
       subject.userinfo_endpoint = "moar"
       subject.login_attribute = "in_id_token"
-      token = double(options: { nonce: }, params: { "id_token" => id_token({ sub: "1", in_id_token: "myid" }) })
+      token = instance_double(OAuth2::AccessToken, options: { nonce: }, params: { "id_token" => id_token({ sub: "1", in_id_token: "myid" }) })
       expect(token).not_to receive(:get)
       expect(subject.unique_id(token)).to eq "myid"
     end
@@ -224,8 +224,8 @@ describe AuthenticationProvider::OpenIDConnect do
     it "ignores userinfo that doesn't match" do
       subject.userinfo_endpoint = "moar"
       subject.login_attribute = "not_in_id_token"
-      token = double(options: { nonce: }, params: { "id_token" => id_token({ sub: "1" }) })
-      expect(token).to receive(:get).with("moar").and_return(double(parsed: { "not_in_id_token" => "myid", "sub" => "2" }))
+      token = instance_double(OAuth2::AccessToken, options: { nonce: }, params: { "id_token" => id_token({ sub: "1" }) })
+      expect(token).to receive(:get).with("moar").and_return(instance_double(OAuth2::Response, parsed: { "not_in_id_token" => "myid", "sub" => "2" }))
       expect(subject.unique_id(token)).to be_nil
     end
 
@@ -249,19 +249,19 @@ describe AuthenticationProvider::OpenIDConnect do
 
       it "passes a valid token" do
         id_token = Canvas::Security.create_jwt(base_payload, nil, subject.client_secret)
-        expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
+        expect { subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
       end
 
       it "validates a multi-valued audience" do
         id_token = Canvas::Security.create_jwt(base_payload.merge(aud: ["def", "client"]), nil, subject.client_secret)
-        expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
+        expect { subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
       end
 
       def self.bad_token_spec(description, payload)
         it "validates #{description}" do
           payload = instance_eval(&payload)
           id_token = Canvas::Security.create_jwt(payload, nil, subject.client_secret)
-          expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
+          expect { subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
         end
       end
 
@@ -274,7 +274,7 @@ describe AuthenticationProvider::OpenIDConnect do
 
       it "validates the signature" do
         id_token = Canvas::Security.create_jwt(base_payload, nil, "wrong_key")
-        expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
+        expect { subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
       end
 
       it "refreshes the keys if the kid is not found. once" do
@@ -290,7 +290,7 @@ describe AuthenticationProvider::OpenIDConnect do
         allow(Canvas::Security).to receive(:decode_jwt).and_return(parsed_token)
         expect(subject).to receive(:download_jwks).with(force: true)
         expect(subject).to receive(:save!)
-        expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
+        expect { subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
       end
 
       it "fails if the key is still wrong" do
@@ -300,7 +300,7 @@ describe AuthenticationProvider::OpenIDConnect do
         allow(Canvas::Security).to receive(:decode_jwt).and_return(parsed_token)
         expect(subject).to receive(:download_jwks).with(force: true)
         expect(subject).not_to receive(:save!)
-        expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
+        expect { subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
       end
     end
   end

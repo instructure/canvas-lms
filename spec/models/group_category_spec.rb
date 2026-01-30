@@ -585,11 +585,11 @@ describe GroupCategory do
         calc = GroupCategory::GroupBySectionCalculator.new(nil)
         mock_users_by_section = {}
         section_counts.each_with_index do |u_count, idx|
-          mock_users_by_section[idx] = double(count: u_count)
+          mock_users_by_section[idx] = instance_double(ActiveRecord::Relation, count: u_count)
         end
         calc.users_by_section_id = mock_users_by_section
         calc.user_count = section_counts.sum
-        calc.groups = double(count: group_count)
+        calc.groups = instance_double(ActiveRecord::Relation, count: group_count)
         dist = calc.determine_group_distribution
         dist.sort_by(&:first).map(&:last)
       end

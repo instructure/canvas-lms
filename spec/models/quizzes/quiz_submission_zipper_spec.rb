@@ -21,45 +21,49 @@ describe Quizzes::QuizSubmissionZipper do
   context "common" do
     let(:attachments) do
       [
-        double(id: 1, display_name: "Foobar.ppt"),
-        double(id: 2, display_name: "Cats.docx"),
-        double(id: 3, display_name: "Pandas.png"),
-        double(id: 4)
+        instance_double(Attachment, id: 1, display_name: "Foobar.ppt"),
+        instance_double(Attachment, id: 2, display_name: "Cats.docx"),
+        instance_double(Attachment, id: 3, display_name: "Pandas.png"),
+        instance_double(Attachment, id: 4, display_name: nil)
       ]
     end
     let(:submissions) do
       [
-        double(user: double(id: 1, last_name_first: "Dale Tom"),
-               submission_data: [{
-                 attachment_ids: ["1"],
-                 question_id: 1,
-                 was_preview: false
-               }]),
-        double(user: double(id: 2, last_name_first: "Florence Ryan"),
-               submission_data: [{
-                 question_id: 2,
-                 attachment_ids: ["2"],
-                 was_preview: false
-               }]),
+        instance_double(Quizzes::QuizSubmission,
+                        user: instance_double(User, id: 1, last_name_first: "Dale Tom"),
+                        submission_data: [{
+                          attachment_ids: ["1"],
+                          question_id: 1,
+                          was_preview: false
+                        }]),
+        instance_double(Quizzes::QuizSubmission,
+                        user: instance_double(User, id: 2, last_name_first: "Florence Ryan"),
+                        submission_data: [{
+                          question_id: 2,
+                          attachment_ids: ["2"],
+                          was_preview: false
+                        }]),
         # Teacher upload from Quiz preview:
-        double(user: double(id: nil, last_name_first: "Petty Bryan"),
-               submission_data: [{
-                 question_id: 3,
-                 attachment_ids: ["3"],
-                 was_preview: true
-               }]),
-        double(user: nil, submission_data: [{}])
+        instance_double(Quizzes::QuizSubmission,
+                        user: instance_double(User, id: nil, last_name_first: "Petty Bryan"),
+                        submission_data: [{
+                          question_id: 3,
+                          attachment_ids: ["3"],
+                          was_preview: true
+                        }]),
+        instance_double(Quizzes::QuizSubmission, user: nil, submission_data: [{}])
       ]
     end
     let(:submission_stubs) do
       submissions.map do |sub|
-        double(
+        instance_double(
+          Quizzes::QuizSubmission,
           latest_submitted_attempt: sub,
           was_preview: sub.submission_data.first[:was_preview]
         )
       end
     end
-    let(:zip_attachment) { double(id: 1, user: nil) }
+    let(:zip_attachment) { instance_double(Attachment, id: 1, user: nil) }
 
     before :once do
       @student = course_with_student

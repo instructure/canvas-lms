@@ -19,7 +19,7 @@
 
 describe QuizzesNext::ExportService do
   describe ".applies_to_course?" do
-    let(:course) { double("course") }
+    let(:course) { instance_double(Course) }
 
     context "service enabled for context" do
       it "returns true" do
@@ -37,7 +37,7 @@ describe QuizzesNext::ExportService do
   end
 
   describe ".begin_export" do
-    let(:course) { double("course") }
+    let(:course) { instance_double(Course) }
 
     before do
       allow(course).to receive(:uuid).and_return(1234)
@@ -58,8 +58,8 @@ describe QuizzesNext::ExportService do
     end
 
     it "returns metadata for each assignment" do
-      assignment1 = double("assignment")
-      assignment2 = double("assignment")
+      assignment1 = instance_double(Assignment)
+      assignment2 = instance_double(Assignment)
       lti_assignments = [
         assignment1,
         assignment2
@@ -93,7 +93,7 @@ describe QuizzesNext::ExportService do
     let(:old_course) { course_model(uuid: "100005") }
     let(:new_course) { course_model(uuid: "100006") }
     let(:root_account) { account_model }
-    let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "some_type", asset_map_url: "http://example.com/resource_map.json") }
+    let(:content_migration) { instance_double(ContentMigration, started_at: 1.hour.ago, migration_type: "some_type", asset_map_url: "http://example.com/resource_map.json") }
     let(:new_assignment1) { assignment_model(id: 1, context: new_course) }
     let(:new_assignment2) { assignment_model(id: 2, context: new_course) }
     let(:old_assignment1) { assignment_model(id: 3, context: old_course) }
@@ -204,7 +204,7 @@ describe QuizzesNext::ExportService do
     end
 
     context "when the assignment is created as part of a blueprint sync" do
-      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "master_course_import", asset_map_url: "http://example.com/resource_map.json") }
+      let(:content_migration) { instance_double(ContentMigration, started_at: 1.hour.ago, migration_type: "master_course_import", asset_map_url: "http://example.com/resource_map.json") }
 
       before do
         course = course_model
@@ -252,7 +252,7 @@ describe QuizzesNext::ExportService do
     end
 
     context "when an assignment is imported into a blueprint child course" do
-      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "common_cartridge_importer", asset_map_url: "http://example.com/resource_map.json") }
+      let(:content_migration) { instance_double(ContentMigration, started_at: 1.hour.ago, migration_type: "common_cartridge_importer", asset_map_url: "http://example.com/resource_map.json") }
 
       before do
         course = course_model
@@ -277,7 +277,7 @@ describe QuizzesNext::ExportService do
     end
 
     context "when an assignment is imported into a non-blueprint course" do
-      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "common_cartridge_importer", asset_map_url: "http://example.com/resource_map.json") }
+      let(:content_migration) { instance_double(ContentMigration, started_at: 1.hour.ago, migration_type: "common_cartridge_importer", asset_map_url: "http://example.com/resource_map.json") }
 
       it "emits a live event with the field created_on_blueprint_sync set as false" do
         basic_import_content[:assignments] << {
@@ -295,7 +295,7 @@ describe QuizzesNext::ExportService do
 
     context "when an assignment is imported using course copy" do
       it "emits a live event with the field remove_alignments set as false" do
-        cm = double({ started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { everything: true }, asset_map_url: "http://example.com/resource_map.json" })
+        cm = instance_double(ContentMigration, started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { everything: true }, asset_map_url: "http://example.com/resource_map.json")
 
         expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
           hash_including(remove_alignments: false)
@@ -305,7 +305,7 @@ describe QuizzesNext::ExportService do
       end
 
       it "emits a live event with the field remove_alignments set as true" do
-        cm = double({ started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { all_course_settings: "1", all_assignments: "1" }, asset_map_url: "http://example.com/resource_map.json" })
+        cm = instance_double(ContentMigration, started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { all_course_settings: "1", all_assignments: "1" }, asset_map_url: "http://example.com/resource_map.json")
 
         expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
           hash_including(remove_alignments: true)
@@ -315,7 +315,7 @@ describe QuizzesNext::ExportService do
       end
 
       it "emits a live event with the field remove_alignments set as false (selected outcomes in course content)" do
-        cm = double({ started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { all_course_settings: "1", all_assignments: "1", all_learning_outcomes: "1" }, asset_map_url: "http://example.com/resource_map.json" })
+        cm = instance_double(ContentMigration, started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { all_course_settings: "1", all_assignments: "1", all_learning_outcomes: "1" }, asset_map_url: "http://example.com/resource_map.json")
 
         expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
           hash_including(remove_alignments: false)

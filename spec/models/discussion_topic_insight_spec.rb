@@ -163,7 +163,7 @@ describe DiscussionTopicInsight do
       @inst_llm = instance_double(InstLLM::Client)
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
 
-      @llm_config = double("LLMConfig")
+      @llm_config = instance_double(LLMConfig)
       allow(@llm_config).to receive_messages(model_id: "anthropic.claude-3-haiku-20240307-v1:0", generate_prompt_and_options: ["test prompt", { "max_tokens" => 2000 }], name: "discussion_topic_insights")
       allow(LLMConfigs).to receive(:config_for).with("discussion_topic_insights").and_return(@llm_config)
     end
@@ -596,7 +596,7 @@ describe DiscussionTopicInsight do
         workflow_state: "created"
       )
 
-      @llm_config = double("LLMConfig")
+      @llm_config = instance_double(LLMConfig)
       allow(@llm_config).to receive_messages(
         model_id: "anthropic.claude-3-haiku-20240307-v1:0",
         generate_prompt_and_options: ["test prompt", { "max_tokens" => 2000 }],

@@ -747,20 +747,20 @@ describe Course do
 
   describe "import_media_objects" do
     before do
-      @kmh = double(KalturaMediaFileHandler)
+      @kmh = instance_double(KalturaMediaFileHandler)
       allow(KalturaMediaFileHandler).to receive(:new).and_return(@kmh)
       MediaObject.create!(media_id: "maybe")
       attachment_model(uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"), media_entry_id: "maybe")
     end
 
     it "waits for media objects on canvas cartridge import" do
-      migration = double(canvas_import?: true)
+      migration = instance_double(ContentMigration, canvas_import?: true)
       expect(@kmh).to receive(:add_media_files).with([@attachment], true)
       Importers::CourseContentImporter.import_media_objects([@attachment], migration)
     end
 
     it "does not wait for media objects on other import" do
-      migration = double(canvas_import?: false)
+      migration = instance_double(ContentMigration, canvas_import?: false)
       expect(@kmh).to receive(:add_media_files).with([@attachment], false)
       Importers::CourseContentImporter.import_media_objects([@attachment], migration)
     end
@@ -1029,7 +1029,7 @@ describe Course do
   end
 
   describe "#error_on_dates?" do
-    let(:item) { double("item") }
+    let(:item) { instance_double(Assignment) }
     let(:attributes) { [:due_at] }
 
     context "when there are errors on the given attributes" do

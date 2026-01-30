@@ -87,7 +87,7 @@ describe Submission do
           submission.workflow_state = "pending_review"
           submission.submission_type = "online_quiz"
 
-          allow(submission).to receive(:quiz_submission).and_return(double("QuizSubmission", "pending_review?" => true))
+          allow(submission).to receive(:quiz_submission).and_return(instance_double(Quizzes::QuizSubmission, pending_review?: true))
         end
 
         it { is_expected.to be :pending_review }
@@ -504,7 +504,7 @@ describe Submission do
     end
 
     it "does not set_final_score if kept_score equals score without deductions" do
-      quiz_submission_mock = double("QuizSubmission", "kept_score" => 123)
+      quiz_submission_mock = instance_double(Quizzes::QuizSubmission, kept_score: 123)
       allow(submission).to receive(:quiz_submission).and_return(quiz_submission_mock)
       submission.update(score: 100, points_deducted: 23, quiz_submission_id: 1)
       expect(quiz_submission_mock).not_to receive(:set_final_score)
@@ -512,7 +512,7 @@ describe Submission do
     end
 
     it "does set_final_score if kept_score differs from score without deductions" do
-      quiz_submission_mock = double("QuizSubmission", "kept_score" => 100)
+      quiz_submission_mock = instance_double(Quizzes::QuizSubmission, kept_score: 100)
       allow(submission).to receive(:quiz_submission).and_return(quiz_submission_mock)
       submission.update(score: 100, points_deducted: 23, quiz_submission_id: 1)
       expect(quiz_submission_mock).to receive(:set_final_score)
@@ -1320,7 +1320,7 @@ describe Submission do
     end
 
     it "deducts nothing if grading period is closed" do
-      grading_period = double("grading_period", closed?: true)
+      grading_period = instance_double(GradingPeriod, closed?: true)
       expect(submission).to receive(:grading_period).and_return(grading_period)
       @assignment.submit_homework(@student, body: "a body")
       submission.score = 700
@@ -2949,7 +2949,7 @@ describe Submission do
 
       @assignment.course = @course
       allow(@assignment).to receive(:published?).and_return(true)
-      grading_period = double("grading_period", closed?: false)
+      grading_period = instance_double(GradingPeriod, closed?: false)
       allow(@submission).to receive(:grading_period).and_return(grading_period)
 
       @submission.grader = @grader
@@ -2996,7 +2996,7 @@ describe Submission do
     context "when the grader is a teacher and the assignment is in a closed grading period" do
       before do
         allow(@course).to receive(:account_membership_allows).with(@grader).and_return(false)
-        grading_period = double("grading_period", closed?: true)
+        grading_period = instance_double(GradingPeriod, closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
 
         @status = @submission.grants_right?(@grader, :grade)
@@ -3014,7 +3014,7 @@ describe Submission do
     context "when grader_id is a teacher's id and the assignment is in a closed grading period" do
       before do
         allow(@course).to receive(:account_membership_allows).with(@grader).and_return(false)
-        grading_period = double("grading_period", closed?: true)
+        grading_period = instance_double(GradingPeriod, closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
         @submission.grader = nil
         @submission.grader_id = 10
@@ -3034,7 +3034,7 @@ describe Submission do
     it 'returns true if the grader is an admin even if the assignment is in
         a closed grading period' do
       allow(@course).to receive(:account_membership_allows).with(@grader).and_return(true)
-      grading_period = double("grading_period", closed?: false)
+      grading_period = instance_double(GradingPeriod, closed?: false)
       allow(@submission).to receive(:grading_period).and_return(grading_period)
 
       expect(@submission.grants_right?(@grader, :grade)).to be_truthy
@@ -3052,7 +3052,7 @@ describe Submission do
       @submission.user_id = 10
 
       allow(@assignment).to receive(:published?).and_return(true)
-      grading_period = double("grading_period", closed?: false)
+      grading_period = instance_double(GradingPeriod, closed?: false)
       allow(@submission).to receive(:grading_period).and_return(grading_period)
     end
 
@@ -3095,7 +3095,7 @@ describe Submission do
 
     context "when the assignment is in a closed grading period for the student" do
       before do
-        grading_period = double("grading_period", closed?: true)
+        grading_period = instance_double(GradingPeriod, closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
 
         @status = @submission.can_autograde?
@@ -4086,7 +4086,7 @@ describe Submission do
           submission.assignment = a
           submission.turnitin_data = lti_tii_data
           submission.user = @user
-          outcome_response_processor_mock = double("outcome_response_processor")
+          outcome_response_processor_mock = instance_double(Turnitin::OutcomeResponseProcessor)
           expect(outcome_response_processor_mock).to receive(:resubmit).with(submission, "attachment_42")
           allow(Turnitin::OutcomeResponseProcessor).to receive(:new).and_return(outcome_response_processor_mock)
           submission.retrieve_lti_tii_score
@@ -4099,7 +4099,7 @@ describe Submission do
           submission.assignment = a
           submission.turnitin_data = lti_tii_data.merge(last_processed_attempt: 1)
           submission.user = @user
-          outcome_response_processor_mock = double("outcome_response_processor")
+          outcome_response_processor_mock = instance_double(Turnitin::OutcomeResponseProcessor)
           expect(outcome_response_processor_mock).to receive(:resubmit).with(submission, "attachment_42")
           allow(Turnitin::OutcomeResponseProcessor).to receive(:new).and_return(outcome_response_processor_mock)
           submission.retrieve_lti_tii_score
@@ -4131,7 +4131,7 @@ describe Submission do
       it "initially sets turnitin submission to pending" do
         init_turnitin_api
         expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ assignment_id: "1234" })
-        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(success?: true))
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(instance_double(Turnitin::Response, success?: true))
         expect(@turnitin_api).to receive(:submitPaper).and_return({
                                                                     @submission.asset_string => {
                                                                       object_id: "12345"
@@ -4144,7 +4144,7 @@ describe Submission do
       it "schedules a retry if something fails initially" do
         init_turnitin_api
         expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ assignment_id: "1234" })
-        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(success?: false))
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(instance_double(Turnitin::Response, success?: false))
         @submission.submit_to_turnitin
         expect(Delayed::Job.list_jobs(:future, 100).count { |j| j.tag == "Submission#submit_to_turnitin" }).to eq 2
       end
@@ -4152,7 +4152,7 @@ describe Submission do
       it "sets status as failed if something fails on a retry" do
         init_turnitin_api
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
-        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(success?: false, error?: true, error_hash: {}))
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(instance_double(Turnitin::Response, success?: false, error?: true, error_hash: {}))
         expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq "error"
@@ -4162,7 +4162,7 @@ describe Submission do
         init_turnitin_api
         # first a submission, to get us into failed state
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
-        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(success?: false, error?: true, error_hash: {}))
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(instance_double(Turnitin::Response, success?: false, error?: true, error_hash: {}))
         expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq "error"
@@ -4900,14 +4900,14 @@ describe Submission do
 
   describe "muted_assignment?" do
     it "returns true if assignment is muted" do
-      assignment = double(muted?: true)
+      assignment = instance_double(Assignment, muted?: true)
       @submission = Submission.new
       expect(@submission).to receive(:assignment).and_return(assignment)
       expect(@submission.muted_assignment?).to be true
     end
 
     it "returns false if assignment is not muted" do
-      assignment = double(muted?: false)
+      assignment = instance_double(Assignment, muted?: false)
       @submission = Submission.new
       expect(@submission).to receive(:assignment).and_return(assignment)
       expect(@submission.muted_assignment?).to be false
@@ -11140,8 +11140,8 @@ describe Submission do
         service_result1 = FileTextExtractionService::Result.new("extracted text 1", true)
         service_result2 = FileTextExtractionService::Result.new("extracted text 2", false)
 
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(instance_double(FileTextExtractionService, call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(instance_double(FileTextExtractionService, call: service_result2))
 
         expect(SubmissionText).to receive(:upsert_all) do |rows, options|
           expect(rows.length).to eq(2)
@@ -11161,8 +11161,8 @@ describe Submission do
         service_result1 = nil
         service_result2 = FileTextExtractionService::Result.new("extracted text 2", false)
 
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(instance_double(FileTextExtractionService, call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(instance_double(FileTextExtractionService, call: service_result2))
 
         expect(SubmissionText).to receive(:upsert_all) do |rows, _options|
           valid_rows = rows.compact
@@ -11178,8 +11178,8 @@ describe Submission do
         service_result1 = FileTextExtractionService::Result.new("", false)
         service_result2 = FileTextExtractionService::Result.new("extracted text 2", false)
 
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(instance_double(FileTextExtractionService, call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(instance_double(FileTextExtractionService, call: service_result2))
 
         expect(SubmissionText).to receive(:upsert_all) do |rows, _options|
           valid_rows = rows.compact
@@ -11194,8 +11194,8 @@ describe Submission do
         service_result1 = FileTextExtractionService::Result.new("   ", false)
         service_result2 = FileTextExtractionService::Result.new("extracted text 2", false)
 
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(instance_double(FileTextExtractionService, call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(instance_double(FileTextExtractionService, call: service_result2))
 
         expect(SubmissionText).to receive(:upsert_all) do |rows, _options|
           valid_rows = rows.compact
@@ -11210,8 +11210,8 @@ describe Submission do
         service_result1 = nil
         service_result2 = FileTextExtractionService::Result.new("", false)
 
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
-        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(instance_double(FileTextExtractionService, call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(instance_double(FileTextExtractionService, call: service_result2))
 
         expect(SubmissionText).not_to receive(:upsert_all)
 

@@ -63,7 +63,7 @@ describe ContentMigration do
     end
 
     it "records the job id" do
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
       run_course_copy
       expect(@cm.reload.migration_settings[:job_ids]).to eq([123])
     end
@@ -847,26 +847,23 @@ describe ContentMigration do
 
     context "media objects" do
       before do
-        kaltura_double = double("kaltura")
+        kaltura_double = instance_double(CanvasKaltura::ClientV3)
+        flavor_asset = {
+          isOriginal: 1,
+          containerFormat: "mp4",
+          fileExt: "mp4",
+          id: "one",
+          size: 15,
+        }
         allow(kaltura_double).to receive(:startSession)
-        # rubocop:disable RSpec/ReceiveMessages
-        allow(kaltura_double).to receive(:flavorAssetGetByEntryId).and_return([
-                                                                                {
-                                                                                  isOriginal: 1,
-                                                                                  containerFormat: "mp4",
-                                                                                  fileExt: "mp4",
-                                                                                  id: "one",
-                                                                                  size: 15,
-                                                                                }
-                                                                              ])
-        allow(kaltura_double).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_double.flavorAssetGetByEntryId.first)
-        allow(kaltura_double).to receive(:media_sources).and_return([{
-                                                                      isOriginal: "0",
-                                                                      fileExt: "mp4",
-                                                                      url: "http://example.com/media_path",
-                                                                      content_type: "video/mp4"
-                                                                    }])
-        # rubocop:enable RSpec/ReceiveMessages
+        allow(kaltura_double).to receive_messages(flavorAssetGetByEntryId: [flavor_asset],
+                                                  flavorAssetGetOriginalAsset: flavor_asset,
+                                                  media_sources: [{
+                                                    isOriginal: "0",
+                                                    fileExt: "mp4",
+                                                    url: "http://example.com/media_path",
+                                                    content_type: "video/mp4"
+                                                  }])
         allow(CanvasKaltura::ClientV3).to receive_messages(config: true, new: kaltura_double)
       end
 

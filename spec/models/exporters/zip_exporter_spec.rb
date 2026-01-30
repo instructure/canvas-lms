@@ -56,7 +56,7 @@ describe "Exporters::ZipExporter" do
         let(:settings) { { time_zone: "America/Denver" } }
 
         it "uses the time zone to calculate the user's local time using TZInfo::Timezone" do
-          expect(TZInfo::Timezone).to receive(:get).with("America/Denver").and_return(double("LocalTime", now: Time.zone.now))
+          expect(TZInfo::Timezone).to receive(:get).with("America/Denver").and_return(instance_double(TZInfo::Timezone, now: Time.zone.now))
           subject
         end
       end

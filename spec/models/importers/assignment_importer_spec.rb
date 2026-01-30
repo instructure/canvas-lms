@@ -362,8 +362,8 @@ describe "Importing assignments" do
           ]
         end
 
-        let(:master_course_subscription) { double("MasterCourseSubscription") }
-        let(:content_tag) { double("ContentTag") }
+        let(:master_course_subscription) { instance_double(MasterCourses::ChildSubscription) }
+        let(:content_tag) { instance_double(MasterCourses::ChildContentTag) }
 
         let(:blueprint_migration) do
           migration = course.content_migrations.create!
@@ -372,7 +372,7 @@ describe "Importing assignments" do
         end
 
         context "when assignment has downstream changes and is not locked" do
-          let(:content_tag) { double("ContentTag", downstream_changes: ["content"]) }
+          let(:content_tag) { instance_double(MasterCourses::ChildContentTag, downstream_changes: ["content"]) }
 
           before do
             allow(master_course_subscription).to receive(:content_tag_for).and_return(content_tag)
@@ -390,7 +390,7 @@ describe "Importing assignments" do
         end
 
         context "when assignment has downstream changes but is locked" do
-          let(:content_tag) { double("ContentTag", downstream_changes: ["content"]) }
+          let(:content_tag) { instance_double(MasterCourses::ChildContentTag, downstream_changes: ["content"]) }
 
           before do
             allow(master_course_subscription).to receive(:content_tag_for).and_return(content_tag)
@@ -408,7 +408,7 @@ describe "Importing assignments" do
         end
 
         context "when assignment has no downstream changes" do
-          let(:content_tag) { double("ContentTag", downstream_changes: []) }
+          let(:content_tag) { instance_double(MasterCourses::ChildContentTag, downstream_changes: []) }
 
           before do
             allow(master_course_subscription).to receive(:content_tag_for).and_return(content_tag)
@@ -441,9 +441,9 @@ describe "Importing assignments" do
           ]
         end
 
-        let(:master_course_subscription) { double("MasterCourseSubscription") }
-        let(:assignment_content_tag) { double("ContentTag", downstream_changes: []) }
-        let(:discussion_topic_content_tag) { double("ContentTag") }
+        let(:master_course_subscription) { instance_double(MasterCourses::ChildSubscription) }
+        let(:assignment_content_tag) { instance_double(MasterCourses::ChildContentTag, downstream_changes: []) }
+        let(:discussion_topic_content_tag) { instance_double(MasterCourses::ChildContentTag) }
 
         let(:blueprint_migration) do
           migration = course.content_migrations.create!
@@ -461,7 +461,7 @@ describe "Importing assignments" do
         end
 
         context "when discussion topic has downstream changes and is not locked" do
-          let(:discussion_topic_content_tag) { double("ContentTag", downstream_changes: ["content"]) }
+          let(:discussion_topic_content_tag) { instance_double(MasterCourses::ChildContentTag, downstream_changes: ["content"]) }
 
           before do
             allow(master_course_subscription).to receive(:content_tag_for).with(assignment_with_discussion).and_return(assignment_content_tag)
@@ -478,7 +478,7 @@ describe "Importing assignments" do
         end
 
         context "when discussion topic has downstream changes but is locked" do
-          let(:discussion_topic_content_tag) { double("ContentTag", downstream_changes: ["content"]) }
+          let(:discussion_topic_content_tag) { instance_double(MasterCourses::ChildContentTag, downstream_changes: ["content"]) }
 
           before do
             allow(master_course_subscription).to receive(:content_tag_for).with(assignment_with_discussion).and_return(assignment_content_tag)
@@ -495,7 +495,7 @@ describe "Importing assignments" do
         end
 
         context "when discussion topic has no downstream changes" do
-          let(:discussion_topic_content_tag) { double("ContentTag", downstream_changes: []) }
+          let(:discussion_topic_content_tag) { instance_double(MasterCourses::ChildContentTag, downstream_changes: []) }
 
           before do
             allow(master_course_subscription).to receive(:content_tag_for).with(assignment_with_discussion).and_return(assignment_content_tag)
@@ -1410,10 +1410,8 @@ describe "Importing assignments" do
         end
 
         context "when import is a master migration" do
-          let(:migration) { double("Migration") }
-          let(:master_course_subscription) { double("MasterCourseSubscription") }
-          let(:item) { double("Item") }
-          let(:content_tag) { double("ContentTag", downstream_changes: ["none"]) }
+          let(:master_course_subscription) { instance_double(MasterCourses::ChildSubscription) }
+          let(:content_tag) { instance_double(MasterCourses::ChildContentTag, downstream_changes: ["none"]) }
 
           let(:master_migration) do
             migration = course.content_migrations.create!
