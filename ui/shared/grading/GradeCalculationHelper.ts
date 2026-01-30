@@ -65,17 +65,17 @@ export function scoreToPercentage(score: number, pointsPossible: number): number
 }
 
 export function scoreToScaledPoints(
-  score: number,
+  score: number | null,
   pointsPossible: number,
   scalingFactor: number,
 ): number {
-  const scoreAsScaledPoints = score / (pointsPossible / scalingFactor)
+  const scoreAsScaledPoints = (score || 0) / (pointsPossible / scalingFactor)
   if (!Number.isFinite(scoreAsScaledPoints)) {
     return scoreAsScaledPoints
   }
 
   const innerDiv = divide(pointsPossible, scalingFactor)
-  const outerDiv = new Big(score).div(innerDiv)
+  const outerDiv = new Big(score || 0).div(innerDiv)
   return toNumber(outerDiv)
 }
 
