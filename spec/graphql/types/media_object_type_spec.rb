@@ -106,9 +106,9 @@ describe Types::MediaObjectType do
     end
 
     it "returns media download url" do
-      mock_request = double("request",
-                            host_with_port: "test.example.com",
-                            protocol: "https://")
+      mock_request = instance_double(ActionDispatch::Request,
+                                     host_with_port: "test.example.com",
+                                     protocol: "https://")
       media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
 
       expect(media_download_url).to include("/download?download_frd=1")
@@ -119,9 +119,9 @@ describe Types::MediaObjectType do
       @media_object.attachment = nil
       @media_object.save!
 
-      mock_request = double("request",
-                            host_with_port: "test.example.com",
-                            protocol: "https://")
+      mock_request = instance_double(ActionDispatch::Request,
+                                     host_with_port: "test.example.com",
+                                     protocol: "https://")
       media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
 
       expect(media_download_url).to be_nil
@@ -132,18 +132,18 @@ describe Types::MediaObjectType do
     end
 
     it "returns nil for media download url if request is defined but host_with_port is missing" do
-      mock_request = double("request",
-                            host_with_port: nil,
-                            protocol: "https://")
+      mock_request = instance_double(ActionDispatch::Request,
+                                     host_with_port: nil,
+                                     protocol: "https://")
       media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
 
       expect(media_download_url).to be_nil
     end
 
     it "returns nil for media download url if request is defined but protocol is missing" do
-      mock_request = double("request",
-                            host_with_port: "test.example.com",
-                            protocol: nil)
+      mock_request = instance_double(ActionDispatch::Request,
+                                     host_with_port: "test.example.com",
+                                     protocol: nil)
       media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
 
       expect(media_download_url).to be_nil
