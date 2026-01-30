@@ -750,6 +750,17 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def delete_lti_context_controls
+    updates = { workflow_state: "deleted_with_context", updated_at: Time.current }
+    Lti::ContextControl.where(account_id: id).active.in_batches.update_all(updates)
+  end
+
+  def undelete_lti_context_controls
+    updates = { workflow_state: "active", updated_at: Time.current }
+    # Only restore context controls that were deleted with the context (account)
+    Lti::ContextControl.where(account_id: id, workflow_state: "deleted_with_context").in_batches.update_all(updates)
+  end
+
   def check_downstream_caches
     # dummy account has no downstream
     return if dummy?
@@ -1562,7 +1573,11 @@ class Account < ActiveRecord::Base
   end
 
   workflow do
-    state :active
+    state :active do
+      on_entry do |prior_state, _event|
+        undelete_lti_context_controls if prior_state == :deleted
+      end
+    end
     state :deleted
   end
 
@@ -1740,9 +1755,10 @@ class Account < ActiveRecord::Base
   end
 
   alias_method :destroy_permanently!, :destroy
-  def destroy
+  def destroy(user: nil)
     transaction do
       account_users.update_all(workflow_state: "deleted")
+      delete_lti_context_controls
       self.workflow_state = "deleted"
       self.deleted_at = Time.now.utc
       save!

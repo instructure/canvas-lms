@@ -9151,6 +9151,48 @@ describe Course do
       course_model
       expect { @course.destroy }.to change { @course.reload.deleted_at }.from(nil).to be_truthy
     end
+
+    it "soft-deletes associated LTI context controls" do
+      course = course_model
+      registration = lti_registration_with_tool(account: course.account)
+      deployment = registration.deployments.first
+
+      # Create a context control for the course
+      control = Lti::ContextControl.create!(
+        context: course,
+        registration:,
+        deployment:
+      )
+
+      expect(control.workflow_state).not_to eq("deleted_with_context")
+
+      course.destroy
+
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+      expect(control.updated_at).to be > control.created_at
+    end
+
+    it "restores LTI context controls when course is undeleted" do
+      course = course_model
+      registration = lti_registration_with_tool(account: course.account)
+      deployment = registration.deployments.first
+
+      control = Lti::ContextControl.create!(
+        context: course,
+        registration:,
+        deployment:
+      )
+
+      # Delete the course
+      course.destroy
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+
+      # Undelete the course
+      course.process_event(:undelete)
+      course.save!
+
+      expect(control.reload.workflow_state).to eq("active")
+    end
   end
 
   describe "#all_dates" do
