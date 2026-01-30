@@ -55,7 +55,7 @@ describe('WidgetCard', () => {
     const user = userEvent.setup()
     render(<WidgetCard {...defaultProps} />)
 
-    const addButton = screen.getByRole('button', {name: 'Add'})
+    const addButton = screen.getByTestId('add-widget-button')
     await user.click(addButton)
 
     expect(defaultProps.onAdd).toHaveBeenCalledTimes(1)
@@ -63,23 +63,23 @@ describe('WidgetCard', () => {
 
   it('displays "Add" text when not disabled', () => {
     render(<WidgetCard {...defaultProps} disabled={false} />)
-    expect(screen.getByRole('button', {name: 'Add'})).toBeInTheDocument()
+    expect(screen.getByTestId('add-widget-button')).toHaveTextContent('Add')
   })
 
   it('displays "Added" text when disabled', () => {
     render(<WidgetCard {...defaultProps} disabled={true} />)
-    expect(screen.getByRole('button', {name: 'Added'})).toBeInTheDocument()
+    expect(screen.getByTestId('add-widget-button')).toHaveTextContent('Added')
   })
 
   it('disables button when disabled prop is true', () => {
     render(<WidgetCard {...defaultProps} disabled={true} />)
-    const button = screen.getByRole('button', {name: 'Added'})
+    const button = screen.getByTestId('add-widget-button')
     expect(button).toBeDisabled()
   })
 
   it('does not disable button when disabled prop is false', () => {
     render(<WidgetCard {...defaultProps} disabled={false} />)
-    const button = screen.getByRole('button', {name: 'Add'})
+    const button = screen.getByTestId('add-widget-button')
     expect(button).not.toBeDisabled()
   })
 
@@ -87,7 +87,7 @@ describe('WidgetCard', () => {
     const user = userEvent.setup()
     render(<WidgetCard {...defaultProps} disabled={true} />)
 
-    const addButton = screen.getByRole('button', {name: 'Added'})
+    const addButton = screen.getByTestId('add-widget-button')
     await user.click(addButton)
 
     expect(defaultProps.onAdd).not.toHaveBeenCalled()
@@ -103,5 +103,19 @@ describe('WidgetCard', () => {
     const {container} = render(<WidgetCard {...defaultProps} disabled={true} />)
     const icon = container.querySelector('svg')
     expect(icon).not.toBeInTheDocument()
+  })
+
+  describe('accessibility', () => {
+    it('includes widget name in Add button aria-label', () => {
+      render(<WidgetCard {...defaultProps} disabled={false} />)
+      const button = screen.getByTestId('add-widget-button')
+      expect(button).toHaveAccessibleName('Add Course Work Summary')
+    })
+
+    it('includes widget name in Added button aria-label', () => {
+      render(<WidgetCard {...defaultProps} disabled={true} />)
+      const button = screen.getByTestId('add-widget-button')
+      expect(button).toHaveAccessibleName('Course Work Summary Added')
+    })
   })
 })
