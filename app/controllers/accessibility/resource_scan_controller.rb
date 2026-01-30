@@ -128,6 +128,15 @@ module Accessibility
                          END
                        SQL
                        Arel.sql("#{type_case} #{direction}")
+                     when "issue_count"
+                       issues_table = AccessibilityIssue.quoted_table_name
+                       scans_table = AccessibilityResourceScan.quoted_table_name
+                       closed_count_subquery = <<~SQL.squish
+                         (SELECT COUNT(*) FROM #{issues_table}
+                          WHERE #{issues_table}.accessibility_resource_scan_id = #{scans_table}.id
+                          AND #{issues_table}.workflow_state = 'closed')
+                       SQL
+                       Arel.sql("issue_count #{direction}, #{closed_count_subquery} #{direction}")
                      else
                        { sort => direction.downcase.to_sym }
                      end

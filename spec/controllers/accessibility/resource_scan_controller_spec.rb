@@ -123,6 +123,122 @@ describe Accessibility::ResourceScanController do
       end
     end
 
+    context "when sorting by issue_count with closed issues as tie-breaker" do
+      let(:wiki_page1) { wiki_page_model(course:) }
+      let(:wiki_page2) { wiki_page_model(course:) }
+      let(:wiki_page3) { wiki_page_model(course:) }
+
+      let!(:scan1) do
+        accessibility_resource_scan_model(
+          course:,
+          context: wiki_page1,
+          workflow_state: "completed",
+          resource_name: "Scan with 5 active, 10 closed",
+          issue_count: 5
+        )
+      end
+
+      let!(:scan2) do
+        accessibility_resource_scan_model(
+          course:,
+          context: wiki_page2,
+          workflow_state: "completed",
+          resource_name: "Scan with 5 active, 3 closed",
+          issue_count: 5
+        )
+      end
+
+      let!(:scan3) do
+        accessibility_resource_scan_model(
+          course:,
+          context: wiki_page3,
+          workflow_state: "completed",
+          resource_name: "Scan with 2 active, 20 closed",
+          issue_count: 2
+        )
+      end
+
+      before do
+        # Create 10 closed issues for scan1
+        10.times do
+          accessibility_issue_model(
+            course:,
+            accessibility_resource_scan: scan1,
+            rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            workflow_state: "closed"
+          )
+        end
+
+        # Create 3 closed issues for scan2
+        3.times do
+          accessibility_issue_model(
+            course:,
+            accessibility_resource_scan: scan2,
+            rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            workflow_state: "closed"
+          )
+        end
+
+        # Create 20 closed issues for scan3
+        20.times do
+          accessibility_issue_model(
+            course:,
+            accessibility_resource_scan: scan3,
+            rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            workflow_state: "closed"
+          )
+        end
+      end
+
+      it "sorts by issue_count DESC, then closed_issue_count DESC" do
+        get :index, params: { course_id: course.id, sort: "issue_count", direction: "desc" }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        # Filter to just our test scans
+        test_scans = json.select { |s| [scan1.id, scan2.id, scan3.id].include?(s["id"]) }
+
+        # Expected order:
+        # 1. scan1 (5 active, 10 closed)
+        # 2. scan2 (5 active, 3 closed) - same active count as scan1, but fewer closed
+        # 3. scan3 (2 active, 20 closed) - fewer active issues
+        expect(test_scans[0]["id"]).to eq(scan1.id)
+        expect(test_scans[1]["id"]).to eq(scan2.id)
+        expect(test_scans[2]["id"]).to eq(scan3.id)
+      end
+
+      it "sorts by issue_count ASC, then closed_issue_count ASC" do
+        get :index, params: { course_id: course.id, sort: "issue_count", direction: "asc" }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        # Filter to just our test scans
+        test_scans = json.select { |s| [scan1.id, scan2.id, scan3.id].include?(s["id"]) }
+
+        # Expected order (ascending):
+        # 1. scan3 (2 active, 20 closed)
+        # 2. scan2 (5 active, 3 closed) - more active than scan3, fewer closed than scan1
+        # 3. scan1 (5 active, 10 closed) - same active count as scan2, but more closed
+        expect(test_scans[0]["id"]).to eq(scan3.id)
+        expect(test_scans[1]["id"]).to eq(scan2.id)
+        expect(test_scans[2]["id"]).to eq(scan1.id)
+      end
+
+      it "includes closed_issue_count in response" do
+        get :index, params: { course_id: course.id }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        scan1_json = json.find { |s| s["id"] == scan1.id }
+        scan2_json = json.find { |s| s["id"] == scan2.id }
+        scan3_json = json.find { |s| s["id"] == scan3.id }
+
+        expect(scan1_json["closed_issue_count"]).to eq(10)
+        expect(scan2_json["closed_issue_count"]).to eq(3)
+        expect(scan3_json["closed_issue_count"]).to eq(20)
+      end
+    end
+
     it "only includes issue_count and issues for completed scans" do
       get :index, params: { course_id: course.id }, format: :json
       expect(response).to have_http_status(:ok)
