@@ -223,7 +223,7 @@ describe Accessibility::ContentLoader do
       "<html><body><div><h1>Test Element</h1></div></body></html>"
     end
     let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: test_content) }
-    let(:mock_rule_instance) { double("RuleInstance") }
+    let(:mock_rule_instance) { instance_double(Accessibility::Rule) }
     let(:mock_rule_registry) { { "img-alt" => mock_rule_instance } }
 
     context "when rule_id is provided and rule exists" do

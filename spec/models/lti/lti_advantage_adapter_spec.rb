@@ -26,7 +26,7 @@ describe Lti::LtiAdvantageAdapter do
   let(:user) { @student }
   let(:opts) { { resource_type: "course_navigation", domain: "test.com" } }
   let(:controller_double) do
-    controller = double(polymorphic_url: "test.com")
+    controller = instance_double(ApplicationController, polymorphic_url: "test.com")
     allow(controller).to receive(:params)
     controller
   end

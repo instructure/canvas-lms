@@ -19,8 +19,8 @@
 
 describe QuizzesNext::Service do
   describe ".enabled_in_context?" do
-    let(:root_account) { double "root_account", feature_allowed?: true }
-    let(:context) { double("context", root_account:) }
+    let(:root_account) { instance_double(Account, feature_allowed?: true) }
+    let(:context) { instance_double(Course, root_account:) }
 
     context "when the feature is enabled on the context" do
       it "will return true" do

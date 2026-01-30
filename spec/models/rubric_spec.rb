@@ -993,7 +993,7 @@ describe Rubric do
     context "feature flag edge cases" do
       it "raises NoMethodError when course doesn't have feature_enabled method" do
         # Create a mock object that responds to is_a?(Course) but doesn't have feature_enabled?
-        mock_course = double("MockCourse")
+        mock_course = instance_double(Course)
         allow(mock_course).to receive(:is_a?).with(Course).and_return(true)
         allow(mock_course).to receive(:feature_enabled?).and_raise(NoMethodError)
 
@@ -1026,7 +1026,7 @@ describe Rubric do
         association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
 
         # Mock the service and feature flag check
-        service = double("RubricLLMService")
+        service = instance_double(RubricLLMService)
         expect(RubricLLMService).to receive(:new).with(llm_rubric).and_return(service)
         expect(service).to receive(:generate_criteria_via_llm).with(assignment).and_return([
                                                                                              { id: "c1", description: "Generated Criterion", points: 20, ratings: [] }

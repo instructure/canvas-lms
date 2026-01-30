@@ -26,8 +26,8 @@ module BroadcastPolicies
       instance_double(Assignment, context: course)
     end
     let(:quiz) do
-      double(
-        "Quizzes::Quiz",
+      instance_double(
+        Quizzes::Quiz,
         context: course,
         context_id: course.id,
         deleted?: false,
@@ -40,18 +40,18 @@ module BroadcastPolicies
       instance_double(Submission, graded_at: Time.zone.now, posted?: true)
     end
     let(:enrollment) do
-      double("Enrollment", course_id: course.id, inactive?: false)
+      instance_double(Enrollment, course_id: course.id, inactive?: false)
     end
     let(:user) do
-      double("User", not_removed_enrollments: double("enrollments", where: [enrollment]))
+      instance_double(User, not_removed_enrollments: instance_double(ActiveRecord::Relation, where: [enrollment]))
     end
     let(:quiz_submission) do
-      double("Quizzes::QuizSubmission",
-             quiz:,
-             posted?: true,
-             submission:,
-             user:,
-             context: course)
+      instance_double(Quizzes::QuizSubmission,
+                      quiz:,
+                      posted?: true,
+                      submission:,
+                      user:,
+                      context: course)
     end
     let(:policy) do
       QuizSubmissionPolicy.new(quiz_submission).tap do |p|

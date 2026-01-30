@@ -27,22 +27,22 @@ module Courses
     let(:course_section_id_2) { 5 }
     let(:mock_student_enrollments) do
       [
-        double(user_id: student_id, course_section_id: course_section_id_1),
-        double(user_id: student_id, course_section_id: course_section_id_2)
+        instance_double(Enrollment, user_id: student_id, course_section_id: course_section_id_1),
+        instance_double(Enrollment, user_id: student_id, course_section_id: course_section_id_2)
       ]
     end
     let(:mock_teacher_enrollments) do
       [
-        double(user_id: teacher_id, course_section_id: course_section_id_1, limit_privileges_to_course_section: true),
-        double(user_id: teacher_id, course_section_id: course_section_id_2, limit_privileges_to_course_section: true),
-        double(user_id: privileged_teacher_id, course_section_id: 99, limit_privileges_to_course_section: false),
-        double(user_id: 101, course_section_id: 99, limit_privileges_to_course_section: true)
+        instance_double(Enrollment, user_id: teacher_id, course_section_id: course_section_id_1, limit_privileges_to_course_section: true),
+        instance_double(Enrollment, user_id: teacher_id, course_section_id: course_section_id_2, limit_privileges_to_course_section: true),
+        instance_double(Enrollment, user_id: privileged_teacher_id, course_section_id: 99, limit_privileges_to_course_section: false),
+        instance_double(Enrollment, user_id: 101, course_section_id: 99, limit_privileges_to_course_section: true)
       ]
     end
     let(:mock_only_section_limited_teacher_enrollments) do
       [
-        double(user_id: teacher_id, course_section_id: course_section_id_1, limit_privileges_to_course_section: true),
-        double(user_id: teacher_id, course_section_id: course_section_id_2, limit_privileges_to_course_section: true),
+        instance_double(Enrollment, user_id: teacher_id, course_section_id: course_section_id_1, limit_privileges_to_course_section: true),
+        instance_double(Enrollment, user_id: teacher_id, course_section_id: course_section_id_2, limit_privileges_to_course_section: true),
       ]
     end
 

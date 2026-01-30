@@ -24,27 +24,28 @@ describe Quizzes::QuizRegrader::Regrader do
 
   let(:questions) do
     1.upto(4).map do |i|
-      double(id: i, question_data: { id: i, regrade_option: "full_credit" })
+      instance_double(Quizzes::QuizQuestion, id: i, question_data: { id: i, regrade_option: "full_credit" })
     end
   end
 
   let(:submissions) do
-    1.upto(4).map { |i| double(id: i, completed?: true, latest_submitted_attempt: 1) }
+    1.upto(4).map { |i| instance_double(Quizzes::QuizSubmission, id: i, completed?: true, latest_submitted_attempt: 1) }
   end
 
   let(:current_quiz_question_regrades) do
-    1.upto(4).map { |i| double(quiz_question_id: i, regrade_option: "full_credit") }
+    1.upto(4).map { |i| instance_double(Quizzes::QuizQuestionRegrade, quiz_question_id: i, regrade_option: "full_credit") }
   end
 
   let(:quiz) do
-    double(quiz_questions: questions,
-           id: 1,
-           version_number: 1,
-           current_quiz_question_regrades:,
-           quiz_submissions: submissions)
+    instance_double(Quizzes::Quiz,
+                    quiz_questions: questions,
+                    id: 1,
+                    version_number: 1,
+                    current_quiz_question_regrades:,
+                    quiz_submissions: submissions)
   end
 
-  let(:quiz_regrade) { double(id: 1, quiz:) }
+  let(:quiz_regrade) { instance_double(Quizzes::QuizRegrade, id: 1, quiz:) }
 
   let(:quiz_regrader) { Quizzes::QuizRegrader::Regrader.new(quiz:) }
 
@@ -68,7 +69,7 @@ describe Quizzes::QuizRegrader::Regrader do
 
   describe "#quiz" do
     it "finds the passed version of the quiz if present" do
-      quiz_stub = double
+      quiz_stub = instance_double(Quizzes::Quiz)
       options = {
         quiz:,
         version_number: 2
@@ -78,7 +79,7 @@ describe Quizzes::QuizRegrader::Regrader do
         versionable_type: Quizzes::Quiz.class_names,
         number: 2,
         versionable_id: quiz.id
-      ).once.and_return([double(model: quiz_stub)])
+      ).once.and_return([instance_double(Version, model: quiz_stub)])
 
       expect(Quizzes::QuizRegrader::Regrader.new(options).quiz).to eq quiz_stub
     end
@@ -86,9 +87,9 @@ describe Quizzes::QuizRegrader::Regrader do
 
   describe "#submissions" do
     it "skips submissions that are in progress with no prior attempts" do
-      questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
+      questions << instance_double(Quizzes::QuizQuestion, id: 5, question_data: { regrade_option: "no_regrade" })
 
-      uncompleted_submission = double(id: 5, completed?: false, latest_submitted_attempt: nil)
+      uncompleted_submission = instance_double(Quizzes::QuizSubmission, id: 5, completed?: false, latest_submitted_attempt: nil)
       submissions << uncompleted_submission
 
       expect(quiz_regrader.submissions.length).to eq 4
@@ -96,9 +97,9 @@ describe Quizzes::QuizRegrader::Regrader do
     end
 
     it "does not skip submissions that are in progress that have prior attempts" do
-      questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
+      questions << instance_double(Quizzes::QuizQuestion, id: 5, question_data: { regrade_option: "no_regrade" })
 
-      uncompleted_submission = double(id: 5, completed?: false, latest_submitted_attempt: 1)
+      uncompleted_submission = instance_double(Quizzes::QuizSubmission, id: 5, completed?: false, latest_submitted_attempt: 1)
       submissions << uncompleted_submission
 
       expect(quiz_regrader.submissions.length).to eq 5
@@ -108,8 +109,8 @@ describe Quizzes::QuizRegrader::Regrader do
 
   describe "#regrade!" do
     it "creates a QuizRegrader::Submission for each submission and regrades them" do
-      questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
-      questions << double(id: 6, question_data: {})
+      questions << instance_double(Quizzes::QuizQuestion, id: 5, question_data: { regrade_option: "no_regrade" })
+      questions << instance_double(Quizzes::QuizQuestion, id: 6, question_data: {})
 
       expect(Quizzes::QuizRegradeRun).to receive(:perform).with(quiz_regrade)
       allow_any_instance_of(Quizzes::QuizRegrader::Submission).to receive(:regrade!)

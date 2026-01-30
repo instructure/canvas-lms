@@ -123,10 +123,10 @@ describe AuthenticationProvider::Clever do
   end
 
   def mock_token(user_data, raw_data = me_response)
-    me_response_double = double("me_response", parsed: raw_data)
-    user_response_double = double("user_response", parsed: user_data)
+    me_response_double = instance_double(OAuth2::Response, parsed: raw_data)
+    user_response_double = instance_double(OAuth2::Response, parsed: user_data)
 
-    token = double("token", options: {})
+    token = instance_double(OAuth2::AccessToken, options: {})
     allow(token).to receive(:get).with("/v3.0/me").and_return(me_response_double)
     allow(token).to receive(:get).with("/v3.0/users/#{raw_data.dig("data", "id")}").and_return(user_response_double)
     token

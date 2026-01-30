@@ -54,8 +54,8 @@ describe PageView::Pv4Client do
   end
 
   def stub_http_request(response)
-    double = double(body: response.to_json, code: 200)
-    allow(CanvasHttp).to receive(:get).and_return(double)
+    http_response = instance_double(Net::HTTPResponse, body: response.to_json, code: 200)
+    allow(CanvasHttp).to receive(:get).and_return(http_response)
   end
 
   describe "#fetch" do
@@ -125,14 +125,14 @@ describe PageView::Pv4Client do
         expect_url = "http://pv4/users/1/page_views#{expect_params}"
         expect_header = { "Authorization" => "Bearer token" }
 
-        res = double(body: { "page_views" => [pv4_object] }.to_json, code: 200)
+        res = instance_double(Net::HTTPResponse, body: { "page_views" => [pv4_object] }.to_json, code: 200)
         expect(CanvasHttp).to receive(:get).with(expect_url, expect_header).and_return(res)
         client.fetch(user, start_time:, end_time:)
       end
     end
 
     it "raises Pv4BadRequest when response code is 400" do
-      response = double(body: "", code: 400)
+      response = instance_double(Net::HTTPResponse, body: "", code: 400)
       allow(CanvasHttp).to receive(:get).and_return(response)
 
       expect { client.fetch(user) }.to raise_error(
@@ -141,7 +141,7 @@ describe PageView::Pv4Client do
     end
 
     it "raises Pv4Unauthorized when response code is 401" do
-      response = double(body: "", code: 401)
+      response = instance_double(Net::HTTPResponse, body: "", code: 401)
       allow(CanvasHttp).to receive(:get).and_return(response)
 
       expect { client.fetch(user) }.to raise_error(
@@ -150,7 +150,7 @@ describe PageView::Pv4Client do
     end
 
     it "raises Pv4NotFound when response code is 404" do
-      response = double(body: "", code: 404)
+      response = instance_double(Net::HTTPResponse, body: "", code: 404)
       allow(CanvasHttp).to receive(:get).and_return(response)
 
       expect { client.fetch(user) }.to raise_error(
@@ -159,7 +159,7 @@ describe PageView::Pv4Client do
     end
 
     it "raises Pv4TooManyRequests when response code is 429" do
-      response = double(body: "", code: 429)
+      response = instance_double(Net::HTTPResponse, body: "", code: 429)
       allow(CanvasHttp).to receive(:get).and_return(response)
 
       expect { client.fetch(user) }.to raise_error(
@@ -168,7 +168,7 @@ describe PageView::Pv4Client do
     end
 
     it "parses the JSON response when the body is valid JSON with page_views" do
-      response = double(body: { "page_views" => [pv4_object] }.to_json, code: 200)
+      response = instance_double(Net::HTTPResponse, body: { "page_views" => [pv4_object] }.to_json, code: 200)
       allow(CanvasHttp).to receive(:get).and_return(response)
 
       result = client.fetch(user)
@@ -177,7 +177,7 @@ describe PageView::Pv4Client do
     end
 
     it "raises Pv4EmptyResponse when response body is empty" do
-      response = double(body: "", code: 200)
+      response = instance_double(Net::HTTPResponse, body: "", code: 200)
       allow(CanvasHttp).to receive(:get).and_return(response)
 
       expect { client.fetch(user) }.to raise_error(
@@ -186,7 +186,7 @@ describe PageView::Pv4Client do
     end
 
     it "raises Pv4EmptyResponse when response body is invalid JSON" do
-      response = double(body: "invalid json", code: 200)
+      response = instance_double(Net::HTTPResponse, body: "invalid json", code: 200)
       allow(CanvasHttp).to receive(:get).and_return(response)
 
       expect { client.fetch(user) }.to raise_error(
@@ -195,7 +195,7 @@ describe PageView::Pv4Client do
     end
 
     it "raises Pv4EmptyResponse when response body does not contain page_views" do
-      response = double(body: { "other_key" => [pv4_object] }.to_json, code: 200)
+      response = instance_double(Net::HTTPResponse, body: { "other_key" => [pv4_object] }.to_json, code: 200)
       allow(CanvasHttp).to receive(:get).and_return(response)
 
       expect { client.fetch(user) }.to raise_error(
@@ -219,11 +219,11 @@ describe PageView::Pv4Client do
       now = Time.now.utc
       result = client.for_user(user).paginate(per_page: 10)
 
-      double = double(body: '{ "page_views": [] }', code: 200)
+      http_response = instance_double(Net::HTTPResponse, body: '{ "page_views": [] }', code: 200)
       expect(CanvasHttp).to receive(:get).with(
         "http://pv4/users/1/page_views?start_time=#{now.iso8601(PageView::Pv4Client::PRECISION)}&end_time=#{pv4_object["timestamp"]}&root_account_uuids=abc&last_page_view_id=#{pv4_object["request_id"]}&limit=10",
         { "Authorization" => "Bearer token" }
-      ).and_return(double)
+      ).and_return(http_response)
       client.for_user(user, oldest: now, newest: now)
             .paginate(page: result.next_page, per_page: 10)
     end

@@ -2217,14 +2217,14 @@ describe Assignment do
 
   describe ".cleanup_importing_assignments" do
     before do
-      importing_for_too_long_result = double
-      @in_batches_result = double
+      importing_for_too_long_result = instance_double(ActiveRecord::Relation)
+      @in_batches_result = instance_double(ActiveRecord::Batches::BatchEnumerator)
       allow(described_class).to receive(:importing_for_too_long).and_return(importing_for_too_long_result)
       allow(importing_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
     end
 
     it "marks all assignments that have been importing for too long as fail_to_import" do
-      now = double("now")
+      now = instance_double(ActiveSupport::TimeWithZone)
       expect(Time.zone).to receive(:now).and_return(now)
       expect(@in_batches_result).to receive(:update_all).with(
         importing_started_at: nil,
@@ -2341,9 +2341,9 @@ describe Assignment do
 
     context "when duplicate_of and context are present" do
       it "calls delay_if_production with LOW_PRIORITY and call_outcome_alignment_service_clone" do
-        delayed_object = double("delayed")
-        expect(duplicated_assignment).to receive(:delay_if_production).with(priority: Delayed::LOW_PRIORITY).and_return(delayed_object)
-        expect(delayed_object).to receive(:call_outcome_alignment_service_clone)
+        expect(duplicated_assignment).to receive(:delay_if_production).with(priority: Delayed::LOW_PRIORITY).and_call_original
+        allow(duplicated_assignment).to receive(:__calculate_sender_for_delay).and_return(duplicated_assignment)
+        expect(duplicated_assignment).to receive(:call_outcome_alignment_service_clone)
         duplicated_assignment.send(:start_outcome_alignment_service_clone)
       end
 
@@ -2463,14 +2463,14 @@ describe Assignment do
 
   describe ".clean_up_cloning_alignments" do
     before do
-      cloning_alignments_for_too_long_result = double
-      @in_batches_result = double
+      cloning_alignments_for_too_long_result = instance_double(ActiveRecord::Relation)
+      @in_batches_result = instance_double(ActiveRecord::Batches::BatchEnumerator)
       allow(described_class).to receive(:cloning_alignments_for_too_long).and_return(cloning_alignments_for_too_long_result)
       allow(cloning_alignments_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
     end
 
     it "marks all assignments that have been in the status cloning assignment for too long as failed_to_clone_outcome_alignment" do
-      now = double("now")
+      now = instance_double(ActiveSupport::TimeWithZone)
       expect(Time.zone).to receive(:now).and_return(now)
       expect(@in_batches_result).to receive(:update_all).with(
         duplication_started_at: nil,
@@ -4060,7 +4060,7 @@ describe Assignment do
     end
 
     it "delegates to NeedsGradingCountQuery" do
-      query = double("Assignments::NeedsGradingCountQuery")
+      query = instance_double(Assignments::NeedsGradingCountQuery)
       expect(query).to receive(:manual_count)
       expect(Assignments::NeedsGradingCountQuery).to receive(:new).with(@assignment).and_return(query)
       @assignment.needs_grading_count

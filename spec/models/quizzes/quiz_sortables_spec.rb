@@ -28,8 +28,8 @@ describe Quizzes::QuizSortables do
     end
 
     it "assigns the group and quiz" do
-      quiz  = double
-      group = double(quiz:)
+      quiz  = instance_double(Quizzes::Quiz)
+      group = instance_double(Quizzes::QuizGroup, quiz:)
 
       sortables = Quizzes::QuizSortables.new(group:, order: [])
 
@@ -44,9 +44,9 @@ describe Quizzes::QuizSortables do
 
       question = Quizzes::QuizQuestion.new
       question.id = 123
-      questions = double(active: [question])
+      questions = class_double(Quizzes::QuizQuestion, active: [question])
 
-      quiz = double(quiz_groups: groups, quiz_questions: questions)
+      quiz = instance_double(Quizzes::Quiz, quiz_groups: groups, quiz_questions: questions)
 
       order = [{ "type" => "group",    "id" => "234" },
                { "type" => "question", "id" => "123" }]
@@ -57,9 +57,9 @@ describe Quizzes::QuizSortables do
 
     it "ignores items that dont have valid ids" do
       groups = [Quizzes::QuizGroup.new]
-      questions = double(active: [Quizzes::QuizQuestion.new])
+      questions = class_double(Quizzes::QuizQuestion, active: [Quizzes::QuizQuestion.new])
 
-      quiz = double(quiz_groups: groups, quiz_questions: questions)
+      quiz = instance_double(Quizzes::Quiz, quiz_groups: groups, quiz_questions: questions)
 
       order = [{ "type" => "group",    "id" => "234" },
                { "type" => "question", "id" => "123" }]
@@ -78,9 +78,10 @@ describe Quizzes::QuizSortables do
         @question2 = Quizzes::QuizQuestion.new
         @question2.id = 234
 
-        @quiz = double(quiz_groups: [],
-                       quiz_questions: double(active: [@question1, @question2]),
-                       mark_edited!: true)
+        @quiz = instance_double(Quizzes::Quiz,
+                                quiz_groups: [],
+                                quiz_questions: class_double(Quizzes::QuizQuestion, active: [@question1, @question2]),
+                                mark_edited!: true)
         @group = Group.new
         allow(@group).to receive_messages(quiz: @quiz, id: 999)
 
@@ -105,9 +106,10 @@ describe Quizzes::QuizSortables do
         @question = Quizzes::QuizQuestion.new
         @question.id = 123
 
-        @quiz = double(quiz_groups: [@group],
-                       quiz_questions: double(active: [@question]),
-                       mark_edited!: true)
+        @quiz = instance_double(Quizzes::Quiz,
+                                quiz_groups: [@group],
+                                quiz_questions: class_double(Quizzes::QuizQuestion, active: [@question]),
+                                mark_edited!: true)
 
         @order = [{ "type" => "group",    "id" => "234" },
                   { "type" => "question", "id" => "123" }]

@@ -93,7 +93,7 @@ describe MediaObject do
     it "fixes associated attachments in a weird state" do
       file_data = fixture_file_upload("292.mp3", "audio/mpeg", true)
       a1 = attachment_model(context: @course, uploaded_data: file_data, media_entry_id: "m-unicorns")
-      client = double("kaltura_client")
+      client = instance_double(CanvasKaltura::ClientV3)
       expect(CanvasKaltura::ClientV3).to receive_messages(new: client)
       url = "http://example.com/video1.mp3"
       media_sources = [{
@@ -119,7 +119,7 @@ describe MediaObject do
 
   describe "#transcoded_details" do
     before do
-      @mock_kaltura = double("CanvasKaltura::ClientV3")
+      @mock_kaltura = instance_double(CanvasKaltura::ClientV3)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
       allow(@mock_kaltura).to receive(:media_sources).and_return(
         [{ height: "240",
@@ -184,7 +184,7 @@ describe MediaObject do
 
   describe "#retrieve_details_ensure_codecs" do
     before do
-      @mock_kaltura = double("CanvasKaltura::ClientV3")
+      @mock_kaltura = instance_double(CanvasKaltura::ClientV3)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
       allow(@mock_kaltura).to receive(:media_sources).and_return(
         [{ height: "240",
@@ -448,7 +448,7 @@ describe MediaObject do
   describe ".add_media_files" do
     before do
       @attachment = Attachment.new
-      @kaltura_media_file_handler = double("KalturaMediaFileHandler")
+      @kaltura_media_file_handler = instance_double(KalturaMediaFileHandler)
       allow(KalturaMediaFileHandler).to receive(:new).and_return(@kaltura_media_file_handler)
     end
 
@@ -517,7 +517,7 @@ describe MediaObject do
     end
 
     before do
-      @mock_kaltura = double("CanvasKaltura::ClientV3")
+      @mock_kaltura = instance_double(CanvasKaltura::ClientV3)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
       allow(@mock_kaltura).to receive_messages(startSession: nil,
                                                media_sources: [{ height: "240",

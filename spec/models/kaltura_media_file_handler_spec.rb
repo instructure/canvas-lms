@@ -21,7 +21,7 @@
 describe KalturaMediaFileHandler do
   describe "#add_media_files" do
     let(:kaltura_config) { {} }
-    let(:kaltura_client) { double("CanvasKaltura::ClientV3") }
+    let(:kaltura_client) { instance_double(CanvasKaltura::ClientV3) }
     let(:files_sent_to_kaltura) { [] }
     let(:uploading_user) { user_factory }
     let(:attachment_context) { uploading_user }

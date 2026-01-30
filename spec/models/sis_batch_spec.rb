@@ -150,7 +150,7 @@ describe SisBatch do
     batch = process_csv_data([%(user_id,login_id,status
                         user_1,user_1,active)])
 
-    expect(Delayed::Worker).to receive(:current_job).at_least(:once).and_return(double("Delayed::Job", id: 789))
+    expect(Delayed::Worker).to receive(:current_job).at_least(:once).and_return(instance_double(Delayed::Job, id: 789))
     allow_any_instance_of(SisBatch).to receive(:roll_back_data).and_raise "no roll back data for you"
     batch.restore_states_later
     run_jobs

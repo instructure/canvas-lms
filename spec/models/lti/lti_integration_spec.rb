@@ -59,9 +59,9 @@ describe "LTI integration tests" do
   let_once(:root_account) { Account.create!(name: "root_account") }
 
   let(:controller) do
-    request_mock = double("request")
+    request_mock = instance_double(ActionDispatch::Request)
     allow(request_mock).to receive_messages(host: "/my/url", scheme: "https")
-    m = double("controller")
+    m = instance_double(ApplicationController)
     allow(m).to receive_messages(request: request_mock, logged_in_user: @user || user)
     m
   end

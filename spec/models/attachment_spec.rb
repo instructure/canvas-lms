@@ -600,7 +600,7 @@ describe Attachment do
       allow(ApplicationController).to receive(:test_cluster?).and_return(true)
       s3_storage!
       a = attachment_model
-      allow(a).to receive(:s3object).and_return(double("s3object"))
+      allow(a).to receive(:s3object).and_return(instance_double(Aws::S3::Object))
       s3object = a.s3object
       expect(s3object).not_to receive(:delete)
       a.destroy_content
@@ -952,7 +952,7 @@ describe Attachment do
           dup = nil
           @shard1.activate do
             dup = Attachment.new
-            expect(dup).to receive(:s3object).at_least(:once).and_return(double("Aws::S3::Object", exists?: false))
+            expect(dup).to receive(:s3object).at_least(:once).and_return(instance_double(Aws::S3::Object, exists?: false))
             att.clone_for(shard1_account, dup)
           end
           expect(dup.content_type).to eq att.content_type
@@ -2079,8 +2079,8 @@ describe Attachment do
       @root = attachment_model(filename: "unknown 2.example")
       @child = attachment_model(root_attachment: @root)
 
-      @old_object = double("old object")
-      @new_object = double("new object")
+      @old_object = instance_double(Aws::S3::Object)
+      @new_object = instance_double(Aws::S3::Object)
       new_full_filename = @root.full_filename.sub(@root.namespace, @new_account.file_namespace)
       allow(@root.bucket).to receive(:object).with(@root.full_filename).and_return(@old_object)
       allow(@root.bucket).to receive(:object).with(new_full_filename).and_return(@new_object)
@@ -2813,7 +2813,7 @@ describe Attachment do
 
     before do
       allow(Attachment).to receive_messages(local_storage?: false, s3_storage?: true)
-      allow(@attachment).to receive(:s3object).and_return(double("s3object"))
+      allow(@attachment).to receive(:s3object).and_return(instance_double(Aws::S3::Object))
       allow(@attachment).to receive(:after_attachment_saved)
     end
 
@@ -2826,7 +2826,7 @@ describe Attachment do
       end
 
       before do
-        allow(@existing_attachment).to receive(:s3object).and_return(double("existing_s3object"))
+        allow(@existing_attachment).to receive(:s3object).and_return(instance_double(Aws::S3::Object))
         allow(@attachment).to receive(:find_existing_attachment_for_md5).and_return(@existing_attachment)
       end
 
@@ -3660,7 +3660,7 @@ describe Attachment do
         file_state: "available"
       )
     end
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(
@@ -3732,7 +3732,7 @@ describe Attachment do
         filename: "test.pdf"
       )
     end
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(
@@ -3758,7 +3758,7 @@ describe Attachment do
     let(:course) { Course.create! }
     let(:public_download_url) { "https://s3.amazonaws.com/bucket/file.pdf" }
     let(:attachment) { attachment_model(context: course, content_type: "application/pdf", filename: "test.pdf") }
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(enabled?: true, ingest_url: true)
@@ -3831,7 +3831,7 @@ describe Attachment do
         file_state: "available"
       )
     end
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
     let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
 
     before do

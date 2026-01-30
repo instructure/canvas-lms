@@ -23,14 +23,15 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:question_group) do
-    double(pick_count: 1, question_points: 25)
+    instance_double(Quizzes::QuizGroup, pick_count: 1, question_points: 25)
   end
 
   let(:question_regrades) do
     1.upto(3).index_with do |i|
-      double(quiz_question: double(id: i, question_data: { id: i }, quiz_group: question_group),
-             question_data: { id: i },
-             regrade_option: regrade_options[i])
+      instance_double(Quizzes::QuizQuestionRegrade,
+                      quiz_question: instance_double(Quizzes::QuizQuestion, id: i, question_data: { id: i }, quiz_group: question_group),
+                      question_data: { id: i },
+                      regrade_option: regrade_options[i])
     end
   end
 
@@ -45,13 +46,14 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:submission) do
-    double(:score => 0,
-           :score_before_regrade => 1,
-           :questions => questions,
-           :score= => nil,
-           :score_before_regrade= => nil,
-           :submission_data => submission_data,
-           :[]= => {})
+    instance_double(Quizzes::QuizSubmission,
+                    :score => 0,
+                    :score_before_regrade => 1,
+                    :questions => questions,
+                    :score= => nil,
+                    :score_before_regrade= => nil,
+                    :submission_data => submission_data,
+                    :[]= => {})
   end
 
   let(:wrapper) do
@@ -60,8 +62,9 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:attempts) do
-    double(
-      version_models: [double(submission_data:)],
+    instance_double(
+      Quizzes::QuizSubmissionHistory,
+      version_models: [instance_double(Quizzes::QuizSubmission, submission_data:)],
       last_versions: []
     )
   end
@@ -71,7 +74,8 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:multiple_attempts_submission) do
-    double(
+    instance_double(
+      Quizzes::QuizSubmission,
       :attempts => attempts,
       :score => 0,
       :score_before_regrade => 1,
@@ -103,7 +107,7 @@ describe Quizzes::QuizRegrader::Submission do
   describe "#regrade!" do
     it "wraps each answer in the submisison's submission_data and regrades" do
       submission_data.each do
-        answer_stub = double
+        answer_stub = instance_double(Quizzes::QuizRegrader::Answer)
         expect(answer_stub).to receive(:regrade!).once.and_return(1)
         expect(Quizzes::QuizRegrader::Answer).to receive(:new).and_return answer_stub
       end
@@ -119,7 +123,7 @@ describe Quizzes::QuizRegrader::Submission do
       expect(submission).to receive(:score_before_regrade=).with(0)
       expect(submission).to receive(:quiz_data=)
       expect(submission).to receive_messages(
-        attempts: double(version_models: [], last_versions: [])
+        attempts: instance_double(Quizzes::QuizSubmissionHistory, version_models: [], last_versions: [])
       )
 
       wrapper.regrade!
@@ -129,7 +133,7 @@ describe Quizzes::QuizRegrader::Submission do
       # These should never be called.
       # The ones that need regrading were part of a different attempt
       multiple_attempts_submission_data.each do
-        answer_stub = double
+        answer_stub = instance_double(Quizzes::QuizRegrader::Answer)
         expect(answer_stub).not_to receive(:regrade!)
       end
 
