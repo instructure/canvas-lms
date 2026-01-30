@@ -17052,6 +17052,7 @@ uk:
   starred_subject_click_to_unstar_6aafcddc: "Позначено \"%{subject}\", Натисніть на зірочку для того щоб відмінити."
   start_5a4cfcd6: Початок
   start_a_new_course_57ae2480: "Почати Новий  Курс "
+  start_at_c29f35f1: "Початок в"
   start_date_e937be8a: "Дата початку"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "Поле \"Дата початку\" для довідника стилів"
