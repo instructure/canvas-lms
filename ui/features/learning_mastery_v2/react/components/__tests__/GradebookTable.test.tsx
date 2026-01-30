@@ -33,6 +33,12 @@ import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributin
 
 vi.mock('@canvas/outcomes/react/hooks/useContributingScores')
 
+vi.mock('@canvas/svg-wrapper', () => ({
+  default: ({ariaLabel, ariaHidden}: {ariaLabel?: string; ariaHidden?: boolean}) => (
+    <svg aria-label={ariaLabel} aria-hidden={ariaHidden} data-testid="mock-svg" />
+  ),
+}))
+
 const mockContributingScores = {
   forOutcome: vi.fn().mockReturnValue({
     isVisible: vi.fn().mockReturnValue(false),
@@ -113,10 +119,10 @@ describe('GradebookTable', () => {
     expect(container.textContent).toContain('Student 3')
   })
 
-  it('renders student outcome scores', () => {
-    const {container} = renderWithQueryClient(<GradebookTable {...defaultProps} />)
-    expect(container.textContent).toContain('mastery!')
-    expect(container.textContent).toContain('great!')
+  it('renders student outcome scores', async () => {
+    renderWithQueryClient(<GradebookTable {...defaultProps} />)
+    expect((await screen.findAllByLabelText('mastery!')).length).toBeGreaterThan(0)
+    expect((await screen.findAllByLabelText('great!')).length).toBeGreaterThan(0)
   })
 
   describe('contributing scores', () => {

@@ -27,6 +27,12 @@ import {
   ContributingScoreAlignment,
 } from '@canvas/outcomes/react/hooks/useContributingScores'
 
+vi.mock('@canvas/svg-wrapper', () => ({
+  default: ({ariaLabel, ariaHidden}: {ariaLabel?: string; ariaHidden?: boolean}) => (
+    <svg aria-label={ariaLabel} aria-hidden={ariaHidden} data-testid="mock-svg" />
+  ),
+}))
+
 describe('ScoresGrid', () => {
   afterEach(() => {
     cleanup()
@@ -133,9 +139,9 @@ describe('ScoresGrid', () => {
     window.ENV.GRADEBOOK_OPTIONS = {ACCOUNT_LEVEL_MASTERY_SCALES: true}
   })
 
-  it('renders each outcome rollup', () => {
-    const {getByText} = render(<ScoresGrid {...defaultProps()} />)
-    expect(getByText(/mastery/)).toBeInTheDocument()
+  it('renders each outcome rollup', async () => {
+    render(<ScoresGrid {...defaultProps()} />)
+    expect(await screen.findByLabelText('mastery')).toBeInTheDocument()
   })
 
   it('passes scoreDisplayFormat prop to StudentOutcomeScore components', () => {
@@ -145,10 +151,9 @@ describe('ScoresGrid', () => {
     expect(getByText('3')).toBeInTheDocument()
   })
 
-  it('uses ICON_ONLY as default scoreDisplayFormat', () => {
-    const {getByText} = render(<ScoresGrid {...defaultProps()} />)
-    const srContent = getByText('mastery')
-    expect(srContent).toBeInTheDocument()
+  it('uses ICON_ONLY as default scoreDisplayFormat', async () => {
+    render(<ScoresGrid {...defaultProps()} />)
+    expect(await screen.findByLabelText('mastery')).toBeInTheDocument()
   })
 
   it('renders correct test-id for student-outcome-score cells', () => {
