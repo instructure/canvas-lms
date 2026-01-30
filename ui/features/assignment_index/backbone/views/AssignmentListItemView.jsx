@@ -361,7 +361,11 @@ export default (AssignmentListItemView = (function () {
         }
       }
 
-      if (assessmentRequests && assessmentRequests.length) {
+      if (
+        assessmentRequests &&
+        assessmentRequests.length &&
+        !ENV.FLAGS.peer_review_allocation_and_grading
+      ) {
         const peerReviewElem =
           this.$el.find(`#assignment_student_peer_review_${this.model.id}`) ?? []
         const mountPoint = peerReviewElem[0]

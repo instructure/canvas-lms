@@ -20,10 +20,49 @@ import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import AssignmentGroup from '../models/AssignmentGroup'
 import SubmissionCollection from './SubmissionCollection'
+import {isStudent} from '../models/Assignment'
 
 const PER_PAGE_LIMIT = 50
 
 export default class AssignmentGroupCollection extends PaginatedCollection {
+  expandPeerReviewSubAssignments() {
+    if (!ENV.FLAGS.peer_review_allocation_and_grading || !isStudent()) {
+      return
+    }
+
+    this.each(group => {
+      const assignments = group.get('assignments')
+      if (!assignments) {
+        return
+      }
+
+      const assignmentsToAdd = []
+
+      assignments.each(assignment => {
+        const peerReviewSubAssignment = assignment.get('peer_review_sub_assignment')
+        if (peerReviewSubAssignment) {
+          const peerReviewAssignment = {
+            ...peerReviewSubAssignment,
+            parent_assignment_id: assignment.get('id'),
+            parent_assignment_name: assignment.get('name'),
+            parent_peer_review_count: assignment.get('peer_review_count') || 0,
+            is_peer_review_assignment: true,
+            assignment_group_id: assignment.get('assignment_group_id'),
+            course_id: assignment.get('course_id'),
+            published: peerReviewSubAssignment.published ?? assignment.get('published'),
+            html_url: assignment.get('html_url') + '/peer_reviews',
+          }
+
+          assignmentsToAdd.push(peerReviewAssignment)
+        }
+      })
+
+      if (assignmentsToAdd.length > 0) {
+        assignments.add(assignmentsToAdd)
+      }
+    })
+  }
+
   loadModuleNames() {
     const modules = new ModuleCollection([], {course_id: this.course.id})
     modules.loadAll = true

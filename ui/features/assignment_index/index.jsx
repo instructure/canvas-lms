@@ -142,6 +142,9 @@ ready(() => {
       }),
     )
     .then(() => {
+      // Expand peer review sub-assignments before date grouping
+      assignmentGroups.expandPeerReviewSubAssignments()
+
       if (ENV.HAS_GRADING_PERIODS) {
         app.filterResults()
       }

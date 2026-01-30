@@ -2433,6 +2433,7 @@ class CoursesController < ApplicationController
             FLAGS: {
               newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
               show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
+              peer_review_allocation_and_grading: @context.feature_enabled?(:peer_review_allocation_and_grading)
             }
           )
           js_env(COURSE_HOME: true)
