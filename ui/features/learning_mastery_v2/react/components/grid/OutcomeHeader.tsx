@@ -104,7 +104,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
     <>
       <ColumnHeader
         title={outcome.title}
-        optionsMenuTriggerLabel={I18n.t('Sort Outcome Column')}
+        optionsMenuTriggerLabel={I18n.t('%{outcome} options', {outcome: outcome.title})}
         optionsMenuItems={[sortMenuGroup, <Menu.Separator key="separator" />, displayMenuGroup]}
       />
 

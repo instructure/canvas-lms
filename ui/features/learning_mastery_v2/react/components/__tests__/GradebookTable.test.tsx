@@ -103,7 +103,7 @@ describe('GradebookTable', () => {
 
   it('renders student column header', () => {
     renderWithQueryClient(<GradebookTable {...defaultProps} />)
-    expect(screen.getByText('Students')).toBeInTheDocument()
+    expect(screen.getAllByText('Students')[0]).toBeInTheDocument()
   })
 
   it('renders outcome column headers', () => {
@@ -205,7 +205,7 @@ describe('GradebookTable', () => {
         />,
       )
 
-      expect(screen.getByText('outcome 1')).toBeInTheDocument()
+      expect(screen.getAllByText('outcome 1')[0]).toBeInTheDocument()
     })
 
     it('calls handleOutcomeReorder when outcome is moved', () => {
@@ -263,7 +263,7 @@ describe('GradebookTable', () => {
       }
 
       renderWithQueryClient(<GradebookTable {...props} />)
-      expect(screen.getByText('outcome 1')).toBeInTheDocument()
+      expect(screen.getAllByText('outcome 1')[0]).toBeInTheDocument()
     })
   })
 })
