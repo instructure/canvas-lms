@@ -36,6 +36,12 @@ vi.mock('../hooks/useGradebookSettings')
 vi.mock('../hooks/useStudents')
 vi.mock('@canvas/outcomes/react/hooks/useContributingScores')
 
+vi.mock('@canvas/svg-wrapper', () => ({
+  default: ({ariaLabel, ariaHidden}: {ariaLabel?: string; ariaHidden?: boolean}) => (
+    <svg aria-label={ariaLabel} aria-hidden={ariaHidden} data-testid="mock-svg" />
+  ),
+}))
+
 describe('LearningMastery', () => {
   const ratings: Rating[] = MOCK_RATINGS
   const students: Student[] = MOCK_STUDENTS
@@ -215,7 +221,7 @@ describe('LearningMastery', () => {
     })
 
     expect(screen.getByText(outcomes[0].title)).toBeInTheDocument()
-    expect(screen.getByText('rating description!')).toBeInTheDocument()
+    expect(await screen.findByLabelText('rating description!')).toBeInTheDocument()
   })
 
   it('calls useRollups with the provided courseId', () => {
