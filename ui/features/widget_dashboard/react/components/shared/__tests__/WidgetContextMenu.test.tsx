@@ -59,7 +59,7 @@ describe('WidgetContextMenu', () => {
   const buildDefaultProps = (overrides = {}) => {
     return {
       trigger: (
-        <IconButton screenReaderLabel="Drag to reorder widget" data-testid="menu-trigger">
+        <IconButton screenReaderLabel="Reorder Test Widget" data-testid="menu-trigger">
           <IconDragHandleLine />
         </IconButton>
       ),

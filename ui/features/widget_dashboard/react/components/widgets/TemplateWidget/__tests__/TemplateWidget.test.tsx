@@ -406,5 +406,23 @@ describe('TemplateWidget', () => {
         </QueryClientProvider>,
       )
     })
+
+    describe('accessibility', () => {
+      it('includes widget name in reorder button aria-label', () => {
+        const props = buildDefaultProps({isEditMode: true})
+        setup(props, <div>Test content</div>, ['desktop'])
+
+        const dragHandle = screen.getByTestId('test-widget-drag-handle')
+        expect(dragHandle).toHaveAccessibleName('Reorder Test Widget')
+      })
+
+      it('includes widget name in remove button aria-label', () => {
+        const props = buildDefaultProps({isEditMode: true})
+        setup(props, <div>Test content</div>, ['desktop'])
+
+        const removeButton = screen.getByTestId('test-widget-remove-button')
+        expect(removeButton).toHaveAccessibleName('Remove Test Widget')
+      })
+    })
   })
 })
