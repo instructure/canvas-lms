@@ -22968,6 +22968,7 @@ fa:
   start_a_new_course_57ae2480: "شروع درس جدید"
   start_a_new_subject_7271b3ec: "موضوع جدیدی را شروع کنید"
   start_assignment_d56256d3: "شروع تکلیف"
+  start_at_c29f35f1: "شروع از"
   start_date_c41cb23a: "تاریخ شروع:"
   start_date_e937be8a: "تاریخ شروع"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
