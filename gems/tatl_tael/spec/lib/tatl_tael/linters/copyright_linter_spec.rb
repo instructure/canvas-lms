@@ -38,7 +38,7 @@ describe TatlTael::Linters::CopyrightLinter do
       }
     ]
   end
-  let(:changes) { raw_changes.map { |c| double(c) } }
+  let(:changes) { raw_changes.map { |c| double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
   let(:linter) { described_class.new(changes:, config:) }
   let(:linter_with_auto_correct) do
     described_class.new(changes:, config:, auto_correct: true)

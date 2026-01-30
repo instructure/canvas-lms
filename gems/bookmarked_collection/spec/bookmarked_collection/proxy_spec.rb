@@ -29,8 +29,8 @@ describe BookmarkedCollection::Proxy do
       3.times { example_class.create! }
       @scope = example_class.order(:id)
 
-      @next_bookmark = double
-      @bookmarker = double(bookmark_for: @next_bookmark, validate: true)
+      @next_bookmark = Object.new
+      @bookmarker = instance_double(BookmarkedCollection::SimpleBookmarker, bookmark_for: @next_bookmark, validate: true)
       @proxy = BookmarkedCollection::Proxy.new(@bookmarker, lambda do |pager|
         results = @scope.paginate(page: 1, per_page: pager.per_page)
         pager.replace results

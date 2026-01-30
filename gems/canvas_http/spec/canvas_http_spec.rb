@@ -139,10 +139,10 @@ describe "CanvasHttp" do
     end
 
     it "does not use ssl" do
-      http = double.as_null_object
+      http = instance_double(Net::HTTP).as_null_object
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(false)
-      response = double("Response")
+      response = instance_double(Net::HTTPResponse)
       expect(response).to receive(:body)
       expect(http).to receive(:request).and_yield(response)
 
@@ -150,13 +150,13 @@ describe "CanvasHttp" do
     end
 
     it "uses ssl" do
-      http = double
+      http = instance_double(Net::HTTP)
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(true)
-      expect(http).not_to receive(:verify_mode).with(OpenSSL::SSL::VERIFY_NONE)
+      expect(http).not_to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
       expect(http).to receive(:verify_hostname=).with(false) # temporary; until all offenders are fixed
       expect(http).to receive(:verify_callback=)             # temporary; until all offenders are fixed
-      expect(http).to receive(:request).and_yield(double(body: "Hello SSL"))
+      expect(http).to receive(:request).and_yield(instance_double(Net::HTTPResponse, body: "Hello SSL"))
       expect(http).to receive(:open_timeout=).with(5)
       expect(http).to receive(:ssl_timeout=).with(5)
       expect(http).to receive(:read_timeout=).with(30)
@@ -250,7 +250,7 @@ describe "CanvasHttp" do
 
   describe ".read_body_max_length" do
     context "when the response has multiple chunks" do
-      let(:mock_response) { double("response") }
+      let(:mock_response) { instance_double(Net::HTTPResponse) }
 
       before do
         allow(mock_response).to receive(:read_body) do |&blk|
@@ -299,7 +299,7 @@ describe "CanvasHttp" do
   end
 
   describe ".tempfile_for_url" do
-    let(:tempfile) { double("tempfile") }
+    let(:tempfile) { instance_double(Tempfile) }
 
     before do
       allow(tempfile).to receive(:binmode)

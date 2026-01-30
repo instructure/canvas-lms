@@ -27,10 +27,19 @@ describe AccountReports do
     let(:account_report) { AccountReport.create!(account_id: account.id, user_id: admin.id) }
 
     before do
-      allow(Canvas::UploadedFile).to receive(:new).and_return(double(Canvas::UploadedFile, size: 10))
+      @tempfile = Tempfile.new(["test", ".csv"])
+      @tempfile.write("test")
+      @tempfile.rewind
+      real_uploaded_file = Canvas::UploadedFile.new(@tempfile.path, "text/csv")
+      allow(Canvas::UploadedFile).to receive(:new).and_return(real_uploaded_file)
       expect(Zip::File).to receive(:open)
       allow(InstFS).to receive(:enabled?).and_return(true)
       allow(InstFS).to receive(:direct_upload)
+    end
+
+    after do
+      @tempfile.close
+      @tempfile.unlink
     end
 
     it "skips touching the account when saving the attachment" do

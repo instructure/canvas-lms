@@ -35,7 +35,7 @@ end
 
 module IncomingMailProcessor
   describe IncomingMessageProcessor do
-    let(:logger) { double("logger").tap { |l| expect(l).to receive(:warn).at_least(1).with(kind_of(String)) } } # rubocop:disable RSpec/ExpectInLet
+    let(:logger) { instance_double(Logger).tap { |l| expect(l).to receive(:warn).at_least(1).with(kind_of(String)) } } # rubocop:disable RSpec/ExpectInLet
     let(:mock_message_handler) do
       Class.new do
         attr_reader :account, :body, :html_body, :incoming_message, :address_tag
@@ -51,7 +51,7 @@ module IncomingMailProcessor
     end
     let(:message_handler) { mock_message_handler.new }
 
-    let(:error_reporter) { double(log_error: nil, log_exception: nil) }
+    let(:error_reporter) { double("ErrorReport", log_error: nil, log_exception: nil) } # rubocop:disable RSpec/VerifiedDoubles -- model doesn't exist in gem
 
     def get_fixture(name)
       Mail.read(MAIL_FIXTURES_PATH + name)
@@ -132,7 +132,7 @@ module IncomingMailProcessor
 
     describe ".healthy?" do
       before do
-        @mock_mailbox = double
+        @mock_mailbox = instance_double(IncomingMailProcessor::ImapMailbox)
         allow(IncomingMessageProcessor).to receive(:create_mailbox).and_return(@mock_mailbox)
         IncomingMessageProcessor.logger = logger
 
@@ -297,7 +297,7 @@ module IncomingMailProcessor
 
     describe "#process" do
       before do
-        @mock_mailbox = double
+        @mock_mailbox = instance_double(IncomingMailProcessor::ImapMailbox)
         allow(IncomingMessageProcessor).to receive(:create_mailbox).and_return(@mock_mailbox)
       end
 
@@ -558,7 +558,8 @@ module IncomingMailProcessor
       it "does not try to load messages with invalid address tag" do
         # this should be tested through the public "process" method
         # rather than calling the private "find_matching_to_address" directly
-        account, message = [double, double]
+        account = instance_double(IncomingMailProcessor::MailboxAccount)
+        message = instance_double(Mail::Message)
         expect(account).to receive(:address).and_return("user@example.com")
         expect(message).to receive(:to).and_return(["user@example.com"])
         result = IncomingMessageProcessor.extract_address_tag(message, account)

@@ -20,6 +20,8 @@
 
 require "spec_helper"
 
+require "active_support"
+
 describe CanvasKaltura::ClientV3 do
   def create_config(opts = {})
     allow(CanvasKaltura::ClientV3).to receive(:config) {
@@ -52,8 +54,8 @@ describe CanvasKaltura::ClientV3 do
   end
 
   before do
-    CanvasKaltura.cache = double(read: nil, write: nil)
-    CanvasKaltura.logger = double.as_null_object
+    CanvasKaltura.cache = instance_double(ActiveSupport::Cache::Store, read: nil, write: nil)
+    CanvasKaltura.logger = instance_double(Logger).as_null_object
     CanvasKaltura.timeout_protector_proc = ->(_options, &block) { block.call }
     create_config
     WebMock.enable!
@@ -174,7 +176,7 @@ describe CanvasKaltura::ClientV3 do
 
       it "caches for set length" do
         create_config_with_mock(2)
-        m = double
+        m = instance_double(ActiveSupport::Cache::Store)
         expect(m).to receive(:write).with(["media_sources2", "hi", 2].join("/"), [@source], { expires_in: 2 })
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
@@ -183,7 +185,7 @@ describe CanvasKaltura::ClientV3 do
 
       it "caches indefinitely" do
         create_config_with_mock(nil)
-        m = double
+        m = instance_double(ActiveSupport::Cache::Store)
         expect(m).to receive(:write).with(["media_sources2", "hi", nil].join("/"), [@source])
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
@@ -281,7 +283,7 @@ describe CanvasKaltura::ClientV3 do
 
       expect(@kaltura).to receive(:getRequest).with(
         :media, :get, { ks: nil, entryId: entry_id }
-      ).and_return(double(children: []))
+      ).and_return(instance_double(Nokogiri::XML::Element, children: []))
 
       @kaltura.mediaGet(entry_id)
     end
@@ -304,7 +306,7 @@ describe CanvasKaltura::ClientV3 do
           :entryId => 12_345,
           "mediaEntry:key" => "value"
         }
-      ).and_return(double(children: []))
+      ).and_return(instance_double(Nokogiri::XML::Element, children: []))
 
       @kaltura.mediaUpdate(12_345, { "key" => "value" })
     end
