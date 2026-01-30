@@ -25,7 +25,9 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {useConversationDetail} from '../hooks/useAIConversations'
+import {useConversationEvaluation} from '../hooks/useConversationEvaluation'
 import type {LLMConversationMessage, ConversationProgress} from '@canvas/ai-experiences/types'
+import {AIAnalysisTab} from './AIAnalysisTab'
 
 const I18n = createI18nScope('ai_experiences_ai_conversations')
 
@@ -59,7 +61,7 @@ const MessageList: React.FC<MessageListProps> = ({messages, progress, isLoading}
   }
 
   return (
-    <View as="div" padding="medium" overflowY="auto" height="calc(100vh - 300px)">
+    <View as="div" padding="medium">
       {messages.slice(1).map((message, index) => {
         const isUser = message.role === 'User'
 
@@ -104,6 +106,17 @@ const ConversationPanel: React.FC<ConversationPanelProps> = ({
   const [messages, setMessages] = useState<LLMConversationMessage[]>([])
   const [progress, setProgress] = useState<ConversationProgress | null>(null)
 
+  // Check if evaluation feature is enabled
+  const isEvaluationEnabled = window.ENV.ai_experiences_evaluation_enabled
+
+  // Evaluation hook for AI analysis tab
+  const {
+    evaluation,
+    isLoading: isLoadingEvaluation,
+    error: evaluationError,
+    fetchEvaluation,
+  } = useConversationEvaluation(courseId, aiExperienceId, conversationId)
+
   useEffect(() => {
     if (conversation?.messages) {
       // Convert backend messages to LLMConversationMessage format
@@ -144,28 +157,40 @@ const ConversationPanel: React.FC<ConversationPanelProps> = ({
   }
 
   return (
-    <Flex as="div" height="100vh" direction="column">
-      <View as="div" borderWidth="0 0 small 0" padding="medium">
-        <Tabs onRequestTabChange={(_e, {index}) => setSelectedTab(index)}>
-          <Tabs.Panel
-            id="conversation-tab"
-            renderTitle={I18n.t('Conversation')}
-            isSelected={selectedTab === 0}
-          >
-            <MessageList messages={messages} progress={progress} isLoading={isLoading} />
-          </Tabs.Panel>
+    <Flex as="div" height="100%" direction="column">
+      <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="auto">
+        <View as="div" borderWidth="0 0 small 0" padding="medium">
+          <Tabs onRequestTabChange={(_e, {index}) => setSelectedTab(index)}>
+            <Tabs.Panel
+              id="conversation-tab"
+              renderTitle={I18n.t('Conversation')}
+              isSelected={selectedTab === 0}
+            >
+              <MessageList messages={messages} progress={progress} isLoading={isLoading} />
+            </Tabs.Panel>
 
-          <Tabs.Panel
-            id="ai-analysis-tab"
-            renderTitle={I18n.t('AI analysis')}
-            isSelected={selectedTab === 1}
-          >
-            <View as="div" padding="large" textAlign="center">
-              <Text color="secondary">{I18n.t('AI analysis coming soon')}</Text>
-            </View>
-          </Tabs.Panel>
-        </Tabs>
-      </View>
+            <Tabs.Panel
+              id="ai-analysis-tab"
+              renderTitle={I18n.t('AI analysis')}
+              isSelected={selectedTab === 1}
+            >
+              {isEvaluationEnabled ? (
+                <AIAnalysisTab
+                  studentName={conversation?.student?.name}
+                  evaluation={evaluation}
+                  isLoading={isLoadingEvaluation}
+                  error={evaluationError}
+                  onRequestEvaluation={fetchEvaluation}
+                />
+              ) : (
+                <View as="div" padding="large" textAlign="center">
+                  <Text color="secondary">{I18n.t('AI analysis coming soon')}</Text>
+                </View>
+              )}
+            </Tabs.Panel>
+          </Tabs>
+        </View>
+      </Flex.Item>
 
       <View
         as="div"

@@ -501,6 +501,122 @@ describe AiConversationsController do
     end
   end
 
+  describe "GET #evaluation" do
+    before :once do
+      @student2 = student_in_course(active_all: true, course: @course).user
+      @conversation = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "student-conv-123",
+        user: @student2,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "active"
+      )
+    end
+
+    context "as teacher" do
+      before do
+        user_session(@teacher)
+        @evaluation_data = {
+          "overall_assessment" => "Student demonstrated strong analytical skills.",
+          "key_moments" => [
+            {
+              "learning_objective" => "Critical thinking",
+              "evidence" => "Student analyzed the problem systematically",
+              "message_number" => 3
+            }
+          ],
+          "learning_objectives_evaluation" => [
+            {
+              "objective" => "Critical thinking",
+              "met" => true,
+              "score" => 85,
+              "explanation" => "Student showed excellent analytical skills"
+            }
+          ],
+          "strengths" => [
+            "Clear communication",
+            "Systematic approach"
+          ],
+          "areas_for_improvement" => [
+            "Historical context analysis"
+          ],
+          "overall_score" => 85
+        }
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:evaluation).and_return(@evaluation_data)
+      end
+
+      it "returns evaluation data for a student conversation" do
+        get :evaluation,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id, id: @conversation.id },
+            format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["id"]).to eq(@conversation.id)
+        expect(json_response["evaluation"]).to be_present
+        expect(json_response["evaluation"]["overall_score"]).to eq(85)
+        expect(json_response["evaluation"]["overall_assessment"]).to be_present
+        expect(json_response["evaluation"]["learning_objectives_evaluation"]).to be_an(Array)
+        expect(json_response["evaluation"]["strengths"]).to be_an(Array)
+        expect(json_response["evaluation"]["areas_for_improvement"]).to be_an(Array)
+      end
+
+      it "returns 404 for non-existent conversation" do
+        get :evaluation,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id, id: 99_999 },
+            format: :json
+
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns service unavailable on conversation error" do
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:evaluation)
+          .and_raise(LlmConversation::Errors::ConversationError, "Evaluation service unavailable")
+
+        get :evaluation,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id, id: @conversation.id },
+            format: :json
+
+        expect(response).to have_http_status(:service_unavailable)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Evaluation service unavailable")
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student) }
+
+      it "returns unauthorized when requesting evaluation" do
+        get :evaluation,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id, id: @conversation.id },
+            format: :json
+
+        assert_forbidden
+      end
+    end
+
+    context "as unenrolled user" do
+      before :once do
+        @unenrolled_user = user_factory(active_all: true)
+      end
+
+      before { user_session(@unenrolled_user) }
+
+      it "returns forbidden for unenrolled users" do
+        get :evaluation,
+            params: { course_id: @course.id, ai_experience_id: @ai_experience.id, id: @conversation.id },
+            format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+
   describe "ai_experiences feature flag" do
     context "when feature flag is disabled" do
       before do

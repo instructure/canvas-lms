@@ -611,6 +611,8 @@
   path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/evaluation'
 - verb: POST
   path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages'
 - verb: DELETE

@@ -56,3 +56,25 @@ export interface AIExperience {
   pedagogical_guidance?: string
   can_manage: boolean
 }
+
+export interface KeyMoment {
+  learning_objective: string
+  evidence: string
+  message_number: number
+}
+
+export interface LearningObjectiveEvaluation {
+  objective: string
+  met: boolean
+  score: number
+  explanation: string
+}
+
+export interface ConversationEvaluation {
+  overall_assessment: string
+  key_moments: KeyMoment[]
+  learning_objectives_evaluation: LearningObjectiveEvaluation[]
+  strengths: string[]
+  areas_for_improvement: string[]
+  overall_score: number
+}
