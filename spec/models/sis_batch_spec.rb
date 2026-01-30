@@ -270,6 +270,36 @@ describe SisBatch do
                                course_1,course_1,course_1,term_1,active\n))
   end
 
+  it "deduplicates csvs in subdirectories within zip files" do
+    stub_const("SIS::CSV::ImportRefactored::DEDUP_THRESHOLD", 1)
+    Dir.mktmpdir("sis_rspec") do |tmpdir|
+      path = "#{tmpdir}/sisfile.zip"
+      Zip::File.open(path, create: true) do |z|
+        z.get_output_stream("Apps/Zips/users.csv") do |f|
+          f.puts(<<~CSV)
+            user_id,login_id,status
+            user_1,user_1,active
+            user_1,user_1,active
+          CSV
+        end
+      end
+
+      batch = File.open(path, "rb") do |tmp|
+        def tmp.original_filename
+          File.basename(path)
+        end
+        SisBatch.create_with_attachment(@account, "instructure_csv", tmp, user_factory)
+      end
+      batch.process_without_send_later
+      atts = Attachment.where(context: batch)
+      expect(atts.pluck(:filename)).to match_array ["sisfile.zip", "users_deduplicated.csv"]
+      expect(atts.last.open.read).to eq(<<~CSV)
+        user_id,login_id,status
+        user_1,user_1,active
+      CSV
+    end
+  end
+
   it "is able to preload downloadable attachments" do
     batch1 = process_csv_data([%(user_id,password,login_id,status,ssha_password
                                 user_1,supersecurepwdude,user_1,active,hunter2),
