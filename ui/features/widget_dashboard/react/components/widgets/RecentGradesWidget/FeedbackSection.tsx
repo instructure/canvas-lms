@@ -66,6 +66,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = ({
                         <Text
                           size="small"
                           weight="bold"
+                          wrap="break-word"
                           data-testid={`feedback-author-${comment._id}`}
                         >
                           {comment.author.name}

@@ -128,7 +128,7 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
         <Flex direction="column" gap="x-small">
           <Flex.Item>{assignmentTitle}</Flex.Item>
           <Flex.Item>{timestamp}</Flex.Item>
-          <Flex.Item>
+          <Flex.Item overflowY="visible">
             <Flex direction="row" gap="x-small" alignItems="center">
               <Flex.Item>{statusPill}</Flex.Item>
               {expandButton && <Flex.Item>{expandButton}</Flex.Item>}
