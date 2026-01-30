@@ -117,7 +117,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
               lineHeight: 1,
             }}
             type="button"
-            aria-label={I18n.t('Drag to reorder or click for options')}
+            aria-label={I18n.t('Reorder %{widgetName}', {widgetName: widgetTitle})}
           >
             <IconDragHandleLine />
           </button>
@@ -127,7 +127,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
         onSelect={handleMenuSelect}
       />
       <IconButton
-        screenReaderLabel={I18n.t('Remove widget')}
+        screenReaderLabel={I18n.t('Remove %{widgetName}', {widgetName: widgetTitle})}
         size="small"
         withBackground={false}
         withBorder={false}
