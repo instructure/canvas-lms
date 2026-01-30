@@ -83,6 +83,7 @@ export type RubricFormComponentProp = {
   rubric?: Rubric
   rubricAssociation?: RubricAssociation
   showAdditionalOptions?: boolean
+  canUseForGrading?: boolean
   onLoadRubric?: (rubricTitle: string) => void
   onSaveRubric: (savedRubricResponse: SaveRubricResponse, updatePointsPossible?: boolean) => void
   onCancel: () => void
@@ -102,6 +103,7 @@ export const RubricForm = ({
   rubric,
   rubricAssociation,
   showAdditionalOptions = false,
+  canUseForGrading = true,
   onLoadRubric,
   onSaveRubric,
   onCancel,
@@ -402,6 +404,7 @@ export const RubricForm = ({
               hidePoints={rubricForm.hidePoints}
               useForGrading={rubricForm.useForGrading}
               hideScoreTotal={rubricForm.hideScoreTotal}
+              canUseForGrading={canUseForGrading}
               setRubricFormField={setRubricFormField}
             />
           )}
