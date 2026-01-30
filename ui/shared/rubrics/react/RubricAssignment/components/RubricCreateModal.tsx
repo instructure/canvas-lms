@@ -31,6 +31,7 @@ const I18n = createI18nScope('rubrics-form')
 type RubricCreateModalProps = {
   assignmentPointsPossible?: number
   assignmentId?: string
+  canUseForGrading: boolean
   isOpen: boolean
   rubric?: Rubric
   rubricAssociation?: RubricAssociation
@@ -41,6 +42,7 @@ type RubricCreateModalProps = {
 export const RubricCreateModal = ({
   assignmentId,
   assignmentPointsPossible,
+  canUseForGrading,
   isOpen,
   rubric,
   rubricAssociation,
@@ -74,6 +76,7 @@ export const RubricCreateModal = ({
             onCancel={onDismiss}
             onSaveRubric={onSaveRubric}
             canManageRubrics={rubric?.canUpdateRubric ?? ENV.PERMISSIONS?.manage_rubrics ?? false}
+            canUseForGrading={canUseForGrading}
             criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range ?? false}
             hideHeader={true}
             aiRubricsEnabled={aiRubricsEnabled}
