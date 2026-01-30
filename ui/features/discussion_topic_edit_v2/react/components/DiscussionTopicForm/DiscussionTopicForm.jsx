@@ -168,7 +168,7 @@ function DiscussionTopicForm({
     }
   }
 
-  const allSectionsOption = {id: 'all', name: 'All Sections'}
+  const allSectionsOption = {id: 'all', name: I18n.t('All Sections')}
 
   const isAlreadyAGroupDiscussion = !!currentDiscussionTopic?.groupSet?._id
 
