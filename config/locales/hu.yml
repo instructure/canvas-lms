@@ -23727,6 +23727,7 @@ hu:
   start_a_new_subject_7271b3ec: "Új téma indítása"
   start_and_end_date_filter_selections_55bcd8b8: "Kezdő és befejező dátum szűrő kiválasztása"
   start_assignment_d56256d3: "Feladat kezdése"
+  start_at_c29f35f1: "Kezdés ideje"
   start_at_c7a5789: "Kezdje itt:"
   start_at_end_at_b375cbe7: "| %{start_at} - %{end_at}"
   start_auto_refresh_e2feafb2: "Automatikus frissítés indítása"
