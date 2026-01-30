@@ -229,4 +229,24 @@ describe('AddWidgetModal', () => {
     expect(mockAddWidget).not.toHaveBeenCalled()
     expect(defaultProps.onClose).not.toHaveBeenCalled()
   })
+
+  it('renders each widget card with role=group for screen readers', () => {
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const widgetGroups = screen.getAllByRole('group')
+    expect(widgetGroups.length).toBeGreaterThan(0)
+  })
+
+  it('provides accessible labels for each widget card group', () => {
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const courseGradesGroup = screen.getByRole('group', {name: 'Course grades'})
+    expect(courseGradesGroup).toBeInTheDocument()
+
+    const announcementsGroup = screen.getByRole('group', {name: 'Announcements'})
+    expect(announcementsGroup).toBeInTheDocument()
+
+    const todoListGroup = screen.getByRole('group', {name: 'To-do list'})
+    expect(todoListGroup).toBeInTheDocument()
+  })
 })
