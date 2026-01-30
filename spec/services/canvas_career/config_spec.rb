@@ -21,7 +21,7 @@
 module CanvasCareer
   describe Config do
     let(:root_account) { Account.default }
-    let(:request) { double("request", base_url: "https://canvascareer.instructure.com") }
+    let(:request) { instance_double(ActionDispatch::Request, base_url: "https://canvascareer.instructure.com") }
     let(:dynamic_settings_yaml) do
       {
         "public_app_config" => {
@@ -31,7 +31,7 @@ module CanvasCareer
     end
 
     before do
-      dynamic_settings = double("DynamicSettings")
+      dynamic_settings = instance_double(DynamicSettings::PrefixProxy)
       allow(DynamicSettings).to receive(:find).and_call_original
       allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(dynamic_settings)
       allow(dynamic_settings).to receive(:[]).and_return(nil)
