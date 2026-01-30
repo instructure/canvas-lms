@@ -171,6 +171,7 @@ export type GenerateResponse = {
 export type FilterOption = {
   label: string
   value: string
+  requiresFeatureFlag?: boolean
 }
 
 export type Filters = {
