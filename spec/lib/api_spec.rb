@@ -311,13 +311,13 @@ describe Api do
       end
 
       it "infers `writable: false` from read-only request method" do
-        expect(@api).to receive(:request).and_return(double(method: "GET"))
+        expect(@api).to receive(:request).and_return(instance_double(ActionDispatch::Request, method: "GET"))
         user = @api.api_find(User, "sis_user_id:cross_shard_user")
         expect(user).to be_shadow_record
       end
 
       it "infers `writable: true` from writable request method" do
-        expect(@api).to receive(:request).and_return(double(method: "POST"))
+        expect(@api).to receive(:request).and_return(instance_double(ActionDispatch::Request, method: "POST"))
         user = @api.api_find(User, "sis_user_id:cross_shard_user")
         expect(user).not_to be_shadow_record
       end
@@ -395,7 +395,7 @@ describe Api do
     end
 
     it "does not hit the database if no valid conditions were found" do
-      collection = double
+      collection = class_double(Course)
       allow(collection).to receive(:table_name).and_return("courses")
       expect(collection).to receive(:none).once
       relation = @api.api_find_all(collection, ["sis_invalid:1"])
@@ -502,9 +502,9 @@ describe Api do
     end
 
     it "tries and make params when non-ar_id columns have returned with ar_id columns" do
-      collection = double
+      collection = class_double(Course)
       pluck_result = ["thing2", "thing3"]
-      relation_result = double(eager_load_values: nil, pluck: pluck_result)
+      relation_result = instance_double(ActiveRecord::Relation, eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => { ids: ["thing1", "thing2"] }, "other-lookup" => { ids: ["thing2", "thing3"] } })
@@ -513,9 +513,9 @@ describe Api do
     end
 
     it "tries and make params when non-ar_id columns have returned without ar_id columns" do
-      collection = double
+      collection = class_double(Course)
       pluck_result = ["thing2", "thing3"]
-      relation_result = double(eager_load_values: nil, pluck: pluck_result)
+      relation_result = instance_double(ActiveRecord::Relation, eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "other-lookup" => ["thing2", "thing3"] })
@@ -524,7 +524,7 @@ describe Api do
     end
 
     it "does not try and make params when no non-ar_id columns have returned with ar_id columns" do
-      collection = double
+      collection = class_double(Course)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => { ids: ["thing1", "thing2"] } })
@@ -533,7 +533,7 @@ describe Api do
     end
 
     it "does not try and make params when no non-ar_id columns have returned without ar_id columns" do
-      collection = double
+      collection = class_double(Course)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({})
@@ -1074,9 +1074,9 @@ describe Api do
   end
 
   describe ".paginate" do
-    let(:request) { double("request", query_parameters: {}) }
-    let(:response) { double("response", headers: {}) }
-    let(:controller) { double("controller", request:, response:, params: {}) }
+    let(:request) { instance_double(ActionDispatch::Request, query_parameters: {}) }
+    let(:response) { instance_double(ActionDispatch::Response, headers: {}) }
+    let(:controller) { instance_double(ApplicationController, request:, response:, params: {}) }
 
     describe "#ordered_colection" do
       it "orders a relation" do
@@ -1089,7 +1089,7 @@ describe Api do
       let(:collection) { [1, 2, 3] }
 
       it "works as expected with a page number in range" do
-        controller = double("controller", request:, response:, params: { per_page: 1 })
+        controller = instance_double(ApplicationController, request:, response:, params: { per_page: 1 })
         page = Api.paginate(collection, controller, "example.com", page: 2)
         expect(page).to eq [2]
         expect(page.next_page).to eq 3
@@ -1097,7 +1097,7 @@ describe Api do
       end
 
       it "retrieves the last page" do
-        controller = double("controller", request:, response:, params: { per_page: 1 })
+        controller = instance_double(ApplicationController, request:, response:, params: { per_page: 1 })
         page = Api.paginate(collection, controller, "example.com", page: 3)
         expect(page).to eq [3]
         expect(page.next_page).to be_nil
@@ -1105,7 +1105,7 @@ describe Api do
       end
 
       it "does not raise Folio::InvalidPage for pages past the end" do
-        controller = double("controller", request:, response:, params: { per_page: 1 })
+        controller = instance_double(ApplicationController, request:, response:, params: { per_page: 1 })
         page = Api.paginate(collection, controller, "example.com", page: 4)
         expect(page).to eq []
         expect(page.next_page).to be_nil
@@ -1136,7 +1136,7 @@ describe Api do
 
       context "with no max_per_page argument" do
         it "limits to the default max_per_page" do
-          controller = double("controller", request:, response:, params: { per_page: Api::MAX_PER_PAGE + 5 })
+          controller = instance_double(ApplicationController, request:, response:, params: { per_page: Api::MAX_PER_PAGE + 5 })
           expect(Api.paginate(collection, controller, "example.com").size)
             .to eq Api::MAX_PER_PAGE
         end
@@ -1144,14 +1144,14 @@ describe Api do
 
       context "with no per_page parameter" do
         it "limits to the default per_page" do
-          controller = double("controller", request:, response:, params: {})
+          controller = instance_double(ApplicationController, request:, response:, params: {})
           expect(Api.paginate(collection, controller, "example.com").size)
             .to eq Api::PER_PAGE
         end
       end
 
       context "with per_page parameter > max_per_page argument" do
-        let(:controller) { double("controller", request:, response:, params: { per_page: 100 }) }
+        let(:controller) { instance_double(ApplicationController, request:, response:, params: { per_page: 100 }) }
 
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, "example.com", { max_per_page: 75 }).size)
@@ -1160,7 +1160,7 @@ describe Api do
       end
 
       context "with per_page parameter < max_per_page argument" do
-        let(:controller) { double("controller", request:, response:, params: { per_page: 75 }) }
+        let(:controller) { instance_double(ApplicationController, request:, response:, params: { per_page: 75 }) }
 
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, "example.com", { max_per_page: 100 }).size)
@@ -1171,9 +1171,9 @@ describe Api do
   end
 
   describe ".jsonapi_paginate" do
-    let(:request) { double("request", query_parameters: {}) }
-    let(:response) { double("response", headers: {}) }
-    let(:controller) { double("controller", request:, response:, params: {}) }
+    let(:request) { instance_double(ActionDispatch::Request, query_parameters: {}) }
+    let(:response) { instance_double(ActionDispatch::Response, headers: {}) }
+    let(:controller) { instance_double(ApplicationController, request:, response:, params: {}) }
     let(:collection) { [1, 2, 3] }
 
     it "returns the links in the headers" do
@@ -1281,17 +1281,17 @@ describe Api do
 
     it "returns true when application/vnd.api+json in the Accept header" do
       controller = test_api_controller.new
-      allow(controller).to receive(:request).and_return double(headers: {
-                                                                 "Accept" => "application/vnd.api+json"
-                                                               })
+      allow(controller).to receive(:request).and_return instance_double(ActionDispatch::Request, headers: {
+                                                                          "Accept" => "application/vnd.api+json"
+                                                                        })
       expect(controller.accepts_jsonapi?).to be true
     end
 
     it "returns false when application/vnd.api+json not in the Accept header" do
       controller = test_api_controller.new
-      allow(controller).to receive(:request).and_return double(headers: {
-                                                                 "Accept" => "application/json"
-                                                               })
+      allow(controller).to receive(:request).and_return instance_double(ActionDispatch::Request, headers: {
+                                                                          "Accept" => "application/json"
+                                                                        })
       expect(controller.accepts_jsonapi?).to be false
     end
   end

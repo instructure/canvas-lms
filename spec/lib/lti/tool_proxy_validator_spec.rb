@@ -22,14 +22,14 @@ module Lti
   describe ToolProxyValidator do
     subject(:tool_proxy_validator) { ToolProxyValidator.new(tool_proxy:, tool_consumer_profile: nil) }
 
-    let(:tp_validator) { double("tp_validator") }
+    let(:tp_validator) { instance_double(::IMS::LTI::Services::ToolProxyValidator) }
     let(:tool_proxy) do
-      tp = double("tool_proxy")
+      tp = instance_double(::IMS::LTI::Models::ToolProxy)
       allow(tp).to receive_messages(tool_profile:, enabled_capabilities:)
       tp
     end
     let(:tool_profile) do
-      tp = double("tool_profile")
+      tp = instance_double(::IMS::LTI::Models::ToolProfile)
       allow(tp).to receive(:security_profiles).and_return(security_profiles)
       tp
     end
@@ -99,17 +99,17 @@ module Lti
 
       context "restricted security profiles" do
         let(:access_token_profile) do
-          sp = double("oauth2_access_token_ws_security")
+          sp = instance_double(::IMS::LTI::Models::SecurityProfile)
           allow(sp).to receive(:security_profile_name).and_return("oauth2_access_token_ws_security")
           sp
         end
         let(:jwt_ws_profile) do
-          sp = double("lti_jwt_ws_security")
+          sp = instance_double(::IMS::LTI::Models::SecurityProfile)
           allow(sp).to receive(:security_profile_name).and_return("lti_jwt_ws_security")
           sp
         end
         let(:oauth_hash_profile) do
-          sp = double("lti_oauth_hash_message_security")
+          sp = instance_double(::IMS::LTI::Models::SecurityProfile)
           allow(sp).to receive(:security_profile_name).and_return("lti_oauth_hash_message_security")
           sp
         end

@@ -401,8 +401,6 @@ RSpec/VariableName:
   Severity: convention
 RSpec/VerifiedDoubleReference:
   Enabled: false
-RSpec/VerifiedDoubles:
-  Enabled: false
 
 Style/AccessorGrouping:
   Severity: convention

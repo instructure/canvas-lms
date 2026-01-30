@@ -22,7 +22,7 @@ require_relative "../spec_helper"
 describe "EnhancedCookieStore" do
   describe "#unmarshal" do
     it "doesn't explode with malformed data" do
-      app = double("SomeAppThing")
+      app = instance_double(Rails::Application)
       options = { secret: "038c3fa7b8f07362f0a79db7e717eada" } # <- fake secret
       store = EnhancedCookieStore.new(app, options)
       expect(Canvas::Errors).to receive(:capture_exception) do |type, e, level|

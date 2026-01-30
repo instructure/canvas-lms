@@ -27,10 +27,11 @@ describe Lti::PrivacyLevelExpander do
   let(:tool) { new_valid_tool(course) }
   let(:launch_url) { "http://www.test.com/launch" }
   let(:variable_expander) do
+    controller = instance_double(ApplicationController, request: { body: "body content" })
     Lti::VariableExpander.new(
       course.root_account,
       course,
-      double(request: { body: "body content" }),
+      controller,
       {
         current_user: user,
         current_pseudonym: user.pseudonyms.first,

@@ -25,7 +25,7 @@ describe SmartSearchable do
     before do
       skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
 
-      allow(SmartSearch).to receive_messages(generate_embedding: [1] * 1024, bedrock_client: double)
+      allow(SmartSearch).to receive_messages(generate_embedding: [1] * 1024, bedrock_client: instance_double(Aws::BedrockRuntime::Client))
     end
 
     before :once do
@@ -106,10 +106,9 @@ describe SmartSearchable do
     end
 
     it "raises an error for a 'successful' response with no embeddings" do
-      mock_resp = double("response",
-                         successful?: true,
-                         body: StringIO.new('{"did_it_work_frd": "nope"}'))
-      mock_client = double("bedrock_client")
+      mock_resp = instance_double(Net::HTTPResponse,
+                                  body: StringIO.new('{"did_it_work_frd": "nope"}'))
+      mock_client = instance_double(Aws::BedrockRuntime::Client)
       allow(SmartSearch).to receive(:bedrock_client).and_return(mock_client)
       expect(mock_client).to receive(:invoke_model).and_return(mock_resp)
 

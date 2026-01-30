@@ -59,7 +59,7 @@ describe SubmissionLifecycleManager do
 
   describe ".recompute" do
     before do
-      @instance = double("instance", recompute: nil)
+      @instance = instance_double(SubmissionLifecycleManager, recompute: nil)
     end
 
     it "doesn't call self.recompute_course if the assignment passed in hasn't been persisted" do
@@ -172,7 +172,7 @@ describe SubmissionLifecycleManager do
     before do
       @assignments = [@assignment]
       @assignments << assignment_model(course: @course)
-      @instance = double("instance", recompute: nil)
+      @instance = instance_double(SubmissionLifecycleManager, recompute: nil)
     end
 
     it "passes along the whole array" do
@@ -489,7 +489,7 @@ describe SubmissionLifecycleManager do
       end
 
       it "queues a delayed job in a singleton if given no assignments and no singleton option" do
-        @instance = double
+        @instance = instance_double(SubmissionLifecycleManager, recompute: nil)
         expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
         expect(@instance).to receive(:delay_if_production)
           .with(
@@ -503,7 +503,7 @@ describe SubmissionLifecycleManager do
       end
 
       it "queues a delayed job in a singleton if given no assignments and a singleton option" do
-        @instance = double
+        @instance = instance_double(SubmissionLifecycleManager, recompute: nil)
         expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
         expect(@instance).to receive(:delay_if_production)
           .with(singleton: "what:up:dog", max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")

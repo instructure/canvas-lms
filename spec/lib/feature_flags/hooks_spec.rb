@@ -35,9 +35,9 @@ describe FeatureFlags::Hooks do
     end
 
     def stub_root_account_membership(root_account, is_member)
-      where_relation = double("where_relation", exists?: is_member)
-      active_relation = double("active_relation", where: where_relation)
-      account_users = double("account_users", active: active_relation)
+      where_relation = instance_double(ActiveRecord::Relation, exists?: is_member)
+      active_relation = instance_double(ActiveRecord::Relation, where: where_relation)
+      account_users = class_double(AccountUser, active: active_relation)
       allow(root_account).to receive(:account_users).and_return(account_users)
     end
 
@@ -284,16 +284,16 @@ describe FeatureFlags::Hooks do
     end
 
     def stub_root_account_membership(root_account, is_member)
-      where_relation = double("where_relation", exists?: is_member)
-      active_relation = double("active_relation", where: where_relation)
-      account_users = double("account_users", active: active_relation)
+      where_relation = instance_double(ActiveRecord::Relation, exists?: is_member)
+      active_relation = instance_double(ActiveRecord::Relation, where: where_relation)
+      account_users = class_double(AccountUser, active: active_relation)
       allow(root_account).to receive(:account_users).and_return(account_users)
     end
 
     def stub_subaccount_membership(account, is_member)
-      where_relation = double("where_relation", exists?: is_member)
-      active_relation = double("active_relation", where: where_relation)
-      account_users = double("account_users", active: active_relation)
+      where_relation = instance_double(ActiveRecord::Relation, exists?: is_member)
+      active_relation = instance_double(ActiveRecord::Relation, where: where_relation)
+      account_users = class_double(AccountUser, active: active_relation)
       allow(account).to receive(:account_users).and_return(account_users)
     end
 
@@ -575,8 +575,9 @@ describe FeatureFlags::Hooks do
   end
 
   describe "oak_visible_on_hook" do
-    let(:context) { double("Context") }
-    let(:current_shard) { double("Shard", database_server: double(config: { region: "us-east-1" })) }
+    let(:context) { instance_double(Account) }
+    let(:database_server) { instance_double(DatabaseServer, config: { region: "us-east-1" }) }
+    let(:current_shard) { instance_double(Shard, database_server:) }
     let(:oak_predicate) { instance_double(FeatureFlags::OakPredicate) }
 
     before do
@@ -599,8 +600,8 @@ describe FeatureFlags::Hooks do
   end
 
   describe "oak_for_users_visible_on_hook" do
-    let(:context) { double("Context") }
-    let(:domain_root_account) { double("Account") }
+    let(:context) { instance_double(Course) }
+    let(:domain_root_account) { instance_double(Account) }
 
     before do
       allow(Account).to receive(:current_domain_root_account).and_return(domain_root_account)

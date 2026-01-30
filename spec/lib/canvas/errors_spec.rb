@@ -49,7 +49,7 @@ module Canvas
       described_class.instance_variable_set(:@registry, @old_registry)
     end
 
-    let(:error) { double("Some Error", backtrace: []) }
+    let(:error) { instance_double(StandardError, backtrace: []) }
 
     describe ".capture_exception" do
       it "tags with the exception type and default level" do

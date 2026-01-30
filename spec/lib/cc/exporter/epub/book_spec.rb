@@ -35,7 +35,7 @@ describe CC::Exporter::Epub::Book do
   end
   let(:templates) { { title: "Sample Export Title", files: [file_data] } }
   let(:filename_prefix) { "sample_export_#{SecureRandom.hex(6)}" }
-  let(:exporter) { double("exporter", templates:, filename_prefix:) }
+  let(:exporter) { instance_double(CC::Exporter::Epub::Exporter, templates:, filename_prefix:) }
 
   describe "#add_files" do
     it "adds file items using keyword arguments" do

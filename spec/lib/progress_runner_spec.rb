@@ -20,7 +20,7 @@
 
 describe ProgressRunner do
   before do
-    @progress = double("progress").as_null_object
+    @progress = instance_double(Progress).as_null_object
   end
 
   let(:progress_messages) do

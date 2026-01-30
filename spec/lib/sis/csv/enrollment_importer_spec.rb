@@ -665,9 +665,9 @@ describe SIS::CSV::EnrollmentImporter do
   describe "#persist_errors" do
     it "gracefully handles string errors" do
       batch = Account.default.sis_batches.create!
-      csv = double(:root_account => Account.default, :batch => batch, :[] => nil)
-      importer = SIS::CSV::EnrollmentImporter.new(csv)
-      importer.persist_errors(csv, ["a string error message"])
+      sis_csv = instance_double(SIS::CSV::ImportRefactored, root_account: Account.default, batch:)
+      importer = SIS::CSV::EnrollmentImporter.new(sis_csv)
+      importer.persist_errors({ file: nil }, ["a string error message"])
       expect(batch.sis_batch_errors.count).to eq(1)
     end
   end

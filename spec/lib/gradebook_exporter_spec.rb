@@ -128,9 +128,9 @@ describe GradebookExporter do
       context "with custom id order" do
         it "sorts collection by provided ID order" do
           items = [
-            double(id: 1, name: "First"),
-            double(id: 2, name: "Second"),
-            double(id: 3, name: "Third")
+            instance_double(Assignment, id: 1, name: "First"),
+            instance_double(Assignment, id: 2, name: "Second"),
+            instance_double(Assignment, id: 3, name: "Third")
           ]
           id_order = [3, 1, 2]
 
@@ -145,9 +145,9 @@ describe GradebookExporter do
 
         it "handles string IDs by converting to integers" do
           items = [
-            double(id: 1, name: "First"),
-            double(id: 2, name: "Second"),
-            double(id: 3, name: "Third")
+            instance_double(Assignment, id: 1, name: "First"),
+            instance_double(Assignment, id: 2, name: "Second"),
+            instance_double(Assignment, id: 3, name: "Third")
           ]
           id_order = %w[3 1 2]
 
@@ -162,10 +162,10 @@ describe GradebookExporter do
 
         it "places items in custom order first, then remaining items sorted by ID" do
           items = [
-            double(id: 4, name: "Fourth"),
-            double(id: 1, name: "First"),
-            double(id: 3, name: "Third"),
-            double(id: 2, name: "Second")
+            instance_double(Assignment, id: 4, name: "Fourth"),
+            instance_double(Assignment, id: 1, name: "First"),
+            instance_double(Assignment, id: 3, name: "Third"),
+            instance_double(Assignment, id: 2, name: "Second")
           ]
           id_order = [3, 1]
 
@@ -182,8 +182,8 @@ describe GradebookExporter do
 
         it "handles duplicate IDs in order by using ID as tie-breaker" do
           items = [
-            double(id: 1, name: "First"),
-            double(id: 2, name: "Second")
+            instance_double(Assignment, id: 1, name: "First"),
+            instance_double(Assignment, id: 2, name: "Second")
           ]
           id_order = [1, 1, 2]
 
@@ -198,19 +198,19 @@ describe GradebookExporter do
 
         it "works with custom accessor using method name" do
           items = [
-            double(user_id: 10, name: "User A"),
-            double(user_id: 20, name: "User B"),
-            double(user_id: 30, name: "User C")
+            { user_id: 10, name: "User A" },
+            { user_id: 20, name: "User B" },
+            { user_id: 30, name: "User C" }
           ]
           id_order = [30, 10, 20]
 
           result = exporter.send(:sort_by_id_order,
                                  items,
                                  id_order:,
-                                 id_accessor: :user_id,
-                                 fallback_sort: ->(item) { item.name })
+                                 id_accessor: ->(item) { item[:user_id] },
+                                 fallback_sort: ->(item) { item[:name] })
 
-          expect(result.map(&:user_id)).to eq([30, 10, 20])
+          expect(result.pluck(:user_id)).to eq([30, 10, 20])
         end
 
         it "works with proc accessor" do
@@ -234,9 +234,9 @@ describe GradebookExporter do
       context "without custom id order" do
         it "uses fallback sort with nil id_order" do
           items = [
-            double(id: 3, name: "Charlie"),
-            double(id: 1, name: "Alice"),
-            double(id: 2, name: "Bob")
+            instance_double(Assignment, id: 3, name: "Charlie"),
+            instance_double(Assignment, id: 1, name: "Alice"),
+            instance_double(Assignment, id: 2, name: "Bob")
           ]
 
           result = exporter.send(:sort_by_id_order,
@@ -250,9 +250,9 @@ describe GradebookExporter do
 
         it "uses fallback sort with empty id_order" do
           items = [
-            double(id: 3, name: "Charlie"),
-            double(id: 1, name: "Alice"),
-            double(id: 2, name: "Bob")
+            instance_double(Assignment, id: 3, name: "Charlie"),
+            instance_double(Assignment, id: 1, name: "Alice"),
+            instance_double(Assignment, id: 2, name: "Bob")
           ]
 
           result = exporter.send(:sort_by_id_order,
@@ -266,19 +266,19 @@ describe GradebookExporter do
 
         it "uses fallback sort with multiple sort keys" do
           items = [
-            double(id: 1, group: "B", position: 2),
-            double(id: 2, group: "A", position: 1),
-            double(id: 3, group: "A", position: 2),
-            double(id: 4, group: "B", position: 1)
+            { id: 1, group: "B", position: 2 },
+            { id: 2, group: "A", position: 1 },
+            { id: 3, group: "A", position: 2 },
+            { id: 4, group: "B", position: 1 }
           ]
 
           result = exporter.send(:sort_by_id_order,
                                  items,
                                  id_order: nil,
-                                 id_accessor: :id,
-                                 fallback_sort: ->(item) { [item.group, item.position] })
+                                 id_accessor: ->(item) { item[:id] },
+                                 fallback_sort: ->(item) { [item[:group], item[:position]] })
 
-          expect(result.map(&:id)).to eq([2, 3, 4, 1])
+          expect(result.pluck(:id)).to eq([2, 3, 4, 1])
         end
       end
     end

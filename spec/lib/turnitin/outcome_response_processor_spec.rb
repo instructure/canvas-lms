@@ -34,11 +34,11 @@ module Turnitin
       let(:filename) { "my_sample_file" }
 
       before do
-        original_submission_response = double("original_submission_mock")
+        original_submission_response = instance_double(Faraday::Response)
         allow(original_submission_response).to receive_messages(headers: { "content-disposition" => "attachment; filename=#{filename}", "content-type" => "plain/text" }, body: "1234")
         expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
 
-        response_response = double("response_mock")
+        response_response = instance_double(Faraday::Response)
         allow(response_response).to receive(:body).and_return(tii_response)
         allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:response).and_return(response_response)
       end
@@ -97,18 +97,18 @@ module Turnitin
           allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:uploaded_at).and_return(tii_response["meta"]["date_uploaded"])
           time = Time.now.utc
           attempt_number = subject.class.max_attempts - 1
-          original_submission_response = double("original_submission_mock")
+          original_submission_response = instance_double(Faraday::Response)
           allow(original_submission_response).to receive_messages(headers: {}, status: 403)
-          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
+          allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
           allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(attempt_number)
-          mock = double
+          delayed_proxy = instance_double(Turnitin::OutcomeResponseProcessor, new_submission: nil)
           expect_any_instance_of(subject.class).to receive(:delay).with(
             max_attempts: subject.class.max_attempts,
             priority: Delayed::LOW_PRIORITY,
             attempts: attempt_number,
             run_at: time + (attempt_number**4) + 5
-          ).and_return(mock)
-          expect(mock).to receive(:new_submission)
+          ).and_return(delayed_proxy)
+          expect(delayed_proxy).to receive(:new_submission)
           Timecop.freeze(time) do
             subject.process
           end
@@ -117,7 +117,7 @@ module Turnitin
 
       context "when it is the last attempt" do
         before do
-          response_response = double("response_mock")
+          response_response = instance_double(Faraday::Response)
           allow(response_response).to receive(:body).and_return(tii_response)
           allow(subject.turnitin_client).to receive(:response).and_return(response_response)
           allow(subject.class).to receive(:max_attempts).and_return(1)
@@ -164,7 +164,7 @@ module Turnitin
           let(:error) { Errors::OriginalSubmissionUnavailableError }
 
           before do
-            original_submission_response = double("original_submission_mock")
+            original_submission_response = instance_double(Faraday::Response)
             allow(original_submission_response).to receive_messages(headers: {}, status: 403)
             allow(subject.turnitin_client).to receive(:original_submission).and_yield(original_submission_response)
           end
@@ -219,7 +219,7 @@ module Turnitin
       it "raises an error and sends stat if max attempts are not exceeded" do
         allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts - 1)
         allow(InstStatsd::Statsd).to receive(:increment)
-        mock_turnitin_client = double("turnitin_client")
+        mock_turnitin_client = instance_double(Turnitin::TiiClient)
         allow(mock_turnitin_client).to receive(:scored?).and_return(false)
         allow(subject).to receive(:turnitin_client).and_return(mock_turnitin_client)
         submission = lti_assignment.submit_homework(lti_student, attachments: [attachment], submission_type: "online_upload")
@@ -235,7 +235,7 @@ module Turnitin
 
       it "sets an error message if max attempts are exceeded" do
         allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts)
-        mock_turnitin_client = double("turnitin_client")
+        mock_turnitin_client = instance_double(Turnitin::TiiClient)
         allow(mock_turnitin_client).to receive(:scored?).and_return(false)
         allow(subject).to receive(:turnitin_client).and_return(mock_turnitin_client)
         submission = lti_assignment.submit_homework(lti_student, attachments: [attachment], submission_type: "online_upload")

@@ -58,7 +58,7 @@ describe Lti::PermissionChecker do
         other_tp = tool_proxy.dup
         other_tp.update(guid: SecureRandom.uuid, context: course)
         allow(other_tp).to receive(:active_in_context?) { true }
-        allow(other_tp).to receive(:resources) { [double(message_handlers: [message_handler])] }
+        allow(other_tp).to receive(:resources) { [instance_double(Lti::ResourceHandler, message_handlers: [message_handler])] }
         other_tp
       end
 

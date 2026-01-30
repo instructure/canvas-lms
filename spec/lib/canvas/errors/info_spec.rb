@@ -21,22 +21,23 @@ module Canvas
   class Errors
     describe Info do
       let(:request) do
-        double(env: {},
-               remote_ip: "",
-               query_parameters: {},
-               request_parameters: {},
-               path_parameters: {},
-               url: "",
-               request_method_symbol: "",
-               format: "HTML",
-               headers: {},
-               authorization: nil)
+        instance_double(ActionDispatch::Request,
+                        env: {},
+                        remote_ip: "",
+                        query_parameters: {},
+                        request_parameters: {},
+                        path_parameters: {},
+                        url: "",
+                        request_method_symbol: "",
+                        format: "HTML",
+                        headers: {},
+                        authorization: nil)
       end
 
       let(:request_context_id) { "abcdefg1234567" }
       let(:auth_header) { "OAuth oauth_body_hash=\"2jmj7l5rSw0yVb%2FvlWAYkK%2FYBwk%3D\", oauth_consumer_key=\"test_key\", oauth_nonce=\"QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8\", oauth_signature=\"QUfER7WBKsq0nzIjJ8Y7iTcDaq0%3D\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"1445980405\", oauth_version=\"1.0\"" }
-      let(:account) { double(global_id: 1_122_334_455) }
-      let(:user) { double(global_id: 5_544_332_211) }
+      let(:account) { instance_double(Account, global_id: 1_122_334_455) }
+      let(:user) { instance_double(User, global_id: 5_544_332_211) }
       let(:opts) { { request_context_id:, type: "core_meltdown" } }
 
       describe "initialization" do
@@ -94,12 +95,13 @@ module Canvas
             (+"HTTP_HOST").force_encoding(Encoding::ASCII_8BIT).freeze =>
               (+"somehost.com").force_encoding(Encoding::ASCII_8BIT).freeze,
           }
-          req = double(env: dangerous_hash,
-                       remote_ip: "",
-                       url: "",
-                       path_parameters: {},
-                       query_parameters: {},
-                       request_parameters: {})
+          req = instance_double(ActionDispatch::Request,
+                                env: dangerous_hash,
+                                remote_ip: "",
+                                url: "",
+                                path_parameters: {},
+                                query_parameters: {},
+                                request_parameters: {})
           env_stuff = described_class.useful_http_env_stuff_from_request(req)
           expect do
             Utf8Cleaner.recursively_strip_invalid_utf8!(env_stuff, true)
@@ -107,12 +109,13 @@ module Canvas
         end
 
         it "has a max limit on the request_parameters data size" do
-          req = double(env: {},
-                       remote_ip: "",
-                       url: "",
-                       path_parameters: {},
-                       query_parameters: {},
-                       request_parameters: { "body" => ("a" * (described_class::MAX_DATA_SIZE * 2)) })
+          req = instance_double(ActionDispatch::Request,
+                                env: {},
+                                remote_ip: "",
+                                url: "",
+                                path_parameters: {},
+                                query_parameters: {},
+                                request_parameters: { "body" => ("a" * (described_class::MAX_DATA_SIZE * 2)) })
           env_stuff = described_class.useful_http_env_stuff_from_request(req)
           expect(env_stuff["request_parameters"].size).to eq(described_class::MAX_DATA_SIZE)
         end
@@ -120,13 +123,13 @@ module Canvas
 
       describe ".useful_http_headers" do
         it "returns some oauth header info" do
-          req = double(authorization: auth_header, headers: {})
+          req = instance_double(ActionDispatch::Request, authorization: auth_header, headers: {})
           oauth_info = described_class.useful_http_headers(req)
           check_oauth(oauth_info)
         end
 
         it "returns user agent" do
-          req = double(headers: { "User-Agent" => "the-agent" }, authorization: nil)
+          req = instance_double(ActionDispatch::Request, headers: { "User-Agent" => "the-agent" }, authorization: nil)
           output = described_class.useful_http_headers(req)
 
           expect(output[:user_agent]).to eq("the-agent")
