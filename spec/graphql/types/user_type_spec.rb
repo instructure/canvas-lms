@@ -157,12 +157,12 @@ describe Types::UserType do
     end
 
     it "returns an avatar url when avatars are enabled" do
-      @student.account.enable_service(:avatars)
+      @course.account.root_account.tap { |a| a.enable_service(:avatars) }.save!
       expect(user_type.resolve("avatarUrl")).to match(/avatar.*png/)
     end
 
     it "returns nil when a user has no avatar" do
-      @student.account.enable_service(:avatars)
+      @course.account.root_account.tap { |a| a.enable_service(:avatars) }.save!
       @student.update! avatar_image_url: nil
       expect(user_type.resolve("avatarUrl")).to be_nil
     end
