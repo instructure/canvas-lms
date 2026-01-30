@@ -63,7 +63,6 @@ const I18n = createI18nScope('MobileGlobalMenu')
 
 type Props = {
   onDismiss: () => void
-  isThemeOverrideActive?: boolean
 }
 
 export default function MobileGlobalMenu(props: Props) {
@@ -116,15 +115,6 @@ export default function MobileGlobalMenu(props: Props) {
 
   const {mutate: switchExperience} = useSwitchExperience()
 
-  let iconColor = 'var(--ic-brand-global-nav-ic-icon-svg-fill)'
-  if (!props.isThemeOverrideActive) {
-    // Icons in Links need to be overriden for high contrast mode
-    iconColor = 'var(--ic-link-color)'
-  }
-  const override: {color: 'brand'; themeOverride: {brandColor: string}} = {
-    color: 'brand',
-    themeOverride: {brandColor: iconColor},
-  }
   return (
     <View
       display="block"
@@ -136,7 +126,7 @@ export default function MobileGlobalMenu(props: Props) {
       <Flex direction="row-reverse" margin="0 0 large 0">
         <Flex.Item>
           <IconButton
-            renderIcon={() => <IconXLine {...(props.isThemeOverrideActive ? override : {})} />}
+            renderIcon={IconXLine}
             withBackground={false}
             withBorder={false}
             onClick={props.onDismiss}
@@ -159,9 +149,9 @@ export default function MobileGlobalMenu(props: Props) {
             <Flex>
               <Flex.Item width="3rem">
                 {k5User ? (
-                  <IconHomeLine inline={false} size="small" {...override} />
+                  <IconHomeLine inline={false} size="small" />
                 ) : (
-                  <IconDashboardLine inline={false} size="small" {...override} />
+                  <IconDashboardLine inline={false} size="small" />
                 )}
               </Flex.Item>
               <Flex.Item>
@@ -184,7 +174,6 @@ export default function MobileGlobalMenu(props: Props) {
                       src={current_user.avatar_image_url}
                       size="x-small"
                       data-fs-exclude={true}
-                      showBorder="always"
                     />
                   </Flex.Item>
                   <Flex.Item>
@@ -199,7 +188,7 @@ export default function MobileGlobalMenu(props: Props) {
             <Link href="/login" isWithinText={false} display="block">
               <Flex>
                 <Flex.Item width="3rem">
-                  <IconLockLine inline={false} size="small" {...override} />
+                  <IconLockLine inline={false} size="small" />
                 </Flex.Item>
                 <Flex.Item>
                   <Text size="medium">{I18n.t('Login')}</Text>
@@ -217,7 +206,7 @@ export default function MobileGlobalMenu(props: Props) {
               summary={
                 <Flex>
                   <Flex.Item width="3rem">
-                    <IconAdminLine inline={false} size="small" {...override} />
+                    <IconAdminLine inline={false} size="small" color="brand" />
                   </Flex.Item>
                   <Flex.Item>
                     <Text color="brand">{I18n.t('Admin')}</Text>
@@ -237,7 +226,7 @@ export default function MobileGlobalMenu(props: Props) {
             summary={
               <Flex>
                 <Flex.Item width="3rem">
-                  <IconCoursesLine inline={false} size="small" {...override} />
+                  <IconCoursesLine inline={false} size="small" color="brand" />
                 </Flex.Item>
                 <Flex.Item>
                   <Text color="brand">{k5User ? I18n.t('Subjects') : I18n.t('Courses')}</Text>
@@ -257,7 +246,7 @@ export default function MobileGlobalMenu(props: Props) {
               summary={
                 <Flex>
                   <Flex.Item width="3rem">
-                    <IconGroupLine inline={false} size="small" {...override} />
+                    <IconGroupLine inline={false} size="small" color="brand" />
                   </Flex.Item>
                   <Flex.Item>
                     <Text color="brand">{I18n.t('Groups')}</Text>
@@ -274,7 +263,7 @@ export default function MobileGlobalMenu(props: Props) {
           <Link href="/calendar" isWithinText={false} display="block">
             <Flex>
               <Flex.Item width="3rem">
-                <IconCalendarMonthLine inline={false} size="small" {...override} />
+                <IconCalendarMonthLine inline={false} size="small" />
               </Flex.Item>
               <Flex.Item>
                 <Text size="medium">{I18n.t('Calendar')}</Text>
@@ -287,7 +276,7 @@ export default function MobileGlobalMenu(props: Props) {
           <Link href="/inbox" isWithinText={false} display="block">
             <Flex>
               <Flex.Item width="3rem">
-                <IconInboxLine inline={false} size="small" {...override} />
+                <IconInboxLine inline={false} size="small" />
               </Flex.Item>
               <Flex.Item>
                 <Text size="medium">{I18n.t('Inbox')}</Text>
@@ -309,18 +298,14 @@ export default function MobileGlobalMenu(props: Props) {
                       size="small"
                       viewBox="0 0 64 64"
                       title="svg-external-tool"
-                      {...override}
+                      color="auto"
                     >
                       <path d={tool.svgPath} />
                     </SVGIcon>
                   ) : tool.toolImg ? (
                     <Img width="26px" height="26px" src={tool.toolImg} alt="" />
                   ) : (
-                    <IconExternalLinkLine
-                      data-testid="IconExternalLinkLine"
-                      size="small"
-                      {...override}
-                    />
+                    <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
                   )}
                 </Flex.Item>
                 <Flex.Item>
@@ -338,7 +323,7 @@ export default function MobileGlobalMenu(props: Props) {
             summary={
               <Flex>
                 <Flex.Item width="3rem">
-                  <IconClockLine inline={false} size="small" {...override} />
+                  <IconClockLine inline={false} size="small" color="brand" />
                 </Flex.Item>
                 <Flex.Item>
                   <Text color="brand">{I18n.t('History')}</Text>
@@ -359,7 +344,7 @@ export default function MobileGlobalMenu(props: Props) {
             summary={
               <Flex>
                 <Flex.Item width="3rem">
-                  <IconQuestionLine inline={false} size="small" {...override} />
+                  <IconQuestionLine inline={false} size="small" color="brand" />
                 </Flex.Item>
                 <Flex.Item>
                   <Text color="brand">{window.ENV.help_link_name || I18n.t('Help')}</Text>
@@ -387,7 +372,7 @@ export default function MobileGlobalMenu(props: Props) {
             >
               <Flex>
                 <Flex.Item width="3rem">
-                  <IconArrowEndSolid inline={false} size="small" {...override} />
+                  <IconArrowEndSolid inline={false} size="small" />
                 </Flex.Item>
                 <Flex.Item>
                   <Text size="medium">{I18n.t('Canvas Career')}</Text>

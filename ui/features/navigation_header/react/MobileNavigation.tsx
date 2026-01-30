@@ -26,10 +26,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {sessionStoragePersister} from '@canvas/query'
-import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
-import {getTheme} from '@canvas/instui-bindings'
-import {List} from '@instructure/ui-list'
-import {ThemeOrOverride} from '@instructure/emotion/types/EmotionTypes'
 
 declare global {
   interface Window {
@@ -125,104 +121,22 @@ const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) 
     </View>
   )
 
-  function updatedTheme(currentTheme: any): {
-    isThemeOverrideActive: boolean
-    themeOverride: ThemeOrOverride
-  } {
-    const textColor = currentTheme['ic-brand-global-nav-menu-item__text-color']
-    const avatarBorderColor = currentTheme['ic-brand-global-nav-avatar-border']
-    const trayBackground = currentTheme['ic-brand-global-nav-bgd']
-    const iconColor = currentTheme['ic-brand-global-nav-ic-icon-svg-fill']
-    if (
-      !textColor ||
-      !avatarBorderColor ||
-      !trayBackground ||
-      !iconColor ||
-      currentTheme.key === 'canvas-high-contrast'
-    ) {
-      // if none of these variables are defined, return a basic override to avoid
-      // unexpected a11y issues and make Link/ToggleDetails coloring consistent
-      const linkColor = currentTheme['ic-link-color'] || 'var(--ic-link-color)'
-      return {
-        isThemeOverrideActive: false,
-        themeOverride: {
-          componentOverrides: {
-            Text: {
-              brandColor: linkColor,
-            },
-            ToggleDetails: {
-              textColor: linkColor,
-              iconColor: linkColor,
-              toggleFocusBorderColor: linkColor,
-            },
-            Link: {
-              focusOutlineColor: linkColor,
-            },
-          },
-        },
-      }
-    }
-
-    const themeOverride = {
-      componentOverrides: {
-        Avatar: {
-          borderColor: avatarBorderColor,
-        },
-        Text: {
-          brandColor: textColor,
-          primaryColor: textColor,
-          secondaryColor: textColor,
-        },
-        Link: {
-          focusOutlineColor: textColor,
-          color: textColor,
-        },
-        ToggleDetails: {
-          textColor: textColor,
-          iconColor: iconColor,
-          toggleFocusBorderColor: textColor,
-        },
-        // for HistoryList entries, which inherits their color from List.Item
-        [List.Item.componentId]: {
-          color: textColor,
-        },
-        Tray: {
-          background: trayBackground,
-        },
-      },
-    }
-    return {isThemeOverrideActive: true, themeOverride}
-  }
-
-  const renderTray = (isThemeOverrideActive: boolean) => {
-    return (
-      <Tray
-        size="large"
-        label={I18n.t('Global Navigation')}
-        open={globalNavIsOpen}
-        onDismiss={() => setGlobalNavIsOpen(false)}
-        shouldCloseOnDocumentClick={true}
-      >
-        {globalNavIsOpen && (
-          <React.Suspense fallback={spinner}>
-            <MobileGlobalMenu
-              onDismiss={() => setGlobalNavIsOpen(false)}
-              isThemeOverrideActive={isThemeOverrideActive}
-            />
-          </React.Suspense>
-        )}
-      </Tray>
-    )
-  }
-
-  const currentTheme = getTheme() as any
-  const override = updatedTheme(currentTheme)
   return (
     <>
       {globalNavIsOpen && (
-        <DynamicInstUISettingsProvider theme={override.themeOverride}>
-          {renderTray(override.isThemeOverrideActive)}
-        </DynamicInstUISettingsProvider>
+        <Tray
+          size="large"
+          label={I18n.t('Global Navigation')}
+          open={globalNavIsOpen}
+          onDismiss={() => setGlobalNavIsOpen(false)}
+          shouldCloseOnDocumentClick={true}
+        >
+          {globalNavIsOpen && (
+            <React.Suspense fallback={spinner}>
+              <MobileGlobalMenu onDismiss={() => setGlobalNavIsOpen(false)} />
+            </React.Suspense>
+          )}
+        </Tray>
       )}
       {contextNavIsOpen && (
         <React.Suspense fallback={spinner}>
