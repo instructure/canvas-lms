@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ContributingScoreHeader, ContributingScoreHeaderProps} from '../ContributingScoreHeader'
 import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
@@ -59,22 +59,22 @@ describe('ContributingScoreHeader', () => {
   })
 
   it('renders the alignment name', () => {
-    const {getByText} = render(<ContributingScoreHeader {...defaultProps()} />)
-    expect(getByText('Assignment 1')).toBeInTheDocument()
+    render(<ContributingScoreHeader {...defaultProps()} />)
+    expect(screen.getAllByText('Assignment 1')[0]).toBeInTheDocument()
   })
 
   it('renders a menu with "Open in Speedgrader" option', async () => {
     const user = userEvent.setup({pointerEventsCheck: 0})
-    const {getByText} = render(<ContributingScoreHeader {...defaultProps()} />)
-    await user.click(getByText('Contributing Score Menu'))
-    expect(getByText('Open in Speedgrader')).toBeInTheDocument()
+    render(<ContributingScoreHeader {...defaultProps()} />)
+    await user.click(screen.getByText('Assignment 1 options'))
+    expect(screen.getByText('Open in Speedgrader')).toBeInTheDocument()
   })
 
   it('opens speedgrader in a new tab when "Open in Speedgrader" is clicked', async () => {
     const user = userEvent.setup({pointerEventsCheck: 0})
-    const {getByText} = render(<ContributingScoreHeader {...defaultProps()} />)
-    await user.click(getByText('Contributing Score Menu'))
-    await user.click(getByText('Open in Speedgrader'))
+    render(<ContributingScoreHeader {...defaultProps()} />)
+    await user.click(screen.getByText('Assignment 1 options'))
+    await user.click(screen.getByText('Open in Speedgrader'))
     expect(mockOpenWindow).toHaveBeenCalledWith(
       '/courses/1/gradebook/speed_grader?assignment_id=100',
       '_blank',
@@ -91,9 +91,9 @@ describe('ContributingScoreHeader', () => {
       },
       courseId: '42',
     }
-    const {getByText} = render(<ContributingScoreHeader {...props} />)
-    await user.click(getByText('Contributing Score Menu'))
-    await user.click(getByText('Open in Speedgrader'))
+    render(<ContributingScoreHeader {...props} />)
+    await user.click(screen.getByText('Assignment 1 options'))
+    await user.click(screen.getByText('Open in Speedgrader'))
     expect(mockOpenWindow).toHaveBeenCalledWith(
       '/courses/42/gradebook/speed_grader?assignment_id=250',
       '_blank',
@@ -102,19 +102,19 @@ describe('ContributingScoreHeader', () => {
 
   it('renders sorting options', async () => {
     const user = userEvent.setup({pointerEventsCheck: 0})
-    const {getByText} = render(<ContributingScoreHeader {...defaultProps()} />)
-    await user.click(getByText('Contributing Score Menu'))
-    expect(getByText('Sort')).toBeInTheDocument()
-    expect(getByText('Ascending scores')).toBeInTheDocument()
-    expect(getByText('Descending scores')).toBeInTheDocument()
+    render(<ContributingScoreHeader {...defaultProps()} />)
+    await user.click(screen.getByText('Assignment 1 options'))
+    expect(screen.getByText('Sort')).toBeInTheDocument()
+    expect(screen.getByText('Ascending scores')).toBeInTheDocument()
+    expect(screen.getByText('Descending scores')).toBeInTheDocument()
   })
 
   it('calls setSortBy and setSortAlignmentId when Ascending is clicked', async () => {
     const user = userEvent.setup({pointerEventsCheck: 0})
     const props = defaultProps()
-    const {getByText} = render(<ContributingScoreHeader {...props} />)
-    await user.click(getByText('Contributing Score Menu'))
-    await user.click(getByText('Ascending scores'))
+    render(<ContributingScoreHeader {...props} />)
+    await user.click(screen.getByText('Assignment 1 options'))
+    await user.click(screen.getByText('Ascending scores'))
     expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.ContributingScore)
     expect(props.sorting.setSortAlignmentId).toHaveBeenCalledWith('1')
     expect(props.sorting.setSortOrder).toHaveBeenCalledWith(SortOrder.ASC)
@@ -123,9 +123,9 @@ describe('ContributingScoreHeader', () => {
   it('calls setSortBy and setSortAlignmentId when Descending is clicked', async () => {
     const user = userEvent.setup({pointerEventsCheck: 0})
     const props = defaultProps()
-    const {getByText} = render(<ContributingScoreHeader {...props} />)
-    await user.click(getByText('Contributing Score Menu'))
-    await user.click(getByText('Descending scores'))
+    render(<ContributingScoreHeader {...props} />)
+    await user.click(screen.getByText('Assignment 1 options'))
+    await user.click(screen.getByText('Descending scores'))
     expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.ContributingScore)
     expect(props.sorting.setSortAlignmentId).toHaveBeenCalledWith('1')
     expect(props.sorting.setSortOrder).toHaveBeenCalledWith(SortOrder.DESC)
@@ -137,9 +137,9 @@ describe('ContributingScoreHeader', () => {
     props.sorting.sortBy = SortBy.ContributingScore
     props.sorting.sortAlignmentId = '1'
     props.sorting.sortOrder = SortOrder.ASC
-    const {getByText} = render(<ContributingScoreHeader {...props} />)
-    await user.click(getByText('Contributing Score Menu'))
-    const ascendingItem = getByText('Ascending scores').closest('[role="menuitemradio"]')
+    render(<ContributingScoreHeader {...props} />)
+    await user.click(screen.getByText('Assignment 1 options'))
+    const ascendingItem = screen.getByText('Ascending scores').closest('[role="menuitemradio"]')
     expect(ascendingItem).toHaveAttribute('aria-checked', 'true')
   })
 
@@ -149,9 +149,9 @@ describe('ContributingScoreHeader', () => {
     props.sorting.sortBy = SortBy.ContributingScore
     props.sorting.sortAlignmentId = '1'
     props.sorting.sortOrder = SortOrder.DESC
-    const {getByText} = render(<ContributingScoreHeader {...props} />)
-    await user.click(getByText('Contributing Score Menu'))
-    const descendingItem = getByText('Descending scores').closest('[role="menuitemradio"]')
+    render(<ContributingScoreHeader {...props} />)
+    await user.click(screen.getByText('Assignment 1 options'))
+    const descendingItem = screen.getByText('Descending scores').closest('[role="menuitemradio"]')
     expect(descendingItem).toHaveAttribute('aria-checked', 'true')
   })
 })

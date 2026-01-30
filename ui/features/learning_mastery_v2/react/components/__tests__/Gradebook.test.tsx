@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {Gradebook, GradebookProps} from '../Gradebook'
@@ -138,9 +138,9 @@ describe('Gradebook', () => {
 
   it('renders each outcome', () => {
     const props = defaultProps()
-    const {getByText} = renderWithQueryClient(<Gradebook {...props} />)
+    renderWithQueryClient(<Gradebook {...props} />)
     props.outcomes.forEach(outcome => {
-      expect(getByText(outcome.title)).toBeInTheDocument()
+      expect(screen.getAllByText(outcome.title)[0]).toBeInTheDocument()
     })
   })
 
@@ -251,10 +251,10 @@ describe('Gradebook', () => {
         contributingScores: mockContributingScoresVisible,
         outcomes: [{...MOCK_OUTCOMES[0], id: '1'}],
       })
-      const {getByText} = renderWithQueryClient(<Gradebook {...props} />)
+      renderWithQueryClient(<Gradebook {...props} />)
 
-      expect(getByText('Test Assignment 1')).toBeInTheDocument()
-      expect(getByText('Test Assignment 2')).toBeInTheDocument()
+      expect(screen.getAllByText('Test Assignment 1')[0]).toBeInTheDocument()
+      expect(screen.getAllByText('Test Assignment 2')[0]).toBeInTheDocument()
     })
 
     it('renders correct number of contributing score headers based on alignments', () => {
@@ -291,11 +291,11 @@ describe('Gradebook', () => {
         contributingScores: mockContributingScoresMultiple,
         outcomes: [{...MOCK_OUTCOMES[0], id: '1'}],
       })
-      const {getByText} = renderWithQueryClient(<Gradebook {...props} />)
+      renderWithQueryClient(<Gradebook {...props} />)
 
-      expect(getByText('Assignment 1')).toBeInTheDocument()
-      expect(getByText('Assignment 2')).toBeInTheDocument()
-      expect(getByText('Assignment 3')).toBeInTheDocument()
+      expect(screen.getAllByText('Assignment 1')[0]).toBeInTheDocument()
+      expect(screen.getAllByText('Assignment 2')[0]).toBeInTheDocument()
+      expect(screen.getAllByText('Assignment 3')[0]).toBeInTheDocument()
     })
 
     it('does not render contributing score headers when alignments is undefined', () => {
@@ -376,11 +376,11 @@ describe('Gradebook', () => {
       }
 
       const props = defaultProps({contributingScores: mockContributingScoresMultipleOutcomes})
-      const {getByText} = renderWithQueryClient(<Gradebook {...props} />)
+      renderWithQueryClient(<Gradebook {...props} />)
 
       // Should render headers for both outcomes (MOCK_OUTCOMES has 2 outcomes)
       props.outcomes.forEach(outcome => {
-        expect(getByText(`Assignment for Outcome ${outcome.id}`)).toBeInTheDocument()
+        expect(screen.getAllByText(`Assignment for Outcome ${outcome.id}`)[0]).toBeInTheDocument()
       })
     })
   })

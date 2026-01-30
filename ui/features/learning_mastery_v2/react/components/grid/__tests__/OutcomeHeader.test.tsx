@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
@@ -69,33 +69,33 @@ describe('OutcomeHeader', () => {
   }
 
   it('renders the outcome title', () => {
-    const {getByText} = render(<OutcomeHeader {...defaultProps()} />)
-    expect(getByText('outcome 1')).toBeInTheDocument()
+    render(<OutcomeHeader {...defaultProps()} />)
+    expect(screen.getAllByText('outcome 1')[0]).toBeInTheDocument()
   })
 
   it('renders a menu with various sorting and display options', () => {
-    const {getByText} = render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(getByText('Sort Outcome Column'))
-    expect(getByText('Sort')).toBeInTheDocument()
-    expect(getByText('Ascending scores')).toBeInTheDocument()
-    expect(getByText('Descending scores')).toBeInTheDocument()
-    expect(getByText('Display')).toBeInTheDocument()
-    expect(getByText('Show Contributing Scores')).toBeInTheDocument()
-    expect(getByText('Outcome Info')).toBeInTheDocument()
-    expect(getByText('Show Outcome Distribution')).toBeInTheDocument()
+    render(<OutcomeHeader {...defaultProps()} />)
+    fireEvent.click(screen.getByText('outcome 1 options'))
+    expect(screen.getByText('Sort')).toBeInTheDocument()
+    expect(screen.getByText('Ascending scores')).toBeInTheDocument()
+    expect(screen.getByText('Descending scores')).toBeInTheDocument()
+    expect(screen.getByText('Display')).toBeInTheDocument()
+    expect(screen.getByText('Show Contributing Scores')).toBeInTheDocument()
+    expect(screen.getByText('Outcome Info')).toBeInTheDocument()
+    expect(screen.getByText('Show Outcome Distribution')).toBeInTheDocument()
   })
 
   it('renders the outcome description modal when option is selected', () => {
-    const {getByText, getByTestId} = render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(getByText('Sort Outcome Column'))
-    fireEvent.click(getByText('Outcome Info'))
-    expect(getByTestId('outcome-description-modal')).toBeInTheDocument()
+    render(<OutcomeHeader {...defaultProps()} />)
+    fireEvent.click(screen.getByText('outcome 1 options'))
+    fireEvent.click(screen.getByText('Outcome Info'))
+    expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
   })
 
   it('renders the outcome distribution popover when option is selected', () => {
-    const {getByText, getByTestId} = render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(getByText('Sort Outcome Column'))
-    fireEvent.click(getByText('Show Outcome Distribution'))
-    expect(getByTestId('outcome-distribution-popover')).toBeInTheDocument()
+    render(<OutcomeHeader {...defaultProps()} />)
+    fireEvent.click(screen.getByText('outcome 1 options'))
+    fireEvent.click(screen.getByText('Show Outcome Distribution'))
+    expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
   })
 })

@@ -220,7 +220,7 @@ describe('LearningMastery', () => {
       expect(screen.getByText(students[0].name)).toBeInTheDocument()
     })
 
-    expect(screen.getByText(outcomes[0].title)).toBeInTheDocument()
+    expect(screen.getAllByText(outcomes[0].title)[0]).toBeInTheDocument()
     expect(await screen.findByLabelText('rating description!')).toBeInTheDocument()
   })
 
