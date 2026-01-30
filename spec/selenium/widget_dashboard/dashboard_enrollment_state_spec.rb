@@ -128,4 +128,33 @@ describe "student dashboard", :ignore_js_errors do
       expect(all_message_buttons.size).to eq(2)
     end
   end
+
+  context "new widgets on zero states" do
+    it "shows empty state when no graded submissions exist" do
+      add_widget_to_dashboard(@student, :recent_grades, 1)
+      go_to_dashboard
+
+      expect(recent_grades_empty_message).to be_displayed
+      expect(recent_grades_empty_message.text).to include("No recent grades available")
+    end
+
+    it "shows empty state message when no messages exist" do
+      add_widget_to_dashboard(@student, :inbox, 1)
+      go_to_dashboard
+
+      expect(inbox_no_messages_message).to be_displayed
+      expect(inbox_show_all_messages_link).to be_displayed
+    end
+
+    it "shows empty state for unread filter when only read messages exist" do
+      # Create student with only read messages
+      create_multiple_conversations(@student, @teacher2, 3, "read")
+      add_widget_to_dashboard(@student, :inbox, 1)
+      go_to_dashboard
+
+      expect(inbox_no_messages_message).to be_displayed
+      filter_inbox_messages_by("All")
+      expect(all_inbox_message_items.size).to eq(3)
+    end
+  end
 end

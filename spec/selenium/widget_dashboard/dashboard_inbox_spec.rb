@@ -73,32 +73,4 @@ describe "student dashboard inbox widget", :ignore_js_errors do
       expect(driver.current_url).to include("/conversations")
     end
   end
-
-  context "widget states" do
-    before :once do
-      @new_student = user_factory(active_all: true, name: "New Student")
-      @course1.enroll_student(@new_student, enrollment_state: :active)
-      add_widget_to_dashboard(@new_student, :inbox, 1)
-    end
-
-    before do
-      user_session(@new_student)
-    end
-
-    it "shows empty state message when no messages exist" do
-      go_to_dashboard
-      expect(inbox_no_messages_message).to be_displayed
-      expect(inbox_show_all_messages_link).to be_displayed
-    end
-
-    it "shows empty state for unread filter when only read messages exist" do
-      # Create student with only read messages
-      create_multiple_conversations(@new_student, @teacher2, 3, "read")
-      go_to_dashboard
-
-      expect(inbox_no_messages_message).to be_displayed
-      filter_inbox_messages_by("All")
-      expect(all_inbox_message_items.size).to eq(3)
-    end
-  end
 end
