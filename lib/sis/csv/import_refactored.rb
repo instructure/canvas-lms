@@ -471,7 +471,11 @@ module SIS
         dedup_dir = Dir.mktmpdir(nil, dir)
         dedup_filename = file_name.sub(/\.csv$/i, "_deduplicated.csv")
 
-        ::CSV.open(File.join(dedup_dir, dedup_filename), "w") do |csv|
+        # Ensure parent directory exists for files with subdirectory paths
+        output_path = File.join(dedup_dir, dedup_filename)
+        FileUtils.mkdir_p(File.dirname(output_path))
+
+        ::CSV.open(output_path, "w") do |csv|
           unique_lines.each { |line| csv << line }
         end
 
