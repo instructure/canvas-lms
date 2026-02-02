@@ -178,6 +178,37 @@ describe AccessibilityResourceScan do
       end
     end
 
+    describe "course_id with is_syllabus scope" do
+      let(:course) { course_model }
+
+      context "when a syllabus scan already exists for the course" do
+        before do
+          accessibility_resource_scan_model(course:, is_syllabus: true)
+          subject.course = course
+          subject.is_syllabus = true
+        end
+
+        it "is invalid due to uniqueness constraint" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:course_id]).to include("has already been taken")
+        end
+      end
+
+      context "when a non-syllabus scan exists for the same course" do
+        let(:wiki_page) { wiki_page_model(course:) }
+
+        before do
+          accessibility_resource_scan_model(course:, context: wiki_page)
+          subject.course = course
+          subject.is_syllabus = true
+        end
+
+        it "is valid because scope differs" do
+          expect(subject).to be_valid
+        end
+      end
+    end
+
     describe "is_syllabus_or_context" do
       let(:course) { course_model }
       let(:wiki_page) { wiki_page_model(course:) }
@@ -244,6 +275,19 @@ describe AccessibilityResourceScan do
         expect(result).to eq(scan)
         expect(result.announcement_id).to eq(announcement.id)
         expect(result.discussion_topic_id).to be_nil
+      end
+    end
+
+    context "when resource is a SyllabusResource" do
+      let(:syllabus_resource) { Accessibility::SyllabusResource.new(course) }
+      let!(:scan) { accessibility_resource_scan_model(course:, is_syllabus: true) }
+      let!(:other_scan) { accessibility_resource_scan_model(course:, context: wiki_page_model(course:)) }
+
+      it "returns only the syllabus scan" do
+        result = described_class.for_resource(syllabus_resource)
+        expect(result.count).to eq(1)
+        expect(result.first).to eq(scan)
+        expect(result.first.is_syllabus).to be true
       end
     end
 
@@ -330,6 +374,13 @@ describe AccessibilityResourceScan do
       it "returns the correct discussion topic URL" do
         subject.discussion_topic = discussion_topic
         expect(subject.context_url).to eq("/courses/#{subject.course_id}/discussion_topics/#{discussion_topic.id}")
+      end
+    end
+
+    context "when it is a syllabus scan" do
+      it "returns the correct syllabus URL" do
+        subject.is_syllabus = true
+        expect(subject.context_url).to eq("/courses/#{subject.course_id}/assignments/syllabus")
       end
     end
 

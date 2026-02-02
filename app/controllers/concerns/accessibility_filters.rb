@@ -94,7 +94,7 @@ module AccessibilityFilters
     return relation if resource_types.blank?
 
     resource_types = Array(resource_types).map(&:to_s)
-    valid_resource_types = %w[wiki_page assignment discussion_topic announcement]
+    valid_resource_types = %w[wiki_page assignment discussion_topic announcement syllabus]
     valid_filters = resource_types & valid_resource_types
 
     return relation.none if valid_filters.empty?
@@ -104,6 +104,7 @@ module AccessibilityFilters
     conditions << "accessibility_resource_scans.assignment_id IS NOT NULL" if valid_filters.include?("assignment")
     conditions << "accessibility_resource_scans.discussion_topic_id IS NOT NULL" if valid_filters.include?("discussion_topic")
     conditions << "accessibility_resource_scans.announcement_id IS NOT NULL" if valid_filters.include?("announcement")
+    conditions << "accessibility_resource_scans.is_syllabus = true" if valid_filters.include?("syllabus")
 
     return relation if conditions.empty?
 

@@ -101,6 +101,41 @@ describe Accessibility::ResourceScanController do
       end
     end
 
+    context "with syllabus" do
+      before do
+        accessibility_resource_scan_model(
+          course:,
+          is_syllabus: true,
+          workflow_state: "completed",
+          resource_name: "Course Syllabus",
+          resource_workflow_state: :published,
+          issue_count: 2,
+          resource_updated_at: 2.days.ago
+        )
+      end
+
+      it "includes syllabus scans" do
+        get :index, params: { course_id: course.id }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        syllabus_scan = json.find { |scan| scan["resource_type"] == "Syllabus" }
+        expect(syllabus_scan).to be_present
+        expect(syllabus_scan["resource_name"]).to eq("Course Syllabus")
+      end
+
+      it "sorts syllabus by resource_type" do
+        get :index, params: { course_id: course.id, sort: "resource_type", direction: "asc" }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        # Syllabus should come after 's' but before 'w' (wiki_page)
+        resource_types = json.pluck("resource_type")
+        syllabus_index = resource_types.index("Syllabus")
+        expect(syllabus_index).not_to be_nil
+      end
+    end
+
     %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].each do |sort_param|
       it "sorts by #{sort_param} ascending and descending" do
         # Ascending order
@@ -377,6 +412,28 @@ describe Accessibility::ResourceScanController do
           json = response.parsed_body
           expect(json.length).to eq(1)
           expect(json.all? { |scan| scan["resource_type"] == "Assignment" }).to be true
+        end
+
+        context "with syllabus filter" do
+          before do
+            accessibility_resource_scan_model(
+              course:,
+              is_syllabus: true,
+              workflow_state: "completed",
+              resource_name: "Course Syllabus",
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
+
+          it "filters by syllabus resource type" do
+            get :index, params: { course_id: course.id, filters: { artifactTypes: ["syllabus"] } }, format: :json
+            expect(response).to have_http_status(:ok)
+
+            json = response.parsed_body
+            expect(json.length).to eq(1)
+            expect(json.first["resource_type"]).to eq("Syllabus")
+          end
         end
 
         context "with discussion topics" do

@@ -121,6 +121,7 @@ module Accessibility
                      when "resource_type"
                        type_case = <<~SQL.squish
                          CASE
+                           WHEN is_syllabus = true THEN 'syllabus'
                            WHEN wiki_page_id IS NOT NULL THEN 'wiki_page'
                            WHEN assignment_id IS NOT NULL THEN 'assignment'
                            WHEN attachment_id IS NOT NULL THEN 'attachment'
@@ -148,9 +149,19 @@ module Accessibility
     # @param scan [AccessibilityResourceScan] the scan record
     # @return [Hash] the scan attributes
     def scan_attributes(scan)
-      resource = scan.context
+      resource = scan.resource
       resource_id = resource&.id
-      resource_type = resource&.class&.name
+      # rubocop:disable Lint/RedundantSafeNavigation
+      # False positive: We need &. because resource could be nil, and we're checking
+      # different conditions: resource exists AND has method vs resource exists WITHOUT method
+      resource_type = if resource&.respond_to?(:resource_class_name)
+                        resource.resource_class_name
+                      elsif resource
+                        resource.class.name
+                      else
+                        nil
+                      end
+      # rubocop:enable Lint/RedundantSafeNavigation
       scan_completed = scan.workflow_state == "completed"
 
       result = {

@@ -17,6 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AccessibilityResourceScan < ActiveRecord::Base
+  include Accessibility::Concerns::ResourceResolvable
   extend RootAccountResolver
 
   resolves_root_account through: :course
@@ -35,6 +36,7 @@ class AccessibilityResourceScan < ActiveRecord::Base
   validates :attachment_id, uniqueness: true, allow_nil: true
   validates :discussion_topic_id, uniqueness: true, allow_nil: true
   validates :announcement_id, uniqueness: true, allow_nil: true
+  validates :course_id, uniqueness: { scope: :is_syllabus }, if: :is_syllabus?
   validate :validate_syllabus_or_context
 
   scope :running, -> { where(workflow_state: %w[queued in_progress]) }
@@ -49,6 +51,8 @@ class AccessibilityResourceScan < ActiveRecord::Base
   def self.for_resource(resource)
     if resource.is_a?(Announcement)
       where(announcement_id: resource.id)
+    elsif resource.is_a?(Accessibility::SyllabusResource)
+      where(course_id: resource.course.id, is_syllabus: true)
     else
       where(context: resource)
     end
@@ -87,10 +91,14 @@ class AccessibilityResourceScan < ActiveRecord::Base
   end
 
   def context_url
+    url_helpers = Rails.application.routes.url_helpers
+
+    # Handle syllabus separately since it doesn't have a context_id
+    return url_helpers.syllabus_course_assignments_path(course_id) if is_syllabus?
+
     context_id = self.context_id
     return unless context_id
 
-    url_helpers = Rails.application.routes.url_helpers
     case context_type
     when "WikiPage"
       url_helpers.course_wiki_page_path(course_id, context_id)
