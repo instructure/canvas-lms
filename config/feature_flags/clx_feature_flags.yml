@@ -58,6 +58,20 @@ horizon_learning_library:
   display_name: "Canvas Career: Learning Library"
   description: |-
     Enables the Learning Library in Canvas Career.
+horizon_learning_library_ms2:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learning Library Milestone 2"
+  description: |-
+    Enables Learning Library microlearning features in Canvas Career.
+horizon_learning_library_ms3:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learning Library Milestone 3"
+  description: |-
+    Enables Learning Library recommendation features in Canvas Career.
 horizon_chart_view:
   applies_to: RootAccount
   state: hidden

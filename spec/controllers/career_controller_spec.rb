@@ -72,6 +72,8 @@ describe CareerController do
             horizon_user_profile_page: false,
             horizon_manual_dashboard_builder: false,
             horizon_learning_library: false,
+            horizon_learning_library_ms2: false,
+            horizon_learning_library_ms3: false,
             horizon_chart_view: false,
             horizon_native_permissions_page: false,
             horizon_block_content_editor: false,
