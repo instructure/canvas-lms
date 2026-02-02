@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useCallback, useState} from 'react'
+import React, {useMemo, useCallback, useState, useRef} from 'react'
+import {flushSync} from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {IconAddLine} from '@instructure/ui-icons'
@@ -66,6 +67,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
   const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [addPosition, setAddPosition] = useState<{col: number; row: number} | null>(null)
+  const lastDraggedWidgetIdRef = useRef<string | null>(null)
 
   const handleDragEnd = useCallback(
     (result: DropResult) => {
@@ -86,7 +88,19 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
             ? Math.max(...destColWidgets.map(w => w.position.row)) + 1
             : 1
 
-      moveWidgetToPosition(result.draggableId, destCol, targetRow)
+      lastDraggedWidgetIdRef.current = result.draggableId
+
+      flushSync(() => {
+        moveWidgetToPosition(result.draggableId, destCol, targetRow)
+      })
+
+      const dragHandle = document.querySelector(
+        `[data-testid="${lastDraggedWidgetIdRef.current}-drag-handle"]`,
+      ) as HTMLElement
+      if (dragHandle) {
+        dragHandle.focus()
+      }
+      lastDraggedWidgetIdRef.current = null
     },
     [moveWidgetToPosition, config.widgets],
   )

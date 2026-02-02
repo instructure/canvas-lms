@@ -423,6 +423,22 @@ describe('TemplateWidget', () => {
         const removeButton = screen.getByTestId('test-widget-remove-button')
         expect(removeButton).toHaveAccessibleName('Remove Test Widget')
       })
+
+      it('maintains focus on drag handle after moving widget via keyboard navigation', async () => {
+        const user = userEvent.setup()
+        const props = buildDefaultProps({isEditMode: true})
+        setup(props, <div>Test content</div>, ['desktop'])
+
+        const dragHandle = screen.getByTestId('test-widget-drag-handle')
+        await user.click(dragHandle)
+
+        const moveDownOption = screen.getByText('Move down')
+        await user.click(moveDownOption)
+
+        await vi.waitFor(() => {
+          expect(document.activeElement).toBe(dragHandle)
+        })
+      })
     })
   })
 })
