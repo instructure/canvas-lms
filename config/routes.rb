@@ -1307,6 +1307,10 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/visible_calendars_count", action: :visible_calendars_count, as: :visible_calendars_count
     end
 
+    scope(controller: :discovery_pages_api) do
+      put "discovery_pages", action: :upsert, as: :discovery_pages
+    end
+
     scope(controller: :account_notifications) do
       post "accounts/:account_id/account_notifications", action: :create, as: "account_notification"
       put "accounts/:account_id/account_notifications/:id", action: :update, as: "account_notification_update"
