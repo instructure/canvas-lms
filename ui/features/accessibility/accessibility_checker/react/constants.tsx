@@ -80,6 +80,7 @@ export const artifactTypeOptions = [
   {value: 'assignment', label: I18n.t('Assignments')},
   {value: 'discussion_topic', label: I18n.t('Discussion topics'), requiresFeatureFlag: true},
   {value: 'announcement', label: I18n.t('Announcements'), requiresFeatureFlag: true},
+  {value: 'syllabus', label: I18n.t('Syllabus'), requiresFeatureFlag: true},
 ]
 
 export const stateOptions = [

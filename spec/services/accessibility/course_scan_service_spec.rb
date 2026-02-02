@@ -267,6 +267,66 @@ describe Accessibility::CourseScanService do
       end
     end
 
+    context "when scanning syllabus" do
+      context "when a11y_checker_additional_resources feature flag is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        end
+
+        context "when course has a syllabus" do
+          before do
+            course.update!(syllabus_body: "<p>Course syllabus content</p>")
+            subject.scan_course
+          end
+
+          it "scans the syllabus" do
+            expect(Accessibility::ResourceScannerService).to have_received(:call).with(
+              resource: an_instance_of(Accessibility::SyllabusResource)
+            )
+          end
+        end
+
+        context "when course has no syllabus" do
+          before do
+            course.update!(syllabus_body: nil)
+            subject.scan_course
+          end
+
+          it "does not scan the syllabus" do
+            expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(
+              resource: an_instance_of(Accessibility::SyllabusResource)
+            )
+          end
+        end
+
+        context "when course has empty syllabus" do
+          before do
+            course.update!(syllabus_body: "")
+            subject.scan_course
+          end
+
+          it "does not scan the syllabus" do
+            expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(
+              resource: an_instance_of(Accessibility::SyllabusResource)
+            )
+          end
+        end
+      end
+
+      context "when a11y_checker_additional_resources feature flag is disabled" do
+        before do
+          course.update!(syllabus_body: "<p>Course syllabus content</p>")
+          subject.scan_course
+        end
+
+        it "does not scan the syllabus" do
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(
+            resource: an_instance_of(Accessibility::SyllabusResource)
+          )
+        end
+      end
+    end
+
     context "when determining if resources need scanning" do
       before do
         Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
@@ -276,6 +336,10 @@ describe Accessibility::CourseScanService do
       let!(:assignment) { assignment_model(course:) }
       let!(:discussion_topic) { discussion_topic_model(context: course) }
       let!(:announcement) { course.announcements.create!(title: "Test Announcement", message: "Test message") }
+
+      before do
+        course.update!(syllabus_body: "<p>Course syllabus content</p>")
+      end
 
       context "when there is no previous scan" do
         it "scans the wiki page" do
@@ -296,6 +360,13 @@ describe Accessibility::CourseScanService do
         it "scans the announcement" do
           subject.scan_course
           expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: announcement)
+        end
+
+        it "scans the syllabus" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(
+            resource: an_instance_of(Accessibility::SyllabusResource)
+          )
         end
       end
 
@@ -338,6 +409,15 @@ describe Accessibility::CourseScanService do
               issue_count: 0
             )
           end
+          Timecop.freeze(course.updated_at + 1.hour) do
+            AccessibilityResourceScan.create!(
+              course:,
+              is_syllabus: true,
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
         end
 
         it "does not scan the wiki page" do
@@ -358,6 +438,13 @@ describe Accessibility::CourseScanService do
         it "does not scan the announcement" do
           subject.scan_course
           expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: announcement)
+        end
+
+        it "does not scan the syllabus" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(
+            resource: an_instance_of(Accessibility::SyllabusResource)
+          )
         end
       end
 
@@ -400,6 +487,15 @@ describe Accessibility::CourseScanService do
               issue_count: 0
             )
           end
+          Timecop.freeze(course.updated_at - 1.hour) do
+            AccessibilityResourceScan.create!(
+              course:,
+              is_syllabus: true,
+              workflow_state: :completed,
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+          end
         end
 
         it "scans the wiki page" do
@@ -420,6 +516,13 @@ describe Accessibility::CourseScanService do
         it "scans the announcement" do
           subject.scan_course
           expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: announcement)
+        end
+
+        it "scans the syllabus" do
+          subject.scan_course
+          expect(Accessibility::ResourceScannerService).to have_received(:call).with(
+            resource: an_instance_of(Accessibility::SyllabusResource)
+          )
         end
       end
 

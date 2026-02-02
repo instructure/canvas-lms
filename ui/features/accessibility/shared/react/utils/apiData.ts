@@ -100,6 +100,8 @@ export const getAsContentItemType = (type?: ResourceType): ContentItemType | und
       return ContentItemType.DiscussionTopic
     case ResourceType.Announcement:
       return ContentItemType.Announcement
+    case ResourceType.Syllabus:
+      return ContentItemType.Syllabus
   }
 }
 

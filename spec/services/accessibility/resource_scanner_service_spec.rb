@@ -406,6 +406,29 @@ describe Accessibility::ResourceScannerService do
           expect(AccessibilityIssue.where(context: discussion_topic).count).to be(0)
         end
       end
+
+      context "for a syllabus with nil syllabus_body" do
+        subject { described_class.new(resource: Accessibility::SyllabusResource.new(course)) }
+
+        let!(:scan) { accessibility_resource_scan_model(course:, is_syllabus: true) }
+
+        before do
+          course.update!(syllabus_body: nil)
+        end
+
+        it "completes the scan successfully" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("completed")
+        end
+
+        it "reports no issues for nil content" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.issue_count).to eq(0)
+          expect(AccessibilityIssue.where(course:, is_syllabus: true).count).to be(0)
+        end
+      end
     end
 
     context "when the resource exceeds size limit" do
@@ -483,6 +506,25 @@ describe Accessibility::ResourceScannerService do
           )
         end
       end
+
+      context "for a syllabus" do
+        subject { described_class.new(resource: Accessibility::SyllabusResource.new(course)) }
+
+        let!(:scan) { accessibility_resource_scan_model(course:, is_syllabus: true) }
+
+        before do
+          course.update!(syllabus_body: "a" * (Accessibility::ResourceScannerService::MAX_HTML_SIZE + 1))
+        end
+
+        it "fails the scan with an error message" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+          expect(scan.error_message).to eq(
+            "This content is too large to check. HTML body must not be greater than 125 KB."
+          )
+        end
+      end
     end
   end
 
@@ -540,6 +582,21 @@ describe Accessibility::ResourceScannerService do
 
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.discussion_topics_scanned",
+          tags: { cluster: scan.course.shard.database_server&.id }
+        )
+      end
+    end
+
+    context "for a syllabus" do
+      subject { described_class.new(resource: Accessibility::SyllabusResource.new(course)) }
+
+      let!(:scan) { accessibility_resource_scan_model(course:, is_syllabus: true, workflow_state: "completed") }
+
+      it "logs syllabus_scanned" do
+        subject.send(:log_to_datadog, scan)
+
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.syllabus_scanned",
           tags: { cluster: scan.course.shard.database_server&.id }
         )
       end
