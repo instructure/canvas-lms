@@ -137,6 +137,38 @@ describe Accessibility::Issue::HtmlFixer do
         )
       end
     end
+
+    context "with an announcement" do
+      let(:announcement) { announcement_model(context: course, message: "<div><h1>Announcement Title</h1></div>") }
+
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          announcement,
+          "./div/h1",
+          "Change heading level to Heading 2"
+        )
+      end
+
+      it "updates the resource successfully" do
+        html_fixer.apply_fix!
+
+        expect(announcement.reload.message).to eq "<div><h2>Announcement Title</h2></div>"
+      end
+
+      it "returns the full document with the fix applied" do
+        result = html_fixer.apply_fix!
+
+        expect(result).to eq(
+          {
+            status: :ok,
+            json: {
+              success: true
+            },
+          }
+        )
+      end
+    end
   end
 
   describe "#preview_fix" do
@@ -304,6 +336,33 @@ describe Accessibility::Issue::HtmlFixer do
       end
     end
 
+    context "with an announcement" do
+      let(:announcement) { announcement_model(context: course, message: "<div><h1>Announcement Title</h1></div>") }
+
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          announcement,
+          "./div/h1",
+          "Change heading level to Heading 2"
+        )
+      end
+
+      it "works with announcement messages" do
+        result = html_fixer.preview_fix
+
+        expect(result).to eq(
+          {
+            status: :ok,
+            json: {
+              content: "<div><h2>Announcement Title</h2></div>",
+              path: "./div/h2"
+            },
+          }
+        )
+      end
+    end
+
     context "with backwards compatibility for fix! return value" do
       let(:wiki_page) do
         wiki_page_model(
@@ -406,6 +465,14 @@ describe Accessibility::Issue::HtmlFixer do
 
       it "returns :message" do
         expect(described_class.target_attribute(discussion_topic)).to eq(:message)
+      end
+    end
+
+    context "with Announcement" do
+      let(:announcement) { announcement_model(context: course) }
+
+      it "returns :message" do
+        expect(described_class.target_attribute(announcement)).to eq(:message)
       end
     end
 

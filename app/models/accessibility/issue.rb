@@ -22,6 +22,7 @@ module Accessibility
     include WikiPageIssues
     include AssignmentIssues
     include AttachmentIssues
+    include AnnouncementIssues
     include DiscussionTopicIssues
     include ContentChecker
 
@@ -36,6 +37,7 @@ module Accessibility
       {
         pages: generate_wiki_page_resources(skip_scan:),
         assignments: generate_assignment_resources(skip_scan:),
+        announcements: generate_announcement_resources(skip_scan:),
         discussion_topics: generate_discussion_topic_resources(skip_scan:),
         # TODO: Disable PDF Accessibility Checks Until Post-InstCon
         # attachments: generate_attachment_resources(skip_scan:),
@@ -52,6 +54,7 @@ module Accessibility
       {
         pages: filter_resources(data[:pages], query),
         assignments: filter_resources(data[:assignments], query),
+        announcements: filter_resources(data[:announcements], query),
         discussion_topics: filter_resources(data[:discussion_topics], query),
         attachments: filter_resources(data[:attachments], query),
         last_checked: data[:last_checked],
@@ -80,7 +83,7 @@ module Accessibility
         context.wiki_pages.find(resource_id)
       when "Assignment"
         context.assignments.find(resource_id)
-      when "DiscussionTopic"
+      when "DiscussionTopic", "Announcement"
         context.discussion_topics.find(resource_id)
       else
         raise ArgumentError, "Unsupported resource type: #{resource_type}"

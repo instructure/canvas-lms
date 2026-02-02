@@ -105,7 +105,7 @@ module Accessibility
     end
 
     def remove_accessibility_scan
-      AccessibilityResourceScan.where(context: self).destroy_all
+      AccessibilityResourceScan.for_resource(self).destroy_all
     end
 
     def a11y_scannable_attributes
@@ -144,7 +144,7 @@ module Accessibility
       topic = DiscussionTopic.find(id)
 
       if topic.graded?
-        AccessibilityResourceScan.where(context: topic).destroy_all
+        AccessibilityResourceScan.for_resource(topic).destroy_all
       else
         Accessibility::ResourceScannerService.call(resource: topic)
       end
