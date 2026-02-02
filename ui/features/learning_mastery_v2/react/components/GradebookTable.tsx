@@ -30,6 +30,7 @@ import {
   DisplayFilter,
   NameDisplayFormat,
 } from '@canvas/outcomes/react/utils/constants'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   Student,
   Outcome,
@@ -50,6 +51,9 @@ import {Table} from './table/Table'
 import {ContributingScoreCellContent} from './table/ContributingScoreCellContent'
 import {Column} from './table/utils'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
+import WithBreakpoints, {Breakpoints} from '@canvas/with-breakpoints/src'
+
+const I18n = createI18nScope('LearningMasteryGradebook')
 
 interface GradebookTableProps {
   courseId: string
@@ -73,11 +77,13 @@ interface GradebookTableProps {
   handleOutcomeDragLeave?: () => void
 }
 
+type GradebookTableComponentProps = GradebookTableProps & {breakpoints?: Breakpoints}
+
 interface ExtendedOutcomeRollup extends OutcomeRollup {
   studentId: string | number
 }
 
-export const GradebookTable: React.FC<GradebookTableProps> = ({
+const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   courseId,
   students,
   outcomes,
@@ -92,7 +98,10 @@ export const GradebookTable: React.FC<GradebookTableProps> = ({
   handleOutcomeReorder,
   handleOutcomeDragEnd,
   handleOutcomeDragLeave,
+  breakpoints = {},
 }) => {
+  const isMobile = breakpoints?.mobileOnly
+
   const rollupsByStudentAndOutcome = useMemo(() => {
     const outcomeRollups = rollups.flatMap(r =>
       r.outcomeRollups.map(or => ({
@@ -250,7 +259,7 @@ export const GradebookTable: React.FC<GradebookTableProps> = ({
       header: renderStudentHeader,
       render: renderStudentCell,
       width: STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING,
-      isSticky: true,
+      isSticky: !isMobile,
       isRowHeader: true,
       colHeaderProps: {
         'data-testid': 'student-header',
@@ -313,6 +322,7 @@ export const GradebookTable: React.FC<GradebookTableProps> = ({
     renderOutcomeCell,
     renderContributingScoreHeader,
     renderContributingScoreCell,
+    isMobile,
   ])
 
   const renderAboveHeaderCallback = useCallback(
@@ -326,10 +336,11 @@ export const GradebookTable: React.FC<GradebookTableProps> = ({
           outcomeDistributions={outcomeDistributions}
           isLoading={isLoadingDistribution}
           handleKeyDown={handleKeyDown}
+          isMobile={isMobile}
         />
       )
     },
-    [outcomeDistributions, isLoadingDistribution],
+    [outcomeDistributions, isLoadingDistribution, isMobile],
   )
 
   const handleColumnMove = useCallback(
@@ -361,8 +372,13 @@ export const GradebookTable: React.FC<GradebookTableProps> = ({
       renderAboveHeader={renderAboveHeaderCallback}
       columns={columns}
       data={tableData}
-      caption="Learning Mastery Gradebook"
+      caption={I18n.t('Learning Mastery Gradebook')}
       dragDropConfig={dragDropConfig}
+      margin="medium none none none"
     />
   )
 }
+
+export const GradebookTable = WithBreakpoints(
+  GradebookTableComponent,
+) as React.ComponentType<GradebookTableProps>

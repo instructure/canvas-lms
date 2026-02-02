@@ -37,7 +37,7 @@ export const Row: React.FC<RowProps> = ({children, setRef}) => {
       role={isStacked ? 'row' : undefined}
       elementRef={setRef}
       // trick to ensure full height div in cell
-      height="1px"
+      height={isStacked ? undefined : '1px'}
     >
       {Children.toArray(children)
         .filter(Boolean)
