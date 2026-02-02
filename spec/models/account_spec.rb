@@ -3512,4 +3512,88 @@ describe Account do
       end
     end
   end
+
+  describe "#sanitize_discovery_page" do
+    let(:account) { Account.default }
+    let!(:auth_provider) { account.authentication_providers.create!(auth_type: "saml") }
+
+    def valid_discovery_page_entry(auth_provider_id, overrides = {})
+      {
+        authentication_provider_id: auth_provider_id,
+        label: "Test Provider",
+        path: "/login/saml"
+      }.merge(overrides)
+    end
+
+    context "when discovery_page setting changes" do
+      it "sanitizes HTML from labels in primary entries" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "<script>alert('xss')</script>Safe Label")],
+          secondary: []
+        }
+        account.save!
+
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Safe Label")
+      end
+
+      it "sanitizes HTML from labels in secondary entries" do
+        account.settings[:discovery_page] = {
+          primary: [],
+          secondary: [valid_discovery_page_entry(auth_provider.id, label: "<b>Bold</b> Text")]
+        }
+        account.save!
+
+        expect(account.settings[:discovery_page][:secondary][0][:label]).to eq("Bold Text")
+      end
+
+      it "sanitizes multiple entries in both positions" do
+        account.settings[:discovery_page] = {
+          primary: [
+            valid_discovery_page_entry(auth_provider.id, label: "<em>First</em>"),
+            valid_discovery_page_entry(auth_provider.id, label: "<strong>Second</strong>")
+          ],
+          secondary: [
+            valid_discovery_page_entry(auth_provider.id, label: "<span>Third</span>")
+          ]
+        }
+        account.save!
+
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("First")
+        expect(account.settings[:discovery_page][:primary][1][:label]).to eq("Second")
+        expect(account.settings[:discovery_page][:secondary][0][:label]).to eq("Third")
+      end
+
+      it "preserves labels without HTML" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Plain Text Label")],
+          secondary: []
+        }
+        account.save!
+
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Plain Text Label")
+      end
+    end
+
+    context "when discovery_page setting has not changed" do
+      it "does not run sanitization" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Original")],
+          secondary: []
+        }
+        account.save!
+
+        account.settings[:restrict_student_future_view] = { value: true }
+        expect(account).not_to receive(:sanitize_discovery_page)
+        account.valid?
+      end
+    end
+
+    context "when discovery_page is not present" do
+      it "does not raise an error" do
+        account.settings.delete(:discovery_page)
+
+        expect { account.save! }.not_to raise_error
+      end
+    end
+  end
 end
