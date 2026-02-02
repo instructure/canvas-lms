@@ -917,6 +917,174 @@ describe "assignment" do
       end
     end
 
+    describe "peer reviews and external tool submission type" do
+      it "hides peer review section when submission type changes to External Tool", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("External Tool PR Test")
+        f("#assignment_text_entry").click
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        peer_review_details = f("#peer_reviews_allocation_and_grading_details")
+        expect(peer_review_details).to be_displayed
+
+        click_option("#assignment_submission_type", "External Tool")
+        wait_for_ajaximations
+
+        expect(peer_review_details).not_to be_displayed
+      end
+
+      it "re-enables peer review section when switching away from External Tool", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Switch From External Tool")
+
+        click_option("#assignment_submission_type", "External Tool")
+        wait_for_ajaximations
+
+        peer_review_fields = f("#assignment_peer_reviews_fields")
+        expect(peer_review_fields).not_to be_displayed
+
+        click_option("#assignment_submission_type", "Online")
+        wait_for_ajaximations
+        f("#assignment_text_entry").click
+
+        expect(peer_review_fields).to be_displayed
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        peer_review_details = f("#peer_reviews_allocation_and_grading_details")
+        expect(peer_review_details).to be_displayed
+      end
+
+      context "editing existing assignment with peer review sub-assignment" do
+        before(:once) do
+          @pr_assignment_for_edit = @pr_course.assignments.create!(
+            name: "Existing PR Assignment for External Tool Edit",
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            peer_reviews: true,
+            peer_review_count: 3
+          )
+
+          @peer_review_sub_for_edit = PeerReview::PeerReviewCreatorService.call(
+            parent_assignment: @pr_assignment_for_edit,
+            points_possible: 15,
+            grading_type: "points"
+          )
+
+          @external_tool = @pr_course.context_external_tools.create!(
+            url: "http://www.example.com/tool",
+            domain: "example.com",
+            shared_secret: "test123",
+            consumer_key: "test123",
+            name: "Test External Tool"
+          )
+        end
+
+        it "allows saving when changing existing peer review assignment to External Tool", custom_timeout: 30 do
+          get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_for_edit.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("[data-testid='peer-review-checkbox']")).to be_checked
+
+          click_option("#assignment_submission_type", "External Tool")
+          wait_for_ajaximations
+
+          f("#assignment_external_tool_tag_attributes_url").send_keys(@external_tool.url)
+          wait_for_ajaximations
+
+          scroll_to(f(".btn-primary[type=submit]"))
+          f(".btn-primary[type=submit]").click
+
+          wait_for_ajaximations
+          @pr_assignment_for_edit.reload
+
+          expect(@pr_assignment_for_edit.submission_types).to eq "external_tool"
+          expect(@pr_assignment_for_edit.peer_reviews).to be false
+        end
+
+        it "destroys peer_review_sub_assignment when submission type changes to external tool", custom_timeout: 30 do
+          assignment = @pr_course.assignments.create!(
+            name: "PR Assignment for External Tool Test",
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            peer_reviews: true,
+            peer_review_count: 3
+          )
+
+          peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+            parent_assignment: assignment,
+            points_possible: 15,
+            grading_type: "points"
+          )
+
+          expect(PeerReviewSubAssignment.find(peer_review_sub.id).workflow_state).to eq "published"
+
+          get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("[data-testid='peer-review-checkbox']")).to be_checked
+
+          click_option("#assignment_submission_type", "External Tool")
+          wait_for_ajaximations
+
+          f("#assignment_external_tool_tag_attributes_url").send_keys(@external_tool.url)
+          wait_for_ajaximations
+
+          scroll_to(f(".btn-primary[type=submit]"))
+          f(".btn-primary[type=submit]").click
+
+          wait_for_ajaximations
+          assignment.reload
+
+          expect(assignment.submission_types).to eq "external_tool"
+          expect(assignment.peer_reviews).to be false
+          expect(PeerReviewSubAssignment.unscoped.find(peer_review_sub.id).workflow_state).to eq "deleted"
+        end
+
+        it "destroys peer_review_sub_assignment when unchecking peer reviews", custom_timeout: 30 do
+          assignment = @pr_course.assignments.create!(
+            name: "PR Assignment for Uncheck Test",
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            peer_reviews: true,
+            peer_review_count: 3
+          )
+
+          peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+            parent_assignment: assignment,
+            points_possible: 15,
+            grading_type: "points"
+          )
+
+          expect(PeerReviewSubAssignment.find(peer_review_sub.id).workflow_state).to eq "published"
+
+          get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("[data-testid='peer-review-checkbox']")).to be_checked
+
+          f("[data-testid='peer-review-checkbox'] + label").click
+          wait_for_ajaximations
+
+          scroll_to(f(".btn-primary[type=submit]"))
+          f(".btn-primary[type=submit]").click
+
+          wait_for_ajaximations
+          assignment.reload
+
+          expect(assignment.peer_reviews).to be false
+          expect(PeerReviewSubAssignment.unscoped.find(peer_review_sub.id).workflow_state).to eq "deleted"
+        end
+      end
+    end
+
     describe "peer review across sections" do
       before(:once) do
         @pr_assignment_sections = @pr_course.assignments.create!(
