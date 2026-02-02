@@ -85,12 +85,7 @@ describe AssignmentGroupsController do
         user_session(@admin)
       end
 
-      context "when new_quizzes_surveys feature is enabled" do
-        before do
-          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
-        end
-
+      context "ungraded survey filtering" do
         it "excludes assignments with new_quizzes type ungraded_survey from the response" do
           regular_assignment = @course.assignments.create!(
             title: "Regular Assignment",
@@ -199,50 +194,6 @@ describe AssignmentGroupsController do
 
           expect(assignment_ids).to include(assignment_with_null_new_quizzes.id)
           expect(assignment_ids).to include(assignment_with_other_keys.id)
-        end
-      end
-
-      context "when new_quizzes_surveys feature is disabled" do
-        before do
-          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
-        end
-
-        it "includes all assignments including ungraded surveys when feature is disabled" do
-          regular_assignment = @course.assignments.create!(
-            title: "Regular Assignment",
-            assignment_group: @group,
-            workflow_state: "published"
-          )
-          ungraded_survey_assignment = @course.assignments.create!(
-            title: "Ungraded Survey Assignment",
-            assignment_group: @group,
-            workflow_state: "published",
-            settings: {
-              "new_quizzes" => {
-                "type" => "ungraded_survey"
-              }
-            }
-          )
-
-          get :index,
-              params: {
-                course_id: @course.id,
-                include: %w[assignments],
-              },
-              format: "json"
-
-          expect(response).to be_successful
-          group = json_parse(response.body).first
-          assignments = group["assignments"]
-          assignment_ids = assignments.pluck("id")
-          assignment_titles = assignments.pluck("name")
-
-          expect(assignment_ids).to include(regular_assignment.id)
-          expect(assignment_ids).to include(ungraded_survey_assignment.id)
-
-          expect(assignment_titles).to include("Regular Assignment")
-          expect(assignment_titles).to include("Ungraded Survey Assignment")
         end
       end
     end

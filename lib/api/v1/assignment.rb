@@ -670,7 +670,7 @@ module Api::V1::Assignment
       quiz_lti_param = assignment_params.key?(:quiz_lti) || assignment_params[:quiz_lti]
       external_tool_url = assignment_params.dig(:external_tool_tag_attributes, :url)
 
-      if quiz_lti_param || assignment.quiz_lti_assignment?(external_tool_url: external_tool_url)
+      if quiz_lti_param || assignment.quiz_lti_assignment?(external_tool_url:)
         unless NewQuizzesFeaturesHelper.new_quizzes_enabled?(context)
           assignment.errors.add("external_tool_tag_attributes[url]", I18n.t("New Quizzes is not enabled for this course"))
           return false
@@ -1180,7 +1180,7 @@ module Api::V1::Assignment
   end
 
   def update_new_quizzes_params(assignment, assignment_params)
-    return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti? && assignment.new_record?
+    return unless assignment.quiz_lti? && assignment.new_record?
 
     type = assignment_params&.[](:new_quizzes_quiz_type)
     if type.present?

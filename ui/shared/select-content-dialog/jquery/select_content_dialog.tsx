@@ -113,10 +113,6 @@ let isAnonymousSubmission = false
 const MODULE_ITEM_DIALOG_HEIGHT_DEFAULT = 550
 const MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR = 650
 
-const isNewQuizzesSurveysEnabled = () => {
-  return ENV?.FEATURES?.new_quizzes_surveys === true
-}
-
 const resizeModuleItemDialog = (height: number) => {
   const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
   if (fullSizeModal) {
@@ -620,13 +616,11 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
       open() {
         $(this).parent().find('.ui-dialog-titlebar-close').focus()
 
-        if (isNewQuizzesSurveysEnabled()) {
-          const itemType = $('#add_module_item_select').val()
-          const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
-          const isCreatingNew = $('#quizs_select').val() === 'new'
-          if (itemType === 'quiz' && isNewQuizzesChecked && isCreatingNew) {
-            resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR)
-          }
+        const itemType = $('#add_module_item_select').val()
+        const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
+        const isCreatingNew = $('#quizs_select').val() === 'new'
+        if (itemType === 'quiz' && isNewQuizzesChecked && isCreatingNew) {
+          resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR)
         }
       },
       modal: true,
@@ -809,10 +803,10 @@ $(document).ready(function () {
               'assignment[assignment_group_id]': data['quiz[assignment_group_id]'],
               quiz_lti: 1,
             }
-            // Only include New Quizzes params when New Quizzes is selected and feature flag is enabled
+            // Only include New Quizzes params when New Quizzes is selected
             const isNewQuizzesSelected =
               $('input[name=quiz_engine_selection]:checked').val() === 'assignment'
-            if (isNewQuizzesSelected && isNewQuizzesSurveysEnabled()) {
+            if (isNewQuizzesSelected) {
               data['assignment[new_quizzes_quiz_type]'] = currentQuizType
               data['assignment[new_quizzes_anonymous_submission]'] = isAnonymousSubmission
             }
@@ -1052,12 +1046,10 @@ $(document).ready(function () {
     if (isCreatingNew) {
       $(this).parents('.module_item_option').find('.new').show().focus().select()
 
-      if (isNewQuizzesSurveysEnabled()) {
-        const itemType = $('#add_module_item_select').val()
-        const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
-        if (itemType === 'quiz' && isNewQuizzesChecked) {
-          resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR)
-        }
+      const itemType = $('#add_module_item_select').val()
+      const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
+      if (itemType === 'quiz' && isNewQuizzesChecked) {
+        resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR)
       }
     } else {
       $(this).parents('.module_item_option').find('.new').hide()
@@ -1067,10 +1059,6 @@ $(document).ready(function () {
 
   // Handle quiz engine radio button changes
   $('input[name=quiz_engine_selection]').on('change', function (this: HTMLInputElement) {
-    if (!isNewQuizzesSurveysEnabled()) {
-      return
-    }
-
     const isNewQuizzes = $(this).val() === 'assignment'
     const $quizTypeSelectorRow = $('#quiz_type_selector_row')
     const $anonymousSubmissionRow = $('#anonymous_submission_selector_row')
@@ -1100,12 +1088,10 @@ $(document).ready(function () {
   })
 
   // Initialize quiz type selector if New Quizzes is already selected on page load
-  if (isNewQuizzesSurveysEnabled()) {
-    const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
-    if (isNewQuizzesChecked) {
-      $('#quiz_type_selector_row').show()
-      renderQuizTypeSelector()
-    }
+  const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
+  if (isNewQuizzesChecked) {
+    $('#quiz_type_selector_row').show()
+    renderQuizTypeSelector()
   }
 })
 

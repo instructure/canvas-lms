@@ -3942,7 +3942,6 @@ RSpec.describe ApplicationController, "#cached_js_env_account_features" do
     flags = controller.cached_js_env_account_features
 
     expect(flags).to have_key(:course_pace_pacing_with_mastery_paths)
-    expect(flags).to have_key(:new_quizzes_surveys)
   end
 
   it "does not include course-level feature flags" do

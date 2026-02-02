@@ -2290,11 +2290,6 @@ describe "Importing assignments" do
   describe "#import_new_quizzes_settings" do
     let(:assignment) { Assignment.new }
 
-    before do
-      allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-      allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
-    end
-
     it "sets both type and anonymous_participants when provided" do
       hash = { new_quizzes_type: "graded_survey", new_quizzes_anonymous_participants: true }
       Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
@@ -2334,18 +2329,6 @@ describe "Importing assignments" do
       Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
       expect(assignment.settings["new_quizzes"]["type"]).to eq("survey")
       expect(assignment.settings["new_quizzes"]["existing_key"]).to eq("existing_value")
-    end
-
-    context "when feature flag is disabled" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
-      end
-
-      it "does not import new_quizzes settings even when present" do
-        hash = { new_quizzes_type: "graded_quiz", new_quizzes_anonymous_participants: true }
-        Importers::AssignmentImporter.import_new_quizzes_settings(hash, assignment)
-        expect(assignment.settings).to be_nil
-      end
     end
   end
 end
