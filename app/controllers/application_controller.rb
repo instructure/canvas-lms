@@ -402,6 +402,7 @@ class ApplicationController < ActionController::Base
             @js_env[:USAGE_METRICS_METADATA][:course_sis_source_id] = @context.sis_source_id
             @js_env[:USAGE_METRICS_METADATA][:course_sis_batch_id] = @context.sis_batch_id
             @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_id] = @context.enrollment_term_id
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_name] = @context.enrollment_term&.name
           end
         end
 
