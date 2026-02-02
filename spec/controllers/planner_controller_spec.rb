@@ -1909,6 +1909,23 @@ describe PlannerController do
         expect(response).to be_successful
       end
 
+      it "only returns items from courses where the observer is observing the specified student" do
+        student2 = user_factory(active_all: true)
+        course2 = Course.create!(workflow_state: "available")
+        course2.enroll_student(@student, enrollment_state: "active")
+        course2.enroll_student(student2, enrollment_state: "active")
+        course2.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: student2.id)
+        assignment3 = course2.assignments.create!(title: "Student 2 Only", due_at: 1.day.from_now)
+
+        get :index, params: { observed_user_id: @student.to_param, include: %w[all_courses] }
+        expect(response).to be_successful
+        response_json = json_parse(response.body)
+        response_hash = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
+        expect(response_hash).to include(["assignment", @assignment.id])
+        expect(response_hash).to include(["assignment", @assignment2.id])
+        expect(response_hash).not_to include(["assignment", assignment3.id])
+      end
+
       it "allows an observer to query their observed user's planner items for valid context_codes" do
         get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
         expect(response).to be_successful

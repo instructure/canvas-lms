@@ -580,6 +580,10 @@ class PlannerController < ApplicationController
       if !@include_context_codes && @include_all_courses
         @user.shard.activate do
           course_ids = @user.course_ids_for_todo_lists(:student, include_concluded:)
+          if params.key?(:observed_user_id)
+            observer_course_ids = @current_user.observer_enrollments.active.where(associated_user: @user).shard(@current_user).pluck(:course_id).map { |id| Shard.relative_id_for(id, @current_user.shard, @user.shard) }
+            course_ids &= observer_course_ids
+          end
           context_codes = course_ids.map { |id| "course_#{id}" }
           context_codes << @user.asset_string
           group_ids = @user.group_ids_for_todo_lists
