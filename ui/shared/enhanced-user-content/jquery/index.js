@@ -48,9 +48,18 @@ import preventDefault from '@canvas/util/preventDefault'
 
 const I18n = createI18nScope('instructure_js')
 
+const dateFormatter = new Intl.DateTimeFormat(ENV?.LOCALE ?? navigator.language, {
+  // ddd, D MMM YYYY HH:mma
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+}).format
+
 export function formatTimeAgoTitle(date) {
   const fudgedDate = fudgeDateForProfileTimezone(date)
-  return fudgedDate.toString('MMM d, yyyy h:mmtt')
+  return dateFormatter(fudgedDate)
 }
 
 // This is temporarily here while we finish the announced deprecation of
@@ -423,7 +432,9 @@ function makeDatesPretty() {
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   let timeAgoEvents = []
   function timeAgoRefresh() {
-    timeAgoEvents = [...document.querySelectorAll('.time_ago_date')].filter($.expr.filters.visible)
+    timeAgoEvents = Array.from(document.querySelectorAll('.time_ago_date')).filter(
+      $.expr.filters.visible,
+    )
     processNextTimeAgoEvent()
   }
   function processNextTimeAgoEvent() {
@@ -432,9 +443,11 @@ function makeDatesPretty() {
       const $event = $(eventElement),
         date = $event.data('parsed_date') || Date.parse($event.data('timestamp') || '')
       if (date) {
+        const diff = new Date() - date
+        const relative = diff < 24 * 3600 * 1000 // less than 24 hours ago
         $event.data('timestamp', date.toISOString())
         $event.data('parsed_date', date)
-        $event.text(fromNow(date))
+        $event.text(relative ? fromNow(date) : formatTimeAgoTitle(date))
         $event.attr('title', formatTimeAgoTitle(date))
       }
       setTimeout(processNextTimeAgoEvent, 1)
