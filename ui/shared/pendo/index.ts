@@ -59,6 +59,8 @@ function init(): Promise<any> | null {
         visitorData.canvasCourseSisBatchId = ENV.USAGE_METRICS_METADATA.course_sis_batch_id
         visitorData.canvasCourseEnrollmentTermId =
           ENV.USAGE_METRICS_METADATA.course_enrollment_term_id
+        visitorData.canvasCourseEnrollmentTermName =
+          ENV.USAGE_METRICS_METADATA.course_enrollment_term_name
       }
     }
 

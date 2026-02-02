@@ -29,5 +29,6 @@ export interface EnvUsageMetrics {
     course_sis_source_id?: string | null
     course_sis_batch_id?: string | null
     course_enrollment_term_id?: string | null
+    course_enrollment_term_name?: string | null
   }
 }
