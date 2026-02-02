@@ -25,6 +25,7 @@ import {mockPlannerItems} from './mocks/data'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
 import {setupServer} from 'msw/node'
 import {
+  plannerItemsHandlers,
   plannerOverrideHandlers,
   errorCreateOverrideHandler,
   errorUpdateOverrideHandler,
@@ -47,7 +48,7 @@ const mockPreferences = {
   custom_colors: {},
 }
 
-const server = setupServer(...plannerOverrideHandlers)
+const server = setupServer(...plannerItemsHandlers, ...plannerOverrideHandlers)
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -119,9 +120,7 @@ describe('TodoItem mutation tests', () => {
     await user.click(button)
 
     await waitFor(() => {
-      expect(
-        screen.queryByTestId(`todo-checkbox-loading-${completedItem.plannable_id}`),
-      ).toBeNull()
+      expect(screen.queryByTestId(`todo-checkbox-loading-${completedItem.plannable_id}`)).toBeNull()
     })
 
     cleanup()
@@ -184,10 +183,25 @@ describe('TodoItem mutation tests', () => {
     await user.click(button)
 
     await waitFor(() => {
-      expect(
-        screen.queryByTestId(`todo-checkbox-loading-${completedItem.plannable_id}`),
-      ).toBeNull()
+      expect(screen.queryByTestId(`todo-checkbox-loading-${completedItem.plannable_id}`)).toBeNull()
     })
+
+    cleanup()
+  })
+
+  it('restores focus to button after toggling complete', async () => {
+    const user = userEvent.setup()
+    const item = mockPlannerItems[0]
+    const {cleanup} = setup(<TodoItem item={item} />)
+
+    const button = screen.getByTestId(`todo-checkbox-${item.plannable_id}`)
+    await user.click(button)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId(`todo-checkbox-loading-${item.plannable_id}`)).toBeNull()
+    })
+
+    expect(button).toHaveFocus()
 
     cleanup()
   })
