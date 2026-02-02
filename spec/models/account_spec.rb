@@ -3399,4 +3399,117 @@ describe Account do
       expect(account.marked_for_deletion?).to be false
     end
   end
+
+  describe "#setting_changed?" do
+    let(:account) { Account.create! }
+
+    context "when the setting has changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_future_view] = { value: true }
+      end
+
+      it "returns true" do
+        expect(account.setting_changed?(:restrict_student_future_view)).to be true
+      end
+    end
+
+    context "when settings have not changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+      end
+
+      it "returns false" do
+        expect(account.setting_changed?(:restrict_student_future_view)).to be false
+      end
+    end
+
+    context "when a different setting has changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.settings[:restrict_student_past_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_past_view] = { value: true }
+      end
+
+      it "returns false for the unchanged setting" do
+        expect(account.setting_changed?(:restrict_student_future_view)).to be false
+      end
+    end
+
+    context "with an unknown setting" do
+      it "raises ArgumentError" do
+        expect { account.setting_changed?(:nonexistent_setting) }.to raise_error(
+          ArgumentError, "Unknown setting nonexistent_setting"
+        )
+      end
+    end
+
+    context "with argument type variations" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_future_view] = { value: true }
+      end
+
+      it "accepts string arguments" do
+        expect(account.setting_changed?("restrict_student_future_view")).to be true
+      end
+
+      it "accepts symbol arguments" do
+        expect(account.setting_changed?(:restrict_student_future_view)).to be true
+      end
+    end
+  end
+
+  describe "dynamically generated <setting>_changed? methods" do
+    let(:account) { Account.create! }
+
+    it "defines a _changed? method for each account setting" do
+      expect(account).to respond_to(:restrict_student_future_view_changed?)
+      expect(account).to respond_to(:restrict_student_past_view_changed?)
+    end
+
+    context "when the setting has changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_future_view] = { value: true }
+      end
+
+      it "returns true" do
+        expect(account.restrict_student_future_view_changed?).to be true
+      end
+    end
+
+    context "when settings have not changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+      end
+
+      it "returns false" do
+        expect(account.restrict_student_future_view_changed?).to be false
+      end
+    end
+
+    context "when a different setting has changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.settings[:restrict_student_past_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_past_view] = { value: true }
+      end
+
+      it "returns false for the unchanged setting" do
+        expect(account.restrict_student_future_view_changed?).to be false
+      end
+
+      it "returns true for the changed setting" do
+        expect(account.restrict_student_past_view_changed?).to be true
+      end
+    end
+  end
 end
