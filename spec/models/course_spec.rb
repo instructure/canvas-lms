@@ -9900,4 +9900,37 @@ describe Course do
       end
     end
   end
+
+  describe "a11y_checker_ai feature methods" do
+    let(:course) { Course.create! }
+    let(:account) { course.account }
+
+    describe "#a11y_checker_ai_table_caption_generation?" do
+      it "delegates to account" do
+        allow(account).to receive(:a11y_checker_ai_table_caption_generation?).and_return(true)
+
+        expect(course.a11y_checker_ai_table_caption_generation?).to be true
+      end
+
+      it "returns false when account returns false" do
+        allow(account).to receive(:a11y_checker_ai_table_caption_generation?).and_return(false)
+
+        expect(course.a11y_checker_ai_table_caption_generation?).to be false
+      end
+    end
+
+    describe "#a11y_checker_ai_alt_text_generation?" do
+      it "delegates to account" do
+        allow(account).to receive(:a11y_checker_ai_alt_text_generation?).and_return(true)
+
+        expect(course.a11y_checker_ai_alt_text_generation?).to be true
+      end
+
+      it "returns false when account returns false" do
+        allow(account).to receive(:a11y_checker_ai_alt_text_generation?).and_return(false)
+
+        expect(course.a11y_checker_ai_alt_text_generation?).to be false
+      end
+    end
+  end
 end

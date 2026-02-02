@@ -4823,6 +4823,10 @@ class Course < ActiveRecord::Base
     !!Course.find_studio_tool(self)
   end
 
+  delegate :a11y_checker_ai_table_caption_generation?,
+           :a11y_checker_ai_alt_text_generation?,
+           to: :account
+
   private
 
   def effective_due_dates

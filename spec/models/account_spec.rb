@@ -3642,4 +3642,119 @@ describe Account do
       end
     end
   end
+
+  describe "a11y_checker_ai feature methods" do
+    let(:account) { Account.create! }
+    let(:root_account) { account.root_account }
+
+    describe "#a11y_checker_ai_table_caption_generation?" do
+      context "when all three conditions are met" do
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+          root_account.enable_feature!(:a11y_checker_ignite_ai)
+        end
+
+        it "returns true when account has a11y_checker enabled" do
+          account.enable_feature!(:a11y_checker)
+          expect(account.a11y_checker_ai_table_caption_generation?).to be true
+        end
+
+        it "returns true when site_admin has a11y_checker_ai_features enabled" do
+          Account.site_admin.enable_feature!(:a11y_checker_ai_features)
+          expect(account.a11y_checker_ai_table_caption_generation?).to be true
+        end
+
+        it "returns true when both a11y_checker and a11y_checker_ai_features are enabled" do
+          account.enable_feature!(:a11y_checker)
+          Account.site_admin.enable_feature!(:a11y_checker_ai_features)
+          expect(account.a11y_checker_ai_table_caption_generation?).to be true
+        end
+      end
+
+      it "returns false when site_admin feature is disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_ai_table_caption_generation)
+        root_account.enable_feature!(:a11y_checker_ignite_ai)
+        account.enable_feature!(:a11y_checker)
+
+        expect(account.a11y_checker_ai_table_caption_generation?).to be false
+      end
+
+      it "returns false when root_account ignite_ai feature is disabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+        root_account.disable_feature!(:a11y_checker_ignite_ai)
+        account.enable_feature!(:a11y_checker)
+
+        expect(account.a11y_checker_ai_table_caption_generation?).to be false
+      end
+
+      it "returns false when neither a11y_checker nor a11y_checker_ai_features are enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+        root_account.enable_feature!(:a11y_checker_ignite_ai)
+
+        expect(account.a11y_checker_ai_table_caption_generation?).to be false
+      end
+
+      it "returns false when all features are disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_ai_table_caption_generation)
+        root_account.disable_feature!(:a11y_checker_ignite_ai)
+
+        expect(account.a11y_checker_ai_table_caption_generation?).to be false
+      end
+    end
+
+    describe "#a11y_checker_ai_alt_text_generation?" do
+      context "when all three conditions are met" do
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+          root_account.enable_feature!(:a11y_checker_ignite_ai)
+        end
+
+        it "returns true when account has a11y_checker enabled" do
+          account.enable_feature!(:a11y_checker)
+          expect(account.a11y_checker_ai_alt_text_generation?).to be true
+        end
+
+        it "returns true when site_admin has a11y_checker_ai_features enabled" do
+          Account.site_admin.enable_feature!(:a11y_checker_ai_features)
+          expect(account.a11y_checker_ai_alt_text_generation?).to be true
+        end
+
+        it "returns true when both a11y_checker and a11y_checker_ai_features are enabled" do
+          account.enable_feature!(:a11y_checker)
+          Account.site_admin.enable_feature!(:a11y_checker_ai_features)
+          expect(account.a11y_checker_ai_alt_text_generation?).to be true
+        end
+      end
+
+      it "returns false when site_admin feature is disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_ai_alt_text_generation)
+        root_account.enable_feature!(:a11y_checker_ignite_ai)
+        account.enable_feature!(:a11y_checker)
+
+        expect(account.a11y_checker_ai_alt_text_generation?).to be false
+      end
+
+      it "returns false when root_account ignite_ai feature is disabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+        root_account.disable_feature!(:a11y_checker_ignite_ai)
+        account.enable_feature!(:a11y_checker)
+
+        expect(account.a11y_checker_ai_alt_text_generation?).to be false
+      end
+
+      it "returns false when neither a11y_checker nor a11y_checker_ai_features are enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+        root_account.enable_feature!(:a11y_checker_ignite_ai)
+
+        expect(account.a11y_checker_ai_alt_text_generation?).to be false
+      end
+
+      it "returns false when all features are disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_ai_alt_text_generation)
+        root_account.disable_feature!(:a11y_checker_ignite_ai)
+
+        expect(account.a11y_checker_ai_alt_text_generation?).to be false
+      end
+    end
+  end
 end
