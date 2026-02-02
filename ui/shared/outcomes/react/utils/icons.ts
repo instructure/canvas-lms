@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  determineMasteryLevel,
+  type ProficiencyRating,
+  type MasteryLevelResult,
+} from './masteryScaleLogic'
+
 export type OutcomeIconType =
   | 'unassessed'
   | 'exceeds_mastery'
@@ -24,29 +30,58 @@ export type OutcomeIconType =
   | 'remediation'
   | 'no_evidence'
 
+// Re-export types for convenience
+export type {ProficiencyRating, MasteryLevelResult}
+
 /**
  * Generates a URL to the appropriate SVG icon based on points and mastery level
  * @param points - The points earned for this outcome, or null if unassessed
  * @param masteryAt - The points threshold for mastery
- * @returns The URL path to the corresponding outcome icon
+ * @param proficiencyRatings - Optional array of proficiency ratings for custom scales
+ * @returns The URL path to the corresponding outcome icon (or null if numeric level)
  */
-export const svgUrl = (points: number | null | undefined, masteryAt: number): string => {
-  return `/images/outcomes/${getTagIcon(points, masteryAt)}.svg`
+export const svgUrl = (
+  points: number | null | undefined,
+  masteryAt: number,
+  proficiencyRatings?: ProficiencyRating[],
+): string | null => {
+  const result = getTagIcon(points, masteryAt, proficiencyRatings)
+  // If result is a number, we can't return an SVG URL
+  if (typeof result === 'number') {
+    return null
+  }
+  return `/images/outcomes/${result}.svg`
 }
 
-/*
- *  NOTE: This is only for Account Level Mastery Scales FF Enabled
- *  This code block only works with the default scale for outcomes
- *  After OUT-5226 (https://instructure.atlassian.net/browse/OUT-5226), support
- *  for custom outcome scales will be included
+/**
+ * Determines the mastery level icon or numeric level based on score and proficiency ratings
  *
- *  Dynamic score handling will be implemented in following ticket:
- *  https://instructure.atlassian.net/browse/OUTC-504
+ * @param points - The points earned for this outcome, or null if unassessed
+ * @param masteryAt - The points threshold for mastery (used for backward compatibility)
+ * @param proficiencyRatings - Optional array of proficiency ratings for custom scales
+ * @returns Either an OutcomeIconType or a numeric level (1-indexed)
+ *
+ * When proficiencyRatings is provided, uses the new algorithm that supports:
+ * - Non-equal point spacing (e.g., 0, 3, 5, 7, 9)
+ * - Variable level counts (1-5+ levels)
+ * - Mastery at different positions
+ * - Automatic switching between icons and numbers based on configuration
+ *
+ * When proficiencyRatings is not provided, falls back to legacy logic that assumes
+ * a 5-level scale with equal spacing.
  */
 export const getTagIcon = (
   points: number | null | undefined,
   masteryAt: number,
-): OutcomeIconType => {
+  proficiencyRatings?: ProficiencyRating[],
+): MasteryLevelResult => {
+  // If proficiencyRatings provided, use new logic
+  if (proficiencyRatings && proficiencyRatings.length > 0) {
+    return determineMasteryLevel(points, proficiencyRatings)
+  }
+
+  // Otherwise fall back to old logic for backward compatibility
+  // NOTE: This legacy code only works with the default 5-level scale for outcomes
   if (points == null) {
     return 'unassessed'
   }
