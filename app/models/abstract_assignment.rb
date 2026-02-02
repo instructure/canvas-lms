@@ -241,7 +241,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   with_options if: :quiz_lti? do
-    validate :new_quizzes_type_ok?, if: -> { Account.site_admin.feature_enabled?(:new_quizzes_surveys) }
+    validate :new_quizzes_type_ok?
   end
 
   accepts_nested_attributes_for :estimated_duration, allow_destroy: true

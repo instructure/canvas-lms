@@ -485,7 +485,6 @@ class ApplicationController < ActionController::Base
     nav_menu_links
     new_quizzes_media_type
     new_quizzes_navigation_updates
-    new_quizzes_surveys
     permanent_page_links
     rce_a11y_resize
     rce_asr_captioning_improvements

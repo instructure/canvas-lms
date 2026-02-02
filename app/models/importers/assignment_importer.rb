@@ -441,8 +441,6 @@ module Importers
     end
 
     def self.import_new_quizzes_settings(hash, item)
-      return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys)
-
       updates = {
         "type" => hash[:new_quizzes_type],
         "anonymous_participants" => ActiveModel::Type::Boolean.new.cast(hash[:new_quizzes_anonymous_participants])

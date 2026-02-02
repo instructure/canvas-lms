@@ -108,7 +108,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       practice_quizzes   = scoped_quizzes_index.select { |q| q.quiz_type == QUIZ_TYPE_PRACTICE }
       surveys            = scoped_quizzes_index.select { |q| QUIZ_TYPE_SURVEYS.include?(q.quiz_type) }
-      if @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+      if @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         surveys += scoped_new_quizzes_index.select do |q|
           Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type"))
         end
@@ -165,7 +165,6 @@ class Quizzes::QuizzesController < ApplicationController
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
           DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share),
-          new_quizzes_surveys_enabled: Account.site_admin.feature_enabled?(:new_quizzes_surveys),
         },
         quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
         quiz_index_menu_tools: external_tools_display_hashes(:quiz_index_menu),
@@ -1134,11 +1133,7 @@ class Quizzes::QuizzesController < ApplicationController
       return quizzes_json(old_quizzes, *serializer_options)
     end
 
-    new_quizzes = if Account.site_admin.feature_enabled?(:new_quizzes_surveys)
-                    scoped_new_quizzes_index.reject { |q| Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type")) }
-                  else
-                    scoped_new_quizzes_index
-                  end
+    new_quizzes = scoped_new_quizzes_index.reject { |q| Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type")) }
 
     quizzes_next_json(
       sort_quizzes(old_quizzes + new_quizzes),

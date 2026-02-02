@@ -219,19 +219,6 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to be(true)
     end
 
-    it "js_env new_quizzes_surveys_enabled is true when new_quizzes_surveys feature is enabled" do
-      user_session(@teacher)
-      Account.site_admin.enable_feature!(:new_quizzes_surveys)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_surveys_enabled]).to be true
-    end
-
-    it "js_env new_quizzes_surveys_enabled is false when new_quizzes_surveys feature is disabled" do
-      user_session(@teacher)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_surveys_enabled]).to be false
-    end
-
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
@@ -385,11 +372,6 @@ describe Quizzes::QuizzesController do
         course_quizzes
       end
 
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
-      end
-
       context "teacher interface" do
         it "includes all old quizzes and new quizzes, sorted by [due_date, title]" do
           user_session(@teacher)
@@ -411,26 +393,6 @@ describe Quizzes::QuizzesController do
           ).to eq([
                     [course_assignments[4].id, due_at, "some assignment 4"],
                     [course_assignments[5].id, due_at, "some assignment 5"],
-                  ])
-        end
-
-        it "lists new quiz surveys as assignments when new_quizzes_surveys feature flag is disabled" do
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
-          user_session(@teacher)
-          get "index", params: { course_id: @course.id }
-          expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
-          expect(controller.js_env[:QUIZZES][:surveys].count).to eq(0)
-          expect(controller.js_env[:QUIZZES][:assignment].count).to eq(6)
-
-          expect(
-            controller.js_env[:QUIZZES][:assignment].map { |x| [x[:id], x[:due_at], x[:title]] }
-          ).to eq([
-                    [course_assignments[2].id, due_at, "some assignment 2"],
-                    [course_assignments[3].id, due_at, "some assignment 3"],
-                    [course_assignments[4].id, due_at, "some assignment 4"],
-                    [course_assignments[5].id, due_at, "some assignment 5"],
-                    [course_quizzes[0].id, nil, "quiz 1"],
-                    [course_quizzes[1].id, nil, "quiz 2"]
                   ])
         end
 
