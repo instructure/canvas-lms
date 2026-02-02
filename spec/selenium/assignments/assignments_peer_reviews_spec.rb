@@ -278,6 +278,16 @@ describe "assignments" do
       points_per_review_input = f("#assignment_peer_reviews_max_input")
       expect(points_per_review_input.attribute("disabled")).to eq("true")
     end
+
+    it "disables External Tool submission type option when peer review submissions exist", custom_timeout: 30, priority: "1" do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      submission_type_dropdown = f("#assignment_submission_type")
+      external_tool_option = submission_type_dropdown.find_element(:css, "option[value='external_tool']")
+
+      expect(external_tool_option.attribute("disabled")).to eq("true")
+    end
   end
 
   describe "auto assign" do

@@ -66,6 +66,7 @@ import YAML from 'yaml'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
+import {SETTING_MESSAGES} from '@canvas/assignments/react/hooks/useSettingDependency'
 
 const I18n = createI18nScope('assignment_editview')
 
@@ -519,6 +520,44 @@ EditView.prototype.enableCheckbox = function (box) {
   }
 }
 
+EditView.prototype.isPeerReviewChecked = function () {
+  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+    const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
+    if (peerReviewHidden) {
+      return peerReviewHidden.value === 'true'
+    }
+    return this.assignment.peerReviews() || false
+  }
+  return !!this.$peerReviewsBox.prop('checked')
+}
+
+// Disables the peer review checkbox AND unchecks it.
+// The React component (PeerReviewDetails) responds by setting both
+// peerReviewEnabled=false (disables interaction) and peerReviewChecked=false (unchecks).
+EditView.prototype.disablePeerReviewsCheckbox = function () {
+  window.top.postMessage({subject: SETTING_MESSAGES.TOGGLE_PEER_REVIEWS, enabled: false}, '*')
+}
+
+// Enables the peer review checkbox for interaction only.
+// Does NOT check the checkbox - the user must manually enable peer reviews.
+// The React component responds by setting peerReviewEnabled=true only.
+EditView.prototype.enablePeerReviewsCheckbox = function () {
+  window.top.postMessage({subject: SETTING_MESSAGES.TOGGLE_PEER_REVIEWS, enabled: true}, '*')
+}
+
+EditView.prototype.isExternalToolSubmissionType = function () {
+  const subVal = this.$submissionType.val()
+  return subVal === 'external_tool' || subVal.includes('external_tool_placement')
+}
+
+EditView.prototype.canEnablePeerReviews = function () {
+  if (this.assignment.moderatedGrading()) return false
+  if ($('#assignment_grading_type').val() === 'not_graded') return false
+  if (this.isExternalToolSubmissionType()) return false
+
+  return true
+}
+
 EditView.prototype.handlesuppressFromGradebookChange = function () {
   return this.model.suppressAssignment(this.$suppressAssignment.prop('checked'))
 }
@@ -596,26 +635,14 @@ EditView.prototype.togglePeerReviewsAndGroupCategoryEnabled = function () {
       this.$peerReviewsBox,
       I18n.t('Peer reviews cannot be enabled for moderated assignments'),
     )
-    window.top.postMessage(
-      {
-        subject: 'ASGMT.togglePeerReviews',
-        enabled: false,
-      },
-      '*',
-    )
+    this.disablePeerReviewsCheckbox()
     this.disableCheckbox(
       this.$groupCategoryBox,
       I18n.t('Group assignments cannot be enabled for moderated assignments'),
     )
   } else {
     this.enableCheckbox(this.$peerReviewsBox)
-    window.top.postMessage(
-      {
-        subject: 'ASGMT.togglePeerReviews',
-        enabled: true,
-      },
-      '*',
-    )
+    this.enablePeerReviewsCheckbox()
     if (this.model.canGroup()) {
       this.enableCheckbox(this.$groupCategoryBox)
     }
@@ -1070,22 +1097,10 @@ EditView.prototype.handleGradingTypeChange = function (gradingType) {
     if (this.$peerReviewsBox.prop('checked')) {
       this.$peerReviewsBox.prop('checked', false)
     }
-    window.top.postMessage(
-      {
-        subject: 'ASGMT.togglePeerReviews',
-        enabled: false,
-      },
-      '*',
-    )
+    this.disablePeerReviewsCheckbox()
     $('#peer_reviews_details')?.toggleAccessibly(false)
   } else if (!this.assignment.moderatedGrading()) {
-    window.top.postMessage(
-      {
-        subject: 'ASGMT.togglePeerReviews',
-        enabled: true,
-      },
-      '*',
-    )
+    this.enablePeerReviewsCheckbox()
   }
 
   this.renderModeratedGradingFormFieldGroup()
@@ -1131,12 +1146,20 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
   const subVal = this.$submissionType.val()
   this.$onlineSubmissionTypes.toggleAccessibly(subVal === 'online')
   this.$externalToolSettings.toggleAccessibly(subVal === 'external_tool')
-  if (subVal === 'external_tool' && this.$peerReviewsBox.prop('checked')) {
-    this.$peerReviewsBox.prop('checked', false)
-    this.togglePeerReviewsAndGroupCategoryEnabled()
-    $('#peer_reviews_details')?.toggleAccessibly(false)
-  }
   const isPlacementTool = subVal.includes('external_tool_placement')
+
+  if (this.isExternalToolSubmissionType()) {
+    if (this.isPeerReviewChecked()) {
+      if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+        this.$peerReviewsBox.prop('checked', false)
+        this.togglePeerReviewsAndGroupCategoryEnabled()
+      }
+      this.disablePeerReviewsCheckbox()
+      $('#peer_reviews_details')?.toggleAccessibly(false)
+    }
+  } else if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && this.canEnablePeerReviews()) {
+    this.enablePeerReviewsCheckbox()
+  }
   this.$externalToolPlacementLaunchContainer.toggleAccessibly(isPlacementTool)
 
   if (isPlacementTool) {
@@ -1615,8 +1638,8 @@ EditView.prototype.getFormData = function () {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }
   if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
-    const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
-    data.peer_reviews = checkedInput?.checked
+    const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
+    data.peer_reviews = peerReviewHidden?.value === 'true'
 
     // Read from hidden inputs to preserve values when Advanced Configuration is collapsed
     const withinGroupsHidden = document.getElementById('peer_reviews_within_groups_checkbox_hidden')
@@ -2033,8 +2056,8 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   }
 
   if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
-    const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-    if (peerReviewCheckbox && peerReviewCheckbox.checked) {
+    const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
+    if (peerReviewHidden && peerReviewHidden.value === 'true') {
       const peerReviewDetailsEl = document.getElementById(
         'peer_reviews_allocation_and_grading_details',
       )
@@ -2482,17 +2505,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     $(document).trigger('validateFinalGraderSelectedValue', {error: false})
     this.hideErrors('final_grader_id_errors')
   }
-  let isPeerReviewEnabled
-  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
-    const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
-    if (peerReviewHidden) {
-      isPeerReviewEnabled = peerReviewHidden.value === 'true'
-    } else {
-      isPeerReviewEnabled = this.assignment.peerReviews() || false
-    }
-  } else {
-    isPeerReviewEnabled = !!this.$peerReviewsBox.prop('checked')
-  }
+  const isPeerReviewChecked = this.isPeerReviewChecked()
   const props = {
     availableModerators: ENV.AVAILABLE_MODERATORS,
     currentGraderCount: this.assignment.get('grader_count'),
@@ -2501,7 +2514,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     graderNamesVisibleToFinalGrader: !!this.assignment.get('grader_names_visible_to_final_grader'),
     gradedSubmissionsExist: ENV.HAS_GRADED_SUBMISSIONS,
     isGroupAssignment: !!this.$groupCategoryBox.prop('checked'),
-    isPeerReviewAssignment: isPeerReviewEnabled,
+    isPeerReviewAssignment: isPeerReviewChecked,
     locale: ENV.LOCALE,
     moderatedGradingEnabled: this.assignment.moderatedGrading(),
     availableGradersCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT,

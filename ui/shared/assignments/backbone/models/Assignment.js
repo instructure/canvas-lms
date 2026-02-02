@@ -1339,6 +1339,7 @@ Assignment.prototype.toView = function () {
     'groupCategoryId',
     'hasDueDate',
     'hasPointsPossible',
+    'hasPeerReviewSubmissions',
     'hasSubAssignments',
     'hideInGradebook',
     'hideZeroPointQuizzesOptionEnabled',
