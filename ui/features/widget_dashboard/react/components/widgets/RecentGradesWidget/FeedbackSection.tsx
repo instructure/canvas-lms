@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import type {SubmissionComment} from '../../../types'
 
@@ -32,6 +32,7 @@ interface FeedbackSectionProps {
   submissionId: string
   totalCommentsCount: number
   assignmentUrl: string
+  assignmentName: string
 }
 
 export const FeedbackSection: React.FC<FeedbackSectionProps> = ({
@@ -39,6 +40,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = ({
   submissionId,
   totalCommentsCount,
   assignmentUrl,
+  assignmentName,
 }) => {
   const feedbackUrl = `${assignmentUrl}?open_feedback=true`
   return (
@@ -86,14 +88,16 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = ({
             ))}
             {totalCommentsCount > 0 && (
               <Flex.Item padding="small 0 0 0" overflowY="visible">
-                <Button
-                  color="primary-inverse"
-                  size="medium"
+                <Link
                   href={feedbackUrl}
-                  data-testid={`view-inline-feedback-button-${submissionId}`}
+                  isWithinText={false}
+                  data-testid={`view-inline-feedback-link-${submissionId}`}
                 >
-                  {I18n.t('View all inline feedback (%{count})', {count: totalCommentsCount})}
-                </Button>
+                  {I18n.t('View all inline feedback for %{assignmentName} (%{count})', {
+                    assignmentName,
+                    count: totalCommentsCount,
+                  })}
+                </Link>
               </Flex.Item>
             )}
           </>

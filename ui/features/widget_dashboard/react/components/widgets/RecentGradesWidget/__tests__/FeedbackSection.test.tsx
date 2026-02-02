@@ -47,6 +47,7 @@ describe('FeedbackSection', () => {
   ]
 
   const mockAssignmentUrl = '/courses/123/assignments/456'
+  const mockAssignmentName = 'Test Assignment'
 
   it('renders feedback section with comments', () => {
     render(
@@ -55,6 +56,7 @@ describe('FeedbackSection', () => {
         submissionId="sub1"
         totalCommentsCount={2}
         assignmentUrl={mockAssignmentUrl}
+        assignmentName={mockAssignmentName}
       />,
     )
 
@@ -69,6 +71,7 @@ describe('FeedbackSection', () => {
         submissionId="sub1"
         totalCommentsCount={2}
         assignmentUrl={mockAssignmentUrl}
+        assignmentName={mockAssignmentName}
       />,
     )
 
@@ -83,6 +86,7 @@ describe('FeedbackSection', () => {
         submissionId="sub1"
         totalCommentsCount={2}
         assignmentUrl={mockAssignmentUrl}
+        assignmentName={mockAssignmentName}
       />,
     )
 
@@ -98,6 +102,7 @@ describe('FeedbackSection', () => {
         submissionId="sub1"
         totalCommentsCount={0}
         assignmentUrl={mockAssignmentUrl}
+        assignmentName={mockAssignmentName}
       />,
     )
 
@@ -105,33 +110,35 @@ describe('FeedbackSection', () => {
     expect(screen.getByTestId('feedback-none-sub1')).toHaveTextContent('None')
   })
 
-  it('shows view inline feedback button with total count and correct URL', () => {
+  it('shows view inline feedback link with assignment name, total count, and correct URL', () => {
     render(
       <FeedbackSection
         comments={mockComments}
         submissionId="sub1"
         totalCommentsCount={5}
         assignmentUrl={mockAssignmentUrl}
+        assignmentName={mockAssignmentName}
       />,
     )
 
-    const button = screen.getByTestId('view-inline-feedback-button-sub1')
-    expect(button).toBeInTheDocument()
-    expect(button).toHaveTextContent('View all inline feedback (5)')
-    expect(button).toHaveAttribute('href', '/courses/123/assignments/456?open_feedback=true')
+    const link = screen.getByTestId('view-inline-feedback-link-sub1')
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveTextContent('View all inline feedback for Test Assignment (5)')
+    expect(link).toHaveAttribute('href', '/courses/123/assignments/456?open_feedback=true')
   })
 
-  it('does not show button when total count is 0', () => {
+  it('does not show link when total count is 0', () => {
     render(
       <FeedbackSection
         comments={[]}
         submissionId="sub1"
         totalCommentsCount={0}
         assignmentUrl={mockAssignmentUrl}
+        assignmentName={mockAssignmentName}
       />,
     )
 
-    expect(screen.queryByTestId('view-inline-feedback-button-sub1')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('view-inline-feedback-link-sub1')).not.toBeInTheDocument()
   })
 
   it('handles comments without authors', () => {
@@ -149,6 +156,7 @@ describe('FeedbackSection', () => {
         submissionId="sub1"
         totalCommentsCount={1}
         assignmentUrl={mockAssignmentUrl}
+        assignmentName={mockAssignmentName}
       />,
     )
 
@@ -174,6 +182,7 @@ describe('FeedbackSection', () => {
         submissionId="sub1"
         totalCommentsCount={1}
         assignmentUrl={mockAssignmentUrl}
+        assignmentName={mockAssignmentName}
       />,
     )
 
