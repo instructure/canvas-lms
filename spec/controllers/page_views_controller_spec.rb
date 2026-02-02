@@ -356,6 +356,257 @@ describe PageViewsController do
         expect(response).to have_http_status(:no_content)
       end
     end
+
+    describe "POST 'batch_query'" do
+      let(:user1) { user_model }
+      let(:user2) { user_model }
+      let(:user3) { user_model }
+      let(:user4) { user_model }
+
+      it "enqueues a new batch page view query" do
+        expected_uuid = SecureRandom.uuid
+        allow_any_instance_of(PageViews::EnqueueBatchQueryService).to receive(:call).and_return(expected_uuid)
+
+        post "batch_query", params: {
+          user_ids: [user1.id, user2.id],
+          start_date: "2025-02-01",
+          end_date: "2025-03-01",
+          results_format: :csv
+        }
+
+        expect(response).to be_successful
+        expect(response).to have_http_status(:created)
+        expect(response.parsed_body["poll_url"]).to eq("/api/v1/users/page_views/query/#{expected_uuid}")
+      end
+
+      it "returns 400 Bad Request response when required parameters are missing" do
+        post "batch_query", params: {
+          user_ids: [user1.id],
+          start_date: "2024-12-01",
+          end_date: "2025-01-10"
+          # missing results_format
+        }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Parameter results_format is missing.")
+      end
+
+      it "returns 400 Bad Request when duplicate user IDs are provided" do
+        post "batch_query", params: {
+          user_ids: [user1.id, user2.id, user1.id],
+          start_date: "2025-01-01",
+          end_date: "2025-02-01",
+          results_format: :csv
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Duplicate user ID found: #{user1.id}")
+      end
+
+      it "returns a 400 Bad Request response when the request is invalid" do
+        allow_any_instance_of(PageViews::EnqueueBatchQueryService).to receive(:call).and_raise(ArgumentError.new("Invalid format"))
+
+        post "batch_query", params: {
+          user_ids: [user1.id],
+          start_date: "2024-12-01",
+          end_date: "2025-01-10",
+          results_format: "xml"
+        }
+
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it "returns 429 Too Many Requests when rate limit is exceeded" do
+        allow_any_instance_of(PageViews::EnqueueBatchQueryService).to receive(:call).and_raise(PageViews::Common::TooManyRequestsError)
+
+        post "batch_query", params: {
+          user_ids: [user1.id],
+          start_date: "2024-01-01",
+          end_date: "2024-02-01",
+          results_format: :csv
+        }
+
+        expect(response).to have_http_status(:too_many_requests)
+      end
+
+      it "returns 400 Bad Request when PV5 API returns invalid request error" do
+        allow_any_instance_of(PageViews::EnqueueBatchQueryService).to receive(:call).and_raise(PageViews::Common::InvalidRequestError.new("Invalid request: Too many user IDs. Maximum: 3, provided: 4"))
+
+        post "batch_query", params: {
+          user_ids: [user1.id, user2.id, user3.id, user4.id],
+          start_date: "2024-01-01",
+          end_date: "2024-02-01",
+          results_format: :csv
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Invalid request: Too many user IDs. Maximum: 3, provided: 4")
+      end
+
+      it "authorizes each user before enqueueing" do
+        non_admin_user = user_model
+        user_session(non_admin_user)
+        other_user = user_model
+
+        post "batch_query", params: {
+          user_ids: [other_user.id],
+          start_date: "2025-01-01",
+          end_date: "2025-02-01",
+          results_format: :csv
+        }
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    describe "GET 'poll_batch_query'" do
+      it "returns a 200 OK when uuid is provided as query id and query is running" do
+        expected_uuid = SecureRandom.uuid
+        expected_polling_result = PageViews::Common::PollingResponse.new(query_id: expected_uuid, status: :running, format: :csv, error_code: nil, warnings: nil)
+        allow_any_instance_of(PageViews::PollBatchQueryService).to receive(:call).and_return(expected_polling_result)
+
+        get "poll_batch_query", params: { query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.parsed_body["query_id"]).to eq(expected_uuid)
+        expect(response.parsed_body["status"]).to eq("running")
+        expect(response.parsed_body["results_url"]).to be_nil
+      end
+
+      it "returns 200 OK and results url when query is finished" do
+        expected_uuid = SecureRandom.uuid
+        expected_polling_result = PageViews::Common::PollingResponse.new(query_id: expected_uuid, status: :finished, format: :csv, error_code: nil, warnings: nil)
+        allow_any_instance_of(PageViews::PollBatchQueryService).to receive(:call).and_return(expected_polling_result)
+
+        get "poll_batch_query", params: { query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.parsed_body["query_id"]).to eq(expected_uuid)
+        expect(response.parsed_body["status"]).to eq("finished")
+        expect(response.parsed_body["results_url"]).to eq("/api/v1/users/page_views/query/#{expected_uuid}/results")
+      end
+
+      it "returns 404 not found when query does not exist" do
+        allow_any_instance_of(PageViews::PollBatchQueryService).to receive(:call).and_raise(PageViews::Common::NotFoundError)
+
+        get "poll_batch_query", params: { query_id: SecureRandom.uuid }
+
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 200 OK when query fails with an error" do
+        expected_uuid = SecureRandom.uuid
+        expected_polling_result = PageViews::Common::PollingResponse.new(query_id: expected_uuid, status: :failed, format: :csv, error_code: "RESULT_SIZE_LIMIT_EXCEEDED", warnings: nil)
+        allow_any_instance_of(PageViews::PollBatchQueryService).to receive(:call).and_return(expected_polling_result)
+
+        get "poll_batch_query", params: { query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.parsed_body["status"]).to eq("failed")
+        expect(response.parsed_body["error_code"]).to eq("RESULT_SIZE_LIMIT_EXCEEDED")
+      end
+
+      it "returns warnings when present in polling response" do
+        expected_uuid = SecureRandom.uuid
+        warnings = [{ "code" => "USER_FILTERED", "message" => "Filtered out 1 user from batch query: 10000000000002" }]
+        expected_polling_result = PageViews::Common::PollingResponse.new(query_id: expected_uuid, status: :finished, format: :csv, error_code: nil, warnings:)
+        allow_any_instance_of(PageViews::PollBatchQueryService).to receive(:call).and_return(expected_polling_result)
+
+        get "poll_batch_query", params: { query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.parsed_body["warnings"]).to eq(warnings)
+        expect(response.parsed_body["warnings"].first["code"]).to eq("USER_FILTERED")
+        expect(response.parsed_body["warnings"].first["message"]).to eq("Filtered out 1 user from batch query: 10000000000002")
+      end
+
+      it "does not include warnings key when warnings are nil" do
+        expected_uuid = SecureRandom.uuid
+        expected_polling_result = PageViews::Common::PollingResponse.new(query_id: expected_uuid, status: :running, format: :csv, error_code: nil, warnings: nil)
+        allow_any_instance_of(PageViews::PollBatchQueryService).to receive(:call).and_return(expected_polling_result)
+
+        get "poll_batch_query", params: { query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.parsed_body).not_to have_key("warnings")
+      end
+
+      it "returns 400 bad request when query id is invalid" do
+        get "poll_batch_query", params: { query_id: "invalid-uuid" }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Invalid query ID")
+      end
+    end
+
+    describe "GET 'batch_query_results'" do
+      let(:example_csv_content) { "dummy,results\n1,2\n" }
+
+      it "returns csv content" do
+        expected_uuid = SecureRandom.uuid
+        expected_response = PageViews::Common::DownloadableResult.new(format: :csv, filename: "#{expected_uuid}.csv", content: example_csv_content)
+        allow_any_instance_of(PageViews::FetchBatchResultService).to receive(:call).and_return(expected_response)
+
+        get "batch_query_results", params: { query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.headers["Content-Type"]).to eq("text/csv")
+        expect(response.headers["Content-Disposition"]).to include("attachment; filename=\"#{expected_uuid}.csv\"")
+        expect(response.body).to eq(example_csv_content)
+      end
+
+      it "returns gzipped content" do
+        expected_uuid = SecureRandom.uuid
+        gzipped_content = Zlib.gzip(example_csv_content)
+        expected_response = PageViews::Common::DownloadableResult.new(format: :csv, filename: "#{expected_uuid}.csv.gz", content: gzipped_content)
+        allow_any_instance_of(PageViews::FetchBatchResultService).to receive(:call).and_return(expected_response)
+
+        get "batch_query_results", params: { query_id: expected_uuid }
+
+        expect(response).to be_successful
+        expect(response.body).to eq(gzipped_content)
+      end
+
+      it "returns 404 not found when query does not exist" do
+        allow_any_instance_of(PageViews::FetchBatchResultService).to receive(:call).and_raise(PageViews::Common::NotFoundError)
+
+        get "batch_query_results", params: { query_id: SecureRandom.uuid }
+
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 400 bad request when query id is invalid" do
+        get "batch_query_results", params: { query_id: "invalid-uuid" }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Invalid query ID")
+      end
+
+      it "returns 400 bad request when result is invalid" do
+        allow_any_instance_of(PageViews::FetchBatchResultService).to receive(:call).and_raise(PageViews::Common::InvalidResultError, "Invalid result format")
+
+        get "batch_query_results", params: { query_id: SecureRandom.uuid }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Invalid result format")
+      end
+
+      it "returns 204 no content when query completed but produced no results" do
+        allow_any_instance_of(PageViews::FetchBatchResultService).to receive(:call).and_raise(PageViews::Common::NoContentError)
+
+        get "batch_query_results", params: { query_id: SecureRandom.uuid }
+
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "returns 500 internal server error on unexpected error" do
+        allow_any_instance_of(PageViews::FetchBatchResultService).to receive(:call).and_raise(StandardError, "Unexpected error")
+
+        get "batch_query_results", params: { query_id: SecureRandom.uuid }
+
+        expect(response).to have_http_status(:internal_server_error)
+        expect(response.parsed_body["error"]).to eq("An unexpected error occurred.")
+      end
+    end
   end
 
   describe "Rate Limiting" do

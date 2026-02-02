@@ -1974,6 +1974,11 @@ CanvasRails::Application.routes.draw do
       post "users/:user_id/page_views/query", action: :query, as: "user_page_views_enqueue_query"
       get "users/:user_id/page_views/query/:query_id", action: :poll_query, as: "page_views_poll_query_status"
       get "users/:user_id/page_views/query/:query_id/results", action: :query_results, as: "page_views_get_query_results"
+
+      # routes for batch page views queries
+      post "users/page_views/query", action: :batch_query, as: "page_views_enqueue_batch_query"
+      get "users/page_views/query/:query_id", action: :poll_batch_query, as: "page_views_poll_batch_query_status"
+      get "users/page_views/query/:query_id/results", action: :batch_query_results, as: "page_views_get_batch_query_results"
     end
 
     get "users/:user_id/profile", controller: :profile, action: :settings

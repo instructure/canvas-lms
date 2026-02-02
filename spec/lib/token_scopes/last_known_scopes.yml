@@ -2478,6 +2478,12 @@
 - verb: DELETE
   path: '/api/v1/users/mobile_sessions'
 - verb: POST
+  path: '/api/v1/users/page_views/query'
+- verb: GET
+  path: '/api/v1/users/page_views/query/:query_id'
+- verb: GET
+  path: '/api/v1/users/page_views/query/:query_id/results'
+- verb: POST
   path: '/api/v1/users/reset_password'
 - verb: DELETE
   path: '/api/v1/users/self/activity_stream'

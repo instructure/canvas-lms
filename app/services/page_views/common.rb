@@ -36,14 +36,29 @@ module PageViews
         raise ArgumentError, "Only full-month intervals are supported" unless start_date.day == 1 && end_date.day == 1
         raise ArgumentError, "User ID must be positive number" unless user_id.positive?
         raise ArgumentError, "Root account UUIDs must be an array" unless root_account_uuids.is_a?(Array)
-        raise ArgumentError, "Root account UUIDs cannot be an empty" if root_account_uuids.empty?
+        raise ArgumentError, "Root account UUIDs cannot be empty" if root_account_uuids.empty?
         raise ArgumentError, "Format must be one of #{FORMATS.join(", ")}" unless FORMATS.include?(format.to_s)
+      end
+    end
+
+    AsyncBatchQueryRequest = Struct.new(:start_date, :end_date, :user_ids, :root_account_uuids, :format) do
+      def validate!(*)
+        raise ArgumentError, "Format must be one of #{FORMATS.join(", ")}" unless FORMATS.include?(format.to_s)
+        raise ArgumentError, "Start date must be a valid date" unless start_date.is_a?(Date)
+        raise ArgumentError, "End date must be a valid date" unless end_date.is_a?(Date)
+        raise ArgumentError, "Start date must be before or equal to end date" if start_date > end_date
+        raise ArgumentError, "Only full-month intervals are supported" unless start_date.day == 1 && end_date.day == 1
+        raise ArgumentError, "User IDs must be an array" unless user_ids.is_a?(Array)
+        raise ArgumentError, "User IDs cannot be empty" if user_ids.empty?
+        raise ArgumentError, "All user IDs must be positive numbers" unless user_ids.all? { |id| id.is_a?(Integer) && id.positive? }
+        raise ArgumentError, "Root account UUIDs must be an array" unless root_account_uuids.is_a?(Array)
+        raise ArgumentError, "Root account UUIDs cannot be empty" if root_account_uuids.empty?
       end
     end
 
     DownloadableResult = Struct.new(:format, :filename, :content, :compressed?)
 
-    PollingResponse = Struct.new(:query_id, :status, :format, :error_code)
+    PollingResponse = Struct.new(:query_id, :status, :format, :error_code, :warnings)
 
     class ConfigurationError < StandardError; end
     class InvalidRequestError < StandardError; end

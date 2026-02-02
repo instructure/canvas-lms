@@ -583,6 +583,232 @@ class PageViewsController < ApplicationController
     render json: { error: t("An unexpected error occurred.") }, status: :internal_server_error
   end
 
+  # @API BETA - Initiate batch page views query
+  # Initiates an asynchronous query for page views data across multiple users.
+  # This method enqueues a background job to process the batch page views query and returns
+  # a polling URL that can be used to check the query status and retrieve results when ready.
+  #
+  # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
+  #
+  # @argument user_ids [Array]
+  #   Array of user IDs to query page views for. Must contain at least one user ID. Duplicate user IDs are not allowed.
+  #
+  # @argument start_date [String]
+  #   The start date for the page views query in YYYY-MM-DD format. Must be the first day of a month.
+  #
+  # @argument end_date [String]
+  #   The end date for the page views query in YYYY-MM-DD format. Must be the first day of a month and after start_date.
+  #
+  # @argument results_format [String]
+  #   The desired format for the query results. Supported formats: "csv", "jsonl"
+  #
+  # @returns AsyncQueryResponse
+  # @returns AsyncApiErrorResponse
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/page_views/query \
+  #     -X POST \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -H 'Content-Type: application/json' \
+  #     -d '{
+  #       "user_ids": [123, 456, 789],
+  #       "start_date": "2023-01-01",
+  #       "end_date": "2023-02-01",
+  #       "results_format": "csv"
+  #     }'
+  #
+  # @example_response 201
+  #   {
+  #     "poll_url": "/api/v1/users/page_views/query/550e8400-e29b-41d4-a716-446655440000"
+  #   }
+  #
+  # @example_response 400
+  #   {
+  #     "error": "Page Views received an invalid or malformed request."
+  #   }
+  #
+  # @example_response 429
+  #   {
+  #     "error": "Page Views rate limit exceeded. Please wait and try again."
+  #   }
+  def batch_query
+    # Add rate limiting cost for initiating async batch queries
+    # Batch queries process multiple users, so higher cost than single-user queries
+    # Cost (150 units) still provides protection while being proportional to actual usage
+    # Allows 4 queries before hitting HWM (700), then 70-second cooldown
+    increment_request_cost(150)
+
+    user_ids, start_date, end_date, results_format = params.require(%i[user_ids start_date end_date results_format])
+
+    # Check for duplicate user IDs
+    duplicate_id = user_ids.detect { |id| user_ids.count(id) > 1 }
+    if duplicate_id
+      return render json: { error: t("Duplicate user ID found: %{user_id}", user_id: duplicate_id) }, status: :bad_request
+    end
+
+    # Find and authorize each user
+    users = user_ids.map do |user_id|
+      user = api_find(User, user_id)
+      return unless authorized_action(user, @current_user, :view_statistics)
+
+      user
+    end
+
+    query_id = pv5_enqueue_batch_service.call(
+      start_date,
+      end_date,
+      users,
+      results_format
+    )
+    poll_url = api_v1_page_views_poll_batch_query_status_path(query_id:)
+    render json: { poll_url: }, status: :created
+  rescue ActionController::ParameterMissing => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Parameter %{param} is missing.", param: e.param) }, status: :bad_request
+  rescue PageViews::Common::TooManyRequestsError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
+  rescue PageViews::Common::InvalidRequestError, ArgumentError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: e.message }, status: :bad_request
+  end
+
+  # @API BETA - Poll batch query status
+  # Checks the status of a previously initiated batch page views query. Returns the current
+  # processing status and provides a result URL when the query is complete.
+  #
+  # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
+  #
+  # @argument query_id [String]
+  #   The UUID of the query to check status for
+  #
+  # @returns AsyncQueryStatusResponse
+  # @returns AsyncApiErrorResponse
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/page_views/query/:query_id \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response 200
+  #   {
+  #     "query_id": "550e8400-e29b-41d4-a716-446655440000",
+  #     "status": "finished",
+  #     "format": "csv",
+  #     "results_url": "/api/v1/users/page_views/query/550e8400-e29b-41d4-a716-446655440000/results"
+  #   }
+  #
+  # @example_response 200
+  #   {
+  #     "query_id": "550e8400-e29b-41d4-a716-446655440000",
+  #     "status": "finished",
+  #     "format": "csv",
+  #     "results_url": "/api/v1/users/page_views/query/550e8400-e29b-41d4-a716-446655440000/results",
+  #     "warnings": [
+  #       {
+  #         "code": "USER_FILTERED",
+  #         "message": "Filtered out 1 user from batch query: 10000000000002"
+  #       }
+  #     ]
+  #   }
+  #
+  # @example_response 400
+  #   {
+  #     "error": "Invalid query ID"
+  #   }
+  #
+  # @example_response 404
+  #   {
+  #     "error": "The query was not found."
+  #   }
+  def poll_batch_query
+    # Add minimal rate limiting cost for polling queries
+    # Polling is lightweight (Redis/DB check only, no DynamoDB query)
+    # Very low cost (5 units) allows up to 140 polls before hitting HWM
+    # Supports extended polling patterns without penalizing async workflow
+    increment_request_cost(5)
+
+    validate_query_id!
+    result = pv5_poll_batch_service.call(params[:query_id])
+    results_url = api_v1_page_views_get_batch_query_results_path(params[:query_id]) if result.status == :finished
+    response_json = { query_id: params[:query_id], status: result.status, format: result.format, results_url:, error_code: result.error_code }
+    response_json[:warnings] = result.warnings if result.warnings
+    render json: response_json
+  rescue PageViews::Common::NotFoundError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("The query was not found.") }, status: :not_found
+  rescue PageViews::Common::InvalidRequestError, ArgumentError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: e.message }, status: :bad_request
+  end
+
+  # @API BETA - Get batch query results
+  # Retrieves the results of a completed batch page views query. Returns the data in the
+  # format specified when the query was initiated (CSV or JSON). The response may
+  # be compressed with gzip encoding.
+  #
+  # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
+  #
+  # @argument query_id [String]
+  #   The UUID of the completed query to retrieve results for
+  #
+  # @returns QueryResultsResponse
+  # @returns AsyncApiErrorResponse
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/page_views/query/:query_id/results \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response 200
+  #   # Returns file download with appropriate Content-Type header
+  #   # Content-Type: text/csv (for CSV format)
+  #   # Content-Disposition: attachment; filename="550e8400-e29b-41d4-a716-446655440000.csv"
+  #
+  # @example_response 204
+  #   # No Content - Query completed but produced no results
+  #
+  # @example_response 400
+  #   {
+  #     "error": "Query results are not in a valid state for download"
+  #   }
+  #
+  # @example_response 404
+  #   {
+  #     "error": "The result for query was not found."
+  #   }
+  #
+  # @example_response 500
+  #   {
+  #     "error": "An unexpected error occurred."
+  #   }
+  def batch_query_results
+    # Add rate limiting cost for fetching query results
+    # Async endpoints have low usage; cost reflects S3 file retrieval
+    # Low cost (50 units) allows 14 downloads before hitting HWM
+    # Proportional to low async usage while preventing abuse
+    increment_request_cost(50)
+
+    validate_query_id!
+    result = pv5_fetch_batch_result_service.call(params[:query_id])
+    send_data(
+      result.content,
+      filename: result.filename,
+      type: PageViews::Common::CONTENT_TYPE_MAPPINGS.key(result.format),
+      disposition: "attachment"
+    )
+  rescue PageViews::Common::InvalidResultError, ArgumentError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: e.message }, status: :bad_request
+  rescue PageViews::Common::NotFoundError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("The result for query was not found.") }, status: :not_found
+  rescue PageViews::Common::NoContentError => e
+    Canvas::Errors.capture_exception(:pv5, e, :info)
+    head :no_content
+  rescue => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("An unexpected error occurred.") }, status: :internal_server_error
+  end
+
   private
 
   def pv5_enqueue_service
@@ -595,6 +821,18 @@ class PageViewsController < ApplicationController
 
   def pv5_fetch_result_service
     PageViews::FetchResultService.new(PageViews::Configuration.new)
+  end
+
+  def pv5_enqueue_batch_service
+    PageViews::EnqueueBatchQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
+  end
+
+  def pv5_poll_batch_service
+    PageViews::PollBatchQueryService.new(PageViews::Configuration.new)
+  end
+
+  def pv5_fetch_batch_result_service
+    PageViews::FetchBatchResultService.new(PageViews::Configuration.new)
   end
 
   def validate_query_id!
