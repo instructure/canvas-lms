@@ -34,9 +34,9 @@ module Importers
 
           import_from_migration(control, tool, migration.context, migration)
         rescue => e
-          migration.add_import_warning(t("#migration.lti_context_control_type", "LTI Context Control"),
-                                       control[:migration_id],
-                                       e)
+          migration.add_error(t("#migration.lti_context_control_type", "LTI Context Control"),
+                              control[:migration_id],
+                              e)
         end
       end
 
