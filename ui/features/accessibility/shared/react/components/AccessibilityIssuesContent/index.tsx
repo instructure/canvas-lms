@@ -194,9 +194,12 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       },
       error => {
         if (error) {
-          formRef.current?.focus()
           setFormError(error)
           setAssertiveAlertMessage(error)
+          // Needed avoid form disabled state + focus issue
+          setTimeout(() => {
+            formRef.current?.focus()
+          }, 0)
         }
         setIsRemediated(false)
         setIsFormLocked(false)
@@ -216,12 +219,18 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
       },
       error => {
         if (error) {
-          formRef.current?.focus()
           setFormError(error)
           setAssertiveAlertMessage(error)
         }
         setIsRemediated(true)
         setIsFormLocked(false)
+
+        // Focus after state updates to ensure form is enabled
+        if (error) {
+          setTimeout(() => {
+            formRef.current?.focus()
+          }, 150)
+        }
       },
     )
   }, [formRef, previewRef])
@@ -331,6 +340,13 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         }
         setIsRemediated(false)
         setIsFormLocked(false)
+
+        // Focus after state updates to ensure form is enabled
+        if (error) {
+          setTimeout(() => {
+            formRef.current?.focus()
+          }, 150)
+        }
       },
     )
   }, [handleSaveAndNext, formRef, previewRef])
