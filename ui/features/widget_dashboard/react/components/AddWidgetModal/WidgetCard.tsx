@@ -23,6 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -41,6 +42,8 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
   onAdd,
   disabled = false,
 }) => {
+  const {isMobile} = useResponsiveContext()
+
   return (
     <View
       as="div"
@@ -66,7 +69,11 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
                 {displayName}
               </Text>
             </Flex.Item>
-            <Flex.Item height="2.3rem" overflowX="visible" overflowY="visible">
+            <Flex.Item
+              height={isMobile ? undefined : '2.3rem'}
+              overflowX="visible"
+              overflowY="visible"
+            >
               <Text size="small" color="secondary">
                 {description}
               </Text>

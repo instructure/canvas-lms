@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {type MockedFunction} from 'vitest'
 import AddWidgetModal from '../AddWidgetModal'
 import {useWidgetLayout} from '../../../hooks/useWidgetLayout'
+import {ResponsiveProvider} from '../../../hooks/useResponsiveContext'
 
 vi.mock('../../../hooks/useWidgetLayout')
 
@@ -250,5 +251,33 @@ describe('AddWidgetModal', () => {
 
     const todoListGroup = screen.getByRole('group', {name: 'To-do list'})
     expect(todoListGroup).toBeInTheDocument()
+  })
+
+  describe('responsive layout', () => {
+    it('uses single-column layout on mobile viewports', () => {
+      render(
+        <ResponsiveProvider matches={['mobile']}>
+          <AddWidgetModal {...defaultProps} />
+        </ResponsiveProvider>,
+      )
+
+      const widgetCards = screen.getAllByRole('group')
+      const firstCardContainer = widgetCards[0].closest('[class*="flexItem"]') as HTMLElement
+
+      expect(firstCardContainer).toHaveStyle({width: '100%'})
+    })
+
+    it('uses two-column layout on desktop viewports', () => {
+      render(
+        <ResponsiveProvider matches={['desktop']}>
+          <AddWidgetModal {...defaultProps} />
+        </ResponsiveProvider>,
+      )
+
+      const widgetCards = screen.getAllByRole('group')
+      const firstCardContainer = widgetCards[0].closest('[class*="flexItem"]') as HTMLElement
+
+      expect(firstCardContainer).toHaveStyle({width: 'calc(50% - 0.5rem)'})
+    })
   })
 })

@@ -24,6 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getAllWidgets} from '../WidgetRegistry'
 import {useWidgetLayout} from '../../hooks/useWidgetLayout'
+import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 import WidgetCard from './WidgetCard'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -42,6 +43,7 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
   targetRow,
 }) => {
   const {addWidget, config} = useWidgetLayout()
+  const {isMobile} = useResponsiveContext()
 
   const isWidgetOnDashboard = useCallback(
     (widgetType: string): boolean => {
@@ -79,7 +81,7 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
       <Modal.Body>
         <Flex direction="row" wrap="wrap" gap="small" alignItems="stretch">
           {Object.entries(getAllWidgets()).map(([type, renderer]) => (
-            <Flex.Item key={type} width="calc(50% - 0.5rem)">
+            <Flex.Item key={type} width={isMobile ? '100%' : 'calc(50% - 0.5rem)'}>
               <WidgetCard
                 type={type}
                 displayName={renderer.displayName}
