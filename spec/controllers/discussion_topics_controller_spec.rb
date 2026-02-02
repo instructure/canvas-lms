@@ -939,7 +939,7 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
-    context 'with the "react_discussions_post" FF enabled' do
+    context "show action" do
       render_views
       subject { get "show", params: { course_id: course.id, id: discussion.id } }
 
@@ -1732,9 +1732,8 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_truthy
     end
 
-    it "js_bundles includes discussion_create when ff is on" do
+    it "js_bundles includes discussion_topic_edit_v2" do
       user_session(@teacher)
-      @course.root_account.enable_feature!(:discussion_create)
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_bundles].first).to include(:discussion_topic_edit_v2)
     end
