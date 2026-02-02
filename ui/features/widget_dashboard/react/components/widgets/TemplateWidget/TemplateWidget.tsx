@@ -17,6 +17,7 @@
  */
 
 import React, {useEffect} from 'react'
+import {flushSync} from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -91,7 +92,16 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   }, [])
 
   const handleMenuSelect = (action: string) => {
-    moveWidget(widget.id, action as MoveAction)
+    flushSync(() => {
+      moveWidget(widget.id, action as MoveAction)
+    })
+
+    const dragHandle = document.querySelector(
+      `[data-testid="${widget.id}-drag-handle"]`,
+    ) as HTMLElement
+    if (dragHandle) {
+      dragHandle.focus()
+    }
   }
 
   const handleRemove = () => {
