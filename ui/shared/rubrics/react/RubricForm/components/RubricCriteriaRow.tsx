@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
