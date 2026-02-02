@@ -80,9 +80,7 @@ describe Importers::ContextExternalToolImporter do
 
     let(:course) { @course }
     let(:developer_key) do
-      lti_developer_key_model(account: course.account).tap do |key|
-        lti_tool_configuration_model(developer_key: key, lti_registration: key.lti_registration)
-      end
+      lti_registration_with_tool(account: course.account).developer_key
     end
     let(:migration) { course.content_migrations.create! }
     let(:settings) { { client_id: developer_key.global_id } }
@@ -442,6 +440,155 @@ describe Importers::ContextExternalToolImporter do
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["3"] # still compacts
+    end
+  end
+
+  describe "primary context control creation" do
+    let_once(:developer_key) do
+      lti_registration_with_tool(account: course.account).developer_key
+    end
+    let_once(:course) { @course }
+    let_once(:migration) { course.content_migrations.create!(user: user_model) }
+    let_once(:tool_hash) do
+      {
+        migration_id: "test_tool_1",
+        title: "LTI 1.3 Tool",
+        url: "http://www.example.com",
+        lti_version: "1.3",
+        settings: { client_id: developer_key.global_id }
+      }
+    end
+
+    it "creates a primary context control when migration has no associated control" do
+      expect do
+        Importers::ContextExternalToolImporter.import_from_migration(
+          tool_hash,
+          course,
+          migration:
+        )
+      end.to change { Lti::ContextControl.count }.by(1)
+
+      control = Lti::ContextControl.last
+      expect(control.course_id).to eq course.id
+      expect(control.registration_id).to eq developer_key.lti_registration.id
+      expect(control.available).to be true
+      expect(control.created_by_id).to eq migration.user.id
+      expect(control.updated_by_id).to eq migration.user.id
+    end
+
+    it "does not create a context control when associated_control_from_migration is provided" do
+      associated_control = { "deployment_migration_id" => "test_tool_1", "available" => false }
+
+      expect do
+        Importers::ContextExternalToolImporter.import_from_migration(
+          tool_hash,
+          course,
+          migration:,
+          associated_control_from_migration: associated_control
+        )
+      end.not_to change { Lti::ContextControl.count }
+    end
+
+    it "does not create a context control when persist is false" do
+      expect do
+        Importers::ContextExternalToolImporter.import_from_migration(
+          tool_hash,
+          course,
+          migration:,
+          persist: false
+        )
+      end.not_to change { Lti::ContextControl.count }
+    end
+
+    it "does not create a context control for LTI 1.1 tools" do
+      tool_hash[:lti_version] = "1.1"
+      tool_hash[:settings] = {}
+      tool_hash[:consumer_key] = "test_key"
+      tool_hash[:shared_secret] = "test_secret"
+
+      expect do
+        Importers::ContextExternalToolImporter.import_from_migration(
+          tool_hash,
+          course,
+          migration:
+        )
+      end.not_to change { Lti::ContextControl.count }
+    end
+
+    it "adds an error when tool has no developer key" do
+      tool_hash[:settings] = { client_id: nil }
+
+      expect(migration).to receive(:add_error).with(
+        a_string_matching(/doesn't have any developer key/)
+      )
+
+      result = Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        course,
+        migration:
+      )
+
+      expect(result).to be_nil
+    end
+
+    it "adds an error when developer key is not usable in context" do
+      # Create a developer key that won't be usable in this course
+      other_account = account_model
+      other_dev_key = lti_registration_with_tool(account: other_account).developer_key
+      tool_hash[:settings] = { client_id: other_dev_key.global_id }
+
+      expect(migration).to receive(:add_error).with(
+        a_string_matching(/is not available or enabled in this context/)
+      )
+
+      result = Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        course,
+        migration:
+      )
+
+      expect(result).to be_nil
+    end
+
+    it "adds an error when tool has no lti_registration_id" do
+      # Create a developer key without an lti_registration
+      orphan_dev_key = DeveloperKey.create!(account: course.account)
+      tool_hash[:settings] = { client_id: orphan_dev_key.global_id }
+
+      expect(migration).to receive(:add_error).with(
+        a_string_matching(/not available or enabled/)
+      )
+
+      result = Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        course,
+        migration:
+      )
+
+      expect(result).to be_nil
+    end
+
+    it "adds the created control to migration imported items" do
+      tool = Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        course,
+        migration:
+      )
+
+      expect(migration.imported_migration_items_by_class(Lti::ContextControl).count).to eq 1
+      control = migration.imported_migration_items_by_class(Lti::ContextControl).first
+      expect(control.deployment_id).to eq tool.id
+    end
+
+    it "sets the control's deployment_id to the tool's id" do
+      tool = Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        course,
+        migration:
+      )
+
+      control = Lti::ContextControl.last
+      expect(control.deployment_id).to eq tool.id
     end
   end
 end
