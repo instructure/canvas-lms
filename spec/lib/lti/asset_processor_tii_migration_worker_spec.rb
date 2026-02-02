@@ -2227,4 +2227,147 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       end
     end
   end
+
+  describe "#rollback" do
+    let(:test_course) { course_model(account: sub_account) }
+    let(:test_assignment1) { assignment_model(course: test_course) }
+    let(:test_assignment2) { assignment_model(course: test_course) }
+
+    let(:migrated_tool_proxy) do
+      create_tool_proxy(
+        context: test_course,
+        product_family:,
+        create_binding: true,
+        raw_data: { "custom" => { "proxy_instance_id" => "test_proxy_123" } }
+      )
+    end
+
+    let(:ap_tool) do
+      test_course.context_external_tools.create!(
+        name: "Asset Processor Tool",
+        domain: "example.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+    end
+
+    let(:resource_handler) do
+      Lti::ResourceHandler.create!(
+        resource_type_code: "resource",
+        name: "Test Resource",
+        tool_proxy: migrated_tool_proxy
+      )
+    end
+
+    let(:message_handler) do
+      Lti::MessageHandler.create!(
+        message_type: "basic-lti-launch-request",
+        launch_path: "http://example.com/launch",
+        resource_handler:,
+        tool_proxy: migrated_tool_proxy
+      )
+    end
+
+    let(:actl1) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment: test_assignment1,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: product_family.vendor_code,
+        tool_product_code: product_family.product_code,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+    end
+
+    let(:actl2) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment: test_assignment2,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: product_family.vendor_code,
+        tool_product_code: product_family.product_code,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+    end
+
+    it "destroys asset processors and clears migrated_to_context_external_tool for all ACTLs" do
+      migrated_tool_proxy.update!(migrated_to_context_external_tool: ap_tool)
+      allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      actl1
+      actl2
+
+      Lti::AssetProcessor.create!(
+        assignment: test_assignment1,
+        context_external_tool: ap_tool,
+        migration_id: worker.send(:generate_migration_id, migrated_tool_proxy, actl1),
+        workflow_state: "active"
+      )
+
+      Lti::AssetProcessor.create!(
+        assignment: test_assignment2,
+        context_external_tool: ap_tool,
+        migration_id: worker.send(:generate_migration_id, migrated_tool_proxy, actl2),
+        workflow_state: "active"
+      )
+
+      expect(migrated_tool_proxy.migrated_to_context_external_tool).to eq(ap_tool)
+      expect(Lti::AssetProcessor.active.where(assignment: [test_assignment1, test_assignment2]).count).to eq(2)
+
+      worker.rollback
+
+      expect(Lti::AssetProcessor.active.where(assignment: [test_assignment1, test_assignment2]).count).to eq(0)
+      expect(migrated_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+    end
+
+    it "skips tool proxies from other accounts and continues processing" do
+      other_account = account_model(parent_account: root_account, root_account:)
+      other_course = course_model(account: other_account)
+      other_tool_proxy = create_tool_proxy(
+        context: other_course,
+        product_family:,
+        create_binding: true
+      )
+      other_tool_proxy.update!(migrated_to_context_external_tool: ap_tool)
+
+      migrated_tool_proxy.update!(migrated_to_context_external_tool: ap_tool)
+      allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      actl1
+      actl2
+
+      ap1 = Lti::AssetProcessor.create!(
+        assignment: test_assignment1,
+        context_external_tool: ap_tool,
+        migration_id: worker.send(:generate_migration_id, migrated_tool_proxy, actl1),
+        workflow_state: "active"
+      )
+
+      ap2 = Lti::AssetProcessor.create!(
+        assignment: test_assignment2,
+        context_external_tool: ap_tool,
+        migration_id: worker.send(:generate_migration_id, migrated_tool_proxy, actl2),
+        workflow_state: "active"
+      )
+
+      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:associated_tool_proxy) do |actl|
+        if actl.id == actl1.id
+          other_tool_proxy
+        else
+          migrated_tool_proxy
+        end
+      end
+
+      worker.rollback
+
+      expect(ap1.reload.workflow_state).to eq("active")
+      expect(ap2.reload.workflow_state).to eq("deleted")
+      expect(other_tool_proxy.reload.migrated_to_context_external_tool).to eq(ap_tool)
+      expect(migrated_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+    end
+  end
 end

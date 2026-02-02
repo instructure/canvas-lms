@@ -70,6 +70,37 @@ module Lti
       end
     end
 
+    # This method is only called from rails console, manually
+    def rollback
+      Rails.logger.info("Rolling back Asset Processor migration in this account=#{@account.global_id}")
+      actls_for_account.find_each do |actl|
+        tool_proxy = actl.associated_tool_proxy
+        next unless tool_proxy.present?
+        next unless tool_proxy.migrated_to_context_external_tool.present?
+        next unless proxy_in_account?(tool_proxy, @account)
+
+        unless @migrated_tool_proxies.include?(tool_proxy)
+          @migrated_tool_proxies << tool_proxy
+          Rails.logger.info("Resubscribe tool_proxy #{tool_proxy.id}")
+          tool_proxy.manage_subscription
+        end
+
+        migration_id = generate_migration_id(tool_proxy, actl)
+        aps = Lti::AssetProcessor.active.where(assignment: actl.assignment, migration_id:)
+        aps.find_each do |ap|
+          Rails.logger.info("Rolling back Asset Processor ID=#{ap.id} for ACTL ID=#{actl.id} and tool_proxy ID=#{tool_proxy.id}")
+          ap.destroy
+        end
+      rescue => e
+        capture_and_log_exception(e)
+        Rails.logger.error("Failed to rollback migration for ACTL ID=#{actl.id}: #{e.message}")
+      end
+      @migrated_tool_proxies.each do |tp|
+        Rails.logger.info("Set migrated_to_context_external_tool to nil from #{tp.migrated_to_context_external_tool_id} for TP #{tp.id}")
+        tp.update!(migrated_to_context_external_tool_id: nil)
+      end
+    end
+
     private
 
     def migrate_actls(csv)
@@ -422,7 +453,7 @@ module Lti
         return [:failed, nil]
       end
 
-      migration_id = "cpf_#{tool_proxy.guid}_#{actl.assignment.global_id}"
+      migration_id = generate_migration_id(tool_proxy, actl)
       existing_ap = Lti::AssetProcessor.active.where(assignment: actl.assignment, migration_id:).first
       if existing_ap.present?
         Rails.logger.warn("Asset Processor already exists for ACTL ID=#{actl.id} and migration_id=#{migration_id}, skipping")
@@ -842,6 +873,10 @@ module Lti
       @results[:fatal_error].present? ||
         @results[:proxies].values.any? { |r| r[:errors].any? } ||
         @results[:actl_errors].present?
+    end
+
+    def generate_migration_id(tool_proxy, actl)
+      "cpf_#{tool_proxy.guid}_#{actl.assignment.global_id}"
     end
   end
 end
