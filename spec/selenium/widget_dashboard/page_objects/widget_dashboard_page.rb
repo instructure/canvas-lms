@@ -308,7 +308,7 @@ module WidgetDashboardPage
   end
 
   def recent_grade_view_feedback_link_selector(submission_id)
-    "[data-testid='view-inline-feedback-button-#{submission_id}']"
+    "[data-testid='view-inline-feedback-link-#{submission_id}']"
   end
 
   def recent_grade_feedback_section_selector(submission_id)

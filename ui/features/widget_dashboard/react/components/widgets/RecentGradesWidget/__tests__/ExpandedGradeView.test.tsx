@@ -241,7 +241,7 @@ describe('ExpandedGradeView', () => {
     )
   })
 
-  it('shows view inline feedback button in feedback section with count', async () => {
+  it('shows view inline feedback link in feedback section with assignment name and count', async () => {
     server.use(
       http.post('/api/graphql', () => {
         return HttpResponse.json(mockSubmissionDetailsResponse)
@@ -251,30 +251,30 @@ describe('ExpandedGradeView', () => {
     renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
 
     await waitFor(() => {
-      expect(screen.getByTestId('view-inline-feedback-button-sub1')).toHaveTextContent(
-        'View all inline feedback (3)',
+      expect(screen.getByTestId('view-inline-feedback-link-sub1')).toHaveTextContent(
+        'View all inline feedback for Test Assignment (3)',
       )
     })
   })
 
-  it('renders the open assignment link', () => {
+  it('renders the open assignment link with assignment name', () => {
     renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
     const link = screen.getByTestId('open-assignment-link-sub1')
-    expect(link).toHaveTextContent('Open assignment')
+    expect(link).toHaveTextContent('View Test Assignment')
     expect(link).toHaveAttribute('href', '/courses/1/assignments/101')
   })
 
-  it('renders the open what-if grading tool link', () => {
+  it('renders the open what-if grading tool link with assignment name', () => {
     renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
     const link = screen.getByTestId('open-whatif-link-sub1')
-    expect(link).toHaveTextContent('Open what-if grading tool')
+    expect(link).toHaveTextContent('View Test Assignment what-if grading tool')
     expect(link).toHaveAttribute('href', '/courses/1/grades')
   })
 
-  it('renders the message instructor link with compose parameter', () => {
+  it('renders the message instructor link with course name', () => {
     renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
     const link = screen.getByTestId('message-instructor-link-sub1')
-    expect(link).toHaveTextContent('Message instructor')
+    expect(link).toHaveTextContent('Message Test Course Instructor')
     expect(link).toHaveAttribute('href', '/conversations?context_id=course_1&compose=true')
   })
 

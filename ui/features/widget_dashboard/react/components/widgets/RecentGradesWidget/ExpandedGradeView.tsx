@@ -42,6 +42,8 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
   const {isMobile} = useResponsiveContext()
   const assignmentUrl = submission.assignment.htmlUrl
   const courseId = submission.assignment.course._id
+  const assignmentName = submission.assignment.name
+  const courseName = submission.assignment.course.name
 
   const courseData = sharedCourseData.find(course => course.courseId === courseId)
   const courseGrade = courseData?.currentGrade ?? null
@@ -72,8 +74,8 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
         </Flex.Item>
 
         <Flex.Item>
-          <Flex direction={isMobile ? 'column' : 'row'} gap="medium" alignItems="start">
-            <Flex.Item shouldGrow shouldShrink>
+          <Flex direction={isMobile ? 'column' : 'row'} alignItems="start">
+            <Flex.Item width={isMobile ? '100%' : '60%'} wrap="wrap">
               <Flex direction="column" gap="x-small" padding="x-small">
                 {isLoading ? (
                   <Flex.Item>
@@ -105,6 +107,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
                         submissionId={submission._id}
                         totalCommentsCount={totalCommentsCount}
                         assignmentUrl={assignmentUrl}
+                        assignmentName={assignmentName}
                       />
                     </Flex.Item>
                   </>
@@ -112,7 +115,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
               </Flex>
             </Flex.Item>
 
-            <Flex.Item>
+            <Flex.Item width={isMobile ? '100%' : '40%'} wrap="wrap" padding="0 0 0 medium">
               <Flex direction="column" gap="x-small" padding="x-small">
                 <Flex.Item overflowY="visible">
                   <Link
@@ -120,7 +123,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
                     isWithinText={false}
                     data-testid={`open-assignment-link-${submission._id}`}
                   >
-                    {I18n.t('Open assignment')}
+                    {I18n.t('View %{assignmentName}', {assignmentName})}
                   </Link>
                 </Flex.Item>
                 <Flex.Item overflowY="visible">
@@ -129,7 +132,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
                     isWithinText={false}
                     data-testid={`open-whatif-link-${submission._id}`}
                   >
-                    {I18n.t('Open what-if grading tool')}
+                    {I18n.t('View %{assignmentName} what-if grading tool', {assignmentName})}
                   </Link>
                 </Flex.Item>
                 <Flex.Item overflowY="visible">
@@ -138,7 +141,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({submission}
                     isWithinText={false}
                     data-testid={`message-instructor-link-${submission._id}`}
                   >
-                    {I18n.t('Message instructor')}
+                    {I18n.t('Message %{courseName} Instructor', {courseName})}
                   </Link>
                 </Flex.Item>
               </Flex>
