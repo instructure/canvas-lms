@@ -17,13 +17,12 @@
  */
 
 import React, {useRef, useCallback} from 'react'
-import {Table as InstUITable} from '@instructure/ui-table'
+import {Table as InstUITable, type TableProps as InstUITableProps} from '@instructure/ui-table'
 import {View} from '@instructure/ui-view'
 import {DragDropContext} from 'react-dnd'
 import ReactDnDHTML5Backend from 'react-dnd-html5-backend'
 import DragDropWrapper from '../grid/DragDropWrapper'
 import {DragDropContainer} from './DragDropContainer'
-import {Responsive} from '@instructure/ui-responsive'
 import {Cell} from './Cell'
 import {Row} from './Row'
 import {ColHeader, ColHeaderProps} from './ColHeader'
@@ -38,7 +37,7 @@ interface DragDropConfig {
   enabled?: boolean
 }
 
-interface TableProps {
+export type TableProps = {
   id?: string
   caption?: string
   columns: Array<Column>
@@ -48,7 +47,7 @@ interface TableProps {
     handleKeyDown: (event: React.KeyboardEvent, rowIndex: number, colIndex: number) => void,
   ) => React.ReactNode
   dragDropConfig?: DragDropConfig
-}
+} & Omit<InstUITableProps, 'children' | 'data'>
 
 const TableComponent: React.FC<TableProps> = ({
   id,
@@ -57,6 +56,7 @@ const TableComponent: React.FC<TableProps> = ({
   caption,
   renderAboveHeader,
   dragDropConfig,
+  ...tableProps
 }) => {
   const tableRef = useRef<HTMLDivElement>(null)
 
@@ -234,33 +234,20 @@ const TableComponent: React.FC<TableProps> = ({
   }
 
   return (
-    <Responsive
-      query={{
-        small: {maxWidth: '40rem'},
-        large: {minWidth: '41rem'},
-      }}
-      props={{
-        small: {layout: 'stacked'},
-        large: {layout: 'auto'},
+    <View
+      as="div"
+      overflowX="auto"
+      elementRef={(el: Element | null) => {
+        if (el instanceof HTMLDivElement) {
+          ;(tableRef as React.MutableRefObject<HTMLDivElement | null>).current = el
+        }
       }}
     >
-      {props => (
-        <View
-          as="div"
-          overflowX="auto"
-          elementRef={(el: Element | null) => {
-            if (el instanceof HTMLDivElement) {
-              ;(tableRef as React.MutableRefObject<HTMLDivElement | null>).current = el
-            }
-          }}
-        >
-          <InstUITable id={id} caption={caption} {...props}>
-            {renderHeader()}
-            {renderBody()}
-          </InstUITable>
-        </View>
-      )}
-    </Responsive>
+      <InstUITable id={id} caption={caption} {...tableProps}>
+        {renderHeader()}
+        {renderBody()}
+      </InstUITable>
+    </View>
   )
 }
 

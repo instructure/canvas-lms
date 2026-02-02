@@ -38,6 +38,7 @@ export interface BarChartRowProps {
   outcomeDistributions?: Record<string, OutcomeDistribution>
   isLoading?: boolean
   handleKeyDown: (event: React.KeyboardEvent, rowIndex: number, colIndex: number) => void
+  isMobile?: boolean
 }
 
 export const BarChartRow: React.FC<BarChartRowProps> = ({
@@ -45,6 +46,7 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
   outcomeDistributions,
   isLoading = false,
   handleKeyDown,
+  isMobile,
 }) => {
   const rowIndex = -2 // Fixed row index for bar chart row
 
@@ -73,7 +75,7 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               key="bar-chart-row-student-cell"
               width={`${STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING}px`}
               height={`${BAR_CHART_HEIGHT}px`}
-              isSticky
+              isSticky={!isMobile}
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
