@@ -2922,6 +2922,16 @@ class Account < ActiveRecord::Base
       (feature_enabled?(:a11y_checker) || Account.site_admin.feature_enabled?(:a11y_checker_ga2_features))
   end
 
+  def a11y_checker_ai_table_caption_generation?
+    Account.site_admin.feature_enabled?(:a11y_checker_ai_table_caption_generation) && root_account.feature_enabled?(:a11y_checker_ignite_ai) &&
+      (feature_enabled?(:a11y_checker) || Account.site_admin.feature_enabled?(:a11y_checker_ai_features))
+  end
+
+  def a11y_checker_ai_alt_text_generation?
+    Account.site_admin.feature_enabled?(:a11y_checker_ai_alt_text_generation) && root_account.feature_enabled?(:a11y_checker_ignite_ai) &&
+      (feature_enabled?(:a11y_checker) || Account.site_admin.feature_enabled?(:a11y_checker_ai_features))
+  end
+
   private
 
   def sanitize_discovery_page

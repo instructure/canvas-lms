@@ -410,6 +410,8 @@ class ApplicationController < ActionController::Base
         if @context.is_a?(Course)
           @js_env[:FEATURES][:youtube_overlay] = @context.account.feature_enabled?(:youtube_overlay)
           @js_env[:FEATURES][:rce_studio_embed_improvements] = @context.feature_enabled?(:rce_studio_embed_improvements)
+          @js_env[:FEATURES][:a11y_checker_ai_table_caption_generation] = @context.a11y_checker_ai_table_caption_generation?
+          @js_env[:FEATURES][:a11y_checker_ai_alt_text_generation] = @context.a11y_checker_ai_alt_text_generation?
         end
 
         # partner context data
@@ -456,8 +458,6 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
-    a11y_checker_ai_alt_text_generation
-    a11y_checker_ai_table_caption_generation
     a11y_checker_additional_resources
     a11y_checker_close_issues
     block_content_editor_toolbar_reorder
