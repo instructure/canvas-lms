@@ -11035,6 +11035,7 @@ describe AssignmentsApiController, type: :request do
                                       resource_workflow_state: "published",
                                       resource_updated_at: Time.zone.now,
                                       context_url: "/courses/#{@course.id}/assignments/#{@assignment.id}",
+                                      resource_scan_path: nil,
                                       workflow_state: "completed",
                                       error_message: nil,
                                       issue_count: 0,

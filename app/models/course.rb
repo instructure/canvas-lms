@@ -20,6 +20,7 @@
 
 class Course < ActiveRecord::Base
   include Context
+  include Accessibility::Scannable
   include Workflow
   include TextHelper
   include HtmlTextHelper
@@ -4052,8 +4053,10 @@ class Course < ActiveRecord::Base
     account.feature_enabled?(:block_content_editor) && feature_enabled?(:block_content_editor_eap)
   end
 
+  # the feature_flag(:a11y_checker_eap) check is for testing purposes. Unfortunately multiple_root_accounts plugin mocking out Feature.definitions
+  # so we have a redundant call for that
   def a11y_checker_enabled?
-    (account.feature_enabled?(:a11y_checker) && feature_enabled?(:a11y_checker_eap)) || account.feature_enabled?(:a11y_checker_ga1)
+    (account.feature_enabled?(:a11y_checker) && feature_flag(:a11y_checker_eap) && feature_enabled?(:a11y_checker_eap)) || account.feature_enabled?(:a11y_checker_ga1)
   end
 
   def elementary_enabled?
@@ -5011,5 +5014,17 @@ class Course < ActiveRecord::Base
     elsif old_rqd_setting == true && new_rqd_setting == false
       InstStatsd::Statsd.distributed_increment("course.settings.restrict_quantitative_data.disabled")
     end
+  end
+
+  def a11y_scannable_attributes
+    [:syllabus_body, :workflow_state]
+  end
+
+  def any_completed_accessibility_scan?
+    Accessibility::CourseScanService.last_accessibility_course_scan(self)&.completed? || false
+  end
+
+  def excluded_from_accessibility_scan?
+    !Account.site_admin.feature_enabled?(:a11y_checker_additional_resources)
   end
 end

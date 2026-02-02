@@ -53,6 +53,8 @@ class AccessibilityResourceScan < ActiveRecord::Base
       where(announcement_id: resource.id)
     elsif resource.is_a?(Accessibility::SyllabusResource)
       where(course_id: resource.course.id, is_syllabus: true)
+    elsif resource.is_a?(Course)
+      where(course_id: resource.id, is_syllabus: true)
     else
       where(context: resource)
     end
@@ -111,6 +113,17 @@ class AccessibilityResourceScan < ActiveRecord::Base
     when "DiscussionTopic"
       url_helpers.course_discussion_topic_path(course_id, context_id)
     end
+  end
+
+  # Returns the API path for scanning this resource (only for syllabus)
+  # This is separate from context_url because syllabus has a different API path pattern
+  # Returns nil for non-syllabus resources
+  def resource_scan_path
+    # Only syllabus needs a different API path
+    return "/courses/#{course_id}/syllabus" if is_syllabus?
+
+    # For all other resources, return nil (they'll use context_url)
+    nil
   end
 
   private

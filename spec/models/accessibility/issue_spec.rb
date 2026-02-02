@@ -42,6 +42,7 @@ describe Accessibility::Issue do
         discussion_topics:,
         announcements:,
         attachments: double("Attachments", not_deleted: double(order: [])),
+        syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
       allow(wiki_pages).to receive(:not_deleted).and_return(not_deleted_wiki_pages)
@@ -78,6 +79,7 @@ describe Accessibility::Issue do
         discussion_topics:,
         announcements:,
         attachments: double("Attachments", not_deleted: double(order: [])),
+        syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
       allow(assignments).to receive(:active).and_return(active_assignments)
@@ -107,6 +109,7 @@ describe Accessibility::Issue do
         discussion_topics:,
         announcements:,
         attachments: double("Attachments", not_deleted: double(order: [])),
+        syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
 
@@ -132,6 +135,7 @@ describe Accessibility::Issue do
         discussion_topics: double("DiscussionTopics", scannable: []),
         announcements:,
         attachments: double("Attachments", not_deleted: double(order: [])),
+        syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
 
@@ -172,6 +176,7 @@ describe Accessibility::Issue do
         discussion_topics:,
         announcements:,
         attachments: attachments_collection,
+        syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
       allow(attachments_collection).to receive(:not_deleted).and_return(not_deleted_attachments_relation)
@@ -229,6 +234,7 @@ describe Accessibility::Issue do
         discussion_topics:,
         announcements:,
         attachments: double("Attachments", not_deleted: double(order: [])),
+        syllabus_body: nil,
         exceeds_accessibility_scan_limit?: true
       )
 
@@ -502,6 +508,7 @@ describe Accessibility::Issue do
         discussion_topics: double("DiscussionTopics", scannable: []),
         announcements: double("Announcements"),
         attachments: double("Attachments", not_deleted: double(order: [])),
+        syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
     end

@@ -168,6 +168,26 @@ describe Accessibility::ResourceScanController do
         syllabus_index = resource_types.index("Syllabus")
         expect(syllabus_index).not_to be_nil
       end
+
+      it "returns resource_scan_path only for syllabus" do
+        get :index, params: { course_id: course.id }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        syllabus_scan = json.find { |scan| scan["resource_type"] == "Syllabus" }
+        expect(syllabus_scan).to be_present
+
+        # Verify that syllabus has resource_scan_path
+        expect(syllabus_scan["resource_url"]).to eq("/courses/#{course.id}/assignments/syllabus")
+        expect(syllabus_scan).to have_key("resource_scan_path")
+        expect(syllabus_scan["resource_scan_path"]).to eq("/courses/#{course.id}/syllabus")
+
+        # Verify that non-syllabus resources have nil resource_scan_path
+        non_syllabus_scan = json.find { |scan| scan["resource_type"] != "Syllabus" }
+        expect(non_syllabus_scan).to be_present
+        expect(non_syllabus_scan).to have_key("resource_scan_path")
+        expect(non_syllabus_scan["resource_scan_path"]).to be_nil
+      end
     end
 
     %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].each do |sort_param|
@@ -393,6 +413,7 @@ describe Accessibility::ResourceScanController do
           "resource_workflow_state" => "published",
           "resource_updated_at" => "2025-07-19T02:18:00Z",
           "resource_url" => "/courses/#{course.id}/pages/#{wiki_page.id}",
+          "resource_scan_path" => nil,
           "workflow_state" => "completed",
           "error_message" => "",
           "closed_at" => nil,
@@ -969,6 +990,7 @@ describe Accessibility::ResourceScanController do
       expect(scan_json).to have_key("resource_workflow_state")
       expect(scan_json).to have_key("resource_updated_at")
       expect(scan_json).to have_key("resource_url")
+      expect(scan_json).to have_key("resource_scan_path")
       expect(scan_json).to have_key("workflow_state")
       expect(scan_json).to have_key("error_message")
     end

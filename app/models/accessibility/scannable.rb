@@ -127,7 +127,7 @@ module Accessibility
     # However, if we need to extend this, consider moving it to an abstract level
     def needs_normalizing?
       a11y_checker_enabled? &&
-        context.try(:a11y_checker_additional_resources?) &&
+        (is_a?(Course) ? a11y_checker_additional_resources? : context.try(:a11y_checker_additional_resources?)) &&
         any_completed_accessibility_scan? &&
         !deleted? &&
         is_a?(DiscussionTopic) &&

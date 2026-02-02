@@ -9919,6 +9919,7 @@ describe Course do
     context "when both a11y_checker and a11y_checker_eap features are enabled" do
       before do
         allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(true)
+        allow(course).to receive(:feature_flag).with(:a11y_checker_eap).and_return(true)
         allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(true)
         allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(false)
       end
@@ -9943,6 +9944,7 @@ describe Course do
     context "when both EAP path and GA1 are enabled" do
       before do
         allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(true)
+        allow(course).to receive(:feature_flag).with(:a11y_checker_eap).and_return(true)
         allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(true)
         allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(true)
       end
@@ -9955,6 +9957,7 @@ describe Course do
     context "when account a11y_checker is enabled but course a11y_checker_eap is disabled and ga1 is disabled" do
       before do
         allow(course.account).to receive(:feature_enabled?).with(:a11y_checker).and_return(true)
+        allow(course).to receive(:feature_flag).with(:a11y_checker_eap).and_return(true)
         allow(course).to receive(:feature_enabled?).with(:a11y_checker_eap).and_return(false)
         allow(course.account).to receive(:feature_enabled?).with(:a11y_checker_ga1).and_return(false)
       end
@@ -10103,6 +10106,121 @@ describe Course do
         allow(account).to receive(:a11y_checker_ai_alt_text_generation?).and_return(false)
 
         expect(course.a11y_checker_ai_alt_text_generation?).to be false
+      end
+    end
+  end
+
+  describe "syllabus accessibility scan" do
+    let(:course) { course_model }
+
+    context "when a11y_checker_additional_resources is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:a11y_checker_additional_resources)
+        course.root_account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+      end
+
+      it "does not trigger accessibility scan for syllabus on update" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        course.update!(syllabus_body: "<h1>Test Syllabus</h1>")
+      end
+    end
+
+    context "when a11y_checker_additional_resources is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        course.root_account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+      end
+
+      it "triggers accessibility scan when syllabus_body changes" do
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: course)
+
+        course.update!(syllabus_body: "<h1>Updated Syllabus</h1>")
+      end
+
+      it "does not trigger scan when syllabus_body doesn't change" do
+        course.update!(syllabus_body: "<p>Initial content</p>")
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        course.update!(name: "New Course Name")
+      end
+
+      it "does not trigger scan when syllabus_body remains blank" do
+        course.update!(syllabus_body: "")
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        course.update!(syllabus_body: "")
+      end
+
+      it "triggers scan when syllabus_body changes to blank" do
+        course.update!(syllabus_body: "<p>Some content</p>")
+
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: course)
+
+        course.update!(syllabus_body: "")
+      end
+
+      it "creates scan with is_syllabus flag" do
+        course.update!(syllabus_body: "<h1>Test Syllabus</h1>")
+
+        # Process the delayed job
+        run_jobs
+
+        scan = AccessibilityResourceScan.where(course_id: course.id, is_syllabus: true).last
+        expect(scan).not_to be_nil
+        expect(scan.is_syllabus).to be true
+        expect(scan.context_id).to be_nil
+        expect(scan.context_type).to be_nil
+      end
+
+      it "updates existing scan when syllabus changes again" do
+        # Create initial scan
+        AccessibilityResourceScan.create!(
+          course:,
+          is_syllabus: true,
+          workflow_state: "completed",
+          issue_count: 0,
+          resource_name: "Course Syllabus",
+          resource_workflow_state: "published"
+        )
+
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: course)
+
+        course.update!(syllabus_body: "<h1>Updated Again</h1>")
+      end
+    end
+
+    context "when course has no initial scan" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        course.root_account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        # No initial course scan exists
+      end
+
+      it "does not trigger accessibility scan for syllabus" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        course.update!(syllabus_body: "<h1>Test Syllabus</h1>")
+      end
+    end
+
+    context "when a11y_checker is disabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        course.root_account.disable_feature!(:a11y_checker)
+      end
+
+      it "does not trigger accessibility scan for syllabus" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        course.update!(syllabus_body: "<h1>Test Syllabus</h1>")
       end
     end
   end

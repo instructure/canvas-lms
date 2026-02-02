@@ -181,6 +181,7 @@ module Accessibility
         resource_workflow_state: scan.resource_workflow_state,
         resource_updated_at: scan.resource_updated_at&.iso8601 || "",
         resource_url: scan.context_url,
+        resource_scan_path: scan.resource_scan_path,
         workflow_state: scan.workflow_state,
         error_message: scan.error_message || "",
         closed_at: scan.closed_at&.iso8601

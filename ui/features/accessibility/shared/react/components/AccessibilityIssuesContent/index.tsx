@@ -554,7 +554,11 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                     <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
                   </Link>
                   <Link
-                    href={`${item.resourceUrl}/edit`}
+                    href={
+                      item.resourceType === 'Syllabus'
+                        ? item.resourceUrl // Syllabus is edited inline, no separate edit page
+                        : `${item.resourceUrl}/edit`
+                    }
                     variant="standalone"
                     target="_blank"
                     iconPlacement="end"
