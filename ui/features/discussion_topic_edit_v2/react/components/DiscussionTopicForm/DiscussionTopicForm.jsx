@@ -317,7 +317,9 @@ function DiscussionTopicForm({
     currentDiscussionTopic?.assignment?.peerReviews?.dueAt || '',
   )
   const [assignedInfoList, setAssignedInfoList] = useState(
-    isEditing ? buildAssignmentOverrides(currentDiscussionTopic) : buildDefaultAssignmentOverride(),
+    isEditing || currentDiscussionTopic?.assignment?.assignmentOverrides?.nodes?.length > 0
+      ? buildAssignmentOverrides(currentDiscussionTopic)
+      : buildDefaultAssignmentOverride(),
   )
 
   const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())

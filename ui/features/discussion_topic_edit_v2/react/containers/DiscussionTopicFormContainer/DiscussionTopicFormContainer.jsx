@@ -83,7 +83,38 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
       discussionTopicId: currentDiscussionTopicId,
     },
   })
-  const currentDiscussionTopic = topicData?.legacyNode
+  const currentDiscussionTopic = isEditing
+    ? topicData?.legacyNode
+    : ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.title || ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.assignment
+      ? {
+          title: ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.title,
+          assignment: ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.assignment
+            ? {
+                pointsPossible: parseFloat(
+                  ENV.DISCUSSION_TOPIC.ATTRIBUTES.assignment.points_possible,
+                ),
+                dueAt: ENV.DISCUSSION_TOPIC.ATTRIBUTES.assignment.due_at,
+                assignmentGroup: ENV.DISCUSSION_TOPIC.ATTRIBUTES.assignment.assignment_group_id
+                  ? {_id: ENV.DISCUSSION_TOPIC.ATTRIBUTES.assignment.assignment_group_id}
+                  : undefined,
+                assignmentOverrides: {
+                  nodes: [
+                    {
+                      id: 'everyone',
+                      dueAt: ENV.DISCUSSION_TOPIC.ATTRIBUTES.assignment.due_at,
+                      unlockAt: null,
+                      lockAt: null,
+                      set: {
+                        __typename: 'Course',
+                        _id: ENV.context_id,
+                      },
+                    },
+                  ],
+                },
+              }
+            : undefined,
+        }
+      : undefined
   const published = currentDiscussionTopic?.published ?? false
 
   // Use setUsageRights to save new usageRightsData
