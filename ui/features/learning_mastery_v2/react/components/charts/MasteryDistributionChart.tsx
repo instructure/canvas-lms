@@ -27,12 +27,12 @@ import {canvas} from '@instructure/ui-themes'
 const I18n = createI18nScope('learning_mastery_gradebook')
 
 interface CustomLabel {
-  iconUrl: string
+  iconUrl: string | null
   text: string
 }
 
 const loadIcons = (
-  labels: CustomLabel[],
+  labels: Array<CustomLabel & {iconUrl: string}>,
   imagesRef: React.MutableRefObject<Map<string, HTMLImageElement>>,
 ): Promise<void>[] => {
   return labels.map(
@@ -121,12 +121,14 @@ export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> =
   }, [masteryLevels, selectedLabel])
 
   // Create custom labels with icons and counts (only if not in preview mode)
-  const customLabels: CustomLabel[] | undefined = useMemo(() => {
+  const customLabels: Array<CustomLabel & {iconUrl: string}> | undefined = useMemo(() => {
     if (isPreview) return undefined
-    return masteryLevels.map(level => ({
-      iconUrl: svgUrl(level.points, outcome.mastery_points),
-      text: level.count.toString(),
-    }))
+    return masteryLevels
+      .map(level => ({
+        iconUrl: svgUrl(level.points, outcome.mastery_points),
+        text: level.count.toString(),
+      }))
+      .filter((label): label is CustomLabel & {iconUrl: string} => label.iconUrl !== null)
   }, [masteryLevels, outcome.mastery_points, isPreview])
 
   // Load images for custom labels
