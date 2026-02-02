@@ -26,10 +26,25 @@ module Accessibility
 
     attr_reader :course
 
-    delegate :id, :syllabus_body, :updated_at, :account, :global_id, to: :course
+    delegate :id, :syllabus_body, :updated_at, :global_id, to: :course
 
     def initialize(course)
       @course = course
+    end
+
+    # Delegate any undefined methods to the underlying Course object
+    # This ensures SyllabusResource can respond to any Course method
+    def method_missing(method, *, &)
+      if course.respond_to?(method)
+        course.send(method, *, &)
+      else
+        super
+      end
+    end
+
+    # Properly implement respond_to? for delegated methods
+    def respond_to_missing?(method, include_private = false)
+      course.respond_to?(method, include_private) || super
     end
 
     # Implementation of AccessibilityCheckable interface

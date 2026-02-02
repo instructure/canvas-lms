@@ -113,12 +113,56 @@ describe Accessibility::SyllabusResource do
       expect(syllabus_resource.updated_at).to eq(course.updated_at)
     end
 
-    it "delegates account to course" do
-      expect(syllabus_resource.account).to eq(course.account)
-    end
-
     it "delegates global_id to course" do
       expect(syllabus_resource.global_id).to eq(course.global_id)
+    end
+  end
+
+  describe "method_missing delegation" do
+    it "correctly delegates account to course through method_missing" do
+      # This is critical for sharding support
+      expect(syllabus_resource.account).to eq(course.account)
+      expect(syllabus_resource.account).to be_a(Account)
+      expect(syllabus_resource.account.id).to eq(course.account.id)
+    end
+
+    it "returns the same account instance as course.account" do
+      # Ensure we're getting the exact same object, not a copy
+      expect(syllabus_resource.account).to be(course.account)
+    end
+
+    it "correctly handles course.account.global_id for sharding" do
+      # This tests the chained delegation that was failing in the background job
+      expect(syllabus_resource.account.global_id).to eq(course.account.global_id)
+    end
+
+    it "delegates course through method_missing and returns the wrapped course" do
+      # The course method should return the wrapped course object
+      expect(syllabus_resource.course).to eq(course)
+      expect(syllabus_resource.course).to be(course)
+    end
+
+    it "delegates name to course through method_missing" do
+      course.update!(name: "Test Course Name")
+      expect(syllabus_resource.name).to eq("Test Course Name")
+    end
+
+    it "delegates workflow_state to course through method_missing" do
+      expect(syllabus_resource.workflow_state).to eq(course.workflow_state)
+    end
+
+    it "raises NoMethodError for methods course doesn't respond to" do
+      expect { syllabus_resource.non_existent_method }.to raise_error(NoMethodError)
+    end
+
+    it "responds to methods that course responds to" do
+      expect(syllabus_resource).to respond_to(:name)
+      expect(syllabus_resource).to respond_to(:account)
+      expect(syllabus_resource).to respond_to(:workflow_state)
+    end
+
+    it "does not respond to methods that course doesn't respond to" do
+      expect(syllabus_resource).not_to respond_to(:non_existent_method)
     end
   end
 

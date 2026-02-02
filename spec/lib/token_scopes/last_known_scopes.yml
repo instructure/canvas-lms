@@ -1541,6 +1541,10 @@
   path: '/api/v1/courses/:course_id/submissions/bulk_mark_read'
 - verb: POST
   path: '/api/v1/courses/:course_id/submissions/update_grades'
+- verb: POST
+  path: '/api/v1/courses/:course_id/syllabus/accessibility/queue_scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/syllabus/accessibility/scan'
 - verb: GET
   path: '/api/v1/courses/:course_id/tabs'
 - verb: PUT

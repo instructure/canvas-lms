@@ -99,6 +99,7 @@ export interface AccessibilityResourceScan extends HasId {
   resourceWorkflowState: ResourceWorkflowState
   resourceUpdatedAt: string
   resourceUrl: string
+  resourceScanPath?: string // Only present for syllabus resources
   workflowState: ScanWorkflowState
   errorMessage?: string
   issueCount: number

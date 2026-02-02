@@ -27,7 +27,9 @@ class Accessibility::ResourceScannerService < ApplicationService
 
   def initialize(resource:)
     super()
-    @resource = resource
+    # When Course is passed directly (from Scannable module), wrap it as SyllabusResource
+    # This is needeed because when the serialization happens we load the object as a Course
+    @resource = resource.is_a?(Course) ? Accessibility::SyllabusResource.new(resource) : resource
   end
 
   def call

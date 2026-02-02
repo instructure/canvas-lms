@@ -30,6 +30,7 @@ import {
   AccessibilityScansState,
   useAccessibilityScansStore,
 } from '../../../stores/AccessibilityScansStore'
+import {ResourceType} from '../../../types'
 
 const mockClose = vi.fn()
 
@@ -347,6 +348,22 @@ describe('AccessibilityIssuesDrawerContent', () => {
     expect(screen.getByText('Edit Page')).toHaveAttribute(
       'href',
       'http://test.com/multi-issue-page/edit',
+    )
+  })
+
+  it('renders correct Edit Page link for Syllabus', async () => {
+    const syllabusItem = {
+      ...baseItem,
+      resourceType: ResourceType.Syllabus,
+      resourceUrl: '/courses/1/assignments/syllabus',
+    }
+
+    render(<AccessibilityIssuesDrawerContent item={syllabusItem} onClose={mockClose} />, {wrapper})
+
+    // For syllabus, edit link should not append /edit
+    expect(await screen.findByText('Edit Page')).toHaveAttribute(
+      'href',
+      '/courses/1/assignments/syllabus',
     )
   })
 
