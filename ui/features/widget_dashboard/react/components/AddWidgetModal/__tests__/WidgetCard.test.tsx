@@ -20,6 +20,7 @@ import React from 'react'
 import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import WidgetCard from '../WidgetCard'
+import {ResponsiveProvider} from '../../../hooks/useResponsiveContext'
 
 describe('WidgetCard', () => {
   const defaultProps = {
@@ -116,6 +117,34 @@ describe('WidgetCard', () => {
       render(<WidgetCard {...defaultProps} disabled={true} />)
       const button = screen.getByTestId('add-widget-button')
       expect(button).toHaveAccessibleName('Course Work Summary Added')
+    })
+  })
+
+  describe('responsive layout', () => {
+    it('uses auto height for description on mobile viewports', () => {
+      render(
+        <ResponsiveProvider matches={['mobile']}>
+          <WidgetCard {...defaultProps} />
+        </ResponsiveProvider>,
+      )
+
+      const description = screen.getByText(defaultProps.description)
+      const descriptionContainer = description.closest('[class*="flexItem"]') as HTMLElement
+
+      expect(descriptionContainer).not.toHaveStyle({height: '2.3rem'})
+    })
+
+    it('uses fixed height for description on desktop viewports', () => {
+      render(
+        <ResponsiveProvider matches={['desktop']}>
+          <WidgetCard {...defaultProps} />
+        </ResponsiveProvider>,
+      )
+
+      const description = screen.getByText(defaultProps.description)
+      const descriptionContainer = description.closest('[class*="flexItem"]') as HTMLElement
+
+      expect(descriptionContainer).toHaveStyle({height: '2.3rem'})
     })
   })
 })
