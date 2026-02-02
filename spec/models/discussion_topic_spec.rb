@@ -4363,18 +4363,11 @@ describe DiscussionTopic do
         topic.update!(message: "Updated message")
       end
 
-      it "does not trigger accessibility scan for announcements on create" do
-        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+      it "triggers destroy when deleting discussion topic" do
+        topic = DiscussionTopic.create!(title: "Test Topic", course:)
+        AccessibilityResourceScan.create!(context: topic, course:)
 
-        Announcement.create!(title: "Test Announcement", message: "Test message", course:)
-      end
-
-      it "does not trigger accessibility scan for announcements on update" do
-        announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
-
-        expect(Accessibility::ResourceScannerService).not_to receive(:call)
-
-        announcement.update!(message: "Updated message")
+        expect { topic.destroy! }.to change { AccessibilityResourceScan.where(discussion_topic_id: topic.id).count }.from(1).to(0)
       end
     end
 
@@ -4400,20 +4393,10 @@ describe DiscussionTopic do
         topic.update!(message: "Updated message")
       end
 
-      context "when topic is announcement" do
-        it "triggers accessibility scan on create" do
-          expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: an_instance_of(Announcement))
+      it "triggers destroy when deleting discussion topic" do
+        topic = DiscussionTopic.create!(title: "Test Topic", course:)
 
-          Announcement.create!(title: "Test Announcement", message: "Test message", course:)
-        end
-
-        it "triggers accessibility scan on update" do
-          announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
-
-          expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: an_instance_of(Announcement))
-
-          announcement.update!(message: "Updated message")
-        end
+        expect { topic.destroy! }.to change { AccessibilityResourceScan.where(discussion_topic_id: topic.id).count }.from(1).to(0)
       end
 
       context "when topic is graded" do

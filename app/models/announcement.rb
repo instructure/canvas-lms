@@ -306,4 +306,12 @@ class Announcement < DiscussionTopic
       recipients
     end
   end
+
+  def a11y_scannable_attributes
+    %i[title message workflow_state]
+  end
+
+  def excluded_from_accessibility_scan?
+    !Account.site_admin.feature_enabled?(:a11y_checker_additional_resources)
+  end
 end

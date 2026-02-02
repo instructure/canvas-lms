@@ -633,6 +633,8 @@
   path: '/api/v1/courses/:course_id/ai_experiences/new'
 - verb: GET
   path: '/api/v1/courses/:course_id/all_quizzes'
+- verb: POST
+  path: '/api/v1/courses/:course_id/announcements/:announcement_id/accessibility/scan'
 - verb: GET
   path: '/api/v1/courses/:course_id/app_center/apps'
 - verb: GET

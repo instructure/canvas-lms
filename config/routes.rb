@@ -2742,6 +2742,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :announcements_api) do
       get "announcements", action: :index, as: :announcements
+
+      post "courses/:course_id/announcements/:announcement_id/accessibility/scan", action: :accessibility_scan, as: "course_announcement_accessibility_scan"
     end
 
     scope(controller: :release_notes) do

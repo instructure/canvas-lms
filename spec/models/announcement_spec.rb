@@ -742,4 +742,78 @@ describe Announcement do
       end
     end
   end
+
+  it_behaves_like "an accessibility scannable resource" do
+    before do
+      Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+    end
+
+    let(:course) { course_model }
+    let(:valid_attributes) { { title: "Test Page", message: "Initial message", course: } }
+    let(:relevant_attributes_for_scan) { { message: "<p>Lorem ipsum</p>" } }
+    let(:irrelevant_attributes_for_scan) { { lock_at: 1.week.ago } }
+  end
+
+  describe "accessibility scan" do
+    let(:course) { course_model }
+
+    context "when a11y_checker_additional_resources is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:a11y_checker_additional_resources)
+        course.root_account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+      end
+
+      it "does not trigger accessibility scan for announcements on create" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+      end
+
+      it "does not trigger accessibility scan for announcements on update" do
+        announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        announcement.update!(message: "Updated message")
+      end
+
+      it "triggers destroy when deleting announcement" do
+        announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+        AccessibilityResourceScan.create!(context: announcement, course:)
+
+        expect { announcement.destroy! }.to change { AccessibilityResourceScan.where(announcement_id: announcement.id).count }.from(1).to(0)
+      end
+    end
+
+    context "when a11y_checker_additional_resources is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        course.root_account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+      end
+
+      it "triggers accessibility scan on create" do
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: an_instance_of(Announcement))
+
+        Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+      end
+
+      it "triggers accessibility scan on update" do
+        announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: an_instance_of(Announcement))
+
+        announcement.update!(message: "Updated message")
+      end
+
+      it "triggers destroy when deleting announcement" do
+        announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+
+        expect { announcement.destroy! }.to change { AccessibilityResourceScan.where(announcement_id: announcement.id).count }.from(1).to(0)
+      end
+    end
+  end
 end

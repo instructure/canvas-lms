@@ -64,7 +64,7 @@ module Accessibility
         @resource.description
       when WikiPage
         @resource.body
-      when DiscussionTopic
+      when DiscussionTopic, Announcement
         @resource.message
       else
         raise UnsupportedResourceTypeError, "Unsupported resource type: #{@resource.class.name}"

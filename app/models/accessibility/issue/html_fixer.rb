@@ -89,7 +89,7 @@ module Accessibility
           :body
         when Assignment
           :description
-        when DiscussionTopic
+        when DiscussionTopic, Announcement
           :message
         else
           raise ArgumentError, "Unsupported resource type: #{resource.class.name}"
