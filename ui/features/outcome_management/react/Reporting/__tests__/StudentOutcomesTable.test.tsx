@@ -57,6 +57,7 @@ describe('StudentOutcomesTable', () => {
       totalAlignmentsCount: 5,
       masteryScore: 2.5,
       masteryLevel: 'near_mastery' as const,
+      masteryPoints: 1,
     },
     {
       id: 2,
@@ -67,6 +68,7 @@ describe('StudentOutcomesTable', () => {
       totalAlignmentsCount: 3,
       masteryScore: null,
       masteryLevel: 'unassessed' as const,
+      masteryPoints: 2,
     },
   ]
 
@@ -200,6 +202,7 @@ describe('StudentOutcomesTable', () => {
         totalAlignmentsCount: 0,
         masteryScore: null,
         masteryLevel: 'unassessed' as const,
+        masteryPoints: 0,
       },
     ]
     render(<StudentOutcomesTable outcomes={zeroAlignmentOutcome} studentId="1" />)

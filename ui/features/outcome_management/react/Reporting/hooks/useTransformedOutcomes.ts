@@ -49,6 +49,7 @@ const transformOutcomeData = (
       totalAlignmentsCount,
       masteryScore,
       masteryLevel,
+      masteryPoints: outcome.mastery_points,
     }
   })
 }
