@@ -35,7 +35,7 @@ const ColorPickerForm: React.FC<FormComponentProps & React.RefAttributes<FormCom
     ({issue, error, onChangeValue, isDisabled}: FormComponentProps, ref) => {
       const colorPickerInputRef = useRef<HTMLInputElement | null>(null)
       const backgroundColor = issue.form.backgroundColor ?? '#FFFFFF'
-      const [foregroundColor, setForegroundColor] = useState(issue.form.value ?? '#000000')
+      const [foregroundColor, setForegroundColor] = useState('')
 
       useImperativeHandle(ref, () => ({
         focus: () => {

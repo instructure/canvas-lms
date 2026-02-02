@@ -137,7 +137,7 @@ describe('ColorPickerForm', () => {
       expect(screen.getByText(LABELS.CUSTOM_INPUT)).toBeInTheDocument()
     })
 
-    it('uses default foreground color #000000 when no value is provided', () => {
+    it('uses empty string as default when no value is provided', () => {
       const issue = createMockIssue({
         form: {
           type: FormType.ColorPicker,
@@ -147,10 +147,10 @@ describe('ColorPickerForm', () => {
 
       renderColorPickerForm({issue})
 
-      expect(getColorPickerInput().value).toBe('000000')
+      expect(getColorPickerInput().value).toBe('')
     })
 
-    it('uses provided foreground color from issue.form.value', () => {
+    it('uses empty string even when issue.form.value is provided', () => {
       const issue = createMockIssue({
         form: {
           type: FormType.ColorPicker,
@@ -161,7 +161,7 @@ describe('ColorPickerForm', () => {
 
       renderColorPickerForm({issue})
 
-      expect(getColorPickerInput().value).toBe('FF0000')
+      expect(getColorPickerInput().value).toBe('')
     })
 
     it('uses default background color #FFFFFF when not provided', () => {
