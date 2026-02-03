@@ -59,7 +59,16 @@ describe Accessibility::Rules::TableHeaderRule do
 
     it "fixes tables by adding headers to the first column" do
       input_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
-      expected_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><th scope=\"row\">Data 1</th><td>Data 2</td></tr></table>"
+      expected_html = "<table><tr><th scope=\"row\">Cell 1</th><td>Cell 2</td></tr><tr><th scope=\"row\">Data 1</th><td>Data 2</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header, input_html, "./*", "The first column")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "fixes tables by adding headers to first column including first row" do
+      input_html = "<table><tr><td>A</td><td>B</td><td>C</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr></table>"
+      expected_html = "<table><tr><th scope=\"row\">A</th><td>B</td><td>C</td></tr><tr><th scope=\"row\">1</th><td>2</td><td>3</td></tr><tr><th scope=\"row\">4</th><td>5</td><td>6</td></tr></table>"
 
       fixed_html = fix_issue(:table_header, input_html, "./*", "The first column")
 
@@ -69,6 +78,15 @@ describe Accessibility::Rules::TableHeaderRule do
     it "fixes tables by adding headers to both the first row and column" do
       input_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
       expected_html = "<table><tr><th scope=\"col\">Cell 1</th><th scope=\"col\">Cell 2</th></tr><tr><th scope=\"row\">Data 1</th><td>Data 2</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header, input_html, "./*", "Both")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "fixes tables by adding headers to both first row and column with multiple rows" do
+      input_html = "<table><tr><td>A</td><td>B</td><td>C</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr></table>"
+      expected_html = "<table><tr><th scope=\"col\">A</th><th scope=\"col\">B</th><th scope=\"col\">C</th></tr><tr><th scope=\"row\">1</th><td>2</td><td>3</td></tr><tr><th scope=\"row\">4</th><td>5</td><td>6</td></tr></table>"
 
       fixed_html = fix_issue(:table_header, input_html, "./*", "Both")
 

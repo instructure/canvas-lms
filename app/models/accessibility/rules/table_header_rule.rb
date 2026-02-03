@@ -59,9 +59,7 @@ module Accessibility
         end
 
         if [I18n.t("The first column"), I18n.t("Both")].include?(value)
-          elem.query_selector_all("tr").each_with_index do |row, index|
-            next if index == 0 # Skip the first row
-
+          elem.query_selector_all("tr").each do |row|
             first_cell = row.query_selector("td")
             if first_cell
               first_cell.name = "th"
