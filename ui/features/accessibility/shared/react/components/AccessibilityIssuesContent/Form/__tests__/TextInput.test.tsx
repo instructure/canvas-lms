@@ -28,7 +28,7 @@ import {
 } from '../../../../contexts/AccessibilityCheckerContext'
 import {FormType, IssueWorkflowState} from '../../../../types'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
-import TextInputForm from '../TextInput'
+import TextInputForm from '../TextInputForm'
 import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
 
 const server = setupServer()

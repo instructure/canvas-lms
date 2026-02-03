@@ -19,7 +19,7 @@
 import React, {forwardRef, useCallback, useImperativeHandle, useRef, useState} from 'react'
 
 import ColorPickerForm from './ColorPickerForm'
-import TextInputForm from './TextInput'
+import TextInputForm from './TextInputForm'
 import RadioInputGroupForm from './RadioInputGroupForm'
 import CheckboxTextInputForm from './CheckboxTextInput'
 import {AccessibilityIssue, FormType, FormValue} from '../../../types'
@@ -35,17 +35,9 @@ export interface FormComponentHandle {
   getValue?: () => FormValue
 }
 
-export interface FormComponentProps {
-  issue: AccessibilityIssue
-  value: FormValue
-  error?: string | null
+export interface FormComponentProps extends FormProps {
   onChangeValue: (formValue: FormValue) => void
-  onReload?: (formValue: FormValue) => void
-  onValidationChange?: (isValid: boolean, errorMessage?: string) => void
-  actionButtons?: React.ReactNode
-  isDisabled?: boolean
-  previewRef?: React.RefObject<PreviewHandle>
-  onGenerateLoadingChange?: (loading: boolean) => void
+  value: FormValue
 }
 
 interface FormProps {
@@ -54,7 +46,6 @@ interface FormProps {
   onReload?: (formValue: FormValue) => void
   onClearError?: () => void
   onValidationChange?: (isValid: boolean, errorMessage?: string) => void
-  actionButtons?: React.ReactNode
   isDisabled?: boolean
   previewRef?: React.RefObject<PreviewHandle>
   onGenerateLoadingChange?: (loading: boolean) => void
@@ -78,7 +69,6 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
       onReload,
       onClearError,
       onValidationChange,
-      actionButtons,
       isDisabled,
       previewRef,
       onGenerateLoadingChange,
@@ -122,7 +112,6 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
         onChangeValue={handleChange}
         onReload={onReload}
         onValidationChange={onValidationChange}
-        actionButtons={actionButtons}
         isDisabled={isDisabled}
         previewRef={previewRef}
         onGenerateLoadingChange={onGenerateLoadingChange}

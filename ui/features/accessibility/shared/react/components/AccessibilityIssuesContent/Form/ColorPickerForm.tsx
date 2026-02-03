@@ -50,7 +50,7 @@ const ColorPickerForm: React.FC<FormComponentProps & React.RefAttributes<FormCom
 
       return (
         <View as="div" data-testid="contrast-ratio-form">
-          <View as="div" margin="medium 0" style={{overflow: 'visible'}}>
+          <View as="div" style={{overflow: 'visible'}}>
             <ColorPicker
               id="a11y-color-picker"
               data-testid="color-picker"
