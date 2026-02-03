@@ -29,6 +29,7 @@ export const ACCOUNT_GRADING_STATUS_QUERY = gql`
           color
           id: _id
           name
+          icon
         }
       }
       standardGradeStatusesConnection(first: ${MAX_STANDARD_GRADE_STATUSES_PER_ACCOUNT}) {

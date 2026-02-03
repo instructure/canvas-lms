@@ -21,6 +21,7 @@ import {func, shape, string} from 'prop-types'
 import {getStatuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
 import type {StatusColors} from '../constants/colors'
+import {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 
 interface ColorPickerRefs {
   [key: string]: Element | null
@@ -32,11 +33,15 @@ const colorPickerContents: ColorPickerRefs = {}
 interface StatusColorPanelProps {
   colors: StatusColors
   onColorsUpdated: (colors: StatusColors) => void
+  customGradeStatuses?: GradeStatusUnderscore[]
+  viewStatusForColorblindness: boolean
 }
 
 export default function StatusColorPanel({
   colors: initialColors,
   onColorsUpdated,
+  customGradeStatuses,
+  viewStatusForColorblindness,
 }: StatusColorPanelProps) {
   const [colors, setColors] = useState<StatusColors>({...initialColors})
   const [openPopover, setOpenPopover] = useState<string | null>(null)
@@ -82,6 +87,7 @@ export default function StatusColorPanel({
         <StatusColorListItem
           key={status}
           status={status}
+          showIcon={viewStatusForColorblindness}
           color={colors[status as keyof StatusColors]}
           isColorPickerShown={openPopover === status}
           colorPickerOnToggle={handleOnToggle(status)}
@@ -91,6 +97,24 @@ export default function StatusColorPanel({
           afterSetColor={updateStatusColors(status as keyof StatusColors)}
         />
       ))}
+      {customGradeStatuses?.map(it => {
+        return (
+          <StatusColorListItem
+            status={it.icon ?? ''}
+            showIcon={viewStatusForColorblindness}
+            key={it.id}
+            name={it.name}
+            color={it.color}
+            disableColorPicker
+            isColorPickerShown={false}
+            colorPickerOnToggle={handleOnToggle(status)}
+            colorPickerButtonRef={bindColorPickerButton(status)}
+            colorPickerContentRef={bindColorPickerContent(status)}
+            colorPickerAfterClose={handleColorPickerAfterClose(status)}
+            afterSetColor={updateStatusColors(status as keyof StatusColors)}
+          />
+        )
+      })}
     </ul>
   )
 }

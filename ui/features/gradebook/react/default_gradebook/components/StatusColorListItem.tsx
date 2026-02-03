@@ -26,6 +26,7 @@ import {Grid} from '@instructure/ui-grid'
 import ColorPicker from '@canvas/color-picker'
 import {statusesTitleMap} from '../constants/statuses'
 import {defaultColors} from '../constants/colors'
+import {STATUS_ICONS} from '@canvas/grading/gradingStatus'
 
 const I18n = createI18nScope('gradebook')
 
@@ -50,6 +51,9 @@ function formatColor(color: string) {
 type Props = {
   color: string
   status: string
+  name?: string
+  disableColorPicker?: boolean
+  showIcon?: boolean
   isColorPickerShown: boolean
   colorPickerOnToggle: (status: boolean) => void
   colorPickerButtonRef: (button: Element | null) => void
@@ -79,62 +83,75 @@ class StatusColorListItem extends React.Component<Props, State> {
   render() {
     const {
       status,
+      name,
       isColorPickerShown,
       colorPickerOnToggle,
       colorPickerButtonRef,
       colorPickerContentRef,
       colorPickerAfterClose,
+      disableColorPicker,
+      showIcon,
     } = this.props
+
+    const icon = STATUS_ICONS?.[status]
+    const title = name ?? statusesTitleMap?.[status as keyof typeof statusesTitleMap]
 
     return (
       <li
         className="Gradebook__StatusModalListItem"
         key={status}
-        style={{backgroundColor: this.state.color}}
+        style={{
+          backgroundColor: this.state.color,
+          padding: disableColorPicker ? '11px 8px' : undefined,
+        }}
       >
         <Grid vAlign="middle">
           <Grid.Row>
+            {showIcon && (
+              <Grid.Col width="auto">{icon && <img src={icon} alt="" title={title} />}</Grid.Col>
+            )}
             <Grid.Col>
-              {/*  @ts-expect-error */}
-              <Text>{statusesTitleMap[status]}</Text>
+              <Text>{title}</Text>
             </Grid.Col>
             <Grid.Col width="auto">
-              <Popover
-                on="click"
-                isShowingContent={isColorPickerShown}
-                onShowContent={colorPickerOnToggle.bind(null, true)}
-                onHideContent={colorPickerOnToggle.bind(null, false)}
-                contentRef={colorPickerContentRef}
-                shouldReturnFocus={true}
-                renderTrigger={
-                  <IconButton
-                    size="small"
-                    withBackground={false}
+              {!disableColorPicker && (
+                <Popover
+                  on="click"
+                  isShowingContent={isColorPickerShown}
+                  onShowContent={colorPickerOnToggle.bind(null, true)}
+                  onHideContent={colorPickerOnToggle.bind(null, false)}
+                  contentRef={colorPickerContentRef}
+                  shouldReturnFocus={true}
+                  renderTrigger={
+                    <IconButton
+                      size="small"
+                      withBackground={false}
+                      withBorder={false}
+                      elementRef={colorPickerButtonRef}
+                      screenReaderLabel={I18n.t('%{status} Color Picker', {status})}
+                    >
+                      <IconEditSolid />
+                    </IconButton>
+                  }
+                >
+                  <ColorPicker
+                    parentComponent="StatusColorListItem"
+                    colors={colorPickerColors}
+                    currentColor={this.state.color}
+                    afterClose={colorPickerAfterClose}
+                    hideOnScroll={false}
+                    allowWhite={true}
+                    nonModal={true}
+                    hidePrompt={true}
+                    withDarkCheck={true}
+                    withAnimation={false}
+                    withArrow={false}
                     withBorder={false}
-                    elementRef={colorPickerButtonRef}
-                    screenReaderLabel={I18n.t('%{status} Color Picker', {status})}
-                  >
-                    <IconEditSolid />
-                  </IconButton>
-                }
-              >
-                <ColorPicker
-                  parentComponent="StatusColorListItem"
-                  colors={colorPickerColors}
-                  currentColor={this.state.color}
-                  afterClose={colorPickerAfterClose}
-                  hideOnScroll={false}
-                  allowWhite={true}
-                  nonModal={true}
-                  hidePrompt={true}
-                  withDarkCheck={true}
-                  withAnimation={false}
-                  withArrow={false}
-                  withBorder={false}
-                  withBoxShadow={false}
-                  setStatusColor={this.setColor}
-                />
-              </Popover>
+                    withBoxShadow={false}
+                    setStatusColor={this.setColor}
+                  />
+                </Popover>
+              )}
             </Grid.Col>
           </Grid.Row>
         </Grid>

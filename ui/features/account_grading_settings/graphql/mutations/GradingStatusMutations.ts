@@ -41,6 +41,7 @@ export const UPSERT_CUSTOM_GRADING_STATUS_MUTATION = gql`
         id: _id
         name
         color
+        icon
       }
       errors {
         attribute
