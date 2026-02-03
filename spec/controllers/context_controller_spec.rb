@@ -415,6 +415,46 @@ describe ContextController do
         end
       end
     end
+
+    describe "rejected enrollments" do
+      render_views
+
+      before :once do
+        @section1 = @course.course_sections.create!(name: "Section 1")
+        @section2 = @course.course_sections.create!(name: "Section 2")
+
+        @student_with_rejected = user_factory(active_all: true)
+        enrollment1 = @course.enroll_student(@student_with_rejected, section: @section1, enrollment_state: "invited")
+        enrollment1.accept!
+
+        enrollment2 = @course.enroll_student(@student_with_rejected, section: @section2, enrollment_state: "invited", allow_multiple_enrollments: true)
+        enrollment2.reject!
+      end
+
+      it "displays 'Invitation Declined' label when profiles are enabled" do
+        account = Account.default
+        account.settings = { enable_profiles: true }
+        account.save!
+
+        user_session(@teacher)
+        get "roster_user", params: { course_id: @course.id, id: @student_with_rejected.id }
+
+        expect(response).to be_successful
+        expect(response.body).to include("Invitation Declined")
+      end
+
+      it "displays 'Invitation Declined' label when profiles are disabled" do
+        account = Account.default
+        account.settings = { enable_profiles: false }
+        account.save!
+
+        user_session(@teacher)
+        get "roster_user", params: { course_id: @course.id, id: @student_with_rejected.id }
+
+        expect(response).to be_successful
+        expect(response.body).to include("Invitation Declined")
+      end
+    end
   end
 
   describe "POST 'object_snippet'" do
