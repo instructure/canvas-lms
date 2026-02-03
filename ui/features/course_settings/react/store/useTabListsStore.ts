@@ -85,6 +85,8 @@ export type MoveItemTrayResult = {
 export interface TabListsState {
   enabledTabs: NavigationTab[]
   disabledTabs: NavigationTab[]
+  appendNewLinkItemTab: (params: {text: string; url: string}) => void
+  deleteTab: (tabInternalId: string) => void
   moveTab: (result: {
     source: {droppableId: string; index: number}
     destination: {droppableId: string; index: number} | null | undefined
@@ -92,7 +94,6 @@ export interface TabListsState {
   toggleTabEnabled: (tabInternalId: string) => void
   moveUsingTrayResult: (result: MoveItemTrayResult) => void
   tabsToSave: () => CourseNavigationTabToSave[]
-  appendNewLinkItemTab: (params: {text: string; url: string}) => void
 }
 
 function reorder<T>(list: T[], sourceIndex: number, destIndex: number): T[] {
@@ -173,6 +174,13 @@ export const useTabListsStore = create<TabListsState>((set, get) => {
     appendNewLinkItemTab: ({text, url}) => {
       const newTab = newLinkItem({text, url})
       set({enabledTabs: [...get().enabledTabs, newTab]})
+    },
+
+    deleteTab(tabInternalId) {
+      set({
+        enabledTabs: get().enabledTabs.filter(tab => tab.internalId !== tabInternalId),
+        disabledTabs: get().disabledTabs.filter(tab => tab.internalId !== tabInternalId),
+      })
     },
 
     moveTab: result => {
