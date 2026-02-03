@@ -174,52 +174,138 @@ describe('AccessibilityIssuesDrawerContent', () => {
     expect(next).toBeEnabled()
   })
 
-  it('shows CloseRemediationView when skipping the last issue', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
+  describe('when a11y_checker_close_issues flag is enabled', () => {
+    it('shows CloseRemediationView when skipping the last issue', async () => {
+      render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
-    const next = screen.getByTestId('skip-button')
+      const next = screen.getByTestId('skip-button')
 
-    // Skip to the last issue
-    fireEvent.click(next)
+      // Skip to the last issue
+      fireEvent.click(next)
 
-    await waitFor(() => {
-      expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
+      })
+
+      // Skip the last issue, should show CloseRemediationView
+      fireEvent.click(next)
+
+      await waitFor(() => {
+        expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /close remediation/i})).toBeInTheDocument()
+      })
     })
 
-    // Skip the last issue, should show CloseRemediationView
-    fireEvent.click(next)
+    it('navigates back to first issue from CloseRemediationView', async () => {
+      render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
-    await waitFor(() => {
-      expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
-      expect(screen.getByRole('button', {name: /close remediation/i})).toBeInTheDocument()
+      const next = screen.getByTestId('skip-button')
+
+      // Skip to last issue
+      fireEvent.click(next)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
+      })
+
+      // Skip last issue to show CloseRemediationView
+      fireEvent.click(next)
+
+      await waitFor(() => {
+        expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+      })
+
+      // Click "Back to start" button
+      const backToStart = screen.getByRole('button', {name: /back to start/i})
+      fireEvent.click(backToStart)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
+      })
     })
   })
 
-  it('navigates back to first issue from CloseRemediationView', async () => {
-    render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
-
-    const next = screen.getByTestId('skip-button')
-
-    // Skip to last issue
-    fireEvent.click(next)
-
-    await waitFor(() => {
-      expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
+  describe('when a11y_checker_close_issues flag is disabled', () => {
+    beforeEach(() => {
+      setupMockStore({isCloseIssuesEnabled: false})
     })
 
-    // Skip last issue to show CloseRemediationView
-    fireEvent.click(next)
+    it('replaces Skip button with Back to start button on last issue with multiple issues', async () => {
+      render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
-    await waitFor(() => {
-      expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+      const skipButton = screen.getByTestId('skip-button')
+      fireEvent.click(skipButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
+      })
+
+      expect(screen.queryByTestId('skip-button')).not.toBeInTheDocument()
+      expect(screen.getByTestId('back-to-start-button')).toBeInTheDocument()
     })
 
-    // Click "Back to start" button
-    const backToStart = screen.getByRole('button', {name: /back to start/i})
-    fireEvent.click(backToStart)
+    it('navigates to first issue when clicking "Back to start" button', async () => {
+      render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
-    await waitFor(() => {
-      expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
+      const skipButton = screen.getByTestId('skip-button')
+      fireEvent.click(skipButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
+      })
+
+      const backToStartButton = screen.getByTestId('back-to-start-button')
+      fireEvent.click(backToStartButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
+      })
+
+      expect(screen.getByTestId('skip-button')).toBeInTheDocument()
+      expect(screen.queryByTestId('back-to-start-button')).not.toBeInTheDocument()
+    })
+
+    it('shows Skip button on non-last issues', async () => {
+      render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
+
+      expect(screen.getByTestId('skip-button')).toBeInTheDocument()
+      expect(screen.queryByTestId('back-to-start-button')).not.toBeInTheDocument()
+    })
+
+    it('does not show CloseRemediationView when on the last issue', async () => {
+      render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
+
+      const skipButton = screen.getByTestId('skip-button')
+      fireEvent.click(skipButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Issue 2\/2:/)).toBeInTheDocument()
+      })
+
+      expect(screen.queryByText(/outstanding issues remaining/i)).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', {name: /close remediation/i})).not.toBeInTheDocument()
+    })
+
+    it('disables both Back and Skip buttons when there is only one issue', async () => {
+      const singleIssueItem = {
+        ...baseItem,
+        issueCount: 1,
+        issues: [baseItem.issues![0]],
+      }
+
+      render(<AccessibilityIssuesDrawerContent item={singleIssueItem} onClose={mockClose} />, {
+        wrapper,
+      })
+
+      expect(screen.getByText(/Issue 1\/1:/)).toBeInTheDocument()
+
+      const backButton = screen.getByTestId('back-button')
+      expect(backButton).toBeDisabled()
+
+      const skipButton = screen.getByTestId('skip-button')
+      expect(skipButton).toBeDisabled()
+
+      expect(screen.queryByTestId('back-to-start-button')).not.toBeInTheDocument()
     })
   })
 
