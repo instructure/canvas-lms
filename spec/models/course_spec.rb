@@ -3221,19 +3221,24 @@ describe Course do
                                                ])
         end
 
-        it "does not include hidden nav menu link tabs unless for_reordering is used" do
+        it "shows hidden nav menu link tabs to admins but not students" do
           @course.tab_configuration = [
             { "id" => Course::TAB_HOME },
             { "id" => Course::TAB_ASSIGNMENTS },
             { "id" => "nav_menu_link_#{link.id}", "hidden" => true }
           ]
           @course.save!
-          tabs = @course.tabs_available(@user)
-          expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
 
-          tabs = @course.tabs_available(@user, for_reordering: true)
+          # Teachers/admins can see hidden nav menu links (like regular tabs)
+          tabs = @course.tabs_available(@teacher)
           nav_link_tab = tabs.find { |t| t[:id] == "nav_menu_link_#{link.id}" }
+          expect(nav_link_tab).to be_present
           expect(nav_link_tab[:hidden]).to be true
+
+          # Students cannot see hidden nav menu links
+          student_in_course(active_all: true)
+          tabs = @course.tabs_available(@student)
+          expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
         end
       end
 

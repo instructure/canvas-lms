@@ -3848,6 +3848,9 @@ class Course < ActiveRecord::Base
 
         hidden_external_tabs = tabs.select do |t|
           next false unless t[:external]
+          # Hidden tools do not show for admins. Hidden Nav Menu Links are
+          # shown with "crossed-out eye" icon like other tabs.
+          next false if NavMenuLinkTabs.nav_menu_link_tab_id?(t[:id])
 
           elementary_enabled = elementary_subject_course? && !course_subject_tabs
           (t[:hidden] && !elementary_enabled) || (elementary_enabled && tab_hidden?(t[:id]))

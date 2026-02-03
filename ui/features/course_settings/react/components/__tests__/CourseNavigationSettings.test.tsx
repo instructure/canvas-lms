@@ -81,48 +81,90 @@ import CourseNavigationSettings from '../CourseNavigationSettings'
 import {NavigationTab, useTabListsStore} from '../../store/useTabListsStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-beforeEach(() => {
-  const enabledTabs: NavigationTab[] = [
-    {
-      externalId: 0,
-      internalId: '0',
-      type: 'existing',
-      label: 'Home',
-      hidden: false,
-      disabled_message: 'Page disabled, will redirect to course home page',
-      immovable: true,
-    },
-    {
-      externalId: 3,
-      internalId: '3',
-      type: 'existing',
-      label: 'Assignments',
-      hidden: false,
-      disabled_message: 'Page disabled, will redirect to course home page',
-      immovable: false,
-    },
-  ]
-  const disabledTabs: NavigationTab[] = [
-    {
-      externalId: 8,
-      internalId: '8',
-      type: 'existing',
-      label: 'Discussions',
-      hidden: true,
-      disabled_message: "This page can't be disabled, only hidden",
-      immovable: true,
-    },
-  ]
+// Common fixtures used across most tests
+const defaultEnabledTabs: NavigationTab[] = [
+  {
+    externalId: 0,
+    internalId: '0',
+    type: 'existing',
+    label: 'Home',
+    hidden: false,
+    disabled_message: 'Page disabled, will redirect to course home page',
+    immovable: true,
+  },
+  {
+    externalId: 3,
+    internalId: '3',
+    type: 'existing',
+    label: 'Assignments',
+    hidden: false,
+    disabled_message: 'Page disabled, will redirect to course home page',
+    immovable: false,
+  },
+  {
+    externalId: 4,
+    internalId: '4',
+    type: 'existing',
+    label: 'Grades',
+    hidden: false,
+    disabled_message: 'Page disabled, will redirect to course home page',
+    immovable: false,
+  },
+  {
+    externalId: 101,
+    internalId: '101',
+    type: 'existing',
+    label: 'External Link',
+    hidden: false,
+    disabled_message: '',
+    immovable: false,
+    href: 'nav_menu_link_url',
+    args: ['https://example.com'],
+  },
+]
 
+const defaultDisabledTabs: NavigationTab[] = [
+  {
+    externalId: 8,
+    internalId: '8',
+    type: 'existing',
+    label: 'Discussions',
+    hidden: true,
+    disabled_message: "This page can't be disabled, only hidden",
+    immovable: true,
+  },
+  {
+    externalId: 9,
+    internalId: '9',
+    type: 'existing',
+    label: 'Quizzes',
+    hidden: true,
+    disabled_message: 'Page disabled, will redirect to course home page',
+    immovable: false,
+  },
+  {
+    externalId: 102,
+    internalId: '102',
+    type: 'existing',
+    label: 'Disabled Link',
+    hidden: true,
+    disabled_message: '',
+    immovable: false,
+    href: 'nav_menu_link_url',
+    args: ['https://disabled.com'],
+  },
+]
+
+beforeEach(() => {
   fakeENV.setup({
-    COURSE_SETTINGS_NAVIGATION_TABS: [...enabledTabs, ...disabledTabs],
+    COURSE_SETTINGS_NAVIGATION_TABS: [...defaultEnabledTabs, ...defaultDisabledTabs],
     K5_SUBJECT_COURSE: false,
   })
 
   // Reset the Zustand store state
   useTabListsStore.setState({
-    enabledTabs: enabledTabs,
-    disabledTabs: disabledTabs,
+    enabledTabs: defaultEnabledTabs,
+    disabledTabs: defaultDisabledTabs,
   })
 })
 
@@ -165,23 +207,23 @@ describe('CourseNavigationSettings', () => {
     const dragDropContext = screen.getByTestId('drag-drop-context')
     expect(dragDropContext).toBeInTheDocument()
 
-    // Verify initial state: Home is in enabled section
+    // Verify initial state: Grades is in enabled section
     const enabledSection = screen.getByTestId('droppable-enabled-tabs')
     const disabledSection = screen.getByTestId('droppable-disabled-tabs')
-    expect(enabledSection).toHaveTextContent('Assignments')
-    expect(disabledSection).not.toHaveTextContent('Assignments')
+    expect(enabledSection).toHaveTextContent('Grades')
+    expect(disabledSection).not.toHaveTextContent('Grades')
 
-    // simulate moving Assignments
+    // simulate moving Grades
     triggerMockDragEnd({
-      draggableId: 'tab-3',
+      draggableId: 'tab-4',
       type: 'DEFAULT',
-      source: {droppableId: 'enabled-tabs', index: 1},
+      source: {droppableId: 'enabled-tabs', index: 2},
       destination: {droppableId: 'disabled-tabs', index: 0},
     })
 
-    // Verify Assignments now appears in disabled section
-    expect(disabledSection).toHaveTextContent('Assignments')
-    expect(enabledSection).not.toHaveTextContent('Assignments')
+    // Verify Grades now appears in disabled section
+    expect(disabledSection).toHaveTextContent('Grades')
+    expect(enabledSection).not.toHaveTextContent('Grades')
     expect(enabledSection).toHaveTextContent('Home')
 
     // Verify the component structure remains intact after drag operation
@@ -193,21 +235,31 @@ describe('CourseNavigationSettings', () => {
   it('renders tab labels from ENV', () => {
     render(<CourseNavigationSettings {...defaultProps} />)
 
+    // Enabled tabs
     expect(screen.getByText('Home')).toBeInTheDocument()
     expect(screen.getByText('Assignments')).toBeInTheDocument()
+    expect(screen.getByText('Grades')).toBeInTheDocument()
+    expect(screen.getByText('External Link')).toBeInTheDocument()
+
+    // Disabled tabs
     expect(screen.getByText('Discussions')).toBeInTheDocument()
+    expect(screen.getByText('Quizzes')).toBeInTheDocument()
+    expect(screen.getByText('Disabled Link')).toBeInTheDocument()
   })
 
   it('displays disabled message for hidden tabs', () => {
     render(<CourseNavigationSettings {...defaultProps} />)
 
-    // Discussions is hidden in our test data
+    // Discussions is hidden and has a specific disabled message
     const discussionsText = screen.getByText('Discussions')
     const parentElement = discussionsText.closest('[id^="nav_edit_tab_id_"]')
 
     // The disabled message should be present for the hidden tab
     expect(parentElement).toBeInTheDocument()
     expect(screen.getByText("This page can't be disabled, only hidden")).toBeInTheDocument()
+
+    // Quizzes is also hidden with a different message
+    expect(screen.getByText('Page disabled, will redirect to course home page')).toBeInTheDocument()
   })
 
   it('shows drag handle for movable tabs', () => {
@@ -221,7 +273,7 @@ describe('CourseNavigationSettings', () => {
   it('does not show drag handle for immovable tabs', () => {
     render(<CourseNavigationSettings {...defaultProps} />)
 
-    // Home and Discussions are immovable
+    // Home (enabled) and Discussions (disabled) are immovable
     const homeElement = screen.getByText('Home').closest('[id^="nav_edit_tab_id_"]')
     const homeDragHandle = homeElement?.querySelector('[name="IconDragHandle"]')
     expect(homeDragHandle).not.toBeInTheDocument()
@@ -229,6 +281,11 @@ describe('CourseNavigationSettings', () => {
     const discussionsElement = screen.getByText('Discussions').closest('[id^="nav_edit_tab_id_"]')
     const discussionsDragHandle = discussionsElement?.querySelector('[name="IconDragHandle"]')
     expect(discussionsDragHandle).not.toBeInTheDocument()
+
+    // But Quizzes (movable, disabled) should have a drag handle
+    const quizzesElement = screen.getByText('Quizzes').closest('[id^="nav_edit_tab_id_"]')
+    const quizzesDragHandle = quizzesElement?.querySelector('[name="IconDragHandle"]')
+    expect(quizzesDragHandle).toBeInTheDocument()
   })
 
   it('renders settings menu button for movable tabs', () => {
@@ -257,73 +314,22 @@ describe('CourseNavigationSettings', () => {
     expect(discussionsSettingsButton).not.toBeInTheDocument()
   })
 
-  describe('Link icon display', () => {
-    beforeEach(() => {
-      const testEnabledTabs = [
-        {
-          id: 100,
-          label: 'Regular Tab',
-          hidden: false,
-          disabled_message: '',
-          immovable: false,
-          type: 'existing' as const,
-          externalId: 100,
-          internalId: '100',
-        },
-        {
-          id: 101,
-          label: 'External Link',
-          hidden: false,
-          disabled_message: '',
-          immovable: false,
-          href: 'nav_menu_link_url',
-          args: ['https://example.com'],
-          type: 'existing' as const,
-          externalId: 101,
-          internalId: '101',
-        },
-      ]
+  it('shows link icon only for items with linkUrl', () => {
+    render(<CourseNavigationSettings {...defaultProps} />)
 
-      const testDisabledTabs = [
-        {
-          id: 102,
-          label: 'Another Link',
-          hidden: true,
-          disabled_message: '',
-          immovable: false,
-          href: 'nav_menu_link_url',
-          args: ['https://test.com'],
-          type: 'existing' as const,
-          externalId: 102,
-          internalId: '102',
-        },
-      ]
+    // Check that tabs with linkUrl show the link icon
+    const externalLinkTab = screen.getByText('External Link').closest('[id^="nav_edit_tab_id_"]')
+    expect(externalLinkTab?.querySelector('[name="IconLink"]')).toBeInTheDocument()
 
-      fakeENV.setup({
-        COURSE_SETTINGS_NAVIGATION_TABS: [...testEnabledTabs, ...testDisabledTabs],
-        K5_SUBJECT_COURSE: false,
-      })
+    const disabledLinkTab = screen.getByText('Disabled Link').closest('[id^="nav_edit_tab_id_"]')
+    expect(disabledLinkTab?.querySelector('[name="IconLink"]')).toBeInTheDocument()
 
-      useTabListsStore.setState({
-        enabledTabs: testEnabledTabs,
-        disabledTabs: testDisabledTabs,
-      })
-    })
+    // Check that tabs without linkUrl do not show the link icon
+    const assignmentsTab = screen.getByText('Assignments').closest('[id^="nav_edit_tab_id_"]')
+    expect(assignmentsTab?.querySelector('[name="IconLink"]')).not.toBeInTheDocument()
 
-    it('shows link icon only for items with linkUrl', () => {
-      render(<CourseNavigationSettings {...defaultProps} />)
-
-      // Check that tabs with linkUrl show the link icon
-      const externalLinkTab = screen.getByText('External Link').closest('[id^="nav_edit_tab_id_"]')
-      expect(externalLinkTab?.querySelector('[name="IconLink"]')).toBeInTheDocument()
-
-      const anotherLinkTab = screen.getByText('Another Link').closest('[id^="nav_edit_tab_id_"]')
-      expect(anotherLinkTab?.querySelector('[name="IconLink"]')).toBeInTheDocument()
-
-      // Check that tabs without linkUrl do not show the link icon
-      const regularTab = screen.getByText('Regular Tab').closest('[id^="nav_edit_tab_id_"]')
-      expect(regularTab?.querySelector('[name="IconLink"]')).not.toBeInTheDocument()
-    })
+    const gradesTab = screen.getByText('Grades').closest('[id^="nav_edit_tab_id_"]')
+    expect(gradesTab?.querySelector('[name="IconLink"]')).not.toBeInTheDocument()
   })
 
   it('handles keyboard space key on menu trigger', async () => {
@@ -355,10 +361,11 @@ describe('CourseNavigationSettings', () => {
       expect.arrayContaining([expect.objectContaining({id: expect.anything()})]),
     )
 
-    // Check that hidden tabs are marked correctly
+    // Check that hidden tabs are marked correctly (Discussions, Quizzes, Disabled Link)
     const call = onSubmit.mock.calls[0][0]
     const hiddenTabs = call.filter((tab: any) => tab.hidden === true)
-    expect(hiddenTabs.length).toBeGreaterThan(0)
+    expect(hiddenTabs).toHaveLength(3)
+    expect(hiddenTabs.map((t: any) => t.id)).toEqual(expect.arrayContaining([8, 9, 102]))
   })
 
   describe('Accessibility', () => {
@@ -569,16 +576,163 @@ describe('CourseNavigationSettings', () => {
     })
   })
 
+  describe('Delete functionality', () => {
+    it('shows delete option only for link tabs', async () => {
+      render(<CourseNavigationSettings onSubmit={vi.fn()} />)
+
+      // Open menu for regular tab (not a link)
+      const assignmentsTab = screen.getByText('Assignments').closest('[id^="nav_edit_tab_id_"]')
+      const regularSettingsButton = assignmentsTab?.querySelector('button[type="button"]')
+
+      if (regularSettingsButton) {
+        await userEvent.click(regularSettingsButton)
+
+        expect(screen.getByText('Disable')).toBeInTheDocument()
+        expect(screen.getByText('Move')).toBeInTheDocument()
+        expect(screen.queryByText('Delete')).not.toBeInTheDocument()
+
+        // Close menu
+        await userEvent.keyboard('{Escape}')
+      }
+
+      // Open menu for link tab
+      const linkTab = screen.getByText('External Link').closest('[id^="nav_edit_tab_id_"]')
+      const linkSettingsButton = linkTab?.querySelector('button[type="button"]')
+
+      if (linkSettingsButton) {
+        await userEvent.click(linkSettingsButton)
+
+        expect(screen.getByText('Disable')).toBeInTheDocument()
+        expect(screen.getByText('Move')).toBeInTheDocument()
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      }
+    })
+
+    it('deletes link tab from enabled list when delete is clicked', async () => {
+      render(<CourseNavigationSettings onSubmit={vi.fn()} />)
+
+      // Verify tab is present initially
+      expect(screen.getByText('External Link')).toBeInTheDocument()
+
+      // Open menu and click delete
+      const linkTab = screen.getByText('External Link').closest('[id^="nav_edit_tab_id_"]')
+      const settingsButton = linkTab?.querySelector('button[type="button"]')
+
+      if (settingsButton) {
+        await userEvent.click(settingsButton)
+
+        const deleteMenuItem = screen.getByText('Delete')
+        await userEvent.click(deleteMenuItem)
+
+        // Tab should be removed from the DOM
+        expect(screen.queryByText('External Link')).not.toBeInTheDocument()
+
+        // Other tabs should still be present
+        expect(screen.getByText('Assignments')).toBeInTheDocument()
+        expect(screen.getByText('Grades')).toBeInTheDocument()
+        expect(screen.getByText('Home')).toBeInTheDocument()
+      }
+    })
+
+    it('deletes link tab from disabled list when delete is clicked', async () => {
+      render(<CourseNavigationSettings onSubmit={vi.fn()} />)
+
+      // Verify disabled link is present
+      expect(screen.getByText('Disabled Link')).toBeInTheDocument()
+
+      // Open menu and click delete
+      const linkTab = screen.getByText('Disabled Link').closest('[id^="nav_edit_tab_id_"]')
+      const settingsButton = linkTab?.querySelector('button[type="button"]')
+
+      if (settingsButton) {
+        await userEvent.click(settingsButton)
+
+        const deleteMenuItem = screen.getByText('Delete')
+        await userEvent.click(deleteMenuItem)
+
+        // Tab should be removed from the DOM
+        expect(screen.queryByText('Disabled Link')).not.toBeInTheDocument()
+      }
+    })
+
+    it('saves correctly after deleting a link tab', async () => {
+      const onSubmit = vi.fn()
+      render(<CourseNavigationSettings onSubmit={onSubmit} />)
+
+      // Delete "External Link" (id: 101)
+      const linkTab = screen.getByText('External Link').closest('[id^="nav_edit_tab_id_"]')
+      const settingsButton = linkTab?.querySelector('button[type="button"]')
+
+      if (settingsButton) {
+        await userEvent.click(settingsButton)
+
+        const deleteMenuItem = screen.getByText('Delete')
+        await userEvent.click(deleteMenuItem)
+      }
+
+      // Click save button
+      const saveButton = screen.getByRole('button', {name: 'Save'})
+      await userEvent.click(saveButton)
+
+      // Verify onSubmit called without the deleted tab
+      expect(onSubmit).toHaveBeenCalledWith([
+        {id: 0}, // Home
+        {id: 3}, // Assignments
+        {id: 4}, // Grades
+        {id: 8, hidden: true}, // Discussions
+        {id: 9, hidden: true}, // Quizzes
+        {id: 102, hidden: true}, // Disabled Link
+        // id: 101 (External Link) should NOT be present
+      ])
+
+      // Verify deleted tab is not in the save data
+      const savedTabs = onSubmit.mock.calls[0][0]
+      expect(savedTabs.find((t: any) => t.id === 101)).toBeUndefined()
+    })
+
+    it('deletes multiple link tabs', async () => {
+      render(<CourseNavigationSettings onSubmit={vi.fn()} />)
+
+      // Delete first link tab (External Link - enabled)
+      const firstLinkTab = screen.getByText('External Link').closest('[id^="nav_edit_tab_id_"]')
+      const firstSettingsButton = firstLinkTab?.querySelector('button[type="button"]')
+
+      if (firstSettingsButton) {
+        await userEvent.click(firstSettingsButton)
+        const deleteMenuItem = screen.getByText('Delete')
+        await userEvent.click(deleteMenuItem)
+      }
+
+      // Delete second link tab (Disabled Link - disabled)
+      const secondLinkTab = screen.getByText('Disabled Link').closest('[id^="nav_edit_tab_id_"]')
+      const secondSettingsButton = secondLinkTab?.querySelector('button[type="button"]')
+
+      if (secondSettingsButton) {
+        await userEvent.click(secondSettingsButton)
+        const deleteMenuItem = screen.getByText('Delete')
+        await userEvent.click(deleteMenuItem)
+      }
+
+      // Both link tabs should be removed
+      expect(screen.queryByText('External Link')).not.toBeInTheDocument()
+      expect(screen.queryByText('Disabled Link')).not.toBeInTheDocument()
+
+      // Regular tabs should still be present
+      expect(screen.getByText('Assignments')).toBeInTheDocument()
+      expect(screen.getByText('Grades')).toBeInTheDocument()
+    })
+  })
+
   describe('User Journey Tests', () => {
     it('moves tab from enabled to disabled and saves with correct data structure', async () => {
       const onSubmit = vi.fn()
       render(<CourseNavigationSettings onSubmit={onSubmit} />)
 
-      // Simulate drag operation from enabled to disabled (moving Assignments instead of Home)
+      // Simulate drag operation from enabled to disabled (moving Grades)
       triggerMockDragEnd({
-        draggableId: 'tab-3',
+        draggableId: 'tab-4',
         type: 'DEFAULT',
-        source: {droppableId: 'enabled-tabs', index: 1},
+        source: {droppableId: 'enabled-tabs', index: 2},
         destination: {droppableId: 'disabled-tabs', index: 1},
       })
 
@@ -589,8 +743,12 @@ describe('CourseNavigationSettings', () => {
       // Verify onSubmit called with correct data structure
       expect(onSubmit).toHaveBeenCalledWith([
         {id: 0}, // Home remains enabled (immovable)
-        {id: 8, hidden: true}, // previously disabled tab
-        {id: 3, hidden: true}, // newly disabled tab (Assignments)
+        {id: 3}, // Assignments remains enabled
+        {id: 101}, // External Link remains enabled
+        {id: 8, hidden: true}, // Discussions (previously disabled)
+        {id: 4, hidden: true}, // Grades (newly disabled)
+        {id: 9, hidden: true}, // Quizzes (previously disabled)
+        {id: 102, hidden: true}, // Disabled Link (previously disabled)
       ])
     })
 
@@ -598,11 +756,11 @@ describe('CourseNavigationSettings', () => {
       const onSubmit = vi.fn()
       render(<CourseNavigationSettings onSubmit={onSubmit} />)
 
-      // Simulate reordering within enabled tabs (move assignments before home)
+      // Simulate reordering within enabled tabs (move Grades before Home)
       triggerMockDragEnd({
-        draggableId: 'tab-3',
+        draggableId: 'tab-4',
         type: 'DEFAULT',
-        source: {droppableId: 'enabled-tabs', index: 1},
+        source: {droppableId: 'enabled-tabs', index: 2},
         destination: {droppableId: 'enabled-tabs', index: 0},
       })
 
@@ -612,9 +770,13 @@ describe('CourseNavigationSettings', () => {
 
       // Verify onSubmit called with correct reordered data
       expect(onSubmit).toHaveBeenCalledWith([
-        {id: 3}, // moved to first position
-        {id: 0}, // moved to second position
-        {id: 8, hidden: true}, // disabled tab unchanged
+        {id: 4}, // Grades moved to first position
+        {id: 0}, // Home moved to second position
+        {id: 3}, // Assignments at third position
+        {id: 101}, // External Link at fourth position
+        {id: 8, hidden: true}, // Discussions (disabled)
+        {id: 9, hidden: true}, // Quizzes (disabled)
+        {id: 102, hidden: true}, // Disabled Link (disabled)
       ])
     })
 
@@ -622,9 +784,9 @@ describe('CourseNavigationSettings', () => {
       const onSubmit = vi.fn()
       render(<CourseNavigationSettings onSubmit={onSubmit} />)
 
-      // Find and click the settings button for assignments tab (movable enabled tab)
-      const assignmentsTab = screen.getByText('Assignments').closest('[id^="nav_edit_tab_id_"]')
-      const settingsButton = assignmentsTab?.querySelector('button[type="button"]')
+      // Find and click the settings button for Grades tab (movable enabled tab)
+      const gradesTab = screen.getByText('Grades').closest('[id^="nav_edit_tab_id_"]')
+      const settingsButton = gradesTab?.querySelector('button[type="button"]')
 
       if (settingsButton) {
         await userEvent.click(settingsButton)
@@ -635,7 +797,7 @@ describe('CourseNavigationSettings', () => {
 
         // Verify tab moved to disabled section
         const disabledSection = screen.getByTestId('droppable-disabled-tabs')
-        expect(disabledSection).toHaveTextContent('Assignments')
+        expect(disabledSection).toHaveTextContent('Grades')
       }
 
       // Click save and verify correct data structure
@@ -644,8 +806,12 @@ describe('CourseNavigationSettings', () => {
 
       expect(onSubmit).toHaveBeenCalledWith([
         {id: 0}, // Home remains enabled (immovable)
-        {id: 8, hidden: true}, // originally disabled tab (remains in original position)
-        {id: 3, hidden: true}, // newly disabled tab (appended to end of disabled list)
+        {id: 3}, // Assignments remains enabled
+        {id: 101}, // External Link remains enabled
+        {id: 8, hidden: true}, // Discussions (originally disabled)
+        {id: 9, hidden: true}, // Quizzes (originally disabled)
+        {id: 102, hidden: true}, // Disabled Link (originally disabled)
+        {id: 4, hidden: true}, // Grades (newly disabled, appended to end)
       ])
     })
   })

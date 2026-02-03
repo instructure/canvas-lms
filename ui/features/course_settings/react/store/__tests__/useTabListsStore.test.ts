@@ -590,4 +590,20 @@ describe('useTabListsStore', () => {
       expect(newTab.args).toEqual(['https://test.com'])
     })
   })
+
+  describe('deleteTab', () => {
+    it('should remove tab from enabled list', () => {
+      const {deleteTab} = useTabListsStore.getState()
+      deleteTab('2') // Delete "Assignments"
+      const state = useTabListsStore.getState()
+      expect(state.enabledTabs.map(t => t.externalId)).toEqual([1, 3, 'context_external_tool_1'])
+    })
+
+    it('should remove tab from disabled list', () => {
+      const {deleteTab} = useTabListsStore.getState()
+      deleteTab('4') // Delete "Grades"
+      const state = useTabListsStore.getState()
+      expect(state.disabledTabs.map(t => t.externalId)).toEqual([5, 'context_external_tool_2'])
+    })
+  })
 })
