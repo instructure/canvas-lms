@@ -30,6 +30,7 @@ describe "student dashboard section specific tests", :ignore_js_errors do
     section_specific_announcements_setup # Creates 7 section specific announcements
     section_specific_assignments_setup # Creates 7 section specific assignments
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@multi_stu_sec1, @multi_stu_sec2)
   end
 
   context "as student" do
@@ -84,6 +85,7 @@ describe "student dashboard section specific tests", :ignore_js_errors do
   context "as observer" do
     before :once do
       observer_w_section_specific_course_setup
+      enable_widget_dashboard_for(@multi_section_observer)
     end
 
     before do

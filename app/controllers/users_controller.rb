@@ -419,6 +419,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    @current_user.reload if @domain_root_account&.feature_enabled?(:widget_dashboard)
     observed_users_list = observed_users(@current_user, session)
     if should_show_widget_dashboard?
       js_bundle :widget_dashboard
@@ -473,7 +474,8 @@ class UsersController < ApplicationController
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
 
     # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
-    @current_user.reload
+    # (skip if already reloaded above for widget_dashboard)
+    @current_user.reload unless @domain_root_account&.feature_enabled?(:widget_dashboard)
     k5_disabled = k5_disabled?
     k5_user = k5_user?(check_disabled: false)
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
@@ -3560,11 +3562,8 @@ class UsersController < ApplicationController
     flag = @domain_root_account&.lookup_feature_flag(:widget_dashboard)
     return false unless flag&.enabled? || flag&.can_override?
 
-    # Check if feature is locked on (cannot be overridden)
-    force_on = flag.enabled? && !flag.can_override?
-
-    # If not forced on, check user preference (pass flag to avoid re-lookup)
-    return false unless force_on || @current_user.prefers_widget_dashboard?(@domain_root_account, flag)
+    # Check user preference (pass flag to avoid re-lookup)
+    return false unless @current_user.prefers_widget_dashboard?(@domain_root_account, flag)
 
     if @current_user.observer_enrollments.active.any?
       # only show widget dashboard if observer is actively observing a student

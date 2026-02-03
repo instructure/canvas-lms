@@ -31,6 +31,7 @@ describe "student dashboard", :ignore_js_errors do
     dashboard_student_setup
     dashboard_pending_enrollment_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   before do
@@ -104,6 +105,7 @@ describe "student dashboard", :ignore_js_errors do
   context "Past or inactive course filtering" do
     before :once do
       dashboard_inactive_courses_setup # enrolls @student_w_inactive in only inactive or concluded courses
+      enable_widget_dashboard_for(@student_w_inactive)
     end
 
     it "displays only active courses" do
@@ -120,6 +122,7 @@ describe "student dashboard", :ignore_js_errors do
 
     it "displays only active courses for observed courses and students" do
       observer_w_inactive_courses_setup # enrolls in inactive courses and @course1
+      enable_widget_dashboard_for(@observer)
       user_session(@observer)
       go_to_dashboard
 

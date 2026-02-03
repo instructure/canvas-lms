@@ -31,6 +31,7 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
     dashboard_course_submission_setup
     dashboard_course_grade_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   before do

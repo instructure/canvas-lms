@@ -33,6 +33,7 @@ describe "Student dashboard as observer", :ignore_js_errors do
     observed_student_setup # created second student with submissions in course2
     observer_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@observer)
   end
 
   before do
