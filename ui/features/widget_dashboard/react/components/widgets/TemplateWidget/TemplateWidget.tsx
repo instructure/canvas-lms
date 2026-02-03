@@ -134,6 +134,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
         }
         widget={widget}
         config={config}
+        isStacked={!isDesktop}
         onSelect={handleMenuSelect}
       />
       <IconButton
@@ -214,7 +215,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                 {headerActions && (
                   <Flex.Item padding="x-small 0 x-small x-small">{headerActions}</Flex.Item>
                 )}
-                {isEditMode && isDesktop && (
+                {isEditMode && (
                   <Flex.Item padding="x-small 0 x-small x-small">{editModeActions}</Flex.Item>
                 )}
               </Flex>
@@ -226,7 +227,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                   </Heading>
                 </Flex.Item>
                 {headerActions && <Flex.Item shouldGrow={false}>{headerActions}</Flex.Item>}
-                {isEditMode && isDesktop && (
+                {isEditMode && (
                   <Flex.Item margin="0 0 0 small" shouldGrow={false}>
                     {editModeActions}
                   </Flex.Item>

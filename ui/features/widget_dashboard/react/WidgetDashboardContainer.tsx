@@ -43,7 +43,7 @@ const I18n = createI18nScope('widget_dashboard')
 const WidgetDashboardContainer: React.FC = () => {
   const {observedUsersList, canAddObservee, currentUser, currentUserRoles, dashboardFeatures} =
     useWidgetDashboard()
-  const {isMobile, isDesktop} = useResponsiveContext()
+  const {isMobile} = useResponsiveContext()
   const {isEditMode, isDirty, isSaving, saveError, enterEditMode, exitEditMode, clearError} =
     useWidgetDashboardEdit()
   const {config, resetConfig, saveLayout} = useWidgetLayout()
@@ -114,7 +114,7 @@ const WidgetDashboardContainer: React.FC = () => {
                 </Button>
               </Flex.Item>
             )}
-            {isCustomizationEnabled && isDesktop && (
+            {isCustomizationEnabled && (
               <>
                 {isEditMode ? (
                   <>
