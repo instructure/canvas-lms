@@ -67,7 +67,7 @@ interface SubmissionStatusColors {
 }
 
 const SUBMISSION_STATUS_COLORS: SubmissionStatusColors = {
-  blue: {background: '#E0EBF5', textColor: '#2B7ABC'},
+  blue: {background: '#E0EBF5', textColor: '#1A5A8E'},
   red: {background: '#FCE4E5', textColor: '#E62429'},
   orange: {background: '#FCE5D9', textColor: '#CF4A00'},
   green: {background: '#DCEEE4', textColor: '#03893D'},
