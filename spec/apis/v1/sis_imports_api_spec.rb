@@ -1142,6 +1142,50 @@ describe SisImportsApiController, type: :request do
     expect(json["errors_attachment"]["id"]).to eq batch.errors_attachment.id
   end
 
+  describe "pre-attachment workflow" do
+    it "supports direct upload to the file store in a separate request" do
+      json = api_call(:post,
+                      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                      { controller: "sis_imports_api",
+                        action: "create",
+                        format: "json",
+                        account_id: @account.to_param },
+                      { import_type: "instructure_csv",
+                        pre_attachment: { name: "test_user_1.csv", size: 159 } })
+
+      expect(json["pre_attachment"]).to be_present
+      expect(json["pre_attachment"]["upload_url"]).to be_present
+      expect(json["pre_attachment"]["upload_params"]).to be_present
+
+      batch = SisBatch.find(json["id"])
+      expect(batch.attachment).to be_nil
+      expect(batch.workflow_state).to eq "initializing"
+
+      # simulate upload success
+      attachment = attachment_model(context: batch,
+                                    folder: nil,
+                                    uploaded_data: fixture_file_upload("sis/test_user_1.csv", "text/csv"))
+      batch.file_upload_success_callback(attachment)
+
+      expect(batch.workflow_state).to eq "created"
+      expect(batch.attachment).to eq attachment
+    end
+
+    it "rejects attachment and pre_attachment parameters provided together" do
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/sis_imports.json",
+               { controller: "sis_imports_api",
+                 action: "create",
+                 format: "json",
+                 account_id: @account.id.to_s },
+               { import_type: "instructure_csv",
+                 attachment: fixture_file_upload("/sis/test_user_1.csv", "text/csv"),
+                 pre_attachment: { name: "test_user_1.csv" } },
+               {},
+               { expected_status: 400 })
+    end
+  end
+
   shared_examples_for "disable_adding_uuid_verifier_in_api" do
     it "verifier on errors_attachment" do
       batch = @account.sis_batches.create!

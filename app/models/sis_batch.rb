@@ -74,11 +74,13 @@ class SisBatch < ActiveRecord::Base
       batch.user = user
       batch.save
 
-      att = Attachment.create_data_attachment(batch, file_obj, file_obj.original_filename)
-      batch.attachment = att
+      if file_obj
+        att = Attachment.create_data_attachment(batch, file_obj, file_obj.original_filename)
+        batch.attachment = att
+      end
 
       yield batch if block_given?
-      batch.workflow_state = :created
+      batch.workflow_state = :created if att
       batch.save!
 
       batch
@@ -134,6 +136,23 @@ class SisBatch < ActiveRecord::Base
 
   def process
     self.class.queue_job_for_account(account)
+  end
+
+  def quota_context
+    account
+  end
+
+  def file_upload_success_callback(attachment)
+    if attachment&.file_state == "available"
+      self.workflow_state = :created
+      self.attachment = attachment
+      save!
+      process
+    else
+      self.workflow_state = :failed
+      data[:error_message] = "File upload failed"
+      save!
+    end
   end
 
   def enable_diffing(data_set_identifier, is_remaster)

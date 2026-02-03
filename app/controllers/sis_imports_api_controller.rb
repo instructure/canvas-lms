@@ -460,12 +460,14 @@ class SisImportsApiController < ApplicationController
   #   will be assumed to be so. Can be part of the query string.
   #
   # @argument attachment
-  #   There are two ways to post SIS import data - either via a
-  #   multipart/form-data form-field-style attachment, or via a non-multipart
-  #   raw post request.
+  #   There are three ways to post SIS import data:
+  #   1. As a multipart/form-data form field named +attachment+
+  #   2. As a raw post with a Content-Type of application/zip or application/octet-stream
+  #   3. Using the {file:file.file_uploads.html File Upload} process, which can be more reliable
+  #      for large files. Use the +pre_attachment[name]+ argument to start that flow.
   #
-  #   'attachment' is required for multipart/form-data style posts. Assumed to
-  #   be SIS data from a file upload form field named 'attachment'.
+  #   +attachment+ is required for multipart/form-data style posts. Assumed to
+  #   be SIS data from a file upload form field named +attachment+.
   #
   #   Examples:
   #     curl -F attachment=@<filename> -H "Authorization: Bearer <token>" \
@@ -495,6 +497,15 @@ class SisImportsApiController < ApplicationController
   #   If the attachment is a zip file, the uncompressed file(s) cannot be 100x larger than the zip, or the import will fail.
   #   For example, if the zip file is 1KB but the total size of the uncompressed file(s) is 100KB or greater the import will
   #   fail. There is a hard cap of 50 GB.
+  #
+  # @argument pre_attachment[name] [String]
+  #   The name of the file to be uploaded in a separate request via the
+  #   {file:file.file_uploads.html File Upload} workflow. Do not supply +attachment+
+  #   when using this option. This option decouples the file upload from the
+  #   SIS import request, which can improve reliability with larger files.
+  #
+  # @argument pre_attachment[*] [String]
+  #   Other file upload properties; see {file:file.file_uploads.html File Upload Documentation}
   #
   # @argument extension [String]
   #   Recommended for raw post request style imports. This field will be used to
@@ -601,7 +612,9 @@ class SisImportsApiController < ApplicationController
       end
 
       file_obj = nil
-      if params.key?(:attachment)
+      if params.key?(:pre_attachment)
+        return render json: { error: true, error_message: "Cannot specify both attachment and pre_attachment" }, status: :bad_request if params.key?(:attachment)
+      elsif params.key?(:attachment)
         file_obj = params[:attachment]
       elsif request.media_type == "multipart/form-data"
         # don't interpret the form itself as a SIS batch
@@ -697,14 +710,18 @@ class SisImportsApiController < ApplicationController
         end
       end
 
-      batch.process
+      if batch.attachment
+        batch.process
 
-      unless api_request?
-        @account.current_sis_batch_id = batch.id
-        @account.save
+        unless api_request?
+          @account.current_sis_batch_id = batch.id
+          @account.save
+        end
+      else
+        attachment_preflight = api_attachment_preflight(batch, request, params: params[:pre_attachment], check_quota: false, return_json: true)
       end
 
-      render json: sis_import_json(batch, @current_user, session)
+      render json: sis_import_json(batch, @current_user, session, attachment_preflight:)
     end
   end
 

@@ -1327,6 +1327,22 @@ describe FilesController do
       get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
       expect(json_parse.fetch("message")).to eq "file size exceeds quota limits"
     end
+
+    it "kicks off a SIS batch" do
+      account = Account.create!
+      batch = SisBatch.create!(account:,
+                               data: { import_type: "instructure_csv" },
+                               workflow_state: "initializing")
+      attachment = Attachment.create!(context: batch,
+                                      filename: "test.csv",
+                                      file_state: "deleted",
+                                      uploaded_data: StringIO.new("test"))
+
+      get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
+
+      expect(response).to have_http_status(:ok)
+      expect(batch.reload).to be_created
+    end
   end
 
   describe "GET 'show_relative'" do
@@ -2397,6 +2413,30 @@ describe FilesController do
         attachment = assigns[:attachment]
         expect(attachment.root_account_id).to eq account.global_id
       end
+    end
+
+    it "accepts SisBatch as valid context and triggers callback" do
+      account = Account.create!
+      user = User.create!(name: "me")
+      batch = SisBatch.create!(account:, data: { import_type: "instructure_csv" }, workflow_state: "initializing")
+
+      expect_any_instantiation_of(batch).to receive(:file_upload_success_callback).and_call_original
+
+      post "api_capture", params: {
+        user_id: user.id,
+        context_type: "SisBatch",
+        context_id: batch.id,
+        token: @token,
+        name: "test.csv",
+        size: 1024,
+        quota_exempt: true,
+        content_type: "text/csv",
+        instfs_uuid: "test-uuid",
+        sha512: "test-hash"
+      }
+
+      expect(response).to have_http_status(:created)
+      expect(batch.reload).to be_created
     end
   end
 
