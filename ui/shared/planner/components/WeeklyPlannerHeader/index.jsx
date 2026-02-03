@@ -203,7 +203,7 @@ export class WeeklyPlannerHeader extends Component {
         if (focusTarget === 'missing-items') {
           this.props.toggleMissing({forceExpanded: true})
         }
-        this.props.scrollToToday({focusTarget, isWeekly: true})
+        this.props.scrollToToday({focusTarget, isWeekly: true, autoFocus: !!focusTarget})
       }, 0) // need to wait until the k5Dashboard tab is active
     }
   }

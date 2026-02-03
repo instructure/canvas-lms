@@ -248,7 +248,7 @@ export class PlannerHeader extends Component {
 
   handleTodayClick = () => {
     if (this.props.scrollToToday) {
-      this.props.scrollToToday()
+      this.props.scrollToToday({autoFocus: true})
     }
   }
 

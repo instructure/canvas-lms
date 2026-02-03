@@ -121,7 +121,13 @@ describe('WeeklyPlannerHeader', () => {
     expect(callback).not.toHaveBeenCalled()
 
     rerender(<WeeklyPlannerHeader {...props} visible={true} />)
-    await waitFor(() => expect(callback).toHaveBeenCalledWith({isWeekly: true}))
+    await waitFor(() =>
+      expect(callback).toHaveBeenCalledWith({
+        focusTarget: undefined,
+        isWeekly: true,
+        autoFocus: false,
+      }),
+    )
   })
 
   it('scrolls to today when it loads if already visible', async () => {
@@ -131,7 +137,13 @@ describe('WeeklyPlannerHeader', () => {
     expect(callback).not.toHaveBeenCalled()
 
     rerender(<WeeklyPlannerHeader {...props} weekLoaded={true} />)
-    await waitFor(() => expect(callback).toHaveBeenCalledWith({isWeekly: true}))
+    await waitFor(() =>
+      expect(callback).toHaveBeenCalledWith({
+        focusTarget: undefined,
+        isWeekly: true,
+        autoFocus: false,
+      }),
+    )
   })
 
   it('sends today as a focus target if passed via query param', async () => {
@@ -141,7 +153,11 @@ describe('WeeklyPlannerHeader', () => {
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     rerender(<WeeklyPlannerHeader {...props} visible={true} />)
     await waitFor(() =>
-      expect(callback).toHaveBeenCalledWith({focusTarget: 'today', isWeekly: true}),
+      expect(callback).toHaveBeenCalledWith({
+        focusTarget: 'today',
+        isWeekly: true,
+        autoFocus: true,
+      }),
     )
   })
 
@@ -153,7 +169,11 @@ describe('WeeklyPlannerHeader', () => {
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     rerender(<WeeklyPlannerHeader {...props} visible={true} />)
     await waitFor(() => {
-      expect(scrollToToday).toHaveBeenCalledWith({focusTarget: 'missing-items', isWeekly: true})
+      expect(scrollToToday).toHaveBeenCalledWith({
+        focusTarget: 'missing-items',
+        isWeekly: true,
+        autoFocus: true,
+      })
       expect(toggleMissing).toHaveBeenCalledWith({forceExpanded: true})
     })
   })
@@ -184,31 +204,19 @@ describe('processFocusTarget', () => {
       'http://localhost?first=yes&focusTarget=not-a-real-one&last=no',
     )
     expect(processFocusTarget()).toBe('not-a-real-one')
-    expect(replaceStateSpy).toHaveBeenCalledWith(
-      {},
-      null,
-      'http://localhost/?first=yes&last=no',
-    )
+    expect(replaceStateSpy).toHaveBeenCalledWith({}, null, 'http://localhost/?first=yes&last=no')
   })
 
   it('returns undefined if no focusTarget query param was present', () => {
     window.history.pushState({}, null, 'http://localhost?something=else')
     expect(processFocusTarget()).toBe(undefined)
-    expect(replaceStateSpy).toHaveBeenCalledWith(
-      {},
-      null,
-      'http://localhost/?something=else',
-    )
+    expect(replaceStateSpy).toHaveBeenCalledWith({}, null, 'http://localhost/?something=else')
   })
 
   it('handles urls with no query params', () => {
     window.history.pushState({}, null, 'http://localhost/courses/5#schedule')
     expect(processFocusTarget()).toBe(undefined)
-    expect(replaceStateSpy).toHaveBeenCalledWith(
-      {},
-      null,
-      'http://localhost/courses/5#schedule',
-    )
+    expect(replaceStateSpy).toHaveBeenCalledWith({}, null, 'http://localhost/courses/5#schedule')
   })
 })
 

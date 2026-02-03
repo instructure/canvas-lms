@@ -140,7 +140,7 @@ export class PlannerApp extends Component {
       this.afterLayoutChange()
     }
     if (!this.props.isLoading && prevProps.isLoading) {
-      this.props.scrollToToday({isWeekly: this.props.isWeekly})
+      this.props.scrollToToday({isWeekly: this.props.isWeekly, autoFocus: false})
     }
   }
 
