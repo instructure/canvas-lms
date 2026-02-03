@@ -36,6 +36,7 @@ interface WidgetContextMenuProps {
   trigger: React.ReactElement
   widget: Widget
   config: WidgetConfig
+  isStacked?: boolean
   onSelect?: (action: string) => void
 }
 
@@ -56,6 +57,7 @@ const WidgetContextMenu: React.FC<WidgetContextMenuProps> = ({
   trigger,
   widget,
   config,
+  isStacked = false,
   onSelect,
 }) => {
   const handleSelect = (action: string) => {
@@ -63,6 +65,38 @@ const WidgetContextMenu: React.FC<WidgetContextMenuProps> = ({
   }
 
   const constraints = getWidgetConstraints(widget, config)
+
+  if (isStacked) {
+    const isAbsoluteFirst = constraints.isInLeftColumn && constraints.isFirstInColumn
+    const isAbsoluteLast = constraints.isInRightColumn && constraints.isLastInColumn
+
+    const handleMoveUp = () => {
+      if (constraints.isInRightColumn && constraints.isFirstInColumn) {
+        handleSelect('move-up-cross')
+      } else {
+        handleSelect('move-up')
+      }
+    }
+
+    const handleMoveDown = () => {
+      if (constraints.isInLeftColumn && constraints.isLastInColumn) {
+        handleSelect('move-down-cross')
+      } else {
+        handleSelect('move-down')
+      }
+    }
+
+    return (
+      <Menu placement="bottom start" trigger={trigger}>
+        <Menu.Item onSelect={handleMoveUp} disabled={isAbsoluteFirst}>
+          <IconMoveUpLine /> {I18n.t('Move up')}
+        </Menu.Item>
+        <Menu.Item onSelect={handleMoveDown} disabled={isAbsoluteLast}>
+          <IconMoveDownLine /> {I18n.t('Move down')}
+        </Menu.Item>
+      </Menu>
+    )
+  }
 
   return (
     <Menu placement="bottom start" trigger={trigger}>

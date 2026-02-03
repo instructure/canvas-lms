@@ -32,12 +32,6 @@ import AddWidgetModal from './AddWidgetModal/AddWidgetModal'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const sortWidgetsForStacking = (widgets: Widget[]): Widget[] => {
-  return [...widgets].sort((a, b) => {
-    return a.position.relative - b.position.relative
-  })
-}
-
 const widgetsAsColumns = (widgets: Widget[]): Widget[][] => {
   const inColumns = widgets.reduce(
     (acc, val) => {
@@ -63,7 +57,6 @@ interface WidgetGridProps {
 const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => {
   const {matches} = useResponsiveContext()
   const {moveWidgetToPosition} = useWidgetLayout()
-  const sortedWidgets = useMemo(() => sortWidgetsForStacking(config.widgets), [config.widgets])
   const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [addPosition, setAddPosition] = useState<{col: number; row: number} | null>(null)
@@ -175,6 +168,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                       data-testid="widget-column-1"
                       width="100%"
                     >
+                      {renderAddWidgetPlaceholder(1, 1)}
                       {widgetsByColumn[0].map((widget, index) => (
                         <React.Fragment key={widget.id}>
                           <Draggable draggableId={widget.id} index={index}>
@@ -191,7 +185,6 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                           {renderAddWidgetPlaceholder(1, widget.position.row + 1)}
                         </React.Fragment>
                       ))}
-                      {widgetsByColumn[0].length === 0 && renderAddWidgetPlaceholder(1, 1)}
                       {provided.placeholder}
                     </Flex>
                   </div>
@@ -224,6 +217,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                       data-testid="widget-column-2"
                       width="100%"
                     >
+                      {renderAddWidgetPlaceholder(2, 1)}
                       {widgetsByColumn[1].map((widget, index) => (
                         <React.Fragment key={widget.id}>
                           <Draggable draggableId={widget.id} index={index}>
@@ -240,7 +234,6 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
                           {renderAddWidgetPlaceholder(2, widget.position.row + 1)}
                         </React.Fragment>
                       ))}
-                      {widgetsByColumn[1].length === 0 && renderAddWidgetPlaceholder(2, 1)}
                       {provided.placeholder}
                     </Flex>
                   </div>
@@ -263,22 +256,103 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
     )
   }
 
-  const renderTabletStack = () => (
-    <Flex data-testid="widget-columns" width="100%">
-      <Flex.Item
-        data-testid="widget-column-tablet"
-        overflowX="visible"
-        overflowY="visible"
-        width="100%"
-      >
-        <Flex direction="column" gap="x-small" width="100%">
-          {sortedWidgets.map(widget => renderWidgetInView(widget))}
-        </Flex>
-      </Flex.Item>
-    </Flex>
-  )
+  const renderColumnSection = (
+    columnWidgets: Widget[],
+    columnNumber: number,
+    provided?: any,
+    showTopPlaceholder = true,
+  ) => {
+    const content = isEditMode ? (
+      <>
+        {showTopPlaceholder && renderAddWidgetPlaceholder(columnNumber, 1)}
+        {columnWidgets.map((widget, index) => (
+          <React.Fragment key={widget.id}>
+            <Draggable draggableId={widget.id} index={index}>
+              {draggableProvided => (
+                <div
+                  ref={draggableProvided.innerRef}
+                  {...draggableProvided.draggableProps}
+                  data-testid={`widget-container-${widget.id}`}
+                >
+                  {renderWidget(widget, draggableProvided.dragHandleProps)}
+                </div>
+              )}
+            </Draggable>
+            {renderAddWidgetPlaceholder(columnNumber, widget.position.row + 1)}
+          </React.Fragment>
+        ))}
+        {provided?.placeholder}
+      </>
+    ) : (
+      columnWidgets.map(widget => renderWidgetInView(widget))
+    )
 
-  const renderMobileStack = renderTabletStack
+    return (
+      <Flex direction="column" gap="x-small" width="100%">
+        {content}
+      </Flex>
+    )
+  }
+
+  const renderStackedLayout = () => {
+    const stackedContent = (
+      <Flex data-testid="widget-columns" direction="column" gap="small" width="100%">
+        <Flex.Item
+          data-testid="widget-column-1-stacked"
+          overflowX="visible"
+          overflowY="visible"
+          width="100%"
+        >
+          {isEditMode ? (
+            <Droppable droppableId="column-1">
+              {provided => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{minHeight: '50px'}}
+                >
+                  {renderColumnSection(widgetsByColumn[0], 1, provided)}
+                </div>
+              )}
+            </Droppable>
+          ) : (
+            renderColumnSection(widgetsByColumn[0], 1)
+          )}
+        </Flex.Item>
+        <Flex.Item
+          data-testid="widget-column-2-stacked"
+          overflowX="visible"
+          overflowY="visible"
+          width="100%"
+        >
+          {isEditMode ? (
+            <Droppable droppableId="column-2">
+              {provided => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{minHeight: '50px'}}
+                >
+                  {renderColumnSection(widgetsByColumn[1], 2, provided, false)}
+                </div>
+              )}
+            </Droppable>
+          ) : (
+            renderColumnSection(widgetsByColumn[1], 2, undefined, false)
+          )}
+        </Flex.Item>
+      </Flex>
+    )
+
+    if (isEditMode) {
+      return <DragDropContext onDragEnd={handleDragEnd}>{stackedContent}</DragDropContext>
+    }
+
+    return stackedContent
+  }
+
+  const renderTabletStack = renderStackedLayout
+  const renderMobileStack = renderStackedLayout
 
   let gridContent
   if (matches.includes('mobile')) {

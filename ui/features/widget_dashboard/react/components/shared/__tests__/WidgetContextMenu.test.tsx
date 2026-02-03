@@ -65,6 +65,7 @@ describe('WidgetContextMenu', () => {
       ),
       widget: mockWidget,
       config: mockConfig,
+      isStacked: false,
       onSelect: vi.fn(),
       ...overrides,
     }
@@ -331,5 +332,137 @@ describe('WidgetContextMenu', () => {
 
     expect(onSelect).not.toHaveBeenCalledWith('move-down')
     expect(onSelect).not.toHaveBeenCalledWith('move-to-bottom')
+  })
+
+  describe('Stacked mode (mobile/tablet)', () => {
+    it('only shows Move up and Move down options', async () => {
+      const user = userEvent.setup()
+      setup(buildDefaultProps({isStacked: true}))
+
+      await user.click(screen.getByTestId('menu-trigger'))
+
+      expect(screen.getByText('Move up')).toBeInTheDocument()
+      expect(screen.getByText('Move down')).toBeInTheDocument()
+      expect(screen.queryByText('Move to top')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move to bottom')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move left top')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move left bottom')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move right top')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move right bottom')).not.toBeInTheDocument()
+    })
+
+    it('disables Move up for first widget in left column', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      setup(
+        buildDefaultProps({
+          isStacked: true,
+          widget: mockWidget,
+          onSelect,
+        }),
+      )
+
+      await user.click(screen.getByTestId('menu-trigger'))
+      await expect(user.click(screen.getByText('Move up'))).rejects.toThrow()
+      expect(onSelect).not.toHaveBeenCalled()
+    })
+
+    it('disables Move down for last widget in right column', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      setup(
+        buildDefaultProps({
+          isStacked: true,
+          widget: {
+            id: 'right-widget',
+            type: 'test',
+            position: {col: 2, row: 1, relative: 3},
+            title: 'Right Widget',
+          },
+          onSelect,
+        }),
+      )
+
+      await user.click(screen.getByTestId('menu-trigger'))
+      await expect(user.click(screen.getByText('Move down'))).rejects.toThrow()
+      expect(onSelect).not.toHaveBeenCalled()
+    })
+
+    it('fires move-up-cross when moving up from top of right column', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      setup(
+        buildDefaultProps({
+          isStacked: true,
+          widget: {
+            id: 'right-widget',
+            type: 'test',
+            position: {col: 2, row: 1, relative: 3},
+            title: 'Right Widget',
+          },
+          onSelect,
+        }),
+      )
+
+      await user.click(screen.getByTestId('menu-trigger'))
+      await user.click(screen.getByText('Move up'))
+
+      expect(onSelect).toHaveBeenCalledWith('move-up-cross')
+    })
+
+    it('fires move-down-cross when moving down from bottom of left column', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      setup(
+        buildDefaultProps({
+          isStacked: true,
+          widget: {
+            id: 'other-widget',
+            type: 'test',
+            position: {col: 1, row: 2, relative: 2},
+            title: 'Other Widget',
+          },
+          onSelect,
+        }),
+      )
+
+      await user.click(screen.getByTestId('menu-trigger'))
+      await user.click(screen.getByText('Move down'))
+
+      expect(onSelect).toHaveBeenCalledWith('move-down-cross')
+    })
+
+    it('fires normal move-up within a column', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      setup(
+        buildDefaultProps({
+          isStacked: true,
+          widget: {
+            id: 'other-widget',
+            type: 'test',
+            position: {col: 1, row: 2, relative: 2},
+            title: 'Other Widget',
+          },
+          onSelect,
+        }),
+      )
+
+      await user.click(screen.getByTestId('menu-trigger'))
+      await user.click(screen.getByText('Move up'))
+
+      expect(onSelect).toHaveBeenCalledWith('move-up')
+    })
+
+    it('fires normal move-down within a column', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      setup(buildDefaultProps({isStacked: true, onSelect}))
+
+      await user.click(screen.getByTestId('menu-trigger'))
+      await user.click(screen.getByText('Move down'))
+
+      expect(onSelect).toHaveBeenCalledWith('move-down')
+    })
   })
 })

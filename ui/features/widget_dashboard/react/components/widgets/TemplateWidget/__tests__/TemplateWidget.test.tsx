@@ -343,12 +343,12 @@ describe('TemplateWidget', () => {
       expect(screen.getByTestId('test-widget-remove-button')).toBeInTheDocument()
     })
 
-    it('does not show edit mode icons in mobile mode even when isEditMode is true', () => {
+    it('shows edit mode icons in mobile mode when isEditMode is true', () => {
       const props = buildDefaultProps({isEditMode: true})
       setup(props, <div>Test content</div>, ['mobile'])
 
-      expect(screen.queryByTestId('test-widget-drag-handle')).not.toBeInTheDocument()
-      expect(screen.queryByTestId('test-widget-remove-button')).not.toBeInTheDocument()
+      expect(screen.getByTestId('test-widget-drag-handle')).toBeInTheDocument()
+      expect(screen.getByTestId('test-widget-remove-button')).toBeInTheDocument()
     })
 
     it('shows context menu when drag handle is clicked', async () => {
