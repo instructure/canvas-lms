@@ -31,6 +31,7 @@ import type {
   LtiLaunchDefinition,
   LtiLaunchPlacement,
 } from '@canvas/select-content-dialog/jquery/select_content_dialog'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 import {
   AssetProcessorsAddModalState,
@@ -230,6 +231,11 @@ function AssetProcessorsAddModalBodyToolLaunch(
             showInvlidDeepLinkingResponse(tool)
             return
           }
+          showFlashAlert({
+            message: I18n.t('%{toolName} successfully added', {toolName: tool.name}),
+            type: 'success',
+            srOnly: true,
+          })
           close()
         },
         ready: close,
