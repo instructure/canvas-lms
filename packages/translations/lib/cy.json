@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Tynnu Dolen"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Dileu Cyfryngau Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Cyfnewid pob un"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Dangos pob un"
     },
-    "show_audio_options_b489926b": {
-        "message": "Dangos opsiynau sain"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Dangos opsiynau delwedd"
     },
     "show_link_options_545338fd": {
         "message": "Dangos opsiynau dolen"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Dangos opsiynau cyfryngau Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Dangos opsiynau fideo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Mae defnyddwyr sy''n gweld yn dda yn pori drwy dudalennau gwe yn gyflym, gan chwilio am benawdau mawr neu drwm. Mae defnyddwyr darllenydd sgrin yn dibynnu ar benawdau i ddeall y cyd-destun. Dylai penawdau ddefnyddio''r strwythur priodol."

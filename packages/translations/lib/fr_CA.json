@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Retirer le lien"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Supprimer Studio Media"
-    },
     "replace_all_d3d68b3": {
         "message": "Remplacer tout"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Tout afficher"
     },
-    "show_audio_options_b489926b": {
-        "message": "Afficher les options audio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Afficher les options d’image"
     },
     "show_link_options_545338fd": {
         "message": "Afficher les options de lien"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Afficher les options média de Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Afficher les options de vidéo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Les utilisateurs voyants parcourent rapidement les pages Web, à la recherche d’entêtes en gros caractères ou en caractères gras. Les utilisateurs de lecteurs d''écran comptent sur les entêtes pour une compréhension contextuelle. Les entêtes devraient utiliser la structure appropriée."

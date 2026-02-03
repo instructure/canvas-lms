@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Poista linkki"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Poista Studio‑media"
-    },
     "replace_all_d3d68b3": {
         "message": "Korvaa kaikki"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Näytä kaikki"
     },
-    "show_audio_options_b489926b": {
-        "message": "Näytä ääniasetukset"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Näytä kuva-asetukset"
     },
     "show_link_options_545338fd": {
         "message": "Näytä linkin asetukset"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Näytä studion mediavälineasetukset"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Näytä videoasetukset"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Näkevät käyttäjät selaavat verkkosivustoja nopeasti ja etsivät suuria tai lihavoituja otsikoita. Näytönlukijan käyttäjät nojaavat otsikkoihin ymmärtääkseen kontekstuaalisesti. Otsikoita pitäisi käyttää asianmukaisen rakenteen luomiseksi."

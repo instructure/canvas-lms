@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "إزالة الارتباط"
     },
-    "remove_studio_media_f913e502": {
-        "message": "إزالة وسائط Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "استبدال الكل"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "إظهار الكل"
     },
-    "show_audio_options_b489926b": {
-        "message": "إظهار خيارات الصوت"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "إظهار خيارات الصورة"
     },
     "show_link_options_545338fd": {
         "message": "إظهار خيارات الارتباطات"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "إظهار خيارات وسائط Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "إظهار خيارات الفيديو"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "يتصفح المستخدمون الذين يتمتعون بالقدرة على الإبصار صفحات الويب بشكل سريع، بحثًا عن عناوين كبيرة أو بخط عريض. ويعتمد مستخدمو قارئة الشاشة على الرؤوس لفهم السياق. يجب أن توظف الرؤوس البنية الملائمة."

@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Fjern link"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Fjern Studio-medier"
-    },
     "replace_all_d3d68b3": {
         "message": "Erstat alle"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Vis alle"
     },
-    "show_audio_options_b489926b": {
-        "message": "Vis lydindstillinger"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Vis billedindstillinger"
     },
     "show_link_options_545338fd": {
         "message": "Vis linkindstillinger"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Vis Studio-medieindstillinger"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Vis videoindstillinger"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Brugere, der er i stand til at se, gennemser websider hurtigt og leder efter store overskrifter. Skærmlæsere er afhængige af overskrifter for kontekstuel forståelse. Overskrifter bør anvende den rigtige struktur."

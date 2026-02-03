@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Odstrani povezavo"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Odstrani medij Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Zamenjaj vse"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Prikaži vse"
     },
-    "show_audio_options_b489926b": {
-        "message": "Prikaži možnosti zvoka"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Prikaži možnosti slike"
     },
     "show_link_options_545338fd": {
         "message": "Prikaži povezave na slike"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Prikaži medijske možnosti za Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Prikaži možnosti videoposnetka"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Slabovidni uporabniki hitro brskajo po spletnih straneh in iščejo velike ali krepko zapisane naslove. Uporabniki bralnikov zaslonov se za razumevanje konteksta zanašajo na glave. Pri glavah mora biti uporabljena pravilna zgradba."
