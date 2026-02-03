@@ -29,6 +29,7 @@ describe "student dashboard people widget", :ignore_js_errors do
     dashboard_student_setup # Creates 2 courses and a student enrolled in both
     dashboard_people_setup # Add one more teacher and TA to course 1
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   before do

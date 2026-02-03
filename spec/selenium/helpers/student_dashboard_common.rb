@@ -22,6 +22,12 @@ module StudentDashboardCommon
     feature_status ? Account.default.root_account.enable_feature!(:widget_dashboard) : Account.default.root_account.disable_feature!(:widget_dashboard)
   end
 
+  def enable_widget_dashboard_for(*users)
+    users.each do |user|
+      user.update!(preferences: user.preferences.merge(widget_dashboard_user_preference: true))
+    end
+  end
+
   def dashboard_student_setup
     @course1 = course_factory(active_all: true, course_name: "Course 1")
     @course2 = course_factory(active_all: true, course_name: "Course 2")

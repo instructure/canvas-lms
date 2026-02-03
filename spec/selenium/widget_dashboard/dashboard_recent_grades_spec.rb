@@ -32,6 +32,7 @@ describe "student dashboard Recent grades & feedback widget", :ignore_js_errors 
     dashboard_course_grade_setup
     dashboard_recent_grades_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   before do
