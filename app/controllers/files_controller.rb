@@ -1050,8 +1050,7 @@ class FilesController < ApplicationController
     "User",
     "ContentMigration",
     "Quizzes::QuizSubmission",
-    "ContentMigration",
-    "Quizzes::QuizSubmission"
+    "SisBatch"
   ].freeze
 
   def api_capture
@@ -1092,7 +1091,7 @@ class FilesController < ApplicationController
                   else
                     @context.shard.activate do
                       # avoid creating an identical Attachment
-                      unless params[:on_duplicate] == "rename"
+                      if params.key?(:folder_id) && params[:on_duplicate] != "rename"
                         att = Attachment
                               .active
                               .where.not(instfs_uuid: nil)
