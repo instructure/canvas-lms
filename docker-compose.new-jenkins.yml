@@ -38,7 +38,7 @@ services:
     init: true
 
   redis:
-    image: starlord.inscloudgate.net/jenkins/redis:alpine
+    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/library/redis:alpine
     init: true
 
   postgres:

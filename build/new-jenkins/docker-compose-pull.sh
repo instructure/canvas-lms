@@ -8,15 +8,15 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 # the image cache is completely fulfilled and subsequent builds don't need
 # to load them. This helps our build times to remain more consistent.
 
-REGISTRY_BASE=starlord.inscloudgate.net/jenkins
+REGISTRY_BASE=948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds
 ECR_BASE=948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io
 
 DOCKER_IMAGES=(
   $PATCHSET_TAG
   $DYNAMODB_IMAGE_TAG
   $POSTGRES_IMAGE_TAG
-  $REGISTRY_BASE/canvas-rce-api
-  $REGISTRY_BASE/redis:alpine
+  $ECR_BASE/instructure/canvas-rce-api
+  $ECR_BASE/library/redis:alpine
   $ECR_BASE/selenium/node-chromium:"${CHROME_VERSION:-137.0-20250606}"
   $ECR_BASE/selenium/hub:"${HUB_VERSION:-4.33.0}"
 )

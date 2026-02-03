@@ -1,6 +1,6 @@
-# syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.5.2
+# syntax = 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/docker/dockerfile:1.5.2
 
-FROM starlord.inscloudgate.net/jenkins/core:focal
+FROM 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/core:jammy
 SHELL ["/usr/bin/bash", "-c"]
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \

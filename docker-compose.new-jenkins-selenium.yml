@@ -13,7 +13,7 @@ services:
       SASS_STYLE: 'compressed'
 
   canvasrceapi:
-    image: starlord.inscloudgate.net/jenkins/canvas-rce-api
+    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/canvas-rce-api
     environment:
       ECOSYSTEM_KEY: "astringthatisactually32byteslong"
       ECOSYSTEM_SECRET: "astringthatisactually32byteslong"

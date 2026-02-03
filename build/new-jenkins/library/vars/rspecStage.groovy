@@ -23,9 +23,7 @@ def setupNode() {
   try {
     distribution.unstashBuildScripts()
     libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-    credentials.withStarlordCredentials { ->
-      sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-    }
+    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
 
     sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
   } catch (err) {

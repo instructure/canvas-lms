@@ -25,7 +25,7 @@ of caching.
 Each image is built through docker-build.sh, and is tagged with the following format:
 
 ```
-starlord.inscloudgate.net/jenkins/canvas-lms-[image type]:[image scope]-[salt]-[cache id]
+948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-[image type]:[image scope]-[salt]-[cache id]
 ```
 
 - image type = one of ruby-runner, yarn-runner, webpack-builder, webpack-assets
@@ -37,17 +37,17 @@ The patchset image is tagged differently in order to be pulled by the testing jo
 don't and shouldn't know about the hash ID formats. The webpack-builder image has an additional
 tag with the unique patchset id for similar reasons.
 
-- `starlord.inscloudgate.net/jenkins/canvas-lms:[unique patchset id]`
-- `starlord.inscloudgate.net/jenkins/canvas-lms-webpack-builder:[unique patchset id]`
+- `948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms:[unique patchset id]`
+- `948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-webpack-builder:[unique patchset id]`
 
 Examples:
 
-- `starlord.inscloudgate.net/jenkins/canvas-lms:20.255220.11-postgres-12-ruby-2.6`
-- `starlord.inscloudgate.net/jenkins/canvas-lms-webpack-builder:20.255220.11-postgres-12-ruby-2.6`
-- `starlord.inscloudgate.net/jenkins/canvas-lms-yarn-runner:master-39e953ae-9414c88300488700236b8f34cd228fe0`
-- `starlord.inscloudgate.net/jenkins/canvas-lms-webpack-assets:master-39e953ae-642ae86a8baf46e598852d6adbdf4766`
-- `starlord.inscloudgate.net/jenkins/canvas-lms-webpack-builder:master-39e953ae-cad9edddd890801ee5cb811267c7299c`
-- `starlord.inscloudgate.net/jenkins/canvas-lms-ruby-runner:master-39e953ae-f98271e7f6a8da245c645b3087238be7`
+- `948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms:20.255220.11-postgres-12-ruby-2.6`
+- `948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-webpack-builder:20.255220.11-postgres-12-ruby-2.6`
+- `948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-yarn-runner:master-39e953ae-9414c88300488700236b8f34cd228fe0`
+- `948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-webpack-assets:master-39e953ae-642ae86a8baf46e598852d6adbdf4766`
+- `948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-webpack-builder:master-39e953ae-cad9edddd890801ee5cb811267c7299c`
+- `948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-ruby-runner:master-39e953ae-f98271e7f6a8da245c645b3087238be7`
 
 # Docker Build Flow
 
@@ -68,7 +68,7 @@ in `docker-build.sh`.
         * The most ideal cached image for yarn.lock and related changes
 4. It builds all of the missing images
 5. It retags relevant patchset-scoped images to be master-scoped upon post-merge
-6. It pushes up all images to starlord
+6. It pushes up all images to ECR
 
 Each pre-merge build pushes up images under the [patchset number] scope, and you can expect that there will be 1 image
 per revision that contains unique file changes. Upon merging the patchset, the post-merge build will attempt to pull
@@ -81,14 +81,14 @@ with a commit that was actually merged.
 All images that are uploaded are tagged with the other images that were used to build it to trace their history.
 
 ```
-docker pull starlord.inscloudgate.net/jenkins/canvas-lms:20.255220.11-postgres-12-ruby-2.6
-docker image inspect starlord.inscloudgate.net/jenkins/canvas-lms:20.255220.11-postgres-12-ruby-2.6 --format '{{json .Config.Labels }}' | python -m json.tool
+docker pull 948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms:20.255220.11-postgres-12-ruby-2.6
+docker image inspect 948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms:20.255220.11-postgres-12-ruby-2.6 --format '{{json .Config.Labels }}' | python -m json.tool
 
 {
-    "RUBY_RUNNER_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-ruby-runner:master-c480fc86-a30b30a43fb95f996d13db8d5236c772",
-    "WEBPACK_BUILDER_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-webpack-builder:master-c480fc86-350f70e66da25a6e27dd0851be751e15",
-    "WEBPACK_ASSETS_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-webpack-assets:master-c480fc86-dccd0b970e09db19fd839da2cb9150e0",
-    "YARN_RUNNER_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-yarn-runner:master-c480fc86-217b3c20e3a7d4a66de8fc4e10871a48",
+    "RUBY_RUNNER_SELECTED_TAG": "948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-ruby-runner:master-c480fc86-a30b30a43fb95f996d13db8d5236c772",
+    "WEBPACK_BUILDER_SELECTED_TAG": "948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-webpack-builder:master-c480fc86-350f70e66da25a6e27dd0851be751e15",
+    "WEBPACK_ASSETS_SELECTED_TAG": "948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-webpack-assets:master-c480fc86-dccd0b970e09db19fd839da2cb9150e0",
+    "YARN_RUNNER_SELECTED_TAG": "948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds/canvas-lms-yarn-runner:master-c480fc86-217b3c20e3a7d4a66de8fc4e10871a48",
     "maintainer": "Instructure"
 }
 ```
