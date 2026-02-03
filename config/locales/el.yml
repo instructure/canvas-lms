@@ -3717,6 +3717,7 @@ el:
   confirmation_code_required_22984955: "Κωδικός επιβεβαίωσης (απαιτείται)"
   confirmation_failed_please_try_again_ae566d37: "<mrk mid=\"5637\" mtype=\"seg\">Απέτυχε η επιβεβαίωση.</mrk>  <mrk mid=\"5638\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
   confirming_2df4b68f: "Επικύρωση σε λειτουργία..."
+  confirming_course_name_5a509f48: "Επιβεβαίωση %{course_name}..."
   consumer_key_6f94ba11: "Κλειδί Καταναλωτή"
   contact_a6e7f6da: "Τρόποι επικοινωνίας"
   content_exports: 
@@ -4594,6 +4595,7 @@ el:
   course_home_4c4c0107: "Αρχική Σελίδα Μαθήματος"
   course_home_sub_navigation_b1ee6b03: "Υπο-πλοήγηση στην Αρχική Σελίδα του Μαθήματος"
   course_id_8bd2a21c: "ID Μαθήματος"
+  course_id_course_id_2841413a: "ID Μαθήματος «%{course_id}»"
   course_id_f8640bb8: course_id
   course_implemented_apps_fa658f5a: "Εφαρμογές που Εφαρμόστηκαν στο Μάθημα"
   course_list: 
@@ -4672,6 +4674,7 @@ el:
   course_name_45175338: "όνομα μαθήματος"
   course_name_63b973d1: "Όνομα Μαθήματος"
   course_name_is_required_90919349: "Απαιτείται όνομα μαθήματος"
+  course_name_not_authorized_for_cross_listing_353e500f: "Δεν υπάρχει εξουσιοδότηση για την αφαίρεση του μαθήματος %{course_name} από τη λίστα"
   course_name_successfully_added_48116a50: "Το μάθημα %{course_name} προστέθηκε επιτυχώς!"
   course_navigation_dd035109: "Πλοήγηση στο μάθημα"
   course_navigation_settings: 
@@ -5186,6 +5189,9 @@ el:
   creative_commons_license_725584ae: "Άδεια Creative Commons:"
   criteria_9fac648: Κριτήρια
   criterion_ratings_3eed22e2: "Κατάταξη Βάσει Κριτηρίων"
+  cross_list_section_27801ec9: "Αφαίρεση Τομέα από τη λίστα"
+  cross_list_this_section_889f7287: "Αφαίρεση αυτού του Τομέα από τη λίστα"
+  cross_list_this_section_90aea97f: "Αφαίρεση αυτού του Τομέα από τη λίστα"
   crumbs: 
     access_report: "Αναφορά Πρόσβασης"
     announcements: Ανακοινώσεις
@@ -10643,6 +10649,7 @@ el:
     : Ναι
   options_3ab0ea65: Επιλογές
   or_ef4e808: ή
+  or_enter_the_course_s_id_46e0792a: "Ή Εισαγάγετε το ID του Μαθήματος"
   orange_81386a62: Πορτοκαλί
   orbis_report_header_assignment_id: "id αξιολόγισης"
   orbis_report_header_assignment_title: "τίτλος εργασίας"
@@ -13043,6 +13050,7 @@ el:
   ratio_answered_correctly_b0c1e7d: "%{ratio}% απάντησαν σωστά"
   ratio_responded_correctly_6d890107: "%{ratio}% απάντησαν σωστά"
   re_activate_user_f7d77c9a: "Επανενεργοποίηση Χρήστη"
+  re_cross_list_this_section_faf7df4d: "Επαναδιαγραφή αυτού του Τομέα από τη Λίστα"
   re_send_confirmation_bcc66940: "Επαναποστολή Επιβεβαίωσης"
   re_sending_379a8580: Επαναποστολή...
   re_submit_assignment_b3e2bd28: "Υποβάλετε ξανά την Εργασία"
@@ -13613,6 +13621,7 @@ el:
   search_for_a_course_58fdc7a6: "Αναζήτησης Μαθήματος"
   search_for_a_deleted_course_by_id_f553398d: "Εύρευση για ένα μάθημα που έχει αφαιρεθεί με αριθμό ταυτοποίησης/ID"
   search_for_assignment_8149cb1: "Αναζήτηση Εργασίας"
+  search_for_course_e1a1dfc6: "Εύρεση για Μάθημα"
   search_for_files_7541fb28: "Αναζήτηση αρχείων"
   search_for_people_by_id_or_name_36107593: "Εύρευση ατόμων με αριθμό ταυτοποίησης/ID ή όνομα"
   search_groups_or_people_6c15d6ad: "Αναζήτηση Ομάδων ή Ατόμων"
@@ -13656,6 +13665,7 @@ el:
   section_name_is_too_long_9cec2a30: "Το Όνομα του Τμήματος είναι πολύ μακρύ"
   section_sis_id_6f989834: "section sis id"
   section_starts_at_65eaed1: "Ο τομέας ξεκινάει στις"
+  section_successfully_cross_listed_86eb2765: "Ο τομέας αφαιρέθηκε επιτυχώς!"
   section_successfully_de_cross_listed_df3b64e: "Ο τομέας επαναφέρθηκε επιτυχώς!"
   sections: 
     section_created: "Ο τομέας δημιουργήθηκε επιτυχώς!"
@@ -13768,6 +13778,7 @@ el:
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Επιλέξτε το αρχείο που θέλετε να συνδέσετε με αυτή την *ενότητα* ή προσθέστε ένα αρχείο επιλέγοντας «Νέο Αρχείο»."
   select_video_file_35b61d4e: "Επιλογή Αρχείου Βίντεο"
   selected_answer: "Επιλέξατε αυτή την απάντηση."
+  selected_course_9bf57f33: "Επιλεγμένο Μάθημα"
   selected_subtree_a7693937: "Επιλεγμένο %{subtree}"
   self_enrollments: 
     already_enrolled: 
