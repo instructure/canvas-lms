@@ -172,4 +172,25 @@ describe('PlannerApp focus handling', () => {
     // Verify the dynamic UI updates were triggered
     expect(mockTriggerUpdates).toHaveBeenCalledTimes(1)
   })
+
+  it('does not auto-focus items on initial load', () => {
+    const mockScrollToToday = vi.fn()
+
+    const {rerender} = render(
+      <PlannerApp
+        {...getDefaultValues({isLoading: true, isWeekly: false})}
+        scrollToToday={mockScrollToToday}
+      />,
+      {container: containerElement},
+    )
+
+    rerender(
+      <PlannerApp
+        {...getDefaultValues({isLoading: false, isWeekly: false})}
+        scrollToToday={mockScrollToToday}
+      />,
+    )
+
+    expect(mockScrollToToday).toHaveBeenCalledWith({isWeekly: false, autoFocus: false})
+  })
 })
