@@ -626,9 +626,15 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           onSkip={handleSkip}
           onBack={handlePrevious}
           onSaveAndNext={handleApplyAndSaveAndNext}
+          onBackToStart={handleBackToStart}
+          showBackToStart={
+            !isCloseIssuesEnabled && currentIssueIndex === issues.length - 1 && issues.length > 1
+          }
+          isBackToStartDisabled={isFormLocked}
           isBackDisabled={currentIssueIndex === 0 || isFormLocked}
           isSkipDisabled={
-            isFormLocked || (!isCloseIssuesEnabled && currentIssueIndex === issues.length - 1)
+            isFormLocked ||
+            (issues.length === 1 && !isCloseIssuesEnabled && currentIssueIndex === 0)
           }
           isSaveAndNextDisabled={
             !isRemediated || isFormLocked || !!formError || !isSaveButtonEnabled
