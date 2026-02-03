@@ -349,15 +349,6 @@ CanvasRails::Application.routes.draw do
       get :tool_launch
     end
 
-    # Support wildcard paths to enable routing in the federated New Quizzes app.
-    #
-    # When the `new_quizzes_native_experience_enabled` feature flag is enabled, path segments after
-    # `/assignment/:id` will be handled by the router in the federated New Quizzes app. Otherwise,
-    # pages will fall back to the assignment view page.
-    #
-    # This route must come after the resources :assignments block to avoid conflicts.
-    get "assignments/:id#{full_path_glob}", controller: :assignments, action: :show
-
     resources :grading_standards, only: %i[index create update destroy]
 
     resources :assignment_groups do
@@ -1666,10 +1657,7 @@ CanvasRails::Application.routes.draw do
       %w[course account].each do |context|
         get "#{context}s/:#{context}_id/external_tools/sessionless_launch", action: :generate_sessionless_launch, as: "#{context}_external_tool_sessionless_launch"
 
-        # Support client-side routing in federated apps (e.g., New Quizzes)
-        # Routes like `/courses/:course_id/external_tools/:external_tool_id/any/nested/path`
-        # will be handled by the router in the federated app
-        get "#{context}s/:#{context}_id/external_tools/:external_tool_id#{full_path_glob}", action: :show, as: "#{context}_external_tool_show"
+        get "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :show, as: "#{context}_external_tool_show"
 
         # Migration URL
         get "#{context}s/:#{context}_id/external_tools/:external_tool_id/migration_info", action: :migration_info, as: "#{context}_external_tool_migration_info"
