@@ -4720,6 +4720,7 @@ he:
   confirmation_code_required_22984955: "קוד אישור (נדרש)"
   confirmation_failed_please_try_again_ae566d37: "אישור נכשל. יש לנסות שוב."
   confirming_2df4b68f: "מאשר... "
+  confirming_course_name_5a509f48: "מאשר את %{course_name}..."
   consumer_key_57d9fcf1: "מפתח מערכת הלקוח"
   consumer_key_6f94ba11: "מפתח מערכת הלקוח"
   contact_a6e7f6da: התקשרות
@@ -5852,6 +5853,7 @@ he:
   course_id_8bd2a21c: "מזהה קורס"
   course_id_a7c924d5: "מזהה קורס"
   course_id_b0bc82d4: "מזהה קורס"
+  course_id_course_id_2841413a: "מזהה קורס \"%{course_id}\""
   course_id_f8640bb8: course_id
   course_image_for_course_cfbb08df: "תמונת קורס עבור %{course}"
   course_image_settings_eba3ec55: "עריכת תמונת הקורס"
@@ -5938,6 +5940,7 @@ he:
   course_name_45175338: "שם קורס"
   course_name_63b973d1: "שם קורס"
   course_name_is_required_90919349: "נדרש שם קורס"
+  course_name_not_authorized_for_cross_listing_353e500f: "%{course_name} אינו מורשה לרישום צולב"
   course_name_successfully_added_48116a50: "%{course_name} נתווסף בהצלחה!"
   course_navigation_dd035109: "ניווט בקורס"
   course_navigation_settings: 
@@ -6617,6 +6620,9 @@ he:
   criterion_long_description_e9a97247: "תאור מלא של הקריטריון"
   criterion_ratings_3eed22e2: "דירוגי קריטריון "
   criterion_updated_36c0b3dc: "קריטריון עודכן"
+  cross_list_section_27801ec9: "רישום צולב של הקבצה"
+  cross_list_this_section_889f7287: "הכנת רישום צולב להקבצה זו"
+  cross_list_this_section_90aea97f: "ביצוע רישום צולב להקבצה זו"
   crowdsourced: true
   crumbs: 
     access_report: "דוח התחברויות "
@@ -14034,6 +14040,7 @@ he:
   options_3ab0ea65: אפשרויות
   or_a01eec62: או
   or_ef4e808: או
+  or_enter_the_course_s_id_46e0792a: "או הקלדת מזהה הקורס"
   orange_81386a62: כתום
   orbis_report_header_assignment_id: "מזהה משימה"
   orbis_report_header_assignment_title: "כותרת משימה"
@@ -16891,6 +16898,7 @@ he:
   ratio_answered_correctly_b0c1e7d: "%{ratio}% ענו נכונה"
   ratio_responded_correctly_6d890107: "%{ratio}% הגיבו נכונה"
   re_activate_user_f7d77c9a: "החזרת משתמש למצב פעיל"
+  re_cross_list_this_section_faf7df4d: "רישום צולב מחודש של להקבצה זו"
   re_reported_b9671073: "דווח מחדש"
   re_send_confirmation_bcc66940: "שליחה מחדש של האישור "
   re_sending_379a8580: "שולח שוב..."
@@ -17580,6 +17588,7 @@ he:
   search_for_a_course_58fdc7a6: "חיפוש קורס"
   search_for_a_deleted_course_by_id_f553398d: "חיפוש על פי מזהה של קורסים שבוטלו"
   search_for_assignment_8149cb1: "חיפוש משימה"
+  search_for_course_e1a1dfc6: "חיפוש קורס"
   search_for_files_7541fb28: "חיפוש קבצים"
   search_for_people_by_id_or_name_36107593: "חפש אנשים לפי מזהה או שם"
   search_grading_periods_e947a3e9: "חיפוש תקופות הערכה..."
@@ -17635,6 +17644,7 @@ he:
   section_sis_94511bcd: "הקבצה במערכת הבית ספרית SIS"
   section_sis_id_6f989834: "מזהה הקבצה במערכת הבית ספרית"
   section_starts_at_65eaed1: "ההקבצה מתחילה ב"
+  section_successfully_cross_listed_86eb2765: "רישום צולב של ההקבצה נוצרה בהצלחה"
   section_successfully_de_cross_listed_df3b64e: "רישום צולב של ההקבצה בוטל בהצלחה"
   sections: 
     section_created: "ההקבצה נוצרה בהצלחה"
@@ -17779,6 +17789,7 @@ he:
   select_video_file_35b61d4e: "בחירת קובץ וידאו"
   selected_274ce24f: נבחר
   selected_answer: "בחרת תשובה זו"
+  selected_course_9bf57f33: "קורס נבחר"
   selected_subtree_a7693937: "%{subtree} נבחר"
   self_enrollments: 
     already_enrolled: 
