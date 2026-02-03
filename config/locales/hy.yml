@@ -3863,6 +3863,7 @@ hy:
   confirmation_code_required_22984955: "Հաստատման ծածկագիր (պարտադիր է)"
   confirmation_failed_please_try_again_ae566d37: "Չհաջողվեց հաստատել: Փորձեք կրկին:"
   confirming_2df4b68f: "Հաստատում է..."
+  confirming_course_name_5a509f48: "%{course_name} հաստատում... "
   consumer_key_57d9fcf1: "Օգտատիրոջ բանալի"
   consumer_key_6f94ba11: "Օգտատիրոջ բանալի"
   content_exports: 
@@ -4859,6 +4860,7 @@ hy:
   course_home_4c4c0107: "Դասընթացի սկիզբ"
   course_home_sub_navigation_b1ee6b03: "Դասընթացի հիմնական էջի ենթանավարկման ֆունկցիա"
   course_id_8bd2a21c: "Դասընթացի նույնականացուցիչ"
+  course_id_course_id_2841413a: "\"%{course_id}\" դասընթացի նույնականացուցիչ"
   course_id_f8640bb8: "դասընթացի նույնականացուցիչ"
   course_implemented_apps_fa658f5a: "Դասընթացի իրականացված հավելվածները"
   course_list: 
@@ -4942,6 +4944,7 @@ hy:
   course_name_45175338: "դասընթացի անվանում"
   course_name_63b973d1: "Դասընթացի անվանում"
   course_name_is_required_90919349: "Դասընթացի անվանումը պարտադիր է "
+  course_name_not_authorized_for_cross_listing_353e500f: "%{course_name}-ի խաչաձև ցուցակներում ընդգրկումը թույլատրված չէ"
   course_name_successfully_added_48116a50: "%{course_name} դասընթացը հաջողությամբ ավելացվել է:"
   course_navigation_dd035109: "Նավարկում դասընթացում"
   course_navigation_settings: 
@@ -5586,6 +5589,9 @@ hy:
   creative_commons_license_725584ae: "\"Creative Commons\" լիցենզիա"
   criteria_9fac648: Չափանիշեր
   criterion_ratings_3eed22e2: "Վարկանիշերի չափանիշը"
+  cross_list_section_27801ec9: "Բաժինն ընդգրկել խաչաձև ցուցակում "
+  cross_list_this_section_889f7287: "Այս բաժինը ընդգրկել խաչաձև ցուցակում"
+  cross_list_this_section_90aea97f: "Այս բաժինը ընդգրկել խաչաձև ցուցակում"
   crowdsourced: true
   crumbs: 
     access_report: "Հասանելիության մասին հաշվետվություն"
@@ -11919,6 +11925,7 @@ hy:
   options_3ab0ea65: Տարբերակներ
   or_a01eec62: ԿԱՄ
   or_ef4e808: կամ
+  or_enter_the_course_s_id_46e0792a: "Կամ մուտքագրել դասընթացի նույնականացուցիչը"
   orange_81386a62: Նարնջագույն
   orbis_report_header_assignment_id: "Հանձնարարության մուտքանուն"
   orbis_report_header_assignment_title: "հանձնարարության անվանում"
@@ -14571,6 +14578,7 @@ hy:
   range_name_90614433: "Դիապազոնի անվանումը"
   ratings_2433172b: Վարկանիշեր
   re_activate_user_f7d77c9a: "Կրկին ակտիվացնել օգտատիրոջ կարգավիճակը"
+  re_cross_list_this_section_faf7df4d: "Այս բաժինը կրկին ընդգրկել խաչաձև ցուցակում"
   re_send_confirmation_bcc66940: "Կրկին ուղարկել հաստատումը"
   re_sending_379a8580: "Կրկին ուղարկվում է..."
   re_submit_assignment_b3e2bd28: "Հանձնարարությունը կրկին ուղարկել"
@@ -15171,6 +15179,7 @@ hy:
   search_for_a_course_58fdc7a6: "Փնտրել դասընթացը"
   search_for_a_deleted_course_by_id_f553398d: "Հեռացված դասընթացի որոնում ըստ նույնականացուցչի"
   search_for_assignment_8149cb1: "Հանձնարարությունների որոնում"
+  search_for_course_e1a1dfc6: "Դասընթացի որոնում"
   search_for_files_7541fb28: "Որոնել ֆայլեր"
   search_for_people_by_id_or_name_36107593: "Մարդկանց որոնում ըստ նույնականացուցչի կամ անվան"
   search_groups_or_people_6c15d6ad: "Որոնել խմբեր կամ մարդկանց"
@@ -15212,6 +15221,7 @@ hy:
   section_name_is_too_long_9cec2a30: "Բաժնի անվանումը չափազանց երկար է"
   section_sis_id_6f989834: "sis բաժնի id"
   section_starts_at_65eaed1: "Բաժինը սկսվում է "
+  section_successfully_cross_listed_86eb2765: "Բաժինը հաջողությամբ ընդգրկված է խաչաձև ցուցակում:"
   section_successfully_de_cross_listed_df3b64e: "Բաժինը հաջողությամբ ջնջվել է խաչաձև ցուցակներից:"
   sections: 
     section_created: "Բաժինը հաջողությամբ ստեղծված է: "
@@ -15324,6 +15334,7 @@ hy:
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Ընտրեք այն ֆայլը, որը ցանկանում եք կապակցել կամ ավելացրեք ֆայլըն, ընտրելով \"Նոր ֆայլ\": "
   select_video_file_35b61d4e: "Ընտրել վիդեո ֆայլ"
   selected_answer: "Դուք ընտրել եք այս պատասխանը:"
+  selected_course_9bf57f33: "Ընտրված դասընթաց"
   selected_subtree_a7693937: "Ընտրված %{subtree}"
   self_enrollments: 
     already_enrolled: 
