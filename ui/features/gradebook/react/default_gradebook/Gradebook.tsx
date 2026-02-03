@@ -359,11 +359,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     [studentId: string]: {
       assignmentGroups: AssignmentGroupGradeMap
       current: {
-        score: number
+        score: number | null
         possible: number
       }
       final: {
-        score: number
+        score: number | null
         possible: number
       }
       scoreUnit: 'points' | 'percentage'
@@ -1541,11 +1541,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     assignmentGroups: AssignmentGroupGradeMap
     gradingPeriods?: GradingPeriodGradeMap
     current: {
-      score: number
+      score: number | null
       possible: number
     }
     final: {
-      score: number
+      score: number | null
       possible: number
     }
     scoreUnit: 'points' | 'percentage'
