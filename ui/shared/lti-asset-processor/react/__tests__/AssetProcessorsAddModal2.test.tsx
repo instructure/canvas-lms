@@ -36,8 +36,10 @@ import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalS
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 vi.mock('@canvas/external-tools/messages')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 const server = setupServer(
   http.get('/api/v1/courses/:courseId/lti_apps/launch_definitions', ({request}) => {
@@ -212,6 +214,11 @@ describe('AssetProcessorsAddModal', () => {
         expect(mockOnProcessorResponse).toHaveBeenCalledWith({
           tool: tool,
           data: validResponse,
+        })
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: `${tool!.name} successfully added`,
+          type: 'success',
+          srOnly: true,
         })
       })
     })
