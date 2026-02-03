@@ -2014,6 +2014,244 @@ RSpec.describe Lti::RegistrationsController do
     end
   end
 
+  describe "GET check_domain_duplicates", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/check_domain_duplicates", params: { domain: } }
+
+    let_once(:account) { account_model }
+    let_once(:admin) { account_admin_user(account:) }
+    let(:domain) { "example.com" }
+    let(:duplicates) { response_json[:duplicates] }
+
+    before { user_session(admin) }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    shared_examples "returns no duplicates" do
+      it "returns empty array" do
+        subject
+        expect(response).to be_successful
+        expect(duplicates).to eq([])
+      end
+    end
+
+    context "domain input edge cases" do
+      context "with blank domain" do
+        let(:domain) { "" }
+
+        it_behaves_like "returns no duplicates"
+      end
+
+      context "with whitespace-only domain" do
+        let(:domain) { "    " }
+
+        it_behaves_like "returns no duplicates"
+      end
+    end
+
+    context "with no matching registrations" do
+      let_once(:registration) { lti_registration_with_tool(account:, configuration_params: { domain: "different.com" }) }
+
+      it_behaves_like "returns no duplicates"
+    end
+
+    context "with matching account-owned registration" do
+      let_once(:registration) { lti_registration_with_tool(account:, configuration_params: { domain: "example.com" }) }
+
+      it "returns the matching registration" do
+        subject
+        expect(duplicates.length).to eq(1)
+        expect(duplicates.first.with_indifferent_access).to include(
+          id: registration.id,
+          name: registration.name,
+          admin_nickname: registration.admin_nickname
+        )
+      end
+
+      it "ignores casing in the domain" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/check_domain_duplicates", params: { domain: domain.upcase }
+        expect(duplicates).to contain_exactly(hash_including("id" => registration.id))
+      end
+
+      it "strips whitespace" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/check_domain_duplicates", params: { domain: "  #{domain}   " }
+        expect(duplicates).to contain_exactly(hash_including("id" => registration.id))
+      end
+    end
+
+    context "with matching IMS registration domain" do
+      let_once(:ims_registration) do
+        lti_ims_registration_model(account:, lti_tool_configuration: { "domain" => "example.com" })
+      end
+
+      it "finds the IMS registration" do
+        subject
+        expect(duplicates).to contain_exactly(hash_including(id: ims_registration.lti_registration.id))
+      end
+    end
+
+    context "with forced-on site admin registration" do
+      let_once(:site_admin_registration) do
+        registration = lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+        Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration:, workflow_state: :on)
+        registration
+      end
+
+      it "includes the forced-on site admin registration" do
+        subject
+        expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.id))
+      end
+
+      context "with site admin registration set to off" do
+        before do
+          Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration: site_admin_registration, workflow_state: :off)
+        end
+
+        it_behaves_like "returns no duplicates"
+      end
+
+      context "with site admin registration set to allow" do
+        before do
+          Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration: site_admin_registration, workflow_state: :allow)
+        end
+
+        it_behaves_like "returns no duplicates"
+      end
+    end
+
+    context "with inherited-on registration" do
+      let_once(:parent_registration) do
+        registration = lti_registration_with_tool(account: Account.site_admin, registration_params: { name: "Inherited Tool" }, configuration_params: { domain: })
+        Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration:, workflow_state: :allow)
+        registration
+      end
+
+      before do
+        Lti::AccountBindingService.call(account:, user: admin, registration: parent_registration, workflow_state: :on)
+      end
+
+      it "includes the inherited registration" do
+        subject
+        expect(duplicates).to contain_exactly(hash_including(id: parent_registration.id))
+      end
+
+      context "and the registration is cross-shard" do
+        specs_require_sharding
+
+        let_once(:site_admin_registration) do
+          Shard.default.activate do
+            reg = lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+            Lti::AccountBindingService.call(account: Account.site_admin, registration: reg, user: nil, workflow_state: "allow")
+            reg
+          end
+        end
+        let_once(:account) { @shard2.activate { account_model } }
+        let_once(:admin) { @shard2.activate { account_admin_user(account:) } }
+
+        before do
+          user_session(admin)
+          @shard2.activate { Lti::AccountBindingService.call(account:, registration: site_admin_registration, user: admin, workflow_state: "on") }
+        end
+
+        it "finds the inherited on registration and returns its global id" do
+          @shard2.activate { subject }
+          expect(response).to be_successful
+          expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.global_id))
+        end
+
+        # We've been burned by this in the past in the ListRegistrationService, make sure
+        # it doesn't happen here.
+        it "doesn't double count forced-on registration's" do
+          other_reg = Shard.default.activate do
+            r = lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+            Lti::AccountBindingService.call(account: Account.site_admin, registration: r, user: nil, workflow_state: "on")
+            r
+          end
+
+          @shard2.activate { subject }
+          expect(response).to be_successful
+          expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.global_id), hash_including(id: other_reg.global_id))
+        end
+      end
+    end
+
+    context "with multiple matching registrations" do
+      before(:once) do
+        3.times do
+          lti_registration_with_tool(account:, configuration_params: { domain: "example.com" })
+        end
+      end
+
+      it "returns all matching registrations" do
+        subject
+        expect(duplicates.length).to eq(3)
+      end
+
+      it "does not return duplicates" do
+        subject
+        returned_ids = duplicates.pluck(:id)
+        expect(returned_ids).to eq(returned_ids.uniq)
+      end
+    end
+
+    context "with cross-shard forced-on site admin registration" do
+      specs_require_sharding
+
+      let_once(:site_admin_registration) do
+        Shard.default.activate do
+          lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+        end
+      end
+      let_once(:account) { @shard2.activate { account_model } }
+      let_once(:admin) { @shard2.activate { account_admin_user(account:) } }
+
+      before { user_session(admin) }
+
+      it "returns the global ID for cross-shard registration" do
+        @shard2.activate { subject }
+        expect(response).to be_successful
+        expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.global_id))
+      end
+    end
+
+    context "with inactive registration" do
+      let_once(:inactive_registration) do
+        registration = lti_registration_with_tool(account:, registration_params: { name: "Inactive Tool" })
+        Lti::AccountBindingService.call(account:, registration:, user: admin, workflow_state: :off)
+        registration
+      end
+
+      it_behaves_like "returns no duplicates"
+    end
+
+    context "with deleted registration" do
+      let_once(:deleted_registration) do
+        reg = lti_registration_model(account:, name: "Deleted Tool")
+        reg.destroy
+        reg
+      end
+
+      it_behaves_like "returns no duplicates"
+    end
+  end
+
   describe "POST create", type: :request do
     subject do
       post "/api/v1/accounts/#{account.id}/lti_registrations",

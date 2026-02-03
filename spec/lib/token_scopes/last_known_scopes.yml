@@ -271,6 +271,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/check_domain_duplicates'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
 - verb: GET

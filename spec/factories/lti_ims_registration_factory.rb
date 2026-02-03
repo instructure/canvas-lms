@@ -82,7 +82,7 @@ module Factories
     }.with_indifferent_access.freeze
 
   def lti_ims_registration_model(**params)
-    params = LTI_IMS_REGISTRATION_BASE_ATTRS.merge(params)
+    params = LTI_IMS_REGISTRATION_BASE_ATTRS.deep_merge(params)
     account = params.delete(:account) || account_model
     params[:developer_key] ||= developer_key_model(
       public_jwk_url: params[:jwks_uri],

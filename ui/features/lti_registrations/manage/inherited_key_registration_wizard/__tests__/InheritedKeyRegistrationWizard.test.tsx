@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render, screen, waitFor, cleanup} from '@testing-library/react'
+import {render as baseRender, screen, waitFor, cleanup} from '@testing-library/react'
 import {ZAccountId} from '../../model/AccountId'
 import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
 import {InheritedKeyRegistrationWizard} from '../InheritedKeyRegistrationWizard'
@@ -28,6 +28,33 @@ import {success} from '../../../common/lib/apiResult/ApiResult'
 import {mockRegistrationWithAllInformation} from '../../pages/manage/__tests__/helpers'
 import userEvent from '@testing-library/user-event'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import React from 'react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer(
+  http.get('/api/v1/accounts/:accountId/lti_registrations/check_domain_duplicates', () => {
+    return HttpResponse.json({duplicates: []})
+  }),
+)
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: 0,
+        gcTime: 0,
+      },
+    },
+  })
+  return ({children}: {children: React.ReactNode}) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
+
+const render = (ui: React.ReactElement) => baseRender(ui, {wrapper: createWrapper()})
 
 const getHeadingByText = (text: RegExp) => screen.getByText(text, {selector: 'h2, h3'})
 
@@ -43,6 +70,7 @@ describe('RegistrationWizardModal', () => {
   let warn: (...data: any[]) => void
 
   beforeAll(() => {
+    server.listen({onUnhandledRequest: 'error'})
     // instui logs an error when we render a component
     // immediately under Modal
 
@@ -55,6 +83,11 @@ describe('RegistrationWizardModal', () => {
   afterAll(() => {
     console.error = error
     console.warn = warn
+    server.close()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   const bindGlobalLtiRegistration = vi.fn()
@@ -141,7 +174,7 @@ describe('RegistrationWizardModal', () => {
 
   describe('When flag is OFF (old behavior)', () => {
     beforeEach(() => {
-      window.ENV = {FEATURES: {lti_registrations_templates: false}} as GlobalEnv
+      window.ENV = {FEATURES: {lti_registrations_templates: false}, ACCOUNT_ID: '123'} as GlobalEnv
       setupTest()
     })
 
@@ -241,7 +274,7 @@ describe('RegistrationWizardModal', () => {
 
   describe('When flag is ON (new multi-step wizard)', () => {
     beforeEach(() => {
-      window.ENV = {FEATURES: {lti_registrations_templates: true}} as GlobalEnv
+      window.ENV = {FEATURES: {lti_registrations_templates: true}, ACCOUNT_ID: '123'} as GlobalEnv
       setupTest()
     })
 

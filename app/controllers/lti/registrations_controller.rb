@@ -1105,7 +1105,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
   before_action :require_manage_lti_registrations
   before_action :require_manage_lti_registrations_in_registrations_account, only: %i[reset update destroy]
-  before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history]
+  before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history check_domain_duplicates]
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
   before_action :validate_registration_params, only: %i[create update]
@@ -1277,6 +1277,30 @@ class Lti::RegistrationsController < ApplicationController
     configuration[:redirect_uris] = Array(configuration[:redirect_uris])
 
     render json: { configuration: }
+  end
+
+  # @internal
+  # @API Check for Duplicate Domains
+  # Checks if any existing LTI registrations in the account have the same domain
+  # as the provided domain. This includes registrations owned by the account,
+  # Site Admin registrations forced on, and inherited registrations that are enabled.
+  # This is a utility endpoint for the LTI registration UI to warn administrators
+  # about potential conflicts.
+  #
+  # @argument domain [Required, String] The domain to check for duplicates.
+  #
+  # @returns { duplicates: [{ id: String, name: String, admin_nickname: String | null }] }
+  #
+  # @example_request
+  #
+  #   This would check for duplicate domains
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/check_domain_duplicates?domain=example.com' \
+  #        -H "Authorization: Bearer <token>"
+  def check_domain_duplicates
+    domain = params[:domain]
+    duplicates = Lti::CheckDomainDuplicatesService.call(account: @account, domain:)
+
+    render json: { duplicates: }
   end
 
   # @API Show an LTI Registration
