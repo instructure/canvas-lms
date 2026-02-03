@@ -2153,6 +2153,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations", action: :list
       post "accounts/:account_id/lti_registrations", action: :create
       post "accounts/:account_id/lti_registrations/configuration/validate", action: :validate_lti_configuration
+      get "accounts/:account_id/lti_registrations/check_domain_duplicates", action: :check_domain_duplicates
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:registration_id/deployments/:deployment_id/context_search", action: :context_search, as: "lti_registration_context_search"
       get "accounts/:account_id/lti_registrations/:id", action: :show

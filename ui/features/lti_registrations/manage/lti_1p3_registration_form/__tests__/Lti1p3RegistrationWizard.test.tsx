@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cleanup, render, screen} from '@testing-library/react'
+import {cleanup, render as baseRender, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Lti1p3RegistrationWizard} from '../Lti1p3RegistrationWizard'
 import {mockRegistration} from '../../pages/manage/__tests__/helpers'
@@ -25,15 +25,50 @@ import {mockLti1p3RegistrationWizardService} from '../../dynamic_registration_wi
 import {ZAccountId} from '../../model/AccountId'
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {LtiPlacements} from '../../model/LtiPlacement'
-import {success} from '../../../common/lib/apiResult/ApiResult'
-import {ZLtiRegistrationId} from '../../model/LtiRegistrationId'
+import React from 'react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer(
+  http.get('/api/v1/accounts/:accountId/lti_registrations/check_domain_duplicates', () => {
+    return HttpResponse.json({duplicates: []})
+  }),
+)
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: 0,
+        gcTime: 0,
+      },
+    },
+  })
+  return ({children}: {children: React.ReactNode}) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
+
+const render = (ui: React.ReactElement) => baseRender(ui, {wrapper: createWrapper()})
 
 // NOTE: The registration wizard creates it's own store during render, so testing it is currently
 // quite slow. Hopefully, we can refactor it to make testing easier in the future, but for now,
 // we'll just test a simple happy path and some error cases.
 describe('Lti1p3RegistrationWizard', () => {
+  beforeAll(() => server.listen({onUnhandledRequest: 'error'}))
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    fakeENV.setup({ACCOUNT_ID: '123'})
+  })
+
   afterEach(() => {
     cleanup()
+    server.resetHandlers()
+    fakeENV.teardown()
   })
 
   const accountId = ZAccountId.parse('123')
@@ -83,7 +118,7 @@ describe('Lti1p3RegistrationWizard', () => {
     expect(screen.getByText('Placement Icon URLs')).toBeInTheDocument()
 
     await userEvent.click(findNextButton())
-    expect(screen.getByText('Review')).toBeInTheDocument()
+    expect(await screen.findByText('Review')).toBeInTheDocument()
   })
 
   it('allows navigating back through steps', async () => {
@@ -162,7 +197,7 @@ describe('Lti1p3RegistrationWizard', () => {
     await userEvent.click(findNextButton())
     expect(screen.getByText(/Tool Icon URL/i, {selector: 'h3'})).toBeInTheDocument()
     await userEvent.click(findNextButton())
-    expect(screen.getByText(/^Review$/i)).toBeInTheDocument()
+    expect(await screen.findByText(/^Review$/i)).toBeInTheDocument()
 
     await userEvent.click(screen.getByText(/^Previous$/i).closest('button')!)
     expect(screen.getByText(/Tool Icon URL/i, {selector: 'h3'})).toBeInTheDocument()
@@ -424,6 +459,8 @@ describe('Lti1p3RegistrationWizard', () => {
     await user.clear(iconUrlInput)
     await user.paste('https://example.com/icon.png')
     await user.click(findNextButton())
-    expect(screen.getByText('Review')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Review')).toBeInTheDocument()
+    })
   })
 })

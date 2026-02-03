@@ -45,6 +45,8 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   validate :require_root_account
   validate :validate_inherited_registration_in_chain
 
+  scope :enabled, -> { where(workflow_state: "on") }
+
   after_update :clear_cache_if_site_admin
 
   def self.find_in_site_admin(registration)
