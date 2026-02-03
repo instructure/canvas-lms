@@ -484,47 +484,6 @@ describe('CheckboxTextInput', () => {
     })
   })
 
-  describe('action buttons', () => {
-    it('renders custom action buttons when provided', () => {
-      const actionButtons = <button data-testid="custom-action-button">Custom Action</button>
-
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...defaultProps} actionButtons={actionButtons} />
-        </AccessibilityCheckerContext.Provider>,
-      )
-
-      expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
-      expect(screen.getByText('Custom Action')).toBeInTheDocument()
-    })
-
-    it('renders action buttons alongside generate button', () => {
-      const actionButtons = <button data-testid="custom-action-button">Custom Action</button>
-      const propsWithGenerateOption = {
-        ...defaultProps,
-        issue: {
-          ...defaultProps.issue,
-          form: {
-            ...defaultProps.issue.form,
-            canGenerateFix: true,
-            isCanvasImage: true,
-            generateButtonLabel: 'Generate Alt Text',
-          },
-        },
-        actionButtons,
-      }
-
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...propsWithGenerateOption} />
-        </AccessibilityCheckerContext.Provider>,
-      )
-
-      expect(screen.getByTestId('generate-alt-text-button')).toBeInTheDocument()
-      expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
-    })
-  })
-
   describe('isDisabled prop', () => {
     it('disables textarea when isDisabled is true', () => {
       render(

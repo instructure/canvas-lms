@@ -56,7 +56,6 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         error,
         onChangeValue,
         onValidationChange,
-        actionButtons,
         isDisabled,
         previewRef,
         onGenerateLoadingChange,
@@ -235,7 +234,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       }
 
       return (
-        <>
+        <Flex direction="column" gap="mediumSmall">
           <View as="div">
             <Checkbox
               inputRef={el => (checkboxRef.current = el)}
@@ -257,7 +256,8 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               onChange={handleCheckboxValueChange}
             />
           </View>
-          <View as="div" margin="small 0">
+
+          <View as="div">
             <TextArea
               data-testid="checkbox-text-input-form"
               textareaRef={el => (textAreaRef.current = el)}
@@ -269,9 +269,10 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               aria-describedby={charCountId}
             />
           </View>
-          <Flex as="div" margin="medium 0" gap="small" direction="column">
-            {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && (
-              <Flex as="div" gap="x-small" direction="column" margin="0 0 medium 0">
+
+          {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && (
+            <Flex as="div" gap="small" direction="column">
+              <Flex as="div" gap="x-small" direction="column">
                 <Flex.Item overflowX="visible" overflowY="visible">
                   <Button
                     data-testid="generate-alt-text-button"
@@ -298,13 +299,9 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                   </Text>
                 </Flex.Item>
               </Flex>
-            )}
-            {actionButtons && (
-              <Flex.Item overflowX="visible" overflowY="visible">
-                {actionButtons}
-              </Flex.Item>
-            )}
-          </Flex>
+            </Flex>
+          )}
+
           {generationError && (
             <Flex>
               <Flex.Item>
@@ -314,6 +311,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               </Flex.Item>
             </Flex>
           )}
+
           {alertMessage && (
             <Alert
               liveRegion={getLiveRegion}
@@ -324,7 +322,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               {alertMessage}
             </Alert>
           )}
-        </>
+        </Flex>
       )
     },
   )

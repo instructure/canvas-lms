@@ -38,15 +38,7 @@ const I18n = createI18nScope('accessibility_checker')
 const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
     (
-      {
-        issue,
-        error,
-        value,
-        onChangeValue,
-        actionButtons,
-        isDisabled,
-        onValidationChange,
-      }: FormComponentProps,
+      {issue, error, value, onChangeValue, isDisabled, onValidationChange}: FormComponentProps,
       ref,
     ) => {
       const [generateLoading, setGenerateLoading] = useState(false)
@@ -111,7 +103,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
       }
 
       return (
-        <>
+        <Flex direction="column" gap="medium">
           <TextInput
             data-testid="text-input-form"
             renderLabel={issue.form.label}
@@ -121,44 +113,40 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             messages={error ? [{text: error, type: 'newError'}] : []}
             interaction={isDisabled ? 'disabled' : 'enabled'}
           />
-          <Flex as="div" margin="medium 0" gap="small">
-            {isAiTableCaptionGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
-              <Flex.Item>
+
+          {isAiTableCaptionGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
+            <Flex direction="column" gap="medium">
+              <Flex>
                 <Button
                   color="ai-primary"
                   renderIcon={() => <IconAiSolid />}
                   onClick={handleGenerateClick}
-                  disabled={generateLoading || isDisabled}
+                  disabled={generateLoading}
                 >
                   {issue.form.generateButtonLabel}
                 </Button>
-              </Flex.Item>
-            )}
-            {actionButtons && <Flex.Item>{actionButtons}</Flex.Item>}
-            {generateLoading ? (
-              <Flex.Item>
-                <Spinner
-                  size="x-small"
-                  renderTitle={I18n.t('Generating...')}
-                  margin="0 small 0 0"
-                />
-              </Flex.Item>
-            ) : (
-              <></>
-            )}
-          </Flex>
-          {generationError !== null ? (
-            <Flex>
-              <Flex.Item>
-                <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
-                  {generationError}
-                </Alert>
-              </Flex.Item>
+              </Flex>
+              {generateLoading && (
+                <Flex.Item>
+                  <Spinner
+                    size="x-small"
+                    renderTitle={I18n.t('Generating...')}
+                    margin="0 small 0 0"
+                  />
+                </Flex.Item>
+              )}
+              {generationError !== null && (
+                <Flex>
+                  <Flex.Item>
+                    <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
+                      {generationError}
+                    </Alert>
+                  </Flex.Item>
+                </Flex>
+              )}
             </Flex>
-          ) : (
-            <></>
           )}
-        </>
+        </Flex>
       )
     },
   )
