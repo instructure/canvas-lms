@@ -722,6 +722,22 @@ describe('GradeInputHelper', () => {
         expect(parseTextValue('83.45%').grade).toBe('0%')
       })
 
+      test('sets the grade to zero when given a percentage with null points possible', () => {
+        options.pointsPossible = null
+        expect(parseTextValue('83.45%').grade).toBe('0%')
+      })
+
+      test('sets the score to zero when given a percentage with null points possible', () => {
+        options.pointsPossible = null
+        expect(parseTextValue('83.45%').score).toBe(0)
+      })
+
+      test('handles plain numeric input with null points possible', () => {
+        options.pointsPossible = null
+        expect(parseTextValue('8.3').grade).toBe('8.3%')
+        expect(parseTextValue('8.3').score).toBe(8.3)
+      })
+
       test('sets the grade to zero when given zero', () => {
         expect(parseTextValue(0).grade).toBe('0%')
       })

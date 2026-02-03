@@ -429,4 +429,196 @@ describe('MessageStudentsWhoHelper', () => {
       expect(callArg.media_comment_type).toBeUndefined()
     })
   })
+
+  describe("'Scored less than' criteria function", () => {
+    let scoredLessThan
+
+    beforeEach(() => {
+      const assignment = {id: '1', name: 'Homework', submissionTypes: ['online_text_entry']}
+      const options = MessageStudentsWhoHelper.options(assignment)
+      const option = options.find(option => option.text === 'Scored less than')
+      scoredLessThan = option.criteriaFn
+    })
+
+    test('returns true when numeric score is less than cutoff', () => {
+      const student = {score: 50}
+      expect(scoredLessThan(student, 75)).toBe(true)
+    })
+
+    test('returns false when numeric score is greater than cutoff', () => {
+      const student = {score: 90}
+      expect(scoredLessThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when numeric score equals cutoff', () => {
+      const student = {score: 75}
+      expect(scoredLessThan(student, 75)).toBe(false)
+    })
+
+    test('returns true when string score is less than cutoff', () => {
+      const student = {score: '50'}
+      expect(scoredLessThan(student, 75)).toBe(true)
+    })
+
+    test('returns false when string score is greater than cutoff', () => {
+      const student = {score: '90'}
+      expect(scoredLessThan(student, 75)).toBe(false)
+    })
+
+    test('returns true when decimal string score is less than cutoff', () => {
+      const student = {score: '74.5'}
+      expect(scoredLessThan(student, 75)).toBe(true)
+    })
+
+    test('returns false when decimal string score is greater than cutoff', () => {
+      const student = {score: '75.5'}
+      expect(scoredLessThan(student, 75)).toBe(false)
+    })
+
+    test('handles string "0" score correctly', () => {
+      const student = {score: '0'}
+      expect(scoredLessThan(student, 10)).toBe(true)
+    })
+
+    test('handles numeric 0 score correctly', () => {
+      const student = {score: 0}
+      expect(scoredLessThan(student, 10)).toBe(true)
+    })
+
+    test('returns false when score is null', () => {
+      const student = {score: null}
+      expect(scoredLessThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when score is undefined', () => {
+      const student = {score: undefined}
+      expect(scoredLessThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when score is empty string', () => {
+      const student = {score: ''}
+      expect(scoredLessThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when score is non-numeric string', () => {
+      const student = {score: 'abc'}
+      expect(scoredLessThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when cutoff is undefined', () => {
+      const student = {score: -5}
+      expect(scoredLessThan(student, undefined)).toBe(false)
+    })
+
+    test('returns false when cutoff is null', () => {
+      const student = {score: -5}
+      expect(scoredLessThan(student, null)).toBe(false)
+    })
+
+    test('handles negative scores correctly', () => {
+      const student = {score: -10}
+      expect(scoredLessThan(student, 0)).toBe(true)
+    })
+
+    test('handles negative string scores correctly', () => {
+      const student = {score: '-10'}
+      expect(scoredLessThan(student, 0)).toBe(true)
+    })
+  })
+
+  describe("'Scored more than' criteria function", () => {
+    let scoredMoreThan
+
+    beforeEach(() => {
+      const assignment = {id: '1', name: 'Homework', submissionTypes: ['online_text_entry']}
+      const options = MessageStudentsWhoHelper.options(assignment)
+      const option = options.find(option => option.text === 'Scored more than')
+      scoredMoreThan = option.criteriaFn
+    })
+
+    test('returns true when numeric score is greater than cutoff', () => {
+      const student = {score: 90}
+      expect(scoredMoreThan(student, 75)).toBe(true)
+    })
+
+    test('returns false when numeric score is less than cutoff', () => {
+      const student = {score: 50}
+      expect(scoredMoreThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when numeric score equals cutoff', () => {
+      const student = {score: 75}
+      expect(scoredMoreThan(student, 75)).toBe(false)
+    })
+
+    test('returns true when string score is greater than cutoff', () => {
+      const student = {score: '90'}
+      expect(scoredMoreThan(student, 75)).toBe(true)
+    })
+
+    test('returns false when string score is less than cutoff', () => {
+      const student = {score: '50'}
+      expect(scoredMoreThan(student, 75)).toBe(false)
+    })
+
+    test('returns true when decimal string score is greater than cutoff', () => {
+      const student = {score: '75.5'}
+      expect(scoredMoreThan(student, 75)).toBe(true)
+    })
+
+    test('returns false when decimal string score is less than cutoff', () => {
+      const student = {score: '74.5'}
+      expect(scoredMoreThan(student, 75)).toBe(false)
+    })
+
+    test('handles string "0" score correctly', () => {
+      const student = {score: '0'}
+      expect(scoredMoreThan(student, -10)).toBe(true)
+    })
+
+    test('handles numeric 0 score correctly', () => {
+      const student = {score: 0}
+      expect(scoredMoreThan(student, -10)).toBe(true)
+    })
+
+    test('returns false when score is null', () => {
+      const student = {score: null}
+      expect(scoredMoreThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when score is undefined', () => {
+      const student = {score: undefined}
+      expect(scoredMoreThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when score is empty string', () => {
+      const student = {score: ''}
+      expect(scoredMoreThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when score is non-numeric string', () => {
+      const student = {score: 'abc'}
+      expect(scoredMoreThan(student, 75)).toBe(false)
+    })
+
+    test('returns false when cutoff is undefined', () => {
+      const student = {score: 5}
+      expect(scoredMoreThan(student, undefined)).toBe(false)
+    })
+
+    test('returns false when cutoff is null', () => {
+      const student = {score: 5}
+      expect(scoredMoreThan(student, null)).toBe(false)
+    })
+
+    test('handles negative scores correctly', () => {
+      const student = {score: -10}
+      expect(scoredMoreThan(student, -20)).toBe(true)
+    })
+
+    test('handles negative string scores correctly', () => {
+      const student = {score: '-10'}
+      expect(scoredMoreThan(student, -20)).toBe(true)
+    })
+  })
 })

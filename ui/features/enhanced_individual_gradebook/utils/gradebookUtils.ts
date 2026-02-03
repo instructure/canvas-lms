@@ -361,23 +361,32 @@ export function mapToCamelizedGradingPeriodSet(
   }
 }
 
-export function scoreToPercentage(score?: number, possible?: number, decimalPlaces = 2) {
+export function scoreToPercentage(
+  score?: number | null,
+  possible?: number | null,
+  decimalPlaces = 2,
+) {
   const percent = (Number(score) / Number(possible)) * 100.0
   return percent % 1 === 0 ? percent : percent.toFixed(decimalPlaces)
 }
 
-export function scoreToScaledPoints(score: number, pointsPossible: number, scalingFactor: number) {
-  const scoreAsScaledPoints = score / (pointsPossible / scalingFactor)
+export function scoreToScaledPoints(
+  score: number | null,
+  pointsPossible: number,
+  scalingFactor: number,
+) {
+  const scoreAsScaledPoints = (score || 0) / (pointsPossible / scalingFactor)
   if (!Number.isFinite(scoreAsScaledPoints)) {
     return scoreAsScaledPoints
   }
-  // @ts-expect-error
-  return toNumber(divide(score, divide(pointsPossible, scalingFactor)))
+  const innerDiv = divide(pointsPossible, scalingFactor)
+  const outerDiv = divide(score, toNumber(innerDiv))
+  return toNumber(outerDiv)
 }
 
 export function getLetterGrade(
   possible?: number,
-  score?: number,
+  score?: number | null,
   gradingStandards?: GradingStandard[] | null,
   pointsBased?: boolean,
   gradingStandardScalingFactor?: number,

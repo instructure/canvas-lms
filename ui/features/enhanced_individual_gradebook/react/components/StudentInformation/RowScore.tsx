@@ -26,7 +26,7 @@ const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   name: string
-  score?: number
+  score?: number | null
   possible?: number
   weight?: number | null
   gradingScheme?: DeprecatedGradingScheme | null

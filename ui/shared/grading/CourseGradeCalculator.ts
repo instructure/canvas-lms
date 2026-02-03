@@ -45,7 +45,10 @@ function combineAssignmentGroupGrades(
   options: {
     weightAssignmentGroups: boolean
   },
-) {
+): {
+  score: number | null
+  possible: number
+} {
   const scopedAssignmentGroupGrades = assignmentGroupGrades.map(
     (assignmentGroupGrade: AssignmentGroupGrade) => {
       const gradeVersion = includeUngraded
@@ -216,11 +219,11 @@ function calculateWithGradingPeriods(
     [periodId: string]: GradingPeriodGrade
   }
   current: {
-    score: number
+    score: number | null
     possible: number
   }
   final: {
-    score: number
+    score: number | null
     possible: number
   }
   scoreUnit: 'points' | 'percentage'
@@ -312,11 +315,11 @@ function calculateWithoutGradingPeriods(
 ): {
   assignmentGroups: AssignmentGroupGradeMap
   current: {
-    score: number
+    score: number | null
     possible: number
   }
   final: {
-    score: number
+    score: number | null
     possible: number
   }
   scoreUnit: 'points' | 'percentage'
@@ -456,11 +459,11 @@ function calculate(
     [periodId: string]: GradingPeriodGrade
   }
   current: {
-    score: number
+    score: number | null
     possible: number
   }
   final: {
-    score: number
+    score: number | null
     possible: number
   }
   scoreUnit: 'points' | 'percentage'
