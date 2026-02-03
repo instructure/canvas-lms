@@ -88,6 +88,7 @@ module CourseTabPage
     dashboard_course_assignment_setup
     course_with_files_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   def course_with_files_setup

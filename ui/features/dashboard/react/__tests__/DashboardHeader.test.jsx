@@ -232,6 +232,35 @@ describe('DashboardHeader', () => {
       expect(dashboardActivity.style.display).toBe('none')
     })
 
+    it('does not trigger page reload on mount when widget_dashboard feature flag is on but user is on classic dashboard', async () => {
+      delete window.location
+      window.location = {reload: vi.fn()}
+
+      window.ENV = {
+        current_user_roles: ['observer'],
+        current_user: {id: '1'},
+        current_user_id: '1',
+        OBSERVED_USERS_LIST: [
+          {id: '2', name: 'Student 2', avatar_url: ''},
+          {id: '3', name: 'Student 3', avatar_url: ''},
+        ],
+        CAN_ADD_OBSERVEE: false,
+        FEATURES: {
+          widget_dashboard: true,
+        },
+      }
+
+      render(
+        <FakeDashboardHeader planner_enabled={false} dashboard_view="activity" env={window.ENV} />,
+      )
+
+      await act(async () => {
+        vi.advanceTimersByTime(100)
+      })
+
+      expect(window.location.reload).not.toHaveBeenCalled()
+    })
+
     it('does not call loadCardDashboard if preloaded cards passed in', async () => {
       window.ENV = {
         ...defaultEnv,

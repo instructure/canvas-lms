@@ -2801,7 +2801,7 @@ describe UsersController do
 
     it "sets the js_env properly with act as user data" do
       get "masquerade", params: { user_id: user2.id }
-      assert_response(:success)
+      expect(response).to have_http_status(:success)
       act_as_user_data = controller.js_env[:act_as_user_data][:user]
       expect(act_as_user_data).to include({
                                             name: user2.name,
@@ -3535,13 +3535,14 @@ describe UsersController do
           expect(assigns[:js_bundles].flatten).to include :dashboard
         end
 
-        it "ignores user preference when feature is locked on (cannot override)" do
+        it "respects user preference when feature is locked on (can override)" do
           Account.default.enable_feature!(:widget_dashboard)
           user_session(@student)
           @student.preferences[:widget_dashboard_user_preference] = false
           @student.save!
           get "user_dashboard"
-          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
         end
 
         it "does not show widget dashboard when feature is disabled even if user preference is true" do
@@ -4095,13 +4096,13 @@ describe UsersController do
 
   describe "dashboard with course grades" do
     before do
-      # Enable feature at account level - widget dashboard shown by default
       Account.default.enable_feature!(:widget_dashboard)
     end
 
     context "when student accesses their own dashboard" do
       before do
         course_with_student(active_all: true)
+        @student.update!(preferences: @student.preferences.merge(widget_dashboard_user_preference: true))
         user_session(@student)
       end
 
@@ -4154,6 +4155,7 @@ describe UsersController do
       before do
         course_with_student(active_all: true)
         @observer = user_with_pseudonym(active_all: true)
+        @observer.update!(preferences: @observer.preferences.merge(widget_dashboard_user_preference: true))
         @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id, enrollment_state: "active")
         user_session(@observer)
         session[:observed_user_id] = @student.id
@@ -4183,6 +4185,7 @@ describe UsersController do
     context "grade priority and display" do
       before do
         course_with_student(active_all: true)
+        @student.update!(preferences: @student.preferences.merge(widget_dashboard_user_preference: true))
         user_session(@student)
         @assignment = @course.assignments.create!(title: "Test", points_possible: 100)
       end
@@ -4214,6 +4217,7 @@ describe UsersController do
 
       it "sorts courses alphabetically by name" do
         course_with_student_logged_in(active_all: true)
+        @user.update!(preferences: @user.preferences.merge(widget_dashboard_user_preference: true))
         @course.update!(name: "Zebra Course")
 
         @course2 = course_factory(active_all: true)
@@ -4231,6 +4235,7 @@ describe UsersController do
     context "enrollment filtering" do
       before do
         @student = user_factory(active_all: true)
+        @student.update!(preferences: @student.preferences.merge(widget_dashboard_user_preference: true))
         @current_course = course_factory(active_all: true)
         @current_course.enroll_student(@student, enrollment_state: "active")
         user_session(@student)
@@ -4370,6 +4375,7 @@ describe UsersController do
       before do
         @student = user_factory(active_all: true)
         @observer = user_with_pseudonym(active_all: true)
+        @observer.update!(preferences: @observer.preferences.merge(widget_dashboard_user_preference: true))
         @current_course = course_factory(active_all: true)
         @current_course.enroll_student(@student, enrollment_state: "active")
         @current_course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id, enrollment_state: "active")

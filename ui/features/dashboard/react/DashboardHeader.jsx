@@ -246,7 +246,7 @@ class DashboardHeader extends React.Component {
   }
 
   handleChangeObservedUser(id) {
-    if (ENV.FEATURES?.widget_dashboard) {
+    if (ENV.widget_dashboard_overridable) {
       const isObservingSelf = id === ENV.current_user_id || id === null
       if (!isObservingSelf) {
         window.location.reload()
