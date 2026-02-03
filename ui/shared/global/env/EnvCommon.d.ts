@@ -356,6 +356,7 @@ export type RootAccountFeatureId =
   | 'modules_requirements_allow_percentage'
   | 'non_scoring_rubrics'
   | 'open_tools_in_new_tab'
+  | 'pendo_extended'
   | 'product_tours'
   | 'rce_lite_enabled_speedgrader_comments'
   | 'rce_studio_embed_improvements'
