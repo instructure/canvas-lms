@@ -6851,6 +6851,7 @@ nn:
   confirmation_code_required_22984955: "Kode for stadfesting (obligatorisk)"
   confirmation_failed_please_try_again_ae566d37: "Stadfesting mislukkast. Prøv på nytt seinare."
   confirming_2df4b68f: Stadfestar...
+  confirming_course_name_5a509f48: "Stadfestar %{course_name}..."
   confused_panda_questioning_what_to_do_next_42941484: "Forvirra Panda funderar på kva han skal gjere no"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Vurder å velje fleire innleveringstypar for å tilpasse innleveringen for studentar som kanskje ikkje får til å lage merknader"
   consumer_key_57d9fcf1: Forbrukarnøkkel
@@ -8198,6 +8199,7 @@ nn:
   course_id_8bd2a21c: Emne-ID
   course_id_a7c924d5: emne-ID
   course_id_b0bc82d4: Emne-ID
+  course_id_course_id_2841413a: "Emne-ID \"%{course_id}\""
   course_id_f8640bb8: course_id
   course_image_for_course_cfbb08df: "Emnebilde for %{course}"
   course_image_settings_eba3ec55: "Innstillingar for emnebilde"
@@ -8288,6 +8290,7 @@ nn:
   course_name_45175338: emnenamn
   course_name_63b973d1: Emnenamn
   course_name_is_required_90919349: "Emnenamn er obligatorisk"
+  course_name_not_authorized_for_cross_listing_353e500f: "%{course_name} ikkje godkjent for krysslisting"
   course_name_successfully_added_48116a50: "%{course_name} er lagt til."
   course_navigation_dd035109: Emnenavigering
   course_navigation_settings: 
@@ -9148,6 +9151,9 @@ nn:
   criterion_updated_36c0b3dc: "Kriterium er oppdatert"
   croatian_d713d655: Kroatisk
   cropper_associated_features_in_buttons_icons_be12ae42: "Skjæring og tilknytta funksjonar i Knappar og ikon"
+  cross_list_section_27801ec9: "Krysslist klassa"
+  cross_list_this_section_889f7287: "Krysslist denne klassa"
+  cross_list_this_section_90aea97f: "Krysslist denne klassa"
   cross_listing_3318526a: Krysslisting
   crowdsourced: true
   crumbs: 
@@ -19231,6 +19237,7 @@ nn:
   or_a01eec62: ELLER
   or_choose_files_b795006d: "eller vel filer"
   or_ef4e808: eller
+  or_enter_the_course_s_id_46e0792a: "Eller oppgi emne-ID-en"
   or_in_the_courses_list_6201030: "... eller i emneoversikten"
   orange_81386a62: Oransje
   orbis_report_header_assignment_id: oppgåve-ID
@@ -22415,6 +22422,7 @@ nn:
   rce_mentions_in_discussions_82cd11e3: "Rik teksteditor nemningar i diskusjonar"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Rik teksteditor sin nye og forbetra likningseditor"
   re_activate_user_f7d77c9a: "Aktiver brukar på nytt"
+  re_cross_list_this_section_faf7df4d: "Krysslist klassa på nytt"
   re_reported_b9671073: "Rapportert på nytt"
   re_send_confirmation_bcc66940: "Send stadfesting på nytt"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Send varsel på nytt direkte til brukar når kunngjeringa startar"
@@ -23551,6 +23559,7 @@ nn:
   search_for_a_deleted_course_by_id_f553398d: "Søk etter sletta emne etter ID"
   search_for_a_deleted_user_by_id_32f109e7: "Søk etter sletta brukar etter ID"
   search_for_assignment_8149cb1: "Søk etter oppgåve"
+  search_for_course_e1a1dfc6: "Søk etter emne"
   search_for_files_7541fb28: "Søk etter filer"
   search_for_people_by_id_or_name_36107593: "Søk etter personar etter ID eller namn"
   search_for_sections_62e90cf4: "Søk etter seksjonar"
@@ -23638,6 +23647,7 @@ nn:
   section_specific_discussions_are_disabled_9e3fd431: "Seksjonsspesifikke diskusjonar er slått av"
   section_specific_topics_must_have_sections_11868960: "Seksjonsspesifikke diskusjonsemne må ha seksjonar"
   section_starts_at_65eaed1: "Seksjon startar på"
+  section_successfully_cross_listed_86eb2765: "Klassa er krysslista."
   section_successfully_de_cross_listed_df3b64e: "Fjerna klassa frå krysslisting."
   sections: 
     section_created: "Seksjon er oppretta."
@@ -23874,6 +23884,7 @@ nn:
   selected_calendars_cc7f325b: "Valgte kalendrar"
   selected_content_contains_non_lti_links_f9dfd762: "Vald innhald inneheld ikkje-LTI-lenker."
   selected_content_is_not_an_lti_link_11780d96: "Valt innhald er ikkje ei LTI-lenke."
+  selected_course_9bf57f33: "Valt emne"
   selected_course_course_a581f834: "Valt emne %{course}"
   selected_de3a8019: valt
   selected_emojis_will_not_be_available_in_the_emoji_412d8776: "Dei utvalde emojiane vil ikkje bli tilgjengelege i \"Emojiutvalet\" for studentar eller faglærarar."
