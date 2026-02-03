@@ -44,6 +44,7 @@ import AdvancedTabPanel from './AdvancedTabPanel'
 import GradePostingPolicyTabPanel from './GradePostingPolicyTabPanel'
 import LatePoliciesTabPanel from './LatePoliciesTabPanel'
 import ViewOptionsTabPanel from './ViewOptionsTabPanel'
+import {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 
 const I18n = createI18nScope('gradebook')
 
@@ -86,6 +87,7 @@ export type GradebookSettingsModalProps = {
     setAssignmentPostPolicies: (postManually: boolean) => void
     setCoursePostPolicy: (coursePostPolicy: {courseId?: string; postManually: boolean}) => void
   }
+  customGradeStatuses: GradeStatusUnderscore[]
 }
 
 type LatePolicy = {
@@ -419,6 +421,7 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
                       setViewOptions({...viewOptions, viewStatusForColorblindness: value})
                     },
                   }}
+                  customGradeStatuses={props.customGradeStatuses}
                 />
               </Tabs.Panel>
             )}

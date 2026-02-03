@@ -71,6 +71,7 @@ describe('GradebookSettingsModal Late Policies', () => {
         setAssignmentPostPolicies: vi.fn(),
         setCoursePostPolicy: vi.fn(),
       },
+      customGradeStatuses: [],
     }
 
     latePolicyUrl = `/api/v1/courses/${props.courseId}/late_policy`

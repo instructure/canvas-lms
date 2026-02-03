@@ -2299,6 +2299,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       onLatePolicyUpdate: this.onLatePolicyUpdate,
       open: this.state.settingsTrayOpen,
       postPolicies: this.postPolicies,
+      customGradeStatuses: this.options?.custom_grade_statuses,
     }
 
     if (this.options.enhanced_gradebook_filters) {

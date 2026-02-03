@@ -34,11 +34,11 @@ describe('StatusColorPanel', () => {
   })
 
   it('renders a list item for each color in .colors', () => {
-    const {getAllByRole} = render(
+    const {container} = render(
       <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />,
     )
 
-    const colorListItems = getAllByRole('listitem')
+    const colorListItems = container.querySelectorAll('li')
     expect(colorListItems).toHaveLength(getStatuses().length)
     getStatuses().forEach((status, idx) => {
       expect(colorListItems[idx]).toHaveStyle({backgroundColor: statusColors[status]})
@@ -47,54 +47,59 @@ describe('StatusColorPanel', () => {
   })
 
   it('shows a popover when the "More" button is clicked for an item', () => {
-    const {getByRole} = render(
+    const {getByText} = render(
       <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />,
     )
 
-    const excusedPickerButton = getByRole('button', {name: /Excused Color Picker/i})
+    const excusedPickerButton = getByText(/Excused Color Picker/i).closest('button')
+    expect(excusedPickerButton).toHaveAttribute('aria-expanded', 'false')
+
     fireEvent.click(excusedPickerButton)
 
-    const colorPickerRadioGroup = getByRole('radiogroup', {name: /Select a predefined color/})
-    expect(colorPickerRadioGroup).toBeInTheDocument()
+    expect(excusedPickerButton).toHaveAttribute('aria-expanded', 'true')
+    expect(getByText('Apply')).toBeInTheDocument()
   })
 
   it('only shows a single popover at a time', () => {
-    const {getAllByRole, getByRole} = render(
+    const {getAllByText, getByText} = render(
       <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />,
     )
 
-    const excusedPickerButton = getByRole('button', {name: /Excused Color Picker/i})
+    const excusedPickerButton = getByText(/Excused Color Picker/i).closest('button')
     fireEvent.click(excusedPickerButton)
 
-    const latePickerButton = getByRole('button', {name: /Late Color Picker/i})
+    const latePickerButton = getByText(/Late Color Picker/i).closest('button')
     fireEvent.click(latePickerButton)
 
-    const colorPickerRadioGroups = getAllByRole('radiogroup', {name: /Select a predefined color/})
-    expect(colorPickerRadioGroups).toHaveLength(1)
+    // Only one "Apply" button should be visible, indicating only one popover is open
+    const applyButtons = getAllByText('Apply')
+    expect(applyButtons).toHaveLength(1)
   })
 
   it('returns focus to the "More" button when the popover is closed', () => {
-    const {getByRole} = render(
+    const {getByText} = render(
       <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />,
     )
 
-    const excusedPickerButton = getByRole('button', {name: /Excused Color Picker/i})
+    const excusedPickerButton = getByText(/Excused Color Picker/i).closest('button')
     fireEvent.click(excusedPickerButton)
 
-    const cancelButton = getByRole('button', {name: /Cancel/})
+    const cancelButton = getByText('Cancel')
     fireEvent.click(cancelButton)
     expect(excusedPickerButton).toHaveFocus()
   })
 
   it('calls the .onColorsUpdated prop when the user saves a change to a color', () => {
     const customColors = {...colors, excused: defaultColors.lavender}
-    const {getByRole} = render(
+    const {getByText} = render(
       <StatusColorPanel colors={customColors} onColorsUpdated={onColorsUpdated} />,
     )
 
-    fireEvent.click(getByRole('button', {name: /Excused Color Picker/i}))
-    fireEvent.click(getByRole('radio', {name: /salmon/i}))
-    fireEvent.click(getByRole('button', {name: /Apply/}))
+    fireEvent.click(getByText(/Excused Color Picker/i).closest('button'))
+    // The radio button has screenreader text with the color name and hex code
+    const salmonRadio = getByText(/salmon \(#/i).closest('button')
+    fireEvent.click(salmonRadio)
+    fireEvent.click(getByText('Apply'))
 
     expect(onColorsUpdated).toHaveBeenCalledWith(
       expect.objectContaining({excused: defaultColors.salmon}),
@@ -103,14 +108,143 @@ describe('StatusColorPanel', () => {
 
   it('does not call the .onColorsUpdated prop when the user cancels a change', () => {
     const customColors = {...colors, excused: defaultColors.lavender}
-    const {getByRole} = render(
+    const {getByText} = render(
       <StatusColorPanel colors={customColors} onColorsUpdated={onColorsUpdated} />,
     )
 
-    fireEvent.click(getByRole('button', {name: /Excused Color Picker/i}))
-    fireEvent.click(getByRole('radio', {name: /salmon/i}))
-    fireEvent.click(getByRole('button', {name: /Cancel/}))
+    fireEvent.click(getByText(/Excused Color Picker/i).closest('button'))
+    // The radio button has screenreader text with the color name and hex code
+    const salmonRadio = getByText(/salmon \(#/i).closest('button')
+    fireEvent.click(salmonRadio)
+    fireEvent.click(getByText('Cancel'))
 
     expect(onColorsUpdated).not.toHaveBeenCalled()
+  })
+
+  describe('icon visibility', () => {
+    it('displays icons for standard statuses when viewStatusForColorblindness is true', () => {
+      const {container} = render(
+        <StatusColorPanel
+          colors={colors}
+          onColorsUpdated={onColorsUpdated}
+          viewStatusForColorblindness={true}
+        />,
+      )
+
+      const icons = container.querySelectorAll('img')
+      // Should have one icon per standard status
+      expect(icons).toHaveLength(getStatuses().length)
+    })
+
+    it('does not display icons for standard statuses when viewStatusForColorblindness is false', () => {
+      const {container} = render(
+        <StatusColorPanel
+          colors={colors}
+          onColorsUpdated={onColorsUpdated}
+          viewStatusForColorblindness={false}
+        />,
+      )
+
+      expect(container.querySelectorAll('img')).toHaveLength(0)
+    })
+  })
+
+  describe('custom grade statuses', () => {
+    const customGradeStatuses = [
+      {
+        id: '1',
+        name: 'Custom Status 1',
+        color: '#FF0000',
+        icon: 'custom-1',
+        applies_to_submissions: true,
+        applies_to_finals: false,
+      },
+      {
+        id: '2',
+        name: 'Custom Status 2',
+        color: '#00FF00',
+        icon: 'custom-2',
+        applies_to_submissions: true,
+        applies_to_finals: false,
+      },
+    ]
+
+    it('renders custom grade statuses when provided', () => {
+      const {container, getByText} = render(
+        <StatusColorPanel
+          colors={colors}
+          onColorsUpdated={onColorsUpdated}
+          customGradeStatuses={customGradeStatuses}
+          viewStatusForColorblindness={false}
+        />,
+      )
+
+      expect(getByText('Custom Status 1')).toBeInTheDocument()
+      expect(getByText('Custom Status 2')).toBeInTheDocument()
+
+      const listItems = container.querySelectorAll('li')
+      // Standard statuses + custom statuses
+      expect(listItems).toHaveLength(getStatuses().length + customGradeStatuses.length)
+    })
+
+    it('displays icons for custom statuses when viewStatusForColorblindness is true', () => {
+      const {container} = render(
+        <StatusColorPanel
+          colors={colors}
+          onColorsUpdated={onColorsUpdated}
+          customGradeStatuses={customGradeStatuses}
+          viewStatusForColorblindness={true}
+        />,
+      )
+
+      const icons = container.querySelectorAll('img')
+      // Standard statuses + custom statuses
+      expect(icons).toHaveLength(getStatuses().length + customGradeStatuses.length)
+    })
+
+    it('does not display icons for custom statuses when viewStatusForColorblindness is false', () => {
+      const {container} = render(
+        <StatusColorPanel
+          colors={colors}
+          onColorsUpdated={onColorsUpdated}
+          customGradeStatuses={customGradeStatuses}
+          viewStatusForColorblindness={false}
+        />,
+      )
+
+      expect(container.querySelectorAll('img')).toHaveLength(0)
+    })
+
+    it('custom statuses do not have color picker buttons', () => {
+      const {getAllByText} = render(
+        <StatusColorPanel
+          colors={colors}
+          onColorsUpdated={onColorsUpdated}
+          customGradeStatuses={customGradeStatuses}
+          viewStatusForColorblindness={false}
+        />,
+      )
+
+      const colorPickerButtons = getAllByText(/Color Picker/i)
+      // Only standard statuses should have color pickers
+      expect(colorPickerButtons).toHaveLength(getStatuses().length)
+    })
+
+    it('applies correct background colors to custom status items', () => {
+      const {container} = render(
+        <StatusColorPanel
+          colors={colors}
+          onColorsUpdated={onColorsUpdated}
+          customGradeStatuses={customGradeStatuses}
+          viewStatusForColorblindness={false}
+        />,
+      )
+
+      const listItems = container.querySelectorAll('li')
+      const customStatusItems = Array.from(listItems).slice(getStatuses().length)
+
+      expect(customStatusItems[0]).toHaveStyle({backgroundColor: '#FF0000'})
+      expect(customStatusItems[1]).toHaveStyle({backgroundColor: '#00FF00'})
+    })
   })
 })
