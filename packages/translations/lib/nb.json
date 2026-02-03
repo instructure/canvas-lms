@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Fjerne lenke"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Fjern Studio-media"
-    },
     "replace_all_d3d68b3": {
         "message": "Erstatt alle"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Vis alle"
     },
-    "show_audio_options_b489926b": {
-        "message": "Vis lydalternativer"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Vis bildemuligheter"
     },
     "show_link_options_545338fd": {
         "message": "Vis lenkevalg"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Vis Studio-mediealternativer"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Vis videovalg"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Seende brukere surfer nettsider kjapt, og ser etter store eller uthevede titler. Brukere av skjermlesere er avhengige av titler for å forstå konteksten. Titler bør bruke korrekt struktur."

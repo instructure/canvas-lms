@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Удалить ссылку"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Удалить Studio Media"
-    },
     "replace_all_d3d68b3": {
         "message": "Заменить все"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Показать все"
     },
-    "show_audio_options_b489926b": {
-        "message": "Показать параметры звука"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Показать варианты изображения"
     },
     "show_link_options_545338fd": {
         "message": "Показать параметры ссылки"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Показать варианты Studio Media"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Показать параметры видео"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Зрячие пользователи быстро просматривают веб-страницы в поисках крупных или полужирных заголовков. Пользователи экранных дикторов полагаются на заголовки для контекстуального понимания. Заголовки должны иметь надлежащую структуру."

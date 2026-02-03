@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Usuń łącze"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Usuń multimedia Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Zamień wszystko"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Pokaż wszystko"
     },
-    "show_audio_options_b489926b": {
-        "message": "Pokaż opcje audio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Pokaż opcje obrazów"
     },
     "show_link_options_545338fd": {
         "message": "Pokaż opcje łącza"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Pokaż opcje multimediów Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Pokaż opcje wideo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Użytkownicy z dobrym wzrokiem szybciej przeglądają strony internetowe, odszukując duże lub zapisane pogrubioną czcionką nagłówki. Użytkownicy czytników ekranu polegają na nagłówkach dla zrozumienia kontekstu. Nagłówki muszą wykorzystywać odpowiednią strukturę."

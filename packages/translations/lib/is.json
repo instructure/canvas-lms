@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Fjarlægja tengil"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Fjarlægja Studio margmiðlunarefni"
-    },
     "replace_all_d3d68b3": {
         "message": "Skipta um allt"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Sýna allt"
     },
-    "show_audio_options_b489926b": {
-        "message": "Sýna valkosti hljóðs"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Sýna valkosti myndar"
     },
     "show_link_options_545338fd": {
         "message": "Sýna valkosti tengla"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Sýna valkosti fyrir margmiðlunarefni í Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Sýna valkosti myndbands"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Notendur sem sjá fara hratt í gegnum vefsíður og leita að stórum eða feitletruðum hausum. Skjálesarar nýta sér hausa til að skilja samhengi. Hausar ættu að vera uppbyggðir á réttan hátt."

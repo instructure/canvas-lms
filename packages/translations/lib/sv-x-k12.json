@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Ta bort länk"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Ta bort Studio-mediefiler"
-    },
     "replace_all_d3d68b3": {
         "message": "Ersätt alla"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Visa alla"
     },
-    "show_audio_options_b489926b": {
-        "message": "Visa ljudalternativ"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Visa bildalternativ"
     },
     "show_link_options_545338fd": {
         "message": "Visa länkalternativ"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Visa mediealternativ för Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Visa videoalternativ"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Seende användare bläddrar snabbt bland webbsidor och letar efter stora rubriker eller rubriker i fetstil. Användare av skärmläsare använder sig av rubriker för kontextuell förståelse. Rubriker ska använda rätt struktur."

@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Alih Keluar Pautan"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Alih Keluar Media Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Gantikan Semua"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Tunjuk semua"
     },
-    "show_audio_options_b489926b": {
-        "message": "Tunjuk pilihan audio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Tunjuk pilihan imej"
     },
     "show_link_options_545338fd": {
         "message": "Tunjuk pilihan pautan"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Tunjuk pilihan media Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Tunjuk pilihan video"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Pengguna yang menggunakan penglihatan untuk memperoleh maklumat menyemak imbas halaman web dengan pantas untuk mencari tajuk yang besar dan tebal. Pengguna pembaca skrin bergantung pada pengepala untuk memperoleh pemahaman kontekstual. Pengepala sepatutnya menggunakan struktur yang betul."

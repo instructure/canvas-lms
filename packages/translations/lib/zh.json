@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "删除链接"
     },
-    "remove_studio_media_f913e502": {
-        "message": "删除 Studio 媒体"
-    },
     "replace_all_d3d68b3": {
         "message": "全部替换"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "显示全部"
     },
-    "show_audio_options_b489926b": {
-        "message": "显示音频选项"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "显示图像选项"
     },
     "show_link_options_545338fd": {
         "message": "显示链接选项"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "显示 Studio 媒体选项"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "显示视频选项"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "视力好的用户快速浏览网页，查找大号字体或粗体标题。屏幕读取器用户依赖于标题了解上下文。标题应使用正确的结构。"
