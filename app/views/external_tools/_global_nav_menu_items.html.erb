@@ -21,9 +21,12 @@
 
   tools = ContextExternalTool.filtered_global_navigation_tools(@domain_root_account, granted_permissions).map do |tool|
     tool_display = tool.extension_setting('global_navigation', 'windowTarget') == '_blank' ? 'borderless' : nil
-    tool_path = account_external_tool_path(@domain_root_account, tool, launch_type: 'global_navigation', display: tool_display)
+    # need to correctly format toolId param for global navigation tools
+    tool_label = tool.label_for(:global_navigation, I18n.locale)
+    tool_id = "#{tool_label.gsub(' ', '-').downcase}-#{tool.id}"
+    tool_path = account_external_tool_path(@domain_root_account, tool, launch_type: 'global_navigation', display: tool_display, toolId: tool_id)
 
-    { tool: tool, tool_path: tool_path, current_page: current_page?(tool_path), new_tab: tool_display == 'borderless' }
+    { tool:, tool_path:, tool_label:, tool_id:, current_page: current_page?(tool_path), new_tab: tool_display == 'borderless' }
   end
 %>
 <%# include active tab status in cache key so that the HTML is always accurate %>
@@ -32,7 +35,7 @@
         tool = tool_details[:tool]
         new_tab = tool_details[:new_tab]
   %>
-    <li id="<%= tool.asset_string %>_menu_item" class="globalNavExternalTool menu-item ic-app-header__menu-list-item<% if tool_details[:current_page]%> ic-app-header__menu-list-item--active<% end %>">
+    <li id="<%= tool.asset_string %>_menu_item" data-tool-id="<%= tool_details[:tool_id] %>" class="globalNavExternalTool menu-item ic-app-header__menu-list-item<% if tool_details[:current_page]%> ic-app-header__menu-list-item--active<% end %>">
       <a class='ic-app-header__menu-list-link' href="<%= tool_details[:tool_path] %>" target="<%= (new_tab && tool.root_account.feature_enabled?(:open_tools_in_new_tab)) ? '_blank' : '' %>">
         <% svg_path = tool.extension_setting(:global_navigation, :icon_svg_path_64) %>
         <% if svg_path %>
@@ -43,7 +46,7 @@
           <img src="<%= tool.extension_setting(:global_navigation, :icon_url) %>" alt="<%= tool.name %>" class="lti_tool_icon_large"/>
         <% end %>
         <div class="menu-item__text">
-          <%= tool.label_for(:global_navigation, I18n.locale) %>
+          <%= tool_details[:tool_label] %>
         </div>
       </a>
     </li>

@@ -198,12 +198,14 @@ describe('SideNav', () => {
           imgSrc: 'img/tool1.png',
           href: 'http://tool1.com',
           svgPath: null,
+          toolId: 'tool-1-1',
         },
         {
           label: 'Tool 2',
           imgSrc: null,
           href: 'http://tool2.com',
           svgPath: 'path-to-svg',
+          toolId: 'tool-2-2',
         },
       ]
       render(
@@ -215,29 +217,31 @@ describe('SideNav', () => {
       expect(screen.getByText('Tool 2')).toBeInTheDocument()
       expect(screen.getByText('Tool 1').closest('a')).toHaveAttribute(
         'href',
-        'http://tool1.com&toolId=tool-1',
+        'http://tool1.com&toolId=tool-1-1',
       )
       expect(screen.getByText('Tool 2').closest('a')).toHaveAttribute(
         'href',
-        'http://tool2.com&toolId=tool-2',
+        'http://tool2.com&toolId=tool-2-2',
       )
     })
 
     it('should not render invalid tools', () => {
-      const valid_tool_id_derived_from_label = 'Valid Tool'
+      const valid_tool_id_derived_from_label = 'valid-tool-1'
       const invalid_tool_id_derived_from_label = ''
       const externalTools: ExternalTool[] = [
         {
-          label: valid_tool_id_derived_from_label,
+          label: 'Valid Tool',
           imgSrc: 'img/tool1.png',
           href: 'http://tool1.com',
           svgPath: null,
+          toolId: valid_tool_id_derived_from_label,
         },
         {
-          label: invalid_tool_id_derived_from_label,
+          label: 'Invalid Tool',
           imgSrc: 'img2.png',
           href: 'http://tool2.com',
           svgPath: 'path2',
+          toolId: invalid_tool_id_derived_from_label,
         },
       ]
       render(
@@ -245,7 +249,7 @@ describe('SideNav', () => {
           <SideNav externalTools={externalTools} />
         </MockedQueryClientProvider>,
       )
-      expect(screen.getByText(valid_tool_id_derived_from_label)).toBeInTheDocument()
+      expect(screen.getByText('Valid Tool')).toBeInTheDocument()
       expect(screen.queryByAltText('img2.png')).not.toBeInTheDocument()
       expect(screen.queryByText('http://tool2.com')).not.toBeInTheDocument()
       expect(screen.queryByAltText('path2')).not.toBeInTheDocument()
@@ -258,6 +262,7 @@ describe('SideNav', () => {
           imgSrc: 'img/tool1.png',
           href: 'https://custom.example.com',
           svgPath: null,
+          toolId: 'tool-1-1',
         },
       ]
       render(
@@ -268,7 +273,7 @@ describe('SideNav', () => {
       expect(screen.getByText('Tool 1')).toBeInTheDocument()
       expect(screen.getByText('Tool 1').closest('a')).toHaveAttribute(
         'href',
-        'https://custom.example.com&toolId=tool-1',
+        'https://custom.example.com&toolId=tool-1-1',
       )
     })
 
@@ -279,6 +284,7 @@ describe('SideNav', () => {
           imgSrc: null,
           href: 'https://global.example.com',
           svgPath: 'path-to-svg',
+          toolId: 'tool-2-2',
         },
       ]
       render(
@@ -289,7 +295,7 @@ describe('SideNav', () => {
       expect(screen.getByText('Tool 2')).toBeInTheDocument()
       expect(screen.getByText('Tool 2').closest('a')).toHaveAttribute(
         'href',
-        'https://global.example.com&toolId=tool-2',
+        'https://global.example.com&toolId=tool-2-2',
       )
     })
 
@@ -300,6 +306,7 @@ describe('SideNav', () => {
           imgSrc: 'img/tool3.png',
           href: null,
           svgPath: null,
+          toolId: 'tool-3-3',
         },
       ]
       render(
@@ -308,7 +315,7 @@ describe('SideNav', () => {
         </MockedQueryClientProvider>,
       )
       expect(screen.getByText('Tool 3')).toBeInTheDocument()
-      expect(screen.getByText('Tool 3').closest('a')).toHaveAttribute('href', '#&toolId=tool-3')
+      expect(screen.getByText('Tool 3').closest('a')).toHaveAttribute('href', '#&toolId=tool-3-3')
     })
 
     it('should handle tools with null image correctly and use fallback icon', async () => {
@@ -318,6 +325,7 @@ describe('SideNav', () => {
           imgSrc: null,
           href: 'http://tool-null-image.com',
           svgPath: null,
+          toolId: 'tool-with-null-image-1',
         },
       ]
       render(
@@ -328,7 +336,7 @@ describe('SideNav', () => {
       expect(await screen.findByText('Tool with Null Image')).toBeInTheDocument()
       expect(screen.getByText('Tool with Null Image').closest('a')).toHaveAttribute(
         'href',
-        'http://tool-null-image.com&toolId=tool-with-null-image',
+        'http://tool-null-image.com&toolId=tool-with-null-image-1',
       )
       const fallbackIcon = screen.getByTestId('IconExternalLinkLine')
       expect(fallbackIcon).toBeInTheDocument()

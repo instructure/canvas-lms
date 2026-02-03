@@ -427,30 +427,36 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
             minimized={collapseSideNav}
           />
 
-          {processedTools.map(tool => (
-            <SideNavBar.Item
-              key={tool.toolId}
-              id={`${tool.toolId}-external-tool-tray`}
-              icon={
-                tool.svgPath ? (
-                  <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
-                ) : tool.toolImg ? (
-                  <Img width="26px" height="26px" src={tool.toolImg} alt="" />
-                ) : (
-                  <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
-                )
-              }
-              label={tool.label}
-              href={`${tool.href?.toString() || '#'}&toolId=${tool.toolId}`}
-              onClick={() => handleActiveTray(tool.toolId)}
-              selected={selectedNavItem === tool.toolId}
-              data-selected={selectedNavItem === tool.toolId}
-              themeOverride={{
-                fontWeight: 400,
-              }}
-              minimized={collapseSideNav}
-            />
-          ))}
+          {processedTools.map(tool => {
+            let toolHref = tool.href?.toString() || '#'
+            if (!tool.href?.includes('toolId')) {
+              toolHref += `&toolId=${tool.toolId}`
+            }
+            return (
+              <SideNavBar.Item
+                key={tool.toolId}
+                id={`${tool.toolId}-external-tool-tray`}
+                icon={
+                  tool.svgPath ? (
+                    <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
+                  ) : tool.toolImg ? (
+                    <Img width="26px" height="26px" src={tool.toolImg} alt="" />
+                  ) : (
+                    <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
+                  )
+                }
+                label={tool.label}
+                href={toolHref}
+                onClick={() => handleActiveTray(tool.toolId)}
+                selected={selectedNavItem === tool.toolId}
+                data-selected={selectedNavItem === tool.toolId}
+                themeOverride={{
+                  fontWeight: 400,
+                }}
+                minimized={collapseSideNav}
+              />
+            )
+          })}
 
           <SideNavBar.Item
             id="help-tray"

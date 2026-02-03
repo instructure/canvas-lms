@@ -73,7 +73,7 @@ describe "New SideNav Navigation" do
                                     })
         @tool.save!
         get "/"
-        expect(f("#commons-external-tool-tray")).to be_displayed
+        expect(f("#commons-#{@tool.id}-external-tool-tray")).to be_displayed
       end
 
       it "displays dynamic elements correctly" do
@@ -140,7 +140,7 @@ describe "New SideNav Navigation" do
                                     })
         @tool.save!
         get "/"
-        expect(f("#commons-external-tool-tray")).to be_displayed
+        expect(f("#commons-#{@tool.id}-external-tool-tray")).to be_displayed
       end
 
       it "displays dynamic elements correctly" do
