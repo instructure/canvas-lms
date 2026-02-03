@@ -161,6 +161,75 @@ describe SubmissionSearch do
     end
   end
 
+  context "completed courses" do
+    let_once(:completed_course) { Course.create!(workflow_state: "completed") }
+    let_once(:completed_teacher) do
+      teacher = User.create!(name: "Completed Course Teacher")
+      TeacherEnrollment.create!(user: teacher, course: completed_course, workflow_state: "active")
+      teacher
+    end
+    let_once(:completed_student) { User.create!(name: "Completed Course Student") }
+    let_once(:completed_assignment) do
+      Assignment.create!(
+        course: completed_course,
+        workflow_state: "active",
+        submission_types: "online_text_entry",
+        title: "completed course assignment"
+      )
+    end
+
+    before :once do
+      StudentEnrollment.create!(user: completed_student, course: completed_course, workflow_state: "completed")
+    end
+
+    it "automatically includes concluded students when course is completed via gradebook enrollment filters" do
+      results = SubmissionSearch.new(
+        completed_assignment,
+        completed_teacher,
+        nil,
+        order_by: [{ field: "username" }],
+        apply_gradebook_enrollment_filters: true
+      ).search
+      expect(results.where(user: completed_student).exists?).to be true
+    end
+
+    it "includes concluded students when course is completed even if gradebook settings explicitly exclude them" do
+      completed_teacher.preferences[:gradebook_settings] = {
+        completed_course.global_id => {
+          "show_concluded_enrollments" => "false"
+        }
+      }
+      completed_teacher.save!
+
+      results = SubmissionSearch.new(
+        completed_assignment,
+        completed_teacher,
+        nil,
+        order_by: [{ field: "username" }],
+        apply_gradebook_enrollment_filters: true
+      ).search
+      expect(results.where(user: completed_student).exists?).to be true
+    end
+
+    it "still excludes inactive students when course is completed unless gradebook settings include them" do
+      inactive_student = User.create!(name: "Inactive Student")
+      StudentEnrollment.create!(user: inactive_student, course: completed_course, workflow_state: "inactive")
+
+      results = SubmissionSearch.new(
+        completed_assignment,
+        completed_teacher,
+        nil,
+        order_by: [{ field: "username" }],
+        apply_gradebook_enrollment_filters: true
+      ).search
+
+      aggregate_failures do
+        expect(results.where(user: completed_student).exists?).to be true
+        expect(results.where(user: inactive_student).exists?).to be false
+      end
+    end
+  end
+
   it "finds submissions with user name search" do
     results = SubmissionSearch.new(assignment,
                                    teacher,
@@ -700,6 +769,49 @@ describe SubmissionSearch do
           expect(results.first.user.id).to eq amanda.id
         end
       end
+
+      it "considers concluded group members when selecting representative for completed courses" do
+        course.update!(workflow_state: "completed")
+        course.enrollments.find_by(user: amanda).conclude
+
+        results = SubmissionSearch.new(
+          assignment,
+          teacher,
+          nil,
+          apply_gradebook_enrollment_filters: true,
+          representatives_only: true
+        ).search
+
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user.id).to eq jonah.id
+        end
+      end
+
+      it "selects concluded user as representative when course is completed, ignoring gradebook exclusion settings" do
+        course.update!(workflow_state: "completed")
+        course.enrollments.find_by(user: jonah).conclude
+        teacher.preferences[:gradebook_settings] = {
+          course.global_id => {
+            "show_concluded_enrollments" => "false"
+          }
+        }
+        teacher.save!
+
+        results = SubmissionSearch.new(
+          assignment,
+          teacher,
+          nil,
+          apply_gradebook_enrollment_filters: true,
+          representatives_only: true
+        ).search
+
+        aggregate_failures do
+          expect(results.count).to eq 1
+          # jonah is still the rep because completed courses include concluded enrollments
+          expect(results.first.user.id).to eq jonah.id
+        end
+      end
     end
   end
 
@@ -874,6 +986,45 @@ describe SubmissionSearch do
       # student_section2 is in section2, but assignment only has section1 override
       search = SubmissionSearch.new(assignment, teacher, nil, apply_gradebook_enrollment_filters: true)
       user_scope = User.where(id: [student_section1.id, student_section2.id])
+      result = search.send(:filter_section_enrollment_states, user_scope)
+      expect(result.pluck(:id)).to eq [student_section1.id]
+    end
+
+    it "includes concluded users when course is completed" do
+      assignment.only_visible_to_overrides = true
+      assignment.save!
+      create_section_override_for_assignment(assignment, section: section1)
+
+      # Conclude student_section1's enrollment
+      course.enrollments.find_by(user: student_section1).conclude
+      # Complete the course
+      course.update!(workflow_state: "completed")
+
+      search = SubmissionSearch.new(assignment, teacher, nil, apply_gradebook_enrollment_filters: true)
+      user_scope = User.where(id: [student_section1.id])
+      result = search.send(:filter_section_enrollment_states, user_scope)
+      expect(result.pluck(:id)).to eq [student_section1.id]
+    end
+
+    it "includes concluded users when course is completed even if gradebook settings exclude them" do
+      assignment.only_visible_to_overrides = true
+      assignment.save!
+      create_section_override_for_assignment(assignment, section: section1)
+
+      # Conclude student_section1's enrollment
+      course.enrollments.find_by(user: student_section1).conclude
+      # Complete the course
+      course.update!(workflow_state: "completed")
+
+      teacher.preferences[:gradebook_settings] = {
+        course.global_id => {
+          "show_concluded_enrollments" => "false"
+        }
+      }
+      teacher.save!
+
+      search = SubmissionSearch.new(assignment, teacher, nil, apply_gradebook_enrollment_filters: true)
+      user_scope = User.where(id: [student_section1.id])
       result = search.send(:filter_section_enrollment_states, user_scope)
       expect(result.pluck(:id)).to eq [student_section1.id]
     end
