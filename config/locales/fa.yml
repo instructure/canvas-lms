@@ -6079,6 +6079,7 @@ fa:
   confirmation_code_required_22984955: "رمز تأیید (لازم)"
   confirmation_failed_please_try_again_ae566d37: "تأیید انجام نشد. لطفا دوباره تلاش کنید."
   confirming_2df4b68f: "درحال تأیید..."
+  confirming_course_name_5a509f48: "در حال تأیید %{course_name}..."
   confused_panda_questioning_what_to_do_next_42941484: "پاندای سردرگم می‌پرسد که بعداً چه کاری انجام دهد"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "انتخاب چندین نوع ارسال را در نظر بگیرید چون که ممکن است دانشجویانی قادر به ایجاد حاشیه نویسی نباشند."
   consumer_key_57d9fcf1: "کلید مصرف کننده"
@@ -7341,6 +7342,7 @@ fa:
   course_id_8bd2a21c: "شناسه درس"
   course_id_a7c924d5: "شناسه درس"
   course_id_b0bc82d4: "شناسه درس"
+  course_id_course_id_2841413a: "شناسه درس \"%{course_id}\""
   course_id_f8640bb8: شناسه_درس
   course_image_for_course_cfbb08df: "تصویر درس برای %{course}"
   course_image_settings_eba3ec55: "تنظیمات تصویر درس"
@@ -7427,6 +7429,7 @@ fa:
   course_name_45175338: "نام درس"
   course_name_63b973d1: "نام درس"
   course_name_is_required_90919349: "نام درس لازم است"
+  course_name_not_authorized_for_cross_listing_353e500f: "%{course_name} برای فهرست بندی متقابل مجاز نیست"
   course_name_successfully_added_48116a50: "%{course_name} با موفقیت افزوده شد!"
   course_navigation_dd035109: "پیمایش درس"
   course_navigation_settings: 
@@ -8273,6 +8276,9 @@ fa:
   criterion_ratings_3eed22e2: "رتبه بندی های معیار"
   criterion_updated_36c0b3dc: "معیار به روز شد"
   croatian_d713d655: کرواسی
+  cross_list_section_27801ec9: "فهرست بندی متقابل بخش"
+  cross_list_this_section_889f7287: "فهرست بندی متقابل این بخش"
+  cross_list_this_section_90aea97f: "فهرست بندی متقابل این بخش"
   cross_listing_3318526a: "مقایسه ی لیست متقابل هم"
   crowdsourced: true
   crumbs: 
@@ -17321,6 +17327,7 @@ fa:
   or_a01eec62: یا
   or_choose_files_b795006d: "یا فایل ها را انتخاب کنید"
   or_ef4e808: یا
+  or_enter_the_course_s_id_46e0792a: "یا شناسه درس را وارد کنید"
   orange_81386a62: نارنجی
   orbis_report_header_assignment_id: "شناسه تکلیف"
   orbis_report_header_assignment_title: "عنوان تکلیف"
@@ -20437,6 +20444,7 @@ fa:
   rce_contents_replace_display_name: " جایگزین کردن محتوا RCE"
   rce_enhancements_5701e06: "ارتقای RCE"
   re_activate_user_f7d77c9a: "فعال سازی دوباره کاربر"
+  re_cross_list_this_section_faf7df4d: "فهرست بندی متقابل دوباره این بخش"
   re_reported_b9671073: "دوباره گزارش شده"
   re_send_confirmation_bcc66940: "ارسال دوباره تأییدیه"
   re_sending_379a8580: "در حال ارسال دوباره..."
@@ -21343,6 +21351,7 @@ fa:
   search_for_a_course_58fdc7a6: "جستجوی یک درس"
   search_for_a_deleted_course_by_id_f553398d: "جستجوی درس حذف شده بر اساس شناسه"
   search_for_assignment_8149cb1: "جستجوی تکلیف"
+  search_for_course_e1a1dfc6: "جستجو برای درس"
   search_for_files_7541fb28: "جستجوی فایل ها"
   search_for_people_by_id_or_name_36107593: "جستجوی افراد بر اساس شناسه یا نام"
   search_for_your_school_or_institution_1eb2eeaf: "مدرسه یا موسسه خود را جستجو کنید"
@@ -21415,6 +21424,7 @@ fa:
   section_specific_discussions_are_disabled_9e3fd431: "بحث های خاص بخش غیر فعال شده اند"
   section_specific_topics_must_have_sections_11868960: "موضوع های خاص بخش باید بخش داشته باشند"
   section_starts_at_65eaed1: "بخش شروع می شود در"
+  section_successfully_cross_listed_86eb2765: "بخش با موفقیت فهرست بندی متقابل شد!"
   section_successfully_de_cross_listed_df3b64e: "لغو فهرست بندی متقابل بخش با موفقیت انجام شد!"
   sections: 
     section_created: "بخش با موفقیت ایجاد شد!"
@@ -21600,6 +21610,7 @@ fa:
   selected_answer: "این پاسخ را انتخاب کرده اید."
   selected_calendars_cc7f325b: "تقویم های منتخب"
   selected_content_is_not_an_lti_link_11780d96: "محتوای انتخاب شده یک لینک LTI نمی باشد."
+  selected_course_9bf57f33: "درس انتخاب شده"
   selected_course_course_a581f834: "درس %{course} انتخاب شده"
   selected_de3a8019: "انتخاب شده"
   selected_external_tool_tool_bae095ba: "ابزار خارجی انتخاب شده %{tool}"
