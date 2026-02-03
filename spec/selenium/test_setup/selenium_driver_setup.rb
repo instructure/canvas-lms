@@ -73,6 +73,9 @@ module SeleniumDriverSetup
     end
 
     def run
+      # Ensure SELENIUM env var is set so initializers can detect Selenium test runs
+      ENV["SELENIUM"] = "1" unless ENV["SELENIUM"]
+
       begin
         [
           Thread.new { start_webserver },
