@@ -6860,6 +6860,7 @@ ko:
   confirm_user_merge_modal_66752375: "사용자 병합 모달 확인"
   confirmation_failed_please_try_again_9b7bab7b: "확인하지 못했습니다. 다시 시도하세요."
   confirming_2df4b68f: "확인 중..."
+  confirming_course_name_5a509f48: "%{course_name} 확인 중..."
   conical_flask_13afda8a: 플라스크
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "메모를 만들 수 없는 학생을 고려하여 여러 제출 유형을 선택하는 것을 고려하세요."
   consolidated_media_player_d39a16fd: "통합된 미디어 플레이어"
@@ -8331,6 +8332,7 @@ ko:
   course_id_a7c924d5: "과목 ID"
   course_id_b0bc82d4: "과목 ID"
   course_id_course_code_df728a00: "과목 ID: %{course_code}"
+  course_id_course_id_2841413a: "과목 ID \"%{course_id}\""
   course_id_is_required_c4f2f16a: "과목 ID는 필수입니다"
   course_id_is_required_fb6931dd: "과목 ID는 필수입니다."
   course_id_is_required_for_assign_to_functionality_15bffb3a: "과제 기능을 위해 과목 ID는 필수입니다"
@@ -8426,6 +8428,7 @@ ko:
   course_name_enrollment_type_6f8db8a1: "%{course_name} (%{enrollment_type})"
   course_name_is_required_d987f1c3: "과목 이름은 필수입니다."
   course_name_must_be_255_characters_or_less_e7afed1a: "과목 이름 255자 이하여야 합니다"
+  course_name_not_authorized_for_cross_listing_353e500f: "%{course_name}은(는) 교차 나열이 승인되지 않음"
   course_name_successfully_added_48116a50: "%{course_name}이(가) 추가되었습니다."
   course_navigation_dd035109: "과목 탐색"
   course_navigation_settings: 
@@ -9306,6 +9309,9 @@ ko:
   criterion_score_8e9d1e60: "조건 점수"
   criterion_updated_36c0b3dc: "조건 업데이트됨"
   croatian_d713d655: 크로아티아어
+  cross_list_section_27801ec9: "섹션 교차 나열"
+  cross_list_this_section_889f7287: "섹션 교차 나열"
+  cross_list_this_section_90aea97f: "섹션 교차 나열"
   cross_listing_3318526a: 크로스리스팅
   crowdsourced: true
   crumbs: 
@@ -20218,6 +20224,7 @@ ko:
   or_choose_a_file_to_upload_501c8c28: "또는 업로드할 파일을 선택"
   or_choose_files_b795006d: "또는 파일 선택"
   or_ef4e808: 또는
+  or_enter_the_course_s_id_46e0792a: "또는 과목 ID 입력"
   or_in_the_courses_list_6201030: "...또는 과목 목록에서"
   orange_81386a62: 오렌지
   orbis_report_header_assignment_id: "과제 ID"
@@ -23664,6 +23671,7 @@ ko:
   rce_icon_maker_2114f87: "RCE 아이콘 작성기"
   rce_lite_in_speedgrader_comments_a06a5df9: "SpeedGrader 댓글에 RCE lite"
   re_activate_user_f7d77c9a: "사용자 다시 활성화"
+  re_cross_list_this_section_faf7df4d: "섹션 다시 교차 나열"
   re_reported_b9671073: "다시 보고됨"
   re_send_confirmation_bcc66940: "확인 다시 전송"
   re_send_notification_directly_to_users_when_announ_c421cea5: "공지가 시작되면 사용자에게 직접 알림을 다시 보내기"
@@ -24816,6 +24824,7 @@ ko:
   search_for_a_deleted_user_by_id_32f109e7: "ID로 삭제된 사용자를 검색"
   search_for_a_folder_or_file_name_3f3ea868: "폴더 또는 파일 이름을 검색..."
   search_for_assignment_8149cb1: "과제 검색"
+  search_for_course_e1a1dfc6: "과목 검색"
   search_for_files_7541fb28: "파일을 검색"
   search_for_people_by_id_or_name_36107593: "ID 또는 이름으로 사용자 검색"
   search_for_sections_62e90cf4: "분반을 검색"
@@ -24881,7 +24890,7 @@ ko:
     enrolled_as_teacher: "등록 유형: 교사"
     errors: 
       confirmation_failed: "확인 실패"
-      course_not_authorized_for_crosslist: "%{course_name}은(는) 교차 나열이 승인되지 않음"
+      course_not_authorized_for_crosslist: "%{course_name}이(가) 크로스리스팅에 승인되지 않음"
       missing_target_course_for_crosslist: "유효한 과목 이름이 아님"
     status: 
       confirming_course: "%{course_name} 확인 중..."
@@ -24917,6 +24926,7 @@ ko:
   section_size_1f3b7f18: "분반 크기"
   section_specific_topics_must_have_sections_11868960: "분반에 지정된 주제에는 분반이 있어야 합니다"
   section_starts_at_65eaed1: "분반 시작"
+  section_successfully_cross_listed_86eb2765: "섹션을 성공적으로 교차 나열했습니다!"
   section_successfully_de_cross_listed_df3b64e: "섹션을 성공적으로 교차 나열 해제했습니다."
   section_type_64250c5b: "반반 유형"
   sections: 
@@ -24936,17 +24946,17 @@ ko:
       buttons: 
         back_to_course: "과목 설정으로 돌아가기"
         cancel: 취소
-        crosslist_section: "섹션 교차 나열"
-        crosslist_this_section: "섹션 교차 나열"
+        crosslist_section: "이 분반을 크로스리스팅"
+        crosslist_this_section: "이 분반을 크로스리스팅"
         decrosslit_section: "이 분반을 크로스리스팅 해제"
         edit_section: "섹션 편집"
-        recrosslist_section: "섹션 다시 교차 나열"
+        recrosslist_section: "이 분반을 다시 크로스리스팅"
         uncrosslist_section: "이 분반을 크로스리스팅 해제"
         update_section: "섹션 업데이트"
       completed_enrollment: 
         one: "완료된 등록 %{count}건"
         other: "완료된 등록 %{count}건"
-      crosslist_description: "교차 나열을 이용하면 하나의 계정에서 섹션을 만들고 다른 계정의 과목으로 이동할 수 있습니다. 이 과목을 교차 나열하려면 검색 도구를 사용하거나 과목 ID를 입력하여 옮길 대상 과목을 찾아야 합니다."
+      crosslist_description: "크로스리스팅을 사용하면 한 계정에 분반을 만들고 다른 계정에 과목으로 이동할 수 있습니다. 이 과목을 크로스리스팅하려면 검색 도구를 사용하거나 과목의 ID를 입력하여 이동하려는 과목을 찾아야 합니다."
       decrosslist_description: "이렇게 하면 분반을 다시 원래 과목 **%{course_name}**(으)로 이동합니다."
       decrosslist_long_description: "이 과목에 학생들의 모든 성적은 더 이상 표시되지 않습니다. 나중에 다시 과목을 크로스리스팅하여 성적을 검색할 수 있지만 그 동안 학생들의 성적은 원래 과목에서 나옵니다."
       labels: 
@@ -24957,7 +24967,7 @@ ko:
           selected_course: "선택된 과목"
           sis_id: "SIS ID"
         name: "섹션 이름"
-        search_for_course: "과목 검색"
+        search_for_course: "과목을 검색"
         sis_id: "SIS ID"
         sis_source_id: "SIS ID"
         start_at: 시작
@@ -24973,8 +24983,8 @@ ko:
       student_access_dates: "학생은 이 날짜 사이에만 과목을 액세스할 수 있음"
       titles: 
         completed_enrollments: "완료된 등록"
-        cross_listed_sections: "섹션 교차 나열"
-        crosslist_this_section: "섹션 교차 나열"
+        cross_listed_sections: "분반을 크로스리스팅"
+        crosslist_this_section: "이 분반을 크로스리스팅"
         current_enrollments: "현재 등록"
         decrosslist_section: "이 분반을 크로스리스팅 해제"
   sections_6d057c07: 분반
@@ -25184,6 +25194,7 @@ ko:
   selected_calendars_cc7f325b: "선택된 캘린더"
   selected_content_contains_non_lti_links_f9dfd762: "선택된 콘텐츠가 LTI 이외의 링크를 포함합니다."
   selected_content_is_not_an_lti_link_11780d96: "선택된 콘텐츠가 LTI 링크가 아닙니다."
+  selected_course_9bf57f33: "선택된 과목"
   selected_course_course_a581f834: "선택 과목 %{course}"
   selected_emojis_will_not_be_available_in_the_emoji_412d8776: "선택된 이모지는 학생 또는 교강사의 '이모지 선택기'에서 사용할 수 없게 됩니다."
   selected_external_tool_tool_bae095ba: "선택된 외부 도구 %{tool}"

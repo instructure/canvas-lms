@@ -4339,6 +4339,7 @@ uk:
   confirmation_code_required_22984955: "Код підтвердження (обов'язково)"
   confirmation_failed_please_try_again_ae566d37: "Підтвердження не вдале.  Будь ласка, спробуйте ще раз."
   confirming_2df4b68f: Підтвердження...
+  confirming_course_name_5a509f48: "Підтвердження %{course_name}..."
   consumer_key_6f94ba11: "Ключ клієнта"
   contact_a6e7f6da: Зв'язатися
   content_1440204b: Вміст
@@ -5383,6 +5384,7 @@ uk:
   course_id_8bd2a21c: "ID курсу"
   course_id_a7c924d5: "ідентифікатор курса"
   course_id_b0bc82d4: "Ідентифікатор курсу"
+  course_id_course_id_2841413a: "Ідентифікатор курсу \"%{course_id}\""
   course_id_f8640bb8: course_id
   course_image_for_course_cfbb08df: "Зображення курсу для %{course}"
   course_image_settings_eba3ec55: "Налаштування зображення курсу"
@@ -5464,6 +5466,7 @@ uk:
   course_name_45175338: "назва курса"
   course_name_63b973d1: "Назва курсу"
   course_name_is_required_90919349: "Ім'я курсу обов'язкове"
+  course_name_not_authorized_for_cross_listing_353e500f: "%{course_name} не авторизован для cross-listing"
   course_name_successfully_added_48116a50: "%{course_name} було успішно додано!"
   course_navigation_dd035109: "Навігація курсу"
   course_navigation_settings: 
@@ -6037,6 +6040,9 @@ uk:
   criterion_long_description_e9a97247: "Детальний опис критерія"
   criterion_ratings_3eed22e2: "Рейтинг критеріїв"
   criterion_updated_36c0b3dc: "Критерій оновлено"
+  cross_list_section_27801ec9: "Cross-List Розділу"
+  cross_list_this_section_889f7287: "Cross-List цього розділу"
+  cross_list_this_section_90aea97f: "Cross-List цього розділу"
   crumbs: 
     access_report: "Звіт про доступ"
     announcements: Оголошення
@@ -12577,6 +12583,7 @@ uk:
   options_3ab0ea65: Варіанти
   options_for_title_label_17f821ff: "Варіанти для %{title_label}"
   or_ef4e808: або
+  or_enter_the_course_s_id_46e0792a: "Або введіть ідентифікатор курсу"
   orange_81386a62: Помаранчевий
   orbis_report_header_assignment_id: "ідентифікатор призначення"
   orbis_report_header_assignment_title: "назва призначення"
@@ -15193,6 +15200,7 @@ uk:
   ratio_answered_correctly_b0c1e7d: "%{ratio}відповіли правильно"
   ratio_responded_correctly_6d890107: "%{ratio}відповіли правильно"
   re_activate_user_f7d77c9a: "Повторно активувати користувача"
+  re_cross_list_this_section_faf7df4d: "Re-Cross-List цього розділу"
   re_reported_b9671073: "Повторно повідомлено"
   re_send_confirmation_bcc66940: "Повторна відправка підтвердження"
   re_sending_379a8580: "Повторна відправка..."
@@ -15876,6 +15884,7 @@ uk:
   search_for_a_course_58fdc7a6: "Пошук для курсу"
   search_for_a_deleted_course_by_id_f553398d: "Шукайте видалений курс за ідентифікатором"
   search_for_assignment_8149cb1: "Пошук Завдання"
+  search_for_course_e1a1dfc6: "Шукати курс"
   search_for_files_7541fb28: "Шукати файли"
   search_for_people_by_id_or_name_36107593: "Пошук людей за ID або іменем"
   search_form_fcaa38f7: "Форма пошуку"
@@ -15937,6 +15946,7 @@ uk:
   section_specific_discussions_are_disabled_9e3fd431: "Обговорення для конкретних розділів відключено"
   section_specific_topics_must_have_sections_11868960: "Теми конкретних розділів повинні мати розділи"
   section_starts_at_65eaed1: "Розділ починається в"
+  section_successfully_cross_listed_86eb2765: "Розділ успішно cross-listed!"
   section_successfully_de_cross_listed_df3b64e: "Розділ успішно de-cross-listed!"
   sections: 
     section_created: "Розділ успішно створено!"
@@ -16082,6 +16092,7 @@ uk:
   selected_274ce24f: Обраний
   selected_all_courses_9cfef57f: "Вибрати усі курси"
   selected_answer: "Ви вибрали цю відповідь."
+  selected_course_9bf57f33: "Обраний курс"
   selected_course_course_a581f834: "Обраний курс %{course}"
   selected_subtree_a7693937: "Обраний %{subtree}"
   self_enrollments: 
