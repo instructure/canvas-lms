@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useState, useCallback, useRef, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
@@ -41,6 +42,7 @@ import {Draggable} from 'react-beautiful-dnd'
 import RegenerateCriteria from './AIGeneratedCriteria/RegenerateCriteria'
 import '../drag-and-drop/styles.css'
 import {useGetRubricOutcome} from '../../RubricAssessment/queries/useGetRubricOutcome'
+import {CriterionRowPopover} from './CriterionRowPopover'
 
 const I18n = createI18nScope('rubrics-criteria-row')
 
@@ -59,6 +61,12 @@ type RubricCriteriaRowProps = {
   onDuplicateCriterion: () => void
   onEditCriterion: () => void
   onRegenerateCriterion?: (criterion: RubricCriterion, additionalPrompt: string) => void
+  handleMoveCriterion: (index: number, moveValue: number) => void
+  criterionIndex: number
+  isFirstCriterion: boolean
+  isLastCriterion: boolean
+  shouldFocus?: boolean
+  onFocused?: () => void
 }
 
 export const RubricCriteriaRow = ({
@@ -76,8 +84,15 @@ export const RubricCriteriaRow = ({
   onDuplicateCriterion,
   onEditCriterion,
   onRegenerateCriterion,
+  handleMoveCriterion,
+  criterionIndex,
+  isFirstCriterion,
+  isLastCriterion,
+  shouldFocus = false,
+  onFocused,
 }: RubricCriteriaRowProps) => {
   const {data: outcomeTagData} = useGetRubricOutcome(selectedLearningOutcomeId)
+  const popoverRef = useRef<HTMLSpanElement>(null)
 
   const {
     description,
@@ -92,6 +107,26 @@ export const RubricCriteriaRow = ({
   const editCriterionTooltip = learningOutcomeId
     ? I18n.t('View Outcome Criterion')
     : I18n.t('Edit Criterion')
+
+  const handleMoveUp = useCallback(() => {
+    handleMoveCriterion(criterionIndex, -1)
+  }, [handleMoveCriterion, criterionIndex])
+
+  const handleMoveDown = useCallback(() => {
+    handleMoveCriterion(criterionIndex, 1)
+  }, [handleMoveCriterion, criterionIndex])
+
+  // Focus the popover trigger button after a criterion is moved
+  useEffect(() => {
+    if (shouldFocus && popoverRef.current) {
+      // Focus the button inside the span wrapper
+      const button = popoverRef.current.querySelector('button')
+      if (button) {
+        button.focus()
+        onFocused?.()
+      }
+    }
+  }, [shouldFocus, onFocused])
 
   return (
     <Draggable draggableId={criterion.id || Date.now().toString()} index={rowIndex - 1}>
@@ -232,6 +267,15 @@ export const RubricCriteriaRow = ({
                     </Text>
                   </Pill>
                 )}
+                <View as="span" margin="0 0 0 medium">
+                  <CriterionRowPopover
+                    ref={popoverRef}
+                    isFirstIndex={isFirstCriterion}
+                    isLastIndex={isLastCriterion}
+                    onMoveUp={handleMoveUp}
+                    onMoveDown={handleMoveDown}
+                  />
+                </View>
                 <View as="span" margin="0 0 0 medium">
                   <Tooltip renderTip={editCriterionTooltip}>
                     <IconButton
