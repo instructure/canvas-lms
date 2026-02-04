@@ -238,7 +238,7 @@
             <option value="new"><%= t :create_quiz_option, "[ Create Quiz ]" %></option>
           <% end %>
           <% @combined_active_quizzes.each do |id, title, type| %>
-            <% option_text = "#{title} #{t :classic_quiz_identifier, '(classic)' if @combined_active_quizzes_includes_both_types && type == 'quiz'}" %>
+            <% option_text = @combined_active_quizzes_includes_both_types && type == 'quiz' ? "#{title} #{t :classic_quiz_identifier, '(classic)'}" : title %>
             <option value="<%= type + '_' + id.to_s %>"><%= option_text %></option>
           <% end %>
         </select>
