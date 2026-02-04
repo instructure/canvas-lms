@@ -183,13 +183,24 @@ def configureBuildStage(buildParameters) {
     env.CANVAS_RAILS = canvasRailsOverrideValue
   }
 
-  // Skip translation builds for patchsets uploaded by svc.cloudjenkins
-  if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' && env.GERRIT_CHANGE_SUBJECT =~ /translation$/) {
-    // Set status to NOT_BUILT for pre-merge builds
-    if (!configuration.isChangeMerged()) {
-      currentBuild.result = 'NOT_BUILT'
+  // Require valid GERRIT_CHANGE_NUMBER for all builds - many stages will fail without it
+  if (!env.GERRIT_CHANGE_NUMBER || env.GERRIT_CHANGE_NUMBER == '000000') {
+    error "GERRIT_CHANGE_NUMBER is not set or invalid (${env.GERRIT_CHANGE_NUMBER}). Cannot proceed with build."
+  }
+
+  if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' &&
+    env.GERRIT_CHANGE_SUBJECT =~ /translation$/) {
+    env.SKIP_BUILD = 'true'
+    if (configuration.isChangeMerged()) {
+      // Post-merge translation: will be set to SUCCESS in post block
+      env.SKIP_BUILD_RESULT = 'SUCCESS'
+      echo "Translation build from svc.cloudjenkins@instructure.com - post-merge build will be skipped"
+    } else {
+      // Pre-merge translation: will be set to NOT_BUILT in post block
+      env.SKIP_BUILD_RESULT = 'NOT_BUILT'
+      echo "Translation build from svc.cloudjenkins@instructure.com - pre-merge build will be skipped"
     }
-    return buildParameters
+    error "Skipping translation build from svc.cloudjenkins@instructure.com"
   }
 
   if (commitMessageFlag('skip-ci') as Boolean) {
