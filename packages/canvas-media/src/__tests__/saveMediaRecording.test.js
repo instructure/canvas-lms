@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {http, HttpResponse} from 'msw'
+import {waitFor} from '@testing-library/dom'
+import {HttpResponse, http} from 'msw'
 import {setupServer} from 'msw/node'
+import {vi} from 'vitest'
 import saveMediaRecording, {
   saveClosedCaptions,
   saveClosedCaptionsForAttachment,
 } from '../saveMediaRecording'
-import {vi} from 'vitest'
-import {waitFor} from '@testing-library/dom'
 
 // Mock K5Uploader
 vi.mock('@instructure/k5uploader', () => {

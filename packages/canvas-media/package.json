@@ -14,13 +14,15 @@
     "test:watch": "vitest",
     "test:debug": "vitest --inspect-brk",
     "build": "yarn installTranslations && yarn run build:es",
-    "build:es": "tsc",
+    "build:es": "scripts/build-es.js",
     "build:canvas": "yarn run build",
     "build:watch": "yarn run clean:es && tsc --watch",
     "clean": "rm -rf lib && yarn run clean:es && rm -rf coverage",
     "clean:es": "rm -rf es",
     "prepublishOnly": "yarn build && yarn test",
-    "publishToNpm": "scripts/publish_to_npm.sh"
+    "publishToNpm": "scripts/publish_to_npm.sh",
+    "fmt:check": "biome check",
+    "fmt:fix": "biome check --write"
   },
   "repository": {
     "type": "git",

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
 import {K5Uploader} from '@instructure/k5uploader'
+import axios from 'axios'
 import FileSizeError from './shared/FileSizeError'
 
 export const VIDEO_SIZE_OPTIONS = {height: '432px', width: '768px'}
