@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {string} from 'prop-types'
 import React from 'react'
 import {legacyRender} from '@canvas/react'
 import {Alert} from '@instructure/ui-alerts'
@@ -26,7 +25,11 @@ import ready from '@instructure/ready'
 
 const I18n = createI18nScope('GroupSubmissionAlert')
 
-export default function GroupSubmissionAlert({groupType}) {
+interface GroupSubmissionAlertProps {
+  groupType: string
+}
+
+export default function GroupSubmissionAlert({groupType}: GroupSubmissionAlertProps) {
   return (
     <Alert variant="warning" margin="medium 0">
       {I18n.t('Keep in mind, this submission will count for everyone in your %{groupType} group.', {
@@ -36,14 +39,10 @@ export default function GroupSubmissionAlert({groupType}) {
   )
 }
 
-GroupSubmissionAlert.propTypes = {
-  groupType: string.isRequired,
-}
-
 ready(() => {
-  $('.group_submission_alert').each((idx, alertContainer) => {
+  $('.group_submission_alert').each((_idx, alertContainer) => {
     legacyRender(
-      <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type')} />,
+      <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type') || ''} />,
       alertContainer,
     )
   })
