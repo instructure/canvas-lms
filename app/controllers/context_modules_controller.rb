@@ -122,6 +122,7 @@ class ContextModulesController < ApplicationController
         },
         ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
         CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS) && assign_to_tags,
+        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
         MODULE_TOOLS: module_tool_definitions,
         DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
         PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?,

@@ -82,6 +82,7 @@ class AssignmentsController < ApplicationController
         hash = {
           ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
           CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
+          PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
           WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
           POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
           SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
@@ -887,7 +888,7 @@ class AssignmentsController < ApplicationController
 
   def edit
     rce_js_env
-    @assignment ||= @context.assignments.active.find(params[:id])
+    @assignment ||= @context.assignments.active.preload(:peer_review_sub_assignment).find(params[:id])
     add_crumb_on_new_quizzes(false)
 
     if @context.root_account.feature_enabled?(:assignment_edit_enhancements_teacher_view) &&

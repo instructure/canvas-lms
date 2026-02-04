@@ -316,6 +316,20 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as true if enabled" do
+      user_session(@teacher)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(true)
+    end
+
+    it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as false if disabled" do
+      user_session(@teacher)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(false)
+    end
+
     context "course grading scheme defaults" do
       it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to 0 in js_env if default canvas grading scheme is selected" do
         Account.site_admin.enable_feature!(:grading_scheme_updates)

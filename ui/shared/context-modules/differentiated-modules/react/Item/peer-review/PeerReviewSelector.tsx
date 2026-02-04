@@ -27,6 +27,7 @@ import {
 } from '@canvas/assignments/react/hooks/useSettingDependency'
 
 type PeerReviewSelectorProps = CustomDateTimeInputProps & {
+  peerReviewsEnabled?: boolean
   assignmentDueDate: string | null
   peerReviewAvailableToDate: string | null
   setPeerReviewAvailableToDate: (date: string | null) => void
@@ -53,6 +54,7 @@ type PeerReviewSelectorProps = CustomDateTimeInputProps & {
 }
 
 const PeerReviewSelector = ({
+  peerReviewsEnabled: peerReviewsEnabledProp,
   assignmentDueDate,
   peerReviewAvailableToDate,
   setPeerReviewAvailableToDate,
@@ -74,7 +76,13 @@ const PeerReviewSelector = ({
       'assignment_peer_reviews_checkbox',
     ) as HTMLInputElement | null
     const isChecked = checkbox?.checked ?? false
-    setPeerReviewEnabled(isChecked)
+
+    // If checkbox exists, use its checked state
+    // If checkbox doesn't exist (e.g., in Assign To modal),
+    // use the peerReviewsEnabledProp which indicates if peer reviews are enabled on the assignment
+    const enabledFromProp = checkbox === null && (peerReviewsEnabledProp ?? false)
+
+    setPeerReviewEnabled(isChecked || enabledFromProp)
   }
 
   useEffect(() => {
@@ -90,7 +98,7 @@ const PeerReviewSelector = ({
     return () => {
       checkbox?.removeEventListener('change', handleCheckboxChange)
     }
-  }, [])
+  }, [peerReviewsEnabledProp])
 
   useSettingDependency(SETTING_MESSAGES.TOGGLE_PEER_REVIEWS, {
     onDisabled: () => {
