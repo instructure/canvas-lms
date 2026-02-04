@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
-
 import React from 'react'
 import keycode from 'keycode'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -36,34 +34,41 @@ import ActAsPanda from './svg/ActAsPanda'
 
 const I18n = createI18nScope('act_as')
 
-export default class ActAsModal extends React.Component {
-  static propTypes = {
-    user: PropTypes.shape({
-      name: PropTypes.string,
-      short_name: PropTypes.string,
-      pronouns: PropTypes.string,
-      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-      avatar_image_url: PropTypes.string,
-      sortable_name: PropTypes.string,
-      email: PropTypes.string,
-      pseudonyms: PropTypes.arrayOf(
-        PropTypes.shape({
-          login_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-          sis_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-          integration_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-        }),
-      ),
-    }).isRequired,
-  }
+export interface Pseudonym {
+  login_id: number | string
+  sis_id: number | string
+  integration_id: number | string
+}
 
-  constructor(props) {
+export interface User {
+  name: string
+  short_name: string
+  pronouns?: string
+  id: number | string
+  avatar_image_url: string
+  sortable_name: string
+  email: string
+  pseudonyms: Pseudonym[]
+}
+
+interface ActAsModalProps {
+  user: User
+}
+
+interface ActAsModalState {
+  isLoading: boolean
+}
+
+export default class ActAsModal extends React.Component<ActAsModalProps, ActAsModalState> {
+  closeButton?: HTMLElement | null
+  proceedButton?: HTMLElement | null
+
+  constructor(props: ActAsModalProps) {
     super(props)
 
     this.state = {
       isLoading: false,
     }
-
-    this._button = null
   }
 
   UNSAFE_componentWillMount() {
@@ -96,17 +101,22 @@ export default class ActAsModal extends React.Component {
     this.setState({isLoading: true})
   }
 
-  handleClick = e => {
-    if (e.keyCode && (e.keyCode === keycode.codes.space || e.keyCode === keycode.codes.enter)) {
+  handleClick = (
+    e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>,
+  ) => {
+    if (
+      'keyCode' in e &&
+      (e.keyCode === keycode.codes.space || e.keyCode === keycode.codes.enter)
+    ) {
       // for the data to post correctly, we need an actual click
       // on enter and space press, we simulate a click event and return
-      e.target.click()
+      ;(e.target as HTMLElement).click()
       return
     }
     this.setState({isLoading: true})
   }
 
-  renderInfoTable(caption, renderRows) {
+  renderInfoTable(caption: string, renderRows: () => React.ReactElement) {
     return (
       <Table caption={caption}>
         <Table.Head>
@@ -136,7 +146,7 @@ export default class ActAsModal extends React.Component {
     )
   }
 
-  renderLoginInfoRows = pseudonym => (
+  renderLoginInfoRows = (pseudonym: Pseudonym) => (
     <Table.Body>
       {this.renderUserRow(I18n.t('Login ID:'), pseudonym.login_id)}
       {this.renderUserRow(I18n.t('SIS ID:'), pseudonym.sis_id)}
@@ -144,7 +154,7 @@ export default class ActAsModal extends React.Component {
     </Table.Body>
   )
 
-  renderUserRow(category, info) {
+  renderUserRow(category: string, info: string | number) {
     return (
       <Table.Row>
         <Table.Cell>
@@ -187,7 +197,7 @@ export default class ActAsModal extends React.Component {
                   </div>
                 </div>
                 <div className="ActAs__text">
-                  <View as="div" size="small">
+                  <View as="div">
                     <View as="div" textAlign="center" padding="0 0 x-small 0">
                       <Text size="x-large" weight="light">
                         {I18n.t('Act as %{name}', {
@@ -237,9 +247,10 @@ export default class ActAsModal extends React.Component {
                         color="primary"
                         href={`/users/${user.id}/masquerade`}
                         data-method="post"
+                        // @ts-expect-error - InstUI Button onClick type doesn't match our handler signature
                         onClick={this.handleClick}
                         margin="large 0 0 0"
-                        elementRef={el => (this.proceedButton = el)}
+                        elementRef={el => (this.proceedButton = el as HTMLElement | null)}
                       >
                         {I18n.t('Proceed')}
                       </Button>
