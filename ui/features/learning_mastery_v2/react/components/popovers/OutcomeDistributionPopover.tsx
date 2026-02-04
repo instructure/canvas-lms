@@ -115,7 +115,7 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
       >
         {/* 1. Title Section */}
         <Flex as="div" alignItems="start" margin="0 0 small 0" justifyItems="space-between">
-          <Flex.Item>
+          <Flex.Item shouldShrink={true}>
             <Heading level="h3">
               <TruncateText>{outcome.title}</TruncateText>
             </Heading>
