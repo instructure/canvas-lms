@@ -4825,6 +4825,7 @@ class Course < ActiveRecord::Base
 
   delegate :a11y_checker_ai_table_caption_generation?,
            :a11y_checker_ai_alt_text_generation?,
+           :a11y_checker_close_issues?,
            to: :account
 
   private
