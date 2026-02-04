@@ -165,6 +165,35 @@ module ConditionalRelease
         expect(visible_assmts).to include(@set1_assmt1)
       end
 
+      it "evaluates sequential module requirements after mastery paths assignment" do
+        module_with_sequential = @course.context_modules.create!(
+          name: "Sequential Module",
+          require_sequential_progress: true
+        )
+
+        # Add mastery path assignment to the sequential module with completion requirement
+        tag = module_with_sequential.add_item(type: "assignment", id: @set1_assmt1.id)
+        module_with_sequential.completion_requirements = [
+          { id: tag.id, type: "must_submit" }
+        ]
+        module_with_sequential.save!
+
+        @trigger_assmt.grade_student(@student, grade: 0, grader: @teacher)
+        run_jobs
+
+        progression = module_with_sequential.evaluate_for(@student)
+        expect(progression.current_position).to be_nil
+
+        # Grade trigger to assign student to mastery path
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        # Verify module progression current_position is now set correctly
+        progression.reload
+        expect(progression.current_position).to eq(1)
+        expect(progression.workflow_state).to eq("unlocked")
+      end
+
       it "assigns due dates to quizzes with course pacing enabled" do
         quiz = @course.quizzes.create!(title: "Quiz 1", quiz_type: "assignment")
         quiz.workflow_state = "available"
