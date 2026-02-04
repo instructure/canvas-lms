@@ -3342,7 +3342,7 @@ describe Attachment do
       it "applies a time limit" do
         attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
         Setting.set("attachment_calculate_words_time_limit", "0.001")
-        expect(PDF::Reader).to receive(:new) { sleep 1 } # rubocop:disable Lint/NoSleep
+        allow(PDF::Reader).to receive(:new) { sleep 1 } # rubocop:disable Lint/NoSleep
         expect(Canvas::Errors).to receive(:capture_exception).with(:word_count, an_instance_of(Timeout::Error), :info)
         @attachment.calculate_words
       end
@@ -3510,6 +3510,85 @@ describe Attachment do
     it "returns soft-deleted media objects" do
       @media_object.destroy
       expect(@attachment.media_object_by_media_id).to eq @media_object
+    end
+  end
+
+  describe "kaltura_media?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    it "returns false when Kaltura is not configured" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
+      @attachment = attachment_model(context: @course, media_entry_id: "0_testentry")
+      expect(@attachment.kaltura_media?).to be false
+    end
+
+    it "returns false when media_entry_id is nil" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      @attachment = attachment_model(context: @course, media_entry_id: nil)
+      expect(@attachment.kaltura_media?).to be false
+    end
+
+    it "returns false when media_entry_id is 'maybe'" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      @attachment = attachment_model(context: @course, media_entry_id: "maybe")
+      expect(@attachment.kaltura_media?).to be false
+    end
+
+    it "returns false when media_object_by_media_id is nil" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      @attachment = attachment_model(context: @course, media_entry_id: "0_nonexistent")
+      expect(@attachment.kaltura_media?).to be false
+    end
+
+    it "returns true when Kaltura is configured and media object exists" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      @media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
+      @attachment = attachment_model(context: @course, media_entry_id: @media_object.media_id)
+      expect(@attachment.kaltura_media?).to be true
+    end
+  end
+
+  describe "kaltura_media_download_url" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    it "returns nil when not a Kaltura media file" do
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: nil)
+      attachment = attachment_model(context: @course)
+      expect(attachment.kaltura_media_download_url).to be_nil
+    end
+
+    it "returns nil when no download url exist" do
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: {})
+      media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
+      attachment = attachment_model(context: @course, media_entry_id: media_object.media_id)
+
+      kaltura_client = instance_double(CanvasKaltura::ClientV3)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_client)
+      allow(kaltura_client).to receive(:media_download_url)
+        .with("0_feedbeef")
+        .and_return(nil)
+
+      expect(attachment.kaltura_media_download_url).to be_nil
+    end
+
+    it "returns download URL from Kaltura V3" do
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: {})
+      media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
+      attachment = attachment_model(context: @course, media_entry_id: media_object.media_id, display_name: "test_video.mp4")
+
+      kaltura_client = instance_double(CanvasKaltura::ClientV3)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_client)
+      allow(kaltura_client).to receive(:media_download_url)
+        .with("0_feedbeef")
+        .and_return("https://kaltura.example.com/download/asset2")
+
+      result = attachment.kaltura_media_download_url
+      expect(result).to include("https://kaltura.example.com/download/asset2")
+      expect(result).to include("filename=test_video.mp4")
     end
   end
 
