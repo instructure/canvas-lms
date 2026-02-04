@@ -582,6 +582,8 @@ class PlannerController < ApplicationController
           course_ids = @user.course_ids_for_todo_lists(:student, include_concluded:)
           context_codes = course_ids.map { |id| "course_#{id}" }
           context_codes << @user.asset_string
+          group_ids = @user.group_ids_for_todo_lists
+          context_codes.concat(group_ids.map { |id| "group_#{id}" })
         end
       end
       context_ids = ActiveRecord::Base.parse_asset_string_list(context_codes)

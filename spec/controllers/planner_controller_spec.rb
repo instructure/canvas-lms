@@ -554,6 +554,13 @@ describe PlannerController do
           expect(response_json.length).to be 16
         end
 
+        it "includes group calendar events when using include all_courses" do
+          get :index, params: { include: ["all_courses"] }
+          response_json = json_parse(response.body)
+          response_hash = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
+          expect(response_hash).to include(["calendar_event", @group_event.id])
+        end
+
         it "returns data from contexted courses for observed user if specified" do
           observer_in_course(course: @course1, associated_user_id: @student, active_all: true)
           user_session(@observer)
