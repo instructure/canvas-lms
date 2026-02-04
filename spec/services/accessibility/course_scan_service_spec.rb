@@ -203,6 +203,7 @@ describe Accessibility::CourseScanService do
       context "when a11y_checker_additional_resources feature flag is enabled" do
         before do
           Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+          Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
           subject.scan_course
         end
 
@@ -271,6 +272,7 @@ describe Accessibility::CourseScanService do
       context "when a11y_checker_additional_resources feature flag is enabled" do
         before do
           Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+          Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
         end
 
         context "when course has a syllabus" do
@@ -330,6 +332,7 @@ describe Accessibility::CourseScanService do
     context "when determining if resources need scanning" do
       before do
         Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
       end
 
       let!(:wiki_page) { wiki_page_model(course:) }

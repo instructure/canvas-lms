@@ -4343,6 +4343,7 @@ describe DiscussionTopic do
   it_behaves_like "an accessibility scannable resource" do
     before do
       Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+      Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
     end
 
     let(:course) { course_model }
