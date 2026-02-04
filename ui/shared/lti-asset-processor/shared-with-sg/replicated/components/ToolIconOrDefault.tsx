@@ -30,6 +30,7 @@ type ToolIconUrlOrDefaultProps = {
   // the same as marginRight=12
   margin?: string | number
   marginRight?: string | number
+  decorative?: boolean
 }
 
 export const ToolIconOrDefault = ({
@@ -39,12 +40,13 @@ export const ToolIconOrDefault = ({
   size,
   margin,
   marginRight,
+  decorative = false,
 }: ToolIconUrlOrDefaultProps): JSX.Element => {
   const defaultIconUrl = `/lti/tool_default_icon?id=${toolId}&name=${encodeURIComponent(toolName)}`
   if (iconUrl) {
     return (
       <img
-        alt={toolName}
+        alt={decorative ? '' : toolName}
         style={{
           height: size,
           width: size,
@@ -63,7 +65,7 @@ export const ToolIconOrDefault = ({
 
   return (
     <img
-      alt={toolName}
+      alt={decorative ? '' : toolName}
       style={{height: size, width: size, margin, marginRight}}
       src={defaultIconUrl}
     />
