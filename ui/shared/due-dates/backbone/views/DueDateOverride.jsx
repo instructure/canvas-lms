@@ -32,7 +32,10 @@ import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import '@canvas/jquery/jquery.instructure_forms'
 import sanitizeData from '../../../forms/sanitizeData'
 import {showPostToSisFlashAlert, combinedDates} from '../../util/differentiatedModulesUtil'
-import {getAssignmentAndPeerReviewOverrides} from '../../../context-modules/differentiated-modules/utils/assignToHelper'
+import {
+  getAssignmentAndPeerReviewOverrides,
+  hasPeerReviewOverrideDates,
+} from '../../../context-modules/differentiated-modules/utils/assignToHelper'
 
 const I18n = createI18nScope('DueDateOverrideView')
 
@@ -378,8 +381,10 @@ DueDateOverrideView.prototype.showError = function (element, message) {
 DueDateOverrideView.prototype.setNewOverridesCollection = function (newOverrides, importantDates) {
   const hasPeerReviews = this.model.assignment.get('peer_reviews')
   const peerReviewAllocationAndGradingEnabled = ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
+  const hasPeerReviewDatesInOverrides = newOverrides?.some(hasPeerReviewOverrideDates)
 
-  if (hasPeerReviews && peerReviewAllocationAndGradingEnabled) {
+  // Check override dates in addition to hasPeerReviews to prevent race condition during form submission
+  if ((hasPeerReviews || hasPeerReviewDatesInOverrides) && peerReviewAllocationAndGradingEnabled) {
     const {assignmentOverrides, peerReview} = getAssignmentAndPeerReviewOverrides(newOverrides)
 
     this.resetOverrides(assignmentOverrides)
