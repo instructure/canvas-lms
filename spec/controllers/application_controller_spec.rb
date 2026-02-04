@@ -246,6 +246,32 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context "FEATURES[:peer_review_allocation_and_grading]" do
+          before do
+            course_with_user("TeacherEnrollment", user: @user, active_all: true)
+            allow(controller).to receive("api_v1_course_ping_url").and_return({})
+          end
+
+          it "is set to true when feature flag is enabled for the course" do
+            @course.enable_feature!(:peer_review_allocation_and_grading)
+            controller.instance_variable_set(:@context, @course)
+            expect(controller.js_env[:FEATURES][:peer_review_allocation_and_grading]).to be true
+          end
+
+          it "is set to false when feature flag is disabled for the course" do
+            @course.disable_feature!(:peer_review_allocation_and_grading)
+            controller.instance_variable_set(:@context, @course)
+            expect(controller.js_env[:FEATURES][:peer_review_allocation_and_grading]).to be false
+          end
+
+          it "is not set when context is not a Course" do
+            account = Account.default
+            account.enable_feature!(:peer_review_allocation_and_grading)
+            controller.instance_variable_set(:@context, account)
+            expect(controller.js_env[:FEATURES][:peer_review_allocation_and_grading]).to be_nil
+          end
+        end
+
         context "widget_dashboard_overridable" do
           it "is not set when feature flag is off" do
             expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
