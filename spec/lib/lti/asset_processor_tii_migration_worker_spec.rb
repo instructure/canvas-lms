@@ -1358,6 +1358,30 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
   end
 
+  describe "#report_download_url" do
+    it "uses environment_specific_domain for the URL" do
+      attachment = Attachment.create!(
+        context: sub_account,
+        filename: "test_report.csv",
+        content_type: "text/csv"
+      )
+
+      allow(sub_account).to receive(:environment_specific_domain).and_return("beta.instructure.com")
+
+      url = worker.send(:report_download_url, attachment.id, sub_account)
+
+      expect(url).to include("beta.instructure.com")
+      expect(url).to include("accounts/#{sub_account.id}")
+      expect(url).to include("files/#{attachment.id}")
+    end
+
+    it "returns nil when attachment_id is nil" do
+      url = worker.send(:report_download_url, nil, sub_account)
+
+      expect(url).to be_nil
+    end
+  end
+
   describe "#any_error_occurred?" do
     it "returns false when no errors present" do
       results = worker.instance_variable_get(:@results)
