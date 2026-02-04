@@ -123,14 +123,11 @@ ready(() => {
   // with scrollbars, even though everything is the right size.
   document.documentElement.setAttribute('style', 'overflow: hidden;')
   const div = document.body.firstElementChild
+  let explicitSize;
   if (isStandalone()) {
     // we're standalone mode
-    if (is_video) {
-      // CanvasMediaPlayer leaves room for the 16px vertical margin.
-      div?.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
-    } else {
-      div?.setAttribute('style', 'width: 320px; height: 14.25rem; margin: 1rem auto;')
-    }
+    div?.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
+    explicitSize = { width: 640, height: 408 };
   }
 
   const aria_label = !media_object.title ? undefined : media_object.title
@@ -144,6 +141,7 @@ ready(() => {
         aria_label={aria_label}
         is_attachment={is_attachment}
         attachment_id={attachment_id}
+        explicitSize={explicitSize}
         kebabMenuElements={
           ENV.FEATURES?.rce_studio_embed_improvements
             ? [
