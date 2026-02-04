@@ -17,7 +17,11 @@
  */
 
 export interface EnvPortfolio {
-  eportfolio_id: number
+  eportfolio_id?: number
   category_id: number
   owner_view: boolean
+  show_eportfolio_deprecation_notice?: boolean
+  SECTION_COUNT_IDX: number
+  context_code: string
+  folder_id: number
 }

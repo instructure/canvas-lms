@@ -53,6 +53,7 @@ import CreatePortfolioForm from '../react/CreatePortfolioForm'
 import {Portal} from '@instructure/ui-portal'
 import PageNameContainer from '../react/PageNameContainer'
 import DeprecationNoticeAlert from '../react/DeprecationNoticeAlert'
+import type {ePortfolioPage} from '../react/types'
 
 const I18n = createI18nScope('eportfolio')
 
@@ -60,10 +61,21 @@ const I18n = createI18nScope('eportfolio')
 // respond when they hit edit
 RichContentEditor.preloadRemoteModule()
 
-const ePortfolioValidations = {
+interface ValidationRule {
+  (value: string): string | undefined
+}
+
+interface ValidationRules {
+  object_name: string
+  property_validations: {
+    [key: string]: ValidationRule
+  }
+}
+
+const ePortfolioValidations: ValidationRules = {
   object_name: 'eportfolio',
   property_validations: {
-    name(value) {
+    name(value: string): string | undefined {
       if (!value || value.trim() === '') {
         return I18n.t('errors.name_required', 'Name is required')
       }
@@ -74,8 +86,12 @@ const ePortfolioValidations = {
   },
 }
 
+interface JQueryWithTemplateData extends JQuery<HTMLElement> {
+  getTemplateData(options: {textValues?: string[]; htmlValues?: string[]}): Record<string, any>
+}
+
 function ePortfolioFormData() {
-  let data = $('#edit_page_form').getFormData({
+  let data = ($('#edit_page_form') as any).getFormData({
     object_name: 'eportfolio_entry',
     values: [
       'eportfolio_entry[name]',
@@ -85,12 +101,14 @@ function ePortfolioFormData() {
   })
   let idx = 0
   $('#edit_page_form .section').each(function () {
-    const $section = $(this)
-    const section_type = $section.getTemplateData({textValues: ['section_type']}).section_type
+    const $section = $(this) as JQueryWithTemplateData
+    const section_type = $section.getTemplateData({textValues: ['section_type']}).section_type as
+      | string
+      | undefined
     if (section_type === 'rich_text' || section_type === 'html' || $section.hasClass('read_only')) {
       idx++
       const name = 'section_' + idx
-      const sectionContent = fetchContent($section, section_type, name)
+      const sectionContent = fetchContent($section, section_type || '', name)
       data = $.extend(data, sectionContent)
     }
   })
@@ -98,19 +116,21 @@ function ePortfolioFormData() {
   return data
 }
 
-function saveObject($obj, type) {
+type ObjectType = 'section' | 'page'
+
+function saveObject($obj: JQuery<HTMLElement>, type: ObjectType) {
   const isSaving = $obj.data('event_pending')
   if (isSaving || $obj.length === 0) {
     return
   }
-  let method = 'PUT'
-  let url = $obj.find('.rename_' + type + '_url').attr('href')
+  let method: 'PUT' | 'POST' = 'PUT'
+  let url = $obj.find('.rename_' + type + '_url').attr('href') || ''
   if ($obj.attr('id') === type + '_new') {
     method = 'POST'
-    url = $('.add_' + type + '_url').attr('href')
+    url = $('.add_' + type + '_url').attr('href') || ''
   }
   const $objs = $obj.parents('ul').find('.' + type + ':not(.unsaved)')
-  let newName = $obj.find('#' + type + '_name').val()
+  let newName = ($obj.find('#' + type + '_name').val() as string) || ''
   $objs.each(function () {
     if (this !== $obj[0] && $(this).find('.name').text() === newName) {
       newName = ''
@@ -123,7 +143,7 @@ function saveObject($obj, type) {
   if (type === 'page') {
     object_name = 'eportfolio_entry'
   }
-  const data = {}
+  const data: Record<string, any> = {}
   data[object_name + '[name]'] = newName
   if (type === 'page') {
     data[object_name + '[eportfolio_category_id]'] = $('#eportfolio_category_id').text()
@@ -137,7 +157,7 @@ function saveObject($obj, type) {
     url,
     method,
     data,
-    res => {
+    (res: any) => {
       $obj.removeClass('event_pending')
       $obj.removeClass('unsaved')
       const obj = res[object_name]
@@ -147,7 +167,7 @@ function saveObject($obj, type) {
       } else {
         $(document).triggerHandler(type + '_updated', res)
       }
-      $obj.fillTemplateData({
+      ;($obj as any).fillTemplateData({
         data: obj,
         id: type + '_' + obj.id,
         hrefValues: ['id', 'slug'],
@@ -155,7 +175,7 @@ function saveObject($obj, type) {
       $obj.data('event_pending', false)
     },
     // error callback
-    (_res, xhr, _textStatus, _errorThrown) => {
+    (_res: any, xhr: any, _textStatus: any, _errorThrown: any) => {
       $obj.removeClass('event_pending')
       $obj.data('event_pending', false)
       let name_message = I18n.t('errors.section_name_invalid', 'Section name is not valid')
@@ -168,7 +188,7 @@ function saveObject($obj, type) {
       } else {
         // put back in "edit" mode
         $obj.find('.edit_section_link').click()
-        $obj.find('#section_name').errorBox(name_message).css('z-index', 20)
+        ;($obj.find('#section_name') as any).errorBox(name_message).css('z-index', 20)
       }
     },
     // options
@@ -181,7 +201,7 @@ function renderCreateForm() {
   const createContainer = document.getElementById('create_portfolio_mount')
   const formContainer = document.getElementById('create_portfolio_form_mount')
 
-  if (createContainer) {
+  if (createContainer && formContainer) {
     return (
       <Portal open={true} mountNode={createContainer}>
         <CreatePortfolioForm formMount={formContainer} />
@@ -190,22 +210,24 @@ function renderCreateForm() {
   }
 }
 
-function renderPortal(portfolio_id) {
+function renderPortal(portfolio_id: number) {
   const sectionListContainer = document.getElementById('section_list_mount')
   const submissionContainer = document.getElementById('recent_submission_mount')
   const pageListContainer = document.getElementById('page_list_mount')
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <PortfolioPortal
-        portfolioId={portfolio_id}
-        sectionListNode={sectionListContainer}
-        pageListNode={pageListContainer}
-        submissionNode={submissionContainer}
-        onPageUpdate={json => $(document).triggerHandler('page_updated', json)}
-      />
-    </QueryClientProvider>
-  )
+  if (sectionListContainer && submissionContainer && pageListContainer) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <PortfolioPortal
+          portfolioId={portfolio_id}
+          sectionListNode={sectionListContainer}
+          pageListNode={pageListContainer}
+          submissionNode={submissionContainer}
+          onPageUpdate={(json: ePortfolioPage) => $(document).triggerHandler('page_updated', json)}
+        />
+      </QueryClientProvider>
+    )
+  }
 }
 
 $(document).ready(function () {
@@ -213,16 +235,19 @@ $(document).ready(function () {
   const showDeprecation = ENV.show_eportfolio_deprecation_notice
   // formRoot is for the name field in the edit page form and renders dynamically
   // root is for everything else and should always be rendered
-  let formRoot = null
+  let formRoot: ReactDOM.Root | null = null
   const pageNameMount = document.getElementById('page_name_mount')
   if (pageNameMount) {
     formRoot = ReactDOM.createRoot(pageNameMount)
   }
-  const root = ReactDOM.createRoot(document.getElementById('eportfolio_portal_mount'))
-  if (portfolio_id) {
-    root.render(renderPortal(portfolio_id))
-  } else {
-    root.render(renderCreateForm())
+  const portalMount = document.getElementById('eportfolio_portal_mount')
+  if (portalMount) {
+    const root = ReactDOM.createRoot(portalMount)
+    if (portfolio_id) {
+      root.render(renderPortal(portfolio_id))
+    } else {
+      root.render(renderCreateForm())
+    }
   }
   if (showDeprecation) {
     const mount = document.getElementById('eportfolio_deprecation_notice_mount')
@@ -245,7 +270,7 @@ $(document).ready(function () {
   })
   $('#add_eportfolio_form').submit(function () {
     const $this = $(this)
-    const result = $this.validateForm(ePortfolioValidations)
+    const result = ($this as any).validateForm(ePortfolioValidations)
     if (!result) {
       return false
     }
@@ -257,7 +282,7 @@ $(document).ready(function () {
     $('#edit_page_form').addClass('editing')
     $('#page_sidebar').addClass('editing')
     $('#edit_page_form .section').each(function () {
-      const $section = $(this)
+      const $section = $(this) as JQueryWithTemplateData
       const sectionData = $section.getTemplateData({
         textValues: ['section_type'],
         htmlValues: ['section_content'],
@@ -282,18 +307,20 @@ $(document).ready(function () {
       const pageButtonContainer = document.getElementById('page_button_mount')
       const sideButtonContainer = document.getElementById('side_button_mount')
 
-      formRoot.render(
-        <PageNameContainer
-          pageName={currentPageName}
-          contentBtnNode={pageButtonContainer}
-          sideBtnNode={sideButtonContainer}
-          onPreview={previewPage}
-          onCancel={cancel}
-          onSave={submitPage}
-          onKeepEditing={keepEditing}
-          setHidden={setHidden}
-        />,
-      )
+      if (pageButtonContainer && sideButtonContainer) {
+        formRoot.render(
+          <PageNameContainer
+            pageName={currentPageName}
+            contentBtnNode={pageButtonContainer}
+            sideBtnNode={sideButtonContainer}
+            onPreview={previewPage}
+            onCancel={cancel}
+            onSave={submitPage}
+            onKeepEditing={keepEditing}
+            setHidden={setHidden}
+          />,
+        )
+      }
     }
 
     $('#edit_page_form :text:first').focus().select()
@@ -307,7 +334,9 @@ $(document).ready(function () {
     })
     .change()
   function submitPage() {
-    formRoot.render(null)
+    if (formRoot) {
+      formRoot.render(null)
+    }
     $('#edit_page_form').submit()
   }
   function previewPage() {
@@ -321,10 +350,12 @@ $(document).ready(function () {
         .removeClass('section_content')
         .addClass('preview_content')
         .addClass('preview_section')
-      const section_type = $section.getTemplateData({textValues: ['section_type']}).section_type
+      const section_type = ($section as JQueryWithTemplateData).getTemplateData({
+        textValues: ['section_type'],
+      }).section_type as string | undefined
       if (section_type === 'html') {
         // xsslint safeString.function sanitizeHtml
-        $preview.html(sanitizeHtml($section.find('.edit_section').val()))
+        $preview.html(sanitizeHtml($section.find('.edit_section').val() as string))
         $section.find('.section_content').after($preview)
       } else if (section_type === 'rich_text') {
         const $richText = $section.find('.edit_section')
@@ -343,7 +374,9 @@ $(document).ready(function () {
   }
 
   function cancel() {
-    formRoot.render(null)
+    if (formRoot) {
+      formRoot.render(null)
+    }
     $('#edit_page_form .edit_rich_text_content .edit_section').each(function () {
       RichContentEditor.destroyRCE($(this))
     })
@@ -357,17 +390,21 @@ $(document).ready(function () {
     $('#page_comments_holder').show()
   }
 
-  function setHidden(pageName) {
-    document.getElementById('page_name_field').value = pageName
+  function setHidden(pageName: string) {
+    const pageNameField = document.getElementById('page_name_field') as HTMLInputElement | null
+    if (pageNameField) {
+      pageNameField.value = pageName
+    }
   }
 
-  $('#edit_page_form').formSubmit({
-    processData(_data) {
+  ;($('#edit_page_form') as any).formSubmit({
+    processData(_data: any) {
       $('#page_content .section.unsaved').removeClass('unsaved')
       $('#page_content .section.failed').remove()
       $('#page_content .section').each(function () {
-        const $section = $(this)
-        const section_type = $section.getTemplateData({textValues: ['section_type']}).section_type
+        const $section = $(this) as JQueryWithTemplateData
+        const section_type = $section.getTemplateData({textValues: ['section_type']})
+          .section_type as string
         if (section_type === 'rich_text' || section_type === 'html') {
           if (section_type === 'rich_text') {
             const $richText = $section.find('.edit_section')
@@ -377,8 +414,8 @@ $(document).ready(function () {
             }
             RichContentEditor.destroyRCE($richText)
           } else {
-            const code = sanitizeHtml($section.find('.edit_section').val())
-            $section.find('.section_content').html(raw(code))
+            const code = sanitizeHtml($section.find('.edit_section').val() as string)
+            $section.find('.section_content').html(raw(code) as unknown as string)
           }
         } else if (!$section.hasClass('read_only')) {
           $section.remove()
@@ -386,7 +423,7 @@ $(document).ready(function () {
       })
       return ePortfolioFormData()
     },
-    beforeSubmit(_data) {
+    beforeSubmit(_data: any) {
       $('#edit_page_form .edit_rich_text_content .edit_section').each(function () {
         RichContentEditor.destroyRCE($(this))
       })
@@ -397,31 +434,34 @@ $(document).ready(function () {
       $('#edit_page_form .edit_section').each(function () {
         $(this).remove()
       })
-      $(this).loadingImage()
+      ;($(this) as any).loadingImage()
     },
-    success(data) {
+    success(data: any) {
       $(document).triggerHandler('page_updated', data)
       $('.edit_content_link_holder').show()
       if (data.eportfolio_entry.allow_comments) {
         $('#page_comments_holder').slideDown('fast')
       }
-      $(this).loadingImage('remove')
+      ;($(this) as any).loadingImage('remove')
     },
   })
   $('#edit_page_form .switch_views_link').click(function (event) {
     event.preventDefault()
     RichContentEditor.callOnRCE($('#edit_page_content'), 'toggle')
     //  todo: replace .andSelf with .addBack when JQuery is upgraded.
-    $(this).siblings('.switch_views_link').andSelf().toggle().focus()
+    const $siblings = $(this).siblings('.switch_views_link')
+    $siblings.add(this).toggle().focus()
   })
   $('#edit_page_sidebar .add_content_link').click(function (event) {
     event.preventDefault()
     $('#edit_page_form .keep_editing_button:first').click()
+    const sectionIdx = ENV.SECTION_COUNT_IDX || 0
     const $section = $('#page_section_blank')
       .clone(true)
-      .attr('id', 'page_section_' + ENV.SECTION_COUNT_IDX)
+      .attr('id', 'page_section_' + sectionIdx)
     $section.addClass('unsaved')
-    $section.attr('id', 'page_section_' + ENV.SECTION_COUNT_IDX++)
+    ENV.SECTION_COUNT_IDX = sectionIdx + 1
+    $section.attr('id', 'page_section_' + sectionIdx)
     $('#page_content').append($section)
     let section_type = 'rich_text'
     let section_type_name = I18n.t(
@@ -448,7 +488,7 @@ $(document).ready(function () {
       )
     }
     const edit_type = 'edit_' + section_type + '_content'
-    $section.fillTemplateData({
+    ;($section as any).fillTemplateData({
       data: {section_type, section_type_name},
     })
     const $edit = $('#edit_content_templates .' + edit_type).clone(true)
@@ -461,7 +501,7 @@ $(document).ready(function () {
       RichContentEditor.loadNewEditor($richText, {focus: true, defaultContent: ''})
     }
     $section.hide().slideDown('fast', () => {
-      $('html,body').scrollTo($section)
+      ;($('html,body') as any).scrollTo($section)
       if (section_type === 'html') {
         $edit.find('.edit_section').focus().select()
       }
@@ -472,29 +512,27 @@ $(document).ready(function () {
   })
   $('.delete_page_section_link').on('click', function (event) {
     event.preventDefault()
-    $(this)
-      .parents('.section')
-      .confirmDelete({
-        success() {
-          $(this).slideUp(function () {
-            $(this).remove()
-          })
-        },
-      })
+    ;($(this).parents('.section') as any).confirmDelete({
+      success() {
+        $(this).slideUp(function () {
+          $(this).remove()
+        })
+      },
+    })
   })
-  $('#page_content').sortable({
+  ;($('#page_content') as any).sortable({
     handle: '.move_link',
     helper: 'clone',
     axis: 'y',
-    start(_event, ui) {
-      const $section = $(ui.item)
+    start(_event: any, ui: any) {
+      const $section = $(ui.item) as JQueryWithTemplateData
       if ($section.getTemplateData({textValues: ['section_type']}).section_type === 'rich_text') {
         const $richText = $section.find('.edit_section')
         RichContentEditor.destroyRCE($richText)
       }
     },
-    stop(_event, ui) {
-      const $section = $(ui.item)
+    stop(_event: any, ui: any) {
+      const $section = $(ui.item) as JQueryWithTemplateData
       if ($section.getTemplateData({textValues: ['section_type']}).section_type === 'rich_text') {
         const $richText = $section.find('.edit_section')
         RichContentEditor.loadNewEditor($richText)
@@ -517,10 +555,10 @@ $(document).ready(function () {
       if ($selection.length === 0) {
         return
       }
-      const url = $selection.find('.submission_info').attr('href')
+      const url = $selection.find('.submission_info').attr('href') || ''
       const title = $selection.find('.submission_info').text()
-      const id = $selection.attr('id').substring(11)
-      $section.fillTemplateData({
+      const id = ($selection.attr('id') || '').substring(11)
+      ;($section as any).fillTemplateData({
         data: {submission_id: id},
       })
       const $sectionContent = $section.find('.section_content')
@@ -543,7 +581,7 @@ $(document).ready(function () {
         return
       }
 
-      $message.fillTemplateData({
+      ;($message as any).fillTemplateData({
         data: {file_name: $upload.val()},
       })
       $(this).parents('.section').find('.section_content').empty().append($message.show())
@@ -553,7 +591,7 @@ $(document).ready(function () {
       $form.find('.file_upload').remove().end().append($upload).submit()
       $section.addClass('read_only')
     })
-  $('#upload_file_form').formSubmit({
+  ;($('#upload_file_form') as any).formSubmit({
     fileUpload: true,
     fileUploadOptions: {
       preparedFileUpload: true,
@@ -564,18 +602,20 @@ $(document).ready(function () {
       formDataTarget: 'uploadDataUrl',
     },
     object_name: 'attachment',
-    processData(data) {
+    processData(data: any) {
       if (!data.uploaded_data) {
         const $section = $(this).data('section')
         const $file = $section.find('.file_list .leaf.active')
         // If the user has selected a file from the list instead of uploading
         if ($file.length > 0) {
-          const templateData = $file.getTemplateData({textValues: ['id', 'name']})
+          const templateData = ($file as JQueryWithTemplateData).getTemplateData({
+            textValues: ['id', 'name'],
+          })
           const id = templateData.id
           const uuid = $('#file_uuid_' + id).text()
           const name = templateData.name
           $section.find('.attachment_id').text(id)
-          let url = $('.eportfolio_download_url').attr('href')
+          let url = $('.eportfolio_download_url').attr('href') || ''
           url = replaceTags(url, 'uuid', uuid)
           if ($file.hasClass('image')) {
             const $image = $('#eportfolio_view_image').clone(true).removeAttr('id')
@@ -584,7 +624,7 @@ $(document).ready(function () {
             $section.find('.section_content').empty().append($image)
           } else {
             const $download = $('#eportfolio_download_file').clone(true).removeAttr('id')
-            $download.fillTemplateData({
+            ;($download as any).fillTemplateData({
               data: {filename: name},
             })
             $download.find('.eportfolio_download').attr('href', url)
@@ -592,15 +632,15 @@ $(document).ready(function () {
           }
           $(this).remove()
         } else {
-          $(this).errorBox(I18n.t('errors.missing_file', 'Please select a file'))
+          ;($(this) as any).errorBox(I18n.t('errors.missing_file', 'Please select a file'))
         }
         return false
       }
     },
-    success(attachment) {
+    success(attachment: any) {
       const $section = $(this).data('section')
       $section.find('.attachment_id').text(attachment.id)
-      let url = $('.eportfolio_download_url').attr('href')
+      let url = $('.eportfolio_download_url').attr('href') || ''
       url = replaceTags(url, 'uuid', attachment.uuid)
       if (attachment['content-type'].indexOf('image') !== -1) {
         const $image = $('#eportfolio_view_image').clone(true).removeAttr('id')
@@ -609,7 +649,7 @@ $(document).ready(function () {
         $section.find('.section_content').empty().append($image)
       } else {
         const $download = $('#eportfolio_download_file').clone(true).removeAttr('id')
-        $download.fillTemplateData({
+        ;($download as any).fillTemplateData({
           data: {filename: attachment.display_name},
         })
         $download.find('.eportfolio_download').attr('href', url)
@@ -617,56 +657,54 @@ $(document).ready(function () {
       }
       $(this).remove()
     },
-    error(data) {
+    error(data: any) {
       const $section = $(this).data('section')
       $section.find('.uploading_file').text(I18n.t('errors.upload_failed', 'Upload Failed.'))
       $section.addClass('failed')
       $(this).remove()
-      $section.formErrors(data.errors || data)
+      ;($section as any).formErrors(data.errors || data)
     },
   })
 
   $('.delete_comment_link').click(function (event) {
     event.preventDefault()
-    $(this)
-      .parents('.comment')
-      .confirmDelete({
-        url: $(this).attr('href'),
-        message: I18n.t('confirm_delete_message', 'Are you sure you want to delete this message?'),
-        success(_data) {
-          $(this).slideUp(function () {
-            $(this).remove()
-          })
-        },
-      })
+    ;($(this).parents('.comment') as any).confirmDelete({
+      url: $(this).attr('href'),
+      message: I18n.t('confirm_delete_message', 'Are you sure you want to delete this message?'),
+      success(_data: any) {
+        $(this).slideUp(function () {
+          $(this).remove()
+        })
+      },
+    })
   })
   $('.delete_eportfolio_link').click(event => {
     event.preventDefault()
     $('#delete_eportfolio_form').toggle(() => {
-      $('html,body').scrollTo($('#delete_eportfolio_form'))
+      ;($('html,body') as any).scrollTo($('#delete_eportfolio_form'))
     })
   })
   $(document).blur(() => {})
 
-  $('.submission_list').instTree({
+  ;($('.submission_list') as any).instTree({
     multi: false,
     dragdrop: false,
   })
-  $('.file_list > ul').instTree({
+  ;($('.file_list > ul') as any).instTree({
     autoclose: false,
     multi: false,
     dragdrop: false,
     overrideEvents: true,
-    onClick(_e, _node) {
+    onClick(_e: any, _node: any) {
       $(this).parents('.file_list').find('li.active').removeClass('active')
       $(this).addClass('active')
     },
   })
-  $(document).bind('page_added page_updated', (_event, data) => {
+  $(document).bind('page_added page_updated', (_event: any, data: any) => {
     const entry = data.eportfolio_entry
     const $activePage = $('#eportfolio_entry_' + entry.id)
     if ($activePage.length) {
-      $activePage.fillTemplateData({
+      ;($activePage as any).fillTemplateData({
         id: 'eportfolio_entry_' + entry.id,
         data: entry,
       })
@@ -678,7 +716,10 @@ $(document).ready(function () {
         // esc
       } else if (event.keyCode === 13) {
         // enter
-        $(this).parents('li').find('.name').text($(this).val())
+        $(this)
+          .parents('li')
+          .find('.name')
+          .text($(this).val() as string)
         saveObject($(this).parents('li'), 'page')
       }
     })
@@ -689,9 +730,10 @@ $(document).ready(function () {
 
   const $wizard_box = $('#wizard_box')
 
-  function setWizardSpacerBoxDisplay(action) {
+  function setWizardSpacerBoxDisplay(action: 'show' | 'hide') {
+    const wizardHeight = $wizard_box.height()
     $('#wizard_spacer_box')
-      .height($wizard_box.height() || 0)
+      .height(typeof wizardHeight === 'number' ? wizardHeight : 0)
       .showIf(action === 'show')
   }
 
@@ -719,8 +761,9 @@ $(document).ready(function () {
 
   if ($wizard_box.length) {
     $wizard_box.bind('wizard_opened', () => {
-      const $wizard_options = $wizard_box.find('.wizard_options'),
-        height = $wizard_options.height()
+      const $wizard_options = $wizard_box.find('.wizard_options')
+      const wizardOptionsHeight = $wizard_options.height()
+      const height = typeof wizardOptionsHeight === 'number' ? wizardOptionsHeight : 0
       $wizard_options.height(height)
       $wizard_box.find('.wizard_details').css({
         maxHeight: height - 5,
@@ -739,14 +782,14 @@ $(document).ready(function () {
       $this.parents('.wizard_options_list').find('.option.selected').removeClass('selected')
       $this.addClass('selected')
       const $details = $wizard_box.find('.wizard_details')
-      const data = $this.getTemplateData({textValues: ['header']})
+      const data = ($this as JQueryWithTemplateData).getTemplateData({textValues: ['header']})
       data.link = data.header
-      $details.fillTemplateData({
+      ;($details as any).fillTemplateData({
         data,
       })
       $details.find('.details').remove()
       $details.find('.header').after($this.find('.details').clone(true).show())
-      const url = $this.find('.header').attr('href')
+      const url = $this.find('.header').attr('href') || ''
       if (url !== '#') {
         $details.find('.link').show().attr('href', url)
       } else {
@@ -764,7 +807,7 @@ $(document).ready(function () {
   $('.download_eportfolio_link').click(function (event) {
     $(this).slideUp()
     event.preventDefault()
-    $('#export_progress').progressbar().progressbar('option', 'value', 0)
+    ;($('#export_progress') as any).progressbar().progressbar('option', 'value', 0)
     const $box = $('#downloading_eportfolio_message')
     $box.slideDown()
     $box
@@ -774,9 +817,9 @@ $(document).ready(function () {
           'Collecting ePortfolio resources. This may take a while if you have a lot of files in your ePortfolio.',
         ),
       )
-    const url = $(this).attr('href')
+    const url = $(this).attr('href') || ''
     let errorCount = 0
-    const check = function (first) {
+    const check = function (first?: boolean) {
       let req_url = url
       if (first) {
         req_url = url + '?compile=1'
@@ -785,35 +828,35 @@ $(document).ready(function () {
         req_url,
         'GET',
         {},
-        data => {
+        (data: any) => {
           if (
             data.attachment &&
             data.attachment.file_state &&
             data.attachment.file_state === 'available'
           ) {
-            $('#export_progress').progressbar('option', 'value', 100)
+            ;($('#export_progress') as any).progressbar('option', 'value', 100)
             window.location.href = url + '.zip'
             return
           } else if (data.attachment && data.attachment.file_state) {
             const progress = parseInt(data.attachment.file_state, 10)
-            $('#export_progress').progressbar(
+            ;($('#export_progress') as any).progressbar(
               'option',
               'value',
               Math.max(
-                Math.min($('#export_progress').progressbar('option', 'value') + 0.1, 90),
+                Math.min(($('#export_progress') as any).progressbar('option', 'value') + 0.1, 90),
                 progress,
               ),
             )
           } else {
-            $('#export_progress').progressbar(
+            ;($('#export_progress') as any).progressbar(
               'option',
               'value',
-              Math.min($('#export_progress').progressbar('option', 'value') + 0.1, 90),
+              Math.min(($('#export_progress') as any).progressbar('option', 'value') + 0.1, 90),
             )
           }
           setTimeout(check, 2000)
         },
-        _data => {
+        (_data: any) => {
           errorCount++
           if (errorCount > 5) {
             $box
