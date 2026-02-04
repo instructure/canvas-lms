@@ -52,7 +52,7 @@ describe CanvasKaltura::ClientV3 do
   end
 
   before do
-    CanvasKaltura.cache = double(read: nil)
+    CanvasKaltura.cache = double(read: nil, write: nil)
     CanvasKaltura.logger = double.as_null_object
     CanvasKaltura.timeout_protector_proc = ->(_options, &block) { block.call }
     create_config
@@ -466,6 +466,343 @@ describe CanvasKaltura::ClientV3 do
         XML
 
       expect(@kaltura.flavorAssetGetPlaylistUrl(entry_id, flavor_id)).to eq media_url
+    end
+  end
+
+  describe "flavorAssetGetDownloadUrl" do
+    before do
+      stub_kaltura_session
+    end
+
+    it "includes 'use' parameter when provided" do
+      asset_id = "asset_123"
+      download_url = "https://www.instructuremedia.com/download/asset_123"
+
+      download_stub = stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+                      .with(query: hash_including(
+                        service: "flavorAsset",
+                        action: "getDownloadUrl",
+                        id: asset_id,
+                        use: "download"
+                      ))
+                      .to_return(body: "<result>#{download_url}</result>")
+
+      result = @kaltura.flavorAssetGetDownloadUrl(asset_id, use: "download")
+
+      expect(download_stub).to have_been_requested
+      expect(result).to eq download_url
+    end
+
+    it "omits 'use' parameter when not provided" do
+      asset_id = "asset_456"
+      download_url = "https://www.instructuremedia.com/download/asset_456"
+
+      download_stub = stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+                      .with(query: hash_including(
+                        service: "flavorAsset",
+                        action: "getDownloadUrl",
+                        id: asset_id
+                      ))
+                      .with(query: hash_excluding(use: anything))
+                      .to_return(body: "<result>#{download_url}</result>")
+
+      result = @kaltura.flavorAssetGetDownloadUrl(asset_id)
+
+      expect(download_stub).to have_been_requested
+      expect(result).to eq download_url
+    end
+
+    it "returns download URL correctly" do
+      asset_id = "asset_789"
+      expected_url = "https://kaltura.example.com/path/to/download"
+
+      stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+        .with(query: hash_including(
+          service: "flavorAsset",
+          action: "getDownloadUrl",
+          id: asset_id
+        ))
+        .to_return(body: "<result>#{expected_url}</result>")
+
+      result = @kaltura.flavorAssetGetDownloadUrl(asset_id)
+
+      expect(result).to eq expected_url
+    end
+  end
+
+  describe "media_download_url" do
+    let(:entry_id) { "0_test_entry" }
+    let(:cache_key) { "media_download_url/#{entry_id}" }
+
+    before do
+      stub_kaltura_session
+    end
+
+    context "caching" do
+      it "returns cached URL when available" do
+        cached_url = "https://cached.example.com/download"
+        cache = double
+        expect(cache).to receive(:read).with(cache_key).and_return(cached_url)
+        allow(CanvasKaltura).to receive(:cache).and_return(cache)
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to eq cached_url
+      end
+
+      it "caches valid download URL for 12 hours" do
+        download_url = "https://kaltura.example.com/download/asset"
+        cache = double
+        expect(cache).to receive(:read).with(cache_key).and_return(nil)
+        expect(cache).to receive(:write).with(cache_key, download_url, expires_in: 43_200)
+        allow(CanvasKaltura).to receive(:cache).and_return(cache)
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: <<~XML)
+            <result>
+              <item><id>asset1</id><status>2</status><bitrate>1000</bitrate></item>
+            </result>
+          XML
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(
+            service: "flavorAsset",
+            action: "getDownloadUrl",
+            id: "asset1",
+            use: "download"
+          ))
+          .to_return(body: "<result>#{download_url}</result>")
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to eq download_url
+      end
+
+      it "does not cache when URL is nil" do
+        cache = double
+        expect(cache).to receive(:read).with(cache_key).and_return(nil)
+        expect(cache).not_to receive(:write)
+        allow(CanvasKaltura).to receive(:cache).and_return(cache)
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: "<result></result>")
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to be_nil
+      end
+    end
+
+    context "when no assets exist" do
+      it "returns nil" do
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: "<result></result>")
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to be_nil
+      end
+    end
+
+    context "when no ready assets exist" do
+      it "returns nil when all assets have non-ready status" do
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: <<~XML)
+            <result>
+              <item><id>asset1</id><status>1</status><bitrate>1000</bitrate></item>
+              <item><id>asset2</id><status>0</status><bitrate>2000</bitrate></item>
+            </result>
+          XML
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to be_nil
+      end
+    end
+
+    context "with multiple ready assets" do
+      it "returns download URL for highest quality asset" do
+        download_url = "https://kaltura.example.com/download/asset2"
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: <<~XML)
+            <result>
+              <item><id>asset1</id><status>2</status><bitrate>1000</bitrate></item>
+              <item><id>asset2</id><status>2</status><bitrate>3000</bitrate></item>
+              <item><id>asset3</id><status>2</status><bitrate>2000</bitrate></item>
+            </result>
+          XML
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(
+            service: "flavorAsset",
+            action: "getDownloadUrl",
+            id: "asset2",
+            use: "download"
+          ))
+          .to_return(body: "<result>#{download_url}</result>")
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to eq download_url
+      end
+
+      it "selects highest bitrate as integer not string" do
+        download_url = "https://kaltura.example.com/download/asset_high"
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: <<~XML)
+            <result>
+              <item><id>asset_low</id><status>2</status><bitrate>900</bitrate></item>
+              <item><id>asset_high</id><status>2</status><bitrate>1100</bitrate></item>
+            </result>
+          XML
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(
+            service: "flavorAsset",
+            action: "getDownloadUrl",
+            id: "asset_high",
+            use: "download"
+          ))
+          .to_return(body: "<result>#{download_url}</result>")
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to eq download_url
+      end
+    end
+
+    context "handling whitespace" do
+      it "strips whitespace from download URL" do
+        download_url = "https://kaltura.example.com/download/asset"
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: <<~XML)
+            <result>
+              <item><id>asset1</id><status>2</status><bitrate>1000</bitrate></item>
+            </result>
+          XML
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(
+            service: "flavorAsset",
+            action: "getDownloadUrl",
+            id: "asset1",
+            use: "download"
+          ))
+          .to_return(body: "<result>  #{download_url}  \n</result>")
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to eq download_url
+      end
+
+      it "returns nil when download URL is empty string" do
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: <<~XML)
+            <result>
+              <item><id>asset1</id><status>2</status><bitrate>1000</bitrate></item>
+            </result>
+          XML
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(
+            service: "flavorAsset",
+            action: "getDownloadUrl",
+            id: "asset1",
+            use: "download"
+          ))
+          .to_return(body: "<result></result>")
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to be_nil
+      end
+
+      it "returns nil when download URL is only whitespace" do
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: <<~XML)
+            <result>
+              <item><id>asset1</id><status>2</status><bitrate>1000</bitrate></item>
+            </result>
+          XML
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(
+            service: "flavorAsset",
+            action: "getDownloadUrl",
+            id: "asset1",
+            use: "download"
+          ))
+          .to_return(body: "<result>   \n  </result>")
+
+        result = @kaltura.media_download_url(entry_id)
+
+        expect(result).to be_nil
+      end
+    end
+
+    context "Kaltura API integration" do
+      it "starts admin session" do
+        session_stub = stub_kaltura_session
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: "<result></result>")
+
+        @kaltura.media_download_url(entry_id)
+
+        expect(session_stub).to have_been_requested
+      end
+
+      it "calls flavorAssetGetByEntryId with correct entry_id" do
+        assets_stub = stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+                      .with(query: hash_including(
+                        service: "flavorAsset",
+                        action: "getByEntryId",
+                        entryId: entry_id
+                      ))
+                      .to_return(body: "<result></result>")
+
+        @kaltura.media_download_url(entry_id)
+
+        expect(assets_stub).to have_been_requested
+      end
+
+      it "calls flavorAssetGetDownloadUrl with use parameter" do
+        download_url = "https://kaltura.example.com/download/asset"
+
+        stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+          .with(query: hash_including(service: "flavorAsset", action: "getByEntryId"))
+          .to_return(body: <<~XML)
+            <result>
+              <item><id>test_asset</id><status>2</status><bitrate>1000</bitrate></item>
+            </result>
+          XML
+
+        download_stub = stub_request(:get, "https://www.instructuremedia.com/api_v3/")
+                        .with(query: hash_including(
+                          service: "flavorAsset",
+                          action: "getDownloadUrl",
+                          id: "test_asset",
+                          use: "download"
+                        ))
+                        .to_return(body: "<result>#{download_url}</result>")
+
+        @kaltura.media_download_url(entry_id)
+
+        expect(download_stub).to have_been_requested
+      end
     end
   end
 end

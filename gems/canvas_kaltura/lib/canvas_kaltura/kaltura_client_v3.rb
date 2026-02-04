@@ -229,6 +229,31 @@ module CanvasKaltura
       getRequest(:media, :delete, hash)
     end
 
+    def media_download_url(entry_id)
+      cache_key = ["media_download_url", entry_id].join("/")
+      if (download_url = CanvasKaltura.cache.read(cache_key))
+        return download_url
+      end
+
+      startSession(CanvasKaltura::SessionType::ADMIN)
+      assets = flavorAssetGetByEntryId(entry_id)
+      return nil unless assets.present?
+
+      highest_quality_asset =
+        assets
+        .select { |asset| ASSET_STATUSES[asset[:status]] == :READY }
+        .max_by { |asset| asset[:bitrate].to_i }
+      return nil unless highest_quality_asset
+
+      download_url = flavorAssetGetDownloadUrl(
+        highest_quality_asset[:id],
+        use: "download"
+      )&.strip&.presence
+
+      CanvasKaltura.cache.write(cache_key, download_url, expires_in: 43_200) if download_url
+      download_url
+    end
+
     # See the method of the same name in saveMediaRecording.js
     def mediaTypeToSymbol(type)
       case type.to_i
@@ -329,11 +354,12 @@ module CanvasKaltura
       flavors.find { |f| f[:isOriginal] == 1 } || flavors.first
     end
 
-    def flavorAssetGetDownloadUrl(assetId)
+    def flavorAssetGetDownloadUrl(asset_id, use: nil)
+      params = { ks: @ks, id: asset_id }
+      params[:use] = use if use.present?
       result = getRequest(:flavorAsset,
                           :getDownloadUrl,
-                          ks: @ks,
-                          id: assetId)
+                          params)
       result&.content
     end
 
