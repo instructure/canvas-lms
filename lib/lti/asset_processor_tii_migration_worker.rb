@@ -684,8 +684,7 @@ module Lti
       Rails.application.routes.url_helpers.account_file_download_url(
         account.id,
         attachment_id,
-        host: HostUrl.context_host(account),
-        protocol: HostUrl.protocol
+        host: account.environment_specific_domain
       )
     end
 
