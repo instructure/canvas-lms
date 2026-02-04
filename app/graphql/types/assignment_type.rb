@@ -421,7 +421,6 @@ module Types
     field :peer_review_sub_assignment, "Types::PeerReviewSubAssignmentType", null: true
     def peer_review_sub_assignment
       return nil unless object.is_a?(Assignment)
-      return nil unless assignment.grants_right?(current_user, session, :read)
       return nil unless assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       return nil unless assignment.peer_reviews
 

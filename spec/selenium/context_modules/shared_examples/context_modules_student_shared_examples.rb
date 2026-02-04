@@ -909,4 +909,57 @@ shared_examples "context modules for students" do
       end
     end
   end
+
+  context "peer review sub-assignments" do
+    before :once do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @course.enable_feature!(:assignments_2_student)
+      @module = @course.context_modules.create!(name: "Test Module")
+      @assignment = @course.assignments.create!(
+        name: "Peer Review Assignment",
+        peer_reviews: true,
+        peer_review_count: 2,
+        points_possible: 10,
+        submission_types: "online_text_entry",
+        due_at: 5.days.from_now
+      )
+      @peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+        parent_assignment: @assignment,
+        points_possible: 10,
+        due_at: 9.days.from_now
+      )
+      @module.add_item({ id: @assignment.id, type: "assignment" })
+    end
+
+    before do
+      user_session(@student)
+    end
+
+    it "renders peer review sub-assignment with correct title and points" do
+      get "/courses/#{@course.id}/modules"
+
+      parent_item = f("#context_module_item_#{@module.content_tags.first.id}")
+      expect(parent_item).to be_displayed
+      expect(parent_item).to include_text(@assignment.name)
+
+      peer_review_container = f("#module_student_view_peer_reviews_#{@assignment.id}_#{@module.id}")
+      expect(peer_review_container).to be_displayed
+
+      peer_review_title = wait_for(method: nil, timeout: 10) do
+        fj("a.ig-title:contains('#{@assignment.name} Peer Reviews')")
+      end
+      expect(peer_review_title).to be_displayed
+      expect(peer_review_title.text).to include("#{@assignment.name} Peer Reviews (#{@assignment.peer_review_count})")
+
+      points_display = wait_for(method: nil, timeout: 10) do
+        fj(".points_possible_display:contains('pts')")
+      end
+      expect(points_display.text).to eq("10 pts")
+
+      due_date_display = wait_for(method: nil, timeout: 10) do
+        f(".due_date_display")
+      end
+      expect(due_date_display.text).not_to be_empty
+    end
+  end
 end

@@ -393,6 +393,7 @@ export type OtherFeatureId =
   | 'canvas_k6_theme'
   | 'new_math_equation_handling'
   | 'lti_asset_processor_course'
+  | 'peer_review_allocation_and_grading'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env
