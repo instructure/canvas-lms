@@ -2932,6 +2932,11 @@ class Account < ActiveRecord::Base
       (feature_enabled?(:a11y_checker) || Account.site_admin.feature_enabled?(:a11y_checker_ai_features))
   end
 
+  def a11y_checker_close_issues?
+    Account.site_admin.feature_enabled?(:a11y_checker_close_issues) &&
+      (feature_enabled?(:a11y_checker) || Account.site_admin.feature_enabled?(:a11y_checker_ga2_features))
+  end
+
   private
 
   def sanitize_discovery_page

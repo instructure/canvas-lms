@@ -3757,4 +3757,50 @@ describe Account do
       end
     end
   end
+
+  describe "#a11y_checker_close_issues?" do
+    let(:account) { Account.create! }
+
+    context "when site_admin a11y_checker_close_issues is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:a11y_checker_close_issues)
+      end
+
+      it "returns false even if account has a11y_checker enabled" do
+        account.enable_feature!(:a11y_checker)
+        expect(account.a11y_checker_close_issues?).to be false
+      end
+
+      it "returns false even if site_admin has a11y_checker_ga2_features enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_close_issues?).to be false
+      end
+    end
+
+    context "when site_admin a11y_checker_close_issues is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_close_issues)
+      end
+
+      it "returns true when account has a11y_checker enabled" do
+        account.enable_feature!(:a11y_checker)
+        expect(account.a11y_checker_close_issues?).to be true
+      end
+
+      it "returns true when site_admin has a11y_checker_ga2_features enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_close_issues?).to be true
+      end
+
+      it "returns true when both a11y_checker and a11y_checker_ga2_features are enabled" do
+        account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_close_issues?).to be true
+      end
+
+      it "returns false when neither a11y_checker nor a11y_checker_ga2_features are enabled" do
+        expect(account.a11y_checker_close_issues?).to be false
+      end
+    end
+  end
 end

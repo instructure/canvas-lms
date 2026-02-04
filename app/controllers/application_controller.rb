@@ -427,6 +427,7 @@ class ApplicationController < ActionController::Base
           @js_env[:FEATURES][:rce_studio_embed_improvements] = @context.feature_enabled?(:rce_studio_embed_improvements)
           @js_env[:FEATURES][:a11y_checker_ai_table_caption_generation] = @context.a11y_checker_ai_table_caption_generation?
           @js_env[:FEATURES][:a11y_checker_ai_alt_text_generation] = @context.a11y_checker_ai_alt_text_generation?
+          @js_env[:FEATURES][:a11y_checker_close_issues] = @context.a11y_checker_close_issues?
           @js_env[:FEATURES][:peer_review_allocation_and_grading] = @context.feature_enabled?(:peer_review_allocation_and_grading)
         end
 
@@ -475,7 +476,6 @@ class ApplicationController < ActionController::Base
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
     a11y_checker_additional_resources
-    a11y_checker_close_issues
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player

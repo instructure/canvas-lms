@@ -102,7 +102,7 @@ module Accessibility
     end
 
     def check_close_issues_feature_flag
-      render_unauthorized_action unless Account.site_admin.feature_enabled?(:a11y_checker_close_issues)
+      render_unauthorized_action unless @context.try(:a11y_checker_close_issues?)
     end
 
     # Apply sorting to the supplied ActiveRecord::Relation of AccessibilityResourceScan
