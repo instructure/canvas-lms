@@ -410,6 +410,16 @@ describe BrandConfig do
 
       @parent_config.clear_dependent_caches
     end
+
+    it "clears Account brand_config caches for accounts using descendant configs" do
+      account_using_child = Account.create!(brand_config_md5: @child_config.md5)
+      account_using_grandchild = Account.create!(brand_config_md5: @grandchild_config.md5)
+
+      expect(Account).to receive(:clear_cache_keys).with([account_using_child.id], :brand_config).once
+      expect(Account).to receive(:clear_cache_keys).with([account_using_grandchild.id], :brand_config).once
+
+      @parent_config.clear_dependent_caches
+    end
   end
 
   context "with sharding" do
