@@ -87,6 +87,7 @@ export type ItemAssignToCardProps = {
   peer_review_available_to: string | null
   peer_review_available_from: string | null
   peer_review_due_at: string | null
+  peerReviewsEnabled?: boolean
   itemType?: ItemType
   onDelete?: (cardId: string) => void
   onValidityChange?: (cardId: string, isValid: boolean) => void
@@ -150,6 +151,7 @@ export default forwardRef(function ItemAssignToCard(
     disabledOptionIdsRef,
     isOpenRef,
     itemType,
+    peerReviewsEnabled,
   } = props
   const [
     requiredRepliesDueDate,
@@ -622,6 +624,7 @@ export default forwardRef(function ItemAssignToCard(
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
           <PeerReviewSelector
+            peerReviewsEnabled={peerReviewsEnabled}
             assignmentDueDate={dueDate}
             peerReviewAvailableToDate={peerReviewAvailableToDate}
             setPeerReviewAvailableToDate={setPeerReviewAvailableToDate}

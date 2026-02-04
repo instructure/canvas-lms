@@ -120,9 +120,6 @@ describe('assitnToHelper', () => {
         required_replies_due_at: null,
         unlock_at: null,
         lock_at: null,
-        peer_review_available_from: null,
-        peer_review_due_at: null,
-        peer_review_available_to: null,
         assignment_overrides: [] as DateDetailsOverride[],
         only_visible_to_overrides: false,
       }
@@ -728,203 +725,325 @@ describe('assitnToHelper', () => {
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
 
-    it('includes peer review dates from everyone card in default payload', () => {
-      const cards: ItemAssignToCardSpec[] = [
-        {
-          key: '1',
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['everyone'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_from: '2024-01-15T12:00:00Z',
-          peer_review_due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_to: '2024-01-25T12:00:00Z',
-        } as ItemAssignToCardSpec,
-      ]
+    describe('with PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED', () => {
+      const originalENV = window.ENV
 
-      const payload = generateDateDetailsPayload(cards, false, [], [])
+      beforeEach(() => {
+        window.ENV = {
+          ...originalENV,
+          PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: true,
+        }
+      })
 
-      expect(payload.peer_review_available_from).toBe('2024-01-15T12:00:00Z')
-      expect(payload.peer_review_due_at).toBe('2024-01-20T12:00:00Z')
-      expect(payload.peer_review_available_to).toBe('2024-01-25T12:00:00Z')
-    })
+      afterEach(() => {
+        window.ENV = originalENV
+      })
 
-    it('includes peer review dates in section override', () => {
-      const cards: ItemAssignToCardSpec[] = [
-        {
-          overrideId: '1',
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['section-2'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_from: '2024-01-15T12:00:00Z',
-          peer_review_due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_to: '2024-01-25T12:00:00Z',
-        } as ItemAssignToCardSpec,
-      ]
+      it('includes peer review dates from everyone card in default payload with nested structure', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            key: '1',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['everyone'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_from: '2024-01-15T12:00:00Z',
+            peer_review_due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_to: '2024-01-25T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
 
-      const payload = generateDateDetailsPayload(cards, false, [], [])
+        const payload = generateDateDetailsPayload(cards, false, [], [])
 
-      expect(payload.assignment_overrides).toHaveLength(1)
-      expect(payload.assignment_overrides[0].course_section_id).toBe('2')
-      expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
-        '2024-01-15T12:00:00Z',
-      )
-      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
-      expect(payload.assignment_overrides[0].peer_review_available_to).toBe('2024-01-25T12:00:00Z')
-    })
+        expect(payload.peer_review).toBeDefined()
+        expect(payload.peer_review?.due_at).toBe('2024-01-20T12:00:00Z')
+        expect(payload.peer_review?.unlock_at).toBe('2024-01-15T12:00:00Z')
+        expect(payload.peer_review?.lock_at).toBe('2024-01-25T12:00:00Z')
+        expect(payload.peer_review?.peer_review_overrides).toEqual([])
+      })
 
-    it('includes peer review dates in student override', () => {
-      const cards: ItemAssignToCardSpec[] = [
-        {
-          overrideId: '1',
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['student-123'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_from: '2024-01-15T12:00:00Z',
-          peer_review_due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_to: '2024-01-25T12:00:00Z',
-        } as ItemAssignToCardSpec,
-      ]
+      it('includes peer review dates in section override as peer_review_overrides', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            overrideId: '1',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['section-2'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_from: '2024-01-15T12:00:00Z',
+            peer_review_due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_to: '2024-01-25T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
 
-      const payload = generateDateDetailsPayload(cards, false, [], [])
+        const payload = generateDateDetailsPayload(cards, false, [], [])
 
-      expect(payload.assignment_overrides).toHaveLength(1)
-      expect(payload.assignment_overrides[0].student_ids).toEqual(['123'])
-      expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
-        '2024-01-15T12:00:00Z',
-      )
-      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
-      expect(payload.assignment_overrides[0].peer_review_available_to).toBe('2024-01-25T12:00:00Z')
-    })
+        expect(payload.assignment_overrides).toHaveLength(1)
+        expect(payload.assignment_overrides[0].course_section_id).toBe('2')
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(1)
+        expect(payload.peer_review?.peer_review_overrides?.[0].course_section_id).toBe('2')
+        expect(payload.peer_review?.peer_review_overrides?.[0].unlock_at).toBe(
+          '2024-01-15T12:00:00Z',
+        )
+        expect(payload.peer_review?.peer_review_overrides?.[0].due_at).toBe('2024-01-20T12:00:00Z')
+        expect(payload.peer_review?.peer_review_overrides?.[0].lock_at).toBe('2024-01-25T12:00:00Z')
+      })
 
-    it('includes peer review override_id when updating existing override', () => {
-      const cards: ItemAssignToCardSpec[] = [
-        {
-          overrideId: '999',
-          peer_review_override_id: '888',
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['section-2'],
-          defaultOptions: ['section-2'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_due_at: '2024-01-20T12:00:00Z',
-        } as ItemAssignToCardSpec,
-      ]
+      it('includes peer review dates in student override as peer_review_overrides', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            overrideId: '1',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['student-123'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_from: '2024-01-15T12:00:00Z',
+            peer_review_due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_to: '2024-01-25T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
 
-      const payload = generateDateDetailsPayload(cards, false, [], [])
+        const payload = generateDateDetailsPayload(cards, false, [], [])
 
-      expect(payload.assignment_overrides).toHaveLength(1)
-      expect(payload.assignment_overrides[0].id).toBe('999')
-      expect(payload.assignment_overrides[0].peer_review_override_id).toBe('888')
-    })
+        expect(payload.assignment_overrides).toHaveLength(1)
+        expect(payload.assignment_overrides[0].student_ids).toEqual(['123'])
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(1)
+        expect(payload.peer_review?.peer_review_overrides?.[0].student_ids).toEqual(['123'])
+        expect(payload.peer_review?.peer_review_overrides?.[0].unlock_at).toBe(
+          '2024-01-15T12:00:00Z',
+        )
+        expect(payload.peer_review?.peer_review_overrides?.[0].due_at).toBe('2024-01-20T12:00:00Z')
+        expect(payload.peer_review?.peer_review_overrides?.[0].lock_at).toBe('2024-01-25T12:00:00Z')
+      })
 
-    it('includes peer review dates in course override (Everyone else)', () => {
-      const cards: ItemAssignToCardSpec[] = [
-        {
-          overrideId: '1',
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['everyone'],
-          defaultOptions: ['everyone'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_from: '2024-01-15T12:00:00Z',
-          peer_review_due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_to: '2024-01-25T12:00:00Z',
-        } as ItemAssignToCardSpec,
-      ]
+      it('includes peer review override_id when updating existing override', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            overrideId: '999',
+            peer_review_override_id: '888',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['section-2'],
+            defaultOptions: ['section-2'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_due_at: '2024-01-20T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
 
-      const payload = generateDateDetailsPayload(cards, true, [], [])
+        const payload = generateDateDetailsPayload(cards, false, [], [])
 
-      expect(payload.assignment_overrides).toHaveLength(1)
-      expect(payload.assignment_overrides[0].course_id).toBe('everyone')
-      expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
-        '2024-01-15T12:00:00Z',
-      )
-      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
-      expect(payload.assignment_overrides[0].peer_review_available_to).toBe('2024-01-25T12:00:00Z')
-    })
+        expect(payload.assignment_overrides).toHaveLength(1)
+        expect(payload.assignment_overrides[0].id).toBe('999')
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(1)
+        expect(payload.peer_review?.peer_review_overrides?.[0].id).toBe('888')
+      })
 
-    it('includes peer review dates in tag override (non-collaborative group)', () => {
-      const cards: ItemAssignToCardSpec[] = [
-        {
-          overrideId: undefined,
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['tag-456'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_from: '2024-01-15T12:00:00Z',
-          peer_review_due_at: '2024-01-20T12:00:00Z',
-          peer_review_available_to: '2024-01-25T12:00:00Z',
-        } as ItemAssignToCardSpec,
-      ]
+      it('includes peer review dates in course override (Everyone else) as peer_review_overrides', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            overrideId: '1',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['everyone'],
+            defaultOptions: ['everyone'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_from: '2024-01-15T12:00:00Z',
+            peer_review_due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_to: '2024-01-25T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
 
-      const payload = generateDateDetailsPayload(cards, false, [], [])
+        const payload = generateDateDetailsPayload(cards, true, [], [])
 
-      expect(payload.assignment_overrides).toHaveLength(1)
-      expect(payload.assignment_overrides[0].group_id).toBe('456')
-      expect(payload.assignment_overrides[0].non_collaborative).toBe(true)
-      expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
-        '2024-01-15T12:00:00Z',
-      )
-      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
-      expect(payload.assignment_overrides[0].peer_review_available_to).toBe('2024-01-25T12:00:00Z')
-    })
+        expect(payload.assignment_overrides).toHaveLength(1)
+        expect(payload.assignment_overrides[0].course_id).toBe('everyone')
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(1)
+        expect(payload.peer_review?.peer_review_overrides?.[0].course_id).toBe('everyone')
+        expect(payload.peer_review?.peer_review_overrides?.[0].unlock_at).toBe(
+          '2024-01-15T12:00:00Z',
+        )
+        expect(payload.peer_review?.peer_review_overrides?.[0].due_at).toBe('2024-01-20T12:00:00Z')
+        expect(payload.peer_review?.peer_review_overrides?.[0].lock_at).toBe('2024-01-25T12:00:00Z')
+      })
 
-    it('updates existing tag override with peer review dates', () => {
-      const cards: ItemAssignToCardSpec[] = [
-        {
-          overrideId: '789',
-          peer_review_override_id: '999',
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['tag-123'],
-          defaultOptions: ['tag-123'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_due_at: '2024-01-21T12:00:00Z',
-        } as ItemAssignToCardSpec,
-      ]
+      it('includes peer review dates in tag override (non-collaborative group) as peer_review_overrides', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            overrideId: undefined,
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['tag-456'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_from: '2024-01-15T12:00:00Z',
+            peer_review_due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_to: '2024-01-25T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
 
-      const payload = generateDateDetailsPayload(cards, false, [], [])
+        const payload = generateDateDetailsPayload(cards, false, [], [])
 
-      expect(payload.assignment_overrides).toHaveLength(1)
-      expect(payload.assignment_overrides[0].id).toBe('789')
-      expect(payload.assignment_overrides[0].group_id).toBe('123')
-      expect(payload.assignment_overrides[0].non_collaborative).toBe(true)
-      expect(payload.assignment_overrides[0].peer_review_override_id).toBe('999')
-      expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-21T12:00:00Z')
-    })
+        expect(payload.assignment_overrides).toHaveLength(1)
+        expect(payload.assignment_overrides[0].group_id).toBe('456')
+        expect(payload.assignment_overrides[0].non_collaborative).toBe(true)
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(1)
+        expect(payload.peer_review?.peer_review_overrides?.[0].group_id).toBe('456')
+        expect(payload.peer_review?.peer_review_overrides?.[0].unlock_at).toBe(
+          '2024-01-15T12:00:00Z',
+        )
+        expect(payload.peer_review?.peer_review_overrides?.[0].due_at).toBe('2024-01-20T12:00:00Z')
+        expect(payload.peer_review?.peer_review_overrides?.[0].lock_at).toBe('2024-01-25T12:00:00Z')
+      })
 
-    it('handles section and tag on different cards with different peer review dates', () => {
-      const cards: ItemAssignToCardSpec[] = [
-        {
-          overrideId: undefined,
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['section-2'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_due_at: '2024-01-22T12:00:00Z',
-        } as ItemAssignToCardSpec,
-        {
-          overrideId: undefined,
-          isValid: true,
-          hasAssignees: true,
-          selectedAssigneeIds: ['tag-5'],
-          due_at: '2024-01-20T12:00:00Z',
-          peer_review_due_at: '2024-01-23T12:00:00Z',
-        } as ItemAssignToCardSpec,
-      ]
+      it('updates existing tag override with peer review dates', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            overrideId: '789',
+            peer_review_override_id: '999',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['tag-123'],
+            defaultOptions: ['tag-123'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_due_at: '2024-01-21T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
 
-      const payload = generateDateDetailsPayload(cards, false, [], [])
+        const payload = generateDateDetailsPayload(cards, false, [], [])
 
-      expect(payload.assignment_overrides).toHaveLength(2)
-      const sectionOverride = payload.assignment_overrides.find(o => o.course_section_id === '2')
-      const tagOverride = payload.assignment_overrides.find(o => o.group_id === '5')
+        expect(payload.assignment_overrides).toHaveLength(1)
+        expect(payload.assignment_overrides[0].id).toBe('789')
+        expect(payload.assignment_overrides[0].group_id).toBe('123')
+        expect(payload.assignment_overrides[0].non_collaborative).toBe(true)
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(1)
+        expect(payload.peer_review?.peer_review_overrides?.[0].id).toBe('999')
+        expect(payload.peer_review?.peer_review_overrides?.[0].due_at).toBe('2024-01-21T12:00:00Z')
+      })
 
-      expect(sectionOverride?.peer_review_due_at).toBe('2024-01-22T12:00:00Z')
-      expect(tagOverride?.peer_review_due_at).toBe('2024-01-23T12:00:00Z')
-      expect(tagOverride?.non_collaborative).toBe(true)
+      it('handles section and tag on different cards with different peer review dates', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            overrideId: undefined,
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['section-2'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_due_at: '2024-01-22T12:00:00Z',
+          } as ItemAssignToCardSpec,
+          {
+            overrideId: undefined,
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['tag-5'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_due_at: '2024-01-23T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
+
+        const payload = generateDateDetailsPayload(cards, false, [], [])
+
+        expect(payload.assignment_overrides).toHaveLength(2)
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(2)
+
+        const sectionPeerReview = payload.peer_review?.peer_review_overrides?.find(
+          o => o.course_section_id === '2',
+        )
+        const tagPeerReview = payload.peer_review?.peer_review_overrides?.find(
+          o => o.group_id === '5',
+        )
+
+        expect(sectionPeerReview?.due_at).toBe('2024-01-22T12:00:00Z')
+        expect(tagPeerReview?.due_at).toBe('2024-01-23T12:00:00Z')
+      })
+
+      it('returns flattened format when keepFlattenedFormat option is true', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            key: '1',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['section-2'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_from: '2024-01-15T12:00:00Z',
+            peer_review_available_to: '2024-01-25T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
+
+        const payload = generateDateDetailsPayload(cards, false, [], [], {
+          keepFlattenedFormat: true,
+        })
+
+        expect(payload.assignment_overrides).toHaveLength(1)
+        expect(payload.assignment_overrides[0].peer_review_due_at).toBe('2024-01-20T12:00:00Z')
+        expect(payload.assignment_overrides[0].peer_review_available_from).toBe(
+          '2024-01-15T12:00:00Z',
+        )
+        expect(payload.assignment_overrides[0].peer_review_available_to).toBe(
+          '2024-01-25T12:00:00Z',
+        )
+      })
+
+      it('merges peer review default dates with overrides', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            key: '1',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['everyone'],
+            due_at: '2024-01-20T12:00:00Z',
+            peer_review_due_at: '2024-01-20T12:00:00Z',
+            peer_review_available_from: '2024-01-15T12:00:00Z',
+            peer_review_available_to: '2024-01-25T12:00:00Z',
+          } as ItemAssignToCardSpec,
+          {
+            key: '2',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['section-2'],
+            due_at: '2024-01-22T12:00:00Z',
+            peer_review_due_at: '2024-01-22T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
+
+        const payload = generateDateDetailsPayload(cards, false, [], [])
+
+        expect(payload.peer_review?.due_at).toBe('2024-01-20T12:00:00Z')
+        expect(payload.peer_review?.unlock_at).toBe('2024-01-15T12:00:00Z')
+        expect(payload.peer_review?.lock_at).toBe('2024-01-25T12:00:00Z')
+
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(1)
+        expect(payload.peer_review?.peer_review_overrides?.[0].course_section_id).toBe('2')
+        expect(payload.peer_review?.peer_review_overrides?.[0].due_at).toBe('2024-01-22T12:00:00Z')
+      })
+
+      it('uses extracted peer review data when no everyoneCard peer review dates exist', () => {
+        const cards: ItemAssignToCardSpec[] = [
+          {
+            key: '1',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['everyone'],
+            due_at: '2024-01-20T12:00:00Z',
+          } as ItemAssignToCardSpec,
+          {
+            key: '2',
+            isValid: true,
+            hasAssignees: true,
+            selectedAssigneeIds: ['section-2'],
+            due_at: '2024-01-22T12:00:00Z',
+            peer_review_due_at: '2024-01-22T12:00:00Z',
+          } as ItemAssignToCardSpec,
+        ]
+
+        const payload = generateDateDetailsPayload(cards, false, [], [])
+
+        expect(payload.peer_review?.due_at).toBeNull()
+        expect(payload.peer_review?.unlock_at).toBeNull()
+        expect(payload.peer_review?.lock_at).toBeNull()
+
+        expect(payload.peer_review?.peer_review_overrides).toHaveLength(1)
+        expect(payload.peer_review?.peer_review_overrides?.[0].due_at).toBe('2024-01-22T12:00:00Z')
+      })
     })
   })
 

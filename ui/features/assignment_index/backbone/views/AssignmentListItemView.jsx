@@ -716,11 +716,12 @@ export default (AssignmentListItemView = (function () {
             this.renderItemAssignToTray(false, returnFocusTo, itemProps)
             returnFocusTo.focus()
           }}
+          // Spread itemProps first so explicit props below can override them
+          {...itemProps}
           itemType="assignment"
           locale={ENV.LOCALE || 'en'}
           timezone={ENV.TIMEZONE || 'UTC'}
           isCheckpointed={itemProps.isCheckpoint}
-          {...itemProps}
         />,
         mountPoint,
       )

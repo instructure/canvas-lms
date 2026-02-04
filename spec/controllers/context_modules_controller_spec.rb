@@ -611,6 +611,22 @@ describe ContextModulesController do
       end
     end
 
+    context "peer review allocation and grading" do
+      it "is true if feature flag is enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be true
+      end
+
+      it "is false if feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be false
+      end
+    end
+
     context "tool definitions for placements" do
       subject { get "index", params: { course_id: @course.id } }
 
@@ -2285,7 +2301,7 @@ describe ContextModulesController do
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:missing)
+      expect(response).to have_http_status(:missing)
     end
 
     it "returns 404 if matching rule is unlocked but has one selected assignment set" do
@@ -2301,7 +2317,7 @@ describe ContextModulesController do
                                                                            ])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:missing)
+      expect(response).to have_http_status(:missing)
     end
 
     it "redirects to context modules page with warning if matching rule is locked" do
@@ -2336,7 +2352,7 @@ describe ContextModulesController do
                                                                            ])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:success)
+      expect(response).to have_http_status(:success)
       mastery_path_data = controller.js_env[:CHOOSE_MASTERY_PATH_DATA]
       expect(mastery_path_data).to include({
                                              selectedOption: nil,
@@ -2362,7 +2378,7 @@ describe ContextModulesController do
                                                                            ])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:success)
+      expect(response).to have_http_status(:success)
       mastery_path_data = controller.js_env[:CHOOSE_MASTERY_PATH_DATA]
       expect(mastery_path_data).to include({
                                              selectedOption: nil
@@ -2394,7 +2410,7 @@ describe ContextModulesController do
                                                                            ])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:success)
+      expect(response).to have_http_status(:success)
       options = controller.js_env[:CHOOSE_MASTERY_PATH_DATA][:options]
       expect(options.length).to eq 2
       expect(options[0][:setId]).to eq 3
@@ -2453,7 +2469,7 @@ describe ContextModulesController do
       item = @mod.add_item type: "page", id: page.id
 
       get "item_redirect_mastery_paths", params: { course_id: @course.id, id: item.id }
-      assert_response :missing
+      expect(response).to have_http_status(:missing)
     end
   end
 
