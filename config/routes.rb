@@ -1308,6 +1308,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :discovery_pages_api) do
+      get "discovery_pages", action: :show
       put "discovery_pages", action: :upsert, as: :discovery_pages
     end
 

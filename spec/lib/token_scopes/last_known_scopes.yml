@@ -1595,6 +1595,8 @@
   path: '/api/v1/developer_keys/:id'
 - verb: PUT
   path: '/api/v1/developer_keys/:id'
+- verb: GET
+  path: '/api/v1/discovery_pages'
 - verb: PUT
   path: '/api/v1/discovery_pages'
 - verb: POST

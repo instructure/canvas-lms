@@ -64,6 +64,37 @@
 class DiscoveryPagesApiController < ApplicationController
   before_action :require_user, :load_context, :require_root_account_management
 
+  # @API Get Discovery Page
+  # Get the discovery page configuration for the domain root account.
+  #
+  # @returns DiscoveryPage
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/discovery_pages' \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "discovery_page": {
+  #       "primary": [
+  #         {
+  #           "authentication_provider_id": 1,
+  #           "label": "Students",
+  #           "icon_url": "https://example.com/icons/students.svg"
+  #         }
+  #       ],
+  #       "secondary": [
+  #         {
+  #           "authentication_provider_id": 3,
+  #           "label": "Admins"
+  #         }
+  #       ]
+  #     }
+  #   }
+  def show
+    render json: { discovery_page: }
+  end
+
   # @API Update Discovery Page
   # Update or create the discovery page configuration for the domain root account.
   #
@@ -141,10 +172,14 @@ class DiscoveryPagesApiController < ApplicationController
     @domain_root_account.settings[:discovery_page] = upsert_params
     @domain_root_account.save!
 
-    render json: { discovery_page: @domain_root_account.settings[:discovery_page] }
+    render json: { discovery_page: }
   end
 
   private
+
+  def discovery_page
+    context.settings[:discovery_page].presence || {}
+  end
 
   def context
     @context ||= @domain_root_account

@@ -19,13 +19,11 @@
 #
 
 describe DiscoveryPagesApiController do
-  before :once do
-    @account = Account.default
-  end
+  let_once(:account) { Account.default }
 
   describe "PUT 'upsert'" do
-    let!(:auth_provider) { @account.authentication_providers.create!(auth_type: "saml") }
-    let!(:secondary_auth_provider) { @account.authentication_providers.create!(auth_type: "cas") }
+    let!(:auth_provider) { account.authentication_providers.create!(auth_type: "saml") }
+    let!(:secondary_auth_provider) { account.authentication_providers.create!(auth_type: "cas") }
 
     let(:valid_discovery_page) do
       {
@@ -59,7 +57,7 @@ describe DiscoveryPagesApiController do
 
     context "when logged in with manage_account_settings permission" do
       before do
-        account_admin_user(account: @account, active_all: true)
+        account_admin_user(account:, active_all: true)
         user_session(@admin)
       end
 
@@ -78,9 +76,9 @@ describe DiscoveryPagesApiController do
       it "persists settings to the domain root account" do
         put :upsert, params: { discovery_page: valid_discovery_page }
 
-        @account.reload
-        expect(@account.settings[:discovery_page][:primary].length).to eq(1)
-        expect(@account.settings[:discovery_page][:secondary].length).to eq(1)
+        account.reload
+        expect(account.settings[:discovery_page][:primary].length).to eq(1)
+        expect(account.settings[:discovery_page][:secondary].length).to eq(1)
       end
 
       it "returns 422 when required fields are missing" do
@@ -125,14 +123,14 @@ describe DiscoveryPagesApiController do
       end
 
       it "updates existing discovery_page settings" do
-        @account.settings[:discovery_page] = { primary: [], secondary: [] }
-        @account.save!
+        account.settings[:discovery_page] = { primary: [], secondary: [] }
+        account.save!
 
         put :upsert, params: { discovery_page: valid_discovery_page }
 
         expect(response).to be_successful
-        @account.reload
-        expect(@account.settings[:discovery_page][:primary].length).to eq(1)
+        account.reload
+        expect(account.settings[:discovery_page][:primary].length).to eq(1)
       end
 
       context "with invalid authentication providers" do
@@ -153,7 +151,7 @@ describe DiscoveryPagesApiController do
         end
 
         it "returns 422 when authentication_provider is soft deleted" do
-          deleted_provider = @account.authentication_providers.create!(auth_type: "ldap")
+          deleted_provider = account.authentication_providers.create!(auth_type: "ldap")
           deleted_provider.destroy
 
           invalid_page = {
@@ -168,6 +166,65 @@ describe DiscoveryPagesApiController do
           expect(response).to have_http_status(:unprocessable_content)
           json = json_parse(response.body)
           expect(json["errors"].any? { |e| e["message"].include?("authentication_provider_id is invalid or inactive") }).to be true
+        end
+      end
+    end
+  end
+
+  describe "GET 'show'" do
+    context "when not logged in" do
+      it "redirects to login" do
+        get :show
+        expect(response).to redirect_to(login_url)
+      end
+    end
+
+    context "when logged in without permission" do
+      before do
+        user_factory(active_all: true)
+        user_session(@user)
+      end
+
+      it "returns unauthorized" do
+        get :show
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when logged in with permission" do
+      before do
+        account_admin_user(account:, active_all: true)
+        user_session(@admin)
+      end
+
+      context "when discovery_page is configured" do
+        let!(:auth_provider) { account.authentication_providers.create!(auth_type: "saml") }
+
+        before do
+          account.settings[:discovery_page] = {
+            primary: [{ authentication_provider_id: auth_provider.id, label: "Test" }],
+            secondary: []
+          }
+          account.save!
+        end
+
+        it "returns discovery_page settings" do
+          get :show
+
+          expect(response).to be_successful
+          json = json_parse(response.body)
+          expect(json["discovery_page"]["primary"].length).to eq(1)
+          expect(json["discovery_page"]["primary"][0]["label"]).to eq("Test")
+        end
+      end
+
+      context "when discovery_page is not configured" do
+        it "returns empty discovery_page object" do
+          get :show
+
+          expect(response).to be_successful
+          json = json_parse(response.body)
+          expect(json["discovery_page"]).to eq({})
         end
       end
     end
