@@ -454,6 +454,13 @@ $icon-size: 1.4rem;
     font-weight: bold;
   }
 
+  #speed_grader_lti_asset_reports_mount_point {
+    h4, .h4 {
+      @include fontSize(14px);
+      font-weight: bold;
+    }
+  }
+
   .content_box {
     padding: $ic-sp*2;
     background: $ic-color-light;
