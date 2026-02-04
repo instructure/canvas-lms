@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -ex
+printenv | sort | sed -E 's/(.*_(KEY|SECRET))=.*/\1 is present/g'
+
 if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
   # when parent is not in $GERRIT_BRANCH (i.e. master)
   if ! git merge-base --is-ancestor HEAD~1 origin/$GERRIT_BRANCH; then

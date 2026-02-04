@@ -48,7 +48,8 @@ def runLintersInline() {
 
   withEnv([
     "COMPOSE_FILE=docker-compose.new-jenkins-linters.yml",
-    "GERGICH_REVIEW_LABEL=Lint-Review"
+    "GERGICH_REVIEW_LABEL=Lint-Review",
+    "GERGICH_GIT_PATH=${pipelineHelpers.getDockerWorkDir()}"
   ]) {
     // Run all linter stages in parallel
     def linterStages = [:]

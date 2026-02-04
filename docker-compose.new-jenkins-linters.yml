@@ -6,7 +6,7 @@ services:
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: test
       GERGICH_DB_PATH: /home/docker/gergich
-      GERGICH_GIT_PATH: /usr/src/app
+      GERGICH_GIT_PATH:
       GERGICH_KEY:
       GERGICH_PUBLISH:
       GERRIT_PROJECT:
