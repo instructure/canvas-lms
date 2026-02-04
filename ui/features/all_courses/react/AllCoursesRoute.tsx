@@ -32,15 +32,17 @@ function fetchCourses() {
   $('#catalog_content').load(window.location.href)
 }
 
-function handleNav(e) {
-  let url
+function handleNav(this: HTMLElement, e: JQuery.Event) {
+  let url: string
   if (!window.history.pushState) {
     return
   }
-  if (this.href) {
+  if (this instanceof HTMLAnchorElement && this.href) {
     url = this.href
-  } else {
+  } else if (this instanceof HTMLFormElement && this.action) {
     url = `${this.action}?${$(this).serialize()}`
+  } else {
+    return
   }
   window.history.pushState(null, '', url)
   fetchCourses()
@@ -48,8 +50,8 @@ function handleNav(e) {
 }
 
 function AllCoursesRoute() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [embeddedLink, setEmbeddedLink] = useState('')
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [embeddedLink, setEmbeddedLink] = useState<string>('')
 
   useEffect(() => {
     $('#course_filter').submit(handleNav)
@@ -59,17 +61,23 @@ function AllCoursesRoute() {
     window.addEventListener('popstate', fetchCourses)
   }, [])
 
-  function handleCourseClick(e) {
-    const link = $(e.target).closest('.course_enrollment_link')[0]
+  function handleCourseClick(e: JQuery.ClickEvent) {
+    const link = $(e.target).closest('.course_enrollment_link')[0] as HTMLElement | undefined
     if (!link) {
       const $course = $(e.target).closest('.course_summary')
       if ($course.length && !$(e.target).is('a')) {
-        $course.find('h3 a')[0].click()
+        const courseLink = $course.find('h3 a')[0] as HTMLElement | undefined
+        if (courseLink) {
+          courseLink.click()
+        }
       }
       return
     } else {
-      setEmbeddedLink(`${link.dataset.href}?embedded=1&no_headers=1`)
-      setIsOpen(true)
+      const href = (link as HTMLElement).dataset.href
+      if (href) {
+        setEmbeddedLink(`${href}?embedded=1&no_headers=1`)
+        setIsOpen(true)
+      }
     }
     e.preventDefault()
   }
