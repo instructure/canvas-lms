@@ -448,8 +448,8 @@ post_grades_enhanced_modal:
 project_lhotse:
   state: hidden
   applies_to: Course
-  display_name: Grading Assistance
-  description: Enables the new AI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
+  display_name: IgniteAI Grading Assistance for SpeedGrader
+  description: Enables the new IgniteAI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
   hidden: true
 performance_improvements_for_gradebook:
   state: hidden
