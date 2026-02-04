@@ -16,23 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UploadMedia from './UploadMedia'
 import ClosedCaptionCreator from './ClosedCaptionCreator'
 import ClosedCaptionCreatorV2 from './ClosedCaptionCreatorV2'
+import closedCaptionLanguages, {
+  captionLanguageForLocale,
+  sortedClosedCaptionLanguageList,
+} from './closedCaptionLanguages'
+import getTranslations from './getTranslations'
 import RocketSVG from './RocketSVG'
-import useComputerPanelFocus from './useComputerPanelFocus'
-import {isAudio, isVideo, isPreviewable, sizeMediaPlayer} from './shared/utils'
-import LoadingIndicator from './shared/LoadingIndicator'
 import saveMediaRecording, {
   saveClosedCaptions,
   saveClosedCaptionsForAttachment,
 } from './saveMediaRecording'
-import closedCaptionLanguages, {
-  sortedClosedCaptionLanguageList,
-  captionLanguageForLocale,
-} from './closedCaptionLanguages'
-import getTranslations from './getTranslations'
 import * as CONSTANTS from './shared/constants'
+import LoadingIndicator from './shared/LoadingIndicator'
+import {isAudio, isPreviewable, isVideo, sizeMediaPlayer} from './shared/utils'
+import UploadMedia from './UploadMedia'
+import useComputerPanelFocus from './useComputerPanelFocus'
 
 export {
   UploadMedia as default,
