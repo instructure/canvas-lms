@@ -601,6 +601,12 @@ pipeline {
   post {
     always {
       script {
+        // Restore the correct build result for skipped builds (e.g., translation builds)
+        if (env.SKIP_BUILD == 'true' && env.SKIP_BUILD_RESULT) {
+          currentBuild.result = env.SKIP_BUILD_RESULT
+          echo "Build was skipped - setting result to ${env.SKIP_BUILD_RESULT}"
+        }
+
         pipelineHelpers.postBuildAlways()
       }
     }
@@ -613,8 +619,10 @@ pipeline {
 
     failure {
       script {
-        pipelineHelpers.maybeSlackSendFailure()
-        pipelineHelpers.maybeRetrigger()
+        if (env.SKIP_BUILD != 'true') {
+          pipelineHelpers.maybeSlackSendFailure()
+          pipelineHelpers.maybeRetrigger()
+        }
       }
     }
   }
