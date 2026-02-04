@@ -284,24 +284,32 @@ class BrandConfig < ActiveRecord::Base
   #
   # This base implementation only handles same-shard children (the common case)
   def clear_dependent_caches
-    clear_child_override_caches_recursively(md5)
-    clear_account_chain_caches
+    self.class.clear_child_override_caches_recursively(md5)
+    self.class.clear_account_chain_caches(md5)
+    self.class.clear_account_caches_for_children(md5)
   end
 
-  private
-
-  def clear_child_override_caches_recursively(parent_md5)
-    BrandConfig.where(parent_md5:).find_each do |child_config|
-      Rails.cache.delete([child_config, "css_and_js_overrides"].cache_key)
-      clear_child_override_caches_recursively(child_config.md5)
+  class << self
+    def clear_child_override_caches_recursively(parent_md5)
+      BrandConfig.where(parent_md5:).find_each do |child_config|
+        Rails.cache.delete([child_config, "css_and_js_overrides"].cache_key)
+        clear_child_override_caches_recursively(child_config.md5)
+      end
     end
-  end
 
-  def clear_account_chain_caches
-    account_ids = Account.where(brand_config_md5: md5).ids
-    shared_config_account_ids = SharedBrandConfig.where(brand_config_md5: md5).pluck(:account_id)
+    def clear_account_chain_caches(target_md5)
+      account_ids = Account.where(brand_config_md5: target_md5).ids
+      shared_config_account_ids = SharedBrandConfig.where(brand_config_md5: target_md5).pluck(:account_id)
 
-    all_account_ids = (account_ids + shared_config_account_ids).uniq
-    Account.clear_cache_keys(all_account_ids, :brand_config) if all_account_ids.any?
+      all_account_ids = (account_ids + shared_config_account_ids).uniq
+      Account.clear_cache_keys(all_account_ids, :brand_config) if all_account_ids.any?
+    end
+
+    def clear_account_caches_for_children(parent_md5)
+      BrandConfig.where(parent_md5:).find_each do |child_config|
+        clear_account_chain_caches(child_config.md5)
+        clear_account_caches_for_children(child_config.md5)
+      end
+    end
   end
 end
