@@ -21,7 +21,7 @@ module Accessibility
   module Concerns
     module CourseStatisticsQueueable
       def queue_course_statistics(course)
-        return unless Account.site_admin.feature_enabled?(:a11y_checker_account_statistics)
+        return unless course.account.a11y_checker_account_statistics?
 
         Accessibility::CourseStatisticCalculatorService.queue_calculation(course)
       end

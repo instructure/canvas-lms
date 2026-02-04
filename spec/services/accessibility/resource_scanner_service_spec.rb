@@ -257,6 +257,7 @@ describe Accessibility::ResourceScannerService do
       context "when a11y_checker_account_statistics feature flag is enabled" do
         before do
           Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+          Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
         end
 
         it "queues course statistics calculation" do
