@@ -2286,7 +2286,7 @@ class Account < ActiveRecord::Base
   def can_see_accessibility_tab?(user)
     return false if !user || !grants_right?(user, :read_course_list)
 
-    feature_enabled?(:a11y_checker) && Account.site_admin.feature_enabled?(:a11y_checker_account_statistics)
+    a11y_checker_account_statistics?
   end
 
   def is_a_context?
@@ -2915,6 +2915,11 @@ class Account < ActiveRecord::Base
 
       client.delete_tenant(root_account_uuid: root_account.uuid, feature_slug: HORIZON_FEATURE_SLUG, current_user:)
     end
+  end
+
+  def a11y_checker_account_statistics?
+    Account.site_admin.feature_enabled?(:a11y_checker_account_statistics) &&
+      (feature_enabled?(:a11y_checker) || Account.site_admin.feature_enabled?(:a11y_checker_ga2_features))
   end
 
   private

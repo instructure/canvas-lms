@@ -451,3 +451,11 @@ a11y_checker_ga1:
   display_name: Accessibility Checker
   description: |-
     Enable the new Accessibility Checker.
+
+a11y_checker_ga2_features:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Accessibility Checker GA2 Features
+  description: |-
+    Enable the new Accessibility Checker GA2 Features.
+  shadow: true
