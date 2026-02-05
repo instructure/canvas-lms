@@ -3556,7 +3556,7 @@ describe CoursesController do
 
         expected_associations = [["syllabus_body", @image.id],
                                  ["syllabus_body", media.id]]
-        expect(@course.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array(expected_associations)
+        expect(@course.reload.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array(expected_associations)
       end
 
       it "removes attachment_associations when files are removed from the syllabus" do
@@ -3566,7 +3566,7 @@ describe CoursesController do
         HTML
         put "update", params: { id: @course.id, course: { syllabus_body: new_body }, format: :json }
 
-        expect(@course.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array([["syllabus_body", media.id]])
+        expect(@course.reload.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array([["syllabus_body", media.id]])
       end
 
       it "does not call update_associations when the syllabus body doesn't change" do

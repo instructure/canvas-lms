@@ -39,8 +39,26 @@ describe Quizzes::Quiz do
       aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
       quiz = @course.quizzes.create!(title: "hello", description: aa_test_data.base_html, saving_user: @teacher)
       quiz.update!(description: aa_test_data.replaced_html, saving_user: @teacher)
-      expect(quiz.attachment_associations.count).to eq(1)
+      expect(quiz.reload.attachment_associations.count).to eq(1)
       expect(quiz.attachment_associations.first.attachment_id).to eq aa_test_data.attachment2.id
+    end
+
+    it "versions attachment associations with the quiz" do
+      course_with_teacher
+      attachment_model(context: @course)
+      quiz = @course.quizzes.create!(description: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+      quiz.reload.update(description: "meh", updating_user: @teacher)
+
+      expect(YAML.load(quiz.reload.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                                 attachment_id: @attachment.id,
+                                                                                                                 context_id: quiz.id,
+                                                                                                                 context_type: "Quizzes::Quiz",
+                                                                                                                 root_account_id: @course.root_account_id,
+                                                                                                                 user_id: @teacher.id,
+                                                                                                                 context_concern: nil
+                                                                                                               })
+
+      expect(YAML.load(quiz.reload.versions.find_by(number: 2).yaml)["attachment_associations"]).to eq([])
     end
   end
 

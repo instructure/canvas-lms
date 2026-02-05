@@ -424,17 +424,18 @@ class Course < ActiveRecord::Base
                      end
                    },
                    on_create: lambda { |course, version|
-                     if course.saving_user
+                     if course.updating_user
                        begin
                          yaml_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
-                         yaml_data["user_id"] = course.saving_user.id
+                         yaml_data["user_id"] = course.updating_user.id
                          version.yaml = yaml_data.to_yaml
                          version.save
                        rescue => e
                          Rails.logger.error("Failed to add user_id to course version: #{e.message}")
                        end
                      end
-                   }
+                   },
+                   versioned_associations: [:attachment_associations]
 
   include StickySisFields
 

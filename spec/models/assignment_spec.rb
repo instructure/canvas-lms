@@ -109,6 +109,21 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  it "versions attachment associations with the assignment" do
+    attachment_model(context: @course)
+    assignment = @course.assignments.create!(description: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+    assignment.update(description: "meh")
+
+    expect(YAML.load(assignment.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                              attachment_id: @attachment.id,
+                                                                                                              context_id: assignment.id,
+                                                                                                              context_type: "Assignment",
+                                                                                                              root_account_id: @course.root_account_id,
+                                                                                                              user_id: @teacher.id,
+                                                                                                              context_concern: nil
+                                                                                                            })
+  end
+
   describe "#question_count" do
     let(:assignment) { Assignment.new }
 

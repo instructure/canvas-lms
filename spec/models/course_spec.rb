@@ -496,6 +496,24 @@ describe Course do
       expect(@course.public_syllabus).to be false
     end
 
+    it "versions attachment associations with the course syllabus" do
+      course_model
+      attachment_model(context: @course)
+      @course.update(syllabus_body: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+      @course.reload.update(syllabus_body: "meh", updating_user: @teacher)
+
+      expect(YAML.load(@course.reload.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                                    attachment_id: @attachment.id,
+                                                                                                                    context_id: @course.id,
+                                                                                                                    context_type: "Course",
+                                                                                                                    root_account_id: @course.root_account_id,
+                                                                                                                    user_id: @teacher.id,
+                                                                                                                    context_concern: "syllabus_body"
+                                                                                                                  })
+
+      expect(YAML.load(@course.reload.versions.find_by(number: 2).yaml)["attachment_associations"]).to eq([])
+    end
+
     it "returns offline web export flag" do
       expect(@course.enable_offline_web_export?).to be false
       account = Account.default

@@ -405,6 +405,24 @@ describe WikiPage do
     expect(wp.root_account_id).to eql @course.root_account_id
   end
 
+  it "versions attachment associations with the page" do
+    course_with_teacher
+    attachment_model(context: @course)
+    page = @course.wiki_pages.create!(title: "meh", body: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+    page.reload.update(body: "meh", updating_user: @teacher)
+
+    expect(YAML.load(page.reload.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                               attachment_id: @attachment.id,
+                                                                                                               context_id: page.id,
+                                                                                                               context_type: "WikiPage",
+                                                                                                               root_account_id: @course.root_account_id,
+                                                                                                               user_id: @teacher.id,
+                                                                                                               context_concern: nil
+                                                                                                             })
+
+    expect(YAML.load(page.reload.versions.find_by(number: 2).yaml)["attachment_associations"]).to eq([])
+  end
+
   context "unpublished" do
     before :once do
       teacher_in_course(active_all: true)
