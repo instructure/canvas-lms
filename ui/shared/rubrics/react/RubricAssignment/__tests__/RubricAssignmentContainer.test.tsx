@@ -27,6 +27,7 @@ import {RUBRIC, RUBRIC_ASSOCIATION, RUBRIC_CONTEXTS, RUBRICS_FOR_CONTEXT} from '
 import {queryClient} from '@canvas/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import type {ViewProps} from '@instructure/ui-view'
 
 vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async importOriginal => {
   const actual =
@@ -112,17 +113,27 @@ describe('RubricAssignmentContainer Tests', () => {
   }
 
   describe('non associated rubric', () => {
-    it('should render the create and search buttons', () => {
+    it('should render the create and search buttons with proper permissions', () => {
       const {getByTestId} = renderComponent()
       expect(getByTestId('create-assignment-rubric-button')).toHaveTextContent('Create Rubric')
       expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
-    it('should not render the create when manage_rubrics permissions is false', () => {
-      const {getByTestId, queryByTestId} = renderComponent({canManageRubrics: false})
+    it('should not render anything when there is no rubric and manage_rubrics permissions is false', () => {
+      const {container} = renderComponent({canManageRubrics: false})
+      expect(container.firstChild).toBeNull()
+    })
+
+    it('should not render the create button when manage_rubrics permissions is false but rubric exists', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        canManageRubrics: false,
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
       expect(queryByTestId('create-assignment-rubric-button')).toBeNull()
+      expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
       expect(queryByTestId('rubric-self-assessment-checkbox')).toBeNull()
-      expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
+      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
     })
 
     it('should render the create modal when the create button is clicked', () => {
@@ -156,6 +167,25 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('edit-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
     })
+
+    it('should call onRubricChange callback when a new rubric is saved', async () => {
+      const onRubricChange = vi.fn()
+      const {getByTestId} = renderComponent({onRubricChange})
+      getByTestId('create-assignment-rubric-button').click()
+      const titleInput = getByTestId('rubric-form-title')
+      fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
+      fireEvent.click(getByTestId('add-criterion-button'))
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
+        target: {value: 'New Criterion Test'},
+      })
+      fireEvent.click(getByTestId('rubric-criterion-save'))
+      fireEvent.click(getByTestId('save-rubric-button'))
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(onRubricChange).toHaveBeenCalledWith(RUBRIC, RUBRIC_ASSOCIATION)
+    })
   })
 
   describe('associated rubric', () => {
@@ -184,7 +214,7 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByText('Rubric 1')).toBeInTheDocument() // Check for the text directly
     })
 
-    it('will not render the edit button when can_manage_rubrics is false', () => {
+    it('will not render the edit, remove, and replace buttons when can_manage_rubrics is false', () => {
       const {getByTestId, queryByTestId} = renderComponent({
         assignmentRubric: RUBRIC,
         assignmentRubricAssociation: RUBRIC_ASSOCIATION,
@@ -192,7 +222,8 @@ describe('RubricAssignmentContainer Tests', () => {
       })
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
       expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
-      expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
+      expect(queryByTestId('remove-assignment-rubric-button')).toBeNull()
+      expect(queryByTestId('find-assignment-rubric-icon-button')).toBeNull()
     })
 
     it('should render the edit modal when the edit button is clicked', () => {
@@ -229,6 +260,19 @@ describe('RubricAssignmentContainer Tests', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('create-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('find-assignment-rubric-button')).toBeInTheDocument()
+    })
+
+    it('should call onRubricChange with undefined values when rubric is removed', async () => {
+      const onRubricChange = vi.fn()
+      const {getByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+        onRubricChange,
+      })
+      fireEvent.click(getByTestId('remove-assignment-rubric-button'))
+      fireEvent.click(getByTestId('delete-confirm-btn'))
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(onRubricChange).toHaveBeenCalledWith(undefined, undefined)
     })
 
     it('should open the preview tray when the preview button is clicked', async () => {

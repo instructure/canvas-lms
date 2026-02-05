@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {RubricUnderscoreType, RubricAssociationUnderscore} from '@canvas/rubrics/react/utils'
+
 export interface EnvDiscussions {
   AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS?: string
   discussion_ai_survey_link: string
@@ -32,4 +34,13 @@ export interface EnvDiscussions {
   context_type?: string
   context_id?: string | number
   discussion_topic_id?: string | number
+
+  /**
+   * Set in DiscussionTopicContainer for rubrics on discussions
+   * Used by ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.tsx
+   */
+  ai_rubrics_enabled: boolean
+  assigned_rubric?: RubricUnderscoreType & {association_count: number}
+  rubric_association?: RubricAssociationUnderscore
+  rubric_self_assessment_ff_enabled: boolean
 }

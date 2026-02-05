@@ -280,6 +280,7 @@ class DiscussionTopicsController < ApplicationController
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
+  include Api::V1::Rubric
   include KalturaHelper
   include SubmittableHelper
   include K5Mode
@@ -924,6 +925,10 @@ class DiscussionTopicsController < ApplicationController
              DISCUSSION_DEFAULT_EXPAND_ENABLED: true, # this is to avoid a small p4 on release
              DISCUSSION_DEFAULT_SORT_ENABLED: true, # this is to avoid a small p4 on release
              restore_discussion_entry: context.feature_enabled?(:restore_discussion_entry),
+             enhanced_rubrics_enabled: @context.feature_enabled?(:enhanced_rubrics),
+             PERMISSIONS: {
+               manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics),
+             },
            })
     unless @locked
       InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
@@ -933,8 +938,10 @@ class DiscussionTopicsController < ApplicationController
 
     asset_processor_eula_js_env_for_discussion
 
+    enhanced_rubrics_assignments_js_env(@topic.assignment) if @topic.assignment.present? && @context.feature_enabled?(:enhanced_rubrics)
+
     js_bundle :discussion_topics_post
-    css_bundle :discussions_index, :learning_outcomes
+    css_bundle :discussions_index, :learning_outcomes, :enhanced_rubrics
 
     respond_to do |format|
       format.html do
