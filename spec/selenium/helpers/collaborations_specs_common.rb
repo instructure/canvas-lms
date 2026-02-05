@@ -88,9 +88,9 @@ module CollaborationsSpecsCommon
 
     get "/courses/#{@course.id}/collaborations"
     wait_for_ajaximations
-    f(".available-users a[data-id=\"#{@student.id}\"]").click
+    f(".available-users button[data-id=\"#{@student.id}\"]").click
     expect(ff(".members-list li")).to have_size(1)
-    expect(f(".members-list")).to contain_css("a[data-id=\"user_#{@student.id}\"]")
+    expect(f(".members-list")).to contain_css("button[data-id=\"user_#{@student.id}\"]")
     expect(f(".members-list")).to contain_css("input[value=\"#{@student.id}\"]")
   end
 
@@ -105,11 +105,11 @@ module CollaborationsSpecsCommon
     move_to_click("label[for=groups-filter-btn-#{@collaboration.id}]")
     wait_for_ajaximations
 
-    expect(ffj("ul[aria-label='Available groups']:visible a")).to have_size 1
-    f(".available-groups a[data-id=\"#{@group.id}\"]").click
+    expect(ffj("ul[aria-label='Available groups']:visible button")).to have_size 1
+    f(".available-groups button[data-id=\"#{@group.id}\"]").click
     wait_for_ajaximations
     expect(ff(".members-list li")).to have_size 2
-    expect(f(".members-list")).to contain_css("a[data-id=\"group_#{@group.id}\"]")
+    expect(f(".members-list")).to contain_css("button[data-id=\"group_#{@group.id}\"]")
     expect(f(".members-list")).to contain_css("input[value=\"#{@group.id}\"]")
     expect_new_page_load do
       submit_form(".edit_collaboration")
@@ -127,11 +127,11 @@ module CollaborationsSpecsCommon
 
     get "/courses/#{@course.id}/collaborations"
     wait_for_ajaximations
-    fj(".available-users:visible a").click
+    fj(".available-users:visible button").click
     wait_for_ajaximations
-    f(".members-list a").click
+    f(".members-list button").click
     expect(f(".members-list")).not_to contain_css("li")
-    expect(f(".available-users")).to contain_css("a[data-id=\"#{@student.id}\"]")
+    expect(f(".available-users")).to contain_css("button[data-id=\"#{@student.id}\"]")
   end
 
   def select_collaborators_and_look_for_start(type)
