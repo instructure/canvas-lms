@@ -682,3 +682,48 @@ div.completion_criterion_option {
 .ui-dialog.ui-widget-content {
   box-shadow: 0 0.375rem 0.4375rem rgba(0, 0, 0, 0.1),0 0.625rem 1.75rem rgba(0, 0, 0, 0.25)
 }
+
+.peer-review-info-container {
+  display: block;
+  white-space: normal;
+  @include fontSize(12px);
+  line-height: 1.5;
+
+  .info-section {
+    display: inline;
+    white-space: normal;
+  }
+
+  .date-section-label {
+    white-space: nowrap;
+  }
+
+  .info-item {
+    display: inline-block;
+    white-space: nowrap;
+
+    &:after {
+      content: "\00a0\00a0|\00a0\00a0";
+    }
+  }
+
+  .info-section:last-child .info-item:last-of-type:after {
+    display: none;
+  }
+
+  a {
+    white-space: nowrap;
+  }
+}
+
+.tooltip-label {
+  text-align: right;
+  @include fontSize(11px);
+  line-height: 12px;
+  font-weight: bold;
+}
+
+.tooltip-value {
+  @include fontSize(11px);
+  line-height: 12px;
+}
