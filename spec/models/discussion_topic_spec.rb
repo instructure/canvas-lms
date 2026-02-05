@@ -3552,6 +3552,51 @@ describe DiscussionTopic do
         expect(@topic.reply_to_entry_required_count).to eq 5
         expect(@topic).to be_valid
       end
+
+      describe "can_lock?" do
+        it "returns false when reply_to_topic checkpoint has a future due date" do
+          @topic.reply_to_topic_checkpoint.update!(due_at: 2.days.from_now)
+          @topic.reply_to_entry_checkpoint.update!(due_at: 2.days.ago)
+
+          expect(@topic.can_lock?).to be false
+        end
+
+        it "returns false when reply_to_entry checkpoint has a future due date" do
+          @topic.reply_to_topic_checkpoint.update!(due_at: 2.days.ago)
+          @topic.reply_to_entry_checkpoint.update!(due_at: 2.days.from_now)
+
+          expect(@topic.can_lock?).to be false
+        end
+
+        it "returns false when both checkpoints have future due dates" do
+          @topic.reply_to_topic_checkpoint.update!(due_at: 2.days.from_now)
+          @topic.reply_to_entry_checkpoint.update!(due_at: 3.days.from_now)
+
+          expect(@topic.can_lock?).to be false
+        end
+
+        it "returns true when all checkpoint due dates have passed" do
+          @topic.reply_to_topic_checkpoint.update!(due_at: 2.days.ago)
+          @topic.reply_to_entry_checkpoint.update!(due_at: 1.day.ago)
+
+          expect(@topic.can_lock?).to be true
+        end
+
+        it "returns true when checkpoints have no due dates" do
+          @topic.reply_to_topic_checkpoint.update!(due_at: nil)
+          @topic.reply_to_entry_checkpoint.update!(due_at: nil)
+
+          expect(@topic.can_lock?).to be true
+        end
+
+        it "returns false when parent assignment has future due date even if checkpoint due dates have passed" do
+          @topic.assignment.update!(due_at: 2.days.from_now)
+          @topic.reply_to_topic_checkpoint.update!(due_at: 2.days.ago)
+          @topic.reply_to_entry_checkpoint.update!(due_at: 1.day.ago)
+
+          expect(@topic.can_lock?).to be false
+        end
+      end
     end
   end
 
