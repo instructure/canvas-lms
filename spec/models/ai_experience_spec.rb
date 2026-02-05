@@ -55,6 +55,17 @@ describe AiExperience do
       expect(experience.errors[:workflow_state]).to include("is not included in the list")
     end
 
+    it "validates context_index_status inclusion" do
+      experience = AiExperience.new(valid_attributes.merge(context_index_status: "invalid_status"))
+      expect(experience).not_to be_valid
+      expect(experience.errors[:context_index_status]).to include("is not included in the list")
+    end
+
+    it "defaults context_index_status to not_started" do
+      experience = AiExperience.create!(valid_attributes)
+      expect(experience.context_index_status).to eq("not_started")
+    end
+
     it "allows facts to be blank" do
       experience = AiExperience.new(valid_attributes.except(:facts))
       expect(experience).to be_valid

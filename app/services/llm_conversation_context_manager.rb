@@ -91,11 +91,26 @@ class LLMConversationContextManager
   private
 
   def context_data
-    {
+    data = {
       scenario: @ai_experience.pedagogical_guidance,
       facts: @ai_experience.facts,
       learning_objectives: @ai_experience.learning_objective
     }
+
+    # Include file data if feature flag is enabled
+    if @ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
+      data[:files] = @ai_experience.context_files.map do |file|
+        {
+          id: file.id,
+          filename: file.filename,
+          size: file.size,
+          content_type: file.content_type,
+          url: file.public_url
+        }
+      end
+    end
+
+    data
   end
 
   def get_prompt_by_code(code)

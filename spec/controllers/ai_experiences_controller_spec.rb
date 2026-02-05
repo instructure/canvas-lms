@@ -529,6 +529,46 @@ describe AiExperiencesController do
         expect(created_experience.root_account).to eq(@course.root_account)
         expect(created_experience.account).to eq(@course.account)
       end
+
+      context "with ai_experiences_context_file_upload feature flag enabled" do
+        before { @course.enable_feature!(:ai_experiences_context_file_upload) }
+
+        it "accepts context_file_ids parameter" do
+          attachment = attachment_model(context: @course, size: 1.megabyte)
+          experience_params = {
+            title: "New Experience with Files",
+            learning_objective: "Test objective",
+            pedagogical_guidance: "Test pedagogical guidance",
+            context_file_ids: [attachment.id]
+          }
+
+          post :create, params: { course_id: @course.id, ai_experience: experience_params }, format: :json
+          expect(response).to have_http_status(:created)
+
+          created_experience = AiExperience.last
+          expect(created_experience.context_files).to include(attachment)
+        end
+      end
+
+      context "with ai_experiences_context_file_upload feature flag disabled" do
+        before { @course.disable_feature!(:ai_experiences_context_file_upload) }
+
+        it "ignores context_file_ids parameter" do
+          attachment = attachment_model(context: @course, size: 1.megabyte)
+          experience_params = {
+            title: "New Experience",
+            learning_objective: "Test objective",
+            pedagogical_guidance: "Test pedagogical guidance",
+            context_file_ids: [attachment.id]
+          }
+
+          post :create, params: { course_id: @course.id, ai_experience: experience_params }, format: :json
+          expect(response).to have_http_status(:created)
+
+          created_experience = AiExperience.last
+          expect(created_experience.context_files).to be_empty
+        end
+      end
     end
 
     context "as student" do
@@ -610,6 +650,42 @@ describe AiExperiencesController do
 
         @ai_experience.reload
         expect(@ai_experience.title).to eq("Customer Service Training") # unchanged
+      end
+
+      context "with ai_experiences_context_file_upload feature flag enabled" do
+        before { @course.enable_feature!(:ai_experiences_context_file_upload) }
+
+        it "accepts context_file_ids parameter" do
+          attachment = attachment_model(context: @course, size: 1.megabyte)
+          update_params = {
+            title: "Updated Experience",
+            context_file_ids: [attachment.id]
+          }
+
+          put :update, params: { course_id: @course.id, id: @ai_experience.id, ai_experience: update_params }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          @ai_experience.reload
+          expect(@ai_experience.context_files).to include(attachment)
+        end
+      end
+
+      context "with ai_experiences_context_file_upload feature flag disabled" do
+        before { @course.disable_feature!(:ai_experiences_context_file_upload) }
+
+        it "ignores context_file_ids parameter" do
+          attachment = attachment_model(context: @course, size: 1.megabyte)
+          update_params = {
+            title: "Updated Experience",
+            context_file_ids: [attachment.id]
+          }
+
+          put :update, params: { course_id: @course.id, id: @ai_experience.id, ai_experience: update_params }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          @ai_experience.reload
+          expect(@ai_experience.context_files).to be_empty
+        end
       end
     end
 
