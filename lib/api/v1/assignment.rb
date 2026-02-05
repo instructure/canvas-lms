@@ -667,7 +667,16 @@ module Api::V1::Assignment
     has_peer_reviews = prepared_create[:assignment].peer_reviews && prepared_create[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
 
     Assignment.suspend_due_date_caching do
-      assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
+      quiz_lti_param = assignment_params.key?(:quiz_lti) || assignment_params[:quiz_lti]
+      external_tool_url = assignment_params.dig(:external_tool_tag_attributes, :url)
+
+      if quiz_lti_param || assignment.quiz_lti_assignment?(external_tool_url: external_tool_url)
+        unless NewQuizzesFeaturesHelper.new_quizzes_enabled?(context)
+          assignment.errors.add("external_tool_tag_attributes[url]", I18n.t("New Quizzes is not enabled for this course"))
+          return false
+        end
+        assignment.quiz_lti!
+      end
 
       update_new_quizzes_params(assignment, assignment_params)
 
