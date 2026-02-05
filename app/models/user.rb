@@ -232,6 +232,7 @@ class User < ActiveRecord::Base
   has_many :discussion_topics, -> { where(type: nil) }
   has_many :submission_comments, foreign_key: "author_id", inverse_of: :author
   has_many :all_comment_bank_items, class_name: "CommentBankItem"
+  has_many :bookmarks, class_name: "Bookmarks::Bookmark"
 
   has_one :profile, class_name: "UserProfile"
   has_many :profile_links, through: :profile, source: :links
