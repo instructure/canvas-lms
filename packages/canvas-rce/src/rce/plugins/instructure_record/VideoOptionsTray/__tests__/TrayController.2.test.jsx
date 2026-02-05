@@ -154,7 +154,64 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(updateMediaObject).toHaveBeenCalledWith({
         attachment_id: '123',
         media_object_id: 'm_somevideo',
+        skipCaptionUpdate: false,
         subtitles: undefined,
+        title: 'new title',
+      })
+    })
+
+    it('sets skipCaptionUpdate to true when rce_asr_captioning_improvements flag is ON', () => {
+      const RCEGlobals = require('../../../../RCEGlobals').default
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({rce_asr_captioning_improvements: true})
+
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: 'm_somevideo',
+        attachment_id: '123',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        updateMediaObject,
+      })
+
+      // skipCaptionUpdate should be true to prevent duplicate caption updates
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        attachment_id: '123',
+        media_object_id: 'm_somevideo',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        skipCaptionUpdate: true,
+        title: 'new title',
+      })
+    })
+
+    it('sets skipCaptionUpdate to false when rce_asr_captioning_improvements flag is OFF', () => {
+      const RCEGlobals = require('../../../../RCEGlobals').default
+      jest
+        .spyOn(RCEGlobals, 'getFeatures')
+        .mockReturnValue({rce_asr_captioning_improvements: false})
+
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: 'm_somevideo',
+        attachment_id: '123',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        updateMediaObject,
+      })
+
+      // skipCaptionUpdate should be false to allow caption updates
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        attachment_id: '123',
+        media_object_id: 'm_somevideo',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        skipCaptionUpdate: false,
         title: 'new title',
       })
     })
@@ -195,6 +252,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(updateMediaObject).toHaveBeenCalledWith({
         attachment_id: '123',
         media_object_id: undefined,
+        skipCaptionUpdate: false,
         subtitles: undefined,
         title: 'new title',
       })

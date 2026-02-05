@@ -19,7 +19,7 @@
 /**
  * Upload/Processing states for caption files
  */
-export type CaptionUploadStatus = 'loading' | 'failed' | 'uploaded'
+export type CaptionUploadStatus = 'processing' | 'failed' | 'uploaded'
 
 /**
  * Creation mode for new captions
@@ -42,6 +42,8 @@ export interface Subtitle {
   inherited?: boolean // Whether caption is inherited from parent course
   file: SubtitleFile
   isNew?: boolean // Whether this is a newly added caption
+  status?: CaptionUploadStatus // Upload state (processing, failed, or uploaded)
+  errorMessage?: string // Error message if upload failed
 }
 
 /**
@@ -58,4 +60,32 @@ export interface LanguageOption {
 export interface ValidationResult {
   valid: boolean
   error?: string
+}
+
+/**
+ * Request headers for API calls
+ * Typically includes Authorization header for authenticated requests
+ */
+export interface RequestHeaders {
+  /** Authorization header (e.g., 'Bearer <token>') */
+  Authorization?: string
+  /** Allow additional string headers */
+  [key: string]: string | undefined
+}
+
+/**
+ * Configuration for caption upload/delete operations
+ * Provide either mediaObjectId or attachmentId (validated at runtime)
+ */
+export interface CaptionUploadConfig {
+  /** Media object ID - provide either this or attachmentId */
+  mediaObjectId?: string
+  /** Attachment ID - provide either this or mediaObjectId */
+  attachmentId?: string
+  /** RCS origin URL */
+  origin?: string
+  /** Request headers (typically includes Authorization: 'Bearer <token>') */
+  headers?: RequestHeaders
+  /** Maximum file size in bytes */
+  maxBytes?: number
 }
