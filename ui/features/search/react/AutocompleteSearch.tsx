@@ -184,7 +184,7 @@ export default function AutocompleteSearch(props: Props) {
           />
         )
       }
-      isShowingOptions={isShowingOptions && filteredOptions.length > 0}
+      isShowingOptions={isShowingOptions}
       inputValue={inputValue}
       onBlur={() => handleBlur()}
       onInputChange={(_e, value) => handleInputChange(value)}
