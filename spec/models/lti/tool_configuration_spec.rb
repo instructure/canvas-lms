@@ -112,6 +112,9 @@ module Lti
 
           before do
             public_jwk["alg"] = "WRONG"
+            tool_configuration.placements.each do |p|
+              p.delete("target_link_uri")
+            end
           end
 
           it { is_expected.to be false }
