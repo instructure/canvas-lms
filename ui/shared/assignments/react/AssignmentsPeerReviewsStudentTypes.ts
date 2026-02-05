@@ -69,19 +69,10 @@ export interface Submission {
   mediaObject?: MediaObject | null
 }
 
-export interface PeerReviewDates {
+export interface PeerReviewSubAssignment {
   dueAt: string | null
   unlockAt: string | null
   lockAt: string | null
-}
-
-export interface AssignedToDates {
-  dueAt: string | null
-  peerReviewDates: PeerReviewDates | null
-  user?: {
-    _id: string
-  } | null
-  anonymousId?: string | null
 }
 
 export interface RubricRating {
@@ -132,8 +123,8 @@ export interface Assignment {
   pointsPossible: number
   courseId: string
   peerReviews: PeerReviews | null
+  peerReviewSubAssignment: PeerReviewSubAssignment | null
   submissionsConnection: SubmissionsConnection | null
-  assignedToDates: AssignedToDates[] | null
   assessmentRequestsForCurrentUser: AssessmentRequest[] | null
   rubric?: Rubric | null
   rubricAssociation?: RubricAssociation | null

@@ -20,39 +20,27 @@ import {Assignment} from '@canvas/assignments/react/AssignmentsPeerReviewsStuden
 
 /**
  * Gets the unlock date for peer reviews.
- * If there's no unlockAt date set in peerReviewDates, we use the assignment due date.
+ * If there's no unlockAt date set in peerReviewSubAssignment, we use the assignment due date.
  */
 export function getPeerReviewUnlockDate(assignment: Assignment): string | null {
-  const allAssignedToDates = assignment.assignedToDates
-  if (!allAssignedToDates || allAssignedToDates.length === 0) {
-    return null
+  const peerReviewSubAssignment = assignment.peerReviewSubAssignment
+  if (!peerReviewSubAssignment) {
+    return assignment.dueAt
   }
 
-  const assignedToDates = allAssignedToDates[0]
-  const peerReviewDates = assignedToDates.peerReviewDates
-  if (!peerReviewDates) {
-    return assignedToDates.dueAt
-  }
-
-  return peerReviewDates.unlockAt || assignedToDates.dueAt
+  return peerReviewSubAssignment.unlockAt || assignment.dueAt
 }
 
 /**
  * Gets the lock date for peer reviews.
  */
 export function getPeerReviewLockDate(assignment: Assignment): string | null {
-  const allAssignedToDates = assignment.assignedToDates
-  if (!allAssignedToDates || allAssignedToDates.length === 0) {
+  const peerReviewSubAssignment = assignment.peerReviewSubAssignment
+  if (!peerReviewSubAssignment) {
     return null
   }
 
-  const assignedToDates = allAssignedToDates[0]
-  const peerReviewDates = assignedToDates.peerReviewDates
-  if (!peerReviewDates) {
-    return null
-  }
-
-  return peerReviewDates.lockAt
+  return peerReviewSubAssignment.lockAt
 }
 
 /**

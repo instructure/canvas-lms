@@ -162,19 +162,14 @@ describe('PeerReviewsStudentView', () => {
           count: 2,
           submissionRequired: false,
         },
+        peerReviewSubAssignment: {
+          dueAt: '2025-12-31T23:59:59Z',
+          unlockAt: null,
+          lockAt: null,
+        },
         submissionsConnection: {
           nodes: [{_id: 'sub-1', submittedAt: '2025-12-01T00:00:00Z'}],
         },
-        assignedToDates: [
-          {
-            dueAt: '2025-12-31T23:59:59Z',
-            peerReviewDates: {
-              dueAt: '2025-12-31T23:59:59Z',
-              unlockAt: null,
-              lockAt: null,
-            },
-          },
-        ],
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -213,7 +208,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 1,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -238,7 +233,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 2,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -263,7 +258,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 1,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -288,7 +283,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 2,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -324,7 +319,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 0,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: null,
       },
     })
@@ -349,7 +344,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 3,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -379,7 +374,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Assignment With Submission',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -412,7 +407,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Assignment With Text Entry',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -460,7 +455,7 @@ describe('PeerReviewsStudentView', () => {
           peerReviews: {
             count: 2,
           },
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -528,7 +523,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 2,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -564,7 +559,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 0,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [],
       },
     })
@@ -587,7 +582,7 @@ describe('PeerReviewsStudentView', () => {
         peerReviews: {
           count: 2,
         },
-        assignedToDates: null,
+        peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [
           {
             _id: 'ar-1',
@@ -636,7 +631,7 @@ describe('PeerReviewsStudentView', () => {
               peerReviews: {
                 count: 3,
               },
-              assignedToDates: null,
+              peerReviewSubAssignment: null,
               assessmentRequestsForCurrentUser: [
                 {
                   _id: 'ar-1',
@@ -659,7 +654,7 @@ describe('PeerReviewsStudentView', () => {
               peerReviews: {
                 count: 3,
               },
-              assignedToDates: null,
+              peerReviewSubAssignment: null,
               assessmentRequestsForCurrentUser: [
                 {
                   _id: 'ar-1',
@@ -710,7 +705,7 @@ describe('PeerReviewsStudentView', () => {
           peerReviews: {
             count: 2,
           },
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -751,7 +746,7 @@ describe('PeerReviewsStudentView', () => {
           peerReviews: {
             count: 2,
           },
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -787,7 +782,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Tab Switching Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Assignment description here</p>',
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -829,7 +824,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Default Tab Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description content</p>',
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -864,7 +859,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Mobile Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
         },
       })
@@ -888,7 +883,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Desktop Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
         },
       })
@@ -912,7 +907,7 @@ describe('PeerReviewsStudentView', () => {
           name: 'Mobile Divider Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
         },
       })
@@ -942,19 +937,15 @@ describe('PeerReviewsStudentView', () => {
             count: 2,
             submissionRequired: true,
           },
+          peerReviewSubAssignment: {
+            dueAt: '2025-12-31T23:59:59Z',
+            unlockAt: null,
+            lockAt: null,
+          },
           submissionsConnection: {
             nodes: [],
           },
           assessmentRequestsForCurrentUser: [],
-          assignedToDates: [
-            {
-              dueAt: '2025-12-31T23:59:59Z',
-              peerReviewDates: {
-                dueAt: '2025-12-31T23:59:59Z',
-                unlockAt: null,
-              },
-            },
-          ],
         },
       })
 
@@ -1340,15 +1331,10 @@ describe('PeerReviewsStudentView', () => {
         assignment: {
           _id: '18',
           name: 'Locked Assignment',
-          dueAt: '2020-09-15T16:00:00Z',
+          dueAt: '2020-10-20T16:00:00Z',
           description: '<p>Description</p>',
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
-          assignedToDates: [
-            {
-              dueAt: '2020-10-20T16:00:00Z',
-              peerReviewDates: null,
-            },
-          ],
         },
       })
 
@@ -1368,17 +1354,12 @@ describe('PeerReviewsStudentView', () => {
           name: 'Locked Peer Review',
           dueAt: '2020-09-15T16:00:00Z',
           description: '<p>Description</p>',
+          peerReviewSubAssignment: {
+            dueAt: null,
+            unlockAt: '2020-10-31T06:00:00Z',
+            lockAt: null,
+          },
           assessmentRequestsForCurrentUser: [],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-15T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-10-31T06:00:00Z',
-                dueAt: null,
-                lockAt: null,
-              },
-            },
-          ],
         },
       })
 
@@ -1396,20 +1377,15 @@ describe('PeerReviewsStudentView', () => {
         assignment: {
           _id: '20',
           name: 'Unlocked Assignment',
-          dueAt: '2020-09-15T16:00:00Z',
+          dueAt: '2020-09-20T16:00:00Z',
           description: '<p>Description</p>',
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
               available: true,
               workflowState: 'assigned',
               createdAt: '2020-09-10T00:00:00Z',
-            },
-          ],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: null,
             },
           ],
         },
@@ -1431,22 +1407,17 @@ describe('PeerReviewsStudentView', () => {
           name: 'Unlocked Peer Review',
           dueAt: '2020-09-15T16:00:00Z',
           description: '<p>Description</p>',
+          peerReviewSubAssignment: {
+            dueAt: null,
+            unlockAt: '2020-09-30T06:00:00Z',
+            lockAt: null,
+          },
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
               available: true,
               workflowState: 'assigned',
               createdAt: '2020-09-10T00:00:00Z',
-            },
-          ],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-09-30T06:00:00Z',
-                dueAt: null,
-                lockAt: null,
-              },
             },
           ],
         },
@@ -1466,15 +1437,10 @@ describe('PeerReviewsStudentView', () => {
         assignment: {
           _id: '22',
           name: 'Locked With Date',
-          dueAt: '2020-09-15T16:00:00Z',
+          dueAt: '2020-10-20T16:00:00Z',
           description: '<p>Description</p>',
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
-          assignedToDates: [
-            {
-              dueAt: '2020-10-20T16:00:00Z',
-              peerReviewDates: null,
-            },
-          ],
         },
       })
 
@@ -1490,19 +1456,14 @@ describe('PeerReviewsStudentView', () => {
         assignment: {
           _id: '23',
           name: 'Locked Assignment No Allocate',
-          dueAt: '2020-09-15T16:00:00Z',
+          dueAt: '2020-10-20T16:00:00Z',
           description: '<p>Description</p>',
           courseId: '100',
           peerReviews: {
             count: 3,
           },
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
-          assignedToDates: [
-            {
-              dueAt: '2020-10-20T16:00:00Z',
-              peerReviewDates: null,
-            },
-          ],
         },
       })
 
@@ -1689,22 +1650,17 @@ describe('PeerReviewsStudentView', () => {
           peerReviews: {
             count: 2,
           },
+          peerReviewSubAssignment: {
+            dueAt: '2020-09-25T06:00:00Z',
+            unlockAt: '2020-09-05T06:00:00Z',
+            lockAt: '2020-09-30T18:00:00Z',
+          },
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
               available: true,
               workflowState: 'assigned',
               createdAt: '2020-09-10T00:00:00Z',
-            },
-          ],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-09-05T06:00:00Z',
-                dueAt: '2020-09-25T06:00:00Z',
-                lockAt: '2020-09-30T18:00:00Z',
-              },
             },
           ],
         },
@@ -1726,17 +1682,12 @@ describe('PeerReviewsStudentView', () => {
           _id: '25',
           name: 'Past Lock Date No Allocate',
           dueAt: '2020-09-15T16:00:00Z',
+          peerReviewSubAssignment: {
+            dueAt: null,
+            unlockAt: '2020-09-05T06:00:00Z',
+            lockAt: '2020-09-30T18:00:00Z',
+          },
           assessmentRequestsForCurrentUser: [],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-09-05T06:00:00Z',
-                dueAt: null,
-                lockAt: '2020-09-30T18:00:00Z',
-              },
-            },
-          ],
         },
       })
 
@@ -1758,17 +1709,12 @@ describe('PeerReviewsStudentView', () => {
           peerReviews: {
             count: 2,
           },
+          peerReviewSubAssignment: {
+            dueAt: null,
+            unlockAt: '2020-09-05T06:00:00Z',
+            lockAt: '2020-09-30T18:00:00Z',
+          },
           assessmentRequestsForCurrentUser: [],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-09-05T06:00:00Z',
-                dueAt: null,
-                lockAt: '2020-09-30T18:00:00Z',
-              },
-            },
-          ],
         },
       })
 
@@ -1792,6 +1738,11 @@ describe('PeerReviewsStudentView', () => {
           peerReviews: {
             count: 2,
           },
+          peerReviewSubAssignment: {
+            dueAt: null,
+            unlockAt: '2020-09-05T06:00:00Z',
+            lockAt: '2020-09-30T18:00:00Z',
+          },
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -1804,16 +1755,6 @@ describe('PeerReviewsStudentView', () => {
                 body: '<p>Student submission</p>',
                 submissionType: 'online_text_entry',
                 submittedAt: '2025-09-10T12:00:00Z',
-              },
-            },
-          ],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-09-05T06:00:00Z',
-                dueAt: null,
-                lockAt: '2020-09-30T18:00:00Z',
               },
             },
           ],
@@ -1840,6 +1781,11 @@ describe('PeerReviewsStudentView', () => {
           peerReviews: {
             count: 2,
           },
+          peerReviewSubAssignment: {
+            dueAt: null,
+            unlockAt: '2020-09-05T06:00:00Z',
+            lockAt: '2020-09-30T18:00:00Z',
+          },
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -1852,16 +1798,6 @@ describe('PeerReviewsStudentView', () => {
               available: true,
               workflowState: 'completed',
               createdAt: '2020-09-11T00:00:00Z',
-            },
-          ],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-09-05T06:00:00Z',
-                dueAt: null,
-                lockAt: '2020-09-30T18:00:00Z',
-              },
             },
           ],
         },
@@ -1880,22 +1816,17 @@ describe('PeerReviewsStudentView', () => {
           _id: '30',
           name: 'Before Lock Date',
           dueAt: '2020-09-15T16:00:00Z',
+          peerReviewSubAssignment: {
+            dueAt: null,
+            unlockAt: '2020-09-05T06:00:00Z',
+            lockAt: '2020-10-31T18:00:00Z',
+          },
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
               available: true,
               workflowState: 'assigned',
               createdAt: '2020-09-10T00:00:00Z',
-            },
-          ],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-09-05T06:00:00Z',
-                dueAt: null,
-                lockAt: '2020-10-31T18:00:00Z',
-              },
             },
           ],
         },
@@ -1916,22 +1847,17 @@ describe('PeerReviewsStudentView', () => {
           peerReviews: {
             count: 2,
           },
+          peerReviewSubAssignment: {
+            dueAt: null,
+            unlockAt: '2020-09-05T06:00:00Z',
+            lockAt: null,
+          },
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
               available: true,
               workflowState: 'assigned',
               createdAt: '2020-09-10T00:00:00Z',
-            },
-          ],
-          assignedToDates: [
-            {
-              dueAt: '2020-09-20T16:00:00Z',
-              peerReviewDates: {
-                unlockAt: '2020-09-05T06:00:00Z',
-                dueAt: null,
-                lockAt: null,
-              },
             },
           ],
         },
@@ -2113,7 +2039,7 @@ describe('PeerReviewsStudentView', () => {
           submissionsConnection: {
             nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
           },
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2161,7 +2087,7 @@ describe('PeerReviewsStudentView', () => {
           submissionsConnection: {
             nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
           },
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2206,7 +2132,7 @@ describe('PeerReviewsStudentView', () => {
           submissionsConnection: {
             nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
           },
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2251,7 +2177,7 @@ describe('PeerReviewsStudentView', () => {
           submissionsConnection: {
             nodes: [{_id: 'sub-1', submissionStatus: 'submitted'}],
           },
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2483,7 +2409,7 @@ describe('PeerReviewsStudentView', () => {
           courseId: '200',
           description: '<p>Description</p>',
           peerReviews: {count: 1},
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2535,7 +2461,7 @@ describe('PeerReviewsStudentView', () => {
           courseId: '200',
           description: '<p>Description</p>',
           peerReviews: {count: 1},
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2590,7 +2516,7 @@ describe('PeerReviewsStudentView', () => {
           courseId: '200',
           description: '<p>Description</p>',
           peerReviews: {count: 1},
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2630,7 +2556,7 @@ describe('PeerReviewsStudentView', () => {
           courseId: '200',
           description: '<p>Description</p>',
           peerReviews: {count: 1, anonymousReviews: true},
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2679,7 +2605,7 @@ describe('PeerReviewsStudentView', () => {
           courseId: '200',
           description: '<p>Description</p>',
           peerReviews: {count: 1, anonymousReviews: true},
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
@@ -2731,7 +2657,7 @@ describe('PeerReviewsStudentView', () => {
           courseId: '200',
           description: '<p>Description</p>',
           peerReviews: {count: 1, anonymousReviews: false},
-          assignedToDates: null,
+          peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [
             {
               _id: 'ar-1',
