@@ -426,8 +426,22 @@ class DiscussionRow extends Component {
     }
   }
 
+  shouldShowSubscribeButton = () => {
+    const permanentHolds = ['not_in_group_set', 'not_in_group']
+    const hasPermanentHold =
+      this.props.discussion.subscription_hold &&
+      permanentHolds.includes(this.props.discussion.subscription_hold)
+
+    if (hasPermanentHold && !this.props.discussion.subscribed) {
+      return false
+    }
+
+    return true
+  }
+
   subscribeButton = () =>
-    !this.isInaccessibleDueToAnonymity() && (
+    !this.isInaccessibleDueToAnonymity() &&
+    this.shouldShowSubscribeButton() && (
       <span
         className="subscribe-button"
         key={`Subscribe_${this.props.discussion.id}`}
