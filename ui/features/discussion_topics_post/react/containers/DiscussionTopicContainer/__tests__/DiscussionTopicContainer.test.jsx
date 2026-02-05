@@ -829,6 +829,77 @@ describe('DiscussionTopicContainer', () => {
         })
         expect(queryByTestId('add_rubric_url')).toBeNull()
       })
+
+      describe('Enhanced Rubrics', () => {
+        beforeEach(() => {
+          ENV.enhanced_rubrics_enabled = true
+          ENV.ASSIGNMENT_ID = '1'
+          ENV.COURSE_ID = '1'
+          ENV.ai_rubrics_enabled = false
+          ENV.rubric_self_assessment_ff_enabled = false
+        })
+
+        afterEach(() => {
+          ENV.enhanced_rubrics_enabled = false
+          delete ENV.ASSIGNMENT_ID
+          delete ENV.COURSE_ID
+          delete ENV.ai_rubrics_enabled
+          delete ENV.rubric_self_assessment_ff_enabled
+        })
+
+        it('does not render add_rubric_url when enhanced rubrics is enabled', () => {
+          const {queryByTestId} = setup({discussionTopic: Discussion.mock()})
+          expect(queryByTestId('add_rubric_url')).toBeNull()
+        })
+
+        it('opens DisplayRubricModal when Add Rubric menu item is clicked', async () => {
+          const {getByTestId, getByText, findByTestId} = setup({
+            discussionTopic: Discussion.mock(),
+          })
+
+          fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+          fireEvent.click(getByText('Add Rubric'))
+
+          const modal = await findByTestId('assignment-rubric-modal')
+          expect(modal).toBeInTheDocument()
+        })
+
+        it('opens DisplayRubricModal when Show Rubric menu item is clicked', async () => {
+          const {getByTestId, getByText, findByTestId} = setup({
+            discussionTopic: Discussion.mock({
+              permissions: DiscussionPermissions.mock({
+                addRubric: false,
+                showRubric: true,
+              }),
+            }),
+          })
+
+          fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+
+          await waitFor(() => {
+            expect(getByText('Show Rubric')).toBeInTheDocument()
+          })
+
+          fireEvent.click(getByText('Show Rubric'))
+
+          const modal = await findByTestId('assignment-rubric-modal')
+          expect(modal).toBeInTheDocument()
+        })
+
+        it('does not open modal when clicking rubric menu without proper permissions', () => {
+          const {queryByTestId} = setup({
+            discussionTopic: Discussion.mock({
+              permissions: DiscussionPermissions.mock({
+                addRubric: false,
+                showRubric: false,
+              }),
+            }),
+          })
+
+          // The menu item won't be present, so we just verify no modal appears
+          expect(queryByTestId('assignment-rubric-modal')).not.toBeInTheDocument()
+        })
+      })
     })
   })
 

@@ -1396,6 +1396,159 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:PEER_REVIEWS_URL]).to eq "/courses/#{@course.id}/assignments/#{@topic.assignment.id}/peer_reviews"
       end
 
+      context "enhanced rubrics js_env variables" do
+        before do
+          Account.site_admin.enable_feature! :enhanced_rubrics_assignments
+          @course.enable_feature! :enhanced_rubrics
+        end
+
+        context "when enhanced_rubrics feature is enabled and assignment has rubric" do
+          before do
+            outcome_with_rubric
+            @rubric.associate_with(@topic.assignment, @course, purpose: "grading")
+            user_session(@teacher)
+          end
+
+          it "sets all assignment-level env variables correctly" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@topic.assignment.id)
+            expect(assigns[:js_env][:ASSIGNMENT_POINTS]).to eq(@topic.assignment.points_possible)
+            expect(assigns[:js_env][:rubric_self_assessment_enabled]).to be(false)
+            expect(assigns[:js_env][:can_update_rubric_self_assessment]).to be_truthy
+          end
+
+          it "sets assigned_rubric with complete rubric JSON with rubric association" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            assigned_rubric = assigns[:js_env][:assigned_rubric]
+            rubric_assoc = assigns[:js_env][:rubric_association]
+            expect(assigned_rubric).to be_present
+            expect(assigned_rubric[:id]).to eq(@rubric.id)
+            expect(assigned_rubric[:title]).to eq(@rubric.title)
+            expect(assigned_rubric[:criteria]).to be_present
+            expect(assigned_rubric[:can_update]).to be_truthy
+            expect(assigned_rubric).to have_key(:unassessed)
+            expect(assigned_rubric).to have_key(:association_count)
+            expect(rubric_assoc).to be_present
+            expect(rubric_assoc[:id]).to eq(@topic.assignment.rubric_association.id)
+            expect(rubric_assoc[:rubric_id]).to eq(@rubric.id)
+            expect(rubric_assoc[:purpose]).to eq("grading")
+          end
+
+          it "sets all context-level env variables correctly" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+            expect(assigns[:js_env][:ai_rubrics_enabled]).to be(false)
+            expect(assigns[:js_env][:rubric_self_assessment_ff_enabled]).to be(false)
+            expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).to be_present
+            expect(assigns[:js_env][:ROOT_OUTCOME_GROUP][:id]).to eq(@course.root_outcome_group.id)
+          end
+
+          context "when account_level_mastery_scales is disabled" do
+            it "sets ACCOUNT_LEVEL_MASTERY_SCALES to false" do
+              get "show", params: { course_id: @course.id, id: @topic.id }
+              expect(assigns[:js_env][:ACCOUNT_LEVEL_MASTERY_SCALES]).to be(false)
+            end
+          end
+
+          context "when account_level_mastery_scales is enabled" do
+            before do
+              @course.root_account.enable_feature! :account_level_mastery_scales
+            end
+
+            it "sets ACCOUNT_LEVEL_MASTERY_SCALES to true" do
+              get "show", params: { course_id: @course.id, id: @topic.id }
+              expect(assigns[:js_env][:ACCOUNT_LEVEL_MASTERY_SCALES]).to be(true)
+            end
+          end
+
+          context "when ai_rubrics feature is enabled" do
+            before do
+              @course.enable_feature! :ai_rubrics
+            end
+
+            it "sets ai_rubrics_enabled to true" do
+              get "show", params: { course_id: @course.id, id: @topic.id }
+              expect(assigns[:js_env][:ai_rubrics_enabled]).to be(true)
+            end
+          end
+
+          context "when rubric_self_assessment feature is enabled" do
+            before do
+              @course.root_account.enable_feature! :rubric_self_assessment
+              @course.enable_feature! :assignments_2_student
+            end
+
+            it "sets rubric_self_assessment_ff_enabled to true" do
+              get "show", params: { course_id: @course.id, id: @topic.id }
+              expect(assigns[:js_env][:rubric_self_assessment_ff_enabled]).to be(true)
+            end
+          end
+        end
+
+        context "when enhanced_rubrics feature is enabled but assignment has no rubric" do
+          before do
+            user_session(@teacher)
+          end
+
+          it "sets assignment-level variables but not rubric-specific ones" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@topic.assignment.id)
+            expect(assigns[:js_env][:ASSIGNMENT_POINTS]).to eq(@topic.assignment.points_possible)
+            expect(assigns[:js_env][:assigned_rubric]).to be_nil
+            expect(assigns[:js_env][:rubric_association]).to be_nil
+            expect(assigns[:js_env][:rubric_self_assessment_enabled]).to be(false)
+            expect(assigns[:js_env][:can_update_rubric_self_assessment]).to be(false)
+
+            expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+            expect(assigns[:js_env][:ACCOUNT_LEVEL_MASTERY_SCALES]).to be(false)
+            expect(assigns[:js_env][:ai_rubrics_enabled]).to be(false)
+            expect(assigns[:js_env][:rubric_self_assessment_ff_enabled]).to be(false)
+            expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).to be_present
+          end
+        end
+
+        context "when enhanced_rubrics feature is disabled" do
+          before do
+            @course.disable_feature! :enhanced_rubrics
+            outcome_with_rubric
+            @rubric.associate_with(@topic.assignment, @course, purpose: "grading")
+            user_session(@teacher)
+          end
+
+          it "does not set any enhanced rubrics env variables" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to be_nil
+            expect(assigns[:js_env][:ASSIGNMENT_POINTS]).to be_nil
+            expect(assigns[:js_env][:assigned_rubric]).to be_nil
+            expect(assigns[:js_env][:rubric_association]).to be_nil
+            expect(assigns[:js_env][:COURSE_ID]).to be_nil
+            expect(assigns[:js_env][:ACCOUNT_LEVEL_MASTERY_SCALES]).to be_nil
+            expect(assigns[:js_env][:ai_rubrics_enabled]).to be_nil
+            expect(assigns[:js_env][:rubric_self_assessment_enabled]).to be_nil
+            expect(assigns[:js_env][:can_update_rubric_self_assessment]).to be_nil
+          end
+        end
+
+        context "when enhanced_rubrics_assignments site admin feature is disabled" do
+          before do
+            Account.site_admin.disable_feature! :enhanced_rubrics_assignments
+            @course.enable_feature! :enhanced_rubrics
+            outcome_with_rubric
+            @rubric.associate_with(@topic.assignment, @course, purpose: "grading")
+            user_session(@teacher)
+          end
+
+          it "does not set any enhanced rubrics env variables" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to be_nil
+            expect(assigns[:js_env][:ASSIGNMENT_POINTS]).to be_nil
+            expect(assigns[:js_env][:assigned_rubric]).to be_nil
+            expect(assigns[:js_env][:rubric_association]).to be_nil
+            expect(assigns[:js_env][:COURSE_ID]).to be_nil
+          end
+        end
+      end
+
       it "assigns groups from the topic's category" do
         user_session(@teacher)
 
