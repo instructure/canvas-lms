@@ -28,6 +28,7 @@ import {
 } from '../../../types'
 import {ColorPickerProblemArea} from './ColorPickerProblemArea'
 import {useState} from 'react'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -38,7 +39,7 @@ export const ProblemArea = (props: {
 }) => {
   const [previewResponse, setPreviewResponse] = useState<PreviewResponse | null>(null)
   return (
-    <View as="section" aria-label={I18n.t('Problem area')}>
+    <Flex as="section" direction="column" gap="mediumSmall" aria-label={I18n.t('Problem area')}>
       <Preview
         ref={props.previewRef}
         issue={props.issue}
@@ -54,6 +55,6 @@ export const ProblemArea = (props: {
           />
         </View>
       )}
-    </View>
+    </Flex>
   )
 }

@@ -146,6 +146,7 @@ module Accessibility
 
       result = {
         id: scan.id,
+        course_id: scan.course_id,
         resource_id:,
         resource_type:,
         resource_name: scan.resource_name,
@@ -159,8 +160,10 @@ module Accessibility
 
       # Only include issue-related data when the scan is completed
       if scan_completed
+        accessibility_issues = scan.accessibility_issues
         result[:issue_count] = scan.issue_count
-        result[:issues] = scan.accessibility_issues.select(&:active?).map { |issue| issue_attributes(issue) }
+        result[:closed_issue_count] = accessibility_issues.count(&:closed?)
+        result[:issues] = accessibility_issues.select(&:active?).map { |issue| issue_attributes(issue) }
       end
 
       result

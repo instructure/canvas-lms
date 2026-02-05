@@ -24,6 +24,7 @@ import {
   ResourceType,
   ScanWorkflowState,
 } from '../../../../../../shared/react/types'
+import {useAccessibilityScansStore} from '../../../../../../shared/react/stores/AccessibilityScansStore'
 
 const mockSelectIssue = vi.fn()
 
@@ -31,9 +32,17 @@ vi.mock('../../../../../../shared/react/hooks/useAccessibilityIssueSelect', () =
   useAccessibilityIssueSelect: vi.fn(() => ({selectIssue: mockSelectIssue})),
 }))
 
+vi.mock('../../../../../../shared/react/stores/AccessibilityScansStore')
+
 describe('ScanStateCell', () => {
   beforeEach(() => {
+    // Enable feature flag by default for tests
+    window.ENV = {FEATURES: {a11y_checker_close_issues: true}} as any
     mockSelectIssue.mockClear()
+    ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
+      const state = {isCloseIssuesEnabled: true}
+      return selector ? selector(state) : state
+    })
   })
 
   describe('Unfinished Scans - ', () => {
@@ -113,6 +122,60 @@ describe('ScanStateCell', () => {
       expect(screen.getByText(/No issues/i)).toBeInTheDocument()
     })
 
+    it('renders closed issues text when issueCount is 0 but closedIssueCount is present', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Completed,
+              issueCount: 0,
+              closedIssueCount: 3,
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/Closed \(3\)/i)).toBeInTheDocument()
+    })
+
+    it('renders closed issues text with singular count', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Completed,
+              issueCount: 0,
+              closedIssueCount: 1,
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/Closed \(1\)/i)).toBeInTheDocument()
+    })
+
+    it('does not render closed issues text when feature flag is disabled', () => {
+      window.ENV = {FEATURES: {a11y_checker_close_issues: false}} as any
+      ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
+        const state = {isCloseIssuesEnabled: false}
+        return selector ? selector(state) : state
+      })
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Completed,
+              issueCount: 0,
+              closedIssueCount: 3,
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.queryByText(/Closed \(3\)/i)).not.toBeInTheDocument()
+      expect(screen.getByText(/No issues/i)).toBeInTheDocument()
+    })
+
     it('renders rescan button for failed scan', () => {
       const baseFailedItem = {
         workflowState: ScanWorkflowState.Failed,
@@ -121,7 +184,7 @@ describe('ScanStateCell', () => {
 
       const {container} = render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
 
-      expect(container.querySelector('#accessibility-checker-rescan-button')).toBeInTheDocument()
+      expect(container.querySelector('[data-pendo="resource-rescan-button"]')).toBeInTheDocument()
     })
 
     it('renders failed scan explanation tooltip', () => {
@@ -150,7 +213,7 @@ describe('ScanStateCell', () => {
       )
 
       const rescanButton = container.querySelector(
-        '#accessibility-checker-rescan-button',
+        '[data-pendo="resource-rescan-button"]',
       ) as HTMLElement
       rescanButton.click()
 
@@ -158,7 +221,7 @@ describe('ScanStateCell', () => {
       expect(mockOnRescan).toHaveBeenCalledTimes(1)
     })
 
-    it('has unique ID for Pendo analytics on rescan button', () => {
+    it('has data-pendo attribute on rescan button', () => {
       const baseFailedItem = {
         workflowState: ScanWorkflowState.Failed,
         errorMessage: 'other error',
@@ -166,9 +229,8 @@ describe('ScanStateCell', () => {
 
       const {container} = render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
 
-      const rescanButton = container.querySelector('#accessibility-checker-rescan-button')
-      expect(rescanButton).toBeInTheDocument()
-      expect(rescanButton).toHaveAttribute('id', 'accessibility-checker-rescan-button')
+      const rescanButton = container.querySelector('[data-pendo="resource-rescan-button"]')
+      expect(rescanButton).toHaveAttribute('data-pendo', 'resource-rescan-button')
     })
   })
 })

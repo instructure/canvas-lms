@@ -35,7 +35,7 @@ const ColorPickerForm: React.FC<FormComponentProps & React.RefAttributes<FormCom
     ({issue, error, onChangeValue, isDisabled}: FormComponentProps, ref) => {
       const colorPickerInputRef = useRef<HTMLInputElement | null>(null)
       const backgroundColor = issue.form.backgroundColor ?? '#FFFFFF'
-      const [foregroundColor, setForegroundColor] = useState(issue.form.value ?? '#000000')
+      const [foregroundColor, setForegroundColor] = useState('')
 
       useImperativeHandle(ref, () => ({
         focus: () => {
@@ -50,7 +50,7 @@ const ColorPickerForm: React.FC<FormComponentProps & React.RefAttributes<FormCom
 
       return (
         <View as="div" data-testid="contrast-ratio-form">
-          <View as="div" margin="medium 0" style={{overflow: 'visible'}}>
+          <View as="div" style={{overflow: 'visible'}}>
             <ColorPicker
               id="a11y-color-picker"
               data-testid="color-picker"

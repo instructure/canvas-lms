@@ -88,6 +88,7 @@ export enum ResourceType {
 
 export interface AccessibilityResourceScan extends HasId {
   id: number
+  courseId: number
   resourceId: number
   resourceType: ResourceType
   resourceName: string
@@ -98,6 +99,8 @@ export interface AccessibilityResourceScan extends HasId {
   errorMessage?: string
   issueCount: number
   issues?: AccessibilityIssue[]
+  closedAt?: string | null
+  closedIssueCount?: number
 }
 
 export interface AccessibilityIssue {
@@ -168,6 +171,7 @@ export type GenerateResponse = {
 export type FilterOption = {
   label: string
   value: string
+  requiresFeatureFlag?: boolean
 }
 
 export type Filters = {

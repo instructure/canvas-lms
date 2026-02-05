@@ -20,6 +20,11 @@ import {cleanup, render, screen, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import FiltersPanel from '../FiltersPanel'
 import {AppliedFilter, FilterOption} from '../../../../../../shared/react/types'
+import {useAccessibilityScansStore} from '../../../../../../shared/react/stores/AccessibilityScansStore'
+
+vi.mock('../../../../../../shared/react/stores/AccessibilityScansStore', () => ({
+  useAccessibilityScansStore: vi.fn(),
+}))
 
 describe('FiltersPanel', () => {
   const mockOnFilterChange = vi.fn()
@@ -52,6 +57,13 @@ describe('FiltersPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockMatchMedia(true)
+    // Mock the store to return additionalResourcesEnabled: true by default
+    vi.mocked(useAccessibilityScansStore).mockImplementation((selector: any) => {
+      if (typeof selector === 'function') {
+        return selector({additionalResourcesEnabled: true})
+      }
+      return {additionalResourcesEnabled: true}
+    })
   })
 
   it('renders the filter panel with correct title', () => {
@@ -309,6 +321,16 @@ describe('FiltersPanel', () => {
   })
 
   describe('apply filters button', () => {
+    it('has data-pendo attribute', async () => {
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByRole('button', {name: 'Filter resources'})
+      await userEvent.click(toggleButton!)
+
+      const applyButton = screen.getByTestId('apply-filters-button')
+      expect(applyButton).toHaveAttribute('data-pendo', 'apply-filters-button')
+    })
+
     it('calls onFilterChange with current filter selections when apply is clicked', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
@@ -491,6 +513,42 @@ describe('FiltersPanel', () => {
       await userEvent.click(applyButton)
 
       expect(mockOnFilterChange).toHaveBeenCalled()
+    })
+  })
+
+  describe('additional resources feature flag', () => {
+    it('shows discussion topics checkbox when feature is enabled', async () => {
+      // additionalResourcesEnabled is true by default in beforeEach
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByTestId('filter-resources-toggle')
+      await userEvent.click(toggleButton!)
+
+      const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')
+      expect(within(resourceTypeGroup).getByLabelText('Discussion topics')).toBeInTheDocument()
+    })
+
+    it('hides discussion topics checkbox when feature is disabled', async () => {
+      // Override the mock to return false
+      vi.mocked(useAccessibilityScansStore).mockImplementation((selector: any) => {
+        if (typeof selector === 'function') {
+          return selector({additionalResourcesEnabled: false})
+        }
+        return {additionalResourcesEnabled: false}
+      })
+
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByTestId('filter-resources-toggle')
+      await userEvent.click(toggleButton!)
+
+      const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')
+      expect(
+        within(resourceTypeGroup).queryByLabelText('Discussion topics'),
+      ).not.toBeInTheDocument()
+      // But Pages and Assignments should still be there
+      expect(within(resourceTypeGroup).getByLabelText('Pages')).toBeInTheDocument()
+      expect(within(resourceTypeGroup).getByLabelText('Assignments')).toBeInTheDocument()
     })
   })
 })

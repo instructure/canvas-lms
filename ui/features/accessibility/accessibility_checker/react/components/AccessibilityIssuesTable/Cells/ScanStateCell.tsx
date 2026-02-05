@@ -40,6 +40,7 @@ import {
 } from '../../../../../shared/react/types'
 import {IssueCountBadge} from '../../../../../shared/react/components/IssueCountBadge/IssueCountBadge'
 import {useAccessibilityIssueSelect} from '../../../../../shared/react/hooks/useAccessibilityIssueSelect'
+import {useAccessibilityScansStore} from '../../../../../shared/react/stores/AccessibilityScansStore'
 const I18n = createI18nScope('accessibility_checker')
 
 interface ScanStateCellProps {
@@ -86,7 +87,7 @@ const RescanAction = ({item, onRescan}: ScanStateCellProps) => {
 
   return (
     <Flex.Item textAlign="start">
-      <Button id="accessibility-checker-rescan-button" size="small" onClick={handleClick}>
+      <Button data-pendo="resource-rescan-button" size="small" onClick={handleClick}>
         <AccessibleContent alt={I18n.t('Rescan issues for %{name}', {name: item.resourceName})}>
           {I18n.t('Rescan')}
         </AccessibleContent>
@@ -169,13 +170,32 @@ const ScanStateWithExplanation = ({
   </Flex>
 )
 
-const NoIssuesText = ({isMobile}: {isMobile: boolean}) => (
-  <ScanStateWithIcon
-    icon={<IconPublishSolid color="success" aria-hidden="true" />}
-    text={I18n.t('No issues')}
-    isMobile={isMobile}
-  />
-)
+const ClosedIssuesText = ({
+  item,
+  isMobile,
+}: {
+  item: AccessibilityResourceScan
+  isMobile: boolean
+}) => {
+  const closedText = I18n.t('Closed (%{count})', {count: item.closedIssueCount})
+  return (
+    <ScanStateWithIcon
+      icon={<IconPublishSolid color="success" aria-hidden="true" />}
+      text={closedText}
+      isMobile={isMobile}
+    />
+  )
+}
+
+const NoIssuesText = ({isMobile}: {isMobile: boolean}) => {
+  return (
+    <ScanStateWithIcon
+      icon={<IconPublishSolid color="success" aria-hidden="true" />}
+      text={I18n.t('No issues')}
+      isMobile={isMobile}
+    />
+  )
+}
 
 const ScanInProgress = ({item, isMobile}: {item: AccessibilityResourceScan; isMobile: boolean}) => (
   <ScanStateWithIcon
@@ -221,6 +241,8 @@ export const ScanStateCell: React.FC<ScanStateCellProps> = ({
   isMobile,
   onRescan,
 }: ScanStateCellProps) => {
+  const isCloseIssuesEnabled = useAccessibilityScansStore(state => state.isCloseIssuesEnabled)
+
   switch (item.workflowState) {
     case ScanWorkflowState.Queued:
     case ScanWorkflowState.InProgress: {
@@ -229,6 +251,8 @@ export const ScanStateCell: React.FC<ScanStateCellProps> = ({
     case ScanWorkflowState.Completed: {
       if (item.issueCount > 0) {
         return <IssueCountAndAction item={item} isMobile={isMobile} />
+      } else if (isCloseIssuesEnabled && item.closedIssueCount && item.closedIssueCount > 0) {
+        return <ClosedIssuesText item={item} isMobile={isMobile} />
       } else if (item.issueCount === 0) {
         return <NoIssuesText isMobile={isMobile} />
       }

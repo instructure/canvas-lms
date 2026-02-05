@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconXLine} from '@instructure/ui-icons'
@@ -37,6 +37,7 @@ import AppliedFilters from './AppliedFilters'
 import CustomToggleGroup from './CustomToggleGroup'
 import {Alert} from '@instructure/ui-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {useAccessibilityScansStore} from '../../../../../shared/react/stores/AccessibilityScansStore'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -63,6 +64,16 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   const [alertMessage, setAlertMessage] = useState<string | null>(null)
   const [toDateError, setToDateError] = useState<Array<{type: 'error'; text: string}>>([])
   const toggleButtonRef = React.useRef<CustomToggleGroup | null>(null)
+
+  const additionalResourcesEnabled = useAccessibilityScansStore(
+    state => state.additionalResourcesEnabled,
+  )
+
+  const filteredArtifactTypeOptions = useMemo(() => {
+    return artifactTypeOptions.filter(
+      option => !option.requiresFeatureFlag || additionalResourcesEnabled,
+    )
+  }, [additionalResourcesEnabled])
 
   const dateFormatter = useDateTimeFormat('date.formats.medium_with_weekday')
   const dateFormatHint = useDateFormatPattern()
@@ -339,7 +350,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                           data-testid="resource-type-checkbox-group"
                           name="resource-type-checkbox-group"
                           description={I18n.t('Resource type')}
-                          options={artifactTypeOptions}
+                          options={filteredArtifactTypeOptions}
                           selected={selectedArtifactType}
                           onUpdate={setSelectedArtifactType}
                         />
@@ -373,6 +384,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                   <Flex.Item>
                     <Button
                       data-testid="apply-filters-button"
+                      data-pendo="apply-filters-button"
                       size="medium"
                       onClick={handleApply}
                       color="primary"

@@ -27,6 +27,7 @@ import {AccessibilityResourceScan, ResourceWorkflowState} from '../../../../shar
 import {ContentTypeCell} from './Cells/ContentTypeCell'
 import {ScanStateCell} from './Cells/ScanStateCell'
 import {useQueueScanResource} from '../../../../shared/react/hooks/useQueueScanResource'
+import {ActionsMenuCell} from './Cells/ActionsMenuCell'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -49,7 +50,7 @@ export const AccessibilityIssuesTableRow = ({item, isMobile}: Props) => {
   return (
     <Table.Row key={`${item.resourceType}-${item.id}`} data-testid={`issue-row-${item.id}`}>
       <Table.Cell themeOverride={baseCellThemeOverride} textAlign="start">
-        <Link href={item.resourceUrl}>
+        <Link data-pendo="navigate-to-resource-url" href={item.resourceUrl}>
           <Text lineHeight="lineHeight150">{item.resourceName}</Text>
         </Link>
       </Table.Cell>
@@ -96,6 +97,9 @@ export const AccessibilityIssuesTableRow = ({item, isMobile}: Props) => {
               }).format(new Date(item.resourceUpdatedAt))
             : '-'}
         </Text>
+      </Table.Cell>
+      <Table.Cell>
+        <ActionsMenuCell scan={item} />
       </Table.Cell>
     </Table.Row>
   )

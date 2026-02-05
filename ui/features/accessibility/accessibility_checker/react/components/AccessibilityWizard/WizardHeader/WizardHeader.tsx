@@ -19,7 +19,6 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
-import type {ViewProps} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -29,15 +28,14 @@ const I18n = createI18nScope('accessibility_checker')
 
 interface WizardProps {
   title: string
-  padding?: ViewProps['padding']
   onDismiss: () => void
 }
 
-export const WizardHeader: React.FC<WizardProps> = ({title, onDismiss, padding}) => {
+export const WizardHeader: React.FC<WizardProps> = ({title, onDismiss}) => {
   const [isHeaderTruncated, setIsHeaderTruncated] = React.useState(false)
 
   return (
-    <Flex as="div" gap="small" justifyItems="space-between" padding={padding ?? 'small'}>
+    <Flex as="div" gap="small" justifyItems="space-between">
       <div style={{display: 'flex', maxWidth: '90%'}}>
         <Tooltip on={isHeaderTruncated ? ['hover'] : []} placement="start center" renderTip={title}>
           <Heading level="h2" variant="titleCardRegular">
