@@ -26,6 +26,12 @@
   "add_image_60b2de07": {
     "message": "Add Image"
   },
+  "add_new_a9226085": {
+    "message": "Add New"
+  },
+  "add_new_caption_79b870c7": {
+    "message": "Add New Caption"
+  },
   "add_one_9e34a6f8": {
     "message": "Add one!"
   },
@@ -248,6 +254,18 @@
   "cap_product_3a5265a6": {
     "message": "Cap Product"
   },
+  "caption_manager_aae0906f": {
+    "message": "Caption Manager"
+  },
+  "captionname_caption_upload_failed_errormessage_573eccfe": {
+    "message": "{ captionName } caption upload failed: { errorMessage }"
+  },
+  "captions_have_been_added_for_lang_cd126cd": {
+    "message": "Captions have been added for { lang }"
+  },
+  "captions_have_been_deleted_for_lang_63906076": {
+    "message": "Captions have been deleted for { lang }"
+  },
   "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
     "message": "Captions inherited from a parent course cannot be removed."
   },
@@ -307,6 +325,9 @@
   },
   "choose_caption_file_9c45bc4e": {
     "message": "Choose caption file"
+  },
+  "choose_file_8d89ccab": {
+    "message": "Choose File"
   },
   "choose_usage_rights_33683854": {
     "message": "Choose usage rights..."
@@ -650,6 +671,9 @@
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Down And Right Diagonal Arrow"
   },
+  "download_captionname_2e5eea35": {
+    "message": "Download { captionName }"
+  },
   "download_filename_2baae924": {
     "message": "Download { filename }"
   },
@@ -844,6 +868,9 @@
   },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "Failed to retrieve content from external tool"
+  },
+  "file_d1b70050": {
+    "message": "File*"
   },
   "file_name_8fd421ff": {
     "message": "File name"
@@ -1277,6 +1304,9 @@
   },
   "lambda_4f602498": {
     "message": "Lambda"
+  },
+  "language_91effaa0": {
+    "message": "Language*"
   },
   "language_arts_icon_a798b0f8": {
     "message": "Language Arts Icon"
@@ -1863,6 +1893,12 @@
   "please_select_a_file_of_a_supported_type_1fc578f2": {
     "message": "Please select a file of a supported type"
   },
+  "please_select_a_language_d90256fb": {
+    "message": "Please select a language"
+  },
+  "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+    "message": "Please select a .vtt or .srt file"
+  },
   "plus_d43cd4ec": {
     "message": "Plus"
   },
@@ -1922,6 +1958,9 @@
   },
   "prime_numbers_13464f61": {
     "message": "Prime Numbers"
+  },
+  "processing_8c569014": {
+    "message": "Processing..."
   },
   "product_39cf144f": {
     "message": "Product"
@@ -2015,6 +2054,9 @@
   },
   "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
     "message": "Replaced all { alertFindText } with { alertReplaceText }"
+  },
+  "request_d1129f7d": {
+    "message": "Request"
   },
   "reset_95a81614": {
     "message": "Reset"
@@ -2162,6 +2204,9 @@
   },
   "selected_274ce24f": {
     "message": "Selected"
+  },
+  "selected_file_name_93fa1a14": {
+    "message": "Selected file: { name }"
   },
   "selected_linkfilename_c093b1f2": {
     "message": "Selected { linkFileName }"
@@ -2591,6 +2636,12 @@
   },
   "updated_link_a827e441": {
     "message": "Updated link"
+  },
+  "upload_8b403d05": {
+    "message": "Upload"
+  },
+  "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+    "message": "Upload a subtitle track in either the SRT or WebVTT format."
   },
   "upload_document_253f0478": {
     "message": "Upload Document"
