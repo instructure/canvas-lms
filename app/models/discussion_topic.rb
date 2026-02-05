@@ -1110,7 +1110,14 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def can_lock?
-    !(assignment.try(:due_at) && assignment.due_at > Time.zone.now)
+    return false if assignment.try(:due_at) && assignment.due_at > Time.zone.now
+
+    if checkpoints?
+      return false if reply_to_topic_checkpoint&.due_at && reply_to_topic_checkpoint.due_at > Time.zone.now
+      return false if reply_to_entry_checkpoint&.due_at && reply_to_entry_checkpoint.due_at > Time.zone.now
+    end
+
+    true
   end
 
   def comments_disabled?
