@@ -18,6 +18,6 @@
 
 import formatMessage from '../../format-message'
 
-const locale = {"greek_65c5b3f7":{"message":"Հունարեն"},"loading_25990131":{"message":"Բեռնում է..."},"no_preview_is_available_for_this_file_f940114a":{"message":"Այս ֆայլի նախնական դիտումը հասանելի չէ:"}}
+const locale = {"cancel_caeb1e68":{"message":"Չեղյալ համարել"},"greek_65c5b3f7":{"message":"Հունարեն"},"loading_25990131":{"message":"Բեռնում է..."},"no_preview_is_available_for_this_file_f940114a":{"message":"Այս ֆայլի նախնական դիտումը հասանելի չէ:"}}
 
 formatMessage.addLocale({hy: locale})
