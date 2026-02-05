@@ -20,25 +20,32 @@ import {useCallback} from 'react'
 import {useSearchParams} from 'react-router-dom'
 import type {SortOrder} from '../react/components/SortableTableHeader'
 
-interface UseSortParamsOptions {
+interface UseCoursesParamsOptions {
   defaultSort: string
   defaultOrder: SortOrder
 }
 
-interface UseSortParamsReturn {
+interface UseCoursesParamsReturn {
   sort: string
   order: SortOrder
+  page: number
+  search: string
   handleChangeSort: (columnId: string) => void
+  handlePageChange: (newPage: number) => void
+  handleSearchChange: (newSearch: string) => void
 }
 
-export const useSortParams = ({
+export const useCoursesParams = ({
   defaultSort,
   defaultOrder,
-}: UseSortParamsOptions): UseSortParamsReturn => {
+}: UseCoursesParamsOptions): UseCoursesParamsReturn => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const sort = searchParams.get('sort') || defaultSort
   const order = (searchParams.get('order') || defaultOrder) as SortOrder
+  const parsedPage = parseInt(searchParams.get('page') || '1', 10)
+  const page = parsedPage > 0 ? parsedPage : 1
+  const search = searchParams.get('search') || ''
 
   const handleChangeSort = useCallback(
     (columnId: string) => {
@@ -55,9 +62,40 @@ export const useSortParams = ({
     [sort, order, setSearchParams],
   )
 
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      setSearchParams(params => {
+        const newParams = new URLSearchParams(params)
+        newParams.set('page', String(newPage))
+        return newParams
+      })
+    },
+    [setSearchParams],
+  )
+
+  const handleSearchChange = useCallback(
+    (newSearch: string) => {
+      setSearchParams(params => {
+        const newParams = new URLSearchParams(params)
+        if (newSearch) {
+          newParams.set('search', newSearch)
+        } else {
+          newParams.delete('search')
+        }
+        newParams.set('page', '1')
+        return newParams
+      })
+    },
+    [setSearchParams],
+  )
+
   return {
     sort,
     order,
+    page,
+    search,
     handleChangeSort,
+    handlePageChange,
+    handleSearchChange,
   }
 }
