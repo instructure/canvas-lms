@@ -54,6 +54,10 @@ class AttachmentAssociation < ActiveRecord::Base
 
   after_save :set_word_count
 
+  def self.versioned_fields
+    %i[attachment_id context_concern context_id context_type created_at root_account_id user_id]
+  end
+
   def self.verify_access(location_param, attachment, user, session = nil)
     return false if attachment.locked_for?(user)
 

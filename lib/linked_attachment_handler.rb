@@ -74,7 +74,7 @@ module LinkedAttachmentHandler
   end
 
   def keep_associations?(attachment, session, user)
-    instance_of?(::WikiPage) || !attachment.grants_right?(user, session, :delete)
+    !attachment.grants_right?(user, session, :delete)
   end
 
   # NB: context_concern is a virtual subdivision of context.

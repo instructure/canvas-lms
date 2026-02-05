@@ -758,7 +758,7 @@ class AbstractAssignment < ActiveRecord::Base
   validates :hide_in_gradebook, inclusion: { in: [false] }, if: -> { points_possible.present? && points_possible > 0 }
 
   acts_as_list scope: :assignment_group
-  simply_versioned keep: 5
+  simply_versioned keep: 5, versioned_associations: [:attachment_associations]
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [context, nil] }
 

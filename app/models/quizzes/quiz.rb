@@ -86,7 +86,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   after_save :restore_learning_outcome_results, if: -> { saved_change_to_quiz_type?(to: "assignment") }
   serialize :quiz_data
 
-  simply_versioned
+  simply_versioned versioned_associations: [:attachment_associations]
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the

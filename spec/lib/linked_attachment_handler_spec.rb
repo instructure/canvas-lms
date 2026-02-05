@@ -131,18 +131,6 @@ describe LinkedAttachmentHandler do
         expect(fetch_list_with_field_name(nil)).to be_empty
       end
 
-      it "keeps wiki page associations" do
-        wiki_page = course.wiki_pages.create!(title: "Test Page")
-        html = <<~HTML
-          <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
-            <img id="3" src="/courses/#{course.id}/files/#{course_attachment2.id}/preview"></p>
-        HTML
-        wiki_page.associate_attachments_to_rce_object(html, teacher)
-        wiki_page.associate_attachments_to_rce_object("", teacher)
-        associations = AttachmentAssociation.where(context: wiki_page).pluck(:attachment_id)
-        expect(associations).to match_array([course_attachment.id, course_attachment2.id])
-      end
-
       it "keeps association if the user doesn't have manage access to the file" do
         html = <<~HTML
           <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
