@@ -16,12 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Store stage tracking info to be processed after parallel block completes
+@groovy.transform.Field
+def linterStageTracking = [:]
+
+// Track which linter stages failed
+@groovy.transform.Field
+def linterFailures = [] as Set
+
 private def runLinterCommand(String stageName, Closure scriptBlock) {
   def startTime = System.currentTimeMillis()
+
+  // Store start time for later tracking
+  linterStageTracking[stageName] = startTime
+
   try {
     scriptBlock()
-  } finally {
-    buildSummaryReport.trackStage(stageName, startTime)
+  } catch (Exception e) {
+    // Track this stage as failed
+    linterFailures << stageName
+    // Re-throw to maintain Jenkins stage failure behavior
+    throw e
   }
 }
 
@@ -120,16 +135,30 @@ def runLintersInline() {
       }
     }
 
-    parallel(linterStages)
+    try {
+      parallel(linterStages)
+    } finally {
+      // Track each linter stage for failure detection
+      echo "[DEBUG] Tracking ${linterStageTracking.size()} linter stages"
+      linterStageTracking.each { stageName, startTime ->
+        echo "[DEBUG] Tracking stage: ${stageName}"
+        buildSummaryReport.trackStage(stageName, startTime)
 
-    // Publish Gergich results after all linters complete (pre-merge only)
-    if (!isMerged) {
-      publishGergichResults()
-    }
+        // Only set failure category if this stage actually failed
+        if (linterFailures.contains(stageName)) {
+          echo "[DEBUG] Setting failure category for failed stage: ${stageName}"
+          buildSummaryReport.setFailureCategory(stageName, buildSummaryReport.FAILURE_TYPE_STAGE)
+        }
+      }
 
-    // Check for force failure
-    if (commitMessageFlag('force-failure-linters') as Boolean) {
-      error 'Linters: force failing due to [force-failure-linters] flag'
+      if (!isMerged) {
+        publishGergichResults()
+      }
+
+      // Check for force failure
+      if (commitMessageFlag('force-failure-linters') as Boolean) {
+        error 'Linters: force failing due to [force-failure-linters] flag'
+      }
     }
   }
 }
@@ -220,14 +249,7 @@ def runGroovyLint() {
   runLinterCommand('Linters - Groovy') {
     sh '''
       set -ex
-      docker compose run --rm linters \
-        npx npm-groovy-lint \
-          --path "." \
-          --ignorepattern "**/node_modules/**" \
-          --files "**/*.groovy,**/Jenkinsfile*" \
-          --config ".groovylintrc.json" \
-          --loglevel info \
-          --failon warning
+      docker compose run --rm linters ./build/new-jenkins/linters/run-gergich-groovy-lint.sh
     '''
   }
 }

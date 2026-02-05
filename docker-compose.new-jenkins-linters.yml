@@ -23,5 +23,10 @@ services:
       SKIP_YARN:
       MASTER_BOUNCER_RUN:
       MASTER_BOUNCER_KEY:
+    volumes:
+      - gergich-data:/home/docker/gergich
     command: sleep infinity
     init: true
+
+volumes:
+  gergich-data:
