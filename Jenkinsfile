@@ -454,7 +454,7 @@ pipeline {
                   def stageName = 'Linters (Build Image)'
                   def startTime = System.currentTimeMillis()
                   try {
-                    timeout(time: 2, unit: 'MINUTES') {
+                    timeout(time: 4, unit: 'MINUTES') {
                       buildDockerImageStage.lintersImage()
                     }
                   } finally {
@@ -596,7 +596,6 @@ pipeline {
         }
       }
     }
-
   }
 
   post {
