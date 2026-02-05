@@ -191,7 +191,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     description,
     peerReviews,
     submissionsConnection,
-    assignedToDates,
+    peerReviewSubAssignment,
   } = data.assignment
 
   const submissionRequired = peerReviews?.submissionRequired ?? false
@@ -202,7 +202,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const showSubmissionRequiredView = submissionRequired && !hasSubmitted
   const isLocked = isPeerReviewLocked(data.assignment)
   const isPastLockDate = isPeerReviewPastLockDate(data.assignment)
-  const peerReviewDueAt = assignedToDates?.[0]?.peerReviewDates?.dueAt
+  const peerReviewDueAt = peerReviewSubAssignment?.dueAt
   const isAnonymous = data.assignment.peerReviews?.anonymousReviews ?? false
   const selectedAssessment = assessmentRequestsForCurrentUser?.[selectedAssessmentIndex]
   const submissionUserId =

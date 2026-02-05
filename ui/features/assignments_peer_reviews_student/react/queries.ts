@@ -35,18 +35,15 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
         pointsPossible
         anonymousReviews
       }
+      peerReviewSubAssignment {
+        dueAt
+        unlockAt
+        lockAt
+      }
       submissionsConnection(filter: {userId: $userId}) {
         nodes {
           _id
           submittedAt
-        }
-      }
-      assignedToDates {
-        dueAt
-        peerReviewDates {
-          dueAt
-          unlockAt
-          lockAt
         }
       }
       assessmentRequestsForCurrentUser {
