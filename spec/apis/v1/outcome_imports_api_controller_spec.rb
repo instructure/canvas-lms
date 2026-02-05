@@ -196,19 +196,6 @@ describe OutcomeImportsApiController, type: :request do
     end
   end
 
-  it "allows raw post without content-type" do
-    # In the current API docs, we specify that you need to send a content-type to make raw
-    # post work. However, long ago we added code to make it work even without the header,
-    # so we are going to maintain that behavior.
-    post "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-         params: "\xffab=\xffcd",
-         headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
-    import = OutcomeImport.last
-    expect(import.attachment.filename).to eq "outcome_import.csv"
-    expect(import.attachment.content_type).to eq "application/x-www-form-urlencoded"
-    expect(import.attachment.size).to eq 7
-  end
-
   it "allows raw post without charset" do
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",

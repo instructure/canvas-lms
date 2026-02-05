@@ -628,11 +628,7 @@ class SisImportsApiController < ApplicationController
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
                                        Attachment.mimetype("sis_import.#{params[:extension]}"))
         else
-          env = request.env.dup
-          env["CONTENT_TYPE"] = env["ORIGINAL_CONTENT_TYPE"]
-          # copy of request with original content type restored
-          request2 = Rack::Request.new(env)
-          charset = request2.media_type_params["charset"]
+          charset = request.media_type_params["charset"]
           if charset.present? && !charset.casecmp?("utf-8")
             return render json: { error: t("errors.invalid_content_type", "Invalid content type, UTF-8 required") }, status: :bad_request
           end
@@ -640,9 +636,9 @@ class SisImportsApiController < ApplicationController
           params[:extension] ||= { "application/zip" => "zip",
                                    "text/xml" => "xml",
                                    "text/plain" => "csv",
-                                   "text/csv" => "csv" }[request2.media_type] || "zip"
+                                   "text/csv" => "csv" }[request.media_type] || "zip"
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
-                                       request2.media_type)
+                                       request.media_type)
         end
       end
 
