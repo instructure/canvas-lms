@@ -207,6 +207,7 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         students={students}
         rollups={rollups}
         outcomeDistributions={distributionData?.outcome_distributions}
+        distributionStudents={distributionData?.students}
         isLoadingDistribution={isLoadingDistribution}
         pagination={pagination}
         setCurrentPage={setCurrentPage}

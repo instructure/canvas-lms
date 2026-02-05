@@ -22,6 +22,7 @@ import {svgUrl} from '@canvas/outcomes/react/utils/icons'
 import {BarChart} from './BarChart'
 import type {Chart as ChartJS, Plugin} from 'chart.js'
 import {RatingDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
+import {canvas} from '@instructure/ui-themes'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -65,6 +66,8 @@ export interface MasteryDistributionChartProps {
     top?: number
     bottom?: number
   }
+  onBarClick?: (label: string, value: number) => void
+  selectedLabel?: string
 }
 
 export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> = ({
@@ -78,6 +81,8 @@ export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> =
   showYAxisGrid = false,
   gridColor,
   isPreview = false,
+  onBarClick,
+  selectedLabel,
 }) => {
   const imagesRef = useRef<Map<string, HTMLImageElement>>(new Map())
   const [imagesLoaded, setImagesLoaded] = useState(false)
@@ -106,7 +111,14 @@ export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> =
 
   const labels = masteryLevels.map(level => level.description)
   const values = masteryLevels.map(level => level.count)
-  const colors = masteryLevels.map(level => level.color)
+  const colors = useMemo(() => {
+    return masteryLevels.map(level => {
+      if (selectedLabel && level.description !== selectedLabel) {
+        return canvas.colors.contrasts.grey1424
+      }
+      return level.color
+    })
+  }, [masteryLevels, selectedLabel])
 
   // Create custom labels with icons and counts (only if not in preview mode)
   const customLabels: CustomLabel[] | undefined = useMemo(() => {
@@ -200,6 +212,10 @@ export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> =
       padding={chartPadding}
       maintainAspectRatio={false}
       plugins={customLabels && imagesLoaded ? [customLabelsPlugin] : []}
+      onClick={(_, elements) => {
+        if (elements.length === 0) return
+        onBarClick?.(labels[elements[0].index], values[elements[0].index])
+      }}
     />
   )
 }
