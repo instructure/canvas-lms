@@ -407,7 +407,14 @@ class AiExperiencesController < ApplicationController
   end
 
   def experience_params
-    params.expect(ai_experience: %i[title description facts learning_objective pedagogical_guidance workflow_state])
+    base_params = %i[title description facts learning_objective pedagogical_guidance workflow_state]
+
+    # Only permit context_file_ids if feature flag is enabled
+    if @context.feature_enabled?(:ai_experiences_context_file_upload)
+      params.expect(ai_experience: [*base_params, { context_file_ids: [] }])
+    else
+      params.expect(ai_experience: base_params)
+    end
   end
 
   def render_404
