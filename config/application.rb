@@ -448,7 +448,6 @@ module CanvasRails
       app.config.middleware.swap(ActionDispatch::RequestId, RequestContext::Generator)
       app.config.middleware.insert_after(config.session_store, RequestContext::Session)
       app.config.middleware.insert_before(Rack::Head, RequestThrottle)
-      app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
       app.config.middleware.insert_before(Sentry::Rails::CaptureExceptions, SentryTraceScrubber)
     end
   end
