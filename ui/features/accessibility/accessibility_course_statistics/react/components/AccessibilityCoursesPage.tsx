@@ -24,9 +24,9 @@ import {Billboard} from '@instructure/ui-billboard'
 import {Pagination} from '@instructure/ui-pagination'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useCourses} from '../../hooks/useCourses'
-import {useSortParams} from '../../hooks/useSortParams'
-import {usePaginationParam} from '../../hooks/usePaginationParam'
+import {useCoursesParams} from '../../hooks/useCoursesParams'
 import {CoursesTable} from './CoursesTable'
+import {CoursesSearch} from './CoursesSearch'
 import {AccessibilityGenericErrorPage} from './AccessibilityGenericErrorPage'
 import EmptyDesert from '@canvas/images/react/EmptyDesert'
 import type {CoursesResponse} from '../../types/course'
@@ -74,12 +74,7 @@ const CoursesContent: React.FC<{
   }
 
   return (
-    <CoursesTable
-      courses={data.courses}
-      sort={sort}
-      order={order}
-      onChangeSort={onChangeSort}
-    />
+    <CoursesTable courses={data.courses} sort={sort} order={order} onChangeSort={onChangeSort} />
   )
 }
 
@@ -109,18 +104,20 @@ const CoursesPagination: React.FC<{
 
 export const AccessibilityCoursesPage: React.FC = () => {
   const accountId = getAccountId()
-  const {sort, order, handleChangeSort} = useSortParams({
-    defaultSort: 'course_name',
-    defaultOrder: 'asc',
-  })
-  const {page, handlePageChange} = usePaginationParam()
-  const {data, isLoading, isError} = useCourses({accountId, sort, order, page})
+  const {sort, order, page, search, handleChangeSort, handlePageChange, handleSearchChange} =
+    useCoursesParams({
+      defaultSort: 'course_name',
+      defaultOrder: 'asc',
+    })
+  const {data, isLoading, isError} = useCourses({accountId, sort, order, page, search})
 
   return (
     <View as="div">
       <Heading level="h1" margin="0 0 medium">
         {I18n.t('Accessibility report')}
       </Heading>
+
+      <CoursesSearch value={search} onChange={handleSearchChange} />
 
       <CoursesContent
         isLoading={isLoading}

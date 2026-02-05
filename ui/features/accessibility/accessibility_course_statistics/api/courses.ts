@@ -23,15 +23,16 @@ import type {SortOrder} from '../react/components/SortableTableHeader'
 const COURSES_PER_PAGE = 14
 const TEACHER_LIMIT = 25
 
-interface FetchCoursesParams {
+export interface FetchCoursesParams {
   accountId: string
   sort: string
   order: SortOrder
-  page?: number
+  page: number
+  search: string
 }
 
 export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesResponse> => {
-  const {accountId, sort, order, page = 1} = params
+  const {accountId, sort, order, page, search} = params
 
   const queryParams: Record<string, any> = {
     include: [
@@ -45,6 +46,9 @@ export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesR
     per_page: COURSES_PER_PAGE,
     no_avatar_fallback: 1,
     page,
+  }
+  if (search.length > 0) {
+    queryParams.search_term = search
   }
 
   queryParams.sort = sort
