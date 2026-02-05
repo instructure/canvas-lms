@@ -172,10 +172,17 @@
             <div class="ig-details__item reply_to_topic_display"></div>
             <div class="ig-details__item reply_to_entry_display"></div>
         <%end%>
-        <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-due-date" class="due_date_display ig-details__item"></div>
-        <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>
-          <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-points" class="points_possible_display ig-details__item"></div>
-        <%end%>
+        <% show_peer_review_info = !@is_student && module_item && module_item.content_type == 'Assignment' && module_item.content&.peer_reviews? && module_item.content&.peer_review_sub_assignment && @context.feature_enabled?(:peer_review_allocation_and_grading) %>
+        <% render_peer_review_container = !@is_student && @context.feature_enabled?(:peer_review_allocation_and_grading) && (!module_item || (module_item.content_type == 'Assignment' && module_item.content&.peer_review_sub_assignment)) %>
+        <% if !show_peer_review_info %>
+          <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-due-date" class="due_date_display ig-details__item"></div>
+          <% if (!module_item && !@is_student) || (module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true)))%>
+            <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-points" class="points_possible_display ig-details__item"></div>
+          <%end%>
+        <% end %>
+        <% if render_peer_review_container %>
+          <div class="peer-review-info-container" id="module_teacher_peer_review_info_<%= module_item ? module_item.content_id : "{{ content_id }}" %>_<%= module_item ? module_item.context_module_id : "{{ context_module_id }}" %>" style="<%= 'display: none;' unless show_peer_review_info %>"></div>
+        <% end %>
         <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-requirement" class="requirement-description ig-details__item">
           <span class="completion_requirement">
             <span class="requirement_type min_score_requirement">

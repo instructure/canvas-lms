@@ -20,6 +20,24 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {PeerReviewInfo, type PeerReviewInfoProps} from '../PeerReviewInfo'
+import {vi} from 'vitest'
+
+vi.mock('@canvas/datetime/date-functions', () => ({
+  datetimeString: vi.fn(date => {
+    if (!date) return ''
+    if (date.includes('2026-02-15')) return 'Feb 15, 2026 at 11:59pm'
+    if (date.includes('2026-02-20')) return 'Feb 20, 2026 at 11:59pm'
+    if (date.includes('2026-03-01')) return 'Mar 1, 2026 at 11:59pm'
+    return 'Feb 15, 2026 at 11:59pm'
+  }),
+  dateString: vi.fn(date => {
+    if (!date) return ''
+    if (date.includes('2026-02-15')) return 'Feb 15, 2026'
+    if (date.includes('2026-02-20')) return 'Feb 20, 2026'
+    if (date.includes('2026-03-01')) return 'Mar 1, 2026'
+    return 'Feb 15, 2026'
+  }),
+}))
 
 const mockAssignmentBase = {
   id: '1',
@@ -583,6 +601,259 @@ describe('PeerReviewInfo', () => {
 
       expect(screen.getByText('Assignment:')).toBeInTheDocument()
       expect(screen.getByText(/Peer Reviews/)).toBeInTheDocument()
+    })
+  })
+
+  describe('Prop: showDueDateLabel', () => {
+    it('hides "Due" label when showDueDateLabel is false', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          due_at: '2026-02-15T23:59:59Z',
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+        showDueDateLabel: false,
+      }
+
+      render(<PeerReviewInfo {...props} />)
+      expect(screen.queryByText('Due')).not.toBeInTheDocument()
+    })
+
+    it('shows "Due" label when showDueDateLabel is true', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          due_at: '2026-02-15T23:59:59Z',
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+        showDueDateLabel: true,
+      }
+
+      render(<PeerReviewInfo {...props} />)
+      const dueDates = screen.getAllByText('Due')
+      expect(dueDates.length).toBeGreaterThan(0)
+    })
+
+    it('defaults to showing "Due" label when prop is not provided', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          due_at: '2026-02-15T23:59:59Z',
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+      }
+
+      render(<PeerReviewInfo {...props} />)
+      const dueDates = screen.getAllByText('Due')
+      expect(dueDates.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Prop: useDateOnly', () => {
+    it('shows date only when useDateOnly is true', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          due_at: '2026-02-15T23:59:59Z',
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+        useDateOnly: true,
+      }
+
+      const {container} = render(<PeerReviewInfo {...props} />)
+      const text = container.textContent || ''
+      expect(text).toMatch(/Feb 15/)
+      expect(text).not.toMatch(/11:59pm/)
+    })
+
+    it('shows datetime when useDateOnly is false', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          due_at: '2026-02-15T23:59:59Z',
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+        useDateOnly: false,
+      }
+
+      const {container} = render(<PeerReviewInfo {...props} />)
+      const text = container.textContent || ''
+      expect(text).toMatch(/Feb 15/)
+      expect(text).toMatch(/11:59pm/)
+    })
+
+    it('defaults to showing datetime when prop is not provided', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          due_at: '2026-02-15T23:59:59Z',
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+      }
+
+      const {container} = render(<PeerReviewInfo {...props} />)
+      const text = container.textContent || ''
+      expect(text).toMatch(/11:59pm/)
+    })
+  })
+
+  describe('Prop: showAvailability', () => {
+    it('hides availability information when showAvailability is false', () => {
+      const futureDate = new Date()
+      futureDate.setDate(futureDate.getDate() + 30)
+
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          unlock_at: null,
+          lock_at: futureDate.toISOString(),
+          availability_status: {
+            status: 'open',
+            date: futureDate.toISOString(),
+          },
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+        showAvailability: false,
+      }
+
+      render(<PeerReviewInfo {...props} />)
+      expect(screen.queryByText(/Available until/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/Not available until/)).not.toBeInTheDocument()
+      expect(screen.queryByText('Closed')).not.toBeInTheDocument()
+    })
+
+    it('shows availability information when showAvailability is true', () => {
+      const futureDate = new Date()
+      futureDate.setDate(futureDate.getDate() + 30)
+
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          unlock_at: null,
+          lock_at: futureDate.toISOString(),
+          availability_status: {
+            status: 'open',
+            date: futureDate.toISOString(),
+          },
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+        showAvailability: true,
+      }
+
+      render(<PeerReviewInfo {...props} />)
+      const assignmentLabel = screen.getByText('Assignment:')
+      const assignmentSection = assignmentLabel.closest('.info-section')
+      expect(assignmentSection).toHaveTextContent(/until/)
+    })
+
+    it('defaults to showing availability when prop is not provided', () => {
+      const futureDate = new Date()
+      futureDate.setDate(futureDate.getDate() + 30)
+
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          unlock_at: null,
+          lock_at: futureDate.toISOString(),
+          availability_status: {
+            status: 'open',
+            date: futureDate.toISOString(),
+          },
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+      }
+
+      render(<PeerReviewInfo {...props} />)
+      const assignmentLabel = screen.getByText('Assignment:')
+      const assignmentSection = assignmentLabel.closest('.info-section')
+      expect(assignmentSection).toHaveTextContent(/until/)
+    })
+
+    it('shows "Multiple Due Dates" link when showAvailability is false and has multiple dates', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          all_dates: [
+            {
+              dueFor: 'Section A',
+              dueAt: '2026-02-15T23:59:59Z',
+            },
+            {
+              dueFor: 'Section B',
+              dueAt: '2026-02-20T23:59:59Z',
+            },
+          ],
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+        showAvailability: false,
+      }
+
+      render(<PeerReviewInfo {...props} />)
+      const links = screen.getAllByText('Multiple Due Dates')
+      expect(links.length).toBeGreaterThan(0)
+    })
+
+    it('shows "Multiple Dates" link when showAvailability is true and has multiple dates', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          all_dates: [
+            {
+              dueFor: 'Section A',
+              dueAt: '2026-02-15T23:59:59Z',
+            },
+            {
+              dueFor: 'Section B',
+              dueAt: '2026-02-20T23:59:59Z',
+            },
+          ],
+          peer_review_sub_assignment: mockPeerReviewSubAssignment,
+        },
+        showAvailability: true,
+      }
+
+      render(<PeerReviewInfo {...props} />)
+      const links = screen.getAllByText('Multiple Dates')
+      expect(links.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Combined props', () => {
+    it('works correctly with showDueDateLabel=false, useDateOnly=true, showAvailability=false', () => {
+      const props: PeerReviewInfoProps = {
+        assignment: {
+          ...mockAssignmentBase,
+          due_at: '2026-02-15T23:59:59Z',
+          unlock_at: null,
+          lock_at: '2026-03-01T23:59:59Z',
+          availability_status: {
+            status: 'open',
+            date: '2026-03-01T23:59:59Z',
+          },
+          all_dates: [
+            {dueFor: 'Section A', dueAt: '2026-02-15T23:59:59Z'},
+            {dueFor: 'Section B', dueAt: '2026-02-20T23:59:59Z'},
+          ],
+          peer_review_sub_assignment: {
+            ...mockPeerReviewSubAssignment,
+            all_dates: [
+              {dueFor: 'Section A', dueAt: '2026-02-18T23:59:59Z'},
+              {dueFor: 'Section B', dueAt: '2026-02-23T23:59:59Z'},
+            ],
+          },
+        },
+        showDueDateLabel: false,
+        useDateOnly: true,
+        showAvailability: false,
+      }
+
+      const {container} = render(<PeerReviewInfo {...props} />)
+      const text = container.textContent || ''
+
+      expect(screen.queryByText('Due')).not.toBeInTheDocument()
+      expect(text).not.toMatch(/11:59pm/)
+      expect(screen.queryByText(/Available/)).not.toBeInTheDocument()
+      expect(screen.getAllByText('Multiple Due Dates').length).toBeGreaterThan(0)
     })
   })
 })

@@ -621,7 +621,8 @@ module DatesOverridable
         peer_review_info = {
           id: peer_review_sub.id,
           points_possible: peer_review_sub.points_possible,
-          peer_review_count: peer_review_sub.peer_review_count
+          peer_review_count: peer_review_sub.peer_review_count,
+          parent_assignment_html_url: "/courses/#{context_id}/assignments/#{id}"
         }
 
         peer_review_info.merge!(
