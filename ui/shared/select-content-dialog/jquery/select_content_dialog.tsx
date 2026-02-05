@@ -538,6 +538,10 @@ export function resetExternalToolFields() {
   $('#external_tool_create_preserve_existing_assignment_name').val('')
 }
 
+export function resetItemTypeSelect() {
+  $('#add_module_item_select').prop('selectedIndex', 0).trigger('change')
+}
+
 export type SelectContentDialogOptions = {
   for_modules?: boolean
   select_button_text?: string
@@ -736,6 +740,8 @@ $(document).ready(function () {
         enable_disable_submit_button(true)
       } else {
         submit(item_data)
+        resetExternalToolFields()
+        resetItemTypeSelect()
       }
     } else if (item_type === 'context_module_sub_header') {
       item_data = {
