@@ -19,11 +19,16 @@
 
 module Lti
   class ToolConfiguration < ActiveRecord::Base
+    VISIBLE_TO_ADMINS = "admins"
+    VISIBLE_TO_MEMBERS = "members"
+    PUBLIC = "public"
+
     belongs_to :developer_key, optional: true
     belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :manual_configuration, optional: true
 
     before_validation :set_redirect_uris
     before_validation :remove_placements_from_launch_settings
+    before_validation Lti::ToolConfigurationCleaner
     after_update :update_external_tools!, if: :configuration_changed?
     after_commit :update_unified_tool_id, if: :update_unified_tool_id?
 
