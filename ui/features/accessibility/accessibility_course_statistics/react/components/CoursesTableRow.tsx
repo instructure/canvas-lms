@@ -135,7 +135,7 @@ const SubaccountCell: React.FC<{
 }> = ({subaccountId, subaccountName}) => (
   <Table.Cell data-testid="subaccount-cell">
     {subaccountName && subaccountId ? (
-      <Link href={`/accounts/${subaccountId}`} isWithinText={false}>
+      <Link href={`/accounts/${subaccountId}/accessibility`} isWithinText={false}>
         {subaccountName}
       </Link>
     ) : (
