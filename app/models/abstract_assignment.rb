@@ -4026,6 +4026,15 @@ class AbstractAssignment < ActiveRecord::Base
     self.external_tool_tag_attributes = { content: tool, url: tool.url }
   end
 
+  # Determines if the external tool URL indicates this is a quiz LTI assignment
+  # @param external_tool_url [String, nil] the external tool URL
+  # @return [Boolean] true if the URL belongs to a quiz LTI tool
+  def quiz_lti_assignment?(external_tool_url: nil)
+    return false unless external_tool_url.present?
+
+    Lti::ToolFinder.from_url(external_tool_url, context)&.quiz_lti?
+  end
+
   def rollcall_assignment?
     external_tool? && title == ROLLCALL_ASSIGNMENT_TITLE
   end

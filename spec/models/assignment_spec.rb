@@ -6794,6 +6794,50 @@ describe Assignment do
     end
   end
 
+  describe "#quiz_lti_assignment?" do
+    before :once do
+      @course = course_model
+      @assignment = @course.assignments.build
+    end
+
+    context "when no URL is provided" do
+      it "returns false" do
+        expect(@assignment.quiz_lti_assignment?).to be false
+      end
+    end
+
+    context "when URL is not a quiz LTI tool" do
+      before do
+        @tool = @course.context_external_tools.create!(
+          name: "Regular Tool",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          url: "http://example.com/launch"
+        )
+      end
+
+      it "returns false" do
+        expect(@assignment.quiz_lti_assignment?(external_tool_url: @tool.url)).to be false
+      end
+    end
+
+    context "when URL is a quiz LTI tool" do
+      before do
+        @tool = @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+      end
+
+      it "returns true" do
+        expect(@assignment.quiz_lti_assignment?(external_tool_url: @tool.url)).to be true
+      end
+    end
+  end
+
   describe "scope :type_quiz_lti" do
     context "with a quiz_lti assignment" do
       before :once do
