@@ -61,6 +61,7 @@ interface GradebookTableProps {
   outcomes: Outcome[]
   rollups: StudentRollupData[]
   outcomeDistributions?: Record<string, OutcomeDistribution>
+  distributionStudents?: Student[]
   isLoadingDistribution?: boolean
   sorting: Sorting
   gradebookSettings?: GradebookSettings
@@ -89,6 +90,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   outcomes,
   rollups,
   outcomeDistributions,
+  distributionStudents,
   isLoadingDistribution,
   sorting,
   gradebookSettings = DEFAULT_GRADEBOOK_SETTINGS,
@@ -180,12 +182,13 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         <OutcomeHeader
           outcome={outcome}
           outcomeDistribution={outcomeDistributions?.[outcome.id.toString()]}
+          distributionStudents={distributionStudents}
           sorting={sorting}
           contributingScoresForOutcome={contributingScoreForOutcome}
         />
       )
     },
-    [sorting, outcomeDistributions],
+    [sorting, outcomeDistributions, distributionStudents],
   )
 
   const renderOutcomeCell = useCallback(

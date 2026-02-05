@@ -44,6 +44,7 @@ export interface GradebookProps {
   outcomes: Outcome[]
   rollups: StudentRollupData[]
   outcomeDistributions?: Record<string, OutcomeDistribution>
+  distributionStudents?: Student[]
   isLoadingDistribution?: boolean
   pagination?: PaginationType
   setCurrentPage: (page: number) => void
@@ -66,6 +67,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
   outcomes: initialOutcomes,
   rollups,
   outcomeDistributions,
+  distributionStudents,
   isLoadingDistribution = false,
   pagination,
   setCurrentPage,
@@ -112,6 +114,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
         rollups={rollups}
         sorting={sorting}
         outcomeDistributions={outcomeDistributions}
+        distributionStudents={distributionStudents}
         isLoadingDistribution={isLoadingDistribution}
         gradebookSettings={gradebookSettings}
         onChangeNameDisplayFormat={onChangeNameDisplayFormat}

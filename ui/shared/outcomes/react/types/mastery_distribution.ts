@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Student} from './rollup'
+
 export interface RatingDistribution {
   description: string
   points: number
@@ -37,14 +39,7 @@ export interface OutcomeDistribution {
   alignment_distributions?: Record<string, AlignmentDistribution>
 }
 
-export interface MasteryDistributionStudent {
-  id: string
-  name: string
-  sortable_name: string
-  display_name?: string
-}
-
 export interface MasteryDistributionResponse {
   outcome_distributions: Record<string, OutcomeDistribution>
-  students: MasteryDistributionStudent[]
+  students: Student[]
 }

@@ -22,7 +22,7 @@ import {Menu} from '@instructure/ui-menu'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SortBy, SortOrder} from '@canvas/outcomes/react/utils/constants'
-import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
 import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
@@ -38,6 +38,7 @@ export interface OutcomeHeaderProps extends DragDropConnectorProps {
   sorting: Sorting
   contributingScoresForOutcome: ContributingScoresForOutcome
   outcomeDistribution?: OutcomeDistribution
+  distributionStudents?: Student[]
 }
 
 export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
@@ -45,6 +46,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
   sorting,
   contributingScoresForOutcome,
   outcomeDistribution,
+  distributionStudents,
 }) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
@@ -119,6 +121,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
         <OutcomeDistributionPopover
           outcome={outcome}
           outcomeDistribution={outcomeDistribution}
+          distributionStudents={distributionStudents}
           isOpen={isODPOpen}
           onCloseHandler={closeODP}
           renderTrigger={<span />}
