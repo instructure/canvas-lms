@@ -65,7 +65,7 @@ module Api::V1::User
         course_or_section = @context if @context.is_a?(Course) || @context.is_a?(CourseSection)
         sis_context = enrollment || course_or_section || @domain_root_account
         type = includes.include?("deleted_pseudonyms") ? :exact : :implicit
-        pseudonym = SisPseudonym.for(user, sis_context, type:, require_sis: false, root_account: @domain_root_account, in_region: true)
+        pseudonym = SisPseudonym.for(user, sis_context, type:, require_sis: false, root_account: @domain_root_account, in_region: true, current_user:)
         enrollment_json_opts[:sis_pseudonym] = pseudonym if pseudonym&.sis_user_id
         # the sis fields on pseudonym are poorly named -- sis_user_id is
         # the id in the SIS import data, where on every other table
@@ -320,7 +320,7 @@ module Api::V1::User
         json[:sis_section_id] = enrollment.course_section.sis_source_id
         json[:section_integration_id] = enrollment.course_section.integration_id
         pseudonym = opts[:sis_pseudonym] if opts.key?(:sis_pseudonym)
-        pseudonym ||= SisPseudonym.for(enrollment.user, enrollment, type: :trusted, root_account: @domain_root_account) if enrollment.user
+        pseudonym ||= SisPseudonym.for(enrollment.user, enrollment, type: :trusted, root_account: @domain_root_account, current_user: @current_user) if enrollment.user
         json[:sis_user_id] = pseudonym&.sis_user_id
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
