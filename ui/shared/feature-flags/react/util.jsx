@@ -120,6 +120,11 @@ export function shouldDelete(flag, allowsDefaults, state) {
   }
   // Revert to inheriting when reasonable
   if (!allowsDefaults && flag.parent_state === 'allowed_on' && state === 'on') {
+    // Exception: new_user_tutorial_on_off needs explicit 'on' flags for legacy users
+    // (created before 2017-04-22) who must explicitly opt-in to the tutorial
+    if (flag.feature === 'new_user_tutorial_on_off') {
+      return false
+    }
     return true
   }
   if (!allowsDefaults && flag.parent_state === 'allowed' && state === 'off') {
