@@ -407,7 +407,7 @@ class UsersController < ApplicationController
           avatar_image_url: @user.avatar_image_url,
           sortable_name: @user.sortable_name,
           email: @user.email,
-          pseudonyms: @user.all_active_pseudonyms.map do |pseudonym|
+          pseudonyms: @user.pseudonyms_visible_to(@current_user).map do |pseudonym|
             { login_id: pseudonym.unique_id,
               sis_id: pseudonym.sis_user_id,
               integration_id: pseudonym.integration_id }
@@ -2339,7 +2339,7 @@ class UsersController < ApplicationController
         session.delete(:require_terms)
         flash[:notice] = t("user_updated", "User was successfully updated.")
         unless params[:redirect_to_previous].blank?
-          return redirect_back fallback_location: user_url(@user)
+          return redirect_back_or_to(user_url(@user))
         end
 
         format.html { redirect_to user_url(@user) }
