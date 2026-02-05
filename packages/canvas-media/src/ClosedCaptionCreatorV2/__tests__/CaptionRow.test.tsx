@@ -104,14 +104,12 @@ describe('<CaptionRow />', () => {
     expect(screen.queryByText(/download/i)).not.toBeInTheDocument()
   })
 
-  it('renders failed state with delete action', async () => {
-    const onDelete = vi.fn()
+  it('renders failed state', async () => {
     renderComponent({
       status: 'failed',
       captionName: 'German Caption',
       errorMessage: 'File size too large',
       liveRegion: () => document.getElementById(LIVE_REGION_ID),
-      onDelete,
     })
 
     // Caption name should be displayed
@@ -119,22 +117,6 @@ describe('<CaptionRow />', () => {
 
     // Error message should be displayed
     expect(screen.getByText('File size too large')).toBeInTheDocument()
-
-    // Screen reader alert should be announced
-    const alerts = document.querySelectorAll('[role="alert"]')
-    await waitFor(() => {
-      expect(alerts.length).toBeGreaterThan(0)
-    })
-
-    // Delete button should be present
-    const deleteButton = screen.getByText('Delete German Caption').closest('button')
-    expect(deleteButton).toBeInTheDocument()
-
-    // Click delete button
-    fireEvent.click(deleteButton!)
-
-    // onDelete should be called
-    expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
   it('inherited state: disabled delete action and has proper aria label on delete button', () => {

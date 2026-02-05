@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Alert} from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconDownloadLine, IconTrashLine} from '@instructure/ui-icons'
@@ -47,8 +46,6 @@ interface ProcessingCaptionRowProps extends BaseCaptionRowProps {
 interface FailedCaptionRowProps extends BaseCaptionRowProps {
   status: 'failed'
   errorMessage?: string
-  onRetry?: () => void
-  onDelete: () => void
 }
 
 /**
@@ -104,38 +101,11 @@ export function CaptionRow(props: CaptionRowProps) {
           )}
 
           {status === 'failed' && (
-            <>
-              {/* Error message alert for screen readers */}
-              {props.errorMessage && (
-                <Alert
-                  liveRegion={props.liveRegion}
-                  screenReaderOnly={true}
-                  isLiveRegionAtomic={true}
-                  liveRegionPoliteness="assertive"
-                >
-                  {formatMessage('{captionName} caption upload failed: {errorMessage}', {
-                    captionName: props.captionName,
-                    errorMessage: props.errorMessage,
-                  })}
-                </Alert>
-              )}
-
-              <Flex alignItems="center" gap="small">
-                <Text size="small" color="danger">
-                  {props.errorMessage || 'Upload failed'}
-                </Text>
-
-                <IconButton
-                  screenReaderLabel={formatMessage(DELETE_CAPTIONS_MESSAGE, {captionName})}
-                  onClick={props.onDelete}
-                  size="small"
-                  withBackground={false}
-                  withBorder={false}
-                >
-                  <IconTrashLine />
-                </IconButton>
-              </Flex>
-            </>
+            <Flex alignItems="center" gap="small">
+              <Text size="small" color="danger">
+                {props.errorMessage || 'Upload failed'}
+              </Text>
+            </Flex>
           )}
 
           {status === 'uploaded' && (

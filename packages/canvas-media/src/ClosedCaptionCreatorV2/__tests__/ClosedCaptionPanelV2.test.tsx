@@ -20,8 +20,18 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {vi} from 'vitest'
 import {ClosedCaptionPanelV2} from '../ClosedCaptionPanelV2'
 import type {Subtitle} from '../types'
+import {HttpResponse, http} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 const LIVE_REGION_ID = 'flash_screenreader_holder'
+
+const TEST_UPLOAD_CONFIG = {
+  mediaObjectId: 'media123',
+  origin: 'http://localhost:3000',
+  headers: {Authorization: 'Bearer token'},
+}
 
 function createValidFile(name = 'captions.vtt', size = 1000): File {
   const content = new Array(size).fill('a').join('')
@@ -43,14 +53,13 @@ function renderComponent(overrideProps = {}) {
 }
 
 describe('<ClosedCaptionPanelV2 />', () => {
+  beforeAll(() => server.listen({onUnhandledRequest: 'error'}))
+
   beforeEach(() => {
     const liveRegion = document.createElement('div')
     liveRegion.id = LIVE_REGION_ID
     liveRegion.setAttribute('role', 'alert')
     document.body.appendChild(liveRegion)
-
-    // Mock setTimeout to avoid waiting in tests
-    vi.useFakeTimers()
   })
 
   const ADD_NEW_BUTTON_TEXT = 'Add New'
@@ -61,8 +70,11 @@ describe('<ClosedCaptionPanelV2 />', () => {
     if (liveRegion) {
       document.body.removeChild(liveRegion)
     }
-    vi.useRealTimers()
+    server.resetHandlers()
+    vi.clearAllMocks()
   })
+
+  afterAll(() => server.close())
 
   it('shows add new and request buttons by default', () => {
     renderComponent()
@@ -104,8 +116,13 @@ describe('<ClosedCaptionPanelV2 />', () => {
     expect(screen.getByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
   })
 
-  it('if language and file selected it shows the new language in processing state in the list', () => {
-    renderComponent()
+  it('if language and file selected it uploads and shows the language in the list', async () => {
+    // Mock successful upload
+    server.use(
+      http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+    )
+
+    renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
 
     // Open manual caption creator
     const addNewButton = screen.getByText(ADD_NEW_BUTTON_TEXT)
@@ -125,13 +142,17 @@ describe('<ClosedCaptionPanelV2 />', () => {
     const uploadButton = screen.getByText('Upload')
     fireEvent.click(uploadButton)
 
-    // Should show the caption row with processing state
-    expect(screen.getByText('English')).toBeInTheDocument()
-    expect(screen.getByText('Processing...')).toBeInTheDocument()
+    // Wait for English to appear in the list (uploaded)
+    expect(await screen.findByText('English')).toBeInTheDocument()
   })
 
-  it('once a language is added, it is removed from the available options dropdown', () => {
-    renderComponent()
+  it('once a language is added and uploaded, it is removed from the available options dropdown', async () => {
+    // Mock successful upload
+    server.use(
+      http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+    )
+
+    renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
 
     // Open manual caption creator
     const addNewButton = screen.getByText(ADD_NEW_BUTTON_TEXT)
@@ -148,8 +169,8 @@ describe('<ClosedCaptionPanelV2 />', () => {
     const uploadButton = screen.getByText('Upload')
     fireEvent.click(uploadButton)
 
-    // English caption should be in the list
-    expect(screen.getByText('English')).toBeInTheDocument()
+    // Wait for English caption to be in the list (uploaded)
+    expect(await screen.findByText('English')).toBeInTheDocument()
 
     // Open manual creator again to add another caption
     const addNewButtonAgain = screen.getByText(ADD_NEW_BUTTON_TEXT)
@@ -183,13 +204,21 @@ describe('<ClosedCaptionPanelV2 />', () => {
   })
 
   it('delete icon works and that language is removed from the list', async () => {
+    server.use(
+      http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+    )
+
     const onUpdateSubtitles = vi.fn()
     const initialSubtitles: Subtitle[] = [
       {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
       {locale: 'es', file: {name: 'spanish.vtt', url: '/url/es'}},
     ]
 
-    renderComponent({subtitles: initialSubtitles, onUpdateSubtitles})
+    renderComponent({
+      subtitles: initialSubtitles,
+      onUpdateSubtitles,
+      uploadConfig: TEST_UPLOAD_CONFIG,
+    })
 
     // Both captions should be rendered
     expect(screen.getByText('English')).toBeInTheDocument()
@@ -209,7 +238,13 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
   describe('a11y', () => {
     it('a11y: announces when a caption is added', async () => {
-      renderComponent()
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      renderComponent({
+        uploadConfig: TEST_UPLOAD_CONFIG,
+      })
 
       // Open manual caption creator
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
@@ -226,23 +261,87 @@ describe('<ClosedCaptionPanelV2 />', () => {
       const uploadButton = screen.getByText('Upload')
       fireEvent.click(uploadButton)
 
-      // Should announce the addition
-      expect(await screen.findByText(/Captions have been added for Spanish/i)).toBeInTheDocument()
+      screen.debug()
+
+      // Wait for a11y announcement for upload to complete
+      await screen.findByText('Captions have been added for Spanish')
     })
 
     it('a11y: announces when a caption is deleted', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
       const initialSubtitles: Subtitle[] = [
         {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
         {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
       ]
 
-      renderComponent({subtitles: initialSubtitles})
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
 
       // Click the first delete button (English)
       fireEvent.click(screen.getByText('Delete English'))
 
-      // Should announce the deletion
-      expect(await screen.findByText(/Captions have been deleted for English/i)).toBeInTheDocument()
+      await screen.findByText('Captions have been deleted for English')
+    })
+
+    it('a11y: announces when a caption upload fails', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Anything'}, {status: 400}),
+        ),
+      )
+
+      renderComponent({
+        uploadConfig: TEST_UPLOAD_CONFIG,
+      })
+
+      // Open manual caption creator
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+      // Select a language and file
+      const selectPlaceholder = screen.getByText('Select Language')
+      fireEvent.click(selectPlaceholder)
+      fireEvent.click(screen.getByText('German'))
+
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+
+      // Click Upload
+      const uploadButton = screen.getByText('Upload')
+      fireEvent.click(uploadButton)
+
+      expect(await screen.findByText('Failed')).toBeInTheDocument()
+
+      await screen.findByText('German caption upload failed')
+    })
+
+    it('a11y: announces when a caption delete fails', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Delete failed'}, {status: 400}),
+        ),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+
+      renderComponent({
+        subtitles: initialSubtitles,
+        uploadConfig: TEST_UPLOAD_CONFIG,
+      })
+
+      // Click delete button
+      fireEvent.click(screen.getByText('Delete French'))
+
+      // Wait for a11y announcement with formatted error message (using template)
+      await screen.findByText('French caption delete failed')
+
+      // Caption should still be visible with error message
+      expect(screen.getByText('French')).toBeInTheDocument()
+      expect(screen.getByText('Failed')).toBeInTheDocument()
     })
   })
 })

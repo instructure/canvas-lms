@@ -20,17 +20,17 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
+import formatMessage from '../../../../format-message'
+import RCEGlobals from '../../../RCEGlobals'
 import {asVideoElement} from '../../shared/ContentSelection'
 import {findMediaPlayerIframe} from '../../shared/iframeUtils'
-import VideoOptionsTray from '.'
 import {
   isStudioEmbeddedMedia,
   parseStudioOptions,
   updateStudioEmbedOptions,
   validateStudioEmbedOptions,
 } from '../../shared/StudioLtiSupportUtils'
-import RCEGlobals from '../../../RCEGlobals'
-import formatMessage from '../../../../format-message'
+import VideoOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 export const ANNOUNCER_ID = 'instructure-video-options-tray-announcer'
@@ -165,11 +165,15 @@ export default class TrayController {
         this.$videoContainer = null
       }
 
+      const isCaptionImprovements =
+        RCEGlobals.getFeatures()?.rce_asr_captioning_improvements || false
+
       const data = {
         media_object_id: videoOptions.media_object_id,
         title: videoOptions.titleText,
-        subtitles: videoOptions.subtitles,
         attachment_id: videoOptions.attachment_id,
+        subtitles: videoOptions.subtitles,
+        skipCaptionUpdate: isCaptionImprovements,
       }
 
       // If the video just edited came from a file uploaded to canvas

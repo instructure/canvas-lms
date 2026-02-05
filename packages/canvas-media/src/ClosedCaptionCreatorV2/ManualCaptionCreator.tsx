@@ -35,6 +35,7 @@ interface ManualCaptionCreatorProps {
   onPrimary: (languageId: string, file: File) => void
   onCancel: () => void
   liveRegion: () => HTMLElement | null
+  mountNode?: HTMLElement | (() => HTMLElement | null)
 }
 
 export function ManualCaptionCreator({
@@ -42,6 +43,7 @@ export function ManualCaptionCreator({
   onPrimary,
   onCancel,
   liveRegion,
+  mountNode,
 }: ManualCaptionCreatorProps) {
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -113,6 +115,7 @@ export function ManualCaptionCreator({
           label={<ScreenReaderContent>{formatMessage('Select Language')}</ScreenReaderContent>}
           placeholder={formatMessage('Select Language')}
           value={selectedLanguageId}
+          mountNode={mountNode}
           translatedStrings={{
             USE_ARROWS: 'Use arrow keys to navigate options.',
             LIST_COLLAPSED: 'List collapsed.',
