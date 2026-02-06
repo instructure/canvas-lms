@@ -392,6 +392,9 @@
     "previous_bd2ac015": {
         "message": "Попередній"
     },
+    "processing_8c569014": {
+        "message": "Обробка..."
+    },
     "published_c944a23d": {
         "message": "опубліковано"
     },
@@ -490,6 +493,9 @@
     },
     "up_c553575d": {
         "message": "вверх"
+    },
+    "upload_8b403d05": {
+        "message": "Завантажити"
     },
     "upload_media_ce31135a": {
         "message": "Завантажити медіа контент"
