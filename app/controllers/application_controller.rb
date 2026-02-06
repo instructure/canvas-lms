@@ -33,7 +33,6 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include ObserverEnrollmentsHelper
-  include NewQuizzesHelper
 
   helper :all
 
@@ -2370,9 +2369,14 @@ class ApplicationController < ActionController::Base
 
       tag.context_module_action(@current_user, :read)
       if @tool
-        # Check if we should use native New Quizzes experience
+        # Redirect to dedicated New Quizzes controller for native experience
         if @tool.quiz_lti? && new_quizzes_native_experience_enabled?
-          return render_native_new_quizzes
+          redirect_params = { module_item_id: params[:module_item_id] }.compact_blank
+          return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(
+            context: @context,
+            assignment: @assignment,
+            **redirect_params
+          )
         end
 
         log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
@@ -3534,47 +3538,6 @@ class ApplicationController < ActionController::Base
     return false unless @context.respond_to?(:feature_enabled?)
 
     @context.feature_enabled?(:new_quizzes_native_experience)
-  end
-  helper_method :new_quizzes_native_experience_enabled?
-
-  def render_native_new_quizzes
-    add_new_quizzes_bundle
-
-    # Build launch data with HMAC signature for tamper protection
-    signed_launch_data = ::NewQuizzes::LaunchDataBuilder.new(
-      context: @context,
-      assignment: @assignment,
-      tool: @tool,
-      tag: @tag || @module_tag,
-      current_user: @current_user,
-      controller: self,
-      request:,
-      variable_expander: Lti::VariableExpander.new(@domain_root_account, @context, self, {
-                                                     current_user: @current_user,
-                                                     current_pseudonym: @current_pseudonym,
-                                                     assignment: @assignment,
-                                                     content_tag: @module_tag || @tag,
-                                                     launch: @lti_launch,
-                                                     tool: @tool,
-                                                     launch_url: @resource_url
-                                                   })
-    ).build_with_signature
-
-    # Calculate basename by removing the quiz subroute (full_path) from the current path
-    # E.g., /courses/3/assignments/9/moderation/1 -> /courses/3/assignments/9
-    basename = if params[:full_path].present?
-                 request.path.sub(params[:full_path], "")
-               else
-                 request.path
-               end
-
-    signed_launch_data[:basename] = basename
-
-    js_env(NEW_QUIZZES: signed_launch_data)
-
-    add_body_class("native-new-quizzes full-width")
-
-    render "assignments/native_new_quizzes", layout: "application"
   end
 
   def show_blueprint_button?

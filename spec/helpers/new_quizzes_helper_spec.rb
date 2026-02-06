@@ -78,4 +78,72 @@ describe NewQuizzesHelper do
       end
     end
   end
+
+  describe ".override_item_banks_tab" do
+    let(:tabs) do
+      [
+        { id: "home", label: "Home", css_class: "home", href: :course_path },
+        { id: "item_banks", label: "Item Banks", css_class: "item_banks", href: :some_original_path },
+        { id: "assignments", label: "Assignments", css_class: "assignments", href: :course_assignments_path }
+      ]
+    end
+
+    context "when Item Banks tab exists" do
+      it "overrides the Item Banks tab with new href" do
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: :course_new_quizzes_banks_path,
+          context: course
+        )
+
+        item_banks_tab = tabs.find { |t| t[:id] == Course::TAB_ITEM_BANKS }
+        expect(item_banks_tab).to be_present
+        expect(item_banks_tab[:href]).to eq(:course_new_quizzes_banks_path)
+        expect(item_banks_tab[:label]).to eq("Item Banks")
+        expect(item_banks_tab[:css_class]).to eq("item_banks")
+      end
+
+      it "maintains the position of the Item Banks tab" do
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: :course_new_quizzes_banks_path,
+          context: course
+        )
+
+        item_banks_index = tabs.find_index { |t| t[:id] == Course::TAB_ITEM_BANKS }
+        expect(item_banks_index).to eq(1)
+      end
+
+      it "uses account path for account context" do
+        account = Account.default
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: :account_new_quizzes_banks_path,
+          context: account
+        )
+
+        item_banks_tab = tabs.find { |t| t[:id] == Course::TAB_ITEM_BANKS }
+        expect(item_banks_tab[:href]).to eq(:account_new_quizzes_banks_path)
+      end
+    end
+
+    context "when Item Banks tab does not exist" do
+      let(:tabs_without_item_banks) do
+        [
+          { id: "home", label: "Home", css_class: "home", href: :course_path },
+          { id: "assignments", label: "Assignments", css_class: "assignments", href: :course_assignments_path }
+        ]
+      end
+
+      it "does not modify the tabs" do
+        original_tabs = tabs_without_item_banks.dup
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs: tabs_without_item_banks,
+          href: :course_new_quizzes_banks_path,
+          context: course
+        )
+        expect(tabs_without_item_banks).to eq(original_tabs)
+      end
+    end
+  end
 end
