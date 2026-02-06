@@ -1,0 +1,39 @@
+# Worktrunk project config for canvas-lms
+#
+# Some Canvas plugins in gems/plugins/ are independent git repos,
+# gitignored in the parent repo but typically worked on alongside it.
+#
+# These hooks coordinate worktrees across all repos so that
+# `wt switch --create my-feature` branches everything together
+# and `wt remove my-feature` cleans everything up.
+
+# Copy gitignored files (node_modules, .env, caches) into new worktrees
+[post-start]
+copy = "wt step copy-ignored"
+
+# For each plugin repo, create a matching worktree and symlink it
+# into the parent worktree's gems/plugins/ directory
+[post-create]
+plugins = """
+for dir in {{ primary_worktree_path }}/gems/plugins/*/; do
+  plugin=$(basename "$dir")
+  [ ! -d "$dir/.git" ] && continue
+  (
+    wt -C "$dir" switch --create {{ branch }} --yes --no-cd 2>&1
+    ln -s "$dir/../$plugin.{{ branch | sanitize }}" \
+      "{{ worktree_path }}/gems/plugins/$plugin"
+  ) &
+done
+wait
+"""
+
+# Remove plugin worktrees when the parent worktree is removed
+[pre-remove]
+plugins = """
+for dir in {{ primary_worktree_path }}/gems/plugins/*/; do
+  plugin=$(basename "$dir")
+  [ ! -d "$dir/.git" ] && continue
+  wt -C "$dir" remove {{ branch }} --yes 2>&1 &
+done
+wait
+"""
