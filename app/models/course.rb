@@ -3777,19 +3777,21 @@ class Course < ActiveRecord::Base
       tabs += default_tabs
       tabs += external_tabs
 
-      if root_account.feature_enabled?(:ams_root_account_integration) &&
-         feature_enabled?(:ams_course_integration) &&
-         tabs.any? { |t| t[:label] == "Item Banks" }
-        ams_item_banks_tab = {
-          id: TAB_ITEM_BANKS,
-          label: t("#tabs.item_banks", "Item Banks"),
-          css_class: "item_banks",
-          href: :course_item_banks_path,
-        }
+      item_bank_href_override = if root_account.feature_enabled?(:ams_root_account_integration) &&
+                                   feature_enabled?(:ams_course_integration)
+                                  :course_item_banks_path
+                                elsif feature_enabled?(:new_quizzes_native_experience)
+                                  :course_new_quizzes_banks_path
+                                else
+                                  nil
+                                end
 
-        item_banks_index = tabs.find_index { |t| t[:label] == "Item Banks" }
-        tabs.delete_at(item_banks_index)
-        tabs.insert(item_banks_index, ams_item_banks_tab)
+      if item_bank_href_override
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: item_bank_href_override,
+          context: self
+        )
       end
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }

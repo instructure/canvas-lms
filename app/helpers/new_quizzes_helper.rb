@@ -28,4 +28,19 @@ module NewQuizzesHelper
                  launch_url: Services::NewQuizzes.launch_url
                })
   end
+
+  def self.override_item_banks_tab(tabs:, href:, context:)
+    item_banks_index = tabs.find_index { |t| t[:label] == "Item Banks" }
+    return unless item_banks_index
+
+    overridden_item_banks_tab = {
+      id: Course::TAB_ITEM_BANKS,
+      label: I18n.t("#tabs.item_banks", "Item Banks"),
+      css_class: "item_banks",
+      href:,
+    }
+
+    tabs.delete_at(item_banks_index)
+    tabs.insert(item_banks_index, overridden_item_banks_tab)
+  end
 end
