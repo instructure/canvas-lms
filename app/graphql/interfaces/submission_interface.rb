@@ -189,10 +189,12 @@ module Interfaces::SubmissionInterface
   end
   def comments_connection(filter:, sort_order:, include_draft_comments:, include_drafts_from_others:, include_provisional_comments:)
     filter = filter.to_h
-    filter => all_comments:, for_attempt:, peer_review:
+    filter => all_comments:, for_attempt:, peer_review:, status:
+    use_visible_comments = status&.include?("ALL") || (include_draft_comments && include_drafts_from_others)
 
-    # Preload provisional comments if needed
-    provisional_comments_promise = if include_provisional_comments
+    # Preload provisional comments only when needed (not using visible_submission_comments_for
+    # which already includes provisional comments via all_submission_comments)
+    provisional_comments_promise = if include_provisional_comments && !use_visible_comments
                                      Loaders::AssociationLoader
                                        .for(Submission, :provisional_grades)
                                        .load(submission)
@@ -215,7 +217,7 @@ module Interfaces::SubmissionInterface
     load_association(:assignment).then do
       load_association(:submission_comments).then do
         provisional_comments_promise.then do |provisional_comments|
-          comments = if include_draft_comments && include_drafts_from_others
+          comments = if use_visible_comments
                        submission.visible_submission_comments_for(current_user)
                      elsif include_draft_comments
                        submission.comments_including_drafts_for(current_user)
@@ -224,7 +226,7 @@ module Interfaces::SubmissionInterface
                      end
           comments = comments.to_a
 
-          if include_provisional_comments
+          if include_provisional_comments && !use_visible_comments
             comments.concat(submission.visible_provisional_comments(current_user, provisional_comments:))
           end
 
@@ -233,7 +235,12 @@ module Interfaces::SubmissionInterface
           comments = comments.sort_by { |comment| [comment.created_at.to_i, comment.id] } if sort_order.present?
           comments.reverse! if sort_order.to_s.casecmp("desc").zero?
 
-          comments.select { |comment| comment.grants_right?(current_user, :read) }
+          if use_visible_comments
+            # Permissions checks are already applied in visible_submission_comments_for
+            comments
+          else
+            comments.select { |comment| comment.grants_right?(current_user, :read) }
+          end
         end
       end
     end

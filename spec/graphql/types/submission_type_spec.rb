@@ -539,6 +539,18 @@ describe Types::SubmissionType do
           resolver.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}", current_user: @student2)
         ).to eq [student_2_comment.id.to_s]
       end
+
+      it "returns only reviewer's own comments with status ALL and peerReview true" do
+        student_2_comment = @peer_review_submission.add_comment(author: @student2, comment: "student2 peer review")
+        student_3_comment = @peer_review_submission.add_comment(author: @student3, comment: "student3 peer review")
+
+        result = GraphQLTypeTester.new(@peer_review_submission, current_user: @student2).resolve(
+          "commentsConnection(filter: { status: [ALL], peerReview: true }) { nodes { _id } }"
+        )
+
+        expect(result).to eq [student_2_comment.id.to_s]
+        expect(result).not_to include(student_3_comment.id.to_s)
+      end
     end
 
     context "draft comments" do
@@ -577,6 +589,190 @@ describe Types::SubmissionType do
         expect(
           submission_type.resolve("commentsConnection(includeDraftComments: true, includeDraftsFromOthers: true) { nodes { _id }}", current_user: @student)
         ).to eq [@comment2.id.to_s]
+      end
+    end
+
+    context "status filter argument" do
+      before(:once) do
+        @filter_student = student_in_course(course: @course, active_all: true).user
+        @teacher2 = teacher_in_course(course: @course, active_all: true).user
+        @filter_submission = @assignment.submit_homework(@filter_student, body: "student work")
+        @teacher_comment = @filter_submission.add_comment(author: @teacher, comment: "teacher comment")
+        @teacher_draft = @filter_submission.add_comment(author: @teacher, comment: "teacher draft", draft_comment: true)
+        @teacher2_comment = @filter_submission.add_comment(author: @teacher2, comment: "teacher2 comment")
+        @teacher2_draft = @filter_submission.add_comment(author: @teacher2, comment: "teacher2 draft", draft_comment: true)
+        @student_comment = @filter_submission.add_comment(author: @filter_student, comment: "student comment")
+      end
+
+      it "returns published comments for student with status ALL" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @filter_student).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@filter_student)
+        expect(result).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "returns published and draft comments for teacher with status ALL" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expect(result).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "delegates to visible_submission_comments_for when status is ALL" do
+        expect_any_instance_of(Submission).to receive(:visible_submission_comments_for).with(@teacher).and_call_original
+
+        GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+      end
+
+      it "falls back to published comments only when status array is empty" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [] }) { nodes { _id } }"
+        )
+
+        expect(result).to match_array([
+                                        @teacher_comment.id.to_s,
+                                        @teacher2_comment.id.to_s,
+                                        @student_comment.id.to_s
+                                      ])
+        expect(result).not_to include(@teacher_draft.id.to_s)
+        expect(result).not_to include(@teacher2_draft.id.to_s)
+      end
+
+      it "falls back to published comments only when status is null" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: null }) { nodes { _id } }"
+        )
+
+        expect(result).to match_array([
+                                        @teacher_comment.id.to_s,
+                                        @teacher2_comment.id.to_s,
+                                        @student_comment.id.to_s
+                                      ])
+        expect(result).not_to include(@teacher_draft.id.to_s)
+        expect(result).not_to include(@teacher2_draft.id.to_s)
+      end
+
+      it "overrides includeDraftComments parameter when status is ALL" do
+        result_with_false = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, includeDraftComments: false) { nodes { _id } }"
+        )
+        result_with_true = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, includeDraftComments: true) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expect(result_with_false).to match_array(visible_comments.map { |c| c.id.to_s })
+        expect(result_with_true).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "filters to specified attempt only when combined with forAttempt" do
+        @filter_submission.update!(attempt: 2)
+        attempt_1_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 1 comment", attempt: 1)
+        attempt_2_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 2 comment", attempt: 2)
+
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL], forAttempt: 2 }) { nodes { _id } }"
+        )
+
+        expect(result).to include(attempt_2_comment.id.to_s)
+        expect(result).not_to include(attempt_1_comment.id.to_s)
+      end
+
+      it "sorts comments newest first when sortOrder is desc" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, sortOrder: desc) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expected_order = visible_comments.sort_by { |c| [c.created_at.to_i, c.id] }.reverse.map { |c| c.id.to_s }
+        expect(result).to eq(expected_order)
+      end
+
+      it "sorts comments oldest first when sortOrder is asc" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, sortOrder: asc) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expected_order = visible_comments.sort_by { |c| [c.created_at.to_i, c.id] }.map { |c| c.id.to_s }
+        expect(result).to eq(expected_order)
+      end
+
+      it "returns comments from all attempts when allComments overrides forAttempt" do
+        @filter_submission.update!(attempt: 2)
+        attempt_1_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 1 comment", attempt: 1)
+        attempt_2_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 2 comment", attempt: 2)
+
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL], allComments: true, forAttempt: 2 }) { nodes { _id } }"
+        )
+
+        expect(result).to include(attempt_1_comment.id.to_s)
+        expect(result).to include(attempt_2_comment.id.to_s)
+      end
+
+      context "with provisional comments" do
+        before(:once) do
+          @final_grader = @teacher
+          @provisional_grader1 = teacher_in_course(course: @course, active_all: true).user
+          @provisional_grader2 = teacher_in_course(course: @course, active_all: true).user
+
+          @moderated_assignment = @course.assignments.create!(
+            name: "moderated assignment",
+            moderated_grading: true,
+            grader_count: 3,
+            final_grader: @final_grader
+          )
+          @moderated_submission = @moderated_assignment.submit_homework(@filter_student, body: "student work")
+
+          @moderated_assignment.grade_student(@filter_student, grade: 8, grader: @final_grader, provisional: true)
+          @moderated_assignment.grade_student(@filter_student, grade: 9, grader: @provisional_grader1, provisional: true)
+          @moderated_assignment.grade_student(@filter_student, grade: 7, grader: @provisional_grader2, provisional: true)
+
+          @final_grader_comment = @moderated_submission.add_comment(
+            author: @final_grader,
+            comment: "final grader provisional comment",
+            provisional: true
+          )
+          @provisional_comment1 = @moderated_submission.add_comment(
+            author: @provisional_grader1,
+            comment: "provisional grader 1 comment",
+            provisional: true
+          )
+          @provisional_comment2 = @moderated_submission.add_comment(
+            author: @provisional_grader2,
+            comment: "provisional grader 2 comment",
+            provisional: true
+          )
+        end
+
+        it "returns provisional comments regardless of includeProvisionalComments parameter when status is ALL" do
+          result_with_false = GraphQLTypeTester.new(@moderated_submission, current_user: @provisional_grader1).resolve(
+            "commentsConnection(filter: { status: [ALL] }, includeProvisionalComments: false) { nodes { _id } }"
+          )
+          result_with_true = GraphQLTypeTester.new(@moderated_submission, current_user: @provisional_grader1).resolve(
+            "commentsConnection(filter: { status: [ALL] }, includeProvisionalComments: true) { nodes { _id } }"
+          )
+
+          visible_comments = @moderated_submission.visible_submission_comments_for(@provisional_grader1)
+          expect(result_with_false).to match_array(visible_comments.map { |c| c.id.to_s })
+          expect(result_with_true).to match_array(visible_comments.map { |c| c.id.to_s })
+          expect(result_with_false).to include(@provisional_comment1.id.to_s)
+        end
+
+        it "returns no provisional comments to students when grades are unpublished" do
+          result = GraphQLTypeTester.new(@moderated_submission, current_user: @filter_student).resolve(
+            "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+          )
+
+          expect(result).to eq([])
+        end
       end
     end
   end
@@ -1048,6 +1244,22 @@ describe Types::SubmissionType do
 
         submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
         query = "commentsConnection(filter: {}, includeProvisionalComments: true) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "does not call visible_provisional_comments when includeProvisionalComments is true and filter status [ALL]" do
+        expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments).with(@teacher, provisional_comments: [@provisional_comment]).and_call_original
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {status: [ALL]}, includeProvisionalComments: true) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "does not call visible_provisional_comments when includeProvisionalComments is true and includeDraftComments and includeDraftsFromOthers are true" do
+        expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments).with(@teacher, provisional_comments: [@provisional_comment]).and_call_original
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeDraftComments: true, includeDraftsFromOthers: true, includeProvisionalComments: true) { nodes { _id } }"
         submission_type.resolve(query)
       end
 
