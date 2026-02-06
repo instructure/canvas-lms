@@ -607,7 +607,10 @@ pipeline {
           echo "Build was skipped - setting result to ${env.SKIP_BUILD_RESULT}"
         }
 
-        pipelineHelpers.postBuildAlways()
+        if (env.SKIP_BUILD != 'true') {
+          // Only run the post-build cleanup if the build wasn't skipped, since skipped builds may not have set up docker or other resources
+          pipelineHelpers.postBuildAlways()
+        }
       }
     }
 
