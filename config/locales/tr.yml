@@ -6693,6 +6693,7 @@ tr:
   close_submission_tray_c4988fa8: "Ödev gönderimi kenar çubuğunu kapat"
   close_the_user_tags_modal_52c6c43c: "Anonim öğrenci"
   close_total_grade_override_tray_d3b1d190: "Anonim Öğrenci"
+  closed_983a96fe: Kapalı
   closed_captioning_2a2f4d8a: "Anonim konular şu anda kullanılamıyor."
   closed_for_comments_e395b42f: "Yorumlara Kapatıldı"
   closes_5c6b4367: "Kapatılıyor:"
@@ -20577,6 +20578,7 @@ tr:
   not_available_at_the_subaccount_level_6ee9b41f: "Alt hesap düzeyinde kullanılamaz"
   not_available_ca8cb4eb: Kullanılamıyor
   not_available_during_sync_ae645e8c: "Senkronizasyon sırasında kullanılamaz"
+  not_available_until_14e61f1e: "Şu zamana kadar kullanılamaz"
   not_available_until_5de20e84: "Şu zamana kadar kullanılamaz"
   not_available_until_date_3c1c73c2: "%{date} tarihine kadar kullanılamaz"
   not_available_until_next_submission_2175158: "Bir sonraki gönderime kadar kullanılamaz"

@@ -3570,6 +3570,7 @@ hy:
   close_for_comments_37783f56: "Փակ է մեկնաբանությունների համար"
   close_for_comments_ce0e5d00: "Մեկնաբանությունների համար փակել"
   close_rubric_a0fc8166: "Փակել ռուբրիկը"
+  closed_983a96fe: "Փակված է"
   closed_for_comments_e395b42f: "Փակ է մեկնաբանությունների համար"
   collaboration: 
     default_title: "Առանց անվանման համատեղ աշխատանք"
@@ -11524,6 +11525,7 @@ hy:
   not_a_number: "պետք է դրական թիվ լինի "
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Այս տարրը կնշանակվի ոչ բոլոր բաժինների համար "
   not_available_487d3648: "Հասանելի չէ"
+  not_available_until_14e61f1e: "Հասանելի չէ մինչև "
   not_available_until_next_submission_2175158: "Հասանելի չէ մինչև հաջորդ հանձնարարության հանձնումը"
   not_completed_d70acea3: "Ավարտված չէ"
   not_deleted_2a7f63ef: "(Հեռացված չէ)"

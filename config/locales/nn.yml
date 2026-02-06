@@ -6285,6 +6285,7 @@ nn:
   close_suggestions_6fcb4985: "Lukk forslaga"
   close_the_window_and_try_again_7353f8e: "Lukk vindauget og prøv igjen. "
   close_warning_d61daf2c: "Lukk åtvaring"
+  closed_983a96fe: Lukka
   closed_captions_subtitles_e6aaa016: Undertekstar
   closed_for_comments_e395b42f: "Stengt for kommentarar"
   closes_5c6b4367: "Lukkar: "
@@ -18547,6 +18548,7 @@ nn:
   not_available_at_the_subaccount_level_6ee9b41f: "Ikkje tilgjengeleg på underkontonivå"
   not_available_ca8cb4eb: "Ikkje tilgjengeleg"
   not_available_during_sync_ae645e8c: "Utilgjengeleg under synkronisering"
+  not_available_until_14e61f1e: "Utilgjengeleg til"
   not_available_until_date_3c1c73c2: "Ikkje tilgjengeleg før %{date}"
   not_available_until_next_submission_2175158: "Ikkje tilgjengeleg før neste innlevering"
   not_calculated_in_final_grade_2b7d5bd1: "Ikkje rekna med i sluttvurdering"

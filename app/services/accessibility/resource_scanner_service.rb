@@ -37,7 +37,7 @@ class Accessibility::ResourceScannerService < ApplicationService
     scan = first_or_initialize_scan
     delay(
       n_strand: [SCAN_TAG, @resource.course.account.global_id],
-      singleton: "#{SCAN_TAG}_#{@resource.global_id}",
+      singleton: "#{SCAN_TAG}_#{@resource.global_id}_#{@resource.class.name.underscore}",
       priority: Delayed::LOW_PRIORITY
     ).scan_resource(scan:)
     scan
