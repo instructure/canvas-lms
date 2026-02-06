@@ -18,6 +18,6 @@
 
 import formatMessage from '../../format-message'
 
-const locale = {"cancel_caeb1e68":{"message":"Скасувати"},"greek_65c5b3f7":{"message":"Грецький"},"loading_25990131":{"message":"Завантаження..."},"no_preview_is_available_for_this_file_f940114a":{"message":"Попередній перегляд  для цього файлу недоступний."}}
+const locale = {"cancel_caeb1e68":{"message":"Скасувати"},"greek_65c5b3f7":{"message":"Грецький"},"loading_25990131":{"message":"Завантаження..."},"no_preview_is_available_for_this_file_f940114a":{"message":"Попередній перегляд  для цього файлу недоступний."},"processing_8c569014":{"message":"Обробка..."},"upload_8b403d05":{"message":"Завантажити"}}
 
 formatMessage.addLocale({'uk-UA': locale})
