@@ -19,6 +19,7 @@ import htmlEscape from '@instructure/html-escape'
 import type {RubricAssessmentData, RubricCriterion, RubricRating} from '../../types/rubric'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ProficiencyRating} from '@canvas/graphql/codegen/graphql'
 const I18n = createI18nScope('enhanced-rubrics-assessment')
 
 export const htmlEscapeCriteriaLongDescription = (longDescription = '') => {
@@ -182,4 +183,20 @@ export const isRubricComplete = ({
     const hasPoints = points !== undefined
     return hasPoints && validPoints
   })
+}
+
+export const getCustomRatingColor = (
+  points: number,
+  pointsPossible: number,
+  customRatings: ProficiencyRating[],
+) => {
+  const sortedRatings = customRatings.sort((a, b) => a.points - b.points).reverse()
+  const firstRatingPoints = sortedRatings[0]?.points ?? 0
+  const scaledPoints = pointsPossible > 0 ? points * (firstRatingPoints / pointsPossible) : points
+  const selectedRating = sortedRatings.find(rating => scaledPoints >= rating.points)
+  if (selectedRating) {
+    return `#${selectedRating.color}`
+  }
+
+  return `#${sortedRatings[sortedRatings.length - 1]?.color}`
 }
