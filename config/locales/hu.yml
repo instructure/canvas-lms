@@ -5765,6 +5765,7 @@ hu:
   close_the_window_and_try_again_7353f8e: "Csukja be az ablakot, és próbálja újra."
   close_total_grade_override_tray_d3b1d190: "Zárja be a teljes érdemjegy felülbírálati tálcát"
   close_warning_d61daf2c: "Figyelmeztetés bezárása"
+  closed_983a96fe: Lezárva
   closed_captions_subtitles_e6aaa016: "Zárt feliratok"
   closed_for_comments_e395b42f: "Nem fűzhető hozzá megjegyzés"
   closes_5c6b4367: "Bezár:"
@@ -17240,6 +17241,7 @@ hu:
   not_available_at_the_subaccount_level_6ee9b41f: "Alfiók szinten nem áll rendelkezésre"
   not_available_ca8cb4eb: "Nem elérhető"
   not_available_during_sync_ae645e8c: "Szinkronizálás közben nem elérhető"
+  not_available_until_14e61f1e: "Nem érhető el eddig"
   not_available_until_date_3c1c73c2: "Nem érhető el eddig: %{date}"
   not_available_until_next_submission_2175158: "A következő beadásig nem érhető el"
   not_calculated_in_final_grade_2b7d5bd1: "Nem számít bele a végső osztályzatba"
