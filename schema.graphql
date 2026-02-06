@@ -10353,6 +10353,17 @@ input SubmissionCommentFilterInput {
   comments authored by themselves.
   """
   peerReview: Boolean = false
+
+  """
+  Filter comments by status type.
+  - ALL: Returns all comments visible to the current user (published + drafts based on permissions)
+  When set, includeDraftComments, includeDraftsFromOthers and includeProvisionalComments will be ignored.
+  """
+  status: [SubmissionCommentStatusType!] = null
+}
+
+enum SubmissionCommentStatusType {
+  ALL
 }
 
 enum SubmissionCommentsSortOrderType {
