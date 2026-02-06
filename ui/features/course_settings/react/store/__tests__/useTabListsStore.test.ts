@@ -550,8 +550,8 @@ describe('useTabListsStore', () => {
 
     it('should handle mix of existing and new link tabs', () => {
       const {appendNewLinkItemTab, tabsToSave, toggleTabEnabled} = useTabListsStore.getState()
-      appendNewLinkItemTab({text: 'Link 1', url: 'https://one.com'})
-      appendNewLinkItemTab({text: 'Link 2', url: 'https://two.com'})
+      appendNewLinkItemTab({label: 'Link 1', url: 'https://one.com'})
+      appendNewLinkItemTab({label: 'Link 2', url: 'https://two.com'})
       // disable Link 2:
       toggleTabEnabled(useTabListsStore.getState().enabledTabs.slice(-1)[0].internalId)
 
@@ -578,7 +578,7 @@ describe('useTabListsStore', () => {
     it('should create proper newLink structure', () => {
       const {appendNewLinkItemTab} = useTabListsStore.getState()
 
-      appendNewLinkItemTab({text: 'Test Link', url: 'https://test.com'})
+      appendNewLinkItemTab({label: 'Test Link', url: 'https://test.com'})
 
       const state = useTabListsStore.getState()
       const newTab = state.enabledTabs[state.enabledTabs.length - 1]

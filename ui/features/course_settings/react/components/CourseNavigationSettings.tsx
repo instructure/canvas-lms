@@ -50,7 +50,7 @@ import {
   type MoveItemTrayResult,
   type NavigationTab,
 } from '../store/useTabListsStore'
-import {AddLinkModal} from './AddLinkModal'
+import {AddLinkModal} from '@canvas/nav-menu-links/react/components/AddLinkModal'
 
 const I18n = createI18nScope('course_navigation_settings')
 

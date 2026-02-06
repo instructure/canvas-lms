@@ -56,11 +56,11 @@ function validateText(normalizedText: string): string | undefined {
 
 export interface AddLinkModalProps {
   onDismiss: () => void
-  onAdd: (link: {text: string; url: string}) => void
+  onAdd: (link: {label: string; url: string}) => void
 }
 
-function normalize({text, url}: {text: string; url: string}): {text: string; url: string} {
-  return {text: text.trim(), url: url.trim()}
+function normalize({label, url}: {label: string; url: string}): {label: string; url: string} {
+  return {label: label.trim(), url: url.trim()}
 }
 
 function textLengthHintText(normalizedText: string): string {
@@ -101,9 +101,9 @@ export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
   const textInputRef = useRef<HTMLInputElement | null>(null)
   const urlInputRef = useRef<HTMLInputElement | null>(null)
 
-  const normalized = normalize({text, url})
+  const normalized = normalize({label: text, url})
   const urlError = validateUrl(normalized.url)
-  const textError = validateText(normalized.text)
+  const textError = validateText(normalized.label)
 
   const handleAdd = () => {
     // Mark all fields as blurred to show any errors
@@ -160,9 +160,9 @@ export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
             <View as="div" margin="x-small none none">
               <Text
                 size="small"
-                color={normalized.text.length > MAX_TEXT_LENGTH ? 'danger' : 'secondary'}
+                color={normalized.label.length > MAX_TEXT_LENGTH ? 'danger' : 'secondary'}
               >
-                {textLengthHintText(normalized.text)}
+                {textLengthHintText(normalized.label)}
               </Text>
             </View>
           </View>
