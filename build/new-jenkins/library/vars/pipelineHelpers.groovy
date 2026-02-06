@@ -185,6 +185,7 @@ def configureBuildStage(buildParameters) {
 
   // Require valid GERRIT_CHANGE_NUMBER for all builds - many stages will fail without it
   if (!env.GERRIT_CHANGE_NUMBER || env.GERRIT_CHANGE_NUMBER == '000000') {
+    env.SKIP_BUILD = 'true'
     error "GERRIT_CHANGE_NUMBER is not set or invalid (${env.GERRIT_CHANGE_NUMBER}). Cannot proceed with build."
   }
 
