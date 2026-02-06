@@ -765,6 +765,18 @@ describe AiExperiencesController do
         get :new, params: { course_id: @course.id }
         expect(assigns(:active_tab)).to eq("ai_experiences")
       end
+
+      it "sets ai_experiences_context_file_upload feature flag in js_env when enabled" do
+        @course.enable_feature!(:ai_experiences_context_file_upload)
+        get :new, params: { course_id: @course.id }
+        expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be true
+      end
+
+      it "sets ai_experiences_context_file_upload feature flag in js_env when disabled" do
+        @course.disable_feature!(:ai_experiences_context_file_upload)
+        get :new, params: { course_id: @course.id }
+        expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
+      end
     end
 
     context "as student" do
@@ -791,6 +803,18 @@ describe AiExperiencesController do
       it "sets the active tab" do
         get :edit, params: { course_id: @course.id, id: @ai_experience.id }
         expect(assigns(:active_tab)).to eq("ai_experiences")
+      end
+
+      it "sets ai_experiences_context_file_upload feature flag in js_env when enabled" do
+        @course.enable_feature!(:ai_experiences_context_file_upload)
+        get :edit, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be true
+      end
+
+      it "sets ai_experiences_context_file_upload feature flag in js_env when disabled" do
+        @course.disable_feature!(:ai_experiences_context_file_upload)
+        get :edit, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
       end
     end
 
