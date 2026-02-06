@@ -2604,34 +2604,23 @@ describe Account do
       account.settings[:discovery_page] = { active: false }
       expect(account.discovery_page_active?).to be(false)
     end
-  end
 
-  describe "native_discovery_enabled setting" do
-    let(:account) { Account.create!(name: "Test", workflow_state: "active") }
-
-    it "defaults native_discovery_enabled to false" do
-      expect(account.native_discovery_enabled?).to be(false)
-      expect(account.native_discovery_route_active?).to be(false)
+    it "can enable discovery_page_active" do
+      account.discovery_page_active = true
+      expect(account.discovery_page_active?).to be(true)
     end
 
-    it "can enable native_discovery_enabled" do
-      account.native_discovery_enabled = true
-      expect(account.native_discovery_enabled?).to be(true)
-      expect(account.native_discovery_route_active?).to be(true)
-    end
-
-    it "can disable native_discovery_enabled" do
-      account.native_discovery_enabled = true
-      account.native_discovery_enabled = false
-      expect(account.native_discovery_enabled?).to be(false)
-      expect(account.native_discovery_route_active?).to be(false)
+    it "can disable discovery_page_active" do
+      account.discovery_page_active = true
+      account.discovery_page_active = false
+      expect(account.discovery_page_active?).to be(false)
     end
 
     it "coerces string values to boolean" do
-      account.native_discovery_enabled = "true"
-      expect(account.native_discovery_enabled?).to be(true)
-      account.native_discovery_enabled = "false"
-      expect(account.native_discovery_enabled?).to be(false)
+      account.discovery_page_active = "true"
+      expect(account.discovery_page_active?).to be(true)
+      account.discovery_page_active = "false"
+      expect(account.discovery_page_active?).to be(false)
     end
   end
 

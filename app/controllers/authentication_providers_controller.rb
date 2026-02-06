@@ -832,7 +832,7 @@ class AuthenticationProvidersController < ApplicationController
     }
 
     if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page)
-      settings[:native_discovery_enabled] = account.native_discovery_enabled?
+      settings[:discovery_page_active] = account.discovery_page_active?
     end
 
     { sso_settings: settings }
@@ -884,7 +884,7 @@ class AuthenticationProvidersController < ApplicationController
     ]
 
     if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page)
-      permitted_params << :native_discovery_enabled
+      permitted_params << :discovery_page_active
     end
 
     sets = params.fetch(:sso_settings, {}).permit(*permitted_params)

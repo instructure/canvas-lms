@@ -38,12 +38,15 @@ module Validators
       record.authentication_providers.load unless record.authentication_providers.loaded?
 
       %i[primary secondary].each do |section|
-        unless data[section].is_a?(Array)
+        section_data = data[section]
+        next if section_data.nil?
+
+        unless section_data.is_a?(Array)
           record.errors.add(:settings, "discovery_page.#{section} must be an array")
           next
         end
 
-        data[section].each_with_index do |entry, index|
+        section_data.each_with_index do |entry, index|
           validate_discovery_page_entry(record, section, entry, index)
         end
       end

@@ -436,58 +436,61 @@ describe AuthenticationProvidersController do
     end
   end
 
-  describe "native_discovery_enabled SSO setting" do
+  describe "discovery_page_active SSO setting" do
     before do
       Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
     end
 
-    it "includes native_discovery_enabled in the sso_settings response when feature flag is enabled" do
-      account.update!(native_discovery_enabled: true)
+    it "includes discovery_page_active in the sso_settings response when feature flag is enabled" do
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
       get :show_sso_settings, params: { account_id: account.id }, format: :json
       expect(response).to be_successful
       json = response.parsed_body
-      expect(json["sso_settings"]["native_discovery_enabled"]).to be(true)
+      expect(json["sso_settings"]["discovery_page_active"]).to be(true)
     end
 
-    it "does not include native_discovery_enabled when feature flag is disabled" do
+    it "does not include discovery_page_active when feature flag is disabled" do
       Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
-      account.update!(native_discovery_enabled: true)
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
       get :show_sso_settings, params: { account_id: account.id }, format: :json
       expect(response).to be_successful
       json = response.parsed_body
-      expect(json["sso_settings"]).not_to have_key("native_discovery_enabled")
+      expect(json["sso_settings"]).not_to have_key("discovery_page_active")
     end
 
-    it "updates native_discovery_enabled via update_sso_settings when feature flag is enabled" do
+    it "updates discovery_page_active via update_sso_settings when feature flag is enabled" do
       put :update_sso_settings, params: {
         account_id: account.id,
-        sso_settings: { native_discovery_enabled: true }
+        sso_settings: { discovery_page_active: true }
       }
       expect(response).to be_redirect
       account.reload
-      expect(account.native_discovery_enabled?).to be(true)
+      expect(account.discovery_page_active?).to be(true)
     end
 
-    it "ignores native_discovery_enabled parameter when feature flag is disabled" do
+    it "ignores discovery_page_active parameter when feature flag is disabled" do
       Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
       put :update_sso_settings, params: {
         account_id: account.id,
-        sso_settings: { native_discovery_enabled: true }
+        sso_settings: { discovery_page_active: true }
       }
       expect(response).to be_redirect
       account.reload
-      expect(account.native_discovery_enabled?).to be(false)
+      expect(account.discovery_page_active?).to be(false)
     end
 
-    it "can disable native_discovery_enabled when feature flag is enabled" do
-      account.update!(native_discovery_enabled: true)
+    it "can disable discovery_page_active when feature flag is enabled" do
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
       put :update_sso_settings, params: {
         account_id: account.id,
-        sso_settings: { native_discovery_enabled: false }
+        sso_settings: { discovery_page_active: false }
       }
       expect(response).to be_redirect
       account.reload
-      expect(account.native_discovery_enabled?).to be(false)
+      expect(account.discovery_page_active?).to be(false)
     end
   end
 end

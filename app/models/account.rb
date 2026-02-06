@@ -323,8 +323,6 @@ class Account < ActiveRecord::Base
   add_setting :unknown_user_url, root_only: true
   add_setting :fft_registration_url, root_only: true
 
-  add_setting :native_discovery_enabled, boolean: true, root_only: true, default: false
-
   add_setting :restrict_student_future_view, boolean: true, default: false, inheritable: true
   add_setting :restrict_student_future_listing, boolean: true, default: false, inheritable: true
   add_setting :restrict_student_past_view, boolean: true, default: false, inheritable: true
@@ -1826,18 +1824,6 @@ class Account < ActiveRecord::Base
     settings[:auth_discovery_url]
   end
 
-  def native_discovery_enabled=(enabled)
-    settings[:native_discovery_enabled] = Canvas::Plugin.value_to_boolean(enabled)
-  end
-
-  def native_discovery_enabled?
-    settings[:native_discovery_enabled] == true
-  end
-
-  def native_discovery_route_active?
-    native_discovery_enabled?
-  end
-
   def auth_discovery_url_options(_request)
     {}
   end
@@ -1864,6 +1850,11 @@ class Account < ActiveRecord::Base
 
   def unknown_user_url
     settings[:unknown_user_url]
+  end
+
+  def discovery_page_active=(active)
+    settings[:discovery_page] ||= {}
+    settings[:discovery_page][:active] = Canvas::Plugin.value_to_boolean(active)
   end
 
   def discovery_page_active?
