@@ -192,12 +192,13 @@ node(nodeLabel()) {
             }
 
             // RSpecQ Set 00 runs on main coordinator node
-            rspecqStages['RSpecQ Set 00'] = {
+            rspecqStages['RSpecQ 00'] = {
               withEnv([
                 "CI_NODE_INDEX=00",
                 "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}",
                 "CRYSTALBALL_MAP=1"
               ]) {
+                def stageName = 'RSpecQ 00'
                 def stageStartTime = System.currentTimeMillis()
                 try {
                   stage('00 Run Tests') {
@@ -217,9 +218,8 @@ node(nodeLabel()) {
 
             // Remaining nodes (1 through rspecqNodeTotal-1)
             for (int i = 1; i < rspecqNodeTotal; i++) {
-              def index = i
-              def indexStr = (index).toString().padLeft(2, '0')
-              rspecqStages["RSpecQ Set ${indexStr}"] = {
+              def indexStr = String.format('%02d', i)
+              rspecqStages["RSpecQ ${indexStr}"] = {
                 rspecStage.runRspecQWorkerNode(indexStr, ["CRYSTALBALL_MAP=1"])
               }
             }

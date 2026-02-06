@@ -227,7 +227,7 @@ node(nodeLabel()) {
             }
 
             // Set 00 runs on main coordinator node
-            rspecqStages["RSpecQ Set 00"] = {
+            rspecqStages["RSpecQ 00"] = {
               withEnv([
                 "CI_NODE_INDEX=00",
                 "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}",
@@ -252,9 +252,8 @@ node(nodeLabel()) {
 
             // Remaining nodes (index 1 through rspecqNodeTotal-1)
             for (int i = 1; i < rspecqNodeTotal; i++) {
-              def index = i
-              def indexStr = (index).toString().padLeft(2, '0')
-              rspecqStages["RSpecQ Set ${indexStr}"] = {
+              def indexStr = String.format('%02d', i)
+              rspecqStages["RSpecQ ${indexStr}"] = {
                 rspecStage.runRspecQWorkerNode(indexStr, ["CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}"])
               }
             }
