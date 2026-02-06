@@ -683,6 +683,40 @@ RSpec.describe Lti::Registration do
         subject
         expect(registration.reload.workflow_state).to eq("deleted")
       end
+
+      context "when registration is local copy of template" do
+        let(:template_registration) { lti_registration_model(account: Account.site_admin) }
+
+        before do
+          registration.update!(template_registration:)
+        end
+
+        it "does not delete the developer key" do
+          subject
+          expect(developer_key.reload.workflow_state).to eq("active")
+        end
+      end
+    end
+
+    context "with a deployment" do
+      let(:developer_key) { lti_developer_key_model(account:) }
+      let(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
+      let(:deployment) { registration.new_external_tool(account) }
+
+      before do
+        tool_configuration
+        deployment
+      end
+
+      it "marks the associated deployment as deleted" do
+        subject
+        expect(deployment.reload.workflow_state).to eq("deleted")
+      end
+
+      it "marks the registration as deleted" do
+        subject
+        expect(registration.reload.workflow_state).to eq("deleted")
+      end
     end
   end
 

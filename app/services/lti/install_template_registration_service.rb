@@ -35,7 +35,7 @@ class Lti::InstallTemplateRegistrationService < ApplicationService
   end
 
   def call
-    existing_copy = Lti::Registration.find_by(template_registration: template, account:)
+    existing_copy = Lti::Registration.active.find_by(template_registration: template, account:)
     return existing_copy if existing_copy.present?
 
     Lti::Registration.transaction do
