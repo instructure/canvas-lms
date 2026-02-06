@@ -68,7 +68,7 @@ course_settings_navigation_react:
   display_name: Course Navigation Settings React UI
   description: |-
     If enabled, the Course Settings Navigation tab will use the new React-based
-    interface. (This is a prerequisite for the Nav Menu Links feature in courses).
+    interface. (This is a prerequisite for the Custom Links feature in courses).
   environments:
     development:
       state: allowed_on
@@ -578,7 +578,7 @@ nav_menu_links:
   state: hidden
   shadow: true
   applies_to: RootAccount
-  display_name: "Nav Menu Links"
+  display_name: "Custom Links"
   description: |-
     Enables the creation of links at the account navigation, user navigation, and course navigation level.
     This is a replacement of the Redirect Tool functionality.

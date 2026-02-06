@@ -21,6 +21,7 @@ import {legacyRender, render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CustomEmojiDenyList from './react/custom_emoji_deny_list/CustomEmojiDenyList'
 import CustomHelpLinkSettings from './react/custom_help_link_settings/CustomHelpLinkSettings'
+import NavMenuLinksSettings from './react/nav_menu_links/NavMenuLinksSettings'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import './jquery/index'
@@ -59,6 +60,18 @@ ready(() => {
         }}
       />,
       customHelpLinkSettingsContainer,
+    )
+  }
+
+  const navMenuLinksSettingsContainer = document.getElementById('nav_menu_links_settings')
+  if (navMenuLinksSettingsContainer) {
+    render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <NavMenuLinksSettings />
+        </ErrorBoundary>
+      </Suspense>,
+      navMenuLinksSettingsContainer,
     )
   }
 
