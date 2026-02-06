@@ -189,7 +189,7 @@ def send_slack_alert(error) {
 }
 
 def runRspecQWorkerNode(index, additionalEnvVars = []) {
-  def stageName = "RSpecQ Set ${index}"
+  def stageName = "RSpecQ ${index}"
   node(nodeLabel()) {
     def stageStartTime = System.currentTimeMillis()
     try {

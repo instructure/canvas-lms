@@ -182,19 +182,19 @@ def sendSlack(success) {
 }
 
 def runFlakeyNode(nodeNumber) {
-  def stageName = "Flakey Set ${nodeNumber}"
+  def stageName = "Flakey ${nodeNumber}"
   node(nodeLabel()) {
     def stageStartTime = System.currentTimeMillis()
     try {
-      stage("Cleanup Flakey Set ${nodeNumber}") {
+      stage("${nodeNumber} Cleanup") {
         pipelineHelpers.cleanupWorkspace()
       }
 
-      stage("Setup Flakey Set ${nodeNumber}") {
+      stage("${nodeNumber} Setup") {
         setupNode()
       }
 
-      stage("Run Flakey Set ${nodeNumber}") {
+      stage("${nodeNumber} Run") {
         try {
           executeFlakeySpecCatcher()
         } finally {
@@ -207,123 +207,94 @@ def runFlakeyNode(nodeNumber) {
   }
 }
 
-pipeline {
-  agent {
-    label nodeLabel()
-  }
+env.GERRIT_PORT = '29418'
+env.GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
+env.BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
+env.COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-flakey-spec-catcher.yml'
+env.IS_PLUGIN = isPlugin()
+env.DOCKER_WORKDIR = pipelineHelpers.getDockerWorkDir()
+env.LOCAL_WORKDIR = pipelineHelpers.getLocalWorkDir()
+env.FORCE_FAILURE = commitMessageFlag('force-failure-fsc').asBooleanInteger()
+// fsc errors when running specs from gems.
+// until we figure out how to run them, we should ignore them
+env.FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,spec/selenium/performance/'
+env.POSTGRES_PASSWORD = 'sekret'
+env.FSC_NODE_COUNT = getNodeCount()
 
-  options {
-    ansiColor('xterm')
-    timeout(time: FSC_TIMEOUT)
-    timestamps()
-  }
+// Targeting 10 minutes / node, each node runs RSPEC_PROCESSES threads and
+// repeats each test FSC_REPEAT_FACTOR times.
+// Assumption: non-selenium tests take 500ms / test
+// Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
+env.FSC_REPEAT_FACTOR = 10
+env.MAX_NODES = getMaxNodes()
+env.RSPEC_PROCESSES = 3
+env.SELENIUM_RATIO = 20
+env.TESTS_PER_NODE = 200
 
-  environment {
-    GERRIT_PORT = '29418'
-    GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-flakey-spec-catcher.yml'
-    IS_PLUGIN = isPlugin()
-    DOCKER_WORKDIR = pipelineHelpers.getDockerWorkDir()
-    LOCAL_WORKDIR = pipelineHelpers.getLocalWorkDir()
-    FORCE_FAILURE = commitMessageFlag('force-failure-fsc').asBooleanInteger()
-    // fsc errors when running specs from gems.
-    // until we figure out how to run them, we should ignore them
-    FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,spec/selenium/performance/'
-    POSTGRES_PASSWORD = 'sekret'
-    FSC_NODE_COUNT = getNodeCount()
-
-    // Targeting 10 minutes / node, each node runs RSPEC_PROCESSES threads and
-    // repeats each test FSC_REPEAT_FACTOR times.
-    // Assumption: non-selenium tests take 500ms / test
-    // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
-    FSC_REPEAT_FACTOR = 10
-    MAX_NODES = getMaxNodes()
-    RSPEC_PROCESSES = 3
-    SELENIUM_RATIO = 20
-    TESTS_PER_NODE = 200
-  }
-
-  stages {
-    stage('Cleanup Workspace') {
-      steps {
-        script {
-          pipelineHelpers.cleanupWorkspace()
-        }
-      }
-    }
-
-    stage('Setup') {
-      steps {
-        script {
-          setupNode()
-        }
-      }
-    }
-
-    stage('Compute Build Distribution') {
-      steps {
-        script {
-          computeTestCount()
-        }
-      }
-    }
-
-    stage('Run Flakey Spec Catcher') {
-      when {
-        expression { partitions.size() > 0 }
-      }
-      steps {
-        script {
-          if (partitions.size() > env.MAX_NODES.toInteger()) {
-            error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
+node(nodeLabel()) {
+  timeout(time: FSC_TIMEOUT) {
+    ansiColor('xterm') {
+      timestamps {
+        try {
+          stage('Cleanup Workspace') {
+            pipelineHelpers.cleanupWorkspace()
           }
 
-          def flakeyStages = [:]
+          stage('Setup') {
+            setupNode()
+          }
 
-          // Initial node (index 0) - runs on main agent
-          flakeyStages['flakey set 00'] = {
-            withEnv([
-              "FSC_TESTS=${partitions[0].join(',')}",
-              'NODE_NUMBER=00'
-            ]) {
-              def stageStartTime = System.currentTimeMillis()
-              try {
-                executeFlakeySpecCatcher()
-              } finally {
-                buildSummaryReport.trackStage('Flakey Set 00', stageStartTime)
-              }
+          stage('Compute Build Distribution') {
+            computeTestCount()
+          }
+
+          if (partitions.size() > 0) {
+            if (partitions.size() > env.MAX_NODES.toInteger()) {
+              error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
             }
-          }
 
-          for (int i = 1; i < partitions.size(); i++) {
-            def index = i
-            def nodeNumber = (index).toString().padLeft(2, '0')
+            def flakeyStages = [:]
 
-            flakeyStages["flakey set $nodeNumber"] = {
+            // Initial node (index 0) - runs on main agent
+            flakeyStages['flakey 00'] = {
               withEnv([
-                "FSC_TESTS=${partitions[index].join(',')}",
-                "NODE_NUMBER=$nodeNumber"
+                "FSC_TESTS=${partitions[0].join(',')}",
+                'NODE_NUMBER=00'
               ]) {
-                runFlakeyNode(nodeNumber)
+                def stageStartTime = System.currentTimeMillis()
+                try {
+                  stage('00 Run') {
+                    executeFlakeySpecCatcher()
+                  }
+                } finally {
+                  buildSummaryReport.trackStage('Flakey 00', stageStartTime)
+                }
               }
             }
+
+            for (int i = 1; i < partitions.size(); i++) {
+              def index = i
+              def nodeNumber = String.format('%02d', index)
+
+              flakeyStages["flakey $nodeNumber"] = {
+                withEnv([
+                  "FSC_TESTS=${partitions[index].join(',')}",
+                  "NODE_NUMBER=$nodeNumber"
+                ]) {
+                  runFlakeyNode(nodeNumber)
+                }
+              }
+            }
+
+            parallel(flakeyStages)
           }
-
-          parallel(flakeyStages)
+        } finally {
+          pipelineHelpers.cleanupDocker()
+          if (fscStatus != 'aborted') {
+            sendSlack(currentBuild.currentResult == 'SUCCESS')
+          }
+          buildSummaryReport.saveRunManifest()
         }
-      }
-    }
-  }
-
-  post {
-    always {
-      script {
-        pipelineHelpers.cleanupDocker()
-        if (fscStatus != 'aborted') {
-          sendSlack(currentBuild.currentResult == 'SUCCESS')
-        }
-        buildSummaryReport.saveRunManifest()
       }
     }
   }
