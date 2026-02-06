@@ -43,13 +43,52 @@ describe Accessibility::ResourceScannerService do
         expect(subject).to receive(:delay)
           .with(
             n_strand: ["resource_accessibility_scan", course.account.global_id],
-            singleton: "resource_accessibility_scan_#{wiki_page.global_id}",
+            singleton: "resource_accessibility_scan_#{wiki_page.global_id}_wiki_page",
             priority: 20
           )
           .and_return(delay_mock)
         expect(delay_mock).to receive(:scan_resource)
 
         subject.call
+      end
+
+      it "includes the resource class name in the singleton to avoid conflicts between different resource types" do
+        assignment = assignment_model(course:)
+        # Simulate same ID scenario by mocking global_id
+        allow(wiki_page).to receive(:global_id).and_return(123)
+        allow(assignment).to receive(:global_id).and_return(123)
+
+        wiki_page_service = described_class.new(resource: wiki_page)
+        assignment_service = described_class.new(resource: assignment)
+
+        wiki_page_delay_mock = instance_double(described_class)
+        assignment_delay_mock = instance_double(described_class)
+
+        allow(wiki_page_service).to receive(:delay).and_return(wiki_page_delay_mock)
+        allow(assignment_service).to receive(:delay).and_return(assignment_delay_mock)
+        allow(wiki_page_delay_mock).to receive(:scan_resource)
+        allow(assignment_delay_mock).to receive(:scan_resource)
+
+        # Verify WikiPage gets WikiPage in singleton
+        expect(wiki_page_service).to receive(:delay)
+          .with(
+            n_strand: ["resource_accessibility_scan", course.account.global_id],
+            singleton: "resource_accessibility_scan_123_wiki_page",
+            priority: 20
+          )
+          .and_return(wiki_page_delay_mock)
+
+        # Verify Assignment gets Assignment in singleton
+        expect(assignment_service).to receive(:delay)
+          .with(
+            n_strand: ["resource_accessibility_scan", course.account.global_id],
+            singleton: "resource_accessibility_scan_123_assignment",
+            priority: 20
+          )
+          .and_return(assignment_delay_mock)
+
+        wiki_page_service.call
+        assignment_service.call
       end
     end
 
@@ -79,7 +118,7 @@ describe Accessibility::ResourceScannerService do
         expect(subject).to receive(:delay)
           .with(
             n_strand: ["resource_accessibility_scan", course.account.global_id],
-            singleton: "resource_accessibility_scan_#{wiki_page.global_id}",
+            singleton: "resource_accessibility_scan_#{wiki_page.global_id}_wiki_page",
             priority: 20
           )
           .and_return(delay_mock)
