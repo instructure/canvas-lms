@@ -17,9 +17,9 @@
  */
 
 import {render, fireEvent} from '@testing-library/react'
-import {NativeDiscoveryPage} from '../NativeDiscoveryPage'
+import {DiscoveryPage} from '../DiscoveryPage'
 
-describe('NativeDiscoveryPage', () => {
+describe('DiscoveryPage', () => {
   const defaultProps = {
     initialEnabled: false,
     onChange: vi.fn(),
@@ -35,28 +35,26 @@ describe('NativeDiscoveryPage', () => {
 
   describe('rendering', () => {
     it('renders the component with all expected elements', () => {
-      const {getByText, getAllByText, getByTestId} = render(
-        <NativeDiscoveryPage {...defaultProps} />,
-      )
+      const {getByText, getAllByText, getByTestId} = render(<DiscoveryPage {...defaultProps} />)
       expect(getByText('Configure')).toBeInTheDocument()
       expect(getAllByText('Enable Identity Service Discovery Page')).toHaveLength(2)
       expect(getByTestId('discovery-page-toggle')).toBeInTheDocument()
     })
 
     it('renders with checkbox unchecked when initialEnabled is false', () => {
-      const {getByTestId} = render(<NativeDiscoveryPage {...defaultProps} initialEnabled={false} />)
+      const {getByTestId} = render(<DiscoveryPage {...defaultProps} initialEnabled={false} />)
       const checkbox = getByTestId('discovery-page-toggle')
       expect(checkbox).not.toBeChecked()
     })
 
     it('renders with checkbox checked when initialEnabled is true', () => {
-      const {getByTestId} = render(<NativeDiscoveryPage {...defaultProps} initialEnabled={true} />)
+      const {getByTestId} = render(<DiscoveryPage {...defaultProps} initialEnabled={true} />)
       const checkbox = getByTestId('discovery-page-toggle')
       expect(checkbox).toBeChecked()
     })
 
     it('renders screen reader content for accessibility', () => {
-      const {getByText} = render(<NativeDiscoveryPage {...defaultProps} />)
+      const {getByText} = render(<DiscoveryPage {...defaultProps} />)
       const srContent = getByText('Enable Identity Service Discovery Page', {
         selector: '[class*="screenReaderContent"]',
       })
@@ -67,9 +65,7 @@ describe('NativeDiscoveryPage', () => {
   describe('toggle functionality', () => {
     it('calls onChange with true when toggling from false to true', () => {
       const onChange = vi.fn()
-      const {getByTestId} = render(
-        <NativeDiscoveryPage initialEnabled={false} onChange={onChange} />,
-      )
+      const {getByTestId} = render(<DiscoveryPage initialEnabled={false} onChange={onChange} />)
       const checkbox = getByTestId('discovery-page-toggle')
       fireEvent.click(checkbox)
       expect(onChange).toHaveBeenCalledTimes(1)
@@ -78,9 +74,7 @@ describe('NativeDiscoveryPage', () => {
 
     it('calls onChange with false when toggling from true to false', () => {
       const onChange = vi.fn()
-      const {getByTestId} = render(
-        <NativeDiscoveryPage initialEnabled={true} onChange={onChange} />,
-      )
+      const {getByTestId} = render(<DiscoveryPage initialEnabled={true} onChange={onChange} />)
       const checkbox = getByTestId('discovery-page-toggle')
       fireEvent.click(checkbox)
       expect(onChange).toHaveBeenCalledTimes(1)
@@ -88,7 +82,7 @@ describe('NativeDiscoveryPage', () => {
     })
 
     it('updates the checkbox state when toggled', () => {
-      const {getByTestId} = render(<NativeDiscoveryPage {...defaultProps} initialEnabled={false} />)
+      const {getByTestId} = render(<DiscoveryPage {...defaultProps} initialEnabled={false} />)
       const checkbox = getByTestId('discovery-page-toggle')
       expect(checkbox).not.toBeChecked()
       fireEvent.click(checkbox)
@@ -99,9 +93,7 @@ describe('NativeDiscoveryPage', () => {
 
     it('handles multiple toggle events correctly', () => {
       const onChange = vi.fn()
-      const {getByTestId} = render(
-        <NativeDiscoveryPage initialEnabled={false} onChange={onChange} />,
-      )
+      const {getByTestId} = render(<DiscoveryPage initialEnabled={false} onChange={onChange} />)
       const checkbox = getByTestId('discovery-page-toggle')
       fireEvent.click(checkbox)
       expect(onChange).toHaveBeenNthCalledWith(1, true)
@@ -116,7 +108,7 @@ describe('NativeDiscoveryPage', () => {
   describe('configure button', () => {
     it('shows an alert when configure button is clicked', () => {
       const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
-      const {getByTestId} = render(<NativeDiscoveryPage {...defaultProps} />)
+      const {getByTestId} = render(<DiscoveryPage {...defaultProps} />)
       const configureButton = getByTestId('configure-button')
       fireEvent.click(configureButton)
       expect(alertSpy).toHaveBeenCalledTimes(1)
@@ -128,9 +120,7 @@ describe('NativeDiscoveryPage', () => {
     it('does not call onChange when configure button is clicked', () => {
       const onChange = vi.fn()
       vi.spyOn(window, 'alert').mockImplementation(() => {})
-      const {getByTestId} = render(
-        <NativeDiscoveryPage initialEnabled={false} onChange={onChange} />,
-      )
+      const {getByTestId} = render(<DiscoveryPage initialEnabled={false} onChange={onChange} />)
       const configureButton = getByTestId('configure-button')
       fireEvent.click(configureButton)
       expect(onChange).not.toHaveBeenCalled()
@@ -139,21 +129,21 @@ describe('NativeDiscoveryPage', () => {
 
   describe('accessibility', () => {
     it('has accessible button for configure', () => {
-      const {getByTestId} = render(<NativeDiscoveryPage {...defaultProps} />)
+      const {getByTestId} = render(<DiscoveryPage {...defaultProps} />)
       const button = getByTestId('configure-button')
       expect(button).toBeInTheDocument()
       expect(button.textContent).toBe('Configure')
     })
 
     it('has properly labeled checkbox', () => {
-      const {getByLabelText} = render(<NativeDiscoveryPage {...defaultProps} />)
+      const {getByLabelText} = render(<DiscoveryPage {...defaultProps} />)
       const checkbox = getByLabelText('Enable Identity Service Discovery Page')
       expect(checkbox).toBeInTheDocument()
       expect(checkbox).toHaveAttribute('type', 'checkbox')
     })
 
     it('checkbox has toggle variant', () => {
-      const {container} = render(<NativeDiscoveryPage {...defaultProps} />)
+      const {container} = render(<DiscoveryPage {...defaultProps} />)
       // InstUI toggle checkboxes have toggle-specific classes
       const toggleFacade = container.querySelector('[class*="toggleFacade"]')
       expect(toggleFacade).toBeInTheDocument()
@@ -162,7 +152,7 @@ describe('NativeDiscoveryPage', () => {
 
   describe('component structure', () => {
     it('renders configure button and checkbox in correct order', () => {
-      const {container} = render(<NativeDiscoveryPage {...defaultProps} />)
+      const {container} = render(<DiscoveryPage {...defaultProps} />)
       const flexItems = container.querySelectorAll('[class*="flexItem"]')
       expect(flexItems.length).toBeGreaterThanOrEqual(2)
       // configure button should be first
@@ -174,14 +164,14 @@ describe('NativeDiscoveryPage', () => {
     })
 
     it('uses Flex layout with correct alignment', () => {
-      const {container} = render(<NativeDiscoveryPage {...defaultProps} />)
+      const {container} = render(<DiscoveryPage {...defaultProps} />)
       const flexContainer = container.querySelector('[class*="flex"]')
       expect(flexContainer).toBeInTheDocument()
     })
 
     it('wraps component in View with test id', () => {
-      const {getByTestId} = render(<NativeDiscoveryPage {...defaultProps} />)
-      expect(getByTestId('native-discovery-page')).toBeInTheDocument()
+      const {getByTestId} = render(<DiscoveryPage {...defaultProps} />)
+      expect(getByTestId('discovery-page')).toBeInTheDocument()
     })
   })
 })

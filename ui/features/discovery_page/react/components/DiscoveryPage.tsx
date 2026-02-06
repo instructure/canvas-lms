@@ -22,16 +22,14 @@ import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 
-interface NativeDiscoveryPageProps {
+interface DiscoveryPageProps {
   initialEnabled: boolean
   onChange: (enabled: boolean) => void
 }
 
-export function NativeDiscoveryPage({initialEnabled, onChange}: NativeDiscoveryPageProps) {
+export function DiscoveryPage({initialEnabled, onChange}: DiscoveryPageProps) {
   const [enabled, setEnabled] = useState(initialEnabled)
 
   const handleToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +44,7 @@ export function NativeDiscoveryPage({initialEnabled, onChange}: NativeDiscoveryP
   }
 
   return (
-    <View as="div" data-testid="native-discovery-page">
+    <View as="div" data-testid="discovery-page">
       <Flex as="div" direction="row" alignItems="center" gap="small">
         <Flex.Item>
           <Button onClick={handleConfigure} margin="0" data-testid="configure-button">

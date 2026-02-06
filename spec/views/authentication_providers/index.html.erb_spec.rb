@@ -72,8 +72,8 @@ describe "authentication_providers/index" do
       Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
       render "authentication_providers/index"
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.css("#native-discovery-page-root")).to be_present
-      expect(doc.css("input#native_discovery_enabled_field")).to be_present
+      expect(doc.css("#discovery-page-root")).to be_present
+      expect(doc.css("input#discovery_page_active_field")).to be_present
       expect(response.body).to include("Identity Service Discovery Page")
     end
 
@@ -81,7 +81,7 @@ describe "authentication_providers/index" do
       Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
       render "authentication_providers/index"
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.css("#native-discovery-page-root")).to be_blank
+      expect(doc.css("#discovery-page-root")).to be_blank
     end
   end
 end

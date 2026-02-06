@@ -71,8 +71,8 @@ If no discovery URL is configured, the first configuration will be used to attem
           <%# BEGIN discovery page logic %>
           <div class="ic-Form-control">
             <%= f.label :discovery_page_active, t("Identity Service Discovery Page"), class: 'ic-Label' %>
-            <%= f.hidden_field :discovery_page_active, id: 'native_discovery_enabled_field', value: presenter.discovery_page_active? %>
-            <div id="native-discovery-page-root"></div>
+            <%= f.hidden_field :discovery_page_active, id: 'discovery_page_active_field', value: presenter.discovery_page_active? %>
+            <div id="discovery-page-root"></div>
             <div class="ic-Form-help-text">
               <%= t('Configure the Identity Service discovery page. When enabled, this page replaces the default discovery experience at /login/discovery.') %>
             </div>
