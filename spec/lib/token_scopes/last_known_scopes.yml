@@ -634,6 +634,8 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/all_quizzes'
 - verb: POST
+  path: '/api/v1/courses/:course_id/announcements/:announcement_id/accessibility/queue_scan'
+- verb: POST
   path: '/api/v1/courses/:course_id/announcements/:announcement_id/accessibility/scan'
 - verb: GET
   path: '/api/v1/courses/:course_id/app_center/apps'
@@ -953,6 +955,8 @@
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/accessibility/queue_scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/accessibility/scan'
 - verb: POST
@@ -1789,6 +1793,8 @@
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id'
 - verb: PUT
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id'
+- verb: POST
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/accessibility/queue_scan'
 - verb: POST
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/accessibility/scan'
 - verb: POST

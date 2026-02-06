@@ -1618,6 +1618,7 @@ CanvasRails::Application.routes.draw do
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights/entries", action: :insight_entries, as: "#{context}_discussion_topic_insight_entries"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights/entries/:entry_id", action: :insight_entry_update, as: "#{context}_discussion_topic_insight_entry_update"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/duplicate", action: :duplicate
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "#{context}_discussion_topic_accessibility_queue_scan"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/accessibility/scan", action: :accessibility_scan, as: "#{context}_discussion_topic_accessibility_scan"
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entry_list", action: :entry_list, as: "#{context}_discussion_topic_entry_list"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", action: :add_entry, as: "#{context}_discussion_add_entry"
@@ -2742,8 +2743,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :announcements_api) do
       get "announcements", action: :index, as: :announcements
-
       post "courses/:course_id/announcements/:announcement_id/accessibility/scan", action: :accessibility_scan, as: "course_announcement_accessibility_scan"
+      post "courses/:course_id/announcements/:announcement_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "course_announcement_accessibility_queue_scan"
     end
 
     scope(controller: :release_notes) do
