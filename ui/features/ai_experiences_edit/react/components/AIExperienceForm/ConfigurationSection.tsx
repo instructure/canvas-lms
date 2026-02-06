@@ -26,6 +26,8 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {IconAiLine} from '@instructure/ui-icons'
 import {AIExperienceFormData} from '../../../types'
+import CanvasFileUpload from '@canvas/canvas-file-upload/react/CanvasFileUpload'
+import {ContextFile} from '@canvas/canvas-file-upload/react/types'
 
 const I18n = createI18nScope('ai_experiences_edit')
 
@@ -36,6 +38,9 @@ interface ConfigurationSectionProps {
   ) => (event: React.ChangeEvent<HTMLTextAreaElement>) => void
   showErrors: boolean
   errors: Record<string, string>
+  contextFiles: ContextFile[]
+  onContextFilesChange: (files: ContextFile[]) => void
+  courseId: string
 }
 
 const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
@@ -43,6 +48,9 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
   onChange,
   showErrors,
   errors,
+  contextFiles,
+  onContextFilesChange,
+  courseId,
 }) => {
   return (
     <View as="div" margin="large 0 0 0">
@@ -133,6 +141,30 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
               }
             />
           </FormFieldGroup>
+
+          {/* Only render if feature flag is enabled */}
+          {(window as any).ENV?.FEATURES?.ai_experiences_context_file_upload && (
+            <View as="div" margin="medium 0 0 0" padding="xxx-small">
+              <Heading level="h4" margin="0 0 x-small 0">
+                {I18n.t('Source materials')}
+              </Heading>
+              <View as="div" margin="0 0 small 0">
+                <Text size="small" color="secondary">
+                  {I18n.t(
+                    'Upload files to provide context for this AI Experience. Supported formats: DOCX, XLSX, XLS, PPTX, PDF, TXT, HTML.',
+                  )}
+                </Text>
+              </View>
+              <CanvasFileUpload
+                files={contextFiles}
+                onFilesChange={onContextFilesChange}
+                courseId={courseId}
+                allowedFileTypes={['.docx', '.xlsx', '.xls', '.pptx', '.pdf', '.txt', '.html']}
+                maxFileSizeMB={300}
+                maxFiles={10}
+              />
+            </View>
+          )}
         </div>
       </div>
     </View>

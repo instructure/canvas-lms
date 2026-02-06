@@ -155,6 +155,8 @@ class AiExperiencesController < ApplicationController
     add_crumb t("#crumbs.new_ai_experience", "New AI Experience")
     @page_title = t("#page_title.new_ai_experience", "New AI Experience")
     js_env({ COURSE_ID: @context.id })
+    js_env[:FEATURES] ||= {}
+    js_env[:FEATURES][:ai_experiences_context_file_upload] = @context.feature_enabled?(:ai_experiences_context_file_upload)
   end
 
   # @API Show edit AI experience form
@@ -166,6 +168,8 @@ class AiExperiencesController < ApplicationController
     add_crumb @experience.title
     @page_title = t("#page_title.edit_ai_experience", "Edit %{title}", title: @experience.title)
     js_env({ COURSE_ID: @context.id, AI_EXPERIENCE_ID: params[:id] })
+    js_env[:FEATURES] ||= {}
+    js_env[:FEATURES][:ai_experiences_context_file_upload] = @context.feature_enabled?(:ai_experiences_context_file_upload)
   end
 
   # @API Create an AI experience
