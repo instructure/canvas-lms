@@ -59,13 +59,16 @@ export const getDueDates = (
   selectedDaysToSkip: string[],
   blackoutDates: BlackoutDate[],
   startDate?: string,
+  timezone?: string,
 ): CoursePaceItemDueDates => {
   const dueDates: {
     [key: string]: string
   } = {}
   if (!startDate) return dueDates
 
-  let currentStart = DateHelpers.formatDate(moment(startDate))
+  let currentStart = DateHelpers.formatDate(
+    timezone ? moment.tz(startDate, timezone) : moment(startDate),
+  )
   for (const item of coursePaceItems) {
     currentStart = DateHelpers.addDays(
       currentStart,
@@ -73,6 +76,7 @@ export const getDueDates = (
       excludeWeekends,
       selectedDaysToSkip,
       blackoutDates,
+      timezone,
     )
     dueDates[item.module_item_id] = currentStart
   }
