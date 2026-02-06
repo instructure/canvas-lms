@@ -272,6 +272,9 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Feliratfájl választása"
     },
+    "choose_file_8d89ccab": {
+        "message": "Válasszon fájlt"
+    },
     "choose_usage_rights_33683854": {
         "message": "Válasszon a felhasználói jogokból..."
     },
@@ -1715,6 +1718,9 @@
     "prime_numbers_13464f61": {
         "message": "Prímszámok"
     },
+    "processing_8c569014": {
+        "message": "Feldolgozás..."
+    },
     "product_39cf144f": {
         "message": "Szorzat"
     },
@@ -2353,6 +2359,9 @@
     },
     "updated_link_a827e441": {
         "message": "Frissített link"
+    },
+    "upload_8b403d05": {
+        "message": "Feltöltés"
     },
     "upload_document_253f0478": {
         "message": "Dokumentum feltöltése"

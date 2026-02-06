@@ -269,6 +269,9 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Vel undertekstfil"
     },
+    "choose_file_8d89ccab": {
+        "message": "Vel fil"
+    },
     "choose_usage_rights_33683854": {
         "message": "Vel bruksrett..."
     },
@@ -1715,6 +1718,9 @@
     "prime_numbers_13464f61": {
         "message": "Primtal"
     },
+    "processing_8c569014": {
+        "message": "Behandlar..."
+    },
     "product_39cf144f": {
         "message": "Produkt"
     },
@@ -2308,6 +2314,9 @@
     },
     "updated_link_a827e441": {
         "message": "Oppdatert lenke"
+    },
+    "upload_8b403d05": {
+        "message": "Last opp"
     },
     "upload_document_253f0478": {
         "message": "Last opp dokument frå disk"
