@@ -4362,6 +4362,7 @@ he:
   close_rubric_a0fc8166: "סגירת רובריקה"
   close_sidebar_10b0fbb4: "סגירת סרגל-צד"
   close_submission_tray_c4988fa8: "סגירת תיבת הגשות"
+  closed_983a96fe: סגור
   closed_for_comments_e395b42f: "סגור להערות"
   closes_5c6b4367: "מסתיים:"
   code_is_case_sensitive_d8175cad: "הקוד הנו רגיש לסוג אות"
@@ -13573,6 +13574,7 @@ he:
   not_a_number: "הערך חייב להיות מספר חיובי"
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "פריט זה יוקצה לכל ההקבצות ."
   not_available_487d3648: "לא זמין"
+  not_available_until_14e61f1e: "אינו זמין לפני"
   not_available_until_next_submission_2175158: "לא זמין עד ההגשה הבאה"
   not_completed_d70acea3: "טרם הושלם"
   not_deleted_2a7f63ef: "(לא בוצע ביטול)"
