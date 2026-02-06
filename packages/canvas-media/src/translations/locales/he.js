@@ -18,6 +18,6 @@
 
 import formatMessage from '../../format-message'
 
-const locale = {"cancel_caeb1e68":{"message":"ביטול"},"greek_65c5b3f7":{"message":"יוונית"},"loading_25990131":{"message":"בטעינה... "},"no_preview_is_available_for_this_file_f940114a":{"message":"אין תצוגה מקדימה לקובץ זה"}}
+const locale = {"cancel_caeb1e68":{"message":"ביטול"},"greek_65c5b3f7":{"message":"יוונית"},"loading_25990131":{"message":"בטעינה... "},"no_preview_is_available_for_this_file_f940114a":{"message":"אין תצוגה מקדימה לקובץ זה"},"processing_8c569014":{"message":"מעבד..."},"upload_8b403d05":{"message":"העלאה"}}
 
 formatMessage.addLocale({he: locale})
