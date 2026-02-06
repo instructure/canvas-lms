@@ -71,6 +71,45 @@ describe AuthenticationProvidersController do
         expect(response).to be_successful
       end
     end
+
+    context "when new_login_ui_identity_discovery_page feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
+      end
+
+      it "includes auth_providers in js_env with id, url, and name" do
+        saml = account.authentication_providers.create!(saml_hash)
+        cas = account.authentication_providers.create!(cas_hash)
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        js_env = assigns(:js_env)
+        expect(js_env).to include(auth_providers: be_an(Array))
+        auth_providers = js_env[:auth_providers]
+        expect(auth_providers).not_to be_empty
+        expect(auth_providers).to all(include(id: be_an(Integer), url: be_a(String), auth_type: be_a(String)))
+        expect(auth_providers.pluck(:id)).to match_array([saml.id, cas.id])
+      end
+
+      it "includes discovery_page_base_url in js_env" do
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        expect(assigns(:js_env)).to include(:discovery_page_base_url)
+      end
+    end
+
+    context "when new_login_ui_identity_discovery_page feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+      end
+
+      it "does not include auth_providers in js_env" do
+        account.authentication_providers.create!(saml_hash)
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        js_env = assigns(:js_env)
+        expect(js_env&.key?(:auth_providers)).to be_falsey
+      end
+    end
   end
 
   describe "refresh_saml_metadata" do
