@@ -62,13 +62,14 @@ describe Accessibility::IssueSummaryController do
           end
         end
 
-        it "returns total 3 and correct rule breakdown" do
+        it "returns active count 3, resolved count 0, and correct rule breakdown" do
           get :show, params: { course_id: course.id }
 
           expect(response).to have_http_status(:ok)
           json_response = response.parsed_body
 
-          expect(json_response["total"]).to eq(3)
+          expect(json_response["active"]).to eq(3)
+          expect(json_response["resolved"]).to eq(0)
           expect(json_response["by_rule_type"]).to eq({
                                                         Accessibility::Rules::ImgAltRule.id => 3
                                                       })
@@ -93,13 +94,14 @@ describe Accessibility::IssueSummaryController do
           )
         end
 
-        it "returns total 3 and correct rule breakdown" do
+        it "returns active count 2, resolved count 0, and correct rule breakdown" do
           get :show, params: { course_id: course.id }
 
           expect(response).to have_http_status(:ok)
           json_response = response.parsed_body
 
-          expect(json_response["total"]).to eq(2)
+          expect(json_response["active"]).to eq(2)
+          expect(json_response["resolved"]).to eq(0)
           expect(json_response["by_rule_type"]).to eq({
                                                         Accessibility::Rules::ImgAltRule.id => 1,
                                                         Accessibility::Rules::ImgAltFilenameRule.id => 1
@@ -108,13 +110,14 @@ describe Accessibility::IssueSummaryController do
       end
 
       context "with 0 issues" do
-        it "returns total 0 and empty rule breakdown" do
+        it "returns active count 0, resolved count 0, and empty rule breakdown" do
           get :show, params: { course_id: course.id }
 
           expect(response).to have_http_status(:ok)
           json_response = response.parsed_body
 
-          expect(json_response["total"]).to eq(0)
+          expect(json_response["active"]).to eq(0)
+          expect(json_response["resolved"]).to eq(0)
           expect(json_response["by_rule_type"]).to eq({})
         end
       end
@@ -144,13 +147,14 @@ describe Accessibility::IssueSummaryController do
           end
         end
 
-        it "returns total 3 and correct rule breakdown (ignoring inactive)" do
+        it "returns active count 3, resolved count 2, and correct rule breakdown (ignoring inactive)" do
           get :show, params: { course_id: course.id }
 
           expect(response).to have_http_status(:ok)
           json_response = response.parsed_body
 
-          expect(json_response["total"]).to eq(3)
+          expect(json_response["active"]).to eq(3)
+          expect(json_response["resolved"]).to eq(2)
           expect(json_response["by_rule_type"]).to eq({
                                                         Accessibility::Rules::ImgAltRule.id => 3
                                                       })
@@ -190,13 +194,14 @@ describe Accessibility::IssueSummaryController do
           )
         end
 
-        it "returns total 2 and correct rule breakdown (ignoring inactive)" do
+        it "returns active count 2, resolved count 1, and correct rule breakdown (ignoring inactive)" do
           get :show, params: { course_id: course.id }
 
           expect(response).to have_http_status(:ok)
           json_response = response.parsed_body
 
-          expect(json_response["total"]).to eq(2)
+          expect(json_response["active"]).to eq(2)
+          expect(json_response["resolved"]).to eq(1)
           expect(json_response["by_rule_type"]).to eq({
                                                         Accessibility::Rules::ImgAltRule.id => 1,
                                                         Accessibility::Rules::ImgAltFilenameRule.id => 1
@@ -222,13 +227,14 @@ describe Accessibility::IssueSummaryController do
           )
         end
 
-        it "returns total 0 and empty rule breakdown" do
+        it "returns active count 0, resolved count 1, and empty rule breakdown" do
           get :show, params: { course_id: course.id }
 
           expect(response).to have_http_status(:ok)
           json_response = response.parsed_body
 
-          expect(json_response["total"]).to eq(0)
+          expect(json_response["active"]).to eq(0)
+          expect(json_response["resolved"]).to eq(1)
           expect(json_response["by_rule_type"]).to eq({})
         end
       end
@@ -266,7 +272,8 @@ describe Accessibility::IssueSummaryController do
         expect(response).to have_http_status(:ok)
         json_response = response.parsed_body
 
-        expect(json_response["total"]).to eq(2)
+        expect(json_response["active"]).to eq(2)
+        expect(json_response["resolved"]).to eq(0)
         expect(json_response["by_rule_type"]).to eq({
                                                       Accessibility::Rules::ImgAltRule.id => 1,
                                                       Accessibility::Rules::ImgAltFilenameRule.id => 1
@@ -310,7 +317,8 @@ describe Accessibility::IssueSummaryController do
         expect(response).to have_http_status(:ok)
         json_response = response.parsed_body
 
-        expect(json_response["total"]).to eq(2)
+        expect(json_response["active"]).to eq(2)
+        expect(json_response["resolved"]).to eq(0)
         expect(json_response["by_rule_type"]).to eq({
                                                       Accessibility::Rules::ImgAltRule.id => 1,
                                                       Accessibility::Rules::HeadingsSequenceRule.id => 1

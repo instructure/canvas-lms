@@ -17,11 +17,15 @@
  */
 
 import {useQuery} from '@tanstack/react-query'
-import {fetchCourses, FetchCoursesParams} from '../api/courses'
+import {fetchAccessibilityIssueSummary} from '../api/accessibility_issue_summary'
 
-export const useCourses = ({accountId, sort, order, page, search}: FetchCoursesParams) => {
+interface UseAccessibilityIssueSummaryOptions {
+  accountId: string
+}
+
+export const useAccessibilityIssueSummary = ({accountId}: UseAccessibilityIssueSummaryOptions) => {
   return useQuery({
-    queryKey: ['accessibility-courses', accountId, sort, order, page, search],
-    queryFn: () => fetchCourses({accountId, sort, order, page, search}),
+    queryKey: ['accessibility-issue-summary', accountId],
+    queryFn: () => fetchAccessibilityIssueSummary({accountId}),
   })
 }

@@ -91,7 +91,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
   const [issues, setIssues] = useState<AccessibilityIssue[]>(item.issues || [])
   const [allIssuesSkipped, setAllIssuesSkipped] = useState<boolean>(false)
-  const previousTotalRef = useRef<number | undefined>()
+  const previousActiveRef = useRef<number | undefined>()
 
   const {setSelectedItem} = useAccessibilityCheckerContext()
   const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
@@ -440,16 +440,16 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   }, [currentIssue])
 
   useEffect(() => {
-    const previousTotal = previousTotalRef.current
-    const currentTotal = issuesSummary?.total
+    const previousActive = previousActiveRef.current
+    const currentActive = issuesSummary?.active
 
-    if (previousTotal !== undefined && previousTotal > 0 && currentTotal === 0) {
+    if (previousActive !== undefined && previousActive > 0 && currentActive === 0) {
       const courseId = window.ENV.current_context?.id
       trackA11yEvent('CourseRemediated', {courseId: courseId || 'unknown'})
     }
 
-    previousTotalRef.current = currentTotal
-  }, [issuesSummary?.total, trackA11yEvent])
+    previousActiveRef.current = currentActive
+  }, [issuesSummary?.active, trackA11yEvent])
 
   if (allIssuesSkipped && isCloseIssuesEnabled) {
     return (

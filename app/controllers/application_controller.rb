@@ -476,6 +476,9 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
+    a11y_checker_additional_resources
+    a11y_checker_close_issues
+    a11y_checker_ga2_features
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player

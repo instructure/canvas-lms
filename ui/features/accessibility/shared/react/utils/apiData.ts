@@ -117,14 +117,6 @@ export const replaceById = <T extends HasId>(data: T[] | null, item: T): T[] => 
   return data.map(existingItem => (existingItem.id === item.id ? item : existingItem))
 }
 
-export const calculateTotalIssuesCount = (data?: AccessibilityResourceScan[] | null): number => {
-  if (!data) return 0
-
-  return data.reduce((total, scan) => {
-    return total + (scan.issueCount || 0)
-  }, 0)
-}
-
 const formatDateFilter = (date?: string) => {
   if (date) {
     const dateFormatter = new Intl.DateTimeFormat('en-US', {

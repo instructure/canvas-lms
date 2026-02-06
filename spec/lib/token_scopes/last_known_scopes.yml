@@ -16,6 +16,8 @@
 - verb: GET
   path: '/api/v1/accounts'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/accessibility_issue_summary'
+- verb: GET
   path: '/api/v1/accounts/:account_id/account_calendars'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/account_calendars'

@@ -27,10 +27,13 @@ import {useCourses} from '../../hooks/useCourses'
 import {useCoursesParams} from '../../hooks/useCoursesParams'
 import {CoursesTable} from './CoursesTable'
 import {CoursesSearch} from './CoursesSearch'
+import {useAccessibilityIssueSummary} from '../../hooks/useAccessibilityIssueSummary'
 import {AccessibilityGenericErrorPage} from './AccessibilityGenericErrorPage'
 import EmptyDesert from '@canvas/images/react/EmptyDesert'
 import type {CoursesResponse} from '../../types/course'
 import type {SortOrder} from './SortableTableHeader'
+import {Flex} from '@instructure/ui-flex'
+import {IssueStatusBarChart} from '../../../shared/react/components/BarChart'
 
 const I18n = createI18nScope('accessibility_course_statistics')
 
@@ -110,6 +113,7 @@ export const AccessibilityCoursesPage: React.FC = () => {
       defaultOrder: 'asc',
     })
   const {data, isLoading, isError} = useCourses({accountId, sort, order, page, search})
+  const {data: issueSummary} = useAccessibilityIssueSummary({accountId})
 
   return (
     <View as="div">
@@ -118,6 +122,13 @@ export const AccessibilityCoursesPage: React.FC = () => {
       </Heading>
 
       <CoursesSearch value={search} onChange={handleSearchChange} />
+
+      <Flex>
+        <IssueStatusBarChart
+          open={issueSummary?.active ?? 0}
+          resolved={issueSummary?.resolved ?? 0}
+        />
+      </Flex>
 
       <CoursesContent
         isLoading={isLoading}

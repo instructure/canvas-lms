@@ -1030,6 +1030,35 @@ class AccountsController < ApplicationController
     end
   end
 
+  # Get account accessibility issue summary
+  def accessibility_issue_summary
+    if authorized_action(@account, @current_user, :read)
+      unless @account.can_see_accessibility_tab?(@current_user)
+        return render json: { error: "Not authorized to view accessibility data" }, status: :unauthorized
+      end
+
+      GuardRail.activate(:secondary) do
+        courses = @account.associated_courses.where.not(workflow_state: "deleted")
+
+        stats_table = AccessibilityCourseStatistic.arel_table
+        active_issues, resolved_issues = courses
+                                         .left_joins(:accessibility_course_statistic)
+                                         .where(stats_table[:workflow_state].eq("active").or(stats_table[:id].eq(nil)))
+                                         .pick(
+                                           Arel.sql("COALESCE(SUM(accessibility_course_statistics.active_issue_count), 0)"),
+                                           Arel.sql("COALESCE(SUM(accessibility_course_statistics.resolved_issue_count), 0)")
+                                         )
+
+        summary_data = {
+          active: active_issues || 0,
+          resolved: resolved_issues || 0
+        }
+
+        render json: summary_data
+      end
+    end
+  end
+
   # Delegated to by the update action (when the request is an api_request?)
   def update_api
     if authorized_action(@account, @current_user, [:manage_account_settings, :manage_storage_quotas])

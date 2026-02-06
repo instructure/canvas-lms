@@ -47,7 +47,7 @@ describe('AccessibilityIssuesSummary', () => {
 
     await act(() => {
       result.current.setLoadingOfSummary(false)
-      result.current.setIssuesSummary({total: 0, byRuleType: {}})
+      result.current.setIssuesSummary({active: 0, resolved: 0, byRuleType: {}})
     })
 
     render(<AccessibilityIssuesSummary />)
