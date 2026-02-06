@@ -456,7 +456,7 @@
   </div>
   <% if @is_student && @context.discussion_checkpoints_enabled? && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints? %>
     <div class="context_module_item indent_<%= module_item.try_rescue(:indent) || '0' %>">
-      <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint] %>
+      <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint].compact %>
       <% checkpoints.each do |checkpoint| %>
         <div class="ig-row" data-testid="checkpoint" style="display: flex; align-items: center;">
           <% left_padding = case module_item.try_rescue(:indent)
