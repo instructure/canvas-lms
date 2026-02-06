@@ -543,6 +543,7 @@ class ApplicationController < ActionController::Base
     lti_registrations_discover_page
     lti_registrations_next
     lti_registrations_page
+    lti_registrations_templates
     lti_registrations_usage_data
     lti_registrations_usage_data_dev
     lti_registrations_usage_data_low_usage

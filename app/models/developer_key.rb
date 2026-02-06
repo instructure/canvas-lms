@@ -631,11 +631,11 @@ class DeveloperKey < ActiveRecord::Base
 
   def tool_management_scope(base_scope, affected_account)
     if affected_account&.site_admin? || affected_account.blank?
-      return base_scope.where(developer_key: self)
+      return base_scope.where(developer_key: self, lti_registration:)
     end
 
     # Don't update tools in another root account on the same shard
-    base_scope.where(developer_key: self, root_account: affected_account)
+    base_scope.where(developer_key: self, lti_registration:, root_account: affected_account)
   end
 
   def update_tools_on_active_shard!(account)

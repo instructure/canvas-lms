@@ -43,35 +43,9 @@ import {PermissionConfirmationPerfWrapper} from './PermissionConfirmationPerfWra
 import {PlacementsConfirmationPerfWrapper} from './PlacementsConfirmationPerfWrapper'
 import {PrivacyConfirmationPerfWrapper} from './PrivacyConfirmationPerfWrapper'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
+import {Section} from '../../../components/Section'
 
 const I18n = createI18nScope('lti_registrations')
-
-const Section = ({
-  title,
-  children,
-  margin = '0 small medium small',
-  subtitle,
-}: {
-  title?: string
-  children: React.ReactNode
-  margin?: Spacing
-  subtitle?: React.ReactNode
-}) => {
-  return (
-    <View
-      borderRadius="large"
-      borderColor="secondary"
-      borderWidth="small"
-      margin={margin}
-      as="div"
-      padding="medium"
-    >
-      {title ? <Heading level="h3">{title}</Heading> : null}
-      {subtitle}
-      {children}
-    </View>
-  )
-}
 
 type SaveState =
   | {

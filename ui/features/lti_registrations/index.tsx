@@ -43,6 +43,7 @@ import {
 import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
 import {InheritedKeyRegistrationWizard} from './manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizard'
 import type {InheritedKeyService} from './manage/inherited_key_registration_wizard/InheritedKeyService'
+import {installInheritedRegistration} from './manage/inherited_key_registration_wizard/InheritedKeyService'
 import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 import {type AccountId} from './manage/model/AccountId'
 import {ToolDetails} from './manage/pages/tool_details/ToolDetails'
@@ -186,6 +187,8 @@ const lti1p3RegistrationWizardService: Lti1p3RegistrationWizardService = {
 const inheritedKeyService: InheritedKeyService = {
   bindGlobalLtiRegistration,
   fetchRegistrationByClientId,
+  updateRegistration,
+  installInheritedRegistration,
 }
 
 render(

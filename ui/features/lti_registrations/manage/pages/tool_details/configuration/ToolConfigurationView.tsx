@@ -17,25 +17,22 @@
  */
 
 import * as React from 'react'
-import {useOutletContext, Link as RouterLink, useNavigate} from 'react-router-dom'
+import {useOutletContext, useNavigate} from 'react-router-dom'
 import type {ToolDetailsOutletContext} from '../ToolDetails'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconCopyLine, IconRefreshLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import type {Spacing} from '@instructure/emotion'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevel} from '../../../model/i18nLtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../model/i18nLtiPlacement'
 import {DefaultLtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
-import {isLtiPlacementWithDefaultIcon, isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
+import {isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
 import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
-import {ltiToolDefaultIconUrl} from '../../../model/ltiToolIcons'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
@@ -48,53 +45,11 @@ import {PlacementInfoTooltip} from '../../../components/PlacementInfoTooltip'
 import {MessageSetting} from '../../../model/internal_lti_configuration/InternalBaseLaunchSettings'
 import {LtiPlacementlessMessageType} from '../../../model/LtiMessageType'
 import {launchTypeSpecificSettingsLabels} from '../../../registration_wizard_forms/LaunchTypeSpecificSettingsConfirmation'
+import {Section, SubSection} from '../../../components/Section'
+import {LaunchSettingsReadOnlyView} from '../../../components/LaunchSettingsReadOnlyView'
+import {IconUrlsReadOnlyView} from '../../../components/IconUrlsReadOnlyView'
 
 const I18n = createI18nScope('lti_registrations')
-
-const Section = ({
-  title,
-  children,
-  margin = '0 small medium small',
-}: {
-  title: string
-  children: React.ReactNode
-  margin?: Spacing
-}) => {
-  return (
-    <View
-      borderRadius="large"
-      borderColor="secondary"
-      borderWidth="small"
-      margin={margin}
-      as="div"
-      padding="medium"
-    >
-      <Heading level="h3" margin="0 0 small 0">
-        {title}
-      </Heading>
-      {children}
-    </View>
-  )
-}
-
-const SubSection = ({
-  title,
-  children,
-  margin = 'small 0 0 0',
-}: {
-  title: string
-  children?: React.ReactNode
-  margin?: Spacing
-}) => {
-  return (
-    <>
-      <Heading level="h4" margin={margin}>
-        {title}
-      </Heading>
-      {children}
-    </>
-  )
-}
 
 const LaunchTypeSpecificSettingsSection = (
   settings: MessageSetting[],
@@ -211,73 +166,19 @@ export const ToolConfigurationView = () => {
     [registration],
   )
 
-  const dynamicRegistrationUrl = registration.dynamic_registration_url
-
   return (
     <div>
       {registration.manual_configuration_id ? (
         <Section title={I18n.t('Launch Settings')}>
-          <SubSection title={I18n.t('Redirect URIs:')}>
-            {redirectUris.map((uri, i) => (
-              <Text key={i}>{uri}</Text>
-            ))}
-          </SubSection>
-
-          <SubSection title={I18n.t('Default Target Link URI:')}>
-            <Text>{registration.overlaid_configuration.target_link_uri}</Text>
-          </SubSection>
-
-          <SubSection title={I18n.t('Open ID Connect Initiation URI:')}>
-            {registration.overlaid_configuration.oidc_initiation_url}
-          </SubSection>
-
-          <Flex direction="row" alignItems="end" margin="small 0 0">
-            <Flex.Item margin="0 xx-small 0 0">
-              <Text weight="bold">{I18n.t('JWK Method:')}</Text>
-            </Flex.Item>
-
-            <Flex.Item>
-              {registration.overlaid_configuration.public_jwk_url ? (
-                <Text>{I18n.t('Public JWK URL')}</Text>
-              ) : (
-                <Text>{I18n.t('Public JWK')}</Text>
-              )}
-            </Flex.Item>
-          </Flex>
-
-          {registration.overlaid_configuration.public_jwk_url ? (
-            <SubSection title={I18n.t('Public JWK URL:')}>
-              <Text>{registration.overlaid_configuration.public_jwk_url}</Text>
-            </SubSection>
-          ) : registration.overlaid_configuration.public_jwk ? (
-            <SubSection title={I18n.t('Public JWK:')}>
-              <View as="div" margin="x-small 0 0 0">
-                <pre style={{fontFamily: 'monospace'}}>
-                  {JSON.stringify(registration.overlaid_configuration.public_jwk, null, 2)}
-                </pre>
-              </View>
-            </SubSection>
-          ) : null}
-
-          <SubSection title={I18n.t('Domain:')}>
-            {registration.overlaid_configuration.domain ? (
-              <Text>{registration.overlaid_configuration.domain}</Text>
-            ) : (
-              <Text fontStyle="italic">{I18n.t('No domain configured.')}</Text>
-            )}
-          </SubSection>
-
-          <SubSection title={I18n.t('Custom Fields:')}>
-            {customFields.length === 0 ? (
-              <Text fontStyle="italic">{I18n.t('No custom fields configured.')}</Text>
-            ) : (
-              <View as="div" margin="x-small 0 0 0">
-                <pre style={{fontFamily: 'monospace'}}>
-                  {customFields.map(([key, field]) => `${key}=${field}`).join('\n')}
-                </pre>
-              </View>
-            )}
-          </SubSection>
+          <LaunchSettingsReadOnlyView
+            redirectUris={redirectUris}
+            targetLinkUri={registration.overlaid_configuration.target_link_uri}
+            oidcInitiationUrl={registration.overlaid_configuration.oidc_initiation_url}
+            publicJwkUrl={registration.overlaid_configuration.public_jwk_url}
+            publicJwk={registration.overlaid_configuration.public_jwk}
+            domain={registration.overlaid_configuration.domain}
+            customFields={registration.overlaid_configuration.custom_fields}
+          />
         </Section>
       ) : null}
 
@@ -371,86 +272,12 @@ export const ToolConfigurationView = () => {
       </Section>
 
       <Section title={I18n.t('Tool Icon URL')}>
-        {registration.overlaid_configuration.launch_settings?.icon_url ? (
-          <Flex direction="row" alignItems="center" margin="small 0 0" gap="xx-small">
-            <Flex.Item margin="0 xx-small 0 0">
-              <img
-                style={{height: '24px'}}
-                src={registration.overlaid_configuration.launch_settings.icon_url}
-                alt={I18n.t('Icon displayed next to tool on Apps page')}
-              ></img>
-            </Flex.Item>
-            <Flex.Item shouldShrink>
-              <Text wrap="break-word">
-                {registration.overlaid_configuration.launch_settings.icon_url}
-              </Text>
-            </Flex.Item>
-          </Flex>
-        ) : (
-          <Text fontStyle="italic">{I18n.t('No tool icon URL configured.')}</Text>
-        )}
-
-        <Heading level="h3" margin="small 0" id="placement-icon-urls">
-          {I18n.t('Placement Icon URLs')}
-        </Heading>
-        {enabledPlacementsWithIcons.length > 0 ? (
-          enabledPlacementsWithIcons.map((p, i) => (
-            <View key={p.placement} as="div" margin="small 0" style={{overflow: 'hidden'}}>
-              <Text weight="bold">{i18nLtiPlacement(p.placement)}:</Text>
-              <Flex
-                direction="row"
-                alignItems="center"
-                margin="0"
-                key={i}
-                style={{overflow: 'hidden'}}
-              >
-                {p.icon_url ? (
-                  <>
-                    <Flex.Item margin="0 xx-small 0 0">
-                      <img style={{height: '24px'}} src={p.icon_url} alt={registration.name}></img>
-                    </Flex.Item>
-                    {/* Can't use Flex.Item here, because it won't let us
-                      set flex:1 which is needed for the text-overflow */}
-                    <div
-                      data-testid={`icon-url-${p.placement}`}
-                      style={{
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        flex: 1,
-                      }}
-                    >
-                      {p.icon_url}
-                    </div>
-                  </>
-                ) : isLtiPlacementWithDefaultIcon(p.placement) ? (
-                  <>
-                    <Flex.Item margin="0 xx-small 0 0">
-                      <img
-                        style={{height: '24px'}}
-                        src={ltiToolDefaultIconUrl({
-                          base: window.location.origin,
-                          toolName: registration.name,
-                          developerKeyId: registration.developer_key_id || undefined,
-                        })}
-                        alt={registration.name}
-                      ></img>
-                    </Flex.Item>
-                    <Flex.Item margin="0 xx-small 0 0" data-testid={`icon-url-${p.placement}`}>
-                      <Text fontStyle="italic">{I18n.t('Default Icon')}</Text>
-                    </Flex.Item>
-                  </>
-                ) : (
-                  <Text fontStyle="italic" data-testid={`icon-url-${p.placement}`}>
-                    {I18n.t('Not Included')}
-                  </Text>
-                )}
-              </Flex>
-            </View>
-          ))
-        ) : (
-          <Text fontStyle="italic">{I18n.t('No placements with icons are enabled.')}</Text>
-        )}
+        <IconUrlsReadOnlyView
+          toolIconUrl={registration.overlaid_configuration.launch_settings?.icon_url}
+          placements={enabledPlacementsWithIcons}
+          registrationName={registration.name}
+          developerKeyId={registration.developer_key_id}
+        />
       </Section>
 
       <ToolConfigurationFooter>
