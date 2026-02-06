@@ -18,18 +18,18 @@
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import {NativeDiscoveryPage} from './react/components/NativeDiscoveryPage'
+import {DiscoveryPage} from './react'
 import ready from '@instructure/ready'
 
 ready(() => {
-  const reactRoot = document.getElementById('native-discovery-page-root')
+  const reactRoot = document.getElementById('discovery-page-root')
   const hiddenField = document.getElementById(
-    'native_discovery_enabled_field',
+    'discovery_page_active_field',
   ) as HTMLInputElement | null
   if (reactRoot && hiddenField) {
     const currentValue = hiddenField.value === 'true'
     createRoot(reactRoot).render(
-      <NativeDiscoveryPage
+      <DiscoveryPage
         initialEnabled={currentValue}
         onChange={newValue => {
           hiddenField.value = String(newValue)
