@@ -86,11 +86,11 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
   )
 
   const onSuccessfulInstallForInheritedKey = React.useCallback(
-    (config: LtiRegistrationWithConfiguration) => {
+    (id: LtiRegistrationId, name?: string) => {
       if (window.ENV.FEATURES.lti_registrations_next) {
-        navigate(`/manage/${config.id}`)
+        navigate(`/manage/${id}`)
       } else {
-        navigate(`/manage?q=${config.admin_nickname || config.name}`)
+        navigate(`/manage?q=${name}`)
       }
     },
     [navigate],

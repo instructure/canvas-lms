@@ -1435,7 +1435,7 @@ class Lti::RegistrationsController < ApplicationController
         @current_user,
         session,
         @context,
-        includes: [:account_binding, :configuration],
+        includes: %i[account_binding configuration overlaid_configuration],
         account_binding: registration.account_binding_for(@context)
       )
     end

@@ -161,6 +161,23 @@ describe('Review Screen Wrapper', () => {
     expect(screen.getByText('Icon URLs')).toBeInTheDocument()
   })
 
+  it('does not render icon URLs section when includeIconUrls is false', () => {
+    const internalConfig = mockInternalConfiguration({})
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+    render(
+      <ReviewScreenWrapper
+        overlayStore={overlayStore}
+        internalConfig={internalConfig}
+        transitionTo={vi.fn()}
+        includeIconUrls={false}
+      />,
+    )
+
+    expect(screen.queryByText('Icon URLs')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: /Edit Icon URLs/i})).not.toBeInTheDocument()
+  })
+
   it('transitions to the correct step when edit buttons are clicked', async () => {
     const {transitionTo} = renderComponent()
 
