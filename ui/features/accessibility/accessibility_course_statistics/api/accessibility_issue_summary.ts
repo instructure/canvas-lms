@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mockScan3, mockScanData} from '../../../../shared/react/stores/mockData'
-import {calculateTotalIssuesCount} from '../../../../shared/react/utils/apiData'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {AccessibilityIssueSummary} from '../types/accessibility_issue_summary'
 
-describe('calculateTotalIssuesCount', () => {
-  it('returns 0 if the scans array is empty', () => {
-    expect(calculateTotalIssuesCount([])).toBe(0)
+interface FetchAccessibilityIssueSummaryParams {
+  accountId: string
+}
+
+export const fetchAccessibilityIssueSummary = async (
+  params: FetchAccessibilityIssueSummaryParams,
+): Promise<AccessibilityIssueSummary> => {
+  const {accountId} = params
+
+  const response = await doFetchApi<AccessibilityIssueSummary>({
+    path: `/api/v1/accounts/${accountId}/accessibility_issue_summary`,
   })
 
-  it('returns 0 if the scans has only no-issue items', () => {
-    const data = [mockScan3]
-    expect(calculateTotalIssuesCount(data)).toBe(0)
-  })
-
-  it('returns the total count of issues from all scans', () => {
-    expect(calculateTotalIssuesCount(mockScanData)).toBe(5)
-  })
-})
+  return response.json || {active: 0, resolved: 0}
+}

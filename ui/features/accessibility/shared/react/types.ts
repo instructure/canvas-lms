@@ -121,7 +121,8 @@ export interface AccessibilityIssue {
 }
 
 export interface AccessibilityIssuesSummaryData {
-  total: number
+  active: number
+  resolved: number
   byRuleType: Record<string, number>
 }
 

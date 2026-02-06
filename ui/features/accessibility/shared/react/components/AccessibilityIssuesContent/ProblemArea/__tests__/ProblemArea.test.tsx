@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cleanup, render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import {setupServer} from 'msw/node'
-import {http, HttpResponse} from 'msw'
 import {ProblemArea} from '../ProblemArea'
 import {
   AccessibilityIssue,
