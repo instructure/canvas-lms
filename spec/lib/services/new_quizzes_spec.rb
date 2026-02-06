@@ -30,17 +30,73 @@ module Services
         .with(tree: :private)
         .and_return(DynamicSettings::FallbackProxy.new({
                                                          "new_quizzes.yml" => {
-                                                           "launch_url" => "https://test.instructure.com/quizzes"
+                                                           NewQuizzes::NEW_QUIZZES_CLOUDFRONT_HOST_PRODUCTION_KEY => "https://example.cloudfront.net"
                                                          }.to_yaml
                                                        }))
+      allow(ApplicationController).to receive(:region).and_return("us-west-2")
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_return("prod")
     end
 
     describe ".launch_url" do
-      it "returns the launch URL from the dynamic settings" do
-        expect(NewQuizzes.launch_url).to eq("https://test.instructure.com/quizzes")
+      context "in development environment" do
+        it "returns edge_cloudfront_host/none/remoteEntry.js" do
+          allow(Rails.env).to receive(:development?).and_return(true)
+          allow(DynamicSettings).to receive(:find)
+            .with(tree: :private)
+            .and_return(DynamicSettings::FallbackProxy.new({
+                                                             "new_quizzes.yml" => {
+                                                               NewQuizzes::NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY => "https://edge.cloudfront.net"
+                                                             }.to_yaml
+                                                           }))
+          expect(NewQuizzes.launch_url).to eq("https://edge.cloudfront.net/none/remoteEntry.js")
+        end
+      end
+
+      context "in non-development environment" do
+        before do
+          allow(Rails.env).to receive(:development?).and_return(false)
+        end
+
+        it "constructs URL with region and environment" do
+          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/prod/remoteEntry.js")
+        end
+
+        it "returns nil cloudfront host when config is blank" do
+          NewQuizzes.instance_variable_set(:@config, nil)
+          allow(DynamicSettings).to receive(:find)
+            .with(tree: :private)
+            .and_return(DynamicSettings::FallbackProxy.new({
+                                                             "new_quizzes.yml" => {}.to_yaml
+                                                           }))
+          expect(NewQuizzes.launch_url).to eq("/us-west-2/prod/remoteEntry.js")
+        end
+
+        it "defaults to edge and warns when CANVAS_ENVIRONMENT is not set" do
+          allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_yield
+          expect(Rails.logger).to receive(:warn).with(/CANVAS_ENVIRONMENT is not set/).at_least(:once)
+          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/edge/remoteEntry.js")
+        end
+
+        it "defaults to us-east-1 and warns when region is nil" do
+          allow(ApplicationController).to receive(:region).and_return(nil)
+          expect(Rails.logger).to receive(:warn).with(/ApplicationController.region is not set/)
+          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-east-1/prod/remoteEntry.js")
+        end
+
+        it "maps cd environment to edge" do
+          allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_return("cd")
+          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/edge/remoteEntry.js")
+        end
+
+        it "uses custom CANVAS_ENVIRONMENT value" do
+          allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_return("beta")
+          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/beta/remoteEntry.js")
+        end
       end
 
       it "caches the config" do
+        allow(Rails.env).to receive(:development?).and_return(false)
         # Call once to cache
         NewQuizzes.launch_url
 
@@ -50,71 +106,14 @@ module Services
       end
     end
 
-    context "when dynamic settings are not available" do
-      before do
-        # Reset the cached config for this context
-        NewQuizzes.instance_variable_set(:@config, nil)
-
-        allow(DynamicSettings).to receive(:find)
-          .with(tree: :private)
-          .and_return(DynamicSettings::FallbackProxy.new({
-                                                           "new_quizzes.yml" => nil
-                                                         }))
-      end
-
-      it "returns nil for launch_url" do
-        expect(NewQuizzes.launch_url).to be_nil
-      end
-    end
-
     describe ".ui_version" do
-      context "when launch URL contains a version" do
-        it "extracts the version from the URL" do
-          allow(NewQuizzes).to receive(:launch_url).and_return("https://example.com/abc123/remoteEntry.js")
-          expect(NewQuizzes.ui_version).to eq("abc123")
-        end
-
-        it "handles URLs with multiple path segments" do
-          allow(NewQuizzes).to receive(:launch_url).and_return("https://example.com/path/to/abc123/remoteEntry.js")
-          expect(NewQuizzes.ui_version).to eq("abc123")
-        end
-
-        it "returns 'none' for local development placeholder" do
-          allow(NewQuizzes).to receive(:launch_url).and_return("http://example.com:8082/none/remoteEntry.js")
-          expect(NewQuizzes.ui_version).to eq("none")
-        end
+      it "returns region/environment" do
+        expect(NewQuizzes.ui_version).to eq("us-west-2/prod")
       end
 
-      context "when launch URL is missing" do
-        it "returns nil when launch_url is nil" do
-          allow(NewQuizzes).to receive(:launch_url).and_return(nil)
-          expect(NewQuizzes.ui_version).to be_nil
-        end
-
-        it "returns nil when launch_url is empty string" do
-          allow(NewQuizzes).to receive(:launch_url).and_return("")
-          expect(NewQuizzes.ui_version).to be_nil
-        end
-      end
-
-      context "when launch URL has unexpected format" do
-        it "returns nil and logs error for URL without remoteEntry.js" do
-          allow(NewQuizzes).to receive(:launch_url).and_return("https://example.com/abc123/index.js")
-          expect(Rails.logger).to receive(:error).with(/Failed to parse New Quizzes launch URL/)
-          expect(NewQuizzes.ui_version).to be_nil
-        end
-
-        it "returns nil and logs error for URL with only remoteEntry.js" do
-          allow(NewQuizzes).to receive(:launch_url).and_return("https://example.com/remoteEntry.js")
-          expect(Rails.logger).to receive(:error).with(/Failed to parse New Quizzes launch URL/)
-          expect(NewQuizzes.ui_version).to be_nil
-        end
-
-        it "returns nil and logs error for invalid URL" do
-          allow(NewQuizzes).to receive(:launch_url).and_return("not a valid url")
-          expect(Rails.logger).to receive(:error).with(/Failed to parse New Quizzes launch URL/)
-          expect(NewQuizzes.ui_version).to be_nil
-        end
+      it "returns none in development" do
+        allow(Rails.env).to receive(:development?).and_return(true)
+        expect(NewQuizzes.ui_version).to eq("none")
       end
     end
   end
