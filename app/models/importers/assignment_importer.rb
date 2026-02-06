@@ -469,7 +469,48 @@ module Importers
         parent_item.sub_assignments << sub_assignment
       end
 
+      # Fix inconsistent state: if has_sub_assignments=true but checkpoints are deleted, restore them
+      fix_checkpoint_consistency(parent_item, migration)
+
       create_missing_sub_assignment_submissions(parent_item)
+    end
+
+    def self.fix_checkpoint_consistency(parent_item, migration)
+      # Consistency rule: if has_sub_assignments is true, each checkpoint tag
+      # should have exactly one active record. Restore only the most recently
+      # updated deleted checkpoint per tag, and only when none is active for
+      # that tag. This prevents stale duplicates from previous toggle cycles
+      # being resurrected alongside current active ones.
+      return unless parent_item.has_sub_assignments
+
+      all_checkpoints = SubAssignment.where(parent_assignment_id: parent_item.id)
+      restore_state = parent_item.workflow_state
+      restored_count = 0
+
+      [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY].each do |tag|
+        # Skip if an active checkpoint already exists for this tag
+        next if all_checkpoints.where(sub_assignment_tag: tag).where.not(workflow_state: "deleted").exists?
+
+        latest_deleted = all_checkpoints
+                         .where(sub_assignment_tag: tag, workflow_state: "deleted")
+                         .order(updated_at: :desc)
+                         .first
+
+        next unless latest_deleted
+
+        latest_deleted.update_columns(workflow_state: restore_state, updated_at: Time.now.utc)
+        restored_count += 1
+      end
+
+      return if restored_count.zero?
+
+      Rails.logger.info(
+        "[Import Consistency Fix] Assignment #{parent_item.id} (#{parent_item.title}) " \
+        "restored #{restored_count} checkpoint(s) to #{restore_state} state. " \
+        "Migration: #{migration&.id}"
+      )
+
+      parent_item.sub_assignments.reload
     end
 
     def self.find_or_create_sub_assignment(sub_assignment_hash, parent_item)
