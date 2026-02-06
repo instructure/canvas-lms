@@ -5538,6 +5538,7 @@ fa:
   close_suggestions_6fcb4985: "بستن پیشنهادات"
   close_the_window_and_try_again_7353f8e: "پنجره را ببندید و دوباره امتحان کنید."
   close_warning_d61daf2c: "بستن هشدار"
+  closed_983a96fe: "بسته شده"
   closed_for_comments_e395b42f: "امکان ارسال نظر وجود ندارد"
   closes_5c6b4367: "بستن:"
   code_93e9abbb: کد
@@ -16739,6 +16740,7 @@ fa:
   not_available_at_the_subaccount_level_3fc74ab: "در سطح زیر حساب موجود نیست."
   not_available_at_the_subaccount_level_6ee9b41f: "در سطح زیر حساب موجود نیست"
   not_available_during_sync_ae645e8c: "در طول همگام‌سازی، موجود نیست"
+  not_available_until_14e61f1e: "غیر قابل دسترسی تا"
   not_available_until_date_3c1c73c2: "غیر قابل دسترس تا %{date}"
   not_available_until_next_submission_2175158: "تا مورد ارسالی بعدی در دسترس نیست"
   not_calculated_in_final_grade_2b7d5bd1: "در نمره نهایی محاسبه نشده است"
