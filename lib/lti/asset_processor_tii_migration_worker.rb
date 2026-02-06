@@ -101,6 +101,12 @@ module Lti
       end
     end
 
+    # This method is only called from rails console, manually
+    def rollback_progress
+      Progress.where(tag: "lti_tii_ap_migration", context: @account).update_all(tag: "lti_tii_ap_migration_rolled_back")
+      Progress.where(tag: "lti_tii_ap_migration_coordinator", context: @account).update_all(tag: "lti_tii_ap_migration_coordinator_rolled_back")
+    end
+
     private
 
     def migrate_actls(csv)
