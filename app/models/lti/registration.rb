@@ -192,10 +192,14 @@ class Lti::Registration < ActiveRecord::Base
   # for a _sub_ account underneath the registration's root account.
   def inherited_for?(account)
     if self.account.feature_enabled?(:lti_registrations_templates)
-      template_registration_id.present?
+      inherited_from_template?
     else
       account != self.account
     end
+  end
+
+  def inherited_from_template?
+    template_registration_id.present?
   end
 
   def developer_key
@@ -287,7 +291,7 @@ class Lti::Registration < ActiveRecord::Base
 
   def undestroy(active_state: "active")
     ims_registration&.undestroy
-    developer_key&.update!(workflow_state: active_state)
+    developer_key&.update!(workflow_state: active_state) unless inherited_from_template?
     lti_registration_account_bindings.each(&:undestroy)
     manual_configuration&.undestroy
     super
@@ -322,9 +326,11 @@ class Lti::Registration < ActiveRecord::Base
   # Finally, dependent: :destroy on the tool_configuration will also hard delete it, which we also don't want.
   def destroy_associations
     ims_registration&.destroy
-    developer_key&.destroy
+    unless inherited_from_template?
+      developer_key&.destroy
+    end
     lti_registration_account_bindings.each(&:destroy)
-    manual_configuration&.destroy
+    deployments.each(&:destroy)
   end
 
   # Overridden in MRA, where federated consortia are supported

@@ -135,6 +135,47 @@ describe Lti::InstallTemplateRegistrationService do
     expect(template.local_copies.where(account:).count).to eq(1)
   end
 
+  it "uses an existing local copy without creating another one" do
+    existing_copy = Lti::Registration.create!(
+      account:,
+      name: template.name,
+      template_registration: template,
+      created_by: user,
+      updated_by: user
+    )
+
+    expect do
+      result = Lti::InstallTemplateRegistrationService.call(
+        account:,
+        user:,
+        template:
+      )
+
+      expect(result).to eq(existing_copy)
+    end.not_to change { Lti::Registration.count }
+  end
+
+  it "does not use a deleted local copy" do
+    deleted_copy = Lti::Registration.create!(
+      account:,
+      name: template.name,
+      template_registration: template,
+      created_by: user,
+      updated_by: user,
+      workflow_state: "deleted"
+    )
+
+    new_copy = Lti::InstallTemplateRegistrationService.call(
+      account:,
+      user:,
+      template:
+    )
+
+    expect(new_copy).not_to eq(deleted_copy)
+    expect(new_copy.workflow_state).to eq("active")
+    expect(template.local_copies.where(account:).active.count).to eq(1)
+  end
+
   it "does not create an account binding" do
     local_copy = Lti::InstallTemplateRegistrationService.call(
       account:,
