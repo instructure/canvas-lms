@@ -1245,4 +1245,81 @@ describe DiscussionTopicsApiController do
       end
     end
   end
+
+  describe "POST accessibility_queue_scan" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @student = student_in_course(active_all: true).user
+      @topic = @course.discussion_topics.create!(
+        title: "Test Discussion",
+        message: "<h1>Title</h1><p>Content</p>"
+      )
+    end
+
+    def accessibility_queue_scan_request(user, topic_id, expected_status: 200)
+      user_session(user)
+      post "accessibility_queue_scan",
+           params: {
+             course_id: @course.id,
+             topic_id:
+           },
+           format: "json"
+
+      (response.status == expected_status) ? response.parsed_body : nil
+    end
+
+    context "when a11y_checker feature is enabled" do
+      before do
+        @course.account.enable_feature!(:a11y_checker)
+        @course.enable_feature!(:a11y_checker_eap)
+      end
+
+      it "requires manage course content permissions" do
+        accessibility_queue_scan_request(@student, @topic.id, expected_status: 403)
+      end
+
+      it "queues an accessibility scan and returns scan results" do
+        json = accessibility_queue_scan_request(@teacher, @topic.id)
+
+        expect(json["id"]).to be_present
+        expect(json["resource_type"]).to eq("DiscussionTopic")
+        expect(json["resource_name"]).to eq("Test Discussion")
+        expect(json["workflow_state"]).to be_in(%w[queued running completed])
+        expect(json).to have_key("issue_count")
+        expect(json).to have_key("issues")
+      end
+
+      it "returns 404 for non-existent discussion topic" do
+        accessibility_queue_scan_request(@teacher, 999_999, expected_status: 404)
+      end
+
+      it "calls ResourceScannerService with the discussion topic" do
+        service_double = instance_double(Accessibility::ResourceScannerService)
+        scan_double = instance_double(AccessibilityResourceScan,
+                                      id: 1,
+                                      context: @topic,
+                                      resource_name: "Test Discussion",
+                                      resource_workflow_state: "active",
+                                      resource_updated_at: Time.zone.now,
+                                      context_url: "/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                                      workflow_state: "queued",
+                                      error_message: nil,
+                                      issue_count: nil,
+                                      accessibility_issues: double(select: []))
+
+        expect(Accessibility::ResourceScannerService).to receive(:new)
+          .with(resource: @topic)
+          .and_return(service_double)
+        expect(service_double).to receive(:call).and_return(scan_double)
+
+        accessibility_queue_scan_request(@teacher, @topic.id)
+      end
+    end
+
+    context "when a11y_checker feature is disabled" do
+      it "returns 403 when feature is not enabled" do
+        accessibility_queue_scan_request(@teacher, @topic.id, expected_status: 403)
+      end
+    end
+  end
 end

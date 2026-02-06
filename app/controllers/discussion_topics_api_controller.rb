@@ -38,7 +38,8 @@ class DiscussionTopicsApiController < ApplicationController
                                                   show
                                                   unsubscribe_topic
                                                   update_discussion_types
-                                                  accessibility_scan]
+                                                  accessibility_scan
+                                                  accessibility_queue_scan]
   before_action only: %i[replies
                          entries
                          add_entry
@@ -1131,6 +1132,14 @@ class DiscussionTopicsApiController < ApplicationController
     return render_unauthorized_action unless @context.a11y_checker_enabled?
 
     scan = Accessibility::ResourceScannerService.new(resource: @topic).call_sync
+    render json: accessibility_resource_scan_json(scan)
+  end
+
+  def accessibility_queue_scan
+    return unless authorized_action(@topic, @current_user, :update)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    scan = Accessibility::ResourceScannerService.new(resource: @topic).call
     render json: accessibility_resource_scan_json(scan)
   end
 

@@ -29,7 +29,7 @@ class AnnouncementsApiController < ApplicationController
 
   before_action :parse_context_codes, only: [:index]
   before_action :get_dates, only: [:index]
-  before_action :require_context_and_announcement, only: [:accessibility_scan]
+  before_action :require_context_and_announcement, only: [:accessibility_scan, :accessibility_queue_scan]
 
   # @API List announcements
   #
@@ -154,16 +154,19 @@ class AnnouncementsApiController < ApplicationController
                                             include_sections_user_count: include_params.include?("sections_user_count"))
   end
 
-  # @API Scan announcement for accessibility issues
-  #
-  # Scans an announcement for accessibility issues and returns the results.
-  #
-  # @returns AccessibilityResourceScan
   def accessibility_scan
     return unless authorized_action(@announcement, @current_user, :update)
     return render_unauthorized_action unless @context.a11y_checker_enabled?
 
     scan = Accessibility::ResourceScannerService.new(resource: @announcement).call_sync
+    render json: accessibility_resource_scan_json(scan)
+  end
+
+  def accessibility_queue_scan
+    return unless authorized_action(@announcement, @current_user, :update)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    scan = Accessibility::ResourceScannerService.new(resource: @announcement).call
     render json: accessibility_resource_scan_json(scan)
   end
 
