@@ -67,7 +67,7 @@ describe('AddLinkModal', () => {
     await clickAdd()
 
     expect(mockProps.onAdd).toHaveBeenCalledWith({
-      text: 'TestLink',
+      label: 'TestLink',
       url: 'https://example.com',
     })
   })

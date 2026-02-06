@@ -904,6 +904,10 @@
           <div id="custom_help_link_settings"></div>
         <% end %>
 
+        <% if @account.feature_enabled?(:nav_menu_links) %>
+          <div id="nav_menu_links_settings"></div>
+        <% end %>
+
         <% unless @account.site_admin? %>
           <fieldset id="turnitin_settings">
             <legend><%= t("Similarity Detection Platform") %></legend>
