@@ -157,5 +157,5 @@ class AuthenticationProvidersPresenter
     suf
   end
 
-  delegate :native_discovery_enabled?, to: :account
+  delegate :discovery_page_active?, to: :account
 end
