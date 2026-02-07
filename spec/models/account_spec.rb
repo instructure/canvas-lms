@@ -2535,6 +2535,34 @@ describe Account do
     end
   end
 
+  describe "discovery_page_active setting" do
+    let(:account) { Account.create!(name: "Test", workflow_state: "active") }
+
+    it "defaults discovery_page_active to false" do
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when active is nil" do
+      account.settings[:discovery_page] = { active: nil }
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when discovery_page is not set" do
+      account.settings.delete(:discovery_page)
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "returns true when active is true" do
+      account.settings[:discovery_page] = { active: true }
+      expect(account.discovery_page_active?).to be(true)
+    end
+
+    it "returns false when active is explicitly false" do
+      account.settings[:discovery_page] = { active: false }
+      expect(account.discovery_page_active?).to be(false)
+    end
+  end
+
   describe "native_discovery_enabled setting" do
     let(:account) { Account.create!(name: "Test", workflow_state: "active") }
 

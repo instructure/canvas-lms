@@ -32,7 +32,8 @@ describe DiscoveryPagesApiController do
         ],
         secondary: [
           { authentication_provider_id: secondary_auth_provider.id, label: "Other Provider", icon_url: "https://example.com/icon.png" }
-        ]
+        ],
+        active: false
       }
     end
 
@@ -63,7 +64,6 @@ describe DiscoveryPagesApiController do
 
       it "stores discovery_page settings successfully" do
         put :upsert, params: { discovery_page: valid_discovery_page }
-
         expect(response).to be_successful
         json = json_parse(response.body)
         expect(json["discovery_page"]["primary"].length).to eq(1)
@@ -131,6 +131,69 @@ describe DiscoveryPagesApiController do
         expect(response).to be_successful
         account.reload
         expect(account.settings[:discovery_page][:primary].length).to eq(1)
+      end
+
+      it "stores active flag when provided as true" do
+        put :upsert, params: { discovery_page: valid_discovery_page.merge(active: true) }
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json["discovery_page"]["active"]).to be true
+        account.reload
+        expect(account.settings[:discovery_page][:active]).to be true
+      end
+
+      it "replaces entire discovery_page on subsequent updates (PUT semantics)" do
+        put :upsert, params: { discovery_page: valid_discovery_page.merge(active: true) }
+        expect(response).to be_successful
+        account.reload
+        expect(account.settings[:discovery_page][:primary].length).to eq(1)
+        expect(account.settings[:discovery_page][:active]).to be true
+        put :upsert, params: {
+          discovery_page: {
+            primary: [{ authentication_provider_id: secondary_auth_provider.id, label: "NewPrimary" }],
+            secondary: []
+          }
+        }
+        expect(response).to be_successful
+        account.reload
+        expect(account.settings[:discovery_page][:primary].length).to eq(1)
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("NewPrimary")
+        expect(account.settings[:discovery_page][:secondary]).to be_empty
+        expect(account.settings[:discovery_page][:active]).to be false
+      end
+
+      it "clears primary array when provided empty" do
+        put :upsert, params: { discovery_page: valid_discovery_page }
+        expect(response).to be_successful
+        account.reload
+        expect(account.settings[:discovery_page][:primary]).to be_present
+        put :upsert, params: {
+          discovery_page: {
+            primary: [],
+            secondary: [{ authentication_provider_id: secondary_auth_provider.id, label: "Secondary" }]
+          }
+        }
+        expect(response).to be_successful
+        account.reload
+        expect(account.settings[:discovery_page][:primary]).to be_empty
+        expect(account.settings[:discovery_page][:secondary].length).to eq(1)
+      end
+
+      it "clears secondary array when provided empty" do
+        put :upsert, params: { discovery_page: valid_discovery_page }
+        expect(response).to be_successful
+        account.reload
+        expect(account.settings[:discovery_page][:secondary]).to be_present
+        put :upsert, params: {
+          discovery_page: {
+            primary: [{ authentication_provider_id: auth_provider.id, label: "Primary" }],
+            secondary: []
+          }
+        }
+        expect(response).to be_successful
+        account.reload
+        expect(account.settings[:discovery_page][:primary].length).to eq(1)
+        expect(account.settings[:discovery_page][:secondary]).to be_empty
       end
 
       context "with invalid authentication providers" do
@@ -208,23 +271,43 @@ describe DiscoveryPagesApiController do
           account.save!
         end
 
-        it "returns discovery_page settings" do
+        it "returns configured discovery_page with active defaulted to false" do
           get :show
 
           expect(response).to be_successful
           json = json_parse(response.body)
           expect(json["discovery_page"]["primary"].length).to eq(1)
           expect(json["discovery_page"]["primary"][0]["label"]).to eq("Test")
+          expect(json["discovery_page"]["secondary"].length).to eq(0)
+          expect(json["discovery_page"]["active"]).to be false
+        end
+
+        it "returns active flag when set to true" do
+          account.settings[:discovery_page][:active] = true
+          account.save!
+          get :show
+          expect(response).to be_successful
+          json = json_parse(response.body)
+          expect(json["discovery_page"]["active"]).to be true
+        end
+
+        it "returns active flag when set to false" do
+          account.settings[:discovery_page][:active] = false
+          account.save!
+          get :show
+          expect(response).to be_successful
+          json = json_parse(response.body)
+          expect(json["discovery_page"]["active"]).to be false
         end
       end
 
       context "when discovery_page is not configured" do
-        it "returns empty discovery_page object" do
+        it "returns discovery_page with defaults for all fields" do
           get :show
 
           expect(response).to be_successful
           json = json_parse(response.body)
-          expect(json["discovery_page"]).to eq({})
+          expect(json["discovery_page"]).to eq({ "primary" => [], "secondary" => [], "active" => false })
         end
       end
     end

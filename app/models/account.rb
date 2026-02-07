@@ -1843,6 +1843,10 @@ class Account < ActiveRecord::Base
     settings[:unknown_user_url]
   end
 
+  def discovery_page_active?
+    settings.dig(:discovery_page, :active) == true
+  end
+
   def validate_auth_discovery_url
     return if settings[:auth_discovery_url].blank?
 
