@@ -18,7 +18,7 @@
 
 import {render} from '@canvas/react'
 import ready from '@instructure/ready'
-import {NewQuizzesApp} from './app/NewQuizzesApp'
+import {NewQuizzesApp} from '@canvas/new-quizzes/react/NewQuizzesApp'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import {NewQuizzesLayout} from './layout/NewQuizzesLayout'
 

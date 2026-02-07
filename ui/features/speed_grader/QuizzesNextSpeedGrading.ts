@@ -33,11 +33,22 @@
 import type {Submission} from '../../api.d'
 import $ from 'jquery'
 
+// Helper to detect if we're in native quiz mode
+function isNativeMode() {
+  return ENV.NEW_QUIZZES && window.jsonData?.quiz_lti
+}
+
 // @ts-expect-error
 function sendPostMessage($iframe_holder, message) {
-  const contentWindow = $iframe_holder.children()[0]?.contentWindow
-  if (contentWindow) {
-    contentWindow.postMessage(message, '*')
+  if (isNativeMode()) {
+    // In native mode, post to window (federated module listens)
+    window.postMessage(message, '*')
+  } else {
+    // In LTI mode, post to iframe
+    const contentWindow = $iframe_holder.children()[0]?.contentWindow
+    if (contentWindow) {
+      contentWindow.postMessage(message, '*')
+    }
   }
 }
 
@@ -158,10 +169,7 @@ export function postChangeSubmissionVersionMessage($iframe_holder, submission) {
     subject: 'canvas.speedGraderSubmissionChange',
     submission: {...submission, external_tool_url: submission.url},
   }
-  const contentWindow = $iframe_holder.children()[0]?.contentWindow
-  if (contentWindow) {
-    contentWindow.postMessage(message, '*')
-  }
+  sendPostMessage($iframe_holder, message)
 }
 
 export default {

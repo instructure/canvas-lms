@@ -536,6 +536,10 @@ export type SpeedGrader = {
     lti_retrieve_url: string,
     submission: HistoricalSubmission,
   ) => void
+  renderNativeQuiz: (submission: HistoricalSubmission) => void
+  unmountNativeQuiz: () => void
+  renderAmsGrading: (submission: HistoricalSubmission) => void
+  unmountAmsGrading: () => void
   setCurrentStudentAvatar: () => void
   setActiveProvisionalGradeFields: (options?: {
     grade?: null | Partial<ProvisionalGrade>
