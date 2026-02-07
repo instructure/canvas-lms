@@ -18,21 +18,26 @@
 
 import {captureException} from '@sentry/browser'
 import {useEffect, useRef} from 'react'
-import {fetchNewQuizzesToken} from '../api/jwt'
+import {fetchNewQuizzesToken} from './api/jwt'
 import {ZAccountId} from '@canvas/lti-apps/models/AccountId'
-import {useModuleItemSequence} from '../hooks/useModuleItemSequence'
+import {useModuleItemSequence} from './hooks/useModuleItemSequence'
 
 interface RemoteModule {
   render?: (element: HTMLDivElement, props: any) => void
   unmount?: () => void
 }
 
-const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
+export interface NewQuizzesAppProps {
+  speedgraderExtensions?: any
+}
 
-export function NewQuizzesApp() {
+export function NewQuizzesApp({speedgraderExtensions}: NewQuizzesAppProps = {}) {
+  const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
   // Store mount point in useRef
   const mountPoint = useRef<HTMLDivElement>(null)
-  const quizzesData = ENV.NEW_QUIZZES
+  const quizzesData = speedgraderExtensions
+    ? {...ENV.NEW_QUIZZES, ...speedgraderExtensions}
+    : ENV.NEW_QUIZZES
 
   const courseId = quizzesData?.params?.custom_canvas_course_id?.toString()
 

@@ -73,6 +73,7 @@ import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
+import {SpeedGraderNativeQuizRenderer} from '../react/SpeedGraderNativeQuizRenderer'
 import {LtiAssetReportsForSpeedgraderWrapper} from '@canvas/lti-asset-processor/react/LtiAssetReportsForSpeedgraderWrapper'
 import useStore from '../stores/index'
 import type {
@@ -238,6 +239,7 @@ let $submissions_container: JQuery
 let $iframe_holder: JQuery
 let $ams_grading_container: JQuery
 let amsGradingRoot: Root | null = null
+let nativeQuizRoot: Root | null = null
 let $avatar_image: JQuery
 let $x_of_x_students: JQuery
 let $grded_so_far: JQuery
@@ -3287,7 +3289,10 @@ EG = {
     } else if (submission && submission.submission_type === 'ams') {
       this.renderAmsGrading(submission)
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
-      if (
+      // Check if native quiz rendering is enabled
+      if (ENV.NEW_QUIZZES && window.jsonData.quiz_lti) {
+        this.renderNativeQuiz(submission)
+      } else if (
         !ENV.SINGLE_NQ_SESSION_ENABLED ||
         !externalToolLoaded ||
         !externalToolLaunchOptions.singleLtiLaunch
@@ -3308,6 +3313,7 @@ EG = {
     elem = elem || $iframe_holder
     elem.empty()
     this.unmountAmsGrading()
+    this.unmountNativeQuiz()
   },
 
   // load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
@@ -3446,6 +3452,33 @@ EG = {
       amsGradingRoot = null
     }
     $ams_grading_container.hide()
+  },
+
+  renderNativeQuiz(submission: HistoricalSubmission) {
+    this.emptyIframeHolder()
+    const container = document.getElementById('native_quiz_container')
+
+    if (!container) {
+      console.error('Native quiz container not found')
+      return
+    }
+
+    // Show container
+    container.style.display = 'block'
+
+    // Mount React component
+    nativeQuizRoot = render(<SpeedGraderNativeQuizRenderer submission={submission} />, container)
+  },
+
+  unmountNativeQuiz() {
+    const container = document.getElementById('native_quiz_container')
+    if (nativeQuizRoot) {
+      nativeQuizRoot.unmount()
+      nativeQuizRoot = null
+    }
+    if (container) {
+      container.style.display = 'none'
+    }
   },
 
   generateWarningTimings(numHours: number): number[] {

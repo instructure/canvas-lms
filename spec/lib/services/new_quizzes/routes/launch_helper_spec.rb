@@ -142,6 +142,84 @@ describe Services::NewQuizzes::Routes::LaunchHelper do
     end
   end
 
+  describe ".build_speedgrader_launch_data" do
+    let(:basename) { "/courses/#{course.id}/gradebook/speed_grader" }
+
+    it "returns signed launch data with basename and grade_by_question_enabled" do
+      result = described_class.build_speedgrader_launch_data(
+        tool:,
+        assignment:,
+        context: course,
+        user:,
+        controller:,
+        request:,
+        basename:,
+        current_pseudonym: pseudonym,
+        domain_root_account: account
+      )
+
+      expect(result).to be_a(Hash)
+      expect(result[:basename]).to eq(basename)
+      expect(result).to have_key(:grade_by_question_enabled)
+    end
+
+    it "defaults grade_by_question_enabled to false" do
+      result = described_class.build_speedgrader_launch_data(
+        tool:,
+        assignment:,
+        context: course,
+        user:,
+        controller:,
+        request:,
+        basename:
+      )
+
+      expect(result[:grade_by_question_enabled]).to be false
+    end
+
+    it "returns true for grade_by_question_enabled when user preference is set" do
+      user.preferences[:enable_speedgrader_grade_by_question] = true
+      user.save!
+
+      result = described_class.build_speedgrader_launch_data(
+        tool:,
+        assignment:,
+        context: course,
+        user:,
+        controller:,
+        request:,
+        basename:
+      )
+
+      expect(result[:grade_by_question_enabled]).to be true
+    end
+
+    it "calls LaunchDataBuilder with correct parameters" do
+      expect(NewQuizzes::LaunchDataBuilder).to receive(:new).with(
+        hash_including(
+          context: course,
+          assignment:,
+          tool:,
+          tag: assignment.external_tool_tag,
+          current_user: user,
+          controller:,
+          request:,
+          placement: nil
+        )
+      ).and_call_original
+
+      described_class.build_speedgrader_launch_data(
+        tool:,
+        assignment:,
+        context: course,
+        user:,
+        controller:,
+        request:,
+        basename:
+      )
+    end
+  end
+
   describe ".item_bank_launch_data" do
     let(:placement) { "course_navigation" }
     let(:basename) { "/courses/#{course.id}" }

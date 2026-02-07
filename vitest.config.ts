@@ -227,5 +227,23 @@ export default defineConfig({
       },
     ],
   },
-  plugins: [jestMockHoistPlugin, handlebarsPlugin(), svgPlugin(), graphqlPlugin, cssPlugin],
+  plugins: [
+    jestMockHoistPlugin,
+    handlebarsPlugin(),
+    svgPlugin(),
+    graphqlPlugin,
+    cssPlugin,
+    // Mock for newquizzes/appInjector module federation remote (not available in test env)
+    {
+      name: 'mock-newquizzes-app-injector',
+      resolveId(id: string) {
+        if (id === 'newquizzes/appInjector') return '\0newquizzes/appInjector'
+      },
+      load(id: string) {
+        if (id === '\0newquizzes/appInjector') {
+          return 'export const render = () => {}; export const unmount = () => {}'
+        }
+      },
+    },
+  ],
 })
