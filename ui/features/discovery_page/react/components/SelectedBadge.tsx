@@ -16,26 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
-import {DiscoveryPage} from './react'
-import ready from '@instructure/ready'
+import {IconCheckSolid} from '@instructure/ui-icons'
+import {colors} from '@instructure/canvas-theme'
 
-ready(() => {
-  const reactRoot = document.getElementById('discovery-page-root')
-  const hiddenField = document.getElementById(
-    'discovery_page_active_field',
-  ) as HTMLInputElement | null
+const BADGE_SIZE = 16
 
-  if (reactRoot && hiddenField) {
-    const currentValue = hiddenField.value === 'true'
-
-    createRoot(reactRoot).render(
-      <DiscoveryPage
-        initialEnabled={currentValue}
-        onChange={newValue => {
-          hiddenField.value = String(newValue)
-        }}
-      />,
-    )
-  }
-})
+export function SelectedBadge() {
+  return (
+    <span
+      style={{
+        position: 'absolute',
+        bottom: -2,
+        right: -2,
+        width: BADGE_SIZE,
+        height: BADGE_SIZE,
+        borderRadius: '50%',
+        backgroundColor: colors.dataVisualization.forest45Primary,
+        border: '1px solid white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+      }}
+    >
+      <IconCheckSolid width={10} height={10} color="primary-inverse" />
+    </span>
+  )
+}
