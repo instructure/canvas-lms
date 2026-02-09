@@ -3,6 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./index.jsx",
+  "main": "./index.tsx",
   "owner": "VICE"
 }
