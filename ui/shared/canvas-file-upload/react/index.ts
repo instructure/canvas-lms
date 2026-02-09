@@ -16,36 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface ContextFile {
-  id: string
-  display_name: string
-  url: string
-  instfs_uuid?: string
-  size: number
-  content_type: string
-  created_at?: string
-}
-
-export interface AIExperience {
-  id?: string
-  title: string
-  description: string
-  facts: string
-  learning_objective: string
-  pedagogical_guidance: string
-  workflow_state?: string
-}
-
-export interface AIExperienceFormData {
-  title: string
-  description: string
-  facts: string
-  learning_objective: string
-  pedagogical_guidance: string
-  workflow_state?: string
-}
-
-export interface AIExperienceEditProps {
-  aiExperience?: AIExperience
-  navbarHeight?: number
-}
+export {default as CanvasFileUpload} from './CanvasFileUpload'
+export type {ContextFile, CanvasFolder, CanvasFile, ColumnWidths} from './types'
