@@ -381,7 +381,7 @@ class ApplicationController < ActionController::Base
         @js_env[:K5_HOMEROOM_COURSE] = @context.is_a?(Course) && @context.elementary_homeroom_course?
         @js_env[:K5_SUBJECT_COURSE] = @context.is_a?(Course) && @context.elementary_subject_course?
         @js_env[:LOCALE_TRANSLATION_FILE] = helpers.path_to_asset("javascripts/translations/#{@js_env[:LOCALES].first}.json")
-        @js_env[:ACCOUNT_ID] = effective_account_id(@context)
+        @js_env[:ACCOUNT_ID] = effective_account_attribute(@context, :id)
         @js_env[:user_cache_key] = CanvasSecurity.hmac_sha512(@current_user.uuid) if @current_user.present?
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
         @js_env[:horizon_course] = @context.is_a?(Course) && @context.horizon_course?
@@ -394,16 +394,31 @@ class ApplicationController < ActionController::Base
                                     end
         if load_usage_metrics? && @domain_root_account&.feature_enabled?(:pendo_extended)
           @js_env[:USAGE_METRICS_METADATA] ||= {}
-          @js_env[:USAGE_METRICS_METADATA][:sub_account_id] = effective_account_id(@context)
-          @js_env[:USAGE_METRICS_METADATA][:sub_account_name] = effective_account_name(@context)
+          @js_env[:USAGE_METRICS_METADATA][:instance_domain] = HostUrl.context_host(@domain_root_account, request.host)
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_id] = effective_account_attribute(@context, :id)
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_name] = effective_account_attribute(@context, :name)
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_sis_id] = effective_account_attribute(@context, :sis_source_id)
+          @js_env[:USAGE_METRICS_METADATA][:user_id] = @current_user&.id
+          @js_env[:USAGE_METRICS_METADATA][:user_uuid] = @current_user&.uuid
+          @js_env[:USAGE_METRICS_METADATA][:user_sis_id] = @current_pseudonym&.sis_user_id
+          @js_env[:USAGE_METRICS_METADATA][:user_display_name] = @current_user&.short_name
+          @js_env[:USAGE_METRICS_METADATA][:user_email] = @current_user&.email
+          @js_env[:USAGE_METRICS_METADATA][:user_time_zone] = @current_user&.time_zone
 
           if @context.is_a?(Course)
             @js_env[:USAGE_METRICS_METADATA][:course_id] = @context.id
             @js_env[:USAGE_METRICS_METADATA][:course_long_name] = "#{@context.name} - #{@context.short_name}"
+            @js_env[:USAGE_METRICS_METADATA][:course_status] = @context.workflow_state
+            @js_env[:USAGE_METRICS_METADATA][:course_is_blueprint] = MasterCourses::MasterTemplate.is_master_course?(@context)
+            @js_env[:USAGE_METRICS_METADATA][:course_is_k5] = @context.elementary_subject_course?
+            @js_env[:USAGE_METRICS_METADATA][:course_has_no_students] = !@context.student_enrollments.exists?
             @js_env[:USAGE_METRICS_METADATA][:course_sis_source_id] = @context.sis_source_id
             @js_env[:USAGE_METRICS_METADATA][:course_sis_batch_id] = @context.sis_batch_id
             @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_id] = @context.enrollment_term_id
             @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_name] = @context.enrollment_term&.name
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_sis_id] = @context.enrollment_term&.sis_source_id
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_start_at] = @context.enrollment_term&.start_at
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_end_at] = @context.enrollment_term&.end_at
           end
         end
 
@@ -637,15 +652,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :render_js_env
 
-  def effective_account_id(context)
+  def effective_account_attribute(context, attribute)
     if context.is_a?(Account)
-      context.id
+      context.send(attribute)
     elsif context.is_a?(Course)
-      context.account_id
+      (attribute == :id) ? context.account_id : context.account.send(attribute)
     elsif context.respond_to?(:context)
-      effective_account_id(context.context)
+      effective_account_attribute(context.context, attribute)
     else
-      @domain_root_account&.id
+      @domain_root_account&.send(attribute)
     end
   end
 
@@ -2685,18 +2700,6 @@ class ApplicationController < ActionController::Base
     feature_enabled?(feature) && service_enabled?(feature)
   end
   helper_method :feature_and_service_enabled?
-
-  def effective_account_name(context)
-    if context.is_a?(Account)
-      context.name
-    elsif context.is_a?(Course)
-      context.account.name
-    elsif context.respond_to?(:context)
-      effective_account_name(context.context)
-    else
-      @domain_root_account&.name
-    end
-  end
 
   def random_lti_tool_form_id
     rand(0..999).to_s
