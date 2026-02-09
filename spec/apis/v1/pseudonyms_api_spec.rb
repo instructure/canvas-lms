@@ -287,6 +287,10 @@ describe PseudonymsController, type: :request do
       it "can suspend the pseudonym" do
         json = api_call(:put, @path, @path_options, { login: { workflow_state: "suspended" } })
         expect(json["workflow_state"]).to eq "suspended"
+
+        audit_record = @student.pseudonym.auditor_records.last
+        expect(audit_record.action).to eq "suspended"
+        expect(audit_record.performing_user_id).to eq @admin.id
       end
 
       it "can suspend the pseudonym and alter attributes" do

@@ -2588,12 +2588,20 @@ describe "Users API", type: :request do
       it "can suspend all pseudonyms" do
         api_call(:put, @path, @path_options, { user: { event: "suspend" } })
         expect(@student.pseudonym.reload).to be_suspended
+
+        audit_record = @student.pseudonym.auditor_records.last
+        expect(audit_record.action).to eq "suspended"
+        expect(audit_record.performing_user_id).to eq @admin.id
       end
 
       it "can unsuspend all pseudonyms" do
         @student.pseudonym.update!(workflow_state: "suspended")
         api_call(:put, @path, @path_options, { user: { event: "unsuspend" } })
         expect(@student.pseudonym.reload).to be_active
+
+        audit_record = @student.pseudonym.auditor_records.last
+        expect(audit_record.action).to eq "unsuspended"
+        expect(audit_record.performing_user_id).to eq @admin.id
       end
     end
 

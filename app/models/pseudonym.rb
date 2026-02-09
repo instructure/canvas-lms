@@ -317,10 +317,17 @@ class Pseudonym < ActiveRecord::Base
 
   def audit_log_update
     return if Setting.get("pseudonym_auditor_killswitch", "false") == "true"
-    return unless workflow_state_changed? && workflow_state == "deleted"
+    return unless workflow_state_changed?
+
+    action = if %w[deleted suspended].include?(workflow_state)
+               workflow_state
+             elsif workflow_state_was == "suspended"
+               "unsuspended"
+             end
+    return unless action
 
     performing_user = @current_user || Canvas.infer_user
-    Auditors::Pseudonym.record(self, performing_user, action: "deleted")
+    Auditors::Pseudonym.record(self, performing_user, action:)
   end
 
   def set_password_changed

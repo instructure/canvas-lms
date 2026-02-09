@@ -2320,6 +2320,7 @@ class UsersController < ApplicationController
           next if p.active? && event == "unsuspend"
           next if p.suspended? && event == "suspend"
 
+          p.current_user = @current_user # performing user for audit logging
           p.update!(workflow_state: (event == "suspend") ? "suspended" : "active")
         end
       end
