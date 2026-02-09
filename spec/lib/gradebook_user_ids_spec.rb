@@ -408,6 +408,55 @@ describe GradebookUserIds do
           [@student1.id, @student3.id, @student4.id, @concluded_student.id, @student2.id, @fake_student.id]
         )
       end
+
+      context "with students having multiple pseudonyms" do
+        before(:once) do
+          # Enable the feature flag to use the fixed implementation
+          Account.site_admin.enable_feature!(:gradebook_use_sis_pseudonym_order_for_sorting)
+
+          # The primary pseudonym should be the one with sis_user_id and position=1 (per SisPseudonym.for logic)
+          @student1.pseudonyms.create!(
+            account: @student1.account,
+            unique_id: "uuid-bert-123",
+            position: 2
+          )
+
+          @student2.pseudonyms.create!(
+            account: @student2.account,
+            unique_id: "aaa-should-not-sort-first",
+            position: 2
+          )
+
+          @student3.pseudonyms.create!(
+            account: @student3.account,
+            unique_id: "zzz-should-not-sort-last",
+            position: 2
+          )
+        end
+
+        it "sorts by the primary pseudonym login_id ascending (using SisPseudonym.for logic)" do
+          # Expected order: Bert, Carl, carl2, Ernie
+          expected_user_ids = [@student1.id, @student3.id, @student4.id, @student2.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "sorts by the primary pseudonym login_id descending (using SisPseudonym.for logic)" do
+          @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
+          # Expected order: Ernie, carl2, Carl, Bert
+          expected_user_ids = [@student2.id, @student4.id, @student3.id, @student1.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "produces deterministic results when called multiple times" do
+          # The bug was that .uniq on duplicate rows from the JOIN was non-deterministic
+          result1 = gradebook_user_ids.user_ids
+          result2 = gradebook_user_ids.user_ids
+          result3 = gradebook_user_ids.user_ids
+
+          expect(result1).to eq(result2)
+          expect(result2).to eq(result3)
+        end
+      end
     end
 
     describe "sorting by SIS ID" do
@@ -432,6 +481,39 @@ describe GradebookUserIds do
           [@student1.id, @student4.id, @student3.id, @concluded_student.id, @student2.id, @fake_student.id]
         )
       end
+
+      context "with students having multiple pseudonyms" do
+        before(:once) do
+          # Enable the feature flag to use the fixed implementation
+          Account.site_admin.enable_feature!(:gradebook_use_sis_pseudonym_order_for_sorting)
+
+          @student1.pseudonyms.create!(
+            account: @student1.account,
+            unique_id: "uuid-bert-sis",
+            sis_user_id: "zzz-should-not-sort-last",
+            position: 2
+          )
+
+          @student2.pseudonyms.create!(
+            account: @student2.account,
+            unique_id: "uuid-ernie-sis",
+            sis_user_id: "aaa-should-not-sort-first",
+            position: 2
+          )
+        end
+
+        it "sorts by the primary pseudonym SIS ID ascending (using SisPseudonym.for logic)" do
+          expected_user_ids = [@student1.id, @student4.id, @student3.id, @student2.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "sorts by the primary pseudonym SIS ID descending (using SisPseudonym.for logic)" do
+          @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
+          # Expected order: Ernie1, Carl1, carl2, Bert1
+          expected_user_ids = [@student2.id, @student3.id, @student4.id, @student1.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+      end
     end
 
     describe "sorting by integration ID" do
@@ -455,6 +537,38 @@ describe GradebookUserIds do
         expect(gradebook_user_ids.user_ids).to eq(
           [@student1.id, @student4.id, @student3.id, @concluded_student.id, @student2.id, @fake_student.id]
         )
+      end
+
+      context "with students having multiple pseudonyms" do
+        before(:once) do
+          # Enable the feature flag to use the fixed implementation
+          Account.site_admin.enable_feature!(:gradebook_use_sis_pseudonym_order_for_sorting)
+
+          @student1.pseudonyms.create!(
+            account: @student1.account,
+            unique_id: "uuid-bert-int",
+            integration_id: "zzz-should-not-sort-last",
+            position: 2
+          )
+
+          @student2.pseudonyms.create!(
+            account: @student2.account,
+            unique_id: "uuid-ernie-int",
+            integration_id: "aaa-should-not-sort-first",
+            position: 2
+          )
+        end
+
+        it "sorts by the primary pseudonym integration ID ascending (using SisPseudonym.for logic)" do
+          expected_user_ids = [@student1.id, @student4.id, @student3.id, @student2.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "sorts by the primary pseudonym integration ID descending (using SisPseudonym.for logic)" do
+          @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
+          expected_user_ids = [@student2.id, @student3.id, @student4.id, @student1.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
       end
     end
   end
