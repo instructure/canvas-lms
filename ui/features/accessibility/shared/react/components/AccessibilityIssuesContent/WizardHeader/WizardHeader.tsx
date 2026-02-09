@@ -45,7 +45,7 @@ export const WizardHeader: React.FC<WizardProps> = ({title, onDismiss}) => {
           </Heading>
         </Tooltip>
       </div>
-      <Flex.Item>
+      <Flex.Item data-testid="wizard-close-button">
         <CloseButton onClick={onDismiss} size="small" screenReaderLabel={I18n.t('Close')} />
       </Flex.Item>
     </Flex>

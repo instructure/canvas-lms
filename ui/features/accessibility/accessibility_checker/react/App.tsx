@@ -25,7 +25,7 @@ import {AccessibilityCheckerApp} from './components/AccessibilityCheckerApp/Acce
 import {AccessibilityCourseScan} from './components/AccessibilityCourseScan'
 import {AccessibilityCheckerContext} from '../../shared/react/contexts/AccessibilityCheckerContext'
 import {AccessibilityResourceScan} from '../../shared/react/types'
-import {AccessibilityWizard} from './components/AccessibilityWizard'
+import AccessibilityWizard from '../../shared/react/components/AccessibilityIssuesContent'
 
 export const App = () => {
   const [selectedItem, setSelectedItem] = useState<AccessibilityResourceScan | null>(null)
