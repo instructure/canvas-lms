@@ -25,6 +25,14 @@ Rails.root.glob("{gems,vendor}/plugins/*/config/pre_routes.rb") do |pre_routes|
 end
 
 CanvasRails::Application.routes.draw do
+  # Test-only routes for Selenium tests with mock LTI tool
+  if Rails.env.test?
+    post "/test/mock_lti/ui", to: "test/mock_lti#ui"
+    post "/test/mock_lti/login", to: "test/mock_lti#login"
+    get "/test/mock_lti/jwks", to: "test/mock_lti#jwks"
+    post "/test/mock_lti/subscription_handler", to: "test/mock_lti#subscription_handler"
+  end
+
   post "/api/graphql", to: "graphql#execute"
   get "graphiql", to: "graphql#graphiql"
 
