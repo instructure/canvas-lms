@@ -5490,6 +5490,101 @@ describe Submission do
         @submission.late?
       }.from(true).to(false)
     end
+
+    context "with discussion checkpoints" do
+      before(:once) do
+        @checkpoint_course = Course.create!
+        @checkpoint_course.account.enable_feature!(:discussion_checkpoints)
+        @student = User.create!
+        @checkpoint_course.enroll_student(@student, enrollment_state: "active")
+        @teacher = User.create!
+        @checkpoint_course.enroll_teacher(@teacher, enrollment_state: "active")
+      end
+
+      it "marks submission late when not all required replies are made before due date" do
+        due_date = 2.days.from_now
+        topic = DiscussionTopic.create_graded_topic!(course: @checkpoint_course, title: "Test Discussion", user: @teacher)
+        topic.create_checkpoints(
+          reply_to_topic_points: 5,
+          reply_to_entry_points: 10,
+          reply_to_entry_required_count: 3
+        )
+
+        topic.reply_to_entry_checkpoint.update!(due_at: due_date)
+        topic.discussion_entries.create!(user: @student, message: "Initial reply")
+
+        entry1 = topic.discussion_entries.create!(user: @teacher, message: "Teacher post 1")
+        Timecop.freeze(due_date - 1.hour) do
+          topic.discussion_entries.create!(user: @student, message: "Reply 1", parent_entry: entry1)
+        end
+
+        entry2 = topic.discussion_entries.create!(user: @teacher, message: "Teacher post 2")
+        Timecop.freeze(due_date - 30.minutes) do
+          topic.discussion_entries.create!(user: @student, message: "Reply 2", parent_entry: entry2)
+        end
+
+        entry3 = topic.discussion_entries.create!(user: @teacher, message: "Teacher post 3")
+        Timecop.freeze(due_date + 1.hour) do
+          topic.discussion_entries.create!(user: @student, message: "Reply 3", parent_entry: entry3)
+        end
+
+        topic.ensure_submission(@student)
+        submission = topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
+
+        expect(submission).to be_late
+        expect(submission.seconds_late).to be > 0
+      end
+
+      it "does not mark submission late when all required replies are made before due date" do
+        due_date = 2.days.from_now
+        topic = DiscussionTopic.create_graded_topic!(course: @checkpoint_course, title: "Test Discussion", user: @teacher)
+        topic.create_checkpoints(
+          reply_to_topic_points: 5,
+          reply_to_entry_points: 10,
+          reply_to_entry_required_count: 2
+        )
+
+        topic.reply_to_entry_checkpoint.update!(due_at: due_date)
+        topic.discussion_entries.create!(user: @student, message: "Initial reply")
+
+        entry1 = topic.discussion_entries.create!(user: @teacher, message: "Teacher post 1")
+        Timecop.freeze(due_date - 2.hours) do
+          topic.discussion_entries.create!(user: @student, message: "Reply 1", parent_entry: entry1)
+        end
+
+        entry2 = topic.discussion_entries.create!(user: @teacher, message: "Teacher post 2")
+        Timecop.freeze(due_date - 1.hour) do
+          topic.discussion_entries.create!(user: @student, message: "Reply 2", parent_entry: entry2)
+        end
+
+        topic.ensure_submission(@student)
+        submission = topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
+
+        expect(submission).not_to be_late
+        expect(submission.seconds_late).to eq 0
+      end
+
+      it "uses earliest reply time for non-checkpoint submissions" do
+        due_date = 2.days.from_now
+        topic = @checkpoint_course.discussion_topics.create!(
+          title: "Regular Discussion",
+          user: @teacher,
+          assignment: @checkpoint_course.assignments.create!(
+            title: "Regular Discussion",
+            submission_types: "discussion_topic",
+            due_at: due_date
+          )
+        )
+
+        Timecop.freeze(due_date - 1.hour) do
+          topic.discussion_entries.create!(user: @student, message: "On time reply")
+        end
+
+        submission = topic.assignment.submissions.find_by(user: @student)
+
+        expect(submission).not_to be_late
+      end
+    end
   end
 
   describe "#extended?" do
