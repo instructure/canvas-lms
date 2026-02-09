@@ -350,6 +350,33 @@ describe SplitUsers do
         expect(source_user.as_student_observation_links.first.workflow_state).to eq "active"
       end
 
+      it "updates existing enrollments' associated_user_id" do
+        observer = user_with_pseudonym(active_all: true, username: "observer@example.com")
+        add_linked_observer(restored_user, observer)
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        observer_enrollment = course1.enrollments.find_by(user_id: observer, associated_user_id: restored_user)
+        expect(observer_enrollment).to be_present
+        UserMerge.from(restored_user).into(source_user)
+        expect(observer_enrollment.reload.associated_user_id).to eq source_user.id
+        SplitUsers.split_db_users(source_user)
+        expect(observer_enrollment.reload.associated_user_id).to eq restored_user.id
+      end
+
+      it "deals with conflicts while updating existing enrollments' associated_user_id" do
+        observer = user_with_pseudonym(active_all: true, username: "observer@example.com")
+        add_linked_observer(restored_user, observer)
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        observer_enrollment = course1.enrollments.find_by(user_id: observer, associated_user_id: restored_user)
+        expect(observer_enrollment).to be_present
+        UserMerge.from(restored_user).into(source_user)
+        expect(observer_enrollment.reload.associated_user_id).to eq source_user.id
+        conflicting_enrollment = course1.observer_enrollments.create!(user_id: observer, associated_user_id: restored_user, course_section_id: observer_enrollment.course_section_id)
+        SplitUsers.split_db_users(source_user)
+        # no exception was raised, and the associated_user_ids were left alone
+        expect(observer_enrollment.reload.associated_user_id).to eq source_user.id
+        expect(conflicting_enrollment.reload.associated_user_id).to eq restored_user.id
+      end
+
       it "only splits users from merge_data when specified" do
         enrollment1 = course1.enroll_user(restored_user)
         enrollment2 = course1.enroll_student(source_user, enrollment_state: "active")
