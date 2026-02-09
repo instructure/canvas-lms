@@ -220,7 +220,7 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}): JSX.Ele
               >
                 <Flex alignItems="center" gap="x-small">
                   <Text size="small">
-                    {I18n.t('View %{reportTitle} Report', {
+                    {I18n.t('View {{reportTitle}} Report', {
                       reportTitle: report.title || I18n.t('Document Processor'),
                     })}
                   </Text>
