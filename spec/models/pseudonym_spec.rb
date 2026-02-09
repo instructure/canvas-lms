@@ -325,6 +325,27 @@ describe Pseudonym do
     end
   end
 
+  describe "suspend auditing" do
+    it "audits suspension" do
+      pseudonym_model
+      @pseudonym.suspend!
+      expect(@pseudonym.auditor_records.where(action: "suspended")).to exist
+    end
+
+    it "audits unsuspension" do
+      pseudonym_model(workflow_state: "suspended")
+      @pseudonym.unsuspend!
+      expect(@pseudonym.auditor_records.where(action: "unsuspended")).to exist
+    end
+
+    it "logs deletion in preference to unsuspension" do
+      pseudonym_model(workflow_state: "suspended")
+      @pseudonym.destroy
+      expect(@pseudonym.auditor_records.where(action: "deleted")).to exist
+      expect(@pseudonym.auditor_records.where(action: "unsuspended")).not_to exist
+    end
+  end
+
   it "allows deleting system-generated pseudonyms" do
     user_with_pseudonym(active_all: true)
     @pseudonym.sis_user_id = "something_cool"

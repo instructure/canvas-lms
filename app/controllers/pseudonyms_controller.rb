@@ -624,6 +624,7 @@ class PseudonymsController < ApplicationController
 
     authorized_if_requested_change?(:workflow_state, :delete) do
       if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :workflow_state)
+        @pseudonym.current_user = @current_user # performing user for audit logging
         @pseudonym.workflow_state = params[:pseudonym][:workflow_state]
       end
     end or return false
