@@ -73,9 +73,6 @@ module SeleniumDriverSetup
     end
 
     def run
-      # Ensure SELENIUM env var is set so initializers can detect Selenium test runs
-      ENV["SELENIUM"] = "1" unless ENV["SELENIUM"]
-
       begin
         [
           Thread.new { start_webserver },
@@ -404,7 +401,7 @@ module SeleniumDriverSetup
 
     def spec_safe_rack_app
       app = base_rack_app
-      TestOnlyRoutes.create_routes(app)
+      # Routes now registered in config/routes.rb wrapped in Rails.env.test?
 
       lambda do |env|
         nope = [503, {}, [""]]
