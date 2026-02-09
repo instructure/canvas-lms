@@ -2151,12 +2151,22 @@ BASE_PERMISSIONS = {
     ]
   },
   view_title_iv_financial_aid_report: {
-    label: -> { I18n.t("Financial Aid Compliance") },
+    label: -> { I18n.t("Title IV Financial Aid Report") },
     group: :view_advanced_analytics,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
     account_only: true,
-    account_allows: ->(a) { a.feature_enabled?(:title_iv_financial_aid_report) }
+    account_allows: ->(a) { a.feature_enabled?(:title_iv_financial_aid_report) },
+    account_details: [
+      { title: -> { I18n.t("Account Settings") },
+        description: -> { I18n.t("Allows an account administrator to access the Title IV Financial Aid Report in Intelligent Insights.") } },
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Provides scoped access to the Title IV Financial Aid Report.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Intelligent Insights") },
+        description: -> { I18n.t("The Title IV Financial Aid Report is part of the Intelligent Insights upgrade in Canvas.") } }
+    ]
   },
   view_rsi_report: {
     label: -> { I18n.t("Regular and Substantive Interaction") },
@@ -2164,7 +2174,18 @@ BASE_PERMISSIONS = {
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
     account_only: true,
-    account_allows: ->(a) { a.feature_enabled?(:intelligent_insights_rsi_report) }
+    account_allows: ->(a) { a.feature_enabled?(:intelligent_insights_rsi_report) },
+    account_details: [
+      { title: -> { I18n.t("Account Settings") },
+        description: -> { I18n.t("Allows an account administrator to access the Regular and Substantive Interaction Insights feature of Intelligent Insights.") } },
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Provides scoped access to the Regular and Substantive Interaction Insights feature.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Intelligent Insights") },
+        description: -> { I18n.t("Regular and Substantive Interaction Insights is part of the Intelligent Insights upgrade in Canvas.") } }
+    ]
+
   },
   view_accessibility_insights: {
     label: -> { I18n.t("Accessibility Insights") },
