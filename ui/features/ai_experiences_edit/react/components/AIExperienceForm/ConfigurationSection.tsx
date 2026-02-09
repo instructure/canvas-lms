@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {IconAiLine} from '@instructure/ui-icons'
 import {AIExperienceFormData} from '../../../types'
 import CanvasFileUpload from '@canvas/canvas-file-upload/react/CanvasFileUpload'
-import {ContextFile} from '@canvas/canvas-file-upload/react/types'
+import type {ContextFile} from '@canvas/canvas-file-upload/react/types'
 
 const I18n = createI18nScope('ai_experiences_edit')
 

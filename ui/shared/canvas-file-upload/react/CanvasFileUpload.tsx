@@ -16,18 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Billboard} from '@instructure/ui-billboard'
-import {Button} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {IconFolderLine, IconUploadLine} from '@instructure/ui-icons'
+import {Modal} from '@instructure/ui-modal'
+import {Heading} from '@instructure/ui-heading'
 import {ContextFile} from './types'
 import FileList from './FileList'
 import {useFileUpload} from './hooks/useFileUpload'
+import CanvasFilesBrowser from './components/CanvasFilesBrowser/CanvasFilesBrowser'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('canvas_file_upload')
 
@@ -58,9 +63,62 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
     maxFiles,
   })
 
+  const [showBrowserModal, setShowBrowserModal] = useState(false)
+
   const handleRemoveFile = (fileId: string) => {
     const updatedFiles = files.filter(file => file.id !== fileId)
     onFilesChange(updatedFiles)
+  }
+
+  const handleFileSelect = async (fileID: string) => {
+    if (!fileID) return
+
+    try {
+      // Fetch file metadata
+      const {json} = await doFetchApi<ContextFile>({
+        path: `/api/v1/files/${fileID}`,
+        method: 'GET',
+      })
+
+      if (!json) return
+
+      // Check if file already exists
+      if (files.some(f => f.id === json.id)) {
+        showFlashAlert({
+          message: I18n.t('This file has already been added.'),
+          type: 'info',
+        })
+        return
+      }
+
+      // Check max files limit
+      if (maxFiles && files.length >= maxFiles) {
+        showFlashAlert({
+          message: I18n.t('Maximum number of files reached (%{max})', {max: maxFiles}),
+          type: 'error',
+        })
+        return
+      }
+
+      // Add to files list
+      const newFiles = [...files, json]
+      onFilesChange(newFiles)
+
+      showFlashAlert({
+        message: I18n.t('File added successfully from Canvas Files'),
+        type: 'success',
+      })
+
+      // Close modal
+      setShowBrowserModal(false)
+    } catch (error: any) {
+      showFlashAlert({
+        message: I18n.t('Failed to add file: %{error}', {
+          error: error.message || 'Unknown error',
+        }),
+        type: 'error',
+      })
+    }
   }
 
   return (
@@ -175,7 +233,7 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
                 <Button
                   display="block"
                   height="100%"
-                  onClick={() => {}} // Stub - no functionality yet
+                  onClick={() => setShowBrowserModal(true)}
                   themeOverride={{borderWidth: '0'}}
                   withBackground={false}
                 >
@@ -204,6 +262,39 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
           onRemoveFile={handleRemoveFile}
         />
       )}
+
+      {/* Canvas Files Browser Modal */}
+      <Modal
+        open={showBrowserModal}
+        onDismiss={() => setShowBrowserModal(false)}
+        size="large"
+        label={I18n.t('Select from Canvas Files')}
+        shouldCloseOnDocumentClick={true}
+      >
+        <Modal.Header>
+          <CloseButton
+            placement="end"
+            offset="medium"
+            onClick={() => setShowBrowserModal(false)}
+            screenReaderLabel={I18n.t('Close')}
+          />
+          <Heading>{I18n.t('Select from Canvas Files')}</Heading>
+        </Modal.Header>
+        <Modal.Body padding="0">
+          <View as="div" height="500px" position="relative" overflowY="auto">
+            <CanvasFilesBrowser
+              courseID={courseId}
+              allowedExtensions={allowedFileTypes}
+              handleCanvasFileSelect={handleFileSelect}
+            />
+          </View>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => setShowBrowserModal(false)} margin="0 xx-small 0 0">
+            {I18n.t('Cancel')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </View>
   )
 }
