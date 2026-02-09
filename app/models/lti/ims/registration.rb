@@ -57,7 +57,8 @@ class Lti::IMS::Registration < ApplicationRecord
            :lti_tool_configuration_is_valid,
            :scopes_are_valid,
            :validate_overlay,
-           :target_link_uri_is_uri
+           :target_link_uri_is_uri,
+           unless: :deleted?
 
   validates :initiate_login_uri,
             :jwks_uri,
