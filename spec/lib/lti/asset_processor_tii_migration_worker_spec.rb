@@ -226,8 +226,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         allow(worker).to receive(:migrate_tool_proxy).and_call_original
         allow(worker).to receive(:create_asset_processor_from_actl)
         worker.perform(test_progress)
-        expect(worker).to have_received(:migrate_tool_proxy).with(tool_proxy)
-        expect(worker).to have_received(:migrate_tool_proxy).with(course_tool_proxy)
+        expect(worker).to have_received(:migrate_tool_proxy).with(tool_proxy).at_least(:once)
+        expect(worker).to have_received(:migrate_tool_proxy).with(course_tool_proxy).at_least(:once)
       end
 
       it "does not migrate proxies of the subtree" do
@@ -394,7 +394,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
         expect(csv_content).to be_present
         csv_rows = CSV.parse(csv_content)
-        expect(csv_rows.length).to eq(3) # Header + 2 data rows
+        expect(csv_rows.length).to eq(4) # Header + 2 ACTL rows + 1 orphan proxy row
 
         first_item = csv_rows[1]
         expect(first_item[0]).to eq(sub_account.id.to_s)
@@ -412,6 +412,10 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         expect(second_item[8]).to eq("failed")
         expect(second_item[9]).to eq("0")
         expect(second_item[10]).to include("Unexpected error when migrating Tool Proxy")
+
+        orphan_row = csv_rows[3]
+        expect(orphan_row[2]).to eq("")
+        expect(orphan_row[10]).to include("Unexpected error when migrating Tool Proxy")
       end
     end
 
@@ -2333,9 +2337,16 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       )
     end
 
-    it "destroys asset processors and clears migrated_to_context_external_tool for all ACTLs" do
+    it "destroys asset processors and clears migrated_to_context_external_tool for all ACTLs and orphan proxies" do
       migrated_tool_proxy.update!(migrated_to_context_external_tool: ap_tool)
       allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      orphan_proxy = create_tool_proxy(
+        context: sub_account,
+        product_family:,
+        create_binding: false
+      )
+      orphan_proxy.update!(migrated_to_context_external_tool: ap_tool)
 
       actl1
       actl2
@@ -2355,12 +2366,14 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       )
 
       expect(migrated_tool_proxy.migrated_to_context_external_tool).to eq(ap_tool)
+      expect(orphan_proxy.migrated_to_context_external_tool).to eq(ap_tool)
       expect(Lti::AssetProcessor.active.where(assignment: [test_assignment1, test_assignment2]).count).to eq(2)
 
       worker.rollback
 
       expect(Lti::AssetProcessor.active.where(assignment: [test_assignment1, test_assignment2]).count).to eq(0)
       expect(migrated_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+      expect(orphan_proxy.reload.migrated_to_context_external_tool).to be_nil
     end
 
     it "skips tool proxies from other accounts and continues processing" do
@@ -2407,6 +2420,346 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       expect(ap2.reload.workflow_state).to eq("deleted")
       expect(other_tool_proxy.reload.migrated_to_context_external_tool).to eq(ap_tool)
       expect(migrated_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+    end
+
+    it "rollback_recursive rolls back orphan proxies in sub-accounts" do
+      child_account = account_model(parent_account: sub_account, root_account:)
+      allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      orphan_proxy_in_child = create_tool_proxy(
+        context: child_account,
+        product_family:,
+        create_binding: false
+      )
+      orphan_proxy_in_child.update!(migrated_to_context_external_tool: ap_tool)
+
+      expect(orphan_proxy_in_child.migrated_to_context_external_tool).to eq(ap_tool)
+
+      worker.rollback_recursive
+
+      expect(orphan_proxy_in_child.reload.migrated_to_context_external_tool).to be_nil
+    end
+
+    it "non-recursive rollback does not roll back orphan proxies in sub-accounts" do
+      child_account = account_model(parent_account: sub_account, root_account:)
+      allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      orphan_proxy_in_child = create_tool_proxy(
+        context: child_account,
+        product_family:,
+        create_binding: false
+      )
+      orphan_proxy_in_child.update!(migrated_to_context_external_tool: ap_tool)
+
+      worker.rollback
+
+      expect(orphan_proxy_in_child.reload.migrated_to_context_external_tool).to eq(ap_tool)
+    end
+  end
+
+  describe "#tii_orphan_proxies" do
+    before do
+      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+    end
+
+    it "returns account-level TII proxies with no ACTLs" do
+      product_family
+      tool_proxy # account-level proxy in sub_account, no ACTLs
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).to include(tool_proxy)
+    end
+
+    it "returns course-level TII proxies with no ACTLs" do
+      product_family
+      course_tool_proxy # course-level proxy, no ACTLs
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).to include(course_tool_proxy)
+    end
+
+    it "excludes already-migrated proxies" do
+      product_family
+      tool_proxy.update!(migrated_to_context_external_tool: external_tool_1_3_model(context: sub_account))
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(tool_proxy)
+    end
+
+    it "excludes deleted proxies" do
+      product_family
+      tool_proxy.update!(workflow_state: "deleted")
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(tool_proxy)
+    end
+
+    it "excludes proxies from other accounts" do
+      product_family
+      other_account = account_model(parent_account: root_account, root_account:)
+      other_proxy = create_tool_proxy(
+        context: other_account,
+        product_family:,
+        create_binding: true,
+        raw_data: tii_raw_data
+      )
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(other_proxy)
+    end
+
+    it "excludes proxies from courses in deleted courses" do
+      product_family
+      course_tool_proxy
+      course.destroy
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(course_tool_proxy)
+    end
+
+    it "excludes non-TII proxies" do
+      other_family = Lti::ProductFamily.create!(
+        vendor_code: "other.com",
+        product_code: "other-tool",
+        vendor_name: "Other",
+        root_account:
+      )
+      other_proxy = create_tool_proxy(
+        context: sub_account,
+        product_family: other_family,
+        create_binding: true,
+        raw_data: tii_raw_data
+      )
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(other_proxy)
+    end
+  end
+
+  describe "#migrate_orphan_proxies" do
+    let(:assignment) { assignment_model(course:) }
+    let(:resource_handler) do
+      Lti::ResourceHandler.create!(
+        resource_type_code: "resource",
+        name: "Test Resource",
+        tool_proxy:
+      )
+    end
+    let(:message_handler) do
+      Lti::MessageHandler.create!(
+        message_type: "basic-lti-launch-request",
+        launch_path: "http://example.com/launch",
+        resource_handler:,
+        tool_proxy:,
+        capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2]
+      )
+    end
+    let(:actl) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: described_class::TII_TOOL_VENDOR_CODE,
+        tool_product_code: described_class::TII_TOOL_PRODUCT_CODE,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+    end
+
+    before do
+      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+    end
+
+    it "migrates an orphan account-level proxy and writes CSV row" do
+      product_family
+      tool_proxy
+      allow(worker).to receive(:migrate_tool_proxy) do |tp|
+        tp.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: sub_account).id)
+      end
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).to have_received(:migrate_tool_proxy).with(tool_proxy)
+      expect(csv_rows.length).to eq(1)
+      row = csv_rows.first
+      expect(row[0]).to eq(sub_account.id)
+      expect(row[1]).to eq(sub_account.name)
+      expect(row[2]).to eq("")
+      expect(row[3]).to eq("")
+      expect(row[4]).to eq("")
+      expect(row[5]).to eq(tool_proxy.id)
+      expect(row[6]).to be_present
+      expect(row[9]).to eq(0)
+      expect(row[11]).to include("not associated with any assignment")
+    end
+
+    it "migrates an orphan course-level proxy with course ID in CSV" do
+      product_family
+      course_tool_proxy
+      allow(worker).to receive(:migrate_tool_proxy) do |tp|
+        tp.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: course).id)
+      end
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).to have_received(:migrate_tool_proxy).with(course_tool_proxy)
+      row = csv_rows.first
+      expect(row[0]).to eq(sub_account.id)
+      expect(row[4]).to eq(course.id)
+    end
+
+    it "skips proxies already in @migrated_tool_proxies" do
+      product_family
+      tool_proxy
+      worker.instance_variable_get(:@migrated_tool_proxies) << tool_proxy
+      allow(worker).to receive(:migrate_tool_proxy)
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).not_to have_received(:migrate_tool_proxy)
+      expect(csv_rows).to be_empty
+    end
+
+    it "skips proxies that were already processed (e.g. failed in normal migration cycle)" do
+      product_family
+      tool_proxy
+      worker.send(:initialize_proxy_results, tool_proxy)
+      allow(worker).to receive(:migrate_tool_proxy)
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).not_to have_received(:migrate_tool_proxy)
+    end
+
+    it "skips already-migrated proxies via DB query" do
+      product_family
+      tool_proxy.update!(migrated_to_context_external_tool: external_tool_1_3_model(context: sub_account))
+      allow(worker).to receive(:migrate_tool_proxy)
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).not_to have_received(:migrate_tool_proxy)
+      expect(csv_rows).to be_empty
+    end
+
+    it "adds migrated proxy to @migrated_tool_proxies for subscription cleanup" do
+      product_family
+      tool_proxy.update_columns(subscription_id: "test-sub-orphan")
+      allow(worker).to receive(:migrate_tool_proxy) do |tp|
+        tp.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: sub_account).id)
+      end
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker.instance_variable_get(:@migrated_tool_proxies)).to include(tool_proxy)
+    end
+
+    it "handles errors per-proxy and continues" do
+      product_family
+      tool_proxy
+      create_tool_proxy(
+        context: sub_account,
+        product_family:,
+        create_binding: true,
+        raw_data: tii_raw_data
+      )
+      call_count = 0
+      allow(worker).to receive(:migrate_tool_proxy) do |tp|
+        call_count += 1
+        raise StandardError, "boom" if call_count == 1
+
+        tp.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: sub_account).id)
+      end
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(csv_rows.length).to eq(2)
+      error_row = csv_rows.find { |r| r[10].include?("Unexpected error") }
+      expect(error_row).to be_present
+    end
+
+    it "does not migrate proxies that have ACTLs (already handled by migrate_actls)" do
+      product_family
+      actl
+      tool_proxy.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: sub_account).id)
+      allow(worker).to receive(:migrate_tool_proxy)
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).not_to have_received(:migrate_tool_proxy).with(tool_proxy)
+    end
+  end
+
+  describe "full flow with orphan proxies" do
+    let(:rsa_key) { OpenSSL::PKey::RSA.new(2048) }
+
+    before do
+      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      allow(Lti::KeyStorage).to receive(:present_key).and_return(rsa_key)
+    end
+
+    it "migrates orphan proxy and deletes its subscription" do
+      product_family
+      tool_proxy.update_columns(subscription_id: "orphan-sub-123")
+      success_response = double("response", is_a?: true, code: "200", body: "success")
+      allow(CanvasHttp).to receive(:post).and_return(success_response)
+
+      worker.perform(test_progress)
+
+      expect(tool_proxy.reload.migrated_to_context_external_tool).to be_present
+      expect(tool_proxy.reload.subscription_id).to be_nil
+    end
+
+    it "includes orphan proxy rows in CSV report" do
+      product_family
+      tool_proxy
+      success_response = double("response", is_a?: true, code: "200", body: "success")
+      allow(CanvasHttp).to receive(:post).and_return(success_response)
+
+      worker.perform(test_progress)
+
+      csv_content = worker.instance_variable_get(:@csv_content)
+      csv_rows = CSV.parse(csv_content)
+      orphan_row = csv_rows.find { |r| r[5] == tool_proxy.id.to_s && r[2].blank? }
+      expect(orphan_row).to be_present
+      expect(orphan_row[0]).to eq(sub_account.id.to_s)
+    end
+
+    it "does not double-migrate a proxy found via both ACTL and orphan path" do
+      product_family
+      assignment = assignment_model(course:)
+      resource_handler = Lti::ResourceHandler.create!(
+        resource_type_code: "resource",
+        name: "Test Resource",
+        tool_proxy:
+      )
+      message_handler = Lti::MessageHandler.create!(
+        message_type: "basic-lti-launch-request",
+        launch_path: "http://example.com/launch",
+        resource_handler:,
+        tool_proxy:,
+        capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2]
+      )
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: described_class::TII_TOOL_VENDOR_CODE,
+        tool_product_code: described_class::TII_TOOL_PRODUCT_CODE,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+      success_response = double("response", is_a?: true, code: "200", body: "success")
+      allow(CanvasHttp).to receive(:post).and_return(success_response)
+
+      worker.perform(test_progress)
+
+      expect(CanvasHttp).to have_received(:post).once
+      deployments = sub_account.context_external_tools.where(lti_registration: tii_registration)
+      expect(deployments.count).to eq(1)
     end
   end
 end
