@@ -500,3 +500,17 @@ use_queue_for_rate_limiting_gradebook_requests:
   description: |
     This feature enables the use of a queue to limit the number of concurrent GraphQL requests made
     when loading data in the Gradebook.
+gradebook_use_sis_pseudonym_order_for_sorting:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Use SisPseudonym.order Logic for Gradebook Pseudonym Sorting
+  description: |
+    Fixes a bug where sorting by Login ID, SIS ID, or Integration ID in the Gradebook would use
+    the wrong pseudonym when users have multiple login IDs. With this flag enabled, the backend
+    sorting will correctly match the frontend's SisPseudonym.for logic to select the primary pseudonym.
+  shadow: true
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
