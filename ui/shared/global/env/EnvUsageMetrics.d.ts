@@ -22,13 +22,28 @@
 
 export interface EnvUsageMetrics {
   USAGE_METRICS_METADATA: {
+    instance_domain?: string
     sub_account_id?: string
     sub_account_name?: string
+    sub_account_sis_id?: string
+    user_id?: string
+    user_uuid?: string
+    user_display_name?: string
+    user_email?: string
+    user_time_zone?: string
+    user_sis_id?: string
     course_id?: string
     course_long_name?: string
-    course_sis_source_id?: string | null
-    course_sis_batch_id?: string | null
-    course_enrollment_term_id?: string | null
-    course_enrollment_term_name?: string | null
+    course_status?: string
+    course_is_blueprint?: boolean
+    course_is_k5?: boolean
+    course_has_no_students?: boolean
+    course_sis_source_id?: string
+    course_sis_batch_id?: string
+    course_enrollment_term_id?: string
+    course_enrollment_term_name?: string
+    course_enrollment_term_sis_id?: string
+    course_enrollment_term_start_at?: string
+    course_enrollment_term_end_at?: string
   }
 }
