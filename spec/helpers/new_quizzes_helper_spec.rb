@@ -31,6 +31,44 @@ describe NewQuizzesHelper do
     allow(Services::NewQuizzes).to receive(:launch_url).and_return("https://newquizzes.example.com/remoteEntry.js")
   end
 
+  describe "#setup_new_quizzes_env" do
+    let(:signed_launch_data) do
+      {
+        launch_url: "http://example.com/launch",
+        signature: "abc123",
+        basename: "/courses/1/assignments/2"
+      }
+    end
+
+    before do
+      course.enable_feature!(:new_quizzes_native_experience)
+    end
+
+    it "calls add_new_quizzes_bundle" do
+      expect(self).to receive(:add_new_quizzes_bundle)
+      expect(self).to receive(:js_env).with(hash_including(NEW_QUIZZES: signed_launch_data))
+      expect(self).to receive(:add_body_class).with("native-new-quizzes full-width")
+
+      setup_new_quizzes_env(signed_launch_data)
+    end
+
+    it "sets NEW_QUIZZES in js_env with signed launch data" do
+      allow(self).to receive(:add_new_quizzes_bundle)
+      allow(self).to receive(:add_body_class)
+      expect(self).to receive(:js_env).with(hash_including(NEW_QUIZZES: signed_launch_data))
+
+      setup_new_quizzes_env(signed_launch_data)
+    end
+
+    it "adds native-new-quizzes and full-width body classes" do
+      allow(self).to receive(:add_new_quizzes_bundle)
+      allow(self).to receive(:js_env)
+      expect(self).to receive(:add_body_class).with("native-new-quizzes full-width")
+
+      setup_new_quizzes_env(signed_launch_data)
+    end
+  end
+
   describe "#add_new_quizzes_bundle" do
     context "when context does not respond to feature_enabled?" do
       before do
