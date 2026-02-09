@@ -73,7 +73,13 @@ export function AssetReportModal({
       </Modal.Header>
       <Modal.Body overflow="scroll">
         <View height="25rem" as="div">
-          <Flex justifyItems="space-between" alignItems="center" margin="0 0 medium 0" gap="medium">
+          <Flex
+            justifyItems="space-between"
+            alignItems="center"
+            margin="0 0 medium 0"
+            gap="medium"
+            wrap="wrap"
+          >
             {mainTitle && (
               <FlexItem>
                 <View maxWidth="30em" as="div">
