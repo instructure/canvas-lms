@@ -2799,9 +2799,48 @@ class Submission < ActiveRecord::Base
     def time_of_submission
       time = submitted_at || Time.zone.now
       time -= 60.seconds if submission_type == "online_quiz" || cached_quiz_lti?
+
+      if discussion_checkpoint_submission_with_required_replies?
+        checkpoint_completion_time = calculate_checkpoint_completion_time
+        time = checkpoint_completion_time if checkpoint_completion_time.present?
+      end
+
       time
     end
     private :time_of_submission
+
+    def discussion_checkpoint_submission_with_required_replies?
+      return false unless submission_type == "discussion_topic"
+      return false unless assignment
+
+      assignment.is_a?(SubAssignment) && assignment.sub_assignment_tag == "reply_to_entry"
+    end
+
+    def calculate_checkpoint_completion_time
+      return @calculate_checkpoint_completion_time if defined?(@calculate_checkpoint_completion_time)
+
+      @calculate_checkpoint_completion_time = fetch_checkpoint_completion_time
+    end
+
+    def fetch_checkpoint_completion_time
+      return nil unless user_id && assignment
+
+      discussion_topic = assignment.parent_assignment&.discussion_topic
+      return nil unless discussion_topic
+
+      required_count = discussion_topic.reply_to_entry_required_count
+      return nil if required_count <= 0
+
+      discussion_topic.discussion_entries
+                      .non_top_level_for_user(user)
+                      .order(created_at: :asc)
+                      .offset(required_count - 1)
+                      .limit(1)
+                      .pick(:created_at)
+    end
+    private :discussion_checkpoint_submission_with_required_replies?,
+            :calculate_checkpoint_completion_time,
+            :fetch_checkpoint_completion_time
   end
   include Tardiness
 
