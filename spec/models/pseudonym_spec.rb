@@ -192,16 +192,10 @@ describe Pseudonym do
       expect(Pseudonym.active.by_unique_id("c①dy@instructure.com")).to eq [p4]
 
       scope = Pseudonym.active
-      shard = instance_double(Shard)
-      allow(shard).to receive(:settings).and_return({})
+      shard = instance_double(Shard, settings: {})
       allow(shard).to receive(:is_a?).with(Shard).and_return(true)
       allow(shard).to receive(:is_a?).with(Switchman::DefaultShard).and_return(false)
       # return our double once for the named scope, then the real thing for the query
-      allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
-      expect(scope.by_unique_id("c1dy@instructure.com")).not_to exist
-
-      # mark the migration as complete, and it will start doing a normalized lookup
-      allow(shard).to receive(:settings).and_return({ "pseudonyms_normalized" => true })
       allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
       expect(scope.by_unique_id("c1dy@instructure.com")).to eq [p4]
     end

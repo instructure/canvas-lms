@@ -257,22 +257,14 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = false
   end
 
-  scope :by_unique_id, lambda { |unique_id|
-    # only do normalized lookups once the migration has completed on this shard
-    if ((s = primary_shard).is_a?(Shard) && s.settings["pseudonyms_normalized"]) ||
-       s.is_a?(Switchman::DefaultShard)
-      unique_id = if unique_id.is_a?(Array)
-                    unique_id.map { |uid| Pseudonym.normalize(uid) }
-                  else
-                    Pseudonym.normalize(unique_id.to_s)
-                  end
-      where(unique_id_normalized: unique_id)
-    elsif unique_id.is_a?(Array)
-      where("LOWER(unique_id) IN (?)", unique_id)
-    else
-      where("LOWER(unique_id)=LOWER(?)", unique_id.to_s)
-    end
-  }
+  scope(:by_unique_id, lambda do |unique_id|
+    unique_id = if unique_id.is_a?(Array)
+                  unique_id.map { |uid| Pseudonym.normalize(uid) }
+                else
+                  Pseudonym.normalize(unique_id.to_s)
+                end
+    where(unique_id_normalized: unique_id)
+  end)
   scope :sis, -> { where.not(sis_user_id: nil) }
   scope :not_instructure_identity, -> { all }
 
