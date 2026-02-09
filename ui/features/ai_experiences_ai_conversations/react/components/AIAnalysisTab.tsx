@@ -195,7 +195,9 @@ export const AIAnalysisTab: React.FC<AIAnalysisTabProps> = ({
                     </Flex.Item>
                   </Flex>
                   <View as="div" margin="x-small 0 0 0">
-                    <Text size="small">{obj.explanation}</Text>
+                    <Text size="small">
+                      <span style={{whiteSpace: 'pre-wrap'}}>{obj.explanation}</span>
+                    </Text>
                   </View>
                 </View>
               </List.Item>
@@ -217,7 +219,9 @@ export const AIAnalysisTab: React.FC<AIAnalysisTabProps> = ({
                       <IconCheckSolid color="success" size="x-small" />
                     </View>
                     <Flex.Item shouldGrow={true}>
-                      <Text>{strength}</Text>
+                      <Text>
+                        <span style={{whiteSpace: 'pre-wrap'}}>{strength}</span>
+                      </Text>
                     </Flex.Item>
                   </Flex>
                 </List.Item>
@@ -234,7 +238,9 @@ export const AIAnalysisTab: React.FC<AIAnalysisTabProps> = ({
             </Heading>
             <List margin="0">
               {evaluation.areas_for_improvement.map((area, index) => (
-                <List.Item key={index}>{area}</List.Item>
+                <List.Item key={index}>
+                  <span style={{whiteSpace: 'pre-wrap'}}>{area}</span>
+                </List.Item>
               ))}
             </List>
           </View>
@@ -246,7 +252,9 @@ export const AIAnalysisTab: React.FC<AIAnalysisTabProps> = ({
             {I18n.t('AI Feedback Summary')}
           </Heading>
           <View as="div" padding="small" background="secondary" borderRadius="medium">
-            <Text>{evaluation.overall_assessment}</Text>
+            <Text>
+              <span style={{whiteSpace: 'pre-wrap'}}>{evaluation.overall_assessment}</span>
+            </Text>
           </View>
         </View>
       </Flex>

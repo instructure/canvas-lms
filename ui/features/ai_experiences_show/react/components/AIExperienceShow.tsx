@@ -156,7 +156,9 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
 
       {aiExperience.description && (
         <View as="div" margin="0 0 medium 0">
-          <Text data-testid="ai-experience-show-description-text">{aiExperience.description}</Text>
+          <Text data-testid="ai-experience-show-description-text">
+            <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.description}</span>
+          </Text>
         </View>
       )}
 
@@ -226,7 +228,9 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
               <Heading level="h3" margin="0 0 small 0">
                 {I18n.t('Facts students should know')}
               </Heading>
-              <Text data-testid="ai-experience-show-facts-text">{aiExperience.facts}</Text>
+              <Text data-testid="ai-experience-show-facts-text">
+                <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.facts}</span>
+              </Text>
             </View>
           )}
 
@@ -236,7 +240,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                 {I18n.t('Learning objectives')}
               </Heading>
               <Text data-testid="ai-experience-show-learning-objectives-text">
-                {aiExperience.learning_objective}
+                <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.learning_objective}</span>
               </Text>
             </View>
           )}
@@ -247,7 +251,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                 {I18n.t('Pedagogical guidance')}
               </Heading>
               <Text data-testid="ai-experience-show-pedagogical-guidance-text">
-                {aiExperience.pedagogical_guidance}
+                <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.pedagogical_guidance}</span>
               </Text>
             </View>
           )}

@@ -83,7 +83,9 @@ const MessageList: React.FC<MessageListProps> = ({messages, progress, isLoading}
               borderWidth={isUser ? 'small' : undefined}
               textAlign="start"
             >
-              <Text>{message.text}</Text>
+              <Text>
+                <span style={{whiteSpace: 'pre-wrap'}}>{message.text}</span>
+              </Text>
             </View>
           </View>
         )
