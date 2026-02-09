@@ -26,6 +26,13 @@ for dir in {{ primary_worktree_path }}/gems/plugins/*/; do
 done
 wait
 """
+# Ensure dependencies are installed in new worktrees
+# (Fallback in case node_modules wasn't copied or is stale)
+yarn = "yarn install --frozen-lockfile"
+
+# Fast format check on changed files only (for agents)
+[pre-commit]
+biome = "yarn check:biome"
 
 # Remove plugin worktrees when the parent worktree is removed
 [pre-remove]
