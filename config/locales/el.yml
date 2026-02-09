@@ -3444,6 +3444,7 @@ el:
   close_d634289d: Κλείσιμο
   close_for_comments_37783f56: "Κλεισμένο για Σχόλια"
   close_rubric_a0fc8166: "Κλείσιμο Ρουμπρίκας"
+  closed_983a96fe: Κλειστό
   closed_for_comments_e395b42f: "Κλεισμένο για Σχόλια"
   collaboration_was_deleted_9cf9934b: "Η συνεργασία διαγράφηκε"
   collaborations: 
@@ -10277,6 +10278,7 @@ el:
   not_a_number: "πρέπει να είναι θετικός αριθμός"
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Αυτό το στοιχείο δεν θα υπάρχει σε όλους τους τομείς."
   not_available_487d3648: "Δεν διατίθεται"
+  not_available_until_14e61f1e: "Μη διαθέσιμο μέχρι"
   not_available_until_next_submission_2175158: "Μη διαθέσιμο έως την επόμενη υποβολή"
   not_completed_d70acea3: "Δεν έχει ολοκληρωθεί"
   not_deleted_2a7f63ef: "(χωρίς διαγραφή)"
