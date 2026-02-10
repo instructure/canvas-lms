@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeDistributionPopover} from '../OutcomeDistributionPopover'
@@ -50,6 +51,19 @@ vi.mock('../../charts/MasteryDistributionChart', () => ({
   ),
 }))
 
+vi.mock('@canvas/message-students-modal', () => {
+  return {
+    default: function MessageStudents({open, onRequestClose, title}: any) {
+      return open ? (
+        <div data-testid="message-students-modal">
+          <h2>{title}</h2>
+          <button onClick={onRequestClose}>Close Modal</button>
+        </div>
+      ) : null
+    },
+  }
+})
+
 describe('OutcomeDistributionPopover', () => {
   const outcome: Outcome = {
     id: '1',
@@ -79,6 +93,7 @@ describe('OutcomeDistributionPopover', () => {
     renderWithContext(
       <OutcomeDistributionPopover
         outcome={outcome}
+        courseId="5"
         isOpen={true}
         onCloseHandler={vi.fn()}
         renderTrigger={<button>Trigger</button>}
@@ -93,6 +108,7 @@ describe('OutcomeDistributionPopover', () => {
     renderWithContext(
       <OutcomeDistributionPopover
         outcome={outcome}
+        courseId="5"
         isOpen={true}
         onCloseHandler={onCloseHandler}
         renderTrigger={<button>Trigger</button>}
@@ -108,9 +124,11 @@ describe('OutcomeDistributionPopover', () => {
   })
 
   it('toggles outcome info section when info button is clicked', async () => {
+    const user = userEvent.setup()
     render(
       <OutcomeDistributionPopover
         outcome={outcome}
+        courseId="5"
         isOpen={true}
         onCloseHandler={vi.fn()}
         renderTrigger={<button>Trigger</button>}
@@ -120,23 +138,21 @@ describe('OutcomeDistributionPopover', () => {
     expect(screen.queryByTestId('outcome-info-section')).not.toBeInTheDocument()
 
     const infoButton = screen.getByTestId('outcome-distribution-popover-info-button')
-    fireEvent.click(infoButton)
+    await user.click(infoButton)
 
-    await waitFor(() => {
-      expect(screen.queryByTestId('outcome-info-section')).toBeInTheDocument()
-    })
+    expect(await screen.findByTestId('outcome-info-section')).toBeInTheDocument()
 
-    fireEvent.click(infoButton)
+    await user.click(infoButton)
 
-    await waitFor(() => {
-      expect(screen.queryByTestId('outcome-info-section')).not.toBeInTheDocument()
-    })
+    expect(screen.queryByTestId('outcome-info-section')).not.toBeInTheDocument()
   })
 
   it('displays configure mastery link when info is shown', async () => {
+    const user = userEvent.setup()
     render(
       <OutcomeDistributionPopover
         outcome={outcome}
+        courseId="5"
         isOpen={true}
         onCloseHandler={vi.fn()}
         renderTrigger={<button>Trigger</button>}
@@ -146,17 +162,17 @@ describe('OutcomeDistributionPopover', () => {
     expect(screen.queryByTestId('configure-mastery-link')).not.toBeInTheDocument()
 
     const infoButton = screen.getByTestId('outcome-distribution-popover-info-button')
-    fireEvent.click(infoButton)
+    await user.click(infoButton)
 
-    await waitFor(() => {
-      expect(screen.queryByTestId('configure-mastery-link')).toBeInTheDocument()
-    })
+    expect(await screen.findByTestId('configure-mastery-link')).toBeInTheDocument()
   })
 
   it('displays the calculation method correctly', async () => {
+    const user = userEvent.setup()
     render(
       <OutcomeDistributionPopover
         outcome={outcome}
+        courseId="5"
         isOpen={true}
         onCloseHandler={vi.fn()}
         renderTrigger={<button>Trigger</button>}
@@ -164,17 +180,17 @@ describe('OutcomeDistributionPopover', () => {
     )
 
     const infoButton = screen.getByTestId('outcome-distribution-popover-info-button')
-    fireEvent.click(infoButton)
+    await user.click(infoButton)
 
-    await waitFor(() => {
-      expect(screen.getByText('Weighted Average')).toBeInTheDocument()
-    })
+    expect(await screen.findByText('Weighted Average')).toBeInTheDocument()
   })
 
   it('displays mastery scale points', async () => {
+    const user = userEvent.setup()
     render(
       <OutcomeDistributionPopover
         outcome={outcome}
+        courseId="5"
         isOpen={true}
         onCloseHandler={vi.fn()}
         renderTrigger={<button>Trigger</button>}
@@ -182,11 +198,9 @@ describe('OutcomeDistributionPopover', () => {
     )
 
     const infoButton = screen.getByTestId('outcome-distribution-popover-info-button')
-    fireEvent.click(infoButton)
+    await user.click(infoButton)
 
-    await waitFor(() => {
-      expect(screen.getByText('5 Point')).toBeInTheDocument()
-    })
+    expect(await screen.findByText('5 Point')).toBeInTheDocument()
   })
 
   describe('student list', () => {
@@ -259,11 +273,13 @@ describe('OutcomeDistributionPopover', () => {
     }
 
     it('shows student list when a bar is clicked', async () => {
+      const user = userEvent.setup()
       renderWithContext(
         <OutcomeDistributionPopover
           outcome={outcome}
           outcomeDistribution={mockOutcomeDistribution}
           distributionStudents={mockStudents}
+          courseId="5"
           isOpen={true}
           onCloseHandler={vi.fn()}
           renderTrigger={<button>Trigger</button>}
@@ -273,19 +289,19 @@ describe('OutcomeDistributionPopover', () => {
       expect(screen.queryByTestId('student-list-section')).not.toBeInTheDocument()
 
       const exceedsBar = screen.getByTestId('bar-exceeds-mastery')
-      fireEvent.click(exceedsBar)
+      await user.click(exceedsBar)
 
-      await waitFor(() => {
-        expect(screen.getByTestId('student-list-section')).toBeInTheDocument()
-      })
+      expect(await screen.findByTestId('student-list-section')).toBeInTheDocument()
     })
 
     it('filters students correctly by mastery level when bar is clicked', async () => {
+      const user = userEvent.setup()
       renderWithContext(
         <OutcomeDistributionPopover
           outcome={outcome}
           outcomeDistribution={mockOutcomeDistribution}
           distributionStudents={mockStudents}
+          courseId="5"
           isOpen={true}
           onCloseHandler={vi.fn()}
           renderTrigger={<button>Trigger</button>}
@@ -293,24 +309,24 @@ describe('OutcomeDistributionPopover', () => {
       )
 
       const exceedsBar = screen.getByTestId('bar-exceeds-mastery')
-      fireEvent.click(exceedsBar)
+      await user.click(exceedsBar)
 
-      await waitFor(() => {
-        expect(screen.getByTestId('student-list-section')).toBeInTheDocument()
-        expect(screen.getByText('Alice Johnson')).toBeInTheDocument()
-        expect(screen.getByText('Eve Davis')).toBeInTheDocument()
-        expect(screen.queryByText('Bob Smith')).not.toBeInTheDocument()
-        expect(screen.queryByText('Charlie Brown')).not.toBeInTheDocument()
-        expect(screen.queryByText('Diana Prince')).not.toBeInTheDocument()
-      })
+      expect(await screen.findByTestId('student-list-section')).toBeInTheDocument()
+      expect(screen.getByText('Alice Johnson')).toBeInTheDocument()
+      expect(screen.getByText('Eve Davis')).toBeInTheDocument()
+      expect(screen.queryByText('Bob Smith')).not.toBeInTheDocument()
+      expect(screen.queryByText('Charlie Brown')).not.toBeInTheDocument()
+      expect(screen.queryByText('Diana Prince')).not.toBeInTheDocument()
     })
 
     it('clicking the same bar twice toggles the student list', async () => {
+      const user = userEvent.setup()
       renderWithContext(
         <OutcomeDistributionPopover
           outcome={outcome}
           outcomeDistribution={mockOutcomeDistribution}
           distributionStudents={mockStudents}
+          courseId="5"
           isOpen={true}
           onCloseHandler={vi.fn()}
           renderTrigger={<button>Trigger</button>}
@@ -319,28 +335,26 @@ describe('OutcomeDistributionPopover', () => {
 
       const masteryBar = screen.getByTestId('bar-mastery')
 
-      fireEvent.click(masteryBar)
+      await user.click(masteryBar)
 
-      await waitFor(() => {
-        expect(screen.getByTestId('student-list-section')).toBeInTheDocument()
-        expect(screen.getByText('Bob Smith')).toBeInTheDocument()
-        expect(screen.getByText('Charlie Brown')).toBeInTheDocument()
-        expect(screen.getByText('Diana Prince')).toBeInTheDocument()
-      })
+      expect(await screen.findByTestId('student-list-section')).toBeInTheDocument()
+      expect(screen.getByText('Bob Smith')).toBeInTheDocument()
+      expect(screen.getByText('Charlie Brown')).toBeInTheDocument()
+      expect(screen.getByText('Diana Prince')).toBeInTheDocument()
 
-      fireEvent.click(masteryBar)
+      await user.click(masteryBar)
 
-      await waitFor(() => {
-        expect(screen.queryByTestId('student-list-section')).not.toBeInTheDocument()
-      })
+      expect(screen.queryByTestId('student-list-section')).not.toBeInTheDocument()
     })
 
     it('clicking different bars shows different students', async () => {
+      const user = userEvent.setup()
       renderWithContext(
         <OutcomeDistributionPopover
           outcome={outcome}
           outcomeDistribution={mockOutcomeDistribution}
           distributionStudents={mockStudents}
+          courseId="5"
           isOpen={true}
           onCloseHandler={vi.fn()}
           renderTrigger={<button>Trigger</button>}
@@ -348,32 +362,31 @@ describe('OutcomeDistributionPopover', () => {
       )
 
       const exceedsBar = screen.getByTestId('bar-exceeds-mastery')
-      fireEvent.click(exceedsBar)
+      await user.click(exceedsBar)
 
-      await waitFor(() => {
-        expect(screen.getByText('Alice Johnson')).toBeInTheDocument()
-        expect(screen.getByText('Eve Davis')).toBeInTheDocument()
-        expect(screen.queryByText('Bob Smith')).not.toBeInTheDocument()
-      })
+      expect(await screen.findByText('Alice Johnson')).toBeInTheDocument()
+      expect(screen.getByText('Eve Davis')).toBeInTheDocument()
+      expect(screen.queryByText('Bob Smith')).not.toBeInTheDocument()
 
       const masteryBar = screen.getByTestId('bar-mastery')
-      fireEvent.click(masteryBar)
+      await user.click(masteryBar)
 
-      await waitFor(() => {
-        expect(screen.queryByText('Alice Johnson')).not.toBeInTheDocument()
-        expect(screen.queryByText('Eve Davis')).not.toBeInTheDocument()
-        expect(screen.getByText('Bob Smith')).toBeInTheDocument()
-        expect(screen.getByText('Charlie Brown')).toBeInTheDocument()
-        expect(screen.getByText('Diana Prince')).toBeInTheDocument()
-      })
+      expect(screen.queryByText('Alice Johnson')).not.toBeInTheDocument()
+
+      expect(screen.queryByText('Eve Davis')).not.toBeInTheDocument()
+      expect(screen.getByText('Bob Smith')).toBeInTheDocument()
+      expect(screen.getByText('Charlie Brown')).toBeInTheDocument()
+      expect(screen.getByText('Diana Prince')).toBeInTheDocument()
     })
 
     it('shows "No students" message when clicking a bar with no students', async () => {
+      const user = userEvent.setup()
       renderWithContext(
         <OutcomeDistributionPopover
           outcome={outcome}
           outcomeDistribution={mockOutcomeDistribution}
           distributionStudents={mockStudents}
+          courseId="5"
           isOpen={true}
           onCloseHandler={vi.fn()}
           renderTrigger={<button>Trigger</button>}
@@ -381,20 +394,20 @@ describe('OutcomeDistributionPopover', () => {
       )
 
       const nearMasteryBar = screen.getByTestId('bar-near-mastery')
-      fireEvent.click(nearMasteryBar)
+      await user.click(nearMasteryBar)
 
-      await waitFor(() => {
-        expect(screen.getByTestId('student-list-section')).toBeInTheDocument()
-        expect(screen.getByText('No students')).toBeInTheDocument()
-      })
+      expect(await screen.findByTestId('student-list-section')).toBeInTheDocument()
+      expect(screen.getByText('No students')).toBeInTheDocument()
     })
 
     it('displays student avatars in the filtered list', async () => {
+      const user = userEvent.setup()
       renderWithContext(
         <OutcomeDistributionPopover
           outcome={outcome}
           outcomeDistribution={mockOutcomeDistribution}
           distributionStudents={mockStudents}
+          courseId="5"
           isOpen={true}
           onCloseHandler={vi.fn()}
           renderTrigger={<button>Trigger</button>}
@@ -402,12 +415,191 @@ describe('OutcomeDistributionPopover', () => {
       )
 
       const exceedsBar = screen.getByTestId('bar-exceeds-mastery')
-      fireEvent.click(exceedsBar)
+      await user.click(exceedsBar)
 
-      await waitFor(() => {
-        const avatars = screen.getAllByTestId('student-avatar')
-        expect(avatars).toHaveLength(2)
-      })
+      const avatars = await screen.findAllByTestId('student-avatar')
+      expect(avatars).toHaveLength(2)
+    })
+  })
+
+  describe('Message Students functionality', () => {
+    const mockStudents: Student[] = [
+      {
+        id: '1',
+        name: 'Alice Johnson',
+        display_name: 'Alice Johnson',
+        sortable_name: 'Johnson, Alice',
+        avatar_url: 'https://example.com/alice.jpg',
+      },
+      {
+        id: '2',
+        name: 'Bob Smith',
+        display_name: 'Bob Smith',
+        sortable_name: 'Smith, Bob',
+        avatar_url: 'https://example.com/bob.jpg',
+      },
+      {
+        id: '3',
+        name: 'Charlie Brown',
+        display_name: 'Charlie Brown',
+        sortable_name: 'Brown, Charlie',
+        avatar_url: 'https://example.com/charlie.jpg',
+      },
+    ]
+
+    const mockRatings: RatingDistribution[] = [
+      {
+        description: 'Mastery',
+        points: 3,
+        color: '#127A1B',
+        count: 3,
+        student_ids: ['1', '2', '3'],
+      },
+    ]
+
+    const mockOutcomeDistribution: OutcomeDistribution = {
+      outcome_id: '1',
+      ratings: mockRatings,
+      total_students: 3,
+    }
+
+    it('shows Message Students link when a rating is selected', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+      )
+
+      expect(screen.queryByTestId('message-students-link')).not.toBeInTheDocument()
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      expect(await screen.findByTestId('message-students-link')).toBeInTheDocument()
+      expect(screen.getByText('Message Students')).toBeInTheDocument()
+    })
+
+    it('hides Message Students link when rating is deselected', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+
+      await user.click(masteryBar)
+
+      expect(await screen.findByTestId('message-students-link')).toBeInTheDocument()
+
+      await user.click(masteryBar)
+
+      expect(screen.queryByTestId('message-students-link')).not.toBeInTheDocument()
+    })
+
+    it('opens MessageStudents modal when link is clicked', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const messageLink = await screen.findByTestId('message-students-link')
+      await user.click(messageLink)
+
+      expect(await screen.findByTestId('message-students-modal')).toBeInTheDocument()
+      expect(screen.getByText('Send a message to students')).toBeInTheDocument()
+    })
+
+    it('closes MessageStudents modal when close button is clicked', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const messageLink = await screen.findByTestId('message-students-link')
+      await user.click(messageLink)
+
+      expect(await screen.findByTestId('message-students-modal')).toBeInTheDocument()
+
+      const closeButton = screen.getByText('Close Modal')
+      await user.click(closeButton)
+
+      expect(screen.queryByTestId('message-students-modal')).not.toBeInTheDocument()
+    })
+
+    it('does not render modal when no students are selected', async () => {
+      const user = userEvent.setup()
+      const emptyRatings: RatingDistribution[] = [
+        {
+          description: 'Mastery',
+          points: 3,
+          color: '#127A1B',
+          count: 0,
+          student_ids: [],
+        },
+      ]
+
+      const emptyDistribution: OutcomeDistribution = {
+        outcome_id: '1',
+        ratings: emptyRatings,
+        total_students: 0,
+      }
+
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={emptyDistribution}
+          distributionStudents={[]}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const messageLink = await screen.findByTestId('message-students-link')
+      await user.click(messageLink)
+
+      expect(screen.queryByTestId('message-students-modal')).not.toBeInTheDocument()
     })
   })
 })

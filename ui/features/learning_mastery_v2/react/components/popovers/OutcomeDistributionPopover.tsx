@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
-import {IconInfoLine} from '@instructure/ui-icons'
+import {IconInfoLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
@@ -36,6 +36,8 @@ import {
   RatingDistribution,
 } from '@canvas/outcomes/react/types/mastery_distribution'
 import {Avatar} from '@instructure/ui-avatar'
+import MessageStudents from '@canvas/message-students-modal'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -63,6 +65,7 @@ export interface OutcomeDistributionPopoverProps {
   isOpen: boolean
   onCloseHandler: () => void
   renderTrigger: ReactElement
+  courseId: string
 }
 
 const calculatePopoverWidth = (showInfo: boolean, hasSelectedRating: boolean) => {
@@ -180,9 +183,11 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   isOpen,
   onCloseHandler,
   renderTrigger,
+  courseId,
 }) => {
   const [showInfo, setShowInfo] = useState(false)
   const [selectedRating, setSelectedRating] = useState<RatingDistribution | null>(null)
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false)
   const {accountLevelMasteryScalesFF} = useLMGBContext()
   const calculationMethod = getCalculationMethod(outcome)
 
@@ -191,6 +196,13 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
     const studentIds = new Set(selectedRating.student_ids)
     return distributionStudents.filter(student => studentIds.has(student.id))
   }, [selectedRating, distributionStudents])
+
+  const messageRecipients = useMemo(() => {
+    return selectedStudents.map(student => ({
+      id: student.id,
+      displayName: student.display_name || student.name,
+    }))
+  }, [selectedStudents])
 
   const handleBarClick = React.useCallback(
     (label: string, _value: number) => {
@@ -228,104 +240,129 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   )
 
   return (
-    <Popover
-      renderTrigger={renderTrigger}
-      isShowingContent={isOpen}
-      onShowContent={() => {}}
-      onHideContent={onCloseHandler}
-      on="click"
-      screenReaderLabel={I18n.t('Outcome Distribution for %{outcomeName}', {
-        outcomeName: outcome.display_name,
-      })}
-      shouldContainFocus={true}
-      shouldReturnFocus={true}
-      shouldCloseOnDocumentClick={true}
-      placement="bottom center"
-    >
-      <Flex
-        as="div"
-        direction="column"
-        padding="small"
-        gap="x-small"
-        data-testid="outcome-distribution-popover"
-        width={`${calculatePopoverWidth(showInfo, !!selectedRating)}`}
+    <>
+      {isMessageModalOpen && selectedStudents.length > 0 && (
+        <MessageStudents
+          contextCode={`course_${courseId}`}
+          onRequestClose={() => setIsMessageModalOpen(false)}
+          open={isMessageModalOpen}
+          bulkMessage={true}
+          groupConversation={true}
+          recipients={messageRecipients}
+          title={I18n.t('Send a message to students')}
+        />
+      )}
+      <Popover
+        renderTrigger={renderTrigger}
+        isShowingContent={isOpen}
+        onShowContent={() => {}}
+        onHideContent={onCloseHandler}
+        on="click"
+        screenReaderLabel={I18n.t('Outcome Distribution for %{outcomeName}', {
+          outcomeName: outcome.display_name,
+        })}
+        shouldContainFocus={true}
+        shouldReturnFocus={true}
+        shouldCloseOnDocumentClick={true}
+        placement="bottom center"
       >
-        {/* 1. Title Section */}
-        <Flex as="div" alignItems="start" margin="0 0 small 0" justifyItems="space-between">
-          <Flex.Item shouldShrink={true}>
-            <Heading level="h3">
-              <TruncateText>{outcome.title}</TruncateText>
-            </Heading>
-          </Flex.Item>
+        <Flex
+          as="div"
+          direction="column"
+          padding="small"
+          gap="x-small"
+          data-testid="outcome-distribution-popover"
+          width={`${calculatePopoverWidth(showInfo, !!selectedRating)}`}
+        >
+          {/* 1. Title Section */}
+          <Flex as="div" alignItems="start" margin="0 0 small 0" justifyItems="space-between">
+            <Flex.Item shouldShrink={true}>
+              <Heading level="h3">
+                <TruncateText>{outcome.title}</TruncateText>
+              </Heading>
+            </Flex.Item>
 
-          <Flex.Item margin="0 xx-small 0 0">
-            <CloseButton
-              data-testid="outcome-distribution-popover-close-button"
-              onClick={onCloseHandler}
-              screenReaderLabel={I18n.t('Close')}
-              tabIndex={-1}
-            />
-          </Flex.Item>
-        </Flex>
-
-        {/* 2. Main Content Section */}
-        <Flex gap="medium" alignItems="stretch">
-          {showInfo && (
-            <Flex.Item shouldGrow={true} shouldShrink={true} size="0">
-              <InfoSection
-                outcome={outcome}
-                calculationMethod={calculationMethod}
-                masteryScaleContextType={masteryScaleContextType}
-                masteryScaleContextId={masteryScaleContextId}
+            <Flex.Item margin="0 xx-small 0 0">
+              <CloseButton
+                data-testid="outcome-distribution-popover-close-button"
+                onClick={onCloseHandler}
+                screenReaderLabel={I18n.t('Close')}
+                tabIndex={-1}
               />
             </Flex.Item>
-          )}
+          </Flex>
 
-          <Flex.Item shouldGrow={true} shouldShrink={true} size="0">
-            <View as="div">{chartComponent}</View>
-          </Flex.Item>
-
-          {selectedRating && (
-            <Flex.Item shouldGrow={true} shouldShrink={true} size="0">
-              <StudentList students={selectedStudents} />
-            </Flex.Item>
-          )}
-        </Flex>
-
-        {/* 3. Footer Section */}
-        <View as="div" borderWidth="small 0 0 0" borderColor="primary" padding="x-small 0 0 0">
-          <Flex justifyItems="space-between">
-            <Flex.Item>
-              <IconButton
-                data-testid="outcome-distribution-popover-info-button"
-                screenReaderLabel={
-                  showInfo
-                    ? I18n.t('Hide outcome distribution information')
-                    : I18n.t('View outcome distribution information')
-                }
-                size="small"
-                onClick={() => setShowInfo(prev => !prev)}
-                withBackground={showInfo}
-                withBorder={true}
-                color="primary"
-                tabIndex={-1}
-              >
-                <IconInfoLine />
-              </IconButton>
-            </Flex.Item>
+          {/* 2. Main Content Section */}
+          <Flex gap="medium" alignItems="stretch">
             {showInfo && (
-              <Flex.Item margin="0 xx-small 0 0">
-                <EditMasteryScaleLink
+              <Flex.Item shouldGrow={true} shouldShrink={true} size="0">
+                <InfoSection
                   outcome={outcome}
-                  accountLevelMasteryScalesFF={accountLevelMasteryScalesFF ?? false}
+                  calculationMethod={calculationMethod}
                   masteryScaleContextType={masteryScaleContextType}
                   masteryScaleContextId={masteryScaleContextId}
                 />
               </Flex.Item>
             )}
+
+            <Flex.Item shouldGrow={true} shouldShrink={true} size="0">
+              <View as="div">{chartComponent}</View>
+            </Flex.Item>
+
+            {selectedRating && (
+              <Flex.Item shouldGrow={true} shouldShrink={true} size="0">
+                <StudentList students={selectedStudents} />
+              </Flex.Item>
+            )}
           </Flex>
-        </View>
-      </Flex>
-    </Popover>
+
+          {/* 3. Footer Section */}
+          <View as="div" borderWidth="small 0 0 0" borderColor="primary" padding="x-small 0 0 0">
+            <Flex justifyItems="space-between">
+              <Flex.Item>
+                <IconButton
+                  data-testid="outcome-distribution-popover-info-button"
+                  screenReaderLabel={
+                    showInfo
+                      ? I18n.t('Hide outcome distribution information')
+                      : I18n.t('View outcome distribution information')
+                  }
+                  size="small"
+                  onClick={() => setShowInfo(prev => !prev)}
+                  withBackground={showInfo}
+                  withBorder={true}
+                  color="primary"
+                  tabIndex={-1}
+                >
+                  <IconInfoLine />
+                </IconButton>
+              </Flex.Item>
+              {showInfo && (
+                <Flex.Item margin="0 xx-small 0 0">
+                  <EditMasteryScaleLink
+                    outcome={outcome}
+                    accountLevelMasteryScalesFF={accountLevelMasteryScalesFF ?? false}
+                    masteryScaleContextType={masteryScaleContextType}
+                    masteryScaleContextId={masteryScaleContextId}
+                  />
+                </Flex.Item>
+              )}
+              {selectedRating && (
+                <Flex.Item>
+                  <Link
+                    onClick={() => setIsMessageModalOpen(true)}
+                    data-testid="message-students-link"
+                    iconPlacement="end"
+                    renderIcon={IconArrowOpenEndLine}
+                  >
+                    <Text size="small">{I18n.t('Message Students')}</Text>
+                  </Link>
+                </Flex.Item>
+              )}
+            </Flex>
+          </View>
+        </Flex>
+      </Popover>
+    </>
   )
 }
