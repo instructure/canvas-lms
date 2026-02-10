@@ -30,6 +30,7 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 const I18n = createI18nScope('assignments_bulk_edit')
 
+// @ts-expect-error
 function BulkEditDateSelect({selectDateRange}) {
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
@@ -63,6 +64,7 @@ function BulkEditDateSelect({selectDateRange}) {
           description={I18n.t('Select by date range')}
           layout="columns"
           colSpacing="small"
+          // @ts-expect-error
           messages={messages()}
         >
           {/* Use a View to trick FormFieldGroup into having one child for layout purposes */}
@@ -74,6 +76,7 @@ function BulkEditDateSelect({selectDateRange}) {
                 <ScreenReaderContent>{I18n.t('Selection start date')}</ScreenReaderContent>
               }
               formatDate={dateFormatter}
+              // @ts-expect-error
               onSelectedDateChange={setStartDate}
             />
             <View as="span" margin="0 small">
@@ -85,6 +88,7 @@ function BulkEditDateSelect({selectDateRange}) {
                 <ScreenReaderContent>{I18n.t('Selection end date')}</ScreenReaderContent>
               }
               formatDate={dateFormatter}
+              // @ts-expect-error
               onSelectedDateChange={setEndDate}
             />
             <Button

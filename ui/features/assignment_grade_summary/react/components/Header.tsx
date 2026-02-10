@@ -38,6 +38,7 @@ import {
 
 const I18n = createI18nScope('assignment_grade_summary')
 
+// @ts-expect-error
 function enumeratedStatuses(actions) {
   return [
     actions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
@@ -47,13 +48,17 @@ function enumeratedStatuses(actions) {
   ]
 }
 
+// @ts-expect-error
 function validGradersSelected(gradesByStudentId) {
   return Object.values(gradesByStudentId).every(gradesByGraderId => {
+    // @ts-expect-error
     const grades = Object.values(gradesByGraderId)
+    // @ts-expect-error
     const selectedGrade = grades.find(grade => grade.selected)
     if (!selectedGrade) {
       return true
     }
+    // @ts-expect-error
     const graderFound = ENV.GRADERS.find(grader => selectedGrade.graderId === grader.user_id)
     return !graderFound || graderFound.grader_selectable
   })
@@ -103,6 +108,7 @@ class Header extends Component {
     // cancel themselves in certain cases.
     // See https://stackoverflow.com/questions/51250430/chrome-dismisses-confirm-promps-immediately-without-any-user-interaction
     setTimeout(() => {
+      // @ts-expect-error
       if (windowConfirm(message)) this.props.releaseGrades()
     }, 100)
   }
@@ -114,21 +120,26 @@ class Header extends Component {
     // cancel themselves in certain cases.
     // See https://stackoverflow.com/questions/51250430/chrome-dismisses-confirm-promps-immediately-without-any-user-interaction
     setTimeout(() => {
+      // @ts-expect-error
       if (windowConfirm(message)) this.props.unmuteAssignment()
     }, 100)
   }
 
+  // @ts-expect-error
   UNSAFE_componentWillReceiveProps(nextProps) {
+    // @ts-expect-error
     if (nextProps.provisionalGrades !== this.props.provisionalGrades) {
       this.updateStatus(nextProps)
     }
   }
 
+  // @ts-expect-error
   updateStatus = nextProps => {
     const isValidSelection = validGradersSelected(nextProps.provisionalGrades)
     const status = !isValidSelection ? SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS : null
     const shouldUpdateStatus = nextProps.releaseGradesStatus !== status
     if (shouldUpdateStatus) {
+      // @ts-expect-error
       this.props.setReleaseGradesStatus(status)
     }
   }
@@ -136,12 +147,14 @@ class Header extends Component {
   render() {
     return (
       <header>
+        {/* @ts-expect-error */}
         {this.props.assignment.gradesPublished && (
           <Alert margin="0 0 medium 0" variant="info">
             <Text weight="bold">{I18n.t('Attention!')}</Text>{' '}
             {I18n.t('Grades cannot be modified from this page as they have already been released.')}
           </Alert>
         )}
+        {/* @ts-expect-error */}
         {this.props.releaseGradesStatus ===
           AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS && (
           <Alert margin="0 0 medium 0" variant="error">
@@ -155,30 +168,38 @@ class Header extends Component {
           {I18n.t('Grade Summary')}
         </Heading>
 
+        {/* @ts-expect-error */}
         <Text size="x-large">{this.props.assignment.title}</Text>
 
         <Flex as="div" margin="large 0 0 0">
+          {/* @ts-expect-error */}
           {this.props.graders.length > 0 && (
+            // @ts-expect-error
             <Flex.Item as="div" flex="1" shouldGrow={true}>
               <GradersTable />
             </Flex.Item>
           )}
 
+          {/* @ts-expect-error */}
           <Flex.Item align="end" as="div" flex="2" shouldGrow={true}>
             <Flex as="div" justifyItems="end">
               <Flex.Item>
                 <ReleaseButton
+                  // @ts-expect-error
                   gradesReleased={this.props.assignment.gradesPublished}
                   margin="0 x-small 0 0"
                   onClick={this.handleReleaseClick}
+                  // @ts-expect-error
                   releaseGradesStatus={this.props.releaseGradesStatus}
                 />
               </Flex.Item>
 
               <Flex.Item>
                 <PostToStudentsButton
+                  // @ts-expect-error
                   assignment={this.props.assignment}
                   onClick={this.handleUnmuteClick}
+                  // @ts-expect-error
                   unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
                 />
               </Flex.Item>
@@ -190,6 +211,7 @@ class Header extends Component {
   }
 }
 
+// @ts-expect-error
 function mapStateToProps(state) {
   const {assignment, releaseGradesStatus, unmuteAssignmentStatus} = state.assignment
 
@@ -202,6 +224,7 @@ function mapStateToProps(state) {
   }
 }
 
+// @ts-expect-error
 function mapDispatchToProps(dispatch) {
   return {
     releaseGrades() {
@@ -211,6 +234,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(AssignmentActions.unmuteAssignment())
     },
 
+    // @ts-expect-error
     setReleaseGradesStatus(status) {
       dispatch(setReleaseGradesStatus(status))
     },

@@ -29,10 +29,12 @@ import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 
 const I18n = createI18nScope('assignment_grade_summary')
 
+// @ts-expect-error
 function buttonProps(props) {
   return omit(props, 'graderName')
 }
 
+// @ts-expect-error
 function readyButton(props) {
   return (
     <Button {...buttonProps(props)}>
@@ -44,6 +46,7 @@ function readyButton(props) {
   )
 }
 
+// @ts-expect-error
 function startedButton(props) {
   const title = I18n.t('Accepting')
 
@@ -55,10 +58,12 @@ function startedButton(props) {
   )
 }
 
+// @ts-expect-error
 function successButton(props) {
   return (
     <Button
       {...buttonProps(props)}
+      // @ts-expect-error
       renderIcon={IconCheckMarkSolid}
       variant={props.disabled ? 'default' : 'light'}
     >
@@ -67,6 +72,7 @@ function successButton(props) {
   )
 }
 
+// @ts-expect-error
 export default function AcceptGradesButton(props) {
   const {acceptGradesStatus, onClick, selectionDetails, ...otherProps} = props
   const actionReady = ![STARTED, SUCCESS].includes(acceptGradesStatus)

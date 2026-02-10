@@ -42,34 +42,51 @@ import IndexCreate from '../../react/IndexCreate'
 
 const I18n = createI18nScope('assignmentsIndexView')
 
+// @ts-expect-error
 extend(IndexView, Backbone.View)
 
+// @ts-expect-error
 function IndexView() {
+  // @ts-expect-error
   this.filterKeyBindings = this.filterKeyBindings.bind(this)
+  // @ts-expect-error
   this.focusOnAssignments = this.focusOnAssignments.bind(this)
+  // @ts-expect-error
   this.filterResults = this.filterResults.bind(this)
+  // @ts-expect-error
   this.hide_dnd_warning = this.hide_dnd_warning.bind(this)
+  // @ts-expect-error
   this.show_dnd_warning = this.show_dnd_warning.bind(this)
+  // @ts-expect-error
   this.cancelBulkEdit = this.cancelBulkEdit.bind(this)
+  // @ts-expect-error
   this.handleBulkEditSaved = this.handleBulkEditSaved.bind(this)
+  // @ts-expect-error
   this.requestBulkEdit = this.requestBulkEdit.bind(this)
+  // @ts-expect-error
   return IndexView.__super__.constructor.apply(this, arguments)
 }
 
+// @ts-expect-error
 IndexView.mixin(AssignmentKeyBindingsMixin)
 
 IndexView.prototype.template = template
 
 IndexView.prototype.el = '#content'
 
+// @ts-expect-error
 IndexView.child('assignmentGroupsView', '[data-view=assignmentGroups]')
 
+// @ts-expect-error
 IndexView.child('createGroupView', '[data-view=createGroup]')
 
+// @ts-expect-error
 IndexView.child('assignmentSettingsView', '[data-view=assignmentSettings]')
 
+// @ts-expect-error
 IndexView.child('assignmentSyncSettingsView', '[data-view=assignmentSyncSettings]')
 
+// @ts-expect-error
 IndexView.child('showByView', '[data-view=showBy]')
 
 IndexView.prototype.events = {
@@ -88,6 +105,7 @@ IndexView.prototype.els = {
 }
 
 IndexView.prototype.initialize = function () {
+  // @ts-expect-error
   IndexView.__super__.initialize.apply(this, arguments)
   this.collection.once('reset', this.enableSearch, this)
   this.collection.on('cancelSearch', this.clearSearch, this)
@@ -95,8 +113,11 @@ IndexView.prototype.initialize = function () {
 }
 
 IndexView.prototype.toJSON = function () {
+  // @ts-expect-error
   const json = IndexView.__super__.toJSON.apply(this, arguments)
+  // @ts-expect-error
   json.course_home = ENV.COURSE_HOME
+  // @ts-expect-error
   json.weight_final_grades = ENV.WEIGHT_FINAL_GRADES
   json.bulkEditMode = this.bulkEditMode
   return json
@@ -111,6 +132,7 @@ IndexView.prototype.afterRender = function () {
     this.assignmentSettingsView.hide()
     this.assignmentSyncSettingsView.hide()
     this.indexMenuStore = configureIndexMenuStore({
+      // @ts-expect-error
       weighted: ENV.WEIGHT_FINAL_GRADES,
       externalTools: [],
       modalIsOpen: false,
@@ -119,6 +141,7 @@ IndexView.prototype.afterRender = function () {
     const contextInfo = ENV.context_asset_string.split('_')
     const contextType = contextInfo[0]
     const contextId = parseInt(contextInfo[1], 10)
+    // @ts-expect-error
     const requestBulkEditFn = (!ENV.COURSE_HOME && this.requestBulkEdit) || void 0
     if (this.$settingsMountPoint.length) {
       const settingsRoot = createRoot(this.$settingsMountPoint[0])
@@ -126,6 +149,7 @@ IndexView.prototype.afterRender = function () {
         React.createElement(IndexMenu, {
           store: this.indexMenuStore,
           contextType,
+          // @ts-expect-error
           contextId,
           requestBulkEdit: !ENV.IN_PACED_COURSE ? requestBulkEditFn : void 0,
           setTrigger: this.assignmentSettingsView.setTrigger.bind(this.assignmentSettingsView),
@@ -136,8 +160,11 @@ IndexView.prototype.afterRender = function () {
           disableSyncToSis: this.assignmentSyncSettingsView.openDisableSync.bind(
             this.assignmentSyncSettingsView,
           ),
+          // @ts-expect-error
           sisName: ENV.SIS_NAME,
+          // @ts-expect-error
           postToSisDefault: ENV.POST_TO_SIS_DEFAULT,
+          // @ts-expect-error
           hasAssignments: ENV.HAS_ASSIGNMENTS,
           assignmentGroupsCollection: this.collection,
         }),
@@ -148,8 +175,11 @@ IndexView.prototype.afterRender = function () {
     const indexRoot = createRoot(this.$indexCreateMountPoint[0])
     indexRoot?.render(
       React.createElement(IndexCreate, {
+        // @ts-expect-error
         newAssignmentUrl: ENV.URLS.new_assignment_url,
+        // @ts-expect-error
         quizLtiEnabled: ENV.QUIZ_LTI_ENABLED,
+        // @ts-expect-error
         manageAssignmentAddPermission: ENV.PERMISSIONS.manage_assignments_add,
       }),
     )
@@ -183,6 +213,7 @@ IndexView.prototype.afterRender = function () {
         onChange={e => {
           // Sends events to hidden input to utilize backbone
           const hiddenInput = $('[data-view=inputFilter]')
+          // @ts-expect-error
           hiddenInput[0].value = e.target?.value
           hiddenInput.keyup()
         }}
@@ -243,6 +274,7 @@ IndexView.prototype.clearSearch = function () {
 }
 
 IndexView.prototype.search = debounce(function () {
+  // @ts-expect-error
   return this.filterResults()
 }, 200)
 
@@ -250,10 +282,12 @@ IndexView.prototype.gradingPeriods = GradingPeriodsAPI.deserializePeriods(
   ENV.active_grading_periods,
 )
 
+// @ts-expect-error
 IndexView.prototype.show_dnd_warning = function (event) {
   return this.$(event.currentTarget).removeClass('screenreader-only')
 }
 
+// @ts-expect-error
 IndexView.prototype.hide_dnd_warning = function (event) {
   return this.$(event.currentTarget).addClass('screenreader-only')
 }
@@ -268,12 +302,14 @@ IndexView.prototype.clearNoAssignments = function () {
 }
 
 IndexView.prototype.filterResults = function () {
+  // @ts-expect-error
   let atleastoneGroup, gradingPeriod, gradingPeriodIndex, matchingAssignmentCount, regex, ul
   const term = $('#search_term').val()
   gradingPeriod = null
   if (ENV.HAS_GRADING_PERIODS) {
     gradingPeriodIndex = $('#grading_period_selector').val()
     if (gradingPeriodIndex !== 'all') {
+      // @ts-expect-error
       gradingPeriod = this.gradingPeriods[parseInt(gradingPeriodIndex, 10)]
     }
     this.saveSelectedGradingPeriod(gradingPeriod)
@@ -281,6 +317,7 @@ IndexView.prototype.filterResults = function () {
   if (term === '' && gradingPeriod === null) {
     this.collection.each(
       (function (_this) {
+        // @ts-expect-error
         return function (group) {
           return group.groupView.endSearch()
         }
@@ -291,7 +328,9 @@ IndexView.prototype.filterResults = function () {
     }
   } else {
     regex = new RegExp(this.cleanSearchTerm(term), 'ig')
+    // @ts-expect-error
     matchingAssignmentCount = this.collection.reduce(function (runningTotal, group) {
+      // @ts-expect-error
       const additionalCount = group.groupView.search(regex, gradingPeriod)
       return runningTotal + additionalCount
     }, 0)
@@ -313,6 +352,7 @@ IndexView.prototype.filterResults = function () {
   }
 }
 
+// @ts-expect-error
 IndexView.prototype.alertForMatchingGroups = function (numAssignments) {
   const msg = I18n.t(
     {
@@ -327,10 +367,12 @@ IndexView.prototype.alertForMatchingGroups = function (numAssignments) {
   return $.screenReaderFlashMessageExclusive(msg)
 }
 
+// @ts-expect-error
 IndexView.prototype.cleanSearchTerm = function (text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
+// @ts-expect-error
 IndexView.prototype.focusOnAssignments = function (e) {
   if (e.keyCode === 74) {
     if (!$(e.target).is(':input')) {
@@ -340,9 +382,13 @@ IndexView.prototype.focusOnAssignments = function (e) {
 }
 
 IndexView.prototype.filterKeyBindings = function () {
+  // @ts-expect-error
   const canManage = ENV.PERMISSIONS.manage
+  // @ts-expect-error
   const canAdd = ENV.PERMISSIONS.manage_assignments_add
+  // @ts-expect-error
   const canDelete = ENV.PERMISSIONS.manage_assignments_delete
+  // @ts-expect-error
   return (this.keyBindings = this.keyBindings.filter(function (binding) {
     if (!canManage && binding.keyCode === 69) {
       return false
@@ -373,6 +419,7 @@ IndexView.prototype.selectGradingPeriod = function () {
   }
 }
 
+// @ts-expect-error
 IndexView.prototype.saveSelectedGradingPeriod = function (gradingPeriod) {
   return userSettings.contextSet(
     'assignments_current_grading_period',

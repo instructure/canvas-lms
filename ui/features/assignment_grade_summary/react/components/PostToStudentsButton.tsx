@@ -28,10 +28,12 @@ import {FAILURE, STARTED, SUCCESS} from '../assignment/AssignmentActions'
 
 const I18n = createI18nScope('assignment_grade_summary')
 
+// @ts-expect-error
 function readyButton(props) {
   return <Button {...props}>{I18n.t('Post to Students')}</Button>
 }
 
+// @ts-expect-error
 function startedButton(props) {
   const title = I18n.t('Posting to Students')
 
@@ -43,6 +45,7 @@ function startedButton(props) {
   )
 }
 
+// @ts-expect-error
 function successButton(props) {
   return (
     <Button {...props} renderIcon={IconCheckMarkSolid} color="primary-inverse">
@@ -51,6 +54,7 @@ function successButton(props) {
   )
 }
 
+// @ts-expect-error
 export default function PostToStudentsButton(props) {
   const {assignment, onClick, unmuteAssignmentStatus, ...otherProps} = props
   const unmutable = assignment.gradesPublished && assignment.muted

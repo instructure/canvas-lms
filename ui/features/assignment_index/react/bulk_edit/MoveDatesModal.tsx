@@ -31,6 +31,7 @@ const I18n = createI18nScope('assignments_bulk_edit')
 export const SHIFT_DAYS_MIN = 1
 export const SHIFT_DAYS_MAX = 999
 
+// @ts-expect-error
 export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ...otherModalProps}) {
   const DUE_DATES = 'dueDates'
   const LOCK_DATES = 'lockDates'
@@ -45,12 +46,14 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
     {value: DUE_AND_LOCK_DATES, label: I18n.t('Remove Both')},
   ]
 
+  // @ts-expect-error
   const handleShiftDaysChange = useCallback((event, value) => {
     setShiftDays(value)
     setShiftDaysMessages([])
   }, [])
 
   const handleShiftDaysIncrement = useCallback(() => {
+    // @ts-expect-error
     if (isNaN(shiftDays)) return
 
     setShiftDays(`${Number(shiftDays) + 1}`)
@@ -58,6 +61,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
   }, [shiftDays])
 
   const handleShiftDaysDecrement = useCallback(() => {
+    // @ts-expect-error
     if (isNaN(shiftDays)) return
 
     setShiftDays(`${Number(shiftDays) - 1}`)
@@ -92,6 +96,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
     if (mode === 'shift') {
       const shiftDaysValidationMessages = generateShiftDaysMessages()
       if (shiftDaysValidationMessages.length > 0) {
+        // @ts-expect-error
         setShiftDaysMessages(shiftDaysValidationMessages)
         return
       }
@@ -114,11 +119,13 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
     // else, unrecognized mode or bad data, so do nothing
   }, [datesToRemove, mode, onShiftDays, onRemoveDates, shiftDays])
 
+  // @ts-expect-error
   const handleModeChange = useCallback(e => {
     setMode(e.target.value)
     setShiftDaysMessages([])
   }, [])
 
+  // @ts-expect-error
   const handleDatesToRemoveChange = useCallback(e => {
     setDatesToRemove(e.target.value)
   }, [])

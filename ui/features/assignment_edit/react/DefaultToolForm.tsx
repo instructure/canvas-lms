@@ -34,9 +34,13 @@ import {View} from '@instructure/ui-view'
 const I18n = createI18nScope('DefaultToolForm')
 
 const DefaultToolForm = ({
+  // @ts-expect-error
   toolUrl,
+  // @ts-expect-error
   courseId,
+  // @ts-expect-error
   toolName,
+  // @ts-expect-error
   previouslySelected,
   toolButtonText = I18n.t('Add Content'),
   toolInfoMessage = I18n.t('Click the button above to add content'),
@@ -46,11 +50,13 @@ const DefaultToolForm = ({
   const toolMessageData = usePostMessage('defaultToolContentReady')
 
   const defaultToolData = launchDefinitions.find(definition =>
+    // @ts-expect-error
     Object.values(definition.placements).find(placement => placement.url === toolUrl),
   )
 
   const contentTitle = () => {
     if (toolMessageData) {
+      // @ts-expect-error
       return toolMessageData.content && toolMessageData.content.title
     }
     return toolName
@@ -70,9 +76,11 @@ const DefaultToolForm = ({
     $('#default-tool').data('tool', defaultToolData)
   }, [defaultToolData, launchDefinitions])
 
+  // @ts-expect-error
   const handleLaunchButton = event => {
     // clear any errors
     document.getElementById('default-tool-launch-button')?.classList.remove('error-outline')
+    // @ts-expect-error
     hideErrors('default-tool-launch-button_errors')
     SelectContentDialogEvents.onContextExternalToolSelect(event, $('#default-tool'))
   }
@@ -125,6 +133,7 @@ const DefaultToolForm = ({
               {/* TODO: use InstUI button */}
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a href="#" className="name">
+                {/* @ts-expect-error */}
                 {defaultToolData.name}
               </a>
               <div className="description">This is a Sample Tool Provider.</div>

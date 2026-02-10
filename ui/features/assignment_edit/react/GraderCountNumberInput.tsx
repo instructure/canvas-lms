@@ -27,6 +27,7 @@ const I18n = createI18nScope('GraderCountNumberInput')
 
 const DEFAULT_GRADER_COUNT = 2
 
+// @ts-expect-error
 function availableGradersText(availableGradersCount) {
   if (availableGradersCount === 1) {
     return I18n.t('There is currently 1 available grader')
@@ -51,7 +52,9 @@ export default class GraderCountNumberInput extends React.Component {
 
   state = {
     graderCount:
+      // @ts-expect-error
       this.props.currentGraderCount ||
+      // @ts-expect-error
       Math.min(this.props.availableGradersCount, DEFAULT_GRADER_COUNT),
     messages: [],
     validationError: false,
@@ -67,6 +70,7 @@ export default class GraderCountNumberInput extends React.Component {
     $(document).off('validateGraderCountNumber')
   }
 
+  // @ts-expect-error
   setValidationError(validationError) {
     this.setState({
       validationError: validationError,
@@ -74,6 +78,7 @@ export default class GraderCountNumberInput extends React.Component {
     })
   }
 
+  // @ts-expect-error
   generateMessages(newValue, eventType) {
     if (newValue === '' && eventType !== 'blur') {
       return []
@@ -82,20 +87,25 @@ export default class GraderCountNumberInput extends React.Component {
     }
 
     const current = parseInt(newValue, 10)
+    // @ts-expect-error
     if (current > this.props.availableGradersCount) {
+      // @ts-expect-error
       return [{text: availableGradersText(this.props.availableGradersCount), type: 'hint'}]
     }
 
     return []
   }
 
+  // @ts-expect-error
   handleNumberInputBlur(value) {
     if (value === '') {
       this.setState({messages: this.generateMessages(value, 'blur')})
     }
   }
 
+  // @ts-expect-error
   handleNumberInputChange(value) {
+    // @ts-expect-error
     if (this.props.hideErrors) this.props.hideErrors('grader_count_errors')
 
     if (value === '') {
@@ -122,6 +132,7 @@ export default class GraderCountNumberInput extends React.Component {
             id="grader_count"
             value={this.state.graderCount.toString()}
             renderLabel={label}
+            // @ts-expect-error
             locale={this.props.locale}
             messages={this.state.messages}
             onChange={e => this.handleNumberInputChange(e.target.value)}

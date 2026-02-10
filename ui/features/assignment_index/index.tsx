@@ -43,15 +43,19 @@ const I18n = createI18nScope('assignment_index')
 
 ready(() => {
   const course = new Course({
+    // @ts-expect-error
     id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
+    // @ts-expect-error
     apply_assignment_group_weights: ENV.apply_assignment_group_weights,
   })
+  // @ts-expect-error
   course.url = ENV.URLS.course_url
 
   const userIsAdmin = ENV.current_user_is_admin
 
   const assignmentGroups = new AssignmentGroupCollection([], {
     course,
+    // @ts-expect-error
     courseSubmissionsURL: ENV.URLS.course_student_submissions_url,
   })
 
@@ -62,13 +66,17 @@ ready(() => {
 
   const assignmentGroupsView = new AssignmentGroupListView({
     collection: assignmentGroups,
+    // @ts-expect-error
     sortURL: ENV.URLS.sort_url,
+    // @ts-expect-error
     assignment_sort_base_url: ENV.URLS.assignment_sort_base_url,
     course,
     userIsAdmin,
   })
 
+  // @ts-expect-error
   if (ENV.PERMISSIONS.manage_assignments_edit) {
+    // @ts-expect-error
     assignmentSettingsView = new AssignmentSettingsView({
       model: course,
       assignmentGroups,
@@ -76,14 +84,18 @@ ready(() => {
       userIsAdmin,
     })
 
+    // @ts-expect-error
     assignmentSyncSettingsView = new AssignmentSyncSettingsView({
       collection: assignmentGroups,
       model: course,
+      // @ts-expect-error
       sisName: ENV.SIS_NAME,
     })
   }
 
+  // @ts-expect-error
   if (ENV.PERMISSIONS.manage_assignments_add) {
+    // @ts-expect-error
     createGroupView = new CreateGroupView({
       assignmentGroups,
       course,
@@ -91,7 +103,9 @@ ready(() => {
     })
   }
 
+  // @ts-expect-error
   if (!ENV.PERMISSIONS.manage_assignments_edit && !ENV.PERMISSIONS.manage_assignments_add) {
+    // @ts-expect-error
     showByView = new ToggleShowByView({
       course,
       assignmentGroups,
@@ -101,6 +115,7 @@ ready(() => {
   const indexEl =
     window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
 
+  // @ts-expect-error
   const app = new IndexView({
     el: indexEl,
     assignmentGroupsView,
@@ -114,6 +129,7 @@ ready(() => {
   app.render()
 
   // kick it all off
+  // @ts-expect-error
   course.trigger('change')
 
   const node = document.querySelector('.loadingIndicator')
@@ -126,6 +142,7 @@ ready(() => {
     )
   }
 
+  // @ts-expect-error
   getPrefetchedXHR('assignment_groups_url')
     .then(res =>
       res.json().then(data => {
@@ -133,7 +150,9 @@ ready(() => {
         // because we used prefetch_xhr to prefetch the first page of assignment_groups
         // but we still want the rest of the pages (if any) to be fetched like any
         // other paginatedCollection would.
+        // @ts-expect-error
         assignmentGroups.reset(data)
+        // @ts-expect-error
         const mockJqXHR = {getResponseHeader: h => res.headers.get(h)}
         assignmentGroups._setStateAfterFetch(mockJqXHR, {})
         if (!assignmentGroups.loadedAll) {
@@ -148,6 +167,7 @@ ready(() => {
       if (ENV.HAS_GRADING_PERIODS) {
         app.filterResults()
       }
+      // @ts-expect-error
       if (ENV.PERMISSIONS.manage) {
         assignmentGroups.loadModuleNames()
       } else {
@@ -156,5 +176,6 @@ ready(() => {
     })
 
   alertIfDeepLinkingCreatedModule()
+  // @ts-expect-error
   addDeepLinkingListener(handleAssignmentIndexDeepLinking)
 })
