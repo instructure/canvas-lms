@@ -21,12 +21,11 @@ import CanvasRce from '@canvas/rce/react/CanvasRce'
 import PropTypes from 'prop-types'
 import {TextArea} from '@instructure/ui-text-area'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import CommentLibrary from './CommentLibrary'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import ReactDOM from 'react-dom'
-import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {CommentLibrary as CommentLibraryV2} from './CommentLibraryV2/CommentLibrary'
+import RCEWrapper from '@instructure/canvas-rce/es/rce/RCEWrapper'
 
 // @ts-expect-error
 const pureTextCommentToRCEComment = value =>
@@ -67,8 +66,7 @@ export default function CommentArea({
   readOnly,
 }) {
   const [comment, setComment] = useState('')
-  const textAreaRef = useRef()
-  const [suggestionsRef, setSuggestionsRef] = useState(null)
+  const textAreaRef = useRef<RCEWrapper>()
   const showCommentLibrary = ENV.assignment_comment_library_feature_enabled
 
   // @ts-expect-error
@@ -80,24 +78,16 @@ export default function CommentArea({
   const setFocusToTextArea = useCallback(() => {
     if (textAreaRef.current) {
       if (useRCELite) {
-        // @ts-expect-error
         const editor = textAreaRef.current?.editor
         editor?.focus()
         editor?.selection.setCursorLocation(editor.getBody(), editor.getBody().childNodes.length)
       } else {
-        // @ts-expect-error
         textAreaRef.current.focus()
       }
     }
   }, [useRCELite])
 
-  // @ts-expect-error
-  const onSetSuggestionsRef = useCallback(node => {
-    setSuggestionsRef(node)
-  }, [])
-
-  // @ts-expect-error
-  const handleContentChange = (content, shouldRerender) => {
+  const handleContentChange = (content: string, shouldRerender: boolean) => {
     setComment(content)
     handleCommentChange(content, shouldRerender)
   }
@@ -105,7 +95,6 @@ export default function CommentArea({
   // @ts-expect-error
   const insertEmoji = emoji => {
     if (useRCELite) {
-      // @ts-expect-error
       textAreaRef.current?.editor?.insertContent(emoji.native)
       // handleCommentChange will be called onContentChange
     } else {
@@ -115,42 +104,29 @@ export default function CommentArea({
     }
 
     if (textAreaRef.current) {
-      // @ts-expect-error
       textAreaRef.current.focus()
     }
   }
 
   return (
     <>
-      {showCommentLibrary &&
-        (ENV?.use_comment_library_v2 ? (
-          <CommentLibraryV2
-            comment={comment}
-            userId={userId}
-            courseId={courseId}
-            setFocusToTextArea={setFocusToTextArea}
-            setComment={content => {
-              // Instead of forcing rerenders with handleContentChange to set value,
-              // just use RCE's api to set content
-              handleContentChange(content, false)
-              if (useRCELite) {
-                // @ts-expect-error
-                const editor = textAreaRef.current?.editor
-                editor?.setContent(pureTextCommentToRCEComment(editor?.dom.encode(content)))
-              }
-            }}
-          />
-        ) : (
-          <CommentLibrary
-            setFocusToTextArea={setFocusToTextArea}
-            setComment={content => handleContentChange(content, useRCELite)}
-            courseId={courseId}
-            userId={userId}
-            // @ts-expect-error
-            commentAreaText={stripHtmlTags(comment)}
-            suggestionsRef={suggestionsRef}
-          />
-        ))}
+      {showCommentLibrary && (
+        <CommentLibraryV2
+          comment={comment}
+          userId={userId}
+          courseId={courseId}
+          setFocusToTextArea={setFocusToTextArea}
+          setComment={content => {
+            // Instead of forcing rerenders with handleContentChange to set value,
+            // just use RCE's api to set content
+            handleContentChange(content, false)
+            if (useRCELite) {
+              const editor = textAreaRef.current?.editor
+              editor?.setContent(pureTextCommentToRCEComment(editor?.dom.encode(content)))
+            }
+          }}
+        />
+      )}
       <div id="textarea-container">
         {useRCELite ? (
           <CanvasRce
@@ -185,7 +161,6 @@ export default function CommentArea({
           <EmojiQuickPicker insertEmoji={insertEmoji} />
         </Portal>
       )}
-      {showCommentLibrary && <div ref={onSetSuggestionsRef} id="library-suggestions" />}
     </>
   )
 }

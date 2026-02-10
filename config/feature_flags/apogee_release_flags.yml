@@ -485,12 +485,6 @@ scheduled_feedback_releases:
       state: allowed_on
     development:
       state: allowed_on
-use_comment_library_v2:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Use Enhanced Comment Library in SpeedGrader
-  description: |
-    Enables the new Comment Library experience in SpeedGrader.
 use_queue_for_rate_limiting_gradebook_requests:
   state: hidden
   applies_to: SiteAdmin
