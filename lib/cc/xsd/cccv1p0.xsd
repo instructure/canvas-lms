@@ -88,6 +88,7 @@
         <xs:element name="lock_all_announcements" type="xs:boolean" minOccurs="0"/>
         <xs:element name="horizon_course" type="xs:boolean" minOccurs="0"/>
         <xs:element name="content_library" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="career_learning_library_only" type="xs:boolean" minOccurs="0"/>
         <xs:element name="public_syllabus" type="xs:boolean" minOccurs="0"/>
         <xs:element name="files_visibility" type="xs:string" minOccurs="0"/>
         <xs:element name="hide_distribution_graphs" type="xs:boolean" minOccurs="0"/>
