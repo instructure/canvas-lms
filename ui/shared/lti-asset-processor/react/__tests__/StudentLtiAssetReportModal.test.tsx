@@ -242,7 +242,7 @@ describe('StudentLtiAssetReportModal', () => {
         />,
       )
 
-      expect(screen.getAllByText('Text submitted to Canvas')[0]).toBeInTheDocument()
+      expect(screen.getByText('Text submitted to Canvas')).toBeInTheDocument()
       expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
     })
 
@@ -284,7 +284,7 @@ describe('StudentLtiAssetReportModal', () => {
         />,
       )
 
-      expect(screen.getAllByText('Text submitted to Canvas')[0]).toBeInTheDocument()
+      expect(screen.getByText('Text submitted to Canvas')).toBeInTheDocument()
       expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
     })
   })
