@@ -3597,6 +3597,111 @@ describe Types::UserType do
         expect(missing_result).to include("Calculated Missing Assignment")
       end
     end
+
+    context "with grading periods" do
+      before(:once) do
+        @frozen_time = Time.zone.parse("2024-06-15 12:00:00")
+
+        Timecop.freeze(@frozen_time) do
+          term = Account.default.enrollment_terms.create!(start_at: 10.years.ago)
+          @gp_course = course_factory(active_all: true, enrollment_term_id: term.id)
+          @gp_course.enroll_student(@student, enrollment_state: :active)
+
+          period_group = Account.default.grading_period_groups.create!
+          period_group.enrollment_terms << @gp_course.enrollment_term
+          @closed_period = period_group.grading_periods.create!(
+            title: "Closed Period",
+            start_date: 5.months.ago(@frozen_time),
+            end_date: 2.months.ago(@frozen_time),
+            close_date: 2.months.ago(@frozen_time)
+          )
+          @current_period = period_group.grading_periods.create!(
+            title: "Current Period",
+            start_date: 2.months.ago(@frozen_time),
+            end_date: 2.months.from_now(@frozen_time),
+            close_date: 2.months.from_now(@frozen_time)
+          )
+
+          @closed_period_assignment = @gp_course.assignments.create!(
+            title: "Assignment in Closed Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 4.months.ago(@frozen_time)
+          )
+          @current_period_assignment = @gp_course.assignments.create!(
+            title: "Assignment in Current Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 1.month.ago(@frozen_time)
+          )
+
+          @closed_period_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+          @current_period_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+        end
+      end
+
+      let(:gp_student_user_type) do
+        GraphQLTypeTester.new(
+          @student,
+          current_user: @student,
+          domain_root_account: @gp_course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+      end
+
+      it "filters missing submissions by current grading period by default" do
+        Timecop.freeze(@frozen_time) do
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment in Current Period")
+          expect(result).not_to include("Assignment in Closed Period")
+        end
+      end
+
+      it "returns all missing submissions when onlyCurrentGradingPeriod is false" do
+        Timecop.freeze(@frozen_time) do
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true, onlyCurrentGradingPeriod: false) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment in Current Period")
+          expect(result).to include("Assignment in Closed Period")
+        end
+      end
+
+      it "includes missing assignments from courses without grading periods" do
+        Timecop.freeze(@frozen_time) do
+          no_gp_course = course_factory(active_all: true)
+          no_gp_course.enroll_student(@student, enrollment_state: :active)
+          no_gp_assignment = no_gp_course.assignments.create!(
+            title: "Assignment Without Grading Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 1.month.ago(@frozen_time)
+          )
+          no_gp_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment Without Grading Period")
+          expect(result).to include("Assignment in Current Period")
+          expect(result).not_to include("Assignment in Closed Period")
+        end
+      end
+    end
   end
 
   context "courseWorkSubmissionsConnection with observed user" do

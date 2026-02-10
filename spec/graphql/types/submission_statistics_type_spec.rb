@@ -98,6 +98,75 @@ describe Types::SubmissionStatisticsType do
       it "counts missing submissions" do
         expect(course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 1
       end
+
+      context "with grading periods" do
+        before(:once) do
+          @frozen_time = Time.zone.parse("2025-06-15 12:00:00")
+
+          @gp_term = Account.default.enrollment_terms.create!(start_at: 10.years.ago)
+          @gp_course = course_factory(active_all: true, enrollment_term_id: @gp_term.id)
+          @gp_course.enroll_student(@student, enrollment_state: :active)
+
+          period_group = Account.default.grading_period_groups.create!
+          period_group.enrollment_terms << @gp_course.enrollment_term
+          @closed_period = period_group.grading_periods.create!(
+            title: "Closed Period",
+            start_date: 5.months.ago(@frozen_time),
+            end_date: 2.months.ago(@frozen_time),
+            close_date: 2.months.ago(@frozen_time)
+          )
+          @current_period = period_group.grading_periods.create!(
+            title: "Current Period",
+            start_date: 2.months.ago(@frozen_time),
+            end_date: 2.months.from_now(@frozen_time),
+            close_date: 2.months.from_now(@frozen_time)
+          )
+
+          Timecop.freeze(@frozen_time) do
+            @closed_period_assignment = @gp_course.assignments.create!(
+              title: "Assignment in Closed Period",
+              workflow_state: "published",
+              submission_types: "online_text_entry",
+              due_at: 4.months.ago(@frozen_time)
+            )
+            @current_period_assignment = @gp_course.assignments.create!(
+              title: "Assignment in Current Period",
+              workflow_state: "published",
+              submission_types: "online_text_entry",
+              due_at: 1.month.ago(@frozen_time)
+            )
+
+            @closed_period_submission = @closed_period_assignment.find_or_create_submission(@student)
+            @closed_period_submission.update!(late_policy_status: "missing")
+            @current_period_submission = @current_period_assignment.find_or_create_submission(@student)
+            @current_period_submission.update!(late_policy_status: "missing")
+          end
+        end
+
+        let(:gp_course_type) { GraphQLTypeTester.new(@gp_course, current_user: @student) }
+
+        it "filters missing submissions by current grading period by default" do
+          Timecop.freeze(@frozen_time) do
+            result = gp_course_type.resolve("submissionStatistics { missingSubmissionsCount }")
+            expect(result).to eq 1
+          end
+        end
+
+        it "returns all missing submissions when onlyCurrentGradingPeriod is false" do
+          Timecop.freeze(@frozen_time) do
+            result = gp_course_type.resolve("submissionStatistics { missingSubmissionsCount(onlyCurrentGradingPeriod: false) }")
+            expect(result).to eq 2
+          end
+        end
+
+        it "excludes missing submissions with nil grading_period_id" do
+          Timecop.freeze(@frozen_time) do
+            @closed_period_submission.update_columns(grading_period_id: nil)
+            result = gp_course_type.resolve("submissionStatistics { missingSubmissionsCount }")
+            expect(result).to eq 1
+          end
+        end
+      end
     end
 
     describe "submitted_submissions_count" do
