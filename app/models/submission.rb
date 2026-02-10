@@ -344,13 +344,27 @@ class Submission < ActiveRecord::Base
   scope :unposted, -> { where(posted_at: nil) }
 
   scope :in_current_grading_period_for_courses, lambda { |course_ids|
-    current_period_clause = ""
-    course_ids.uniq.each_with_index do |course_id, i|
-      grading_period_id = GradingPeriod.current_period_for(Course.find(course_id))&.id
-      current_period_clause += grading_period_id.nil? ? sanitize_sql(["course_id = ?", course_id]) : sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
-      current_period_clause += " OR " if i < course_ids.length - 1
+    unique_course_ids = course_ids.uniq
+    return none if unique_course_ids.empty?
+
+    courses = Course.where(id: unique_course_ids).preload(
+      :grading_period_groups,
+      :grading_periods,
+      enrollment_term: [:grading_period_group, :grading_periods]
+    ).index_by(&:id)
+
+    clauses = unique_course_ids.map do |course_id|
+      course = courses[course_id]
+      grading_period_id = course ? GradingPeriod.for(course).find(&:current?)&.id : nil
+
+      if grading_period_id.nil?
+        sanitize_sql(["course_id = ?", course_id])
+      else
+        sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
+      end
     end
-    where(current_period_clause)
+
+    where(clauses.join(" OR "))
   }
 
   workflow do

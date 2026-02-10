@@ -616,13 +616,13 @@ module Types
 
         is_observer = !observed_students.empty?
 
-        if is_observer
-          Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request], observed_user_id:).load(course)
-        elsif observed_user_id.nil?
-          Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
-        else
-          nil
-        end
+        loader_promise = if is_observer
+                           Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request], observed_user_id:).load(course)
+                         elsif observed_user_id.nil?
+                           Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+                         end
+
+        loader_promise&.then { |submissions| { course:, submissions: } }
       end
     end
 
