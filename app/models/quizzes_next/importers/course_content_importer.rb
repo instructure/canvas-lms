@@ -55,6 +55,7 @@ module QuizzesNext::Importers
         assignment.importing = true
         if assignment.quiz_lti!
           assignment.quiz = nil
+          assignment.importing = true
           assignment.save!
         end
 
