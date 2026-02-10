@@ -743,19 +743,20 @@ describe Announcement do
     end
   end
 
-  it_behaves_like "an accessibility scannable resource" do
-    before do
-      Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
-    end
-
-    let(:course) { course_model }
-    let(:valid_attributes) { { title: "Test Page", message: "Initial message", course: } }
-    let(:relevant_attributes_for_scan) { { message: "<p>Lorem ipsum</p>" } }
-    let(:irrelevant_attributes_for_scan) { { lock_at: 1.week.ago } }
-  end
-
   describe "accessibility scan" do
     let(:course) { course_model }
+
+    it_behaves_like "an accessibility scannable resource" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+      end
+
+      let(:course) { course_model }
+      let(:valid_attributes) { { title: "Test Page", message: "Initial message", course: } }
+      let(:relevant_attributes_for_scan) { { message: "<p>Lorem ipsum</p>" } }
+      let(:irrelevant_attributes_for_scan) { { lock_at: 1.week.ago } }
+    end
 
     context "when a11y_checker_additional_resources is disabled" do
       before do
