@@ -156,9 +156,11 @@ const handleDeleteToken = async (token: Token, deleteToken: ReturnType<typeof us
       messageDangerouslySetInnerHTML: {
         __html: I18n.t(
           `You are about to delete a user generated API token with the following purpose:
-          <div style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><strong>%{purpose}</strong></div>.
+          *%{purpose}*
           This action can not be undone.`,
           {
+            wrappers:
+              '<div style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><strong>$1</strong></div>',
             purpose: token.purpose || I18n.t('User Generated'),
           },
         ),
