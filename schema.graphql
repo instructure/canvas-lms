@@ -33,6 +33,11 @@ type Account implements LegacyIDInterface & Node {
     before: String
 
     """
+    Whether or not to include or exclude Canvas Career learning library only courses
+    """
+    careerLearningLibraryOnly: Boolean
+
+    """
     Returns the first _n_ elements from the list.
     """
     first: Int
@@ -2175,6 +2180,7 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     last: Int
   ): UserConnection
   availableModeratorsCount: Int
+  careerLearningLibraryOnly: Boolean
 
   """
   course short name

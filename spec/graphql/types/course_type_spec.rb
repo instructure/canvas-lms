@@ -3021,4 +3021,63 @@ describe Types::CourseType do
       ).to match_array result_array
     end
   end
+
+  describe "career_learning_library_only field" do
+    before :once do
+      @horizon_account = Account.create!
+      @horizon_account.enable_feature!(:horizon_course_setting)
+      @horizon_account.enable_feature!(:horizon_learning_library_ms2)
+      @horizon_account.horizon_account = true
+      @horizon_account.save!
+
+      @horizon_course = course_with_teacher(
+        account: @horizon_account,
+        course_name: "Horizon Course",
+        career_learning_library_only: true,
+        active_all: true
+      ).course
+
+      @teacher = @user
+    end
+
+    let(:course_type) { GraphQLTypeTester.new(@horizon_course, current_user: @teacher) }
+
+    it "returns nil when feature flag is not enabled" do
+      account = Account.create!
+      course = course_with_teacher(
+        account:,
+        course_name: "Regular Course",
+        active_all: true
+      ).course
+
+      result = GraphQLTypeTester.new(course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be_nil
+    end
+
+    it "returns boolean value when feature flag is enabled" do
+      result = GraphQLTypeTester.new(@horizon_course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be(true)
+    end
+
+    it "returns false for regular courses in horizon account" do
+      regular_course = course_with_teacher(
+        account: @horizon_account,
+        course_name: "Regular Course",
+        career_learning_library_only: false,
+        active_all: true
+      ).course
+
+      result = GraphQLTypeTester.new(regular_course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be(false)
+    end
+  end
 end
