@@ -27,7 +27,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import LtiAssetReportStatus from './LtiAssetReportStatus'
 import {LtiAssetReports, type LtiAssetReportsProps} from './LtiAssetReports'
 import {ResubmitDiscussionNoticesButton} from './ResubmitDiscussionNoticesButton'
-import TruncateWithTooltip from './TruncateWithTooltip'
 
 export type AssetReportModalProps = LtiAssetReportsProps & {
   modalTitle: string
@@ -83,14 +82,8 @@ export function AssetReportModal({
             {mainTitle && (
               <FlexItem>
                 <View maxWidth="30em" as="div">
-                  <Text size="descriptionPage" weight="weightImportant">
-                    <TruncateWithTooltip
-                      linesAllowed={1}
-                      horizontalOffset={0}
-                      backgroundColor="primary-inverse"
-                    >
-                      {mainTitle}
-                    </TruncateWithTooltip>
+                  <Text size="descriptionPage" weight="weightImportant" wrap="break-word">
+                    {mainTitle}
                   </Text>
                 </View>
               </FlexItem>
