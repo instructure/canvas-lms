@@ -12026,6 +12026,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
   email: String
   enrollments(
     """
+    Whether or not to only filter for or exclude Canvas Career learning library only courses
+    """
+    careerLearningLibraryOnly: Boolean
+
+    """
     only return enrollments for this course
     """
     courseId: ID
