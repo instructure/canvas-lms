@@ -21,7 +21,7 @@ import getCookie from '@instructure/get-cookie'
 export type OutcomeRollupScore = {
   score: string
   links: {
-    outcome_id: string
+    outcome: string
     user: string
   }
 }

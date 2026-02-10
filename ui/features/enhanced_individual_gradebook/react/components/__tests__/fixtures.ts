@@ -578,24 +578,24 @@ export const OUTCOME_ROLLUP_QUERY_RESPONSE = [
   {
     links: {user: '5', section: '1', status: 'active'},
     scores: [
-      {links: {outcome_id: '1'}, score: 5},
-      {links: {outcome_id: '2'}, score: 0},
-      {links: {outcome_id: '3'}, score: 4},
+      {links: {outcome: '1'}, score: 5},
+      {links: {outcome: '2'}, score: 0},
+      {links: {outcome: '3'}, score: 4},
     ],
   },
   {
     links: {user: '4', section: '1', status: 'active'},
     scores: [
-      {links: {outcome_id: '1'}, score: 0},
-      {links: {outcome_id: '2'}, score: 5},
+      {links: {outcome: '1'}, score: 0},
+      {links: {outcome: '2'}, score: 5},
     ],
   },
   {
     links: {user: '2', section: '1', status: 'active'},
     scores: [
-      {links: {outcome_id: '1'}, score: 5},
-      {links: {outcome_id: '2'}, score: 4},
-      {links: {outcome_id: '3'}, score: 5},
+      {links: {outcome: '1'}, score: 5},
+      {links: {outcome: '2'}, score: 4},
+      {links: {outcome: '3'}, score: 5},
     ],
   },
 ]
