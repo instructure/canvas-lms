@@ -225,6 +225,10 @@ module Types
     ALLOWED_ORDER_BY_VALUES = %w[id user_id course_id created_at start_at end_at completed_at courses.id courses.name courses.course_code courses.start_at courses.conclude_at].to_set
 
     field :enrollments, [EnrollmentType], null: false do
+      argument :career_learning_library_only,
+               Boolean,
+               "Whether or not to only filter for or exclude Canvas Career learning library only courses",
+               required: false
       argument :course_id,
                ID,
                "only return enrollments for this course",
@@ -272,7 +276,7 @@ module Types
       end
     end
 
-    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
+    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, career_learning_library_only: nil, sort: {})
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
         course_ids:,
@@ -280,6 +284,7 @@ module Types
         current_only:,
         exclude_concluded:,
         horizon_courses:,
+        career_learning_library_only:,
         sort:
       ).load(object.id).then do |enrollments|
         (enrollments || []).select do |enrollment|
@@ -1024,13 +1029,14 @@ end
 
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
-    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil, sort: {})
+    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil, career_learning_library_only: nil, sort: {})
       @course_ids = course_ids
       @order_by = order_by
       @current_only = current_only
       @exclude_concluded = exclude_concluded
       @exclude_pending_enrollments = exclude_pending_enrollments
       @horizon_courses = horizon_courses
+      @career_learning_library_only = career_learning_library_only
       @sort = sort
 
       scope = build_scope
@@ -1077,6 +1083,14 @@ module Loaders
                 Enrollment.not_horizon
               else
                 Enrollment.joins(:course)
+              end
+
+      scope = if @career_learning_library_only
+                scope.career_learning_library
+              elsif @career_learning_library_only == false
+                scope.not_career_learning_library
+              else
+                scope
               end
 
       scope = if @current_only
