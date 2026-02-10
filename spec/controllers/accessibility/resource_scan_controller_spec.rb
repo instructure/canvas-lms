@@ -194,7 +194,8 @@ describe Accessibility::ResourceScanController do
       end
 
       before do
-        # Create 10 closed issues for scan1
+        Account.site_admin.enable_feature!(:a11y_checker_close_issues)
+
         10.times do
           accessibility_issue_model(
             course:,
@@ -225,7 +226,7 @@ describe Accessibility::ResourceScanController do
         end
       end
 
-      it "sorts by issue_count DESC, then closed_issue_count DESC" do
+      it "sorts by issue_count DESC, then closed_issue_count DESC when feature flag enabled" do
         get :index, params: { course_id: course.id, sort: "issue_count", direction: "desc" }, format: :json
         expect(response).to have_http_status(:ok)
 
@@ -242,7 +243,7 @@ describe Accessibility::ResourceScanController do
         expect(test_scans[2]["id"]).to eq(scan3.id)
       end
 
-      it "sorts by issue_count ASC, then closed_issue_count ASC" do
+      it "sorts by issue_count ASC, then closed_issue_count ASC when feature flag enabled" do
         get :index, params: { course_id: course.id, sort: "issue_count", direction: "asc" }, format: :json
         expect(response).to have_http_status(:ok)
 
@@ -257,6 +258,24 @@ describe Accessibility::ResourceScanController do
         expect(test_scans[0]["id"]).to eq(scan3.id)
         expect(test_scans[1]["id"]).to eq(scan2.id)
         expect(test_scans[2]["id"]).to eq(scan1.id)
+      end
+
+      it "sorts by issue_count only when feature flag disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_close_issues)
+
+        get :index, params: { course_id: course.id, sort: "issue_count", direction: "desc" }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        test_scans = json.select { |s| [scan1.id, scan2.id, scan3.id].include?(s["id"]) }
+
+        # Expected order when not considering closed count:
+        # scan1 and scan2 both have 5 active issues, so order between them may vary
+        # scan3 has 2 active issues, so it should be last
+        expect(test_scans.length).to eq(3)
+        first_two_ids = [test_scans[0]["id"], test_scans[1]["id"]]
+        expect(first_two_ids).to contain_exactly(scan1.id, scan2.id)
+        expect(test_scans[2]["id"]).to eq(scan3.id)
       end
 
       it "includes closed_issue_count in response" do
@@ -483,6 +502,183 @@ describe Accessibility::ResourceScanController do
           json = response.parsed_body
           expect(json.length).to eq(2)
           expect(json.first["resource_name"]).to eq("Completed Resource")
+        end
+
+        context "when combining filters with sorting" do
+          let(:wiki_page1) { wiki_page_model(course:) }
+          let(:wiki_page2) { wiki_page_model(course:) }
+          let(:wiki_page3) { wiki_page_model(course:) }
+
+          let!(:scan_high_count) do
+            accessibility_resource_scan_model(
+              course:,
+              context: wiki_page1,
+              workflow_state: "completed",
+              resource_name: "High Issue Count Page",
+              resource_workflow_state: "published",
+              issue_count: 10
+            )
+          end
+
+          let!(:scan_medium_count) do
+            accessibility_resource_scan_model(
+              course:,
+              context: wiki_page2,
+              workflow_state: "completed",
+              resource_name: "Medium Issue Count Page",
+              resource_workflow_state: "published",
+              issue_count: 5
+            )
+          end
+
+          let!(:scan_low_count) do
+            accessibility_resource_scan_model(
+              course:,
+              context: wiki_page3,
+              workflow_state: "completed",
+              resource_name: "Low Issue Count Page",
+              resource_workflow_state: "published",
+              issue_count: 2
+            )
+          end
+
+          before do
+            3.times do
+              accessibility_issue_model(
+                course:,
+                accessibility_resource_scan: scan_high_count,
+                rule_type: "img-alt"
+              )
+            end
+
+            2.times do
+              accessibility_issue_model(
+                course:,
+                accessibility_resource_scan: scan_medium_count,
+                rule_type: "img-alt"
+              )
+            end
+
+            accessibility_issue_model(
+              course:,
+              accessibility_resource_scan: scan_low_count,
+              rule_type: "img-alt"
+            )
+
+            2.times do
+              accessibility_issue_model(
+                course:,
+                accessibility_resource_scan: scan_high_count,
+                rule_type: "img-alt-filename"
+              )
+            end
+
+            accessibility_issue_model(
+              course:,
+              accessibility_resource_scan: scan_medium_count,
+              rule_type: "img-alt-filename"
+            )
+
+            accessibility_issue_model(
+              course:,
+              accessibility_resource_scan: scan_high_count,
+              rule_type: "img-alt-length"
+            )
+          end
+
+          it "filters by multiple rule types and sorts by issue_count descending" do
+            get :index,
+                params: {
+                  course_id: course.id,
+                  filters: {
+                    ruleTypes: %w[img-alt img-alt-filename img-alt-length],
+                    artifactTypes: %w[wiki_page]
+                  },
+                  sort: "issue_count",
+                  direction: "desc"
+                },
+                format: :json
+
+            expect(response).to have_http_status(:ok)
+
+            json = response.parsed_body
+            test_scans = json.select { |s| [scan_high_count.id, scan_medium_count.id, scan_low_count.id].include?(s["id"]) }
+
+            expect(test_scans.length).to eq(3)
+
+            expect(test_scans[0]["id"]).to eq(scan_high_count.id)
+            expect(test_scans[1]["id"]).to eq(scan_medium_count.id)
+            expect(test_scans[2]["id"]).to eq(scan_low_count.id)
+          end
+
+          it "filters by multiple rule types and sorts by issue_count ascending" do
+            get :index,
+                params: {
+                  course_id: course.id,
+                  filters: {
+                    ruleTypes: %w[img-alt img-alt-filename],
+                    artifactTypes: %w[wiki_page]
+                  },
+                  sort: "issue_count",
+                  direction: "asc"
+                },
+                format: :json
+
+            expect(response).to have_http_status(:ok)
+
+            json = response.parsed_body
+            test_scans = json.select { |s| [scan_high_count.id, scan_medium_count.id, scan_low_count.id].include?(s["id"]) }
+
+            expect(test_scans.length).to eq(3)
+
+            expect(test_scans[0]["id"]).to eq(scan_low_count.id)
+            expect(test_scans[1]["id"]).to eq(scan_medium_count.id)
+            expect(test_scans[2]["id"]).to eq(scan_high_count.id)
+          end
+
+          it "filters by single rule type with artifact type and sorts by resource_type" do
+            get :index,
+                params: {
+                  course_id: course.id,
+                  filters: {
+                    ruleTypes: %w[img-alt],
+                    artifactTypes: %w[wiki_page]
+                  },
+                  sort: "resource_type",
+                  direction: "asc"
+                },
+                format: :json
+
+            expect(response).to have_http_status(:ok)
+
+            json = response.parsed_body
+            test_scans = json.select { |s| [scan_high_count.id, scan_medium_count.id, scan_low_count.id].include?(s["id"]) }
+
+            expect(test_scans.length).to eq(3)
+            expect(test_scans.all? { |s| s["resource_type"] == "WikiPage" }).to be true
+          end
+
+          it "combines rule type filter, artifact type filter, and resource_name sort" do
+            get :index,
+                params: {
+                  course_id: course.id,
+                  filters: {
+                    ruleTypes: %w[img-alt-filename],
+                    artifactTypes: %w[wiki_page]
+                  },
+                  sort: "resource_name",
+                  direction: "asc"
+                },
+                format: :json
+
+            expect(response).to have_http_status(:ok)
+
+            json = response.parsed_body
+            test_scans = json.select { |s| [scan_high_count.id, scan_medium_count.id].include?(s["id"]) }
+
+            expect(test_scans.length).to eq(2)
+            expect(test_scans.pluck("resource_name")).to eq(["High Issue Count Page", "Medium Issue Count Page"])
+          end
         end
 
         it "returns all scans if filters are empty" do
