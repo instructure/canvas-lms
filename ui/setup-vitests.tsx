@@ -67,6 +67,11 @@ globalThis.clearInterval = ((id?: ReturnType<typeof setInterval>) => {
 // Global cleanup after each test to prevent memory leaks and timer issues
 // This is especially important for InstUI components that use transitions with setTimeout
 afterEach(() => {
+  // Clean up any rendered React components that weren't explicitly unmounted.
+  // This must run BEFORE clearing timers because cleanup() can trigger InstUI
+  // Transition animations that create new timers via setTimeout.
+  cleanup()
+
   // Clear all pending timers from InstUI transitions, animations, etc.
   // These can cause "document is not defined" errors when they fire after jsdom teardown
   for (const id of pendingTimeouts) {
@@ -78,10 +83,6 @@ afterEach(() => {
     originalClearInterval(id)
   }
   pendingIntervals.clear()
-
-  // Clean up any rendered React components that weren't explicitly unmounted
-  // This is a safeguard for tests that don't properly clean up
-  cleanup()
 })
 
 // jQuery plugins (toJSON, dialog, droppable, etc.) are added via the jquery-with-plugins.ts wrapper
