@@ -912,6 +912,14 @@ class AccountsController < ApplicationController
       @courses = @courses.homeroom
     end
 
+    if @account.root_account.feature_enabled?(:horizon_learning_library_ms2) && params.key?(:career_learning_library_only)
+      @courses = if value_to_boolean(params[:career_learning_library_only])
+                   @courses.career_learning_library
+                 else
+                   @courses.not_career_learning_library
+                 end
+    end
+
     if starts_before || ends_after
       @courses = @courses.joins(:enrollment_term)
       if starts_before
