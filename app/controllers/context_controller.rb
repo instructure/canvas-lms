@@ -442,6 +442,7 @@ class ContextController < ApplicationController
         )
       end
 
+      @item.updating_user = @current_user if @item.respond_to?(:updating_user=)
       @item.restore
       if @item.errors.any?
         return render json: @item.errors.full_messages, status: :forbidden
