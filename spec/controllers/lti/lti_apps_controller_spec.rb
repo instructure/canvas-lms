@@ -18,8 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../spec_helper"
+require_relative "../../lti_spec_helper"
 
 RSpec.describe Lti::LtiAppsController, type: :controller do
+  include LtiSpecHelper
+
   describe "GET #launch_definitions" do
     let(:course) { course_model }
     let(:teacher) { user_model }
@@ -27,6 +30,11 @@ RSpec.describe Lti::LtiAppsController, type: :controller do
     before do
       course.enroll_teacher(teacher, enrollment_state: "active")
       user_session(teacher)
+      tp = create_tool_proxy
+      tp.bindings.create(context: course.root_account)
+      rh = create_resource_handler(tp)
+      mh = create_message_handler(rh)
+      mh.placements.create!(placement: Lti::ResourcePlacement::COURSE_NAVIGATION)
     end
 
     context "when new quizzes feature is enabled" do
@@ -73,7 +81,7 @@ RSpec.describe Lti::LtiAppsController, type: :controller do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        tool_ids = json.map { |tool| tool["definition_id"] }
+        tool_ids = json.pluck("definition_id")
 
         expect(tool_ids).to include(quiz_tool.id)
         expect(tool_ids).to include(regular_tool.id)
@@ -121,7 +129,7 @@ RSpec.describe Lti::LtiAppsController, type: :controller do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        tool_ids = json.map { |tool| tool["definition_id"] }
+        tool_ids = json.pluck("definition_id")
 
         expect(tool_ids).not_to include(quiz_tool.id)
         expect(tool_ids).to include(regular_tool.id)
@@ -149,7 +157,7 @@ RSpec.describe Lti::LtiAppsController, type: :controller do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        tool_ids = json.map { |tool| tool["definition_id"] }
+        tool_ids = json.pluck("definition_id")
 
         expect(tool_ids).not_to include(quiz_tool.id)
         expect(tool_ids).to include(regular_tool.id)
