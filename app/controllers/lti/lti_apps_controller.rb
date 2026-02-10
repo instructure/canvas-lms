@@ -146,7 +146,9 @@ module Lti
             filtered_launch_defs = if NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context)
                                      launch_defs
                                    else
-                                     launch_defs.reject { |tool| tool.tool_id == "Quizzes 2" }
+                                     launch_defs.reject do |tool|
+                                       tool.respond_to?(:tool_id) && tool.tool_id == "Quizzes 2"
+                                     end
                                    end
 
             render json: AppLaunchCollator.launch_definitions(filtered_launch_defs, placements, include_context_name: value_to_boolean(params[:include_context_name]))
