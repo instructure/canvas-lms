@@ -51,11 +51,26 @@ module Types
       account.resolved_outcome_calculation_method
     end
 
-    field :courses_connection, CourseType.connection_type, null: true
-    def courses_connection
+    field :courses_connection, CourseType.connection_type, null: true do
+      argument :career_learning_library_only,
+               Boolean,
+               "Whether or not to include or exclude Canvas Career learning library only courses",
+               required: false
+    end
+    def courses_connection(career_learning_library_only: nil)
       return unless account.grants_right?(current_user, :read_course_list)
 
-      account.associated_courses
+      courses = account.associated_courses
+
+      if account.root_account.feature_enabled?(:horizon_learning_library_ms2) && !career_learning_library_only.nil?
+        courses = if career_learning_library_only
+                    courses.career_learning_library
+                  else
+                    courses.not_career_learning_library
+                  end
+      end
+
+      courses
     end
 
     field :custom_grade_statuses_connection, CustomGradeStatusType.connection_type, null: true
