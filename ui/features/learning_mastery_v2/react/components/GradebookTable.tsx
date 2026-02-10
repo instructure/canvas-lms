@@ -183,12 +183,13 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
           outcome={outcome}
           outcomeDistribution={outcomeDistributions?.[outcome.id.toString()]}
           distributionStudents={distributionStudents}
+          courseId={courseId}
           sorting={sorting}
           contributingScoresForOutcome={contributingScoreForOutcome}
         />
       )
     },
-    [sorting, outcomeDistributions, distributionStudents],
+    [sorting, outcomeDistributions, distributionStudents, courseId],
   )
 
   const renderOutcomeCell = useCallback(

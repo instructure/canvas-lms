@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
@@ -64,6 +65,7 @@ describe('OutcomeHeader', () => {
         setSortAlignmentId: vi.fn(),
       },
       contributingScoresForOutcome: mockContributingScoresForOutcome,
+      courseId: '5',
     }
   }
 
@@ -72,9 +74,10 @@ describe('OutcomeHeader', () => {
     expect(screen.getAllByText('outcome 1')[0]).toBeInTheDocument()
   })
 
-  it('renders a menu with various sorting and display options', () => {
+  it('renders a menu with various sorting and display options', async () => {
+    const user = userEvent.setup()
     render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(screen.getByText('outcome 1 options'))
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
     expect(screen.getByText('Sort')).toBeInTheDocument()
     expect(screen.getByText('Ascending scores')).toBeInTheDocument()
     expect(screen.getByText('Descending scores')).toBeInTheDocument()
@@ -84,17 +87,19 @@ describe('OutcomeHeader', () => {
     expect(screen.getByText('Show Outcome Distribution')).toBeInTheDocument()
   })
 
-  it('renders the outcome description modal when option is selected', () => {
+  it('renders the outcome description modal when option is selected', async () => {
+    const user = userEvent.setup()
     render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(screen.getByText('outcome 1 options'))
-    fireEvent.click(screen.getByText('Outcome Info'))
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    await user.click(screen.getByText('Outcome Info'))
     expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
   })
 
-  it('renders the outcome distribution popover when option is selected', () => {
+  it('renders the outcome distribution popover when option is selected', async () => {
+    const user = userEvent.setup()
     render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(screen.getByText('outcome 1 options'))
-    fireEvent.click(screen.getByText('Show Outcome Distribution'))
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    await user.click(screen.getByText('Show Outcome Distribution'))
     expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
   })
 })
