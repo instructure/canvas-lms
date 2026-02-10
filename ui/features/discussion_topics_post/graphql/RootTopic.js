@@ -19,28 +19,48 @@
 import {gql} from '@apollo/client'
 import {arrayOf, shape, string} from 'prop-types'
 import {ChildTopic} from './ChildTopic'
+import {DiscussionPermissions} from './DiscussionPermissions'
+import {GroupSet} from './GroupSet'
 
 export const RootTopic = {
   fragment: gql`
     fragment RootTopic on Discussion {
       id
       _id
+      permissions {
+        ...DiscussionPermissions
+      }
+      groupSet {
+        ...DiscussionPostGroupSet
+      }
       childTopics {
         ...ChildTopic
       }
     }
     ${ChildTopic.fragment}
+    ${DiscussionPermissions.fragment}
+    ${GroupSet.fragment}
   `,
 
   shape: shape({
     id: string,
     _id: string,
+    permissions: DiscussionPermissions.shape,
+    groupSet: GroupSet.shape,
     childTopics: arrayOf(ChildTopic.shape),
   }),
 
-  mock: ({id = 'QXNzaWdubWVu2323wewrwr', _id = '7', childTopics = [ChildTopic.mock()]} = {}) => ({
+  mock: ({
+    id = 'QXNzaWdubWVu2323wewrwr',
+    _id = '7',
+    permissions = DiscussionPermissions.mock(),
+    groupSet = GroupSet.mock(),
+    childTopics = [ChildTopic.mock()],
+  } = {}) => ({
     id,
     _id,
+    permissions,
+    groupSet,
     childTopics,
     __typename: 'Discussion',
   }),
