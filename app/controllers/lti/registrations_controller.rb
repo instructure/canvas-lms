@@ -1101,7 +1101,6 @@
 #
 class Lti::RegistrationsController < ApplicationController
   before_action :require_root_account_instrumented_or_sub_account_and_feature_flag
-  before_action :require_feature_flag
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
   before_action :require_manage_lti_registrations
@@ -2051,15 +2050,6 @@ class Lti::RegistrationsController < ApplicationController
   rescue ActiveRecord::RecordNotFound => e
     report_error(e)
     raise e
-  end
-
-  def require_feature_flag
-    unless @account.root_account.feature_enabled?(:lti_registrations_page)
-      respond_to do |format|
-        format.html { render "shared/errors/404_message", status: :not_found }
-        format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
-      end
-    end
   end
 
   def require_lti_registrations_next_feature_flag

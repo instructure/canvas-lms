@@ -150,7 +150,7 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
       id="install-new-lti-app"
       display={buttonWidth}
       color="primary"
-      interaction={buttonIsEnabled(integration, jsonFetchStatus) ? 'enabled' : 'disabled'}
+      interaction={buttonIsEnabled(jsonFetchStatus) ? 'enabled' : 'disabled'}
       onClick={() => {
         switch (integration?.integration_type) {
           case 'lti_13_dynamic_registration':
@@ -201,22 +201,4 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
   )
 }
 
-const buttonIsEnabled = (
-  integration: PreferredLtiIntegration | undefined,
-  jsonFetchStatus: JsonFetchStatus,
-) => {
-  if (integration === undefined) {
-    return true
-  } else if (jsonFetchStatus._tag === 'loading') {
-    return false
-  } else if (integration?.integration_type === 'lti_13_dynamic_registration') {
-    return true
-  } else if (
-    (jsonFetchStatus._tag === 'loaded' && isSuccessful(jsonFetchStatus.result)) ||
-    integration?.integration_type === 'lti_13_global_inherited_key'
-  ) {
-    return window.ENV.FEATURES.lti_registrations_page
-  } else {
-    return true
-  }
-}
+const buttonIsEnabled = (jsonFetchStatus: JsonFetchStatus) => jsonFetchStatus._tag !== 'loading'
