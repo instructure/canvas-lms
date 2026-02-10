@@ -352,6 +352,7 @@ describe('useCanvasFileBrowser', () => {
 
       const error = new Error('Failed to load folder contents')
       mockAxiosGet.mockRejectedValueOnce(error)
+      mockAxiosGet.mockRejectedValueOnce(error)
 
       const {result} = renderHook(() => useCanvasFileBrowser({courseID: '1'}))
 
