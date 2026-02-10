@@ -3532,11 +3532,9 @@ class UsersController < ApplicationController
       last_updated = nil
 
       if can_read_grades
+        display_grade = enrollment.effective_current_score(course_score: true)
         course_score = enrollment.find_score(course_score: true)
-        if course_score
-          display_grade = course_score.override_score.presence || course_score.current_score
-          last_updated = course_score.updated_at
-        end
+        last_updated = course_score&.updated_at
 
         if course.grading_standard_enabled? && course.grading_standard
           grading_scheme = course.grading_standard.data

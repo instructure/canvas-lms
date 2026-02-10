@@ -4190,16 +4190,69 @@ describe UsersController do
         @assignment = @course.assignments.create!(title: "Test", points_possible: 100)
       end
 
-      it "displays override score when present" do
+      it "displays override score when course allows final grade override" do
+        @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
+
         submission = @assignment.submit_homework(@student, body: "test")
         submission.update_column(:score, 80)
-        @enrollment.find_score(course_score: true).update!(override_score: 95)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(override_score: 95, current_score: 80)
 
         get :user_dashboard
         expect(response).to be_successful
 
         course_data = assigns[:js_env][:SHARED_COURSE_DATA]
         expect(course_data.first[:currentGrade]).to eq(95.0)
+      end
+
+      it "displays current score when override exists but course does not allow final grade override" do
+        @course.disable_feature!(:final_grades_override)
+
+        submission = @assignment.submit_homework(@student, body: "test")
+        submission.update_column(:score, 80)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(override_score: 95, current_score: 80)
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expect(course_data.first[:currentGrade]).to eq(80.0)
+      end
+
+      it "matches mobile API grade calculation (effective_current_score) with override allowed" do
+        @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
+
+        submission = @assignment.submit_homework(@student, body: "test")
+        submission.update_column(:score, 80)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(override_score: 95, current_score: 80, final_score: 85)
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expected_grade = @enrollment.effective_current_score(course_score: true)
+        expect(course_data.first[:currentGrade]).to eq(expected_grade)
+      end
+
+      it "matches mobile API grade calculation (effective_current_score) with override not allowed" do
+        @course.disable_feature!(:final_grades_override)
+
+        submission = @assignment.submit_homework(@student, body: "test")
+        submission.update_column(:score, 80)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(override_score: 95, current_score: 80, final_score: 85)
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expected_grade = @enrollment.effective_current_score(course_score: true)
+        expect(course_data.first[:currentGrade]).to eq(expected_grade)
+        expect(expected_grade).to eq(80.0)
       end
 
       it "displays current score when no override present" do
