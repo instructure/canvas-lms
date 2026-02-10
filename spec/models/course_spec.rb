@@ -9348,6 +9348,179 @@ describe Course do
     end
   end
 
+  describe "career_learning_library_only" do
+    describe "scopes" do
+      before :once do
+        @horizon_account = Account.create!
+        @horizon_account.enable_feature!(:horizon_course_setting)
+        @horizon_account.enable_feature!(:horizon_learning_library_ms2)
+        @horizon_account.horizon_account = true
+        @horizon_account.save!
+      end
+
+      it ".career_learning_library returns only courses with career_learning_library_only=true" do
+        regular_course = @horizon_account.courses.create!(name: "Regular Course")
+        regular_course.update!(career_learning_library_only: false)
+
+        cll_course = @horizon_account.courses.create!(name: "CLL Course")
+        cll_course.update!(career_learning_library_only: true)
+
+        expect(Course.career_learning_library).to include(cll_course)
+        expect(Course.career_learning_library).not_to include(regular_course)
+      end
+
+      it ".not_career_learning_library returns only courses with career_learning_library_only=false" do
+        regular_course = @horizon_account.courses.create!(name: "Regular Course")
+        regular_course.update!(career_learning_library_only: false)
+
+        cll_course = @horizon_account.courses.create!(name: "CLL Course")
+        cll_course.update!(career_learning_library_only: true)
+
+        expect(Course.not_career_learning_library).to include(regular_course)
+        expect(Course.not_career_learning_library).not_to include(cll_course)
+      end
+    end
+
+    describe "default value" do
+      it "defaults to false for new courses" do
+        course = course_factory
+        expect(course.career_learning_library_only).to be false
+      end
+    end
+
+    describe "#set_career_learning_library_only" do
+      let(:horizon_account) do
+        account = Account.create!
+        account.enable_feature!(:horizon_course_setting)
+        account.enable_feature!(:horizon_learning_library_ms2)
+        account.horizon_account = true
+        account.save!
+        account
+      end
+
+      let(:regular_account) { Account.create! }
+
+      it "allows setting to true in a horizon account with feature flag enabled" do
+        course = horizon_account.courses.create!(career_learning_library_only: true)
+        course.save!
+        expect(course.career_learning_library_only).to be true
+      end
+
+      it "forces to false in a non-horizon account" do
+        regular_account.enable_feature!(:horizon_learning_library_ms2)
+        course = regular_account.courses.create!(career_learning_library_only: true)
+        course.save!
+        expect(course.career_learning_library_only).to be false
+      end
+
+      it "forces to false when feature flag is not enabled" do
+        account = Account.create!
+        account.enable_feature!(:horizon_course_setting)
+        account.horizon_account = true
+        account.save!
+
+        course = account.courses.create!(career_learning_library_only: true)
+        course.save!
+        expect(course.career_learning_library_only).to be false
+      end
+
+      it "forces to false when moving course from horizon to non-horizon account" do
+        course = horizon_account.courses.create!(career_learning_library_only: true)
+        course.save!
+        expect(course.career_learning_library_only).to be true
+
+        course.account = regular_account
+        course.save!
+        expect(course.career_learning_library_only).to be false
+      end
+
+      it "allows keeping true when moving course between horizon accounts" do
+        horizon_account2 = Account.create!
+        horizon_account2.enable_feature!(:horizon_course_setting)
+        horizon_account2.enable_feature!(:horizon_learning_library_ms2)
+        horizon_account2.horizon_account = true
+        horizon_account2.save!
+
+        course = horizon_account.courses.create!(career_learning_library_only: true)
+        course.save!
+        expect(course.career_learning_library_only).to be true
+
+        course.account = horizon_account2
+        course.save!
+        expect(course.career_learning_library_only).to be true
+      end
+
+      it "runs callback on account change" do
+        course = horizon_account.courses.create!
+        expect(course).to receive(:set_career_learning_library_only).and_call_original
+
+        course.account = regular_account
+        course.save!
+      end
+
+      it "runs callback when career_learning_library_only is changed" do
+        course = horizon_account.courses.create!
+        expect(course).to receive(:set_career_learning_library_only).and_call_original
+
+        course.career_learning_library_only = true
+        course.save!
+      end
+    end
+
+    describe "clonable_attributes" do
+      it "includes career_learning_library_only in clonable attributes" do
+        expect(Course.clonable_attributes).to include(:career_learning_library_only)
+      end
+
+      it "clones career_learning_library_only when copying a course in horizon account" do
+        horizon_account = Account.create!
+        horizon_account.enable_feature!(:horizon_course_setting)
+        horizon_account.enable_feature!(:horizon_learning_library_ms2)
+        horizon_account.horizon_account = true
+        horizon_account.save!
+
+        original_course = horizon_account.courses.create!(
+          name: "Original Course",
+          career_learning_library_only: true
+        )
+        original_course.save!
+
+        copied_course = original_course.dup
+        Course.clonable_attributes.each do |attr|
+          copied_course.send(:"#{attr}=", original_course.send(attr))
+        end
+        copied_course.save!
+
+        expect(copied_course.career_learning_library_only).to be true
+      end
+
+      it "forces to false when cloning to non-horizon account" do
+        horizon_account = Account.create!
+        horizon_account.enable_feature!(:horizon_course_setting)
+        horizon_account.enable_feature!(:horizon_learning_library_ms2)
+        horizon_account.horizon_account = true
+        horizon_account.save!
+
+        regular_account = Account.create!
+
+        original_course = horizon_account.courses.create!(
+          name: "Original Course",
+          career_learning_library_only: true
+        )
+        original_course.save!
+
+        copied_course = regular_account.courses.build
+        Course.clonable_attributes.each do |attr|
+          copied_course.send(:"#{attr}=", original_course.send(attr))
+        end
+        copied_course.save!
+
+        # Should be forced to false because regular_account is not horizon
+        expect(copied_course.career_learning_library_only).to be false
+      end
+    end
+  end
+
   describe "horizon content ingestion" do
     let(:horizon_account) do
       account = Account.create!

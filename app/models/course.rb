@@ -69,6 +69,7 @@ class Course < ActiveRecord::Base
     storage_quota
     created_at
     updated_at
+    career_learning_library_only
   ].freeze
 
   time_zone_attribute :time_zone
@@ -343,6 +344,7 @@ class Course < ActiveRecord::Base
   before_save :update_show_total_grade_as_on_weighting_scheme_change
   before_save :set_self_enrollment_code
   before_save :validate_license
+  before_save :set_career_learning_library_only, if: -> { account_id_changed? || new_record? || career_learning_library_only_changed? }
   before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
   before_save :update_syllabus_timestamp
   before_save :handle_syllabus_master_template_tracking
@@ -1247,6 +1249,9 @@ class Course < ActiveRecord::Base
   scope :horizon, -> { where(horizon_course: true) }
   scope :not_horizon, -> { where(horizon_course: false) }
 
+  scope :career_learning_library, -> { where(career_learning_library_only: true) }
+  scope :not_career_learning_library, -> { where(career_learning_library_only: false) }
+
   def potential_collaborators
     current_users
   end
@@ -1652,6 +1657,17 @@ class Course < ActiveRecord::Base
   def validate_license
     if !license.nil? && !self.class.licenses.key?(license)
       self.license = "private"
+    end
+  end
+
+  def set_career_learning_library_only
+    return if dummy?
+
+    new_account = Account.find(account_id)
+    return unless new_account
+
+    unless root_account.feature_enabled?(:horizon_learning_library_ms2) && new_account.horizon_account?
+      self.career_learning_library_only = false
     end
   end
 
@@ -3115,6 +3131,7 @@ class Course < ActiveRecord::Base
        alt_name
        restrict_quantitative_data
        horizon_course
+       career_learning_library_only
        conditional_release
        default_due_time
        content_library]
