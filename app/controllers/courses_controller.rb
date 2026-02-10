@@ -4622,6 +4622,7 @@ class CoursesController < ApplicationController
       :conditional_release,
       :post_manually,
       :horizon_course,
+      :career_learning_library_only,
       :disable_csp,
       :default_student_gradebook_view
     )
