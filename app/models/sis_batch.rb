@@ -1017,10 +1017,26 @@ class SisBatch < ActiveRecord::Base
 
   def self.load_downloadable_attachments(batches)
     batches = Array(batches)
-    all_ids = batches.map { |sb| sb.data&.dig(:downloadable_attachment_ids) || [] }.flatten
-    all_attachments = all_ids.any? ? Attachment.where(context_type: name, context_id: batches, id: all_ids).to_a.group_by(&:context_id) : {}
+    all_ids = batches.flat_map { |sb| sb.data&.dig(:downloadable_attachment_ids) || [] }
+
+    all_attachments = if all_ids.any?
+                        Attachment.where(context_type: name, context_id: batches, id: all_ids)
+                                  .to_a.group_by(&:context_id)
+                      else
+                        {}
+                      end
+
+    # Preload last_attachment_upload_status to avoid N+1 in AttachmentUploadStatus.upload_status
+    all_atts = all_attachments.values.flatten
+    if all_atts.any?
+      ActiveRecord::Associations.preload(all_atts, [:last_attachment_upload_status])
+    end
+
     batches.each do |b|
-      b.downloadable_attachments = all_attachments[b.id] || []
+      atts = all_attachments[b.id] || []
+      # Set the context association to avoid N+1 when accessing attachment.context
+      atts.each { |att| att.association(:context).target = b }
+      b.downloadable_attachments = atts
     end
   end
 
