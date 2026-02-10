@@ -403,7 +403,6 @@ lti_registrations_discover_page:
       state: allowed_on
     ci:
       state: allowed_on
-  custom_transition_proc: lti_registrations_discover_page_hook
 lti_registrations_history:
   state: hidden
   shadow: true
@@ -436,16 +435,6 @@ lti_registrations_next:
   applies_to: RootAccount
   display_name: LTI Apps Page Features In-Development
   description: When enabled, the LTI Apps page will have features that are currently in-development.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_registrations_page:
-  state: hidden
-  applies_to: RootAccount
-  display_name: LTI Apps Page
-  description: When enabled, the LTI Apps page will be available in the Account navigation sidebar.
   environments:
     development:
       state: allowed_on
