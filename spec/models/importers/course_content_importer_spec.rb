@@ -1222,7 +1222,7 @@ describe Course do
       # Course copy not handled yet for Nav Menu Link tabs. See INTEROP-9293
       link = NavMenuLink.create!(
         context: @copy_from,
-        nav_type: "course",
+        course_nav: true,
         label: "External Link",
         url: "https://example.com"
       )

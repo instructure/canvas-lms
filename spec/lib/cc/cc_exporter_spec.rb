@@ -1013,7 +1013,7 @@ describe "Common Cartridge exporting" do
     it "filters out nav menu links from tab_configuration during export" do
       # Nav Menu Links for Course Copy not implemented yet (see INTEROP-9293)
       @course.root_account.enable_feature!(:nav_menu_links)
-      link = NavMenuLink.create!(context: @course, nav_type: "course", label: "Link", url: "https://example.com")
+      link = NavMenuLink.create!(context: @course, course_nav: true, label: "Link", url: "https://example.com")
       @course.tab_configuration = [
         { "id" => Course::TAB_HOME },
         { "id" => "nav_menu_link_#{link.id}" }

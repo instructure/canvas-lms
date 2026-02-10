@@ -201,7 +201,7 @@ describe TabsController, type: :request do
     it "includes nav menu links" do
       course_with_teacher(active_all: true)
 
-      link = NavMenuLink.create!(context: @course, nav_type: "course", label: "Test Link", url: "https://example.com")
+      link = NavMenuLink.create!(context: @course, course_nav: true, label: "Test Link", url: "https://example.com")
       @course.tab_configuration = [{ "id" => "nav_menu_link_#{link.id}" }]
       @course.save!
 

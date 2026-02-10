@@ -24,13 +24,13 @@ describe NavMenuLinkTabs do
     account_model
   end
 
-  describe ".create_and_delete_links" do
+  describe ".sync_course_links_with_tabs" do
     subject do
-      @link1 = NavMenuLink.create!(context: @course, nav_type: "course", label: "Link 1", url: "https://example1.com")
-      @link2 = NavMenuLink.create!(context: @course, nav_type: "course", label: "Link 2", url: "https://example2.com")
+      @link1 = NavMenuLink.create!(context: @course, course_nav: true, label: "Link 1", url: "https://example1.com")
+      @link2 = NavMenuLink.create!(context: @course, course_nav: true, label: "Link 2", url: "https://example2.com")
 
-      @link_wrong_context = NavMenuLink.create!(context: @account, nav_type: "account", label: "Wrong", url: "https://wrong.example.com")
-      @link_deleted = NavMenuLink.create!(context: @course, nav_type: "course", label: "Link 2", url: "https://example2.com", workflow_state: :deleted)
+      @link_wrong_context = NavMenuLink.create!(context: @account, account_nav: true, label: "Wrong", url: "https://wrong.example.com")
+      @link_deleted = NavMenuLink.create!(context: @course, course_nav: true, label: "Link 2", url: "https://example2.com", workflow_state: :deleted)
 
       tabs = [
         { "id" => "assignments" },
@@ -41,7 +41,7 @@ describe NavMenuLinkTabs do
         { "id" => "nav_menu_link_#{@link_deleted.id}" },
       ]
 
-      NavMenuLinkTabs.create_and_delete_links(context: @course, nav_type: "course", tabs:)
+      NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
     end
 
     it "preserves existing links and passes through non-link" do
@@ -52,7 +52,7 @@ describe NavMenuLinkTabs do
     it "creates and delete links" do
       subject
 
-      links = NavMenuLink.active.where(context: @course, nav_type: "course").to_a
+      links = NavMenuLink.active.where(context: @course, course_nav: true).to_a
       expect(links.map(&:id)).to include(@link1.id)
       expect(links.map(&:id)).not_to include(@link2.id)
       expect(links.map(&:label)).to include("New 1", "New 2")
@@ -74,12 +74,12 @@ describe NavMenuLinkTabs do
 
   describe ".course_tabs" do
     it "returns tabs for course navigation links" do
-      link1 = NavMenuLink.create!(context: @course, nav_type: "course", label: "Course Link 1", url: "https://course1.com")
-      link2 = NavMenuLink.create!(context: @course, nav_type: "course", label: "Course Link 2", url: "https://course2.com")
+      link1 = NavMenuLink.create!(context: @course, course_nav: true, label: "Course Link 1", url: "https://course1.com")
+      link2 = NavMenuLink.create!(context: @course, course_nav: true, label: "Course Link 2", url: "https://course2.com")
 
       # Should not be included
-      NavMenuLink.create!(context: @account, nav_type: "account", label: "Account Link", url: "https://account.com")
-      NavMenuLink.create!(context: @account, nav_type: "user", label: "Other User Link", url: "https://other.com")
+      NavMenuLink.create!(context: @account, account_nav: true, label: "Account Link", url: "https://account.com")
+      NavMenuLink.create!(context: @account, user_nav: true, label: "Other User Link", url: "https://other.com")
 
       tabs = NavMenuLinkTabs.course_tabs(@course)
 
