@@ -116,6 +116,7 @@ class AssignmentGroupUI extends React.Component<AssignmentGroupUIProps> {
       <div data-testid="AssignmentGroup">
         <SelectableText
           key="assignment-group-select"
+          // @ts-expect-error
           id="assignment-group"
           mode={this.props.mode}
           label={I18n.t('Assignment Group')}
