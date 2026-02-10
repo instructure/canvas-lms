@@ -43,25 +43,37 @@ BulkEditHeader.propTypes = {
 }
 
 export default function BulkEditHeader({
+  // @ts-expect-error
   assignments,
+  // @ts-expect-error
   startingSave,
+  // @ts-expect-error
   jobRunning,
+  // @ts-expect-error
   jobCompletion,
+  // @ts-expect-error
   jobSuccess,
+  // @ts-expect-error
   onSave,
+  // @ts-expect-error
   onCancel,
+  // @ts-expect-error
   onOpenBatchEdit,
 }) {
+  // @ts-expect-error
   function renderProgressValue({valueNow}) {
     return <Text>{I18n.t('%{percent}%', {percent: valueNow})}</Text>
   }
 
   const validationErrorsExist = (() => {
+    // @ts-expect-error
     return assignments.some(assignment =>
+      // @ts-expect-error
       assignment.all_dates.some(override => Object.keys(override.errors || {}).length > 0),
     )
   })()
 
+  // @ts-expect-error
   const selectedAssignmentsCount = assignments.filter(a => a.selected).length
 
   return window.ENV.FEATURES?.instui_nav ? (

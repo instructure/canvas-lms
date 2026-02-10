@@ -33,11 +33,16 @@ import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('AssignmentSettingsView')
 
+// @ts-expect-error
 extend(AssignmentSettingsView, DialogFormView)
 
+// @ts-expect-error
 function AssignmentSettingsView() {
+  // @ts-expect-error
   this.errorRoots = {}
+  // @ts-expect-error
   this.ariaLabels = {}
+  // @ts-expect-error
   return AssignmentSettingsView.__super__.constructor.apply(this, arguments)
 }
 
@@ -62,13 +67,17 @@ AssignmentSettingsView.prototype.events = lodashExtend(
   },
 )
 
+// @ts-expect-error
 AssignmentSettingsView.optionProperty('assignmentGroups')
 
+// @ts-expect-error
 AssignmentSettingsView.optionProperty('weightsView')
 
+// @ts-expect-error
 AssignmentSettingsView.optionProperty('userIsAdmin')
 
 AssignmentSettingsView.prototype.initialize = function () {
+  // @ts-expect-error
   AssignmentSettingsView.__super__.initialize.apply(this, arguments)
   return (this.weights = [])
 }
@@ -78,7 +87,9 @@ AssignmentSettingsView.prototype.validateFormData = function () {
   let shouldFocus = true
   const weightInputs = document.querySelectorAll('.group_weight_value')
   weightInputs.forEach(input => {
+    // @ts-expect-error
     if (input.value && isNaN(numberHelper.parse(input.value))) {
+      // @ts-expect-error
       errors[input.id] = [
         {
           type: 'number',
@@ -86,6 +97,7 @@ AssignmentSettingsView.prototype.validateFormData = function () {
         },
       ]
       if (shouldFocus) {
+        // @ts-expect-error
         input.focus()
         shouldFocus = false
       }
@@ -95,6 +107,7 @@ AssignmentSettingsView.prototype.validateFormData = function () {
 }
 
 AssignmentSettingsView.prototype.openAgain = function () {
+  // @ts-expect-error
   AssignmentSettingsView.__super__.openAgain.apply(this, arguments)
   this.toggleTableByModel()
   return this.addAssignmentGroups()
@@ -109,14 +122,17 @@ AssignmentSettingsView.prototype.canChangeWeights = function () {
   )
 }
 
+// @ts-expect-error
 AssignmentSettingsView.prototype.submit = function (event) {
   if (this.canChangeWeights()) {
+    // @ts-expect-error
     return AssignmentSettingsView.__super__.submit.call(this, event)
   } else {
     return event != null ? event.preventDefault() : void 0
   }
 }
 
+// @ts-expect-error
 AssignmentSettingsView.prototype.saveFormData = function (data) {
   if (data == null) {
     data = null
@@ -128,6 +144,7 @@ AssignmentSettingsView.prototype.saveFormData = function (data) {
     v.model.set('group_weight', new_weight)
     v.model.save()
   }
+  // @ts-expect-error
   return AssignmentSettingsView.__super__.saveFormData.call(this, data)
 }
 
@@ -138,6 +155,7 @@ AssignmentSettingsView.prototype.cancel = function () {
 }
 
 AssignmentSettingsView.prototype.onSaveSuccess = function () {
+  // @ts-expect-error
   AssignmentSettingsView.__super__.onSaveSuccess.apply(this, arguments)
   this.assignmentGroups.trigger('change:groupWeights')
   const checked = this.model.get('apply_assignment_group_weights')
@@ -149,6 +167,7 @@ AssignmentSettingsView.prototype.toggleTableByModel = function () {
   return this.toggleWeightsTable(checked)
 }
 
+// @ts-expect-error
 AssignmentSettingsView.prototype.toggleTableByClick = function (e) {
   if (this.canChangeWeights()) {
     const checked = $(e.currentTarget).is(':checked')
@@ -158,6 +177,7 @@ AssignmentSettingsView.prototype.toggleTableByClick = function (e) {
   }
 }
 
+// @ts-expect-error
 AssignmentSettingsView.prototype.toggleWeightsTable = function (show) {
   if (show) {
     this.$('#ag_weights_wrapper').show()
@@ -200,6 +220,7 @@ AssignmentSettingsView.prototype.clearWeights = function () {
   return this.$el.find('#assignment_groups_weights tbody').empty()
 }
 
+// @ts-expect-error
 AssignmentSettingsView.prototype.updateTotalWeight = function (event) {
   const groupId = event.currentTarget.getAttribute('groupId')
   if (this.errorRoots[groupId] && event.key !== 'Enter') {
@@ -221,6 +242,7 @@ AssignmentSettingsView.prototype.updateTotalWeight = function (event) {
 }
 
 AssignmentSettingsView.prototype.toJSON = function () {
+  // @ts-expect-error
   const data = AssignmentSettingsView.__super__.toJSON.apply(this, arguments)
   data.canChangeWeights = this.canChangeWeights()
   return data

@@ -41,11 +41,14 @@ export default class GradeIndicator extends Component {
     gradeInfo: null,
   }
 
+  // @ts-expect-error
   shouldComponentUpdate(nextProps) {
+    // @ts-expect-error
     return Object.keys(nextProps).some(key => this.props[key] !== nextProps[key])
   }
 
   render() {
+    // @ts-expect-error
     const {gradeInfo} = this.props
     const selected = gradeInfo && gradeInfo.selected
     let textColor = selected ? 'primary-inverse' : 'primary'
@@ -58,6 +61,7 @@ export default class GradeIndicator extends Component {
         borderWidth={selected ? 'small' : '0'}
         padding="xx-small small"
       >
+        {/* @ts-expect-error */}
         <Text color={textColor}>
           {gradeInfo && gradeInfo.score != null ? I18n.n(gradeInfo.score) : '–'}
         </Text>

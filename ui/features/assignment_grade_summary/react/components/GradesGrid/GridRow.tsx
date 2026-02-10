@@ -54,28 +54,36 @@ export default class GridRow extends Component {
     selectProvisionalGradeStatus: null,
   }
 
+  // @ts-expect-error
   shouldComponentUpdate(nextProps) {
+    // @ts-expect-error
     return Object.keys(nextProps).some(key => this.props[key] !== nextProps[key])
   }
 
   render() {
     return (
+      // @ts-expect-error
       <tr className={`GradesGrid__BodyRow student_${this.props.row.studentId}`} role="row">
         <th className="GradesGrid__BodyRowHeader" role="rowheader" scope="row">
           <Link
+            // @ts-expect-error
             themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: '1.25rem'}}
+            // @ts-expect-error
             href={this.props.row.speedGraderUrl}
             isWithinText={false}
           >
+            {/* @ts-expect-error */}
             {this.props.row.studentName}
           </Link>
         </th>
 
+        {/* @ts-expect-error */}
         {this.props.graders.map(grader => {
           const classNames = ['GradesGrid__ProvisionalGradeCell', `grader_${grader.graderId}`]
 
           return (
             <td className={classNames.join(' ')} key={grader.graderId} role="cell">
+              {/* @ts-expect-error */}
               <GradeIndicator gradeInfo={this.props.grades[grader.graderId]} />
             </td>
           )
@@ -83,13 +91,21 @@ export default class GridRow extends Component {
 
         <td className="GradesGrid__FinalGradeCell" role="cell">
           <GradeSelect
+            // @ts-expect-error
             disabledCustomGrade={this.props.disabledCustomGrade}
+            // @ts-expect-error
             finalGrader={this.props.finalGrader}
+            // @ts-expect-error
             graders={this.props.graders}
+            // @ts-expect-error
             grades={this.props.grades}
+            // @ts-expect-error
             onSelect={this.props.onGradeSelect}
+            // @ts-expect-error
             selectProvisionalGradeStatus={this.props.selectProvisionalGradeStatus}
+            // @ts-expect-error
             studentId={this.props.row.studentId}
+            // @ts-expect-error
             studentName={this.props.row.studentName}
           />
         </td>

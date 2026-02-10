@@ -73,11 +73,17 @@ BulkEditTable.propTypes = {
 }
 
 export default function BulkEditTable({
+  // @ts-expect-error
   assignments,
+  // @ts-expect-error
   updateAssignmentDate,
+  // @ts-expect-error
   setAssignmentSelected,
+  // @ts-expect-error
   selectAllAssignments,
+  // @ts-expect-error
   clearOverrideEdits,
+  // @ts-expect-error
   defaultDueTime,
 }) {
   const CHECKBOX_COLUMN_WIDTH_REMS = 2
@@ -85,10 +91,13 @@ export default function BulkEditTable({
   const ACTION_COLUMN_WIDTH_REMS = 4
   const NOTE_COLUMN_WIDTH_REMS = 3
 
+  // @ts-expect-error
   const someAssignmentsSelected = assignments.some(a => a.selected)
   const allAssignmentsSelected =
+    // @ts-expect-error
     someAssignmentsSelected && assignments.every(a => a.selected || !canEditAll(a))
 
+  // @ts-expect-error
   function processErrors(errors, dateKey) {
     if (!errors || !errors.hasOwnProperty(dateKey)) {
       return []
@@ -96,19 +105,24 @@ export default function BulkEditTable({
     return [{text: errors[dateKey], type: 'error'}]
   }
 
+  // @ts-expect-error
   function renderDateInput(assignmentId, dateKey, dates, overrideId = null) {
+    // @ts-expect-error
     const label = DATE_INPUT_META[dateKey].label
     const calculatedWidth = `${DATE_COLUMN_WIDTH_REMS - 1}rem`
     return (
       <BulkDateInput
         label={label}
         selectedDateString={dates[dateKey]}
+        // @ts-expect-error
         messages={processErrors(dates.errors, dateKey)}
         dateKey={dateKey}
         assignmentId={assignmentId}
+        // @ts-expect-error
         overrideId={overrideId}
         updateAssignmentDate={updateAssignmentDate}
         fancyMidnight={
+          // @ts-expect-error
           dateKey === 'due_at' && defaultDueTime ? false : DATE_INPUT_META[dateKey].fancyMidnight
         }
         defaultTime={dateKey === 'due_at' ? defaultDueTime : null}
@@ -118,6 +132,7 @@ export default function BulkEditTable({
     )
   }
 
+  // @ts-expect-error
   function renderOverrideTitle(assignment, override) {
     return (
       <BulkEditOverrideTitle
@@ -128,6 +143,7 @@ export default function BulkEditTable({
     )
   }
 
+  // @ts-expect-error
   function renderNoDefaultDates(hasTooManyDates) {
     // The goal here is to create a cell that spans multiple columns. You can't do that with InstUI
     // yet, so we're going to fake it with a View that's as wide as all the other columns and
@@ -150,6 +166,7 @@ export default function BulkEditTable({
     )
   }
 
+  // @ts-expect-error
   function renderAssignmentCheckbox(assignment) {
     if (assignment.hasOwnProperty('all_dates_count')) {
       return null
@@ -169,6 +186,7 @@ export default function BulkEditTable({
     )
   }
 
+  // @ts-expect-error
   function renderActions(assignment, override) {
     const overrideHasBeenEdited = ['due_at', 'unlock_at', 'lock_at']
       .map(field => originalDateField(field))
@@ -191,6 +209,7 @@ export default function BulkEditTable({
     }
   }
 
+  // @ts-expect-error
   function renderNote(assignment, dateSet) {
     if (!dateSet.can_edit) {
       let explanation
@@ -211,7 +230,9 @@ export default function BulkEditTable({
     }
   }
 
+  // @ts-expect-error
   function renderBaseRow(assignment) {
+    // @ts-expect-error
     const baseOverride = assignment.all_dates.find(dates => dates.base === true)
     // It's a bit repetitive this way, but Table.Row borks if it has anything but Table.Cell children.
     if (baseOverride) {
@@ -244,8 +265,11 @@ export default function BulkEditTable({
     }
   }
 
+  // @ts-expect-error
   function renderOverrideRows(assignment) {
+    // @ts-expect-error
     const overrides = assignment.all_dates.filter(dates => !dates.base)
+    // @ts-expect-error
     return overrides.map(override => {
       return (
         <Table.Row key={`override_${override.id}`} data-testid="bulk-edit-table-row">
@@ -272,11 +296,14 @@ export default function BulkEditTable({
   }
 
   function renderAssignments() {
+    // @ts-expect-error
     const rows = []
+    // @ts-expect-error
     assignments.forEach(assignment => {
       rows.push(renderBaseRow(assignment))
       rows.push(...renderOverrideRows(assignment))
     })
+    // @ts-expect-error
     return rows
   }
 
@@ -285,6 +312,7 @@ export default function BulkEditTable({
     [allAssignmentsSelected, selectAllAssignments],
   )
 
+  // @ts-expect-error
   const handleRevertClick = (assignment, override, event) => {
     // assuming the revert button is going away, so we reset focus to the prior input before that
     // happens.
@@ -301,6 +329,7 @@ export default function BulkEditTable({
     const widthProp = `${DATE_COLUMN_WIDTH_REMS}rem`
     const actionsWidthProp = `${ACTION_COLUMN_WIDTH_REMS}rem`
     const noteWidthProp = `${NOTE_COLUMN_WIDTH_REMS}rem`
+    // @ts-expect-error
     const layoutProp = matches.includes('small') ? 'stacked' : 'fixed'
 
     // The select all checkbox can't be in the table header because we don't want a SR to read it on
@@ -330,6 +359,7 @@ export default function BulkEditTable({
 
     return (
       <div style={{position: 'relative'}}>
+        {/* @ts-expect-error */}
         <div style={selectAllStyles}>
           <Checkbox
             label={selectAllLabel}
@@ -369,6 +399,7 @@ export default function BulkEditTable({
   }
 
   // For test environments that don't have matchMedia
+  // @ts-expect-error
   if (window.matchMedia) {
     return (
       <Responsive
@@ -380,6 +411,7 @@ export default function BulkEditTable({
             }rem`,
           },
         }}
+        // @ts-expect-error
         render={renderTable}
       />
     )

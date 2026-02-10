@@ -47,6 +47,7 @@ const INITIAL_STATE = {
   customGradeOption: undefined,
 }
 
+// @ts-expect-error
 function reducer(prevState, action) {
   let state
   switch (action.event) {
@@ -100,6 +101,7 @@ function reducer(prevState, action) {
   }
 }
 
+// @ts-expect-error
 function buildCustomGradeOption(gradeInfo, fmtr) {
   return {
     gradeInfo,
@@ -107,6 +109,7 @@ function buildCustomGradeOption(gradeInfo, fmtr) {
     value: gradeInfo.graderId,
   }
 }
+// @ts-expect-error
 export default function GradeSelect(props) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
   const originalSelectedOption = useRef(null)
@@ -116,7 +119,9 @@ export default function GradeSelect(props) {
   const numFormatter = useMemo(() => new Intl.NumberFormat(locale).format, [locale])
 
   useEffect(() => {
+    // @ts-expect-error
     const graders = []
+    // @ts-expect-error
     props.graders.forEach(grader => {
       const gradeInfo = props.grades[grader.graderId]
       if (gradeInfo) {
@@ -128,6 +133,7 @@ export default function GradeSelect(props) {
         })
       }
     })
+    // @ts-expect-error
     const opts = [...graders]
 
     const custom = makeCustomGradeOption()
@@ -136,8 +142,11 @@ export default function GradeSelect(props) {
     const selected = opts.find(opt => opt.gradeInfo.selected)
     originalSelectedOption.current = selected || null
 
+    // @ts-expect-error
     const dispatchData = {event: 'new_props', graders, custom, opts}
+    // @ts-expect-error
     dispatchData.input = selected ? selected.label : NO_SELECTION_LABEL
+    // @ts-expect-error
     dispatchData.selectedId = selected ? selected.value : null
     dispatch(dispatchData)
     // The dep array is a single element which is clearly a function (the resulting JSON string) of all
@@ -148,11 +157,15 @@ export default function GradeSelect(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify([props.graders, props.grades, props.finalGrader])])
 
+  // @ts-expect-error
   function filterOptions(text) {
     if (text.length === 0) return state.options
+    // @ts-expect-error
     const exactMatches = []
+    // @ts-expect-error
     const partialMatches = []
     const matchText = text.trim().toLowerCase()
+    // @ts-expect-error
     state.options.forEach(g => {
       if (g.value === NO_SELECTION) return
       const score = g.gradeInfo.score.toString()
@@ -164,6 +177,7 @@ export default function GradeSelect(props) {
       }
     })
     if (exactMatches.length + partialMatches.length === 0) return [NO_SELECTION_GRADE]
+    // @ts-expect-error
     return [...exactMatches, ...partialMatches]
   }
 
@@ -175,10 +189,13 @@ export default function GradeSelect(props) {
     return null
   }
 
+  // @ts-expect-error
   function getOptionById(id) {
+    // @ts-expect-error
     return state.options.find(o => o.value === id)
   }
 
+  // @ts-expect-error
   function performChange(selected) {
     if (!props.onSelect) return
     const original = originalSelectedOption.current
@@ -186,27 +203,32 @@ export default function GradeSelect(props) {
     if (
       state.customGradeOption &&
       selected.value === state.customGradeOption.value &&
+      // @ts-expect-error
       (!original || original.gradeInfo.score !== selected.gradeInfo.score)
     ) {
       props.onSelect(selected.gradeInfo)
       return
     }
 
+    // @ts-expect-error
     if (!original || original.value !== selected.value) {
       props.onSelect(selected.gradeInfo)
     }
   }
 
+  // @ts-expect-error
   function handleShowOptions(e) {
     dispatch({event: 'show_options'})
     props.onOpen?.(e)
   }
 
+  // @ts-expect-error
   function handleHideOptions(e) {
     dispatch({event: 'hide_options'})
     props.onClose?.(e)
   }
 
+  // @ts-expect-error
   function handleInputChange(e) {
     if (props.disabledCustomGrade) return
     const input = e.target.value.trimStart()
@@ -233,6 +255,7 @@ export default function GradeSelect(props) {
 
   function handleFocus() {
     // selecting all text when the input widget is focussed makes it easier for the user to just start typing
+    // @ts-expect-error
     inputRef.current?.select()
   }
 
@@ -241,12 +264,14 @@ export default function GradeSelect(props) {
     dispatch({event: 'set_blur', opt})
   }
 
+  // @ts-expect-error
   function handleHighlight({type}, {id}) {
     const opt = getOptionById(id)
     if (!opt) return
     dispatch({event: 'set_highlight', id, opt, type})
   }
 
+  // @ts-expect-error
   function handleSelect(e, {id}) {
     const opt = getOptionById(id)
     if (!opt) return
@@ -256,6 +281,7 @@ export default function GradeSelect(props) {
 
   function renderOptions() {
     if (!state.options) return []
+    // @ts-expect-error
     return filterOptions(state.typed).map(opt => (
       <Select.Option
         isDisabled={opt.disabled}
@@ -273,6 +299,7 @@ export default function GradeSelect(props) {
   const readOnly = !props.onSelect || props.selectProvisionalGradeStatus === STARTED
 
   return (
+    // @ts-expect-error
     <Select
       renderLabel={
         <ScreenReaderContent>
@@ -280,6 +307,7 @@ export default function GradeSelect(props) {
         </ScreenReaderContent>
       }
       inputRef={ref => {
+        // @ts-expect-error
         inputRef.current = ref
       }}
       interaction={readOnly ? 'disabled' : 'enabled'}

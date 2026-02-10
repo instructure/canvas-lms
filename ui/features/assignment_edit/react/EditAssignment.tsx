@@ -46,6 +46,7 @@ const attachmentNameStyle = {
   width: '280px',
 }
 
+// @ts-expect-error
 function FileBrowserWrapper(props) {
   return (
     <ErrorBoundary
@@ -63,6 +64,7 @@ function FileBrowserWrapper(props) {
   )
 }
 
+// @ts-expect-error
 export function AnnotatedDocumentSelector({attachment, defaultUploadFolderId, onSelect, onRemove}) {
   return attachment ? (
     <div>

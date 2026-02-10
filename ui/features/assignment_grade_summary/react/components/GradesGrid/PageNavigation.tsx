@@ -30,19 +30,24 @@ export default class PageNavigation extends Component {
     pageCount: number.isRequired,
   }
 
+  // @ts-expect-error
   shouldComponentUpdate(nextProps) {
+    // @ts-expect-error
     return Object.keys(nextProps).some(key => this.props[key] !== nextProps[key])
   }
 
   render() {
     const pageButtons = []
 
+    // @ts-expect-error
     for (let i = 1; i <= this.props.pageCount; i++) {
       pageButtons.push(
         <Pagination.Page
+          // @ts-expect-error
           current={i === this.props.currentPage}
           key={i}
           onClick={() => {
+            // @ts-expect-error
             this.props.onPageClick(i)
           }}
         >

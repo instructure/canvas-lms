@@ -48,6 +48,7 @@ BulkEdit.defaultProps = {
   onSave: () => {},
 }
 
+// @ts-expect-error
 export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   const dateValidator = useMemo(
     () =>
@@ -76,7 +77,9 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     },
   )
 
+  // @ts-expect-error
   const filterAssignments = useCallback(assignments => {
+    // @ts-expect-error
     assignments.forEach(assignment => {
       if (!assignment.hasOwnProperty('all_dates')) {
         assignment.all_dates = []
@@ -88,6 +91,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
 
   useFetchApi({
     success: setAssignments,
+    // @ts-expect-error
     error: setLoadingError,
     loading: setLoading,
     convert: filterAssignments,
@@ -105,6 +109,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     function clearOriginalDates() {
       setAssignments(currentAssignments =>
         produce(currentAssignments, draftAssignments => {
+          // @ts-expect-error
           const draftOverrides = draftAssignments.flatMap(assignment => assignment.all_dates)
           draftOverrides.forEach(draftOverride => {
             delete draftOverride[originalDateField('due_at')]
@@ -119,17 +124,21 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   }, [jobSuccess])
 
   useEffect(() => {
+    // @ts-expect-error
     function recordJobErrors(errors) {
       setAssignments(currentAssignments =>
         produce(currentAssignments, draftAssignments => {
           draftAssignments.forEach(draftAssignment => {
+            // @ts-expect-error
             draftAssignment.all_dates.forEach(draftOverride => {
               let error
               if (draftOverride.base) {
                 error = errors.find(
+                  // @ts-expect-error
                   e => e.assignment_id == draftAssignment.id && !e.assignment_override_id,
                 )
               } else {
+                // @ts-expect-error
                 error = errors.find(e => e.assignment_override_id == draftOverride.id)
               }
               if (error && error.errors) {
@@ -145,10 +154,12 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
         }),
       )
     }
+    // @ts-expect-error
     if (jobErrors && !jobErrors.hasOwnProperty('message')) recordJobErrors(jobErrors)
   }, [jobErrors])
 
   const setDateOnOverride = useCallback(
+    // @ts-expect-error
     (override, dateFieldName, newDate) => {
       const currentDate = override[dateFieldName]
       const newDateISO = newDate?.toISOString() || null
@@ -166,6 +177,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   )
 
   const shiftDateOnOverride = useCallback(
+    // @ts-expect-error
     (override, dateFieldName, nDays) => {
       const currentDate = override[dateFieldName]
       if (currentDate) {
@@ -183,14 +195,18 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     setProgressUrl(null)
   }, [setJobSuccess, setProgressUrl])
 
+  // @ts-expect-error
   const findOverride = useCallback((someAssignments, assignmentId, overrideId) => {
     const isBaseOverride = !overrideId
+    // @ts-expect-error
     const assignment = someAssignments.find(a => a.id === assignmentId)
+    // @ts-expect-error
     const override = assignment.all_dates.find(o => (isBaseOverride ? o.base : o.id === overrideId))
     return override
   }, [])
 
   const updateAssignmentDate = useCallback(
+    // @ts-expect-error
     ({dateKey, newDate, assignmentId, overrideId}) => {
       clearPreviousSave()
       setAssignments(currentAssignments =>
@@ -204,6 +220,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   )
 
   const clearOverrideEdits = useCallback(
+    // @ts-expect-error
     ({assignmentId, overrideId}) => {
       setAssignments(currentAssignments =>
         produce(currentAssignments, draftAssignments => {
@@ -223,25 +240,31 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     [findOverride],
   )
 
+  // @ts-expect-error
   const setAssignmentSelected = useCallback((assignmentId, selected) => {
     setAssignments(currentAssignments =>
       produce(currentAssignments, draftAssignments => {
+        // @ts-expect-error
         const assignment = draftAssignments.find(a => a.id === assignmentId)
+        // @ts-expect-error
         assignment.selected = selected
       }),
     )
   }, [])
 
+  // @ts-expect-error
   const selectAllAssignments = useCallback(selected => {
     setAssignments(currentAssignments =>
       produce(currentAssignments, draftAssignments => {
         draftAssignments.forEach(a => {
+          // @ts-expect-error
           if (canEditAll(a)) a.selected = selected
         })
       }),
     )
   }, [])
 
+  // @ts-expect-error
   const selectDateRange = useCallback((startDate, endDate) => {
     const timezone = ENV?.TIMEZONE || DateTime.browserTimeZone()
     const startMoment = moment.tz(startDate, timezone).startOf('day')
@@ -249,11 +272,13 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     setAssignments(currentAssignments =>
       produce(currentAssignments, draftAssignments => {
         draftAssignments.forEach(draftAssignment => {
+          // @ts-expect-error
           const shouldSelect = draftAssignment.all_dates.some(draftOverride =>
             ['due_at', 'lock_at', 'unlock_at'].some(dateField =>
               moment(draftOverride[dateField]).isBetween(startMoment, endMoment, null, '[]'),
             ),
           )
+          // @ts-expect-error
           draftAssignment.selected = shouldSelect
         })
       }),
@@ -272,6 +297,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
 
   const handleOpenBatchEdit = useCallback(
     (value = true) => {
+      // @ts-expect-error
       const selectedAssignmentsCount = assignments.filter(a => a.selected).length
       if (value && selectedAssignmentsCount === 0) {
         setNoAssignmentsSelectedError(true)
@@ -284,11 +310,14 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   )
 
   const handleBatchEditShift = useCallback(
+    // @ts-expect-error
     nDays => {
       setAssignments(currentAssignments =>
         produce(currentAssignments, draftAssignments => {
           draftAssignments.forEach(draftAssignment => {
+            // @ts-expect-error
             if (draftAssignment.selected) {
+              // @ts-expect-error
               draftAssignment.all_dates.forEach(draftOverride => {
                 shiftDateOnOverride(draftOverride, 'due_at', nDays)
                 shiftDateOnOverride(draftOverride, 'unlock_at', nDays)
@@ -303,11 +332,14 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     [shiftDateOnOverride],
   )
   const handleBatchEditRemove = useCallback(
+    // @ts-expect-error
     datesToRemove => {
       setAssignments(currentAssignments =>
         produce(currentAssignments, draftAssignments => {
           draftAssignments.forEach(draftAssignment => {
+            // @ts-expect-error
             if (draftAssignment.selected) {
+              // @ts-expect-error
               draftAssignment.all_dates.forEach(draftOverride => {
                 if (datesToRemove.includes('due_at'))
                   setDateOnOverride(draftOverride, 'due_at', null)
@@ -346,6 +378,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   function renderSaveSuccess() {
     if (jobSuccess) {
       return (
+        // @ts-expect-error
         <CanvasInlineAlert variant="success" liveAlert={true}>
           {I18n.t('Assignment dates saved successfully.')}
         </CanvasInlineAlert>
@@ -355,6 +388,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
 
   function renderFetchError() {
     return (
+      // @ts-expect-error
       <CanvasInlineAlert variant="error" liveAlert={true}>
         {I18n.t('There was an error retrieving assignment dates.')}
       </CanvasInlineAlert>
@@ -364,6 +398,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   function renderNoAssignmentsSelectedError() {
     if (noAssignmentsSelectedError) {
       return (
+        // @ts-expect-error
         <CanvasInlineAlert
           variant="error"
           liveAlert={true}
@@ -380,6 +415,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   function renderNoAssignmentsEditedError() {
     if (noAssignmentsEditedError) {
       return (
+        // @ts-expect-error
         <CanvasInlineAlert
           variant="error"
           liveAlert={true}
@@ -396,15 +432,19 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   function renderSaveError() {
     if (startingSaveError) {
       return (
+        // @ts-expect-error
         <CanvasInlineAlert variant="error" liveAlert={true}>
           {I18n.t('Error starting save operation:')} {startingSaveError}
         </CanvasInlineAlert>
       )
     } else if (jobErrors) {
       return (
+        // @ts-expect-error
         <CanvasInlineAlert variant="error" liveAlert={true}>
+          {/* @ts-expect-error */}
           {jobErrors.hasOwnProperty('message')
-            ? I18n.t('Error saving assignment dates: ') + jobErrors.message
+            ? // @ts-expect-error
+              I18n.t('Error saving assignment dates: ') + jobErrors.message
             : I18n.t('Invalid dates were found. Please correct them and try again.')}
         </CanvasInlineAlert>
       )

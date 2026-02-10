@@ -36,8 +36,10 @@ export default class FinalGraderSelectMenu extends React.Component {
     finalGraderID: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
+    // @ts-expect-error
     this.state = {selectedValue: this.props.finalGraderID || ''}
   }
 
@@ -51,13 +53,16 @@ export default class FinalGraderSelectMenu extends React.Component {
     $(document).off('validateFinalGraderSelectedValue')
   }
 
+  // @ts-expect-error
   setValidationError(validationError) {
     this.setState({
       validationError: validationError,
     })
   }
 
+  // @ts-expect-error
   handleSelectFinalGrader = ({target: {value: selectedValue}}) => {
+    // @ts-expect-error
     if (this.props.hideErrors) this.props.hideErrors('final_grader_id_errors')
     this.setState({selectedValue})
   }
@@ -75,16 +80,20 @@ export default class FinalGraderSelectMenu extends React.Component {
             id="selected-moderator"
             name="final_grader_id"
             onChange={this.handleSelectFinalGrader}
+            // @ts-expect-error
             value={this.state.selectedValue}
             style={{
+              // @ts-expect-error
               borderColor: this.state.validationError ? 'red' : '',
             }}
           >
+            {/* @ts-expect-error */}
             {this.state.selectedValue === '' && (
               <option
                 key="select-grader"
                 value=""
                 style={{
+                  // @ts-expect-error
                   borderColor: this.state.validationError ? 'red' : '',
                 }}
               >
@@ -92,6 +101,7 @@ export default class FinalGraderSelectMenu extends React.Component {
               </option>
             )}
 
+            {/* @ts-expect-error */}
             {this.props.availableModerators.map(user => (
               <option key={user.id} value={user.id}>
                 {user.name}

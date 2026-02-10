@@ -30,6 +30,7 @@ const I18n = createI18nScope('assignment_grade_summary')
 
 const ROWS_PER_PAGE = 20
 
+// @ts-expect-error
 function studentToRow(student, pageStart, studentIndex, rowOptions) {
   const {anonymousStudents, assignmentId, courseId} = rowOptions
   return {
@@ -44,18 +45,21 @@ function studentToRow(student, pageStart, studentIndex, rowOptions) {
   }
 }
 
+// @ts-expect-error
 function studentsToPages(props) {
   const {anonymousStudents, assignment, students} = props
   const rowOptions = {anonymousStudents, assignmentId: assignment.id, courseId: assignment.courseId}
   const pages = []
 
   if (anonymousStudents) {
+    // @ts-expect-error
     students.sort((a, b) => (a.id > b.id ? 1 : -1))
   }
 
   for (let pageStart = 0; pageStart < students.length; pageStart += ROWS_PER_PAGE) {
     const pageStudents = students.slice(pageStart, pageStart + ROWS_PER_PAGE)
     pages.push(
+      // @ts-expect-error
       pageStudents.map((student, studentIndex) =>
         studentToRow(student, pageStart, studentIndex, rowOptions),
       ),
@@ -98,6 +102,7 @@ export default class GradesGrid extends Component {
     onGradeSelect: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
@@ -107,45 +112,60 @@ export default class GradesGrid extends Component {
     }
   }
 
+  // @ts-expect-error
   UNSAFE_componentWillReceiveProps(nextProps) {
+    // @ts-expect-error
     if (nextProps.students !== this.props.students) {
       this.setState(oldState => {
         const pages = studentsToPages(nextProps)
+        // @ts-expect-error
         const currentPageIndex = Math.min(oldState.currentPageIndex, pages.length - 1)
         return {currentPageIndex, pages}
       })
     }
   }
 
+  // @ts-expect-error
   setPage = page => {
     this.setState({currentPageIndex: page - 1})
   }
 
   render() {
+    // @ts-expect-error
     const rows = this.state.pages[this.state.currentPageIndex]
 
     return (
       <div data-testid="grades-grid">
         <FocusableView>
+          {/* @ts-expect-error */}
           {props => (
             <Grid
+              // @ts-expect-error
               disabledCustomGrade={this.props.disabledCustomGrade}
+              // @ts-expect-error
               finalGrader={this.props.finalGrader}
+              // @ts-expect-error
               graders={this.props.graders}
+              // @ts-expect-error
               grades={this.props.grades}
               horizontalScrollRef={props.horizontalScrollRef}
+              // @ts-expect-error
               onGradeSelect={this.props.onGradeSelect}
               rows={rows}
+              // @ts-expect-error
               selectProvisionalGradeStatuses={this.props.selectProvisionalGradeStatuses}
             />
           )}
         </FocusableView>
 
+        {/* @ts-expect-error */}
         {this.state.pages.length > 1 && (
           <View as="div" margin="medium">
             <PageNavigation
+              // @ts-expect-error
               currentPage={this.state.currentPageIndex + 1}
               onPageClick={this.setPage}
+              // @ts-expect-error
               pageCount={this.state.pages.length}
             />
           </View>

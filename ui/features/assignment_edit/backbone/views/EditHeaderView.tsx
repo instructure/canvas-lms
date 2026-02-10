@@ -32,15 +32,22 @@ import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 
 const I18n = createI18nScope('assignmentsEditHeaderView')
 
+// @ts-expect-error
 extend(EditHeaderView, Backbone.View)
 
+// @ts-expect-error
 function EditHeaderView() {
+  // @ts-expect-error
   this.onShowErrors = this.onShowErrors.bind(this)
+  // @ts-expect-error
   this.onGradingTypeUpdate = this.onGradingTypeUpdate.bind(this)
+  // @ts-expect-error
   this.onDelete = this.onDelete.bind(this)
+  // @ts-expect-error
   return EditHeaderView.__super__.constructor.apply(this, arguments)
 }
 
+// @ts-expect-error
 EditHeaderView.optionProperty('userIsAdmin')
 
 EditHeaderView.prototype.template = template
@@ -66,7 +73,9 @@ EditHeaderView.prototype.els = {
   '#edit-assignment-header-cr-tabs': '$headerTabsCr',
 }
 
+// @ts-expect-error
 EditHeaderView.prototype.initialize = function (options) {
+  // @ts-expect-error
   EditHeaderView.__super__.initialize.apply(this, arguments)
   this.editView = options.views.edit_assignment_form
   return this.editView.on('show-errors', this.onShowErrors)
@@ -99,17 +108,20 @@ EditHeaderView.prototype.canDelete = function () {
     (this.userIsAdmin || this.model.canDelete()) &&
     !(
       ((ref = ENV.MASTER_COURSE_DATA) != null ? ref.is_master_course_child_content : void 0) &&
+      // @ts-expect-error
       ENV.MASTER_COURSE_DATA.restricted_by_master_course
     )
   )
 }
 
+// @ts-expect-error
 EditHeaderView.prototype.onDelete = function (e) {
   e.preventDefault()
   if (this.canDelete()) {
     if (window.confirm(this.messages.confirm)) {
       return this.delete()
     } else {
+      // @ts-expect-error
       return window.$('a:first[role="button"].al-trigger.btn').focus()
     }
   }
@@ -117,6 +129,7 @@ EditHeaderView.prototype.onDelete = function (e) {
 
 EditHeaderView.prototype.delete = function () {
   let destroyDfd
+  // @ts-expect-error
   const disablingDfd = new $.Deferred()
   if ((destroyDfd = this.model.destroy())) {
     destroyDfd.then(this.onDeleteSuccess.bind(this))
@@ -130,15 +143,18 @@ EditHeaderView.prototype.delete = function () {
 }
 
 EditHeaderView.prototype.onDeleteSuccess = function () {
+  // @ts-expect-error
   return assignLocation(ENV.ASSIGNMENT_INDEX_URL)
 }
 
+// @ts-expect-error
 EditHeaderView.prototype.onGradingTypeUpdate = function (e) {
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
     return this.toggleConditionalReleaseTab(e.target.value)
   }
 }
 
+// @ts-expect-error
 EditHeaderView.prototype.toggleConditionalReleaseTab = function (gradingType) {
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
     if (gradingType === 'not_graded') {
@@ -157,6 +173,7 @@ EditHeaderView.prototype.onTabChange = function () {
   return true
 }
 
+// @ts-expect-error
 EditHeaderView.prototype.onShowErrors = function (errors) {
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
     if (errors.conditional_release) {
@@ -186,9 +203,11 @@ EditHeaderView.prototype.toJSON = function () {
   json.courseId = ENV.COURSE_ID
   // EVAL-3711 Remove ICE feature flag
   json.instui_nav = ENV.FEATURES.instui_nav
+  // @ts-expect-error
   json.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
   json.is_locked =
     ((ref = ENV.MASTER_COURSE_DATA) != null ? ref.is_master_course_child_content : void 0) &&
+    // @ts-expect-error
     ENV.MASTER_COURSE_DATA.restricted_by_master_course
   return json
 }

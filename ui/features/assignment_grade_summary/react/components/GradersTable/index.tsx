@@ -33,7 +33,9 @@ import AcceptGradesButton from './AcceptGradesButton'
 
 const I18n = createI18nScope('assignment_grade_summary')
 
+// @ts-expect-error
 function GradersTable(props) {
+  // @ts-expect-error
   const rows = props.graders.map(grader => {
     const {graderId, graderName} = grader
 
@@ -51,6 +53,7 @@ function GradersTable(props) {
   })
 
   const showAcceptGradesColumn =
+    // @ts-expect-error
     !props.gradesLoading && rows.some(row => (row.selectionDetails || {}).allowed)
 
   return (
@@ -72,6 +75,7 @@ function GradersTable(props) {
           )}
         </Grid.Row>
 
+        {/* @ts-expect-error */}
         {rows.map(row => (
           <Grid.Row id={`grader-row-${row.graderId}`} key={row.graderId}>
             <Grid.Col>
@@ -110,6 +114,7 @@ GradersTable.propTypes = {
   gradesLoading: bool.isRequired,
 }
 
+// @ts-expect-error
 function mapStateToProps(state) {
   const {bulkSelectProvisionalGradeStatuses, bulkSelectionDetails, provisionalGrades} = state.grades
 
@@ -122,8 +127,10 @@ function mapStateToProps(state) {
   }
 }
 
+// @ts-expect-error
 function mapDispatchToProps(dispatch) {
   return {
+    // @ts-expect-error
     onGradesAccept(graderId) {
       dispatch(GradeActions.acceptGraderGrades(graderId))
     },

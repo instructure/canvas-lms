@@ -56,12 +56,15 @@ export default class Grid extends Component {
     onGradeSelect: null,
   }
 
+  // @ts-expect-error
   shouldComponentUpdate(nextProps) {
+    // @ts-expect-error
     return Object.keys(nextProps).some(key => this.props[key] !== nextProps[key])
   }
 
   render() {
     return (
+      // @ts-expect-error
       <div className="GradesGrid" ref={this.props.horizontalScrollRef}>
         <table role="table">
           <caption>
@@ -74,6 +77,7 @@ export default class Grid extends Component {
                 <Text>{I18n.t('Student')}</Text>
               </th>
 
+              {/* @ts-expect-error */}
               {this.props.graders.map(grader => (
                 <th
                   className="GradesGrid__GraderHeader"
@@ -92,16 +96,23 @@ export default class Grid extends Component {
           </thead>
 
           <tbody>
+            {/* @ts-expect-error */}
             {this.props.rows.map(row => (
               <GridRow
+                // @ts-expect-error
                 disabledCustomGrade={this.props.disabledCustomGrade}
+                // @ts-expect-error
                 finalGrader={this.props.finalGrader}
+                // @ts-expect-error
                 graders={this.props.graders}
+                // @ts-expect-error
                 grades={this.props.grades[row.studentId]}
                 key={row.studentId}
+                // @ts-expect-error
                 onGradeSelect={this.props.onGradeSelect}
                 row={row}
                 selectProvisionalGradeStatus={
+                  // @ts-expect-error
                   this.props.selectProvisionalGradeStatuses[row.studentId]
                 }
               />

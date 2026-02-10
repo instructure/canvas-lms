@@ -23,6 +23,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('ModeratedGradingCheckbox')
 
+// @ts-expect-error
 export default function ModeratedGradingCheckbox(props) {
   function handleChange() {
     props.onChange(!props.checked)

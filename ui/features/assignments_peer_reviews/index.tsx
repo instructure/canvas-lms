@@ -47,8 +47,10 @@ $(document).ready(() => {
   if (peerReviewCountContainer) {
     const root = createRoot(peerReviewCountContainer)
     const initialCount = peerReviewCountContainer.dataset.count ?? '0'
+    // @ts-expect-error
     const setValue = value => {
       const peerReviewCount = document.getElementById('peer_review_count')
+      // @ts-expect-error
       peerReviewCount.value = value
     }
     root.render(
@@ -81,6 +83,7 @@ $(document).ready(() => {
   })
   $('.peer_review').focusout(function (event) {
     const $parent = $(this).closest('.peer_review')
+    // @ts-expect-error
     const $newFocus = $(event.related).closest('.peer_review')
     if (!$newFocus.is($parent)) {
       $parent.removeClass('focusWithin')
@@ -125,6 +128,7 @@ $(document).ready(() => {
       let user_id = $(this)
         .parents('.student_reviews')
         .getTemplateData({textValues: ['student_review_id']}).student_review_id
+      // @ts-expect-error
       url = replaceTags(url, 'reviewer_id', user_id)
       $form.find(`select option.student_${user_id}`).prop('disabled', true)
       $(this)
@@ -152,7 +156,9 @@ $(document).ready(() => {
         container.attr('aria-label', ERROR_MESSAGE)
       }
 
+      // @ts-expect-error
       const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
+      // @ts-expect-error
       errorRoots[form.attr('action')] = root
       root.render(
         <Flex as="div" alignItems="start" margin="0 0 0 0">
@@ -171,11 +177,14 @@ $(document).ready(() => {
         container.removeClass('error-outline')
         container.removeAttr('aria-label')
       }
+      // @ts-expect-error
       errorRoots[form.attr('action')]?.unmount()
+      // @ts-expect-error
       errorRoots[form.attr('action')] = null
     }
   })
 
+  // @ts-expect-error
   $('#assign_peer_review_form').formSubmit({
     beforeSubmit(data) {
       if (!data.reviewee_id) {
@@ -187,7 +196,9 @@ $(document).ready(() => {
           container.attr('aria-label', ERROR_MESSAGE)
           container.focus()
         }
+        // @ts-expect-error
         const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
+        // @ts-expect-error
         errorRoots[form.attr('action')] = root
 
         root.render(
@@ -238,19 +249,23 @@ $(document).ready(() => {
     },
     error(data) {
       $(this).loadingImage('remove')
+      // @ts-expect-error
       $(this).formErrors(data)
     },
   })
 
+  // @ts-expect-error
   $('#assign_peer_reviews_form').formSubmit({
     beforeSubmit(data) {
       const textInput = document.getElementById('reviews_per_user_input')
       if (!data.peer_review_count) {
+        // @ts-expect-error
         textInput.focus()
         return false
       } else {
         const input = Number(data.peer_review_count)
         if (!Number.isInteger(input) || input <= 0) {
+          // @ts-expect-error
           textInput.focus()
           return false
         }
@@ -266,6 +281,7 @@ $(document).ready(() => {
     event.preventDefault()
     const $link = $(this)
     $link.parents('.peer_review').loadingImage({image_size: 'small'})
+    // @ts-expect-error
     return $.ajaxJSON($link.attr('href'), 'POST', {}, data => {
       $link.parents('.peer_review').loadingImage('remove')
       const assessor_name = $link.parents('.student_reviews').find('.assessor_name').text()

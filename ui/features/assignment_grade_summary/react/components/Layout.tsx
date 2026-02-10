@@ -65,10 +65,12 @@ class Layout extends Component {
   }
 
   componentDidMount() {
+    // @ts-expect-error
     this.props.loadStudents()
   }
 
   render() {
+    // @ts-expect-error
     const onGradeSelect = this.props.assignment.gradesPublished ? null : this.props.selectGrade
 
     return (
@@ -78,16 +80,25 @@ class Layout extends Component {
         <Header />
 
         <View as="div" margin="large 0 0 0">
+          {/* @ts-expect-error */}
           {this.props.students.length > 0 ? (
             <GradesGrid
+              // @ts-expect-error
               anonymousStudents={!this.props.canViewStudentIdentities}
+              // @ts-expect-error
               assignment={this.props.assignment}
+              // @ts-expect-error
               disabledCustomGrade={!this.props.canEditCustomGrades}
+              // @ts-expect-error
               finalGrader={this.props.finalGrader}
+              // @ts-expect-error
               graders={this.props.graders}
+              // @ts-expect-error
               grades={this.props.provisionalGrades}
               onGradeSelect={onGradeSelect}
+              // @ts-expect-error
               selectProvisionalGradeStatuses={this.props.selectProvisionalGradeStatuses}
+              // @ts-expect-error
               students={this.props.students}
             />
           ) : (
@@ -99,6 +110,7 @@ class Layout extends Component {
   }
 }
 
+// @ts-expect-error
 function mapStateToProps(state) {
   const {currentUser, finalGrader, graders} = state.context
   const {assignment} = state.assignment
@@ -117,12 +129,14 @@ function mapStateToProps(state) {
   }
 }
 
+// @ts-expect-error
 function mapDispatchToProps(dispatch) {
   return {
     loadStudents() {
       dispatch(loadStudents())
     },
 
+    // @ts-expect-error
     selectGrade(gradeInfo) {
       dispatch(selectFinalGrade(gradeInfo))
     },
