@@ -25,15 +25,8 @@ module NavMenuLinkTabs
 
   module_function
 
-  def course_tabs(context)
-    tabs_for_context_and_nav_type(context:, nav_type: "course")
-  end
-
-  def tabs_for_context_and_nav_type(context:, nav_type:)
-    scope = NavMenuLink.active.where(context:, nav_type:)
-    scope.pluck(:id, :label, :url).map do |(id, label, url)|
-      make_tab(id:, label:, url:)
-    end
+  def course_tabs(course)
+    tabs_for_context_and_nav_type(NavMenuLink.where(context: course))
   end
 
   def make_tab(id:, label:, url:)
@@ -52,13 +45,17 @@ module NavMenuLinkTabs
     }
   end
 
-  # Ensures that NavMenuLink.active.where(context:, nav_type:) matches tabs array by:
+  # Ensures that NavMenuLink.active.where(context: course) matches tabs
+  # array (as used in e.g. Course#tab_configuration).
   # * Deleting links no longer present in tabs
   # * Creates new links (with linkUrl and no id) and replaces them with {id: "nav_menu_link_123"}
   # * Filtering out any links that are for the wrong context / nav type
-  def create_and_delete_links(context:, nav_type:, tabs:)
+  # (Note that course-context course all have only course_nav: true)
+  def sync_course_links_with_tabs(course:, tabs:)
+    raise ArgumentError unless course.is_a?(Course)
+
     tabs = tabs.map(&:with_indifferent_access)
-    current_link_ids = Set.new(NavMenuLink.active.where(context:, nav_type:).pluck(:id))
+    current_link_ids = Set.new(NavMenuLink.active.where(context: course).pluck(:id))
     links_to_keep = current_link_ids & tabs.filter_map { |tab| tab_json_id_to_numeric_id(tab[:id]) }
     links_to_remove = current_link_ids - links_to_keep
 
@@ -69,13 +66,13 @@ module NavMenuLinkTabs
         new_link_url = (tab[:args].is_a?(Array) && tab[:args][0].is_a?(String)) ? tab[:args][0] : nil
 
         if id.nil? && tab[:href].to_s == TAB_HREF_VALUE.to_s && new_link_url.present?
-          new_link = NavMenuLink.create!(context:, nav_type:, url: new_link_url, label: tab[:label])
+          new_link = NavMenuLink.create!(context: course, course_nav: true, url: new_link_url, label: tab[:label])
           { id: numeric_id_to_tab_json_id(new_link.id), hidden: tab[:hidden] }.compact.with_indifferent_access
         elsif id.present? && (numeric_id.nil? || links_to_keep.include?(numeric_id))
           # Non-link, or existing link
           tab
         else
-          Rails.logger.warn("NavMenuLinkTabs#create_and_delete_links: Ignoring invalid tab: #{tab.inspect}")
+          Rails.logger.warn("NavMenuLinkTabs.sync_course_links_with_tabs: Ignoring invalid tab: #{tab.inspect}")
           nil
         end
       end
@@ -106,6 +103,14 @@ module NavMenuLinkTabs
     # Interprets tabs created by tabs_for_context
     def nav_menu_link_url(url, _opts = {})
       url
+    end
+  end
+
+  def tabs_for_context_and_nav_type(scope)
+    # Safer to keep this method private so we don't accidentally
+    # do NavMenuLink.all.active.pluck(...)
+    scope.active.pluck(:id, :label, :url).map do |(id, label, url)|
+      make_tab(id:, label:, url:)
     end
   end
 end

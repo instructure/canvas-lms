@@ -3178,7 +3178,7 @@ describe Course do
         let(:link) do
           NavMenuLink.create!(
             context: @course,
-            nav_type: "course",
+            course_nav: true,
             label: "External Resource",
             url: "https://example.com"
           )

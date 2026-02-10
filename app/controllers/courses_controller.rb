@@ -1913,9 +1913,8 @@ class CoursesController < ApplicationController
   def update_nav
     get_context
     if authorized_action(@context, @current_user, :update)
-      @context.tab_configuration = NavMenuLinkTabs.create_and_delete_links(
-        context: @context,
-        nav_type: "course",
+      @context.tab_configuration = NavMenuLinkTabs.sync_course_links_with_tabs(
+        course: @context,
         tabs: JSON.parse(params[:tabs_json]).compact
       )
       @context.save

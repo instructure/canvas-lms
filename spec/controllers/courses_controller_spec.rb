@@ -6467,7 +6467,7 @@ describe CoursesController do
       course_with_teacher(active_all: true)
     end
 
-    it "calls NavMenuLinkTabs.create_and_delete_links and saves course" do
+    it "calls NavMenuLinkTabs.sync_course_links_with_tabs and saves course" do
       user_session(@teacher)
       tabs_json = [
         { id: "assignments", label: "Assignments" },
@@ -6479,10 +6479,9 @@ describe CoursesController do
         { "id" => "announcements", "label" => "Announcements", "hidden" => true }
       ]
 
-      expect(NavMenuLinkTabs).to receive(:create_and_delete_links)
+      expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
         .with(
-          context: @course,
-          nav_type: "course",
+          course: @course,
           tabs: [
             { "id" => "assignments", "label" => "Assignments" },
             { "id" => "announcements", "label" => "Announcements", "hidden" => true }

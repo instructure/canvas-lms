@@ -23,6 +23,8 @@ class NavMenuLink < ActiveRecord::Base
   include Canvas::SoftDeletable
   include CustomValidations
 
+  self.ignored_columns += ["nav_type"]
+
   resolves_root_account through: :context
 
   belongs_to :context, polymorphic: %i[account course], separate_columns: true, optional: false
@@ -30,21 +32,20 @@ class NavMenuLink < ActiveRecord::Base
   validates :label, presence: true, length: { maximum: 255 }
   validates :url, presence: true, length: { maximum: 2048 }
   validates_as_url :url
-  validates :nav_type, presence: true, inclusion: { in: %w[course account user] }
 
-  # See also corresponding Postgres check constraint
-  validate :nav_type_matches_context
-  VALID_CONTEXT_NAV_TYPE_PAIRS = Set.new([
-                                           %w[Course course],
-                                           %w[Account account],
-                                           %w[Account user],
-                                         ])
+  # See also corresponding Postgres check constraints
+  validate :at_least_one_nav_type_enabled
+  validate :nav_types_match_context
 
-  private
+  def at_least_one_nav_type_enabled
+    unless course_nav || account_nav || user_nav
+      errors.add(:base, "at least one nav type must be enabled")
+    end
+  end
 
-  def nav_type_matches_context
-    unless VALID_CONTEXT_NAV_TYPE_PAIRS.member?([context_type, nav_type])
-      errors.add(:nav_type, "mismatch between context type and nav type")
+  def nav_types_match_context
+    if context_type == "Course" && (account_nav || user_nav)
+      errors.add(:base, "course-context link can only have course navigation enabled")
     end
   end
 end
