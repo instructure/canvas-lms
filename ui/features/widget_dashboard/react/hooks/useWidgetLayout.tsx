@@ -21,6 +21,10 @@ import type {WidgetConfig, Widget} from '../types'
 import {DEFAULT_WIDGET_CONFIG, LEFT_COLUMN, RIGHT_COLUMN} from '../constants'
 import {useWidgetDashboardEdit} from './useWidgetDashboardEdit'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {announceToScreenReader} from '../utils/screenReaderAnnounce'
+
+const I18n = createI18nScope('widget_dashboard')
 
 export type MoveAction =
   | 'move-left'
@@ -34,11 +38,34 @@ export type MoveAction =
   | 'move-to-top'
   | 'move-to-bottom'
 
+export const getMoveActionDescription = (action: MoveAction): string => {
+  switch (action) {
+    case 'move-to-top':
+      return I18n.t('to top')
+    case 'move-up':
+    case 'move-up-cross':
+      return I18n.t('up')
+    case 'move-down':
+    case 'move-down-cross':
+      return I18n.t('down')
+    case 'move-to-bottom':
+      return I18n.t('to bottom')
+    case 'move-left':
+      return I18n.t('to left bottom')
+    case 'move-left-top':
+      return I18n.t('to left top')
+    case 'move-right':
+      return I18n.t('to right bottom')
+    case 'move-right-top':
+      return I18n.t('to right top')
+  }
+}
+
 interface WidgetLayoutContextType {
   config: WidgetConfig
   moveWidget: (widgetId: string, action: MoveAction) => void
   moveWidgetToPosition: (widgetId: string, targetCol: number, targetRow: number) => void
-  removeWidget: (widgetId: string) => void
+  removeWidget: (widgetId: string, widgetName?: string) => void
   addWidget: (type: string, displayName: string, col: number, row: number) => void
   resetConfig: () => void
   saveLayout: () => Promise<void>
@@ -370,7 +397,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
   )
 
   const removeWidget = useCallback(
-    (widgetId: string) => {
+    (widgetId: string, widgetName: string = I18n.t('Widget')) => {
       setConfig(prevConfig => {
         const updatedWidgets = prevConfig.widgets.filter(w => w.id !== widgetId)
         const normalizedWidgets = normalizeRowNumbers(
@@ -381,6 +408,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
         return {...prevConfig, widgets: finalWidgets}
       })
       markDirty()
+      announceToScreenReader(I18n.t('%{widgetName} removed', {widgetName}))
     },
     [markDirty],
   )
@@ -414,6 +442,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
         return {...prevConfig, widgets: finalWidgets}
       })
       markDirty()
+      announceToScreenReader(I18n.t('%{widgetName} added', {widgetName: displayName}))
     },
     [markDirty],
   )
