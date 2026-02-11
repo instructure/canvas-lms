@@ -18,7 +18,10 @@
 import $ from 'jquery'
 import CollectionView from '@canvas/backbone-collection-view'
 import SectionView from './SectionView'
-import OutcomeDetailView from './OutcomeDetailView'
+import OutcomeDetailModal from '../../react/OutcomeDetailModal'
+import {render, rerender} from '@canvas/react'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 export default class OutcomeSummaryView extends CollectionView {
   static initClass() {
@@ -29,18 +32,49 @@ export default class OutcomeSummaryView extends CollectionView {
 
   initialize() {
     super.initialize(...arguments)
-    this.outcomeDetailView = new OutcomeDetailView()
     return this.bindToggles()
   }
 
-  show(path) {
+  onClose() {
+    window.location.hash = 'tab-outcomes'
+    rerender(this.outcomeDetailViewRoot, null)
+  }
+
+  createOutcomeDetailModal(outcome) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <OutcomeDetailModal
+          outcome={outcome.attributes}
+          courseId={this.collection.course_id}
+          courseName={ENV.current_context.name}
+          userId={this.collection.user_id}
+          onClose={() => this.onClose()}
+        />
+      </QueryClientProvider>
+    )
+  }
+
+  async show(path) {
     this.fetch()
-    if (path) {
-      const outcome_id = parseInt(path, 10)
-      const outcome = this.collection.outcomeCache.get(outcome_id)
-      if (outcome) return this.outcomeDetailView.show(outcome)
+
+    if (!path) {
+      return
+    }
+
+    const outcome_id = parseInt(path, 10)
+    const outcome = this.collection.outcomeCache.get(outcome_id)
+
+    if (!outcome) {
+      return
+    }
+
+    if (this.outcomeDetailViewRoot) {
+      rerender(this.outcomeDetailViewRoot, this.createOutcomeDetailModal(outcome))
     } else {
-      return this.outcomeDetailView.close()
+      this.outcomeDetailViewRoot = render(
+        this.createOutcomeDetailModal(outcome),
+        document.getElementById('outcome-detail-view-mount-point'),
+      )
     }
   }
 
