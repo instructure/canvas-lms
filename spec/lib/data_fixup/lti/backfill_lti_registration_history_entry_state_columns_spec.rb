@@ -443,14 +443,25 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationHistoryEntryStateColumns d
       specs_require_sharding
 
       it "backfills history entries on different shard from site admin registration" do
-        # Create a site admin registration on the default shard
+        # Create a site admin dynamic registration on the default shard
+        # (dynamic registrations still use overlays, unlike manual registrations)
         site_admin_registration = nil
         site_admin_user = nil
         Shard.default.activate do
           site_admin_user = user_model
-          site_admin_registration = lti_registration_with_tool(
+          ims_registration = lti_ims_registration_model(account: Account.site_admin)
+          site_admin_registration = lti_registration_model(
             account: Account.site_admin,
+            ims_registration:,
             created_by: site_admin_user
+          )
+          # Create developer key for the registration
+          DeveloperKey.create!(
+            account: nil, # Site admin keys have nil account
+            is_lti_key: true,
+            scopes: [],
+            public_jwk_url: "https://example.com/jwk",
+            lti_registration: site_admin_registration
           )
         end
 
