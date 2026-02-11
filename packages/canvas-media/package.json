@@ -67,7 +67,7 @@
     "@instructure/uid": "10.29.0",
     "@sheerun/mutationobserver-shim": "^0.3.2",
     "aphrodite": "^2",
-    "axios": "^0.30.0",
+    "axios": "^1.13.5",
     "format-message": "^6",
     "format-message-generate-id": "^6",
     "prop-types": "^15",
