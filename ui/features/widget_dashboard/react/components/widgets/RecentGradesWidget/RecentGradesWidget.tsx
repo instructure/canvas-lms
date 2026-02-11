@@ -40,6 +40,7 @@ const RecentGradesWidget: React.FC<BaseWidgetProps> = ({
   dragHandleProps,
 }) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
+  const isRightColumn = widget.position.col === 2
 
   const {
     currentPage,
@@ -121,7 +122,7 @@ const RecentGradesWidget: React.FC<BaseWidgetProps> = ({
           <List isUnstyled margin="0">
             {currentSubmissions.map(submission => (
               <List.Item key={submission._id} margin="0">
-                <GradeItem submission={submission} />
+                <GradeItem submission={submission} isRightColumn={isRightColumn} />
               </List.Item>
             ))}
           </List>

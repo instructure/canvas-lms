@@ -52,7 +52,7 @@ const CourseProgressItem: React.FC<CourseProgressItemProps> = ({course}) => {
         <Flex.Item overflowY="visible">
           <Flex direction="column" gap="x-small">
             <Flex.Item>
-              <Text size="medium" weight="bold">
+              <Text size="medium" weight="bold" wrap="break-word">
                 {courseName}
               </Text>
             </Flex.Item>

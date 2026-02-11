@@ -186,18 +186,27 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                         </Flex.Item>
                         <Flex.Item shouldGrow shouldShrink>
                           <View as="div">
-                            <Text size="medium" weight="bold" lineHeight="condensed">
+                            <Text
+                              size="medium"
+                              weight="bold"
+                              wrap="break-word"
+                              lineHeight="condensed"
+                            >
                               {instructor.name}
                             </Text>
                             {instructor.email && (
                               <View as="div">
-                                <Text size="small">{instructor.email}</Text>
+                                <Text size="small" wrap="break-word">
+                                  {instructor.email}
+                                </Text>
                               </View>
                             )}
                             {instructor.enrollments.length === 1 ? (
                               <>
                                 <View as="div">
-                                  <Text size="small">{instructor.course_name}</Text>
+                                  <Text size="small" wrap="break-word">
+                                    {instructor.course_name}
+                                  </Text>
                                 </View>
                                 <View as="div">
                                   <Text size="small">
@@ -241,7 +250,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                                             : I18n.t('Teaching Assistant')
                                         return (
                                           <li key={enrollment.id}>
-                                            <Text size="small">
+                                            <Text size="small" wrap="break-word">
                                               {I18n.t('%{role} in %{course}', {
                                                 role,
                                                 course: enrollment.course_name,
