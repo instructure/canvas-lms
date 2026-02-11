@@ -92,7 +92,35 @@ describe Lti::UpdateRegistrationService do
     end
   end
 
-  context "with no previous overlay" do
+  # TEMPORARY: These tests now only apply to dynamic registrations.
+  # Manual registrations merge overlays into configuration instead.
+  context "with no previous overlay (dynamic registration)" do
+    let(:ims_registration) { lti_ims_registration_model(account:) }
+    let(:dynamic_developer_key) do
+      DeveloperKey.create!(
+        account:,
+        is_lti_key: true,
+        scopes: [],
+        public_jwk_url: "https://example.com/jwk",
+        lti_registration: dynamic_registration
+      )
+    end
+    let(:dynamic_registration) do
+      Lti::Registration.create!(
+        account:,
+        ims_registration:,
+        name: "Dynamic Registration",
+        workflow_state: "active",
+        created_by: updated_by,
+        updated_by:
+      )
+    end
+    let(:registration) { dynamic_registration }
+
+    before do
+      dynamic_developer_key # Ensure developer key exists
+    end
+
     context "and overlay_params" do
       let(:overlay_params) { { some: "data" }.with_indifferent_access }
 
@@ -112,18 +140,42 @@ describe Lti::UpdateRegistrationService do
       end
     end
 
-    it "does not create an overlay" do
+    it "does not create an overlay without overlay_params" do
       expect(Lti::Overlay.find_by(registration:, account:)).to be_nil
       subject
       expect(Lti::Overlay.find_by(registration:, account:)).to be_nil
     end
   end
 
-  context "with previous overlay" do
+  context "with previous overlay (dynamic registration)" do
+    let(:ims_registration) { lti_ims_registration_model(account:) }
+    let(:dynamic_developer_key) do
+      DeveloperKey.create!(
+        account:,
+        is_lti_key: true,
+        scopes: [],
+        public_jwk_url: "https://example.com/jwk",
+        lti_registration: dynamic_registration
+      )
+    end
+    let(:dynamic_registration) do
+      Lti::Registration.create!(
+        account:,
+        ims_registration:,
+        name: "Dynamic Registration",
+        workflow_state: "active",
+        created_by: updated_by,
+        updated_by:
+      )
+    end
+    let(:registration) { dynamic_registration }
     let(:overlay) { lti_overlay_model(registration:, account:, data: { hello: :there }) }
     let(:overlay_params) { { some: "data" }.with_indifferent_access }
 
-    before { overlay }
+    before do
+      dynamic_developer_key # Ensure developer key exists
+      overlay
+    end
 
     it "updates the overlay with provided params" do
       subject
@@ -264,28 +316,39 @@ describe Lti::UpdateRegistrationService do
       end
     end
 
+    # TEMPORARY: Manual registrations merge overlays into configuration now
     context "in overlay_params" do
       let(:overlay_params) { { disabled_scopes: ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"] } }
 
-      it "stores overlaid scopes on developer key" do
+      it "merges overlay into configuration (removes disabled scope)" do
         subject
+        expect(registration.manual_configuration.reload.scopes).to eq []
         expect(developer_key.reload.scopes).to eq []
+      end
+
+      it "does not create an overlay" do
+        expect { subject }.not_to change { Lti::Overlay.count }
       end
     end
 
+    # TEMPORARY: Manual registrations merge overlays into configuration now
     context "in both" do
       let(:new_scopes) { ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"] }
       let(:configuration_params) { { scopes: scopes + new_scopes } }
       let(:overlay_params) { { disabled_scopes: ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"] } }
 
-      it "stores overlaid scopes on developer key" do
+      it "stores merged scopes on developer key (overlay applied)" do
         subject
         expect(developer_key.reload.scopes).to match_array(new_scopes)
       end
 
-      it "stores scopes without overlay on tool configuration" do
+      it "stores merged scopes on tool configuration (overlay applied)" do
         subject
-        expect(registration.manual_configuration.reload.scopes).to match_array(scopes + new_scopes)
+        expect(registration.manual_configuration.reload.scopes).to match_array(new_scopes)
+      end
+
+      it "does not create an overlay" do
+        expect { subject }.not_to change { Lti::Overlay.count }
       end
     end
 
@@ -293,6 +356,121 @@ describe Lti::UpdateRegistrationService do
       it "does not change scopes" do
         expect { subject }.not_to change { developer_key.reload.scopes }
       end
+    end
+  end
+
+  # TEMPORARY: This test verifies temporary behavior. Remove this when we revert the temporary changes.
+  context "with manual registration and overlay" do
+    before do
+      # Set up the base configuration on the manual configuration
+      registration.manual_configuration.update!(
+        title: "Base Title",
+        description: "Base Description",
+        scopes: [
+          "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+          "https://purl.imsglobal.org/spec/lti-ags/scope/score"
+        ],
+        placements: [
+          { placement: "course_navigation", text: "Base Course Nav", enabled: true },
+          { placement: "account_navigation", text: "Base Account Nav", enabled: true }
+        ],
+        custom_fields: { base_field: "base_value" }
+      )
+    end
+
+    let(:configuration_params) do
+      # Send the base configuration (this simulates what the frontend sends)
+      registration.manual_configuration.internal_lti_configuration
+    end
+
+    let(:overlay_params) do
+      {
+        title: "Overlaid Title",
+        description: "Overlaid Description",
+        disabled_scopes: ["https://purl.imsglobal.org/spec/lti-ags/scope/score"],
+        disabled_placements: ["account_navigation"],
+        placements: {
+          course_navigation: {
+            text: "Overlaid Course Nav"
+          }
+        },
+        custom_fields: { overlay_field: "overlay_value" }
+      }
+    end
+
+    it "merges overlay into configuration and does not create an overlay" do
+      expect { subject }.not_to change { Lti::Overlay.count }
+
+      # Verify overlay was applied to configuration
+      config = registration.manual_configuration.reload
+      expect(config.title).to eq("Overlaid Title")
+      expect(config.description).to eq("Overlaid Description")
+      expect(config.custom_fields).to eq("overlay_field" => "overlay_value")
+
+      # Verify disabled scope was removed
+      expect(config.scopes).to eq(["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"])
+
+      # Verify disabled placement was disabled
+      account_nav = config.placements.find { |p| p["placement"] == "account_navigation" }
+      expect(account_nav["enabled"]).to be(false)
+
+      # Verify placement overlay was applied
+      course_nav = config.placements.find { |p| p["placement"] == "course_navigation" }
+      expect(course_nav["text"]).to eq("Overlaid Course Nav")
+    end
+
+    it "tracks the merged configuration in history" do
+      expect { subject }.to change(Lti::RegistrationHistoryEntry, :count).by(1)
+
+      diff = Lti::RegistrationHistoryEntry.last.diff
+      expect(diff["internal_lti_configuration"]).to be_present
+    end
+  end
+
+  context "with dynamic registration and overlay" do
+    let(:ims_registration) { lti_ims_registration_model(account:) }
+    let(:dynamic_developer_key) do
+      DeveloperKey.create!(
+        account:,
+        is_lti_key: true,
+        scopes: [],
+        public_jwk_url: "https://example.com/jwk",
+        lti_registration: dynamic_registration
+      )
+    end
+    let(:dynamic_registration) do
+      Lti::Registration.create!(
+        account:,
+        ims_registration:,
+        name: "Dynamic Registration",
+        workflow_state: "active",
+        created_by: updated_by,
+        updated_by:
+      )
+    end
+    let(:registration) { dynamic_registration }
+
+    before do
+      dynamic_developer_key # Ensure developer key is created
+    end
+
+    let(:overlay_params) do
+      {
+        title: "Overlaid Title for Dynamic"
+      }
+    end
+
+    it "creates an overlay for dynamic registrations" do
+      expect { subject }.to change { Lti::Overlay.count }.by(1)
+
+      overlay = Lti::Overlay.find_by(registration:, account:)
+      expect(overlay.data).to eq("title" => "Overlaid Title for Dynamic")
+    end
+
+    it "does not modify the IMS registration configuration" do
+      original_config = ims_registration.internal_lti_configuration
+      subject
+      expect(ims_registration.reload.internal_lti_configuration).to eq(original_config)
     end
   end
 end
