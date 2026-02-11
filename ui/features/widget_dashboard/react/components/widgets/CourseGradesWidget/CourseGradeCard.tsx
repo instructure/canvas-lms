@@ -277,19 +277,30 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                 themeOverride={{
                   fontWeightBold: 700,
                 }}
+                wrap="break-word"
                 data-testid={`course-${courseId}-name`}
               >
                 {courseName}
               </Text>
             </View>
             <View>
-              <Text size="small" color="secondary" data-testid={`course-${courseId}-code`}>
+              <Text
+                size="small"
+                color="secondary"
+                wrap="break-word"
+                data-testid={`course-${courseId}-code`}
+              >
                 {courseCode}
               </Text>
             </View>
             {term && (
               <View>
-                <Text size="small" color="secondary" data-testid={`course-${courseId}-term`}>
+                <Text
+                  size="small"
+                  color="secondary"
+                  wrap="break-word"
+                  data-testid={`course-${courseId}-term`}
+                >
                   {term}
                 </Text>
               </View>

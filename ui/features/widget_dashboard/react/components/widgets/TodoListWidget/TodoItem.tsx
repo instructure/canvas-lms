@@ -100,7 +100,11 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
                 isWithinText={false}
                 data-testid={`todo-link-${item.plannable_id}`}
               >
-                <Text weight="bold" color={isMarkedComplete ? 'secondary' : undefined}>
+                <Text
+                  weight="bold"
+                  wrap="break-word"
+                  color={isMarkedComplete ? 'secondary' : undefined}
+                >
                   {item.plannable.title}
                 </Text>
               </Link>
@@ -108,7 +112,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
 
             {item.plannable.details && (
               <Flex.Item>
-                <Text size="small" color="secondary" lineHeight="condensed">
+                <Text size="small" color="secondary" wrap="break-word" lineHeight="condensed">
                   {item.plannable.details}
                 </Text>
               </Flex.Item>
@@ -121,7 +125,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
                   isWithinText={false}
                   data-testid={`todo-item-course-link-${item.plannable_id}`}
                 >
-                  <Text size="small" color="secondary">
+                  <Text wrap="break-word" size="small" color="secondary">
                     {item.context_name}
                   </Text>
                 </Link>
