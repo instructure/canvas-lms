@@ -176,4 +176,22 @@ describe SectionTabPresenter do
       end
     end
   end
+
+  describe "link_context_type" do
+    it "stores link_context_type when present" do
+      tab_with_context = tab.merge({
+                                     id: "nav_menu_link_123",
+                                     link_context_type: "account"
+                                   })
+      presenter = SectionTabPresenter.new(tab_with_context, course)
+
+      expect(presenter.tab.link_context_type).to eq("account")
+    end
+
+    it "handles missing link_context_type" do
+      presenter = SectionTabPresenter.new(tab, course)
+
+      expect(presenter.tab.link_context_type).to be_nil
+    end
+  end
 end

@@ -20,8 +20,8 @@ require_relative "../spec_helper"
 
 describe NavMenuLinkTabs do
   before :once do
-    course_with_teacher(active_all: true)
     account_model
+    course_with_teacher(active_all: true, account: @account)
   end
 
   describe ".sync_course_links_with_tabs" do
@@ -70,6 +70,67 @@ describe NavMenuLinkTabs do
     it "filters irrelevant links" do
       expect(subject.length).to eq(4)
     end
+
+    context "with account-level links" do
+      before do
+        @account_link = NavMenuLink.create!(context: @account, course_nav: true, label: "Account Link", url: "https://account.com")
+        @course_link = NavMenuLink.create!(context: @course, course_nav: true, label: "Course Link", url: "https://course.com")
+      end
+
+      it "preserves account-level links in tab list" do
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{@account_link.id}" }
+        ]
+
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+
+        expect(result.length).to eq(2)
+        expect(result[1]).to eq({ "id" => "nav_menu_link_#{@account_link.id}" })
+
+        # Course link should be deleted since it's not in tabs
+        expect(NavMenuLink.active.where(id: @course_link.id).exists?).to be false
+
+        # Account link should remain untouched
+        expect(NavMenuLink.active.where(id: @account_link.id).exists?).to be true
+      end
+
+      it "allows reordering with account-level links" do
+        course_link = NavMenuLink.create!(context: @course, course_nav: true, label: "Course Link", url: "https://course.com")
+
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{@account_link.id}" },
+          { "id" => "nav_menu_link_#{course_link.id}" },
+          { "id" => "people" }
+        ]
+
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+
+        expect(result.length).to eq(4)
+        expect(result[0]["id"]).to eq("assignments")
+        expect(result[1]["id"]).to eq("nav_menu_link_#{@account_link.id}")
+        expect(result[2]["id"]).to eq("nav_menu_link_#{course_link.id}")
+        expect(result[3]["id"]).to eq("people")
+      end
+
+      it "rejects invalid and wrong-account links from different account chains" do
+        other_account = account_model
+        other_link = NavMenuLink.create!(context: other_account, course_nav: true, label: "Other Account Link", url: "https://other.com")
+
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{other_link.id}" },
+          { "id" => "nav_menu_link_#{NavMenuLink.last.id + 1}" } # Non-existent link
+        ]
+
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+
+        # Should filter out the other account's link
+        expect(result.length).to eq(1)
+        expect(result[0]["id"]).to eq("assignments")
+      end
+    end
   end
 
   describe ".course_tabs" do
@@ -91,7 +152,8 @@ describe NavMenuLinkTabs do
         args: ["https://course1.com"],
         external: true,
         css_class: "nav_menu_link_#{link1.id}",
-        target: "_blank"
+        target: "_blank",
+        link_context_type: "course"
       )
       expect(tabs[1]).to include(
         id: "nav_menu_link_#{link2.id}",
@@ -100,8 +162,43 @@ describe NavMenuLinkTabs do
         args: ["https://course2.com"],
         external: true,
         css_class: "nav_menu_link_#{link2.id}",
-        target: "_blank"
+        target: "_blank",
+        link_context_type: "course"
       )
+    end
+
+    it "returns both course-level and account-level links" do
+      NavMenuLink.create!(context: @course, course_nav: true, label: "Course Link", url: "https://course.com")
+      NavMenuLink.create!(context: @account, course_nav: true, label: "Account Link", url: "https://account.com")
+
+      tabs = NavMenuLinkTabs.course_tabs(@course)
+
+      expect(tabs.length).to eq(2)
+      expect(tabs[0][:link_context_type]).to eq("course")
+      expect(tabs[1][:link_context_type]).to eq("account")
+    end
+
+    def make_link(context, label)
+      NavMenuLink.create!(context:, course_nav: true, label:, url: "https://#{label}.com")
+    end
+
+    it "returns links for whole account chain, ordered by account then id" do
+      # Create a new parent account and child account to avoid conflicts
+      parent_account = Account.create!(name: "Parent Account")
+      child_account = Account.create!(name: "Child Account", parent_account:)
+
+      # Create course in the child account
+      course = Course.create!(name: "Test Course", account: child_account)
+
+      make_link(parent_account, "parent1")
+      make_link(child_account, "child1")
+      make_link(parent_account, "parent2")
+      make_link(child_account, "child2")
+
+      tabs = NavMenuLinkTabs.course_tabs(course)
+
+      expect(tabs.pluck(:label)).to eq %w[parent1 parent2 child1 child2]
+      expect(tabs.pluck(:link_context_type).uniq).to eq ["account"]
     end
   end
 
