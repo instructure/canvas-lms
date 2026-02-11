@@ -1897,11 +1897,20 @@ describe PlannerController do
         assert_unauthorized
       end
 
-      it "requires the user to be observing observed_user_id in context_codes" do
-        other_course = course_model
-        other_course.enroll_student(@observer, enrollment_state: "active")
-        get :index, params: { observed_user_id: @student.to_param, context_codes: [other_course.asset_string] }
-        assert_unauthorized
+      it "filters context_codes to only courses where observer is linked to observed student" do
+        student2 = user_factory(active_all: true)
+        course2 = Course.create!(workflow_state: "available")
+        course2.enroll_student(student2, enrollment_state: "active")
+        course2.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: student2.id)
+        course2.assignments.create!(title: "Student 2 Assignment", due_at: 1.day.from_now)
+
+        get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string, course2.asset_string] }
+        expect(response).to be_successful
+        response_json = json_parse(response.body)
+        response_hash = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
+        expect(response_hash).to include(["assignment", @assignment.id])
+        expect(response_hash).to include(["assignment", @assignment2.id])
+        expect(response_hash.none? { |type, _id| type == "assignment" && response_json.any? { |i| i["plannable"]["title"] == "Student 2 Assignment" } }).to be true
       end
 
       it "does not require context_codes if all visible courses are requested" do
