@@ -50,6 +50,7 @@ import {SearchContext, isSpeedGraderInTopUrl} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 // @ts-expect-error TS7016 (typescriptify)
@@ -444,6 +445,11 @@ export const DiscussionTopicContainer = ({
           />
           {/* @ts-expect-error TS2339 (typescriptify) */}
           <AssignmentAssetProcessorEula launches={ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS} />
+          {isSearch && (
+            <ScreenReaderContent>
+              <h1>{props.discussionTopic.title}</h1>
+            </ScreenReaderContent>
+          )}
           {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">

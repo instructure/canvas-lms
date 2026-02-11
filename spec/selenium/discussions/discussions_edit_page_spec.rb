@@ -1516,7 +1516,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
           fj("button:contains('Save')").click
 
-          expect(f("h2[data-testid='message_title']").text).to include(@checkpointed_discussion.title)
+          expect(f("h1[data-testid='message_title']").text).to include(@checkpointed_discussion.title)
         end
 
         it "deletes checkpoints if the checkpoint checkbox is unselected on an existing discussion with checkpoints" do
