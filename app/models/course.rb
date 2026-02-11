@@ -5025,6 +5025,6 @@ class Course < ActiveRecord::Base
   end
 
   def excluded_from_accessibility_scan?
-    !Account.site_admin.feature_enabled?(:a11y_checker_additional_resources)
+    !a11y_checker_additional_resources?
   end
 end
