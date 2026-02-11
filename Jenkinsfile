@@ -380,7 +380,10 @@ pipeline {
       parallel {
         stage('ARM64 Builder') {
           when {
-            expression { configuration.isChangeMerged() }
+            allOf {
+              expression { shouldStageRun('ARM64') }
+              expression { configuration.isChangeMerged() }
+            }
           }
           agent { label 'docker-arm64' }
           options {
@@ -411,10 +414,13 @@ pipeline {
 
         stage('Javascript Flow') {
           when {
-            expression {
-              configuration.isChangeMerged() ||
-              commitMessageFlag('force-failure-js') as Boolean ||
-              (!configuration.isChangeMerged() && (filesChangedStage.hasGraphqlFiles() || filesChangedStage.hasJsFiles()))
+            allOf {
+              expression { shouldStageRun('Javascript') }
+              expression {
+                configuration.isChangeMerged() ||
+                commitMessageFlag('force-failure-js') as Boolean ||
+                (!configuration.isChangeMerged() && (filesChangedStage.hasGraphqlFiles() || filesChangedStage.hasJsFiles()))
+              }
             }
           }
           stages {
@@ -447,6 +453,9 @@ pipeline {
         }
 
         stage('Linters Flow') {
+          when {
+            expression { shouldStageRun('Linters') }
+          }
           stages {
             stage('Linters (Build Image)') {
               steps {
@@ -478,6 +487,9 @@ pipeline {
         }
 
         stage('Consumer Smoke Test') {
+          when {
+            expression { shouldStageRun('Consumer') }
+          }
           steps {
             script {
               def stageName = 'Consumer Smoke Test'
@@ -493,7 +505,10 @@ pipeline {
 
         stage('Run i18n:extract') {
           when {
-            expression { configuration.isChangeMerged() }
+            allOf {
+              expression { shouldStageRun('i18n') }
+              expression { configuration.isChangeMerged() }
+            }
           }
           steps {
             script {
@@ -510,8 +525,11 @@ pipeline {
 
         stage('Local Docker Dev Build') {
           when {
-            environment name: 'GERRIT_PROJECT', value: 'canvas-lms'
-            expression { filesChangedStage.hasDockerDevFiles() }
+            allOf {
+              expression { shouldStageRun('DockerDev') }
+              environment name: 'GERRIT_PROJECT', value: 'canvas-lms'
+              expression { filesChangedStage.hasDockerDevFiles() }
+            }
           }
           steps {
             script {
@@ -525,6 +543,9 @@ pipeline {
         }
 
         stage('Contract Tests') {
+          when {
+            expression { shouldStageRun('Contract') }
+          }
           steps {
             script {
               pipelineHelpers.runTestSuite(
@@ -541,10 +562,13 @@ pipeline {
 
         stage('Flakey Spec Catcher') {
           when {
-            expression { !configuration.isChangeMerged() }
-            anyOf {
-              expression { filesChangedStage.hasSpecFiles() }
-              expression { commitMessageFlag('force-failure-fsc') as Boolean }
+            allOf {
+              expression { shouldStageRun('FSC') }
+              expression { !configuration.isChangeMerged() }
+              anyOf {
+                expression { filesChangedStage.hasSpecFiles() }
+                expression { commitMessageFlag('force-failure-fsc') as Boolean }
+              }
             }
           }
           steps {
@@ -562,6 +586,9 @@ pipeline {
         }
 
         stage('Vendored Gems') {
+          when {
+            expression { shouldStageRun('Vendored') }
+          }
           steps {
             script {
               pipelineHelpers.runTestSuite(
@@ -577,6 +604,9 @@ pipeline {
         }
 
         stage('RspecQ Tests') {
+          when {
+            expression { shouldStageRun('RspecQ') }
+          }
           steps {
             script {
               pipelineHelpers.runTestSuite(
