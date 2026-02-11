@@ -569,4 +569,66 @@ RSpec.describe PeerReviewSubAssignment do
       expect(assessment_request.peer_review_sub_assignment_id).to be_nil
     end
   end
+
+  describe ".not_ignored_by" do
+    let(:course) { course_model }
+    let(:teacher) { user_model }
+    let(:parent_assignment) { assignment_model(course:) }
+    let!(:peer_review_sub_assignment1) { PeerReviewSubAssignment.create!(parent_assignment:) }
+    let!(:peer_review_sub_assignment2) do
+      other_parent = assignment_model(course:, title: "Other Assignment")
+      PeerReviewSubAssignment.create!(parent_assignment: other_parent)
+    end
+
+    it "includes peer review sub assignments that are not ignored" do
+      result = PeerReviewSubAssignment.not_ignored_by(teacher, "grading")
+      expect(result).to include(peer_review_sub_assignment1, peer_review_sub_assignment2)
+    end
+
+    it "excludes peer review sub assignments that are ignored" do
+      Ignore.create!(
+        user: teacher,
+        asset: peer_review_sub_assignment1,
+        purpose: "grading"
+      )
+
+      result = PeerReviewSubAssignment.not_ignored_by(teacher, "grading")
+      expect(result).to include(peer_review_sub_assignment2)
+      expect(result).not_to include(peer_review_sub_assignment1)
+    end
+
+    it "respects different purposes" do
+      Ignore.create!(
+        user: teacher,
+        asset: peer_review_sub_assignment1,
+        purpose: "viewing"
+      )
+
+      # Ignored for "viewing" but not for "grading"
+      result = PeerReviewSubAssignment.not_ignored_by(teacher, "grading")
+      expect(result).to include(peer_review_sub_assignment1, peer_review_sub_assignment2)
+
+      # Now check for "viewing" purpose
+      result = PeerReviewSubAssignment.not_ignored_by(teacher, "viewing")
+      expect(result).to include(peer_review_sub_assignment2)
+      expect(result).not_to include(peer_review_sub_assignment1)
+    end
+
+    it "respects different users" do
+      other_teacher = user_model
+      Ignore.create!(
+        user: teacher,
+        asset: peer_review_sub_assignment1,
+        purpose: "grading"
+      )
+
+      # teacher has ignored peer_review_sub_assignment1
+      result = PeerReviewSubAssignment.not_ignored_by(teacher, "grading")
+      expect(result).not_to include(peer_review_sub_assignment1)
+
+      # other_teacher has not ignored it
+      result = PeerReviewSubAssignment.not_ignored_by(other_teacher, "grading")
+      expect(result).to include(peer_review_sub_assignment1)
+    end
+  end
 end

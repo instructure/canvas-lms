@@ -14206,4 +14206,76 @@ describe Assignment do
       end
     end
   end
+
+  describe ".not_ignored_by" do
+    let(:course) { course_model }
+    let(:teacher) { user_model }
+    let!(:assignment1) { assignment_model(course:) }
+    let!(:assignment2) { assignment_model(course:, title: "Assignment 2") }
+
+    it "includes assignments that are not ignored" do
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment1, assignment2)
+    end
+
+    it "excludes assignments that are ignored with correct asset_type" do
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment2)
+      expect(result).not_to include(assignment1)
+    end
+
+    it "respects different purposes" do
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "grading"
+      )
+
+      # Ignored for "grading" but not for "viewing"
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment1, assignment2)
+
+      # Check for "grading" purpose
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "grading")
+      expect(result).to include(assignment2)
+      expect(result).not_to include(assignment1)
+    end
+
+    it "respects different users" do
+      other_teacher = user_model
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      # teacher has ignored assignment1
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).not_to include(assignment1)
+
+      # other_teacher has not ignored it
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(other_teacher, "viewing")
+      expect(result).to include(assignment1)
+    end
+
+    it "uses correct asset_type for Assignment class" do
+      # Create ignore with "Assignment" asset_type (the actual class name)
+      ignore = Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      expect(ignore.asset_type).to eq("Assignment")
+
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).not_to include(assignment1)
+    end
+  end
 end
