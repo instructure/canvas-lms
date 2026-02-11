@@ -227,9 +227,27 @@ describe Api::V1::Lti::Registration do
       end
     end
 
+    # TEMPORARY: Manual registrations now merge overlays into configuration.
+    # Use a dynamic registration to test overlay functionality.
     context "with an overlay" do
-      let(:registration) { lti_registration_with_tool(account: context, registration_params: { admin_nickname: "Test", vendor: "Test Company" }, overlay_params: data) }
-      let(:overlay) { registration.overlay_for(context) }
+      let(:ims_registration) { lti_ims_registration_model(account: context) }
+      let(:registration) do
+        lti_registration_model(
+          account: context,
+          ims_registration:,
+          admin_nickname: "Test",
+          vendor: "Test Company",
+          created_by: user_model
+        )
+      end
+      let(:overlay) do
+        Lti::Overlay.create!(
+          registration:,
+          account: context,
+          data:,
+          updated_by: user_model
+        )
+      end
       let(:includes) { [:overlay] }
       let(:data) { { title: "Test" } }
 
