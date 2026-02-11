@@ -195,6 +195,7 @@ describe Accessibility::ResourceScanController do
 
       before do
         Account.site_admin.enable_feature!(:a11y_checker_close_issues)
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
 
         10.times do
           accessibility_issue_model(
