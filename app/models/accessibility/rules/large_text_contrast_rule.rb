@@ -47,7 +47,7 @@ module Accessibility
 
         return nil if background.nil?
 
-        contrast_ratio = WCAGColorContrast.ratio(foreground.delete_prefix("#"), background.delete_prefix("#"))
+        contrast_ratio = calculate_contrast_ratio(foreground, background)
 
         if contrast_ratio < CONTRAST_THRESHOLD
           I18n.t("Contrast ratio for large text is smaller than threshold %{value}.", { value: CONTRAST_THRESHOLD })
@@ -57,7 +57,8 @@ module Accessibility
       def form(elem)
         style_str = elem.attribute("style")&.value.to_s
         background = extract_background_color(style_str)
-        foreground = if WCAGColorContrast.ratio("000000", background.delete_prefix("#")) >= CONTRAST_THRESHOLD
+
+        foreground = if calculate_contrast_ratio("000000", background) >= CONTRAST_THRESHOLD
                        "#000000"
                      else
                        "#FFFFFF"
@@ -72,7 +73,7 @@ module Accessibility
           options: ["large"],
           background_color: background,
           value: foreground,
-          contrast_ratio: WCAGColorContrast.ratio(foreground.delete_prefix("#"), background.delete_prefix("#"))
+          contrast_ratio: calculate_contrast_ratio(foreground, background)
         )
       end
 
@@ -89,8 +90,7 @@ module Accessibility
         foreground = extract_color(new_style, "color") || "#000000"
         background = extract_background_color(style_str)
 
-        contrast_ratio = WCAGColorContrast.ratio(foreground.delete_prefix("#"), background.delete_prefix("#"))
-
+        contrast_ratio = calculate_contrast_ratio(foreground, background)
         if contrast_ratio < CONTRAST_THRESHOLD
           error = StandardError.new("Insufficient contrast ratio (#{contrast_ratio.round(2)})")
           error.instance_variable_set(:@metadata, { foreground:, background: })
@@ -133,6 +133,15 @@ module Accessibility
                      else
                        LARGE_TEXT_MIN_SIZE_PX
                      end
+      end
+
+      def calculate_contrast_ratio(foreground, background)
+        WCAGColorContrast.ratio(foreground.delete_prefix("#"), background.delete_prefix("#"))
+      rescue WCAGColorContrast::InvalidColorError => e
+        message = e.message.blank? ? "color_missing" : "invalid_color_format"
+        error = StandardError.new(message)
+        error.instance_variable_set(:@metadata, { foreground:, background: })
+        raise error
       end
     end
   end
