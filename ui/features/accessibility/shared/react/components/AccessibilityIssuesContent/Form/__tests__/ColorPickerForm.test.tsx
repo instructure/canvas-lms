@@ -18,7 +18,11 @@
 
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ColorPickerForm from '../ColorPickerForm'
+import ColorPickerForm, {
+  COLOR_REQUIRED_MESSAGE,
+  INVALID_COLOR_MESSAGE,
+  type ContrastErrorCode,
+} from '../ColorPickerForm'
 import {AccessibilityIssue, FormType, IssueWorkflowState} from '../../../../types'
 
 describe('ColorPickerForm', () => {
@@ -293,6 +297,20 @@ describe('ColorPickerForm', () => {
       renderColorPickerForm()
 
       expect(screen.getByTestId(TEST_IDS.COLOR_PICKER)).toBeInTheDocument()
+    })
+
+    it('maps backend error "color_missing" to user-friendly message', () => {
+      const errorCode: ContrastErrorCode = 'color_missing'
+      renderColorPickerForm({error: errorCode})
+
+      expect(screen.getByText(COLOR_REQUIRED_MESSAGE)).toBeInTheDocument()
+    })
+
+    it('maps backend error "invalid_color_format" to user-friendly message', () => {
+      const errorCode: ContrastErrorCode = 'invalid_color_format'
+      renderColorPickerForm({error: errorCode})
+
+      expect(screen.getByText(INVALID_COLOR_MESSAGE)).toBeInTheDocument()
     })
   })
 
