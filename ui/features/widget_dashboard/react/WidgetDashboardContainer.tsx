@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
@@ -49,8 +49,18 @@ const WidgetDashboardContainer: React.FC = () => {
   const {config, resetConfig, saveLayout} = useWidgetLayout()
   const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
   const [switchingDashboard, setSwitchingDashboard] = useState(false)
+  const customizeButtonRef = useRef<Element | null>(null)
+  const wasEditModeRef = useRef(isEditMode)
 
   const handleChangeObservedUser = useMemo(() => getHandleChangeObservedUser(), [])
+
+  // Focus customize button when exiting edit mode
+  useEffect(() => {
+    if (wasEditModeRef.current && !isEditMode) {
+      ;(customizeButtonRef.current as HTMLElement)?.focus()
+    }
+    wasEditModeRef.current = isEditMode
+  }, [isEditMode])
 
   useEffect(() => {
     if (!isDirty) return
@@ -141,6 +151,9 @@ const WidgetDashboardContainer: React.FC = () => {
                 ) : (
                   <Flex.Item>
                     <Button
+                      elementRef={el => {
+                        customizeButtonRef.current = el
+                      }}
                       onClick={enterEditMode}
                       renderIcon={<IconConfigureLine />}
                       withBackground={false}
