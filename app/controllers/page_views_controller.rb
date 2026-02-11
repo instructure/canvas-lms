@@ -260,6 +260,9 @@ class PageViewsController < ApplicationController
   # Maximum records per page for page views API (PV5 supports up to 200)
   PAGE_VIEWS_MAX_PER_PAGE = 200
 
+  # Maximum number of user IDs allowed in a batch query
+  BATCH_QUERY_MAX_USER_IDS = 10
+
   # @API List user page views
   # Return a paginated list of the user's page view history in json format,
   # similar to the available CSV download. Page views are returned in
@@ -639,6 +642,16 @@ class PageViewsController < ApplicationController
     increment_request_cost(150)
 
     user_ids, start_date, end_date, results_format = params.require(%i[user_ids start_date end_date results_format])
+
+    # Check for maximum number of user IDs
+    if user_ids.length > BATCH_QUERY_MAX_USER_IDS
+      return render json: {
+                      error: t("Too many user IDs. Maximum: %{max}, provided: %{provided}",
+                               max: BATCH_QUERY_MAX_USER_IDS,
+                               provided: user_ids.length)
+                    },
+                    status: :bad_request
+    end
 
     # Check for duplicate user IDs
     duplicate_id = user_ids.detect { |id| user_ids.count(id) > 1 }

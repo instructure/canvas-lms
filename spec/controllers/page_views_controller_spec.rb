@@ -390,6 +390,20 @@ describe PageViewsController do
         expect(response.parsed_body["error"]).to eq("Parameter results_format is missing.")
       end
 
+      it "returns 400 Bad Request when too many user IDs are provided" do
+        user_ids = (1..11).map { user_model.id }
+
+        post "batch_query", params: {
+          user_ids:,
+          start_date: "2025-01-01",
+          end_date: "2025-02-01",
+          results_format: :csv
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to eq("Too many user IDs. Maximum: 10, provided: 11")
+      end
+
       it "returns 400 Bad Request when duplicate user IDs are provided" do
         post "batch_query", params: {
           user_ids: [user1.id, user2.id, user1.id],
