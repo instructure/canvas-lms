@@ -269,6 +269,22 @@ describe AssignmentOverride do
       expect(override.reload.notify_change?).to be false
     end
 
+    it "does not notify of change for course that has not yet started" do
+      due_date_timestamp = Time.zone.now.iso8601
+      assignment = assignment_model(course: @course)
+      override = assignment.assignment_overrides.create!(
+        due_at: due_date_timestamp,
+        due_at_overridden: true
+      )
+      override.assignment_override_students.create!(user: @student)
+      assignment.update(due_at: nil, only_visible_to_overrides: true, created_at: 4.hours.ago)
+      @course.update!(
+        restrict_enrollments_to_course_dates: true,
+        start_at: 1.month.from_now
+      )
+      expect(override.reload.notify_change?).to be false
+    end
+
     it "does not notify of change for course that has concluded" do
       due_date_timestamp = Time.zone.now.iso8601
       assignment = assignment_model(course: @course)
@@ -286,6 +302,175 @@ describe AssignmentOverride do
       end.to change {
         override.reload.notify_change?
       }.from(true).to(false)
+    end
+  end
+
+  describe "broadcast_policy" do
+    before :once do
+      Notification.create!(name: "Assignment Due Date Changed")
+      Notification.create!(name: "Assignment Due Date Override Changed")
+      @teacher = teacher_in_course(course: @course, active_all: true).user
+      communication_channel(@teacher, { username: "teacher-notify@example.com", active_cc: true })
+      @notified_student = user_with_pseudonym(active_all: true, username: "student-notify@example.com")
+      @course.enroll_student(@notified_student, enrollment_state: "active")
+      @other_section = @course.course_sections.create!(name: "Other Section")
+      @other_student = user_with_pseudonym(active_all: true, username: "other-student@example.com")
+      @course.enroll_student(@other_student, enrollment_state: "active", section: @other_section)
+    end
+
+    it "sends Assignment Due Date Changed to section students and Assignment Due Date Override Changed to admins when a section override due date changes" do
+      assignment = @course.assignments.create!(title: "Test", due_at: 1.week.from_now)
+      override = assignment.assignment_overrides.create!(
+        set: @course.default_section,
+        due_at: 2.weeks.from_now,
+        due_at_overridden: true
+      )
+      assignment.update_attribute(:created_at, 1.day.ago)
+      override.reload
+      override.override_due_at(3.weeks.from_now)
+      override.save!
+
+      expect(override.messages_sent["Assignment Due Date Changed"].map(&:user)).to include(@notified_student)
+      expect(override.messages_sent["Assignment Due Date Changed"].map(&:user)).not_to include(@other_student)
+      expect(override.messages_sent["Assignment Due Date Override Changed"].map(&:user)).to include(@teacher)
+    end
+
+    it "sends Assignment Due Date Changed to the ADHOC student and Assignment Due Date Override Changed to admins when an ADHOC override due date changes" do
+      assignment = @course.assignments.create!(title: "Test", due_at: 1.week.from_now)
+      override = assignment.assignment_overrides.create!(
+        set_type: "ADHOC",
+        due_at: 2.weeks.from_now,
+        due_at_overridden: true
+      )
+      override.assignment_override_students.create!(user: @notified_student)
+      assignment.update_attribute(:created_at, 1.day.ago)
+      override.reload
+      override.override_due_at(3.weeks.from_now)
+      override.save!
+
+      expect(override.messages_sent["Assignment Due Date Changed"].map(&:user)).to include(@notified_student)
+      expect(override.messages_sent["Assignment Due Date Changed"].map(&:user)).not_to include(@other_student)
+      expect(override.messages_sent["Assignment Due Date Override Changed"].map(&:user)).to include(@teacher)
+    end
+
+    it "sends Assignment Due Date Changed to group members and Assignment Due Date Override Changed to admins when a group override due date changes" do
+      group_category = @course.group_categories.create!(name: "Broadcast Test Category")
+      group = group_category.groups.create!(context: @course)
+      group.group_memberships.create!(user: @notified_student, workflow_state: "accepted")
+      assignment = @course.assignments.create!(title: "Test", due_at: 1.week.from_now, group_category:)
+      override = assignment.assignment_overrides.create!(
+        set: group,
+        due_at: 2.weeks.from_now,
+        due_at_overridden: true
+      )
+      assignment.update_attribute(:created_at, 1.day.ago)
+      override.reload
+      override.override_due_at(3.weeks.from_now)
+      override.save!
+
+      expect(override.messages_sent["Assignment Due Date Changed"].map(&:user)).to include(@notified_student)
+      expect(override.messages_sent["Assignment Due Date Override Changed"].map(&:user)).to include(@teacher)
+    end
+
+    it "sends Assignment Due Date Changed to all enrolled students and Assignment Due Date Override Changed to admins when a course override due date changes" do
+      assignment = @course.assignments.create!(title: "Test", due_at: 1.week.from_now)
+      override = assignment.assignment_overrides.create!(
+        set: @course,
+        due_at: 2.weeks.from_now,
+        due_at_overridden: true
+      )
+      assignment.update_attribute(:created_at, 1.day.ago)
+      override.reload
+      override.override_due_at(3.weeks.from_now)
+      override.save!
+
+      expect(override.messages_sent["Assignment Due Date Changed"].map(&:user)).to include(@notified_student)
+      expect(override.messages_sent["Assignment Due Date Override Changed"].map(&:user)).to include(@teacher)
+    end
+
+    context "when the course has not yet started" do
+      before :once do
+        @future_course = course_factory(active_all: true)
+        @future_course.update!(
+          restrict_enrollments_to_course_dates: true,
+          start_at: 1.month.from_now,
+          conclude_at: 3.months.from_now
+        )
+        @future_teacher = teacher_in_course(course: @future_course, active_all: true).user
+        communication_channel(@future_teacher, { username: "future-teacher@example.com", active_cc: true })
+        @future_student = user_with_pseudonym(active_all: true, username: "future-student@example.com")
+        @future_course.enroll_student(@future_student, enrollment_state: "active")
+      end
+
+      it "does not notify the ADHOC student or admins" do
+        assignment = @future_course.assignments.create!(title: "Test", due_at: 1.week.from_now)
+        override = assignment.assignment_overrides.create!(
+          set_type: "ADHOC",
+          due_at: 2.weeks.from_now,
+          due_at_overridden: true
+        )
+        override.assignment_override_students.create!(user: @future_student)
+        assignment.update_attribute(:created_at, 1.day.ago)
+        override.reload
+        override.override_due_at(3.weeks.from_now)
+        override.save!
+
+        expect(override.messages_sent["Assignment Due Date Changed"]).to be_blank
+        expect(override.messages_sent["Assignment Due Date Override Changed"]).to be_blank
+      end
+
+      it "does not notify section students or admins" do
+        assignment = @future_course.assignments.create!(title: "Test", due_at: 1.week.from_now)
+        override = assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set: @future_course.default_section,
+          due_at: 2.weeks.from_now,
+          due_at_overridden: true
+        )
+        assignment.update_attribute(:created_at, 1.day.ago)
+        override.reload
+        override.override_due_at(3.weeks.from_now)
+        override.save!
+
+        expect(override.messages_sent["Assignment Due Date Changed"]).to be_blank
+        expect(override.messages_sent["Assignment Due Date Override Changed"]).to be_blank
+      end
+
+      it "does not notify course students or admins" do
+        assignment = @future_course.assignments.create!(title: "Test", due_at: 1.week.from_now)
+        override = assignment.assignment_overrides.create!(
+          set_type: "Course",
+          set: @future_course,
+          due_at: 2.weeks.from_now,
+          due_at_overridden: true
+        )
+        assignment.update_attribute(:created_at, 1.day.ago)
+        override.reload
+        override.override_due_at(3.weeks.from_now)
+        override.save!
+
+        expect(override.messages_sent["Assignment Due Date Changed"]).to be_blank
+        expect(override.messages_sent["Assignment Due Date Override Changed"]).to be_blank
+      end
+
+      it "does not notify group members or admins" do
+        group_category = @future_course.group_categories.create!(name: "Future Group Category")
+        group = group_category.groups.create!(context: @future_course)
+        group.group_memberships.create!(user: @future_student, workflow_state: "accepted")
+        assignment = @future_course.assignments.create!(title: "Test", due_at: 1.week.from_now, group_category:)
+        override = assignment.assignment_overrides.create!(
+          set: group,
+          due_at: 2.weeks.from_now,
+          due_at_overridden: true
+        )
+        assignment.update_attribute(:created_at, 1.day.ago)
+        override.reload
+        override.override_due_at(3.weeks.from_now)
+        override.save!
+
+        expect(override.messages_sent["Assignment Due Date Changed"]).to be_blank
+        expect(override.messages_sent["Assignment Due Date Override Changed"]).to be_blank
+      end
     end
   end
 
@@ -984,7 +1169,7 @@ describe AssignmentOverride do
   describe "#update_grading_period_grades" do
     before :once do
       @override = AssignmentOverride.new(set_type: "ADHOC", due_at_overridden: true)
-      student_in_course
+      student_in_course(active_all: true)
       @assignment = assignment_model(course: @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term
@@ -1288,16 +1473,17 @@ describe AssignmentOverride do
     end
 
     it "returns the right students for ADHOC" do
+      active_student = student_in_course(course: @course, active_all: true).user
       @override = assignment_override_model(course: @course)
       @override.set_type = "ADHOC"
 
       expect(@override.applies_to_students).to eq []
 
       @override_student = @override.assignment_override_students.build
-      @override_student.user = @student
+      @override_student.user = active_student
       @override_student.save!
 
-      expect(@override.set).to eq @override.applies_to_students
+      expect(@override.applies_to_students).to match_array([active_student])
     end
 
     it "returns the right students for a section" do
@@ -1320,6 +1506,119 @@ describe AssignmentOverride do
 
       expect(@override.applies_to_students).to include(@active_student)
       expect(@override.applies_to_students).to eq @course.participating_students
+    end
+
+    context "when the course has not yet started" do
+      before do
+        @future_student = student_in_course(course: @course, active_all: true).user
+        @course.update!(
+          restrict_enrollments_to_course_dates: true,
+          start_at: 1.month.from_now,
+          conclude_at: 3.months.from_now
+        )
+        EnrollmentState.invalidate_states_for_course_or_section(@course)
+      end
+
+      it "excludes future students from section overrides" do
+        @override = assignment_override_model(course: @course)
+        @override.set = @course.default_section
+        @override.save!
+
+        expect(@override.applies_to_students).not_to include(@future_student)
+      end
+
+      it "excludes future students from course overrides" do
+        @override = assignment_override_model(course: @course)
+        @override.set = @course
+        @override.save!
+
+        expect(@override.applies_to_students).not_to include(@future_student)
+      end
+
+      it "excludes future students from group overrides" do
+        group_category = @course.group_categories.create!(name: "Future Group Category")
+        group = @course.groups.create!(group_category:, name: "Future Group")
+        group.add_user(@future_student)
+        assignment = assignment_model(course: @course)
+        assignment.update!(group_category:)
+        @override = assignment_override_model(assignment:, set: group)
+
+        expect(@override.applies_to_students).not_to include(@future_student)
+      end
+    end
+
+    context "when the course is active with restrict_enrollments enabled" do
+      before do
+        @active_student_with_restriction = student_in_course(course: @course, active_all: true).user
+        @course.update!(
+          restrict_enrollments_to_course_dates: true,
+          start_at: 1.month.ago,
+          conclude_at: 2.months.from_now
+        )
+        EnrollmentState.invalidate_states_for_course_or_section(@course)
+      end
+
+      it "includes active students in section overrides" do
+        section_override = assignment_override_model(course: @course)
+        section_override.set = @course.default_section
+        section_override.save!
+
+        expect(section_override.applies_to_students).to include(@active_student_with_restriction)
+      end
+
+      it "includes active students in course overrides" do
+        course_override = assignment_override_model(course: @course)
+        course_override.set = @course
+        course_override.save!
+
+        expect(course_override.applies_to_students).to include(@active_student_with_restriction)
+      end
+
+      it "includes active students in both section and course overrides" do
+        section_override = assignment_override_model(course: @course)
+        section_override.set = @course.default_section
+        section_override.save!
+
+        course_override = assignment_override_model(course: @course)
+        course_override.set = @course
+        course_override.save!
+
+        expect(section_override.applies_to_students).to include(@active_student_with_restriction)
+        expect(course_override.applies_to_students).to include(@active_student_with_restriction)
+      end
+    end
+
+    context "when an ADHOC override student has a deactivated enrollment" do
+      it "excludes the deactivated student" do
+        deactivated_student = student_in_course(course: @course, active_all: true).user
+        @override = assignment_override_model(course: @course)
+        @override.set_type = "ADHOC"
+        @override_student = @override.assignment_override_students.build
+        @override_student.user = deactivated_student
+        @override_student.save!
+
+        @course.enrollments.find_by(user: deactivated_student).deactivate
+
+        expect(@override.applies_to_students).not_to include(deactivated_student)
+      end
+    end
+
+    context "when a group override student has a deactivated enrollment" do
+      it "excludes the deactivated student" do
+        enrollment = student_in_course(course: @course, active_all: true)
+        student = enrollment.user
+        group_category = @course.group_categories.create!(name: "Test Groups")
+        group = @course.groups.create!(group_category:, name: "Group 1")
+        group.add_user(student)
+
+        assignment = assignment_model(course: @course)
+        assignment.update!(group_category:)
+        override = assignment_override_model(assignment:, set: group)
+
+        enrollment.deactivate
+
+        expect(override.applies_to_students).not_to include(student)
+      end
     end
   end
 
