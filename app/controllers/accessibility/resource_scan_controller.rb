@@ -127,6 +127,7 @@ module Accessibility
             WHEN #{scans_table}.assignment_id IS NOT NULL THEN 'assignment'
             WHEN #{scans_table}.attachment_id IS NOT NULL THEN 'attachment'
             WHEN #{scans_table}.discussion_topic_id IS NOT NULL THEN 'discussion_topic'
+            WHEN #{scans_table}.announcement_id IS NOT NULL THEN 'announcement'
           END
         SQL
         relation.select("#{scans_table}.*", "#{type_case} AS resource_type_sort")
