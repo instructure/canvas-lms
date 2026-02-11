@@ -199,12 +199,14 @@ class PlannerController < ApplicationController
       end
 
       @user = api_find(User, params[:observed_user_id])
-      # observers can only specify course context_codes
-      course_ids = Course.find_all_by_asset_string(params[:context_codes]).pluck(:id)
-      include_all_visible_courses = params[:context_codes].nil? && include_all_visible_courses
-      valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-      courses = include_all_visible_courses ? [] : course_ids - valid_course_ids
-      render_unauthorized_action unless courses.empty?
+      unless include_visible_courses
+        valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
+        params[:context_codes] = params[:context_codes].select do |code|
+          type, id = code.split("_", 2)
+          type == "course" && valid_course_ids.include?(id.to_i)
+        end
+        render_unauthorized_action if params[:context_codes].empty?
+      end
     else
       @user = @current_user
     end

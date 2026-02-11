@@ -3884,13 +3884,15 @@ describe "Users API", type: :request do
         assert_forbidden
       end
 
-      it "renders forbidden if the observer isn't observing the student in a passed course" do
+      it "filters to valid courses when observer isn't linked to student in all passed courses" do
         course1 = @course
         course2 = course_factory(active_all: true)
         course2.enroll_student(@student, enrollment_state: "active")
         course2.enroll_user(@observer, "ObserverEnrollment")
-        api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
-        assert_forbidden
+        course2.assignments.create!(name: "A2", due_at: 3.days.ago, workflow_state: "published", submission_types: "online_text_entry")
+        json = api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
+        expect(response).to be_successful
+        expect(json.pluck("course_id").uniq).to eq([course1.id])
       end
 
       it "returns missing assignments for all courses provided" do
