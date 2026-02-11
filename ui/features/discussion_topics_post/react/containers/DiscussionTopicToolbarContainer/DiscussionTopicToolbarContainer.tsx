@@ -212,9 +212,6 @@ const DiscussionTopicToolbarContainer = props => {
         </>
       ) : (
         <>
-          <ScreenReaderContent>
-            <h1>{props.discussionTopic.title}</h1>
-          </ScreenReaderContent>
           <DiscussionPostToolbar
             canViewGroupPages={props.discussionTopic.permissions.viewGroupPages}
             canEdit={props.discussionTopic.permissions.update}
