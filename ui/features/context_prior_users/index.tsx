@@ -18,12 +18,19 @@
 
 import ready from '@instructure/ready'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+import type {Crumb} from '@canvas/top-navigation/react/TopNavPortalBase'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('PriorUsers')
 
 ready(() => {
-  const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+  const handleBreadCrumbSetter = ({
+    getCrumbs,
+    setCrumbs,
+  }: {
+    getCrumbs: () => Crumb[]
+    setCrumbs: (crumbs: Crumb[]) => void
+  }): void => {
     const crumbs = getCrumbs()
     crumbs.push({name: I18n.t('People'), url: document.referrer})
     crumbs.push({name: I18n.t('Prior users'), url: ''})
