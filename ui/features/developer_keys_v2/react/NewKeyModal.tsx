@@ -34,9 +34,6 @@ import type {DeveloperKey} from '../model/api/DeveloperKey'
 import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
-import {Link} from '@instructure/ui-link'
-import {OverlayAlert} from './OverlayAlert'
-import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('react_developer_keys')
 
@@ -430,12 +427,6 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
               <Heading level="h1">{I18n.t('Key Settings')}</Heading>
             </Modal.Header>
             <Modal.Body>
-              {this.developerKey.has_overlay && (
-                <OverlayAlert
-                  contextId={this.props.ctx.params.contextId}
-                  ltiRegistrationId={this.developerKey.lti_registration_id}
-                />
-              )}
               {this.isSaving ? (
                 <View as="div" textAlign="center">
                   <Spinner
@@ -474,19 +465,6 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
               )}
             </Modal.Body>
             <Modal.Footer>
-              {this.developerKey.has_overlay && (
-                <Flex>
-                  <Flex.Item margin="0 large 0 0">
-                    <Link
-                      href={`/accounts/${this.props.ctx.params.contextId}/apps/manage/${this.developerKey.lti_registration_id}/configuration`}
-                    >
-                      {I18n.t(
-                        'This key has been customized in the Apps page. Edit it there to make changes.',
-                      )}
-                    </Link>
-                  </Flex.Item>
-                </Flex>
-              )}
               <Button id="lti-key-cancel-button" onClick={this.closeModal} margin="0 small 0 0">
                 {I18n.t('Cancel')}
               </Button>
@@ -494,15 +472,13 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
                 id="lti-key-save-button"
                 onClick={this.handleSave}
                 color="primary"
-                disabled={this.isSaving || ENV.devKeysReadOnly || this.developerKey.has_overlay}
+                disabled={this.isSaving || ENV.devKeysReadOnly}
                 title={
-                  this.developerKey.has_overlay
-                    ? I18n.t('Cannot edit keys with overlays. Edit in Apps page.')
-                    : ENV.devKeysReadOnly
-                      ? I18n.t(
-                          'You do not have permission to create or modify developer keys in this account.',
-                        )
-                      : undefined
+                  ENV.devKeysReadOnly
+                    ? I18n.t(
+                        'You do not have permission to create or modify developer keys in this account',
+                      )
+                    : undefined
                 }
               >
                 {I18n.t('Save')}
