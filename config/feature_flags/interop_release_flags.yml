@@ -253,8 +253,7 @@ lti_asset_processor_course:
   applies_to: Course
   display_name: Document Processor
   description: |-
-    If enabled, the Document Processor placement will be visible on Assignments and Discussions
-    when at least one tool is configured to use this placement and Documents Processors are enabled for the root account.
+    If enabled, the Document Processor placement will be visible on Assignments when at least one tool is configured to use this placement and Documents Processors are enabled for the root account.
   environments:
     development:
       state: allowed_on
