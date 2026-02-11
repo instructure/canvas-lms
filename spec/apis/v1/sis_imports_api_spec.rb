@@ -834,6 +834,17 @@ describe SisImportsApiController, type: :request do
     end
   end
 
+  it "gives a 400 rather than a 500 if binary is posted without an appropriate Content-Type" do
+    raw_zip_content = Rails.root.join("spec/fixtures/sis/mac_sis_batch.zip").read
+    post "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
+         params: raw_zip_content,
+         headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+
+    expect(response).to be_bad_request
+    json = json_parse(response.body)
+    expect(json["error"]).to include "Ensure the Content-Type header is set"
+  end
+
   it "allows raw post without charset" do
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
