@@ -127,7 +127,13 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
   )
 
   const renderPopoverContent = () => (
-    <View padding="small" display="block" maxWidth="480px" minWidth="300px" minHeight="200px">
+    <View
+      padding="small"
+      display="block"
+      maxWidth="480px"
+      minWidth="300px"
+      minHeight="200px"
+    >
       {isLoading && (
         <View as="div" textAlign="center" margin="medium none">
           <Spinner renderTitle={t('Loading user details')} size="small" />
@@ -235,7 +241,12 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
       )}
       <Popover
         renderTrigger={
-          <Link isWithinText={false} onClick={() => {}} data-testid="student-cell-link">
+          <Link
+            isWithinText={false}
+            onClick={() => {}}
+            data-testid="student-cell-link"
+            aria-haspopup="dialog"
+          >
             <TruncateText>{studentName}</TruncateText>
           </Link>
         }
