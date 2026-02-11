@@ -6,7 +6,9 @@
   "types": "es/index.d.ts",
   "typesVersions": {
     "*": {
-      "enhance-user-content": ["./es/enhance-user-content/index.d.ts"]
+      "enhance-user-content": [
+        "./es/enhance-user-content/index.d.ts"
+      ]
     }
   },
   "exports": {
@@ -61,11 +63,19 @@
   ],
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
-  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
+  "browserslist": [
+    "extends @instructure/browserslist-config-canvas-lms"
+  ],
   "nyc": {
-    "include": ["shared/**/*.js", "src/**/*.js"],
+    "include": [
+      "shared/**/*.js",
+      "src/**/*.js"
+    ],
     "exclude": [],
-    "require": ["@babel/register", "@instructure/canvas-theme"],
+    "require": [
+      "@babel/register",
+      "@instructure/canvas-theme"
+    ],
     "sourceMap": false,
     "instrument": false
   },
@@ -129,7 +139,7 @@
     "@types/tinycolor2": "^1.4.6",
     "@tinymce/tinymce-react": "~3.8.4",
     "aphrodite": "^2",
-    "axios": "^0.30.0",
+    "axios": "^1.13.5",
     "bloody-offset": "0.0.0",
     "crypto-es": "^2.1.0",
     "classnames": "^2.2.5",
