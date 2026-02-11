@@ -287,7 +287,8 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def grading_rubrics
+  # LEGACY: Original implementation
+  def grading_rubrics_legacy
     return unless authorized_action(@context, @current_user, [:read_rubrics, :manage_rubrics])
 
     @rubric_contexts = @context.rubric_contexts(@current_user)
@@ -308,6 +309,46 @@ class GradebooksController < ApplicationController
       render json: StringifyIds.recursively_stringify_ids(data)
     else
       render json: @rubric_contexts
+    end
+  end
+
+  def grading_rubrics
+    if Account.site_admin.feature_enabled?(:optimized_grading_rubrics)
+      grading_rubrics_optimized
+    else
+      grading_rubrics_legacy
+    end
+  end
+
+  # OPTIMIZED: Uses context filtering to avoid loading all contexts when requesting specific one
+  def grading_rubrics_optimized
+    return unless authorized_action(@context, @current_user, [:read_rubrics, :manage_rubrics])
+
+    # Only load requested context instead of all contexts when filtering
+    rubric_contexts = if params[:context_code]
+                        @context.rubric_contexts(@current_user, context_code: params[:context_code])
+                      else
+                        @context.rubric_contexts(@current_user)
+                      end
+
+    if params[:context_code]
+      # rubric_contexts already filtered by context_code, check if context exists
+      rubric_context = if rubric_contexts.any?
+                         Context.find_by_asset_string(params[:context_code])
+                       else
+                         @context
+                       end
+      rubric_associations = rubric_context.shard.activate { Context.sorted_rubrics(rubric_context) }
+      data = rubric_associations.map do |ra|
+        json = ra.as_json(methods: [:context_name], include: { rubric: { include_root: false } })
+        # return shard-aware context codes
+        json["rubric_association"]["context_code"] = ra.context.asset_string
+        json["rubric_association"]["rubric"]["context_code"] = ra.rubric.context.asset_string
+        json
+      end
+      render json: StringifyIds.recursively_stringify_ids(data)
+    else
+      render json: rubric_contexts
     end
   end
 
