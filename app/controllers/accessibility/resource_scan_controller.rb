@@ -134,7 +134,7 @@ module Accessibility
       when "issue_count"
         scans_table = AccessibilityResourceScan.quoted_table_name
 
-        if Account.site_admin.feature_enabled?(:a11y_checker_close_issues)
+        if @context.try(:a11y_checker_close_issues?)
           issues_table = AccessibilityIssue.quoted_table_name
           closed_count_subquery = <<~SQL.squish
             (SELECT COUNT(*) FROM #{issues_table}
