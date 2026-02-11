@@ -1825,6 +1825,40 @@ module ExistenceInversions
       end
     RUBY
   end
+
+  # add_reference/remove_reference need the same top-level if_not_exists/if_exists
+  # swap as above, plus handling of the nested index: { if_not_exists: true } option
+  def invert_add_reference(args)
+    orig_args = args.map(&:dup)
+    result = super
+    if orig_args.last.is_a?(Hash)
+      if orig_args.last[:if_not_exists]
+        result[1] << {} unless result[1].last.is_a?(Hash)
+        result[1].last[:if_exists] = orig_args.last[:if_not_exists]
+        result[1].last.delete(:if_not_exists)
+      end
+      if result[1].last.is_a?(Hash) && result[1].last[:index].is_a?(Hash) && result[1].last[:index][:if_not_exists]
+        result[1].last[:index][:if_exists] = result[1].last[:index].delete(:if_not_exists)
+      end
+    end
+    result
+  end
+
+  def invert_remove_reference(args)
+    orig_args = args.map(&:dup)
+    result = super
+    if orig_args.last.is_a?(Hash)
+      if orig_args.last[:if_exists]
+        result[1] << {} unless result[1].last.is_a?(Hash)
+        result[1].last[:if_not_exists] = orig_args.last[:if_exists]
+        result[1].last.delete(:if_exists)
+      end
+      if result[1].last.is_a?(Hash) && result[1].last[:index].is_a?(Hash) && result[1].last[:index][:if_exists]
+        result[1].last[:index][:if_not_exists] = result[1].last[:index].delete(:if_exists)
+      end
+    end
+    result
+  end
 end
 
 ActiveRecord::Migration::CommandRecorder.prepend(ExistenceInversions)

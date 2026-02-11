@@ -734,15 +734,19 @@ describe ActiveRecord::Migration::CommandRecorder do
       r.add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
       r.add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
       r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true # rubocop:disable Migration/NonTransactional
+      r.add_reference :accounts, :other_account, foreign_key: { to_table: :accounts }, index: { algorithm: :concurrently, if_not_exists: true }, if_not_exists: true # rubocop:disable Migration/NonTransactional
 
       r.remove_column :courses, :id, :integer, limit: 8, if_exists: true
       r.remove_foreign_key :enrollments, :users, if_exists: true
       r.remove_index :accounts, :id, if_exists: true
+      r.remove_reference :accounts, :parent_account, foreign_key: { to_table: :accounts }, index: { if_exists: true }, if_exists: true
     end
     expect(recorder.commands).to eq([
+                                      [:add_reference, [:accounts, :parent_account, { foreign_key: { to_table: :accounts }, index: { if_not_exists: true }, if_not_exists: true }], nil],
                                       [:add_index, [:accounts, :id, { if_not_exists: true }]],
                                       [:add_foreign_key, [:enrollments, :users, { if_not_exists: true }]],
                                       [:add_column, [:courses, :id, :integer, { limit: 8, if_not_exists: true }], nil],
+                                      [:remove_reference, [:accounts, :other_account, { foreign_key: { to_table: :accounts }, index: { algorithm: :concurrently, if_exists: true }, if_exists: true }], nil],
                                       [:remove_index, [:accounts, :course_template_id, { algorithm: :concurrently, if_exists: true }], nil],
                                       [:remove_foreign_key, [:accounts, :courses, { column: :course_template_id, if_exists: true }], nil],
                                       [:remove_column, [:accounts, :course_template_id, :integer, { limit: 8, if_exists: true }], nil],
