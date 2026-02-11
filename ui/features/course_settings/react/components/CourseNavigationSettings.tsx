@@ -51,6 +51,7 @@ import {
   type NavigationTab,
 } from '../store/useTabListsStore'
 import {AddLinkModal} from '@canvas/nav-menu-links/react/components/AddLinkModal'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('course_navigation_settings')
 
@@ -60,7 +61,7 @@ declare const ENV: EnvCommon & {
 
 /**
  * Navigation settings in Course Settings, where the teacher can reorder the
- * items ("tabs") which display in the Course Nav.
+ * items ("tabs") which display in the Course Nav, and add custom `NavMenuLink`s.
  */
 export default function CourseNavigationSettings({
   onSubmit,
@@ -287,16 +288,13 @@ const NavItem = React.memo(
                   withBorder={false}
                   onKeyDown={e => {
                     if (e.key === ' ') {
-                      // make space work to open menu
+                      // make space work to open menu (otherwise it initiates a move)
                       e.stopPropagation()
                     }
                   }}
-                >
-                  <IconMoreSolid />
-                </IconButton>
+                  renderIcon={IconMoreSolid}
+                />
               }
-              placement="bottom"
-              shouldHideOnSelect={true}
             >
               <Menu.Item
                 data-pendo="navigation-menu-disable-enable"
@@ -326,6 +324,7 @@ const NavItem = React.memo(
                 <Menu.Item
                   data-pendo="navigation-menu-delete"
                   onClick={() => onDelete(tab.internalId)}
+                  disabled={tab.link_context_type === 'account'}
                   type="button"
                 >
                   <Flex>

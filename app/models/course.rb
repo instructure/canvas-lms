@@ -3748,6 +3748,7 @@ class Course < ActiveRecord::Base
         tab[:external] = default_tab[:external]
         tab[:icon] = default_tab[:icon]
         tab[:target] = default_tab[:target] if default_tab[:target]
+        tab[:link_context_type] = default_tab[:link_context_type] if default_tab[:link_context_type]
         default_tabs.delete_if { |t| t[:id] == tab[:id] }
         external_tabs.delete_if { |t| t[:id] == tab[:id] }
         tab
