@@ -356,9 +356,38 @@ module CanvasRails
 
     class ExceptionsApp
       def call(env)
+        if (error = custom_bad_request_error_message(env))
+          return [400, { "Content-Type" => "application/json" }, [{ error: }.to_json]]
+        end
+
         req = ActionDispatch::Request.new(env)
         res = ApplicationController.make_response!(req)
         ApplicationController.dispatch("rescue_action_dispatch_exception", req, res)
+      end
+
+      private
+
+      def custom_bad_request_error_message(env)
+        exception = env["action_dispatch.exception"]
+
+        # detect incorrect SIS batch raw posts that would otherwise result in a 500 error
+        if env.dig("action_dispatch.request.path_parameters", :controller)&.start_with?("sis_imports") &&
+           env.dig("action_dispatch.request.path_parameters", :action) == "create" &&
+           (
+             exception.is_a?(Encoding::CompatibilityError) ||
+             exception.is_a?(Encoding::InvalidByteSequenceError) ||
+             exception.message.include?("invalid byte sequence") ||
+             exception.message.include?("invalid %-encoding") ||
+             (
+               env["rack.request.form_vars"]&.start_with?("PK\x03\x04") &&
+               env["CONTENT_TYPE"] != "application/zip" &&
+               env["CONTENT_TYPE"] != "application/octet-stream"
+             )
+           )
+          return "Malformed SIS batch request. Ensure the Content-Type header is set appropriately (e.g. application/zip or text/csv) and CSV files are encoded in UTF-8."
+        end
+
+        nil
       end
     end
 
