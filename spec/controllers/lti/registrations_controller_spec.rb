@@ -1274,45 +1274,40 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    # TEMPORARY: Manual registrations now merge overlays into configuration
     context "sending an overlay" do
       let(:params) do
         super().tap do |p|
-          p[:overlay] = { "name" => "overlay name" }
+          p[:overlay] = { "title" => "overlay title" }
         end
       end
 
-      it "creates an overlay" do
-        expect { subject }.to change { Lti::Overlay.count }.by(1)
+      it "merges overlay into configuration (no overlay created)" do
+        expect { subject }.not_to change { Lti::Overlay.count }
         expect(subject).to be_successful
 
-        expect(registration.overlay_for(account).data.with_indifferent_access)
-          .to eq(params[:overlay].with_indifferent_access)
+        expect(tool_configuration.reload.title).to eq("overlay title")
       end
 
       context "but an overlay already exists" do
         before do
-          Lti::Overlay.create!(registration:, account:, data: { "name" => "old name" }, updated_by: admin)
+          Lti::Overlay.create!(registration:, account:, data: { "title" => "old title" }, updated_by: admin)
         end
 
-        it "updates the existing overlay" do
+        it "merges new overlay into configuration (clears existing overlay)" do
           expect { subject }.not_to change { Lti::Overlay.count }
 
           expect(subject).to be_successful
-          expect(registration.overlay_for(account).data.with_indifferent_access)
-            .to eq(params[:overlay].with_indifferent_access)
-        end
-
-        it "returns the overlay versions" do
-          expect(subject).to be_successful
-
-          expect(response_json[:overlay]).to include({ versions: an_instance_of(Array) })
+          expect(tool_configuration.reload.title).to eq("overlay title")
+          # The overlay data should be cleared after merging
+          expect(registration.overlay_for(account)&.data || {}).to be_empty
         end
       end
 
       context "an overlay exists in Site Admin but not for the current account" do
         let(:site_admin_user) { account_admin_user(account: Account.site_admin) }
         let(:site_admin_overlay) do
-          Lti::Overlay.create!(registration:, account: Account.site_admin, data: { "name" => "site admin overlay" }, updated_by: site_admin_user)
+          Lti::Overlay.create!(registration:, account: Account.site_admin, data: { "title" => "site admin overlay" }, updated_by: site_admin_user)
         end
 
         before do
@@ -1325,11 +1320,10 @@ RSpec.describe Lti::RegistrationsController do
           expect { subject }.not_to change { site_admin_overlay.reload }
         end
 
-        it "creates a new overlay for the current account" do
-          expect { subject }.to change { Lti::Overlay.count }.by(1)
+        it "merges overlay into configuration (no new overlay created)" do
+          expect { subject }.not_to change { Lti::Overlay.count }
 
-          expect(Lti::Overlay.find_by(registration:, account:).data.with_indifferent_access)
-            .to eq(params[:overlay].with_indifferent_access)
+          expect(tool_configuration.reload.title).to eq("overlay title")
         end
       end
     end
@@ -1359,6 +1353,7 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    # TEMPORARY: Manual registrations now merge overlays into configuration
     context "when updating only the overlay" do
       let(:params) do
         {
@@ -1368,12 +1363,14 @@ RSpec.describe Lti::RegistrationsController do
         }
       end
 
-      it "is successful" do
-        expect { subject }.not_to change { tool_configuration.reload.internal_lti_configuration }
+      it "is successful and merges overlay into configuration" do
         expect(subject).to be_successful
 
-        expect(registration.overlay_for(account).data.with_indifferent_access)
-          .to eq(params[:overlay].with_indifferent_access)
+        # The configuration SHOULD change (disabled placement applied)
+        reloaded_config = tool_configuration.reload.internal_lti_configuration.with_indifferent_access
+        course_nav = reloaded_config[:placements].find { |p| p[:placement] == "course_navigation" }
+        expect(course_nav).not_to be_nil
+        expect(course_nav[:enabled]).to be(false)
       end
 
       it "still tries to update all installed external tools" do
@@ -1443,6 +1440,8 @@ RSpec.describe Lti::RegistrationsController do
       it { is_expected.to have_http_status(:unprocessable_content) }
     end
 
+    # TEMPORARY: Manual registrations now merge overlays into configuration
+    # Note: nil values in overlays are compacted out, so they don't actually set fields to nil
     context "with overlay containing nil attribute" do
       let(:params) do
         super().tap do |p|
@@ -1450,9 +1449,11 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
 
-      it "is successful" do
+      it "is successful (nil values are compacted out, domain remains unchanged)" do
+        original_domain = tool_configuration.domain
         expect(subject).to be_successful
-        expect(registration.overlay_for(account).data[:domain]).to be_nil
+        # The domain should remain unchanged because nil values are compacted
+        expect(tool_configuration.reload.domain).to eq(original_domain)
       end
     end
 
@@ -2201,6 +2202,7 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    # TEMPORARY: Manual registrations now merge overlays into configuration
     context "with overlay" do
       let(:params) do
         super().tap do |p|
@@ -2208,19 +2210,11 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
 
-      it "creates a new LTI registration with overlay" do
-        expect { subject }.to change { Lti::Overlay.count }.by(1)
+      it "creates a new LTI registration with overlay merged into config" do
+        expect { subject }.not_to change { Lti::Overlay.count }
         expect(response).to be_successful
 
-        expect(Lti::Overlay.last.data).to eq({ "title" => "different title!" })
-        expect(Lti::Registration.last.lti_overlays.last).to eq(Lti::Overlay.last)
-      end
-
-      it "returns the created overlay in the response" do
-        expect(subject).to be_successful
-
-        expect(response_json[:overlay][:data].with_indifferent_access)
-          .to eq(params[:overlay].with_indifferent_access)
+        expect(Lti::ToolConfiguration.last.title).to eq("different title!")
       end
 
       it "removes scopes from the dev key that are disabled in the overlay" do
