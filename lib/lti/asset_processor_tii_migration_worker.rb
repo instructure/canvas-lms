@@ -71,13 +71,13 @@ module Lti
     end
 
     # This method is only called from rails console, manually
-    def rollback
-      Rails.logger.info("Rolling back Asset Processor migration in this account=#{@account.global_id}")
+    def rollback(recursive: false)
+      Rails.logger.info("#{"Recursive " if recursive}Rolling back Asset Processor migration in this account=#{@account.global_id}")
       actls_for_account.find_each do |actl|
         tool_proxy = actl.associated_tool_proxy
         next unless tool_proxy.present?
         next unless tool_proxy.migrated_to_context_external_tool.present?
-        next unless proxy_in_account?(tool_proxy, @account)
+        next unless proxy_in_account?(tool_proxy, @account) || recursive
 
         unless @migrated_tool_proxies.include?(tool_proxy)
           @migrated_tool_proxies << tool_proxy
@@ -102,9 +102,21 @@ module Lti
     end
 
     # This method is only called from rails console, manually
+    def rollback_recursive
+      rollback(recursive: true)
+    end
+
+    # This method is only called from rails console, manually
     def rollback_progress
       Progress.where(tag: "lti_tii_ap_migration", context: @account).update_all(tag: "lti_tii_ap_migration_rolled_back")
       Progress.where(tag: "lti_tii_ap_migration_coordinator", context: @account).update_all(tag: "lti_tii_ap_migration_coordinator_rolled_back")
+    end
+
+    # This method is only called from rails console, manually
+    def rollback_progress_recursive
+      ids = sub_account_ids
+      Progress.where(tag: "lti_tii_ap_migration", context_type: "Account", context_id: ids).update_all(tag: "lti_tii_ap_migration_rolled_back")
+      Progress.where(tag: "lti_tii_ap_migration_coordinator", context_type: "Account", context_id: ids).update_all(tag: "lti_tii_ap_migration_coordinator_rolled_back")
     end
 
     private
