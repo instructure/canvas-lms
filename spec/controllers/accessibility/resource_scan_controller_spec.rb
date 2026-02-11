@@ -101,6 +101,40 @@ describe Accessibility::ResourceScanController do
       end
     end
 
+    context "with announcements" do
+      before do
+        announcement = discussion_topic_model(context: course, type: "Announcement")
+        scan = AccessibilityResourceScan.new(
+          course:,
+          announcement_id: announcement.id,
+          workflow_state: "completed",
+          resource_name: "Announcement Resource",
+          resource_workflow_state: :published,
+          issue_count: 1,
+          resource_updated_at: 1.day.ago
+        )
+        scan.save!
+      end
+
+      it "includes announcement scans" do
+        get :index, params: { course_id: course.id }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        resource_types = json.pluck("resource_type")
+        expect(resource_types).to include("Announcement")
+      end
+
+      it "sorts announcements by resource_type" do
+        get :index, params: { course_id: course.id, sort: "resource_type", direction: "asc" }, format: :json
+        expect(response).to have_http_status(:ok)
+
+        json = response.parsed_body
+        announcement_scan = json.find { |scan| scan["resource_type"] == "Announcement" }
+        expect(announcement_scan).to be_present
+      end
+    end
+
     context "with syllabus" do
       before do
         accessibility_resource_scan_model(
@@ -475,6 +509,30 @@ describe Accessibility::ResourceScanController do
             json = response.parsed_body
             expect(json.length).to eq(1)
             expect(json.first["resource_type"]).to eq("DiscussionTopic")
+          end
+        end
+
+        context "with announcements" do
+          before do
+            announcement = discussion_topic_model(context: course, type: "Announcement")
+            scan = AccessibilityResourceScan.new(
+              course:,
+              announcement_id: announcement.id,
+              workflow_state: "completed",
+              resource_name: "Announcement",
+              resource_workflow_state: :published,
+              issue_count: 0
+            )
+            scan.save!
+          end
+
+          it "filters by announcement resource type" do
+            get :index, params: { course_id: course.id, filters: { artifactTypes: ["announcement"] } }, format: :json
+            expect(response).to have_http_status(:ok)
+
+            json = response.parsed_body
+            expect(json.length).to eq(1)
+            expect(json.first["resource_type"]).to eq("Announcement")
           end
         end
 
