@@ -10223,5 +10223,54 @@ describe Course do
         course.update!(syllabus_body: "<h1>Test Syllabus</h1>")
       end
     end
+
+    context "when additional_resources FF is on with EAP enabled (uses delegated method)" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        course.root_account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+      end
+
+      it "triggers accessibility scan for syllabus on update" do
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: course)
+
+        course.update!(syllabus_body: "<h1>Test Syllabus with EAP</h1>")
+      end
+    end
+
+    context "when additional_resources FF is on but neither EAP nor a11y_checker is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        Account.site_admin.disable_feature!(:a11y_checker_ga2_features)
+        course.root_account.disable_feature!(:a11y_checker)
+        # Don't set a11y_checker_eap since it requires a11y_checker to be enabled
+        Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+      end
+
+      it "does not trigger accessibility scan for syllabus on update" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        course.update!(syllabus_body: "<h1>Test Syllabus without proper flags</h1>")
+      end
+    end
+
+    context "when additional_resources FF is on with GA2 features enabled (alternative path)" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        # Don't disable a11y_checker at root account level since GA2 works at site admin level
+        # But enable a11y_checker_eap requires a11y_checker to be enabled, so enable it
+        course.root_account.enable_feature!(:a11y_checker)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+      end
+
+      it "triggers accessibility scan for syllabus on update" do
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: course)
+
+        course.update!(syllabus_body: "<h1>Test Syllabus with GA2</h1>")
+      end
+    end
   end
 end
