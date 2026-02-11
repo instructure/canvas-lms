@@ -122,6 +122,12 @@ module Api::V1::PlannerItem
         hash[:plannable] = plannable_json(title_date.merge(item.attributes), extra_fields: ASSESSMENT_REQUEST_FIELDS)
         submission = item.asset
         hash[:html_url] = student_peer_review_url(submission.context, submission.assignment, item, user)
+      elsif item.is_a?(PeerReviewSubAssignment)
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
+        hash[:plannable_date] = item[:cached_due_date] || item.due_at
+        title = I18n.t("Grade %{peer_review_title}", peer_review_title: item.title)
+        hash[:plannable] = plannable_json(item.attributes.merge(title:), extra_fields: GRADABLE_FIELDS)
+        hash[:html_url] = named_context_url(item.context, :speed_grader_context_gradebook_url, assignment_id: item.id)
       else
         hash[:plannable_date] = item[:cached_due_date] || item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)

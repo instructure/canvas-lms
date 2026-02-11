@@ -34,8 +34,13 @@ class ToDoListPresenter
       sub_assignments_needing_grading = assignments_needing(:grading, is_sub_assignment: true)
       if discussion_checkpoints_enabled_somewhere(sub_assignments_needing_grading)
         @needs_grading += sub_assignments_needing_grading
-        @needs_grading.sort_by! { |a| a.due_at || a.updated_at }
       end
+      # add peer review sub assignments that need grading
+      peer_review_sub_assignments_needing_grading = assignments_needing(:grading, is_peer_review_sub_assignment: true)
+      if peer_review_allocation_enabled_somewhere(peer_review_sub_assignments_needing_grading)
+        @needs_grading += peer_review_sub_assignments_needing_grading
+      end
+      @needs_grading.sort_by! { |a| a.due_at || a.updated_at }
       @needs_moderation = assignments_needing(:moderation)
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
       @needs_submitting += ungraded_quizzes_needing_submitting
@@ -74,6 +79,13 @@ class ToDoListPresenter
 
   def discussion_checkpoints_enabled_somewhere(assignment_presenter_array)
     assignment_presenter_array&.any? { |ap| ap.assignment.discussion_checkpoints_enabled? } || false
+  end
+
+  def peer_review_allocation_enabled_somewhere(assignment_presenter_array)
+    return false unless assignment_presenter_array&.any?
+
+    courses = assignment_presenter_array.map { |ap| ap.assignment.context }.uniq
+    courses.any? { |course| course.feature_enabled?(:peer_review_allocation_and_grading) }
   end
 
   def assignments_needing(type, opts = {})

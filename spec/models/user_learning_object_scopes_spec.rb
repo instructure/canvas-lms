@@ -881,6 +881,63 @@ describe UserLearningObjectScopes do
         expect(@teacher.assignments_needing_grading.length).to eq 2
       end
     end
+
+    context "with peer review sub assignments" do
+      before :once do
+        @course = course_with_teacher(active_all: true).course
+        @student1 = user_with_pseudonym(active_all: true)
+        @student2 = user_with_pseudonym(active_all: true)
+        @course.enroll_student(@student1, enrollment_state: "active")
+        @course.enroll_student(@student2, enrollment_state: "active")
+
+        @assignment = @course.assignments.create!(
+          title: "Peer Review Assignment",
+          submission_types: ["online_text_entry"],
+          peer_reviews: true,
+          peer_review_count: 2,
+          points_possible: 10
+        )
+
+        @peer_review_sub_assignment = @assignment.create_peer_review_sub_assignment!(
+          points_possible: 5,
+          due_at: 1.day.from_now
+        )
+      end
+
+      it "does not include peer review sub assignments when feature flag is disabled" do
+        @course.account.disable_feature!(:peer_review_allocation_and_grading)
+        expect(@teacher.assignments_needing_grading(is_peer_review_sub_assignment: true)).to be_empty
+      end
+
+      it "includes peer review sub assignments when feature flag is enabled and submissions need grading" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+
+        @peer_review_sub_assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "peer review 1")
+        @peer_review_sub_assignment.submit_homework(@student2, submission_type: "online_text_entry", body: "peer review 2")
+
+        result = @teacher.assignments_needing_grading(is_peer_review_sub_assignment: true)
+        expect(result).to include(@peer_review_sub_assignment)
+      end
+
+      it "does not include peer review sub assignments without submissions" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+
+        result = @teacher.assignments_needing_grading(is_peer_review_sub_assignment: true)
+        expect(result).not_to include(@peer_review_sub_assignment)
+      end
+
+      it "does not include peer review sub assignments when all are graded" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+
+        @peer_review_sub_assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "peer review 1")
+        @peer_review_sub_assignment.submit_homework(@student2, submission_type: "online_text_entry", body: "peer review 2")
+        @peer_review_sub_assignment.grade_student(@student1, grade: 5, grader: @teacher)
+        @peer_review_sub_assignment.grade_student(@student2, grade: 5, grader: @teacher)
+
+        result = @teacher.assignments_needing_grading(is_peer_review_sub_assignment: true)
+        expect(result).not_to include(@peer_review_sub_assignment)
+      end
+    end
   end
 
   describe "#submissions_needing_grading_count" do
