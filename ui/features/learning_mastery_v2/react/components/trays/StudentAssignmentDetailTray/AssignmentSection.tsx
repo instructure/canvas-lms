@@ -67,9 +67,16 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
         onNext={onNext}
         data-testid="assignment-navigator"
       >
-        <Link href={currentAssignment.htmlUrl} isWithinText={false} target="_blank">
-          <TruncateWithTooltip>{currentAssignment.name}</TruncateWithTooltip>
-        </Link>
+        <View as="div" display="inline-block" maxWidth="100%">
+          <Link
+            href={currentAssignment.htmlUrl}
+            isWithinText={false}
+            target="_blank"
+            display="block"
+          >
+            <TruncateWithTooltip>{currentAssignment.name}</TruncateWithTooltip>
+          </Link>
+        </View>
       </Navigator>
 
       <View as="div" textAlign="center">
