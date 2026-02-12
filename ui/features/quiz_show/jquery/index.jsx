@@ -98,16 +98,11 @@ function renderRubric() {
         canUseForGrading={false}
         courseId={ENV.COURSE_ID}
         currentUserId={ENV.current_user_id}
-        rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
+        rubricSelfAssessmentFFEnabled={false}
         aiRubricsEnabled={ENV.ai_rubrics_enabled}
       />,
     )
   }
-
-  createOrUpdateRoot(
-    'enhanced-rubric-self-assessment-edit',
-    <RubricSelfAssessmentSettingsWrapper assignmentId={ENV.ASSIGNMENT_ID} />,
-  )
 }
 
 $(document).ready(function () {

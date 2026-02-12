@@ -1478,9 +1478,9 @@ describe DiscussionTopicsController do
               @course.enable_feature! :assignments_2_student
             end
 
-            it "sets rubric_self_assessment_ff_enabled to true" do
+            it "sets rubric_self_assessment_ff_enabled to false" do
               get "show", params: { course_id: @course.id, id: @topic.id }
-              expect(assigns[:js_env][:rubric_self_assessment_ff_enabled]).to be(true)
+              expect(assigns[:js_env][:rubric_self_assessment_ff_enabled]).to be(false)
             end
           end
         end
