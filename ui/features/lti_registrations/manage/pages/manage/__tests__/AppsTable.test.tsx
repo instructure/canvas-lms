@@ -19,13 +19,15 @@
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {type MockedFunction} from 'vitest'
 import {AppsTableInner, type AppsTableInnerProps} from '../AppsTable'
-import {mockPageOfRegistrations, mockRegistration, mswHandlers} from './helpers'
+import {mockPageOfRegistrations, mockRegistration, mockUser, mswHandlers} from './helpers'
 import {BrowserRouter} from 'react-router-dom'
 import {ZAccountId} from '../../../model/AccountId'
 import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {ZLtiRegistrationAccountBindingId} from '../../../model/LtiRegistrationAccountBinding'
+import {ZLtiRegistrationId} from '../../../model/LtiRegistrationId'
 
 vi.mock('@canvas/alerts/react/FlashAlert')
 
@@ -269,6 +271,108 @@ describe('AppsTableInner', () => {
         exact: false,
       })
       expect(kebabMenuIcons).toHaveLength(0)
+    })
+  })
+
+  describe('On/Off column', () => {
+    describe('with lti_deactivate_registrations enabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES.lti_deactivate_registrations = true
+      })
+
+      it('displays On when workflow_state is active', () => {
+        renderTable({
+          tableProps: {
+            apps: {
+              data: [mockRegistration('ActiveApp', 1, {}, {workflow_state: 'active'})],
+              total: 1,
+            },
+          },
+        })
+        expect(screen.getByText('On')).toBeInTheDocument()
+        expect(screen.queryByText('Off')).not.toBeInTheDocument()
+      })
+
+      it('displays Off when workflow_state is inactive', () => {
+        renderTable({
+          tableProps: {
+            apps: {
+              data: [mockRegistration('InactiveApp', 1, {}, {workflow_state: 'inactive'})],
+              total: 1,
+            },
+          },
+        })
+        expect(screen.getByText('Off')).toBeInTheDocument()
+        expect(screen.queryByText('On')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('with lti_deactivate_registrations disabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES.lti_deactivate_registrations = false
+      })
+
+      it('displays On when account_binding workflow_state is on', () => {
+        renderTable({
+          tableProps: {
+            apps: {
+              data: [
+                mockRegistration(
+                  'OnApp',
+                  1,
+                  {},
+                  {
+                    account_binding: {
+                      id: ZLtiRegistrationAccountBindingId.parse('1'),
+                      registration_id: ZLtiRegistrationId.parse('1'),
+                      account_id: ZAccountId.parse('1'),
+                      workflow_state: 'on',
+                      created_at: new Date(),
+                      updated_at: new Date(),
+                      created_by: mockUser({id: '1'}),
+                      updated_by: mockUser({id: '1'}),
+                    },
+                  },
+                ),
+              ],
+              total: 1,
+            },
+          },
+        })
+        expect(screen.getByText('On')).toBeInTheDocument()
+        expect(screen.queryByText('Off')).not.toBeInTheDocument()
+      })
+
+      it('displays Off when account_binding workflow_state is off', () => {
+        renderTable({
+          tableProps: {
+            apps: {
+              data: [
+                mockRegistration(
+                  'OffApp',
+                  1,
+                  {},
+                  {
+                    account_binding: {
+                      id: ZLtiRegistrationAccountBindingId.parse('1'),
+                      registration_id: ZLtiRegistrationId.parse('1'),
+                      account_id: ZAccountId.parse('1'),
+                      workflow_state: 'off',
+                      created_at: new Date(),
+                      updated_at: new Date(),
+                      created_by: mockUser({id: '1'}),
+                      updated_by: mockUser({id: '1'}),
+                    },
+                  },
+                ),
+              ],
+              total: 1,
+            },
+          },
+        })
+        expect(screen.getByText('Off')).toBeInTheDocument()
+        expect(screen.queryByText('On')).not.toBeInTheDocument()
+      })
     })
   })
 })

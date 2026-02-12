@@ -175,6 +175,19 @@ import_numeric_lti_custom_params_as_string:
       state: allowed_on
     ci:
       state: allowed_on
+lti_deactivate_registrations:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Registration Deactivation
+  description: >-
+    When enabled, allows deactivating and reactivating
+    LTI registrations from the Apps page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_target_link_uri_for_assignment_edit_view:
   state: hidden
   shadow: true
