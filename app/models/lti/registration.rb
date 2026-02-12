@@ -251,12 +251,6 @@ class Lti::Registration < ActiveRecord::Base
     return internal_config unless include_overlay
 
     overlay = overlay_for(context)&.data
-    # TODO: Remove this clause once we have backfilled all Lti::IMS::Registration overlays into the
-    # actual Lti::Overlay table.
-    if ims_registration.present? && overlay.blank?
-      overlay = Schemas::Lti::IMS::RegistrationOverlay
-                .to_lti_overlay(ims_registration.registration_overlay)
-    end
 
     # IMS registrations should not allow adding new placements via overlay
     # Only manual/legacy registrations can have additional placements added
@@ -313,17 +307,16 @@ class Lti::Registration < ActiveRecord::Base
 
   private
 
-  # Returns which placements are disabled at the Lti::IMS::Registration or Lti::ToolConfiguration level.
-  # Note that this is legacy behavior, as moving forward, the overlay will be the source of truth. This method
-  # is only used for backwards compatibility.
+  # Returns which placements are disabled at the Lti::ToolConfiguration level.
+  # Note: For IMS registrations, disabled placements are now handled via Lti::Overlay
+  # and applied in internal_lti_configuration, so this method returns an empty array.
+  # This method is only used for backwards compatibility with manual configurations.
   #
   # @return [Array<String>] An array of placement names that are disabled.
   def registration_level_disabled_placements
     @registration_level_disabled_placements ||=
       if ims_registration.present?
-        ims_registration&.registration_overlay
-                        &.with_indifferent_access
-                        &.dig(:disabledPlacements) || []
+        []
       else
         manual_configuration&.disabled_placements || []
       end
