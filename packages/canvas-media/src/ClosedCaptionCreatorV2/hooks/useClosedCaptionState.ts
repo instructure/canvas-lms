@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import formatMessage from '../../format-message'
 import type {CaptionCreationMode, LanguageOption, Subtitle} from '../types'
 
@@ -52,6 +52,11 @@ export function useClosedCaptionState({
   const [subtitles, setSubtitles] = useState<Subtitle[]>(initialSubtitles)
   const [creationMode, setCreationMode] = useState<CaptionCreationMode | null>(null)
   const [announcement, setAnnouncement] = useState<string | null>(null)
+
+  // Sync internal state when parent passes updated subtitles
+  useEffect(() => {
+    setSubtitles(initialSubtitles)
+  }, [initialSubtitles])
 
   const handleNewButtonClick = useCallback(() => {
     setAnnouncement(null)

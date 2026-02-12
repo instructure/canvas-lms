@@ -21,14 +21,16 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Tray} from '@instructure/ui-tray'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {ClosedCaptionPanel} from '@instructure/canvas-media'
+import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {StoreProvider} from '../../shared/StoreContext'
 import Bridge from '../../../../bridge'
+import RceApiSource, {originFromHost} from '../../../../rcs/api'
 import formatMessage from '../../../../format-message'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {Heading} from '@instructure/ui-heading'
+import RCEGlobals from '../../../../rce/RCEGlobals'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
@@ -43,12 +45,19 @@ export default function AudioOptionsTray({
   requestSubtitlesFromIframe,
 }) {
   const [subtitles, setSubtitles] = useState(audioOptions.tracks || [])
+  const api = new RceApiSource(trayProps)
 
   useEffect(() => {
     if (subtitles.length === 0) requestSubtitlesFromIframe(setSubtitles)
   }, [])
 
-  const handleSave = (e, contentProps) => {
+  const isAsrCaptioningImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements
+
+  const handleUpdateSubtitles = newSubtitles => {
+    setSubtitles(newSubtitles)
+  }
+
+  const handleSave = (_e, contentProps) => {
     onSave({
       media_object_id: audioOptions.id,
       subtitles,
@@ -73,6 +82,7 @@ export default function AudioOptionsTray({
           shouldCloseOnDocumentClick={true}
           shouldContainFocus={true}
           shouldReturnFocus={true}
+          size={isAsrCaptioningImprovements ? 'regular' : 'small'}
         >
           <Flex direction="column" height={getTrayHeight()}>
             <Flex.Item as="header" padding="medium">
@@ -96,16 +106,47 @@ export default function AudioOptionsTray({
                   <Flex direction="column">
                     <Flex.Item padding="small">
                       <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
-                        <ClosedCaptionPanel
-                          subtitles={subtitles.map(st => ({
-                            locale: st.locale,
-                            file: {name: st.language || st.locale},
-                          }))}
-                          uploadMediaTranslations={Bridge.uploadMediaTranslations}
-                          languages={Bridge.languages}
-                          updateSubtitles={newSubtitles => setSubtitles(newSubtitles)}
-                          liveRegion={getLiveRegion}
-                        />
+                        {!isAsrCaptioningImprovements ? (
+                          <ClosedCaptionPanel
+                            subtitles={subtitles.map(st => ({
+                              locale: st.locale,
+                              file: {name: st.language || st.locale},
+                            }))}
+                            uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                            languages={Bridge.languages}
+                            updateSubtitles={newSubtitles => setSubtitles(newSubtitles)}
+                            liveRegion={getLiveRegion}
+                          />
+                        ) : (
+                          <ClosedCaptionPanelV2
+                            subtitles={subtitles.map(st => ({
+                              locale: st.locale,
+                              file: {name: st.language || st.locale},
+                            }))}
+                            languages={Bridge.languages}
+                            userLocale={Bridge.userLocale}
+                            onUpdateSubtitles={handleUpdateSubtitles}
+                            liveRegion={getLiveRegion}
+                            mountNode={instuiPopupMountNodeFn}
+                            uploadConfig={{
+                              mediaObjectId: audioOptions.id,
+                              attachmentId: audioOptions.attachmentId,
+                              origin: originFromHost(api.host),
+                              headers: api.jwt ? {Authorization: `Bearer ${api.jwt}`} : undefined,
+                              maxBytes: CONSTANTS.CC_FILE_MAX_BYTES,
+                            }}
+                            onCaptionUploaded={subtitle => {
+                              // Update local state so "Done" button knows about it
+                              setSubtitles(prev => [
+                                ...prev.filter(s => s.locale !== subtitle.locale),
+                                subtitle,
+                              ])
+                            }}
+                            onCaptionDeleted={locale => {
+                              setSubtitles(prev => prev.filter(s => s.locale !== locale))
+                            }}
+                          />
+                        )}
                       </FormFieldGroup>
                     </Flex.Item>
                   </Flex>

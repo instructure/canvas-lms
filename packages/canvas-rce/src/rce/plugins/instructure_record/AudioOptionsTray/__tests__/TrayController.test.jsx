@@ -17,14 +17,16 @@
  */
 
 import ReactDOM from 'react-dom'
+import {act} from 'react-dom/test-utils'
 
-import {waitFor} from '@testing-library/dom'
+import {waitFor, screen} from '@testing-library/dom'
 import TrayController, {CONTAINER_ID} from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import bridge from '../../../../../bridge'
+import RCEGlobals from '../../../../RCEGlobals'
 
 import {findMediaPlayerIframe} from '../../../shared/iframeUtils'
 
@@ -172,6 +174,8 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
       expect(updateMediaObject).toHaveBeenCalledWith({
         attachment_id: '123',
         media_object_id: undefined,
+        skipCaptionUpdate: false,
+        subtitles: undefined,
       })
     })
   })
@@ -231,6 +235,92 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
       msgEvent.data = {subject: 'wrong_response', payload: [{locale: 'en'}]}
       window.dispatchEvent(msgEvent)
       expect(eventMock).toHaveBeenCalledTimes(0)
+    })
+  })
+
+  describe('caption update behavior with feature flag', () => {
+    let getFeaturesSpy
+
+    beforeEach(() => {
+      // container?.contentWindow.location.reload() is not defined in jsdom
+      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
+      delete iframe.contentWindow.location
+      iframe.contentWindow.location = {reload: jest.fn()}
+    })
+
+    afterEach(() => {
+      // Clean up feature flag mock if it was created
+      if (getFeaturesSpy) {
+        getFeaturesSpy.mockRestore()
+        getFeaturesSpy = null
+      }
+    })
+
+    it('calls updateMediaObject with skipCaptionUpdate=false when feature flag is OFF', () => {
+      // Mock feature flag OFF (old flow)
+      getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: false,
+      })
+
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyAudioOptions({
+        media_object_id: 'audio_id',
+        attachment_id: '123',
+        subtitles: [{locale: 'en'}],
+        updateMediaObject,
+      })
+
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        media_object_id: 'audio_id',
+        attachment_id: '123',
+        subtitles: [{locale: 'en'}],
+        skipCaptionUpdate: false, // Old flow - updates captions via API
+      })
+    })
+
+    it('calls updateMediaObject with skipCaptionUpdate=true when feature flag is ON', () => {
+      // Mock feature flag ON (new flow)
+      getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyAudioOptions({
+        media_object_id: 'audio_id',
+        attachment_id: '123',
+        subtitles: [{locale: 'en'}],
+        updateMediaObject,
+      })
+
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        media_object_id: 'audio_id',
+        attachment_id: '123',
+        subtitles: [{locale: 'en'}],
+        skipCaptionUpdate: true, // New flow - captions managed via upload/delete callbacks
+      })
+    })
+
+    it('defaults to skipCaptionUpdate=false when feature flag is not defined', () => {
+      // Mock feature flag undefined
+      getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue(undefined)
+
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyAudioOptions({
+        media_object_id: 'audio_id',
+        attachment_id: '123',
+        subtitles: [{locale: 'en'}],
+        updateMediaObject,
+      })
+
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        media_object_id: 'audio_id',
+        attachment_id: '123',
+        subtitles: [{locale: 'en'}],
+        skipCaptionUpdate: false, // Defaults to old flow
+      })
     })
   })
 })

@@ -344,4 +344,32 @@ describe('<ClosedCaptionPanelV2 />', () => {
       expect(screen.getByText('Failed')).toBeInTheDocument()
     })
   })
+
+  it('updates displayed subtitles when prop changes after mount', async () => {
+    const onUpdateSubtitles = vi.fn()
+
+    // Start with empty subtitles
+    const {rerender, props} = renderComponent({
+      subtitles: [],
+      onUpdateSubtitles,
+    })
+
+    // Should show "Add New" button (no subtitles yet)
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.queryByText('English')).not.toBeInTheDocument()
+
+    // Simulate async subtitle loading (like iframe response)
+    const newSubtitles: Subtitle[] = [
+      {locale: 'en', file: {name: 'English'}},
+      {locale: 'es', file: {name: 'Spanish'}},
+    ]
+
+    rerender(<ClosedCaptionPanelV2 {...props} subtitles={newSubtitles} />)
+
+    // Should now show both captions
+    await waitFor(() => {
+      expect(screen.getByText('English')).toBeInTheDocument()
+      expect(screen.getByText('Spanish')).toBeInTheDocument()
+    })
+  })
 })
