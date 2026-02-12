@@ -20434,6 +20434,7 @@ tr:
   no_integrations_available_6729d0ca: "Kullanılabilir entegrasyon yok"
   no_issuer_configured_for_openid_connect_provider_8b78f00e: "OpenID Connect sağlayıcısı için yapılandırılmış bir issuer yok"
   no_issues_fce85bba: "İmzalı kimlik doğrulama verisi bulunamadı"
+  no_items_20cde5bf: "Öğe bulunamadı."
   no_items_found_870b2d0d: "Hiçbir öğe bulunamadı"
   no_items_in_this_module_917bc681: "İmzalı jwk bulunamadı"
   no_job_selected_d6c5e6f4: "Bu sınıf için seçilebilir görüntülü görüşme aracı yok"
