@@ -52,6 +52,7 @@ module CanvasCareer
                                                              learner_assist: true,
                                                            }
                                                          })
+          expect(result["experience_mode"]).to eq("career")
         end
       end
 
@@ -71,6 +72,7 @@ module CanvasCareer
                                                              learner_assist: false,
                                                            }
                                                          })
+          expect(result["experience_mode"]).to eq("academic")
         end
       end
     end
