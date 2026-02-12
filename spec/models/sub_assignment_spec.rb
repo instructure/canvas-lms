@@ -470,4 +470,38 @@ describe SubAssignment do
       expect(@reply_to_topic.title_with_required_replies).to eq @reply_to_topic.title.to_s
     end
   end
+
+  describe ".not_ignored_by" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @course.account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "excludes sub assignments that are ignored with correct asset_type" do
+      Ignore.create!(
+        user: @teacher,
+        asset: @reply_to_topic,
+        purpose: "viewing"
+      )
+
+      result = SubAssignment.where(id: [@reply_to_topic.id, @reply_to_entry.id]).not_ignored_by(@teacher, "viewing")
+      expect(result).to include(@reply_to_entry)
+      expect(result).not_to include(@reply_to_topic)
+    end
+
+    it "uses correct asset_type for SubAssignment class (STI uses base class)" do
+      # STI models use the base class "Assignment" for asset_type
+      ignore = Ignore.create!(
+        user: @teacher,
+        asset: @reply_to_topic,
+        purpose: "viewing"
+      )
+
+      expect(ignore.asset_type).to eq("Assignment")
+
+      result = SubAssignment.where(id: [@reply_to_topic.id, @reply_to_entry.id]).not_ignored_by(@teacher, "viewing")
+      expect(result).not_to include(@reply_to_topic)
+    end
+  end
 end
