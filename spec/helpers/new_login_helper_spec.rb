@@ -96,10 +96,28 @@ describe NewLoginHelper do
     )
     expect(data[:help_link]).to include("Get Help")
     expect(data[:require_aup]).to eq("true")
+    expect(data[:discovery_enabled]).to be_nil
     terms = TermsOfService.ensure_terms_for_account(@domain_root_account)
     expect(terms.passive).to be(false)
     expect(terms.terms_type).to eq("default")
     expect(data).to be_a(Hash)
+  end
+
+  it "returns discovery_enabled when discovery page is active" do
+    @domain_root_account.discovery_page_active = true
+    data = new_login_data_attributes
+    expect(data[:discovery_enabled]).to eq("true")
+  end
+
+  it "returns nil for discovery_enabled when discovery page is not active" do
+    data = new_login_data_attributes
+    expect(data[:discovery_enabled]).to be_nil
+  end
+
+  it "returns discovery_enabled when auth_discovery_url is present" do
+    @domain_root_account.auth_discovery_url = "https://example.com/discovery"
+    data = new_login_data_attributes
+    expect(data[:discovery_enabled]).to eq("true")
   end
 
   describe "invalid_login_faq_url" do

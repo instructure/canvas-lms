@@ -32,6 +32,7 @@ import {
   ForgotPasswordLink,
   LoginTroubleLink,
   MessageAlert,
+  OtherWaysToLogin,
   RememberMeCheckbox,
   SSOButtons,
 } from '../shared'
@@ -46,6 +47,7 @@ const SignIn = () => {
     useNewLogin()
   const {
     authProviders,
+    discoveryEnabled,
     invalidLoginFaqUrl,
     isPreviewMode,
     loginHandleName,
@@ -251,9 +253,14 @@ const SignIn = () => {
       </form>
 
       {authProviders && authProviders.length > 0 && (
-        <Flex direction="column" gap="large">
-          <SSOButtons />
-        </Flex>
+        <SSOButtons>
+          {discoveryEnabled && (
+            <Flex.Item align="center" overflowX="visible" overflowY="visible">
+              {/* /login hard-redirects server-side to the correct branded login */}
+              <OtherWaysToLogin url="/login" />
+            </Flex.Item>
+          )}
+        </SSOButtons>
       )}
     </Flex>
   )
