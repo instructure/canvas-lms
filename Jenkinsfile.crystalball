@@ -180,10 +180,6 @@ node(nodeLabel()) {
                 def stageName = 'RSpecQ Set 00'
                 def stageStartTime = System.currentTimeMillis()
                 try {
-                  stage('00 Cleanup') {
-                    pipelineHelpers.cleanupWorkspace()
-                  }
-
                   stage('00 Setup') {
                     sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
                   }
