@@ -32,12 +32,16 @@ export interface DifferentiationTagModalManagerProps {
   mode: 'create' | 'edit'
   differentiationTagCategoryId?: number
   onCreationSuccess?: (newCategoryID: number) => void
+  courseId?: number
 }
 
 function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerProps) {
-  const {isOpen, onClose, mode, differentiationTagCategoryId, onCreationSuccess} = props
+  const {isOpen, onClose, mode, differentiationTagCategoryId, onCreationSuccess, courseId} = props
 
-  const courseID = Number(ENV?.course?.id)
+  // People Page gets it from the course object,
+  // Improved LMGB passes the courseId prop to the modal directly,
+  // so we need to check both places to get the course ID
+  const courseID = Number(courseId ?? ENV?.course?.id)
   const hasValidCourseID = typeof courseID === 'number' && !isNaN(courseID)
 
   const {data} = useDifferentiationTagCategoriesIndex(courseID, {

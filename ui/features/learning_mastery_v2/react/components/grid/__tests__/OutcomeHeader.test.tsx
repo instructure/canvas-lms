@@ -25,6 +25,7 @@ import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 describe('OutcomeHeader', () => {
@@ -79,14 +80,26 @@ describe('OutcomeHeader', () => {
     }
   }
 
+  const renderWithQueryClient = (component: React.ReactElement) => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+
+    return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>)
+  }
+
   it('renders the outcome title', () => {
-    render(<OutcomeHeader {...defaultProps()} />)
+    renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
     expect(screen.getAllByText('outcome 1')[0]).toBeInTheDocument()
   })
 
   it('renders a menu with various sorting and display options', async () => {
     const user = userEvent.setup()
-    render(<OutcomeHeader {...defaultProps()} />)
+    renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
     await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
     expect(screen.getByText('Sort')).toBeInTheDocument()
     expect(screen.getByText('Ascending scores')).toBeInTheDocument()
@@ -99,7 +112,7 @@ describe('OutcomeHeader', () => {
 
   it('renders the outcome description modal when option is selected', async () => {
     const user = userEvent.setup()
-    render(<OutcomeHeader {...defaultProps()} />)
+    renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
     await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
     await user.click(screen.getByText('Outcome Info'))
     expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
@@ -107,7 +120,7 @@ describe('OutcomeHeader', () => {
 
   it('renders the outcome distribution popover when option is selected', async () => {
     const user = userEvent.setup()
-    render(<OutcomeHeader {...defaultProps()} />)
+    renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
     await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
     await user.click(screen.getByText('Show Outcome Distribution'))
     expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
