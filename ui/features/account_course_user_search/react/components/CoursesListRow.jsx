@@ -39,6 +39,7 @@ import {uniqBy} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import UserLink from './UserLink'
 import AddPeopleApp from '@canvas/add-people'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('account_course_user_search')
 
@@ -118,23 +119,27 @@ export default class CoursesListRow extends React.Component {
   }
 
   openAddUsersToCourseDialog = () => {
-    this.getSections().then(sections => {
-      this.addPeopleApp =
-        this.addPeopleApp ||
-        new AddPeopleApp(document.createElement('div'), {
-          courseId: this.props.id,
-          courseName: this.props.name,
-          defaultInstitutionName: ENV.ROOT_ACCOUNT_NAME || '',
-          roles: this.getAvailableRoles(),
-          sections,
-          onClose: () => {
-            this.handleNewEnrollments(this.addPeopleApp.usersHaveBeenEnrolled())
-          },
-          inviteUsersURL: `/courses/${this.props.id}/invite_users`,
-          canReadSIS: this.props.showSISIds,
-        })
-      this.addPeopleApp.open()
-    })
+    this.getSections()
+      .then(sections => {
+        this.addPeopleApp =
+          this.addPeopleApp ||
+          new AddPeopleApp(document.createElement('div'), {
+            courseId: this.props.id,
+            courseName: this.props.name,
+            defaultInstitutionName: ENV.ROOT_ACCOUNT_NAME || '',
+            roles: this.getAvailableRoles(),
+            sections,
+            onClose: () => {
+              this.handleNewEnrollments(this.addPeopleApp.usersHaveBeenEnrolled())
+            },
+            inviteUsersURL: `/courses/${this.props.id}/invite_users`,
+            canReadSIS: this.props.showSISIds,
+          })
+        this.addPeopleApp.open()
+      })
+      .catch(() => {
+        showFlashError(I18n.t('Failed to open the Add People dialog'))()
+      })
   }
 
   showMoreTeachers = () => {
@@ -152,6 +157,7 @@ export default class CoursesListRow extends React.Component {
       return (
         <Tooltip renderTip={addUsersTip}>
           <IconButton
+            data-testid="add-enrollments-tooltip"
             withBorder={false}
             withBackground={false}
             size="small"
