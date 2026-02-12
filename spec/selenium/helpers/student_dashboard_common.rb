@@ -381,6 +381,10 @@ module StudentDashboardCommon
       widget_id = "recent_grades-widget"
       widget_type = "recent_grades"
       title = "Recent grades & feedback"
+    when :todo_list
+      widget_id = "todo-list-widget"
+      widget_type = "todo_list"
+      title = "To-do list"
     end
 
     config = user.get_preference(:widget_dashboard_config) || {}

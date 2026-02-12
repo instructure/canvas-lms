@@ -327,6 +327,31 @@ module WidgetDashboardPage
     "[data-testid='recent-grades-list']"
   end
 
+  # Todo widget selectors
+  def todo_filter_select_selector
+    "[data-testid='todo-filter-select']"
+  end
+
+  def todo_item_selector(item_id)
+    "[data-testid='todo-item-#{item_id}']"
+  end
+
+  def todo_item_prefix_selector
+    "[data-testid^='todo-item-'][role='group']"
+  end
+
+  def todo_item_title_selector(item_id)
+    "[data-testid='todo-link-#{item_id}']"
+  end
+
+  def todo_checkbox_selector(item_id)
+    "[data-testid='todo-checkbox-#{item_id}']"
+  end
+
+  def todo_item_course_link_selector(item_id)
+    "[data-testid='todo-item-course-link-#{item_id}']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -639,6 +664,31 @@ module WidgetDashboardPage
     f(recent_grades_empty_message_selector)
   end
 
+  # Todo widget elements
+  def todo_filter_select
+    f(todo_filter_select_selector)
+  end
+
+  def all_todo_items
+    ff(todo_item_prefix_selector)
+  end
+
+  def todo_item(item_id)
+    f(todo_item_selector(item_id))
+  end
+
+  def todo_item_title(item_id)
+    f(todo_item_title_selector(item_id))
+  end
+
+  def todo_checkbox(item_id)
+    f(todo_checkbox_selector(item_id))
+  end
+
+  def todo_item_course_link(item_id)
+    f(todo_item_course_link_selector(item_id))
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -761,5 +811,12 @@ module WidgetDashboardPage
   def expand_feedback_on_recent_grade(submission_id)
     expect(recent_grade_expand_button(submission_id)).to be_displayed
     recent_grade_expand_button(submission_id).click
+  end
+
+  def filter_todos_by(filter_value)
+    expect(todo_filter_select).to be_displayed
+    todo_filter_select.click
+    click_INSTUI_Select_option(todo_filter_select_selector, filter_value)
+    wait_for_ajaximations
   end
 end
