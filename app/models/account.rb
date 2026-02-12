@@ -300,6 +300,8 @@ class Account < ActiveRecord::Base
   add_setting :sub_account_includes, boolean: true, default: false
   add_setting :restrict_quantitative_data, boolean: true, default: false, inheritable: true
 
+  add_setting :turnitin_asset_processor_client_id, root_only: true
+
   # Microsoft Sync Account Settings
   add_setting :microsoft_sync_enabled, root_only: true, boolean: true, default: false
   add_setting :microsoft_sync_tenant, root_only: true
@@ -1119,6 +1121,11 @@ class Account < ActiveRecord::Base
     return nil unless turnitin_salt && turnitin_crypted_secret
 
     Canvas::Security.decrypt_password(turnitin_crypted_secret, turnitin_salt, "instructure_turnitin_secret_shared")
+  end
+
+  def turnitin_asset_processor_client_id
+    settings[:turnitin_asset_processor_client_id].presence ||
+      Setting.get("turnitin_asset_processor_client_id", "")
   end
 
   def self.account_chain(starting_account_id)

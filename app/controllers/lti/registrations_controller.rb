@@ -1133,7 +1133,7 @@ class Lti::RegistrationsController < ApplicationController
     end
 
     if @account.root_account.feature_enabled?(:lti_asset_processor_tii_migration)
-      turnitin_devkey_id = Setting.get("turnitin_asset_processor_client_id", "")
+      turnitin_devkey_id = @account.root_account.turnitin_asset_processor_client_id
       if turnitin_devkey_id.present?
         js_env({
                  turnitinAPClientId: turnitin_devkey_id
