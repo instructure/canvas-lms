@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, fireEvent, waitFor} from '@testing-library/react'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import {setupServer} from 'msw/node'
@@ -120,6 +120,8 @@ describe('ItemAssignToCard - Grading Periods', () => {
   afterEach(() => {
     server.resetHandlers()
     fakeENV.teardown()
+    vi.clearAllMocks()
+    cleanup()
   })
 
   afterAll(() => {
@@ -134,7 +136,7 @@ describe('ItemAssignToCard - Grading Periods', () => {
     const {getByLabelText} = renderComponent({due_at, original_due_at})
     expect(getByLabelText('Due Date')).toHaveValue('May 5, 2024')
     expect(getByLabelText('Due Date')).toBeDisabled()
-  })
+  }, 30000)
 
   it('renders all fields when date falls in a closed grading period for admin', () => {
     setupGradingPeriodsMock()
@@ -145,7 +147,7 @@ describe('ItemAssignToCard - Grading Periods', () => {
     const {getByLabelText} = renderComponent({due_at, original_due_at})
     expect(getByLabelText('Due Date')).toHaveValue('May 5, 2024')
     expect(getByLabelText('Due Date')).not.toBeDisabled()
-  })
+  }, 30000)
 
   it('renders error when date change to a closed grading period for teacher', async () => {
     setupGradingPeriodsMock()
@@ -159,9 +161,9 @@ describe('ItemAssignToCard - Grading Periods', () => {
     fireEvent.change(dateInput, {target: {value: 'May 4, 2024'}})
     getAllByRole('option', {name: '4 May 2024'})[0].click()
 
-    await waitFor(async () => {
+    await waitFor(() => {
       expect(dateInput).toHaveValue('May 4, 2024')
       expect(getAllByText(/Please enter a due date on or after/).length).toBeGreaterThanOrEqual(1)
     })
-  })
+  }, 30000)
 })

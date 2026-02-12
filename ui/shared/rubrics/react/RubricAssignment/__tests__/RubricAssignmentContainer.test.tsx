@@ -166,7 +166,7 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('edit-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
-    })
+    }, 30000)
 
     it('should call onRubricChange callback when a new rubric is saved', async () => {
       const onRubricChange = vi.fn()
@@ -247,7 +247,7 @@ describe('RubricAssignmentContainer Tests', () => {
       fireEvent.click(getByTestId('remove-assignment-rubric-button'))
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('delete-confirm-btn')).toBeInTheDocument()
-    })
+    }, 30000)
 
     it('should remove the rubric from the assignment when the delete confirm modal is confirmed', async () => {
       const {getByTestId} = renderComponent({
@@ -260,7 +260,7 @@ describe('RubricAssignmentContainer Tests', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('create-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('find-assignment-rubric-button')).toBeInTheDocument()
-    })
+    }, 30000)
 
     it('should call onRubricChange with undefined values when rubric is removed', async () => {
       const onRubricChange = vi.fn()

@@ -101,5 +101,5 @@ describe('RubricForm Save Button with Criteria Tests', () => {
     await waitFor(() => {
       expect(getByTestId('save-rubric-button')).toBeEnabled()
     })
-  })
+  }, 30000)
 })

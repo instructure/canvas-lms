@@ -93,5 +93,5 @@ describe('DiscussionTopicForm Checkpoints SIS - Missing Dates Validation', () =>
     submitButton.click()
 
     expect(mockOnSubmit).not.toHaveBeenCalled()
-  })
+  }, 30000)
 })

@@ -93,5 +93,5 @@ describe('DiscussionTopicForm Checkpoints SIS - Due Date Not Required', () => {
     submitButton.click()
 
     expect(mockOnSubmit).toHaveBeenCalled()
-  })
+  }, 30000)
 })

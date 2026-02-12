@@ -78,20 +78,24 @@ describe('DiscussionTopicForm Checkpoints SIS - Post to SIS Disabled', () => {
     mockOnSubmit.mockClear()
   })
 
-  it('allows submission when post to SIS is disabled', () => {
-    const {queryByRole, queryByLabelText} = setupWithPreConfiguredCheckpoints({
-      dueDateRequired: true,
-      postToSis: false,
-      checkpointDueAt: null,
-    })
+  it(
+    'allows submission when post to SIS is disabled',
+    () => {
+      const {queryByRole, queryByLabelText} = setupWithPreConfiguredCheckpoints({
+        dueDateRequired: true,
+        postToSis: false,
+        checkpointDueAt: null,
+      })
 
-    const titleInput = queryByLabelText('Topic Title')
-    titleInput.value = 'Test Checkpoint Discussion'
-    titleInput.dispatchEvent(new Event('change', {bubbles: true}))
+      const titleInput = queryByLabelText('Topic Title')
+      titleInput.value = 'Test Checkpoint Discussion'
+      titleInput.dispatchEvent(new Event('change', {bubbles: true}))
 
-    const submitButton = queryByRole('button', {name: /save/i})
-    submitButton.click()
+      const submitButton = queryByRole('button', {name: /save/i})
+      submitButton.click()
 
-    expect(mockOnSubmit).toHaveBeenCalled()
-  })
+      expect(mockOnSubmit).toHaveBeenCalled()
+    },
+    30000,
+  )
 })

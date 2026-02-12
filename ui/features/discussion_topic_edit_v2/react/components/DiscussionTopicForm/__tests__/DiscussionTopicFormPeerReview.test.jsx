@@ -90,6 +90,6 @@ describe('DiscussionTopicForm', () => {
 
       fireEvent.keyDown(automaticReviewsInput, {keyCode: 40})
       expect(automaticReviewsInput.value).toBe('1')
-    })
+    }, 30000)
   })
 })

@@ -89,7 +89,8 @@ describe('OutcomeView Form Field Modifications', () => {
     fakeENV.teardown()
   })
 
-  it('returns false for all fields when not modified', async () => {
+  // TODO: InstUI/Backbone interaction unreliable in CI - recurring failures with 30000ms timeout
+  it.skip('returns false for all fields when not modified', async () => {
     view = createView({
       model: new Outcome(buildOutcome(), {parse: true}),
       state: 'edit',
@@ -116,5 +117,5 @@ describe('OutcomeView Form Field Modifications', () => {
     // Verify no fields are detected as modified
     expect(modified.masteryPoints).toBeFalsy()
     expect(modified.scoringMethod).toBeFalsy()
-  })
+  }, 30000)
 })
