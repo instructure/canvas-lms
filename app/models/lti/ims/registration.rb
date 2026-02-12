@@ -22,6 +22,7 @@ class Lti::IMS::Registration < ApplicationRecord
   extend RootAccountResolver
 
   self.table_name = "lti_ims_registrations"
+  self.ignored_columns += [:registration_overlay]
 
   # These attributes are in the spec (config JSON) but not stored in the
   # database because the particular values are required/implied.
@@ -56,7 +57,6 @@ class Lti::IMS::Registration < ApplicationRecord
   validate :redirect_uris_contains_uris,
            :lti_tool_configuration_is_valid,
            :scopes_are_valid,
-           :validate_overlay,
            :target_link_uri_is_uri,
            unless: :deleted?
 
@@ -279,16 +279,11 @@ class Lti::IMS::Registration < ApplicationRecord
     (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil
   end
 
-  def lookup_placement_overlay(placement_type)
-    registration_overlay["placements"]&.find { |p| p["type"] == placement_type }
-  end
-
   def as_json(options = {})
     {
       id: global_id.to_s,
       lti_registration_id: Shard.global_id_for(lti_registration_id).to_s,
       developer_key_id: Shard.global_id_for(developer_key_id).to_s,
-      overlay: registration_overlay,
       lti_tool_configuration:,
       application_type: REQUIRED_APPLICATION_TYPE,
       grant_types: REQUIRED_GRANT_TYPES,
@@ -408,15 +403,6 @@ class Lti::IMS::Registration < ApplicationRecord
       lti_tool_configuration,
       error_format: :hash
     )&.each { |error| errors.add(:lti_tool_configuration, error.to_json) }
-  end
-
-  def validate_overlay
-    return if registration_overlay.blank?
-
-    overlay_errors = Schemas::Lti::IMS::RegistrationOverlay.simple_validation_errors(registration_overlay)
-    if overlay_errors.present?
-      errors.add(:registration_overlay, overlay_errors.join("; "))
-    end
   end
 
   def infer_privacy_level_from(claims)

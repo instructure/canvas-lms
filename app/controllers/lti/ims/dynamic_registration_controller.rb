@@ -206,17 +206,13 @@ module Lti
 
       def update_registration_overlay
         registration = Lti::IMS::Registration.find(params[:registration_id])
-        # Historically, the overlay for an IMS Registration lived on its
-        # registration_overlay column. However, we're transitioning over to using
-        # the Lti::Overlay and Lti::Registration models, so that more than just Dynamic
-        # Registrations can be overlaid, hence the reason for keeping two data
-        # sources in sync.
         Lti::IMS::Registration.transaction do
           registration_overlay = JSON.parse(request.body.read)
           overlay = registration.lti_registration.overlay_for(@context)
 
-          # Let the registration validate the data they passed
-          registration.update!(registration_overlay:)
+          # Validate the data before proceeding
+          errors = Schemas::Lti::IMS::RegistrationOverlay.simple_validation_errors(registration_overlay)
+          raise ActiveRecord::RecordInvalid, registration if errors.present?
 
           # also update the DK scopes
           if registration_overlay["disabledScopes"].present?
