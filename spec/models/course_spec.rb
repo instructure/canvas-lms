@@ -836,6 +836,8 @@ describe Course do
         enrollment = course.enroll_user(user, "StudentEnrollment", role:)
 
         account2 = Account.default.sub_accounts.create!
+        # ensure the most specific role is chosen (it should prefer the one in the subaccount)
+        Account.default.roles.create! name: "Something", base_role_type: "StudentEnrollment"
         # ensure the active role is chosen if there are dups (a unique constraint ensures only one active one can exist)
         account2.roles.create! name: "Something", workflow_state: "inactive", base_role_type: "StudentEnrollment"
         role2 = account2.roles.create! name: "Something", workflow_state: "active", base_role_type: "StudentEnrollment"

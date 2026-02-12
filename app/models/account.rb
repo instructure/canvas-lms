@@ -1471,8 +1471,19 @@ class Account < ActiveRecord::Base
     account_roles
   end
 
+  # returns active roles first, then ordered by their place in the account chain.
+  # this provides determinism when multiple roles with the same name exist
+  # in the account chain - just pick the first matching one you find
   def available_custom_course_roles(include_inactive = false)
-    available_custom_roles(include_inactive).for_courses.to_a
+    roles = available_custom_roles(include_inactive).for_courses.to_a
+
+    shard.activate do
+      account_positions = account_chain_ids(include_federated_parent_id: true).each_with_index.to_h
+      roles.sort_by do |role|
+        [role.active? ? CanvasSort::First : CanvasSort::Last,
+         account_positions[role.account_id] || CanvasSort::Last]
+      end
+    end
   end
 
   def available_course_roles(include_inactive = false)
@@ -1510,24 +1521,13 @@ class Account < ActiveRecord::Base
     end
 
     shard.activate do
-      role_scope = Role.not_deleted.where(name: role_name)
-      role_scope = if self.class.connection.adapter_name == "PostgreSQL"
-                     role_scope.where("account_id = ? OR
-          account_id IN (
-            WITH RECURSIVE t AS (
-              SELECT id, parent_account_id FROM #{Account.quoted_table_name} WHERE id = ?
-              UNION
-              SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
-            )
-            SELECT id FROM t
-          )",
-                                      id,
-                                      id)
-                   else
-                     role_scope.where(account_id: account_chain.map(&:id))
-                   end
-      # not_deleted scope could return both active and inactive roles, prefer the active one
-      role_scope.min_by { |r| (r.workflow_state == "active") ? 0 : 1 }
+      role_scope = Role.not_deleted.where(name: role_name, account_id: account_chain_ids)
+      # not_deleted scope could return both active and inactive roles, prefer the active one.
+      # also prefer roles defined lower in the account chain, to eliminate ambiguity when a role with
+      # the same name exists at multiple levels
+      account_positions = account_chain_ids.each_with_index.to_h
+      n = account_positions.size
+      role_scope.min_by { |r| ((r.workflow_state == "active") ? 0 : n) + (account_positions[r.account_id] || n) }
     end
   end
 
