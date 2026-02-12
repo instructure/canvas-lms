@@ -264,7 +264,7 @@ module Lti
     def tii_developer_key
       return @tii_developer_key if defined?(@tii_developer_key)
 
-      dk_id = Setting.get("turnitin_asset_processor_client_id", "")
+      dk_id = @account.root_account.turnitin_asset_processor_client_id
       @tii_developer_key = if dk_id.blank?
                              nil
                            else

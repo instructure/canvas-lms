@@ -191,8 +191,8 @@ RSpec.describe Lti::RegistrationsController do
 
       before do
         account.root_account.enable_feature!(:lti_asset_processor_tii_migration)
-        allow(Setting).to receive(:get).and_call_original
-        allow(Setting).to receive(:get).with("turnitin_asset_processor_client_id", "").and_return(turnitin_client_id)
+        account.root_account.settings[:turnitin_asset_processor_client_id] = turnitin_client_id
+        account.root_account.save!
       end
 
       it "sets turnitinAPClientId in js_env" do

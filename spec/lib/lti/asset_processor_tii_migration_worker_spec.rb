@@ -139,7 +139,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     before do
-      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      root_account.settings[:turnitin_asset_processor_client_id] = developer_key.global_id.to_s
+      root_account.save!
     end
 
     describe "full migration flow" do
@@ -427,7 +428,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       end
 
       it "marks progress as failed when fatal error occurs" do
-        Setting.set("turnitin_asset_processor_client_id", "")
+        root_account.settings[:turnitin_asset_processor_client_id] = ""
+        root_account.save!
         product_family
         actl
 
@@ -466,7 +468,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
     context "prevalidations" do
       it "fails when developer key is not configured" do
-        Setting.set("turnitin_asset_processor_client_id", "")
+        root_account.settings[:turnitin_asset_processor_client_id] = ""
+        root_account.save!
         product_family
         actl
         allow(worker).to receive(:migrate_tool_proxy)
@@ -596,7 +599,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     before do
-      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      root_account.settings[:turnitin_asset_processor_client_id] = developer_key.global_id.to_s
+      root_account.save!
       # Set @progress instance variable for tests that call migrate_tool_proxy directly
       worker.instance_variable_set(:@progress, test_progress)
     end
@@ -712,7 +716,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     let(:rsa_key) { OpenSSL::PKey::RSA.new(2048) }
 
     before do
-      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      root_account.settings[:turnitin_asset_processor_client_id] = developer_key.global_id.to_s
+      root_account.save!
       allow(Lti::KeyStorage).to receive(:present_key).and_return(rsa_key)
     end
 
@@ -1188,7 +1193,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     before do
-      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      root_account.settings[:turnitin_asset_processor_client_id] = developer_key.global_id.to_s
+      root_account.save!
       worker.instance_variable_set(:@progress, test_progress)
     end
 
@@ -1199,13 +1205,22 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil when setting is blank" do
-      Setting.set("turnitin_asset_processor_client_id", "")
+      root_account.settings[:turnitin_asset_processor_client_id] = ""
+      root_account.save!
       expect(worker.send(:tii_developer_key)).to be_nil
     end
 
     it "returns nil and logs warning when developer key not found" do
-      Setting.set("turnitin_asset_processor_client_id", "99999999")
+      root_account.settings[:turnitin_asset_processor_client_id] = "99999999"
+      root_account.save!
       expect(worker.send(:tii_developer_key)).to be_nil
+    end
+
+    it "falls back to global Setting when account setting is not set" do
+      root_account.settings[:turnitin_asset_processor_client_id] = nil
+      root_account.save!
+      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      expect(worker.send(:tii_developer_key)).to eq(developer_key)
     end
   end
 
