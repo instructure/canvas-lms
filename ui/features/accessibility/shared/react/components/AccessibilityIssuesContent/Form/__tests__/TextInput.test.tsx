@@ -23,7 +23,6 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
 import {FormType, IssueWorkflowState} from '../../../../types'
-import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 import TextInputForm from '../TextInputForm'
 import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
 
@@ -79,6 +78,7 @@ describe('TextInputForm', () => {
     },
     value: '',
     onChangeValue: vi.fn(),
+    onValidationChange: vi.fn(),
   }
 
   const propsWithGenerateOption = {
@@ -180,6 +180,85 @@ describe('TextInputForm', () => {
       render(<TextInputForm {...propsWithGenerateOption} />)
 
       expect(screen.queryByText('Generate Alt Text')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Error display', () => {
+    it('does not show errors when error prop is not provided', () => {
+      render(<TextInputForm {...defaultProps} />)
+
+      expect(screen.queryByText('Caption cannot be empty.')).not.toBeInTheDocument()
+    })
+
+    it('shows error message when error prop is provided', () => {
+      const propsWithError = {
+        ...defaultProps,
+        error: 'Caption cannot be empty.',
+      }
+      render(<TextInputForm {...propsWithError} />)
+
+      expect(screen.getByText('Caption cannot be empty.')).toBeInTheDocument()
+    })
+
+    it('does not show validation errors on initial mount with empty input', () => {
+      render(<TextInputForm {...defaultProps} />)
+
+      expect(screen.queryByText('Caption cannot be empty.')).not.toBeInTheDocument()
+    })
+
+    it('does not show error when user enters non-empty text', async () => {
+      render(<TextInputForm {...defaultProps} />)
+
+      const input = screen.getByTestId('text-input-form')
+      await userEvent.type(input, 'Valid caption')
+
+      expect(screen.queryByText('Caption cannot be empty.')).not.toBeInTheDocument()
+    })
+
+    it('shows error when user clears the input', async () => {
+      const propsWithValue = {
+        ...defaultProps,
+        value: 'Some text',
+      }
+
+      render(<TextInputForm {...propsWithValue} />)
+
+      const input = screen.getByTestId('text-input-form')
+      await userEvent.clear(input)
+
+      expect(defaultProps.onValidationChange).toHaveBeenCalledWith(
+        false,
+        'Caption cannot be empty.',
+      )
+    })
+
+    it('shows error when user enters only whitespace', async () => {
+      render(<TextInputForm {...defaultProps} />)
+
+      const input = screen.getByTestId('text-input-form')
+      await userEvent.type(input, '   ')
+
+      expect(defaultProps.onValidationChange).toHaveBeenCalledWith(
+        false,
+        'Caption cannot be empty.',
+      )
+    })
+
+    it('clears error when user enters valid text after error', async () => {
+      render(<TextInputForm {...defaultProps} />)
+
+      const input = screen.getByTestId('text-input-form')
+
+      await userEvent.type(input, '   ')
+      expect(defaultProps.onValidationChange).toHaveBeenCalledWith(
+        false,
+        'Caption cannot be empty.',
+      )
+
+      await userEvent.clear(input)
+      await userEvent.type(input, 'Valid caption')
+
+      expect(defaultProps.onValidationChange).toHaveBeenLastCalledWith(true)
     })
   })
 })
