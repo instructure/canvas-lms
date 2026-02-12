@@ -204,7 +204,16 @@ class AbstractAssignment < ActiveRecord::Base
       SQL
   }
   scope :nondeleted, -> { where.not(workflow_state: "deleted") }
+  scope :assignments_only, -> { where(type: "Assignment") }
   scope :assignment_or_peer_review, -> { where(type: ["Assignment", "PeerReviewSubAssignment"]) }
+
+  def self.assignment_scope_for_context(context)
+    if context.feature_enabled?(:peer_review_allocation_and_grading)
+      assignment_or_peer_review.where(context:)
+    else
+      assignments_only.where(context:)
+    end
+  end
 
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?

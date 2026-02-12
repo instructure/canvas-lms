@@ -6935,6 +6935,73 @@ describe Assignment do
     end
   end
 
+  describe ".assignment_scope_for_context" do
+    context "when peer_review_allocation_and_grading is enabled" do
+      before :once do
+        @course = course_factory(active_all: true)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @older_assignment = @course.assignments.create!(title: "Older Assignment")
+        @older_assignment.update_column(:created_at, 2.days.ago)
+        @parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @parent_assignment.update_column(:created_at, 1.day.ago)
+        @newer_assignment = @course.assignments.create!(title: "Newer Assignment")
+        @peer_review_assignment = peer_review_model(parent_assignment: @parent_assignment)
+      end
+
+      it "includes regular assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@older_assignment)
+      end
+
+      it "includes assignments with peer reviews" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@parent_assignment)
+      end
+
+      it "includes peer review sub assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@peer_review_assignment)
+      end
+
+      it "does not include assignments from other courses" do
+        other_course = Course.create!
+        other_course.enable_feature!(:peer_review_allocation_and_grading)
+        other_assignment = other_course.assignments.create!(title: "Other")
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).not_to include(other_assignment)
+      end
+    end
+
+    context "when peer_review_allocation_and_grading is disabled" do
+      before :once do
+        @course = course_factory(active_all: true)
+        @older_assignment = @course.assignments.create!(title: "Older Assignment")
+        @older_assignment.update_column(:created_at, 2.days.ago)
+        @parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          automatic_peer_reviews: false
+        )
+        @parent_assignment.update_column(:created_at, 1.day.ago)
+        @newer_assignment = @course.assignments.create!(title: "Newer Assignment")
+      end
+
+      it "includes regular assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@older_assignment)
+      end
+
+      it "does not include peer review sub-assignments" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = @parent_assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).not_to include(peer_review)
+      end
+    end
+  end
+
   describe "scope: exclude_muted_associations_for_user" do
     before do
       @assignment = assignment_model(course: @course)

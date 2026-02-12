@@ -148,6 +148,73 @@ RSpec.describe AnonymousSubmissionsController do
     end
   end
 
+  describe "PUT update" do
+    context "with peer review sub assignment" do
+      before(:once) do
+        @course = course_factory(active_all: true)
+        @teacher = teacher_in_course(course: @course, active_all: true).user
+        @student = student_in_course(course: @course, active_all: true).user
+        @parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          points_possible: 10,
+          peer_reviews: true
+        )
+        @peer_review = peer_review_model(parent_assignment: @parent_assignment)
+        @reviewer = student_in_course(course: @course, active_all: true).user
+        @assessment_request = AssessmentRequest.create!(
+          user: @student,
+          asset: @parent_assignment.find_or_create_submission(@student),
+          assessor: @reviewer,
+          assessor_asset: @peer_review.find_or_create_submission(@reviewer),
+          peer_review_sub_assignment: @peer_review
+        )
+        @peer_review_submission = @peer_review.grade_student(@reviewer, grade: "3", grader: @teacher).first
+      end
+
+      before { user_session(@reviewer) }
+
+      it "allows posting a comment via peer review sub assignment" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              anonymous_id: @peer_review_submission.anonymous_id,
+              submission: { comment: "peer review comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:created)
+        expect(@peer_review_submission.reload.submission_comments.length).to be 1
+        expect(@peer_review_submission.submission_comments.first.comment).to eq("peer review comment")
+      end
+
+      it "does not allow updating deleted peer review assignments" do
+        @peer_review.destroy
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              anonymous_id: @peer_review_submission.anonymous_id,
+              submission: { comment: "peer review comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "does not find peer review sub assignment when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              anonymous_id: @peer_review_submission.anonymous_id,
+              submission: { comment: "peer review comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   context "originality report" do
     let(:account) { Account.default }
     let(:course) do

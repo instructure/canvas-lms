@@ -3815,6 +3815,98 @@ describe "Submissions API", type: :request do
         submission.reload.sticker
       }.from(nil).to("trophy")
     end
+
+    context "with peer review sub assignment" do
+      before(:once) do
+        @course = course_factory(active_all: true)
+        @teacher = teacher_in_course(course: @course, active_all: true).user
+        @student = student_in_course(course: @course, active_all: true).user
+        @parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          points_possible: 10,
+          peer_reviews: true
+        )
+        @peer_review = peer_review_model(parent_assignment: @parent_assignment)
+        @reviewer = student_in_course(course: @course, active_all: true).user
+        @assessment_request = AssessmentRequest.create!(
+          user: @student,
+          asset: @parent_assignment.find_or_create_submission(@student),
+          assessor: @reviewer,
+          assessor_asset: @peer_review.find_or_create_submission(@reviewer),
+          peer_review_sub_assignment: @peer_review
+        )
+        @peer_review_submission = @peer_review.grade_student(@reviewer, grade: "3", grader: @teacher).first
+      end
+
+      it "allows posting a comment via peer review sub assignment" do
+        expect do
+          api_call_as_user(
+            @reviewer,
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+            {
+              controller: "submissions_api",
+              action: "update_anonymous",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: @peer_review.id.to_s,
+              anonymous_id: @peer_review_submission.anonymous_id.to_s
+            },
+            {
+              comment: { text_comment: "peer review comment via API" }
+            }
+          )
+        end.to change {
+          @peer_review_submission.reload.submission_comments.count
+        }.by(1)
+
+        expect(@peer_review_submission.submission_comments.last.comment).to eq("peer review comment via API")
+      end
+
+      it "does not allow updating deleted peer review assignments" do
+        @peer_review.destroy
+        api_call_as_user(
+          @reviewer,
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+          {
+            controller: "submissions_api",
+            action: "update_anonymous",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @peer_review.id.to_s,
+            anonymous_id: @peer_review_submission.anonymous_id.to_s
+          },
+          {
+            comment: { text_comment: "should not work" }
+          },
+          {},
+          { expected_status: 404 }
+        )
+      end
+
+      it "does not find peer review sub assignment when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        api_call_as_user(
+          @reviewer,
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+          {
+            controller: "submissions_api",
+            action: "update_anonymous",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @peer_review.id.to_s,
+            anonymous_id: @peer_review_submission.anonymous_id.to_s
+          },
+          {
+            comment: { text_comment: "should not work" }
+          },
+          {},
+          { expected_status: 404 }
+        )
+      end
+    end
   end
 
   describe "#update" do
