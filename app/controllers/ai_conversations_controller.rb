@@ -49,8 +49,11 @@ class AiConversationsController < ApplicationController
 
     @page_title = t("#page_title.ai_conversations", "%{title} - AI Conversations", title: @experience.title)
     js_bundle :ai_experiences_ai_conversations
+
+    can_manage = @context.grants_any_right?(@current_user, *permissions)
+
     js_env(
-      AI_EXPERIENCE: ai_experience_json(@experience, @current_user, session, can_manage: true),
+      AI_EXPERIENCE: ai_experience_json(@experience, @current_user, session, can_manage:),
       COURSE_ID: @context.id,
       ai_experiences_evaluation_enabled: @context.feature_enabled?(:ai_experiences_evaluation)
     )

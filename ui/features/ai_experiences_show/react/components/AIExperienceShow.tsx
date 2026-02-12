@@ -162,6 +162,25 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         </View>
       )}
 
+      {aiExperience.learning_objective && !canManage && (
+        <View as="div" margin="large 0">
+          <Heading level="h2" margin="0 0 small 0">
+            {I18n.t('Learning Objectives')}
+          </Heading>
+          <View
+            as="div"
+            padding="medium"
+            background="primary"
+            borderWidth="small"
+            borderRadius="medium"
+          >
+            <Text size="medium" data-testid="ai-experience-show-student-goals-text">
+              <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.learning_objective}</span>
+            </Text>
+          </View>
+        </View>
+      )}
+
       <Heading level="h2" margin="large 0 small 0">
         {I18n.t('Experience')}
       </Heading>
@@ -181,82 +200,88 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         isTeacherPreview={canManage}
       />
 
-      <Heading level="h2" margin="large 0 0 0">
-        {I18n.t('Configurations')}
-      </Heading>
+      {canManage && (
+        <>
+          <Heading level="h2" margin="large 0 0 0">
+            {I18n.t('Configurations')}
+          </Heading>
 
-      <div
-        style={{
-          margin: '0.75rem 0 0 0',
-          borderRadius: '0.5rem',
-          overflow: 'hidden',
-          border: '3px solid transparent',
-          backgroundImage:
-            'linear-gradient(white, white), linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box',
-        }}
-      >
-        <div
-          style={{
-            padding: '1rem',
-            background: 'linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
-          }}
-        >
-          <Flex gap="small" alignItems="start">
-            <Flex.Item>
-              <IconAiLine color="primary-inverse" size="small" />
-            </Flex.Item>
-            <Flex.Item shouldGrow shouldShrink>
-              <View>
-                <Text color="primary-inverse" weight="bold" size="large">
-                  {I18n.t('Learning design')}
-                </Text>
-                <View as="div" margin="xx-small 0 0 0">
-                  <Text color="primary-inverse" size="small">
-                    {I18n.t('What should students know and how should the AI behave?')}
+          <div
+            style={{
+              margin: '0.75rem 0 0 0',
+              borderRadius: '0.5rem',
+              overflow: 'hidden',
+              border: '3px solid transparent',
+              backgroundImage:
+                'linear-gradient(white, white), linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
+              backgroundOrigin: 'border-box',
+              backgroundClip: 'padding-box, border-box',
+            }}
+          >
+            <div
+              style={{
+                padding: '1rem',
+                background: 'linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
+              }}
+            >
+              <Flex gap="small" alignItems="start">
+                <Flex.Item>
+                  <IconAiLine color="primary-inverse" size="small" />
+                </Flex.Item>
+                <Flex.Item shouldGrow shouldShrink>
+                  <View>
+                    <Text color="primary-inverse" weight="bold" size="large">
+                      {I18n.t('Learning Design')}
+                    </Text>
+                    <View as="div" margin="xx-small 0 0 0">
+                      <Text color="primary-inverse" size="small">
+                        {I18n.t('What should students know and how should the AI behave?')}
+                      </Text>
+                    </View>
+                  </View>
+                </Flex.Item>
+              </Flex>
+            </div>
+
+            <View as="div" padding="medium" background="primary">
+              {aiExperience.facts && (
+                <View as="div" margin="0 0 medium 0">
+                  <Heading level="h3" margin="0 0 small 0">
+                    {I18n.t('Facts Students Should Know')}
+                  </Heading>
+                  <Text data-testid="ai-experience-show-facts-text">
+                    <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.facts}</span>
                   </Text>
                 </View>
-              </View>
-            </Flex.Item>
-          </Flex>
-        </div>
+              )}
 
-        <View as="div" padding="medium" background="primary">
-          {aiExperience.facts && (
-            <View as="div" margin="0 0 medium 0">
-              <Heading level="h3" margin="0 0 small 0">
-                {I18n.t('Facts students should know')}
-              </Heading>
-              <Text data-testid="ai-experience-show-facts-text">
-                <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.facts}</span>
-              </Text>
-            </View>
-          )}
+              {aiExperience.learning_objective && (
+                <View as="div" margin="0 0 medium 0">
+                  <Heading level="h3" margin="0 0 small 0">
+                    {I18n.t('Learning Objectives')}
+                  </Heading>
+                  <Text data-testid="ai-experience-show-learning-objectives-text">
+                    <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.learning_objective}</span>
+                  </Text>
+                </View>
+              )}
 
-          {aiExperience.learning_objective && (
-            <View as="div" margin="0 0 medium 0">
-              <Heading level="h3" margin="0 0 small 0">
-                {I18n.t('Learning objectives')}
-              </Heading>
-              <Text data-testid="ai-experience-show-learning-objectives-text">
-                <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.learning_objective}</span>
-              </Text>
+              {aiExperience.pedagogical_guidance && (
+                <View as="div" margin="0 0 0 0">
+                  <Heading level="h3" margin="0 0 small 0">
+                    {I18n.t('Pedagogical Guidance')}
+                  </Heading>
+                  <Text data-testid="ai-experience-show-pedagogical-guidance-text">
+                    <span style={{whiteSpace: 'pre-wrap'}}>
+                      {aiExperience.pedagogical_guidance}
+                    </span>
+                  </Text>
+                </View>
+              )}
             </View>
-          )}
-
-          {aiExperience.pedagogical_guidance && (
-            <View as="div" margin="0 0 0 0">
-              <Heading level="h3" margin="0 0 small 0">
-                {I18n.t('Pedagogical guidance')}
-              </Heading>
-              <Text data-testid="ai-experience-show-pedagogical-guidance-text">
-                <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.pedagogical_guidance}</span>
-              </Text>
-            </View>
-          )}
-        </View>
-      </div>
+          </div>
+        </>
+      )}
 
       <Modal
         open={isDeleteModalOpen}

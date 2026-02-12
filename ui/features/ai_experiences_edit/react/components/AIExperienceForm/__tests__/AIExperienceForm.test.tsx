@@ -69,7 +69,7 @@ describe('AIExperienceForm', () => {
           isLoading={false}
         />,
       )
-      expect(screen.getByText('Edit AI Experience')).toBeInTheDocument()
+      expect(screen.getByText('Edit Test Experience')).toBeInTheDocument()
     })
 
     it('renders all form fields', () => {
@@ -77,16 +77,16 @@ describe('AIExperienceForm', () => {
 
       expect(screen.getByLabelText(/Title/)).toBeInTheDocument()
       expect(screen.getByLabelText(/Description/)).toBeInTheDocument()
-      expect(screen.getByLabelText(/Facts students should know/)).toBeInTheDocument()
-      expect(screen.getByLabelText(/Learning objectives/)).toBeInTheDocument()
-      expect(screen.getByLabelText(/Pedagogical guidance/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Facts Students Should Know/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Learning Objectives/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Pedagogical Guidance/)).toBeInTheDocument()
     })
 
     it('renders configuration section with gradient header', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
       expect(screen.getByText('Configurations')).toBeInTheDocument()
-      expect(screen.getByText('Learning design')).toBeInTheDocument()
+      expect(screen.getByText('Learning Design')).toBeInTheDocument()
       expect(
         screen.getByText('What should students know and how should the AI behave?'),
       ).toBeInTheDocument()
@@ -128,15 +128,17 @@ describe('AIExperienceForm', () => {
 
       const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
       const descriptionInput = screen.getByLabelText(/Description/) as HTMLTextAreaElement
+      const factsInput = screen.getByLabelText(/Facts Students Should Know/) as HTMLTextAreaElement
       const learningObjectivesInput = screen.getByLabelText(
-        /Learning objectives/,
+        /Learning Objectives/,
       ) as HTMLTextAreaElement
       const pedagogicalGuidanceInput = screen.getByLabelText(
-        /Pedagogical guidance/,
+        /Pedagogical Guidance/,
       ) as HTMLTextAreaElement
 
       fireEvent.change(titleInput, {target: {value: 'New Title'}})
       fireEvent.change(descriptionInput, {target: {value: 'New Description'}})
+      fireEvent.change(factsInput, {target: {value: 'New Facts'}})
       fireEvent.change(learningObjectivesInput, {target: {value: 'New Learning Objectives'}})
       fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'New Pedagogical Guidance'}})
 
@@ -148,6 +150,7 @@ describe('AIExperienceForm', () => {
           expect.objectContaining({
             title: 'New Title',
             description: 'New Description',
+            facts: 'New Facts',
             learning_objective: 'New Learning Objectives',
             pedagogical_guidance: 'New Pedagogical Guidance',
           }),
@@ -228,6 +231,21 @@ describe('AIExperienceForm', () => {
     it('calls onSubmit when preview is confirmed', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
+      // Fill in required fields
+      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      const factsInput = screen.getByLabelText(/Facts Students Should Know/) as HTMLTextAreaElement
+      const learningObjectivesInput = screen.getByLabelText(
+        /Learning Objectives/,
+      ) as HTMLTextAreaElement
+      const pedagogicalGuidanceInput = screen.getByLabelText(
+        /Pedagogical Guidance/,
+      ) as HTMLTextAreaElement
+
+      fireEvent.change(titleInput, {target: {value: 'Preview Title'}})
+      fireEvent.change(factsInput, {target: {value: 'Preview Facts'}})
+      fireEvent.change(learningObjectivesInput, {target: {value: 'Preview Objectives'}})
+      fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'Preview Guidance'}})
+
       const previewButton = screen.getByText('Preview')
       fireEvent.click(previewButton)
 
@@ -247,6 +265,180 @@ describe('AIExperienceForm', () => {
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('form validation', () => {
+    it('shows error when title is empty on submission', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      const saveButton = screen.getByText('Save as draft')
+      fireEvent.click(saveButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Title required')).toBeInTheDocument()
+      })
+
+      expect(mockOnSubmit).not.toHaveBeenCalled()
+    })
+
+    it('shows error when facts is empty on submission', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      fireEvent.change(titleInput, {target: {value: 'Test Title'}})
+
+      const saveButton = screen.getByText('Save as draft')
+      fireEvent.click(saveButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Please provide facts students should know')).toBeInTheDocument()
+      })
+
+      expect(mockOnSubmit).not.toHaveBeenCalled()
+    })
+
+    it('shows error when learning_objective is empty on submission', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      fireEvent.change(titleInput, {target: {value: 'Test Title'}})
+
+      const saveButton = screen.getByText('Save as draft')
+      fireEvent.click(saveButton)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Please provide at least one learning objective'),
+        ).toBeInTheDocument()
+      })
+
+      expect(mockOnSubmit).not.toHaveBeenCalled()
+    })
+
+    it('shows error when pedagogical_guidance is empty on submission', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      fireEvent.change(titleInput, {target: {value: 'Test Title'}})
+
+      const saveButton = screen.getByText('Save as draft')
+      fireEvent.click(saveButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Please provide pedagogical guidance')).toBeInTheDocument()
+      })
+
+      expect(mockOnSubmit).not.toHaveBeenCalled()
+    })
+
+    it('shows error banner when validation fails', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      const saveButton = screen.getByText('Save as draft')
+      fireEvent.click(saveButton)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Some required information is missing. Please complete all highlighted fields before saving.',
+          ),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('does not show errors until first submission attempt', () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      expect(screen.queryByText('Title required')).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Please provide facts students should know'),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Please provide at least one learning objective'),
+      ).not.toBeInTheDocument()
+      expect(screen.queryByText('Please provide pedagogical guidance')).not.toBeInTheDocument()
+    })
+
+    it('clears error when field is filled', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      const saveButton = screen.getByText('Save as draft')
+      fireEvent.click(saveButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Title required')).toBeInTheDocument()
+      })
+
+      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      fireEvent.change(titleInput, {target: {value: 'Test Title'}})
+
+      await waitFor(() => {
+        expect(screen.queryByText('Title required')).not.toBeInTheDocument()
+      })
+    })
+
+    it('validates before preview', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      const previewButton = screen.getByText('Preview')
+      fireEvent.click(previewButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Preview experience')).toBeInTheDocument()
+      })
+
+      const previewExperienceItem = screen.getByText('Preview experience')
+      fireEvent.click(previewExperienceItem)
+
+      await waitFor(() => {
+        expect(screen.getByText('Preview AI experience')).toBeInTheDocument()
+      })
+
+      const confirmButton = screen.getByText('Confirm')
+      fireEvent.click(confirmButton)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Some required information is missing. Please complete all highlighted fields before saving.',
+          ),
+        ).toBeInTheDocument()
+      })
+
+      expect(mockOnSubmit).not.toHaveBeenCalled()
+    })
+
+    it('submits successfully when all required fields are filled', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+
+      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      const factsInput = screen.getByLabelText(/Facts Students Should Know/) as HTMLTextAreaElement
+      const learningObjectivesInput = screen.getByLabelText(
+        /Learning Objectives/,
+      ) as HTMLTextAreaElement
+      const pedagogicalGuidanceInput = screen.getByLabelText(
+        /Pedagogical Guidance/,
+      ) as HTMLTextAreaElement
+
+      fireEvent.change(titleInput, {target: {value: 'New Title'}})
+      fireEvent.change(factsInput, {target: {value: 'New Facts'}})
+      fireEvent.change(learningObjectivesInput, {target: {value: 'New Learning Objectives'}})
+      fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'New Pedagogical Guidance'}})
+
+      const saveButton = screen.getByText('Save as draft')
+      fireEvent.click(saveButton)
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: 'New Title',
+            facts: 'New Facts',
+            learning_objective: 'New Learning Objectives',
+            pedagogical_guidance: 'New Pedagogical Guidance',
+          }),
+        )
       })
     })
   })

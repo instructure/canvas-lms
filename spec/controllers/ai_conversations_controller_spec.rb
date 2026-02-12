@@ -35,6 +35,34 @@ describe AiConversationsController do
     )
   end
 
+  describe "GET #index" do
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "returns success for HTML format" do
+        get :index, params: { course_id: @course.id, ai_experience_id: @ai_experience.id }
+        expect(response).to be_successful
+      end
+
+      it "sets AI_EXPERIENCE in js_env with facts and pedagogical_guidance for teachers" do
+        get :index, params: { course_id: @course.id, ai_experience_id: @ai_experience.id }
+        ai_exp_json = assigns[:js_env][:AI_EXPERIENCE]
+        expect(ai_exp_json[:facts]).to eq(@ai_experience.facts)
+        expect(ai_exp_json[:pedagogical_guidance]).to eq(@ai_experience.pedagogical_guidance)
+        expect(ai_exp_json[:learning_objective]).to eq(@ai_experience.learning_objective)
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student) }
+
+      it "returns unauthorized for students" do
+        get :index, params: { course_id: @course.id, ai_experience_id: @ai_experience.id }
+        assert_unauthorized
+      end
+    end
+  end
+
   describe "GET #active_conversation" do
     context "as teacher" do
       before { user_session(@teacher) }

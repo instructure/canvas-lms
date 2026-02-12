@@ -85,17 +85,17 @@ describe('AIExperienceShow', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
     expect(screen.getByText('Configurations')).toBeInTheDocument()
-    expect(screen.getByText('Facts students should know')).toBeInTheDocument()
+    expect(screen.getByText('Facts Students Should Know')).toBeInTheDocument()
     expect(
       screen.getByText(
         'You are a customer service representative helping customers with billing issues.',
       ),
     ).toBeInTheDocument()
-    expect(screen.getByText('Learning objectives')).toBeInTheDocument()
+    expect(screen.getByText('Learning Objectives')).toBeInTheDocument()
     expect(
       screen.getByText('Students will learn to handle customer complaints professionally'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Pedagogical guidance')).toBeInTheDocument()
+    expect(screen.getByText('Pedagogical Guidance')).toBeInTheDocument()
     expect(screen.getByText('A customer calls about incorrect billing')).toBeInTheDocument()
   })
 

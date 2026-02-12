@@ -36,6 +36,12 @@ module Api::V1::AiExperience
     # Include can_unpublish if user can manage
     json[:can_unpublish] = ai_experience.can_unpublish? if opts[:can_manage]
 
+    # Hide teacher-facing fields from non-managers
+    unless opts[:can_manage]
+      json.delete(:facts)
+      json.delete(:pedagogical_guidance)
+    end
+
     # Include context files if feature flag is enabled
     if ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
       json[:context_files] = ai_experience.ai_experience_context_files.order(:position).map do |context_file|
