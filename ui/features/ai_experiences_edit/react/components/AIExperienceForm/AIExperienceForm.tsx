@@ -109,6 +109,10 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       newErrors.title = I18n.t('Title required')
     }
 
+    if (!formData.facts.trim()) {
+      newErrors.facts = I18n.t('Please provide facts students should know')
+    }
+
     if (!formData.learning_objective.trim()) {
       newErrors.learning_objective = I18n.t('Please provide at least one learning objective')
     }
@@ -148,6 +152,16 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
   }
 
   const handleConfirmPreview = () => {
+    const validationErrors = validateForm()
+    setErrors(validationErrors)
+
+    if (Object.keys(validationErrors).length > 0) {
+      setShowErrors(true)
+      setShowErrorBanner(true)
+      setShowPreviewModal(false)
+      return
+    }
+
     setShowPreviewModal(false)
     // Save as draft first, then redirect to preview
     onSubmit(formData, true)
@@ -197,7 +211,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         </Alert>
       )}
 
-      <FormHeader isEdit={isEdit} onDeleteClick={handleDeleteClick} />
+      <FormHeader isEdit={isEdit} title={aiExperience?.title} onDeleteClick={handleDeleteClick} />
 
       <form onSubmit={handleSubmit} noValidate={true}>
         <View as="div" margin="0 0 large 0">
@@ -217,7 +231,6 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
             label={I18n.t('Description')}
             value={formData.description}
             onChange={handleInputChange('description')}
-            required
             resize="vertical"
             height="120px"
           />
