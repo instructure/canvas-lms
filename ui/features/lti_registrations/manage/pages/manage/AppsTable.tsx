@@ -239,9 +239,14 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('On/Off'),
     width: '80px',
     sortable: true,
-    render: r => (
-      <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
-    ),
+    render: r => {
+      const checkWorkflowState = window.ENV.FEATURES.lti_deactivate_registrations
+      const isOn = checkWorkflowState
+        ? r.workflow_state === 'active'
+        : r.account_binding?.workflow_state === 'on'
+
+      return <div>{isOn ? I18n.t('On') : I18n.t('Off')}</div>
+    },
   },
   {
     id: 'status',
@@ -422,9 +427,14 @@ const CondensedColumns: ReadonlyArray<Column> = [
     header: I18n.t('On/Off'),
     width: '10%',
     sortable: true,
-    render: r => (
-      <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
-    ),
+    render: r => {
+      const checkWorkflowState = window.ENV.FEATURES.lti_deactivate_registrations
+      const isOn = checkWorkflowState
+        ? r.workflow_state === 'active'
+        : r.account_binding?.workflow_state === 'on'
+
+      return <div>{isOn ? I18n.t('On') : I18n.t('Off')}</div>
+    },
   },
   {
     id: 'status',

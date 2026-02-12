@@ -329,6 +329,23 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
 
+      context "when registration is inactive" do
+        let(:inactive_registration) do
+          reg = lti_registration_model(account:, name: "Inactive registration")
+          lti_registration_account_binding_model(registration: reg, account:, workflow_state: "on", created_by: admin)
+          reg.deactivate!
+          reg
+        end
+
+        it "includes the inactive registration with workflow_state 'inactive'" do
+          inactive_registration
+          subject
+          reg_json = response_data.find { |r| r["id"] == inactive_registration.id }
+          expect(reg_json).to be_present
+          expect(reg_json["workflow_state"]).to eq("inactive")
+        end
+      end
+
       context "when sorting by installed_by" do
         subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
 
@@ -453,16 +470,29 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
 
-      context "when sorting by a workflow_state" do
-        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=on" }
+      context "when sorting by workflow_state" do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=on&dir=asc" }
 
-        it "does not error if the account binding is nil" do
-          reg = lti_registration_model(account:, name: "no account bindings")
-          # expect it to have no account bindings, just in case we start automatically
-          # creating a default one in the future.
-          expect(reg.lti_registration_account_bindings).to eq([])
+        context "with lti_deactivate_registrations disabled" do
+          before do
+            account.disable_feature!(:lti_deactivate_registrations)
+          end
+
+          it "does not error if the account binding is nil" do
+            reg = lti_registration_model(account:, name: "no account bindings")
+            expect(reg.lti_registration_account_bindings).to eq([])
+            subject
+            expect(response_data.first["name"]).to eq("no account bindings")
+          end
+        end
+
+        it "sorts by registration workflow_state" do
+          inactive_reg = lti_registration_model(account:, name: "Inactive reg")
+          inactive_reg.deactivate!
+
           subject
-          expect(response_data.last["name"]).to eq("no account bindings")
+          workflow_states = response_data.pluck("workflow_state")
+          expect(workflow_states).to eq(workflow_states.sort)
         end
       end
 
