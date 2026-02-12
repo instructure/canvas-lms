@@ -150,11 +150,11 @@ const SignIn = () => {
   }
 
   const handleUsernameChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setUsername(value.trim())
+    setUsername(value)
   }
 
   const handlePasswordChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setPassword(value.trim())
+    setPassword(value)
   }
 
   if (otpRequired && !isPreviewMode) {

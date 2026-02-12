@@ -283,7 +283,7 @@ const Parent = () => {
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setEmail(value.trim())
+    setEmail(value)
   }
 
   const handlePasswordChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -295,7 +295,7 @@ const Parent = () => {
   }
 
   const handlePairingCodeChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setPairingCode(value.trim())
+    setPairingCode(value)
   }
 
   const handleTermsChange = (checked: boolean) => {

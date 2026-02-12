@@ -135,11 +135,11 @@ describe('ForgotPassword', () => {
       expect(emailInput).toHaveValue('test@example.com')
     })
 
-    it('trims whitespace from the email input', async () => {
+    it('allows spaces to be typed in the email input', async () => {
       setup()
       const emailInput = screen.getByTestId('email-input')
-      await userEvent.type(emailInput, '  test@example.com  ')
-      expect(emailInput).toHaveValue('test@example.com')
+      await userEvent.type(emailInput, 'test user@example.com')
+      expect(emailInput).toHaveValue('test user@example.com')
     })
   })
 

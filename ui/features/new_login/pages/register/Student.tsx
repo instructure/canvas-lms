@@ -306,7 +306,7 @@ const Student = () => {
   }
 
   const handleUsernameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setUsername(value.trim())
+    setUsername(value)
   }
 
   const handlePasswordChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -318,11 +318,11 @@ const Student = () => {
   }
 
   const handleJoinCodeChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setJoinCode(value.trim())
+    setJoinCode(value)
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setEmail(value.trim())
+    setEmail(value)
   }
 
   const handleTermsChange = (checked: boolean) => {

@@ -93,7 +93,7 @@ const ForgotPassword = () => {
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setEmail(value.trim())
+    setEmail(value)
   }
 
   const handleCancel = () => assignLocation(LOGIN_ENTRY_URL)
