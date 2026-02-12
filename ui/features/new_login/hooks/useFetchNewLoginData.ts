@@ -39,6 +39,7 @@ interface NewLoginData {
   invalidLoginFaqUrl?: string
   helpLink?: HelpLink
   requireAup?: boolean
+  discoveryEnabled?: boolean
   customMessageLogin?: string
   customMessageRegistration?: string
   customMessageRegistrationParent?: string
@@ -152,6 +153,7 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
         invalidLoginFaqUrl: getStringAttribute(container, 'data-invalid-login-faq-url'),
         helpLink: getObjectAttribute<HelpLink>(container, 'data-help-link', transformHelpLink),
         requireAup: getBooleanAttribute(container, 'data-require-aup'),
+        discoveryEnabled: getBooleanAttribute(container, 'data-discovery-enabled'),
         customMessageLogin: getStringAttribute(container, 'data-custom-message-login'),
         customMessageRegistration: getStringAttribute(
           container,
@@ -187,6 +189,7 @@ export const useFetchNewLoginData = (): NewLoginDataResult => {
     invalidLoginFaqUrl: undefined,
     helpLink: undefined,
     requireAup: undefined,
+    discoveryEnabled: undefined,
     customMessageLogin: undefined,
     customMessageRegistration: undefined,
     customMessageRegistrationParent: undefined,

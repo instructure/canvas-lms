@@ -40,6 +40,7 @@ const createMockContainer = (
   invalidLoginFaqUrl: string | null,
   helpLink: string | null,
   requireAup: string | null,
+  discoveryEnabled: string | null,
   customMessageLogin?: string | null,
   customMessageRegistration?: string | null,
   customMessageRegistrationParent?: string | null,
@@ -103,6 +104,9 @@ const createMockContainer = (
   if (requireAup !== null) {
     container.setAttribute('data-require-aup', requireAup)
   }
+  if (discoveryEnabled !== null) {
+    container.setAttribute('data-discovery-enabled', discoveryEnabled)
+  }
   if (customMessageLogin !== undefined && customMessageLogin !== null) {
     container.setAttribute('data-custom-message-login', customMessageLogin)
   }
@@ -152,6 +156,7 @@ describe('useFetchNewLoginData', () => {
       '', // invalidLoginFaqUrl
       '', // helpLink
       '', // requireAup
+      '', // discoveryEnabled
       '', // customMessageLogin
       '', // customMessageRegistration
       '', // customMessageRegistrationParent
@@ -179,6 +184,7 @@ describe('useFetchNewLoginData', () => {
         'invalidLoginFaqUrl',
         'helpLink',
         'requireAup',
+        'discoveryEnabled',
         'customMessageLogin',
         'customMessageRegistration',
         'customMessageRegistrationParent',
@@ -209,6 +215,7 @@ describe('useFetchNewLoginData', () => {
       invalidLoginFaqUrl: undefined,
       helpLink: undefined,
       requireAup: undefined,
+      discoveryEnabled: undefined,
       customMessageLogin: undefined,
       customMessageRegistration: undefined,
       customMessageRegistrationParent: undefined,
@@ -244,6 +251,7 @@ describe('useFetchNewLoginData', () => {
         trackLabel: 'help',
       }), // helpLink
       'true', // requireAup
+      'true', // discoveryEnabled
       'Welcome to our platform!', // customMessageLogin
       'Register to get started!', // customMessageRegistration
       'Please fill out the registration form below.', // customMessageRegistrationParent
@@ -277,6 +285,7 @@ describe('useFetchNewLoginData', () => {
         trackLabel: 'help',
       },
       requireAup: true,
+      discoveryEnabled: true,
       customMessageLogin: 'Welcome to our platform!',
       customMessageRegistration: 'Register to get started!',
       customMessageRegistrationParent: 'Please fill out the registration form below.',
@@ -305,6 +314,7 @@ describe('useFetchNewLoginData', () => {
       null, // invalidLoginFaqUrl
       null, // helpLink
       null, // requireAup
+      null, // discoveryEnabled
       null, // customMessageLogin
       null, // customMessageRegistration
       null, // customMessageRegistrationParent
@@ -339,6 +349,7 @@ describe('useFetchNewLoginData', () => {
       null, // invalidLoginFaqUrl
       null, // helpLink
       'false', // requireAup
+      'false', // discoveryEnabled
       null, // customMessageLogin
       null, // customMessageRegistration
       null, // customMessageRegistrationParent
@@ -348,6 +359,7 @@ describe('useFetchNewLoginData', () => {
     expect(result.current.data.isPreviewMode).toBe(false)
     expect(result.current.data.requireEmail).toBe(false)
     expect(result.current.data.requireAup).toBe(false)
+    expect(result.current.data.discoveryEnabled).toBe(false)
   })
 
   it('returns undefined for empty string attributes', () => {
@@ -371,6 +383,7 @@ describe('useFetchNewLoginData', () => {
       '', // invalidLoginFaqUrl
       '', // helpLink
       '', // requireAup
+      '', // discoveryEnabled
       '', // customMessageLogin
       '', // customMessageRegistration
       '', // customMessageRegistrationParent
@@ -396,6 +409,7 @@ describe('useFetchNewLoginData', () => {
       invalidLoginFaqUrl: undefined,
       helpLink: undefined,
       requireAup: undefined,
+      discoveryEnabled: undefined,
       customMessageLogin: undefined,
       customMessageRegistration: undefined,
       customMessageRegistrationParent: undefined,
@@ -423,6 +437,7 @@ describe('useFetchNewLoginData', () => {
       null, // invalidLoginFaqUrl
       JSON.stringify({}), // helpLink
       null, // requireAup
+      null, // discoveryEnabled
       null, // customMessageLogin
       null, // customMessageRegistration
       null, // customMessageRegistrationParent
@@ -459,6 +474,7 @@ describe('useFetchNewLoginData', () => {
       null, // invalidLoginFaqUrl
       null, // helpLink
       null, // requireAup
+      null, // discoveryEnabled
       null, // customMessageLogin
       null, // customMessageRegistration
       null, // customMessageRegistrationParent
@@ -525,6 +541,7 @@ describe('useFetchNewLoginData', () => {
         null, // invalidLoginFaqUrl
         null, // helpLink
         null, // requireAup
+        null, // discoveryEnabled
         xssStrings[0], // customMessageLogin
         xssStrings[2], // customMessageRegistration
         xssStrings[3], // customMessageRegistrationParent

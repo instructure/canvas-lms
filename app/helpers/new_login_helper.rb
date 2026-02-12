@@ -44,6 +44,7 @@ module NewLoginHelper
       invalid_login_faq_url:,
       help_link: help_link_info,
       require_aup:,
+      discovery_enabled:,
       custom_message_login:,
       custom_message_registration:,
       custom_message_registration_parent:
@@ -54,7 +55,7 @@ module NewLoginHelper
 
   # course catalog link for display in the top navigation bar
   def enable_course_catalog
-    @domain_root_account&.enable_course_catalog? && "true"
+    @domain_root_account.enable_course_catalog? && "true"
   end
 
   # returns a simplified version of authentication providers
@@ -71,7 +72,7 @@ module NewLoginHelper
 
   # “Authentication Settings” customizable “Login Label”
   def login_handle_name
-    @domain_root_account&.login_handle_name_with_inference.presence
+    @domain_root_account.login_handle_name_with_inference.presence
   end
 
   # “Themes” custom organization logo as defined in the “Current theme”
@@ -103,7 +104,7 @@ module NewLoginHelper
 
   # “Authentication Settings” Canvas provider self-registration (none, all, observer)
   def self_registration_type
-    return nil unless @domain_root_account&.self_registration?
+    return nil unless @domain_root_account.self_registration?
 
     value = @domain_root_account.self_registration_type
     %w[all observer].include?(value) ? value : nil
@@ -111,12 +112,12 @@ module NewLoginHelper
 
   # reCAPTCHA site key for the current domain, if configured
   def recaptcha_key
-    @domain_root_account&.recaptcha_key.presence
+    @domain_root_account.recaptcha_key.presence
   end
 
   # whether the current domain requires users to accept terms on login
   def terms_required
-    @domain_root_account&.terms_required? && "true"
+    @domain_root_account.terms_required? && "true"
   end
 
   # URL for the terms of use, if configured for the current domain
@@ -131,12 +132,12 @@ module NewLoginHelper
 
   # whether email is required for self-registration on the current domain
   def require_email
-    @domain_root_account&.require_email_for_registration? && "true"
+    @domain_root_account.require_email_for_registration? && "true"
   end
 
   # password policy rules as a hash, or nil if none are configured
   def password_policy
-    data = @domain_root_account&.password_policy&.slice(
+    data = @domain_root_account.password_policy&.slice(
       :minimum_character_length,
       :require_number_characters,
       :require_symbol_characters
@@ -149,7 +150,7 @@ module NewLoginHelper
   def forgot_password_url
     return nil if params[:canvas_login] == "1"
 
-    @domain_root_account&.forgot_password_external_url.presence
+    @domain_root_account.forgot_password_external_url.presence
   end
 
   # URL for login help if configured for account (with global fallback)
@@ -177,6 +178,10 @@ module NewLoginHelper
 
   def require_aup
     (TermsOfService.ensure_terms_for_account(@domain_root_account)&.terms_type == "no_terms") ? nil : "true"
+  end
+
+  def discovery_enabled
+    (@domain_root_account.discovery_page_active? || @domain_root_account.auth_discovery_url(request).present?) ? "true" : nil
   end
 
   # custom messages as defined in the theme editor for login, registration, and parent registration
