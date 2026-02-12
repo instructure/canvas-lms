@@ -30,6 +30,7 @@ describe('useLMGBContext', () => {
           env: {
             accountLevelMasteryScalesFF: true,
             outcomesFriendlyDescriptionFF: true,
+            allowDifferentiationTags: true,
             contextURL: '/courses/1',
             outcomeProficiency: mockProficiency,
           },
@@ -41,6 +42,7 @@ describe('useLMGBContext', () => {
     const {result} = renderHook(() => useLMGBContext(), {wrapper})
     expect(result.current.accountLevelMasteryScalesFF).toBe(true)
     expect(result.current.outcomesFriendlyDescriptionFF).toBe(true)
+    expect(result.current.allowDifferentiationTags).toBe(true)
     expect(result.current.contextURL).toBe('/courses/1')
     expect(result.current.outcomeProficiency).toEqual(mockProficiency)
   })
@@ -52,7 +54,40 @@ describe('useLMGBContext', () => {
     const {result} = renderHook(() => useLMGBContext(), {wrapper})
     expect(result.current.accountLevelMasteryScalesFF).toBe(undefined)
     expect(result.current.outcomesFriendlyDescriptionFF).toBe(undefined)
+    expect(result.current.allowDifferentiationTags).toBe(undefined)
     expect(result.current.contextURL).toBe(undefined)
     expect(result.current.outcomeProficiency).toBe(undefined)
+  })
+
+  it('returns false when allowDifferentiationTags is explicitly set to false', () => {
+    const wrapper = ({children}) => (
+      <LMGBContext.Provider
+        value={{
+          env: {
+            allowDifferentiationTags: false,
+          },
+        }}
+      >
+        {children}
+      </LMGBContext.Provider>
+    )
+    const {result} = renderHook(() => useLMGBContext(), {wrapper})
+    expect(result.current.allowDifferentiationTags).toBe(false)
+  })
+
+  it('returns true when allowDifferentiationTags is explicitly set to true', () => {
+    const wrapper = ({children}) => (
+      <LMGBContext.Provider
+        value={{
+          env: {
+            allowDifferentiationTags: true,
+          },
+        }}
+      >
+        {children}
+      </LMGBContext.Provider>
+    )
+    const {result} = renderHook(() => useLMGBContext(), {wrapper})
+    expect(result.current.allowDifferentiationTags).toBe(true)
   })
 })
