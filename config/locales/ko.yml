@@ -19372,6 +19372,7 @@ ko:
   no_integrations_available_6729d0ca: "사용 가능한 통합 없음"
   no_issuer_configured_for_openid_connect_provider_8b78f00e: "OpenID Connect 공급자에 구성된 발급자 없음"
   no_issues_fce85bba: "발급자 없음"
+  no_items_20cde5bf: "항목이 없습니다."
   no_items_found_870b2d0d: "항목을 찾을 수 없음"
   no_items_in_this_module_917bc681: "이 모듈에 항목 없음"
   no_job_selected_d6c5e6f4: "선택된 작업 없음"
