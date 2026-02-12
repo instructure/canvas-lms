@@ -856,12 +856,11 @@ class Course < ActiveRecord::Base
     if used_roles.any?
       available_roles = account.available_course_roles(true)
       (used_roles - available_roles).each do |missing_role|
-        replacement_roles = available_roles.select do |role|
+        replacement_role = available_roles.find do |role|
           role.built_in? == missing_role.built_in? &&
             role.name == missing_role.name &&
             role.base_role_type == missing_role.base_role_type
         end
-        replacement_role = replacement_roles.find(&:active?) || replacement_roles.first
         if replacement_role
           role_map[missing_role.id] = replacement_role.id
         else

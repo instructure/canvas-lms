@@ -3162,6 +3162,14 @@ describe Account do
       result = account.get_role_by_name(role_name)
       expect(result).to be_nil
     end
+
+    it "returns the most specific role if multiple roles exist in the account chain" do
+      sub_account = account.sub_accounts.create!
+      sub_account.roles.create(name: role_name, base_role_type: "TeacherEnrollment", workflow_state: "active")
+
+      result = sub_account.get_role_by_name(role_name)
+      expect(result.account_id).to eq(sub_account.id)
+    end
   end
 
   describe "horizon account" do

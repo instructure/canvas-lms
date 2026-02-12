@@ -816,6 +816,23 @@ describe SIS::CSV::EnrollmentImporter do
         expect(@user1.enrollments.size).to eq 0
         expect(@user2.enrollments.map { |e| [e.type, e.role.name] }).to eq [["DesignerEnrollment", "Pixel Pusher"]]
       end
+
+      it "finds the most specific role when multiple roles have the same name" do
+        sub1 = @account.sub_accounts.create!
+        sub2 = sub1.sub_accounts.create!
+        sub3 = sub2.sub_accounts.create!
+        @account.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        sub2.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        sub1.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        course2 = course_model(account: sub3, sis_source_id: "OtherCourse")
+        process_csv_data_cleanly(
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "OtherCourse,user2,Pixel Pusher,,active,"
+        )
+        role = course2.enrollments.where(user_id: @user2).first.role
+        expect(role.name).to eq "Pixel Pusher"
+        expect(role.account_id).to eq sub2.id
+      end
     end
   end
 
