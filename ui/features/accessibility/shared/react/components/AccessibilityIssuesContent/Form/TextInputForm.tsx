@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {forwardRef, useImperativeHandle, useRef, useState, useEffect} from 'react'
+import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -33,6 +33,8 @@ import {useShallow} from 'zustand/react/shallow'
 
 const I18n = createI18nScope('accessibility_checker')
 
+export const CAPTION_EMPTY_MESSAGE = I18n.t('Caption cannot be empty.')
+
 const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
     (
@@ -40,9 +42,9 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
         issue,
         error,
         value,
+        onValidationChange,
         onChangeValue,
         isDisabled,
-        onValidationChange,
         onGenerateLoadingChange,
       }: FormComponentProps,
       ref,
@@ -60,9 +62,15 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
         },
       }))
 
-      useEffect(() => {
-        onValidationChange?.(value?.trim()?.length > 0, I18n.t('Caption cannot be empty.'))
-      }, [value, onValidationChange])
+      const handleOnChange = (value: string) => {
+        onChangeValue(value)
+
+        if (value?.trim().length === 0) {
+          onValidationChange?.(false, CAPTION_EMPTY_MESSAGE)
+        } else {
+          onValidationChange?.(true)
+        }
+      }
 
       const handleGenerateClick = () => {
         setGenerateLoading(true)
@@ -85,7 +93,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             return result.json
           })
           .then(resultJson => {
-            onChangeValue(resultJson?.value)
+            handleOnChange(resultJson?.value || '')
           })
           .catch(error => {
             const statusCode = error?.response?.status || 0
@@ -116,7 +124,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             data-testid="text-input-form"
             renderLabel={issue.form.label}
             value={value || ''}
-            onChange={(_, value) => onChangeValue(value)}
+            onChange={(_, value) => handleOnChange(value)}
             inputRef={el => (inputRef.current = el)}
             messages={error ? [{text: error, type: 'newError'}] : []}
             interaction={isDisabled ? 'disabled' : 'enabled'}
