@@ -5902,7 +5902,7 @@ describe Submission do
 
       body = "<a href=/users/#{@user.id}/files/#{f.id}>blah.txt</a>"
 
-      sub = @assignment.submit_homework(@user, submission_type: "online_text_entry", body:, saving_user: @user)
+      sub = @assignment.submit_homework(@user, submission_type: "online_text_entry", body:, updating_user: @user)
       expect(f.attachment_associations.pluck(:context_type)).to eq ["Submission"]
       expect(f.attachment_associations.pluck(:context_id)).to eq [sub.id]
     end
@@ -5913,6 +5913,27 @@ describe Submission do
       sub = @assignment.submit_homework(@user, submission_type: "online_upload", attachments: [f])
       expect(f.attachment_associations.pluck(:context_type)).to eq ["Submission"]
       expect(f.attachment_associations.pluck(:context_id)).to eq [sub.id]
+    end
+
+    it "keeps attachment associations when new submissions are submitted" do
+      @course.enroll_student(@user, enrollment_state: :active)
+      attachment_model(filename: "blah.txt", user: @user, context: @user)
+      body = "<a href=/users/#{@user.id}/files/#{@attachment.id}>blah.txt</a>"
+
+      sub = @assignment.submit_homework(@user, submission_type: "online_text_entry", body:)
+      expect(sub.reload.attachment_associations.count).to eq 1
+      aa = sub.attachment_associations.take
+      expect(aa.attributes).to include({
+                                         "attachment_id" => @attachment.id,
+                                         "context_id" => sub.id,
+                                         "context_type" => "Submission",
+                                         "root_account_id" => @course.root_account_id,
+                                         "user_id" => @user.id,
+                                         "context_concern" => nil
+                                       })
+
+      @assignment.submit_homework(@user, submission_type: "online_text_entry", body: "meh", updating_user: @user)
+      expect(sub.reload.attachment_associations).to eq([aa])
     end
   end
 

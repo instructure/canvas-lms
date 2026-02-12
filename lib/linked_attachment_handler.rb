@@ -74,7 +74,7 @@ module LinkedAttachmentHandler
   end
 
   def keep_associations?(attachment, session, user)
-    !attachment.grants_right?(user, session, :delete)
+    instance_of?(Submission) || instance_of?(Quizzes::QuizSubmission) || !attachment.grants_right?(user, session, :delete)
   end
 
   # NB: context_concern is a virtual subdivision of context.
