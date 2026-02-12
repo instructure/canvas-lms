@@ -117,24 +117,18 @@ describe('SignIn', () => {
   })
 
   describe('user input', () => {
-    it('trims whitespace from the username field when typing', async () => {
+    it('allows spaces to be typed in the username field', async () => {
       setup()
       const usernameInput = screen.getByTestId('username-input')
-      const loginButton = screen.getByTestId('login-button')
-      await userEvent.type(usernameInput, '   user@example.com   ')
-      await userEvent.click(loginButton)
-      expect(usernameInput).toHaveValue('user@example.com')
-      expect(usernameInput).not.toHaveValue('   user@example.com   ')
+      await userEvent.type(usernameInput, 'user name')
+      expect(usernameInput).toHaveValue('user name')
     })
 
-    it('trims whitespace from the password field when typing', async () => {
+    it('allows spaces to be typed in the password field', async () => {
       setup()
       const passwordInput = screen.getByTestId('password-input')
-      const loginButton = screen.getByTestId('login-button')
-      await userEvent.type(passwordInput, '   password123   ')
-      await userEvent.click(loginButton)
-      expect(passwordInput).toHaveValue('password123')
-      expect(passwordInput).not.toHaveValue('   password123   ')
+      await userEvent.type(passwordInput, 'pass word 123')
+      expect(passwordInput).toHaveValue('pass word 123')
     })
   })
 })

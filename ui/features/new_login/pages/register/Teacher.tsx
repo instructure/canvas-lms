@@ -199,7 +199,7 @@ const Teacher = () => {
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setEmail(value.trim())
+    setEmail(value)
   }
 
   const handleNameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
