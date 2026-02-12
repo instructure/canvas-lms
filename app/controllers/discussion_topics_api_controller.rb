@@ -216,20 +216,29 @@ class DiscussionTopicsApiController < ApplicationController
     when InstLLM::ValidationTooLongError
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.too_long")
       render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_content)
-    when InstLLM::ValidationError, InstructureMiscPlugin::Extensions::CedarClient::ValidationError
+    when InstLLM::ValidationError
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.validation")
       render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_content)
     when InstLLMHelper::RateLimitExceededError
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
       render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed (%{limit}) for now. Please try again later.", limit: e.limit) }, status: :too_many_requests)
-    when InstructureMiscPlugin::Extensions::CedarClient::CedarClientError
-      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.cedar_client")
-      Canvas::Errors.capture_exception(:discussion_summary, e, :error)
-      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_content)
     else
-      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.unknown")
-      Canvas::Errors.capture_exception(:discussion_summary, e, :error)
-      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_content)
+      case e.class.name
+      when "InstructureMiscPlugin::Extensions::CedarClient::ValidationError"
+        InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.validation")
+        render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_content)
+      when "InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError"
+        InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
+        render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed for now. Please try again later.") }, status: :too_many_requests)
+      when "InstructureMiscPlugin::Extensions::CedarClient::CedarClientError"
+        InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.cedar_client")
+        Canvas::Errors.capture_exception(:discussion_summary, e, :error)
+        render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_content)
+      else
+        InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.unknown")
+        Canvas::Errors.capture_exception(:discussion_summary, e, :error)
+        render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_content)
+      end
     end
   end
 

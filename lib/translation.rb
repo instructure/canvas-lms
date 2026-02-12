@@ -133,6 +133,8 @@ module Translation
       yield
     rescue => e
       case e.class.name
+      when /SameLanguageTranslationError/
+        raise SameLanguageTranslationError
       when /ContentTooLongError/
         raise TextTooLongError
       when /UnsupportedLanguageError/
