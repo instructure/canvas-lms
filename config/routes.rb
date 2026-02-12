@@ -1885,6 +1885,11 @@ CanvasRails::Application.routes.draw do
         get "courses/:course_id/convert_tag_overrides/status", action: :conversion_job_status
       end
 
+      scope(controller: :assignment_peer_review_allocation_conversion) do
+        put "courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations", action: :convert_peer_review_allocations
+        get "courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations/status", action: :conversion_job_status
+      end
+
       scope(controller: :login) do
         get "login/session_token", action: :session_token, as: :login_session_token
       end

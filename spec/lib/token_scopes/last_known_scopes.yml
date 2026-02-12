@@ -679,6 +679,10 @@
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations'
+- verb: GET
+  path: /api/v1/courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations/status
 - verb: GET
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/date_details'
 - verb: PUT
