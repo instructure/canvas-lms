@@ -193,7 +193,8 @@ module Lti
         [[c[:account_id], c[:deployment_id]], true]
       end.to_h
 
-      controls.filter_map do |c|
+      # First pass: calculate all anchor controls that might need to be created
+      anchor_controls = controls.filter_map do |c|
         if deployment_course_ids.key?(c[:deployment_id])
           # course-level deployments never need an anchor control
           next nil
@@ -240,8 +241,30 @@ module Lti
           account_id: anchor_account_id,
           available: parent_availability,
           path:,
-        }
+        }.with_indifferent_access
       end.uniq { [it[:account_id], it[:deployment_id]] }
+
+      # Second pass: query for existing anchor controls and filter them out
+      # If an anchor already exists, we don't need to create it
+      if anchor_controls.any?
+        account_ids = anchor_controls.pluck(:account_id)
+        deployment_ids = anchor_controls.pluck(:deployment_id)
+
+        existing_anchors = Lti::ContextControl
+                           .active
+                           .where(
+                             # We use unnest here to help with query plan caching
+                             "(account_id, deployment_id) IN (SELECT unnest(ARRAY[?]::bigint[]), unnest(ARRAY[?]::bigint[]))",
+                             account_ids,
+                             deployment_ids
+                           )
+                           .pluck(:account_id, :deployment_id)
+                           .to_set { |account_id, deployment_id| [account_id, deployment_id] }
+
+        anchor_controls.reject! { |ac| existing_anchors.include?([ac[:account_id], ac[:deployment_id]]) }
+      end
+
+      anchor_controls
     end
 
     # Calculate attributes in bulk for a collection of Lti::ContextControls.

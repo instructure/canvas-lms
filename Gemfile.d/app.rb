@@ -49,7 +49,7 @@ gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
 gem "canvas_link_migrator", "~> 1.0"
 gem "canvas_webex", "0.18.2"
-gem "code_ownership", "~> 1.33"
+gem "code_ownership", "~> 2.1"
 gem "datadog", "~> 2.1", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"

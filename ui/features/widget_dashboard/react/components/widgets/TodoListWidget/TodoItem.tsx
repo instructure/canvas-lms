@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -26,7 +26,7 @@ import {Link} from '@instructure/ui-link'
 import {IconCheckPlusLine, IconCheckLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import type {PlannerItem} from './types'
-import {formatDate, getPlannableTypeLabel, isOverdue} from './utils'
+import {formatDate, formatAnnouncementDate, getPlannableTypeLabel, isOverdue} from './utils'
 import {usePlannerOverride} from './hooks/usePlannerOverride'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -36,10 +36,15 @@ interface TodoItemProps {
 }
 
 const TodoItem: React.FC<TodoItemProps> = ({item}) => {
-  const dateText = formatDate(item.plannable_date)
-  const isItemOverdue = isOverdue(item.plannable_date)
+  const isAnnouncement = item.plannable_type === 'announcement'
+  const dateText = isAnnouncement
+    ? formatAnnouncementDate(item.plannable_date)
+    : formatDate(item.plannable_date)
+  const isItemOverdue = isAnnouncement ? false : isOverdue(item.plannable_date)
   const typeLabel = getPlannableTypeLabel(item.plannable_type)
   const {toggleComplete, isLoading} = usePlannerOverride()
+  const buttonRef = useRef<HTMLButtonElement | null>(null)
+  const previousLoadingRef = useRef<boolean>(false)
 
   const isMarkedComplete =
     item.planner_override?.marked_complete ||
@@ -50,6 +55,13 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
 
   // For planner notes, course_id may be in plannable.course_id instead of item.course_id
   const courseId = item.course_id || item.plannable.course_id
+
+  useEffect(() => {
+    if (previousLoadingRef.current && !isLoading) {
+      buttonRef.current?.focus()
+    }
+    previousLoadingRef.current = isLoading
+  }, [isLoading])
 
   const handleCheckboxClick = () => {
     toggleComplete({
@@ -67,6 +79,8 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
       borderRadius="large"
       background="secondary"
       data-testid={`todo-item-${item.plannable_id}`}
+      role="group"
+      aria-label={item.plannable?.title ?? I18n.t('Unnamed To-Do')}
       themeOverride={{
         backgroundSecondary: '#F9FAFA',
       }}
@@ -86,7 +100,11 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
                 isWithinText={false}
                 data-testid={`todo-link-${item.plannable_id}`}
               >
-                <Text weight="bold" color={isMarkedComplete ? 'secondary' : undefined}>
+                <Text
+                  weight="bold"
+                  wrap="break-word"
+                  color={isMarkedComplete ? 'secondary' : undefined}
+                >
                   {item.plannable.title}
                 </Text>
               </Link>
@@ -94,7 +112,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
 
             {item.plannable.details && (
               <Flex.Item>
-                <Text size="small" color="secondary" lineHeight="condensed">
+                <Text size="small" color="secondary" wrap="break-word" lineHeight="condensed">
                   {item.plannable.details}
                 </Text>
               </Flex.Item>
@@ -107,7 +125,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
                   isWithinText={false}
                   data-testid={`todo-item-course-link-${item.plannable_id}`}
                 >
-                  <Text size="small" color="secondary">
+                  <Text wrap="break-word" size="small" color="secondary">
                     {item.context_name}
                   </Text>
                 </Link>
@@ -123,15 +141,17 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
                 )}
                 {dateText &&
                   item.plannable.points_possible !== undefined &&
-                  item.plannable.points_possible !== null && (
+                  item.plannable.points_possible !== null &&
+                  item.plannable.points_possible > 0 && (
                     <Text size="small" color="secondary">
                       {' | '}
                     </Text>
                   )}
                 {item.plannable.points_possible !== undefined &&
-                  item.plannable.points_possible !== null && (
+                  item.plannable.points_possible !== null &&
+                  item.plannable.points_possible > 0 && (
                     <Text size="small" color="secondary">
-                      {item.plannable.points_possible} pts
+                      {I18n.t('%{points} points', {points: item.plannable.points_possible})}
                     </Text>
                   )}
               </Text>
@@ -148,6 +168,9 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
             />
           ) : (
             <IconButton
+              elementRef={(el: Element | null) => {
+                buttonRef.current = el as HTMLButtonElement | null
+              }}
               screenReaderLabel={
                 isMarkedComplete
                   ? I18n.t('Mark %{title} as incomplete', {title: item.plannable.title})

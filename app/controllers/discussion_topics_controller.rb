@@ -716,7 +716,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:RESTRICT_QUANTITATIVE_DATA] = @context.settings[:restrict_quantitative_data]
     end
 
-    if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post) && @context.grants_right?(@current_user, session, :read)
+    if @context.grants_right?(@current_user, session, :read)
       js_hash[:context_id] = @context.id
       if @context.is_a?(Course)
         js_hash[:context_type] = "Course"
@@ -733,18 +733,12 @@ class DiscussionTopicsController < ApplicationController
     conditional_release_js_env(@topic.assignment)
 
     respond_to do |format|
-      if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post)
-        @page_title = topic_page_title(@topic)
+      @page_title = topic_page_title(@topic)
 
-        js_bundle :discussion_topic_edit_v2
-        css_bundle :discussions_index, :learning_outcomes, :conditional_release_editor
-        format.html do
-          render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
-        end
-      else
-        format.html do
-          render :edit, layout: (params[:embed] == "true") ? "mobile_embed" : true
-        end
+      js_bundle :discussion_topic_edit_v2
+      css_bundle :discussions_index, :learning_outcomes, :conditional_release_editor
+      format.html do
+        render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
       end
     end
   end
@@ -772,17 +766,6 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
-    if @topic.anonymous? && !@context.feature_enabled?(:react_discussions_post)
-      message = if @context.grants_right?(@current_user, session, :read_as_admin)
-                  I18n.t(:anonymous_topic_notice_teacher, "Anonymous topics cannot be accessed without Discussions/Announcements Redesign feature preview enabled.")
-                else
-                  I18n.t(:anonymous_topic_notice_student, "Anonymous topics are not available at this time.")
-                end
-      flash[:info] = message
-      redirect_to named_context_url(@context, :context_discussion_topics_url)
-      return
-    end
-
     if (can_read_and_visible = @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user))
       @topic.change_read_state("read", @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       add_rss_links_to_content
@@ -805,313 +788,158 @@ class DiscussionTopicsController < ApplicationController
                            @topic.available_for?(@current_user)
                          )
 
-    # Render updated Post UI if feature flag is enabled
-    if @context.feature_enabled?(:react_discussions_post)
-      env_hash = {
-        per_page: 20,
-        split_screen_view_initial_page_size: 5,
-        current_page: 0
+    # Render updated Post UI
+    env_hash = {
+      per_page: 20,
+      split_screen_view_initial_page_size: 5,
+      current_page: 0
+    }
+    unless @context.is_a?(Group)
+      env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url)
+      env_hash[:VALID_DATE_RANGE] = CourseDateRange.new(@context)
+      env_hash[:HAS_GRADING_PERIODS] = @context.grading_periods?
+      set_section_list_js_env
+    end
+    if params[:entry_id] && @topic.discussion_entries.find_by(id: params[:entry_id])
+      entry = @topic.discussion_entries.find(params[:entry_id])
+      env_hash[:discussions_deep_link] = {
+        root_entry_id: entry.root_entry_id,
+        parent_id: entry.parent_id,
+        entry_id: entry.id
       }
-      unless @context.is_a?(Group)
-        env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url)
-        env_hash[:VALID_DATE_RANGE] = CourseDateRange.new(@context)
-        env_hash[:HAS_GRADING_PERIODS] = @context.grading_periods?
-        set_section_list_js_env
-      end
-      if params[:entry_id] && @topic.discussion_entries.find_by(id: params[:entry_id])
-        entry = @topic.discussion_entries.find(params[:entry_id])
-        env_hash[:discussions_deep_link] = {
-          root_entry_id: entry.root_entry_id,
-          parent_id: entry.parent_id,
-          entry_id: entry.id
-        }
 
-        entry = entry.highest_level_parent_or_self
-        sort_order = @topic.sort_order_for_user(@current_user)
-        condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">" : "<"
-        count_before = @topic.root_discussion_entries
-                             .where(parent_id: nil)
-                             .where("created_at #{condition}?", entry.created_at).count
-        env_hash[:current_page] = (count_before / env_hash[:per_page]).ceil
+      entry = entry.highest_level_parent_or_self
+      sort_order = @topic.sort_order_for_user(@current_user)
+      condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">" : "<"
+      count_before = @topic.root_discussion_entries
+                           .where(parent_id: nil)
+                           .where("created_at #{condition}?", entry.created_at).count
+      env_hash[:current_page] = (count_before / env_hash[:per_page]).ceil
 
-      end
-      js_env(env_hash)
+    end
+    js_env(env_hash)
 
-      topics = groups_and_group_topics if @topic.for_group_discussion?
-      if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
-        redirect_params = { root_discussion_topic_id: @topic.id }
-        redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
-        # add in query parameters from the url, we want them preserved
-        redirect_params.merge!(request.query_parameters) unless request.query_parameters.empty?
-        redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params)
-        return
-      end
-      log_asset_access(@topic, "topics", "topics")
-
-      if @sequence_asset
-        js_env({ SEQUENCE: {
-                 ASSET_TYPE: @sequence_asset.is_a?(Assignment) ? "Assignment" : "Discussion",
-                 ASSET_ID: @sequence_asset.id,
-                 COURSE_ID: @sequence_asset.context.id,
-               } })
-      end
-
-      @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
-      if @topic.for_assignment? && @presenter.allows_speed_grader? && @assignment_presenter.can_view_speed_grader_link?(@current_user)
-        js_env(
-          { SPEEDGRADER_URL_TEMPLATE: named_context_url(
-            @topic.assignment.context,
-            :speed_grader_context_gradebook_url,
-            assignment_id: @topic.assignment.id,
-            student_id: ":student_id"
-          ) }
-        )
-      end
-
-      unless can_read_and_visible
-        return render_unauthorized_action unless @current_user
-
-        respond_to do |format|
-          if @topic.is_announcement
-            flash[:error] = t "You do not have access to the requested announcement."
-            format.html do
-              redirect_to named_context_url(@context, :context_announcements_url)
-              return
-            end
-          else
-            flash[:error] = t "You do not have access to the requested discussion."
-            format.html do
-              redirect_to named_context_url(@context, :context_discussion_topics_url)
-              return
-            end
-          end
-        end
-      end
-
-      edit_url = context_url(@topic.context, :edit_context_discussion_topic_url, @topic)
-      edit_url += "?embed=true" if params[:embed] == "true"
-
-      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
-      participant = @topic.participant(@current_user)
-      translation_flags = Translation.get_translation_flags(@context.feature_enabled?(:translation), @domain_root_account)
-      js_env({
-               course_id: params[:course_id] || @context.course&.id,
-               context_type: @topic.context_type,
-               context_id: @context.id,
-               EDIT_URL: edit_url,
-               INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
-               PEER_REVIEWS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) : nil,
-               ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
-               CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
-               discussion_topic_id: @topic.id,
-               manual_mark_as_read: @current_user&.manual_mark_as_read?,
-               discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
-               rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
-               discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
-               discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
-               discussion_translation_available: Translation.available?(translation_flags), # Is translation enabled on the course.
-               ai_translation_improvements: @domain_root_account.feature_enabled?(:ai_translation_improvements),
-               cedar_translation: @domain_root_account.feature_enabled?(:cedar_translation),
-               discussion_translation_languages: Translation.available?(translation_flags) ? Translation.languages(translation_flags) : [],
-               discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
-               user_can_summarize: @topic.user_can_summarize?(@current_user),
-               user_can_access_insights: @topic.user_can_access_insights?(@current_user),
-               discussion_pin_post: @context.feature_enabled?(:discussion_pin_post),
-               discussion_summary_enabled: participant.nil? ? @topic.summary_enabled : participant.summary_enabled,
-               should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
-               # although there is a permissions object in DiscussionEntry type, it's only accessible if a discussion entry
-               # is being replied to. We need this env var so that replying to the topic can use this
-               can_attach_entries:,
-               # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
-               DISCUSSION: {
-                 GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
-                 CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
-                 ATTACHMENTS_FOLDER_ID: @current_user.nil? ? Folder.unfiled_folder(@context).id : Folder.unfiled_folder(@current_user).id,
-                 ASSIGNMENT: @topic.assignment&.asset_string,
-                 preferences: {
-                   discussions_splitscreen_view: @current_user&.discussions_splitscreen_view? || false
-                 }
-               },
-               apollo_caching: @current_user &&
-                 Account.site_admin.feature_enabled?(:apollo_caching),
-               discussion_cache_key: @current_user &&
-                 Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg"),
-               checkpointed_discussion_without_feature_flag:
-                 @topic.assignment&.has_sub_assignments? && !@context.discussion_checkpoints_enabled?,
-               DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
-               DISCUSSION_DEFAULT_EXPAND_ENABLED: true, # this is to avoid a small p4 on release
-               DISCUSSION_DEFAULT_SORT_ENABLED: true, # this is to avoid a small p4 on release
-               restore_discussion_entry: context.feature_enabled?(:restore_discussion_entry),
-             })
-      unless @locked
-        InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
-        InstStatsd::Statsd.count("discussion_topic.visit.entries.redesign", @topic.discussion_entries.count)
-        InstStatsd::Statsd.count("discussion_topic.visit.pages.redesign", (@topic.discussion_entries.count / 20).ceil)
-      end
-
-      asset_processor_eula_js_env_for_discussion
-
-      js_bundle :discussion_topics_post
-      css_bundle :discussions_index, :learning_outcomes
-
-      respond_to do |format|
-        format.html do
-          conditional_release_js_env(@topic.assignment)
-          render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
-        end
-      end
-
+    topics = groups_and_group_topics if @topic.for_group_discussion?
+    if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
+      redirect_params = { root_discussion_topic_id: @topic.id }
+      redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
+      # add in query parameters from the url, we want them preserved
+      redirect_params.merge!(request.query_parameters) unless request.query_parameters.empty?
+      redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params)
       return
     end
+    log_asset_access(@topic, "topics", "topics")
 
-    @assignment = @topic.for_assignment? ? AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user) : nil
-    @context.try(:require_assignment_group)
+    if @sequence_asset
+      js_env({ SEQUENCE: {
+               ASSET_TYPE: @sequence_asset.is_a?(Assignment) ? "Assignment" : "Discussion",
+               ASSET_ID: @sequence_asset.id,
+               COURSE_ID: @sequence_asset.context.id,
+             } })
+    end
 
-    if can_read_and_visible
-      @headers = !params[:headless]
-      @unlock_at = @topic.available_from_for(@current_user)
-      topics = groups_and_group_topics if @topic.for_group_discussion?
+    @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
+    if @topic.for_assignment? && @presenter.allows_speed_grader? && @assignment_presenter.can_view_speed_grader_link?(@current_user)
+      js_env(
+        { SPEEDGRADER_URL_TEMPLATE: named_context_url(
+          @topic.assignment.context,
+          :speed_grader_context_gradebook_url,
+          assignment_id: @topic.assignment.id,
+          student_id: ":student_id"
+        ) }
+      )
+    end
 
-      @initial_post_required = @topic.initial_post_required?(@current_user, session)
-
-      @padless = true
-
-      log_asset_access(@topic, "topics", "topics")
-      respond_to do |format|
-        if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
-          redirect_params = { root_discussion_topic_id: @topic.id }
-          redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
-          format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params) }
-        else
-          format.html do
-            @discussion_topic_menu_tools = external_tools_display_hashes(:discussion_topic_menu)
-
-            if @context.is_a?(Course) && @topic.is_section_specific
-              user_counts = Enrollment.where(course_section_id: @topic.course_sections,
-                                             course_id: @context).not_fake.active_or_pending_by_date_ignoring_access
-                                      .group(:course_section_id).count
-              section_data = @topic.course_sections.map do |cs|
-                cs.attributes.slice(*%w[id name]).merge(user_count: user_counts[cs.id] || 0)
-              end
-            end
-            api_url = lambda do |endpoint, *params|
-              endpoint = "api_v1_context_discussion_#{endpoint}_url"
-              named_context_url(@context, endpoint, @topic, *params)
-            end
-
-            env_hash = {
-              APP_URL: named_context_url(@context, :context_discussion_topic_url, @topic),
-              TOPIC: {
-                ID: @topic.id,
-                TITLE: @topic.title,
-                IS_SUBSCRIBED: @topic.subscribed?(@current_user),
-                IS_PUBLISHED: @topic.published?,
-                CAN_UNPUBLISH: @topic.can_unpublish?,
-                IS_ANNOUNCEMENT: @topic.is_announcement,
-                COURSE_SECTIONS: @topic.is_section_specific ? section_data : nil,
-              },
-              PERMISSIONS: {
-                # Can reply
-                CAN_REPLY: @topic.grants_right?(@current_user, session, :reply) &&
-                           !@topic.homeroom_announcement?(@context),
-                # Can attach files on topic
-                CAN_ATTACH_TOPIC: can_attach_topic,
-                # Can attach files on entries aka replies
-                CAN_ATTACH_ENTRIES: can_attach_entries,
-                CAN_RATE: @topic.grants_right?(@current_user, session, :rate),
-                CAN_READ_REPLIES: @topic.grants_right?(@current_user, :read_replies) &&
-                                  !@topic.homeroom_announcement?(@context),
-                # Can moderate their own topics
-                CAN_MANAGE_OWN: @context.user_can_manage_own_discussion_posts?(@current_user) &&
-                                !@topic.locked_for?(@current_user, check_policies: true),
-                # Can moderate any topic
-                MODERATE: user_can_moderate
-              },
-              ROOT_URL: "#{api_url.call("topic_view")}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1",
-              ENTRY_ROOT_URL: api_url.call("topic_entry_list"),
-              REPLY_URL: api_url.call("add_reply", ":entry_id"),
-              ROOT_REPLY_URL: api_url.call("add_entry"),
-              DELETE_URL: api_url.call("delete_reply", ":id"),
-              UPDATE_URL: api_url.call("update_reply", ":id"),
-              MARK_READ_URL: api_url.call("topic_discussion_entry_mark_read", ":id"),
-              MARK_UNREAD_URL: api_url.call("topic_discussion_entry_mark_unread", ":id"),
-              RATE_URL: api_url.call("topic_discussion_entry_rate", ":id"),
-              MARK_ALL_READ_URL: api_url.call("topic_mark_all_read"),
-              MARK_ALL_UNREAD_URL: api_url.call("topic_mark_all_unread"),
-              MANUAL_MARK_AS_READ: @current_user.try(:manual_mark_as_read?),
-              CAN_SUBSCRIBE: !@topic.subscription_hold(@current_user, session),
-              CURRENT_USER: user_display_json(@current_user),
-              INITIAL_POST_REQUIRED: @initial_post_required,
-              THREADED: @topic.threaded?,
-              ALLOW_RATING: @topic.allow_rating,
-              TODO_DATE: @topic.todo_date,
-              IS_ASSIGNMENT: @topic.assignment_id?,
-              ASSIGNMENT_ID: @topic.assignment_id,
-              IS_GROUP: @topic.group_category_id?,
-            }
-            # will fire off the xhr for this as soon as the page comes back.
-            # see ui/features/discussion_topic/backbone/models/Topic#fetch for where it is consumed
-            prefetch_xhr(env_hash[:ROOT_URL])
-
-            env_hash[:GRADED_RUBRICS_URL] = context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) if @topic.assignment
-            if params[:hide_student_names]
-              env_hash[:HIDE_STUDENT_NAMES] = true
-              env_hash[:STUDENT_ID] = params[:student_id]
-            end
-            if @sequence_asset
-              env_hash[:SEQUENCE] = {
-                ASSET_TYPE: @sequence_asset.is_a?(Assignment) ? "Assignment" : "Discussion",
-                ASSET_ID: @sequence_asset.id,
-                COURSE_ID: @sequence_asset.context.id,
-              }
-            end
-            @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
-            if @topic.for_assignment? && @presenter.allows_speed_grader? &&
-               @assignment_presenter.can_view_speed_grader_link?(@current_user)
-              env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
-                                                                      :speed_grader_context_gradebook_url,
-                                                                      assignment_id: @topic.assignment.id,
-                                                                      student_id: ":student_id")
-            end
-
-            js_hash = { DISCUSSION: env_hash }
-            if @context.is_a?(Course)
-              GuardRail.activate(:secondary) do
-                js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake
-                                                   .active_or_pending_by_date_ignoring_access.distinct.count(:user_id)
-              end
-            end
-            js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
-            js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
-
-            append_sis_data(js_hash)
-            js_env(js_hash)
-            set_master_course_js_env_data(@topic, @context)
-            conditional_release_js_env(@topic.assignment, includes: [:rule])
-            js_bundle :discussion_topic
-            css_bundle :tinymce, :discussions, :learning_outcomes
-
-            unless @locked
-              InstStatsd::Statsd.distributed_increment("discussion_topic.visit.legacy")
-              InstStatsd::Statsd.count("discussion_topic.visit.entries.legacy", @topic.discussion_entries.count)
-              InstStatsd::Statsd.count("discussion_topic.visit.pages.legacy", (@topic.discussion_entries.count / 50).ceil)
-            end
-
-            render stream: can_stream_template?
-          end
-        end
-      end
-    else
+    unless can_read_and_visible
       return render_unauthorized_action unless @current_user
 
       respond_to do |format|
         if @topic.is_announcement
           flash[:error] = t "You do not have access to the requested announcement."
-          format.html { redirect_to named_context_url(@context, :context_announcements_url) }
+          format.html do
+            redirect_to named_context_url(@context, :context_announcements_url)
+            return
+          end
         else
           flash[:error] = t "You do not have access to the requested discussion."
-          format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
+          format.html do
+            redirect_to named_context_url(@context, :context_discussion_topics_url)
+            return
+          end
         end
+      end
+    end
+
+    edit_url = context_url(@topic.context, :edit_context_discussion_topic_url, @topic)
+    edit_url += "?embed=true" if params[:embed] == "true"
+
+    assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
+    participant = @topic.participant(@current_user)
+    translation_flags = Translation.get_translation_flags(@context.feature_enabled?(:translation), @domain_root_account)
+    js_env({
+             course_id: params[:course_id] || @context.course&.id,
+             context_type: @topic.context_type,
+             context_id: @context.id,
+             EDIT_URL: edit_url,
+             INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
+             PEER_REVIEWS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) : nil,
+             ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+             CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
+             discussion_topic_id: @topic.id,
+             manual_mark_as_read: @current_user&.manual_mark_as_read?,
+             discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
+             rce_mentions_in_discussions: !@topic.anonymous?,
+             discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
+             discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
+             discussion_translation_available: Translation.available?(translation_flags), # Is translation enabled on the course.
+             ai_translation_improvements: @domain_root_account.feature_enabled?(:ai_translation_improvements),
+             cedar_translation: @domain_root_account.feature_enabled?(:cedar_translation),
+             discussion_translation_languages: Translation.available?(translation_flags) ? Translation.languages(translation_flags) : [],
+             discussion_anonymity_enabled: true,
+             user_can_summarize: @topic.user_can_summarize?(@current_user),
+             user_can_access_insights: @topic.user_can_access_insights?(@current_user),
+             discussion_pin_post: @context.feature_enabled?(:discussion_pin_post),
+             discussion_summary_enabled: participant.nil? ? @topic.summary_enabled : participant.summary_enabled,
+             should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
+             # although there is a permissions object in DiscussionEntry type, it's only accessible if a discussion entry
+             # is being replied to. We need this env var so that replying to the topic can use this
+             can_attach_entries:,
+             # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
+             DISCUSSION: {
+               GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
+               CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
+               ATTACHMENTS_FOLDER_ID: @current_user.nil? ? Folder.unfiled_folder(@context).id : Folder.unfiled_folder(@current_user).id,
+               ASSIGNMENT: @topic.assignment&.asset_string,
+               preferences: {
+                 discussions_splitscreen_view: @current_user&.discussions_splitscreen_view? || false
+               }
+             },
+             apollo_caching: @current_user &&
+        Account.site_admin.feature_enabled?(:apollo_caching),
+             discussion_cache_key: @current_user &&
+        Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg"),
+             checkpointed_discussion_without_feature_flag:
+        @topic.assignment&.has_sub_assignments? && !@context.discussion_checkpoints_enabled?,
+             DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
+             DISCUSSION_DEFAULT_EXPAND_ENABLED: true, # this is to avoid a small p4 on release
+             DISCUSSION_DEFAULT_SORT_ENABLED: true, # this is to avoid a small p4 on release
+             restore_discussion_entry: context.feature_enabled?(:restore_discussion_entry),
+           })
+    unless @locked
+      InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
+      InstStatsd::Statsd.count("discussion_topic.visit.entries.redesign", @topic.discussion_entries.count)
+      InstStatsd::Statsd.count("discussion_topic.visit.pages.redesign", (@topic.discussion_entries.count / 20).ceil)
+    end
+
+    asset_processor_eula_js_env_for_discussion
+
+    js_bundle :discussion_topics_post
+    css_bundle :discussions_index, :learning_outcomes
+
+    respond_to do |format|
+      format.html do
+        conditional_release_js_env(@topic.assignment)
+        render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
       end
     end
   end

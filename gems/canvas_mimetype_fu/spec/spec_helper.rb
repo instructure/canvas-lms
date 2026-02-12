@@ -28,7 +28,7 @@ begin
   require "../../spec/coverage_tool"
   CoverageTool.start("canvas-mimetype-fu-gem")
 rescue LoadError => e
-  puts "Error: #{e} "
+  warn "Error: #{e}"
 end
 
 require "tempfile"

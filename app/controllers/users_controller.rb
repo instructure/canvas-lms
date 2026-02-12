@@ -407,7 +407,7 @@ class UsersController < ApplicationController
           avatar_image_url: @user.avatar_image_url,
           sortable_name: @user.sortable_name,
           email: @user.email,
-          pseudonyms: @user.all_active_pseudonyms.map do |pseudonym|
+          pseudonyms: @user.pseudonyms_visible_to(@current_user).map do |pseudonym|
             { login_id: pseudonym.unique_id,
               sis_id: pseudonym.sis_user_id,
               integration_id: pseudonym.integration_id }
@@ -419,6 +419,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    @current_user.reload if @domain_root_account&.feature_enabled?(:widget_dashboard)
     observed_users_list = observed_users(@current_user, session)
     if should_show_widget_dashboard?
       js_bundle :widget_dashboard
@@ -473,7 +474,8 @@ class UsersController < ApplicationController
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
 
     # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
-    @current_user.reload
+    # (skip if already reloaded above for widget_dashboard)
+    @current_user.reload unless @domain_root_account&.feature_enabled?(:widget_dashboard)
     k5_disabled = k5_disabled?
     k5_user = k5_user?(check_disabled: false)
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
@@ -1150,7 +1152,8 @@ class UsersController < ApplicationController
 
         user = api_find(User, params[:observed_user_id])
         valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-        return render_unauthorized_action unless (included_course_ids - valid_course_ids).empty?
+        included_course_ids &= valid_course_ids
+        return render_unauthorized_action if included_course_ids.empty?
       end
 
       filter = Array(params[:filter])
@@ -2318,6 +2321,7 @@ class UsersController < ApplicationController
           next if p.active? && event == "unsuspend"
           next if p.suspended? && event == "suspend"
 
+          p.current_user = @current_user # performing user for audit logging
           p.update!(workflow_state: (event == "suspend") ? "suspended" : "active")
         end
       end
@@ -2339,7 +2343,7 @@ class UsersController < ApplicationController
         session.delete(:require_terms)
         flash[:notice] = t("user_updated", "User was successfully updated.")
         unless params[:redirect_to_previous].blank?
-          return redirect_back fallback_location: user_url(@user)
+          return redirect_back_or_to(user_url(@user))
         end
 
         format.html { redirect_to user_url(@user) }
@@ -3529,24 +3533,27 @@ class UsersController < ApplicationController
       last_updated = nil
 
       if can_read_grades
+        display_grade = enrollment.effective_current_score(course_score: true)
         course_score = enrollment.find_score(course_score: true)
-        if course_score
-          display_grade = course_score.override_score.presence || course_score.current_score
-          last_updated = course_score.updated_at
-        end
+        last_updated = course_score&.updated_at
 
         if course.grading_standard_enabled? && course.grading_standard
           grading_scheme = course.grading_standard.data
         end
       end
 
+      nickname = @current_user.course_nickname(course)
       {
         courseId: course.id.to_s,
         courseCode: course.course_code || "N/A",
-        courseName: course.name,
+        courseName: nickname || course.name,
+        originalName: course.name,
         currentGrade: display_grade,
         gradingScheme: grading_scheme,
-        lastUpdated: last_updated&.iso8601
+        lastUpdated: last_updated&.iso8601,
+        courseColor: @current_user.custom_colors[course.asset_string],
+        term: course.enrollment_term&.name,
+        image: course.image
       }
     end
 
@@ -3560,11 +3567,8 @@ class UsersController < ApplicationController
     flag = @domain_root_account&.lookup_feature_flag(:widget_dashboard)
     return false unless flag&.enabled? || flag&.can_override?
 
-    # Check if feature is locked on (cannot be overridden)
-    force_on = flag.enabled? && !flag.can_override?
-
-    # If not forced on, check user preference (pass flag to avoid re-lookup)
-    return false unless force_on || @current_user.prefers_widget_dashboard?(@domain_root_account, flag)
+    # Check user preference (pass flag to avoid re-lookup)
+    return false unless @current_user.prefers_widget_dashboard?(@domain_root_account, flag)
 
     if @current_user.observer_enrollments.active.any?
       # only show widget dashboard if observer is actively observing a student

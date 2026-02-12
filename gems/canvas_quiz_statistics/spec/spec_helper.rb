@@ -21,7 +21,7 @@ begin
   require "../../spec/coverage_tool"
   CoverageTool.start("canvas-quiz-statistics-gem")
 rescue LoadError => e
-  puts "Error: #{e} "
+  warn "Error: #{e}"
 end
 
 require "debug"

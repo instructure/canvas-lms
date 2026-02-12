@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import type {RubricAssessment} from '../../../types'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -58,9 +59,10 @@ export const RubricSection: React.FC<RubricSectionProps> = ({rubricAssessment, s
               <View as="div" padding="x-small 0">
                 <Flex direction="column">
                   <Flex.Item>
-                    <Flex direction="row" gap="xx-small">
+                    <Flex direction="row" gap="xx-small" wrap="wrap">
                       <Flex.Item>
                         <Text
+                          wrap="break-word"
                           weight="bold"
                           size="small"
                           data-testid={`rubric-criterion-description-${criterion._id}`}
@@ -86,9 +88,11 @@ export const RubricSection: React.FC<RubricSectionProps> = ({rubricAssessment, s
                   </Flex.Item>
                   {rating.comments && (
                     <Flex.Item>
-                      <Text size="small" data-testid={`rubric-rating-comments-${criterion._id}`}>
-                        {rating.comments}
-                      </Text>
+                      <TruncateText maxLines={3}>
+                        <Text size="small" data-testid={`rubric-rating-comments-${criterion._id}`}>
+                          {rating.comments}
+                        </Text>
+                      </TruncateText>
                     </Flex.Item>
                   )}
                 </Flex>

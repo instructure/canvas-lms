@@ -26,28 +26,86 @@ describe NavMenuLink do
     @course = course_factory
   end
 
-  def make_nav_menu_link(context, nav_type)
-    NavMenuLink.new(context:, nav_type:, label: "Foo", url: "https://example.com")
+  def make_nav_menu_link(context, course_nav: false, account_nav: false, user_nav: false)
+    NavMenuLink.new(
+      context:,
+      course_nav:,
+      account_nav:,
+      user_nav:,
+      label: "Foo",
+      url: "https://example.com"
+    )
   end
 
   include_context "url validation tests"
   it "checks url validity" do
-    cl = make_nav_menu_link(@account, "account")
+    cl = make_nav_menu_link(@account, account_nav: true)
     cl.save!
     test_url_validation(cl, nullable: false)
   end
 
-  describe "nav_type_matches_context validation" do
-    it "accepts NavMenuLinks with matching nav_type and context" do
-      expect(make_nav_menu_link(@account, "account").valid?).to be true
-      expect(make_nav_menu_link(@account, "user").valid?).to be true
-      expect(make_nav_menu_link(@course, "course").valid?).to be true
+  describe "nav type validations" do
+    describe "at_least_one_nav_type_enabled" do
+      it "accepts NavMenuLinks with at least one nav type enabled" do
+        expect(make_nav_menu_link(@account, account_nav: true).valid?).to be true
+        expect(make_nav_menu_link(@account, user_nav: true).valid?).to be true
+        expect(make_nav_menu_link(@account, account_nav: true, user_nav: true).valid?).to be true
+        expect(make_nav_menu_link(@course, course_nav: true).valid?).to be true
+      end
+
+      it "rejects NavMenuLinks with no nav types enabled" do
+        link = make_nav_menu_link(@account)
+        expect(link.valid?).to be false
+        expect(link.errors[:base]).to include("at least one nav type must be enabled")
+      end
     end
 
-    it "rejects NavMenuLinks with non-matching nav_type and context" do
-      expect(make_nav_menu_link(@account, "course").valid?).to be false
-      expect(make_nav_menu_link(@course, "account").valid?).to be false
-      expect(make_nav_menu_link(@course, "user").valid?).to be false
+    describe "nav_types_match_context" do
+      context "with course context" do
+        it "accepts NavMenuLinks with only course_nav enabled" do
+          expect(make_nav_menu_link(@course, course_nav: true).valid?).to be true
+        end
+
+        it "rejects NavMenuLinks with account_nav enabled" do
+          link = make_nav_menu_link(@course, course_nav: true, account_nav: true)
+          expect(link.valid?).to be false
+          expect(link.errors[:base]).to include("course-context link can only have course navigation enabled")
+        end
+
+        it "rejects NavMenuLinks with user_nav enabled" do
+          link = make_nav_menu_link(@course, course_nav: true, user_nav: true)
+          expect(link.valid?).to be false
+          expect(link.errors[:base]).to include("course-context link can only have course navigation enabled")
+        end
+
+        it "rejects NavMenuLinks without course_nav enabled" do
+          link = make_nav_menu_link(@course, account_nav: true)
+          expect(link.valid?).to be false
+          expect(link.errors[:base]).to include("course-context link can only have course navigation enabled")
+        end
+      end
+
+      context "with account context" do
+        it "accepts NavMenuLinks with account_nav enabled" do
+          expect(make_nav_menu_link(@account, account_nav: true).valid?).to be true
+        end
+
+        it "accepts NavMenuLinks with user_nav enabled" do
+          expect(make_nav_menu_link(@account, user_nav: true).valid?).to be true
+        end
+
+        it "accepts NavMenuLinks with both account_nav and user_nav enabled" do
+          expect(make_nav_menu_link(@account, account_nav: true, user_nav: true).valid?).to be true
+        end
+
+        it "accepts NavMenuLinks with course_nav enabled" do
+          expect(make_nav_menu_link(@account, course_nav: true, account_nav: true).valid?).to be true
+        end
+
+        it "accepts NavMenuLinks with only course_nav enabled" do
+          expect(make_nav_menu_link(@account, course_nav: true).valid?).to be true
+        end
+      end
     end
   end
 end

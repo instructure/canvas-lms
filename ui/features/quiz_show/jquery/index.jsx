@@ -95,6 +95,7 @@ function renderRubric() {
         assignmentRubricAssociation={assignmentRubricAssociation}
         assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
         canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
+        canUseForGrading={false}
         courseId={ENV.COURSE_ID}
         currentUserId={ENV.current_user_id}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}

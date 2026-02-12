@@ -60,6 +60,8 @@ class CareerController < ApplicationController
       horizon_user_profile_page
       horizon_manual_dashboard_builder
       horizon_learning_library
+      horizon_learning_library_ms2
+      horizon_learning_library_ms3
       horizon_chart_view
       horizon_native_permissions_page
       horizon_block_content_editor

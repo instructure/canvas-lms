@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Hapus Tautan"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Hapus Media Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Ganti Semua"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Tampilkan semua"
     },
-    "show_audio_options_b489926b": {
-        "message": "Tampilkan opsi audio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Tampilkan opsi gambar"
     },
     "show_link_options_545338fd": {
         "message": "Tampilkan opsi tautan"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Tampilkan opsi media Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Tampilkan opsi video"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Melihat halaman web browser pengguna dengan cepat, mencari heading besar atau ditebalkan. Pengguna pembaca layar bergantung pada header untuk pemahaman kontekstual. Header harus menggunakan struktur yang tepat."

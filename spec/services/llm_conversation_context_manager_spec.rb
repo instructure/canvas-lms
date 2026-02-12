@@ -113,11 +113,11 @@ describe LLMConversationContextManager do
           body: hash_including(
             "type" => "assignment",
             "prompt_id" => "prompt-uuid",
-            "data" => {
+            "data" => hash_including(
               "scenario" => "Test scenario",
               "facts" => "Test facts",
               "learning_objectives" => "Test objectives"
-            }
+            )
           )
         )
     end

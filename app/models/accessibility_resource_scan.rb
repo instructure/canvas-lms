@@ -17,6 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AccessibilityResourceScan < ActiveRecord::Base
+  include Accessibility::Concerns::ResourceResolvable
   extend RootAccountResolver
 
   resolves_root_account through: :course
@@ -35,12 +36,29 @@ class AccessibilityResourceScan < ActiveRecord::Base
   validates :attachment_id, uniqueness: true, allow_nil: true
   validates :discussion_topic_id, uniqueness: true, allow_nil: true
   validates :announcement_id, uniqueness: true, allow_nil: true
+  validates :course_id, uniqueness: { scope: :is_syllabus }, if: :is_syllabus?
   validate :validate_syllabus_or_context
 
   scope :running, -> { where(workflow_state: %w[queued in_progress]) }
   scope :for_course, ->(course) { where(course:) }
   scope :open, -> { where(closed_at: nil) }
   scope :closed, -> { where.not(closed_at: nil) }
+
+  # This is necessary because Canvas's polymorphic associations don't correctly handle STI types.
+  # In case of Announcements, the discussion_topic_id is filled Instead of the announcement_id
+  # This is because Rails always uses the base_class to determine the type of the resource
+  # Which is DiscussionTopic for Announcements because of the STI.
+  def self.for_resource(resource)
+    if resource.is_a?(Announcement)
+      where(announcement_id: resource.id)
+    elsif resource.is_a?(Accessibility::SyllabusResource)
+      where(course_id: resource.course.id, is_syllabus: true)
+    elsif resource.is_a?(Course)
+      where(course_id: resource.id, is_syllabus: true)
+    else
+      where(context: resource)
+    end
+  end
 
   def closed?
     closed_at.present?
@@ -75,10 +93,14 @@ class AccessibilityResourceScan < ActiveRecord::Base
   end
 
   def context_url
+    url_helpers = Rails.application.routes.url_helpers
+
+    # Handle syllabus separately since it doesn't have a context_id
+    return url_helpers.syllabus_course_assignments_path(course_id) if is_syllabus?
+
     context_id = self.context_id
     return unless context_id
 
-    url_helpers = Rails.application.routes.url_helpers
     case context_type
     when "WikiPage"
       url_helpers.course_wiki_page_path(course_id, context_id)
@@ -86,9 +108,22 @@ class AccessibilityResourceScan < ActiveRecord::Base
       url_helpers.course_assignment_path(course_id, context_id)
     when "Attachment"
       url_helpers.course_files_path(course_id, preview: context_id)
+    when "Announcement"
+      url_helpers.course_announcement_path(course_id, context_id)
     when "DiscussionTopic"
       url_helpers.course_discussion_topic_path(course_id, context_id)
     end
+  end
+
+  # Returns the API path for scanning this resource (only for syllabus)
+  # This is separate from context_url because syllabus has a different API path pattern
+  # Returns nil for non-syllabus resources
+  def resource_scan_path
+    # Only syllabus needs a different API path
+    return "/courses/#{course_id}/syllabus" if is_syllabus?
+
+    # For all other resources, return nil (they'll use context_url)
+    nil
   end
 
   private

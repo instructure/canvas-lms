@@ -15,29 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
-import React, {Suspense, useEffect, useState} from 'react'
-import ReactDOM from 'react-dom'
-import {isEqual} from 'es-toolkit/compat'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {Tabs} from '@instructure/ui-tabs'
-import {px} from '@instructure/ui-utils'
 import {ProgressBar} from '@instructure/ui-progress'
+import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
-
-import formatMessage from './format-message'
+import {px} from '@instructure/ui-utils'
+import {isEqual} from 'es-toolkit/compat'
+import {bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
+import React, {Suspense, useEffect, useState} from 'react'
+import ReactDOM from 'react-dom'
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
-import LoadingIndicator from './shared/LoadingIndicator'
+import formatMessage from './format-message'
+import getTranslations from './getTranslations'
 import saveMediaRecording, {
   saveClosedCaptions,
   saveClosedCaptionsForAttachment,
 } from './saveMediaRecording'
-import translationShape from './translationShape'
-import getTranslations from './getTranslations'
 import {CC_FILE_MAX_BYTES, mediaExtension} from './shared/constants'
+import LoadingIndicator from './shared/LoadingIndicator'
+import translationShape from './translationShape'
 
 const fileExtensionRegex = /\.\S/
 const DEFAULT_EXTENSION = 'webm'

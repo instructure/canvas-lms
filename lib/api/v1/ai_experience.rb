@@ -22,7 +22,7 @@ module Api::V1::AiExperience
   include Api::V1::User
 
   API_JSON_OPTS = {
-    only: %w[id title description facts learning_objective pedagogical_guidance workflow_state course_id created_at updated_at]
+    only: %w[id title description facts learning_objective pedagogical_guidance workflow_state course_id context_index_status created_at updated_at]
   }.freeze
 
   CONVERSATION_JSON_OPTS = {
@@ -35,6 +35,22 @@ module Api::V1::AiExperience
     json[:submission_status] = opts[:submission_status] if opts.key?(:submission_status)
     # Include can_unpublish if user can manage
     json[:can_unpublish] = ai_experience.can_unpublish? if opts[:can_manage]
+
+    # Include context files if feature flag is enabled
+    if ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
+      json[:context_files] = ai_experience.ai_experience_context_files.order(:position).map do |context_file|
+        attachment = context_file.attachment
+        {
+          id: attachment.id,
+          filename: attachment.filename,
+          size: attachment.size,
+          content_type: attachment.content_type,
+          url: attachment.public_url,
+          position: context_file.position
+        }
+      end
+    end
+
     json
   end
 

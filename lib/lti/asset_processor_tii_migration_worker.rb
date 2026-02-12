@@ -70,6 +70,55 @@ module Lti
       end
     end
 
+    # This method is only called from rails console, manually
+    def rollback(recursive: false)
+      Rails.logger.info("#{"Recursive " if recursive}Rolling back Asset Processor migration in this account=#{@account.global_id}")
+      actls_for_account.find_each do |actl|
+        tool_proxy = actl.associated_tool_proxy
+        next unless tool_proxy.present?
+        next unless tool_proxy.migrated_to_context_external_tool.present?
+        next unless proxy_in_account?(tool_proxy, @account) || recursive
+
+        unless @migrated_tool_proxies.include?(tool_proxy)
+          @migrated_tool_proxies << tool_proxy
+          Rails.logger.info("Resubscribe tool_proxy #{tool_proxy.id}")
+          tool_proxy.manage_subscription
+        end
+
+        migration_id = generate_migration_id(tool_proxy, actl)
+        aps = Lti::AssetProcessor.active.where(assignment: actl.assignment, migration_id:)
+        aps.find_each do |ap|
+          Rails.logger.info("Rolling back Asset Processor ID=#{ap.id} for ACTL ID=#{actl.id} and tool_proxy ID=#{tool_proxy.id}")
+          ap.destroy
+        end
+      rescue => e
+        capture_and_log_exception(e)
+        Rails.logger.error("Failed to rollback migration for ACTL ID=#{actl.id}: #{e.message}")
+      end
+      @migrated_tool_proxies.each do |tp|
+        Rails.logger.info("Set migrated_to_context_external_tool to nil from #{tp.migrated_to_context_external_tool_id} for TP #{tp.id}")
+        tp.update!(migrated_to_context_external_tool_id: nil)
+      end
+    end
+
+    # This method is only called from rails console, manually
+    def rollback_recursive
+      rollback(recursive: true)
+    end
+
+    # This method is only called from rails console, manually
+    def rollback_progress
+      Progress.where(tag: "lti_tii_ap_migration", context: @account).update_all(tag: "lti_tii_ap_migration_rolled_back")
+      Progress.where(tag: "lti_tii_ap_migration_coordinator", context: @account).update_all(tag: "lti_tii_ap_migration_coordinator_rolled_back")
+    end
+
+    # This method is only called from rails console, manually
+    def rollback_progress_recursive
+      ids = sub_account_ids
+      Progress.where(tag: "lti_tii_ap_migration", context_type: "Account", context_id: ids).update_all(tag: "lti_tii_ap_migration_rolled_back")
+      Progress.where(tag: "lti_tii_ap_migration_coordinator", context_type: "Account", context_id: ids).update_all(tag: "lti_tii_ap_migration_coordinator_rolled_back")
+    end
+
     private
 
     def migrate_actls(csv)
@@ -215,7 +264,7 @@ module Lti
     def tii_developer_key
       return @tii_developer_key if defined?(@tii_developer_key)
 
-      dk_id = Setting.get("turnitin_asset_processor_client_id", "")
+      dk_id = @account.root_account.turnitin_asset_processor_client_id
       @tii_developer_key = if dk_id.blank?
                              nil
                            else
@@ -422,7 +471,7 @@ module Lti
         return [:failed, nil]
       end
 
-      migration_id = "cpf_#{tool_proxy.guid}_#{actl.assignment.global_id}"
+      migration_id = generate_migration_id(tool_proxy, actl)
       existing_ap = Lti::AssetProcessor.active.where(assignment: actl.assignment, migration_id:).first
       if existing_ap.present?
         Rails.logger.warn("Asset Processor already exists for ACTL ID=#{actl.id} and migration_id=#{migration_id}, skipping")
@@ -653,8 +702,7 @@ module Lti
       Rails.application.routes.url_helpers.account_file_download_url(
         account.id,
         attachment_id,
-        host: HostUrl.context_host(account),
-        protocol: HostUrl.protocol
+        host: account.environment_specific_domain
       )
     end
 
@@ -842,6 +890,10 @@ module Lti
       @results[:fatal_error].present? ||
         @results[:proxies].values.any? { |r| r[:errors].any? } ||
         @results[:actl_errors].present?
+    end
+
+    def generate_migration_id(tool_proxy, actl)
+      "cpf_#{tool_proxy.guid}_#{actl.assignment.global_id}"
     end
   end
 end

@@ -17,7 +17,7 @@
  */
 
 import {useState, useCallback, useMemo, useEffect, useRef} from 'react'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery, keepPreviousData} from '@tanstack/react-query'
 import {fetchPlannerItems, type FetchPlannerItemsParams} from '../api'
 import type {PlannerItem} from '../types'
 import {widgetDashboardPersister} from '../../../../utils/persister'
@@ -44,6 +44,7 @@ interface UsePlannerItemsResult {
   goToPage: (page: number) => void
   resetPagination: () => void
   isLoading: boolean
+  isPaginationLoading: boolean
   error: Error | null
   refetch: () => void
 }
@@ -72,6 +73,7 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
   const {
     data,
     isLoading,
+    isFetching,
     error,
     refetch: refetchInitial,
   } = useQuery({
@@ -81,6 +83,7 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
     retry: 2,
     persister: widgetDashboardPersister,
     refetchOnMount: false,
+    placeholderData: keepPreviousData,
   })
 
   useEffect(() => {
@@ -147,7 +150,7 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
     refetchInitial()
   }, [refetchInitial])
 
-  const currentPage = allPages[currentPageIndex] || []
+  const currentPage = allPages[currentPageIndex] || allPages[allPages.length - 1] || []
   const lastLoadedPageIndex = allPages.length - 1
   const hasMorePages =
     lastLoadedPageIndex >= 0 &&
@@ -161,7 +164,8 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
     totalPages,
     goToPage,
     resetPagination,
-    isLoading: isLoading || isLoadingMore,
+    isLoading,
+    isPaginationLoading: (isFetching || isLoadingMore) && allPages.length > 0,
     error: error as Error | null,
     refetch,
   }

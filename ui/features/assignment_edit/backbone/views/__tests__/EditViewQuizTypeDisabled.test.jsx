@@ -141,9 +141,6 @@ EditView.prototype._attachEditorToDescription = () => {}
 
 beforeEach(() => {
   fakeENV.setup({
-    FEATURES: {
-      new_quizzes_surveys: true,
-    },
     PERMISSIONS: {
       can_edit_grades: true,
     },

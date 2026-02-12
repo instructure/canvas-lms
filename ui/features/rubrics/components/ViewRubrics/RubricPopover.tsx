@@ -143,7 +143,7 @@ export const RubricPopover = ({
           >
             {I18n.t('Duplicate')}
           </Menu.Item>
-          {window.ENV.enhanced_rubrics_copy_to && courseId && (
+          {courseId && (
             <Menu.Item
               data-testid={`copy-to-${courseId}-button`}
               onClick={() => {

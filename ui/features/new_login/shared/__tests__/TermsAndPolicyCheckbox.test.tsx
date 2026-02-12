@@ -25,7 +25,7 @@ afterEach(() => {
 })
 
 describe('TermsAndPolicyCheckbox', () => {
-  const termsOfUseUrl = 'http://www.canvaslms.com/policies/terms-of-use'
+  const termsOfUseUrl = '/acceptable_use_policy'
   const privacyPolicyUrl = 'http://www.canvaslms.com/policies/privacy-policy'
 
   it('mounts without crashing', () => {
@@ -39,7 +39,7 @@ describe('TermsAndPolicyCheckbox', () => {
     )
   })
 
-  it('renders both terms of use and privacy policy links when both URLs are provided', () => {
+  it('renders both Acceptable Use Policy and Privacy Policy links when both URLs are provided', () => {
     render(
       <TermsAndPolicyCheckbox
         id="terms-checkbox"
@@ -50,16 +50,19 @@ describe('TermsAndPolicyCheckbox', () => {
         privacyPolicyUrl={privacyPolicyUrl}
       />,
     )
-    expect(screen.getByText('terms of use')).toBeInTheDocument()
-    expect(screen.getByText('privacy policy')).toBeInTheDocument()
-    expect(screen.getByText('terms of use').closest('a')).toHaveAttribute('href', termsOfUseUrl)
-    expect(screen.getByText('privacy policy').closest('a')).toHaveAttribute(
+    expect(screen.getByText('Acceptable Use Policy')).toBeInTheDocument()
+    expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
+    expect(screen.getByText('Acceptable Use Policy').closest('a')).toHaveAttribute(
+      'href',
+      termsOfUseUrl,
+    )
+    expect(screen.getByText('Privacy Policy').closest('a')).toHaveAttribute(
       'href',
       privacyPolicyUrl,
     )
   })
 
-  it('renders only the terms of use link when only termsOfUseUrl is provided', () => {
+  it('renders only the Acceptable Use Policy link when only termsOfUseUrl is provided', () => {
     render(
       <TermsAndPolicyCheckbox
         id="terms-checkbox"
@@ -69,9 +72,12 @@ describe('TermsAndPolicyCheckbox', () => {
         termsOfUseUrl={termsOfUseUrl}
       />,
     )
-    expect(screen.getByText('terms of use')).toBeInTheDocument()
-    expect(screen.queryByText('privacy policy')).not.toBeInTheDocument()
-    expect(screen.getByText('terms of use').closest('a')).toHaveAttribute('href', termsOfUseUrl)
+    expect(screen.getByText('Acceptable Use Policy')).toBeInTheDocument()
+    expect(screen.queryByText('Privacy Policy')).not.toBeInTheDocument()
+    expect(screen.getByText('Acceptable Use Policy').closest('a')).toHaveAttribute(
+      'href',
+      termsOfUseUrl,
+    )
   })
 
   it('renders only the privacy policy link when only privacyPolicyUrl is provided', () => {
@@ -84,9 +90,9 @@ describe('TermsAndPolicyCheckbox', () => {
         privacyPolicyUrl={privacyPolicyUrl}
       />,
     )
-    expect(screen.getByText('privacy policy')).toBeInTheDocument()
-    expect(screen.queryByText('terms of use')).not.toBeInTheDocument()
-    expect(screen.getByText('privacy policy').closest('a')).toHaveAttribute(
+    expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
+    expect(screen.queryByText('Acceptable Use Policy')).not.toBeInTheDocument()
+    expect(screen.getByText('Privacy Policy').closest('a')).toHaveAttribute(
       'href',
       privacyPolicyUrl,
     )

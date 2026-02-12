@@ -17,7 +17,7 @@
  */
 
 import {useState} from 'react'
-import {TruncateText} from '@instructure/ui-truncate-text'
+import {TruncateText, type TruncateTextProps} from '@instructure/ui-truncate-text'
 import {Tooltip, type TooltipProps} from '@instructure/ui-tooltip'
 
 interface TruncateWithTooltipProps {
@@ -28,6 +28,8 @@ interface TruncateWithTooltipProps {
    * running off the screen.
    */
   maxTooltipWidth?: string | number
+  truncate?: TruncateTextProps['truncate']
+  position?: TruncateTextProps['position']
   linesAllowed?: number
   horizontalOffset?: number
   backgroundColor?: 'primary' | 'primary-inverse'

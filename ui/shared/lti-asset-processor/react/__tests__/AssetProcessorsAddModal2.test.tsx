@@ -33,12 +33,13 @@ import {
   mockContributionDeepLinkResponse,
 } from './assetProcessorsTestHelpers'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
-import {useAssetProcessorsToolsList} from '../hooks/useAssetProcessorsToolsList'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 vi.mock('@canvas/external-tools/messages')
+vi.mock('@canvas/alerts/react/FlashAlert')
 
 const server = setupServer(
   http.get('/api/v1/courses/:courseId/lti_apps/launch_definitions', ({request}) => {
@@ -145,6 +146,13 @@ describe('AssetProcessorsAddModal', () => {
           expect(cards).toHaveLength(4)
           const foundCard = cards.find(card => card.textContent?.includes(tool!.name))
           expect(foundCard).toBeDefined()
+
+          toolsForType(type).forEach(t => {
+            if (t.context_name) {
+              expect(getByText(`Installed in: ${t.context_name}`)).toBeInTheDocument()
+            }
+          })
+
           return foundCard
         },
         {timeout: 3000},
@@ -160,6 +168,15 @@ describe('AssetProcessorsAddModal', () => {
       const {selection_width, selection_height} = tool!.placements[type]!
       expect(iframe.style.width).toBe(selection_width + 'px')
       expect(iframe.style.height).toBe(selection_height + 'px')
+
+      await waitFor(() => {
+        const closeButton = document.querySelector(
+          '[data-pendo="asset-processors-add-modal-close-button"]',
+        )
+        if (closeButton) {
+          expect(document.activeElement).toBe(closeButton)
+        }
+      })
     })
 
     it(`handles valid deep linking response for ${type}`, async () => {
@@ -169,10 +186,12 @@ describe('AssetProcessorsAddModal', () => {
       expect(validResponse.tool_id).toBe(tool_id)
 
       const mockHECM = handleExternalContentMessages as any
-      mockHECM.mockImplementation(({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
-        setTimeout(() => onDeepLinkingResponse(validResponse), 0)
-        return () => {}
-      })
+      mockHECM.mockImplementation(
+        ({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
+          setTimeout(() => onDeepLinkingResponse(validResponse), 0)
+          return () => {}
+        },
+      )
 
       render(
         <MockedQueryClientProvider client={queryClient}>
@@ -196,6 +215,11 @@ describe('AssetProcessorsAddModal', () => {
           tool: tool,
           data: validResponse,
         })
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: `${tool!.name} successfully added`,
+          type: 'success',
+          srOnly: true,
+        })
       })
     })
 
@@ -207,10 +231,12 @@ describe('AssetProcessorsAddModal', () => {
       expect(matchingTool).not.toBeUndefined()
 
       const mockHECM = handleExternalContentMessages as any
-      mockHECM.mockImplementation(({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
-        setTimeout(() => onDeepLinkingResponse(mockInvalidDeepLinkResponse), 0)
-        return () => {}
-      })
+      mockHECM.mockImplementation(
+        ({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
+          setTimeout(() => onDeepLinkingResponse(mockInvalidDeepLinkResponse), 0)
+          return () => {}
+        },
+      )
 
       render(
         <MockedQueryClientProvider client={queryClient}>
@@ -315,6 +341,18 @@ describe('AssetProcessorsAddModal', () => {
         },
         {timeout: 5000},
       )
+
+      await waitFor(
+        () => {
+          const closeButton = document.querySelector(
+            '[data-pendo="asset-processors-add-modal-close-button"]',
+          )
+          if (closeButton) {
+            expect(document.activeElement).toBe(closeButton)
+          }
+        },
+        {timeout: 3000},
+      )
     })
 
     it('launches the tool when Space key is pressed on a card', async () => {
@@ -346,6 +384,15 @@ describe('AssetProcessorsAddModal', () => {
         },
         {timeout: 5000},
       )
+
+      await waitFor(() => {
+        const closeButton = document.querySelector(
+          '[data-pendo="asset-processors-add-modal-close-button"]',
+        )
+        if (closeButton) {
+          expect(document.activeElement).toBe(closeButton)
+        }
+      })
     })
 
     it('does not launch the tool when other keys are pressed on a card', async () => {

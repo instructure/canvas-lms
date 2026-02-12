@@ -52,8 +52,13 @@ describe('useCourses', () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 
-  const renderUseCourses = (sort = 'sis_course_id', order: 'asc' | 'desc' = 'asc', page = 1) => {
-    return renderHook(() => useCourses({accountId, sort, order, page}), {wrapper})
+  const renderUseCourses = (
+    sort = 'sis_course_id',
+    order: 'asc' | 'desc' = 'asc',
+    page = 1,
+    search = '',
+  ) => {
+    return renderHook(() => useCourses({accountId, sort, order, page, search}), {wrapper})
   }
 
   it('fetches courses successfully', async () => {
@@ -102,6 +107,43 @@ describe('useCourses', () => {
     expect(requestParams?.get('sort')).toBe('course_name')
     expect(requestParams?.get('order')).toBe('desc')
     expect(requestParams?.get('page')).toBe('1')
+    expect(requestParams?.has('search_term')).toBe(false)
+  })
+
+  it('includes search_term in request when search is provided', async () => {
+    const mockCourses = createMockCourses(1)
+    let requestParams: URLSearchParams | undefined
+
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/courses`, ({request}) => {
+        requestParams = new URL(request.url).searchParams
+        return HttpResponse.json(mockCourses)
+      }),
+    )
+
+    const {result} = renderUseCourses('course_name', 'asc', 1, 'test search')
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(requestParams?.get('search_term')).toBe('test search')
+  })
+
+  it('does not include search_term when search is empty', async () => {
+    const mockCourses = createMockCourses(1)
+    let requestParams: URLSearchParams | undefined
+
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/courses`, ({request}) => {
+        requestParams = new URL(request.url).searchParams
+        return HttpResponse.json(mockCourses)
+      }),
+    )
+
+    const {result} = renderUseCourses('course_name', 'asc', 1, '')
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(requestParams?.has('search_term')).toBe(false)
   })
 
   it('includes sort and order in query key for proper caching', async () => {
@@ -122,6 +164,30 @@ describe('useCourses', () => {
       'a11y_active_issue_count',
       'asc',
       1,
+      '',
+    ])
+    expect(cachedData).toBeTruthy()
+  })
+
+  it('includes search in query key for proper caching', async () => {
+    const mockCourses = createMockCourses(1)
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/courses`, () => {
+        return HttpResponse.json(mockCourses)
+      }),
+    )
+
+    const {result} = renderUseCourses('course_name', 'asc', 1, 'biology')
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    const cachedData = queryClient.getQueryData([
+      'accessibility-courses',
+      accountId,
+      'course_name',
+      'asc',
+      1,
+      'biology',
     ])
     expect(cachedData).toBeTruthy()
   })
@@ -189,6 +255,7 @@ describe('useCourses', () => {
       'sis_course_id',
       'asc',
       1,
+      '',
     ])
     expect(cachedData).toBeTruthy()
   })
@@ -243,7 +310,7 @@ describe('useCourses', () => {
       )
 
       const {result} = renderHook(
-        () => useCourses({accountId, sort: 'sis_course_id', order: 'asc', page: 3}),
+        () => useCourses({accountId, sort: 'sis_course_id', order: 'asc', page: 3, search: ''}),
         {wrapper},
       )
 
@@ -264,7 +331,7 @@ describe('useCourses', () => {
       )
 
       const {result} = renderHook(
-        () => useCourses({accountId, sort: 'sis_course_id', order: 'asc', page: 1}),
+        () => useCourses({accountId, sort: 'sis_course_id', order: 'asc', page: 1, search: ''}),
         {wrapper},
       )
 

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
@@ -42,6 +42,6 @@ ready(() => {
       )
     })
 
-    ReactDOM.render(alerts, container)
+    legacyRender(alerts, container)
   }
 })

@@ -15,19 +15,43 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import htmlEscape from '@instructure/html-escape'
 import type {RubricAssessmentData, RubricCriterion, RubricRating} from '../../types/rubric'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ProficiencyRating} from '@canvas/graphql/codegen/graphql'
 const I18n = createI18nScope('enhanced-rubrics-assessment')
 
-export const htmlEscapeCriteriaLongDescription = (criteria: RubricCriterion) => {
-  const {longDescription} = criteria
+export const htmlEscapeCriteriaLongDescription = (longDescription = '') => {
+  const decodedText = decodeHtmlEntities(longDescription)
 
   return {
-    __html: longDescription ?? '',
+    __html: decodedText,
   }
+}
+
+export const fullyDecodeHtmlEntities = (text?: string): string => {
+  if (!text) {
+    return ''
+  }
+
+  let decoded = text || ''
+  let previous = ''
+  // Keep decoding while entities remain (handles double/triple encoding)
+  while (decoded !== previous && decoded.includes('&')) {
+    previous = decoded
+    decoded = decodeHtmlEntities(decoded)
+  }
+  return decoded
+}
+
+export const decodeHtmlEntities = (text?: string): string => {
+  if (!text) {
+    return ''
+  }
+  const textarea = document.createElement('textarea')
+  textarea.innerHTML = text
+  return textarea.value
 }
 
 export const escapeNewLineText = (text?: string) => {
@@ -159,4 +183,20 @@ export const isRubricComplete = ({
     const hasPoints = points !== undefined
     return hasPoints && validPoints
   })
+}
+
+export const getCustomRatingColor = (
+  points: number,
+  pointsPossible: number,
+  customRatings: ProficiencyRating[],
+) => {
+  const sortedRatings = customRatings.sort((a, b) => a.points - b.points).reverse()
+  const firstRatingPoints = sortedRatings[0]?.points ?? 0
+  const scaledPoints = pointsPossible > 0 ? points * (firstRatingPoints / pointsPossible) : points
+  const selectedRating = sortedRatings.find(rating => scaledPoints >= rating.points)
+  if (selectedRating) {
+    return `#${selectedRating.color}`
+  }
+
+  return `#${sortedRatings[sortedRatings.length - 1]?.color}`
 }

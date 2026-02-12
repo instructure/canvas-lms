@@ -142,4 +142,32 @@ describe('feature_flags:util', () => {
       expect(util.doesAllowDefaults(sampleData.allowedOnCourseFeature.feature_flag)).toBe(false)
     })
   })
+
+  describe('shouldDelete', () => {
+    it('returns true when new state matches parent state', () => {
+      const flag = {parent_state: 'allowed_on', state: 'on'}
+      expect(util.shouldDelete(flag, false, 'allowed_on')).toBe(true)
+    })
+
+    it('returns true for hidden parent when setting to off', () => {
+      const flag = {parent_state: 'hidden', state: 'on'}
+      expect(util.shouldDelete(flag, false, 'off')).toBe(true)
+    })
+
+    it('returns true when reverting allowed_on to on for contexts that allow defaults', () => {
+      const flag = {parent_state: 'allowed_on', state: 'off', feature: 'some_feature'}
+      expect(util.shouldDelete(flag, false, 'on')).toBe(true)
+    })
+
+    it('returns false for new_user_tutorial_on_off when setting to on with allowed_on parent', () => {
+      // This exception allows legacy users to create explicit 'on' flags
+      const flag = {parent_state: 'allowed_on', state: 'off', feature: 'new_user_tutorial_on_off'}
+      expect(util.shouldDelete(flag, false, 'on')).toBe(false)
+    })
+
+    it('returns true for other flags when setting to on with allowed_on parent', () => {
+      const flag = {parent_state: 'allowed_on', state: 'off', feature: 'some_other_feature'}
+      expect(util.shouldDelete(flag, false, 'on')).toBe(true)
+    })
+  })
 })

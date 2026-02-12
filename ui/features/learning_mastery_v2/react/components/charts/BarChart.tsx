@@ -27,6 +27,8 @@ import {
   Legend,
   ChartConfiguration,
   Plugin,
+  ActiveElement,
+  ChartEvent,
 } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend)
@@ -64,6 +66,7 @@ export interface BarChartProps {
     top?: number
     bottom?: number
   }
+  onClick: (event: ChartEvent, elements: ActiveElement[]) => void
 }
 
 export const BarChart: React.FC<BarChartProps> = ({
@@ -89,6 +92,7 @@ export const BarChart: React.FC<BarChartProps> = ({
   maintainAspectRatio = false,
   plugins = [],
   padding,
+  onClick,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const chartRef = useRef<ChartJS<'bar'> | null>(null)
@@ -170,6 +174,7 @@ export const BarChart: React.FC<BarChartProps> = ({
             beginAtZero: true,
           },
         },
+        onClick: onClick,
       },
       plugins,
     }
@@ -203,6 +208,7 @@ export const BarChart: React.FC<BarChartProps> = ({
     maintainAspectRatio,
     plugins,
     padding,
+    onClick,
   ])
 
   return (

@@ -22,6 +22,12 @@ module StudentDashboardCommon
     feature_status ? Account.default.root_account.enable_feature!(:widget_dashboard) : Account.default.root_account.disable_feature!(:widget_dashboard)
   end
 
+  def enable_widget_dashboard_for(*users)
+    users.each do |user|
+      user.update!(preferences: user.preferences.merge(widget_dashboard_user_preference: true))
+    end
+  end
+
   def dashboard_student_setup
     @course1 = course_factory(active_all: true, course_name: "Course 1")
     @course2 = course_factory(active_all: true, course_name: "Course 2")
@@ -127,6 +133,44 @@ module StudentDashboardCommon
   def dashboard_course_grade_setup
     @graded_assignment.grade_student(@student, grade: "8", grader: @teacher2)
     @graded_discussion.grade_student(@student, grade: "9", grader: @teacher1)
+  end
+
+  def dashboard_recent_grades_setup
+    # Add the widget to the dashboard
+    add_widget_to_dashboard(@student, :recent_grades, 1)
+
+    # Add comments to submissions
+    @graded_assignment.submission_for_student(@student).add_comment(author: @teacher2, comment: "Place for improvement...")
+    @graded_discussion.submission_for_student(@student).add_comment(author: @teacher1, comment: "Well done!")
+  end
+
+  def pagination_recent_grades_setup
+    9.times do |i|
+      c1_graded_assignment = @course1.assignments.create!(
+        name: "Course 1: Graded Assignment #{i + 1}",
+        points_possible: "10",
+        due_at: (i + 1).days.ago.end_of_day,
+        submission_types: "online_text_entry"
+      )
+      c1_graded_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "Submission #{i + 1}")
+      c1_graded_assignment.grade_student(@student, grade: (7 + (i % 3)).to_s, grader: @teacher1)
+
+      c1_submitted_assignment = @course1.assignments.create!(
+        name: "Course 1: Submitted Assignment #{i + 1}",
+        points_possible: "10",
+        due_at: (i + 1).days.ago.end_of_day,
+        submission_types: "online_text_entry"
+      )
+      c1_submitted_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "Submission #{i + 1}")
+
+      c2_submitted_assignment = @course2.assignments.create!(
+        name: "Course 2: Graded Assignment #{i + 1}",
+        points_possible: "10",
+        due_at: (i + 1).days.ago.end_of_day,
+        submission_types: "online_text_entry"
+      )
+      c2_submitted_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "Submission #{i + 1}")
+    end
   end
 
   def dashboard_conversation_setup
@@ -333,6 +377,10 @@ module StudentDashboardCommon
       widget_id = "inbox-widget"
       widget_type = "inbox"
       title = "Inbox"
+    when :recent_grades
+      widget_id = "recent_grades-widget"
+      widget_type = "recent_grades"
+      title = "Recent grades & feedback"
     end
 
     config = user.get_preference(:widget_dashboard_config) || {}

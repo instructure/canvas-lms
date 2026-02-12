@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -21,73 +21,79 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-pipeline {
-  agent none
-  options {
-    ansiColor('xterm')
-    timeout(time: 20)
-    timestamps()
-  }
+env.BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
+env.COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
+env.DOCKER_BUILDKIT = 1
+env.FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
+env.SELENIUM_NODE_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:126.0-20240621'
+env.SELENIUM_HUB_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:4.22.0'
 
-  environment {
-    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    COMPOSE_DOCKER_CLI_BUILD = 1
-    COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
-    DOCKER_BUILDKIT = 1
-    FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
-    PROGRESS_NO_TRUNC = 1
-    SELENIUM_NODE_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:126.0-20240621'
-    SELENIUM_HUB_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:4.22.0'
-  }
-
-  stages {
-    stage('Environment') {
-      steps {
-        script {
-          def hostSh = { script ->
-            sh(script)
+node(nodeLabel()) {
+  timeout(time: 20, unit: 'MINUTES') {
+    ansiColor('xterm') {
+      timestamps {
+        def tests = [:]
+        try {
+          for (int i = 0; i < jsTestsStage.VITEST_NODE_COUNT; i++) {
+            def index = i
+            def stageName = "Vitest ${index}"
+            tests[stageName] = {
+              jsTestsStage.runVitestNode(index)
+            }
           }
 
-          def postRunnerHandler = [
-            onStageEnded: { stageName, stageConfig, result ->
-              node('master') {
-                buildSummaryReport.saveRunManifest()
+          // Packages runs on the main coordinator node
+          tests['Packages'] = {
+            def stageName = 'Packages'
+            def stageStartTime = System.currentTimeMillis()
+            try {
+              stage("${stageName} - Cleanup") {
+                pipelineHelpers.cleanupWorkspace()
               }
-            }
-          ]
 
-          def stageHooks = [
-            onNodeAcquired: { ->
-              libraryScript.load('bash/docker-with-flakey-network-protection.sh', './docker-with-flakey-network-protection.sh')
-              libraryScript.load('js/docker-provision.sh', './docker-provision.sh')
-
-              hostSh('./docker-provision.sh')
-            },
-            onStageEnded: { stageName, stageConfig, result ->
-              buildSummaryReport.setStageTimings(stageName, stageConfig.timingValues())
-            }
-          ]
-
-          extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
-            def runnerStages = [:]
-
-            for (int i = 0; i < jsStage.VITEST_NODE_COUNT; i++) {
-              String index = i
-              extendedStage("Runner - Vitest ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.vitestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
-                def tests = [:]
-                callableWithDelegate(jsStage.queueVitestDistribution(index))(tests)
-                parallel(tests)
+              stage("${stageName} - Setup") {
+                jsTestsStage.checkoutCode()
+                jsTestsStage.provisionDocker()
+                jsTestsStage.startServices()
               }
-            }
 
-            extendedStage('Runner - Packages').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.packagesNodeRequirementsTemplate()).obeysAllowStages(false).timeout(12).queue(runnerStages) {
-              def tests = [:]
-              callableWithDelegate(jsStage.queuePackagesDistribution())(tests)
-              parallel(tests)
-            }
+              def envVars = [
+                "FORCE_FAILURE=${env.FORCE_FAILURE}",
+                "RAILS_ENV=test",
+                "TEST_RESULT_OUTPUT_DIR=js-results/packages"
+              ]
+              def envFlags = envVars.collect { "-e ${it}" }.join(' ')
 
-            parallel(runnerStages)
+              stage("${stageName} - Run Tests") {
+                try {
+                  sh("docker compose -f ${env.COMPOSE_FILE} exec -T ${envFlags} canvas bash -c 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/\$TEST_RESULT_OUTPUT_DIR yarn test:packages'")
+                } finally {
+                  pipelineHelpers.copyFromContainer('canvas', '/usr/src/app/js-results/packages', './js-results/packages')
+                  archiveArtifacts artifacts: "js-results/packages/**/*.xml"
+                  junit "js-results/packages/**/*.xml"
+
+                  if (env.COVERAGE == '1') {
+                    jsTestsStage.collectCoverage('Packages')
+                  }
+                }
+              }
+            } finally {
+              pipelineHelpers.cleanupDocker()
+            }
           }
+
+          parallel(tests)
+        } finally {
+          // Collect all build summary data on coordinator node after parallel stages complete
+          stage('Collect Build Summary Data') {
+            // Analyze the entire JS build from the coordinator node
+            tests.each { stageName, closure ->
+              buildSummaryReport.addFailureRun(stageName, currentBuild)
+              buildSummaryReport.addRunTestActions(stageName, currentBuild)
+            }
+          }
+
+          buildSummaryReport.saveRunManifest()
         }
       }
     }

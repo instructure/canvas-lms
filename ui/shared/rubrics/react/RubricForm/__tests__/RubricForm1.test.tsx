@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
@@ -27,7 +28,7 @@ import {WarningModal} from '../components/WarningModal'
 import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
 import {reorderRatingsAtIndex} from '../../utils'
 
-vi.mock('../queries/RubricFormQueries', async (importOriginal) => {
+vi.mock('../queries/RubricFormQueries', async importOriginal => {
   const actual = await importOriginal<typeof import('../queries/RubricFormQueries')>()
   return {
     ...actual,
@@ -597,6 +598,111 @@ describe('RubricForm Tests', () => {
 
       expect(queryByTestId('rubric-points-possible-1')).not.toBeInTheDocument()
       expect(queryAllByTestId('rubric-criteria-row-points')).toHaveLength(0)
+    })
+  })
+
+  describe('Accessibility: Criteria Reordering', () => {
+    it('should display a move up menu option for criteria rows', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      expect(criterionPopovers.length).toBeGreaterThan(0)
+
+      await user.click(criterionPopovers[1])
+
+      await waitFor(() => {
+        expect(queryByTestId('move-up-criterion-menu-item')).not.toBeNull()
+      })
+    })
+
+    it('should display a move down menu option for criteria rows', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      expect(criterionPopovers.length).toBeGreaterThan(0)
+
+      await user.click(criterionPopovers[0])
+
+      await waitFor(() => {
+        expect(queryByTestId('move-down-criterion-menu-item')).not.toBeNull()
+      })
+    })
+
+    it('should move a criterion up when move up is clicked', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionDescriptionsBefore = queryAllByTestId('rubric-criteria-row-description')
+      const secondCriterionBefore = criterionDescriptionsBefore[1].textContent
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      await user.click(criterionPopovers[1])
+
+      await waitFor(() => {
+        expect(getByTestId('move-up-criterion-menu-item')).toBeInTheDocument()
+      })
+
+      await user.click(getByTestId('move-up-criterion-menu-item'))
+
+      const criterionDescriptionsAfter = queryAllByTestId('rubric-criteria-row-description')
+      expect(criterionDescriptionsAfter[0].textContent).toEqual(secondCriterionBefore)
+    })
+
+    it('should move a criterion down when move down is clicked', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionDescriptionsBefore = queryAllByTestId('rubric-criteria-row-description')
+      const firstCriterionBefore = criterionDescriptionsBefore[0].textContent
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      await user.click(criterionPopovers[0])
+
+      await waitFor(() => {
+        expect(getByTestId('move-down-criterion-menu-item')).toBeInTheDocument()
+      })
+
+      await user.click(getByTestId('move-down-criterion-menu-item'))
+
+      const criterionDescriptionsAfter = queryAllByTestId('rubric-criteria-row-description')
+      expect(criterionDescriptionsAfter[1].textContent).toEqual(firstCriterionBefore)
+    })
+
+    it('should disable move up for the first criterion', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      await user.click(criterionPopovers[0])
+
+      await waitFor(() => {
+        const moveUpItem = getByTestId('move-up-criterion-menu-item')
+        expect(moveUpItem).toBeInTheDocument()
+        expect(moveUpItem.closest('button')).toHaveAttribute('aria-disabled', 'true')
+      })
+    })
+
+    it('should disable move down for the last criterion', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      const lastIndex = criterionPopovers.length - 1
+      await user.click(criterionPopovers[lastIndex])
+
+      await waitFor(() => {
+        const moveDownItem = getByTestId('move-down-criterion-menu-item')
+        expect(moveDownItem).toBeInTheDocument()
+        expect(moveDownItem.closest('button')).toHaveAttribute('aria-disabled', 'true')
+      })
     })
   })
 

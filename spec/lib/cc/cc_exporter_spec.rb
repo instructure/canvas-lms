@@ -719,16 +719,20 @@ describe "Common Cartridge exporting" do
 
       client = double("kaltura_client")
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
-      allow(client).to receive(:flavorAssetGetOriginalAsset)
       allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
       mp3_path = "http://canvas.example/mp3_path"
-      allow(client).to receive(:media_sources).and_return([{
-                                                            isOriginal: "0",
-                                                            fileExt: "mp3",
-                                                            url: mp3_path,
-                                                            content_type: "audio/mpeg"
-                                                          }])
-      expect(CanvasHttp).to receive(:get).with(mp3_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+      allow(client).to receive_messages(
+        flavorAssetGetOriginalAsset: nil,
+        media_download_url: mp3_path,
+        media_sources: [{
+          isOriginal: "0",
+          fileExt: "mp3",
+          url: mp3_path,
+          content_type: "audio/mpeg"
+        }]
+      )
+      allow(CanvasHttp).to receive(:get).with(mp3_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+      allow(CanvasHttp).to receive(:get).with("#{mp3_path}?filename=292.mp3").and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
 
       run_export
 
@@ -769,16 +773,20 @@ describe "Common Cartridge exporting" do
 
       client = double("kaltura_client")
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
-      allow(client).to receive(:flavorAssetGetOriginalAsset)
       allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
       media_path = "http://www.example.com/blah.mp3"
-      allow(client).to receive(:media_sources).and_return([{
-                                                            isOriginal: "0",
-                                                            fileExt: "mp3",
-                                                            url: media_path,
-                                                            content_type: "audio/mpeg"
-                                                          }])
-      expect(CanvasHttp).to receive(:get).with(media_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+      allow(client).to receive_messages(
+        flavorAssetGetOriginalAsset: nil,
+        media_download_url: media_path,
+        media_sources: [{
+          isOriginal: "0",
+          fileExt: "mp3",
+          url: media_path,
+          content_type: "audio/mpeg"
+        }]
+      )
+      allow(CanvasHttp).to receive(:get).with(media_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+      allow(CanvasHttp).to receive(:get).with("#{media_path}?filename=test.mp4").and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
 
       run_export
 
@@ -819,15 +827,20 @@ describe "Common Cartridge exporting" do
 
       client = double("kaltura_client")
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
-      allow(client).to receive(:flavorAssetGetOriginalAsset)
       allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
       media_path = "http://www.example.com/blah.mp3"
-      allow(client).to receive(:media_sources).and_return([{
-                                                            isOriginal: "0",
-                                                            fileExt: "mp3",
-                                                            url: media_path,
-                                                            content_type: "audio/mpeg"
-                                                          }])
+      allow(client).to receive_messages(
+        flavorAssetGetOriginalAsset: nil,
+        media_download_url: media_path,
+        media_sources: [{
+          isOriginal: "0",
+          fileExt: "mp3",
+          url: media_path,
+          content_type: "audio/mpeg"
+        }]
+      )
+      allow(CanvasHttp).to receive(:get).with(media_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+      allow(CanvasHttp).to receive(:get).with("#{media_path}?filename=test.mp4").and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
       run_export
 
       check_resource_node(@page, CC::CCHelper::WEBCONTENT)
@@ -1010,6 +1023,25 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
+    it "filters out nav menu links from tab_configuration during export" do
+      # Nav Menu Links for Course Copy not implemented yet (see INTEROP-9293)
+      @course.root_account.enable_feature!(:nav_menu_links)
+      link = NavMenuLink.create!(context: @course, course_nav: true, label: "Link", url: "https://example.com")
+      @course.tab_configuration = [
+        { "id" => Course::TAB_HOME },
+        { "id" => "nav_menu_link_#{link.id}" }
+      ]
+      @course.save!
+
+      run_export
+
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/course_settings.xml"))
+      tab_config = JSON.parse(doc.at_css("tab_configuration").text)
+
+      expect(tab_config.none? { |t| t["id"].to_s.start_with?("nav_menu_link_") }).to be true
+      expect(tab_config.pluck("id")).to include(Course::TAB_HOME)
+    end
+
     it "does not export syllabus if not selected" do
       @course.syllabus_body = "<p>Bodylicious</p>"
 
@@ -1083,7 +1115,10 @@ describe "Common Cartridge exporting" do
       before do
         client = double("kaltura_client")
         allow(CanvasKaltura::ClientV3).to receive_messages(new: client)
-        allow(client).to receive_messages(media_sources: {})
+        allow(client).to receive_messages(
+          media_download_url: nil,
+          media_sources: {}
+        )
       end
 
       it "exports media tracks" do

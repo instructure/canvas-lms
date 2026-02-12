@@ -188,7 +188,7 @@ describe('InboxWidget', () => {
     expect(screen.getByText('The group project deadline has been...')).toBeInTheDocument()
   })
 
-  it('renders "Show all messages in inbox" action link', () => {
+  it('renders "View all messages in inbox" action link', () => {
     renderWithProviders(<InboxWidget {...buildDefaultProps()} />)
 
     const showAllLink = screen.getByTestId('show-all-messages-link')

@@ -86,8 +86,10 @@ class Accessibility::CourseScanService < ApplicationService
     scan_resources(@course.wiki_pages.not_deleted, :wiki_page_id)
     scan_resources(@course.assignments.active.not_excluded_from_accessibility_scan.except(:order), :assignment_id)
 
-    if Account.site_admin.feature_enabled?(:a11y_checker_additional_resources)
-      scan_resources(@course.discussion_topics.except(:order), :discussion_topic_id)
+    if @course.a11y_checker_additional_resources?
+      scan_resources(@course.discussion_topics.scannable.except(:order), :discussion_topic_id)
+      scan_resources(@course.announcements.active.except(:order), :announcement_id)
+      scan_syllabus
     end
   end
 
@@ -108,6 +110,20 @@ class Accessibility::CourseScanService < ApplicationService
 
       Accessibility::ResourceScannerService.call(resource:)
     end
+  end
+
+  def scan_syllabus
+    # Skip if syllabus is empty
+    return if @course.syllabus_body.blank?
+
+    last_scan = AccessibilityResourceScan.find_by(course_id: @course.id, is_syllabus: true)
+
+    if Account.site_admin.feature_enabled?(:a11y_checker_course_scan_conditional_resource_scan)
+      return unless needs_scan?(@course, last_scan)
+    end
+    resource = Accessibility::SyllabusResource.new(@course)
+
+    Accessibility::ResourceScannerService.call(resource:)
   end
 
   def needs_scan?(resource, last_scan)

@@ -1349,13 +1349,13 @@ describe RubricsController do
       end
 
       context "authorization and feature flags" do
-        include_examples "requires enabled features", "llm_criteria"
-        include_examples "requires manage rubric permission", "llm_criteria"
+        it_behaves_like "requires enabled features", "llm_criteria"
+        it_behaves_like "requires manage rubric permission", "llm_criteria"
       end
 
       context "validation" do
-        include_examples "validates parameter bounds", "llm_criteria"
-        include_examples "validates association", "llm_criteria"
+        it_behaves_like "validates parameter bounds", "llm_criteria"
+        it_behaves_like "validates association", "llm_criteria"
 
         it "accepts request when criteria_count is missing" do
           params = request_params.tap { |p| p[:generate_options].delete(:criteria_count) }
@@ -1643,13 +1643,13 @@ describe RubricsController do
       end
 
       context "authorization and feature flags" do
-        include_examples "requires enabled features", "llm_regenerate_criteria"
-        include_examples "requires manage rubric permission", "llm_regenerate_criteria"
+        it_behaves_like "requires enabled features", "llm_regenerate_criteria"
+        it_behaves_like "requires manage rubric permission", "llm_regenerate_criteria"
       end
 
       context "parameter validation" do
-        include_examples "validates parameter bounds", "llm_regenerate_criteria"
-        include_examples "validates association", "llm_regenerate_criteria"
+        it_behaves_like "validates parameter bounds", "llm_regenerate_criteria"
+        it_behaves_like "validates association", "llm_regenerate_criteria"
 
         context "string length limits" do
           it "returns error when additional_user_prompt is too long" do

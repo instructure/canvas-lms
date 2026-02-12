@@ -20,7 +20,11 @@
 
 class Loaders::RubricAssociationsLoader < GraphQL::Batch::Loader
   def perform(rubric_ids)
-    associations = RubricAssociation.where(association_type: "Assignment", workflow_state: "active", rubric_id: rubric_ids).pluck(:rubric_id)
+    associations = RubricAssociation
+                   .joins("INNER JOIN #{Course.quoted_table_name} ON rubric_associations.context_id = courses.id AND rubric_associations.context_type = 'Course'")
+                   .where(association_type: "Assignment", workflow_state: "active", rubric_id: rubric_ids)
+                   .where.not("courses.workflow_state": "deleted")
+                   .pluck(:rubric_id)
 
     rubric_ids.each do |rubric_id|
       fulfill(rubric_id, associations.include?(rubric_id))

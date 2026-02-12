@@ -664,7 +664,5 @@ describe "context modules", :ignore_js_errors do
     end
   end
 
-  context "module locking" do
-    include_examples "module unlock dates"
-  end
+  it_behaves_like "module unlock dates"
 end

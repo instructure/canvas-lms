@@ -51,7 +51,7 @@ const isAdmin = function () {
 }
 
 // must check canManage because current_user_roles will include roles from other enrolled courses
-const isStudent = function () {
+export const isStudent = function () {
   return (ENV.current_user_roles || []).includes('student') && !canManage()
 }
 
@@ -358,6 +358,16 @@ Assignment.prototype.description = function (newDescription) {
 
 Assignment.prototype.name = function (newName) {
   if (!(arguments.length > 0)) {
+    // For peer review assignments, return the formatted display name
+    if (this.get('is_peer_review_assignment') === true) {
+      const parentName = this.get('parent_assignment_name') || I18n.t('Assignment')
+      const peerReviewCount =
+        this.get('peer_review_count') || this.get('parent_peer_review_count') || 0
+      return I18n.t(
+        {one: '%{name} Peer Review (%{count})', other: '%{name} Peer Reviews (%{count})'},
+        {name: parentName, count: peerReviewCount},
+      )
+    }
     return this.get('name')
   }
   return this.set('name', newName)
@@ -715,6 +725,15 @@ Assignment.prototype.hasPeerReviewSubmissions = function () {
   return this.get('has_peer_review_submissions')
 }
 
+Assignment.prototype.shouldShowPeerReviewInfo = function () {
+  return (
+    canManage() &&
+    ENV.FLAGS?.peer_review_allocation_and_grading &&
+    this.peerReviews() &&
+    this.peerReviewSubAssignment() !== null
+  )
+}
+
 Assignment.prototype.notifyOfUpdate = function (notifyOfUpdateBoolean) {
   if (!(arguments.length > 0)) {
     return this.get('notify_of_update')
@@ -968,6 +987,9 @@ Assignment.prototype.position = function (newPosition) {
 }
 
 Assignment.prototype.iconType = function () {
+  if (this.isPeerReviewAssignment()) {
+    return 'peer-review'
+  }
   if (this.useNewQuizIcon()) {
     return 'quiz icon-Solid'
   }
@@ -997,6 +1019,9 @@ Assignment.prototype.objectType = function () {
 }
 
 Assignment.prototype.objectTypeDisplayName = function () {
+  if (this.isPeerReviewAssignment()) {
+    return I18n.t('Peer Review')
+  }
   if (this.isQuiz() || (this.isQuizLTIAssignment() && isStudent())) {
     return I18n.t('Quiz')
   }
@@ -1140,6 +1165,51 @@ Assignment.prototype.multipleDueDates = function () {
     dateGroups = this.get('all_dates')
     return dateGroups && dateGroups.length > 1
   }
+}
+
+Assignment.prototype.multiplePeerReviewDueDates = function () {
+  const sub = this.peerReviewSubAssignment()
+  const count = sub?.all_dates_count
+  if (count && count > 1) return true
+  else {
+    const dates = sub?.all_dates || []
+    return dates.length > 1
+  }
+}
+
+Assignment.prototype.peerReviewAllDates = function () {
+  const sub = this.peerReviewSubAssignment()
+  const dates = sub?.all_dates || []
+
+  return dates.map(d => ({
+    dueFor: d.title,
+    dueAt: d.due_at,
+    unlockAt: d.unlock_at,
+    lockAt: d.lock_at,
+    availabilityStatus: d.availability_status,
+  }))
+}
+
+Assignment.prototype.peerReviewSingleSection = function () {
+  const allDates = this.peerReviewAllDates()
+  if (allDates && allDates.length === 1) {
+    return allDates[0]
+  }
+  return null
+}
+
+Assignment.prototype.peerReviewDefaultDates = function () {
+  const peerReviewSub = this.peerReviewSubAssignment()
+  if (!peerReviewSub) return null
+
+  const singleSection = this.peerReviewSingleSection()
+  return new DateGroup({
+    due_at: peerReviewSub.due_at,
+    unlock_at: peerReviewSub.unlock_at,
+    lock_at: peerReviewSub.lock_at,
+    single_section_unlock_at: singleSection != null ? singleSection.unlockAt : undefined,
+    single_section_lock_at: singleSection != null ? singleSection.lockAt : undefined,
+  })
 }
 
 Assignment.prototype.hasDueDate = function () {
@@ -1323,6 +1393,7 @@ Assignment.prototype.toView = function () {
     'groupCategoryId',
     'hasDueDate',
     'hasPointsPossible',
+    'hasPeerReviewSubmissions',
     'hasSubAssignments',
     'hideInGradebook',
     'hideZeroPointQuizzesOptionEnabled',
@@ -1367,6 +1438,7 @@ Assignment.prototype.toView = function () {
     'peerReviewCount',
     'peerReviews',
     'peerReviewsAssignAt',
+    'peerReviewSubAssignment',
     'pointsPossible',
     'position',
     'postToSIS',
@@ -1828,6 +1900,10 @@ Assignment.prototype.isHorizonCourse = function () {
 
 Assignment.prototype.getId = function () {
   return this.get('id')
+}
+
+Assignment.prototype.isPeerReviewAssignment = function () {
+  return this.get('is_peer_review_assignment') === true
 }
 
 Assignment.prototype.sortingDueAt = function () {

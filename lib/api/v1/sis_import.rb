@@ -31,7 +31,7 @@ module Api::V1::SisImport
     end
   end
 
-  def sis_import_json(batch, user, session, includes: [])
+  def sis_import_json(batch, user, session, attachment_preflight: nil, includes: [])
     json = api_json(batch, user, session)
     json[:errors_attachment] = attachment_json(batch.errors_attachment, user) if batch.errors_attachment_id
     json[:user] = user_json(batch.user, user, session) if batch.user
@@ -39,6 +39,7 @@ module Api::V1::SisImport
     json[:csv_attachments] = attachments_json(atts, user) if atts.any?
     diff_atts = batch.downloadable_attachments(:diffed)
     json[:diffed_csv_attachments] = attachments_json(diff_atts, user) if diff_atts.any?
+    json[:pre_attachment] = attachment_preflight if attachment_preflight
     json
   end
 end

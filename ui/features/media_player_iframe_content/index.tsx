@@ -44,6 +44,17 @@ const isStandalone = () => {
   return !window.frameElement && window.location === window?.top?.location
 }
 
+const addVerifier = (url: string, verifier: string | string[] | undefined): string => {
+  if (Array.isArray(verifier)) verifier = verifier[0]
+  if (typeof verifier == 'undefined') return url
+
+  const parsedUrl = URL.parse(url)
+  if (!parsedUrl) return url
+
+  parsedUrl.searchParams.set('verifier', verifier)
+  return parsedUrl.href
+}
+
 ready(() => {
   const container = document.getElementById('player_container')
   // get the media_id from something like
@@ -64,11 +75,7 @@ ready(() => {
   let href_source
 
   if (media_href_match) {
-    href_source = decodeURIComponent(media_href_match[1])
-    if (parsed_loc.query.verifier) {
-      const delim = href_source.indexOf('?') > 0 ? '&' : '?'
-      href_source = `${href_source}${delim}verifier=${parsed_loc.query.verifier}`
-    }
+    href_source = addVerifier(decodeURIComponent(media_href_match[1]), parsed_loc.query.verifier)
 
     if (is_video) {
       href_source = [href_source]
@@ -77,8 +84,9 @@ ready(() => {
 
   const mediaTracks = media_object?.media_tracks?.map(track => {
     return {
-      id: track.id,
-      src: track.url,
+      ...track,
+      url: addVerifier(track.url, parsed_loc.query.verifier), // For CanvasStudioPlayer
+      src: addVerifier(track.url, parsed_loc.query.verifier), // For CanvasMediaPlayer
       label: captionLanguageForLocale(track.locale),
       type: track.kind,
       language: track.locale,
@@ -115,14 +123,11 @@ ready(() => {
   // with scrollbars, even though everything is the right size.
   document.documentElement.setAttribute('style', 'overflow: hidden;')
   const div = document.body.firstElementChild
+  let explicitSize;
   if (isStandalone()) {
     // we're standalone mode
-    if (is_video) {
-      // CanvasMediaPlayer leaves room for the 16px vertical margin.
-      div?.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
-    } else {
-      div?.setAttribute('style', 'width: 320px; height: 14.25rem; margin: 1rem auto;')
-    }
+    div?.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
+    explicitSize = { width: 640, height: 408 };
   }
 
   const aria_label = !media_object.title ? undefined : media_object.title
@@ -131,11 +136,12 @@ ready(() => {
       <CanvasStudioPlayer
         media_id={media_id || ''}
         media_sources={href_source || media_object.media_sources}
-        media_tracks={media_object?.media_tracks}
+        media_tracks={mediaTracks}
         type={is_video ? 'video' : 'audio'}
         aria_label={aria_label}
         is_attachment={is_attachment}
         attachment_id={attachment_id}
+        explicitSize={explicitSize}
         kebabMenuElements={
           ENV.FEATURES?.rce_studio_embed_improvements
             ? [

@@ -98,6 +98,14 @@ describe Types::RubricType do
       expect(rubric_type.resolve("hasRubricAssociations")).to be true
     end
 
+    it "has_rubric_associations excludes deleted courses" do
+      rubric_association_model(rubric:, association_object: assignment, purpose: "grading")
+      expect(rubric_type.resolve("hasRubricAssociations")).to be true
+
+      @course.destroy
+      expect(rubric_type.resolve("hasRubricAssociations")).to be false
+    end
+
     it "rubric_association_for_context" do
       rubric_association_model(rubric:, association_object: rubric.context, purpose: "bookmark")
 

@@ -17,24 +17,11 @@
  */
 
 import {useQuery} from '@tanstack/react-query'
-import {fetchCourses} from '../api/courses'
-import type {SortOrder} from '../react/components/SortableTableHeader'
+import {fetchCourses, FetchCoursesParams} from '../api/courses'
 
-interface UseCoursesOptions {
-  accountId: string
-  sort: string
-  order: SortOrder
-  page: number
-}
-
-export const useCourses = ({
-  accountId,
-  sort,
-  order,
-  page,
-}: UseCoursesOptions) => {
+export const useCourses = ({accountId, sort, order, page, search}: FetchCoursesParams) => {
   return useQuery({
-    queryKey: ['accessibility-courses', accountId, sort, order, page],
-    queryFn: () => fetchCourses({accountId, sort, order, page}),
+    queryKey: ['accessibility-courses', accountId, sort, order, page, search],
+    queryFn: () => fetchCourses({accountId, sort, order, page, search}),
   })
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {createServer, renderMessageStudents} from './MessageStudentsTestHelpers'
 
@@ -41,17 +41,17 @@ describe('MessageStudents form validation', () => {
   })
 
   it('displays error when submitting without subject', async () => {
-    const {getByTestId, getByText} = renderMessageStudents()
+    renderMessageStudents()
     await act(async () => {
-      await user.click(getByTestId('message-students-submit'))
+      await user.click(screen.getByTestId('message-students-submit'))
       vi.runAllTimers()
     })
-    expect(getByText(/please provide a subject/i)).toBeInTheDocument()
+    expect(screen.getByText(/please provide a subject/i)).toBeInTheDocument()
   })
 
   it('displays error when subject is too long', async () => {
-    const {getByLabelText, getByTestId, getByText} = renderMessageStudents()
-    const subjectInput = getByLabelText(/subject/i)
+    renderMessageStudents()
+    const subjectInput = screen.getByLabelText(/subject/i)
     await act(async () => {
       // Use paste instead of type to avoid timeout with 256 characters
       await user.click(subjectInput)
@@ -59,9 +59,39 @@ describe('MessageStudents form validation', () => {
       vi.runAllTimers()
     })
     await act(async () => {
-      await user.click(getByTestId('message-students-submit'))
+      await user.click(screen.getByTestId('message-students-submit'))
       vi.runAllTimers()
     })
-    expect(getByText(/subject must contain fewer than 255 characters/i)).toBeInTheDocument()
+    expect(screen.getByText(/subject must contain fewer than 255 characters/i)).toBeInTheDocument()
+  })
+
+  it('displays error when subject contains only whitespace', async () => {
+    renderMessageStudents()
+    const subjectInput = screen.getByLabelText(/subject/i)
+    await act(async () => {
+      await user.type(subjectInput, '   ')
+      vi.runAllTimers()
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('message-students-submit'))
+      vi.runAllTimers()
+    })
+    expect(screen.getByText(/please provide a subject/i)).toBeInTheDocument()
+  })
+
+  it('displays error when body contains only whitespace', async () => {
+    renderMessageStudents()
+    const subjectInput = screen.getByLabelText(/subject/i)
+    const bodyInput = screen.getByLabelText(/body/i)
+    await act(async () => {
+      await user.type(subjectInput, 'Valid Subject')
+      await user.type(bodyInput, '   ')
+      vi.runAllTimers()
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('message-students-submit'))
+      vi.runAllTimers()
+    })
+    expect(screen.getByText(/please provide a body/i)).toBeInTheDocument()
   })
 })

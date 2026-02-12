@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {cleanup, render} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {StudentHeader, StudentHeaderProps} from '../StudentHeader'
 import {SortOrder, SortBy, NameDisplayFormat} from '@canvas/outcomes/react/utils/constants'
@@ -46,8 +46,8 @@ describe('StudentHeader', () => {
   })
 
   it('renders a "Student" cell', () => {
-    const {getByText} = render(<StudentHeader {...makeProps()} />)
-    expect(getByText('Students')).toBeInTheDocument()
+    render(<StudentHeader {...makeProps()} />)
+    expect(screen.getAllByText('Students')[0]).toBeInTheDocument()
   })
 
   it('renders a menu with various sorting options', async () => {

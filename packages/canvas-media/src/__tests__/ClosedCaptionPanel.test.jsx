@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import React from 'react'
+import {vi} from 'vitest'
 import ClosedCaptionCreator, {ClosedCaptionPanel} from '../ClosedCaptionCreator'
 import getTranslations from '../getTranslations'
-import {vi} from 'vitest'
 
 vi.mock('../getTranslations', () => ({
   default: vi.fn(locale => Promise.resolve({[locale]: {}})),

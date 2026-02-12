@@ -1231,6 +1231,23 @@ describe DeveloperKey do
         expect(developer_key.reload).to be_deleted
       end
 
+      context "when the ims registration has an invalid target_link_uri" do
+        before do
+          ims_registration.update_column(
+            :lti_tool_configuration,
+            ims_registration.lti_tool_configuration.merge("target_link_uri" => "localhost")
+          )
+          ims_registration.reload
+        end
+
+        it "still destroys the developer key and associated records" do
+          subject
+          expect(developer_key.reload).to be_deleted
+          expect(lti_registration.reload).to be_deleted
+          expect(ims_registration.reload).to be_deleted
+        end
+      end
+
       context "and the key has tools associated with it" do
         let_once(:course) { course_model(account:) }
         let_once(:course_tool) { lti_registration.new_external_tool(course) }

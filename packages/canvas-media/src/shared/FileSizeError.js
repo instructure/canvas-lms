@@ -17,10 +17,12 @@
  */
 
 class FileSizeError extends Error {
-  static get type() { return 'FileSizeError' }
+  static get type() {
+    return 'FileSizeError'
+  }
 
   constructor({maxBytes, actualBytes}, ...args) {
-    super("Max file size exceeded", args)
+    super('Max file size exceeded', args)
 
     this.name = FileSizeError.type
     this.maxBytes = maxBytes

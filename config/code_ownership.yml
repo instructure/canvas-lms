@@ -9,6 +9,7 @@
 # 2. Every file is uniquely owned -- this is fine
 skip_codeowners_validation: true
 
+owned_globs: [] # nothing is required to be owned yet
 js_package_paths:
   - ui
   - packages

@@ -139,7 +139,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     before do
-      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      root_account.settings[:turnitin_asset_processor_client_id] = developer_key.global_id.to_s
+      root_account.save!
     end
 
     describe "full migration flow" do
@@ -427,7 +428,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       end
 
       it "marks progress as failed when fatal error occurs" do
-        Setting.set("turnitin_asset_processor_client_id", "")
+        root_account.settings[:turnitin_asset_processor_client_id] = ""
+        root_account.save!
         product_family
         actl
 
@@ -466,7 +468,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
     context "prevalidations" do
       it "fails when developer key is not configured" do
-        Setting.set("turnitin_asset_processor_client_id", "")
+        root_account.settings[:turnitin_asset_processor_client_id] = ""
+        root_account.save!
         product_family
         actl
         allow(worker).to receive(:migrate_tool_proxy)
@@ -596,7 +599,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     before do
-      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      root_account.settings[:turnitin_asset_processor_client_id] = developer_key.global_id.to_s
+      root_account.save!
       # Set @progress instance variable for tests that call migrate_tool_proxy directly
       worker.instance_variable_set(:@progress, test_progress)
     end
@@ -712,7 +716,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     let(:rsa_key) { OpenSSL::PKey::RSA.new(2048) }
 
     before do
-      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      root_account.settings[:turnitin_asset_processor_client_id] = developer_key.global_id.to_s
+      root_account.save!
       allow(Lti::KeyStorage).to receive(:present_key).and_return(rsa_key)
     end
 
@@ -1188,7 +1193,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     before do
-      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      root_account.settings[:turnitin_asset_processor_client_id] = developer_key.global_id.to_s
+      root_account.save!
       worker.instance_variable_set(:@progress, test_progress)
     end
 
@@ -1199,13 +1205,22 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil when setting is blank" do
-      Setting.set("turnitin_asset_processor_client_id", "")
+      root_account.settings[:turnitin_asset_processor_client_id] = ""
+      root_account.save!
       expect(worker.send(:tii_developer_key)).to be_nil
     end
 
     it "returns nil and logs warning when developer key not found" do
-      Setting.set("turnitin_asset_processor_client_id", "99999999")
+      root_account.settings[:turnitin_asset_processor_client_id] = "99999999"
+      root_account.save!
       expect(worker.send(:tii_developer_key)).to be_nil
+    end
+
+    it "falls back to global Setting when account setting is not set" do
+      root_account.settings[:turnitin_asset_processor_client_id] = nil
+      root_account.save!
+      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      expect(worker.send(:tii_developer_key)).to eq(developer_key)
     end
   end
 
@@ -1355,6 +1370,30 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       expect(body).to include(sub_account.name)
       expect(body).to include(download_url)
       expect(body).not_to include("successfully")
+    end
+  end
+
+  describe "#report_download_url" do
+    it "uses environment_specific_domain for the URL" do
+      attachment = Attachment.create!(
+        context: sub_account,
+        filename: "test_report.csv",
+        content_type: "text/csv"
+      )
+
+      allow(sub_account).to receive(:environment_specific_domain).and_return("beta.instructure.com")
+
+      url = worker.send(:report_download_url, attachment.id, sub_account)
+
+      expect(url).to include("beta.instructure.com")
+      expect(url).to include("accounts/#{sub_account.id}")
+      expect(url).to include("files/#{attachment.id}")
+    end
+
+    it "returns nil when attachment_id is nil" do
+      url = worker.send(:report_download_url, nil, sub_account)
+
+      expect(url).to be_nil
     end
   end
 
@@ -2225,6 +2264,149 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
         worker.perform(progress)
       end
+    end
+  end
+
+  describe "#rollback" do
+    let(:test_course) { course_model(account: sub_account) }
+    let(:test_assignment1) { assignment_model(course: test_course) }
+    let(:test_assignment2) { assignment_model(course: test_course) }
+
+    let(:migrated_tool_proxy) do
+      create_tool_proxy(
+        context: test_course,
+        product_family:,
+        create_binding: true,
+        raw_data: { "custom" => { "proxy_instance_id" => "test_proxy_123" } }
+      )
+    end
+
+    let(:ap_tool) do
+      test_course.context_external_tools.create!(
+        name: "Asset Processor Tool",
+        domain: "example.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+    end
+
+    let(:resource_handler) do
+      Lti::ResourceHandler.create!(
+        resource_type_code: "resource",
+        name: "Test Resource",
+        tool_proxy: migrated_tool_proxy
+      )
+    end
+
+    let(:message_handler) do
+      Lti::MessageHandler.create!(
+        message_type: "basic-lti-launch-request",
+        launch_path: "http://example.com/launch",
+        resource_handler:,
+        tool_proxy: migrated_tool_proxy
+      )
+    end
+
+    let(:actl1) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment: test_assignment1,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: product_family.vendor_code,
+        tool_product_code: product_family.product_code,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+    end
+
+    let(:actl2) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment: test_assignment2,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: product_family.vendor_code,
+        tool_product_code: product_family.product_code,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+    end
+
+    it "destroys asset processors and clears migrated_to_context_external_tool for all ACTLs" do
+      migrated_tool_proxy.update!(migrated_to_context_external_tool: ap_tool)
+      allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      actl1
+      actl2
+
+      Lti::AssetProcessor.create!(
+        assignment: test_assignment1,
+        context_external_tool: ap_tool,
+        migration_id: worker.send(:generate_migration_id, migrated_tool_proxy, actl1),
+        workflow_state: "active"
+      )
+
+      Lti::AssetProcessor.create!(
+        assignment: test_assignment2,
+        context_external_tool: ap_tool,
+        migration_id: worker.send(:generate_migration_id, migrated_tool_proxy, actl2),
+        workflow_state: "active"
+      )
+
+      expect(migrated_tool_proxy.migrated_to_context_external_tool).to eq(ap_tool)
+      expect(Lti::AssetProcessor.active.where(assignment: [test_assignment1, test_assignment2]).count).to eq(2)
+
+      worker.rollback
+
+      expect(Lti::AssetProcessor.active.where(assignment: [test_assignment1, test_assignment2]).count).to eq(0)
+      expect(migrated_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+    end
+
+    it "skips tool proxies from other accounts and continues processing" do
+      other_account = account_model(parent_account: root_account, root_account:)
+      other_course = course_model(account: other_account)
+      other_tool_proxy = create_tool_proxy(
+        context: other_course,
+        product_family:,
+        create_binding: true
+      )
+      other_tool_proxy.update!(migrated_to_context_external_tool: ap_tool)
+
+      migrated_tool_proxy.update!(migrated_to_context_external_tool: ap_tool)
+      allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      actl1
+      actl2
+
+      ap1 = Lti::AssetProcessor.create!(
+        assignment: test_assignment1,
+        context_external_tool: ap_tool,
+        migration_id: worker.send(:generate_migration_id, migrated_tool_proxy, actl1),
+        workflow_state: "active"
+      )
+
+      ap2 = Lti::AssetProcessor.create!(
+        assignment: test_assignment2,
+        context_external_tool: ap_tool,
+        migration_id: worker.send(:generate_migration_id, migrated_tool_proxy, actl2),
+        workflow_state: "active"
+      )
+
+      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:associated_tool_proxy) do |actl|
+        if actl.id == actl1.id
+          other_tool_proxy
+        else
+          migrated_tool_proxy
+        end
+      end
+
+      worker.rollback
+
+      expect(ap1.reload.workflow_state).to eq("active")
+      expect(ap2.reload.workflow_state).to eq("deleted")
+      expect(other_tool_proxy.reload.migrated_to_context_external_tool).to eq(ap_tool)
+      expect(migrated_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
     end
   end
 end

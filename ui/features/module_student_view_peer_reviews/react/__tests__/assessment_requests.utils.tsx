@@ -80,7 +80,10 @@ describe('Assessment Requests', () => {
         name: 'Test Assignment',
         peerReviews: {
           anonymousReviews: true,
+          count: null,
+          pointsPossible: null,
         },
+        peerReviewSubAssignment: null,
       }
 
       const result = formatAssignment(mockAssignment, 'module1')
@@ -113,7 +116,10 @@ describe('Assessment Requests', () => {
         name: 'Test Assignment',
         peerReviews: {
           anonymousReviews: true,
+          count: null,
+          pointsPossible: null,
         },
+        peerReviewSubAssignment: null,
       }
 
       const result = formatAssignment(mockAssignment, 'module1')

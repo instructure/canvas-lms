@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import JobStats from './react/components/JobStats'
 import ready from '@instructure/ready'
 
 ready(() => {
-  ReactDOM.render(<JobStats />, document.getElementById('content'))
+  legacyRender(<JobStats />, document.getElementById('content'))
 })

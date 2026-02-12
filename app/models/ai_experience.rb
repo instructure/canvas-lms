@@ -23,11 +23,14 @@ class AiExperience < ApplicationRecord
   belongs_to :course
 
   has_many :ai_conversations, dependent: :destroy
+  has_many :ai_experience_context_files, dependent: :destroy
+  has_many :context_files, through: :ai_experience_context_files, source: :attachment, class_name: "Attachment"
 
   validates :title, presence: true, length: { maximum: 255 }
   validates :learning_objective, presence: true
   validates :pedagogical_guidance, presence: true
   validates :workflow_state, presence: true, inclusion: { in: %w[unpublished published deleted] }
+  validates :context_index_status, presence: true, inclusion: { in: %w[not_started processing completed failed] }
   validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
 
   scope :published, -> { where(workflow_state: "published") }
@@ -130,8 +133,16 @@ class AiExperience < ApplicationRecord
   end
 
   def should_update_context?
-    llm_conversation_context_id.present? &&
-      (saved_change_to_pedagogical_guidance? || saved_change_to_facts? || saved_change_to_learning_objective?)
+    return false unless llm_conversation_context_id.present?
+
+    context_changed = saved_change_to_pedagogical_guidance? || saved_change_to_facts? || saved_change_to_learning_objective?
+
+    # Check for context file changes only if feature flag is enabled
+    if course.feature_enabled?(:ai_experiences_context_file_upload)
+      context_changed ||= saved_changes.key?("ai_experience_context_files")
+    end
+
+    context_changed
   end
 
   def update_conversation_context

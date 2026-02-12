@@ -642,9 +642,11 @@ class Rubric < ActiveRecord::Base
   end
 
   def used_locations
-    associations = rubric_associations.active.where(association_type: "Assignment")
-
-    Assignment.where(id: associations.pluck(:association_id))
+    Assignment.active
+              .joins("INNER JOIN #{RubricAssociation.quoted_table_name} ON rubric_associations.association_id = assignments.id AND rubric_associations.association_type = 'Assignment'")
+              .joins("INNER JOIN #{Course.quoted_table_name} AS context_course ON assignments.context_id = context_course.id AND assignments.context_type = 'Course'")
+              .where(rubric_associations: { rubric_id: id, workflow_state: "active" })
+              .where.not("context_course.workflow_state": "deleted")
   end
 
   def update_association_count

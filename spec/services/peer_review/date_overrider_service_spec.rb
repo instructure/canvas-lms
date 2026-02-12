@@ -417,6 +417,7 @@ RSpec.describe PeerReview::DateOverriderService do
     before do
       allow(service).to receive(:run_validations)
       allow(service).to receive(:create_or_update_peer_review_overrides)
+      allow(service).to receive(:update_only_visible_to_overrides)
     end
 
     it "calls run_validations" do
@@ -427,6 +428,80 @@ RSpec.describe PeerReview::DateOverriderService do
     it "calls create_or_update_peer_review_overrides" do
       expect(service).to receive(:create_or_update_peer_review_overrides)
       service.call
+    end
+
+    it "calls update_only_visible_to_overrides" do
+      expect(service).to receive(:update_only_visible_to_overrides)
+      service.call
+    end
+  end
+
+  describe "#refresh_parent_associations" do
+    context "when reload_associations is false (default)" do
+      it "does not call refresh_parent_associations during call" do
+        service = described_class.new(
+          peer_review_sub_assignment:,
+          reload_associations: false
+        )
+
+        allow(service).to receive(:run_validations)
+        allow(service).to receive(:create_or_update_peer_review_overrides)
+        expect(service).not_to receive(:refresh_parent_associations)
+
+        service.call
+      end
+    end
+
+    context "when reload_associations is true" do
+      it "calls refresh_parent_associations during call and reloads associations" do
+        service = described_class.new(
+          peer_review_sub_assignment:,
+          reload_associations: true
+        )
+
+        allow(service).to receive(:run_validations)
+        allow(service).to receive(:create_or_update_peer_review_overrides)
+        expect(peer_review_sub_assignment.association(:parent_assignment)).to receive(:reload).and_return(parent_assignment)
+        expect(parent_assignment.association(:assignment_overrides)).to receive(:reload)
+
+        service.call
+      end
+    end
+
+    context "when assignment is nil" do
+      it "does not reload even when called directly" do
+        service = described_class.new(
+          peer_review_sub_assignment: nil,
+          reload_associations: true
+        )
+
+        expect(service.send(:refresh_parent_associations)).to be_nil
+      end
+    end
+
+    context "when peer_review_sub_assignment is nil" do
+      it "does not reload even when method is called directly" do
+        service = described_class.new(
+          peer_review_sub_assignment: nil,
+          reload_associations: true
+        )
+
+        expect(service.send(:refresh_parent_associations)).to be_nil
+      end
+    end
+
+    context "when called directly" do
+      it "reloads parent_assignment and assignment_overrides associations" do
+        service = described_class.new(
+          peer_review_sub_assignment:,
+          reload_associations: false
+        )
+
+        expect(peer_review_sub_assignment.association(:parent_assignment)).to receive(:reload).and_return(parent_assignment)
+        expect(parent_assignment.association(:assignment_overrides)).to receive(:reload)
+
+        service.send(:refresh_parent_associations)
+      end
     end
   end
 
@@ -556,8 +631,8 @@ RSpec.describe PeerReview::DateOverriderService do
         existing_override1
         existing_override2
         existing_override3
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "partitions overrides correctly" do
@@ -594,8 +669,8 @@ RSpec.describe PeerReview::DateOverriderService do
         existing_override1
         existing_override2
         existing_override3
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "calls only the updater service" do
@@ -622,8 +697,8 @@ RSpec.describe PeerReview::DateOverriderService do
       before do
         existing_override1
         existing_override2
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "calls only the creator service" do
@@ -654,8 +729,8 @@ RSpec.describe PeerReview::DateOverriderService do
       before do
         existing_override1
         existing_override2
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "calls neither service" do
@@ -680,8 +755,8 @@ RSpec.describe PeerReview::DateOverriderService do
       let(:overrides) { [create_override1, create_override2] }
 
       before do
-        allow(PeerReview::DateOverrideUpdaterService).to receive(:call).and_return(double(success?: true))
-        allow(PeerReview::DateOverrideCreatorService).to receive(:call).and_return(double(success?: true))
+        allow(PeerReview::DateOverrideUpdaterService).to receive(:call)
+        allow(PeerReview::DateOverrideCreatorService).to receive(:call)
       end
 
       it "calls only the creator service" do
@@ -750,6 +825,311 @@ RSpec.describe PeerReview::DateOverriderService do
 
     it "handles non-existent override ids gracefully" do
       expect { service.send(:destroy_overrides, [999_999]) }.not_to raise_error
+    end
+  end
+
+  describe "#update_only_visible_to_overrides" do
+    context "when flag needs to change from false to true" do
+      before do
+        peer_review_sub_assignment.update!(
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil,
+          only_visible_to_overrides: false
+        )
+      end
+
+      let(:section) { add_section("Test Section", course:) }
+      let(:parent_override) { assignment_override_model(assignment: parent_assignment, set: section) }
+
+      it "updates only_visible_to_overrides to true when conditions are met" do
+        assignment_override_model(assignment: peer_review_sub_assignment, set: section, parent_override:)
+
+        service.send(:update_only_visible_to_overrides)
+
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be true
+      end
+    end
+
+    context "when flag needs to change from true to false" do
+      before do
+        peer_review_sub_assignment.update!(
+          due_at: 1.week.from_now,
+          only_visible_to_overrides: true
+        )
+      end
+
+      it "updates only_visible_to_overrides to false when base dates exist" do
+        service.send(:update_only_visible_to_overrides)
+
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be false
+      end
+    end
+
+    context "when flag does not need to change" do
+      before do
+        peer_review_sub_assignment.update!(
+          due_at: 1.week.from_now,
+          only_visible_to_overrides: false
+        )
+      end
+
+      it "does not update the record" do
+        expect(peer_review_sub_assignment).not_to receive(:update!)
+        service.send(:update_only_visible_to_overrides)
+      end
+    end
+  end
+
+  describe "#only_visible_to_overrides?" do
+    context "when base dates exist" do
+      before do
+        peer_review_sub_assignment.update!(due_at: 1.week.from_now)
+      end
+
+      it "returns false" do
+        expect(service.send(:only_visible_to_overrides?)).to be false
+      end
+    end
+
+    context "when Course override exists" do
+      before do
+        peer_review_sub_assignment.update!(due_at: nil, unlock_at: nil, lock_at: nil)
+        parent_course_override = assignment_override_model(
+          assignment: parent_assignment,
+          set_type: "Course",
+          set_id: course.id
+        )
+        assignment_override_model(
+          assignment: peer_review_sub_assignment,
+          set_type: "Course",
+          set_id: course.id,
+          parent_override: parent_course_override
+        )
+      end
+
+      it "returns false" do
+        expect(service.send(:only_visible_to_overrides?)).to be false
+      end
+    end
+
+    context "when no base dates, no Course override, but Section override exists" do
+      let(:section) { add_section("Test Section", course:) }
+
+      before do
+        peer_review_sub_assignment.update!(due_at: nil, unlock_at: nil, lock_at: nil)
+        parent_override = assignment_override_model(assignment: parent_assignment, set: section)
+        assignment_override_model(assignment: peer_review_sub_assignment, set: section, parent_override:)
+      end
+
+      it "returns true" do
+        expect(service.send(:only_visible_to_overrides?)).to be true
+      end
+    end
+
+    context "when no base dates and no overrides" do
+      before do
+        peer_review_sub_assignment.update!(due_at: nil, unlock_at: nil, lock_at: nil)
+        peer_review_sub_assignment.assignment_overrides.destroy_all
+      end
+
+      it "returns false" do
+        expect(service.send(:only_visible_to_overrides?)).to be false
+      end
+    end
+  end
+
+  describe "#no_base_dates?" do
+    context "when all dates are nil" do
+      before do
+        peer_review_sub_assignment.update!(due_at: nil, unlock_at: nil, lock_at: nil)
+      end
+
+      it "returns true" do
+        expect(service.send(:no_base_dates?)).to be true
+      end
+    end
+
+    context "when due_at is present" do
+      before do
+        peer_review_sub_assignment.update!(due_at: 1.week.from_now, unlock_at: nil, lock_at: nil)
+      end
+
+      it "returns false" do
+        expect(service.send(:no_base_dates?)).to be false
+      end
+    end
+
+    context "when unlock_at is present" do
+      before do
+        peer_review_sub_assignment.update!(due_at: nil, unlock_at: 1.day.from_now, lock_at: nil)
+      end
+
+      it "returns false" do
+        expect(service.send(:no_base_dates?)).to be false
+      end
+    end
+
+    context "when lock_at is present" do
+      before do
+        peer_review_sub_assignment.update!(due_at: nil, unlock_at: nil, lock_at: 2.weeks.from_now)
+      end
+
+      it "returns false" do
+        expect(service.send(:no_base_dates?)).to be false
+      end
+    end
+  end
+
+  describe "only_visible_to_overrides integration scenarios" do
+    let(:section) { add_section("Test Section", course:) }
+
+    context "when assignment has base dates set" do
+      before do
+        peer_review_sub_assignment.update!(
+          due_at: 1.week.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 2.weeks.from_now,
+          only_visible_to_overrides: false
+        )
+      end
+
+      it "keeps only_visible_to_overrides as false" do
+        service.call
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be false
+      end
+    end
+
+    context "when assignment has only unlock_at set" do
+      before do
+        peer_review_sub_assignment.update!(
+          due_at: nil,
+          unlock_at: 1.day.from_now,
+          lock_at: nil,
+          only_visible_to_overrides: false
+        )
+      end
+
+      it "keeps only_visible_to_overrides as false" do
+        service.call
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be false
+      end
+    end
+
+    context "when no base dates and Course override exists" do
+      let(:overrides) do
+        [{ set_type: "Course", set_id: course.id, due_at: 1.week.from_now }]
+      end
+
+      before do
+        peer_review_sub_assignment.update!(
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil,
+          only_visible_to_overrides: false
+        )
+        parent_course_override = assignment_override_model(
+          assignment: parent_assignment,
+          set_type: "Course",
+          set_id: course.id
+        )
+        assignment_override_model(
+          assignment: peer_review_sub_assignment,
+          set_type: "Course",
+          set_id: course.id,
+          parent_override: parent_course_override
+        )
+      end
+
+      it "keeps only_visible_to_overrides as false" do
+        service.call
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be false
+      end
+    end
+
+    context "when no base dates and Section override exists" do
+      let(:overrides) do
+        [{ set_type: "CourseSection", set_id: section.id, due_at: 1.week.from_now }]
+      end
+
+      before do
+        peer_review_sub_assignment.update!(
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil,
+          only_visible_to_overrides: false
+        )
+        parent_override = assignment_override_model(assignment: parent_assignment, set: section)
+        assignment_override_model(assignment: peer_review_sub_assignment, set: section, parent_override:)
+      end
+
+      it "sets only_visible_to_overrides to true" do
+        service.call
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be true
+      end
+    end
+
+    context "when no base dates and no overrides" do
+      let(:overrides) { [] }
+
+      before do
+        peer_review_sub_assignment.update!(
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil,
+          only_visible_to_overrides: false
+        )
+        peer_review_sub_assignment.assignment_overrides.destroy_all
+      end
+
+      it "keeps only_visible_to_overrides as false" do
+        service.call
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be false
+      end
+    end
+
+    context "when base dates are cleared and Section overrides exist" do
+      let(:overrides) do
+        [{ set_type: "CourseSection", set_id: section.id, due_at: 1.week.from_now }]
+      end
+
+      before do
+        parent_override = assignment_override_model(assignment: parent_assignment, set: section)
+        assignment_override_model(assignment: peer_review_sub_assignment, set: section, parent_override:)
+
+        peer_review_sub_assignment.update!(
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil,
+          only_visible_to_overrides: false
+        )
+      end
+
+      it "updates only_visible_to_overrides to true" do
+        service.call
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be true
+      end
+    end
+
+    context "when all overrides are deleted" do
+      let(:overrides) { [] }
+
+      before do
+        parent_override = assignment_override_model(assignment: parent_assignment, set: section)
+        assignment_override_model(assignment: peer_review_sub_assignment, set: section, parent_override:)
+
+        peer_review_sub_assignment.update!(
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil,
+          only_visible_to_overrides: true
+        )
+      end
+
+      it "updates only_visible_to_overrides to false" do
+        service.call
+        expect(peer_review_sub_assignment.reload.only_visible_to_overrides).to be false
+      end
     end
   end
 

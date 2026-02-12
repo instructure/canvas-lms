@@ -32,17 +32,19 @@ export const COURSE_INSTRUCTORS_PAGINATED_QUERY = gql`
           avatarUrl
           email
         }
-        course {
-          _id
-          name
-          courseCode
+        enrollments {
+          course {
+            _id
+            name
+            courseCode
+          }
+          type
+          role {
+            _id
+            name
+          }
+          enrollmentState
         }
-        type
-        role {
-          _id
-          name
-        }
-        enrollmentState
       }
       pageInfo {
         hasNextPage
@@ -66,17 +68,19 @@ export interface CourseInstructorsPaginatedResponse {
         avatarUrl?: string
         email?: string
       }
-      course: {
-        _id: string
-        name: string
-        courseCode?: string
-      }
-      type: 'TeacherEnrollment' | 'TaEnrollment'
-      role: {
-        _id: string
-        name: string
-      }
-      enrollmentState: string
+      enrollments: Array<{
+        course: {
+          _id: string
+          name: string
+          courseCode?: string
+        }
+        type: 'TeacherEnrollment' | 'TaEnrollment'
+        role: {
+          _id: string
+          name: string
+        }
+        enrollmentState: string
+      }>
     }>
     pageInfo: {
       hasNextPage: boolean
@@ -128,29 +132,32 @@ export const fetchPaginatedCourseInstructors = async (
   const {nodes, pageInfo} = response.courseInstructorsConnection
 
   const instructors: CourseInstructorForComponent[] = nodes
-    .filter(enrollment => enrollment.user?._id)
-    .map(enrollment => ({
-      id: `${enrollment.user._id}-${enrollment.course._id}`,
-      name: enrollment.user.name,
-      sortable_name: enrollment.user.sortableName,
-      short_name: enrollment.user.shortName,
-      avatar_url: enrollment.user.avatarUrl,
-      email: enrollment.user.email,
-      bio: null,
-      course_name: enrollment.course.name,
-      course_code: enrollment.course.courseCode,
-      enrollments: [
-        {
-          id: `${enrollment.user._id}-${enrollment.course._id}`,
-          user_id: enrollment.user._id,
+    .filter(node => node.user?._id && node.enrollments.length > 0)
+    .map(node => {
+      const firstEnrollment = node.enrollments[0]
+      return {
+        id: node.user._id,
+        name: node.user.name,
+        sortable_name: node.user.sortableName,
+        short_name: node.user.shortName,
+        avatar_url: node.user.avatarUrl,
+        email: node.user.email,
+        bio: null,
+        course_name: firstEnrollment.course.name,
+        course_code: firstEnrollment.course.courseCode,
+        enrollments: node.enrollments.map(enrollment => ({
+          id: `${node.user._id}-${enrollment.course._id}`,
+          user_id: node.user._id,
           course_id: enrollment.course._id,
+          course_name: enrollment.course.name,
+          course_code: enrollment.course.courseCode,
           type: enrollment.type,
           role: enrollment.role.name,
           role_id: enrollment.role._id,
           enrollment_state: enrollment.enrollmentState,
-        },
-      ],
-    }))
+        })),
+      }
+    })
 
   return {
     data: instructors,

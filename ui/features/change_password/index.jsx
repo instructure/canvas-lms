@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import ConfirmChangePassword from './react/ConfirmChangePassword'
 
 ready(() => {
   const mountPoint = document.getElementById('confirm_change_password_mount_point')
-  const root = createRoot(mountPoint)
 
-  root.render(
+  render(
     <ConfirmChangePassword
       cc={ENV.CC}
       pseudonym={ENV.PSEUDONYM}
       defaultPolicy={ENV.PASSWORD_POLICY}
       passwordPoliciesAndPseudonyms={ENV.PASSWORD_POLICIES}
     />,
+    mountPoint,
   )
 })

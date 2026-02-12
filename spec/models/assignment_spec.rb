@@ -6794,6 +6794,50 @@ describe Assignment do
     end
   end
 
+  describe "#quiz_lti_assignment?" do
+    before :once do
+      @course = course_model
+      @assignment = @course.assignments.build
+    end
+
+    context "when no URL is provided" do
+      it "returns false" do
+        expect(@assignment.quiz_lti_assignment?).to be false
+      end
+    end
+
+    context "when URL is not a quiz LTI tool" do
+      before do
+        @tool = @course.context_external_tools.create!(
+          name: "Regular Tool",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          url: "http://example.com/launch"
+        )
+      end
+
+      it "returns false" do
+        expect(@assignment.quiz_lti_assignment?(external_tool_url: @tool.url)).to be false
+      end
+    end
+
+    context "when URL is a quiz LTI tool" do
+      before do
+        @tool = @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+      end
+
+      it "returns true" do
+        expect(@assignment.quiz_lti_assignment?(external_tool_url: @tool.url)).to be true
+      end
+    end
+  end
+
   describe "scope :type_quiz_lti" do
     context "with a quiz_lti assignment" do
       before :once do
@@ -13788,78 +13832,59 @@ describe Assignment do
       @assignment.quiz_lti! && @assignment.save!
     end
 
-    context "when the new_quizzes_surveys feature is disabled" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
-      end
-
-      it "assignment is valid" do
-        @assignment.new_quizzes_type = "anything"
-        expect(@assignment).to be_valid
-      end
+    it "assignment is valid if no new_quizzes_type is set" do
+      @assignment.settings = nil
+      expect(@assignment).to be_valid
+      @assignment.settings = {}
+      expect(@assignment).to be_valid
+      @assignment.settings = { "new_quizzes" => nil }
+      expect(@assignment).to be_valid
     end
 
-    context "when the new_quizzes_surveys feature is enabled" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
-      end
+    it "sets the settings->new_quizzes->type attribute when settings is nil" do
+      @assignment.settings = nil
+      @assignment.new_quizzes_type = "graded_survey"
+      expect(@assignment.new_quizzes_type).to eq("graded_survey")
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "graded_survey" } })
+      expect(@assignment).to be_valid
+    end
 
-      it "assignment is valid if no new_quizzes_type is set" do
-        @assignment.settings = nil
-        expect(@assignment).to be_valid
-        @assignment.settings = {}
-        expect(@assignment).to be_valid
-        @assignment.settings = { "new_quizzes" => nil }
-        expect(@assignment).to be_valid
-      end
+    it "sets the settings->new_quizzes->type attribute when new_quizzes key does not exist" do
+      @assignment.settings = {}
+      @assignment.new_quizzes_type = "ungraded_survey"
+      expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
+      expect(@assignment).to be_valid
+    end
 
-      it "sets the settings->new_quizzes->type attribute when settings is nil" do
-        @assignment.settings = nil
-        @assignment.new_quizzes_type = "graded_survey"
-        expect(@assignment.new_quizzes_type).to eq("graded_survey")
-        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "graded_survey" } })
-        expect(@assignment).to be_valid
-      end
+    it "sets the settings->new_quizzes->type attribute when new_quizzes key already exists and empty" do
+      @assignment.settings = { "new_quizzes" => nil }
+      @assignment.new_quizzes_type = "ungraded_survey"
+      expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
+      expect(@assignment).to be_valid
+    end
 
-      it "sets the settings->new_quizzes->type attribute when new_quizzes key does not exist" do
-        @assignment.settings = {}
-        @assignment.new_quizzes_type = "ungraded_survey"
-        expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
-        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
-        expect(@assignment).to be_valid
-      end
+    it "leaves the existing other keys in tact" do
+      @assignment.settings = { "another_key" => 123, "new_quizzes" => { "other_key" => "other_value" } }
+      @assignment.new_quizzes_type = "graded_survey"
+      expect(@assignment.new_quizzes_type).to eq("graded_survey")
+      expect(@assignment.settings).to eq({ "another_key" => 123, "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
+      expect(@assignment).to be_valid
+    end
 
-      it "sets the settings->new_quizzes->type attribute when new_quizzes key already exists and empty" do
-        @assignment.settings = { "new_quizzes" => nil }
-        @assignment.new_quizzes_type = "ungraded_survey"
-        expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
-        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
-        expect(@assignment).to be_valid
-      end
+    it "gives validation error" do
+      @assignment.new_quizzes_type = "invalid_type"
+      expect(@assignment.new_quizzes_type).to eq("invalid_type")
+      expect(@assignment).not_to be_valid
+    end
 
-      it "leaves the existing other keys in tact" do
-        @assignment.settings = { "another_key" => 123, "new_quizzes" => { "other_key" => "other_value" } }
-        @assignment.new_quizzes_type = "graded_survey"
-        expect(@assignment.new_quizzes_type).to eq("graded_survey")
-        expect(@assignment.settings).to eq({ "another_key" => 123, "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
-        expect(@assignment).to be_valid
-      end
-
-      it "gives validation error" do
-        @assignment.new_quizzes_type = "invalid_type"
-        expect(@assignment.new_quizzes_type).to eq("invalid_type")
-        expect(@assignment).not_to be_valid
-      end
-
-      it "overwrites existing type with new type" do
-        @assignment.settings = { "new_quizzes" => { "type" => "old_value", "other_key" => "other_value" } }
-        @assignment.new_quizzes_type = "graded_survey"
-        expect(@assignment.new_quizzes_type).to eq("graded_survey")
-        expect(@assignment.settings).to eq({ "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
-        expect(@assignment).to be_valid
-      end
+    it "overwrites existing type with new type" do
+      @assignment.settings = { "new_quizzes" => { "type" => "old_value", "other_key" => "other_value" } }
+      @assignment.new_quizzes_type = "graded_survey"
+      expect(@assignment.new_quizzes_type).to eq("graded_survey")
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
+      expect(@assignment).to be_valid
     end
   end
 

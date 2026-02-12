@@ -116,6 +116,9 @@
         {{#if isCheckpoint}}
           <div id="assignment_teacher_checkpoint_info_{{id}}"></div>
         {{/if}}
+        {{#if hasPeerReviewInfo}}
+          <div id="assignment_peer_review_info_{{id}}" class="peer-review-info-container"></div>
+        {{else}}
         {{#if showAvailability}}
         <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
@@ -142,6 +145,7 @@
               {{#t}}No Points Possible{{/t}}
             </span>
           {{/if}}
+        {{/if}}
         {{/if}}
         {{#if isMasteryConnectTool}}
           <div class="ig-details__item mc-objectives">{{externalToolData.objectives}}</div>

@@ -834,16 +834,15 @@ describe SisImportsApiController, type: :request do
     end
   end
 
-  it "allows raw post without content-type" do
-    # In the current API docs, we specify that you need to send a content-type to make raw
-    # post work. However, long ago we added code to make it work even without the header,
-    # so we are going to maintain that behavior.
-    post "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv", params: "\xffab=\xffcd", headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+  it "gives a 400 rather than a 500 if binary is posted without an appropriate Content-Type" do
+    raw_zip_content = Rails.root.join("spec/fixtures/sis/mac_sis_batch.zip").read
+    post "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
+         params: raw_zip_content,
+         headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
 
-    batch = SisBatch.last
-    expect(batch.attachment.filename).to eq "sis_import.zip"
-    expect(batch.attachment.content_type).to eq "application/x-www-form-urlencoded"
-    expect(batch.attachment.size).to eq 7
+    expect(response).to be_bad_request
+    json = json_parse(response.body)
+    expect(json["error"]).to include "Ensure the Content-Type header is set"
   end
 
   it "allows raw post without charset" do
@@ -1152,6 +1151,50 @@ describe SisImportsApiController, type: :request do
                       id: batch.id.to_s })
     expect(json).to have_key("errors_attachment")
     expect(json["errors_attachment"]["id"]).to eq batch.errors_attachment.id
+  end
+
+  describe "pre-attachment workflow" do
+    it "supports direct upload to the file store in a separate request" do
+      json = api_call(:post,
+                      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                      { controller: "sis_imports_api",
+                        action: "create",
+                        format: "json",
+                        account_id: @account.to_param },
+                      { import_type: "instructure_csv",
+                        pre_attachment: { name: "test_user_1.csv", size: 159 } })
+
+      expect(json["pre_attachment"]).to be_present
+      expect(json["pre_attachment"]["upload_url"]).to be_present
+      expect(json["pre_attachment"]["upload_params"]).to be_present
+
+      batch = SisBatch.find(json["id"])
+      expect(batch.attachment).to be_nil
+      expect(batch.workflow_state).to eq "initializing"
+
+      # simulate upload success
+      attachment = attachment_model(context: batch,
+                                    folder: nil,
+                                    uploaded_data: fixture_file_upload("sis/test_user_1.csv", "text/csv"))
+      batch.file_upload_success_callback(attachment)
+
+      expect(batch.workflow_state).to eq "created"
+      expect(batch.attachment).to eq attachment
+    end
+
+    it "rejects attachment and pre_attachment parameters provided together" do
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/sis_imports.json",
+               { controller: "sis_imports_api",
+                 action: "create",
+                 format: "json",
+                 account_id: @account.id.to_s },
+               { import_type: "instructure_csv",
+                 attachment: fixture_file_upload("/sis/test_user_1.csv", "text/csv"),
+                 pre_attachment: { name: "test_user_1.csv" } },
+               {},
+               { expected_status: 400 })
+    end
   end
 
   shared_examples_for "disable_adding_uuid_verifier_in_api" do

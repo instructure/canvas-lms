@@ -34,10 +34,20 @@
           }.to_json %>"
         ></div>
       <% end %>
-      <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>
-    <% else %>
-      <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.crosslist_section', 'Cross-List this Section') %></a>
     <% end %>
+    <div
+      id="crosslist_link_button_container"
+      data-props="<%= {
+        sectionId: @section.id.to_s,
+        isAlreadyCrosslisted: @section.nonxlist_course_id.present?,
+        nonxlistCourseId: @section.nonxlist_course_id&.to_s,
+        nonxlistCourseName: @section.nonxlist_course&.name,
+        enrollmentsCount: @student_enrollments_count,
+        manageableCoursesUrl: context_url(@current_user, :context_manageable_courses_url, :format => :json),
+        confirmCrosslistUrl: context_url(@context, :context_section_confirm_crosslist_url, @section.id, ':id'),
+        crosslistUrl: context_url(@context, :context_section_crosslist_url, @section.id)
+      }.to_json %>"
+    ></div>
   <% end %>
   <a href="<%= context_url(@context, :context_settings_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
 <% end %>
@@ -257,50 +267,3 @@ h3 .tally {
   </div>
 <% end %>
 <% js_bundle :section %>
-
-<div style="display: none;">
-  <%= form_tag context_url(@context, :context_section_crosslist_url, @section.id), :id => "crosslist_course_form", :class => "form-dialog no-margin-bottom", :title => t('titles.crosslist_this_section', 'Cross-List this Section'), :method => :post do %>
-    <h2><%= t('titles.cross_listed_sections', 'Cross-List Section') %></h2>
-    <p>
-      <%= t('crosslist_description', %{
-      Cross-listing allows you to create a section in one account and
-      then move it to a course on a different account.
-      To cross-list this course, you'll need to find the course you
-      want to move it to, either using the search tool or by
-      entering the course's ID. }) %>
-    </p>
-    <table class="formtable">
-      <tr>
-        <td>
-          <a href="<%= context_url(@current_user, :context_manageable_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
-          <a href="<%= context_url(@context, :context_section_confirm_crosslist_url, @section.id, "{{ id }}") %>" id="course_confirm_crosslist_url" style="display: none;">&nbsp;</a>
-          <input type="hidden" name="new_course_id" id="course_autocomplete_id"/>
-          <label for="course_autocomplete_id_lookup"><strong><%= before_label('search_for_course', "Search for Course") %></strong></label>
-          <input type="text" id="course_autocomplete_id_lookup" style="width: 80%;"/>
-          <div id="course_autocomplete_id_lookup_errors"></div>
-        </td>
-      </tr><tr>
-        <td>
-          <label for="course_id"><strong><%= before_label('enter_course_id', "Or Enter the Course's ID") %></strong></label>
-          <input type="text" id="course_id" style="width: 80%;"/>
-          <div id="course_id_errors"></div>
-        </td>
-      </tr><tr>
-        <td colspan="2">
-          <div id="course_autocomplete_name_holder" style="margin-top: 20px;">
-            <%= before_label('labels.selected_course', 'Selected Course') %>
-            <div style="margin-<%= direction('left') %>: 20px;">
-              <div id="course_autocomplete_name" style="font-weight: bold;"></div>
-              <div id="sis_id_holder" style="display: none;"><%= before_label('labels.sis_id', 'SIS ID') %> <span class="sis_id">&nbsp;</span></div>
-              <div id="account_name_holder" style="display: none;"><%= before_label('labels.account', 'Account') %> <span class="account_name"></span></div>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </table>
-    <div class="form-controls">
-      <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.crosslist_this_section', 'Cross-List This Section') %></button>
-      <button type="button" class="btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
-    </div>
-  <% end %>
-</div>

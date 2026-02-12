@@ -200,7 +200,7 @@ class Login::SamlController < ApplicationController
 
   def saml_config_error(error)
     Canvas::Errors.capture_exception(:saml, error, :warn)
-    render status: :unprocessable_entity, plain: error.to_s
+    render status: :unprocessable_content, plain: error.to_s
   end
 
   def destroy
@@ -500,24 +500,9 @@ class Login::SamlController < ApplicationController
   def handle_one_time_use(aac, response)
     assertion = response.assertions.first
     # SAML2 Library can't validate OneTimeUse on its own, so we have to do it here.
-    if assertion&.conditions&.grep(SAML2::Conditions::OneTimeUse)&.any?
-      if duplicate_response?(aac, response)
-        if !aac.settings.key?("most_recent_one_time_use_violation") ||
-           aac.settings["most_recent_one_time_use_violation"] < 1.minute.ago
-          aac.settings["most_recent_one_time_use_violation"] = Time.zone.now.iso8601
-          aac.save!
-        end
-
-        if aac.account.feature_enabled?(:saml_enforce_one_time_use)
-          response.errors << "OneTimeUse condition violated"
-          return :one_time_use_violation
-        else
-          increment_statsd(:one_time_use_soft_violation)
-        end
-      else
-        # just log that we saw it
-        increment_statsd(:one_time_use_passed)
-      end
+    if assertion&.conditions&.grep(SAML2::Conditions::OneTimeUse)&.any? && duplicate_response?(aac, response)
+      response.errors << "OneTimeUse condition violated"
+      return :one_time_use_violation
     end
     nil
   end

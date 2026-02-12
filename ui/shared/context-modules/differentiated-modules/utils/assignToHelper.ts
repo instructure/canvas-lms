@@ -231,17 +231,34 @@ export const generateDateDetailsPayload = (
   hasModuleOverrides: boolean,
   deletedModuleAssignees: string[],
   existingUnassignedOverrides: DateDetailsOverride[] = [],
+  options?: {keepFlattenedFormat?: boolean},
 ) => {
   const overrideCards = getOverrideCards(cards)
   const everyoneCard = getEveryoneCard(cards)
   const payload = defaultDateDetailsPayload(overrideCards, everyoneCard, hasModuleOverrides)
-  payload.assignment_overrides = createAssignmentOverrides(
+  const allOverrides = createAssignmentOverrides(
     overrideCards,
     everyoneCard,
     hasModuleOverrides,
     deletedModuleAssignees,
     existingUnassignedOverrides,
   )
+
+  if (options?.keepFlattenedFormat || !ENV?.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+    payload.assignment_overrides = allOverrides
+    return payload
+  }
+
+  const {assignmentOverrides, peerReview} = getAssignmentAndPeerReviewOverrides(allOverrides)
+  payload.assignment_overrides = assignmentOverrides
+
+  if (peerReview) {
+    if (payload.peer_review) {
+      payload.peer_review.peer_review_overrides = peerReview.peer_review_overrides
+    } else {
+      payload.peer_review = peerReview
+    }
+  }
 
   return payload
 }
@@ -258,9 +275,18 @@ const defaultDateDetailsPayload = (
     payload.lock_at = everyoneCard.lock_at || null
     payload.reply_to_topic_due_at = everyoneCard.reply_to_topic_due_at || null
     payload.required_replies_due_at = everyoneCard.required_replies_due_at || null
-    payload.peer_review_available_from = everyoneCard.peer_review_available_from || null
-    payload.peer_review_due_at = everyoneCard.peer_review_due_at || null
-    payload.peer_review_available_to = everyoneCard.peer_review_available_to || null
+
+    if (
+      everyoneCard.peer_review_due_at ||
+      everyoneCard.peer_review_available_from ||
+      everyoneCard.peer_review_available_to
+    ) {
+      payload.peer_review = {
+        due_at: everyoneCard.peer_review_due_at || null,
+        unlock_at: everyoneCard.peer_review_available_from || null,
+        lock_at: everyoneCard.peer_review_available_to || null,
+      }
+    }
   }
   if (
     (everyoneCard !== undefined && !hasModuleOverrides) ||

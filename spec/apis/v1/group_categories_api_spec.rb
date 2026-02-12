@@ -96,11 +96,11 @@ describe "Group Categories API", type: :request do
             @course.save!
           end
 
-          include_examples "basic course roster"
+          it_behaves_like "basic course roster"
         end
 
         context "normal course" do
-          include_examples "basic course roster"
+          it_behaves_like "basic course roster"
         end
       end
 

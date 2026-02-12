@@ -1172,11 +1172,11 @@ describe Rubric do
             expect(progress.results[:criteria].first[:description]).to eq "Generated Criterion"
           end
 
-          include_examples "checks user permissions", :process_generate_criteria_via_llm
+          it_behaves_like "checks user permissions", :process_generate_criteria_via_llm
         end
 
         context "error handling" do
-          include_examples "handles LLM service errors", :process_generate_criteria_via_llm
+          it_behaves_like "handles LLM service errors", :process_generate_criteria_via_llm
         end
       end
 
@@ -1208,11 +1208,11 @@ describe Rubric do
             expect(progress.results[:criteria].first[:description]).to eq "Regenerated Criterion"
           end
 
-          include_examples "checks user permissions", :process_regenerate_criteria_via_llm
+          it_behaves_like "checks user permissions", :process_regenerate_criteria_via_llm
         end
 
         context "error handling" do
-          include_examples "handles LLM service errors", :process_regenerate_criteria_via_llm
+          it_behaves_like "handles LLM service errors", :process_regenerate_criteria_via_llm
         end
       end
     end

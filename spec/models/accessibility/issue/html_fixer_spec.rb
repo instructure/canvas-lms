@@ -137,6 +137,80 @@ describe Accessibility::Issue::HtmlFixer do
         )
       end
     end
+
+    context "with an announcement" do
+      let(:announcement) { announcement_model(context: course, message: "<div><h1>Announcement Title</h1></div>") }
+
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          announcement,
+          "./div/h1",
+          "Change heading level to Heading 2"
+        )
+      end
+
+      it "updates the resource successfully" do
+        html_fixer.apply_fix!
+
+        expect(announcement.reload.message).to eq "<div><h2>Announcement Title</h2></div>"
+      end
+
+      it "returns the full document with the fix applied" do
+        result = html_fixer.apply_fix!
+
+        expect(result).to eq(
+          {
+            status: :ok,
+            json: {
+              success: true
+            },
+          }
+        )
+      end
+    end
+
+    context "with a course syllabus" do
+      before do
+        course_with_teacher(active_all: true)
+        @course.update!(syllabus_body: '<img src="test.jpg" />')
+      end
+
+      let(:html_fixer) do
+        described_class.new(
+          "img-alt",
+          @course,
+          ".//img[1]",
+          "Description of image"
+        )
+      end
+
+      it "updates the syllabus_body field" do
+        result = html_fixer.apply_fix!(updating_user: @teacher)
+        expect(result[:status]).to eq(:ok)
+
+        @course.reload
+        expect(@course.syllabus_body).to include('alt="Description of image"')
+      end
+
+      it "calls save_without_accessibility_scan!" do
+        expect(@course).to receive(:save_without_accessibility_scan!)
+        html_fixer.apply_fix!(updating_user: @teacher)
+      end
+
+      context "with SyllabusResource wrapper" do
+        let(:syllabus_resource) { Accessibility::SyllabusResource.new(@course) }
+        let(:fixer) { described_class.new("img-alt", syllabus_resource, ".//img[1]", "Alt text via wrapper") }
+
+        it "applies fixes through the wrapper" do
+          result = fixer.apply_fix!(updating_user: @teacher)
+          expect(result[:status]).to eq(:ok)
+
+          @course.reload
+          expect(@course.syllabus_body).to include('alt="Alt text via wrapper"')
+        end
+      end
+    end
   end
 
   describe "#preview_fix" do
@@ -304,6 +378,61 @@ describe Accessibility::Issue::HtmlFixer do
       end
     end
 
+    context "with an announcement" do
+      let(:announcement) { announcement_model(context: course, message: "<div><h1>Announcement Title</h1></div>") }
+
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          announcement,
+          "./div/h1",
+          "Change heading level to Heading 2"
+        )
+      end
+
+      it "works with announcement messages" do
+        result = html_fixer.preview_fix
+
+        expect(result).to eq(
+          {
+            status: :ok,
+            json: {
+              content: "<div><h2>Announcement Title</h2></div>",
+              path: "./div/h2"
+            },
+          }
+        )
+      end
+    end
+
+    context "with a course syllabus" do
+      before do
+        course_with_teacher(active_all: true)
+        @course.update!(syllabus_body: '<img src="test.jpg" />')
+      end
+
+      let(:html_fixer) do
+        described_class.new(
+          "img-alt",
+          @course,
+          ".//img[1]",
+          "Preview description"
+        )
+      end
+
+      it "returns preview without saving" do
+        original_body = @course.syllabus_body
+
+        result = html_fixer.preview_fix(element_only: true)
+        expect(result[:status]).to eq(:ok)
+        expect(result[:json][:content]).to include('alt="Preview description"')
+
+        # Ensure it didn't save
+        @course.reload
+        expect(@course.syllabus_body).to eq(original_body)
+      end
+    end
+
     context "with backwards compatibility for fix! return value" do
       let(:wiki_page) do
         wiki_page_model(
@@ -406,6 +535,30 @@ describe Accessibility::Issue::HtmlFixer do
 
       it "returns :message" do
         expect(described_class.target_attribute(discussion_topic)).to eq(:message)
+      end
+    end
+
+    context "with Announcement" do
+      let(:announcement) { announcement_model(context: course) }
+
+      it "returns :message" do
+        expect(described_class.target_attribute(announcement)).to eq(:message)
+      end
+    end
+
+    context "with Course (syllabus)" do
+      before do
+        course_with_teacher(active_all: true)
+        @course.update!(syllabus_body: '<img src="test.jpg" />')
+      end
+
+      it "returns :syllabus_body for Course" do
+        expect(described_class.target_attribute(@course)).to eq(:syllabus_body)
+      end
+
+      it "returns :syllabus_body for SyllabusResource" do
+        syllabus_resource = Accessibility::SyllabusResource.new(@course)
+        expect(described_class.target_attribute(syllabus_resource)).to eq(:syllabus_body)
       end
     end
 

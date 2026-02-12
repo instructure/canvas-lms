@@ -269,6 +269,9 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Vel undertekstfil"
     },
+    "choose_file_8d89ccab": {
+        "message": "Vel fil"
+    },
     "choose_usage_rights_33683854": {
         "message": "Vel bruksrett..."
     },
@@ -1715,6 +1718,9 @@
     "prime_numbers_13464f61": {
         "message": "Primtal"
     },
+    "processing_8c569014": {
+        "message": "Behandlar..."
+    },
     "product_39cf144f": {
         "message": "Produkt"
     },
@@ -1973,20 +1979,11 @@
     "show_all_967a90f0": {
         "message": "Vis alt"
     },
-    "show_audio_options_b489926b": {
-        "message": "Vis lydalternativ"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Vis alternativ for bilde"
     },
     "show_link_options_545338fd": {
         "message": "Vis lenkealternativ"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Vis medievalg for studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Vis videoalternativ"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Personer med normalt syn navigerer nettsider raskt ved å sjå etter store eller utheva titlar. Skjermlesarar brukar titlar for å forstå konteksten. Titlar burde bruke riktig struktur."
@@ -2317,6 +2314,9 @@
     },
     "updated_link_a827e441": {
         "message": "Oppdatert lenke"
+    },
+    "upload_8b403d05": {
+        "message": "Last opp"
     },
     "upload_document_253f0478": {
         "message": "Last opp dokument frå disk"

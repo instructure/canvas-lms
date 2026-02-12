@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Remove Link"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Remove Studio Media"
-    },
     "replace_all_d3d68b3": {
         "message": "Replace All"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Show all"
     },
-    "show_audio_options_b489926b": {
-        "message": "Show audio options"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Show image options"
     },
     "show_link_options_545338fd": {
         "message": "Show link options"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Show Studio media options"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Show video options"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure."

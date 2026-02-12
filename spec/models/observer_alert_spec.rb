@@ -669,31 +669,31 @@ describe ObserverAlert do
     describe "when context is an assignment" do
       let(:test_context) { assignment }
 
-      include_examples "includes alert for context", "an assignment"
+      it_behaves_like "includes alert for context", "an assignment"
     end
 
     describe "when context is a sub-assignment" do
       let(:test_context) { assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC) }
 
-      include_examples "includes alert for context", "a sub-assignment"
+      it_behaves_like "includes alert for context", "a sub-assignment"
     end
 
     describe "when context is a course" do
       let(:test_context) { course }
 
-      include_examples "includes alert for context", "a course"
+      it_behaves_like "includes alert for context", "a course"
     end
 
     describe "when context is a discussion topic" do
       let(:test_context) { DiscussionTopic.create!(context: course, title: "discussion") }
 
-      include_examples "includes alert for context", "a discussion topic"
+      it_behaves_like "includes alert for context", "a discussion topic"
     end
 
     describe "when context is a submission" do
       let(:test_context) { assignment.submit_homework(student, submission_type: "online_text_entry", body: "done") }
 
-      include_examples "includes alert for context", "a submission"
+      it_behaves_like "includes alert for context", "a submission"
     end
 
     describe "when there are multiple alerts for the same course" do

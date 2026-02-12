@@ -466,34 +466,38 @@ module Interfaces::SubmissionInterface
                       object.grants_right?(current_user, :view_vericite_report) &&
                       object.assignment.vericite_enabled
 
-      promises =
-        object.vericite_data
-              .except(
-                :provider,
-                :last_processed_attempt,
-                :webhook_info,
-                :eula_agreement_timestamp,
-                :assignment_error,
-                :student_error,
-                :status
-              )
-              .map do |asset_string, data|
-                Loaders::AssetStringLoader
-                  .load(asset_string.to_s)
-                  .then do |target|
-                    next if target.nil?
+      object.vericite_data(false)
+            .except(
+              :provider,
+              :last_processed_attempt,
+              :webhook_info,
+              :eula_agreement_timestamp,
+              :assignment_error,
+              :student_error,
+              :status
+            )
+            .map do |asset_string, data|
+              # For submission asset strings, use current submission object instead of loading
+              # OriginalityReport#asset_key appends ISO8601 timestamp to submission asset strings
+              target_promise = if asset_string.to_s.start_with?("submission_")
+                                 Promise.resolve(object)
+                               else
+                                 Loaders::AssetStringLoader.load(asset_string.to_s)
+                               end
 
-                    {
-                      target:,
-                      asset_string:,
-                      report_url: data[:report_url],
-                      score: data[:similarity_score],
-                      status: data[:status],
-                      state: data[:state],
-                    }
-                  end
-        end
-      Promise.all(promises).then(&:compact)
+              target_promise.then do |target|
+                next if target.nil?
+
+                {
+                  target:,
+                  asset_string:,
+                  report_url: data[:report_url],
+                  score: data[:similarity_score],
+                  status: data[:status],
+                  state: data[:state],
+                }
+              end
+      end
     end
   end
 
@@ -501,37 +505,40 @@ module Interfaces::SubmissionInterface
   def turnitin_data
     load_association(:assignment).then do
       next nil unless object.grants_right?(current_user, :view_turnitin_report)
-      next nil if object.turnitin_data.empty?
 
-      promises =
-        object
-        .turnitin_data
-        .except(
-          :last_processed_attempt,
-          :webhook_info,
-          :eula_agreement_timestamp,
-          :assignment_error,
-          :provider,
-          :student_error,
-          :status
-        )
-        .map do |asset_string, data|
-          Loaders::AssetStringLoader
-            .load(asset_string.to_s)
-            .then do |target|
-              next if target.nil?
+      Promise.all(
+        [
+          load_association(:originality_reports),
+          Loaders::AssociationLoader.for(Assignment, :assignment_configuration_tool_lookups).load(object.assignment)
+        ]
+      ).then do
+        next nil unless object.originality_data.present?
 
-              {
-                target:,
-                asset_string:,
-                report_url: data[:report_url],
-                score: data[:similarity_score],
-                status: data[:status],
-                state: data[:state]
-              }
-            end
+        # matching Api:V1:Submission#submission_attempt_json
+        promises = object.originality_data.map do |asset_string, data|
+          # For submission asset strings, use current submission object instead of loading
+          # OriginalityReport#asset_key appends ISO8601 timestamp to submission asset strings
+          target_promise = if asset_string.to_s.start_with?("submission_")
+                             Promise.resolve(object)
+                           else
+                             Loaders::AssetStringLoader.load(asset_string.to_s)
+                           end
+
+          target_promise.then do |target|
+            next if target.nil?
+
+            {
+              target:,
+              asset_string:,
+              report_url: data[:report_url],
+              score: data[:similarity_score],
+              status: data[:status],
+              state: data[:state]
+            }
+          end
         end
-      Promise.all(promises).then(&:compact)
+        Promise.all(promises).then(&:compact)
+      end
     end
   end
 

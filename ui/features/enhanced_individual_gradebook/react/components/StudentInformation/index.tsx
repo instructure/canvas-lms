@@ -207,7 +207,7 @@ export default function StudentInformation({
     const showPointsText = !!(!hidePointsText && gradeToDisplay)
     let pointsText = ''
     if (showPointsText) {
-      const scoreText = I18n.n(gradeToDisplay.score, {
+      const scoreText = I18n.n(gradeToDisplay.score ?? 0, {
         precision: gradingStandardPointsBased ? 2 : undefined,
       })
       const possibleText = gradingStandardPointsBased

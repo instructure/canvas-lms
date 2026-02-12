@@ -113,11 +113,7 @@ describe "Services API", type: :request do
                                                                         "entryUrl" => "http://kaltura.example.com/index.php/partnerservices2/addEntry",
                                                                         "uiconfUrl" => "http://kaltura.example.com/index.php/partnerservices2/getuiconf",
                                                                         "uploadUrl" => "http://kaltura.example.com/index.php/partnerservices2/upload",
-                                                                        "partner_data" => {
-                                                                          "root_account_id" => @user.account.root_account.id,
-                                                                          "sis_source_id" => nil,
-                                                                          "sis_user_id" => nil
-                                                                        },
+                                                                        "partner_data" => "root_account_uuid=#{@user.account.root_account.uuid}&user_uuid=#{@user.uuid}",
                                                                       },
                                                                     })
   end

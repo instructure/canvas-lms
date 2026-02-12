@@ -109,8 +109,6 @@ module Exporters
     end
 
     def assignment_settings
-      return {} unless Account.site_admin.feature_enabled?(:new_quizzes_surveys)
-
       {
         "new_quizzes" => {
           "type" => QUIZ_TYPE_MAP[quiz.quiz_type],

@@ -79,13 +79,13 @@ const TermsAndPolicyCheckbox = ({
           {splitText[0]}
           {termsOfUseUrl && (
             <Link href={termsOfUseUrl} target="_blank">
-              {I18n.t('terms of use')}
+              {I18n.t('Acceptable Use Policy')}
             </Link>
           )}
           {splitText[1]}
           {privacyPolicyUrl && (
             <Link href={privacyPolicyUrl} target="_blank">
-              {I18n.t('privacy policy')}
+              {I18n.t('Privacy Policy')}
             </Link>
           )}
           {splitText[2] && splitText[2]}

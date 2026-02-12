@@ -96,10 +96,18 @@ class TabsController < ApplicationController
   #         "type": "external"
   #       },
   #       {
+  #         "html_url": "https://example.com/resource",
+  #         "id": "nav_menu_link_5",
+  #         "label": "External Resource",
+  #         "position": 3,
+  #         "visibility": "public",
+  #         "type": "external"
+  #       },
+  #       {
   #         "html_url": "/courses/1/grades",
   #         "id": "grades",
   #         "label": "Grades",
-  #         "position": 3,
+  #         "position": 4,
   #         "hidden": true
   #         "visibility": "admins"
   #         "type": "internal"

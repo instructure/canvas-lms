@@ -93,6 +93,9 @@
             </td>
             <td style="width: 50%;">
               <%= t 'enrolled_as', "Enrolled as: %{enrollment_type}", :enrollment_type => enrollment.readable_role_name %>
+              <% if enrollment.rejected? %>
+                (<%= t('invitation_declined', 'Invitation Declined') %>)
+              <% end %>
               <br />
               <%= t "Created %{created}", created: datetime_string(enrollment.created_at) %>
               <% if enrollment.is_a?(ObserverEnrollment) %>

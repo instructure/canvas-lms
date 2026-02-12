@@ -26,6 +26,7 @@ class AddPolymorphicCheckConstraintsForNewA11yCheckerResources < ActiveRecord::M
                                      %i[wiki_page assignment attachment discussion_topic announcement],
                                      replace: "chk_require_context",
                                      null: true,
+                                     sort: false,
                                      delay_validation: true,
                                      if_not_exists: true
 
@@ -34,6 +35,7 @@ class AddPolymorphicCheckConstraintsForNewA11yCheckerResources < ActiveRecord::M
                                      %i[wiki_page assignment attachment discussion_topic announcement],
                                      replace: "chk_require_context",
                                      null: true,
+                                     sort: false,
                                      delay_validation: true,
                                      if_not_exists: true
   end
@@ -44,6 +46,7 @@ class AddPolymorphicCheckConstraintsForNewA11yCheckerResources < ActiveRecord::M
                                      %i[wiki_page assignment attachment],
                                      replace: true,
                                      null: false,
+                                     sort: false,
                                      delay_validation: true,
                                      if_not_exists: true
 
@@ -52,6 +55,7 @@ class AddPolymorphicCheckConstraintsForNewA11yCheckerResources < ActiveRecord::M
                                      %i[wiki_page assignment attachment],
                                      replace: true,
                                      null: false,
+                                     sort: false,
                                      delay_validation: true,
                                      if_not_exists: true
   end

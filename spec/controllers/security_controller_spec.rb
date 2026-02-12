@@ -189,6 +189,27 @@ RSpec.describe SecurityController, type: :request do
       expect(lti_platform_configuration["notice_types_supported"]).to eq notice_types
     end
 
+    it "uses account.environment_specific_domain" do
+      account = Account.default
+      allow(account).to receive(:environment_specific_domain).and_return("test.example.com")
+      allow(Lti::Oidc).to receive(:auth_domain).with("test.example.com").and_return("test.example.com")
+
+      allow(Account).to receive(:find_by).with(id: account.global_id).and_return(account)
+
+      jwt = Canvas::Security.create_jwt({
+                                          user_id: 1,
+                                          root_account_global_id: account.global_id,
+                                          root_account_domain: account.domain
+                                        },
+                                        5.minutes.from_now)
+
+      get "/api/lti/security/openid-configuration?registration_token=#{jwt}"
+
+      expect(response).to have_http_status :ok
+      parsed_body = response.parsed_body
+      expect(parsed_body["authorization_server"]).to eq "test.example.com"
+    end
+
     it "contains the scopes based on available public scopes for that account (possibly feature-flag-gated)" do
       sample_scope_urls_for_root_account =
         TokenScopes::LTI_SCOPES.keys - [TokenScopes::LTI_ASSET_REPORT_SCOPE]
@@ -282,7 +303,8 @@ RSpec.describe SecurityController, type: :request do
     context "in a beta environment" do
       before do
         allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => "https://canvas.beta.instructure.com" })
-        allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.beta.instructure.com")
+        allow(Lti::Oidc).to receive(:auth_domain).and_call_original
+        allow(Lti::Oidc).to receive(:auth_domain).with(Account.default.environment_specific_domain).and_return("canvas.beta.instructure.com")
         host! "canvas.beta.instructure.com"
       end
 
@@ -303,7 +325,8 @@ RSpec.describe SecurityController, type: :request do
     context "in a test environment" do
       before do
         allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => "https://canvas.test.instructure.com" })
-        allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.test.instructure.com")
+        allow(Lti::Oidc).to receive(:auth_domain).and_call_original
+        allow(Lti::Oidc).to receive(:auth_domain).with(Account.default.environment_specific_domain).and_return("canvas.test.instructure.com")
         host! "canvas.test.instructure.com"
       end
 

@@ -117,9 +117,6 @@ describe('ItemAssignToTray - Save Operations', () => {
       ...payloadValues,
       reply_to_topic_due_at: null,
       required_replies_due_at: null,
-      peer_review_available_from: null,
-      peer_review_due_at: null,
-      peer_review_available_to: null,
       only_visible_to_overrides,
       assignment_overrides: [
         {

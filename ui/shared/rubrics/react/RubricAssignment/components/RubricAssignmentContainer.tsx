@@ -53,6 +53,7 @@ export type RubricAssignmentContainerProps = {
   assignmentRubric?: AssignmentRubric
   assignmentRubricAssociation?: RubricAssociation
   canManageRubrics: boolean
+  canUseForGrading?: boolean
   courseId: string
   currentUserId: string
   rubricSelfAssessmentFFEnabled: boolean
@@ -66,6 +67,7 @@ export const RubricAssignmentContainer = ({
   assignmentRubric,
   assignmentRubricAssociation,
   canManageRubrics,
+  canUseForGrading = true,
   courseId,
   currentUserId,
   rubricSelfAssessmentFFEnabled,
@@ -289,6 +291,7 @@ export const RubricAssignmentContainer = ({
       <RubricCreateModal
         assignmentId={assignmentId}
         assignmentPointsPossible={assignmentPoints}
+        canUseForGrading={canUseForGrading}
         isOpen={rubricCreateModalOpen}
         rubric={rubric}
         rubricAssociation={rubricAssociation}

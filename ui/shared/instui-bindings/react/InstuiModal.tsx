@@ -64,6 +64,7 @@ type Props = {
   closeButtonLabel?: string
   onDismiss: () => void
   children: ReactElement | ReactElement[]
+  closeButtonElementRef?: (element: Element | null) => void
   [key: string]: any
 }
 
@@ -74,6 +75,7 @@ function getLiveRegion(): HTMLElement | null {
 function CanvasInstUIModal({
   label,
   closeButtonLabel,
+  closeButtonElementRef,
   onDismiss,
   children,
   ...otherPropsToPassOnToModal
@@ -92,6 +94,7 @@ function CanvasInstUIModal({
           offset="medium"
           onClick={onDismiss}
           screenReaderLabel={closeButtonLabel || I18n.t('Close')}
+          elementRef={closeButtonElementRef}
         />
         <Heading>{label}</Heading>
       </Modal.Header>

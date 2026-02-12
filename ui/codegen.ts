@@ -28,7 +28,6 @@ const config: CodegenConfig = {
     '!ui/**/__tests__/**/*',
     '!ui/**/*.test.*',
     '!ui/**/Mocks.*',
-    '!ui/features/context_modules_v2/**/*',
     '!ui/features/grade_summary/**/*',
     // Self-contained graphql modules with internal fragment systems - excluded to avoid duplicate names
     // TODO: Refactor these to use unique fragment names, then remove exclusions

@@ -199,12 +199,14 @@ class PlannerController < ApplicationController
       end
 
       @user = api_find(User, params[:observed_user_id])
-      # observers can only specify course context_codes
-      course_ids = Course.find_all_by_asset_string(params[:context_codes]).pluck(:id)
-      include_all_visible_courses = params[:context_codes].nil? && include_all_visible_courses
-      valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-      courses = include_all_visible_courses ? [] : course_ids - valid_course_ids
-      render_unauthorized_action unless courses.empty?
+      unless include_visible_courses
+        valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
+        params[:context_codes] = params[:context_codes].select do |code|
+          type, id = code.split("_", 2)
+          type == "course" && valid_course_ids.include?(id.to_i)
+        end
+        render_unauthorized_action if params[:context_codes].empty?
+      end
     else
       @user = @current_user
     end
@@ -503,7 +505,8 @@ class PlannerController < ApplicationController
       end
       next nil if shard_context_codes.blank?
 
-      scope = sharded_relation.for_user_and_context_codes(@user, shard_context_codes)
+      section_codes = @user.section_context_codes(shard_context_codes, false, include_concluded: false)
+      scope = sharded_relation.for_user_and_context_codes(@user, shard_context_codes, section_codes)
       apply_completion_filter(scope, @user, completion_filter)
     end
 
@@ -579,8 +582,14 @@ class PlannerController < ApplicationController
       if !@include_context_codes && @include_all_courses
         @user.shard.activate do
           course_ids = @user.course_ids_for_todo_lists(:student, include_concluded:)
+          if params.key?(:observed_user_id)
+            observer_course_ids = @current_user.observer_enrollments.active.where(associated_user: @user).shard(@current_user).pluck(:course_id).map { |id| Shard.relative_id_for(id, @current_user.shard, @user.shard) }
+            course_ids &= observer_course_ids
+          end
           context_codes = course_ids.map { |id| "course_#{id}" }
           context_codes << @user.asset_string
+          group_ids = @user.group_ids_for_todo_lists
+          context_codes.concat(group_ids.map { |id| "group_#{id}" })
         end
       end
       context_ids = ActiveRecord::Base.parse_asset_string_list(context_codes)

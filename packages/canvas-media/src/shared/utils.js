@@ -23,7 +23,7 @@ export const NON_PREVIEWABLE_TYPES = [
   'video/avi',
   'video/x-msvideo',
   'video/x-ms-wma',
-  'video/x-ms-wmv'
+  'video/x-ms-wmv',
 ]
 
 export const isPreviewable = type => !NON_PREVIEWABLE_TYPES.includes(type)
@@ -47,7 +47,7 @@ export function sizeMediaPlayer(player, type, container) {
 
   const sz = {
     width: player.videoWidth,
-    height: player.videoHeight
+    height: player.videoHeight,
   }
   if (container?.width && container?.height) {
     if (sz.width > sz.height) {

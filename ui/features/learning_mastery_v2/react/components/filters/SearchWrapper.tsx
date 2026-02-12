@@ -37,21 +37,15 @@ export const SearchWrapper: React.FC<SearchWrapperProps> = ({
   onSelectOutcomes,
 }) => {
   return (
-    <Flex
-      width="100%"
-      alignItems="center"
-      gap="small"
-      wrap="no-wrap"
-      margin="small none medium none"
-    >
-      <Flex.Item shouldGrow={true} shouldShrink={true} size="45%">
+    <Flex width="100%" alignItems="center" gap="small" wrap="wrap" margin="small none medium none">
+      <Flex.Item shouldGrow={true} shouldShrink={true} size="255px">
         <StudentSearch
           courseId={courseId}
           selectedUserIds={selectedUserIds}
           onSelectedUserIdsChange={onSelectedUserIdsChange}
         />
       </Flex.Item>
-      <Flex.Item shouldGrow={true} shouldShrink={true} size="45%">
+      <Flex.Item shouldGrow={true} shouldShrink={true} size="255px">
         <OutcomeSearch
           courseId={courseId}
           selectedOutcomes={selectedOutcomes}

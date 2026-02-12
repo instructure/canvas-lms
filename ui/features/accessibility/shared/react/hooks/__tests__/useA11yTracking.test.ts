@@ -132,18 +132,16 @@ describe('useA11yTracking', () => {
 
     it('tracks CourseRemediated event with props', () => {
       const {result} = renderHook(() => useA11yTracking())
-
-      result.current.trackA11yEvent('CourseRemediated', {
-        totalResources: 10,
+      const props = {
+        activeResources: 10,
         remediatedResources: 8,
-      })
+      }
+
+      result.current.trackA11yEvent('CourseRemediated', props)
 
       expect(mockTrackEvent).toHaveBeenCalledWith({
         eventName: 'canvasCourseA11yCheckerCourseRemediated',
-        props: {
-          totalResources: 10,
-          remediatedResources: 8,
-        },
+        props,
       })
     })
   })

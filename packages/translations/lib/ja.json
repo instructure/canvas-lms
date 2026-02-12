@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "リンクの削除"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Studio メディアを削除する"
-    },
     "replace_all_d3d68b3": {
         "message": "すべて置換する"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "すべて表示"
     },
-    "show_audio_options_b489926b": {
-        "message": "オーディオオプションを表示する"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "画像オプションを表示"
     },
     "show_link_options_545338fd": {
         "message": "リンクオプションを表示する"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "スタジオメディアオプションを表示する"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "ビデオオプションを表示する"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "視認ユーザーは大きく太字の見出しを探し、Webページをすばやく参照します。スクリーンリーダーのユーザーは、文脈に基づいた理解を行う際にヘッダーに依存しています。ヘッダーは適切な構造を使用しなければなりません。"

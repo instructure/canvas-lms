@@ -97,6 +97,7 @@ export default class DateGroup extends Backbone.Model {
       open: this.open(),
       closed: this.closed(),
       setType: this.get('set_type'),
+      availabilityStatus: this.get('availability_status'),
     }
   }
 }

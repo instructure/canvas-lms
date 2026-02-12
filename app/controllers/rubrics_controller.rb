@@ -55,8 +55,6 @@ class RubricsController < ApplicationController
     if @context.feature_enabled?(:enhanced_rubrics)
       js_env breadcrumbs: rubric_breadcrumbs
       js_env enhanced_rubrics_enabled: true
-      js_env rubric_imports_exports: Account.site_admin.feature_enabled?(:rubric_imports_exports)
-      js_env enhanced_rubrics_copy_to: Account.site_admin.feature_enabled?(:enhanced_rubrics_copy_to)
       js_env enhanced_rubric_assignments_enabled: Rubric.enhanced_rubrics_assignments_enabled?(@context)
 
       return show_rubrics_redesign

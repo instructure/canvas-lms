@@ -1913,7 +1913,10 @@ class CoursesController < ApplicationController
   def update_nav
     get_context
     if authorized_action(@context, @current_user, :update)
-      @context.tab_configuration = JSON.parse(params[:tabs_json]).compact
+      @context.tab_configuration = NavMenuLinkTabs.sync_course_links_with_tabs(
+        course: @context,
+        tabs: JSON.parse(params[:tabs_json]).compact
+      )
       @context.save
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_details_url) }
@@ -1985,7 +1988,7 @@ class CoursesController < ApplicationController
       else
         # Redirects back to HTTP_REFERER if it exists (so if you accept from an assignent page it will put
         # you back on the same page you were looking at). Otherwise, it redirects back to the course homepage
-        redirect_back(fallback_location: course_url(@context.id))
+        redirect_back_or_to(course_url(@context.id))
       end
     elsif (!@current_user && enrollment.user.registered?) || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
@@ -2429,6 +2432,7 @@ class CoursesController < ApplicationController
             FLAGS: {
               newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
               show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
+              peer_review_allocation_and_grading: @context.feature_enabled?(:peer_review_allocation_and_grading)
             }
           )
           js_env(COURSE_HOME: true)
@@ -3828,7 +3832,7 @@ class CoursesController < ApplicationController
 
     assignment_ids = effective_due_dates_params[:assignment_ids]
     unless validate_assignment_ids(assignment_ids)
-      return render json: { errors: t("%{assignment_ids} param is invalid", assignment_ids: "assignment_ids") }, status: :unprocessable_entity
+      return render json: { errors: t("%{assignment_ids} param is invalid", assignment_ids: "assignment_ids") }, status: :unprocessable_content
     end
 
     due_dates = if assignment_ids.present?
@@ -4503,7 +4507,7 @@ class CoursesController < ApplicationController
     if @context.save
       render json: course_json(@context, @current_user, session, [], nil)
     else
-      render json: @context.errors, status: :unprocessable_entity
+      render json: @context.errors, status: :unprocessable_content
     end
   end
 
@@ -4618,6 +4622,7 @@ class CoursesController < ApplicationController
       :conditional_release,
       :post_manually,
       :horizon_course,
+      :career_learning_library_only,
       :disable_csp,
       :default_student_gradebook_view
     )

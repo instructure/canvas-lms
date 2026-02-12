@@ -25,6 +25,8 @@ export enum ContentItemType {
   Assignment = 'Assignment',
   Attachment = 'attachment',
   DiscussionTopic = 'DiscussionTopic',
+  Announcement = 'Announcement',
+  Syllabus = 'Syllabus',
 }
 
 /* export const ContentTypeToKey = {
@@ -84,6 +86,8 @@ export enum ResourceType {
   Assignment = 'Assignment',
   Attachment = 'Attachment',
   DiscussionTopic = 'DiscussionTopic',
+  Announcement = 'Announcement',
+  Syllabus = 'Syllabus',
 }
 
 export interface AccessibilityResourceScan extends HasId {
@@ -95,6 +99,7 @@ export interface AccessibilityResourceScan extends HasId {
   resourceWorkflowState: ResourceWorkflowState
   resourceUpdatedAt: string
   resourceUrl: string
+  resourceScanPath?: string // Only present for syllabus resources
   workflowState: ScanWorkflowState
   errorMessage?: string
   issueCount: number
@@ -117,7 +122,8 @@ export interface AccessibilityIssue {
 }
 
 export interface AccessibilityIssuesSummaryData {
-  total: number
+  active: number
+  resolved: number
   byRuleType: Record<string, number>
 }
 

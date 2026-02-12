@@ -1306,8 +1306,8 @@ describe "Groups API", type: :request do
   end
 
   context "group files" do
-    include_examples "file uploads api with folders"
-    include_examples "file uploads api with quotas"
+    it_behaves_like "file uploads api with folders"
+    it_behaves_like "file uploads api with quotas"
 
     before do
       @user = @member

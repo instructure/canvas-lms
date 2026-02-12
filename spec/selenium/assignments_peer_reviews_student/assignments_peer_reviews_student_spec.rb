@@ -925,13 +925,14 @@ describe "peer review student landing page" do
                                                  submission_types: "online_text_entry",
                                                  peer_review_submission_required: false
                                                })
+      PeerReview::PeerReviewCreatorService.call(parent_assignment: @lock_date_assignment)
       @lock_date_assignment.submit_homework(@student1, body: "student 1 attempt", submission_type: "online_text_entry")
       @lock_date_assignment.submit_homework(@student2, body: "student 2 attempt", submission_type: "online_text_entry")
       @lock_date_assignment.submit_homework(@student3, body: "student 3 attempt", submission_type: "online_text_entry")
     end
 
     def create_peer_review_override_for_student(assignment, student, unlock_at: nil, lock_at: nil)
-      peer_review_sub = assignment.peer_review_sub_assignment || peer_review_model(parent_assignment: assignment)
+      peer_review_sub = assignment.reload.peer_review_sub_assignment
 
       parent_override = AssignmentOverride.create!({
                                                      assignment:,
@@ -944,6 +945,7 @@ describe "peer review student landing page" do
                                                     set_type: "ADHOC",
                                                     parent_override_id: parent_override.id
                                                   })
+      child_override.assignment_override_students.create!(user: student)
       child_override.override_unlock_at(unlock_at) if unlock_at
       child_override.override_lock_at(lock_at) if lock_at
       child_override.save!

@@ -52,7 +52,11 @@ import ItemAssignToCard, {
   type ItemAssignToCardProps,
   type ItemAssignToCardRef,
 } from './ItemAssignToCard'
-import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelper'
+import {
+  flattenPeerReviewDates,
+  getOverriddenAssignees,
+  itemTypeToApiURL,
+} from '../../utils/assignToHelper'
 import {getEveryoneOption, type ItemAssignToTrayProps} from './ItemAssignToTray'
 import {getDueAtForCheckpointTag} from './utils'
 import DifferentiationTagConverterMessage from '@canvas/differentiation-tags/react/DifferentiationTagConverterMessage/DifferentiationTagConverterMessage'
@@ -124,6 +128,7 @@ const ItemAssignToCardMemo = memo(
       prevProps.peer_review_available_to === nextProps.peer_review_available_to &&
       prevProps.peer_review_available_from === nextProps.peer_review_available_from &&
       prevProps.peer_review_due_at === nextProps.peer_review_due_at &&
+      prevProps.peerReviewsEnabled === nextProps.peerReviewsEnabled &&
       prevProps.reply_to_topic_due_at === nextProps.reply_to_topic_due_at &&
       prevProps.required_replies_due_at === nextProps.required_replies_due_at &&
       prevProps.removeDueDateInput === nextProps.removeDueDateInput &&
@@ -187,6 +192,7 @@ const ItemAssignToTrayContent = ({
   const [fetchInFlight, setFetchInFlight] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
   const [refetchPages, setRefetchPages] = useState(false)
+  const [peerReviewsEnabled, setPeerReviewsEnabled] = useState(false)
 
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const addCardButtonRef = useRef<Element | null>(null)
@@ -338,14 +344,16 @@ const ItemAssignToTrayContent = ({
 
       try {
         let pageCount = 0
+        const params: Record<string, any> = {per_page: 100}
+        if (itemType === 'discussion_topic') {
+          params.include = ''
+        } else if (itemType === 'assignment' && ENV?.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+          params.include = ['peer_review', 'child_peer_review_override_dates']
+          params.exclude = ['peer_review_overrides']
+        }
         let args: DoFetchApiOpts = {
           path: url,
-          params: {
-            per_page: 100,
-            ...(itemType === 'discussion_topic' && {
-              include: '',
-            }),
-          },
+          params,
         }
         while (url && pageCount < MAX_PAGES) {
           // @ts-expect-error
@@ -375,7 +383,14 @@ const ItemAssignToTrayContent = ({
 
         const dateDetailsApiResponse = combinedResponse
         // @ts-expect-error
-        const overrides = dateDetailsApiResponse.overrides
+        const peerReviewSub = dateDetailsApiResponse.peer_review_sub_assignment
+        const hasPeerReviewSub = !!peerReviewSub
+        setPeerReviewsEnabled(hasPeerReviewSub)
+        // @ts-expect-error
+        let overrides = dateDetailsApiResponse.overrides
+        if (hasPeerReviewSub && overrides?.length) {
+          overrides = flattenPeerReviewDates(overrides)
+        }
         const overriddenTargets = getOverriddenAssignees(overrides)
         // @ts-expect-error
         delete dateDetailsApiResponse.overrides
@@ -395,6 +410,11 @@ const ItemAssignToTrayContent = ({
               baseDates.reply_to_topic_due_at = checkpoint.due_at
             }
           })
+        }
+        if (hasPeerReviewSub) {
+          baseDates.peer_review_due_at = peerReviewSub.due_at
+          baseDates.peer_review_available_from = peerReviewSub.unlock_at
+          baseDates.peer_review_available_to = peerReviewSub.lock_at
         }
         // @ts-expect-error
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
@@ -527,6 +547,7 @@ const ItemAssignToTrayContent = ({
               peer_review_available_to: override.peer_review_available_to,
               peer_review_available_from: override.peer_review_available_from,
               peer_review_due_at: override.peer_review_due_at,
+              peer_review_override_id: override.peer_review_override_id,
               selectedAssigneeIds: defaultOptions,
               defaultOptions,
               initialAssigneeOptions,
@@ -869,6 +890,7 @@ const ItemAssignToTrayContent = ({
             peer_review_available_to={card.peer_review_available_to}
             peer_review_available_from={card.peer_review_available_from}
             peer_review_due_at={card.peer_review_due_at}
+            peerReviewsEnabled={peerReviewsEnabled}
             onDelete={cardCount === 1 ? undefined : handleDeleteCard}
             onCardAssignmentChange={handleCardAssignment}
             onCardDatesChange={handleDatesChange}
@@ -899,6 +921,7 @@ const ItemAssignToTrayContent = ({
       courseId,
       removeDueDateInput,
       isCheckpointed,
+      peerReviewsEnabled,
       handleDeleteCard,
       handleCardAssignment,
       handleDatesChange,

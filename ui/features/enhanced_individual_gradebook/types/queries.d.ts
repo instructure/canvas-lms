@@ -48,6 +48,7 @@ export type AssignmentConnection = {
   assignmentGroupId: string
   name: string
   pointsPossible: number
+  position: number
   submissionTypes: string[]
   anonymizeStudents: boolean
   omitFromFinalGrade: boolean
@@ -68,6 +69,7 @@ export type AssignmentConnection = {
   hasSubmittedSubmissions: boolean
   inClosedGradingPeriod: boolean | null
   checkpoints?: AssignmentCheckpoint[]
+  peerReviewSubAssignment?: Omit<AssignmentConnection, 'peerReviewSubAssignment' | 'checkpoints'> | null
 }
 
 export type AssignmentGroupConnection = {
@@ -120,6 +122,7 @@ export type SubmissionConnection = {
   gradingPeriodId?: string
   excused?: boolean
   state: string
+  subAssignmentSubmissions?: GradebookUserSubSubmissionDetails[]
 }
 
 export type Attachment = {

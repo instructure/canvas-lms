@@ -31,7 +31,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {StoreProvider} from '../../shared/StoreContext'
-import {ClosedCaptionPanel} from '@instructure/canvas-media'
+import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
 import {
   CUSTOM,
   MIN_WIDTH_VIDEO,
@@ -45,7 +45,7 @@ import {
   MIN_HEIGHT_STUDIO_PLAYER,
 } from '../../instructure_image/ImageEmbedOptions'
 import Bridge from '../../../../bridge'
-import RceApiSource from '../../../../rcs/api'
+import RceApiSource, {originFromHost} from '../../../../rcs/api'
 import formatMessage from '../../../../format-message'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {getTrayHeight} from '../../shared/trayUtils'
@@ -79,6 +79,7 @@ export default function VideoOptionsTray({
 }) {
   const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
   const isEmbedImprovements = RCEGlobals.getFeatures()?.rce_studio_embed_improvements
+  const isAsrCaptioningImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
   const currentWidth = videoOptions.appliedWidth || naturalWidth
@@ -355,19 +356,60 @@ export default function VideoOptionsTray({
                       )}
                       {!isStudio && !editLocked && (
                         <Flex.Item padding="small">
-                          <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
-                            <ClosedCaptionPanel
-                              subtitles={subtitles.map(st => ({
-                                locale: st.locale,
-                                inherited: st.inherited,
-                                file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
-                              }))}
-                              uploadMediaTranslations={Bridge.uploadMediaTranslations}
-                              userLocale={Bridge.userLocale}
-                              updateSubtitles={handleUpdateSubtitles}
-                              liveRegion={getLiveRegion}
-                              mountNode={instuiPopupMountNodeFn}
-                            />
+                          <FormFieldGroup
+                            description={
+                              isAsrCaptioningImprovements
+                                ? formatMessage('Caption Manager')
+                                : formatMessage('Closed Captions/Subtitles')
+                            }
+                          >
+                            {!isAsrCaptioningImprovements && (
+                              <ClosedCaptionPanel
+                                subtitles={subtitles.map(st => ({
+                                  locale: st.locale,
+                                  inherited: st.inherited,
+                                  file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
+                                }))}
+                                uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                                userLocale={Bridge.userLocale}
+                                updateSubtitles={handleUpdateSubtitles}
+                                liveRegion={getLiveRegion}
+                                mountNode={instuiPopupMountNodeFn}
+                              />
+                            )}
+                            {isAsrCaptioningImprovements && (
+                              <ClosedCaptionPanelV2
+                                subtitles={subtitles.map(st => ({
+                                  locale: st.locale,
+                                  inherited: st.inherited,
+                                  file: {name: st.language || st.locale},
+                                }))}
+                                uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                                userLocale={Bridge.userLocale}
+                                onUpdateSubtitles={handleUpdateSubtitles}
+                                liveRegion={getLiveRegion}
+                                mountNode={instuiPopupMountNodeFn}
+                                uploadConfig={{
+                                  mediaObjectId: videoOptions.id,
+                                  attachmentId: videoOptions.attachmentId,
+                                  origin: originFromHost(api.host),
+                                  headers: api.jwt
+                                    ? {Authorization: `Bearer ${api.jwt}`}
+                                    : undefined,
+                                  maxBytes: CONSTANTS.CC_FILE_MAX_BYTES,
+                                }}
+                                onCaptionUploaded={subtitle => {
+                                  // Update local state so "Done" button knows about it
+                                  setSubtitles(prev => [
+                                    ...prev.filter(s => s.locale !== subtitle.locale),
+                                    subtitle,
+                                  ])
+                                }}
+                                onCaptionDeleted={locale => {
+                                  setSubtitles(prev => prev.filter(s => s.locale !== locale))
+                                }}
+                              />
+                            )}
                           </FormFieldGroup>
                         </Flex.Item>
                       )}

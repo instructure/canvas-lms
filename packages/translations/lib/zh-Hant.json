@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "移除連結"
     },
-    "remove_studio_media_f913e502": {
-        "message": "移除 Studio 媒體"
-    },
     "replace_all_d3d68b3": {
         "message": "全部取代"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "全部顯示"
     },
-    "show_audio_options_b489926b": {
-        "message": "顯示音訊選項"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "顯示影像選項"
     },
     "show_link_options_545338fd": {
         "message": "顯示連結選項"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "顯示 Studio 媒體選項"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "顯示影片選項"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "有視力的使用者能迅速瀏覽網頁，尋找大型或粗體標題。屏幕閱讀器使用者依靠標題理解內容背景。標題應使用適當的結構。"

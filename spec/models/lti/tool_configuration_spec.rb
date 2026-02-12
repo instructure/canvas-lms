@@ -47,6 +47,7 @@ module Lti
       )
     end
     let(:lti_registration) { developer_key.lti_registration }
+    let(:root_account) { account_model }
     let(:disabled_placements) { [] }
     let(:privacy_level) { internal_lti_configuration[:privacy_level] }
     let(:title) { internal_lti_configuration[:title] }
@@ -63,7 +64,7 @@ module Lti
     let(:redirect_uris) { internal_lti_configuration[:redirect_uris] }
     let(:launch_settings) { internal_lti_configuration[:launch_settings] }
     let(:placements) { internal_lti_configuration[:placements] }
-    let(:developer_key) { DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com", redirect_uris: ["https://example.com"]) }
+    let(:developer_key) { DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com", redirect_uris: ["https://example.com"], account: root_account) }
 
     def make_placement(type, message_type, extra = {})
       {
@@ -161,8 +162,11 @@ module Lti
         it { is_expected.to be false }
       end
 
-      context 'when "developer_key_id" is blank' do
-        before { tool_configuration.developer_key_id = nil }
+      context "when both developer_key_id and lti_registration_id are blank" do
+        before do
+          tool_configuration.developer_key_id = nil
+          tool_configuration.lti_registration_id = nil
+        end
 
         it { is_expected.to be false }
       end
@@ -232,6 +236,48 @@ module Lti
         let(:oidc_initiation_urls) { { "us-east-1" => "http://example.com" } }
 
         it { is_expected.to be true }
+      end
+    end
+
+    describe "#effective_developer_key" do
+      it "returns the developer_key when present" do
+        expect(tool_configuration.effective_developer_key).to eq developer_key
+      end
+
+      context "with local copy of template registration" do
+        let(:template_registration) { lti_registration_with_tool(account: Account.site_admin) }
+        let(:lti_registration) do
+          lti_registration_model.tap do |reg|
+            # mimics the local copy creation process:
+            # the local copy can't be associated with the developer key
+            # can only reference one lti_registration_id
+            reg.developer_key = nil
+            reg.template_registration = template_registration
+            reg.save!
+          end
+        end
+
+        it "returns the developer_key from the lti_registration" do
+          tool_configuration.developer_key = nil
+          tool_configuration.lti_registration = lti_registration
+          expect(tool_configuration.effective_developer_key).to eq template_registration.developer_key
+        end
+
+        context "when template is cross-shard" do
+          specs_require_sharding
+
+          let(:root_account) { account_model }
+
+          it "returns the developer_key from the lti_registration" do
+            Account.site_admin.shard.activate { template_registration }
+
+            @shard2.activate do
+              tool_configuration.developer_key = nil
+              tool_configuration.lti_registration = lti_registration
+              expect(tool_configuration.effective_developer_key).to eq template_registration.developer_key
+            end
+          end
+        end
       end
     end
 

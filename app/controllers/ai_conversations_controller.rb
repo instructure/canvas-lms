@@ -29,7 +29,7 @@ class AiConversationsController < ApplicationController
   before_action :check_ai_experiences_feature_flag
   before_action :require_access_right
   before_action :load_experience
-  before_action :load_conversation, only: %i[post_message destroy show]
+  before_action :load_conversation, only: %i[post_message destroy show evaluation]
 
   # Display the page for teachers to view all student AI conversations
   # Returns HTML for teachers, JSON for students (their active conversation)
@@ -51,7 +51,8 @@ class AiConversationsController < ApplicationController
     js_bundle :ai_experiences_ai_conversations
     js_env(
       AI_EXPERIENCE: ai_experience_json(@experience, @current_user, session, can_manage: true),
-      COURSE_ID: @context.id
+      COURSE_ID: @context.id,
+      ai_experiences_evaluation_enabled: @context.feature_enabled?(:ai_experiences_evaluation)
     )
 
     render html: view_context.content_tag(:div, nil, id: "ai_experiences_ai_conversations"), layout: true
@@ -220,6 +221,38 @@ class AiConversationsController < ApplicationController
   def destroy
     @conversation.complete!
     render json: { message: "Conversation completed successfully" }
+  end
+
+  # @API Get conversation evaluation
+  #
+  # Fetch evaluation data for a conversation from the llm-conversation service
+  #
+  # @returns {Object} Hash with evaluation metrics
+  def evaluation
+    # Only teachers can request evaluations
+    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
+    unless @context.grants_any_right?(@current_user, *permissions)
+      return render_unauthorized_action
+    end
+
+    client = LLMConversationClient.new(
+      current_user: @conversation.user,
+      root_account_uuid: @context.root_account.uuid,
+      conversation_context_id: @experience.llm_conversation_context_id,
+      facts: @experience.facts,
+      learning_objectives: @experience.learning_objective,
+      scenario: @experience.pedagogical_guidance,
+      conversation_id: @conversation.llm_conversation_id
+    )
+
+    evaluation_data = client.evaluation
+
+    render json: {
+      id: @conversation.id,
+      evaluation: evaluation_data
+    }
+  rescue LlmConversation::Errors::ConversationError => e
+    render json: { error: e.message }, status: :service_unavailable
   end
 
   private

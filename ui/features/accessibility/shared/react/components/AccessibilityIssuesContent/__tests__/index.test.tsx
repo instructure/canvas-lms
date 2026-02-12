@@ -25,13 +25,20 @@ import userEvent from '@testing-library/user-event'
 import {multiIssueItem, checkboxTextInputRuleItem} from './__mocks__'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
+import {
+  AccessibilityScansActions,
+  AccessibilityScansState,
+  useAccessibilityScansStore,
+} from '../../../stores/AccessibilityScansStore'
+import {ResourceType} from '../../../types'
 
 const mockClose = vi.fn()
 
 const baseItem = multiIssueItem
 
-const createMockState = (overrides = {}) => {
+const createMockState = (
+  overrides: Partial<AccessibilityScansState & AccessibilityScansActions> = {},
+) => {
   const defaultState = {
     accessibilityScans: null,
     nextResource: {index: -1, item: null},
@@ -47,7 +54,9 @@ const createMockState = (overrides = {}) => {
   return {...defaultState, ...overrides}
 }
 
-const setupMockStore = (stateOverrides = {}) => {
+const setupMockStore = (
+  stateOverrides: Partial<AccessibilityScansState & AccessibilityScansActions> = {},
+) => {
   ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
     const state = createMockState(stateOverrides)
     return selector ? selector(state) : state
@@ -108,7 +117,7 @@ const server = setupServer(
   http.get('/', ({request}: {request: Request}) => {
     const url = new URL(request.url)
     if (url.searchParams.has('filters')) {
-      return HttpResponse.json({total: 0, by_type: {}})
+      return HttpResponse.json({active: 0, by_type: {}})
     }
     return new HttpResponse(null, {status: 404})
   }),
@@ -342,6 +351,22 @@ describe('AccessibilityIssuesDrawerContent', () => {
     )
   })
 
+  it('renders correct Edit Page link for Syllabus', async () => {
+    const syllabusItem = {
+      ...baseItem,
+      resourceType: ResourceType.Syllabus,
+      resourceUrl: '/courses/1/assignments/syllabus',
+    }
+
+    render(<AccessibilityIssuesDrawerContent item={syllabusItem} onClose={mockClose} />, {wrapper})
+
+    // For syllabus, edit link should not append /edit
+    expect(await screen.findByText('Edit Page')).toHaveAttribute(
+      'href',
+      '/courses/1/assignments/syllabus',
+    )
+  })
+
   it('wraps Preview component in a semantic region for screen reader navigation', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />, {wrapper})
 
@@ -571,13 +596,13 @@ describe('AccessibilityIssuesDrawerContent', () => {
         window.ENV = {current_context: {id: '123'}} as any
       })
 
-      it('calls trackA11yEvent when issuesSummary.total transitions from >0 to 0', async () => {
-        setupMockStore({issuesSummary: {total: 1, byRuleType: {['img-alt']: 1}}})
+      it('calls trackA11yEvent when issuesSummary.active transitions from >0 to 0', async () => {
+        setupMockStore({issuesSummary: {active: 1, resolved: 0, byRuleType: {['img-alt']: 1}}})
         const {rerender} = render(
           <AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />,
         )
 
-        setupMockStore({issuesSummary: {total: 0, byRuleType: {}}})
+        setupMockStore({issuesSummary: {active: 0, resolved: 0, byRuleType: {}}})
         rerender(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
         await waitFor(() => {
@@ -588,7 +613,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
       })
 
       it('does not call trackA11yEvent on initial mount', async () => {
-        setupMockStore({issuesSummary: {total: 0, byRuleType: {}}})
+        setupMockStore({issuesSummary: {active: 0, resolved: 0, byRuleType: {}}})
         render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
         const allRemediatedCalls = mockTrackA11yEvent.mock.calls.filter(
@@ -597,13 +622,13 @@ describe('AccessibilityIssuesDrawerContent', () => {
         expect(allRemediatedCalls).toHaveLength(0)
       })
 
-      it('does not call trackA11yEvent when total stays above 0', async () => {
-        setupMockStore({issuesSummary: {total: 5, byRuleType: {['img-alt']: 5}}})
+      it('does not call trackA11yEvent when active stays above 0', async () => {
+        setupMockStore({issuesSummary: {active: 5, resolved: 0, byRuleType: {['img-alt']: 5}}})
         const {rerender} = render(
           <AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />,
         )
 
-        setupMockStore({issuesSummary: {total: 4, byRuleType: {['img-alt']: 4}}})
+        setupMockStore({issuesSummary: {active: 4, resolved: 0, byRuleType: {['img-alt']: 4}}})
         rerender(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
         await waitFor(() => {
@@ -614,13 +639,13 @@ describe('AccessibilityIssuesDrawerContent', () => {
         })
       })
 
-      it('does not call trackA11yEvent when previousTotal was already 0', async () => {
-        setupMockStore({issuesSummary: {total: 0, byRuleType: {}}})
+      it('does not call trackA11yEvent when previousActive was already 0', async () => {
+        setupMockStore({issuesSummary: {active: 0, resolved: 0, byRuleType: {}}})
         const {rerender} = render(
           <AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />,
         )
 
-        setupMockStore({issuesSummary: {total: 0, byRuleType: {}}})
+        setupMockStore({issuesSummary: {active: 0, resolved: 0, byRuleType: {}}})
         rerender(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
         await waitFor(() => {

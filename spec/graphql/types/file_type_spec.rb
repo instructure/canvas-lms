@@ -156,6 +156,134 @@ describe Types::FileType do
       request = ActionDispatch::TestRequest.create
       expect(type_tester.resolve("url", request:, current_user: @student)).to start_with("http:")
     end
+
+    context "with peer reviews" do
+      before(:once) do
+        @assignment = assignment_model(course: @course, peer_reviews: true)
+        @reviewee = student_in_course(course: @course, active_all: true).user
+        @reviewer = student_in_course(course: @course, active_all: true).user
+        @submission_file = attachment_with_context(@course, user: @reviewee)
+        @submission = @assignment.submit_homework(
+          @reviewee,
+          submission_type: "online_upload",
+          attachments: [@submission_file]
+        )
+        AttachmentAssociation.create!(attachment: @submission_file, context: @submission, context_type: "Submission")
+        @assignment.assign_peer_review(@reviewer, @reviewee)
+      end
+
+      it "peer_reviewer? returns true for assigned peer reviewers" do
+        expect(@submission.peer_reviewer?(@reviewer)).to be true
+      end
+
+      it "peer_reviewer? returns false for non-peer-reviewers" do
+        other_student = student_in_course(course: @course, active_all: true).user
+        expect(@submission.peer_reviewer?(other_student)).to be false
+      end
+
+      it "returns regular submission download URL for non-anonymous peer reviewers" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @reviewer, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
+        urls = submission_type.resolve("attachments { url }")
+
+        expect(urls).not_to be_empty
+        url = urls.first
+        expect(url).to include("/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@reviewee.id}")
+        expect(url).to include("download=#{@submission_file.id}")
+      end
+
+      it "returns anonymous submission download URL for anonymous peer reviewers" do
+        @assignment.update!(anonymous_peer_reviews: true)
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @reviewer, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
+        urls = submission_type.resolve("attachments { url }")
+
+        expect(urls).not_to be_empty
+        url = urls.first
+        expect(url).to include("/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{@submission.anonymous_id}")
+        expect(url).to include("download=#{@submission_file.id}")
+      end
+
+      it "does not return submission download URL for non-peer-reviewers" do
+        other_student = student_in_course(course: @course, active_all: true).user
+        submission_type = GraphQLTypeTester.new(@submission, current_user: other_student, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
+        urls = submission_type.resolve("attachments { url }")
+
+        # Should return nil or regular file download URL, not submission URL
+        if urls.present?
+          url = urls.first
+          expect(url).not_to include("/submissions/") if url
+        end
+      end
+
+      it "does not cause N+1 queries when loading URLs for multiple files" do
+        # Add more files to the submission
+        file2 = attachment_with_context(@course, user: @reviewee)
+        file3 = attachment_with_context(@course, user: @reviewee)
+        @submission.attachment_ids = "#{@submission_file.id},#{file2.id},#{file3.id}"
+        @submission.save!
+        AttachmentAssociation.create!(attachment: file2, context: @submission, context_type: "Submission")
+        AttachmentAssociation.create!(attachment: file3, context: @submission, context_type: "Submission")
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @reviewer, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
+
+        # Count queries for 3 files
+        query_count = 0
+        counter = ->(*) { query_count += 1 }
+        ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+          urls = submission_type.resolve("attachments { url }")
+          expect(urls.length).to eq 3
+        end
+
+        # Now add 2 more files and verify query count doesn't increase significantly
+        file4 = attachment_with_context(@course, user: @reviewee)
+        file5 = attachment_with_context(@course, user: @reviewee)
+        @submission.attachment_ids = "#{@submission_file.id},#{file2.id},#{file3.id},#{file4.id},#{file5.id}"
+        @submission.save!
+        AttachmentAssociation.create!(attachment: file4, context: @submission, context_type: "Submission")
+        AttachmentAssociation.create!(attachment: file5, context: @submission, context_type: "Submission")
+
+        # Reload to clear any caching
+        @submission.reload
+
+        # Count queries for 5 files
+        query_count_with_more_files = 0
+        counter2 = ->(*) { query_count_with_more_files += 1 }
+        ActiveSupport::Notifications.subscribed(counter2, "sql.active_record") do
+          urls = submission_type.resolve("attachments { url }")
+          expect(urls.length).to eq 5
+        end
+
+        # Query count should not increase linearly with number of files
+        # Allow for some variance but ensure we don't have N+1
+        # The difference should be minimal (just for loading 2 extra attachments)
+        expect(query_count_with_more_files - query_count).to be <= 2
+      end
+
+      it "checks peer_reviewer? only once per submission, not per file" do
+        # Add multiple files to the submission
+        file2 = attachment_with_context(@course, user: @reviewee)
+        file3 = attachment_with_context(@course, user: @reviewee)
+        @submission.attachment_ids = "#{@submission_file.id},#{file2.id},#{file3.id}"
+        @submission.save!
+        AttachmentAssociation.create!(attachment: file2, context: @submission, context_type: "Submission")
+        AttachmentAssociation.create!(attachment: file3, context: @submission, context_type: "Submission")
+
+        # Mock peer_reviewer? at the class level to count calls across all instances
+        call_count = 0
+        allow_any_instance_of(Submission).to receive(:peer_reviewer?).and_wrap_original do |method, *args|
+          call_count += 1
+          method.call(*args)
+        end
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @reviewer, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
+        urls = submission_type.resolve("attachments { url }")
+        expect(urls.length).to eq 3
+
+        # peer_reviewer? should NOT be called once per file (3 times)
+        # It should be called a constant number of times regardless of file count
+        # (may be 1-2 depending on GraphQL loader behavior, but NOT 3)
+        expect(call_count).to be < 3
+      end
+    end
   end
 
   context "submission preview url" do

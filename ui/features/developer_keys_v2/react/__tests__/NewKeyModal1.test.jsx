@@ -643,8 +643,58 @@ describe('NewKeyModal', () => {
             const saveButton = wrapper.getByRole('button', {name: 'Save'})
             expect(saveButton).toHaveAttribute(
               'title',
-              'You do not have permission to create or modify developer keys in this account',
+              'You do not have permission to create or modify developer keys in this account.',
             )
+          })
+        })
+
+        describe('when developer key has_overlay is true', () => {
+          it('disables the save button', () => {
+            const devKeyWithOverlay = {
+              ...developerKey,
+              has_overlay: true,
+              lti_registration_id: '123',
+            }
+            const stateWithOverlay = {...editDeveloperKeyState, developerKey: devKeyWithOverlay}
+            const {wrapper} = createWrapper(stateWithOverlay)
+            const saveButton = wrapper.getByRole('button', {name: 'Save'})
+            expect(saveButton).toBeDisabled()
+          })
+
+          it('shows a link to the Apps page', () => {
+            const devKeyWithOverlay = {
+              ...developerKey,
+              has_overlay: true,
+              lti_registration_id: '123',
+            }
+            const stateWithOverlay = {...editDeveloperKeyState, developerKey: devKeyWithOverlay}
+            const {wrapper} = createWrapper(stateWithOverlay)
+            const link = wrapper.getByRole('link', {
+              name: /This key has been customized in the Apps page./i,
+            })
+            expect(link).toBeInTheDocument()
+            expect(link).toHaveAttribute('href', '/accounts/1/apps/manage/123/configuration')
+          })
+
+          it('does not show overlay message when has_overlay is false', () => {
+            const devKeyWithoutOverlay = {...developerKey, has_overlay: false}
+            const stateWithoutOverlay = {
+              ...editDeveloperKeyState,
+              developerKey: devKeyWithoutOverlay,
+            }
+            const {wrapper} = createWrapper(stateWithoutOverlay)
+            const link = wrapper.queryByRole('link', {
+              name: /This key has been customized in the Apps page./i,
+            })
+            expect(link).not.toBeInTheDocument()
+          })
+
+          it('does not show overlay message when has_overlay is not present', () => {
+            const {wrapper} = createWrapper()
+            const link = wrapper.queryByRole('link', {
+              name: /This developer key has an associated overlay/i,
+            })
+            expect(link).not.toBeInTheDocument()
           })
         })
       })

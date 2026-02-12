@@ -314,6 +314,31 @@ describe SisBatch do
     expect(atts.map(&:id)).to match_array(batch1.data[:downloadable_attachment_ids])
   end
 
+  it "preloads last_attachment_upload_status on downloadable attachments" do
+    batch = process_csv_data([%(user_id,login_id,status
+                                user_1,user_1,active)])
+    SisBatch.load_downloadable_attachments([batch])
+
+    atts = batch.instance_variable_get(:@downloadable_attachments)
+    expect(atts).to be_present
+    atts.each do |att|
+      expect(att.association(:last_attachment_upload_status)).to be_loaded
+    end
+  end
+
+  it "sets context association on preloaded downloadable attachments" do
+    batch = process_csv_data([%(user_id,login_id,status
+                                user_1,user_1,active)])
+    SisBatch.load_downloadable_attachments([batch])
+
+    atts = batch.instance_variable_get(:@downloadable_attachments)
+    expect(atts).to be_present
+    atts.each do |att|
+      expect(att.association(:context)).to be_loaded
+      expect(att.context).to eq batch
+    end
+  end
+
   it "keeps the batch in initializing state during create_with_attachment" do
     batch = SisBatch.create_with_attachment(@account, "instructure_csv", stub_file_data("test.csv", "abc", "text"), user_factory) do |b|
       expect(b.attachment).not_to be_new_record

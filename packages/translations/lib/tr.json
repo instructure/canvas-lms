@@ -158,6 +158,9 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Alt yazı dosyasını seçin"
     },
+    "choose_file_8d89ccab": {
+        "message": "Dosya Seç"
+    },
     "choose_usage_rights_33683854": {
         "message": "Kullanıcı haklarını seçin..."
     },
@@ -710,6 +713,9 @@
     "previous_bd2ac015": {
         "message": "Önceki"
     },
+    "processing_8c569014": {
+        "message": "İşleniyor..."
+    },
     "published_c944a23d": {
         "message": "yayınlandı"
     },
@@ -820,6 +826,9 @@
     },
     "up_c553575d": {
         "message": "Yukarı"
+    },
+    "upload_8b403d05": {
+        "message": "Yükle"
     },
     "upload_document_253f0478": {
         "message": "Belge Yükle"

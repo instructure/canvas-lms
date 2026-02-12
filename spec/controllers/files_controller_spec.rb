@@ -1327,6 +1327,22 @@ describe FilesController do
       get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
       expect(json_parse.fetch("message")).to eq "file size exceeds quota limits"
     end
+
+    it "kicks off a SIS batch" do
+      account = Account.create!
+      batch = SisBatch.create!(account:,
+                               data: { import_type: "instructure_csv" },
+                               workflow_state: "initializing")
+      attachment = Attachment.create!(context: batch,
+                                      filename: "test.csv",
+                                      file_state: "deleted",
+                                      uploaded_data: StringIO.new("test"))
+
+      get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
+
+      expect(response).to have_http_status(:ok)
+      expect(batch.reload).to be_created
+    end
   end
 
   describe "GET 'show_relative'" do
@@ -2398,6 +2414,30 @@ describe FilesController do
         expect(attachment.root_account_id).to eq account.global_id
       end
     end
+
+    it "accepts SisBatch as valid context and triggers callback" do
+      account = Account.create!
+      user = User.create!(name: "me")
+      batch = SisBatch.create!(account:, data: { import_type: "instructure_csv" }, workflow_state: "initializing")
+
+      expect_any_instantiation_of(batch).to receive(:file_upload_success_callback).and_call_original
+
+      post "api_capture", params: {
+        user_id: user.id,
+        context_type: "SisBatch",
+        context_id: batch.id,
+        token: @token,
+        name: "test.csv",
+        size: 1024,
+        quota_exempt: true,
+        content_type: "text/csv",
+        instfs_uuid: "test-uuid",
+        sha512: "test-hash"
+      }
+
+      expect(response).to have_http_status(:created)
+      expect(batch.reload).to be_created
+    end
   end
 
   describe "public_url" do
@@ -2647,22 +2687,31 @@ describe FilesController do
       user_session(@teacher)
       expect_any_instance_of(FilesController).to receive(:safe_send_file)
         .with(thumbnail.full_filename, content_type: thumbnail.content_type).and_return(nil)
-      expect { get :show_thumbnail, params: { id: thumbnail.id, location: "avatar_#{@teacher.id}" } }.not_to raise_error
+      expect { get :show_thumbnail, params: { id: thumbnail.id } }.not_to raise_error
     end
 
     it "returns unauthorized if not authorized" do
       local_storage!
-      allow_any_instance_of(FilesController).to receive(:authorized_action).and_return(false)
       user_session(user)
       get :show_thumbnail, params: { id: thumbnail.id }
       expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "sends the thumbnail file is authorized by old UUID format" do
+      # TODO: remove when file_association_access FF is removed
+      local_storage!
+      @teacher.update(avatar_image_source: "attachment", avatar_image_url: "http://host.instructure.com/images/thumbnails/#{image.id}")
+      user_session(user)
+      expect_any_instance_of(FilesController).to receive(:safe_send_file)
+        .with(thumbnail.full_filename, content_type: thumbnail.content_type).and_return(nil)
+      expect { get :show_thumbnail, params: { id: thumbnail.id, uuid: thumbnail.uuid } }.not_to raise_error
     end
 
     it "sends the thumbnail file if authorized by location" do
       local_storage!
       @teacher.avatar_image_source = "attachment"
       @teacher.avatar_image_url =
-        "http://host.instructure.com/images/thumbnails/#{image.id}?location=avatar_#{@teacher.id}"
+        "http://host.instructure.com/images/thumbnails/#{image.id}"
       @teacher.save!
       user_session(user)
       expect_any_instance_of(FilesController).to receive(:safe_send_file)

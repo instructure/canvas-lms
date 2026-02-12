@@ -463,10 +463,26 @@ GEM
     childprocess (5.1.0)
       logger (~> 1.5)
     chunky_png (1.4.0)
-    code_ownership (1.39.0)
+    code_ownership (2.1.1)
       code_teams (~> 1.0)
       packs-specification
-      sorbet-runtime (>= 0.5.11249)
+      sorbet-runtime (>= 0.6.12763)
+    code_ownership (2.1.1-aarch64-linux)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.6.12763)
+    code_ownership (2.1.1-arm64-darwin)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.6.12763)
+    code_ownership (2.1.1-x86_64-darwin)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.6.12763)
+    code_ownership (2.1.1-x86_64-linux)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.6.12763)
     code_teams (1.2.0)
       sorbet-runtime
     coercible (1.0.0)
@@ -830,7 +846,7 @@ GEM
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0, >= 2.0.3)
       version_gem (~> 1.1, >= 1.1.9)
-    oj (3.16.11)
+    oj (3.16.13)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
     once-ler (2.2.0)
@@ -1205,7 +1221,7 @@ GEM
       guardrail (~> 3.1.0)
       parallel (~> 1.22)
       railties (>= 7.1, < 8.1)
-    switchman-inst-jobs (4.3.0)
+    switchman-inst-jobs (4.3.2)
       inst-jobs (>= 2.4.9, < 4.0)
       parallel (>= 1.19)
       railties (>= 7.0, < 8.1)
@@ -1341,7 +1357,7 @@ DEPENDENCIES
   canvas_time!
   canvas_unzip!
   canvas_webex (= 0.18.2)
-  code_ownership (~> 1.33)
+  code_ownership (~> 2.1)
   colorize (~> 1.0)
   config_file!
   crystalball!

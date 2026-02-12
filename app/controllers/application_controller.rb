@@ -275,6 +275,7 @@ class ApplicationController < ActionController::Base
           captcha_site_key:,
           current_user_id: @current_user&.id,
           current_user_global_id: @current_user&.global_id,
+          current_user_uuid: @current_user&.uuid,
           current_user_usage_metrics_id: @current_user&.usage_metrics_id,
           current_user_roles: @current_user&.roles(@domain_root_account),
           current_user_is_student: @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user),
@@ -312,7 +313,7 @@ class ApplicationController < ActionController::Base
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
         widget_dashboard_flag = @domain_root_account&.lookup_feature_flag(:widget_dashboard)
-        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard?(@domain_root_account, widget_dashboard_flag) if @current_user && widget_dashboard_flag&.enabled? && widget_dashboard_flag.can_override? && !mobile_device?
+        @js_env[:widget_dashboard_overridable] = @current_user&.prefers_widget_dashboard?(@domain_root_account, widget_dashboard_flag) if @current_user && widget_dashboard_flag&.enabled? && !mobile_device? && widget_dashboard_eligible?
         if @domain_root_account&.feature_enabled?(:restrict_student_access)
           @js_env[:current_user_has_teacher_enrollment] = @current_user&.teacher_enrollment?
         end
@@ -380,7 +381,7 @@ class ApplicationController < ActionController::Base
         @js_env[:K5_HOMEROOM_COURSE] = @context.is_a?(Course) && @context.elementary_homeroom_course?
         @js_env[:K5_SUBJECT_COURSE] = @context.is_a?(Course) && @context.elementary_subject_course?
         @js_env[:LOCALE_TRANSLATION_FILE] = helpers.path_to_asset("javascripts/translations/#{@js_env[:LOCALES].first}.json")
-        @js_env[:ACCOUNT_ID] = effective_account_id(@context)
+        @js_env[:ACCOUNT_ID] = effective_account_attribute(@context, :id)
         @js_env[:user_cache_key] = CanvasSecurity.hmac_sha512(@current_user.uuid) if @current_user.present?
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
         @js_env[:horizon_course] = @context.is_a?(Course) && @context.horizon_course?
@@ -393,22 +394,42 @@ class ApplicationController < ActionController::Base
                                     end
         if load_usage_metrics? && @domain_root_account&.feature_enabled?(:pendo_extended)
           @js_env[:USAGE_METRICS_METADATA] ||= {}
-          @js_env[:USAGE_METRICS_METADATA][:sub_account_id] = effective_account_id(@context)
-          @js_env[:USAGE_METRICS_METADATA][:sub_account_name] = effective_account_name(@context)
+          @js_env[:USAGE_METRICS_METADATA][:instance_domain] = HostUrl.context_host(@domain_root_account, request.host)
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_id] = effective_account_attribute(@context, :id)
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_name] = effective_account_attribute(@context, :name)
+          @js_env[:USAGE_METRICS_METADATA][:sub_account_sis_id] = effective_account_attribute(@context, :sis_source_id)
+          @js_env[:USAGE_METRICS_METADATA][:user_id] = @current_user&.id
+          @js_env[:USAGE_METRICS_METADATA][:user_uuid] = @current_user&.uuid
+          @js_env[:USAGE_METRICS_METADATA][:user_sis_id] = @current_pseudonym&.sis_user_id
+          @js_env[:USAGE_METRICS_METADATA][:user_display_name] = @current_user&.short_name
+          @js_env[:USAGE_METRICS_METADATA][:user_email] = @current_user&.email
+          @js_env[:USAGE_METRICS_METADATA][:user_time_zone] = @current_user&.time_zone
 
           if @context.is_a?(Course)
             @js_env[:USAGE_METRICS_METADATA][:course_id] = @context.id
             @js_env[:USAGE_METRICS_METADATA][:course_long_name] = "#{@context.name} - #{@context.short_name}"
+            @js_env[:USAGE_METRICS_METADATA][:course_status] = @context.workflow_state
+            @js_env[:USAGE_METRICS_METADATA][:course_is_blueprint] = MasterCourses::MasterTemplate.is_master_course?(@context)
+            @js_env[:USAGE_METRICS_METADATA][:course_is_k5] = @context.elementary_subject_course?
+            @js_env[:USAGE_METRICS_METADATA][:course_has_no_students] = !@context.student_enrollments.exists?
             @js_env[:USAGE_METRICS_METADATA][:course_sis_source_id] = @context.sis_source_id
             @js_env[:USAGE_METRICS_METADATA][:course_sis_batch_id] = @context.sis_batch_id
             @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_id] = @context.enrollment_term_id
             @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_name] = @context.enrollment_term&.name
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_sis_id] = @context.enrollment_term&.sis_source_id
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_start_at] = @context.enrollment_term&.start_at
+            @js_env[:USAGE_METRICS_METADATA][:course_enrollment_term_end_at] = @context.enrollment_term&.end_at
           end
         end
 
         if @context.is_a?(Course)
           @js_env[:FEATURES][:youtube_overlay] = @context.account.feature_enabled?(:youtube_overlay)
           @js_env[:FEATURES][:rce_studio_embed_improvements] = @context.feature_enabled?(:rce_studio_embed_improvements)
+          @js_env[:FEATURES][:a11y_checker_ai_table_caption_generation] = @context.a11y_checker_ai_table_caption_generation?
+          @js_env[:FEATURES][:a11y_checker_ai_alt_text_generation] = @context.a11y_checker_ai_alt_text_generation?
+          @js_env[:FEATURES][:a11y_checker_close_issues] = @context.a11y_checker_close_issues?
+          @js_env[:FEATURES][:a11y_checker_additional_resources] = @context.a11y_checker_additional_resources?
+          @js_env[:FEATURES][:peer_review_allocation_and_grading] = @context.feature_enabled?(:peer_review_allocation_and_grading)
         end
 
         # partner context data
@@ -455,10 +476,9 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
-    a11y_checker_ai_alt_text_generation
-    a11y_checker_ai_table_caption_generation
     a11y_checker_additional_resources
     a11y_checker_close_issues
+    a11y_checker_ga2_features
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player
@@ -481,11 +501,12 @@ class ApplicationController < ActionController::Base
     instui_header
     media_links_use_attachment_id
     multiselect_gradebook_filters
+    nav_menu_links
     new_quizzes_media_type
     new_quizzes_navigation_updates
-    new_quizzes_surveys
     permanent_page_links
     rce_a11y_resize
+    rce_asr_captioning_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases
@@ -634,15 +655,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :render_js_env
 
-  def effective_account_id(context)
+  def effective_account_attribute(context, attribute)
     if context.is_a?(Account)
-      context.id
+      context.send(attribute)
     elsif context.is_a?(Course)
-      context.account_id
+      (attribute == :id) ? context.account_id : context.account.send(attribute)
     elsif context.respond_to?(:context)
-      effective_account_id(context.context)
+      effective_account_attribute(context.context, attribute)
     else
-      @domain_root_account&.id
+      @domain_root_account&.send(attribute)
     end
   end
 
@@ -2683,18 +2704,6 @@ class ApplicationController < ActionController::Base
   end
   helper_method :feature_and_service_enabled?
 
-  def effective_account_name(context)
-    if context.is_a?(Account)
-      context.name
-    elsif context.is_a?(Course)
-      context.account.name
-    elsif context.respond_to?(:context)
-      effective_account_name(context.context)
-    else
-      @domain_root_account&.name
-    end
-  end
-
   def random_lti_tool_form_id
     rand(0..999).to_s
   end
@@ -3276,7 +3285,7 @@ class ApplicationController < ActionController::Base
     # 2. courses_controller (context of this will be Account)
     # discussion_checkpoints_enabled? works for either context
     account_has_discussion_checkpoints_enabled = @context.discussion_checkpoints_enabled?
-
+    course_has_peer_reviews_enabled = @context.is_a?(Course) && @context.feature_enabled?(:peer_review_allocation_and_grading)
     prefetch_xhr(api_v1_course_assignment_groups_url(
                    @context,
                    include: [
@@ -3285,7 +3294,8 @@ class ApplicationController < ActionController::Base
                      account_has_discussion_checkpoints_enabled && "checkpoints",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
-                     peer_reviews_for_a2_enabled? && "assessment_requests"
+                     peer_reviews_for_a2_enabled? && "assessment_requests",
+                     course_has_peer_reviews_enabled && "peer_review"
                    ].compact_blank,
                    exclude_response_fields: ["description", "rubric"],
                    exclude_assignment_submission_types: ["wiki_page"],
@@ -3600,6 +3610,12 @@ class ApplicationController < ActionController::Base
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_user?(check_disabled:)
   end
   helper_method :k5_user?
+
+  def widget_dashboard_eligible?
+    return false unless @current_user
+
+    @current_user.observer_enrollments.active.any? || !@current_user.non_student_enrollment?
+  end
 
   def use_classic_font?
     observed_users(@current_user, session) if @current_user&.roles(@domain_root_account)&.include?("observer")

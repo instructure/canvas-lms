@@ -18,7 +18,9 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {
+  IconAnnouncementLine,
   IconAssignmentLine,
+  IconCoursesLine,
   IconDiscussionLine,
   IconDocumentLine,
   IconMsWordLine,
@@ -45,6 +47,10 @@ function getIconByContentType(contentType: ResourceType) {
       return <IconMsWordLine aria-hidden="true" />
     case ResourceType.DiscussionTopic:
       return <IconDiscussionLine aria-hidden="true" />
+    case ResourceType.Announcement:
+      return <IconAnnouncementLine aria-hidden="true" />
+    case ResourceType.Syllabus:
+      return <IconCoursesLine aria-hidden="true" />
   }
 }
 
@@ -58,6 +64,10 @@ function getTextByContentType(contentType: ResourceType) {
       return I18n.t('Attachment')
     case ResourceType.DiscussionTopic:
       return I18n.t('Discussion topic')
+    case ResourceType.Announcement:
+      return I18n.t('Announcement')
+    case ResourceType.Syllabus:
+      return I18n.t('Syllabus')
   }
 }
 

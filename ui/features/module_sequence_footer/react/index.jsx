@@ -19,7 +19,7 @@
 import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import SpeedGraderLink from '@canvas/speed-grader-link'
 import StudentGroupFilter from '@canvas/student-group-filter'
@@ -76,7 +76,7 @@ function renderModuleSequenceFooter() {
   if (ENV.speed_grader_url) {
     const $container = document.getElementById('speed_grader_link_container')
 
-    ReactDOM.render(
+    legacyRender(
       <ModuleSequenceFooter
         courseId={ENV.COURSE_ID}
         filterSpeedGraderByStudentGroup={ENV.SETTINGS.filter_speed_grader_by_student_group}

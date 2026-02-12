@@ -74,11 +74,13 @@ module Lti
         external_tools.exists? || message_handlers.exists?
       end
 
-      def launch_definitions(collection, placements)
+      def launch_definitions(collection, placements, include_context_name: false)
+        context_names = include_context_name ? batch_load_context_names(collection) : {}
+
         collection.map do |o|
           case o
           when ContextExternalTool
-            lti1_launch_definition(o, placements)
+            lti1_launch_definition(o, placements, context_names:)
           when MessageHandler
             lti2_launch_definition(o, placements)
           end
@@ -97,7 +99,7 @@ module Lti
         tool.extension_setting(:resource_selection, property) || tool.extension_setting(placement, property)
       end
 
-      def lti1_launch_definition(tool, placements)
+      def lti1_launch_definition(tool, placements, context_names:)
         definition = {
           definition_type: tool.class.name,
           definition_id: tool.id,
@@ -107,6 +109,9 @@ module Lti
           domain: tool.domain,
           placements: {}
         }
+        if context_names.present?
+          definition[:context_name] = context_names[[tool.context_type, tool.context_id]]
+        end
         placements.each do |p|
           next unless tool.has_placement?(p)
 
@@ -194,6 +199,30 @@ module Lti
         tool_path = account_external_tool_path(tool.context, tool, launch_type: "global_navigation", display: tool_display)
         h[:html_url] = tool_path
         h
+      end
+
+      def batch_load_context_names(collection)
+        tools = collection.select { |o| o.is_a?(ContextExternalTool) }
+        return {} if tools.empty?
+
+        account_ids = tools.select { |t| t.context_type == "Account" }.map(&:context_id)
+        course_ids = tools.select { |t| t.context_type == "Course" }.map(&:context_id)
+
+        names = {}
+
+        if account_ids.present?
+          Account.where(id: account_ids).pluck(:id, :name).each do |id, name|
+            names[["Account", id]] = name
+          end
+        end
+
+        if course_ids.present?
+          Course.where(id: course_ids).pluck(:id, :name).each do |id, name|
+            names[["Course", id]] = name
+          end
+        end
+
+        names
       end
     end
   end

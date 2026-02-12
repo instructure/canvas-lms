@@ -24,6 +24,7 @@ import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {CELL_HEIGHT, COLUMN_WIDTH} from '@canvas/outcomes/react/utils/constants'
 import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 export interface ColumnHeaderProps {
   title: string
@@ -39,13 +40,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   columnWidth = COLUMN_WIDTH,
 }) => {
   return (
-    <View
-      background="secondary"
-      as="div"
-      width={columnWidth}
-      borderWidth="large 0 medium 0"
-      data-testid="column-header"
-    >
+    <View background="secondary" as="div" width={columnWidth} data-testid="column-header">
       <Flex
         alignItems="center"
         justifyItems="space-between"
@@ -53,9 +48,11 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
         padding="none xx-small"
       >
         <Flex.Item size="80%">
-          <Text weight="bold">
-            <TruncateWithTooltip>{title}</TruncateWithTooltip>
-          </Text>
+          <AccessibleContent alt={title}>
+            <Text weight="bold">
+              <TruncateWithTooltip>{title}</TruncateWithTooltip>
+            </Text>
+          </AccessibleContent>
         </Flex.Item>
         {optionsMenuItems.length > 0 && (
           <Menu

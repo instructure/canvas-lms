@@ -155,6 +155,8 @@ class AiExperiencesController < ApplicationController
     add_crumb t("#crumbs.new_ai_experience", "New AI Experience")
     @page_title = t("#page_title.new_ai_experience", "New AI Experience")
     js_env({ COURSE_ID: @context.id })
+    js_env[:FEATURES] ||= {}
+    js_env[:FEATURES][:ai_experiences_context_file_upload] = @context.feature_enabled?(:ai_experiences_context_file_upload)
   end
 
   # @API Show edit AI experience form
@@ -166,6 +168,8 @@ class AiExperiencesController < ApplicationController
     add_crumb @experience.title
     @page_title = t("#page_title.edit_ai_experience", "Edit %{title}", title: @experience.title)
     js_env({ COURSE_ID: @context.id, AI_EXPERIENCE_ID: params[:id] })
+    js_env[:FEATURES] ||= {}
+    js_env[:FEATURES][:ai_experiences_context_file_upload] = @context.feature_enabled?(:ai_experiences_context_file_upload)
   end
 
   # @API Create an AI experience
@@ -407,7 +411,14 @@ class AiExperiencesController < ApplicationController
   end
 
   def experience_params
-    params.expect(ai_experience: %i[title description facts learning_objective pedagogical_guidance workflow_state])
+    base_params = %i[title description facts learning_objective pedagogical_guidance workflow_state]
+
+    # Only permit context_file_ids if feature flag is enabled
+    if @context.feature_enabled?(:ai_experiences_context_file_upload)
+      params.expect(ai_experience: [*base_params, { context_file_ids: [] }])
+    else
+      params.expect(ai_experience: base_params)
+    end
   end
 
   def render_404

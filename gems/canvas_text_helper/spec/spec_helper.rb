@@ -27,7 +27,7 @@ begin
   require "../../spec/coverage_tool"
   CoverageTool.start("canvas-text-helper-gem")
 rescue LoadError => e
-  puts "Error: #{e} "
+  warn "Error: #{e}"
 end
 
 require "canvas_text_helper"

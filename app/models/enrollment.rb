@@ -101,6 +101,8 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
   scope :horizon, -> { joins(:course).where(courses: { horizon_course: true }) }
   scope :not_horizon, -> { joins(:course).where(courses: { horizon_course: false }) }
+  scope :career_learning_library, -> { joins(:course).where(courses: { career_learning_library_only: true }) }
+  scope :not_career_learning_library, -> { joins(:course).where(courses: { career_learning_library_only: false }) }
 
   def ensure_role_id
     self.role_id ||= role.id

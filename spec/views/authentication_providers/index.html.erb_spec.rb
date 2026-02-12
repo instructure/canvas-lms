@@ -66,4 +66,22 @@ describe "authentication_providers/index" do
     doc = Nokogiri::HTML5(response.body)
     expect(doc.css("#delete-aac-#{aac.id}")).to be_blank
   end
+
+  describe "Identity Service Discovery Page section" do
+    it "renders when feature flag is enabled" do
+      Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.css("#native-discovery-page-root")).to be_present
+      expect(doc.css("input#native_discovery_enabled_field")).to be_present
+      expect(response.body).to include("Identity Service Discovery Page")
+    end
+
+    it "does not render when feature flag is disabled" do
+      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.css("#native-discovery-page-root")).to be_blank
+    end
+  end
 end

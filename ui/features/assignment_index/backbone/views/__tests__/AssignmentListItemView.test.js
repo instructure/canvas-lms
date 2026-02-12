@@ -25,9 +25,6 @@ import AssignmentListItemView from '../AssignmentListItemView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import tzInTest from '@instructure/moment-utils/specHelpers'
-import timezone from 'timezone'
-import juneau from 'timezone/America/Juneau'
-import french from 'timezone/fr_FR'
 import I18nStubber from '@canvas/test-utils/I18nStubber'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
@@ -145,6 +142,7 @@ const createView = (model, options = {}) => {
   ENV.FLAGS = {
     show_additional_speed_grader_link: options.show_additional_speed_grader_link,
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
+    peer_review_allocation_and_grading: options.peer_review_allocation_and_grading,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
   ENV.SETTINGS = {}
@@ -1302,6 +1300,155 @@ describe('Assignment#quizzesRespondusEnabled', () => {
     const view = createView(model, {canManage: false})
     const json = view.toJSON()
     expect(json.quizzesRespondusEnabled).toBe(true)
+  })
+})
+
+describe('AssignmentListItemViewSpec - assessment requests display', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user_roles: ['student'],
+      URLS: {assignment_sort_base_url: 'test'},
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    genTeardown()
+  })
+
+  test('renders StudentViewPeerReviews component when flag is disabled', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      assessment_requests: [
+        {
+          anonymous_id: 'abc123',
+          asset_id: 1,
+          user_id: 1,
+          workflow_state: 'assigned',
+        },
+      ],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: false})
+
+    // Check for elements that StudentViewPeerReviews renders
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(1)
+    expect(studentViewItem.text()).toContain('Required Peer Review 1')
+  })
+
+  test('does not render StudentViewPeerReviews when flag is enabled', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      assessment_requests: [
+        {
+          anonymous_id: 'abc123',
+          asset_id: 1,
+          user_id: 1,
+          workflow_state: 'assigned',
+        },
+      ],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+
+    // When flag is enabled, peer reviews are handled as sub-assignments
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(0)
+  })
+
+  test('does not render StudentViewPeerReviews when no assessment requests', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Regular Assignment',
+      assessment_requests: [],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: false})
+
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(0)
+  })
+
+  test('does not render StudentViewPeerReviews for teachers', () => {
+    fakeENV.setup({
+      current_user_roles: ['teacher'],
+      URLS: {assignment_sort_base_url: 'test'},
+    })
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      // Teachers don't have assessment_requests on their assignments
+      assessment_requests: [],
+    })
+    const view = createView(model, {canManage: true, peer_review_allocation_and_grading: false})
+
+    // Teachers don't see the StudentViewPeerReviews component
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(0)
+  })
+})
+
+describe('AssignmentListItemViewSpec - peer review sub-assignment rendering', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user_roles: ['student'],
+      URLS: {assignment_sort_base_url: 'test'},
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    genTeardown()
+  })
+
+  test('displays peer review title with count', () => {
+    const model = buildAssignment({
+      id: 100,
+      name: 'Should not be displayed',
+      is_peer_review_assignment: true,
+      parent_assignment_name: 'French Revolution Essay',
+      parent_peer_review_count: 2,
+      points_possible: 5,
+      due_at: '2025-01-15T23:59:00Z',
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+    expect(view.$('.ig-title').text().trim()).toBe('French Revolution Essay Peer Reviews (2)')
+  })
+
+  test('displays peer review icon', () => {
+    const model = buildAssignment({
+      id: 101,
+      is_peer_review_assignment: true,
+      parent_assignment_name: 'Test Assignment',
+      parent_peer_review_count: 3,
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+    expect(view.$('.icon-peer-review')).toHaveLength(1)
+  })
+
+  test('displays peer review points', () => {
+    const model = buildAssignment({
+      id: 102,
+      is_peer_review_assignment: true,
+      parent_assignment_name: 'Test Assignment',
+      parent_peer_review_count: 2,
+      points_possible: 5,
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+    expect(view.$('.js-score').text()).toContain('5 pts')
+  })
+
+  test('displays peer review due date', () => {
+    const model = buildAssignment({
+      id: 103,
+      is_peer_review_assignment: true,
+      parent_assignment_name: 'Test Assignment',
+      parent_peer_review_count: 2,
+      due_at: '2025-01-15T23:59:00Z',
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+    const dueDateView = view.dateDueColumnView
+    expect(dueDateView).toBeTruthy()
   })
 })
 

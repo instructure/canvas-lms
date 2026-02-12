@@ -135,7 +135,7 @@ export const CoursesTable: React.FC<CoursesTableProps> = ({
             />
           </Table.ColHeader>
           <Table.ColHeader id="header-students" width="1">
-            <Table.ColHeader id="header-students">{I18n.t('Students')}</Table.ColHeader>
+            {I18n.t('Students')}
           </Table.ColHeader>
         </Table.Row>
       </Table.Head>

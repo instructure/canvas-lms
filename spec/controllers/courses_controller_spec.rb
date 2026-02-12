@@ -6461,4 +6461,50 @@ describe CoursesController do
       end
     end
   end
+
+  describe "PUT update_nav" do
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    it "calls NavMenuLinkTabs.sync_course_links_with_tabs and saves course" do
+      user_session(@teacher)
+      tabs_json = [
+        { id: "assignments", label: "Assignments" },
+        { id: "announcements", label: "Announcements", hidden: true }
+      ].to_json
+
+      processed_tabs = [
+        { "id" => "assignments", "label" => "Assignments" },
+        { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+      ]
+
+      expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+        .with(
+          course: @course,
+          tabs: [
+            { "id" => "assignments", "label" => "Assignments" },
+            { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+          ]
+        )
+        .and_return(processed_tabs)
+
+      put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+      expect(response).to be_redirect
+      @course.reload
+      expect(@course.tab_configuration).to eq(processed_tabs)
+    end
+
+    it "requires update permission" do
+      student_in_course(active_all: true)
+      user_session(@student)
+
+      tabs_json = [{ id: "assignments", label: "Assignments" }].to_json
+
+      put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+      expect(response).to be_unauthorized
+    end
+  end
 end

@@ -71,7 +71,7 @@ describe "login/canvas/new_login" do
       "data-recaptcha-key" => "test-recaptcha-key",
       "data-require-email" => "true",
       "data-self-registration-type" => "all",
-      "data-terms-of-use-url" => "http://example.com/terms",
+      "data-terms-of-use-url" => "/acceptable_use_policy",
       "data-terms-required" => "true",
       "data-require-aup" => "true",
     }
@@ -103,9 +103,9 @@ describe "login/canvas/new_login" do
     )
     # stub settings
     allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return("http://example.com/faq")
-    allow(Setting).to receive(:get).with("terms_of_use_url", anything).and_return("http://example.com/terms")
+    allow(Setting).to receive(:get).with("terms_of_use_url", anything).and_return("/acceptable_use_policy")
     allow(Setting).to receive(:get).with("privacy_policy_url", anything).and_return("http://example.com/privacy")
-    allow(Setting).to receive(:get).with("terms_of_use_fft", anything).and_return("http://example.com/terms")
+    allow(Setting).to receive(:get).with("terms_of_use_fft", anything).and_return("/acceptable_use_policy")
     allow(Setting).to receive(:get).with("privacy_policy_fft", anything).and_return("http://example.com/privacy")
     allow(Setting).to receive(:get).with("terms_required", "true").and_return("true")
     # stub branding variables

@@ -370,8 +370,12 @@ describe('FiltersPanel', () => {
       const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')
       const assignmentCheckbox = within(resourceTypeGroup).getByLabelText('Assignments')
       const discussionTopicCheckbox = within(resourceTypeGroup).getByLabelText('Discussion topics')
+      const announcementCheckbox = within(resourceTypeGroup).getByLabelText('Announcements')
+      const syllabusCheckbox = within(resourceTypeGroup).getByLabelText('Syllabus')
       await userEvent.click(assignmentCheckbox)
       await userEvent.click(discussionTopicCheckbox)
+      await userEvent.click(announcementCheckbox)
+      await userEvent.click(syllabusCheckbox)
 
       await userEvent.click(toggleButton!)
 
@@ -526,6 +530,8 @@ describe('FiltersPanel', () => {
 
       const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')
       expect(within(resourceTypeGroup).getByLabelText('Discussion topics')).toBeInTheDocument()
+      expect(within(resourceTypeGroup).getByLabelText('Announcements')).toBeInTheDocument()
+      expect(within(resourceTypeGroup).getByLabelText('Syllabus')).toBeInTheDocument()
     })
 
     it('hides discussion topics checkbox when feature is disabled', async () => {
@@ -546,6 +552,8 @@ describe('FiltersPanel', () => {
       expect(
         within(resourceTypeGroup).queryByLabelText('Discussion topics'),
       ).not.toBeInTheDocument()
+      expect(within(resourceTypeGroup).queryByLabelText('Announcements')).not.toBeInTheDocument()
+      expect(within(resourceTypeGroup).queryByLabelText('Syllabus')).not.toBeInTheDocument()
       // But Pages and Assignments should still be there
       expect(within(resourceTypeGroup).getByLabelText('Pages')).toBeInTheDocument()
       expect(within(resourceTypeGroup).getByLabelText('Assignments')).toBeInTheDocument()

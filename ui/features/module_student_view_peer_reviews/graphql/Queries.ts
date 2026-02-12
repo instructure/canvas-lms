@@ -31,6 +31,11 @@ const ASSIGNMENT_QUERY = gql`
                 _id
                 peerReviews {
                   anonymousReviews
+                  count
+                  pointsPossible
+                }
+                peerReviewSubAssignment {
+                  dueAt
                 }
                 assessmentRequestsForCurrentUser {
                   id: _id

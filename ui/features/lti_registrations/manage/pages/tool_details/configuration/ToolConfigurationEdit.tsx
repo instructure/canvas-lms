@@ -260,10 +260,11 @@ const Footer = React.memo(({save, isSaving}: {save: () => Promise<void>; isSavin
   return (
     <ToolConfigurationFooter>
       <Flex direction="row" justifyItems="end" padding="0 small">
-        <Flex.Item margin="small">
+        <Flex.Item>
           <Button
             data-pendo="lti-registrations-cancel-edit"
             color="secondary"
+            margin="0 xx-small 0 0"
             onClick={() => {
               navigate(-1)
             }}
@@ -275,6 +276,7 @@ const Footer = React.memo(({save, isSaving}: {save: () => Promise<void>; isSavin
           <Button
             color="primary"
             disabled={isSaving}
+            margin="0 0 0 xx-small"
             onClick={save}
             data-pendo="lti-registrations-update-tool-configuration"
           >

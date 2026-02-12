@@ -108,6 +108,58 @@ describe('PeerReviewSelector', () => {
     })
   })
 
+  describe('peerReviewsEnabled prop (Assign To modal context)', () => {
+    it('renders when checkbox does not exist and peerReviewsEnabled is true', () => {
+      document.body.removeChild(mockCheckbox)
+      renderComponent({peerReviewsEnabled: true})
+      expect(screen.getByText('Review Due Date')).toBeInTheDocument()
+      expect(screen.getByText('Reviewing Starts')).toBeInTheDocument()
+      expect(screen.getByText('Until')).toBeInTheDocument()
+    })
+
+    it('does not render when checkbox does not exist and peerReviewsEnabled is false', () => {
+      document.body.removeChild(mockCheckbox)
+      renderComponent({peerReviewsEnabled: false})
+      expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
+    })
+
+    it('does not render when checkbox does not exist and peerReviewsEnabled is undefined', () => {
+      document.body.removeChild(mockCheckbox)
+      renderComponent({peerReviewsEnabled: undefined})
+      expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
+    })
+
+    it('updates visibility when peerReviewsEnabled changes from false to true', async () => {
+      document.body.removeChild(mockCheckbox)
+      const {rerender} = renderComponent({peerReviewsEnabled: false})
+      expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
+
+      rerender(<PeerReviewSelector {...defaultProps} peerReviewsEnabled={true} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Review Due Date')).toBeInTheDocument()
+      })
+    })
+
+    it('updates visibility when peerReviewsEnabled changes from true to false', async () => {
+      document.body.removeChild(mockCheckbox)
+      const {rerender} = renderComponent({peerReviewsEnabled: true})
+      expect(screen.getByText('Review Due Date')).toBeInTheDocument()
+
+      rerender(<PeerReviewSelector {...defaultProps} peerReviewsEnabled={false} />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
+      })
+    })
+
+    it('checkbox checked state takes precedence over peerReviewsEnabled when checkbox exists', () => {
+      mockCheckbox.checked = false
+      renderComponent({peerReviewsEnabled: true})
+      expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
+    })
+  })
+
   describe('child component rendering', () => {
     it('renders all three peer review input components', () => {
       renderComponent()

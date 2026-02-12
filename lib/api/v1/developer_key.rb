@@ -54,6 +54,7 @@ module Api::V1::DeveloperKey
         hash["public_jwk"] = key.public_jwk
         hash["public_jwk_url"] = key.public_jwk_url
         hash["allow_includes"] = key.allow_includes
+        hash["has_overlay"] = key.has_overlay if key.respond_to?(:has_overlay)
       end
 
       if account_binding.present?

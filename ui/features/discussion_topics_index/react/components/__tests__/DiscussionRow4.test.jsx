@@ -419,6 +419,7 @@ describe('DiscussionRow', () => {
               lock_at: '2018-07-01T05:59:00Z',
               unlock_at: '2018-06-21T06:00:00Z',
               id: '50',
+              speed_grader_url: '/courses/1/gradebook/speed_grader?assignment_id=50',
             },
           },
         })}

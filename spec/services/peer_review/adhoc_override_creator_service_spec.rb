@@ -486,7 +486,7 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
       end
 
       it "rolls back if student validation fails mid-transaction" do
-        course_students = double("course_students")
+        course_students = instance_double(ActiveRecord::Relation)
         allow(peer_review_sub_assignment.course).to receive(:all_students).and_return(course_students)
         allow(course_students).to receive(:where).and_raise(ActiveRecord::StatementInvalid.new("Database error"))
 

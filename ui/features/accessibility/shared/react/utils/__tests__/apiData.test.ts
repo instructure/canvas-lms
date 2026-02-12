@@ -100,6 +100,10 @@ describe('apiData utils', () => {
       )
     })
 
+    it('returns ContentItemType.Announcement for ResourceType.Announcement', () => {
+      expect(getAsContentItemType(ResourceType.Announcement)).toBe(ContentItemType.Announcement)
+    })
+
     it('returns undefined when no type is provided', () => {
       expect(getAsContentItemType(undefined)).toBeUndefined()
     })

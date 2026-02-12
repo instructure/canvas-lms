@@ -29,7 +29,9 @@ describe('ScoreWithLabel', () => {
   }
 
   it('renders with icon and label', () => {
-    render(<ScoreWithLabel {...defaultProps} />)
+    render(
+      <ScoreWithLabel {...defaultProps} scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_LABEL} />,
+    )
     expect(screen.getByTestId('test-icon')).toBeInTheDocument()
     expect(screen.getByText('Mastery')).toBeInTheDocument()
   })
@@ -37,9 +39,8 @@ describe('ScoreWithLabel', () => {
   describe('scoreDisplayFormat', () => {
     it('shows label in ScreenReaderContent with ICON_ONLY format (default)', () => {
       render(<ScoreWithLabel {...defaultProps} scoreDisplayFormat={ScoreDisplayFormat.ICON_ONLY} />)
-      const srContent = screen.getByText('Mastery')
-      expect(srContent).toBeInTheDocument()
-      expect(srContent.closest('[class*="screenReaderContent"]')).toBeInTheDocument()
+      expect(screen.getByTestId('test-icon')).toBeInTheDocument()
+      expect(screen.queryByText('Mastery')).not.toBeInTheDocument()
     })
 
     it('shows visible label with ICON_AND_LABEL format', () => {
@@ -65,7 +66,13 @@ describe('ScoreWithLabel', () => {
   })
 
   it('renders without icon', () => {
-    render(<ScoreWithLabel {...defaultProps} icon={undefined} />)
+    render(
+      <ScoreWithLabel
+        {...defaultProps}
+        icon={undefined}
+        scoreDisplayFormat={ScoreDisplayFormat.ICON_AND_LABEL}
+      />,
+    )
     expect(screen.queryByTestId('test-icon')).not.toBeInTheDocument()
     expect(screen.getByText('Mastery')).toBeInTheDocument()
   })
@@ -84,7 +91,7 @@ describe('ScoreWithLabel', () => {
 
   it('uses default ICON_ONLY format when not specified', () => {
     render(<ScoreWithLabel {...defaultProps} />)
-    const srContent = screen.getByText('Mastery')
-    expect(srContent.closest('[class*="screenReaderContent"]')).toBeInTheDocument()
+    expect(screen.getByTestId('test-icon')).toBeInTheDocument()
+    expect(screen.queryByText('Mastery')).not.toBeInTheDocument()
   })
 })

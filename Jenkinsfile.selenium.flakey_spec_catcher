@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -35,22 +35,6 @@ def isPlugin() {
 
 def getNodeCount() {
   return commitMessageFlag('fsc-node-count') as Integer ?: 0
-}
-
-def getDockerWorkDir() {
-  if (env.GERRIT_PROJECT == 'qti_migration_tool') {
-    return "/usr/src/app/vendor/${env.GERRIT_PROJECT}"
-  }
-
-  return env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
-}
-
-def getLocalWorkDir() {
-  if (env.GERRIT_PROJECT == 'qti_migration_tool') {
-    return "vendor/${env.GERRIT_PROJECT}"
-  }
-
-  return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
 def getMaxNodes() {
@@ -197,14 +181,37 @@ def sendSlack(success) {
   slackSend channel: '#flakey_spec_catcher_noisy', color: color, message: message
 }
 
-def cleanupFn(status) {
-  if (fscStatus != 'aborted') {
-    sendSlack(status == 'SUCCESS')
+def runFlakeyNode(nodeNumber) {
+  def stageName = "Flakey Set ${nodeNumber}"
+  node(nodeLabel()) {
+    def stageStartTime = System.currentTimeMillis()
+    try {
+      stage("Cleanup Flakey Set ${nodeNumber}") {
+        pipelineHelpers.cleanupWorkspace()
+      }
+
+      stage("Setup Flakey Set ${nodeNumber}") {
+        setupNode()
+      }
+
+      stage("Run Flakey Set ${nodeNumber}") {
+        try {
+          executeFlakeySpecCatcher()
+        } finally {
+          buildSummaryReport.trackStage(stageName, stageStartTime)
+        }
+      }
+    } finally {
+      pipelineHelpers.cleanupDocker()
+    }
   }
 }
 
 pipeline {
-  agent none
+  agent {
+    label nodeLabel()
+  }
+
   options {
     ansiColor('xterm')
     timeout(time: FSC_TIMEOUT)
@@ -217,8 +224,8 @@ pipeline {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-flakey-spec-catcher.yml'
     IS_PLUGIN = isPlugin()
-    DOCKER_WORKDIR = getDockerWorkDir()
-    LOCAL_WORKDIR = getLocalWorkDir()
+    DOCKER_WORKDIR = pipelineHelpers.getDockerWorkDir()
+    LOCAL_WORKDIR = pipelineHelpers.getLocalWorkDir()
     FORCE_FAILURE = commitMessageFlag('force-failure-fsc').asBooleanInteger()
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
@@ -238,68 +245,85 @@ pipeline {
   }
 
   stages {
-    stage('Environment') {
+    stage('Cleanup Workspace') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: nodeLabel()).obeysAllowStages(false).execute {
-            def postBuildHandler = [
-              onStageEnded: { stageName, stageConfig, result ->
-                cleanupFn(stageConfig.status())
-              }
-            ]
+          pipelineHelpers.cleanupWorkspace()
+        }
+      }
+    }
 
-            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).execute {
-              stage('Setup') {
-                setupNode()
-              }
+    stage('Setup') {
+      steps {
+        script {
+          setupNode()
+        }
+      }
+    }
 
-              stage('Compute Build Distribution') {
-                computeTestCount()
-              }
+    stage('Compute Build Distribution') {
+      steps {
+        script {
+          computeTestCount()
+        }
+      }
+    }
 
-              stage('Run Flakey Spec Catcher') {
-                if (partitions.size() == 0) {
-                  return
-                } else if (partitions.size() > env.MAX_NODES.toInteger()) {
-                  error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
+    stage('Run Flakey Spec Catcher') {
+      when {
+        expression { partitions.size() > 0 }
+      }
+      steps {
+        script {
+          if (partitions.size() > env.MAX_NODES.toInteger()) {
+            error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
+          }
 
-                  return
-                }
+          def flakeyStages = [:]
 
-                def stages = [:]
-
-                stages['flakey set 00'] = {
-                  withEnv([
-                    "FSC_TESTS=${partitions[0].join(',')}",
-                    'NODE_NUMBER=00'
-                  ]) {
-                    executeFlakeySpecCatcher()
-                  }
-                }
-
-                for (int i = 1; i < partitions.size(); i++) {
-                  // make sure to create a new index variable so this value gets
-                  // captured by the lambda
-                  def index = i
-                  def nodeNumber = (index).toString().padLeft(2, '0')
-
-                  stages["flakey set $nodeNumber"] = {
-                    protectedNode(nodeLabel()) {
-                      withEnv([
-                        "FSC_TESTS=${partitions[index].join(',')}",
-                        "NODE_NUMBER=$nodeNumber"
-                      ]) {
-                        setupNode()
-                        executeFlakeySpecCatcher()
-                      }
-                    }
-                  }
-                }
-                parallel(stages)
+          // Initial node (index 0) - runs on main agent
+          flakeyStages['flakey set 00'] = {
+            withEnv([
+              "FSC_TESTS=${partitions[0].join(',')}",
+              'NODE_NUMBER=00'
+            ]) {
+              def stageStartTime = System.currentTimeMillis()
+              try {
+                executeFlakeySpecCatcher()
+              } finally {
+                buildSummaryReport.trackStage('Flakey Set 00', stageStartTime)
               }
             }
           }
+
+          for (int i = 1; i < partitions.size(); i++) {
+            def index = i
+            def nodeNumber = (index).toString().padLeft(2, '0')
+
+            flakeyStages["flakey set $nodeNumber"] = {
+              withEnv([
+                "FSC_TESTS=${partitions[index].join(',')}",
+                "NODE_NUMBER=$nodeNumber"
+              ]) {
+                runFlakeyNode(nodeNumber)
+              }
+            }
+          }
+
+          parallel(flakeyStages)
         }
+      }
+    }
+  }
+
+  post {
+    always {
+      script {
+        pipelineHelpers.cleanupDocker()
+        if (fscStatus != 'aborted') {
+          sendSlack(currentBuild.currentResult == 'SUCCESS')
+        }
+        buildSummaryReport.saveRunManifest()
       }
     }
   }

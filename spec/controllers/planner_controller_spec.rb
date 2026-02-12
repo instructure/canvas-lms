@@ -193,6 +193,42 @@ describe PlannerController do
         expect(event_ids).not_to include my_event_id
       end
 
+      it "does not show section calendar events from concluded enrollments" do
+        section_a = @course.course_sections.create!(name: "Section A")
+        section_b = @course.course_sections.create!(name: "Section B")
+
+        parent_event = @course.calendar_events.build(
+          title: "Section Event",
+          child_event_data: {
+            "0" => { start_at: 1.day.from_now.iso8601, end_at: (1.day.from_now + 1.hour).iso8601, context_code: section_a.asset_string },
+            "1" => { start_at: 2.days.from_now.iso8601, end_at: (2.days.from_now + 1.hour).iso8601, context_code: section_b.asset_string }
+          }
+        )
+        parent_event.updating_user = @teacher
+        parent_event.save!
+
+        section_a_event = section_a.calendar_events.where(parent_calendar_event_id: parent_event).first
+        section_b_event = section_b.calendar_events.where(parent_calendar_event_id: parent_event).first
+
+        @student.enrollments.destroy_all
+        section_a_enrollment = @course.enroll_student(@student, section: section_a, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get :index
+        json = json_parse(response.body)
+        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
+        expect(event_ids).to include section_a_event.id
+        expect(event_ids).not_to include section_b_event.id
+
+        section_a_enrollment.complete!
+        @course.enroll_student(@student, section: section_b, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get :index
+        json = json_parse(response.body)
+        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
+        expect(event_ids).not_to include section_a_event.id
+        expect(event_ids).to include section_b_event.id
+      end
+
       it "shows appointment group reservations" do
         ag = appointment_group_model(title: "appointment group")
         ap = appointment_participant_model(participant: @student, course: @course, appointment_group: ag)
@@ -516,6 +552,13 @@ describe PlannerController do
           get :index, params: { per_page: 50 }
           response_json = json_parse(response.body)
           expect(response_json.length).to be 16
+        end
+
+        it "includes group calendar events when using include all_courses" do
+          get :index, params: { include: ["all_courses"] }
+          response_json = json_parse(response.body)
+          response_hash = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
+          expect(response_hash).to include(["calendar_event", @group_event.id])
         end
 
         it "returns data from contexted courses for observed user if specified" do
@@ -1854,16 +1897,42 @@ describe PlannerController do
         assert_unauthorized
       end
 
-      it "requires the user to be observing observed_user_id in context_codes" do
-        other_course = course_model
-        other_course.enroll_student(@observer, enrollment_state: "active")
-        get :index, params: { observed_user_id: @student.to_param, context_codes: [other_course.asset_string] }
-        assert_unauthorized
+      it "filters context_codes to only courses where observer is linked to observed student" do
+        student2 = user_factory(active_all: true)
+        course2 = Course.create!(workflow_state: "available")
+        course2.enroll_student(student2, enrollment_state: "active")
+        course2.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: student2.id)
+        course2.assignments.create!(title: "Student 2 Assignment", due_at: 1.day.from_now)
+
+        get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string, course2.asset_string] }
+        expect(response).to be_successful
+        response_json = json_parse(response.body)
+        response_hash = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
+        expect(response_hash).to include(["assignment", @assignment.id])
+        expect(response_hash).to include(["assignment", @assignment2.id])
+        expect(response_hash.none? { |type, _id| type == "assignment" && response_json.any? { |i| i["plannable"]["title"] == "Student 2 Assignment" } }).to be true
       end
 
       it "does not require context_codes if all visible courses are requested" do
         get :index, params: { observed_user_id: @student.to_param, include: %w[all_courses] }
         expect(response).to be_successful
+      end
+
+      it "only returns items from courses where the observer is observing the specified student" do
+        student2 = user_factory(active_all: true)
+        course2 = Course.create!(workflow_state: "available")
+        course2.enroll_student(@student, enrollment_state: "active")
+        course2.enroll_student(student2, enrollment_state: "active")
+        course2.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: student2.id)
+        assignment3 = course2.assignments.create!(title: "Student 2 Only", due_at: 1.day.from_now)
+
+        get :index, params: { observed_user_id: @student.to_param, include: %w[all_courses] }
+        expect(response).to be_successful
+        response_json = json_parse(response.body)
+        response_hash = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
+        expect(response_hash).to include(["assignment", @assignment.id])
+        expect(response_hash).to include(["assignment", @assignment2.id])
+        expect(response_hash).not_to include(["assignment", assignment3.id])
       end
 
       it "allows an observer to query their observed user's planner items for valid context_codes" do

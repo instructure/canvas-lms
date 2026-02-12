@@ -38,5 +38,5 @@ export const ACCEPTED_FILE_TYPES = [
   'wma',
   'wmv',
   'video/*',
-  'audio/*'
+  'audio/*',
 ]

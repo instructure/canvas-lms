@@ -107,12 +107,11 @@ class PeerReviewSubAssignment < AbstractAssignment
   end
 
   def parent_assignment_not_discussion_topic_or_external_tool
-    assignment = parent_assignment
-    return unless assignment
+    return if will_save_change_to_workflow_state?(to: "deleted")
 
-    if assignment.submission_types == "discussion_topic"
+    if parent_assignment&.submission_types == "discussion_topic"
       errors.add(:parent_assignment, I18n.t("cannot be a discussion topic"))
-    elsif assignment.external_tool?
+    elsif parent_assignment&.external_tool?
       errors.add(:parent_assignment, I18n.t("cannot be an external tool"))
     end
   end

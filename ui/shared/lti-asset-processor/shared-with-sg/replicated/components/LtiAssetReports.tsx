@@ -70,17 +70,20 @@ function ltiAssetProcessorHeader(assetProcessor: LtiAssetProcessor) {
           toolId={assetProcessor.externalTool._id}
           toolName={assetProcessor.externalTool.name}
           iconUrl={assetProcessor.iconOrToolIconUrl}
+          decorative={true}
         />
       </Flex.Item>
       <Flex.Item padding="0 large 0 0">
-        <Heading level="h4">
-          <TruncateWithTooltip linesAllowed={1} backgroundColor={undefined} horizontalOffset={0}>
-            {buildAPDisplayTitle({
-              toolName: assetProcessor.externalTool.name,
-              toolPlacementLabel: assetProcessor.externalTool.labelFor,
-              title: assetProcessor.title,
-            })}
-          </TruncateWithTooltip>
+        <Heading level="h3">
+          <Text size="medium">
+            <TruncateWithTooltip linesAllowed={1} backgroundColor={undefined} horizontalOffset={0}>
+              {buildAPDisplayTitle({
+                toolName: assetProcessor.externalTool.name,
+                toolPlacementLabel: assetProcessor.externalTool.labelFor,
+                title: assetProcessor.title,
+              })}
+            </TruncateWithTooltip>
+          </Text>
         </Heading>
       </Flex.Item>
     </Flex>
@@ -102,11 +105,11 @@ function LtiAssetReportsCardGroup({
     <Flex direction="column" gap="x-small" margin="xx-small 0 0 0">
       {showDisplayName && displayName && (
         <View as="div" maxWidth="80%">
-          <Heading level="h4">
+          <Text weight="bold" size="medium">
             <TruncateWithTooltip linesAllowed={1} backgroundColor={undefined} horizontalOffset={0}>
               {displayName}
             </TruncateWithTooltip>
-          </Heading>
+          </Text>
         </View>
       )}
       {reports.length ? (

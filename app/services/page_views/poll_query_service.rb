@@ -30,7 +30,8 @@ module PageViews
         status = body["status"].to_s.downcase.to_sym
         format = body["format"].to_s.downcase.to_sym
         error_code = body["errorCode"]
-        return Common::PollingResponse.new(query_id:, status:, format:, error_code:)
+        warnings = nil
+        return Common::PollingResponse.new(query_id:, status:, format:, error_code:, warnings:)
       end
     end
   end

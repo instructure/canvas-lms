@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Eliminar enlace"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Eliminar los archivos multimedia de Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Reemplazar todo"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Mostrar todos"
     },
-    "show_audio_options_b489926b": {
-        "message": "Mostrar opciones de audio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Mostrar opciones de imágenes"
     },
     "show_link_options_545338fd": {
         "message": "Mostrar opciones de enlace"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Mostrar opciones de contenido multimedia en Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Mostrar opciones de video"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Los usuarios detectados navegan rápido por las páginas web, buscando títulos grandes o en negrita. Los usuarios del lector de pantalla solo utilizan los encabezados para una comprensión contextual. Los encabezados deben tener la estructura apropiada."

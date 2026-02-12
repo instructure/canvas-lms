@@ -58,17 +58,17 @@ describe MediaTracksController do
 
       it "disallows TTML" do
         post "create", params: { media_object_id: @mo.media_id, kind: "subtitles", locale: "en", content: example_ttml_susceptible_to_xss }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "validates :kind" do
         post "create", params: { media_object_id: @mo.media_id, kind: "unkind", locale: "en", content: "1" }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "validates :locale" do
         post "create", params: { media_object_id: @mo.media_id, kind: "subtitles", locale: '<img src="lolcats.gif">', content: "1" }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "respects the exclude[] option" do
@@ -108,7 +108,7 @@ describe MediaTracksController do
         track = @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
         track.update_attribute(:content, example_ttml_susceptible_to_xss)
         get "show", params: { media_object_id: @mo.media_id, id: track.id }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 

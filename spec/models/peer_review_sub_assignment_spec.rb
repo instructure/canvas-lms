@@ -143,6 +143,14 @@ RSpec.describe PeerReviewSubAssignment do
         peer_review_sub_assignment = PeerReviewSubAssignment.new(parent_assignment: regular_assignment)
         expect(peer_review_sub_assignment).to be_valid
       end
+
+      it "skips validation when workflow_state is changing to deleted" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(parent_assignment:)
+        parent_assignment.update!(submission_types: "external_tool")
+
+        expect { peer_review_sub_assignment.destroy }.not_to raise_error
+        expect(peer_review_sub_assignment.workflow_state).to eq("deleted")
+      end
     end
 
     describe "#points_possible_changes_ok?" do

@@ -155,9 +155,11 @@ export function LtiAssetReportsForSpeedgrader(
     <View as="section" margin="0 0 medium 0">
       <ToggleDetails
         summary={
-          <Text weight="bold" size="medium" data-testid="comments-label">
-            {I18n.t('Document processor reports')}
-          </Text>
+          <Heading level="h2">
+            <Text weight="bold" size="medium" data-testid="comments-label">
+              {I18n.t('Document processor reports')}
+            </Text>
+          </Heading>
         }
         iconPosition="end"
         icon={() => <IconArrowOpenDownSolid />}

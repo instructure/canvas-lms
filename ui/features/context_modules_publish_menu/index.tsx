@@ -19,18 +19,18 @@
 import React from 'react'
 import ContextModulesPublishMenu from '@canvas/context-modules/react/ContextModulesPublishMenu'
 import ready from '@instructure/ready'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 ready(() => {
   const menuElement = document.getElementById('context-modules-publish-menu')
   if (menuElement) {
-    const root = createRoot(menuElement)
-    root.render(
+    render(
       <ContextModulesPublishMenu
         courseId={menuElement.dataset['courseId']!}
         runningProgressId={menuElement.dataset['progressId']!}
         disabled={menuElement.dataset['disabled'] === 'true'}
       />,
+      menuElement,
     )
   }
 })

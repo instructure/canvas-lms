@@ -98,6 +98,10 @@ export const getAsContentItemType = (type?: ResourceType): ContentItemType | und
       return ContentItemType.Attachment
     case ResourceType.DiscussionTopic:
       return ContentItemType.DiscussionTopic
+    case ResourceType.Announcement:
+      return ContentItemType.Announcement
+    case ResourceType.Syllabus:
+      return ContentItemType.Syllabus
   }
 }
 
@@ -111,14 +115,6 @@ export const findById = <T extends HasId>(data: T[] | null, id: string | number)
 export const replaceById = <T extends HasId>(data: T[] | null, item: T): T[] => {
   if (!data) return []
   return data.map(existingItem => (existingItem.id === item.id ? item : existingItem))
-}
-
-export const calculateTotalIssuesCount = (data?: AccessibilityResourceScan[] | null): number => {
-  if (!data) return 0
-
-  return data.reduce((total, scan) => {
-    return total + (scan.issueCount || 0)
-  }, 0)
 }
 
 const formatDateFilter = (date?: string) => {

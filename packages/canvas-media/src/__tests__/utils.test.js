@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isVideo, isAudio, sizeMediaPlayer} from '../shared/utils'
+import {isAudio, isVideo, sizeMediaPlayer} from '../shared/utils'
 
 describe('media utilities', () => {
   describe('isVideo', () => {
@@ -37,7 +37,7 @@ describe('media utilities', () => {
     it('sizes landscape videos constrained horizontally', () => {
       const sz = sizeMediaPlayer({videoWidth: 1000, videoHeight: 700}, 'video', {
         width: 500,
-        height: 500
+        height: 500,
       })
       expect(sz.width).toEqual('500px')
       expect(sz.height).toEqual('350px')
@@ -45,7 +45,7 @@ describe('media utilities', () => {
     it('sizes portrait videos constrained vertically', () => {
       const sz = sizeMediaPlayer({videoWidth: 700, videoHeight: 1000}, 'video', {
         width: 500,
-        height: 250
+        height: 250,
       })
       expect(sz.width).toEqual('175px')
       expect(sz.height).toEqual('250px')
@@ -53,7 +53,7 @@ describe('media utilities', () => {
     it('sizes small landscape videos to fill the available space', () => {
       const sz = sizeMediaPlayer({videoWidth: 500, videoHeight: 250}, 'video', {
         width: 1000,
-        height: 800
+        height: 800,
       })
       expect(sz.width).toEqual('1000px')
       expect(sz.height).toEqual('500px')
@@ -64,9 +64,9 @@ describe('media utilities', () => {
         'video',
         {
           width: 1000,
-          height: 800
+          height: 800,
         },
-        true
+        true,
       )
       expect(sz.width).toEqual('400px')
       expect(sz.height).toEqual('800px')
@@ -83,9 +83,9 @@ describe('media utilities', () => {
         'video',
         {
           width: 800,
-          height: 400
+          height: 400,
         },
-        true
+        true,
       )
       expect(sz.width).toEqual('640px')
       expect(sz.height).toEqual('400px')

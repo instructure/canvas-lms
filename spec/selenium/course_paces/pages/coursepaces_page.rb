@@ -751,7 +751,6 @@ module CoursePacesPageObject
 
   def force_main_menu_clicked(selector_to_verify)
     unless element_exists?(selector_to_verify)
-      puts "retrying the main menu click"
       click_main_course_pace_menu
     end
   end
@@ -768,7 +767,6 @@ module CoursePacesPageObject
     # This check reduces the flakiness of the clicking in this menu.  Keeping
     # the puts line for verification in the logs
     unless element_exists?(section_cp_xpath_selector(section_name), true)
-      puts "Section course pace selector didn't exist so retrying click"
       click_section_menu_item
     end
 
@@ -779,7 +777,6 @@ module CoursePacesPageObject
     # This check reduces the flakiness of the clicking in this menu.  Keeping
     # the puts line for verification in the logs
     unless element_exists?(student_cp_xpath_selector(student_name), true)
-      puts "Student course pace selector didn't exist so retrying click"
       click_students_menu_item
     end
 

@@ -243,3 +243,102 @@ describe('AssignmentGroup#anyAssignmentInClosedGradingPeriod', () => {
     expect(group.anyAssignmentInClosedGradingPeriod()).toBe(false)
   })
 })
+
+describe('AssignmentGroup#expandPeerReviewSubAssignments', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user_roles: ['student'],
+      FLAGS: {peer_review_allocation_and_grading: true},
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('adds peer review sub-assignments to collection when flag is enabled', () => {
+    const group = new AssignmentGroup({
+      name: 'Assignments',
+      assignments: [
+        {
+          id: 1,
+          name: 'Essay',
+          peer_review_count: 2,
+          peer_review_sub_assignment: {
+            id: 10,
+            name: 'Essay Peer Reviews',
+            points_possible: 5,
+            due_at: '2025-01-15T23:59:00Z',
+          },
+        },
+      ],
+    })
+
+    const assignments = group.get('assignments')
+    expect(assignments).toHaveLength(2)
+
+    const peerReviewAssignment = assignments.at(1)
+    expect(peerReviewAssignment.get('is_peer_review_assignment')).toBe(true)
+    expect(peerReviewAssignment.get('parent_assignment_id')).toBe(1)
+    expect(peerReviewAssignment.get('parent_assignment_name')).toBe('Essay')
+    expect(peerReviewAssignment.get('parent_peer_review_count')).toBe(2)
+  })
+
+  test('does not add peer review sub-assignments when flag is disabled', () => {
+    fakeENV.setup({FLAGS: {peer_review_allocation_and_grading: false}})
+
+    const group = new AssignmentGroup({
+      name: 'Assignments',
+      assignments: [
+        {
+          id: 1,
+          name: 'Essay',
+          peer_review_sub_assignment: {
+            id: 10,
+            name: 'Essay Peer Reviews',
+            points_possible: 5,
+          },
+        },
+      ],
+    })
+
+    const assignments = group.get('assignments')
+    expect(assignments).toHaveLength(1)
+  })
+
+  test('does not add anything when no peer review sub-assignments exist', () => {
+    const group = new AssignmentGroup({
+      name: 'Assignments',
+      assignments: [
+        {
+          id: 1,
+          name: 'Regular Assignment',
+        },
+      ],
+    })
+
+    const assignments = group.get('assignments')
+    expect(assignments).toHaveLength(1)
+  })
+
+  test('copies published state from parent assignment', () => {
+    const group = new AssignmentGroup({
+      name: 'Assignments',
+      assignments: [
+        {
+          id: 1,
+          name: 'Essay',
+          published: false,
+          peer_review_sub_assignment: {
+            id: 10,
+            points_possible: 5,
+          },
+        },
+      ],
+    })
+
+    const assignments = group.get('assignments')
+    const peerReviewAssignment = assignments.at(1)
+    expect(peerReviewAssignment.get('published')).toBe(false)
+  })
+})

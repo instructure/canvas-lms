@@ -191,4 +191,36 @@ describe Accessibility::Rules::LargeTextContrastRule do
       expect(form_hash[:background_color]).to eq("#333333")
     end
   end
+
+  context "when calculating contrast ratio" do
+    let(:rule) { Accessibility::Rules::SmallTextContrastRule.new }
+
+    it "raises error with metadata when calculate_contrast_ratio receives empty color" do
+      expect { rule.calculate_contrast_ratio("", "#FFFFFF") }.to raise_error do |error|
+        expect(error.message).to eq("color_missing")
+        metadata = error.instance_variable_get(:@metadata)
+        expect(metadata).to include(:foreground, :background)
+        expect(metadata[:foreground]).to eq("")
+        expect(metadata[:background]).to eq("#FFFFFF")
+      end
+    end
+
+    it "raises error with metadata when calculate_contrast_ratio receives invalid color" do
+      expect { rule.calculate_contrast_ratio("#11", "#FFFFFF") }.to raise_error do |error|
+        expect(error.message).to eq("invalid_color_format")
+        metadata = error.instance_variable_get(:@metadata)
+        expect(metadata).to include(:foreground, :background)
+        expect(metadata[:foreground]).to eq("#11")
+        expect(metadata[:background]).to eq("#FFFFFF")
+      end
+    end
+
+    it "raises error with metadata when calculate_contrast_ratio receives whitespace-only colors" do
+      expect { rule.calculate_contrast_ratio("   ", "#FFFFFF") }.to raise_error do |error|
+        expect(error.message).to eq("color_missing")
+        metadata = error.instance_variable_get(:@metadata)
+        expect(metadata).to include(:foreground, :background)
+      end
+    end
+  end
 end

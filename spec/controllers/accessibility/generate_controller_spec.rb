@@ -29,7 +29,8 @@ RSpec.describe Accessibility::GenerateController do
       allow(controller).to receive_messages(
         require_context: true,
         require_user: true,
-        check_authorized_action: true
+        check_authorized_action: true,
+        check_table_caption_feature: true
       )
       controller.instance_variable_set(:@context, course)
       controller.instance_variable_set(:@current_user, user)
@@ -37,6 +38,7 @@ RSpec.describe Accessibility::GenerateController do
 
       allow(course).to receive_messages(a11y_checker_enabled?: true, root_account: Account.default)
       Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+      course.root_account.enable_feature!(:a11y_checker_ignite_ai)
 
       stub_const("CedarClient", Class.new do
         def self.conversation(*)
@@ -126,7 +128,8 @@ RSpec.describe Accessibility::GenerateController do
       allow(controller).to receive_messages(
         require_context: true,
         require_user: true,
-        check_authorized_action: true
+        check_authorized_action: true,
+        check_alt_text_feature: true
       )
       controller.instance_variable_set(:@context, course)
       controller.instance_variable_set(:@current_user, user)
@@ -134,6 +137,7 @@ RSpec.describe Accessibility::GenerateController do
 
       allow(course).to receive_messages(a11y_checker_enabled?: true, root_account: Account.default)
       Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+      course.root_account.enable_feature!(:a11y_checker_ignite_ai)
 
       stub_const("CedarClient", Class.new do
         def self.generate_alt_text(*)
@@ -302,8 +306,15 @@ RSpec.describe Accessibility::GenerateController do
   end
 
   describe "#check_table_caption_feature" do
+    let!(:course) { Course.create! }
+
+    before do
+      controller.instance_variable_set(:@context, course)
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+    end
+
     it "renders forbidden if table caption feature flag is disabled" do
-      Account.site_admin.disable_feature!(:a11y_checker_ai_table_caption_generation)
+      allow(course).to receive(:a11y_checker_ai_table_caption_generation?).and_return(false)
 
       expect(controller).to receive(:render).with(status: :forbidden)
 
@@ -311,7 +322,7 @@ RSpec.describe Accessibility::GenerateController do
     end
 
     it "does not render forbidden if table caption feature flag is enabled" do
-      Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+      allow(course).to receive(:a11y_checker_ai_table_caption_generation?).and_return(true)
 
       expect(controller).not_to receive(:render)
 
@@ -320,8 +331,15 @@ RSpec.describe Accessibility::GenerateController do
   end
 
   describe "#check_alt_text_feature" do
+    let!(:course) { Course.create! }
+
+    before do
+      controller.instance_variable_set(:@context, course)
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+    end
+
     it "renders forbidden if alt text feature flag is disabled" do
-      Account.site_admin.disable_feature!(:a11y_checker_ai_alt_text_generation)
+      allow(course).to receive(:a11y_checker_ai_alt_text_generation?).and_return(false)
 
       expect(controller).to receive(:render).with(status: :forbidden)
 
@@ -329,7 +347,7 @@ RSpec.describe Accessibility::GenerateController do
     end
 
     it "does not render forbidden if alt text feature flag is enabled" do
-      Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+      allow(course).to receive(:a11y_checker_ai_alt_text_generation?).and_return(true)
 
       expect(controller).not_to receive(:render)
 

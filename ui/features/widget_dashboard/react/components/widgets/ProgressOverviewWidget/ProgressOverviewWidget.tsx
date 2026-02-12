@@ -58,7 +58,6 @@ const ProgressOverviewWidget: React.FC<BaseWidgetProps> = ({
         currentPage: currentPageIndex + 1,
         totalPages,
         onPageChange: goToPage,
-        isLoading,
         ariaLabel: I18n.t('Progress overview pagination'),
       }}
     >

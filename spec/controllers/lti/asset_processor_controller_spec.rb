@@ -313,7 +313,7 @@ describe Lti::AssetProcessorController do
 
         it "returns unprocessable entity" do
           post(:resubmit_discussion_notices_all, params:)
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body["error"]).to eq("Not a discussion assignment")
         end
       end

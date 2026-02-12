@@ -32,6 +32,7 @@ describe Accessibility::Concerns::CourseStatisticsQueueable do
     context "when a11y_checker_account_statistics feature flag is enabled" do
       before do
         Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        course.account.enable_feature!(:a11y_checker)
       end
 
       it "queues course statistics calculation" do

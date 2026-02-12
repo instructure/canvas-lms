@@ -42,9 +42,7 @@ const mockedFilterAndProcessTools = filterAndProcessTools as MockedFunction<
   typeof filterAndProcessTools
 >
 const mockedGetExternalApps = getExternalApps as MockedFunction<typeof getExternalApps>
-const mockedUseSwitchExperience = useSwitchExperience as MockedFunction<
-  typeof useSwitchExperience
->
+const mockedUseSwitchExperience = useSwitchExperience as MockedFunction<typeof useSwitchExperience>
 
 describe('MobileGlobalMenu', () => {
   beforeEach(() => {
@@ -211,6 +209,7 @@ describe('MobileGlobalMenu', () => {
   it('should handle tools with null image correctly and use fallback icon', async () => {
     const externalTools: ExternalTool[] = [
       {
+        toolId: 'tool-with-null-image-1',
         label: 'Tool with Null Image',
         imgSrc: null,
         href: 'http://tool-null-image.com',

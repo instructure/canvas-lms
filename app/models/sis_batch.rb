@@ -74,11 +74,13 @@ class SisBatch < ActiveRecord::Base
       batch.user = user
       batch.save
 
-      att = Attachment.create_data_attachment(batch, file_obj, file_obj.original_filename)
-      batch.attachment = att
+      if file_obj
+        att = Attachment.create_data_attachment(batch, file_obj, file_obj.original_filename)
+        batch.attachment = att
+      end
 
       yield batch if block_given?
-      batch.workflow_state = :created
+      batch.workflow_state = :created if att
       batch.save!
 
       batch
@@ -134,6 +136,23 @@ class SisBatch < ActiveRecord::Base
 
   def process
     self.class.queue_job_for_account(account)
+  end
+
+  def quota_context
+    account
+  end
+
+  def file_upload_success_callback(attachment)
+    if attachment&.file_state == "available"
+      self.workflow_state = :created
+      self.attachment = attachment
+      save!
+      process
+    else
+      self.workflow_state = :failed
+      data[:error_message] = "File upload failed"
+      save!
+    end
   end
 
   def enable_diffing(data_set_identifier, is_remaster)
@@ -998,10 +1017,26 @@ class SisBatch < ActiveRecord::Base
 
   def self.load_downloadable_attachments(batches)
     batches = Array(batches)
-    all_ids = batches.map { |sb| sb.data&.dig(:downloadable_attachment_ids) || [] }.flatten
-    all_attachments = all_ids.any? ? Attachment.where(context_type: name, context_id: batches, id: all_ids).to_a.group_by(&:context_id) : {}
+    all_ids = batches.flat_map { |sb| sb.data&.dig(:downloadable_attachment_ids) || [] }
+
+    all_attachments = if all_ids.any?
+                        Attachment.where(context_type: name, context_id: batches, id: all_ids)
+                                  .to_a.group_by(&:context_id)
+                      else
+                        {}
+                      end
+
+    # Preload last_attachment_upload_status to avoid N+1 in AttachmentUploadStatus.upload_status
+    all_atts = all_attachments.values.flatten
+    if all_atts.any?
+      ActiveRecord::Associations.preload(all_atts, [:last_attachment_upload_status])
+    end
+
     batches.each do |b|
-      b.downloadable_attachments = all_attachments[b.id] || []
+      atts = all_attachments[b.id] || []
+      # Set the context association to avoid N+1 when accessing attachment.context
+      atts.each { |att| att.association(:context).target = b }
+      b.downloadable_attachments = atts
     end
   end
 

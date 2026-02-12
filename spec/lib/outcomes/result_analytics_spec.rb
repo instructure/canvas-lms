@@ -1178,4 +1178,117 @@ describe Outcomes::ResultAnalytics do
       expect(score.hide_points).to be false
     end
   end
+
+  describe "#mastery_distributions" do
+    before(:once) do
+      course_with_teacher
+      @outcome = @course.created_learning_outcomes.create!(title: "outcome", calculation_method: "highest")
+      @rubric = Rubric.create!(context: @course)
+      @rubric.data = [
+        {
+          points: 5,
+          description: "Outcome row",
+          id: "outcome_123",
+          ratings: [
+            { points: 5, description: "Excellent", id: "rat1", color: "#00FF00" },
+            { points: 3, description: "Good", id: "rat2", color: "#FFFF00" },
+            { points: 2, description: "Fair", id: "rat3", color: "#FFA500" },
+            { points: 0, description: "Poor", id: "rat4", color: "#FF0000" }
+          ],
+          learning_outcome_id: @outcome.id
+        }
+      ]
+      @rubric.save!
+      @assignment = @course.assignments.create!(title: "Test Assignment")
+      @alignment = @outcome.align(@assignment, @course)
+    end
+
+    def create_outcome_result(outcome, student, course, score)
+      LearningOutcomeResult.create!(
+        user: student,
+        learning_outcome: outcome,
+        alignment: @alignment,
+        context: course,
+        score:,
+        possible: 5
+      )
+    end
+
+    it "calculates distribution counts for each rating level" do
+      students = create_users(Array.new(10) { |i| { name: "Student #{i}" } }, return_type: :record)
+      students.each { |s| @course.enroll_student(s, enrollment_state: "active") }
+
+      # Create results with different scores (0, 1, 2, 3 pattern)
+      students.each_with_index do |student, idx|
+        create_outcome_result(@outcome, student, @course, idx % 4)
+      end
+
+      results = LearningOutcomeResult.where(learning_outcome: @outcome)
+      rollups = ra.outcome_results_rollups(results:, users: students, context: @course)
+
+      distributions = ra.mastery_distributions(
+        rollups:,
+        outcomes: [@outcome],
+        context: @course
+      )
+
+      dist = distributions[@outcome.id.to_s]
+      expect(dist[:outcome_id]).to eq(@outcome.id.to_s)
+      expect(dist[:total_students]).to eq(10)
+      expect(dist[:ratings]).to be_an(Array)
+
+      # Verify student_ids are tracked
+      all_student_ids = dist[:ratings].flat_map { |r| r[:student_ids] }
+      expect(all_student_ids.length).to eq(10)
+    end
+  end
+
+  describe "#alignment_mastery_distributions" do
+    before(:once) do
+      course_with_teacher
+      @outcome = @course.created_learning_outcomes.create!(title: "outcome")
+      @assignment = @course.assignments.create!(title: "Test Assignment")
+      @alignment = @outcome.align(@assignment, @course)
+    end
+
+    it "calculates distribution counts for each alignment" do
+      students = create_users(Array.new(5) { |i| { name: "Student #{i}" } }, return_type: :record)
+      students.each { |s| @course.enroll_student(s, enrollment_state: "active") }
+
+      # Create results for the alignment
+      students.each_with_index do |student, idx|
+        LearningOutcomeResult.create!(
+          user: student,
+          learning_outcome: @outcome,
+          context: @course,
+          associated_asset: @assignment,
+          alignment: @alignment,
+          score: idx,
+          possible: 5
+        )
+      end
+
+      results = LearningOutcomeResult.where(learning_outcome: @outcome)
+
+      # Wrap ContentTag in AlignmentWithMetadata
+      alignment_with_metadata = AlignmentWithMetadata.new(
+        content_tag: @alignment,
+        alignment_type: AlignmentWithMetadata::AlignmentTypes::DIRECT
+      )
+      alignments_by_outcome = { @outcome.id => [alignment_with_metadata] }
+
+      distributions = ra.alignment_mastery_distributions(
+        outcomes: [@outcome],
+        users: students,
+        context: @course,
+        results:,
+        alignments_by_outcome:
+      )
+
+      dist = distributions[@outcome.id.to_s][alignment_with_metadata.prefixed_id]
+      expect(dist[:alignment_id]).to eq(alignment_with_metadata.prefixed_id)
+      expect(dist[:total_students]).to eq(5)
+      expect(dist[:ratings]).to be_an(Array)
+    end
+  end
 end

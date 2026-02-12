@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -22,7 +22,10 @@ library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 pipeline {
-  agent none
+  agent {
+    label nodeLabel()
+  }
+
   options {
     ansiColor('xterm')
     timeout(time: 22)
@@ -35,15 +38,12 @@ pipeline {
   }
 
   stages {
-    stage('Environment') {
+    stage('Setup') {
       steps {
-        script {
-          protectedNode(nodeLabel()) {
-            stage('Setup') {
-              // always pull from gerrit refspec to test the changed docker dev code
-              checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: env.GERRIT_REFSPEC, depth: 1)
-              sh '''#!/bin/bash
-              cat <<EOF > docker-compose.local.jenkins.yml
+        // always pull from gerrit refspec to test the changed docker dev code
+        checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: env.GERRIT_REFSPEC, depth: 1)
+        sh '''#!/bin/bash
+        cat <<EOF > docker-compose.local.jenkins.yml
 version: '2.3'
 services:
     web:
@@ -53,64 +53,80 @@ services:
         CANVAS_LMS_STATS_COLLECTION: opt_out
         CANVAS_LMS_ACCOUNT_NAME: 'School of Butters'
 EOF
-              '''
-            }
+        '''
+      }
+    }
 
-            stage('Copy Canvas Config') {
-              sh '''#!/bin/bash
-                cp -vr docker-compose/config/*.yml config/
-                cp -vr config/docker-compose.override.yml.example docker-compose.override.yml
-                sed -i "/- .:\\/usr\\/src\\/app/d" ./docker-compose.override.yml
-                sed -i "s/instructure\\/ruby-passenger/local\\/ruby-passenger/g" ./Dockerfile
-                echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.jenkins.yml" > .env
-              '''
-            }
+    stage('Copy Canvas Config') {
+      steps {
+        sh '''#!/bin/bash
+          cp -vr docker-compose/config/*.yml config/
+          cp -vr config/docker-compose.override.yml.example docker-compose.override.yml
+          sed -i "/- .:\\/usr\\/src\\/app/d" ./docker-compose.override.yml
+          sed -i "s/instructure\\/ruby-passenger/local\\/ruby-passenger/g" ./Dockerfile
+          echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.jenkins.yml" > .env
+        '''
+      }
+    }
 
-            stage('Copy App Directory') {
-              sh """#!/bin/bash
-                 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                 CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.ruby()}-jammy)"
-                 docker cp ./ "\$CONTAINER:/usr/src/app/"
-                 docker start \$CONTAINER
-                 docker exec -i --user root \$CONTAINER chown -R docker:docker /usr/src/app/
-                 docker commit \$CONTAINER "local/ruby-passenger:${configuration.ruby()}-jammy"
-               """
-            }
+    stage('Copy App Directory') {
+      steps {
+        script {
+          sh """#!/bin/bash
+             set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+             CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.ruby()}-jammy)"
+             docker cp ./ "\$CONTAINER:/usr/src/app/"
+             docker start \$CONTAINER
+             docker exec -i --user root \$CONTAINER chown -R docker:docker /usr/src/app/
+             docker commit \$CONTAINER "local/ruby-passenger:${configuration.ruby()}-jammy"
+           """
+        }
+      }
+    }
 
-            stage('Build Canvas') {
-              sh '''#!/bin/bash
-                set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                source script/common/canvas/build_helpers.sh
+    stage('Build Canvas') {
+      steps {
+        sh '''#!/bin/bash
+          set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+          source script/common/canvas/build_helpers.sh
 
-                build_images
-                docker_compose_up
-                build_assets
-              '''
-            }
+          build_images
+          docker_compose_up
+          build_assets
+        '''
+      }
+    }
 
-            stage('Create DB and Migrate') {
-              sh '''#!/bin/bash
-                 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                 source script/common/canvas/build_helpers.sh
+    stage('Create DB and Migrate') {
+      steps {
+        sh '''#!/bin/bash
+           set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+           source script/common/canvas/build_helpers.sh
 
-                 create_db
-               '''
-            }
+           create_db
+         '''
+      }
+    }
 
-            stage('Start Canvas Container') {
-              sh 'docker compose up -d'
-            }
+    stage('Start Canvas Container') {
+      steps {
+        sh 'docker compose up -d'
+      }
+    }
 
-            stage('Test') {
-              sh 'docker compose exec -T web bundle exec rspec spec/controllers/oauth2_provider_controller_spec.rb -fd'
-            }
-          } //protectedNode
-        } //script
-      } //steps
-    } //environment
-  } //stages
+    stage('Test') {
+      steps {
+        sh 'docker compose exec -T web bundle exec rspec spec/controllers/oauth2_provider_controller_spec.rb -fd'
+      }
+    }
+  }
 
   post {
+    always {
+      script {
+        buildSummaryReport.saveRunManifest()
+      }
+    }
     unsuccessful {
       script {
         def causes = currentBuild.getBuildCauses()[0].shortDescription
@@ -124,4 +140,4 @@ EOF
       }
     }
   }
-} //pipeline
+}

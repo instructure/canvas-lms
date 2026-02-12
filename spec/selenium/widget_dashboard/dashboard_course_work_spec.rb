@@ -29,6 +29,7 @@ describe "student dashboard Course work widget", :ignore_js_errors do
     dashboard_student_setup # Creates 2 courses and a student enrolled in both
     dashboard_course_assignment_setup # Add 11 assignments
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   before do
@@ -142,6 +143,7 @@ describe "student dashboard Course work widget", :ignore_js_errors do
   context "assignments workflow edge case" do
     before :once do
       workflow_edge_case_course_setup
+      enable_widget_dashboard_for(@student3)
     end
 
     before do

@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import type {LtiMessageHandler} from '../lti_message_handler'
+const ENV = window.ENV as GlobalEnv
 
 const getPageContent: LtiMessageHandler = ({responseMessages}) => {
   /* Get all included elements with data-lti-page-content="true"
@@ -36,8 +38,20 @@ const getPageContent: LtiMessageHandler = ({responseMessages}) => {
     },
     '',
   )
-  responseMessages.sendResponse({content})
+
+  // ENV.ASSIGNMENT_ID may not always be there for assignments of type external_tool
+  const contentId =
+    ENV.ASSIGNMENT_ID ||
+    assignmentIdFromUrl() ||
+    // @ts-expect-error
+    ENV.WIKI_PAGE?.page_id
+  responseMessages.sendResponse({content, content_id: contentId ? parseInt(contentId) : -1})
   return true
+}
+
+function assignmentIdFromUrl(): string {
+  const match = window.location?.pathname?.match(/\/assignments\/(\d+)/)
+  return match && match[1] !== null ? match[1] : ''
 }
 
 export default getPageContent

@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Link entfernen"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Studio-Medien entfernen"
-    },
     "replace_all_d3d68b3": {
         "message": "Alle ersetzen"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Alle anzeigen"
     },
-    "show_audio_options_b489926b": {
-        "message": "Audiooptionen anzeigen"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Bildoptionen anzeigen"
     },
     "show_link_options_545338fd": {
         "message": "Link-Optionen anzeigen"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Studio-Medienoptionen anzeigen"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Videooptionen anzeigen"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Sehende Benutzer*innen durchsuchen Webseiten schnell nach groß- oder fettgedruckten Überschriften. Benutzer*innen von Bildschirmbetrachtern sind für ein kontextbezogenes Verständnis auf Überschriften angewiesen. Überschriften sollten die entsprechende Struktur verwenden."

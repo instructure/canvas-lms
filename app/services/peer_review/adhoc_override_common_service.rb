@@ -67,6 +67,7 @@ class PeerReview::AdhocOverrideCommonService < ApplicationService
     normalized_student_ids = student_ids.map(&:to_i).uniq
 
     parent_assignment
+      .reload
       .active_assignment_overrides
       .where(set_type: AssignmentOverride::SET_TYPE_ADHOC)
       .where(

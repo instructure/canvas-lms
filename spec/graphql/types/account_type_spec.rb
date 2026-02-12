@@ -174,4 +174,132 @@ describe Types::AccountType do
       ).to eq ["active"]
     end
   end
+
+  describe "coursesConnection with career_learning_library_only filtering" do
+    before :once do
+      @test_account = Account.create!
+      @test_account.enable_feature!(:horizon_course_setting)
+      @test_account.enable_feature!(:horizon_learning_library_ms2)
+      @test_account.horizon_account = true
+      @test_account.save!
+
+      @admin = account_admin_user(account: @test_account)
+
+      @regular_course = course_with_teacher(
+        account: @test_account,
+        course_name: "Regular Course",
+        career_learning_library_only: false,
+        active_all: true
+      ).course
+
+      @cll_course = course_with_teacher(
+        account: @test_account,
+        course_name: "Career Learning Library Course",
+        career_learning_library_only: true,
+        active_all: true
+      ).course
+    end
+
+    let(:account_type) { GraphQLTypeTester.new(@test_account, current_user: @admin) }
+
+    it "returns all courses when no parameter is specified" do
+      result = account_type.resolve(<<~GQL)
+        coursesConnection {
+          nodes {
+            name
+          }
+        }
+      GQL
+
+      expect(result).to include("Regular Course")
+      expect(result).to include("Career Learning Library Course")
+    end
+
+    it "returns only career_learning_library_only courses when parameter is true" do
+      result = account_type.resolve(<<~GQL)
+        coursesConnection(careerLearningLibraryOnly: true) {
+          nodes {
+            name
+          }
+        }
+      GQL
+
+      expect(result).to include("Career Learning Library Course")
+      expect(result).not_to include("Regular Course")
+    end
+
+    it "returns only regular courses when parameter is false" do
+      result = account_type.resolve(<<~GQL)
+        coursesConnection(careerLearningLibraryOnly: false) {
+          nodes {
+            name
+          }
+        }
+      GQL
+
+      expect(result).to include("Regular Course")
+      expect(result).not_to include("Career Learning Library Course")
+    end
+
+    it "applies filtering to any account with feature flag enabled" do
+      other_account = Account.create!
+      other_account.enable_feature!(:horizon_course_setting)
+      other_account.enable_feature!(:horizon_learning_library_ms2)
+      other_account.horizon_account = true
+      other_account.save!
+      other_admin = account_admin_user(account: other_account)
+
+      course_with_teacher(
+        account: other_account,
+        course_name: "Other Regular Course",
+        career_learning_library_only: false,
+        active_all: true
+      )
+
+      course_with_teacher(
+        account: other_account,
+        course_name: "Other CLL Course",
+        career_learning_library_only: true,
+        active_all: true
+      )
+
+      account_type_other = GraphQLTypeTester.new(other_account, current_user: other_admin)
+      result = account_type_other.resolve(<<~GQL)
+        coursesConnection(careerLearningLibraryOnly: true) {
+          nodes {
+            name
+          }
+        }
+      GQL
+
+      expect(result).to include("Other CLL Course")
+      expect(result).not_to include("Other Regular Course")
+    end
+
+    it "does not filter when feature flag is disabled" do
+      account_without_flag = Account.create!
+      account_without_flag.enable_feature!(:horizon_course_setting)
+      account_without_flag.horizon_account = true
+      account_without_flag.save!
+
+      admin_no_flag = account_admin_user(account: account_without_flag)
+
+      course_with_teacher(
+        account: account_without_flag,
+        course_name: "Test Course",
+        active_all: true
+      )
+
+      account_type_no_flag = GraphQLTypeTester.new(account_without_flag, current_user: admin_no_flag)
+      result = account_type_no_flag.resolve(<<~GQL)
+        coursesConnection {
+          nodes {
+            name
+          }
+        }
+      GQL
+
+      expect(result).to include("Test Course")
+    end
+  end
 end

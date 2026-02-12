@@ -1,3 +1,5 @@
 name: test
 owned_globs:
   - spec/data/owned_class.rb
+github:
+  team: ''

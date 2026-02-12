@@ -73,6 +73,7 @@ describe('LtiAssetReportStatus', () => {
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       const link = screen.getByText('All good')
       expect(link).toBeInTheDocument()
+      expect(link).toHaveAttribute('aria-haspopup', 'dialog')
     })
 
     it('calls openModal when link is clicked', () => {
@@ -102,6 +103,7 @@ describe('LtiAssetReportStatus', () => {
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       const link = screen.getByText('Please review')
       expect(link).toBeInTheDocument()
+      expect(link).toHaveAttribute('aria-haspopup', 'dialog')
     })
 
     it('calls openModal when link is clicked', () => {
@@ -137,6 +139,7 @@ describe('LtiAssetReportStatus', () => {
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       const link = screen.getByText('Processing')
       expect(link).toBeInTheDocument()
+      expect(link).toHaveAttribute('aria-haspopup', 'dialog')
     })
 
     it('calls openModal when processing link is clicked', () => {
@@ -161,6 +164,7 @@ describe('LtiAssetReportStatus', () => {
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       const link = screen.getByText('No result')
       expect(link).toBeInTheDocument()
+      expect(link).toHaveAttribute('aria-haspopup', 'dialog')
     })
 
     it('calls openModal when no result link is clicked', () => {

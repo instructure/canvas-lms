@@ -161,6 +161,10 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
+              // TODO: Refactor to pass issue_id instead of content_type/content_id/rule/path
+              // This would allow the backend to use the same resource resolution as the fix
+              // action, ensuring consistency and eliminating dependency on dead code.
+              // Should be: { issue_id: issue.id, value: formValue }
               content_id: resourceId,
               content_type: getAsContentItemType(itemType),
               rule: issue.ruleId,

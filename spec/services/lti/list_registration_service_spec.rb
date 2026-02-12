@@ -110,5 +110,52 @@ describe Lti::ListRegistrationService do
         end
       end
     end
+
+    context "with sharding and site admin forced-on registrations" do
+      specs_require_sharding
+
+      let_once(:sharded_account) do
+        @shard1.activate { account_model }
+      end
+
+      let(:service) do
+        Lti::ListRegistrationService.new(account: sharded_account, search_terms:, sort_field:, sort_direction:)
+      end
+
+      it "does not duplicate registrations that are forced on in site admin and have inherited bindings" do
+        site_admin_reg = nil
+        site_admin_binding = nil
+
+        Account.site_admin.shard.activate do
+          site_admin_reg = lti_registration_with_tool(account: Account.site_admin)
+          site_admin_binding = Lti::RegistrationAccountBinding.find_by!(registration: site_admin_reg, account: Account.site_admin)
+          site_admin_binding.update!(workflow_state: "allow")
+        end
+
+        # The user enables the key on their account
+        @shard1.activate do
+          Lti::RegistrationAccountBinding.create!(
+            registration: site_admin_reg,
+            account: sharded_account,
+            workflow_state: "on",
+            created_by: user_model,
+            updated_by: user_model
+          )
+        end
+
+        # ...site admin comes along later and forces it on for everyone.
+        Shard.default.activate do
+          site_admin_binding.update!(workflow_state: "on")
+        end
+
+        result = nil
+        @shard1.activate do
+          result = service.call
+        end
+
+        expect(result[:registrations].count).to eq(1)
+        expect(result[:registrations].first.global_id).to eq(site_admin_reg.global_id)
+      end
+    end
   end
 end

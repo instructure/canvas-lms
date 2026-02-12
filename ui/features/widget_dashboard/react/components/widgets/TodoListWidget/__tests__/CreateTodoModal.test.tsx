@@ -61,10 +61,18 @@ describe('CreateTodoModal', () => {
     expect(screen.getByTestId('create-todo-details-input')).toBeInTheDocument()
   })
 
-  it('disables submit button when form is empty', () => {
+  it('shows error message when submitting with empty title', async () => {
+    const user = userEvent.setup()
     render(<CreateTodoModal {...defaultProps} />)
+
+    const titleInput = screen.getByTestId('create-todo-title-input') as HTMLInputElement
+    await user.clear(titleInput)
+
     const submitButton = screen.getByTestId('create-todo-submit-button')
-    expect(submitButton).toHaveAttribute('disabled')
+    await user.click(submitButton)
+
+    expect(screen.getByText('Title is required')).toBeInTheDocument()
+    expect(defaultProps.onSubmit).not.toHaveBeenCalled()
   })
 
   it('renders cancel button', () => {
@@ -113,8 +121,8 @@ describe('CreateTodoModal', () => {
     const user = userEvent.setup()
     render(<CreateTodoModal {...defaultProps} />)
 
-    const titleInput = screen.getByLabelText('Title') as HTMLInputElement
-    const detailsInput = screen.getByLabelText('Details') as HTMLTextAreaElement
+    const titleInput = screen.getByTestId('create-todo-title-input') as HTMLInputElement
+    const detailsInput = screen.getByTestId('create-todo-details-input') as HTMLTextAreaElement
 
     await user.clear(titleInput)
     await user.type(titleInput, 'Test Todo')
@@ -132,12 +140,28 @@ describe('CreateTodoModal', () => {
     })
   })
 
-  it('enforces maximum length on title input', async () => {
-    const user = userEvent.setup()
+  it('enforces maximum length on title input', () => {
     render(<CreateTodoModal {...defaultProps} />)
 
-    const titleInput = screen.getByLabelText('Title') as HTMLInputElement
+    const titleInput = screen.getByTestId('create-todo-title-input') as HTMLInputElement
 
     expect(titleInput).toHaveAttribute('maxlength', '255')
+  })
+
+  it('marks title input as required', () => {
+    render(<CreateTodoModal {...defaultProps} />)
+
+    const titleInput = screen.getByTestId('create-todo-title-input') as HTMLInputElement
+
+    expect(titleInput).toHaveAttribute('required')
+  })
+
+  it('marks date and time inputs as required', () => {
+    render(<CreateTodoModal {...defaultProps} />)
+
+    const dateTimeContainer = screen.getByTestId('create-todo-date-input')
+    const inputs = dateTimeContainer.querySelectorAll('input[required]')
+
+    expect(inputs.length).toBeGreaterThanOrEqual(2)
   })
 })

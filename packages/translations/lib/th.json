@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "ลบลิงค์"
     },
-    "remove_studio_media_f913e502": {
-        "message": "ลบมีเดีย Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "แทนที่ทั้งหมด"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "แสดงทั้งหมด"
     },
-    "show_audio_options_b489926b": {
-        "message": "แสดงตัวเลือกเสียง"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "แสดงตัวเลือกสำหรับภาพ"
     },
     "show_link_options_545338fd": {
         "message": "แสดงตัวเลือกสำหรับลิงค์"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "แสดงตัวเลือกมีเดีย Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "แสดงตัวเลือกสำหรับวิดีโอ"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "ผู้ใช้ที่อ่านได้เองจะเรียกดูหน้าเว็บได้อย่างรวดเร็ว ทั้งหัวเรื่องตัวใหญ่และตัวหนา ผู้ใช้ตัวอ่านหน้าจอจะต้องอาศัยหัวเรื่องเพื่อทำความเข้าใจบริบทแวดล้อม หัวเรื่องควรใช้โครงสร้างที่เหมาะสม"

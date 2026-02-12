@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Remover ligação"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Remover o Studio Media"
-    },
     "replace_all_d3d68b3": {
         "message": "Substituir tudo"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Mostrar tudo"
     },
-    "show_audio_options_b489926b": {
-        "message": "Mostrar opções de áudio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Mostrar opções de imagem"
     },
     "show_link_options_545338fd": {
         "message": "Mostrar opções de ligação"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Mostrar Opções de mídia do Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Mostrar opções de vídeo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Utilizadores vistos navegam nas páginas da Web rapidamente, procurando títulos em grande ou em negrito. Os utilizadores do leitor de ecrã dependem de cabeçalhos para a compreensão contextual. Os cabeçalhos devem usar a estrutura adequada."

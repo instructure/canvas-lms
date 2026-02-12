@@ -214,6 +214,14 @@ class ProfileController < ApplicationController
   # When requesting the profile for the user accessing the API, the user's
   # calendar feed URL and LTI user id will be returned as well.
   #
+  # @argument include[] [String, "links"|"user_services"|"uuid"]
+  #   Array of additional information to include.
+  #
+  #   "links":: include the user's profile links in the response
+  #             as an array of objects with +url+ and +title+ fields
+  #   "user_services":: include names and links for the user's connected services
+  #   "uuid":: include the user's uuid in the response
+  #
   # @returns Profile
   def settings
     if api_request?

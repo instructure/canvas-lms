@@ -22,13 +22,14 @@ import {Menu} from '@instructure/ui-menu'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SortBy, SortOrder} from '@canvas/outcomes/react/utils/constants'
-import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
 import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
 import {DragDropConnectorProps} from './DragDropWrapper'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {DraggableColumnHeader} from './DraggableColumnHeader'
+import {ColumnHeader} from './ColumnHeader'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -36,17 +37,18 @@ export interface OutcomeHeaderProps extends DragDropConnectorProps {
   outcome: Outcome
   sorting: Sorting
   contributingScoresForOutcome: ContributingScoresForOutcome
-  scores: (number | undefined)[]
+  outcomeDistribution?: OutcomeDistribution
+  distributionStudents?: Student[]
+  courseId: string
 }
 
 export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
   outcome,
   sorting,
-  connectDragSource,
-  connectDropTarget,
-  isDragging,
   contributingScoresForOutcome,
-  scores,
+  outcomeDistribution,
+  distributionStudents,
+  courseId,
 }) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
@@ -105,13 +107,10 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
 
   return (
     <>
-      <DraggableColumnHeader
+      <ColumnHeader
         title={outcome.title}
-        optionsMenuTriggerLabel={I18n.t('Sort Outcome Column')}
+        optionsMenuTriggerLabel={I18n.t('%{outcome} options', {outcome: outcome.title})}
         optionsMenuItems={[sortMenuGroup, <Menu.Separator key="separator" />, displayMenuGroup]}
-        connectDragSource={connectDragSource}
-        connectDropTarget={connectDropTarget}
-        isDragging={isDragging}
       />
 
       <OutcomeDescriptionModal
@@ -123,7 +122,9 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
       {isODPOpen && (
         <OutcomeDistributionPopover
           outcome={outcome}
-          scores={scores}
+          outcomeDistribution={outcomeDistribution}
+          distributionStudents={distributionStudents}
+          courseId={courseId}
           isOpen={isODPOpen}
           onCloseHandler={closeODP}
           renderTrigger={<span />}

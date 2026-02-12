@@ -912,6 +912,14 @@ class AccountsController < ApplicationController
       @courses = @courses.homeroom
     end
 
+    if @account.root_account.feature_enabled?(:horizon_learning_library_ms2) && params.key?(:career_learning_library_only)
+      @courses = if value_to_boolean(params[:career_learning_library_only])
+                   @courses.career_learning_library
+                 else
+                   @courses.not_career_learning_library
+                 end
+    end
+
     if starts_before || ends_after
       @courses = @courses.joins(:enrollment_term)
       if starts_before
@@ -1027,6 +1035,35 @@ class AccountsController < ApplicationController
       paginated_set = Api.paginate(available_filters, self, api_v1_quiz_ip_filters_url)
       renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
       render json: renderable
+    end
+  end
+
+  # Get account accessibility issue summary
+  def accessibility_issue_summary
+    if authorized_action(@account, @current_user, :read)
+      unless @account.can_see_accessibility_tab?(@current_user)
+        return render json: { error: "Not authorized to view accessibility data" }, status: :unauthorized
+      end
+
+      GuardRail.activate(:secondary) do
+        courses = @account.associated_courses.where.not(workflow_state: "deleted")
+
+        stats_table = AccessibilityCourseStatistic.arel_table
+        active_issues, resolved_issues = courses
+                                         .left_joins(:accessibility_course_statistic)
+                                         .where(stats_table[:workflow_state].eq("active").or(stats_table[:id].eq(nil)))
+                                         .pick(
+                                           Arel.sql("COALESCE(SUM(accessibility_course_statistics.active_issue_count), 0)"),
+                                           Arel.sql("COALESCE(SUM(accessibility_course_statistics.resolved_issue_count), 0)")
+                                         )
+
+        summary_data = {
+          active: active_issues || 0,
+          resolved: resolved_issues || 0
+        }
+
+        render json: summary_data
+      end
     end
   end
 

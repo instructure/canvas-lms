@@ -17,6 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AccessibilityIssue < ActiveRecord::Base
+  include Accessibility::Concerns::ResourceResolvable
   extend RootAccountResolver
 
   resolves_root_account through: :course

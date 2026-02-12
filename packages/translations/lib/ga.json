@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Bain Nasc"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Bain Meáin Stiúideo"
-    },
     "replace_all_d3d68b3": {
         "message": "Athraigh Gach Rud"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Taispeáin gach rud"
     },
-    "show_audio_options_b489926b": {
-        "message": "Taispeáin roghanna fuaime"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Taispeáin roghanna íomhá"
     },
     "show_link_options_545338fd": {
         "message": "Taispeáin roghanna naisc"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Taispeáin roghanna meáin Stiúideo"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Taispeáin roghanna físeáin"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Déanann úsáideoirí radharcacha leathanaigh ghréasáin a bhrabhsáil go tapa, ag lorg ceannteidil mhóra nó chló trom. Bíonn úsáideoirí léitheoirí scáileáin ag brath ar cheanntásca chun tuiscint a fháil ar an gcomhthéacs. Ba cheart go n-úsáidfeadh ceanntásca an struchtúr ceart."

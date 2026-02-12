@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
@@ -64,38 +65,41 @@ describe('OutcomeHeader', () => {
         setSortAlignmentId: vi.fn(),
       },
       contributingScoresForOutcome: mockContributingScoresForOutcome,
-      scores: [3, 4, 5, 2, 4],
+      courseId: '5',
     }
   }
 
   it('renders the outcome title', () => {
-    const {getByText} = render(<OutcomeHeader {...defaultProps()} />)
-    expect(getByText('outcome 1')).toBeInTheDocument()
+    render(<OutcomeHeader {...defaultProps()} />)
+    expect(screen.getAllByText('outcome 1')[0]).toBeInTheDocument()
   })
 
-  it('renders a menu with various sorting and display options', () => {
-    const {getByText} = render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(getByText('Sort Outcome Column'))
-    expect(getByText('Sort')).toBeInTheDocument()
-    expect(getByText('Ascending scores')).toBeInTheDocument()
-    expect(getByText('Descending scores')).toBeInTheDocument()
-    expect(getByText('Display')).toBeInTheDocument()
-    expect(getByText('Show Contributing Scores')).toBeInTheDocument()
-    expect(getByText('Outcome Info')).toBeInTheDocument()
-    expect(getByText('Show Outcome Distribution')).toBeInTheDocument()
+  it('renders a menu with various sorting and display options', async () => {
+    const user = userEvent.setup()
+    render(<OutcomeHeader {...defaultProps()} />)
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    expect(screen.getByText('Sort')).toBeInTheDocument()
+    expect(screen.getByText('Ascending scores')).toBeInTheDocument()
+    expect(screen.getByText('Descending scores')).toBeInTheDocument()
+    expect(screen.getByText('Display')).toBeInTheDocument()
+    expect(screen.getByText('Show Contributing Scores')).toBeInTheDocument()
+    expect(screen.getByText('Outcome Info')).toBeInTheDocument()
+    expect(screen.getByText('Show Outcome Distribution')).toBeInTheDocument()
   })
 
-  it('renders the outcome description modal when option is selected', () => {
-    const {getByText, getByTestId} = render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(getByText('Sort Outcome Column'))
-    fireEvent.click(getByText('Outcome Info'))
-    expect(getByTestId('outcome-description-modal')).toBeInTheDocument()
+  it('renders the outcome description modal when option is selected', async () => {
+    const user = userEvent.setup()
+    render(<OutcomeHeader {...defaultProps()} />)
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    await user.click(screen.getByText('Outcome Info'))
+    expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
   })
 
-  it('renders the outcome distribution popover when option is selected', () => {
-    const {getByText, getByTestId} = render(<OutcomeHeader {...defaultProps()} />)
-    fireEvent.click(getByText('Sort Outcome Column'))
-    fireEvent.click(getByText('Show Outcome Distribution'))
-    expect(getByTestId('outcome-distribution-popover')).toBeInTheDocument()
+  it('renders the outcome distribution popover when option is selected', async () => {
+    const user = userEvent.setup()
+    render(<OutcomeHeader {...defaultProps()} />)
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    await user.click(screen.getByText('Show Outcome Distribution'))
+    expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
   })
 })

@@ -27,7 +27,7 @@ import {
   AssetProcessorsAddModalProps,
 } from '../AssetProcessorsAddModal'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
-import {AssetProcessorType, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {useAssetProcessorsState} from '../hooks/AssetProcessorsState'
 import {
   mockDeepLinkResponse,
@@ -40,7 +40,7 @@ import {http, HttpResponse} from 'msw'
 
 const server = setupServer(
   http.get('/api/v1/courses/:courseId/lti_apps/launch_definitions', ({request}) => {
-    return HttpResponse.json(createAssetProcessorMswHandler(123)({request}))
+    return HttpResponse.json(createAssetProcessorMswHandler()({request}))
   }),
 )
 
@@ -125,6 +125,7 @@ describe.skip('AssetProcessors', () => {
     let tag = renderHook(() => useAssetProcessorsAddModalState(s => s.state.tag)).result.current
     expect(tag).toBe('closed')
     const addButton = getByText('Add Document Processing App')
+    expect(addButton).toHaveAttribute('aria-haspopup', 'dialog')
     addButton.click()
     tag = renderHook(() => useAssetProcessorsAddModalState(s => s.state.tag)).result.current
     expect(tag).toBe('toolList')

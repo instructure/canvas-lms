@@ -18,11 +18,11 @@
 
 import ready from '@instructure/ready'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import AdminSplit from './react/index'
 
 ready(() => {
-  ReactDOM.render(
+  legacyRender(
     <AdminSplit
       user={ENV.ADMIN_SPLIT_USER}
       splitUrl={ENV.ADMIN_SPLIT_URL}

@@ -20,6 +20,8 @@
 require "puma"
 require "httparty"
 
+# rubocop:disable RSpec/Output
+
 class SpecFriendlyWebServer
   class << self
     def bind_address
@@ -74,3 +76,5 @@ class SpecFriendlyWebServer
     end
   end
 end
+
+# rubocop:enable RSpec/Output

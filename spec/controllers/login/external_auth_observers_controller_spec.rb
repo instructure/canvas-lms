@@ -40,7 +40,7 @@ describe Login::ExternalAuthObserversController do
     it "returns an error if unique_id is not valid" do
       allow(controller).to receive(:valid_user_unique_id?).and_return(false)
       post(:redirect_login, params:)
-      expect(response).to have_http_status :unprocessable_entity
+      expect(response).to have_http_status :unprocessable_content
     end
   end
 end

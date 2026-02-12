@@ -308,7 +308,7 @@ describe('Upload data actions', () => {
     it('dispatches a uploadPreflight with the proper parentFolderId set', () => {
       const baseState = setupState()
       const store = spiedStore(baseState)
-      return store.dispatch(actions.uploadToMediaFolder('images', fakeFileMetaData)).then(() => {
+      return store.dispatch(actions.uploadToMediaFolder(fakeFileMetaData)).then(() => {
         expect(store.spy).toHaveBeenCalledWith({
           type: actions.START_FILE_UPLOAD,
           file: {
@@ -330,7 +330,7 @@ describe('Upload data actions', () => {
     it('results in a START_MEDIA_UPLOADING action being fired', () => {
       const baseState = setupState()
       const store = spiedStore(baseState)
-      return store.dispatch(actions.uploadToMediaFolder('images', fakeFileMetaData)).then(() => {
+      return store.dispatch(actions.uploadToMediaFolder(fakeFileMetaData)).then(() => {
         expect(store.spy).toHaveBeenCalledWith({
           type: 'START_MEDIA_UPLOADING',
           payload: fakeFileMetaData,
@@ -370,7 +370,7 @@ describe('Upload data actions', () => {
 
       // This test uses mocked source methods rather than HTTP mocks
       // Note: uploadToMediaFolder doesn't return a promise when using saveMediaRecording
-      store.dispatch(actions.uploadToMediaFolder('media', fakeFileMetaData))
+      store.dispatch(actions.uploadToMediaFolder(fakeFileMetaData))
 
       expect(saveMediaRecording).toHaveBeenCalledTimes(1)
       expect(saveMediaRecording).toHaveBeenCalledWith(
@@ -454,7 +454,7 @@ describe('Upload data actions', () => {
         domObject: file(),
       })
 
-      const subject = () => store.dispatch(actions.uploadPreflight('files', fileProps()))
+      const subject = () => store.dispatch(actions.uploadPreflight(fileProps()))
 
       describe('when the file is an icon maker svg', () => {
         beforeEach(() => {
@@ -505,7 +505,7 @@ describe('Upload data actions', () => {
         domObject: file(),
       })
 
-      const subject = () => store.dispatch(actions.uploadPreflight('files', fileProps()))
+      const subject = () => store.dispatch(actions.uploadPreflight(fileProps()))
 
       it('sets the category to undefined', () => {
         subject().then(() => {
@@ -518,7 +518,7 @@ describe('Upload data actions', () => {
     })
 
     it('follows chain preflight -> upload -> complete', () => {
-      return store.dispatch(actions.uploadPreflight('files', props)).then(() => {
+      return store.dispatch(actions.uploadPreflight(props)).then(() => {
         expect(store.spy).toHaveBeenCalledWith({
           type: actions.START_FILE_UPLOAD,
           file: {},
@@ -539,7 +539,7 @@ describe('Upload data actions', () => {
 
     it('sets usage rights', () => {
       props.usageRights = {}
-      return store.dispatch(actions.uploadPreflight('files', props)).then(() => {
+      return store.dispatch(actions.uploadPreflight(props)).then(() => {
         expect(successSource.setUsageRights).toHaveBeenCalledWith(results.id, props.usageRights)
       })
     })
@@ -551,7 +551,7 @@ describe('Upload data actions', () => {
         display_name: 'foo',
         preview_url: 'http://someurl',
       })
-      return store.dispatch(actions.uploadPreflight('files', props)).then(() => {
+      return store.dispatch(actions.uploadPreflight(props)).then(() => {
         expect(store.spy).toHaveBeenCalledWith(
           expect.objectContaining({
             type: filesActions.ADD_FILE,
@@ -567,7 +567,7 @@ describe('Upload data actions', () => {
     it('dispatches INSERT_FILE with folder and file ids', () => {
       props.parentFolderId = 74
       successSource.uploadFRD.mockResolvedValueOnce({id: 47})
-      return store.dispatch(actions.uploadPreflight('files', props)).then(() => {
+      return store.dispatch(actions.uploadPreflight(props)).then(() => {
         expect(store.spy).toHaveBeenCalledWith(
           expect.objectContaining({
             type: filesActions.INSERT_FILE,
@@ -584,7 +584,7 @@ describe('Upload data actions', () => {
         'content-type': 'image/png',
         thumbnail_url: 'thumbnailurl',
       })
-      return store.dispatch(actions.uploadPreflight('images', props)).then(() => {
+      return store.dispatch(actions.uploadPreflight(props)).then(() => {
         expect(store.spy).toHaveBeenCalledWith(
           expect.objectContaining({type: imagesActions.ADD_IMAGE}),
         )
@@ -593,7 +593,7 @@ describe('Upload data actions', () => {
 
     it('does not dispatch ADD_IMAGE if content type is not image/*', () => {
       props.contentType = 'text/plain'
-      return store.dispatch(actions.uploadPreflight('images', props)).then(() => {
+      return store.dispatch(actions.uploadPreflight(props)).then(() => {
         expect(store.spy).not.toHaveBeenCalledWith(
           expect.objectContaining({type: imagesActions.INSERT_IMAGE}),
         )
@@ -607,7 +607,7 @@ describe('Upload data actions', () => {
         'content-type': 'image/jpeg',
         thumbnail_url: 'thumbnailurl',
       })
-      return store.dispatch(actions.uploadPreflight('images', props)).then(() => {
+      return store.dispatch(actions.uploadPreflight(props)).then(() => {
         expect(bridgeSpy).toHaveBeenCalledTimes(1)
       })
     })
@@ -619,10 +619,10 @@ describe('Upload data actions', () => {
       state.ui.selectedTabIndex = 1
       store = spiedStore(state)
       successSource.uploadFRD.mockResolvedValueOnce({
-        'content-type': 'image/jpeg',
+        'content-type': 'text/csv',
         thumbnail_url: 'thumbnailurl',
       })
-      return store.dispatch(actions.uploadPreflight('files', props)).then(() => {
+      return store.dispatch(actions.uploadPreflight(props)).then(() => {
         expect(bridgeSpy).toHaveBeenCalledTimes(1)
       })
     })
@@ -720,20 +720,17 @@ describe('Upload data actions', () => {
       it('insert image on image type and text not selected', () => {
         const expected = {'content-type': 'image/png'}
         actions.embedUploadResult(expected)
-        expect(Bridge.insertLink).toHaveBeenCalledWith(
+        expect(Bridge.insertImage).toHaveBeenCalledWith(
           expect.objectContaining({
-            embed: expect.objectContaining({
-              type: 'image',
-            }),
+            content_type: 'image/png',
           }),
-          false,
         )
       })
 
       it('link image on image type and text selected', () => {
         jest.spyOn(Bridge, 'existingContentToLink').mockImplementation(() => true)
         jest.spyOn(Bridge, 'existingContentToLinkIsImg').mockImplementation(() => false)
-        actions.embedUploadResult({'content-type': 'image/png'}, 'files')
+        actions.embedUploadResult({'content-type': 'image/png', displayAs: 'link'})
         expect(Bridge.insertLink).toHaveBeenCalledWith(
           expect.objectContaining({
             embed: expect.objectContaining({

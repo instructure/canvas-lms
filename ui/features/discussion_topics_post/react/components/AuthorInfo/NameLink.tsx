@@ -34,9 +34,12 @@ interface NameLinkProps {
 
 const NameLink = (props: NameLinkProps) => {
   let classnames = ''
-  if (props.user?.courseRoles?.includes('StudentEnrollment'))
-    classnames = 'student_context_card_trigger'
+  const isStudent = props.user?.courseRoles?.includes('StudentEnrollment')
+  if (isStudent) classnames = 'student_context_card_trigger'
   if (props.mobileOnly) classnames += ' author_post'
+
+  const isInSpeedGrader = window.top?.location?.href?.includes('gradebook/speed_grader') || false
+  const shouldOpenInNewTab = isInSpeedGrader && !isStudent
 
   return (
     <div
@@ -55,7 +58,13 @@ const NameLink = (props: NameLinkProps) => {
       data-student_id={props.user?._id}
       data-course_id={ENV.course_id}
     >
-      <Link href={props.user?.htmlUrl} isWithinText={false} themeOverride={{fontWeight: 700}}>
+      <Link
+        href={props.user?.htmlUrl}
+        isWithinText={false}
+        themeOverride={{fontWeight: 700}}
+        target={shouldOpenInNewTab ? '_blank' : undefined}
+        rel={shouldOpenInNewTab ? 'noopener noreferrer' : undefined}
+      >
         {props.userType === 'author' ? (
           <>
             <SearchSpan

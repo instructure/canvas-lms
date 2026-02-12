@@ -3074,4 +3074,151 @@ describe AccountsController do
       end
     end
   end
+
+  describe "#accessibility_issue_summary" do
+    before(:once) do
+      @account = Account.default
+    end
+
+    context "authorization" do
+      it "requires authentication" do
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_unauthorized
+      end
+
+      it "requires read permission on account" do
+        user_model
+        user_session(@user)
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_forbidden
+      end
+
+      it "returns 401 when user cannot see accessibility tab" do
+        account_admin_user(account: @account)
+        user_session(@user)
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_unauthorized
+        expect(response.parsed_body["error"]).to eq("Not authorized to view accessibility data")
+      end
+
+      it "allows access when user has permission and feature flags enabled" do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        account_admin_user(account: @account)
+        user_session(@user)
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+      end
+    end
+
+    context "data retrieval" do
+      before(:once) do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "returns zeros when account has no courses" do
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(0)
+        expect(data["resolved"]).to eq(0)
+      end
+
+      it "returns zeros when courses have no accessibility statistics" do
+        course_model(account: @account)
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(0)
+        expect(data["resolved"]).to eq(0)
+      end
+
+      it "returns correct counts when courses have active statistics" do
+        course1 = course_model(account: @account)
+        course2 = course_model(account: @account)
+        AccessibilityCourseStatistic.create!(course: course1, workflow_state: "active", active_issue_count: 5, resolved_issue_count: 3)
+        AccessibilityCourseStatistic.create!(course: course2, workflow_state: "active", active_issue_count: 10, resolved_issue_count: 7)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(15)
+        expect(data["resolved"]).to eq(10)
+      end
+
+      it "excludes deleted courses from the summary" do
+        active_course = course_model(account: @account)
+        deleted_course = course_model(account: @account)
+        deleted_course.destroy
+
+        AccessibilityCourseStatistic.create!(course: active_course, workflow_state: "active", active_issue_count: 5, resolved_issue_count: 3)
+        AccessibilityCourseStatistic.create!(course: deleted_course, workflow_state: "active", active_issue_count: 10, resolved_issue_count: 7)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(5)
+        expect(data["resolved"]).to eq(3)
+      end
+    end
+
+    context "workflow state filtering" do
+      before(:once) do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "includes courses with nil accessibility statistics (no record)" do
+        _ = course_model(account: @account)
+        course_with_stats = course_model(account: @account)
+        AccessibilityCourseStatistic.create!(course: course_with_stats, workflow_state: "active", active_issue_count: 5, resolved_issue_count: 3)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(5)
+        expect(data["resolved"]).to eq(3)
+      end
+
+      it "excludes statistics with non-active workflow states" do
+        course1 = course_model(account: @account)
+        course2 = course_model(account: @account)
+        course3 = course_model(account: @account)
+        course4 = course_model(account: @account)
+
+        AccessibilityCourseStatistic.create!(course: course1, workflow_state: "active", active_issue_count: 5, resolved_issue_count: 3)
+        AccessibilityCourseStatistic.create!(course: course2, workflow_state: "in_progress", active_issue_count: 10, resolved_issue_count: 7)
+        AccessibilityCourseStatistic.create!(course: course3, workflow_state: "queued", active_issue_count: 8, resolved_issue_count: 4)
+        AccessibilityCourseStatistic.create!(course: course4, workflow_state: "deleted", active_issue_count: 15, resolved_issue_count: 12)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(5)
+        expect(data["resolved"]).to eq(3)
+      end
+
+      it "counts both active and resolved issues from active statistics" do
+        course = course_model(account: @account)
+        AccessibilityCourseStatistic.create!(course:, workflow_state: "active", active_issue_count: 12, resolved_issue_count: 8)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(12)
+        expect(data["resolved"]).to eq(8)
+      end
+    end
+  end
 end

@@ -19,15 +19,15 @@
 import {map, reduce} from 'es-toolkit/compat'
 import Big from 'big.js'
 
-export function add(a: number, b: number): Big {
+export function add(a: number | null | undefined, b: number | null | undefined): Big {
   return new Big(a || 0).plus(b || 0)
 }
 
-export function divide(a: number, b: number): Big {
+export function divide(a: number | null | undefined, b: number | null | undefined): Big {
   return new Big(a || 0).div(b || 0)
 }
 
-export function multiply(a: number, b: number): Big {
+export function multiply(a: number | null | undefined, b: number | null | undefined): Big {
   return new Big(a || 0).times(b || 0)
 }
 
@@ -35,8 +35,8 @@ export function toNumber(big: Big): number {
   return Number.parseFloat(big.toString())
 }
 
-export function bigSum(values: Big[]) {
-  return values.reduce((total, value) => total.plus(value || 0), Big(0))
+export function bigSum(values: (Big | null)[]): Big {
+  return values.reduce((total: Big, value) => total.plus(value || 0), Big(0))
 }
 
 // @ts-expect-error
@@ -53,8 +53,12 @@ export function sumBy(collection, attr) {
   return sum(values)
 }
 
-export function scoreToPercentage(score: number, pointsPossible: number): number {
-  const floatingPointResult = (score / pointsPossible) * 100
+export function scoreToPercentage(
+  score: number | null | undefined,
+  pointsPossible: number | null | undefined,
+): number {
+  // Use Number() coercion to preserve exact behavior: Number(null)=0, Number(undefined)=NaN
+  const floatingPointResult = (Number(score) / Number(pointsPossible)) * 100
   if (!Number.isFinite(floatingPointResult)) {
     return floatingPointResult
   }
@@ -84,7 +88,7 @@ export function weightedPercent({
   possible,
   weight,
 }: {
-  score: number
+  score: number | null
   possible: number
   weight: number
 }) {
@@ -92,7 +96,7 @@ export function weightedPercent({
 }
 
 // this function is in place to ensure we round consistently with the backend when calculating total grades
-export function totalGradeRound(n: number | string | null, digits = 0) {
+export function totalGradeRound(n: number | string | Big | null, digits = 0) {
   try {
     if (n == null) {
       return NaN

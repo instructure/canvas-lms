@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Remover link"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Remover mídia do Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Substituir todos"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Mostrar tudo"
     },
-    "show_audio_options_b489926b": {
-        "message": "Mostrar opções de áudio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Exibir opções de imagem"
     },
     "show_link_options_545338fd": {
         "message": "Exibir opções de link"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Mostrar opções de mídia do Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Exibir opções de vídeo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Deficientes visuais navegam rapidamente nas páginas web, buscando títulos grandes ou negritos. Usuários de leitores de tela dependem dos cabeçalhos para entendimento contextual. Os cabeçalhos devem usar a estrutura adequada."

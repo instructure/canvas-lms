@@ -282,6 +282,7 @@ describe('quizReports:generate', function () {
         {
           id: '1',
           report_type: 'student_analysis',
+          includes_all_versions: true,
           progress: {
             id: '1',
             workflow_state: K.PROGRESS_ACTIVE,

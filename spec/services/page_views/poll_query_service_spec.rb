@@ -30,7 +30,7 @@ describe PageViews::PollQueryService do
   it "returns query is running" do
     expected_uuid = SecureRandom.uuid
     expected_json = '{"status": "RUNNING", "query_id": "' + expected_uuid + '"}'
-    response = double(code: 202, body: expected_json)
+    response = instance_double(Net::HTTPResponse, code: 202, body: expected_json)
     allow(CanvasHttp).to receive(:get).and_yield(response)
 
     result = service.call(expected_uuid)
@@ -41,8 +41,9 @@ describe PageViews::PollQueryService do
 
   it "returns an error" do
     expected_uuid = SecureRandom.uuid
-    response = double(code: 202,
-                      body: '{"status": "FAILED", "query_id": "' + expected_uuid + '", "errorCode": "RESULT_SIZE_LIMIT_EXCEEDED"}')
+    response = instance_double(Net::HTTPResponse,
+                               code: 202,
+                               body: '{"status": "FAILED", "query_id": "' + expected_uuid + '", "errorCode": "RESULT_SIZE_LIMIT_EXCEEDED"}')
     allow(CanvasHttp).to receive(:get).and_yield(response)
 
     result = service.call(expected_uuid)
@@ -53,8 +54,9 @@ describe PageViews::PollQueryService do
 
   it "passes through unknown error codes as-is" do
     expected_uuid = SecureRandom.uuid
-    response = double(code: 202,
-                      body: '{"status": "FAILED", "query_id": "' + expected_uuid + '", "errorCode": "SOME_NEW_UNKNOWN_ERROR_CODE"}')
+    response = instance_double(Net::HTTPResponse,
+                               code: 202,
+                               body: '{"status": "FAILED", "query_id": "' + expected_uuid + '", "errorCode": "SOME_NEW_UNKNOWN_ERROR_CODE"}')
     allow(CanvasHttp).to receive(:get).and_yield(response)
 
     result = service.call(expected_uuid)
@@ -65,8 +67,9 @@ describe PageViews::PollQueryService do
 
   it "returns nil when status is failed but no error code provided" do
     expected_uuid = SecureRandom.uuid
-    response = double(code: 202,
-                      body: '{"status": "FAILED", "query_id": "' + expected_uuid + '"}')
+    response = instance_double(Net::HTTPResponse,
+                               code: 202,
+                               body: '{"status": "FAILED", "query_id": "' + expected_uuid + '"}')
     allow(CanvasHttp).to receive(:get).and_yield(response)
 
     result = service.call(expected_uuid)
@@ -77,9 +80,10 @@ describe PageViews::PollQueryService do
 
   it "returns results when query is finished" do
     expected_uuid = SecureRandom.uuid
-    response = double(code: 200,
-                      header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/#{expected_uuid}/results" },
-                      body: '{"status": "FINISHED", "query_id": "' + expected_uuid + '"}')
+    response = instance_double(Net::HTTPResponse,
+                               code: 200,
+                               header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/#{expected_uuid}/results" },
+                               body: '{"status": "FINISHED", "query_id": "' + expected_uuid + '"}')
     allow(CanvasHttp).to receive(:get).and_yield(response)
 
     result = service.call(expected_uuid)
@@ -88,7 +92,7 @@ describe PageViews::PollQueryService do
   end
 
   it "raises not found error when query id doesn't exist" do
-    response = double(code: 404)
+    response = instance_double(Net::HTTPResponse, code: 404)
     allow(CanvasHttp).to receive(:get).and_yield(response)
 
     expect do
@@ -99,7 +103,7 @@ describe PageViews::PollQueryService do
   end
 
   it "raises invalid request error when query id is invalid" do
-    response = double(code: 400, body: '{"errors": ["could not parse parameter queryId"]}')
+    response = instance_double(Net::HTTPResponse, code: 400, body: '{"errors": ["could not parse parameter queryId"]}')
     allow(CanvasHttp).to receive(:get).and_yield(response)
 
     expect do
@@ -110,7 +114,7 @@ describe PageViews::PollQueryService do
   end
 
   it "raises internal server error when PV5 API returns internal server error" do
-    response = double(code: 500)
+    response = instance_double(Net::HTTPResponse, code: 500)
     allow(CanvasHttp).to receive(:get).and_yield(response)
 
     expect do
@@ -122,7 +126,7 @@ describe PageViews::PollQueryService do
 
   it "includes request id in headers" do
     expected_request_id = SecureRandom.uuid
-    allow(CanvasHttp).to receive(:get).and_yield(double(code: 200, body: "{}"))
+    allow(CanvasHttp).to receive(:get).and_yield(instance_double(Net::HTTPResponse, code: 200, body: "{}"))
     allow(RequestContext::Generator).to receive(:request_id).and_return(expected_request_id)
 
     service.call("123456")

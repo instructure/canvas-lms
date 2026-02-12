@@ -95,7 +95,9 @@ export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = (
   return (
     <ColumnHeader
       title={alignment.associated_asset_name}
-      optionsMenuTriggerLabel={I18n.t('Contributing Score Menu')}
+      optionsMenuTriggerLabel={I18n.t('%{assignment} options', {
+        assignment: alignment.associated_asset_name,
+      })}
       optionsMenuItems={[speedGraderMenuItem, sortMenuGroup]}
     />
   )

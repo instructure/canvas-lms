@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {canUseMediaCapture, MediaCapture} from '@instructure/media-capture'
 
 import {Alert} from '@instructure/ui-alerts'
-import {canUseMediaCapture, MediaCapture} from '@instructure/media-capture'
 import {func, object, string} from 'prop-types'
+import React from 'react'
 
 export default function MediaRecorder(props) {
   return (
@@ -39,5 +39,5 @@ export default function MediaRecorder(props) {
 MediaRecorder.propTypes = {
   onSave: func.isRequired,
   errorMessage: string.isRequired,
-  MediaCaptureStrings: object
+  MediaCaptureStrings: object,
 }

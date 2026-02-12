@@ -178,6 +178,22 @@ module AssignmentsIndexPage
     f("a[aria-label='Required Peer Review #{index} for #{assignment_name}']")
   end
 
+  def show_by_date_button
+    f("#show_by_date")
+  end
+
+  def show_by_type_button
+    f("#show_by_type")
+  end
+
+  def assignment_group_by_id(group_id)
+    f("#assignment_group_#{group_id}")
+  end
+
+  def peer_review_sub_assignment(assignment_name)
+    fj("li:contains('#{assignment_name} Peer Reviews')")
+  end
+
   #------------------------------ Actions --------------------------------
 
   def click_assign_to_menu_link(assignment_id)

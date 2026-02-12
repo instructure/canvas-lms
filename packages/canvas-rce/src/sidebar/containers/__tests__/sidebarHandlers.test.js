@@ -131,11 +131,10 @@ describe('Sidebar handlers', () => {
 
   describe('upload management', () => {
     it('dispatches uploadPreflight action', () => {
-      const context = 'course'
       const fileProps = {name: 'test.jpg'}
       uploadActions.uploadPreflight.mockReturnValue('UPLOAD_PREFLIGHT_ACTION')
-      props.startUpload(context, fileProps)
-      expect(uploadActions.uploadPreflight).toHaveBeenCalledWith(context, fileProps)
+      props.startUpload(fileProps)
+      expect(uploadActions.uploadPreflight).toHaveBeenCalledWith(fileProps)
       expect(dispatch).toHaveBeenCalledWith('UPLOAD_PREFLIGHT_ACTION')
     })
 
@@ -155,11 +154,10 @@ describe('Sidebar handlers', () => {
     })
 
     it('dispatches uploadToMediaFolder action', () => {
-      const context = 'course'
       const fileProps = {name: 'video.mp4'}
       uploadActions.uploadToMediaFolder.mockReturnValue('UPLOAD_MEDIA_ACTION')
-      props.startMediaUpload(context, fileProps)
-      expect(uploadActions.uploadToMediaFolder).toHaveBeenCalledWith(context, fileProps)
+      props.startMediaUpload(fileProps)
+      expect(uploadActions.uploadToMediaFolder).toHaveBeenCalledWith(fileProps)
       expect(dispatch).toHaveBeenCalledWith('UPLOAD_MEDIA_ACTION')
     })
 

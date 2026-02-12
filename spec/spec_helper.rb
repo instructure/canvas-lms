@@ -40,7 +40,7 @@ ENV["RAILS_ENV"] = "test"
 if ENV["COVERAGE"] == "1" && (ENV["SUPPRESS_OUTPUT"] != "1")
   require_relative("canvas_simplecov")
   require_relative("coverage_tool")
-  puts "Code Coverage enabled" unless ENV["SUPPRESS_OUTPUT"] == "1"
+  puts "Code Coverage enabled" unless ENV["SUPPRESS_OUTPUT"] == "1" # rubocop:disable RSpec/Output
   CoverageTool.start("RSpec")
 end
 
@@ -62,7 +62,7 @@ if ENV["CRYSTALBALL_MAP"] == "1"
         end
 
         def call(example_map, example)
-          puts "Calling Coverage Strategy for #{example.inspect}"
+          puts "Calling Coverage Strategy for #{example.inspect}" # rubocop:disable RSpec/Output
           before = Coverage.peek_result
           yield example_map, example
           after = Coverage.peek_result
@@ -263,10 +263,12 @@ module ReadOnlySecondaryStub
     if readonly_user_exists? && readonly_user_can_read?
       ActiveRecord::Base.connection.execute((env == :secondary) ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
     else
-      puts "The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following."
-      puts "psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}"
-      puts "psql -c 'GRANT canvas_readonly_user TO #{datbase_username}' -d #{test_db_name}"
-      puts "RAILS_ENV=#{Rails.env} bundle exec rake db:migrate:redo VERSION=20211101220306"
+      warn <<~TEXT
+        The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following.
+        psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}
+        psql -c 'GRANT canvas_readonly_user TO #{datbase_username}' -d #{test_db_name}
+        RAILS_ENV=#{Rails.env} bundle exec rake db:migrate:redo VERSION=20211101220306
+      TEXT
     end
   end
 
@@ -552,7 +554,7 @@ RSpec.configure do |config|
   config.before :suite do
     if ENV["COVERAGE"] == "1"
       simple_cov_cmd = "rspec:#{Process.pid}"
-      puts "Starting SimpleCov command: #{simple_cov_cmd}"
+      puts "Starting SimpleCov command: #{simple_cov_cmd}" # rubocop:disable RSpec/Output
       SimpleCov.command_name(simple_cov_cmd)
       SimpleCov.pid = Process.pid # because https://github.com/colszowka/simplecov/pull/377
     end
@@ -645,7 +647,7 @@ RSpec.configure do |config|
          params: { "pseudonym_session[unique_id]" => username,
                    "pseudonym_session[password]" => password }
     follow_redirect! while response.redirect?
-    assert_response :success
+    expect(response).to have_http_status(:success)
     expect(request.fullpath).to eq "/?login_success=1"
   end
 

@@ -30,7 +30,7 @@ describe PageViews::EnqueueQueryService do
   end
 
   it "returns query's job ID" do
-    response = double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" })
+    response = instance_double(Net::HTTPResponse, code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" })
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     query = service.call("2025-03-01", "2025-06-01", user, "csv")
@@ -59,7 +59,7 @@ describe PageViews::EnqueueQueryService do
   end
 
   it "raises InvalidRequestError when PV5 API returns query parameters are invalid" do
-    response = double(code: 400, body: '{"errors": ["invalid root account uuid"]}')
+    response = instance_double(Net::HTTPResponse, code: 400, body: '{"errors": ["invalid root account uuid"]}')
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
@@ -70,7 +70,7 @@ describe PageViews::EnqueueQueryService do
   end
 
   it "raises NotFoundError when PV5 API returns not found" do
-    response = double(code: 404)
+    response = instance_double(Net::HTTPResponse, code: 404)
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
@@ -81,7 +81,7 @@ describe PageViews::EnqueueQueryService do
   end
 
   it "raises TooManyRequestsError when PV5 API rate limit is exceeded" do
-    response = double(code: 429)
+    response = instance_double(Net::HTTPResponse, code: 429)
     allow(CanvasHttp).to receive(:post).and_yield(response)
     expect do
       service.call("2024-12-01", "2025-01-01", user, "csv")
@@ -91,7 +91,7 @@ describe PageViews::EnqueueQueryService do
   end
 
   it "raises InternalServerError when PV5 API returns internal server error" do
-    response = double(code: 500)
+    response = instance_double(Net::HTTPResponse, code: 500)
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
@@ -104,7 +104,7 @@ describe PageViews::EnqueueQueryService do
   it "includes request id in headers" do
     expected_request_id = SecureRandom.uuid
     allow(RequestContext::Generator).to receive(:request_id).and_return(expected_request_id)
-    allow(CanvasHttp).to receive(:post).and_yield(double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" }))
+    allow(CanvasHttp).to receive(:post).and_yield(instance_double(Net::HTTPResponse, code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" }))
 
     service.call("2025-03-01", "2025-06-01", user, "csv")
 
@@ -112,7 +112,7 @@ describe PageViews::EnqueueQueryService do
   end
 
   it "includes requestor's global user ID in headers when provided" do
-    allow(CanvasHttp).to receive(:post).and_yield(double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" }))
+    allow(CanvasHttp).to receive(:post).and_yield(instance_double(Net::HTTPResponse, code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" }))
 
     service.call("2025-03-01", "2025-06-01", user, "csv")
 

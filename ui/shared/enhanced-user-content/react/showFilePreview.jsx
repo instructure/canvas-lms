@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {instanceOf} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -46,10 +46,6 @@ export function showFilePreview(
     document.body.appendChild(container)
   }
 
-  if (!root) {
-    root = createRoot(container)
-  }
-
   let url = `/api/v1/files/${file_id}?include[]=enhanced_preview_url`
   if (verifier) {
     url += `&verifier=${verifier}`
@@ -62,7 +58,12 @@ export function showFilePreview(
   asJson(fetch(url, defaultFetchOptions()))
     .then(file => {
       const backboneFile = new File(file)
-      root.render(<StandaloneFilePreview preview_file={backboneFile} />)
+      const element = <StandaloneFilePreview preview_file={backboneFile} />
+      if (!root) {
+        root = render(element, container)
+      } else {
+        rerender(root, element)
+      }
     })
     .catch(err => {
       showFlashAlert({

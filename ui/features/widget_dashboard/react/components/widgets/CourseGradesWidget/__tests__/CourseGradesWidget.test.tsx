@@ -122,7 +122,7 @@ describe('CourseGradesWidget', () => {
     })
   })
 
-  it('displays N/A for courses with null grades', async () => {
+  it('renders courses with null grades', async () => {
     const courseDataWithNullGrade: SharedCourseData[] = [
       {
         courseId: '1',
@@ -138,7 +138,6 @@ describe('CourseGradesWidget', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Course Without Grade')).toBeInTheDocument()
-      expect(screen.getByText('N/A')).toBeInTheDocument()
     })
   })
 
@@ -188,7 +187,6 @@ describe('CourseGradesWidget', () => {
       expect(screen.getByText('Course With Grade')).toBeInTheDocument()
       expect(screen.getByText('Course Without Grade')).toBeInTheDocument()
       expect(screen.getByText('85%')).toBeInTheDocument()
-      expect(screen.getByText('N/A')).toBeInTheDocument()
     })
   })
 

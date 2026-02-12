@@ -2092,6 +2092,63 @@ describe ContextModule do
       end
     end
 
+    describe "when mastery path has fewer than 3 assignment associations" do
+      before :once do
+        @simple_trigger = @course.assignments.create!(points_possible: 10, submission_types: "online_text_entry")
+        @simple_pass = @course.assignments.create!(only_visible_to_overrides: true)
+        @simple_fail = @course.assignments.create!(only_visible_to_overrides: true)
+
+        ranges = [
+          ConditionalRelease::ScoringRange.new(lower_bound: 0.5, upper_bound: 1.0, assignment_sets: [
+                                                 ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                         ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @simple_pass.id)
+                                                                                       ])
+                                               ]),
+          ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.5, assignment_sets: [
+                                                 ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                         ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @simple_fail.id)
+                                                                                       ])
+                                               ])
+        ]
+        @simple_rule = @course.conditional_release_rules.create!(trigger_assignment: @simple_trigger, scoring_ranges: ranges)
+
+        @tag_m1_trigger = @module1.add_item(type: "assignment", id: @simple_trigger.id)
+        @module1.completion_requirements = { id: @tag_m1_trigger.id, type: "must_submit" }
+        @module1.save
+
+        @tag_m2_pass = @module2.add_item(type: "assignment", id: @simple_pass.id)
+        @tag_m2_fail = @module2.add_item(type: "assignment", id: @simple_fail.id)
+        @module2.completion_requirements = [
+          { id: @tag_m2_pass.id, type: "must_view" },
+          { id: @tag_m2_fail.id, type: "must_view" }
+        ]
+        @module2.requirement_count = 1
+        @module2.save
+
+        @m3_assmt = @course.assignments.create!
+        @tag_m3 = @module3.add_item(type: "assignment", id: @m3_assmt.id)
+
+        course_with_student(course: @course)
+        @simple_trigger.submit_homework(@student, body: "hi")
+      end
+
+      it "includes unreleased items even with only 2 associations" do
+        expect(@module2.content_tags_for(@student)).to include(@tag_m2_pass)
+      end
+
+      it "does not unlock module 3 until module 2 is completed" do
+        @module1_prog = @module1.evaluate_for(@student)
+        expect(@module1_prog).to be_completed
+
+        @module2_prog = @module2.evaluate_for(@student)
+        expect(@module2_prog).not_to be_completed
+        expect(@module2_prog.workflow_state).to eq("unlocked")
+
+        @module3_prog = @module3.evaluate_for(@student)
+        expect(@module3_prog).to be_locked
+      end
+    end
+
     describe "when a module includes attachments" do
       def create_attachment(context, opts = {})
         opts[:uploaded_data] ||= StringIO.new("attachment content")

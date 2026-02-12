@@ -192,7 +192,7 @@ describe "Submissions API", type: :request do
     end
 
     context "active enrollment_state with active and concluded enrollments" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         e = @course.enroll_user(@student1, "StudentEnrollment", section: @default_section)
         e.conclude
@@ -203,7 +203,7 @@ describe "Submissions API", type: :request do
     end
 
     context "active enrollment_state" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @enrollment_state = "active"
         @active_count = 1
@@ -212,7 +212,7 @@ describe "Submissions API", type: :request do
     end
 
     context "active enrollment_state state_based_on_date=false" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @course.start_at = 10.days.ago
         @course.conclude_at = 2.days.ago
@@ -227,7 +227,7 @@ describe "Submissions API", type: :request do
     end
 
     context "conclude enrollment_state" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @state_based_on_date = true
         @enrollment_state = "concluded"
@@ -237,7 +237,7 @@ describe "Submissions API", type: :request do
     end
 
     context "conclude enrollment_state state_based_on_date=false" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @course.start_at = 10.days.ago
         @course.conclude_at = 2.days.ago
@@ -252,7 +252,7 @@ describe "Submissions API", type: :request do
     end
 
     context "empty enrollment_state" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @enrollment_state = ""
         @active_count = 1
@@ -6323,8 +6323,8 @@ describe "Submissions API", type: :request do
           @user = @student1
         end
 
-        include_examples "file uploads api"
-        include_examples "file uploads api without quotas"
+        it_behaves_like "file uploads api"
+        it_behaves_like "file uploads api without quotas"
 
         # preflight_params has to be first and nameless to keep backwards compat with the include_examples
         def preflight(preflight_params, request_params: {}, api_url: nil)

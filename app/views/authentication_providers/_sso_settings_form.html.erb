@@ -48,6 +48,8 @@
                   "Leave blank for default Canvas behavior") %>
           </div>
         </div>
+
+        <%# BEGIN discovery url logic %>
         <div class="ic-Form-control">
           <%= f.label :auth_discovery_url, t("Discovery URL"),
                       class: 'ic-Label' %>
@@ -59,10 +61,25 @@
 If a discovery URL is set, Canvas will forward all users to that URL when they need to be authenticated.
 That page will need to then help the user figure out where they need to go to log in.
 If no discovery URL is configured, the first configuration will be used to attempt to authenticate the user.
-                TEXT
+                 TEXT
             %>
           </div>
         </div>
+        <%# END discovery url logic %>
+
+        <% if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page) %>
+          <%# BEGIN native discovery url logic %>
+          <div class="ic-Form-control">
+            <%= f.label :native_discovery_enabled, t("Identity Service Discovery Page"), class: 'ic-Label' %>
+            <%= f.hidden_field :native_discovery_enabled, id: 'native_discovery_enabled_field', value: presenter.native_discovery_enabled? %>
+            <div id="native-discovery-page-root"></div>
+            <div class="ic-Form-help-text">
+              <%= t('Enable the Canvas built-in Identity Service discovery page. When enabled, this page will override the Discovery URL above and replace the default discovery experience at /login/discovery.') %>
+            </div>
+          </div>
+          <%# END native discovery logic %>
+        <% end %>
+
         <% if presenter.needs_unknown_user_url? %>
           <div class="ic-Form-control">
             <%= f.label :unknown_user_url, t("Unknown User URL"),

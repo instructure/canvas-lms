@@ -90,15 +90,20 @@ export interface CourseGrade {
   courseId: string
   courseCode: string
   courseName: string
+  originalName?: string
   currentGrade: number | null
   gradingScheme: 'percentage' | GradingStandardData
   lastUpdated?: Date | null
+  courseColor?: string
+  term?: string | null
+  image?: string
 }
 
 export interface CourseGradeCardProps {
   courseId: string
   courseCode: string
   courseName: string
+  originalName?: string
   currentGrade: number | null
   gradingScheme: 'percentage' | GradingStandardData
   lastUpdated?: Date | null
@@ -106,6 +111,9 @@ export interface CourseGradeCardProps {
   gridIndex?: number
   globalGradeVisibility?: boolean
   onGradeVisibilityChange?: (visible: boolean) => void
+  courseColor?: string
+  term?: string | null
+  image?: string
 }
 export interface Announcement {
   id: string
@@ -154,6 +162,7 @@ export interface RecentGradeSubmission {
 
 export interface GradeItemProps {
   submission: RecentGradeSubmission
+  isRightColumn?: boolean
 }
 
 export interface ConversationParticipant {

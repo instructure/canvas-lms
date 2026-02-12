@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery, useQueryClient} from '@tanstack/react-query'
+import {useQuery, useQueryClient, keepPreviousData} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {useState, useCallback, useMemo, useEffect} from 'react'
 import {getCurrentUserId, executeGraphQLQuery} from '../utils/graphql'
@@ -255,6 +255,7 @@ export function useRecentGrades(options: UseRecentGradesOptions = {}) {
   const {
     data: currentPage,
     isLoading,
+    isFetching,
     error,
     refetch: refetchCurrentPage,
   } = useQuery({
@@ -264,6 +265,7 @@ export function useRecentGrades(options: UseRecentGradesOptions = {}) {
     staleTime: QUERY_CONFIG.STALE_TIME.STATISTICS * 60 * 1000,
     persister: widgetDashboardPersister,
     refetchOnMount: false,
+    placeholderData: keepPreviousData,
   })
 
   useBroadcastQuery({
@@ -293,6 +295,8 @@ export function useRecentGrades(options: UseRecentGradesOptions = {}) {
     return refetchCurrentPage()
   }, [queryClient, refetchCurrentPage])
 
+  const isPaginationLoading = isFetching && !!currentPage
+
   return {
     currentPage,
     currentPageIndex,
@@ -302,6 +306,7 @@ export function useRecentGrades(options: UseRecentGradesOptions = {}) {
     resetPagination,
     refetch,
     isLoading,
+    isPaginationLoading,
     error: error as Error | null,
     pageSize,
   }

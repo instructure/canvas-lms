@@ -30,7 +30,7 @@ export const Checkpoint = {
       onlyVisibleToOverrides
       assignmentOverrides {
         nodes {
-          ...AssignmentOverride
+          ...DiscussionPostAssignmentOverride
         }
       }
     }

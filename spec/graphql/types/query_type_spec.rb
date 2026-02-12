@@ -720,9 +720,15 @@ describe Types::QueryType do
                 _id
                 name
               }
-              course {
-                _id
-                name
+              enrollments {
+                course {
+                  _id
+                  name
+                }
+                type
+                role {
+                  name
+                }
               }
             }
           }
@@ -799,8 +805,8 @@ describe Types::QueryType do
         context: { current_user: @observer }
       )
 
-      course_ids = result.dig("data", "courseInstructorsConnection", "nodes")
-                         .pluck("course").pluck("_id").sort
+      nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+      course_ids = nodes.flat_map { |node| node["enrollments"].pluck("course").pluck("_id") }.sort
       expect(course_ids).to eq([@course1.id.to_s, @course2.id.to_s])
     end
 
@@ -828,7 +834,8 @@ describe Types::QueryType do
       # Should only return instructor1 once, not three times (one per section)
       expect(instructors.length).to eq(1)
       expect(instructors[0].dig("user", "name")).to eq("Instructor 1")
-      expect(instructors[0].dig("course", "_id")).to eq(@course1.id.to_s)
+      expect(instructors[0]["enrollments"].length).to eq(1)
+      expect(instructors[0]["enrollments"][0].dig("course", "_id")).to eq(@course1.id.to_s)
     end
 
     it "filters out past enrollments based on course end dates" do
@@ -882,6 +889,49 @@ describe Types::QueryType do
       instructors = result.dig("data", "courseInstructorsConnection", "nodes")
       # Should not return instructors from unpublished courses
       expect(instructors).to be_empty
+    end
+
+    it "groups instructors teaching multiple courses with their enrollments" do
+      @course3.enroll_student(@student, enrollment_state: "active")
+
+      grouped_query = <<~GQL
+        query($courseIds: [ID!]!) {
+          courseInstructorsConnection(courseIds: $courseIds) {
+            nodes {
+              user {
+                _id
+                name
+              }
+              enrollments {
+                course {
+                  _id
+                  name
+                }
+                type
+                role {
+                  name
+                }
+              }
+            }
+          }
+        }
+      GQL
+
+      result = CanvasSchema.execute(
+        grouped_query,
+        variables: { courseIds: [@course1.id.to_s, @course3.id.to_s] },
+        context: { current_user: @student }
+      )
+
+      nodes = result.dig("data", "courseInstructorsConnection", "nodes")
+      expect(nodes.length).to eq(1)
+
+      instructor_node = nodes[0]
+      expect(instructor_node.dig("user", "name")).to eq("Instructor 1")
+      expect(instructor_node["enrollments"].length).to eq(2)
+
+      enrollment_course_ids = instructor_node["enrollments"].pluck("course").pluck("_id").sort
+      expect(enrollment_course_ids).to eq([@course1.id.to_s, @course3.id.to_s].sort)
     end
 
     describe "pagination" do
@@ -1064,7 +1114,9 @@ describe Types::QueryType do
                   user {
                     name
                   }
-                  type
+                  enrollments {
+                    type
+                  }
                 }
               }
             }
@@ -1078,9 +1130,9 @@ describe Types::QueryType do
         teacher_nodes = nodes.select { |n| n["user"]["name"].include?("Teacher User") }
 
         expect(ta_nodes.length).to eq(2)
-        expect(ta_nodes.all? { |n| n["type"] == "TaEnrollment" }).to be true
+        expect(ta_nodes.all? { |n| n["enrollments"].first["type"] == "TaEnrollment" }).to be true
         expect(teacher_nodes.length).to eq(1)
-        expect(teacher_nodes.first["type"]).to eq("TeacherEnrollment")
+        expect(teacher_nodes.first["enrollments"].first["type"]).to eq("TeacherEnrollment")
       end
 
       it "returns TAs when course has only TAs and no teachers" do
@@ -1128,7 +1180,9 @@ describe Types::QueryType do
                   _id
                   name
                 }
-                type
+                enrollments {
+                  type
+                }
               }
             }
           }
@@ -1148,7 +1202,7 @@ describe Types::QueryType do
         instructor_names = nodes.pluck("user").pluck("name").sort
         expect(instructor_names).to eq(["Filter Teacher 1", "Filter Teacher 2"])
 
-        types = nodes.pluck("type").uniq
+        types = nodes.flat_map { |n| n["enrollments"].pluck("type") }.uniq
         expect(types).to eq(["TeacherEnrollment"])
       end
 
@@ -1165,7 +1219,7 @@ describe Types::QueryType do
         instructor_names = nodes.pluck("user").pluck("name").sort
         expect(instructor_names).to eq(["Filter TA 1", "Filter TA 2"])
 
-        types = nodes.pluck("type").uniq
+        types = nodes.flat_map { |n| n["enrollments"].pluck("type") }.uniq
         expect(types).to eq(["TaEnrollment"])
       end
 
@@ -1185,7 +1239,7 @@ describe Types::QueryType do
         instructor_names = nodes.pluck("user").pluck("name").sort
         expect(instructor_names).to eq(["Filter TA 1", "Filter TA 2", "Filter Teacher 1", "Filter Teacher 2"])
 
-        types = nodes.pluck("type").uniq.sort
+        types = nodes.flat_map { |n| n["enrollments"].pluck("type") }.uniq.sort
         expect(types).to eq(["TaEnrollment", "TeacherEnrollment"])
       end
 
@@ -1227,7 +1281,7 @@ describe Types::QueryType do
         nodes = result.dig("data", "courseInstructorsConnection", "nodes")
         expect(nodes.length).to eq(2)
 
-        types = nodes.pluck("type").uniq
+        types = nodes.flat_map { |n| n["enrollments"].pluck("type") }.uniq
         expect(types).to eq(["TeacherEnrollment"])
       end
     end
@@ -1269,7 +1323,9 @@ describe Types::QueryType do
               courseInstructorsConnection(courseIds: $courseIds) {
                 nodes {
                   user { name }
-                  enrollmentState
+                  enrollments {
+                    enrollmentState
+                  }
                 }
               }
             }
@@ -1278,7 +1334,7 @@ describe Types::QueryType do
           context: { current_user: @priority_student }
         )
 
-        enrollment_state = result_with_state.dig("data", "courseInstructorsConnection", "nodes", 0, "enrollmentState")
+        enrollment_state = result_with_state.dig("data", "courseInstructorsConnection", "nodes", 0, "enrollments", 0, "enrollmentState")
         expect(enrollment_state).to eq("active")
       end
 
@@ -1319,7 +1375,9 @@ describe Types::QueryType do
               courseInstructorsConnection(courseIds: $courseIds) {
                 nodes {
                   user { name }
-                  type
+                  enrollments {
+                    type
+                  }
                 }
               }
             }
@@ -1331,8 +1389,10 @@ describe Types::QueryType do
         nodes = result.dig("data", "courseInstructorsConnection", "nodes")
         dual_role_nodes = nodes.select { |n| n["user"]["name"] == "Dual Role Instructor" }
 
-        # Should return only one enrollment (deduplicated by course_id + user_id)
+        # Should return one instructor with one enrollment (deduplicated by course + user)
+        # The DISTINCT ON query picks the highest priority enrollment
         expect(dual_role_nodes.length).to eq(1)
+        expect(dual_role_nodes.first["enrollments"].length).to eq(1)
       end
 
       it "filters out completed enrollments even when user has no active enrollment" do
@@ -1375,23 +1435,41 @@ describe Types::QueryType do
         @course_m.enroll_teacher(@instructor_m).accept!
       end
 
-      it "sorts by course name ascending, then by user sortable name ascending" do
+      it "sorts instructors by sortable name, then courses within enrollments by name" do
         result = CanvasSchema.execute(
-          query,
+          <<~GQL,
+            query($courseIds: [ID!]!) {
+              courseInstructorsConnection(courseIds: $courseIds) {
+                nodes {
+                  user {
+                    name
+                    sortableName
+                  }
+                  enrollments {
+                    course {
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          GQL
           variables: { courseIds: [@course_z.id.to_s, @course_a.id.to_s, @course_m.id.to_s] },
           context: { current_user: @sort_student }
         )
 
         nodes = result.dig("data", "courseInstructorsConnection", "nodes")
-        course_names = nodes.pluck("course").pluck("name")
 
-        # Should be sorted by course name: A Course, M Course, Z Course
-        expect(course_names).to eq(["A Course", "A Course", "M Course", "Z Course"])
+        # Should return 3 instructors, sorted by sortable name
+        expect(nodes.length).to eq(3)
+        instructor_names = nodes.pluck("user").pluck("sortableName")
+        expect(instructor_names).to eq(["A, Instructor", "M, Instructor", "Z, Instructor"])
 
-        # Within A Course, should be sorted by sortable name: A then Z
-        a_course_instructors = nodes.select { |n| n["course"]["name"] == "A Course" }
-        a_course_names = a_course_instructors.pluck("user").pluck("name")
-        expect(a_course_names).to eq(["Instructor A", "Instructor Z"])
+        # Instructor Z has enrollments in both A Course and Z Course
+        # Courses within enrollments should be sorted alphabetically
+        instructor_z_node = nodes.find { |n| n["user"]["name"] == "Instructor Z" }
+        z_courses = instructor_z_node["enrollments"].pluck("course").pluck("name")
+        expect(z_courses).to eq(["A Course", "Z Course"])
       end
     end
 

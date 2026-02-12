@@ -113,6 +113,7 @@ export default function LtiAssetReportStatus({
         variant="inline"
         themeOverride={statusDisplayProps.linkThemeOverride}
         data-pendo={statusDisplayProps.linkDataPendo}
+        aria-haspopup="dialog"
       >
         {statusDisplayProps.title}
       </Link>

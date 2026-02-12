@@ -45,3 +45,9 @@ course_pace_enable_from_account_setting:
   applies_to: RootAccount
   display_name: Account Setting to enable or disable course paces
   description: Allows controlling whether the course pacing feature is enabled from an account setting
+
+course_pace_remove_overrides_on_disable:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Remove Course Pacing overrides when disabled
+  description: When Course Pacing is disabled for a course, automatically removes all assignment overrides created by Course Pacing

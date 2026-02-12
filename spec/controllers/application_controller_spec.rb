@@ -246,6 +246,32 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context "FEATURES[:peer_review_allocation_and_grading]" do
+          before do
+            course_with_user("TeacherEnrollment", user: @user, active_all: true)
+            allow(controller).to receive("api_v1_course_ping_url").and_return({})
+          end
+
+          it "is set to true when feature flag is enabled for the course" do
+            @course.enable_feature!(:peer_review_allocation_and_grading)
+            controller.instance_variable_set(:@context, @course)
+            expect(controller.js_env[:FEATURES][:peer_review_allocation_and_grading]).to be true
+          end
+
+          it "is set to false when feature flag is disabled for the course" do
+            @course.disable_feature!(:peer_review_allocation_and_grading)
+            controller.instance_variable_set(:@context, @course)
+            expect(controller.js_env[:FEATURES][:peer_review_allocation_and_grading]).to be false
+          end
+
+          it "is not set when context is not a Course" do
+            account = Account.default
+            account.enable_feature!(:peer_review_allocation_and_grading)
+            controller.instance_variable_set(:@context, account)
+            expect(controller.js_env[:FEATURES][:peer_review_allocation_and_grading]).to be_nil
+          end
+        end
+
         context "widget_dashboard_overridable" do
           it "is not set when feature flag is off" do
             expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
@@ -261,9 +287,9 @@ RSpec.describe ApplicationController do
             expect(controller.js_env[:widget_dashboard_overridable]).to be false
           end
 
-          it "is not set when feature flag is in 'on' state" do
+          it "is set to false when feature flag is in 'on' state and user has no preference (requires opt-in)" do
             Account.default.enable_feature!(:widget_dashboard)
-            expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            expect(controller.js_env[:widget_dashboard_overridable]).to be false
           end
 
           it "respects user preference when feature is in 'allowed_on' state" do
@@ -271,6 +297,43 @@ RSpec.describe ApplicationController do
             @user.preferences[:widget_dashboard_user_preference] = false
             @user.save!
             expect(controller.js_env[:widget_dashboard_overridable]).to be false
+          end
+
+          context "enrollment-based eligibility" do
+            before do
+              Account.default.set_feature_flag!(:widget_dashboard, "allowed_on")
+            end
+
+            it "is not set for users with teacher enrollment" do
+              course_with_teacher(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is not set for users with TA enrollment" do
+              course_with_ta(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is not set for users with designer enrollment" do
+              course_with_designer(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is set for users with only student enrollment" do
+              course_with_student(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is set for users with observer enrollment" do
+              course_with_observer(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is not set for users with mixed teacher and student enrollment" do
+              course_with_teacher(user: @user, active_all: true)
+              course_with_student(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
           end
         end
       end
@@ -3905,7 +3968,6 @@ RSpec.describe ApplicationController, "#cached_js_env_account_features" do
     flags = controller.cached_js_env_account_features
 
     expect(flags).to have_key(:course_pace_pacing_with_mastery_paths)
-    expect(flags).to have_key(:new_quizzes_surveys)
   end
 
   it "does not include course-level feature flags" do
@@ -3985,5 +4047,40 @@ RSpec.describe ApplicationController, "#render_native_new_quizzes" do
     end
 
     controller.send(:render_native_new_quizzes)
+  end
+
+  describe "#set_js_assignment_data peer_review inclusion logic" do
+    let(:course) { course_factory(active_all: true) }
+    let(:account) { Account.default }
+
+    it "evaluates to true when context is a Course and feature flag is enabled" do
+      course.enable_feature!(:peer_review_allocation_and_grading)
+      controller.instance_variable_set(:@context, course)
+
+      course_has_peer_reviews_enabled = controller.instance_variable_get(:@context).is_a?(Course) &&
+                                        controller.instance_variable_get(:@context).feature_enabled?(:peer_review_allocation_and_grading)
+
+      expect(course_has_peer_reviews_enabled).to be true
+    end
+
+    it "evaluates to false when context is a Course and feature flag is disabled" do
+      course.disable_feature!(:peer_review_allocation_and_grading)
+      controller.instance_variable_set(:@context, course)
+
+      course_has_peer_reviews_enabled = controller.instance_variable_get(:@context).is_a?(Course) &&
+                                        controller.instance_variable_get(:@context).feature_enabled?(:peer_review_allocation_and_grading)
+
+      expect(course_has_peer_reviews_enabled).to be false
+    end
+
+    it "evaluates to false when context is not a Course even if feature flag is enabled" do
+      account.enable_feature!(:peer_review_allocation_and_grading)
+      controller.instance_variable_set(:@context, account)
+
+      course_has_peer_reviews_enabled = controller.instance_variable_get(:@context).is_a?(Course) &&
+                                        controller.instance_variable_get(:@context).feature_enabled?(:peer_review_allocation_and_grading)
+
+      expect(course_has_peer_reviews_enabled).to be false
+    end
   end
 end

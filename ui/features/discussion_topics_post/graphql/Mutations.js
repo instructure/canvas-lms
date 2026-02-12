@@ -226,7 +226,7 @@ export const UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT = gql`
       input: {splitScreenViewDeeplyNestedAlert: $splitScreenViewDeeplyNestedAlert}
     ) {
       user {
-        ...User
+        ...DiscussionPostUser
       }
     }
   }

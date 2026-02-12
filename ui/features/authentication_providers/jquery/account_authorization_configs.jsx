@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import AuthTypePicker from '../react/AuthTypePicker'
 import authenticationProviders from './index'
 import $ from 'jquery'
@@ -39,7 +39,7 @@ ready(() => {
     value: 'default',
   })
 
-  ReactDOM.render(
+  legacyRender(
     <AuthTypePicker
       authTypes={authTypeOptions}
       onChange={authenticationProviders.changedAuthType}

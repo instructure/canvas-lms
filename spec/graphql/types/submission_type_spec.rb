@@ -1127,6 +1127,489 @@ describe Types::SubmissionType do
     it "returns assetString" do
       expect(submission_type.resolve("turnitinData { assetString }")).to eq [@submission.asset_string]
     end
+
+    context "with originality reports" do
+      before(:once) do
+        @assignment_with_tii = @course.assignments.create!(
+          name: "assignment with turnitin",
+          submission_types: "online_upload",
+          turnitin_enabled: true
+        )
+        @assignment_with_tii.update(
+          turnitin_settings: { originality_report_visibility: "after_grading" }
+        )
+
+        @attachment = attachment_model
+        @attachment.context = @student
+        @attachment.save!
+
+        @submission_with_tii = @assignment_with_tii.submit_homework(
+          @student,
+          submission_type: "online_upload",
+          attachments: [@attachment]
+        )
+
+        @originality_report = OriginalityReport.create!(
+          attachment: @attachment,
+          submission: @submission_with_tii,
+          originality_score: 75.5,
+          workflow_state: "scored",
+          submission_time: @submission_with_tii.submitted_at,
+          originality_report_url: "http://example.com/report"
+        )
+      end
+
+      let(:submission_with_tii_type) { GraphQLTypeTester.new(@submission_with_tii, current_user: @teacher) }
+
+      it "returns data from originality reports" do
+        expect(
+          submission_with_tii_type.resolve("turnitinData { score }")
+        ).to eq [75.5]
+      end
+
+      it "returns status from originality report" do
+        expect(
+          submission_with_tii_type.resolve("turnitinData { status }")
+        ).to eq ["scored"]
+      end
+
+      it "returns state from originality report" do
+        # State is calculated from originality_score: 75.5% >= 75 = "failure"
+        expect(
+          submission_with_tii_type.resolve("turnitinData { state }")
+        ).to eq ["failure"]
+      end
+
+      it "returns reportUrl from originality report" do
+        result = submission_with_tii_type.resolve("turnitinData { reportUrl }")
+        expect(result).to eq ["http://example.com/report"]
+      end
+
+      context "permissions" do
+        it "returns turnitin data for teachers" do
+          result = submission_with_tii_type.resolve("turnitinData { score }")
+          expect(result).to eq [75.5]
+        end
+
+        it "does not return turnitin data for students before grading" do
+          student_type = GraphQLTypeTester.new(@submission_with_tii, current_user: @student)
+          result = student_type.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+
+        it "returns turnitin data for students after grading" do
+          @assignment_with_tii.grade_student(@student, grade: 80, grader: @teacher)
+          student_type = GraphQLTypeTester.new(@submission_with_tii, current_user: @student)
+          result = student_type.resolve("turnitinData { score }")
+          expect(result).to eq [75.5]
+        end
+
+        it "does not return turnitin data for unauthorized users" do
+          other_student = student_in_course(active_all: true).user
+          other_type = GraphQLTypeTester.new(@submission_with_tii, current_user: other_student)
+          result = other_type.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+      end
+
+      context "edge cases" do
+        it "returns nil when no originality reports exist" do
+          # Create a new assignment without any turnitin setup to avoid data from parent test
+          clean_assignment = @course.assignments.create!(
+            name: "clean assignment",
+            submission_types: "online_text_entry"
+          )
+          submission_without_data = clean_assignment.submit_homework(@student, body: "test")
+          type_without = GraphQLTypeTester.new(submission_without_data, current_user: @teacher)
+          result = type_without.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+
+        it "returns nil for unsubmitted submissions" do
+          # Create a second student who hasn't submitted yet
+          other_student = student_in_course(course: @course, active_all: true).user
+          unsubmitted = @assignment_with_tii.submissions.find_by!(user: other_student)
+          type_unsubmitted = GraphQLTypeTester.new(unsubmitted, current_user: @teacher)
+          result = type_unsubmitted.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+      end
+
+      context "with CPF migration" do
+        before(:once) do
+          @assignment_with_tii.assignment_configuration_tool_lookups.create!(
+            tool_product_code: "turnitin-lti",
+            tool_vendor_code: "turnitin.com",
+            tool_resource_type_code: "resource-type-code",
+            tool_type: "Lti::MessageHandler"
+          )
+        end
+
+        it "returns nil when assignment is CPF migrated" do
+          allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(true)
+          result = submission_with_tii_type.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+
+        it "returns turnitin data when assignment is not CPF migrated" do
+          allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(false)
+          result = submission_with_tii_type.resolve("turnitinData { score }")
+          expect(result).to eq [75.5]
+        end
+      end
+
+      context "with multiple originality reports" do
+        before(:once) do
+          # Create a pending report
+          @pending_report = OriginalityReport.create!(
+            attachment: @attachment,
+            submission: @submission_with_tii,
+            workflow_state: "pending",
+            originality_score: nil
+          )
+
+          # Create a second scored report (should be preferred)
+          @scored_report = OriginalityReport.create!(
+            attachment: @attachment,
+            submission: @submission_with_tii,
+            originality_score: 85.0,
+            workflow_state: "scored"
+          )
+        end
+
+        it "prefers scored report over pending report" do
+          result = submission_with_tii_type.resolve("turnitinData { score }")
+          expect(result).to include(85.0)
+        end
+      end
+    end
+
+    context "with timestamp-based asset strings" do
+      before(:once) do
+        @submission_with_timestamp = @course.assignments.create!(
+          name: "assignment for resubmission",
+          submission_types: "online_text_entry"
+        ).submit_homework(@student, body: "attempt 1", submission_type: "online_text_entry")
+
+        @timestamp1 = @submission_with_timestamp.submitted_at.utc.iso8601
+        @asset_string_with_timestamp = "#{@submission_with_timestamp.asset_string}_#{@timestamp1}"
+
+        @submission_with_timestamp.turnitin_data[@asset_string_with_timestamp] = {
+          similarity_score: 88.0,
+          state: "failure",
+          report_url: "http://example.com/report1",
+          status: "scored"
+        }
+        @submission_with_timestamp.save!
+      end
+
+      let(:submission_with_timestamp_type) { GraphQLTypeTester.new(@submission_with_timestamp, current_user: @teacher) }
+
+      it "handles submission asset strings with ISO8601 timestamps" do
+        result = submission_with_timestamp_type.resolve("turnitinData { assetString }")
+        expect(result).to eq [@asset_string_with_timestamp]
+      end
+
+      it "returns correct target for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { target { ...on Submission { _id } } }")
+        expect(result).to eq [@submission_with_timestamp.id.to_s]
+      end
+
+      it "returns correct score for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { score }")
+        expect(result).to eq [88.0]
+      end
+
+      it "returns correct state for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { state }")
+        expect(result).to eq ["failure"]
+      end
+
+      it "returns correct status for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { status }")
+        expect(result).to eq ["scored"]
+      end
+
+      it "returns correct reportUrl for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { reportUrl }")
+        expect(result).to eq ["http://example.com/report1"]
+      end
+    end
+
+    context "with multiple resubmissions" do
+      before(:once) do
+        @assignment_multi = @course.assignments.create!(
+          name: "assignment with multiple attempts",
+          submission_types: "online_text_entry"
+        )
+
+        # First submission
+        @submission_multi = @assignment_multi.submit_homework(@student, body: "attempt 1", submission_type: "online_text_entry")
+        @timestamp1 = @submission_multi.submitted_at.utc.iso8601
+        @asset_string1 = "#{@submission_multi.asset_string}_#{@timestamp1}"
+
+        # Resubmit
+        Timecop.freeze(1.hour.from_now) do
+          @submission_multi = @assignment_multi.submit_homework(@student, body: "attempt 2", submission_type: "online_text_entry")
+          @timestamp2 = @submission_multi.submitted_at.utc.iso8601
+          @asset_string2 = "#{@submission_multi.asset_string}_#{@timestamp2}"
+        end
+
+        # Add turnitin data for both attempts
+        @submission_multi.turnitin_data[@asset_string1] = {
+          similarity_score: 88.0,
+          state: "failure",
+          report_url: "http://example.com/attempt1",
+          status: "scored"
+        }
+        @submission_multi.turnitin_data[@asset_string2] = {
+          similarity_score: 35.0,
+          state: "warning",
+          report_url: "http://example.com/attempt2",
+          status: "scored"
+        }
+        @submission_multi.save!
+      end
+
+      let(:submission_multi_type) { GraphQLTypeTester.new(@submission_multi, current_user: @teacher) }
+
+      it "returns turnitin data for all resubmissions" do
+        result = submission_multi_type.resolve("turnitinData { assetString }")
+        expect(result).to contain_exactly(@asset_string1, @asset_string2)
+      end
+
+      it "returns different scores for different attempts" do
+        result = submission_multi_type.resolve("turnitinData { score }")
+        expect(result).to contain_exactly(88.0, 35.0)
+      end
+
+      it "returns different states for different attempts" do
+        result = submission_multi_type.resolve("turnitinData { state }")
+        expect(result).to contain_exactly("failure", "warning")
+      end
+
+      it "returns different reportUrls for different attempts" do
+        result = submission_multi_type.resolve("turnitinData { reportUrl }")
+        expect(result).to contain_exactly("http://example.com/attempt1", "http://example.com/attempt2")
+      end
+
+      it "returns same target (submission) for all attempts" do
+        result = submission_multi_type.resolve("turnitinData { target { ...on Submission { _id } } }")
+        expect(result).to eq [@submission_multi.id.to_s, @submission_multi.id.to_s]
+      end
+    end
+
+    context "with attachment asset strings" do
+      before(:once) do
+        @assignment_with_attachment = @course.assignments.create!(
+          name: "assignment with attachment",
+          submission_types: "online_upload"
+        )
+
+        @attachment = attachment_model(context: @student, filename: "test.pdf")
+        @submission_with_attachment = @assignment_with_attachment.submit_homework(
+          @student,
+          submission_type: "online_upload",
+          attachments: [@attachment]
+        )
+
+        @attachment_asset_string = @attachment.asset_string
+
+        @submission_with_attachment.turnitin_data[@attachment_asset_string] = {
+          similarity_score: 50.0,
+          state: "problem",
+          report_url: "http://example.com/attachment_report",
+          status: "scored"
+        }
+        @submission_with_attachment.save!
+      end
+
+      let(:submission_with_attachment_type) { GraphQLTypeTester.new(@submission_with_attachment, current_user: @teacher) }
+
+      it "returns attachment asset string" do
+        result = submission_with_attachment_type.resolve("turnitinData { assetString }")
+        expect(result).to eq [@attachment_asset_string]
+      end
+
+      it "resolves target to File type for attachment asset strings" do
+        result = submission_with_attachment_type.resolve("turnitinData { target { ...on File { _id } } }")
+        expect(result).to eq [@attachment.id.to_s]
+      end
+
+      it "returns correct score for attachment" do
+        result = submission_with_attachment_type.resolve("turnitinData { score }")
+        expect(result).to eq [50.0]
+      end
+
+      it "returns correct state for attachment" do
+        result = submission_with_attachment_type.resolve("turnitinData { state }")
+        expect(result).to eq ["problem"]
+      end
+    end
+
+    context "edge cases" do
+      it "returns nil when turnitin_data is empty" do
+        empty_submission = @course.assignments.create!(
+          name: "assignment without turnitin",
+          submission_types: "online_text_entry"
+        ).submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+        empty_type = GraphQLTypeTester.new(empty_submission, current_user: @teacher)
+        result = empty_type.resolve("turnitinData { score }")
+        expect(result).to be_nil
+      end
+
+      it "filters out entries where target is nil" do
+        @submission_edge = @course.assignments.create!(
+          name: "edge case assignment",
+          submission_types: "online_text_entry"
+        ).submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+        # Add entry with valid submission asset string
+        valid_asset_string = "#{@submission_edge.asset_string}_2026-01-01T00:00:00Z"
+        @submission_edge.turnitin_data[valid_asset_string] = {
+          similarity_score: 10.0,
+          state: "acceptable",
+          report_url: "http://example.com",
+          status: "scored"
+        }
+
+        # Add entry with non-existent attachment (should be filtered out)
+        @submission_edge.turnitin_data["attachment_99999999"] = {
+          similarity_score: 20.0,
+          state: "acceptable",
+          report_url: "http://example.com",
+          status: "scored"
+        }
+        @submission_edge.save!
+
+        edge_type = GraphQLTypeTester.new(@submission_edge, current_user: @teacher)
+        result = edge_type.resolve("turnitinData { assetString }")
+        # Should only return the valid submission asset string
+        expect(result).to eq [valid_asset_string]
+      end
+
+      it "handles malformed asset strings gracefully" do
+        @submission_malformed = @course.assignments.create!(
+          name: "malformed assignment",
+          submission_types: "online_text_entry"
+        ).submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+        # Add entry with completely malformed asset string (not submission_ or attachment_)
+        @submission_malformed.turnitin_data["invalid_asset_string"] = {
+          similarity_score: 10.0,
+          state: "acceptable",
+          report_url: "http://example.com",
+          status: "scored"
+        }
+        @submission_malformed.save!
+
+        malformed_type = GraphQLTypeTester.new(@submission_malformed, current_user: @teacher)
+        result = malformed_type.resolve("turnitinData { assetString }")
+        # Should return empty array for invalid asset strings
+        expect(result).to eq([])
+      end
+    end
+  end
+
+  describe "vericite_data" do
+    before(:once) do
+      @assignment_vericite = @course.assignments.create!(
+        name: "assignment with vericite",
+        submission_types: "online_text_entry",
+        vericite_enabled: true
+      )
+      @submission_vericite = @assignment_vericite.submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+      @vericite_asset_string = @submission_vericite.asset_string
+      @submission_vericite.turnitin_data[@vericite_asset_string] = {
+        similarity_score: 45.0,
+        state: "warning",
+        report_url: "http://vericite.example.com",
+        status: "scored"
+      }
+      @submission_vericite.turnitin_data[:provider] = "vericite"
+      @submission_vericite.save!
+    end
+
+    let(:submission_vericite_type) { GraphQLTypeTester.new(@submission_vericite, current_user: @teacher) }
+
+    it "returns vericite data when enabled" do
+      result = submission_vericite_type.resolve("vericiteData { score }")
+      expect(result).to eq [45.0]
+    end
+
+    it "returns correct state" do
+      result = submission_vericite_type.resolve("vericiteData { state }")
+      expect(result).to eq ["warning"]
+    end
+
+    it "returns correct status" do
+      result = submission_vericite_type.resolve("vericiteData { status }")
+      expect(result).to eq ["scored"]
+    end
+
+    it "returns correct reportUrl" do
+      result = submission_vericite_type.resolve("vericiteData { reportUrl }")
+      expect(result).to eq ["http://vericite.example.com"]
+    end
+
+    it "returns correct assetString" do
+      result = submission_vericite_type.resolve("vericiteData { assetString }")
+      expect(result).to eq [@vericite_asset_string]
+    end
+
+    it "returns correct target" do
+      result = submission_vericite_type.resolve("vericiteData { target { ...on Submission { _id } } }")
+      expect(result).to eq [@submission_vericite.id.to_s]
+    end
+
+    context "with timestamp-based asset strings" do
+      before(:once) do
+        @timestamp_vericite = @submission_vericite.submitted_at.utc.iso8601
+        @vericite_asset_with_timestamp = "#{@submission_vericite.asset_string}_#{@timestamp_vericite}"
+
+        @submission_vericite.turnitin_data[@vericite_asset_with_timestamp] = {
+          similarity_score: 65.0,
+          state: "problem",
+          report_url: "http://vericite.example.com/timestamp",
+          status: "scored"
+        }
+        @submission_vericite.save!
+      end
+
+      it "handles vericite data with timestamps" do
+        result = submission_vericite_type.resolve("vericiteData { assetString }")
+        expect(result).to include(@vericite_asset_with_timestamp)
+      end
+
+      it "returns correct score for timestamp-based vericite data" do
+        result = submission_vericite_type.resolve("vericiteData { score }")
+        expect(result).to include(65.0)
+      end
+    end
+
+    context "permissions" do
+      it "returns nil when vericite is not enabled" do
+        @assignment_no_vericite = @course.assignments.create!(
+          name: "assignment without vericite",
+          submission_types: "online_text_entry",
+          vericite_enabled: false
+        )
+        @submission_no_vericite = @assignment_no_vericite.submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+        no_vericite_type = GraphQLTypeTester.new(@submission_no_vericite, current_user: @teacher)
+        result = no_vericite_type.resolve("vericiteData { score }")
+        expect(result).to be_nil
+      end
+
+      it "checks view_vericite_report permission" do
+        other_student = student_in_course(active_all: true).user
+        other_type = GraphQLTypeTester.new(@submission_vericite, current_user: other_student)
+        result = other_type.resolve("vericiteData { score }")
+        expect(result).to be_nil
+      end
+    end
   end
 
   describe "submissionType" do

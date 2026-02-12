@@ -62,13 +62,13 @@ module Accessibility
     end
 
     def check_table_caption_feature
-      unless Account.site_admin.feature_enabled?(:a11y_checker_ai_table_caption_generation)
+      unless @context.a11y_checker_ai_table_caption_generation?
         render status: :forbidden
       end
     end
 
     def check_alt_text_feature
-      unless Account.site_admin.feature_enabled?(:a11y_checker_ai_alt_text_generation)
+      unless @context.a11y_checker_ai_alt_text_generation?
         render status: :forbidden
       end
     end

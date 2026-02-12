@@ -43,8 +43,8 @@ export const App = () => {
       <AccessibilityCheckerContext.Provider
         value={{selectedItem, setSelectedItem, isTrayOpen, setIsTrayOpen}}
       >
-        <AccessibilityWizard />
         <QueryClientProvider client={queryClient}>
+          <AccessibilityWizard />
           <AccessibilityCourseScan courseId={courseId} scanDisabled={scanDisabled}>
             <AccessibilityCheckerApp />
           </AccessibilityCourseScan>

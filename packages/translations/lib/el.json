@@ -335,6 +335,9 @@
     "previous_bd2ac015": {
         "message": "Προηγούμενο"
     },
+    "processing_8c569014": {
+        "message": "Γίνεται Επεξεργασία..."
+    },
     "published_c944a23d": {
         "message": "δημοσιευμένο/α"
     },
@@ -427,6 +430,9 @@
     },
     "up_c553575d": {
         "message": "Επάνω"
+    },
+    "upload_8b403d05": {
+        "message": "Μεταφόρτωση"
     },
     "upload_file_fd2361b8": {
         "message": "Φόρτωση Αρχείου"

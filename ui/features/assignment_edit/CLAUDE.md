@@ -35,6 +35,7 @@ window.top.postMessage({ subject: 'ASGMT.togglePeerReviews', enabled: false }, '
 | Grading Type → "Not Graded" | Disables peer reviews |
 | Moderated Grading enabled | Disables peer reviews + group assignments |
 | Group Category selected | Shows "within groups" peer review option |
+| Submission Type → "External Tool" | Disables peer reviews |
 
 ### Rubrics Are Different
 

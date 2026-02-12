@@ -22,7 +22,7 @@ require_relative "common_helper_methods/custom_screen_actions"
 require_relative "patches/selenium/webdriver/remote/w3c/bridge"
 require_relative "test_only_routes"
 
-# rubocop:disable Rails/Output
+# rubocop:disable Rails/Output, RSpec/Output
 module SeleniumDriverSetup
   CONFIG = ConfigFile.load("selenium") || {}.freeze
   SECONDS_UNTIL_GIVING_UP = 10
@@ -401,7 +401,7 @@ module SeleniumDriverSetup
 
     def spec_safe_rack_app
       app = base_rack_app
-      TestOnlyRoutes.create_routes(app)
+      # Routes now registered in config/routes.rb wrapped in Rails.env.test?
 
       lambda do |env|
         nope = [503, {}, [""]]
@@ -474,7 +474,7 @@ module SeleniumDriverSetup
     end
   end
 end
-# rubocop:enable Rails/Output
+# rubocop:enable Rails/Output, RSpec/Output
 
 # make Wait play nicely with Timecop
 module Selenium::WebDriver::Wait::Time

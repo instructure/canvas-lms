@@ -1929,6 +1929,26 @@ describe Submission do
       expect(submission.score).to eq 650
       expect(submission.points_deducted).to eq 150
     end
+
+    it "handles points_deducted values over 9999.99 without overflow" do
+      assignment = @course.assignments.create!(
+        points_possible: 100_000,
+        submission_types: "online_text_entry",
+        due_at: 2.days.ago(@date)
+      )
+
+      @late_policy.update!(late_submission_deduction: 10.0, late_submission_interval: "day")
+
+      Timecop.freeze(@date) do
+        assignment.submit_homework(@student, body: "late submission")
+        assignment.grade_student(@student, grade: 100_000, grader: @teacher)
+
+        submission = assignment.submissions.find_by(user_id: @student)
+
+        expect(submission.points_deducted).to eq(20_000.0)
+        expect(submission.score).to eq(80_000.0)
+      end
+    end
   end
 
   include_context "url validation tests"
@@ -10690,6 +10710,43 @@ describe Submission do
 
     it "is false for others" do
       expect(@submission.peer_reviewer?(user_factory)).to be false
+    end
+  end
+
+  describe "#peer_reviewer_for?" do
+    before do
+      student_in_course(active_all: true)
+      @peer_reviewer = user_factory
+      @course.enroll_student(@peer_reviewer).accept!
+      @assignment = @course.assignments.build(
+        title: "Peer Reviews",
+        submission_types: "online_text_entry",
+        peer_reviews: true
+      )
+      @assignment.save!
+      @submission = @assignment.submission_for_student(@student)
+      @submission.assessment_requests.create!(
+        user: @student,
+        assessor: @peer_reviewer,
+        assessor_asset: @submission
+      )
+    end
+
+    it "caches false values to prevent N+1 queries" do
+      # Expect peer_reviewer? to be called only once, not on subsequent calls
+      expect(@submission).to receive(:peer_reviewer?).with(@student).once.and_call_original
+
+      # Call multiple times - should only query once
+      expect(@submission.peer_reviewer_for?(@student)).to be false
+      expect(@submission.peer_reviewer_for?(@student)).to be false
+      expect(@submission.peer_reviewer_for?(@student)).to be false
+    end
+
+    it "caches true values" do
+      expect(@submission).to receive(:peer_reviewer?).with(@peer_reviewer).once.and_call_original
+
+      expect(@submission.peer_reviewer_for?(@peer_reviewer)).to be true
+      expect(@submission.peer_reviewer_for?(@peer_reviewer)).to be true
     end
   end
 

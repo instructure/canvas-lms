@@ -1673,6 +1673,204 @@ describe "Accounts API", type: :request do
       expect(json.pluck("name")).to match_array(["c2"])
     end
 
+    context "career_learning_library_only filtering" do
+      before :once do
+        @test_account = Account.create!
+        @test_account.enable_feature!(:horizon_learning_library_ms2)
+        @test_account.enable_feature!(:horizon_course_setting)
+        @test_account.settings[:horizon_account] = { value: true }
+        @test_account.save!
+
+        @admin = account_admin_user(account: @test_account)
+
+        @regular_course = course_factory(
+          account: @test_account,
+          course_name: "Regular Course"
+        )
+        @regular_course.career_learning_library_only = false
+        @regular_course.save!
+
+        @cll_course = course_factory(
+          account: @test_account,
+          course_name: "Career Learning Library Course"
+        )
+        @cll_course.career_learning_library_only = true
+        @cll_course.save!
+      end
+
+      it "returns all courses when parameter is not provided" do
+        json = api_call_as_user(@admin,
+                                :get,
+                                "/api/v1/accounts/#{@test_account.id}/courses",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: @test_account.to_param,
+                                format: "json")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Regular Course")
+        expect(course_names).to include("Career Learning Library Course")
+      end
+
+      it "returns only career_learning_library_only courses when parameter is true" do
+        json = api_call_as_user(@admin,
+                                :get,
+                                "/api/v1/accounts/#{@test_account.id}/courses?career_learning_library_only=true",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: @test_account.to_param,
+                                format: "json",
+                                career_learning_library_only: "true")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Career Learning Library Course")
+        expect(course_names).not_to include("Regular Course")
+      end
+
+      it "returns only regular courses when parameter is false" do
+        json = api_call_as_user(@admin,
+                                :get,
+                                "/api/v1/accounts/#{@test_account.id}/courses?career_learning_library_only=false",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: @test_account.to_param,
+                                format: "json",
+                                career_learning_library_only: "false")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Regular Course")
+        expect(course_names).not_to include("Career Learning Library Course")
+      end
+
+      it "works in any account with the feature flag enabled" do
+        regular_account = Account.create!
+        regular_account.enable_feature!(:horizon_learning_library_ms2)
+        regular_account.enable_feature!(:horizon_course_setting)
+        regular_account.settings[:horizon_account] = { value: true }
+        regular_account.save!
+        admin = account_admin_user(account: regular_account)
+
+        regular_course = course_factory(
+          account: regular_account,
+          course_name: "Regular Test Course"
+        )
+        regular_course.career_learning_library_only = false
+        regular_course.save!
+
+        cll_course = course_factory(
+          account: regular_account,
+          course_name: "CLL Test Course"
+        )
+        cll_course.career_learning_library_only = true
+        cll_course.save!
+
+        # Without parameter, should return all courses
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{regular_account.id}/courses",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: regular_account.to_param,
+                                format: "json")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Regular Test Course")
+        expect(course_names).to include("CLL Test Course")
+
+        # With parameter=true, should return only CLL courses
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{regular_account.id}/courses?career_learning_library_only=true",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: regular_account.to_param,
+                                format: "json",
+                                career_learning_library_only: "true")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("CLL Test Course")
+        expect(course_names).not_to include("Regular Test Course")
+      end
+
+      it "does not filter when feature flag is disabled" do
+        account_without_flag = Account.create!
+        admin = account_admin_user(account: account_without_flag)
+
+        course_factory(
+          account: account_without_flag,
+          course_name: "Test Course"
+        )
+
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{account_without_flag.id}/courses",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: account_without_flag.to_param,
+                                format: "json")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Test Course")
+      end
+
+      it "filters correctly for sub-accounts when root account has feature flag" do
+        # Root account has feature flag
+        root_account = Account.create!
+        root_account.enable_feature!(:horizon_learning_library_ms2)
+        root_account.enable_feature!(:horizon_course_setting)
+        root_account.save!
+
+        # Create a sub-account as a horizon account
+        sub_account = root_account.sub_accounts.create!
+        sub_account.settings[:horizon_account] = { value: true }
+        sub_account.save!
+
+        admin = account_admin_user(account: sub_account)
+
+        # Create courses in the sub-account
+        regular_course = course_factory(
+          account: sub_account,
+          course_name: "Sub Account Regular Course"
+        )
+        regular_course.career_learning_library_only = false
+        regular_course.save!
+
+        cll_course = course_factory(
+          account: sub_account,
+          course_name: "Sub Account CLL Course"
+        )
+        cll_course.career_learning_library_only = true
+        cll_course.save!
+
+        # Test default behavior (should include all courses)
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{sub_account.id}/courses",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: sub_account.to_param,
+                                format: "json")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Sub Account Regular Course")
+        expect(course_names).to include("Sub Account CLL Course")
+
+        # Test with parameter=true (should only show CLL courses)
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{sub_account.id}/courses?career_learning_library_only=true",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: sub_account.to_param,
+                                format: "json",
+                                career_learning_library_only: "true")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Sub Account CLL Course")
+        expect(course_names).not_to include("Sub Account Regular Course")
+      end
+    end
+
     it "does not set pagination total_pages/last page link for token-authenticated API requests" do
       course_factory(account: @a1, course_name: "c1")
       api_call_as_user(account_admin_user(account: @a1),

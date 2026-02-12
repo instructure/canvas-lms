@@ -28,7 +28,8 @@ module Factories
         course_code: opts[:course_code],
         account:,
         is_public: !!opts[:is_public],
-        enrollment_term_id: opts[:enrollment_term_id]
+        enrollment_term_id: opts[:enrollment_term_id],
+        career_learning_library_only: opts[:career_learning_library_only] || false
       )
       @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]

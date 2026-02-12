@@ -190,13 +190,13 @@ describe UserContent, type: :request do
     context "with precise_link_replacements FF OFF" do
       before { Account.site_admin.disable_feature! :precise_link_replacements }
 
-      include_examples "link translation examples"
+      it_behaves_like "link translation examples"
     end
 
     context "with precise_link_replacements FF ON" do
       before { Account.site_admin.enable_feature! :precise_link_replacements }
 
-      include_examples "link translation examples"
+      it_behaves_like "link translation examples"
     end
   end
 

@@ -36,8 +36,8 @@ const I18n = createI18nScope('widget_dashboard')
 
 const RESPONSIVE_QUERY = {
   mobile: {maxWidth: '639px'},
-  tablet: {minWidth: '640px', maxWidth: '1023px'},
-  desktop: {minWidth: '1024px'},
+  tablet: {minWidth: '640px', maxWidth: '1379px'},
+  desktop: {minWidth: '1380px'},
 }
 
 ready(() => {

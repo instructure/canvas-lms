@@ -752,8 +752,7 @@ shared_examples_for "context modules for teachers" do
       expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
     end
 
-    it "shows quiz type selector without scrolling when creating new quiz with new_quizzes_surveys enabled" do
-      Account.site_admin.enable_feature!(:new_quizzes_surveys)
+    it "shows quiz type selector without scrolling when creating new quiz" do
       @course.disable_feature!(:new_quizzes_by_default)
       get "/courses/#{@course.id}/modules"
 

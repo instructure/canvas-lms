@@ -61,6 +61,13 @@ module Lti::IMS
       expect(registration.reload.workflow_state).to eq("deleted")
     end
 
+    it "can be soft-deleted even with an invalid target_link_uri" do
+      registration.lti_tool_configuration["target_link_uri"] = "localhost"
+      registration.save!(validate: false)
+      expect { registration.destroy }.not_to raise_error
+      expect(registration.reload.workflow_state).to eq("deleted")
+    end
+
     describe "validations" do
       subject { registration.validate }
 

@@ -70,9 +70,9 @@ export const DISCUSSION_QUERY = gql`
         )
         searchEntryCount(filter: $filter, searchTerm: $searchTerm)
         groupSet {
-          ...GroupSet
+          ...DiscussionPostGroupSet
           groups {
-            ...Group
+            ...DiscussionPostGroup
           }
         }
         ${ENV.discussion_pin_post ? 'pinnedEntries { ...DiscussionEntry }' : ''}
@@ -203,7 +203,7 @@ export const COURSE_USER_QUERY = gql`
   query GetCourseUserQuery($courseId: ID!) {
     legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        ...Course
+        ...DiscussionPostCourse
       }
     }
   }

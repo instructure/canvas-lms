@@ -1,0 +1,606 @@
+/*
+ * Copyright (C) 2022 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {
+  AUTO_MARK_AS_READ_DELAY,
+  SearchContext,
+  DiscussionManagerUtilityContext,
+} from '../../utils/constants'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import DateHelper from '@canvas/datetime/dateHelper'
+import {Discussion} from '../../../graphql/Discussion'
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
+import {Flex} from '@instructure/ui-flex'
+import {Highlight} from '../../components/Highlight/Highlight'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {
+  isTopicAuthor,
+  updateDiscussionTopicEntryCounts,
+  updateDiscussionEntryRootEntryCounts,
+  responsiveQuerySizes,
+  getDisplayName,
+} from '../../utils'
+import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
+import PropTypes from 'prop-types'
+import React, {useContext, useState, useEffect, useCallback} from 'react'
+import {Responsive} from '@instructure/ui-responsive'
+import {ShowMoreRepliesButton} from '../../components/ShowMoreRepliesButton/ShowMoreRepliesButton'
+import {Spinner} from '@instructure/ui-spinner'
+import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
+import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
+import {
+  UPDATE_DISCUSSION_ENTRIES_READ_STATE,
+  UPDATE_DISCUSSION_ENTRY,
+  UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
+} from '../../../graphql/Mutations'
+import {useMutation} from '@apollo/client'
+import {View} from '@instructure/ui-view'
+import {ReportReply} from '../../components/ReportReply/ReportReply'
+import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
+import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
+
+const I18n = createI18nScope('discussion_topics_post')
+
+// @ts-expect-error TS7006 (typescriptify)
+export const SplitScreenThreadsContainer = props => {
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+
+  const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
+
+  // @ts-expect-error TS7006 (typescriptify)
+  const updateCache = (cache, result) => {
+    updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+      unreadCountChange: -result?.data?.updateDiscussionEntriesReadState?.discussionEntries?.length,
+    })
+
+    // update each root discussionEntry in cache
+    // @ts-expect-error TS7006 (typescriptify)
+    result?.data?.updateDiscussionEntriesReadState?.discussionEntries?.forEach(discussionEntry => {
+      const discussionEntryOptions = {
+        id: btoa('DiscussionEntry-' + discussionEntry._id),
+        fragment: DiscussionEntry.fragment,
+        fragmentName: 'DiscussionEntry',
+      }
+
+      const data = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
+
+      data.entryParticipant.read = discussionEntry.entryParticipant.read
+
+      cache.writeFragment({
+        ...discussionEntryOptions,
+        data,
+      })
+
+      if (discussionEntry.rootEntryId && !discussionEntry.deleted) {
+        const discussionUnreadCountChange = discussionEntry.entryParticipant.read ? -1 : 1
+        updateDiscussionEntryRootEntryCounts(cache, discussionEntry, discussionUnreadCountChange)
+      }
+    })
+  }
+
+  const [updateDiscussionEntriesReadState] = useMutation(UPDATE_DISCUSSION_ENTRIES_READ_STATE, {
+    update: updateCache,
+    onCompleted: () => {
+      setOnSuccess(I18n.t('The replies were successfully updated'))
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error while updating the replies'))
+    },
+  })
+
+  const extractedSubentryNodes = props.discussionEntry.discussionSubentriesConnection?.nodes // extracting to new variable to use in useEffect deps
+  useEffect(() => {
+    if (discussionEntriesToUpdate.size > 0) {
+      const interval = setInterval(() => {
+        const entryIds = Array.from(discussionEntriesToUpdate)
+        const entries = JSON.parse(
+          JSON.stringify(
+            extractedSubentryNodes.filter(
+              // @ts-expect-error TS7006 (typescriptify)
+              entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false,
+            ),
+          ),
+        )
+
+        // @ts-expect-error TS7006 (typescriptify)
+        entries.forEach(entry => (entry.entryParticipant.read = true))
+        setDiscussionEntriesToUpdate(new Set())
+        updateDiscussionEntriesReadState({
+          variables: {
+            discussionEntryIds: entryIds,
+            read: true,
+          },
+          optimisticResponse: {
+            updateDiscussionEntriesReadState: {
+              discussionEntries: entries,
+              __typename: 'UpdateDiscussionEntriesReadStatePayload',
+            },
+          },
+        })
+      }, AUTO_MARK_AS_READ_DELAY)
+
+      return () => clearInterval(interval)
+    }
+  }, [discussionEntriesToUpdate, extractedSubentryNodes, updateDiscussionEntriesReadState])
+
+  // @ts-expect-error TS7006 (typescriptify)
+  const setToBeMarkedAsRead = entryId => {
+    if (!discussionEntriesToUpdate.has(entryId)) {
+      const entries = Array.from(discussionEntriesToUpdate)
+      setDiscussionEntriesToUpdate(new Set([...entries, entryId]))
+    }
+  }
+
+  return (
+    <View data-testid="split-screen-view-children" padding="0 small 0 small">
+      {props.hasMoreOlderReplies && (
+        <View as="div" padding="0 0 small medium">
+          <ShowMoreRepliesButton
+            onClick={props.showOlderReplies}
+            buttonText={I18n.t('Show older replies')}
+            fetchingMoreReplies={props.fetchingMoreOlderReplies}
+          />
+          {props.fetchingMoreOlderReplies && (
+            <Spinner
+              renderTitle="loading older replies"
+              data-testid="old-reply-spinner"
+              size="x-small"
+              margin="0 0 0 small"
+            />
+          )}
+        </View>
+      )}
+      {/* @ts-expect-error TS7006 (typescriptify) */}
+      {props.discussionEntry?.discussionSubentriesConnection?.nodes?.map(entry => (
+        <SplitScreenThreadContainer
+          discussionTopic={props.discussionTopic}
+          discussionEntry={entry}
+          key={entry.id}
+          onToggleRating={props.onToggleRating}
+          onToggleUnread={props.onToggleUnread}
+          onDelete={props.onDelete}
+          onOpenInSpeedGrader={props.onOpenInSpeedGrader}
+          onOpenSplitScreenView={props.onOpenSplitScreenView}
+          setToBeMarkedAsRead={setToBeMarkedAsRead}
+          goToTopic={props.goToTopic}
+          isHighlighted={entry._id === props.highlightEntryId}
+          moreOptionsButtonRef={props.moreOptionsButtonRef}
+        />
+      ))}
+      {props.hasMoreNewerReplies && (
+        <View as="div" padding="0 0 small medium">
+          <ShowMoreRepliesButton
+            onClick={props.showNewerReplies}
+            buttonText={I18n.t('Show newer replies')}
+            fetchingMoreReplies={props.fetchingMoreNewerReplies}
+          />
+          {props.fetchingMoreNewerReplies && (
+            <Spinner
+              renderTitle="loading newer replies"
+              data-testid="new-reply-spinner"
+              size="x-small"
+              margin="0 0 0 small"
+            />
+          )}
+        </View>
+      )}
+    </View>
+  )
+}
+
+SplitScreenThreadsContainer.propTypes = {
+  discussionTopic: Discussion.shape,
+  discussionEntry: DiscussionEntry.shape,
+  onToggleRating: PropTypes.func,
+  onToggleUnread: PropTypes.func,
+  onDelete: PropTypes.func,
+  onOpenInSpeedGrader: PropTypes.func,
+  showOlderReplies: PropTypes.func,
+  showNewerReplies: PropTypes.func,
+  onOpenSplitScreenView: PropTypes.func,
+  goToTopic: PropTypes.func,
+  highlightEntryId: PropTypes.string,
+  hasMoreOlderReplies: PropTypes.bool,
+  hasMoreNewerReplies: PropTypes.bool,
+  fetchingMoreOlderReplies: PropTypes.bool,
+  fetchingMoreNewerReplies: PropTypes.bool,
+  moreOptionsButtonRef: PropTypes.any,
+}
+
+export default SplitScreenThreadsContainer
+
+// @ts-expect-error TS7006 (typescriptify)
+const SplitScreenThreadContainer = props => {
+  // @ts-expect-error TS7034 (typescriptify)
+  const threadActions = []
+  const [isEditing, setIsEditing] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
+  const [reportingError, setReportingError] = useState(false)
+
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
+  const {filter} = useContext(SearchContext)
+  const [threadRefCurrent, setThreadRefCurrent] = useState(null)
+  // @ts-expect-error TS2345 (typescriptify)
+  const {toggleUnread} = useUpdateDiscussionThread({
+    discussionEntry: props.discussionEntry,
+    discussionTopic: props.discussionTopic,
+  })
+  // @ts-expect-error TS7006 (typescriptify)
+  const onThreadRefCurrentSet = useCallback(refCurrent => {
+    setThreadRefCurrent(refCurrent)
+  }, [])
+
+  // Scrolling auto listener to mark messages as read
+  useEffect(() => {
+    if (
+      // @ts-expect-error TS2339 (typescriptify)
+      !ENV.manual_mark_as_read &&
+      !props.discussionEntry?.deleted &&
+      !props.discussionEntry.entryParticipant?.read &&
+      !props.discussionEntry?.entryParticipant?.forcedReadState
+    ) {
+      const observer = new IntersectionObserver(
+        ([entry]) => entry.isIntersecting && props.setToBeMarkedAsRead(props.discussionEntry._id),
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.4,
+        },
+      )
+
+      if (threadRefCurrent) observer.observe(threadRefCurrent)
+
+      return () => {
+        if (threadRefCurrent) observer.unobserve(threadRefCurrent)
+      }
+    }
+  }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props, filter])
+
+  const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
+    onCompleted: data => {
+      if (!data.updateDiscussionEntry.errors) {
+        setOnSuccess(I18n.t('The reply was successfully updated.'))
+        setIsEditing(false)
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+    },
+  })
+
+  const [updateDiscussionEntryReported] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    onCompleted: data => {
+      if (!data || !data.updateDiscussionEntryParticipant) {
+        return null
+      }
+      setReportModalIsLoading(false)
+      setShowReportModal(false)
+      setOnSuccess(I18n.t('You have reported this reply.'), false)
+    },
+    onError: () => {
+      setReportModalIsLoading(false)
+      setReportingError(true)
+      setTimeout(() => {
+        setReportingError(false)
+      }, 3000)
+    },
+  })
+
+  // @ts-expect-error TS7006 (typescriptify)
+  const onUpdate = (message, quotedEntryId, file) => {
+    updateDiscussionEntry({
+      variables: {
+        discussionEntryId: props.discussionEntry._id,
+        message,
+        fileId: file?._id,
+        removeAttachment: !file?._id,
+        quotedEntryId,
+      },
+    })
+  }
+
+  // @ts-expect-error TS7006 (typescriptify)
+  const onThreadReplyKeyboard = e => {
+    if (
+      e.detail.entryId === props.discussionEntry._id &&
+      props?.discussionEntry?.permissions?.reply
+    ) {
+      onThreadReply()
+    }
+  }
+  useEventHandler(KeyboardShortcuts.ON_THREAD_REPLY_KEYBOARD, onThreadReplyKeyboard)
+
+  const onThreadReply = () => {
+    props.onOpenSplitScreenView(props.discussionEntry._id, true)
+  }
+
+  if (props?.discussionEntry?.permissions?.reply) {
+    threadActions.push(
+      <ThreadingToolbar.Reply
+        key={`reply-${props.discussionEntry.id}`}
+        authorName={getDisplayName(props.discussionEntry)}
+        delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        onClick={onThreadReply}
+        isSplitScreenView={true}
+      />,
+    )
+  }
+
+  const canViewAndRate =
+    props.discussionEntry.permissions.viewRating &&
+    (props.discussionEntry.permissions.rate || props.discussionEntry.ratingSum > 0)
+  // @ts-expect-error TS7006 (typescriptify)
+  const toggleRatingKeyboard = e => {
+    if (canViewAndRate && e.detail.entryId === props.discussionEntry._id) {
+      props.onToggleRating(props.discussionEntry)
+    }
+  }
+  useEventHandler(KeyboardShortcuts.TOGGLE_RATING_KEYBOARD, toggleRatingKeyboard)
+
+  if (canViewAndRate) {
+    threadActions.push(
+      <ThreadingToolbar.Like
+        key={`like-${props.discussionEntry.id}`}
+        delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
+        onClick={() => props.onToggleRating(props.discussionEntry)}
+        authorName={getDisplayName(props.discussionEntry)}
+        isLiked={!!props.discussionEntry.entryParticipant?.rating}
+        likeCount={props.discussionEntry.ratingSum || 0}
+        interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
+        isSplitScreenView={true}
+      />,
+    )
+  }
+
+  if (!props.discussionEntry.deleted) {
+    threadActions.push(
+      <ThreadingToolbar.MarkAsRead
+        key={`mark-as-read-${props.discussionEntry.id}`}
+        // @ts-expect-error TS2322 (typescriptify)
+        delimiterKey={`mark-as-read-delimiter-${props.discussionEntry.id}`}
+        isRead={props.discussionEntry.entryParticipant?.read}
+        authorName={getDisplayName(props.discussionEntry)}
+        onClick={toggleUnread}
+        isSplitScreenView={true}
+      />,
+    )
+  }
+
+  // @ts-expect-error TS7006 (typescriptify)
+  const onShowRepliesKeyboard = e => {
+    if (e.detail.entryId === props.discussionEntry._id && props.discussionEntry.subentriesCount) {
+      onShowReplies()
+    }
+  }
+  const onShowReplies = () => {
+    props.onOpenSplitScreenView(props.discussionEntry._id, false)
+  }
+  useEventHandler(KeyboardShortcuts.ON_SHOW_REPLIES_KEYBOARD, onShowRepliesKeyboard)
+
+  if (props.discussionEntry.subentriesCount) {
+    threadActions.push(
+      <ThreadingToolbar.Expansion
+        key={`expand-${props.discussionEntry.id}`}
+        delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
+        authorName={getDisplayName(props.discussionEntry)}
+        expandText={I18n.t('View Replies')}
+        isExpanded={false}
+        onClick={onShowReplies}
+      />,
+    )
+  }
+
+  // @ts-expect-error TS7006 (typescriptify)
+  const onDeleteKeyboard = e => {
+    if (
+      e.detail.entryId === props.discussionEntry._id &&
+      props.discussionEntry.permissions?.delete
+    ) {
+      onDelete()
+    }
+  }
+  useEventHandler(KeyboardShortcuts.ON_DELETE_KEYBOARD, onDeleteKeyboard)
+
+  const onDelete = () => {
+    props.onDelete(props.discussionEntry)
+  }
+
+  // @ts-expect-error TS7006 (typescriptify)
+  const onEditKeyboard = e => {
+    if (
+      e.detail.entryId === props.discussionEntry._id &&
+      props.discussionEntry.permissions?.update
+    ) {
+      onEdit()
+    }
+  }
+  useEventHandler(KeyboardShortcuts.ON_EDIT_KEYBOARD, onEditKeyboard)
+
+  const onEdit = () => {
+    setIsEditing(true)
+  }
+
+  return (
+    <Responsive
+      match="media"
+      // @ts-expect-error TS2769 (typescriptify)
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          padding: 'x-small',
+        },
+        desktop: {
+          padding: '0 medium',
+        },
+      }}
+      render={responsiveProps => (
+        <div ref={onThreadRefCurrentSet}>
+          {/* @ts-expect-error TS18049 (typescriptify) */}
+          <View as="div" padding={responsiveProps.padding}>
+            <Highlight
+              isHighlighted={props.isHighlighted}
+              discussionEntryId={props.discussionEntry._id}
+            >
+              <Flex padding="small">
+                <Flex.Item shouldShrink={true} shouldGrow={true}>
+                  {/* @ts-expect-error TS2741 (typescriptify) */}
+                  <DiscussionEntryContainer
+                    discussionTopic={props.discussionTopic}
+                    discussionEntry={props.discussionEntry}
+                    isTopic={false}
+                    toggleUnread={toggleUnread}
+                    postUtilities={
+                      <ThreadActions
+                        authorName={getDisplayName(props.discussionEntry)}
+                        id={props.discussionEntry.id}
+                        entry={props.discussionEntry}
+                        isUnread={!props.discussionEntry.entryParticipant?.read}
+                        onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
+                        onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
+                        onEdit={props.discussionEntry.permissions?.update ? onEdit : null}
+                        onOpenInSpeedGrader={
+                          props.discussionTopic.permissions?.speedGrader
+                            ? () => props.onOpenInSpeedGrader(props.discussionEntry)
+                            : null
+                        }
+                        goToParent={() => {
+                          props.onOpenSplitScreenView(
+                            props.discussionEntry.rootEntryId,
+                            false,
+                            props.discussionEntry.rootEntryId,
+                          )
+                        }}
+                        goToTopic={props.goToTopic}
+                        permalinkId={props.discussionEntry._id}
+                        goToQuotedReply={
+                          props.discussionEntry.quotedEntry !== null
+                            ? () => {
+                                props.onOpenSplitScreenView(
+                                  props.discussionEntry.rootEntryId,
+                                  false,
+                                  props.discussionEntry.quotedEntry._id,
+                                )
+                              }
+                            : null
+                        }
+                        onQuoteReply={
+                          props?.discussionEntry?.permissions?.reply
+                            ? () => {
+                                // @ts-expect-error TS2554 (typescriptify)
+                                setReplyFromId(props.discussionEntry._id)
+                                props.onOpenSplitScreenView(props.discussionEntry._id, true)
+                              }
+                            : null
+                        }
+                        onReport={
+                          ENV.discussions_reporting &&
+                          props.discussionTopic.permissions?.studentReporting
+                            ? () => {
+                                setShowReportModal(true)
+                              }
+                            : null
+                        }
+                        isReported={props.discussionEntry?.entryParticipant?.reportType != null}
+                        moreOptionsButtonRef={props.moreOptionsButtonRef}
+                      />
+                    }
+                    author={props.discussionEntry.author}
+                    anonymousAuthor={props.discussionEntry.anonymousAuthor}
+                    message={props.discussionEntry.message}
+                    isEditing={isEditing}
+                    onSave={onUpdate}
+                    onCancel={() => {
+                      setIsEditing(false)
+                      setTimeout(() => {
+                        props.moreOptionsButtonRef?.current?.focus()
+                      }, 0)
+                    }}
+                    isSplitView={true}
+                    editor={props.discussionEntry.editor}
+                    isUnread={!props.discussionEntry.entryParticipant?.read}
+                    isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
+                    createdAt={props.discussionEntry.createdAt}
+                    updatedAt={props.discussionEntry.updatedAt}
+                    timingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.createdAt,
+                    )}
+                    editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.updatedAt,
+                    )}
+                    lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
+                      props.discussionEntry.lastReply?.createdAt,
+                    )}
+                    deleted={props.discussionEntry.deleted}
+                    isTopicAuthor={isTopicAuthor(
+                      props.discussionTopic.author,
+                      props.discussionEntry.author,
+                    )}
+                    quotedEntry={props.discussionEntry.quotedEntry}
+                    attachment={props.discussionEntry.attachment}
+                  >
+                    <View as="div">
+                      <ThreadingToolbar discussionEntry={props.discussionEntry} isSplitView={true}>
+                        {/* @ts-expect-error TS7005 (typescriptify) */}
+                        {threadActions}
+                      </ThreadingToolbar>
+                    </View>
+                  </DiscussionEntryContainer>
+                  <ReportReply
+                    onCloseReportModal={() => {
+                      setShowReportModal(false)
+                    }}
+                    onSubmit={reportType => {
+                      updateDiscussionEntryReported({
+                        variables: {
+                          discussionEntryId: props.discussionEntry._id,
+                          reportType,
+                        },
+                      })
+                      setReportModalIsLoading(true)
+                    }}
+                    showReportModal={showReportModal}
+                    isLoading={reportModalIsLoading}
+                    errorSubmitting={reportingError}
+                  />
+                </Flex.Item>
+              </Flex>
+            </Highlight>
+          </View>
+        </div>
+      )}
+    />
+  )
+}
+
+SplitScreenThreadContainer.propTypes = {
+  discussionTopic: Discussion.shape,
+  discussionEntry: DiscussionEntry.shape,
+  onToggleRating: PropTypes.func,
+  onToggleUnread: PropTypes.func,
+  setToBeMarkedAsRead: PropTypes.func,
+  onDelete: PropTypes.func,
+  onOpenInSpeedGrader: PropTypes.func,
+  onOpenSplitScreenView: PropTypes.func,
+  goToTopic: PropTypes.func,
+  isHighlighted: PropTypes.bool,
+  moreOptionsButtonRef: PropTypes.any,
+}

@@ -38,7 +38,15 @@ const I18n = createI18nScope('accessibility_checker')
 const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
     (
-      {issue, error, value, onChangeValue, isDisabled, onValidationChange}: FormComponentProps,
+      {
+        issue,
+        error,
+        value,
+        onChangeValue,
+        isDisabled,
+        onValidationChange,
+        onGenerateLoadingChange,
+      }: FormComponentProps,
       ref,
     ) => {
       const [generateLoading, setGenerateLoading] = useState(false)
@@ -64,6 +72,8 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
       const handleGenerateClick = () => {
         setGenerateLoading(true)
         setGenerationError(null)
+        onGenerateLoadingChange?.(true)
+
         doFetchApi<GenerateResponse>({
           path: `${stripQueryString(window.location.href)}/generate/table_caption`,
           method: 'POST',
@@ -99,7 +109,10 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
               )
             }
           })
-          .finally(() => setGenerateLoading(false))
+          .finally(() => {
+            setGenerateLoading(false)
+            onGenerateLoadingChange?.(false)
+          })
       }
 
       return (
@@ -123,18 +136,16 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
                   onClick={handleGenerateClick}
                   disabled={generateLoading}
                 >
-                  {issue.form.generateButtonLabel}
+                  {generateLoading ? (
+                    <>
+                      {issue.form.generateButtonLabel}{' '}
+                      <Spinner size="x-small" renderTitle={I18n.t('Generating...')} />
+                    </>
+                  ) : (
+                    issue.form.generateButtonLabel
+                  )}
                 </Button>
               </Flex>
-              {generateLoading && (
-                <Flex.Item>
-                  <Spinner
-                    size="x-small"
-                    renderTitle={I18n.t('Generating...')}
-                    margin="0 small 0 0"
-                  />
-                </Flex.Item>
-              )}
               {generationError !== null && (
                 <Flex>
                   <Flex.Item>

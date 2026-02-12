@@ -140,7 +140,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
         it "rejects the registration" do
           subject
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.body).to match(/invalid_scope/)
         end
       end
@@ -189,7 +189,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(Schemas::Lti::IMS::OidcRegistration).to \
             receive(:to_model_attrs).and_return(to_model_attrs_result)
           subject
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.body).to match(/oopsy/)
         end
 
@@ -328,7 +328,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
           it "returns a 422 with validation errors" do
             subject
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.body).to match(/target_link_uri/)
           end
         end
@@ -342,7 +342,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
           it "returns a 422 with validation errors" do
             subject
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.body).to match(/target_link_uri/)
           end
         end
@@ -356,7 +356,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
           it "returns a 422 with validation errors" do
             subject
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.body).to match(/grant_types.*client_credentials/)
           end
 
@@ -374,7 +374,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
           it "returns a 422 with validation errors" do
             subject
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.body).to match(/response_types.*id_token/)
           end
 
@@ -392,7 +392,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
           it "returns a 422 with validation errors" do
             subject
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.body).to match(/token_endpoint_auth_method.*private_key_jwt/)
           end
 
@@ -645,7 +645,7 @@ describe Lti::IMS::DynamicRegistrationController do
         it "returns validation errors" do
           put :update, params: { registration_id: registration.id, **invalid_params }
 
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body["errors"]).to be_present
         end
 
@@ -661,7 +661,7 @@ describe Lti::IMS::DynamicRegistrationController do
             receive(:to_model_attrs).and_return(to_model_attrs_result)
 
           put :update, params: { registration_id: registration.id, **update_params }
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.body).to match(/update validation failed/)
         end
       end
@@ -674,7 +674,7 @@ describe Lti::IMS::DynamicRegistrationController do
         it "returns validation errors" do
           put :update, params: { registration_id: registration.id, **invalid_params }
 
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body["errors"]).to be_present
         end
       end
@@ -687,7 +687,7 @@ describe Lti::IMS::DynamicRegistrationController do
         it "returns validation errors" do
           put :update, params: { registration_id: registration.id, **invalid_params }
 
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body["errors"]).to be_present
         end
       end
@@ -1138,7 +1138,7 @@ describe Lti::IMS::DynamicRegistrationController do
             registration_id: registration.id
           },
           body: overlay.merge({ invalid: "data" }).to_json
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "returns a 404 if the registration cannot be found" do

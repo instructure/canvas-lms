@@ -28,6 +28,7 @@ describe "student dashboard group specific tests", :ignore_js_errors do
   before :once do
     group_assignment_course_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student3, @student_no_group, @student1_group1, @student2_group1)
 
     @group_assignment = @course4.assignments.create!(
       name: "Group Project",
@@ -147,6 +148,7 @@ describe "student dashboard group specific tests", :ignore_js_errors do
   context "as observer" do
     before :once do
       @observer = user_factory(active_all: true, name: "Observer")
+      enable_widget_dashboard_for(@observer)
       @course4.enroll_user(@observer,
                            "ObserverEnrollment",
                            associated_user_id:

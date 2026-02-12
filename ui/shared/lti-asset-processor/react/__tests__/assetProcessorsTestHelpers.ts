@@ -26,12 +26,14 @@ function makeMockTool({
   url,
   definition_id,
   contribution = false,
+  context_name,
 }: {
   name: string
   description: string
   url: string
   definition_id: number
   contribution?: boolean
+  context_name?: string
 }): LtiLaunchDefinition {
   const def: LtiLaunchDefinition = {
     definition_type: 'ContextExternalTool',
@@ -41,6 +43,7 @@ function makeMockTool({
     description,
     domain: 'http://lti-13-test-tool.inseng.test',
     placements: {},
+    context_name,
   }
   if (contribution) {
     def.placements.ActivityAssetProcessorContribution = {
@@ -92,17 +95,19 @@ function makeMockTools(contribution = false): LtiLaunchDefinition[] {
       url: 'http://t4.instructure.com.com',
       definition_id: 44,
       contribution,
+      context_name: 'Account A',
     }),
   ]
 }
 
 // MSW handler for asset processor tools
-export function createAssetProcessorMswHandler(courseId: number = 123) {
-  const path = `/api/v1/courses/${courseId}/lti_apps/launch_definitions`
+export function createAssetProcessorMswHandler() {
   return (req: any) => {
     const url = new URL(req.request.url)
     const placements = url.searchParams.get('placements[]')
-    return placements === 'ActivityAssetProcessor' ? mockToolsForAssignment : mockToolsForDiscussions
+    return placements === 'ActivityAssetProcessor'
+      ? mockToolsForAssignment
+      : mockToolsForDiscussions
   }
 }
 

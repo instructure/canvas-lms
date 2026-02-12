@@ -25,7 +25,7 @@ class AccessibilityIssuesController < ApplicationController
 
   def update
     error = validate_update_params
-    return render json: { error: }, status: :unprocessable_entity if error
+    return render json: { error: }, status: :unprocessable_content if error
 
     @issue.workflow_state = params[:workflow_state]
     @issue.updated_by = @current_user
@@ -83,7 +83,7 @@ class AccessibilityIssuesController < ApplicationController
 
     fix_response = Accessibility::Issue::HtmlFixer.new(
       @issue.rule_type,
-      @issue.context,
+      @issue.resource,
       @issue.node_path,
       sanitized_value
     ).apply_fix!(updating_user: @current_user)

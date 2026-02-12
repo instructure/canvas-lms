@@ -61,6 +61,7 @@ export type AccessibilityScansState = {
   isAiTableCaptionGenerationEnabled?: boolean
   additionalResourcesEnabled?: boolean
   isCloseIssuesEnabled?: boolean
+  isGA2FeaturesEnabled?: boolean
 }
 
 export type AccessibilityScansActions = {
@@ -107,6 +108,7 @@ export const initialState: AccessibilityScansState = {
   isAiTableCaptionGenerationEnabled:
     window.ENV.FEATURES?.a11y_checker_ai_table_caption_generation || false,
   isCloseIssuesEnabled: window.ENV.FEATURES?.a11y_checker_close_issues || false,
+  isGA2FeaturesEnabled: window.ENV.FEATURES?.a11y_checker_ga2_features || false,
 }
 
 export const defaultStateToFetch: NewStateToFetch = {

@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
-import {act, render, fireEvent, waitFor, screen} from '@testing-library/react'
-import ComputerPanel from '../ComputerPanel'
-import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
 import {vi} from 'vitest'
+import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
+import ComputerPanel from '../ComputerPanel'
 
 const uploadMediaTranslations = {
   UploadMediaStrings: {

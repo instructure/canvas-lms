@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -ex
+printenv | sort | sed -E 's/(.*_(KEY|SECRET))=.*/\1 is present/g'
+
 if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
   # when parent is not in $GERRIT_BRANCH (i.e. master)
   if ! git merge-base --is-ancestor HEAD~1 origin/$GERRIT_BRANCH; then
@@ -52,7 +54,7 @@ if ! git diff HEAD~1 --exit-code -GENV -- 'packages/canvas-rce/**/*.js' 'package
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
 fi
 
-if ! git diff-tree --no-commit-id --name-only --diff-filter=D -r --no-renames --exit-code HEAD -- 'db/migrate'; then
+if ! git diff-tree --no-commit-id --name-only --diff-filter=D -r --find-renames --exit-code HEAD -- 'db/migrate'; then
   # We have deleted migrations, make sure we made a new migration integrity version
   if git diff-tree --no-commit-id --name-only --diff-filter=A -r --no-renames --exit-code HEAD -- 'db/migrate/*_validate_migration_integrity.rb'; then
     # No new migration integrity commit was added

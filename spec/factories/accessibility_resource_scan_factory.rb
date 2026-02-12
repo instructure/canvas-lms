@@ -22,7 +22,10 @@ module Factories
     opts[:course] ||= course_model
 
     scan = AccessibilityResourceScan.new(opts)
-    scan.context ||= wiki_page_model(course: opts[:course])
+    # Only set context if not a syllabus scan
+    unless opts[:is_syllabus]
+      scan.context ||= wiki_page_model(course: opts[:course])
+    end
     scan.tap(&:save!)
   end
 end

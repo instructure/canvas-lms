@@ -230,7 +230,7 @@ class CourseSection < ActiveRecord::Base
 
     return true unless scope.exists?
 
-    errors.add(:integration_id, t("integration_id_taken", "INTEGRATRION ID \"%{integration_id}\" is already in use", integration_id:))
+    errors.add(:integration_id, t("integration_id_taken", "INTEGRATION ID \"%{integration_id}\" is already in use", integration_id:))
     throw :abort
   end
 

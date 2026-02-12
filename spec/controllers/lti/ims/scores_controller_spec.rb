@@ -1248,7 +1248,7 @@ module Lti::IMS
           it "returns an unprocessable_entity error" do
             result
             send_request
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
           end
         end
 
@@ -1433,7 +1433,7 @@ module Lti::IMS
             result
             send_request
             expect(assignment.find_or_create_submission(user).workflow_state).to eq "unsubmitted"
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
             expect(response.body).to include "This assignment is still unpublished"
           end
         end

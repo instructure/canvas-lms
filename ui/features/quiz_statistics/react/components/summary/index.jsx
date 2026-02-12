@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import config from '../../../config'
 import formatNumber from '../../../util/format_number'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import parseNumber from '../../../util/parse_number'
@@ -77,7 +78,9 @@ class Summary extends React.Component {
 
           <div className="pull-right inline">
             <SectionSelect />
-            {this.props.quizReports.map(this.renderReport.bind(this))}
+            {this.props.quizReports
+              .filter(report => report.includesAllVersions === config.includesAllVersions)
+              .map(this.renderReport.bind(this))}
           </div>
         </header>
 

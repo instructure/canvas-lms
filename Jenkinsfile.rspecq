@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -35,6 +35,14 @@ def crystalballColor = 'danger'
 def specUnique = []
 
 def computeTestCountNecessary() {
+  // Check skip-crystalball flag first, before attempting to copy artifacts
+  if (commitMessageFlag('skip-crystalball') as Boolean) {
+    summaryMessage = "Skip Crystalball Detected! - Running everything!\n"
+    crystalballColor = 'danger'
+    env.CRYSTALBALL_SPEC = '.'
+    return false
+  }
+
   copyArtifacts filter: 'tmp/crystalball_spec_list.txt', projectName: "${env.UPSTREAM}", selector: upstream()
   copyArtifacts filter: 'tmp/crystalball_map_version.txt', projectName: "${env.UPSTREAM}", selector: upstream()
 
@@ -44,13 +52,6 @@ def computeTestCountNecessary() {
   env.CRYSTALBALL_SPEC = specUnique.join(' ')
 
   summaryMessage = "Map: $mapVersion\n"
-
-  if (commitMessageFlag('skip-crystalball') as Boolean) {
-    summaryMessage += "Skip Crystalball Detected! - Running everything!"
-    crystalballColor = 'danger'
-    env.CRYSTALBALL_SPEC = '.'
-    return false
-  }
 
   // Crystalball predictor returned empty text file
   if (specUnique.size() == 0) {
@@ -119,7 +120,7 @@ def computeTestCount() {
   if (specTimings && specTimings.isNumber()) {
     echo "=== Total Spec Time $specTimings"
 
-    def newNodeTotal = Math.ceil(specTimings.toFloat() / (rspecqTargetTime * RSPEC_PROCESSES.toInteger()))
+    def newNodeTotal = Math.ceil(specTimings.toFloat() / (rspecqTargetTime * env.RSPEC_PROCESSES.toInteger()))
 
     summaryMessage += " (new: ${newNodeTotal})"
   } else {
@@ -155,152 +156,134 @@ def sendCrystalballMetrics() {
 }
 
 def redisUrl() {
-  return "redis://${TEST_QUEUE_HOST}:6379"
+  return "redis://${env.TEST_QUEUE_HOST}:6379"
 }
 
-pipeline {
-  agent none
-  options {
-    ansiColor('xterm')
-    timeout(60)
-    timestamps()
-  }
+env.REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
+env.COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
+env.COMPOSE_PROJECT_NAME = 'test-queue'
+env.FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
+env.RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
+env.RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
+env.RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)
+env.RSPECQ_WORKER_LIVENESS_SEC = commitMessageFlag('worker-liveness-sec').asType(Integer)
+env.RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
+env.TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
+env.EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
+env.RSPECQ_UPDATE_TIMINGS = "${env.RSPECQ_UPDATE_TIMINGS}"
+env.ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
+env.POSTGRES_PASSWORD = 'sekret'
+env.RSPECQ_REDIS_URL = redisUrl()
 
-  environment {
-    REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
-    COMPOSE_PROJECT_NAME = 'test-queue'
-    FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
-    RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
-    RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
-    RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)
-    RSPECQ_WORKER_LIVENESS_SEC = commitMessageFlag('worker-liveness-sec').asType(Integer)
-    RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
-    TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
-    EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
-    RSPECQ_UPDATE_TIMINGS = "${env.RSPECQ_UPDATE_TIMINGS}"
-    ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
-    POSTGRES_PASSWORD = 'sekret'
-    RSPECQ_REDIS_URL = redisUrl()
-  }
+node(nodeLabel()) {
+  timeout(time: 60, unit: 'MINUTES') {
+    ansiColor('xterm') {
+      timestamps {
+        try {
+          stage('Clean Workspace') {
+            pipelineHelpers.cleanupWorkspace()
+          }
 
-  stages {
-    stage('Environment') {
-      steps {
-        script {
-          def rspecNodeRequirements = [label: nodeLabel()]
-          env.CRYSTALBALL_SPEC = '.'
+          stage('Checkout Code') {
+            env.CRYSTALBALL_SPEC = '.'
+            sh 'rm -vrf ./tmp'
+            checkout scm
+            distribution.stashBuildScripts()
+          }
 
-          def postRunnerHandler = [
-            onStageEnded: { stageName, stageConfig, result ->
-              node('master') {
-                if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
-                  sendCrystalballSlack(summaryMessage, crystalballColor, stageConfig.status())
-                }
-                if (stageConfig.status() != 'SUCCESS' && env.RSPECQ_UPDATE_TIMINGS == '1') {
-                  sendRspecqSlack(stageConfig.status())
-                }
-                buildSummaryReport.saveRunManifest()
-              }
+          if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1' && computeTestCountNecessary()) {
+            stage('Compute Build Distribution') {
+              computeTestCount()
             }
-          ]
+          }
 
-          def postBuildHandler = [
-            onNodeReleasing: {
-              if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
-                sendCrystalballMetrics()
-              }
-            }
-          ]
+          stage('Run Tests') {
+            def rspecqStages = [:]
 
-          def postStageHandler = [
-            onStageEnded: { stageName, stageConfig, result ->
-              buildSummaryReport.setStageTimings(stageName, stageConfig.timingValues())
-            }
-          ]
+            // Set 00 runs on main coordinator node
+            rspecqStages["RSpecQ Set 00"] = {
+              withEnv([
+                "CI_NODE_INDEX=0",
+                "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}",
+                "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"
+              ]) {
+                def stageStartTime = System.currentTimeMillis()
+                try {
+                  stage('00 Cleanup') {
+                    pipelineHelpers.cleanupWorkspace()
+                  }
 
-          extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
-            extendedStage('Builder').hooks(postStageHandler + postBuildHandler).obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
-              extendedStage('RSpecQ Setup').hooks(postStageHandler).obeysAllowStages(false).execute {
-                sh 'rm -vrf ./tmp'
+                  stage('00 Setup') {
+                    rspecStage.setupNode()
+                  }
 
-                checkout scm
+                  def initialStages = [:]
 
-                distribution.stashBuildScripts()
-              }
-
-              def testCountNecessary = !configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1' && computeTestCountNecessary()
-
-              if (testCountNecessary) {
-                extendedStage('RSpecQ Compute Build Distribution').hooks(postStageHandler).obeysAllowStages(false).execute {
-
-                  computeTestCount()
-                }
-              }
-
-              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
-                def rspecqStages = [:]
-
-                def initialNodeHooks = testCountNecessary ?
-                  postStageHandler + [onNodeReleasing: { rspecStage.tearDownNode() }] :
-                  postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }]
-
-                extendedStage('RSpecQ Initial Node')
-                    .envVars(['CI_NODE_INDEX=0',
-                        "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}",
-                        "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"])
-                    .hooks(initialNodeHooks)
-                    .timeout(env.NODE_TIMEOUT.toInteger())
-                    .queue(rspecqStages) {
-                      def initialNodeStages = [:]
-
-                      extendedStage('RSpecQ Reporter').queue(initialNodeStages) {
-                        try {
-                          sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
-                            --build=${JOB_NAME}_build${BUILD_NUMBER} \
-                            --queue-wait-timeout 120 \
-                            --redis-url $RSPECQ_REDIS_URL \
-                            --report", label: 'Reporter')
-                        } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-                          if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-                            /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
-                            sh '''#!/bin/bash
-                              ids=($(docker ps -aq --filter "name=canvas-"))
-                              for i in "${ids[@]}"
-                                do
-                                  docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-                              done
-                            '''
-                          }
-                          throw e
-                        }
+                  initialStages['Reporter'] = {
+                    try {
+                      sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t \$PATCHSET_TAG bundle exec rspecq \
+                        --build=${env.JOB_NAME}_build${env.BUILD_NUMBER} \
+                        --queue-wait-timeout 120 \
+                        --redis-url \$RSPECQ_REDIS_URL \
+                        --report", label: 'Reporter')
+                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                      if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+                        sh '''#!/bin/bash
+                          ids=($(docker ps -aq --filter "name=canvas-"))
+                          for i in "${ids[@]}"
+                            do
+                              docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+                          done
+                        '''
                       }
-
-                      extendedStage("RSpecQ Set 00").queue(initialNodeStages) {
-                        rspecStage.runRspecqSuite()
-                      }
-
-                      parallel(initialNodeStages)
+                      throw e
                     }
+                  }
 
-                for (int i = 1; i < rspecqNodeTotal; i++) {
-                  def index = i
-                  extendedStage("RSpecQ Set ${(index).toString().padLeft(2, '0')}")
-                    .envVars(["CI_NODE_INDEX=$index",
-                        "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}",
-                        "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"])
-                    .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
-                    .nodeRequirements(rspecNodeRequirements)
-                    .timeout(env.NODE_TIMEOUT.toInteger())
-                    .queue(rspecqStages) { rspecStage.runRspecqSuite() }
+                  initialStages['00 Run Tests'] = {
+                    try {
+                      rspecStage.runRspecqSuite()
+                    } finally {
+                      buildSummaryReport.trackStage('RSpecQ Set 00', stageStartTime)
+                    }
+                  }
+
+                  stage('Run Tests and Reporter') {
+                    parallel(initialStages)
+                  }
+
+                  stage('00 Collect Results') {
+                    rspecStage.tearDownNode()
+                  }
+                } finally {
+                  pipelineHelpers.cleanupDocker()
                 }
+              }
+            }
 
-                parallel(rspecqStages)
-              } //rspecQ
-            } //builder
-          } //runner
-        } //script
-      } //steps
-    } //environment
-  } //stages
-} //pipeline
+            // Remaining nodes (index 1 through rspecqNodeTotal-1)
+            for (int i = 1; i < rspecqNodeTotal; i++) {
+              def index = i
+              def indexStr = (index).toString().padLeft(2, '0')
+              rspecqStages["RSpecQ Set ${indexStr}"] = {
+                rspecStage.runRspecQWorkerNode(indexStr, ["CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}"])
+              }
+            }
+
+            parallel(rspecqStages)
+          }
+        } finally {
+          pipelineHelpers.cleanupDocker()
+          if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
+            sendCrystalballSlack(summaryMessage, crystalballColor, currentBuild.currentResult)
+            sendCrystalballMetrics()
+          }
+          if (currentBuild.currentResult != 'SUCCESS' && env.RSPECQ_UPDATE_TIMINGS == '1') {
+            sendRspecqSlack(currentBuild.currentResult)
+          }
+          buildSummaryReport.saveRunManifest()
+        }
+      }
+    }
+  }
+}

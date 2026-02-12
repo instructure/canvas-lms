@@ -81,6 +81,11 @@ export default function EnhancedIndividualGradebook() {
   )
 
   const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
+
+  // Peer review submissions are returned as first-class submissions via the includePeerReviewSubmissions filter.
+  // They are stored in assignmentSubmissionsMap under their own assignment ID, so no extraction is needed.
+  // Note: subAssignmentSubmissions field only works for Discussion Checkpoints (checkpoints_parent? = true),
+  // not for peer review sub assignments (checkpoints_parent? = false).
   const submissionsMap = selectedAssignment ? assignmentSubmissionsMap[selectedAssignment.id] : {}
   const submissionsForSelectedAssignment = Object.values(submissionsMap ?? {})
 

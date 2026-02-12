@@ -18,6 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Accessibility
+  # TODO: RCX-4765 - This controller is dead code and should be removed.
+  # The UI that consumed these endpoints was removed in commit 70d63e25976.
+  # The new accessibility checker uses AccessibilityResourceScan instead.
+  # Keeping for now to maintain API compatibility if any external tools use it.
   class IssuesController < ApplicationController
     before_action :require_context
     before_action :require_user
@@ -27,6 +31,7 @@ module Accessibility
       @search_query = params[:search]
     end
 
+    # TODO: RCX-4765 - Dead endpoint. No frontend calls POST /accessibility/issues
     def create
       if request.body.present? && !request.body.read.strip.empty?
         request.body.rewind
@@ -40,6 +45,8 @@ module Accessibility
       render json: issue.search(search_query)
     end
 
+    # TODO: RCX-4765 - Dead endpoint. The wizard now uses AccessibilityIssuesController#update
+    # at /accessibility_issues/:id instead of this endpoint at /accessibility/issues
     def update
       response = Accessibility::Issue.new(context: @context).update_content(params[:rule], params[:content_type], params[:content_id], params[:path], params[:value])
       render json: response[:json], status: response[:status]

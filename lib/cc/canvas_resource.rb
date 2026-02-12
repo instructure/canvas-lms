@@ -168,7 +168,11 @@ module CC
         if @course.tab_configuration.present?
           tab_config = []
           @course.tab_configuration.each do |t|
+            # skip nav menu links for now, see INTEROP-9293
+            next if NavMenuLinkTabs.nav_menu_link_tab_id?(t["id"])
+
             tab = t.dup
+
             if tab["id"].is_a?(String)
               # it's an external tool, so translate the id to a migration_id
               tool_id = tab["id"].sub("context_external_tool_", "")

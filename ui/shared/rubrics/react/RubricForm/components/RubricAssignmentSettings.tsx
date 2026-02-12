@@ -28,6 +28,7 @@ type RubricAssignmentSettingsProps = {
   hidePoints: boolean
   useForGrading: boolean
   hideScoreTotal: boolean
+  canUseForGrading: boolean
   setRubricFormField: RubricFormFieldSetter
 }
 export const RubricAssignmentSettings = ({
@@ -35,6 +36,7 @@ export const RubricAssignmentSettings = ({
   hidePoints,
   useForGrading,
   hideScoreTotal,
+  canUseForGrading,
   setRubricFormField,
 }: RubricAssignmentSettingsProps) => {
   return (
@@ -49,17 +51,19 @@ export const RubricAssignmentSettings = ({
       </Flex.Item>
       {!hidePoints && (
         <>
-          <Flex.Item>
-            <Checkbox
-              label={I18n.t('Use this rubric for assignment grading')}
-              checked={useForGrading}
-              onChange={e => {
-                setRubricFormField('useForGrading', e.target.checked)
-                setRubricFormField('hideScoreTotal', false)
-              }}
-              data-testid="use-for-grading-checkbox"
-            />
-          </Flex.Item>
+          {canUseForGrading && (
+            <Flex.Item>
+              <Checkbox
+                label={I18n.t('Use this rubric for assignment grading')}
+                checked={useForGrading}
+                onChange={e => {
+                  setRubricFormField('useForGrading', e.target.checked)
+                  setRubricFormField('hideScoreTotal', false)
+                }}
+                data-testid="use-for-grading-checkbox"
+              />
+            </Flex.Item>
+          )}
 
           {!useForGrading && (
             <Flex.Item>

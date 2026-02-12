@@ -214,7 +214,7 @@ describe('WidgetGrid', () => {
       mockMatchMedia(800)
     })
 
-    it('renders single column layout', () => {
+    it('renders stacked column layout', () => {
       const {getByTestId} = setUp({...buildDefaultProps(), matches: ['tablet']})
       const grid = getByTestId('widget-columns')
 
@@ -222,17 +222,55 @@ describe('WidgetGrid', () => {
       expect(grid).toHaveStyle({
         display: 'flex',
       })
-      expect(grid.childElementCount).toBe(1)
+      expect(grid.childElementCount).toBe(2)
+
+      expect(getByTestId('widget-column-1-stacked')).toBeInTheDocument()
+      expect(getByTestId('widget-column-2-stacked')).toBeInTheDocument()
     })
 
-    it('sorts widgets in proper stacking order (relative)', () => {
+    it('groups widgets by column (column 1 first, then column 2)', () => {
       const {getAllByTestId} = setUp({...buildDefaultProps(), matches: ['tablet']})
       const widgetContainers = getAllByTestId(/^widget-container-/)
 
-      // Expected order: widget-1 (relative 1), widget-2 (relative 2), widget-3 (relative 3)
       expect(widgetContainers[0]).toHaveAttribute('data-testid', 'widget-container-widget-1')
-      expect(widgetContainers[1]).toHaveAttribute('data-testid', 'widget-container-widget-2')
-      expect(widgetContainers[2]).toHaveAttribute('data-testid', 'widget-container-widget-3')
+      expect(widgetContainers[1]).toHaveAttribute('data-testid', 'widget-container-widget-3')
+      expect(widgetContainers[2]).toHaveAttribute('data-testid', 'widget-container-widget-2')
+    })
+
+    it('supports edit mode with drag-and-drop', () => {
+      const {getByTestId} = setUp({...buildDefaultProps(), matches: ['tablet']}, true)
+
+      expect(getByTestId('drag-drop-context')).toBeInTheDocument()
+      expect(getByTestId('droppable-column-1')).toBeInTheDocument()
+      expect(getByTestId('droppable-column-2')).toBeInTheDocument()
+    })
+
+    it('renders add widget placeholders in edit mode', () => {
+      const {getAllByText} = setUp({...buildDefaultProps(), matches: ['tablet']}, true)
+
+      const addButtons = getAllByText('Add widget')
+      expect(addButtons.length).toBeGreaterThanOrEqual(2)
+    })
+  })
+
+  describe('Mobile Layout (<640px)', () => {
+    beforeEach(() => {
+      mockMatchMedia(400)
+    })
+
+    it('renders same stacked layout as tablet', () => {
+      const {getByTestId} = setUp({...buildDefaultProps(), matches: ['mobile']})
+
+      expect(getByTestId('widget-column-1-stacked')).toBeInTheDocument()
+      expect(getByTestId('widget-column-2-stacked')).toBeInTheDocument()
+    })
+
+    it('supports edit mode with drag-and-drop', () => {
+      const {getByTestId} = setUp({...buildDefaultProps(), matches: ['mobile']}, true)
+
+      expect(getByTestId('drag-drop-context')).toBeInTheDocument()
+      expect(getByTestId('droppable-column-1')).toBeInTheDocument()
+      expect(getByTestId('droppable-column-2')).toBeInTheDocument()
     })
   })
 
@@ -274,8 +312,8 @@ describe('WidgetGrid', () => {
   })
 
   describe('Edit Mode', () => {
-    it('does not render placeholder buttons before first widget in each column', () => {
-      const {getByTestId} = setUp(buildDefaultProps(), true)
+    it('renders placeholder buttons at top and after each widget in each column', () => {
+      const {getByTestId, getAllByText} = setUp(buildDefaultProps(), true)
 
       const column1 = getByTestId('widget-column-1')
       const column2 = getByTestId('widget-column-2')
@@ -283,10 +321,11 @@ describe('WidgetGrid', () => {
       const firstElementCol1 = column1.children[0] as HTMLElement
       const firstElementCol2 = column2.children[0] as HTMLElement
 
-      expect(firstElementCol1.tagName).not.toBe('BUTTON')
-      expect(firstElementCol2.tagName).not.toBe('BUTTON')
-      expect(firstElementCol1.getAttribute('data-testid')).toMatch(/draggable/)
-      expect(firstElementCol2.getAttribute('data-testid')).toMatch(/draggable/)
+      expect(firstElementCol1.tagName).toBe('BUTTON')
+      expect(firstElementCol2.tagName).toBe('BUTTON')
+
+      const addButtons = getAllByText('Add widget')
+      expect(addButtons).toHaveLength(5)
     })
 
     it('renders placeholder buttons for empty columns', () => {

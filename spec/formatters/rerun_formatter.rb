@@ -20,6 +20,7 @@
 require "rspec/core/formatters/base_text_formatter"
 require_relative "rerun_argument"
 
+# rubocop:disable RSpec/Output
 module RSpec
   class RerunFormatter < RSpec::Core::Formatters::BaseFormatter
     ::RSpec::Core::Formatters.register self, :dump_failures
@@ -47,3 +48,4 @@ module RSpec
     end
   end
 end
+# rubocop:enable RSpec/Output

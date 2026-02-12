@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Gỡ Liên Kết"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Gỡ Phương Tiện Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Thay Tất Cả"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Hiển thị tất cả"
     },
-    "show_audio_options_b489926b": {
-        "message": "Hiển thị tùy chọn âm thanh"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Hiển thị tùy chọn hình ảnh"
     },
     "show_link_options_545338fd": {
         "message": "Hiển thị tùy chọn liên kết"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Hiển thị tùy chọn phương tiện Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Hiển thị tùy chọn video"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Người dùng không bị khiếm thị duyệt nhanh trang web, tìm các đầu đề cỡ lớn hoặc được in đậm. Người dùng trình đọc màn hình phụ thuộc vào đầu đề để nắm bắt ngữ cảnh. Đầu đề phải sử dụng cấu trúc hoàn chỉnh."

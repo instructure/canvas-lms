@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import './react/show'
@@ -44,15 +44,22 @@ $(document).ready(() => {
     }
 
     if (!unenrollmentRoot) {
-      unenrollmentRoot = createRoot(mountPoint)
+      unenrollmentRoot = render(
+        <SelfUnenrollmentModal
+          unenrollmentApiUrl={apiUrl}
+          onClose={() => rerender(unenrollmentRoot, null)}
+        />,
+        mountPoint,
+      )
+    } else {
+      rerender(
+        unenrollmentRoot,
+        <SelfUnenrollmentModal
+          unenrollmentApiUrl={apiUrl}
+          onClose={() => rerender(unenrollmentRoot, null)}
+        />,
+      )
     }
-
-    unenrollmentRoot.render(
-      <SelfUnenrollmentModal
-        unenrollmentApiUrl={apiUrl}
-        onClose={() => unenrollmentRoot.render(null)}
-      />,
-    )
   })
 
   $('.re_send_confirmation_link').click(function (event) {

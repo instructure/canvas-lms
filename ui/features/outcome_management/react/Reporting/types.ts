@@ -100,5 +100,6 @@ export interface Outcome {
   totalAlignmentsCount: number
   masteryScore: number | null
   masteryLevel: MasteryLevel
+  masteryPoints: number
   scores?: LMGBScoreReporting[]
 }

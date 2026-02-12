@@ -272,6 +272,9 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Feliratfájl választása"
     },
+    "choose_file_8d89ccab": {
+        "message": "Válasszon fájlt"
+    },
     "choose_usage_rights_33683854": {
         "message": "Válasszon a felhasználói jogokból..."
     },
@@ -1715,6 +1718,9 @@
     "prime_numbers_13464f61": {
         "message": "Prímszámok"
     },
+    "processing_8c569014": {
+        "message": "Feldolgozás..."
+    },
     "product_39cf144f": {
         "message": "Szorzat"
     },
@@ -1982,20 +1988,11 @@
     "show_all_967a90f0": {
         "message": "Mindent megmutat"
     },
-    "show_audio_options_b489926b": {
-        "message": "Hangbeállítások megjelenítése"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Képbeállítások mutatása"
     },
     "show_link_options_545338fd": {
         "message": "Linkbeállítások mutatása"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "A Studio médiabeállításainak megjelenítése"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Videóbeállítások mutatása"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "A látó felhasználók gyorsan böngésznek a weboldalakon, nagy vagy félkövér fejléceket keresve. A képernyőolvasó felhasználói a fejlécekre hagyatkoznak a kontextus megértéséhez. A fejléceknek a megfelelő szerkezetet kell használniuk."
@@ -2362,6 +2359,9 @@
     },
     "updated_link_a827e441": {
         "message": "Frissített link"
+    },
+    "upload_8b403d05": {
+        "message": "Feltöltés"
     },
     "upload_document_253f0478": {
         "message": "Dokumentum feltöltése"

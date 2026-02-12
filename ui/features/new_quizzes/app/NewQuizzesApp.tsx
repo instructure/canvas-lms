@@ -72,5 +72,11 @@ export function NewQuizzesApp() {
     }
   }, [quizzesData])
 
-  return <div id="root" ref={mountPoint} />
+  return (
+    <>
+      <div id="alertHolder" role="alert" aria-live="assertive" />
+      <div id="politeAlertHolder" role="alert" aria-live="polite" />
+      <div id="root" ref={mountPoint} />
+    </>
+  )
 }

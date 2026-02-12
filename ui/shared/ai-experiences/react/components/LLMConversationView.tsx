@@ -298,7 +298,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                     textAlign="start"
                   >
                     <Text data-testid={`llm-conversation-message-${message.role}`}>
-                      {message.text}
+                      <span style={{whiteSpace: 'pre-wrap'}}>{message.text}</span>
                     </Text>
                   </View>
                 </View>
@@ -597,7 +597,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                                 textAlign="start"
                               >
                                 <Text data-testid={`llm-conversation-message-${message.role}`}>
-                                  {message.text}
+                                  <span style={{whiteSpace: 'pre-wrap'}}>{message.text}</span>
                                 </Text>
                               </View>
                             </View>

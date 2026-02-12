@@ -143,5 +143,220 @@ describe "context modules" do
         expect(module_item_move_tray).to be_displayed
       end
     end
+
+    context "peer review info display" do
+      before(:once) do
+        @course.root_account.disable_feature!(:modules_page_rewrite)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @module = @course.context_modules.create!(name: "Test Module")
+        @assignment = @course.assignments.create!(
+          title: "Peer Review Assignment",
+          submission_types: "online_text_entry",
+          due_at: 2.days.from_now,
+          points_possible: 100,
+          peer_reviews: true,
+          peer_review_count: 2,
+          automatic_peer_reviews: false
+        )
+        @pr_subassignment = PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: @assignment,
+          points_possible: 10,
+          due_at: 9.days.from_now
+        )
+        @module.add_item({ id: @assignment.id, type: "assignment" })
+
+        @new_peer_review_assignment = @course.assignments.create!(
+          title: "New Peer Review Assignment",
+          submission_types: "online_text_entry",
+          due_at: 3.days.from_now,
+          points_possible: 50,
+          peer_reviews: true,
+          peer_review_count: 3,
+          automatic_peer_reviews: false
+        )
+        @new_pr_subassignment = PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: @new_peer_review_assignment,
+          points_possible: 15,
+          due_at: 10.days.from_now
+        )
+      end
+
+      before do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+      end
+
+      it "displays peer review info for assignments with peer reviews" do
+        module_item = f("#context_module_item_#{@module.content_tags.first.id}")
+        expect(module_item).to include_text("Assignment:")
+        expect(module_item).to include_text("Peer Reviews (2):")
+      end
+
+      it "shows assignment and peer review due dates" do
+        module_item = f("#context_module_item_#{@module.content_tags.first.id}")
+        assignment_due = format_date_for_view(@assignment.due_at, :short)
+        peer_review_due = format_date_for_view(@pr_subassignment.due_at, :short)
+        expect(module_item).to include_text(assignment_due)
+        expect(module_item).to include_text(peer_review_due)
+      end
+
+      it "does not show availability dates" do
+        module_item = f("#context_module_item_#{@module.content_tags.first.id}")
+        expect(module_item.text).not_to include("Available")
+        expect(module_item.text).not_to include("Closed")
+      end
+
+      it "shows points possible" do
+        module_item = f("#context_module_item_#{@module.content_tags.first.id}")
+        expect(module_item).to include_text("100 pts")
+        expect(module_item).to include_text("10 pts")
+      end
+
+      it "displays peer review info when adding assignment to module" do
+        f("#context_module_#{@module.id} .ig-header-admin .al-trigger").click
+        f("#context_module_#{@module.id} .add_module_item_link").click
+        wait_for_ajaximations
+        select_module_item("#add_module_item_select", "Assignment")
+        wait_for_ajaximations
+        select_module_item("#assignments_select .module_item_select", @new_peer_review_assignment.title)
+        fj(".add_item_button:visible").click
+        wait_for_ajaximations
+
+        new_module_item = ffj(".context_module_item:visible").last
+        expect(new_module_item).to include_text("Assignment:")
+        expect(new_module_item).to include_text("Peer Reviews (3):")
+        expect(new_module_item).to include_text("50 pts")
+        expect(new_module_item).to include_text("15 pts")
+      end
+
+      it "displays regular due date and points for non-peer-review assignments" do
+        regular_assignment = @course.assignments.create!(
+          title: "Regular Assignment",
+          submission_types: "online_text_entry",
+          due_at: 5.days.from_now,
+          points_possible: 25
+        )
+        @module.add_item({ id: regular_assignment.id, type: "assignment" })
+        refresh_page
+        wait_for_ajaximations
+
+        module_item = f("#context_module_item_#{@module.content_tags.last.id}")
+        expect(module_item).not_to include_text("Assignment:")
+        expect(module_item).not_to include_text("Peer Reviews")
+        expect(module_item).to include_text(format_date_for_view(regular_assignment.due_at, :short))
+        expect(module_item).to include_text("25 pts")
+      end
+    end
+
+    context "peer review info with multiple due dates" do
+      before(:once) do
+        @course.root_account.disable_feature!(:modules_page_rewrite)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @module = @course.context_modules.create!(name: "Test Module")
+        @section1 = @course.course_sections.create!(name: "Section 1")
+        @section2 = @course.course_sections.create!(name: "Section 2")
+
+        @multi_date_assignment = @course.assignments.create!(
+          title: "Multi Date Assignment",
+          submission_types: "online_text_entry",
+          peer_reviews: true,
+          peer_review_count: 2,
+          automatic_peer_reviews: false
+        )
+
+        @pr_subassignment = PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: @multi_date_assignment,
+          points_possible: 10,
+          due_at: 9.days.from_now
+        )
+
+        @multi_date_assignment.assignment_overrides.create!(
+          set: @section1,
+          due_at: 2.days.from_now
+        )
+        @multi_date_assignment.assignment_overrides.create!(
+          set: @section2,
+          due_at: 4.days.from_now
+        )
+
+        @module.add_item({ id: @multi_date_assignment.id, type: "assignment" })
+      end
+
+      before do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+      end
+
+      it "displays 'Multiple Due Dates' link for assignments with multiple dates" do
+        module_item = f("#context_module_item_#{@module.content_tags.first.id}")
+        expect(module_item).to include_text("Multiple Due Dates")
+      end
+
+      it "does not display 'Multiple Dates' link" do
+        module_item = f("#context_module_item_#{@module.content_tags.first.id}")
+        expect(module_item.text).not_to match(/Multiple Dates(?! Dates)/)
+      end
+    end
+
+    context "assignments without peer reviews" do
+      before(:once) do
+        @course.root_account.disable_feature!(:modules_page_rewrite)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @module = @course.context_modules.create!(name: "Test Module")
+        @regular_assignment = @course.assignments.create!(
+          title: "Regular Assignment",
+          submission_types: "online_text_entry",
+          due_at: 2.days.from_now,
+          points_possible: 50
+        )
+        @module.add_item({ id: @regular_assignment.id, type: "assignment" })
+      end
+
+      before do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+      end
+
+      it "displays regular due date and points without peer review info" do
+        module_item = f("#context_module_item_#{@module.content_tags.first.id}")
+        expect(module_item.text).not_to include("Peer Review")
+        expect(module_item.text).not_to include("Assignment:")
+      end
+    end
+
+    context "peer review info with feature flag disabled" do
+      before(:once) do
+        @course.root_account.disable_feature!(:modules_page_rewrite)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        @module = @course.context_modules.create!(name: "Test Module")
+        @peer_review_assignment = @course.assignments.create!(
+          title: "Peer Review Assignment",
+          submission_types: "online_text_entry",
+          due_at: 2.days.from_now,
+          points_possible: 100,
+          peer_reviews: true,
+          peer_review_count: 2,
+          automatic_peer_reviews: false
+        )
+        @module.add_item({ id: @peer_review_assignment.id, type: "assignment" })
+      end
+
+      before do
+        get "/courses/#{@course.id}/modules"
+        wait_for_ajaximations
+      end
+
+      it "does not display peer review info component" do
+        module_item = f("#context_module_item_#{@module.content_tags.first.id}")
+        expect(module_item.text).not_to include("Assignment:")
+        expect(module_item.text).not_to include("Peer Reviews (2):")
+      end
+
+      it "displays regular due date and points displays" do
+        f("#context_module_item_#{@module.content_tags.first.id}")
+        expect(f("#context_module_item_#{@module.content_tags.first.id} .due_date_display")).to be_displayed
+        expect(f("#context_module_item_#{@module.content_tags.first.id} .points_possible_display")).to be_displayed
+      end
+    end
   end
 end

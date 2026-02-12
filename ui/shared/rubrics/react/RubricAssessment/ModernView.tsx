@@ -361,7 +361,7 @@ export const CriterionRow = ({
             size="small"
             weight="normal"
             themeOverride={{fontSizeXSmall: '0.875rem', paragraphMargin: 0}}
-            dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion)}
+            dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion.longDescription)}
           />
         </View>
         {criterion.learningOutcomeId && (

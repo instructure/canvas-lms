@@ -66,6 +66,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const [selectedTab, setSelectedTab] = useState<'details' | 'submission'>('details')
   const [selectedAssessmentIndex, setSelectedAssessmentIndex] = useState(0)
   const [hasCalledAllocate, setHasCalledAllocate] = useState(false)
+  const [isWaitingForAllocationRefetch, setIsWaitingForAllocationRefetch] = useState(false)
   const [shouldNavigateToNext, setShouldNavigateToNext] = useState(false)
   const [peerReviewModalOpen, setPeerReviewModalOpen] = useState(false)
   const [hasSeenPeerReviewModal, setHasSeenPeerReviewModal] = useState(false)
@@ -73,8 +74,8 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const userId = ENV.current_user_id || ''
 
   const queryClient = useQueryClient()
-  const {data, isLoading, isError} = useAssignmentQuery(assignmentId, userId)
-  const {mutate: allocatePeerReviews} = useAllocatePeerReviews()
+  const {data, isLoading, isError, isFetching} = useAssignmentQuery(assignmentId, userId)
+  const {mutate: allocatePeerReviews, isPending: isAllocating} = useAllocatePeerReviews()
   const {data: reviewerSubmission} = useReviewerSubmissionQuery(assignmentId, userId || '')
   const isMobile = breakpoints.mobileOnly
 
@@ -100,6 +101,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
 
       if (!showSubmissionRequiredView && assessmentRequestsCount < peerReviewsRequired) {
         setHasCalledAllocate(true)
+        setIsWaitingForAllocationRefetch(true)
         allocatePeerReviews({
           courseId: assignment.courseId,
           assignmentId: assignment._id,
@@ -107,6 +109,12 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
       }
     }
   }, [data, allocatePeerReviews, hasCalledAllocate])
+
+  useEffect(() => {
+    if (isWaitingForAllocationRefetch && !isFetching && data?.assignment) {
+      setIsWaitingForAllocationRefetch(false)
+    }
+  }, [isWaitingForAllocationRefetch, isFetching, data])
 
   useEffect(() => {
     const assessmentRequests = data?.assignment?.assessmentRequestsForCurrentUser
@@ -153,10 +161,15 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     return selectedAssessmentIndex >= availableCount
   }
 
-  if (isLoading) {
+  if (isLoading || isAllocating || isWaitingForAllocationRefetch) {
     return (
       <View as="div" padding="medium" textAlign="center">
-        <Spinner renderTitle={I18n.t('Loading assignment details')} size="large" />
+        <Spinner
+          renderTitle={
+            isAllocating ? I18n.t('Allocating peer reviews') : I18n.t('Loading assignment details')
+          }
+          size="large"
+        />
       </View>
     )
   }
@@ -178,7 +191,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     description,
     peerReviews,
     submissionsConnection,
-    assignedToDates,
+    peerReviewSubAssignment,
   } = data.assignment
 
   const submissionRequired = peerReviews?.submissionRequired ?? false
@@ -189,7 +202,7 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   const showSubmissionRequiredView = submissionRequired && !hasSubmitted
   const isLocked = isPeerReviewLocked(data.assignment)
   const isPastLockDate = isPeerReviewPastLockDate(data.assignment)
-  const peerReviewDueAt = assignedToDates?.[0]?.peerReviewDates?.dueAt
+  const peerReviewDueAt = peerReviewSubAssignment?.dueAt
   const isAnonymous = data.assignment.peerReviews?.anonymousReviews ?? false
   const selectedAssessment = assessmentRequestsForCurrentUser?.[selectedAssessmentIndex]
   const submissionUserId =

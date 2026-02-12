@@ -1050,8 +1050,7 @@ class FilesController < ApplicationController
     "User",
     "ContentMigration",
     "Quizzes::QuizSubmission",
-    "ContentMigration",
-    "Quizzes::QuizSubmission"
+    "SisBatch"
   ].freeze
 
   def api_capture
@@ -1092,7 +1091,7 @@ class FilesController < ApplicationController
                   else
                     @context.shard.activate do
                       # avoid creating an identical Attachment
-                      unless params[:on_duplicate] == "rename"
+                      if params.key?(:folder_id) && params[:on_duplicate] != "rename"
                         att = Attachment
                               .active
                               .where.not(instfs_uuid: nil)
@@ -1607,7 +1606,7 @@ class FilesController < ApplicationController
     user = InstAccessToken.find_user_by_uuid_prefer_local(params[:user_uuid])
     return render_unauthorized_action unless user&.grants_right?(@current_user, session, :read_full_profile)
     return render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :bad_request if params[:file_urls].blank?
-    return render json: { errors: [{ "message" => "Too many file links requested.  A maximum of 100 file links can be processed per request." }] }, status: :unprocessable_entity if params[:file_urls].size > 100
+    return render json: { errors: [{ "message" => "Too many file links requested.  A maximum of 100 file links can be processed per request." }] }, status: :unprocessable_content if params[:file_urls].size > 100
 
     parsed_file_urls = params[:file_urls]&.filter_map do |url|
       Rails.application.routes.recognize_path(url).merge(url:)
@@ -1660,7 +1659,7 @@ class FilesController < ApplicationController
 
     return render json: file_urls_with_metadata.to_json, status: :ok if file_urls_with_metadata.present?
 
-    render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :unprocessable_entity
+    render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :unprocessable_content
   end
 
   def image_thumbnail
@@ -1710,12 +1709,12 @@ class FilesController < ApplicationController
     if Attachment.local_storage?
       cancel_cache_buster
       thumbnail = Thumbnail.find_by(id: params[:id]) if params[:id].present?
-
       raise ActiveRecord::RecordNotFound unless thumbnail
 
       attachment = thumbnail.attachment
-
-      return render_unauthorized_action unless access_allowed(attachment:, user: @current_user, access_type: :download)
+      root_account = attachment&.root_account
+      old_auth = params[:uuid].present? && params[:uuid] == thumbnail.uuid && root_account.present? && !root_account.feature_enabled?(:disable_file_verifier_access)
+      return unless old_auth || access_allowed(attachment:, user: @current_user, access_type: :download)
 
       safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type
     end

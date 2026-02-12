@@ -29,6 +29,8 @@ export type MoveAction =
   | 'move-right-top'
   | 'move-up'
   | 'move-down'
+  | 'move-up-cross'
+  | 'move-down-cross'
   | 'move-to-top'
   | 'move-to-bottom'
 
@@ -123,6 +125,51 @@ const moveWidgetRightTop = (widgets: Widget[], widgetId: string): Widget[] => {
       return {...w, position: {...w.position, col: RIGHT_COLUMN, row: 1}}
     }
     if (w.position.col === RIGHT_COLUMN) {
+      return {...w, position: {...w.position, row: w.position.row + 1}}
+    }
+    return w
+  })
+}
+
+const moveWidgetUpCross = (widgets: Widget[], widgetId: string): Widget[] => {
+  const widget = widgets.find(w => w.id === widgetId)
+  if (!widget || widget.position.col !== RIGHT_COLUMN) return widgets
+
+  const leftWidgets = widgets.filter(w => w.position.col === LEFT_COLUMN)
+  if (leftWidgets.length === 0) {
+    return widgets.map(w =>
+      w.id === widgetId ? {...w, position: {...w.position, col: LEFT_COLUMN, row: 1}} : w,
+    )
+  }
+
+  const maxRow = Math.max(...leftWidgets.map(w => w.position.row))
+  return widgets.map(w => {
+    if (w.id === widgetId) {
+      return {...w, position: {...w.position, col: LEFT_COLUMN, row: maxRow}}
+    }
+    if (w.position.col === LEFT_COLUMN && w.position.row === maxRow) {
+      return {...w, position: {...w.position, row: w.position.row + 1}}
+    }
+    return w
+  })
+}
+
+const moveWidgetDownCross = (widgets: Widget[], widgetId: string): Widget[] => {
+  const widget = widgets.find(w => w.id === widgetId)
+  if (!widget || widget.position.col !== LEFT_COLUMN) return widgets
+
+  const rightWidgets = widgets.filter(w => w.position.col === RIGHT_COLUMN)
+  if (rightWidgets.length === 0) {
+    return widgets.map(w =>
+      w.id === widgetId ? {...w, position: {...w.position, col: RIGHT_COLUMN, row: 1}} : w,
+    )
+  }
+
+  return widgets.map(w => {
+    if (w.id === widgetId) {
+      return {...w, position: {...w.position, col: RIGHT_COLUMN, row: 2}}
+    }
+    if (w.position.col === RIGHT_COLUMN && w.position.row >= 2) {
       return {...w, position: {...w.position, row: w.position.row + 1}}
     }
     return w
@@ -268,6 +315,12 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
             break
           case 'move-down':
             updatedWidgets = moveWidgetDown(updatedWidgets, widgetId)
+            break
+          case 'move-up-cross':
+            updatedWidgets = moveWidgetUpCross(updatedWidgets, widgetId)
+            break
+          case 'move-down-cross':
+            updatedWidgets = moveWidgetDownCross(updatedWidgets, widgetId)
             break
           case 'move-to-top':
             updatedWidgets = moveWidgetToTop(updatedWidgets, widgetId)

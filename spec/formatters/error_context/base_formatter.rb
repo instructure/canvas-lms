@@ -76,7 +76,7 @@ module ErrorContext
     class << self
       # In the case of loads of specs failing, don't generate error pages
       # beyond a certain point
-      MAX_FAILURES_TO_RECORD = 20
+      MAX_FAILURES_TO_RECORD = 40
       attr_writer :num_failures
 
       def num_failures

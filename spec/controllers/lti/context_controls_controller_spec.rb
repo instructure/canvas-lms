@@ -568,7 +568,7 @@ describe Lti::ContextControlsController, type: :request do
 
     before { root_deployment }
 
-    include_examples "navigation cache invalidation"
+    it_behaves_like "navigation cache invalidation"
 
     it "creates a new control" do
       expect { subject }.to change { Lti::ContextControl.count }.by(1)
@@ -629,7 +629,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0)).to eq("Exactly one context must be present")
       end
     end
@@ -639,14 +639,14 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0)).to eq("Either account_id or course_id must be present.")
       end
 
       context "with existing control" do
         it "returns 422" do
           subject
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response_json["errors"]).to include(
             "Either account_id or course_id must be present."
           )
@@ -684,7 +684,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "No active deployment found for the root account."
         )
@@ -699,7 +699,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "Context must belong to the deployment's context"
         )
@@ -739,7 +739,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "A context control for this deployment and context already exists."
         )
@@ -833,7 +833,7 @@ describe Lti::ContextControlsController, type: :request do
     context "with empty params" do
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Invalid parameters. Expected an array of context control parameters.")
       end
     end
@@ -843,7 +843,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Invalid parameters. Expected an array of context control parameters.")
       end
     end
@@ -861,7 +861,7 @@ describe Lti::ContextControlsController, type: :request do
       let(:subaccount2) { account_model(parent_account: account) }
       let(:subdeployment) { registration.new_external_tool(subaccount).tap(&:save!) }
 
-      include_examples "navigation cache invalidation"
+      it_behaves_like "navigation cache invalidation"
 
       it "creates context controls" do
         subdeployment
@@ -982,15 +982,40 @@ describe Lti::ContextControlsController, type: :request do
         it "does not create a new anchor control" do
           expect { subject }.to change { Lti::ContextControl.count }.by(3)
           expect(response).to be_successful
-          expect(response_json.length).to eq(4)
+          expect(response_json.length).to eq(3)
           expect(response_json.map(&:with_indifferent_access)).to match_array(
             [
               hash_including(account_id: other_subsubaccount.id, available: true),
               hash_including(course_id: course.id, available: false),
-              hash_including(account_id: other_subaccount.id, available: root_deployment.primary_context_control.available), # existing anchor is still returned
-              hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available) # anchor
+              hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available)
             ]
           )
+        end
+
+        it "does not modify the existing anchor control's availability" do
+          anchor_control
+          original_available = anchor_control.available
+          expect { subject }.not_to change { anchor_control.reload.available }.from(original_available)
+          expect(response).to be_successful
+        end
+
+        it "does not modify existing unavailable anchor control" do
+          separate_subaccount = account_model(parent_account: account)
+          unavailable_anchor = Lti::ContextControl.create!(
+            account: separate_subaccount,
+            registration:,
+            deployment: root_deployment,
+            available: false
+          )
+
+          deep_account = account_model(parent_account: account_model(parent_account: separate_subaccount))
+
+          post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/bulk",
+               params: [{ account_id: deep_account.id, available: true }],
+               as: :json
+
+          expect(response).to be_successful
+          expect(unavailable_anchor.reload.available).to be(false)
         end
 
         it "tracks the changes" do
@@ -998,16 +1023,17 @@ describe Lti::ContextControlsController, type: :request do
 
           body = response.parsed_body
 
-          controls = Lti::ContextControl.where(id: body.filter { |c| c["id"] != anchor_control.id }.pluck("id"))
+          controls = Lti::ContextControl.where(id: body.pluck("id"))
 
           expected = controls.map do |control|
             ["+", [control.id], control.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)]
           end
-          expected << ["~", [anchor_control.id, "available"], true, false]
 
           expect(Lti::RegistrationHistoryEntry.last.diff["context_controls"]).to match_array(
             expected
           )
+
+          expect(anchor_control.reload.available).to be(true)
         end
       end
     end
@@ -1025,7 +1051,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Cannot create multiple context controls for the same context")
       end
     end
@@ -1042,7 +1068,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Either account_id or course_id must be present for each context control")
       end
     end
@@ -1059,7 +1085,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Either account_id or course_id must be present for each context control, but not both")
       end
     end
@@ -1186,7 +1212,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "Cannot create more than #{max_size} context controls at once"
         )
@@ -1205,7 +1231,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0, "message")).to eq(
           "Context must belong to the deployment's context"
         )
@@ -1222,7 +1248,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0, "message")).to eq(
           "Context must belong to the deployment's context"
         )
@@ -1237,7 +1263,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include(
           "No active deployment found for the root account."
         )
@@ -1287,7 +1313,7 @@ describe Lti::ContextControlsController, type: :request do
     let(:registration_id) { registration.id }
 
     context "with the lti_registrations_next feature flag enabled" do
-      include_examples "navigation cache invalidation"
+      it_behaves_like "navigation cache invalidation"
 
       it "updates the context control" do
         expect(control.available).to be true
@@ -1375,7 +1401,7 @@ describe Lti::ContextControlsController, type: :request do
     let(:registration_id) { registration.id }
     let(:control_id) { control.id }
 
-    include_examples "navigation cache invalidation"
+    it_behaves_like "navigation cache invalidation"
 
     it "deletes and returns the context control" do
       subject
@@ -1395,7 +1421,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns a 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Cannot delete primary control for deployment")
       end
 

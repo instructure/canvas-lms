@@ -28,6 +28,7 @@ import {useMemo, useEffect} from 'react'
 import type {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import OutcomeAlignmentsList from './OutcomeAlignmentsList'
 
 const I18n = createI18nScope('outcome_management')
 
@@ -35,12 +36,14 @@ interface OutcomesTableRowExpansionProps {
   outcomeId: number | string
   studentId: string
   contributingScores: ContributingScoresManager
+  masteryPoints: number
 }
 
 const OutcomesTableRowExpansion = ({
   outcomeId,
   studentId,
   contributingScores,
+  masteryPoints,
 }: OutcomesTableRowExpansionProps) => {
   const outcomeScores = contributingScores.forOutcome(outcomeId)
 
@@ -94,7 +97,9 @@ const OutcomesTableRowExpansion = ({
     )
   }
 
-  if (scores.length === 0) {
+  const hasAlignments = (outcomeScores.alignments?.length ?? 0) > 0
+
+  if (scores.length === 0 && !hasAlignments) {
     return (
       <View as="div" padding="medium" textAlign="center">
         <Text>{I18n.t('No assessment data available')}</Text>
@@ -104,49 +109,59 @@ const OutcomesTableRowExpansion = ({
 
   return (
     <View as="div" padding="0 0 small small">
-      <Flex direction="column" gap="small">
-        <Flex.Item>
-          <View
-            as="div"
-            height="16rem"
-            width="calc(100% / 3)"
-            position="relative"
-            borderWidth="small"
-            borderRadius="large"
-            padding="0 0 0 medium"
-          >
-            <canvas
-              ref={canvasRef}
-              role="img"
-              aria-label={I18n.t('Outcome scores over time chart')}
-              aria-describedby="outcome-scores-table"
-              data-testid="outcome-scores-chart"
-            />
-            {/* Accessible data table for screen readers */}
-            <ScreenReaderContent>
-              <Table caption={I18n.t('Outcome scores over time')} id="outcome-scores-table">
-                <Table.Head>
-                  <Table.Row>
-                    <Table.ColHeader id="assignment">{I18n.t('Assignment')}</Table.ColHeader>
-                    <Table.ColHeader id="date">{I18n.t('Date')}</Table.ColHeader>
-                    <Table.ColHeader id="score">{I18n.t('Score')}</Table.ColHeader>
-                  </Table.Row>
-                </Table.Head>
-                <Table.Body>
-                  {sortedScores.map((score, index) => (
-                    <Table.Row key={index}>
-                      <Table.Cell>{score.title}</Table.Cell>
-                      <Table.Cell>
-                        {new Date(score.submitted_at).toLocaleDateString(I18n.currentLocale())}
-                      </Table.Cell>
-                      <Table.Cell>{score.score.toFixed(2)}</Table.Cell>
+      <Flex direction="row" gap="small" alignItems="start">
+        {/* Chart View - 1/3 width */}
+        {scores.length > 0 && (
+          <Flex.Item width="33.33%">
+            <View
+              as="div"
+              height="16rem"
+              position="relative"
+              borderWidth="small"
+              borderRadius="large"
+              padding="0 0 0 medium"
+            >
+              <canvas
+                ref={canvasRef}
+                role="img"
+                aria-label={I18n.t('Outcome scores over time chart')}
+                aria-describedby="outcome-scores-table"
+                data-testid="outcome-scores-chart"
+              />
+              {/* Accessible data table for screen readers */}
+              <ScreenReaderContent>
+                <Table caption={I18n.t('Outcome scores over time')} id="outcome-scores-table">
+                  <Table.Head>
+                    <Table.Row>
+                      <Table.ColHeader id="assignment">{I18n.t('Assignment')}</Table.ColHeader>
+                      <Table.ColHeader id="date">{I18n.t('Date')}</Table.ColHeader>
+                      <Table.ColHeader id="score">{I18n.t('Score')}</Table.ColHeader>
                     </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-            </ScreenReaderContent>
-          </View>
-        </Flex.Item>
+                  </Table.Head>
+                  <Table.Body>
+                    {sortedScores.map((score, index) => (
+                      <Table.Row key={index}>
+                        <Table.Cell>{score.title}</Table.Cell>
+                        <Table.Cell>
+                          {new Date(score.submitted_at).toLocaleDateString(I18n.currentLocale())}
+                        </Table.Cell>
+                        <Table.Cell>{score.score.toFixed(2)}</Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table>
+              </ScreenReaderContent>
+            </View>
+          </Flex.Item>
+        )}
+
+        {/* List View - 2/3 width */}
+        <OutcomeAlignmentsList
+          outcomeScores={outcomeScores}
+          studentId={studentId}
+          masteryPoints={masteryPoints}
+          hasChartView={scores.length > 0}
+        />
       </Flex>
     </View>
   )

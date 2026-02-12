@@ -34,12 +34,12 @@ describe PactApiConsumerProxy do
       @student1 = User.create!(name: "Student1")
       @student2 = User.create!(name: "Student2")
 
-      student1_token = double(full_token: "1_TOKEN")
-      student1_tokens = double(create!: student1_token)
+      student1_token = instance_double(AccessToken, full_token: "1_TOKEN")
+      student1_tokens = instance_double(ActiveRecord::Relation, create!: student1_token)
       allow_any_instantiation_of(@student1).to receive(:access_tokens).and_return(student1_tokens)
 
-      student2_token = double(full_token: "2_TOKEN")
-      student2_tokens = double(create!: student2_token)
+      student2_token = instance_double(AccessToken, full_token: "2_TOKEN")
+      student2_tokens = instance_double(ActiveRecord::Relation, create!: student2_token)
       allow_any_instantiation_of(@student2).to receive(:access_tokens).and_return(student2_tokens)
     end
 

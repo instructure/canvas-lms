@@ -47,7 +47,7 @@ describe "Submissions Comment API", type: :request do
                                                 submission_types: "online_upload"
     end
 
-    include_examples "file uploads api"
+    it_behaves_like "file uploads api"
     def has_query_exemption?
       true
     end

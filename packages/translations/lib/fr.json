@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Supprimer lien"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Retirer le média Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Tout remplacer"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Tout afficher"
     },
-    "show_audio_options_b489926b": {
-        "message": "Afficher les options audio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Afficher les options d''images"
     },
     "show_link_options_545338fd": {
         "message": "Afficher les options de lien"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Afficher les options de média Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Afficher les options vidéo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Les utilisateurs voyants naviguent rapidement sur les pages web, en recherchant des en-têtes en gras ou en grands caractères. Les lecteurs d''écrans s''appuient sur les en-têtes pour en déduire une compréhension contextuelle. Les en-têtes doivent toujours respecter la bonne structure."

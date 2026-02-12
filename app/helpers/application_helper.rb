@@ -882,7 +882,7 @@ module ApplicationHelper
     # may be overridden by a plugin
     @agree_to_terms ||
       I18n.t(
-        "I agree to the *terms of use*.", wrapper: '<span class="terms_of_service_link">\1</span>'
+        "I agree to the *Acceptable Use Policy*.", wrapper: '<span class="terms_of_service_link">\1</span>'
       )
   end
 

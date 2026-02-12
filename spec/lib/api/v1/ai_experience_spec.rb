@@ -35,7 +35,7 @@ describe Api::V1::AiExperience do
   describe "ai_experience_json" do
     it "includes all specified attributes" do
       json = api.ai_experience_json(@ai_experience, @teacher, session)
-      expected_fields = %w[id title description facts learning_objective pedagogical_guidance workflow_state course_id created_at updated_at]
+      expected_fields = %w[id title description facts learning_objective pedagogical_guidance workflow_state course_id context_index_status created_at updated_at]
 
       expected_fields.each do |field|
         expect(json).to have_key(field)
@@ -64,6 +64,39 @@ describe Api::V1::AiExperience do
     it "does not include submission_status when not provided in opts" do
       json = api.ai_experience_json(@ai_experience, @teacher, session)
       expect(json).not_to have_key(:submission_status)
+    end
+
+    context "with ai_experiences_context_file_upload feature flag enabled" do
+      before { @course.enable_feature!(:ai_experiences_context_file_upload) }
+
+      it "includes context_files array" do
+        attachment = attachment_model(context: @course, size: 1.megabyte, filename: "test.pdf")
+        AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment:)
+
+        json = api.ai_experience_json(@ai_experience, @teacher, session)
+
+        expect(json).to have_key(:context_files)
+        expect(json[:context_files]).to be_an(Array)
+        expect(json[:context_files].length).to eq(1)
+        expect(json[:context_files].first[:id]).to eq(attachment.id)
+        expect(json[:context_files].first[:filename]).to eq("test.pdf")
+        expect(json[:context_files].first).to have_key(:size)
+        expect(json[:context_files].first).to have_key(:content_type)
+        expect(json[:context_files].first).to have_key(:position)
+      end
+    end
+
+    context "with ai_experiences_context_file_upload feature flag disabled" do
+      before { @course.disable_feature!(:ai_experiences_context_file_upload) }
+
+      it "does not include context_files array" do
+        attachment = attachment_model(context: @course, size: 1.megabyte)
+        AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment:)
+
+        json = api.ai_experience_json(@ai_experience, @teacher, session)
+
+        expect(json).not_to have_key(:context_files)
+      end
     end
   end
 

@@ -75,6 +75,7 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
     totalPages,
     goToPage,
     isLoading,
+    isPaginationLoading,
     error,
     refetch,
     resetPagination,
@@ -188,15 +189,18 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
         loadingText={I18n.t('Loading to-do items...')}
         headerActions={
           <Button size="small" onClick={() => setIsModalOpen(true)} data-testid="new-todo-button">
-            {I18n.t('+ New')}
+            {I18n.t('+ New To-do')}
           </Button>
         }
         pagination={{
           currentPage: currentPageIndex + 1,
           totalPages,
           onPageChange: goToPage,
-          isLoading,
           ariaLabel: I18n.t('To-do list pagination'),
+        }}
+        loadingOverlay={{
+          isLoading: isPaginationLoading,
+          ariaLabel: I18n.t('Loading to-do items'),
         }}
       >
         {renderContent()}

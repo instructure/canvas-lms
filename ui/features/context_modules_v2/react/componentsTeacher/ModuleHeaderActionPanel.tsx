@@ -168,25 +168,29 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
           </Flex.Item>
         )}
       </Flex>
-      <DirectShareUserModal
-        id={id}
-        open={isDirectShareOpen}
-        sourceCourseId={courseId}
-        courseId={courseId}
-        contentShare={{content_type: 'module', content_id: id}}
-        onDismiss={() => {
-          setIsDirectShareOpen(false)
-        }}
-      />
-      <DirectShareCourseTray
-        open={isDirectShareCourseOpen}
-        sourceCourseId={courseId}
-        courseId={courseId}
-        contentSelection={{modules: [id]}}
-        onDismiss={() => {
-          setIsDirectShareCourseOpen(false)
-        }}
-      />
+      {isDirectShareOpen && (
+        <DirectShareUserModal
+          id={id}
+          open={isDirectShareOpen}
+          sourceCourseId={courseId}
+          courseId={courseId}
+          contentShare={{content_type: 'module', content_id: id}}
+          onDismiss={() => {
+            setIsDirectShareOpen(false)
+          }}
+        />
+      )}
+      {isDirectShareCourseOpen && (
+        <DirectShareCourseTray
+          open={isDirectShareCourseOpen}
+          sourceCourseId={courseId}
+          courseId={courseId}
+          contentSelection={{modules: [id]}}
+          onDismiss={() => {
+            setIsDirectShareCourseOpen(false)
+          }}
+        />
+      )}
       <AddItemModal
         isOpen={isAddItemOpen}
         onRequestClose={() => setIsAddItemOpen(false)}

@@ -339,13 +339,13 @@ class AppointmentGroup < ActiveRecord::Base
                                           ->(c) { c.participating_students_by_date }
                                         end
                      if sub_contexts.empty?
-                       contexts.select(&:published?).map(&participant_func).flatten
+                       contexts.select(&:published?).map(&participant_func).flatten.uniq
                      else
-                       sub_contexts.map(&participant_func).flatten
+                       sub_contexts.map(&participant_func).flatten.uniq
                      end
                    else
                      # FIXME?
-                     sub_contexts.map(&:groups).flatten
+                     sub_contexts.map(&:groups).flatten.uniq
                    end
     participant_ids = self.participant_ids
     registered = participants.select { |p| participant_ids.include?(p.id) }
@@ -359,8 +359,18 @@ class AppointmentGroup < ActiveRecord::Base
                      participants
                    end
 
-    if current_user && context_code
-      recipients = normalize_recipients(recipients: participants.map(&:id), context_code:, current_user:)
+    if current_user && participant_type == "User"
+      # Only filter users through normalize_recipients (not groups)
+      recipients = if context_code.is_a?(Array) && context_code.length == 1
+                     normalize_recipients(recipients: participants.map(&:id), context_code: context_code.first, current_user:)
+                   elsif context_code && !context_code.is_a?(Array)
+                     normalize_recipients(recipients: participants.map(&:id), context_code:, current_user:)
+                   else
+                     # Multi-course appointment groups or no context_code:
+                     # Filter without context restriction to include students from all courses
+                     # while still filtering out test students and other unmessageable users
+                     normalize_recipients(recipients: participants.map(&:id), current_user:)
+                   end
       recipient_ids = recipients.map(&:id)
       participants = participants.select { |p| recipient_ids.include?(p.id) }
     end

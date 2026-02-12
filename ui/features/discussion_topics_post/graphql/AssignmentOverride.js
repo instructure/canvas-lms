@@ -23,7 +23,7 @@ import {shape, string, oneOfType} from 'prop-types'
 
 export const AssignmentOverride = {
   fragment: gql`
-    fragment AssignmentOverride on AssignmentOverride {
+    fragment DiscussionPostAssignmentOverride on AssignmentOverride {
       id
       _id
       dueAt
@@ -35,7 +35,7 @@ export const AssignmentOverride = {
           ...AdhocStudents
         }
         ... on Group {
-          ...Group
+          ...DiscussionPostGroup
         }
       }
     }

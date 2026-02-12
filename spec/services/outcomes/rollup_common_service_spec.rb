@@ -356,7 +356,7 @@ describe Outcomes::RollupCommonService do
     end
 
     it "handles ActiveRecord relations" do
-      canvas_results = double("ActiveRecord::Relation", to_a: [canvas_result1])
+      canvas_results = instance_double(ActiveRecord::Relation, to_a: [canvas_result1])
       os_results = [os_result1]
 
       combined = subject.combine_results(canvas_results, os_results)
@@ -416,7 +416,7 @@ describe Outcomes::RollupCommonService do
 
     it "returns rollup objects from outcome_results_rollups" do
       results = [result1]
-      mock_rollup = double("Rollup")
+      mock_rollup = instance_double(Outcomes::ResultAnalytics::Rollup)
 
       allow(subject).to receive(:outcome_results_rollups)
         .and_return([mock_rollup])
@@ -432,37 +432,37 @@ describe Outcomes::RollupCommonService do
     let(:submitted_at2) { 1.day.ago }
 
     let(:score1) do
-      double("Score",
-             outcome:,
-             score: 4.0,
-             submitted_at: submitted_at1,
-             title: "Assignment 1",
-             hide_points: false,
-             count: 1)
+      instance_double(RollupScore,
+                      outcome:,
+                      score: 4.0,
+                      submitted_at: submitted_at1,
+                      title: "Assignment 1",
+                      hide_points: false,
+                      count: 1)
     end
 
     let(:score2) do
-      double("Score",
-             outcome: double("Outcome", id: 2, calculation_method: "highest"),
-             score: 3.5,
-             submitted_at: submitted_at2,
-             title: "Assignment 2",
-             hide_points: true,
-             count: 2)
+      instance_double(RollupScore,
+                      outcome: instance_double(LearningOutcome, id: 2, calculation_method: "highest"),
+                      score: 3.5,
+                      submitted_at: submitted_at2,
+                      title: "Assignment 2",
+                      hide_points: true,
+                      count: 2)
     end
 
     let(:nil_score) do
-      double("Score",
-             outcome: double("Outcome", id: 3, calculation_method: "n_mastery"),
-             score: nil,
-             submitted_at: nil,
-             title: nil,
-             hide_points: false,
-             count: 0)
+      instance_double(RollupScore,
+                      outcome: instance_double(LearningOutcome, id: 3, calculation_method: "n_mastery"),
+                      score: nil,
+                      submitted_at: nil,
+                      title: nil,
+                      hide_points: false,
+                      count: 0)
     end
 
     let(:rollup) do
-      double("Rollup", scores: [score1, score2, nil_score])
+      instance_double(Outcomes::ResultAnalytics::Rollup, scores: [score1, score2, nil_score])
     end
 
     before do
@@ -501,7 +501,7 @@ describe Outcomes::RollupCommonService do
     end
 
     it "filters out scores with nil values" do
-      rollup_with_nil = double("Rollup", scores: [nil_score])
+      rollup_with_nil = instance_double(Outcomes::ResultAnalytics::Rollup, scores: [nil_score])
 
       rows = subject.build_rollup_rows(rollup_with_nil, course, student)
 
@@ -509,7 +509,7 @@ describe Outcomes::RollupCommonService do
     end
 
     it "handles empty scores array" do
-      empty_rollup = double("Rollup", scores: [])
+      empty_rollup = instance_double(Outcomes::ResultAnalytics::Rollup, scores: [])
 
       rows = subject.build_rollup_rows(empty_rollup, course, student)
 
@@ -517,7 +517,7 @@ describe Outcomes::RollupCommonService do
     end
 
     it "includes all required fields for database insertion" do
-      rollup_with_one_score = double("Rollup", scores: [score1])
+      rollup_with_one_score = instance_double(Outcomes::ResultAnalytics::Rollup, scores: [score1])
 
       rows = subject.build_rollup_rows(rollup_with_one_score, course, student)
 

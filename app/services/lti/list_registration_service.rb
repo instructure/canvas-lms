@@ -47,9 +47,11 @@ module Lti
       GuardRail.activate(:secondary) do
         registrations = account_registrations
         unless account.site_admin?
-          registrations += forced_on_in_site_admin +
-                           inherited_on_registrations(registrations) +
-                           consortia_registrations
+          forced_on = forced_on_in_site_admin
+          inherited_on = inherited_on_registrations(registrations, forced_on)
+          registrations += forced_on +
+                           inherited_on +
+                           consortia_registrations(forced_on, inherited_on)
         end
 
         if preload_overlays
@@ -113,7 +115,7 @@ module Lti
 
     # Get all registration account bindings that are bound to the consortium parent account and that are "on,"
     # since they will apply to this account
-    def consortia_registrations
+    def consortia_registrations(forced_on, inherited_on)
       if account.root_account.primary_settings_root_account?
         return Lti::RegistrationAccountBinding.none
       end
@@ -124,24 +126,33 @@ module Lti
         .shard(consortium_parent.shard)
         .where(account: consortium_parent)
         .where(lti_registration_account_bindings: { workflow_state: "on", account: consortium_parent })
+        # Ensure we're only getting unique registrations we haven't already considered elsewhere
+        .where.not(id: (forced_on.map(&:id) + inherited_on.map(&:id)).uniq)
     end
 
-    # Get all registration account bindings in this account, then fetch the registrations from their own shards
-    # Omit registrations that were found in the "account_registrations" list; we're only looking for ones that
-    # are uniquely being inherited from a different account.
-    def inherited_on_registrations(account_registrations)
-      ids = inherited_on_registration_ids(account_registrations)
+    # Get all registration account bindings in this account, then fetch the
+    # registrations from their own shards. Omit registrations that were found in
+    # the "account_registrations" list or the "forced_on" list; we're only looking
+    # for ones that are uniquely being inherited from a different account and
+    # aren't already forced on.
+    #
+    # A registration might have been inherited_on at one point, then, when the
+    # site admin key is forced to on, the old account binding record still hangs
+    # around. Thus, we have to explicitly filter out forced_on_registrations for
+    # cases like this.
+    def inherited_on_registrations(account_registrations, forced_on_registrations)
+      ids = inherited_on_registration_ids(account_registrations, forced_on_registrations)
 
       Shard.partition_by_shard(ids) do |registration_ids_for_shard|
         base_query.where(id: registration_ids_for_shard)
       end.flatten
     end
 
-    def inherited_on_registration_ids(account_registrations)
+    def inherited_on_registration_ids(account_registrations, forced_on_registrations)
       Lti::RegistrationAccountBinding
         .where(workflow_state: "on")
         .where(account:)
-        .where.not(registration_id: account_registrations.map(&:id))
+        .where.not(registration_id: (account_registrations.map(&:id) + forced_on_registrations.map(&:id)).uniq)
         .pluck(:registration_id)
         .uniq
     end

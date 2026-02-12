@@ -159,7 +159,7 @@ module ConditionalRelease
           student = User.find(student_id)
           affected_context_modules.each do |context_module|
             progression = context_module.find_or_create_progression(student)
-            progression.mark_as_outdated
+            progression.mark_as_outdated!
             progression.reload.evaluate
           end
 

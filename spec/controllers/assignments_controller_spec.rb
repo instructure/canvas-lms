@@ -281,6 +281,20 @@ describe AssignmentsController do
       expect(assigns[:js_env][:FLAGS][:new_quizzes_by_default]).to be_falsey
     end
 
+    it "sets FLAGS/peer_review_allocation_and_grading in js_env if 'peer_review_allocation_and_grading' is enabled" do
+      user_session @teacher
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:FLAGS][:peer_review_allocation_and_grading]).to be_truthy
+    end
+
+    it "does not set FLAGS/peer_review_allocation_and_grading in js_env if 'peer_review_allocation_and_grading' is disabled" do
+      user_session @teacher
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:FLAGS][:peer_review_allocation_and_grading]).to be_falsey
+    end
+
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
@@ -300,6 +314,20 @@ describe AssignmentsController do
       allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get "index", params: { course_id: @course.id }
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
+    end
+
+    it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as true if enabled" do
+      user_session(@teacher)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(true)
+    end
+
+    it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as false if disabled" do
+      user_session(@teacher)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(false)
     end
 
     context "course grading scheme defaults" do
@@ -2676,8 +2704,6 @@ describe AssignmentsController do
 
     context "New Quizzes Surveys" do
       before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
         @course.context_external_tools.create!(
           name: "Quizzes.Next",
           consumer_key: "test_key",
@@ -2700,23 +2726,6 @@ describe AssignmentsController do
         expect(assignment).not_to be_nil
         expect(assignment.new_quizzes_type).to eq("graded_survey")
         expect(assignment.anonymous_participants?).to be true
-      end
-
-      it "does not set new quizzes survey attributes when feature flag is disabled" do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
-
-        post "create", params: {
-          course_id: @course.id,
-          assignment: {
-            new_quizzes_quiz_type: "graded_survey",
-            new_quizzes_anonymous_submission: true
-          },
-          quiz_lti: 1
-        }
-        assignment = assigns[:assignment]
-        expect(assignment).not_to be_nil
-        expect(assignment.new_quizzes_type).to eq("graded_quiz")
-        expect(assignment.anonymous_participants?).to be false
       end
     end
   end

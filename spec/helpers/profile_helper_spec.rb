@@ -23,8 +23,8 @@ require_relative "../spec_helper"
 describe ProfileHelper do
   let(:dummy_class) { Class.new { include ProfileHelper } }
   let(:dummy_instance) { dummy_class.new }
-  let(:user) { double("User") }
-  let(:current_pseudonym) { double("Pseudonym") }
+  let(:user) { instance_double(User) }
+  let(:current_pseudonym) { instance_double(Pseudonym) }
   let(:mfa_settings) { :optional }
 
   before do

@@ -181,7 +181,8 @@ ul.user_list div.enrollment_type.pending {
 
 #sections {
   @include reset-list;
-  max-width: 500px;
+  max-width: fit-content;
+  min-width: 500px;
   list-style-type: none;
 }
 

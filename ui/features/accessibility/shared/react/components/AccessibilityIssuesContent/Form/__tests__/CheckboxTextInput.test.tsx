@@ -424,6 +424,22 @@ describe('CheckboxTextInput', () => {
 
       expect(onValidationChange).toHaveBeenCalledWith(false, 'Alt text is required.')
     })
+
+    it('calls onValidationChange when textarea has only whitespaces input', () => {
+      const onValidationChange = vi.fn()
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <CheckboxTextInput
+            {...defaultProps}
+            value="   "
+            onValidationChange={onValidationChange}
+          />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(onValidationChange).toHaveBeenCalledWith(false, 'Alt text is required.')
+    })
   })
 
   describe('AI generation feature flag', () => {

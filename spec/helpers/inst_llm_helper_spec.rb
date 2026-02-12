@@ -24,7 +24,8 @@ describe InstLLMHelper do
       InstLLMHelper.instance_variable_set(:@clients, nil)
 
       aws_credential_provider = double
-      allow(aws_credential_provider).to receive(:credentials).and_return(double(
+      allow(aws_credential_provider).to receive(:credentials).and_return(instance_double(
+                                                                           Aws::Credentials,
                                                                            access_key_id: "access_key_id",
                                                                            secret_access_key: "secret_access_key",
                                                                            session_token: "session_token"
@@ -53,11 +54,11 @@ describe InstLLMHelper do
   end
 
   describe ".with_rate_limit" do
-    let(:user) { double(uuid: "user123") }
-    let(:llm_config) { double(rate_limit: { limit: 10, period: "day" }, name: "test") }
+    let(:user) { instance_double(User, uuid: "user123") }
+    let(:llm_config) { instance_double(LLMConfig, rate_limit: { limit: 10, period: "day" }, name: "test") }
 
     it "yields if rate limit is not set" do
-      llm_config = double(rate_limit: nil)
+      llm_config = instance_double(LLMConfig, rate_limit: nil)
       expect { |b| InstLLMHelper.with_rate_limit(user:, llm_config:, &b) }.to yield_control
     end
 
@@ -71,7 +72,7 @@ describe InstLLMHelper do
     end
 
     it "raises an error if period is not 'day'" do
-      llm_config = double(rate_limit: { limit: 10, period: "hour" })
+      llm_config = instance_double(LLMConfig, rate_limit: { limit: 10, period: "hour" })
       expect do
         InstLLMHelper.with_rate_limit(user:, llm_config:) do
           true

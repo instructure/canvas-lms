@@ -379,4 +379,63 @@ describe('load items', () => {
     await thunk(fakeDispatch, mockGetState())
     expect(requestUrl).toContain('filter=incomplete_items')
   })
+
+  it('uses include=all_courses instead of context_codes for observers with many enrollments', async () => {
+    const manyCourses = Array(700)
+      .fill()
+      .map((_, i) => ({
+        id: `${i + 1}`,
+        assetString: `course_${i + 1}`,
+        name: `Course ${i + 1}`,
+      }))
+
+    let requestUrl = ''
+    server.use(
+      http.get('*/api/v1/dashboard/dashboard_cards', () => {
+        return new HttpResponse(JSON.stringify(manyCourses), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+      http.get('*/api/v1/planner/items', req => {
+        requestUrl = req.request.url
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
+    const getState = () => ({
+      sidebar: {
+        items: [],
+        loading: false,
+        nextUrl: null,
+        loaded: false,
+      },
+      timeZone: 'UTC',
+      courses: manyCourses,
+      groups: [],
+      selectedObservee: '123',
+      currentUser: {id: '456'},
+    })
+
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
+    const fakeDispatch = vi.fn(action => {
+      if (typeof action === 'function') {
+        return action(fakeDispatch, getState)
+      }
+      return Promise.resolve({data: manyCourses})
+    })
+
+    await thunk(fakeDispatch, getState)
+
+    expect(requestUrl).toContain('include%5B%5D=all_courses')
+    expect(requestUrl).toContain('observed_user_id=123')
+    expect(requestUrl).not.toMatch(/context_codes.*course_1&context_codes.*course_2/)
+  })
 })

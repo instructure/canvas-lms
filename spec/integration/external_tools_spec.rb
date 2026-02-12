@@ -193,12 +193,12 @@ describe "External Tools" do
 
       menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
       expect(menu_link1).not_to be_nil
-      expect(menu_link1["href"]).to eq account_external_tool_path(Account.default, @admin_tool, launch_type: "global_navigation")
+      expect(menu_link1["href"]).to eq account_external_tool_path(Account.default, @admin_tool, launch_type: "global_navigation", toolId: "example-url-#{@admin_tool.id}")
       expect(menu_link1.text).to match_ignoring_whitespace(@admin_tool.label_for(:global_navigation))
 
       menu_link2 = doc.at_css("##{@member_tool.asset_string}_menu_item a")
       expect(menu_link2).not_to be_nil
-      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation")
+      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation", toolId: "example-url-2-#{@member_tool.id}")
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
@@ -213,7 +213,7 @@ describe "External Tools" do
 
       menu_link2 = doc.at_css("##{@member_tool.asset_string}_menu_item a")
       expect(menu_link2).not_to be_nil
-      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation")
+      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation", toolId: "example-url-2-#{@member_tool.id}")
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
@@ -314,7 +314,7 @@ describe "External Tools" do
       it "doesn't highlight the tool if the tool is no longer the current page" do
         admin = account_admin_user(account: @account)
         user_session(admin)
-        get "/accounts/#{Account.default.id}/external_tools/#{@admin_tool.id}?launch_type=global_navigation"
+        get "/accounts/#{Account.default.id}/external_tools/#{@admin_tool.id}?launch_type=global_navigation&toolId=example-url-#{@admin_tool.id}"
         doc = Nokogiri::HTML5(response.body)
         external_tool_link = doc.at_css("##{@admin_tool.asset_string}_menu_item")
         # Expect the tool to be highlighted

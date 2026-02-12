@@ -362,6 +362,9 @@
     "previous_bd2ac015": {
         "message": "קודם"
     },
+    "processing_8c569014": {
+        "message": "מעבד..."
+    },
     "published_c944a23d": {
         "message": "פורסם"
     },
@@ -457,6 +460,9 @@
     },
     "up_c553575d": {
         "message": "מעלה"
+    },
+    "upload_8b403d05": {
+        "message": "העלאה"
     },
     "upload_file_fd2361b8": {
         "message": "העלאת קובץ"

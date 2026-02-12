@@ -860,88 +860,22 @@ describe Login::SamlController do
     end
 
     it "does nothing by default" do
-      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
-      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
-      expect(controller).to receive(:successful_login)
-
-      post :create, params: { SAMLResponse: "foo" }
-
-      # we mock successful_login to avoid dealing with redirects in this test
-      expect(response).to have_http_status :no_content
-      expect(authentication_provider.reload.settings).not_to have_key("most_recent_one_time_use_violation")
-    end
-
-    it "does nothing when enforcement feature enabled" do
-      Account.site_admin.enable_feature!(:saml_enforce_one_time_use)
-      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
-      expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
       expect(controller).to receive(:successful_login)
 
       post :create, params: { SAMLResponse: "foo" }
 
       expect(response).to have_http_status :no_content
-      expect(authentication_provider.reload.settings).not_to have_key("most_recent_one_time_use_violation")
     end
 
-    context "when the condition is present" do
-      before do
-        saml_response.assertions.first.conditions << SAML2::Conditions::OneTimeUse.new
-      end
+    it "blocks login when violated" do
+      saml_response.assertions.first.conditions << SAML2::Conditions::OneTimeUse.new
+      allow(controller).to receive(:duplicate_response?).and_return(true)
+      expect(controller).to receive(:increment_statsd).with(:attempts, anything)
+      expect(controller).to receive(:increment_statsd).with(:failure, reason: :one_time_use_violation)
 
-      it "sends to Datadog" do
-        expect(controller).to receive(:increment_statsd).with(:one_time_use_passed)
-        expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
-        expect(controller).to receive(:successful_login)
+      post :create, params: { SAMLResponse: "foo" }
 
-        post :create, params: { SAMLResponse: "foo" }
-
-        expect(response).to have_http_status :no_content
-        expect(authentication_provider.reload.settings).not_to have_key("most_recent_one_time_use_violation")
-      end
-
-      context "when violated" do
-        before do
-          allow(controller).to receive(:duplicate_response?).and_return(true)
-        end
-
-        it "updates the timestamp if one already exists" do
-          last_time = 1.day.ago.iso8601
-          authentication_provider.settings["most_recent_one_time_use_violation"] = last_time
-          authentication_provider.save!
-          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
-          expect(controller).to receive(:increment_statsd).with(:one_time_use_soft_violation)
-          expect(controller).to receive(:successful_login)
-
-          post :create, params: { SAMLResponse: "foo" }
-
-          expect(response).to have_http_status :no_content
-          expect(authentication_provider.reload.settings).to have_key("most_recent_one_time_use_violation")
-          expect(authentication_provider.reload.settings["most_recent_one_time_use_violation"]).not_to eql last_time
-        end
-
-        it "records a timestamp and sends to Datadog" do
-          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
-          expect(controller).to receive(:increment_statsd).with(:one_time_use_soft_violation)
-          expect(controller).to receive(:successful_login)
-
-          post :create, params: { SAMLResponse: "foo" }
-
-          expect(response).to have_http_status :no_content
-          expect(authentication_provider.reload.settings).to have_key("most_recent_one_time_use_violation")
-        end
-
-        it "blocks login when enforcement feature enabled" do
-          Account.site_admin.enable_feature!(:saml_enforce_one_time_use)
-          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_passed)
-          expect(controller).not_to receive(:increment_statsd).with(:one_time_use_soft_violation)
-          expect(controller).to receive(:increment_statsd).with(:failure, reason: :one_time_use_violation)
-
-          post :create, params: { SAMLResponse: "foo" }
-
-          expect(response).to redirect_to(login_url)
-          expect(authentication_provider.reload.settings).to have_key("most_recent_one_time_use_violation")
-        end
-      end
+      expect(response).to redirect_to(login_url)
     end
   end
 

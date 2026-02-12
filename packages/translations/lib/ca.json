@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Elimina l''enllaç"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Suprimiu l''element multimèdia de l’Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Substitueix-ho tot"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Mostra-ho tot"
     },
-    "show_audio_options_b489926b": {
-        "message": "Mostra les opcions de so"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Mostra les opcions d''imatge"
     },
     "show_link_options_545338fd": {
         "message": "Mostra les opcions d''enllaç"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Mostra les opcions d’elements multimèdia de l’Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Mostra les opcions de vídeo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Els usuaris vistos naveguen ràpidament per les pàgines web i hi cerquen capçaleres grans o en negreta. Els usuaris del lector de pantalla es basen en les capçaleres per obtenir-ne el significat contextual. Les capçaleres han de tenir l''estructura adequada."

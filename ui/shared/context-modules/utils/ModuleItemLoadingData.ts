@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot, type Root} from 'react-dom/client'
+import React from 'react'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {type ModuleId, type PaginationData} from './types'
 
 type ModuleData = {
@@ -75,7 +77,7 @@ class ModuleItemLoadingData {
       pagingDiv.className = 'item-paging'
       moduleItemContainer.insertAdjacentElement('beforeend', pagingDiv)
     }
-    moduleData.root = createRoot(pagingDiv)
+    moduleData.root = render(React.createElement(React.Fragment), pagingDiv as HTMLElement)
     return moduleData.root
   }
 

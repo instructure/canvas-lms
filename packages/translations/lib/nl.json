@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Link verwijderen"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Studio-media verwijderen"
-    },
     "replace_all_d3d68b3": {
         "message": "Alles vervangen"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Alles tonen"
     },
-    "show_audio_options_b489926b": {
-        "message": "Audio-opties weergeven"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Afbeeldingsopties weergeven"
     },
     "show_link_options_545338fd": {
         "message": "Linkopties weergeven"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Studio Media-opties weergeven"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Video-opties weergeven"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Slechtzienden bladeren snel door webpagina''s, op zoek naar grote of vette koppen. Gebruikers van schermlezers zijn afhankelijk van koppen om een idee van de context te krijgen. Koppen moeten de juiste structuur hebben."

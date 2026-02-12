@@ -53,7 +53,10 @@ module Extensions
             add_reference(table_name, sub_ref_name, index: sub_index, if_not_exists:, **)
           end
 
-          add_polymorphic_check_constraint(table_name, ref_name, polymorphic, if_not_exists:, delay_validation:, null:) if check_constraint
+          if check_constraint
+            kwargs = check_constraint.is_a?(Hash) ? check_constraint : {}
+            add_polymorphic_check_constraint(table_name, ref_name, polymorphic, if_not_exists:, delay_validation:, null:, sort: true, **kwargs)
+          end
         end
 
         def rename_constraint(table_name, old_name, new_name, if_exists: false)
@@ -69,8 +72,9 @@ module Extensions
                                              replace: false,
                                              if_not_exists: false,
                                              delay_validation: true,
-                                             null: true)
-          check_sql, check_name = polymorphic_check_constraint_sql(ref_name, polymorphic, null:)
+                                             null: true,
+                                             sort: true)
+          check_sql, check_name = polymorphic_check_constraint_sql(ref_name, polymorphic, null:, sort:)
 
           if replace
             replaced_name = "#{check_name}_old"
@@ -89,12 +93,15 @@ module Extensions
           remove_check_constraint(table_name, name: replaced_name, if_exists: replace) if replaced_name
         end
 
-        def polymorphic_check_constraint_sql(ref_name, polymorphic, null: true)
+        def polymorphic_check_constraint_sql(ref_name, polymorphic, null: true, sort: true, name: nil)
+          polymorphic = polymorphic.sort if sort
           check_clauses = polymorphic.map do |sub_ref_name|
             "(#{sub_ref_name}_id IS NOT NULL)::int"
           end
           check_sql = "(#{check_clauses.join(" + ")}) #{null ? "<=" : "="} 1"
-          check_name = if null
+          check_name = if name
+                         name
+                       elsif null
                          "chk_#{ref_name}_disjunction"
                        else
                          "chk_require_#{ref_name}"
@@ -154,10 +161,11 @@ module Extensions
                 ::ActiveRecord::ConnectionAdapters::ReferenceDefinition.new(sub_ref_name, index: sub_index, foreign_key:, **).add_to(self)
               end
 
-              if check_constraint
-                sql, name = @conn.polymorphic_check_constraint_sql(ref_name, polymorphic, null:)
-                check_constraint(sql, name:)
-              end
+              next unless check_constraint
+
+              kwargs = check_constraint.is_a?(Hash) ? check_constraint : {}
+              sql, name = @conn.polymorphic_check_constraint_sql(ref_name, polymorphic, null:, sort: true, **kwargs)
+              check_constraint(sql, name:)
             end
           end
         end

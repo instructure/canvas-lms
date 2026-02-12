@@ -25,6 +25,7 @@ class AccessibilityController < ApplicationController
   def index
     @page_title = t("titles.accessibility_checker", "Accessibility Checker")
     add_crumb(t("titles.accessibility_checker", "Accessibility Checker"))
+    set_active_tab "accessibility"
     @show_left_side = true
     @collapse_course_menu = false
     js_bundle :accessibility_checker

@@ -31,7 +31,16 @@ describe('ColumnHeader', () => {
 
   it('renders the title', () => {
     render(<ColumnHeader {...defaultProps} />)
-    expect(screen.getByText('Test Column')).toBeInTheDocument()
+    expect(screen.getAllByText('Test Column')[0]).toBeInTheDocument()
+  })
+
+  it('provides accessible content for screen readers', () => {
+    const {container} = render(<ColumnHeader {...defaultProps} />)
+    const screenReaderContent = container.querySelector('[class*="screenReaderContent"]')
+    expect(screenReaderContent).toHaveTextContent('Test Column')
+    const visualContent = container.querySelector('[aria-hidden="true"]')
+    expect(visualContent).toBeInTheDocument()
+    expect(visualContent).toHaveTextContent('Test Column')
   })
 
   it('does not render the options menu when no items are provided', () => {

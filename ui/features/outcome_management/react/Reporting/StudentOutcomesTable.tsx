@@ -97,6 +97,7 @@ const OutcomesTableRow = ({
     totalAlignmentsCount,
     masteryScore,
     masteryLevel,
+    masteryPoints,
   } = outcome
   const [isTooltipShown, setIsTooltipShown] = useState(false)
 
@@ -157,7 +158,9 @@ const OutcomesTableRow = ({
         </Table.Cell>
         <Table.Cell>
           <View as="div" padding="x-small 0">
-            <Text>{getAssessedText(assessedAlignmentsCount, totalAlignmentsCount)}</Text>
+            <Text weight={isExpanded ? 'bold' : 'normal'}>
+              {getAssessedText(assessedAlignmentsCount, totalAlignmentsCount)}
+            </Text>
           </View>
         </Table.Cell>
         <Table.Cell>
@@ -173,6 +176,7 @@ const OutcomesTableRow = ({
               outcomeId={id}
               studentId={studentId}
               contributingScores={contributingScores}
+              masteryPoints={masteryPoints}
             />
           </Table.Cell>
         </Table.Row>

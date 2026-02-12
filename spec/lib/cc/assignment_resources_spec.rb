@@ -237,11 +237,6 @@ describe CC::AssignmentResources do
     end
 
     context "export new quizzes settings" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
-      end
-
       it "does not export new_quizzes_type when settings are not present" do
         expect(subject.at("new_quizzes_type")).to be_nil
       end
@@ -274,19 +269,6 @@ describe CC::AssignmentResources do
         assignment.save!
         expect(subject.at("new_quizzes_type").text).to eq("ungraded_survey")
         expect(subject.at("new_quizzes_anonymous_participants")).to be_nil
-      end
-
-      context "when feature flag is disabled" do
-        before do
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
-        end
-
-        it "does not export new_quizzes settings even when present" do
-          assignment.settings = { "new_quizzes" => { "type" => "graded_quiz", "anonymous_participants" => true } }
-          assignment.save!
-          expect(subject.at("new_quizzes_type")).to be_nil
-          expect(subject.at("new_quizzes_anonymous_participants")).to be_nil
-        end
       end
     end
   end

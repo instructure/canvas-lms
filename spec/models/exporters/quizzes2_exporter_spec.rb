@@ -107,10 +107,6 @@ describe "Quizzes2 Exporter" do
     end
 
     context "new_quizzes type mapping" do
-      before do
-        Account.site_admin.enable_feature!(:new_quizzes_surveys)
-      end
-
       {
         "survey" => "ungraded_survey",
         "graded_survey" => "graded_survey",
@@ -136,10 +132,6 @@ describe "Quizzes2 Exporter" do
     end
 
     context "anonymous_participants setting" do
-      before do
-        Account.site_admin.enable_feature!(:new_quizzes_surveys)
-      end
-
       it "sets anonymous_participants to true when quiz has anonymous_submissions" do
         anonymous_quiz = @course.quizzes.create!(
           title: "Anonymous Quiz",

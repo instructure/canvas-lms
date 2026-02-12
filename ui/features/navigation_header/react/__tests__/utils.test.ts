@@ -83,12 +83,14 @@ describe('utils.ts', () => {
           label: 'Local Studio',
           svgPath: null,
           imgSrc: 'https://example.com/icon.png',
+          toolId: 'local-studio-8300',
         },
         {
           href: '/accounts/1/external_tools/8066?launch_type=global_navigation',
           label: 'Lucid Integration',
           svgPath: 'path/to/svg',
           imgSrc: null,
+          toolId: 'lucid-integration-8066',
         },
       ])
     })
@@ -125,15 +127,25 @@ describe('utils.ts', () => {
     it('should correctly handle arrays with empty or incomplete tool objects', () => {
       const tools: ExternalTool[] = [
         {} as ExternalTool, // ignored
-        {href: 'http://example.com', label: 'LocalStudio', svgPath: ''},
+        {
+          href: 'http://example.com',
+          label: 'LocalStudio',
+          svgPath: '',
+          toolId: 'localstudio-1',
+        },
         {} as ExternalTool, // ignored
-        {href: 'https://example.com', label: 'Studio', svgPath: ''},
-        {href: 'https://example-dev.com', label: 'Dev', svgPath: ''},
-        {href: 'https://example-studio.com', label: 'Studio', svgPath: ''},
-        {href: 'https://example-iad.com', label: 'Studio IAD', svgPath: ''},
-        {href: 'https://example-pdx.com', label: 'Studio PDX', svgPath: ''},
-        {href: 'https://example-studio.com', label: 'Studio', svgPath: ''},
-        {href: 'https://example-testing.com', label: 'Studio Testing', svgPath: ''},
+        {href: 'https://example.com', label: 'Studio', svgPath: '', toolId: 'studio-2'},
+        {href: 'https://example-dev.com', label: 'Dev', svgPath: '', toolId: 'dev-3'},
+        {href: 'https://example-studio.com', label: 'Studio', svgPath: '', toolId: 'studio-4'},
+        {href: 'https://example-iad.com', label: 'Studio IAD', svgPath: '', toolId: 'studio-iad-5'},
+        {href: 'https://example-pdx.com', label: 'Studio PDX', svgPath: '', toolId: 'studio-pdx-6'},
+        {href: 'https://example-studio.com', label: 'Studio', svgPath: '', toolId: 'studio-7'},
+        {
+          href: 'https://example-testing.com',
+          label: 'Studio Testing',
+          svgPath: '',
+          toolId: 'studio-testing-8',
+        },
         {} as ExternalTool, // ignored
       ]
       const expected: ProcessedTool[] = [
@@ -141,56 +153,56 @@ describe('utils.ts', () => {
           href: 'http://example.com',
           label: 'LocalStudio',
           svgPath: null,
-          toolId: 'localstudio',
+          toolId: 'localstudio-1',
           toolImg: null,
         },
         {
           href: 'https://example.com',
           label: 'Studio',
           svgPath: null,
-          toolId: 'studio',
+          toolId: 'studio-2',
           toolImg: null,
         },
         {
           href: 'https://example-dev.com',
           label: 'Dev',
           svgPath: null,
-          toolId: 'dev',
+          toolId: 'dev-3',
           toolImg: null,
         },
         {
           href: 'https://example-studio.com',
           label: 'Studio',
           svgPath: null,
-          toolId: 'studio',
+          toolId: 'studio-4',
           toolImg: null,
         },
         {
           href: 'https://example-iad.com',
           label: 'Studio IAD',
           svgPath: null,
-          toolId: 'studio-iad',
+          toolId: 'studio-iad-5',
           toolImg: null,
         },
         {
           href: 'https://example-pdx.com',
           label: 'Studio PDX',
           svgPath: null,
-          toolId: 'studio-pdx',
+          toolId: 'studio-pdx-6',
           toolImg: null,
         },
         {
           href: 'https://example-studio.com',
           label: 'Studio',
           svgPath: null,
-          toolId: 'studio',
+          toolId: 'studio-7',
           toolImg: null,
         },
         {
           href: 'https://example-testing.com',
           label: 'Studio Testing',
           svgPath: null,
-          toolId: 'studio-testing',
+          toolId: 'studio-testing-8',
           toolImg: null,
         },
       ]
@@ -199,26 +211,28 @@ describe('utils.ts', () => {
     })
 
     it('should filter out tools with invalid toolId (derived from label)', () => {
-      const valid_tool_id_derived_from_label = 'Valid Tool'
+      const valid_tool_id_derived_from_label = 'valid-tool-1'
       const invalid_tool_id_derived_from_label = ''
       const tools: ExternalTool[] = [
         {
-          label: valid_tool_id_derived_from_label,
+          label: 'Valid Tool',
           imgSrc: 'img1.png',
           href: 'http://tool1.com',
           svgPath: 'path1',
+          toolId: valid_tool_id_derived_from_label,
         },
         {
-          label: invalid_tool_id_derived_from_label,
+          label: 'Invalid Tool',
           imgSrc: 'img2.png',
           href: 'http://tool2.com',
           svgPath: 'path2',
+          toolId: invalid_tool_id_derived_from_label,
         },
       ]
       const expected: ProcessedTool[] = [
         {
-          label: valid_tool_id_derived_from_label,
-          toolId: 'valid-tool',
+          label: 'Valid Tool',
+          toolId: valid_tool_id_derived_from_label,
           toolImg: 'img1.png',
           href: 'http://tool1.com',
           svgPath: 'path1',

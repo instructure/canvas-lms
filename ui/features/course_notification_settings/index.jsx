@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import NotificationSettings from '@canvas/notification-preferences-course'
 import React from 'react'
-import ReactDom from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 $(() => {
-  ReactDom.render(<NotificationSettings />, $('<div/>').appendTo('#content')[0])
+  legacyRender(<NotificationSettings />, $('<div/>').appendTo('#content')[0])
 })

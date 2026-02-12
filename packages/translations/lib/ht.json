@@ -1994,9 +1994,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Elimine Lyen"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Elimine Medya Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Ranplase Tout"
     },
@@ -2198,20 +2195,11 @@
     "show_all_967a90f0": {
         "message": "Afiche tout"
     },
-    "show_audio_options_b489926b": {
-        "message": "Afiche opsyon odyo"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Afiche opsyon imaj"
     },
     "show_link_options_545338fd": {
         "message": "Afiche opsyon lyen"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Afiche opsyon estidyo medya a"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Afiche opsyon videyo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Itilizatè prevwayan yo navige sou paj wèb yo byen vit, pou yo ka chèche antèt ki gwo oswa an gra. Itilizatè lektè ekran yo konte sou antèt yo pou konpreyansyon kontekstyèl. Antèt yo dwe itilize estrikti ki apwopriye."

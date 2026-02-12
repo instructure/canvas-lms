@@ -30,8 +30,7 @@ import '@canvas/rails-flash-notifications'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
-import {createRoot} from 'react-dom/client'
+import {legacyRender, render} from '@canvas/react'
 import {initializePlanner, renderToDoSidebar} from '@canvas/planner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
@@ -117,7 +116,7 @@ const addToDoSidebar = parent => {
 $(() => {
   const container = document.getElementById('choose_home_page')
   if (container) {
-    ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
+    legacyRender(<ChooseHomePageButton store={defaultViewStore} />, container)
   }
 
   const todo_container = document.querySelector('.todo-list')
@@ -127,7 +126,7 @@ $(() => {
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
   if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
-    ReactDOM.render(
+    legacyRender(
       <View as="div" maxWidth="12em">
         <ObserverOptions
           autoFocus={autoFocusObserverPicker()}
@@ -147,12 +146,12 @@ $(() => {
     'differentiation-tag-converter-message-root',
   )
   if (diffTagOverrideConversionContainer) {
-    const root = createRoot(diffTagOverrideConversionContainer)
-    root.render(
+    render(
       <CourseDifferentiationTagConverterMessage
         courseId={ENV.COURSE.id}
         activeConversionJob={ENV.ACTIVE_TAG_CONVERSION_JOB}
       />,
+      diffTagOverrideConversionContainer,
     )
   }
 })

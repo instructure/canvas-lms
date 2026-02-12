@@ -157,6 +157,35 @@ module Lti
                                  })
       end
 
+      it "does not cause N+1 queries when include_context_name is true" do
+        account.update!(name: "Root Account")
+        subaccount = account.sub_accounts.create!(name: "Sub Account")
+        course = subaccount.courses.create!(name: "Test Course")
+
+        new_valid_external_tool(account)
+        new_valid_external_tool(subaccount)
+        new_valid_external_tool(course)
+
+        placements = %w[assignment_selection link_selection resource_selection]
+        tools_collection = described_class.bookmarked_collection(course, placements).paginate(per_page: 100).to_a
+
+        cnt = 0
+        subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, _payload|
+          cnt += 1
+        end
+
+        definitions = described_class.launch_definitions(tools_collection, placements, include_context_name: true)
+
+        ActiveSupport::Notifications.unsubscribe(subscription)
+
+        expect(definitions.count).to eq 3
+        context_names = definitions.pluck(:context_name)
+        expect(context_names).to contain_exactly("Root Account", "Sub Account", "Test Course")
+        # Batch loading does 2 queries total (one for accounts, one for courses)
+        # regardless of the number of tools, which avoids N+1
+        expect(cnt).to eq 2
+      end
+
       it "uses localized labels" do
         tool = account.context_external_tools.new(name: "bob",
                                                   consumer_key: "test",

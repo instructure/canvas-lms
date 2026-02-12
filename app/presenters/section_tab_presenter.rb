@@ -19,6 +19,7 @@
 
 class SectionTabPresenter
   include Rails.application.routes.url_helpers
+  include NavMenuLinkTabs::HrefHelper
 
   TabDefinition = Struct.new(:id,
                              :css_class,
@@ -76,5 +77,13 @@ class SectionTabPresenter
       path:,
       label: tab.label
     }
+  end
+
+  def nav_menu_link?
+    NavMenuLinkTabs.nav_menu_link_tab_id?(tab.id)
+  end
+
+  def external?
+    !!tab.external
   end
 end

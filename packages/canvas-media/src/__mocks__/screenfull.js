@@ -18,6 +18,6 @@
 
 const screenfull = {
   on() {},
-  off() {}
+  off() {},
 }
 export default screenfull

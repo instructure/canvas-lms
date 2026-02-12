@@ -181,6 +181,18 @@ class LLMConversationClient
     }
   end
 
+  def evaluation
+    raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
+
+    response = make_request(
+      method: :post,
+      path: "/conversations/#{@conversation_id}/evaluate",
+      error_message: "Failed to evaluate conversation"
+    )
+
+    response["data"]
+  end
+
   private
 
   def make_request(method:, path:, payload: nil, error_message:)

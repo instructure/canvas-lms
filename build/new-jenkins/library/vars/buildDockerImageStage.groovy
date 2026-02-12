@@ -20,6 +20,22 @@ def getFuzzyTagSuffix() {
   return "fuzzy-${env.IMAGE_CACHE_MERGE_SCOPE}"
 }
 
+def uploadCacheImages(includeWebpackCache = true) {
+  def cacheScript = """
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_BUILDER_PREFIX || true
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
+  """
+
+  if (includeWebpackCache) {
+    cacheScript += "\n    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX || true"
+  }
+
+  sh(script: cacheScript, label: 'upload cache images')
+}
+
 def getPinnedGitHubGems() {
   return commitMessageFlag("pin-github-gems") as String
 }
@@ -36,7 +52,7 @@ def handleDockerBuildFailure(imagePrefix, e) {
 
     sh(script: """
       docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $imagePrefix-failed
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $imagePrefix-failed
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $imagePrefix-failed
     """, label: 'upload failed image')
   }
 
@@ -169,14 +185,7 @@ def premergeCacheImage() {
 
       // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
       // has changed between the post-merge build and this pre-merge build.
-      sh(script: """
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_BUILDER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX || true
-      """, label: 'upload cache images')
+      uploadCacheImages(true)
     }
   }
 }
@@ -233,13 +242,7 @@ def patchsetImage(asyncStepsStr = '', platformSuffix = '') {
       sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
     }
 
-    sh(script: """
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_BUILDER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
-    """, label: 'upload cache images')
+    uploadCacheImages(false)
   }
 }
 
@@ -278,6 +281,26 @@ def i18nExtract() {
       aws s3 cp --profile transifreq --acl bucket-owner-full-control \
         ./transifreq-en.yml \
         $dest
+    """
+  )
+}
+
+def augmentArm64Manifest() {
+  sh(
+    label: 'augment manifest with ARM64 variant',
+    script: """#!/bin/bash -ex
+      # Check if the tag is already a manifest list
+      if docker manifest inspect $PATCHSET_TAG 2>/dev/null | grep -q "manifests"; then
+        echo "Warning: $PATCHSET_TAG is already a manifest list. Skipping manifest creation."
+        # Show current manifest for debugging
+        echo "Current manifest:"
+        docker manifest inspect $PATCHSET_TAG
+        exit 0
+      else
+        echo "Creating manifest list for $PATCHSET_TAG..."
+        docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
+        docker manifest push $PATCHSET_TAG
+      fi
     """
   )
 }

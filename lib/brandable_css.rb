@@ -247,7 +247,7 @@ module BrandableCSS
     end
 
     def s3_uploader
-      @s3_uploaderer ||= Canvas::Cdn::S3Uploader.new
+      @s3_uploader ||= Canvas::Cdn::S3Uploader.new
     end
 
     def public_default_path(type, high_contrast = false)

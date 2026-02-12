@@ -238,7 +238,7 @@
             <option value="new"><%= t :create_quiz_option, "[ Create Quiz ]" %></option>
           <% end %>
           <% @combined_active_quizzes.each do |id, title, type| %>
-            <% option_text = "#{title} #{t :classic_quiz_identifier, '(classic)' if @combined_active_quizzes_includes_both_types && type == 'quiz'}" %>
+            <% option_text = @combined_active_quizzes_includes_both_types && type == 'quiz' ? "#{title} #{t :classic_quiz_identifier, '(classic)'}" : title %>
             <option value="<%= type + '_' + id.to_s %>"><%= option_text %></option>
           <% end %>
         </select>
@@ -271,7 +271,7 @@
               <td><%= before_label :quiz_name, "Quiz Name" %></td>
               <td><input type="text" name="quiz[title]" class="item_title" aria-label="<%= before_label :quiz_name, "Quiz Name" %>"/></td>
             </tr>
-            <% if Account.site_admin.feature_enabled?(:new_quizzes_surveys) %>
+            <% if new_quizzes_enabled %>
               <tr id="quiz_type_selector_row" style="display: none;">
                 <td style="vertical-align: top; text-align: left;"><%= before_label :quiz_type, "Quiz Type" %></td>
                 <td><div id="quiz_type_selector_mount_point"></div></td>

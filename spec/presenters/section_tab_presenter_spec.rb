@@ -163,4 +163,17 @@ describe SectionTabPresenter do
       expect(h.keys).to include(:icon, :hidden, :path, :label)
     end
   end
+
+  describe "#nav_menu_link?" do
+    it "returns true for nav menu link tabs" do
+      {
+        "nav_menu_link_123" => true,
+        "assignments" => false,
+        "context_external_tool_456" => false,
+      }.each do |id, expected|
+        presenter = SectionTabPresenter.new(tab.merge(id:), course)
+        expect(presenter.nav_menu_link?).to be expected
+      end
+    end
+  end
 end

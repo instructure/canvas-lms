@@ -122,16 +122,18 @@ shared_examples "Gradebook frontend/backend calculators" do |ff_enabled|
       course = @courses[i]
       f("#assignments-filter").send_keys(course.id.to_s)
       driver.action.send_keys(:enter).perform
-      @frontend_grades = Gradebook.scores_scraped
-      @backend_grades = Gradebook.scores_api(course)
-      @diff = @frontend_grades - @backend_grades
+      frontend_grades = Gradebook.scores_scraped
+      backend_grades = Gradebook.scores_api(course)
+      diff = frontend_grades - backend_grades
 
-      @diff.each do |entry|
-        puts "USER: #{entry[:user_id]} scores: #{@unlucky_group[i].map { |v| { score: v } }}"
-        puts "frontend grade: #{@frontend_grades.select { |user| user[:user_id] == entry[:user_id] }}"
-        puts "backend grade: #{@backend_grades.select { |user| user[:user_id] == entry[:user_id] }}"
-      end
-      expect(@diff).to be_empty
+      diff = diff.map do |entry|
+        <<~TEXT
+          USER: #{entry[:user_id]} scores: #{@unlucky_group[i].map { |v| { score: v } }}
+          frontend grade: #{frontend_grades.select { |user| user[:user_id] == entry[:user_id] }}
+          backend grade: #{backend_grades.select { |user| user[:user_id] == entry[:user_id] }}
+        TEXT
+      end.join("\n")
+      expect(diff).to be_empty
     end
   end
 end

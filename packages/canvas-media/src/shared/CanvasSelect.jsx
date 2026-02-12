@@ -47,13 +47,13 @@
  *  but with strings passed in, rather then formatMessage'd here.
  */
 
-import React from 'react'
-import {func, node, string, shape, oneOfType, element} from 'prop-types'
-import {compact, castArray, isEqual} from 'es-toolkit/compat'
-import formatMessage from 'format-message'
-import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
+import {Select} from '@instructure/ui-select'
+import {castArray, compact, isEqual} from 'es-toolkit/compat'
+import formatMessage from 'format-message'
+import {element, func, node, oneOfType, shape, string} from 'prop-types'
+import React from 'react'
 
 const noOptionsOptionId = '_noOptionsOption'
 

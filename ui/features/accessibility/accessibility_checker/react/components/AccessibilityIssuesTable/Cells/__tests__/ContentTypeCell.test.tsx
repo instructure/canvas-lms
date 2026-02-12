@@ -58,6 +58,15 @@ describe('ContentTypeCell', () => {
       )
       expect(screen.getByText('Discussion topic')).toBeInTheDocument()
     })
+
+    it('renders "Announcement" for Announcement resource type', () => {
+      render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.Announcement} as AccessibilityResourceScan}
+        />,
+      )
+      expect(screen.getByText('Announcement')).toBeInTheDocument()
+    })
   })
 
   describe('icon rendering', () => {
@@ -101,6 +110,17 @@ describe('ContentTypeCell', () => {
         />,
       )
       const icon = container.querySelector('svg[name="IconDiscussion"]')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('renders announcement icon for Announcement', () => {
+      const {container} = render(
+        <ContentTypeCell
+          item={{resourceType: ResourceType.Announcement} as AccessibilityResourceScan}
+        />,
+      )
+      const icon = container.querySelector('svg[name="IconAnnouncement"]')
       expect(icon).toBeInTheDocument()
       expect(icon).toHaveAttribute('aria-hidden', 'true')
     })

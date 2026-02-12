@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 
 import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
@@ -47,8 +47,7 @@ ready(() => {
   body.style.padding = '0'
   body.style.overflow = 'hidden'
 
-  const root = createRoot(mountPoint)
-  root.render(
+  const root = render(
     <div
       style={{
         position: 'fixed',
@@ -63,6 +62,7 @@ ready(() => {
     >
       <Spinner renderTitle={I18n.t('Loading')} margin="large auto 0 auto" />
     </div>,
+    mountPoint,
   )
 
   let bundles = []
@@ -86,7 +86,8 @@ ready(() => {
       console.error('Failed to load Canvas Career', error)
       captureException(error)
 
-      root.render(
+      rerender(
+        root,
         <GenericErrorPage
           imageUrl={errorShipUrl}
           errorMessage={error.message}

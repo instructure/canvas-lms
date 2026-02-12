@@ -33,6 +33,7 @@ describe "Student dashboard as observer", :ignore_js_errors do
     observed_student_setup # created second student with submissions in course2
     observer_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@observer)
   end
 
   before do
@@ -205,20 +206,20 @@ describe "Student dashboard as observer", :ignore_js_errors do
       go_to_dashboard
       select_observed_student(@student.name)
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      expect(element_exists?(message_instructor_button_selector(@teacher2.id, @course2.id))).to be_falsey
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      expect(element_exists?(message_instructor_button_selector(@teacher2.id))).to be_falsey
 
       select_observed_student(@student2.name)
-      expect(message_instructor_button(@teacher2.id, @course2.id)).to be_displayed
-      expect(element_exists?(message_instructor_button_selector(@teacher1.id, @course1.id))).to be_falsey
+      expect(message_instructor_button(@teacher2.id)).to be_displayed
+      expect(element_exists?(message_instructor_button_selector(@teacher1.id))).to be_falsey
     end
 
     it "sends message to instructor as observer" do
       go_to_dashboard
       select_observed_student(@student.name)
 
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
-      message_instructor_button(@teacher1.id, @course1.id).click
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
+      message_instructor_button(@teacher1.id).click
       wait_for_ajaximations
       expect(message_modal_subject_input).to be_displayed
       message_modal_subject_input.send_keys("Observer")
@@ -228,6 +229,74 @@ describe "Student dashboard as observer", :ignore_js_errors do
 
       message = ConversationMessage.last
       expect(message.author_id).to eq(@observer.id)
+    end
+  end
+
+  context "Recent grades widget as observer" do
+    before :once do
+      dashboard_recent_grades_setup
+      add_widget_to_dashboard(@observer, :recent_grades, 1)
+    end
+
+    it "view grades only for observed student" do
+      go_to_dashboard
+      select_observed_student(@student.name)
+      expect(recent_grades_widget.text).to include(@submitted_assignment.name)
+      expect(recent_grades_widget.text).to include(@graded_discussion.title)
+      expect(recent_grades_widget.text).to include(@graded_quiz.title)
+      expect(all_recent_grade_course_name.size).to eq(3)
+
+      select_observed_student(@student2.name)
+      expect(recent_grades_widget.text).to include(@graded_assignment.name)
+      expect(recent_grades_widget.text).to include(@submitted_discussion.title)
+      expect(all_recent_grade_course_name.size).to eq(2)
+    end
+
+    it "navigates to grades page when clicking view all grades link" do
+      go_to_dashboard
+
+      select_observed_student(@student.name)
+      expect(recent_grades_view_all_link).to be_displayed
+      recent_grades_view_all_link.click
+      expect(driver.current_url).to include("/grades")
+    end
+
+    it "navigates to assignment page when clicking open assignment link" do
+      submission = @graded_assignment.submission_for_student(@student2)
+
+      go_to_dashboard
+      select_observed_student(@student2.name)
+      expand_feedback_on_recent_grade(submission.id)
+
+      expect(recent_grade_open_assignment_link(submission.id)).to be_displayed
+      recent_grade_open_assignment_link(submission.id).click
+      expect(driver.current_url).to include("/courses/#{@course2.id}/assignments/#{@graded_assignment.id}")
+    end
+
+    it "navigates to course grades page when clicking what-if grading tool link" do
+      submission = @graded_assignment.submission_for_student(@student2)
+
+      go_to_dashboard
+      select_observed_student(@student2.name)
+      expand_feedback_on_recent_grade(submission.id)
+
+      expect(recent_grade_whatif_link(submission.id)).to be_displayed
+      recent_grade_whatif_link(submission.id).click
+      expect(driver.current_url).to include("/courses/#{@course2.id}/grades")
+    end
+
+    it "navigates to assignment with feedback when clicking view inline feedback link" do
+      submission = @graded_discussion.submission_for_student(@student)
+      discussion_topic = DiscussionTopic.find_by(assignment_id: @graded_discussion.id)
+
+      go_to_dashboard
+      select_observed_student(@student.name)
+      expand_feedback_on_recent_grade(submission.id)
+
+      expect(recent_grade_view_feedback_link(submission.id)).to be_displayed
+      expect(recent_grade_feedback_section(submission.id).text).to include("Well done!")
+      recent_grade_view_feedback_link(submission.id).click
+      expect(driver.current_url).to include("/courses/#{@course1.id}/discussion_topics/#{discussion_topic.id}")
     end
   end
 end
