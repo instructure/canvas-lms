@@ -48,6 +48,7 @@ module CanvasCareer
       config["public_app_config"].tap do |c|
         c["hosts"]["canvas"] = request.base_url
         c["experience_preferences"] = experience_preferences
+        c["experience_mode"] = @root_account.settings[:horizon_academic_mode] ? "academic" : "career"
       end
     end
 
