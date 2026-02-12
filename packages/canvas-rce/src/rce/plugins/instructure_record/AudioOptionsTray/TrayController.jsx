@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
+import RCEGlobals from '../../../RCEGlobals'
 import {asAudioElement} from '../../shared/ContentSelection'
 import {findMediaPlayerIframe} from '../../shared/iframeUtils'
 import AudioOptionsTray from '.'
@@ -95,12 +96,18 @@ export default class TrayController {
       return
     }
     const container = this._audioContainer
+
+    const isCaptionImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements || false
+
+    const data = {
+      media_object_id: audioOptions.media_object_id,
+      attachment_id: audioOptions.attachment_id,
+      subtitles: audioOptions.subtitles,
+      skipCaptionUpdate: isCaptionImprovements,
+    }
+
     return audioOptions
-      .updateMediaObject({
-        media_object_id: audioOptions.media_object_id,
-        subtitles: audioOptions.subtitles,
-        attachment_id: audioOptions.attachment_id,
-      })
+      .updateMediaObject(data)
       .then(() => container?.contentWindow.location.reload())
       .catch(ex => {
         console.error('Failed updating audio captions', ex)
