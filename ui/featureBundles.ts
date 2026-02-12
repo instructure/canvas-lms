@@ -101,7 +101,6 @@ const featureBundles: {
   discussion_topic_edit_v2: () => import('./features/discussion_topic_edit_v2/index'),
   discussion_topic_edit: () => import('./features/discussion_topic_edit/index'),
   discussion_topic_insights: () => import('./features/discussion_topic_insights/index'),
-  discussion_topic: () => import('./features/discussion_topic/index'),
   discussion_topics_index: () => import('./features/discussion_topics_index/index'),
   discussion_topics_post: () => import('./features/discussion_topics_post/index'),
   edit_calendar_event: () => import('./features/edit_calendar_event/index'),
