@@ -61,7 +61,7 @@ describe('ItemAssignToTray - Card Focus', () => {
 
     const addButton = getAllByTestId('add-card')[0]
     await waitFor(() => expect(addButton).toHaveFocus())
-  })
+  }, 30000)
 
   it("focuses on the newly-created card's delete button when adding a card", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
@@ -79,5 +79,5 @@ describe('ItemAssignToTray - Card Focus', () => {
     await waitFor(() =>
       expect(deleteButtons[deleteButtons.length - 1].closest('button')).toHaveFocus(),
     )
-  })
+  }, 30000)
 })

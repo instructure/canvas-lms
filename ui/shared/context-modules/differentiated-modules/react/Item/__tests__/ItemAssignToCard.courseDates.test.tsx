@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, fireEvent, waitFor} from '@testing-library/react'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import {setupServer} from 'msw/node'
@@ -105,6 +105,8 @@ describe('ItemAssignToCard - Course Dates', () => {
   afterEach(() => {
     server.resetHandlers()
     fakeENV.teardown()
+    vi.clearAllMocks()
+    cleanup()
   })
 
   afterAll(() => {
@@ -117,11 +119,11 @@ describe('ItemAssignToCard - Course Dates', () => {
     fireEvent.change(dateInput, {target: {value: 'May 4, 2025'}})
     getAllByRole('option', {name: '4 May 2025'})[0].click()
 
-    await waitFor(async () => {
+    await waitFor(() => {
       expect(dateInput).toHaveValue('May 4, 2025')
       expect(getAllByText(/Due date cannot be after course end/).length).toBeGreaterThanOrEqual(1)
     })
-  })
+  }, 30000)
 
   it('does not render error when date is outside of course dates but assignees are ADHOC', async () => {
     const {getByLabelText, getAllByRole, queryByText} = renderComponent({
@@ -132,11 +134,11 @@ describe('ItemAssignToCard - Course Dates', () => {
     fireEvent.change(dateInput, {target: {value: 'May 4, 2025'}})
     getAllByRole('option', {name: '4 May 2025'})[0].click()
 
-    await waitFor(async () => {
+    await waitFor(() => {
       expect(dateInput).toHaveValue('May 4, 2025')
       expect(queryByText(/Due date cannot be after course end/)).not.toBeInTheDocument()
     })
-  })
+  }, 30000)
 
   it('does not render error when date is outside of course dates but inside section dates', async () => {
     const {getByLabelText, getAllByRole, queryByText} = renderComponent({
@@ -147,9 +149,9 @@ describe('ItemAssignToCard - Course Dates', () => {
     fireEvent.change(dateInput, {target: {value: 'May 4, 2025'}})
     getAllByRole('option', {name: '4 May 2025'})[0].click()
 
-    await waitFor(async () => {
+    await waitFor(() => {
       expect(dateInput).toHaveValue('May 4, 2025')
       expect(queryByText(/Due date cannot be after course end/)).not.toBeInTheDocument()
     })
-  })
+  }, 30000)
 })

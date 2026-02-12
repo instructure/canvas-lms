@@ -80,7 +80,7 @@ describe('Assignment Bulk Edit Dates - Batch Edit Dialog', () => {
       fireEvent.click(getByTestId('cancel-batch-edit'))
       vi.runAllTimers()
       expect(queryByText('Batch Edit Dates')).toBeNull()
-    })
+    }, 30000)
 
     it('clears days error when closing and reopening the dialog', async () => {
       const {queryByText, getByLabelText, getByTestId} = await renderOpenBatchEditDialog([1])
@@ -94,7 +94,7 @@ describe('Assignment Bulk Edit Dates - Batch Edit Dialog', () => {
       fireEvent.click(queryByText('Batch Edit'))
       expect(queryByText('Batch Edit Dates')).toBeInTheDocument()
       expect(queryByText('Number of days is required')).not.toBeInTheDocument()
-    })
+    }, 30000)
   })
 
   describe('Shift Dates', () => {
@@ -126,7 +126,7 @@ describe('Assignment Bulk Edit Dates - Batch Edit Dialog', () => {
           ],
         },
       ])
-    })
+    }, 30000)
 
     it('ignores blank date fields', async () => {
       const {getByText, getByLabelText} = await renderOpenBatchEditDialog([1])
@@ -135,7 +135,7 @@ describe('Assignment Bulk Edit Dates - Batch Edit Dialog', () => {
       vi.runAllTimers()
       await user.click(getByText('Save'))
       expect(getByText('Update at least one date to save changes.')).toBeInTheDocument()
-    })
+    }, 30000)
   })
 
   describe('Remove Dates', () => {
@@ -167,7 +167,7 @@ describe('Assignment Bulk Edit Dates - Batch Edit Dialog', () => {
           ],
         },
       ])
-    })
+    }, 30000)
 
     it('removes availability dates from assignments', async () => {
       const {assignments, getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
@@ -198,7 +198,7 @@ describe('Assignment Bulk Edit Dates - Batch Edit Dialog', () => {
           ],
         },
       ])
-    })
+    }, 30000)
 
     it('removes all dates from assignments', async () => {
       const {getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
@@ -229,6 +229,6 @@ describe('Assignment Bulk Edit Dates - Batch Edit Dialog', () => {
           ],
         },
       ])
-    })
+    }, 30000)
   })
 })

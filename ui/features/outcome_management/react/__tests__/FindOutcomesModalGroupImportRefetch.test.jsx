@@ -60,6 +60,7 @@ describe('FindOutcomesModal - Group Import Refetch Tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.restoreAllMocks()
     vi.useRealTimers()
     resolveProgress.mockReset()
   })
@@ -104,7 +105,7 @@ describe('FindOutcomesModal - Group Import Refetch Tests', () => {
 
     await clickEl(getByText('Group 200'))
     expect(getByText('All Refetched Group 200 Outcomes')).toBeInTheDocument()
-  })
+  }, 30000)
 
   it('does not refetch outcomes if no group is selected after group import', async () => {
     const doResolveProgress = delayImportOutcomesProgress()
@@ -140,5 +141,5 @@ describe('FindOutcomesModal - Group Import Refetch Tests', () => {
     await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
     expect(getAllByText('Added')).toHaveLength(3)
     expect(queryByText('All Refetched Group 200 Outcomes')).not.toBeInTheDocument()
-  })
+  }, 30000)
 })

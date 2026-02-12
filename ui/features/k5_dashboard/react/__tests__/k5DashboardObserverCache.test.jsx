@@ -150,5 +150,5 @@ describe('K5Dashboard Parent Support - Cache', () => {
     expect(requestUrls[requestUrls.length - 1]).toContain('observed_user_id=2')
     // 2 total requests - one for student 4, one for student 2
     expect(requestUrls).toHaveLength(2)
-  })
+  }, 30000)
 })

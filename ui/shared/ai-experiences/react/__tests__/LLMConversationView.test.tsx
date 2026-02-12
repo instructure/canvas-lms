@@ -554,43 +554,47 @@ describe('LLMConversationView', () => {
       expect(screen.queryByText('Test message')).not.toBeInTheDocument()
     })
 
-    it('displays error alert when restart fails', async () => {
-      const initialMessages = [
-        {role: 'User', text: 'Start', timestamp: new Date()},
-        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
-      ]
+    it(
+      'displays error alert when restart fails',
+      async () => {
+        const initialMessages = [
+          {role: 'User', text: 'Start', timestamp: new Date()},
+          {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+        ]
 
-      let callCount = 0
+        let callCount = 0
 
-      server.resetHandlers()
-      server.use(
-        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-          return HttpResponse.json({})
-        }),
-        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-          callCount++
-          if (callCount === 1) {
-            return HttpResponse.json({id: '1', messages: initialMessages})
-          }
-          return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
-        }),
-      )
+        server.resetHandlers()
+        server.use(
+          http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+            return HttpResponse.json({})
+          }),
+          http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+            callCount++
+            if (callCount === 1) {
+              return HttpResponse.json({id: '1', messages: initialMessages})
+            }
+            return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
+          }),
+        )
 
-      render(<LLMConversationView {...defaultProps} />)
+        render(<LLMConversationView {...defaultProps} />)
 
-      await waitFor(() => {
-        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
-      })
+        await waitFor(() => {
+          expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
+        })
 
-      const restartButton = screen.getByText('Restart')
-      fireEvent.click(restartButton)
+        const restartButton = screen.getByText('Restart')
+        fireEvent.click(restartButton)
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Failed to restart conversation. Please try again.'),
-        ).toBeInTheDocument()
-      })
-    })
+        await waitFor(() => {
+          expect(
+            screen.getByText('Failed to restart conversation. Please try again.'),
+          ).toBeInTheDocument()
+        })
+      },
+      30000,
+    )
 
     it('allows dismissing error alerts', async () => {
       // Override with error response

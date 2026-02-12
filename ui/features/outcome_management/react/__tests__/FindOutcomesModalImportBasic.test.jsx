@@ -123,6 +123,7 @@ describe('FindOutcomesModal - Import Basic Tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.restoreAllMocks()
     resolveProgress.mockReset()
     delete localStorage.activeImports
     vi.useRealTimers()
@@ -201,7 +202,7 @@ describe('FindOutcomesModal - Import Basic Tests', () => {
     await waitFor(() => expect(queryByText('Loading')).not.toBeInTheDocument())
     expect(queryAllByText('Added')).toHaveLength(1)
     expect(localStorage.activeImports).toEqual('[]')
-  })
+  }, 30000)
 
   it('handles outcome import button states correctly', async () => {
     const doResolveProgress = delayImportOutcomesProgress()

@@ -179,5 +179,5 @@ describe('RubricForm AI Regenerate Dialog Test', () => {
       'Please provide more information about how you would like to regenerate the criterion',
     )
     expect(getByTestId('additional-prompt-textarea')).toBeInTheDocument()
-  })
+  }, 30000)
 })

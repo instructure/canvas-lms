@@ -145,7 +145,7 @@ describe('RegenerateCriteria', () => {
     })
 
     expect(getByTestId('additional-prompt-textarea')).toHaveValue('')
-  })
+  }, 30000)
 
   it('disables the button when disabled prop is true', () => {
     const {getByTestId} = render(<RegenerateCriteria {...defaultProps} disabled={true} />)

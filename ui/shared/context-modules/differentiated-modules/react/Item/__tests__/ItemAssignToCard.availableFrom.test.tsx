@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, fireEvent, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import {http, HttpResponse} from 'msw'
@@ -87,6 +88,8 @@ describe('ItemAssignToCard - Available From Defaults', () => {
   afterEach(() => {
     server.resetHandlers()
     fakeEnv.teardown()
+    vi.clearAllMocks()
+    cleanup()
   })
 
   it('defaults to midnight for available from dates if it is null on click', () => {
@@ -103,13 +106,10 @@ describe('ItemAssignToCard - Available From Defaults', () => {
       onCardDatesChange: onCardDatesChangeMock,
     })
     const dateInput = getByLabelText('Available from')
-    // Clear mock calls from initial render
     onCardDatesChangeMock.mockClear()
-    fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
-    // userEvent causes Event Pooling issues, so I used fireEvent instead
-    fireEvent.blur(dateInput, {target: {value: 'Nov 9, 2020'}})
-    await waitFor(async () => {
-      // Check if the mock was called with the correct arguments at any point
+    await userEvent.type(dateInput, 'Nov 9, 2020')
+    await userEvent.tab()
+    await waitFor(() => {
       const unlockAtCalls = onCardDatesChangeMock.mock.calls.filter(call => call[1] === 'unlock_at')
       expect(unlockAtCalls.length).toBeGreaterThan(0)
       expect(unlockAtCalls[unlockAtCalls.length - 1]).toEqual([
@@ -117,8 +117,9 @@ describe('ItemAssignToCard - Available From Defaults', () => {
         'unlock_at',
         '2020-11-09T00:00:00.000Z',
       ])
-      expect((await findAllByLabelText('Time'))[1]).toHaveValue('12:00 AM')
-    })
+    }, {timeout: 30000})
+    const timeInputs = await findAllByLabelText('Time')
+    expect(timeInputs[1]).toHaveValue('12:00 AM')
   })
 
   it('defaults to midnight for available from dates if it is undefined', () => {

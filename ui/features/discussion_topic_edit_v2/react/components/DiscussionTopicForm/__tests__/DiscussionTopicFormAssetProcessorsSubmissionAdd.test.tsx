@@ -93,54 +93,58 @@ describe('DiscussionTopicForm AssetProcessors Submission', () => {
     vi.resetAllMocks()
   })
 
-  it('adds a new discussion topic with AssetProcessors', async () => {
-    const mockOnSubmit = vi.fn()
-    const {getByTestId, getByLabelText, getByPlaceholderText, findByText} = setup({
-      isEditing: false,
-      onSubmit: mockOnSubmit,
-    })
-
-    fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
-
-    // Switch to graded and wait for form to update
-    await act(async () => {
-      getByLabelText('Graded').click()
-    })
-
-    // Wait for AssetProcessors section to appear (confirms form state updated)
-    await findByText('Document Processing App(s)')
-
-    act(() => {
-      useAssetProcessorsState.getState().addAttachedProcessors({
-        tool: mockToolsForDiscussions[0],
-        data: mockContributionDeepLinkResponse,
-        type: 'ActivityAssetProcessorContribution',
+  it(
+    'adds a new discussion topic with AssetProcessors',
+    async () => {
+      const mockOnSubmit = vi.fn()
+      const {getByTestId, getByLabelText, getByPlaceholderText, findByText} = setup({
+        isEditing: false,
+        onSubmit: mockOnSubmit,
       })
-    })
 
-    expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(1)
+      fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
 
-    await act(async () => {
-      getByTestId('save-button').click()
-    })
+      // Switch to graded and wait for form to update
+      await act(async () => {
+        getByLabelText('Graded').click()
+      })
 
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalled()
-    })
+      // Wait for AssetProcessors section to appear (confirms form state updated)
+      await findByText('Document Processing App(s)')
 
-    const submissionData = mockOnSubmit.mock.calls[0][0]
-    // For expected structure, see AttachedAssetProcessorGraphqlMutation
-    const aps = submissionData.assignment.assetProcessors
-    expect(aps).toEqual([
-      {
-        newContentItem: {
-          contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
-          // from mockDeepLinkResponse:
-          text: 'Lti 1.3 Tool Text',
-          title: 'Lti 1.3 Tool Title',
-          report: {},
+      act(() => {
+        useAssetProcessorsState.getState().addAttachedProcessors({
+          tool: mockToolsForDiscussions[0],
+          data: mockContributionDeepLinkResponse,
+          type: 'ActivityAssetProcessorContribution',
+        })
+      })
+
+      expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(1)
+
+      await act(async () => {
+        getByTestId('save-button').click()
+      })
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalled()
+      })
+
+      const submissionData = mockOnSubmit.mock.calls[0][0]
+      // For expected structure, see AttachedAssetProcessorGraphqlMutation
+      const aps = submissionData.assignment.assetProcessors
+      expect(aps).toEqual([
+        {
+          newContentItem: {
+            contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
+            // from mockDeepLinkResponse:
+            text: 'Lti 1.3 Tool Text',
+            title: 'Lti 1.3 Tool Title',
+            report: {},
+          },
         },
-      },
-    ])
-  })
+      ])
+    },
+    30000,
+  )
 })

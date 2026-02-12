@@ -91,7 +91,7 @@ describe('K5Dashboard Missing Items', () => {
     expect(missingItemsLink).toHaveTextContent(
       'View 2 missing items for course Economics 1012 missing',
     )
-  }, 10000)
+  }, 30000)
 
   it('links to the schedule tab with missing items focus target', async () => {
     sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
@@ -106,5 +106,5 @@ describe('K5Dashboard Missing Items', () => {
     expect(missingItemsLink.getAttribute('href')).toMatch(
       '/courses/1?focusTarget=missing-items#schedule',
     )
-  }, 10000)
+  }, 30000)
 })

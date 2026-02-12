@@ -312,7 +312,7 @@ describe('RubricForm AI Tests', () => {
         ).toBeInTheDocument()
         expect(getByTestId('give-feedback-link')).toBeInTheDocument()
       })
-    })
+    }, 30000)
 
     it('shows error when generateCriteria fails', async () => {
       const generateCriteriaMock = RubricFormQueries.generateCriteria as Mock

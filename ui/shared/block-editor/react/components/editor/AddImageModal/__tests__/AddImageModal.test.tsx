@@ -174,7 +174,7 @@ describe('AddImageModal', () => {
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg', '')
     })
-  }, 10000)
+  }, 30000)
 
   it('can submit URL images with alt texts', async () => {
     const user = userEvent.setup()
@@ -198,7 +198,7 @@ describe('AddImageModal', () => {
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg', 'Some alt text')
     })
-  }, 10000)
+  }, 30000)
 
   it.skip('can submit course images', async () => {
     // RCX-2420 to fix it

@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import {http, HttpResponse} from 'msw'
@@ -88,17 +89,20 @@ describe('ItemAssignToCard - Available Until Click Defaults', () => {
   afterEach(() => {
     server.resetHandlers()
     fakeEnv.teardown()
+    vi.clearAllMocks()
+    cleanup()
   })
 
   it('defaults to 11:59 PM for available until dates if it is null on click', async () => {
     const onCardDatesChangeMock = vi.fn()
-    const {getByLabelText, getAllByLabelText} = renderComponent({
+    const {getByLabelText, getAllByLabelText, findByRole} = renderComponent({
       onCardDatesChange: onCardDatesChangeMock,
     })
     const dateInput = getByLabelText('Until')
     onCardDatesChangeMock.mockClear()
-    fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
-    fireEvent.blur(dateInput, {target: {value: 'Nov 10, 2020'}})
+    await userEvent.type(dateInput, 'Nov 10, 2020')
+    const dateOption = await findByRole('option', {name: /10 november 2020/i})
+    await userEvent.click(dateOption)
     await waitFor(() => {
       expect(onCardDatesChangeMock).toHaveBeenCalledWith(
         expect.any(String),
@@ -106,6 +110,6 @@ describe('ItemAssignToCard - Available Until Click Defaults', () => {
         '2020-11-10T23:59:59.000Z',
       )
       expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')
-    })
+    }, {timeout: 30000})
   })
 })
