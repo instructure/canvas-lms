@@ -861,7 +861,7 @@ class GradebooksController < ApplicationController
       user_ids = submissions.pluck(:user_id)
       assignment_ids = submissions.pluck(:assignment_id)
       users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
-      assignments = assignment_scope.active.find(assignment_ids).index_by(&:id)
+      assignments = AbstractAssignment.assignment_scope_for_context(@context).active.find(assignment_ids).index_by(&:id)
       # `submissions` is not a collection of ActiveRecord Submission objects,
       # so we pull the records here in order to check hide_grade_from_student?
       # on each submission below.
@@ -1075,7 +1075,7 @@ class GradebooksController < ApplicationController
     @assignment = if params[:assignment_id].blank?
                     nil
                   else
-                    assignment_scope.active.find(params[:assignment_id])
+                    AbstractAssignment.assignment_scope_for_context(@context).active.find(params[:assignment_id])
                   end
 
     platform_speedgrader_param_enabled = query_params_allow_platform_service_speedgrader?(params)
@@ -1595,14 +1595,6 @@ class GradebooksController < ApplicationController
   end
 
   private
-
-  def assignment_scope
-    @assignment_scope ||= if @context.feature_enabled?(:peer_review_allocation_and_grading)
-                            AbstractAssignment.assignment_or_peer_review.where(context: @context)
-                          else
-                            @context.assignments
-                          end
-  end
 
   def multiselect_filters_enabled?
     return @multiselect_filters_enabled if defined?(@multiselect_filters_enabled)
