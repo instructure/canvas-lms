@@ -99,17 +99,19 @@ module Api::V1::Rubric
       can_update_rubric_self_assessment: assignment.can_update_rubric_self_assessment?
     }
     js_env(rubrics_hash)
-    enhanced_rubrics_context_js_env
+    enhanced_rubrics_context_js_env(assignment)
   end
 
-  def enhanced_rubrics_context_js_env
+  def enhanced_rubrics_context_js_env(assignment = nil)
     return unless Rubric.enhanced_rubrics_assignments_enabled?(@context)
+
+    is_valid_self_assessment_assignment_type = !assignment.nil? && !assignment.quiz_lti? && !assignment.quiz? && !assignment.discussion_topic?
 
     rubrics_hash = {
       ACCOUNT_LEVEL_MASTERY_SCALES: @context.root_account.feature_enabled?(:account_level_mastery_scales),
       COURSE_ID: @context.id,
       ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),
-      rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context),
+      rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context) && is_valid_self_assessment_assignment_type,
       ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
     }
     js_env(rubrics_hash)

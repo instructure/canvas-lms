@@ -42,6 +42,14 @@ module Mutations
         raise GraphQL::ExecutionError, I18n.t("Cannot set rubric self assessment for group assignments")
       end
 
+      if assignment.quiz_lti? || assignment.quiz?
+        raise GraphQL::ExecutionError, I18n.t("Cannot set rubric self assessment for quiz assignments")
+      end
+
+      if assignment.discussion_topic?
+        raise GraphQL::ExecutionError, I18n.t("Cannot set rubric self assessment for discussion assignments")
+      end
+
       unless assignment.can_update_rubric_self_assessment?
         raise GraphQL::ExecutionError, I18n.t("Assignment has self assessments or due date has passed")
       end
