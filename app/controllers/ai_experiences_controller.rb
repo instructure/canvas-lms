@@ -107,7 +107,7 @@ class AiExperiencesController < ApplicationController
         render
       end
       format.json do
-        experiences_json = can_manage ? experiences_json_for_teacher : experiences_json_for_student
+        experiences_json = can_manage ? experiences_json_for_teacher(can_manage) : experiences_json_for_student(can_manage)
         render json: {
           experiences: experiences_json,
           can_manage:
@@ -428,11 +428,11 @@ class AiExperiencesController < ApplicationController
     end
   end
 
-  def experiences_json_for_teacher
-    ai_experiences_json(@experiences, @current_user, session)
+  def experiences_json_for_teacher(can_manage)
+    ai_experiences_json(@experiences, @current_user, session, can_manage:)
   end
 
-  def experiences_json_for_student
+  def experiences_json_for_student(can_manage)
     @experiences.map do |experience|
       # Query for the student's latest conversation for this experience
       latest_conversation = experience.ai_conversations
@@ -450,7 +450,7 @@ class AiExperiencesController < ApplicationController
                             "in_progress"
                           end
 
-      ai_experience_json(experience, @current_user, session, { submission_status: })
+      ai_experience_json(experience, @current_user, session, { submission_status:, can_manage: })
     end
   end
 end

@@ -29,15 +29,26 @@ const I18n = createI18nScope('ai_experiences_edit')
 
 interface FormHeaderProps {
   isEdit: boolean
+  title?: string
   onDeleteClick: () => void
 }
 
-const FormHeader: React.FC<FormHeaderProps> = ({isEdit, onDeleteClick}) => {
+const FormHeader: React.FC<FormHeaderProps> = ({isEdit, title, onDeleteClick}) => {
+  const getHeading = () => {
+    if (!isEdit) {
+      return I18n.t('New AI Experience')
+    }
+    if (title?.trim()) {
+      return I18n.t('Edit %{title}', {title})
+    }
+    return I18n.t('Edit AI Experience')
+  }
+
   return (
     <Flex justifyItems="space-between" alignItems="start" margin="0 0 large 0">
       <Flex.Item shouldGrow>
         <Heading level="h1" margin="0">
-          {isEdit ? I18n.t('Edit AI Experience') : I18n.t('New AI Experience')}
+          {getHeading()}
         </Heading>
       </Flex.Item>
       <Flex.Item>
