@@ -308,6 +308,39 @@ RSpec.describe ApplicationController do
               course_with_student(user: @user, active_all: true)
               expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
             end
+
+            it "is set for users with concluded teacher enrollment and active student enrollment" do
+              course1 = course_factory(active_all: true)
+              course1.enroll_teacher(@user).tap do |e|
+                e.accept!
+                e.complete!
+              end
+              course2 = course_factory(active_all: true)
+              course2.enroll_student(@user).tap(&:accept!)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is set for users with concluded observer enrollment and active student enrollment" do
+              course1 = course_factory(active_all: true)
+              course1.enroll_user(@user, "ObserverEnrollment").tap do |e|
+                e.accept!
+                e.complete!
+              end
+              course2 = course_factory(active_all: true)
+              course2.enroll_student(@user).tap(&:accept!)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is set for users with inactive teacher enrollment and active student enrollment" do
+              course1 = course_factory(active_all: true)
+              course1.enroll_teacher(@user).tap do |e|
+                e.accept!
+                e.deactivate
+              end
+              course2 = course_factory(active_all: true)
+              course2.enroll_student(@user).tap(&:accept!)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
           end
         end
       end
