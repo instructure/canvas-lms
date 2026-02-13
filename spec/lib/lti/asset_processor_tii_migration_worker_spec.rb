@@ -772,7 +772,56 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       expect(subdomain_tool_proxy.reload.migrated_to_context_external_tool_id).to eq(deployment.id)
     end
 
-    it "rejects endpoint with invalid domain (not turnitin.com)" do
+    %w[turnitin.dev turnitin.net turnitin.org turnitinuk.com].each do |domain|
+      it "accepts valid #{domain} endpoint" do
+        domain_tool_proxy = create_tool_proxy(
+          context: sub_account,
+          product_family:,
+          create_binding: true,
+          raw_data: {
+            "tool_profile" => {
+              "service_offered" => [
+                {
+                  "endpoint" => "https://api.#{domain}/api/v1/service"
+                }
+              ]
+            }
+          }
+        )
+        success_response = double("response", is_a?: true, code: "200", body: "success")
+        allow(CanvasHttp).to receive(:post).and_return(success_response)
+        worker.send(:initialize_proxy_results, domain_tool_proxy)
+        worker.send(:tii_tp_migration, domain_tool_proxy, deployment)
+        expect(CanvasHttp).to have_received(:post).with("https://api.#{domain}/api/migrate", anything, anything)
+        expect(domain_tool_proxy.reload.migrated_to_context_external_tool_id).to eq(deployment.id)
+      end
+    end
+
+    it "accepts endpoint from a domain added via Setting" do
+      Setting.set("asset_processor_tii_migration_extra_domains", "custom-tii.example.com")
+      custom_tool_proxy = create_tool_proxy(
+        context: sub_account,
+        product_family:,
+        create_binding: true,
+        raw_data: {
+          "tool_profile" => {
+            "service_offered" => [
+              {
+                "endpoint" => "https://api.custom-tii.example.com/api/v1/service"
+              }
+            ]
+          }
+        }
+      )
+      success_response = double("response", is_a?: true, code: "200", body: "success")
+      allow(CanvasHttp).to receive(:post).and_return(success_response)
+      worker.send(:initialize_proxy_results, custom_tool_proxy)
+      worker.send(:tii_tp_migration, custom_tool_proxy, deployment)
+      expect(CanvasHttp).to have_received(:post).with("https://api.custom-tii.example.com/api/migrate", anything, anything)
+      expect(custom_tool_proxy.reload.migrated_to_context_external_tool_id).to eq(deployment.id)
+    end
+
+    it "rejects endpoint with untrusted domain" do
       invalid_tool_proxy = create_tool_proxy(
         context: sub_account,
         product_family:,
@@ -794,7 +843,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       expect(results[:proxies][invalid_tool_proxy.id][:errors].first).to match(/Failed to extract migration endpoint/)
     end
 
-    it "rejects endpoint with domain ending in turnitin.com but not a subdomain" do
+    it "rejects endpoint with domain ending in a trusted domain but not a subdomain" do
       invalid_tool_proxy = create_tool_proxy(
         context: sub_account,
         product_family:,
