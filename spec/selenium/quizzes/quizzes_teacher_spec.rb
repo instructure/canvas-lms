@@ -303,8 +303,8 @@ describe "quizzes" do
     def upload_attachment_answer
       f("input[type=file]").send_keys @fullpath
       wait_for_ajaximations
-      expect(f(".file-uploaded").text).to be
-      expect(f(".list_question, .answered").text).to be
+      expect(f(".file-uploaded").text).not_to be_nil
+      expect(f(".list_question, .answered").text).not_to be_nil
       f(".upload-label").click
       wait_for_ajaximations
     end

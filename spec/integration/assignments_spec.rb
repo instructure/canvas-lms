@@ -367,7 +367,7 @@ describe "assignments_2 feature flag and parameter" do
       it "shows the old assignments page even with query parameter" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css("div#assignment_show")).to be
+        expect(html.at_css("div#assignment_show")).not_to be_nil
       end
     end
 
@@ -379,13 +379,13 @@ describe "assignments_2 feature flag and parameter" do
       it "shows new assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css("div#assignment_show")).not_to be
+        expect(html.at_css("div#assignment_show")).to be_nil
       end
 
       it "shows old assignments when explicitly requested" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css("div#assignment_show")).to be
+        expect(html.at_css("div#assignment_show")).not_to be_nil
       end
     end
   end
@@ -404,7 +404,7 @@ describe "assignments_2 feature flag and parameter" do
       it "shows the old assignments page even with query parameter" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css("div#assignment_show")).to be
+        expect(html.at_css("div#assignment_show")).not_to be_nil
       end
     end
 
@@ -418,13 +418,13 @@ describe "assignments_2 feature flag and parameter" do
         @assignment.save!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css("div#assignment_show")).not_to be
+        expect(html.at_css("div#assignment_show")).to be_nil
       end
 
       it "shows old assignments if requested" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css("div#assignment_show")).to be
+        expect(html.at_css("div#assignment_show")).not_to be_nil
       end
 
       it "sets the necessary RCS ENV" do

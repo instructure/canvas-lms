@@ -40,10 +40,10 @@ describe "discussion_topics" do
     student_enrollment = course_with_student(course: @course, active_all: true)
     @topic = DiscussionTopic.new(context: @course, title: "will this work?", user: @user)
     @topic.save!
-    expect(@topic.grants_right?(@user, :update)).to be
+    expect(@topic.grants_right?(@user, :update)).to be true
     student_enrollment.send(:conclude)
     AdheresToPolicy::Cache.clear
-    expect(@topic.grants_right?(@user, :update)).not_to be
+    expect(@topic.grants_right?(@user, :update)).to be false
   end
 
   it "allows teachers to edit concluded students topics" do
@@ -51,10 +51,10 @@ describe "discussion_topics" do
     student_enrollment = course_with_student(course: @course, user: @student, active_enrollment: true)
     @topic = DiscussionTopic.new(context: @course, title: "will this work?", user: @student)
     @topic.save!
-    expect(@topic.grants_right?(@teacher, :update)).to be
+    expect(@topic.grants_right?(@teacher, :update)).to be true
     student_enrollment.send(:conclude)
     AdheresToPolicy::Cache.clear
-    expect(@topic.grants_right?(@teacher, :update)).to be
+    expect(@topic.grants_right?(@teacher, :update)).to be true
   end
 
   context "posting first to view setting" do

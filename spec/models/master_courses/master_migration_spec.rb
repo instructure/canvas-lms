@@ -1224,7 +1224,7 @@ describe MasterCourses::MasterMigration do
       expect(ag1_to.group_weight).to eq 33
       expect(ag1_to.rules).to eq "drop_highest:1\n"
       a1_to = ag1_to.assignments.first
-      expect(a1_to).to be
+      expect(a1_to).not_to be_nil
     end
 
     it "syncs unpublished quiz points possible" do

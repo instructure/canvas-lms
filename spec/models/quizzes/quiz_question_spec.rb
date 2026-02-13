@@ -132,7 +132,7 @@ describe Quizzes::QuizQuestion do
       @question.save
 
       question_regrade = Quizzes::QuizQuestionRegrade.first
-      expect(question_regrade).to be
+      expect(question_regrade).not_to be_nil
       expect(question_regrade.regrade_option).to eq "full_credit"
     end
 

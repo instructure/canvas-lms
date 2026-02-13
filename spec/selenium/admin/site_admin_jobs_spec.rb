@@ -89,7 +89,7 @@ describe "site admin jobs ui" do
     it "only actions the individual job when it has been searched for" do
       job = Delayed::Job.list_jobs(:current, 1).first
       get "/jobs_v1?flavor=id&q=#{job.id}"
-      expect(f("#jobs-grid .slick-cell")).to be
+      expect(f("#jobs-grid .slick-cell")).not_to be_nil
       f("#hold-jobs").click
       wait_for_ajax_requests
       expect(job.reload.locked_by).to eq "on hold"

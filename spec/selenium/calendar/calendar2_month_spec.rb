@@ -554,7 +554,7 @@ describe "calendar2" do
         expect(f("#content")).not_to contain_css(".fc-event")
         eventStartText = eventStart.strftime("%Y %m %d")
         quick_jump_to_date(eventStartText)
-        expect(find(".fc-event")).to be
+        expect(find(".fc-event")).not_to be_nil
       end
 
       it "shows section-level events, but not the parent event" do
@@ -575,7 +575,7 @@ describe "calendar2" do
         events.first.click
 
         details = find(".event-details")
-        expect(details).to be
+        expect(details).not_to be_nil
         expect(details.text).to include(@course.default_section.name)
         expect(details.find(".view_event_link")[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end

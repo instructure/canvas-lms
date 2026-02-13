@@ -2967,7 +2967,7 @@ describe Assignment do
     end
 
     it "returns a jwt" do
-      expect(Canvas::Security.decode_jwt(@assignment.secure_params)).to be
+      expect(Canvas::Security.decode_jwt(@assignment.secure_params)).not_to be_nil
     end
 
     it "contains the description when the assignment isn't locked" do

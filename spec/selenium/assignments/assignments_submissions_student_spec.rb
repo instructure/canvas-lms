@@ -432,7 +432,7 @@ describe "submissions" do
 
         # Expect preview link to exist
         driver.switch_to.frame(f("#preview_frame"))
-        expect(f(".modal_preview_link")).to be
+        expect(f(".modal_preview_link")).not_to be_nil
       end
     end
 

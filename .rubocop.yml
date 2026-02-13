@@ -332,8 +332,6 @@ Rake/MethodDefinitionInTask:
 
 RSpec/AroundBlock:
   Severity: convention
-RSpec/Be:
-  Severity: convention
 RSpec/BeforeAfterAll:
   Severity: convention
 RSpec/ContextWording:
