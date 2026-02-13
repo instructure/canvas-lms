@@ -3367,9 +3367,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["available"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course1.id, @course2.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "available"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "available")
       end
 
       it "returns only courses with state unpublished on ?state[]=unpublished" do
@@ -3378,9 +3376,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course3.id, @course4.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "unpublished"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "unpublished")
       end
 
       it "returns only courses with state unpublished and available on ?state[]=unpublished, available" do
@@ -3389,9 +3385,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished", "available"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course1.id, @course2.id, @course3.id, @course4.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to be_in %w[available unpublished]
-        end
+        expect(json.pluck("workflow_state")).to all(be_in(%w[available unpublished]))
       end
 
       it "returns courses by custom role and state unpublished" do
@@ -3406,9 +3400,7 @@ describe CoursesController, type: :request do
                                                 "user_id" => @me.id,
                                                 "enrollment_state" => "invited",
                                                 "limit_privileges_to_course_section" => false }]
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "unpublished"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "unpublished")
       end
 
       it "does not return courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do

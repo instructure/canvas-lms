@@ -884,9 +884,7 @@ s2,test_1,section2,active),
       )
       expect(@user.reload).to be_registered
       expect(@section.reload).to be_deleted
-      @section.enrollments.not_fake.each do |e|
-        expect(e).to be_deleted
-      end
+      expect(@section.enrollments.not_fake).to all(be_deleted)
       expect(@course.reload).to be_claimed
       expect(b.data[:counts][:batch_sections_deleted]).to eq 1
 

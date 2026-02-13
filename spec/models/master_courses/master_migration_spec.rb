@@ -3162,9 +3162,7 @@ describe MasterCourses::MasterMigration do
       copied_tag = @copy_to.context_module_tags.where(migration_id: mig_id(tag)).first
       copied_things = [copied_assmt, copied_topic, copied_page, copied_quiz, copied_file, copied_mod, copied_tag]
 
-      copied_things.each do |copied_obj|
-        expect(copied_obj).to be_published
-      end
+      expect(copied_things).to all(be_published)
 
       # unpublish everything
       Timecop.freeze(1.minute.from_now) do

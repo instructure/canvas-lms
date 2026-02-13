@@ -311,7 +311,7 @@ describe FilesController do
         expect(response).to be_successful
 
         files_contexts = assigns[:js_env][:FILES_CONTEXTS]
-        files_contexts.each { |c| expect(c).to have_key(:root_folder_right) }
+        expect(files_contexts).to all(have_key(:root_folder_right))
       end
 
       it "includes user context with accessible courses" do

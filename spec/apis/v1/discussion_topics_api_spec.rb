@@ -931,9 +931,7 @@ describe DiscussionTopicsController, type: :request do
                           scope: "unlocked" })
         expect(json.size).to eq 1
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("scope=unlocked")
-        end
+        expect(links).to all(match("scope=unlocked"))
 
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked",
@@ -945,9 +943,7 @@ describe DiscussionTopicsController, type: :request do
                           scope: "locked" })
         expect(json.size).to eq 2
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("scope=locked")
-        end
+        expect(links).to all(match("scope=locked"))
 
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=pinned",
@@ -1000,11 +996,9 @@ describe DiscussionTopicsController, type: :request do
                           scope: "unlocked" })
         expect(json.size).to eq 2
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("only_announcements=true")
-          expect(link).to match("order_by=recent_activity")
-          expect(link).to match("scope=unlocked")
-        end
+        expect(links).to all(match("only_announcements=true")
+          .and(match("order_by=recent_activity"))
+          .and(match("scope=unlocked")))
       end
 
       it "returns group_topic_children for group discussions" do

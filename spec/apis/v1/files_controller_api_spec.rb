@@ -687,7 +687,7 @@ describe "Files API", type: :request do
         json = api_call(:get, @files_path, @files_path_options, {})
         res = json.pluck("display_name")
         expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
-        json.pluck("url").each { |url| expect(url).to include "verifier=" } unless disable_adding_uuid_verifier_in_api
+        expect(json.pluck("url")).to all(include "verifier=") unless disable_adding_uuid_verifier_in_api
       end
 
       it "does not omit verifiers using session auth if params[:use_verifiers] is given" do
@@ -695,7 +695,7 @@ describe "Files API", type: :request do
         get @files_path + "?use_verifiers=1"
         expect(response).to be_successful
         json = json_parse
-        json.pluck("url").each { |url| expect(url).to include "verifier=" } unless disable_adding_uuid_verifier_in_api
+        expect(json.pluck("url")).to all(include "verifier=") unless disable_adding_uuid_verifier_in_api
       end
     end
 
