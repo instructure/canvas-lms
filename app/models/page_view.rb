@@ -64,13 +64,13 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.find_for_update(request_id)
+  def self.find_for_update(request_id, created_at = nil)
     if PageView.updates_enabled? && db?
       find_by(id: request_id)
     else
       new do |p|
         p.request_id = request_id
-        p.created_at = Time.zone.now
+        p.created_at = created_at || Time.now.utc
       end
     end
   end

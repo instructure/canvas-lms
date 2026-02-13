@@ -1155,23 +1155,26 @@ RSpec.describe ApplicationController do
 
         it "sets created_at for the page view thus allowing the interaction token to be generated correctly" do
           Timecop.freeze do
-            request_id = "31877f1c-7bfc-4389-8daa-3adb48d98829"
-            interaction_seconds = 12
-            created_at = Time.zone.now
-            expected_interaction_token = "#{request_id}|#{created_at.iso8601(2)}|#{interaction_seconds}"
-            controller.response = instance_double(ActionDispatch::Response, headers: {})
-            controller.params[:page_view_token] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpIjoiMzE4NzdmMWMtN2JmYy00Mzg5LThkYWEtM2FkYjQ4ZDk4ODI5IiwidSI6bnVsbCwiYyI6bnVsbH0.IltPMbU08FUf-Kr_5vYzie4HnSW2tW8qFfYJunR9Z4o"
-            controller.params[:interaction_seconds] = interaction_seconds
-            allow(controller.request).to receive_messages(xhr?: 0, put?: true)
-            allow(controller.response).to receive(:headers).and_return({})
-            expect(RequestContext::Generator).to receive(:add_meta_header).with("r", expected_interaction_token)
+            Time.use_zone("Budapest") do
+              request_id = "31877f1c-7bfc-4389-8daa-3adb48d98829"
+              user_id = "123"
+              interaction_seconds = 12
+              created_at = 5.minutes.ago
+              expected_interaction_token = "#{request_id}|#{created_at.utc.iso8601(2)}|#{interaction_seconds}"
+              controller.response = double("response", headers: {})
+              controller.params[:page_view_token] = CanvasSecurity::PageViewJwt.generate({ request_id:, user_id:, created_at: })
+              controller.params[:interaction_seconds] = interaction_seconds
+              allow(controller.request).to receive_messages(xhr?: 0, put?: true)
+              allow(controller.response).to receive(:headers).and_return({})
+              expect(RequestContext::Generator).to receive(:add_meta_header).with("r", expected_interaction_token)
 
-            controller.send(:add_interaction_seconds)
+              controller.send(:add_interaction_seconds)
 
-            jwt_from_url = controller.response.headers["X-Canvas-Page-View-Update-Url"].split("=").last
-            page_view = CanvasSecurity::PageViewJwt.decode(jwt_from_url)
-            expect(page_view[:request_id]).to eq request_id
-            expect(page_view[:created_at]).to be_truthy
+              jwt_from_url = controller.response.headers["X-Canvas-Page-View-Update-Url"].split("=").last
+              page_view = CanvasSecurity::PageViewJwt.decode(jwt_from_url)
+              expect(page_view[:request_id]).to eq request_id
+              expect(page_view[:created_at]).to be_truthy
+            end
           end
         end
       end
