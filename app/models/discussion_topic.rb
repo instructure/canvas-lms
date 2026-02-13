@@ -1437,7 +1437,6 @@ class DiscussionTopic < ActiveRecord::Base
   def initialize_last_reply_at
     unless [:migration, :after_migration].include?(saved_by)
       self.posted_at ||= Time.now.utc
-      self.last_reply_at ||= Time.now.utc
     end
   end
 
