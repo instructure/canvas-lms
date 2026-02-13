@@ -22,10 +22,6 @@ import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-import {
-  AccessibilityCheckerContext,
-  type AccessibilityCheckerContextType,
-} from '../../../../contexts/AccessibilityCheckerContext'
 import {FormType, IssueWorkflowState} from '../../../../types'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 import TextInputForm from '../TextInputForm'
@@ -85,26 +81,6 @@ describe('TextInputForm', () => {
     onChangeValue: vi.fn(),
   }
 
-  // Create a fully typed mock context
-  const mockContextValue: AccessibilityCheckerContextType = {
-    selectedItem: getAsAccessibilityResourceScan(
-      {
-        id: 123,
-        type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
-        title: 'Mock Page',
-        published: true,
-        updatedAt: '2023-01-01',
-        count: 0,
-        url: 'http://example.com',
-        editUrl: 'http://example.com/edit',
-      },
-      1,
-    ),
-    setSelectedItem: vi.fn(),
-    isTrayOpen: false,
-    setIsTrayOpen: vi.fn(),
-  }
-
   const propsWithGenerateOption = {
     ...defaultProps,
     issue: {
@@ -118,20 +94,12 @@ describe('TextInputForm', () => {
   }
 
   it('renders without crashing', () => {
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <TextInputForm {...propsWithGenerateOption} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<TextInputForm {...propsWithGenerateOption} />)
     expect(screen.getByTestId('text-input-form')).toBeInTheDocument()
   })
 
   it('displays the correct label', () => {
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <TextInputForm {...propsWithGenerateOption} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<TextInputForm {...propsWithGenerateOption} />)
     expect(screen.getByText('Test Label')).toBeInTheDocument()
   })
 
@@ -140,21 +108,13 @@ describe('TextInputForm', () => {
       ...defaultProps,
       value: 'test value',
     }
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <TextInputForm {...propsWithValue} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<TextInputForm {...propsWithValue} />)
     const input = screen.getByTestId('text-input-form')
     expect(input).toHaveValue('test value')
   })
 
   it('calls onChangeValue when the input value changes', async () => {
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <TextInputForm {...propsWithGenerateOption} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<TextInputForm {...propsWithGenerateOption} />)
     const input = screen.getByTestId('text-input-form')
     await userEvent.type(input, 'a')
     expect(defaultProps.onChangeValue).toHaveBeenCalledWith('a')
@@ -165,11 +125,7 @@ describe('TextInputForm', () => {
       ...defaultProps,
       error: 'Error message',
     }
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <TextInputForm {...propsWithError} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<TextInputForm {...propsWithError} />)
     expect(screen.getByText('Error message')).toBeInTheDocument()
   })
 
@@ -182,11 +138,7 @@ describe('TextInputForm', () => {
       }),
     )
 
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <TextInputForm {...propsWithGenerateOption} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<TextInputForm {...propsWithGenerateOption} />)
 
     // Click the generate button
     const generateButton = screen.getByText('Generate Alt Text')
@@ -200,11 +152,7 @@ describe('TextInputForm', () => {
   })
 
   it('focuses the input when the form is refocused', () => {
-    const {container} = render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <TextInputForm {...propsWithGenerateOption} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    const {container} = render(<TextInputForm {...propsWithGenerateOption} />)
     const input = container.querySelector('input')
     expect(input).not.toHaveFocus()
     input?.focus()
@@ -218,11 +166,7 @@ describe('TextInputForm', () => {
         return selector(state)
       })
 
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <TextInputForm {...propsWithGenerateOption} />
-        </AccessibilityCheckerContext.Provider>,
-      )
+      render(<TextInputForm {...propsWithGenerateOption} />)
 
       expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
     })
@@ -233,11 +177,7 @@ describe('TextInputForm', () => {
         return selector(state)
       })
 
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <TextInputForm {...propsWithGenerateOption} />
-        </AccessibilityCheckerContext.Provider>,
-      )
+      render(<TextInputForm {...propsWithGenerateOption} />)
 
       expect(screen.queryByText('Generate Alt Text')).not.toBeInTheDocument()
     })

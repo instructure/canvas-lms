@@ -24,35 +24,9 @@ import {FormType, IssueWorkflowState} from '../../../../types'
 
 const server = setupServer()
 
-// Import the actual context
-import {
-  AccessibilityCheckerContext,
-  type AccessibilityCheckerContextType,
-} from '../../../../contexts/AccessibilityCheckerContext'
-import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
 
 vi.mock('../../../../stores/AccessibilityScansStore')
-
-// Create a fully typed mock context
-const mockContextValue: AccessibilityCheckerContextType = {
-  selectedItem: getAsAccessibilityResourceScan(
-    {
-      id: 123,
-      type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
-      title: 'Mock Page',
-      published: true,
-      updatedAt: '2023-01-01',
-      count: 0,
-      url: 'http://example.com',
-      editUrl: 'http://example.com/edit',
-    },
-    1,
-  ),
-  setSelectedItem: vi.fn(),
-  isTrayOpen: false,
-  setIsTrayOpen: vi.fn(),
-}
 
 beforeAll(() => server.listen())
 afterAll(() => server.close())
@@ -95,20 +69,12 @@ describe('CheckboxTextInput', () => {
   }
 
   it('renders without crashing', () => {
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...defaultProps} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...defaultProps} />)
     expect(screen.getByTestId('checkbox-text-input-form')).toBeInTheDocument()
   })
 
   it('displays all text elements correctly', () => {
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...defaultProps} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...defaultProps} />)
 
     expect(screen.getByText('Test Checkbox Label')).toBeInTheDocument()
     expect(screen.getByText('Test checkbox subtext')).toBeInTheDocument()
@@ -117,11 +83,7 @@ describe('CheckboxTextInput', () => {
   })
 
   it('toggles checkbox and disables/enables textarea accordingly', () => {
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...defaultProps} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...defaultProps} />)
     const checkbox = screen.getByRole('checkbox', {
       name: 'Test Checkbox Label Test checkbox subtext',
     })
@@ -144,11 +106,7 @@ describe('CheckboxTextInput', () => {
       ...defaultProps,
       value: 'test value',
     }
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...propsWithValue} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...propsWithValue} />)
     const checkbox = screen.getByRole('checkbox', {
       name: 'Test Checkbox Label Test checkbox subtext',
     })
@@ -162,11 +120,7 @@ describe('CheckboxTextInput', () => {
       ...defaultProps,
       value: 'test value',
     }
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...propsWithValue} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...propsWithValue} />)
     const textarea = screen.getByTestId('checkbox-text-input-form')
     expect(textarea).toHaveValue('test value')
   })
@@ -185,11 +139,7 @@ describe('CheckboxTextInput', () => {
       },
     }
 
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...propsWithGenerateOption} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...propsWithGenerateOption} />)
     const button = screen.getByTestId('generate-alt-text-button')
     expect(button).toBeInTheDocument()
     expect(button).not.toBeDisabled()
@@ -209,11 +159,7 @@ describe('CheckboxTextInput', () => {
       },
     }
 
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...propsWithGenerateDisabled} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...propsWithGenerateDisabled} />)
     const button = screen.getByTestId('generate-alt-text-button')
     expect(button).toBeInTheDocument()
     expect(button).toBeDisabled()
@@ -246,11 +192,7 @@ describe('CheckboxTextInput', () => {
       }),
     )
 
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...propsWithGenerateOption} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...propsWithGenerateOption} />)
 
     // Click the generate button
     const generateButton = screen.getByTestId('generate-alt-text-button')
@@ -291,11 +233,7 @@ describe('CheckboxTextInput', () => {
       }),
     )
 
-    render(
-      <AccessibilityCheckerContext.Provider value={mockContextValue}>
-        <CheckboxTextInput {...propsWithGenerateOption} />
-      </AccessibilityCheckerContext.Provider>,
-    )
+    render(<CheckboxTextInput {...propsWithGenerateOption} />)
 
     // Click the generate button
     const generateButton = screen.getByTestId('generate-alt-text-button')
@@ -325,13 +263,11 @@ describe('CheckboxTextInput', () => {
       const onChangeValue = vi.fn()
 
       const {rerender} = render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput
-            {...defaultProps}
-            onValidationChange={onValidationChange}
-            onChangeValue={onChangeValue}
-          />
-        </AccessibilityCheckerContext.Provider>,
+        <CheckboxTextInput
+          {...defaultProps}
+          onValidationChange={onValidationChange}
+          onChangeValue={onChangeValue}
+        />,
       )
 
       onValidationChange.mockClear()
@@ -340,14 +276,12 @@ describe('CheckboxTextInput', () => {
       fireEvent.change(textarea, {target: {value: 'Valid alt text'}})
 
       rerender(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput
-            {...defaultProps}
-            value="Valid alt text"
-            onValidationChange={onValidationChange}
-            onChangeValue={onChangeValue}
-          />
-        </AccessibilityCheckerContext.Provider>,
+        <CheckboxTextInput
+          {...defaultProps}
+          value="Valid alt text"
+          onValidationChange={onValidationChange}
+          onChangeValue={onChangeValue}
+        />,
       )
 
       await waitFor(() => {
@@ -360,13 +294,11 @@ describe('CheckboxTextInput', () => {
       const onChangeValue = vi.fn()
 
       const {rerender} = render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput
-            {...defaultProps}
-            onValidationChange={onValidationChange}
-            onChangeValue={onChangeValue}
-          />
-        </AccessibilityCheckerContext.Provider>,
+        <CheckboxTextInput
+          {...defaultProps}
+          onValidationChange={onValidationChange}
+          onChangeValue={onChangeValue}
+        />,
       )
 
       onValidationChange.mockClear()
@@ -376,14 +308,12 @@ describe('CheckboxTextInput', () => {
       fireEvent.change(textarea, {target: {value: longText}})
 
       rerender(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput
-            {...defaultProps}
-            value={longText}
-            onValidationChange={onValidationChange}
-            onChangeValue={onChangeValue}
-          />
-        </AccessibilityCheckerContext.Provider>,
+        <CheckboxTextInput
+          {...defaultProps}
+          value={longText}
+          onValidationChange={onValidationChange}
+          onChangeValue={onChangeValue}
+        />,
       )
 
       await waitFor(() => {
@@ -397,11 +327,7 @@ describe('CheckboxTextInput', () => {
     it('calls onValidationChange when checkbox is checked (decorative image)', async () => {
       const onValidationChange = vi.fn()
 
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />
-        </AccessibilityCheckerContext.Provider>,
-      )
+      render(<CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />)
 
       onValidationChange.mockClear()
 
@@ -416,11 +342,7 @@ describe('CheckboxTextInput', () => {
     it('calls onValidationChange when textarea is empty', async () => {
       const onValidationChange = vi.fn()
 
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />
-        </AccessibilityCheckerContext.Provider>,
-      )
+      render(<CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />)
 
       expect(onValidationChange).toHaveBeenCalledWith(false, 'Alt text is required.')
     })
@@ -429,13 +351,7 @@ describe('CheckboxTextInput', () => {
       const onValidationChange = vi.fn()
 
       render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput
-            {...defaultProps}
-            value="   "
-            onValidationChange={onValidationChange}
-          />
-        </AccessibilityCheckerContext.Provider>,
+        <CheckboxTextInput {...defaultProps} value="   " onValidationChange={onValidationChange} />,
       )
 
       expect(onValidationChange).toHaveBeenCalledWith(false, 'Alt text is required.')
@@ -462,11 +378,7 @@ describe('CheckboxTextInput', () => {
         },
       }
 
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...propsWithGenerateOption} />
-        </AccessibilityCheckerContext.Provider>,
-      )
+      render(<CheckboxTextInput {...propsWithGenerateOption} />)
 
       expect(screen.getByTestId('generate-alt-text-button')).toBeInTheDocument()
     })
@@ -490,11 +402,7 @@ describe('CheckboxTextInput', () => {
         },
       }
 
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...propsWithGenerateOption} />
-        </AccessibilityCheckerContext.Provider>,
-      )
+      render(<CheckboxTextInput {...propsWithGenerateOption} />)
 
       expect(screen.queryByTestId('generate-alt-text-button')).not.toBeInTheDocument()
     })
@@ -502,11 +410,7 @@ describe('CheckboxTextInput', () => {
 
   describe('isDisabled prop', () => {
     it('disables textarea when isDisabled is true', () => {
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...defaultProps} isDisabled={true} />
-        </AccessibilityCheckerContext.Provider>,
-      )
+      render(<CheckboxTextInput {...defaultProps} isDisabled={true} />)
 
       const textarea = screen.getByTestId('checkbox-text-input-form')
       expect(textarea).toBeDisabled()
@@ -527,11 +431,7 @@ describe('CheckboxTextInput', () => {
         },
       }
 
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...propsWithGenerate} />
-        </AccessibilityCheckerContext.Provider>,
-      )
+      render(<CheckboxTextInput {...propsWithGenerate} />)
 
       const button = screen.getByTestId('generate-alt-text-button')
       expect(button).toBeInTheDocument()

@@ -24,8 +24,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-
-import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
@@ -50,13 +48,10 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
       ref,
     ) => {
       const [generateLoading, setGenerateLoading] = useState(false)
-      const {selectedItem} = useAccessibilityCheckerContext()
       const inputRef = useRef<HTMLInputElement | null>(null)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const {isAiTableCaptionGenerationEnabled} = useAccessibilityScansStore(
-        useShallow(state => ({
-          isAiTableCaptionGenerationEnabled: state.isAiTableCaptionGenerationEnabled,
-        })),
+      const [isAiTableCaptionGenerationEnabled, selectedItem] = useAccessibilityScansStore(
+        useShallow(state => [state.isAiTableCaptionGenerationEnabled, state.selectedScan]),
       )
 
       useImperativeHandle(ref, () => ({
