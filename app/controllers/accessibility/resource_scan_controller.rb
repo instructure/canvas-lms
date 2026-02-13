@@ -123,7 +123,7 @@ module Accessibility
         type_case = <<~SQL.squish
           CASE
             WHEN #{scans_table}.is_syllabus = true THEN 'syllabus'
-            WHEN #{scans_table}.wiki_page_id IS NOT NULL THEN 'wiki_page'
+            WHEN #{scans_table}.wiki_page_id IS NOT NULL THEN 'page'
             WHEN #{scans_table}.assignment_id IS NOT NULL THEN 'assignment'
             WHEN #{scans_table}.attachment_id IS NOT NULL THEN 'attachment'
             WHEN #{scans_table}.discussion_topic_id IS NOT NULL THEN 'discussion_topic'
