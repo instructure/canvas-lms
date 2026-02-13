@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 shared_examples "comments" do |raw_changes|
-  let(:changes) { raw_changes.map { |c| instance_double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
+  let(:changes) { raw_changes.map { |c| double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
   let(:linter) { described_class.new(changes:, config:) }
 
   it "comments" do
@@ -10,7 +10,7 @@ shared_examples "comments" do |raw_changes|
 end
 
 shared_examples "comments with msg key" do |raw_changes, msg_key|
-  let(:changes) { raw_changes.map { |c| instance_double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
+  let(:changes) { raw_changes.map { |c| double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
   let(:linter) { described_class.new(changes:, config:) }
 
   it "comments" do
@@ -21,7 +21,7 @@ shared_examples "comments with msg key" do |raw_changes, msg_key|
 end
 
 shared_examples "does not comment" do |raw_changes|
-  let(:changes) { raw_changes.map { |c| instance_double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
+  let(:changes) { raw_changes.map { |c| double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
   let(:linter) { described_class.new(changes:, config:) }
 
   it "does not comment" do

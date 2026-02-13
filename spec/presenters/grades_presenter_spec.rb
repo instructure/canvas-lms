@@ -236,7 +236,7 @@ describe GradesPresenter do
   end
 
   describe "#single_enrollment" do
-    let(:course) { instance_double("Course") }
+    let(:course) { instance_double(Course) }
 
     let(:attrs) do
       { student?: false, instructor?: false, course_id: 1, state_based_on_date: :active, course:, is_a?: false }

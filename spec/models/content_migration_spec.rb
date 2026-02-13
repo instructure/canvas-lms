@@ -1037,7 +1037,7 @@ describe ContentMigration do
           .and_return(false)
       end
 
-      let(:importer) { class_double("Importers::CourseContentImporter") }
+      let(:importer) { class_double(Importers::CourseContentImporter) }
 
       it "should not calls QuizzesNext::Importers" do
         expect(QuizzesNext::Importers::CourseContentImporter)
@@ -2779,7 +2779,7 @@ describe ContentMigration do
       expect(KalturaMediaFileHandler).to receive(:new).and_return(@kaltura_media_handler)
 
       # Mock API calls for Kaltura redirects during media downloads
-      kaltura_client_double = instance_double("CanvasKaltura::ClientV3")
+      kaltura_client_double = instance_double(CanvasKaltura::ClientV3)
 
       allow(kaltura_client_double).to receive(:media_download_url).with("m-media_id_1").and_return("http://kaltura.example/download/t-123")
       Net::HTTPSuccess.new(1.1, 200, "OK").tap do |response|

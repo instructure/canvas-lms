@@ -89,7 +89,7 @@ RSpec.describe PeerReview::DateOverrideCommonService do
     end
 
     context "with mocked services" do
-      let(:mock_section_service) { instance_double("MockSectionService") }
+      let(:mock_section_service) { class_double(PeerReview::SectionOverrideCommonService) }
 
       let(:override_data) do
         [{
@@ -161,7 +161,7 @@ RSpec.describe PeerReview::DateOverrideCommonService do
         )
       end
 
-      let(:mock_service) { instance_double("MockService") }
+      let(:mock_service) { class_double(PeerReview::SectionOverrideCommonService) }
 
       before do
         allow(service).to receive(:services).and_return({

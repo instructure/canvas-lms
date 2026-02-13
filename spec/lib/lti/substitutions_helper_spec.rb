@@ -943,7 +943,7 @@ module Lti
 
         context "if it's an LTI2 tool" do
           let(:substitution_helper) do
-            tool = class_double("Lti::ToolProxy")
+            tool = class_double(Lti::ToolProxy)
             SubstitutionsHelper.new(course, root_account, user, tool)
           end
 
@@ -951,7 +951,7 @@ module Lti
         end
 
         it "returns the email for the courses enrollment if there is one." do
-          tool = class_double("Lti::ToolProxy")
+          tool = class_double(Lti::ToolProxy)
           p = sis_pseudonym
           # moving account so that if the pseudonym was not tied to enrollment
           # it would return 'test@foo.com' instead of sis_email
@@ -963,7 +963,7 @@ module Lti
         end
 
         it "only returns active logins" do
-          tool = class_double("Lti::ToolProxy")
+          tool = class_double(Lti::ToolProxy)
           p = sis_pseudonym
           # moving account so that if the pseudonym was not tied to enrollment
           # it would return 'test@foo.com' instead of sis_email if it was active

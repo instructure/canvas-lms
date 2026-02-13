@@ -399,8 +399,6 @@ RSpec/SubjectDeclaration:
   Severity: convention
 RSpec/VariableName:
   Severity: convention
-RSpec/VerifiedDoubleReference:
-  Enabled: false
 
 Style/AccessorGrouping:
   Severity: convention
