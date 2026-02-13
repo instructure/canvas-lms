@@ -1277,9 +1277,7 @@ describe DiscussionTopic do
                                                                   .group(:context_id)
                                                                   .pluck("array_agg(attachment_id) as attachment_ids")
 
-          child_association_attachment_ids.each do |attachment_ids|
-            expect(attachment_ids).to match_array([@attachment1.id, @attachment2.id])
-          end
+          expect(child_association_attachment_ids).to all(match_array([@attachment1.id, @attachment2.id]))
         end
 
         it "preserves user_id from parent associations when copying to child topics" do
@@ -1316,9 +1314,7 @@ describe DiscussionTopic do
                                                                   .group(:context_id)
                                                                   .pluck("array_agg(attachment_id) as attachment_ids")
 
-          child_association_attachment_ids.each do |attachment_ids|
-            expect(attachment_ids).to match_array([@attachment3.id])
-          end
+          expect(child_association_attachment_ids).to all(match_array([@attachment3.id]))
         end
       end
     end

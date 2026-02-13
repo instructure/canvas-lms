@@ -67,7 +67,11 @@ module AnnouncementsCommon
     expect(ff(".toggleSelected")).to have_size(what_to_create.count)
     (filter_type == :css) ? fj(filter).click : replace_content(f("#searchTerm"), filter)
     expect(ff(".ic-announcement-row").count).to eq expected_results
-    (expected_results > 1) ? ff(".ic-announcement-row").each { |topic| expect(topic).to include_text(expected_text) } : (expect(f(".discussionTopicIndexList .discussion-topic")).to include_text(expected_text))
+    if expected_results > 1
+      expect(ff(".ic-announcement-row")).to all(include_text(expected_text))
+    else
+      expect(f(".discussionTopicIndexList .discussion-topic")).to include_text(expected_text)
+    end
   end
 
   def add_attachment_and_validate

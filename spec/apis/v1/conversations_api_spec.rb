@@ -136,9 +136,7 @@ describe ConversationsController, type: :request do
                         format: "json",
                         include: ["participant_avatars"] })
       json.each do |conversation|
-        conversation["participants"].each do |user|
-          expect(user).to have_key "avatar_url"
-        end
+        expect(conversation["participants"]).to all(have_key("avatar_url"))
       end
     end
 

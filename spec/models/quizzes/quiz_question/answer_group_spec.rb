@@ -64,9 +64,7 @@ describe Quizzes::QuizQuestion::AnswerGroup do
     end
 
     it "converts each answer to a hash" do
-      question_data.answers.to_a.each do |a|
-        expect(a).to be_instance_of(Hash)
-      end
+      expect(question_data.answers.to_a).to all(be_instance_of(Hash))
     end
   end
 

@@ -48,7 +48,7 @@ describe "site admin jobs ui" do
   def validate_all_jobs_selected
     f("#select-all-jobs").click
     all_jobs = ff("#jobs-grid .slick-cell")
-    all_jobs.each { |job| expect(job).to have_class("selected") }
+    expect(all_jobs).to all(have_class("selected"))
   end
 
   def load_jobs_page

@@ -55,9 +55,7 @@ describe JobLiveEventsContext do
     it "stringifies all ids" do
       context_values = fake_delayed_instance.live_events_context.values
 
-      context_values.each do |value|
-        expect(value).to be_a(String)
-      end
+      expect(context_values).to all(be_a(String))
     end
   end
 end
