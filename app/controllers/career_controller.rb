@@ -62,6 +62,7 @@ class CareerController < ApplicationController
       horizon_learning_library
       horizon_chart_view
       horizon_native_permissions_page
+      horizon_block_content_editor
       horizon_course_academic_switcher
       horizon_syncable_objects_redesign
       horizon_help_navigation
