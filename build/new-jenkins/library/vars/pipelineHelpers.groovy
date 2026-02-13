@@ -190,7 +190,7 @@ def configureBuildStage(buildParameters) {
   }
 
   if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' &&
-    env.GERRIT_CHANGE_SUBJECT =~ /translation$/) {
+    env.GERRIT_CHANGE_SUBJECT =~ /translations?$/) {
     env.SKIP_BUILD = 'true'
     if (configuration.isChangeMerged()) {
       // Post-merge translation: will be set to SUCCESS in post block
