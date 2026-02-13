@@ -17,7 +17,6 @@
  */
 import React from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {colors} from '@instructure/canvas-theme'
 import {MasteryDistributionChart} from './MasteryDistributionChart'
 import {RatingDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
@@ -39,7 +38,6 @@ export interface MasteryDistributionChartCellProps {
 
 const containerStyle: React.CSSProperties = {
   width: `${CELL_WIDTH}px`,
-  boxShadow: `-2px 0 0 0 ${colors.contrasts.grey1214} inset`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
