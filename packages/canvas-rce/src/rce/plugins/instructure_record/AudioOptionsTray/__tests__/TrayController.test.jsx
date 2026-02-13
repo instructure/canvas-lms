@@ -239,26 +239,9 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   })
 
   describe('caption update behavior with feature flag', () => {
-    let getFeaturesSpy
-
-    beforeEach(() => {
-      // container?.contentWindow.location.reload() is not defined in jsdom
-      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
-      delete iframe.contentWindow.location
-      iframe.contentWindow.location = {reload: jest.fn()}
-    })
-
-    afterEach(() => {
-      // Clean up feature flag mock if it was created
-      if (getFeaturesSpy) {
-        getFeaturesSpy.mockRestore()
-        getFeaturesSpy = null
-      }
-    })
-
     it('calls updateMediaObject with skipCaptionUpdate=false when feature flag is OFF', () => {
       // Mock feature flag OFF (old flow)
-      getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
         rce_asr_captioning_improvements: false,
       })
 
@@ -277,11 +260,14 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
         subtitles: [{locale: 'en'}],
         skipCaptionUpdate: false, // Old flow - updates captions via API
       })
+
+      // Cleanup
+      getFeaturesSpy.mockRestore()
     })
 
     it('calls updateMediaObject with skipCaptionUpdate=true when feature flag is ON', () => {
       // Mock feature flag ON (new flow)
-      getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
         rce_asr_captioning_improvements: true,
       })
 
@@ -300,11 +286,14 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
         subtitles: [{locale: 'en'}],
         skipCaptionUpdate: true, // New flow - captions managed via upload/delete callbacks
       })
+
+      // Cleanup
+      getFeaturesSpy.mockRestore()
     })
 
     it('defaults to skipCaptionUpdate=false when feature flag is not defined', () => {
       // Mock feature flag undefined
-      getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue(undefined)
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue(undefined)
 
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
@@ -321,6 +310,115 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
         subtitles: [{locale: 'en'}],
         skipCaptionUpdate: false, // Defaults to old flow
       })
+
+      // Cleanup
+      getFeaturesSpy.mockRestore()
+    })
+  })
+
+  describe('caption reload on tray dismiss', () => {
+    it('does NOT reload iframe on dismiss when feature flag is OFF', async () => {
+      // Mock feature flag OFF
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: false,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadAudioPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadAudioPlayer')
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+
+      // Assert: reload should NOT be called (old behavior preserved)
+      expect(reloadSpy).not.toHaveBeenCalled()
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('reloads iframe on dismiss when feature flag is ON and captions were modified', async () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadAudioPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadAudioPlayer')
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+
+      // Assert: _reloadAudioPlayer SHOULD be called
+      expect(reloadSpy).toHaveBeenCalledTimes(1)
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('does NOT reload iframe on dismiss when feature flag is ON but captions were NOT modified', async () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadAudioPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadAudioPlayer')
+
+      // Do NOT modify captions (trayController._captionsModified stays false)
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+
+      // Assert: reload should NOT be called (no changes made)
+      expect(reloadSpy).not.toHaveBeenCalled()
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('resets caption modified flag when opening tray again', () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+      expect(trayController._captionsModified).toBe(true)
+
+      // Close and reopen
+      trayController.hideTrayForEditor(editors[0])
+      trayController.showTrayForEditor(editors[0])
+
+      // Assert: flag should be reset to false
+      expect(trayController._captionsModified).toBe(false)
+
+      // Cleanup
+      getFeaturesSpy.mockRestore()
     })
   })
 })
