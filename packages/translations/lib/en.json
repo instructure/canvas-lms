@@ -257,9 +257,6 @@
   "caption_manager_aae0906f": {
     "message": "Caption Manager"
   },
-  "captionname_caption_upload_failed_errormessage_573eccfe": {
-    "message": "{ captionName } caption upload failed: { errorMessage }"
-  },
   "captions_have_been_added_for_lang_cd126cd": {
     "message": "Captions have been added for { lang }"
   },
@@ -859,6 +856,9 @@
   },
   "fail_544e5dde": {
     "message": "FAIL"
+  },
+  "failed_276786d": {
+    "message": "Failed"
   },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Failed getting file contents"
