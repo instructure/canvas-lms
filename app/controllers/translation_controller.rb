@@ -30,6 +30,7 @@ class TranslationController < ApplicationController
     # Don't allow users that can't access, or if translation is not available
     return render_unauthorized_action unless Translation.available? && user_can_read? && @context.feature_enabled?(:translation)
 
+    start_time = Time.zone.now
     translated_text = Translation.translate_html(html_string: required_params[:text],
                                                  tgt_lang: required_params[:tgt_lang],
                                                  options: {
@@ -38,11 +39,14 @@ class TranslationController < ApplicationController
                                                    current_user: @current_user
                                                  })
 
+    duration = Time.zone.now - start_time
+    InstStatsd::Statsd.timing("translation.discussions.duration", duration)
     render json: { translated_text: }
   end
 
   def translate_paragraph
     # Right now course is always undefined
+    start_time = Time.zone.now
     translated_text = Translation.translate_text(
       text: required_params[:text],
       tgt_lang: required_params[:tgt_lang],
@@ -52,6 +56,8 @@ class TranslationController < ApplicationController
         current_user: @current_user
       }
     )
+    duration = Time.zone.now - start_time
+    InstStatsd::Statsd.timing("translation.inbox_compose.duration", duration)
     render json: { translated_text: }
   end
 
