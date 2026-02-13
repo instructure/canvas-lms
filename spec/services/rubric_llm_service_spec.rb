@@ -35,7 +35,7 @@ describe RubricLLMService do
 
   let(:llm_config_double) do
     instance_double(
-      "LLMConfig",
+      LLMConfig,
       name: "rubric-create-V3",
       model_id: "anthropic.claude-3-haiku-20240307-v1:0"
     ).tap do |config|
