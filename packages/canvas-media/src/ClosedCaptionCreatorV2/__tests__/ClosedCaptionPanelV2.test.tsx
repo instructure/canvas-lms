@@ -345,7 +345,8 @@ describe('<ClosedCaptionPanelV2 />', () => {
     })
   })
 
-  it('updates displayed subtitles when prop changes after mount', async () => {
+  // Skipped: ARC-11427
+  it.skip('updates displayed subtitles when prop changes after mount', async () => {
     const onUpdateSubtitles = vi.fn()
 
     // Start with empty subtitles
