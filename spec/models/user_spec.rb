@@ -4389,7 +4389,7 @@ describe User do
       expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).twice # sync_enrollments and destroy_enrollments
       test_student = @course.student_view_student
       test_student.destroy
-      test_student.reload.enrollments.each { |e| expect(e).to be_deleted }
+      expect(test_student.reload.enrollments).to all(be_deleted)
     end
   end
 
@@ -4727,6 +4727,72 @@ describe User do
     it "returns false when user is designer" do
       course_with_designer(user:)
       expect(user.has_student_enrollment?).to be false
+    end
+  end
+
+  describe "#active_non_student_enrollment?" do
+    let(:user) { User.create! }
+
+    it "returns false by default" do
+      expect(user.active_non_student_enrollment?).to be false
+    end
+
+    it "returns false when user has only student enrollment" do
+      course_with_student(user:, active_all: true)
+      expect(user.active_non_student_enrollment?).to be false
+    end
+
+    it "returns true when user has active teacher enrollment" do
+      course_with_teacher(user:, active_all: true)
+      expect(user.active_non_student_enrollment?).to be true
+    end
+
+    it "returns true when user has active TA enrollment" do
+      course_with_ta(user:, active_all: true)
+      expect(user.active_non_student_enrollment?).to be true
+    end
+
+    it "returns true when user has active designer enrollment" do
+      course_with_designer(user:, active_all: true)
+      expect(user.active_non_student_enrollment?).to be true
+    end
+
+    it "returns false when user has only observer enrollment" do
+      course_with_observer(user:, active_all: true)
+      expect(user.active_non_student_enrollment?).to be false
+    end
+
+    it "returns false when teacher enrollment is concluded" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").complete!
+      user.remove_instance_variable(:@_active_non_student_enrollment) if user.instance_variable_defined?(:@_active_non_student_enrollment)
+      expect(user.active_non_student_enrollment?).to be false
+    end
+
+    it "returns false when teacher enrollment is inactive" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").deactivate
+      user.remove_instance_variable(:@_active_non_student_enrollment) if user.instance_variable_defined?(:@_active_non_student_enrollment)
+      expect(user.active_non_student_enrollment?).to be false
+    end
+
+    it "returns false when teacher enrollment is deleted" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").destroy
+      user.remove_instance_variable(:@_active_non_student_enrollment) if user.instance_variable_defined?(:@_active_non_student_enrollment)
+      expect(user.active_non_student_enrollment?).to be false
+    end
+
+    it "returns false when user has concluded teacher enrollment and active student enrollment" do
+      course1 = course_factory(active_all: true)
+      course1.enroll_teacher(user).tap do |e|
+        e.accept!
+        e.complete!
+      end
+      course2 = course_factory(active_all: true)
+      course2.enroll_student(user).tap(&:accept!)
+      user.remove_instance_variable(:@_active_non_student_enrollment) if user.instance_variable_defined?(:@_active_non_student_enrollment)
+      expect(user.active_non_student_enrollment?).to be false
     end
   end
 

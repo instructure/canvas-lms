@@ -3570,10 +3570,10 @@ class UsersController < ApplicationController
     # Check user preference (pass flag to avoid re-lookup)
     return false unless @current_user.prefers_widget_dashboard?(@domain_root_account, flag)
 
-    if @current_user.observer_enrollments.active.any?
+    if @current_user.observer_enrollments.active_or_pending.any?
       # only show widget dashboard if observer is actively observing a student
       return true if @selected_observed_user && @selected_observed_user != @current_user
-    elsif !@current_user.non_student_enrollment?
+    elsif !@current_user.active_non_student_enrollment?
       return true
     end
     false
