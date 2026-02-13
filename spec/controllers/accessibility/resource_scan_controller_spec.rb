@@ -190,6 +190,34 @@ describe Accessibility::ResourceScanController do
       end
     end
 
+    it "sorts wiki pages before syllabus when sorting by resource_type ascending" do
+      # Create a wiki page scan and a syllabus scan to test sort order
+      accessibility_resource_scan_model(
+        course:,
+        is_syllabus: true,
+        workflow_state: "completed",
+        resource_name: "Syllabus Resource",
+        resource_workflow_state: :published,
+        issue_count: 1,
+        resource_updated_at: 1.day.ago
+      )
+
+      get :index, params: { course_id: course.id, sort: "resource_type", direction: "asc" }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      resource_types = json.pluck("resource_type")
+
+      # Wiki pages sort as 'page', syllabus sorts as 'syllabus'
+      # 'page' comes before 'syllabus' alphabetically
+      wiki_page_index = resource_types.index("WikiPage")
+      syllabus_index = resource_types.index("Syllabus")
+
+      expect(wiki_page_index).not_to be_nil
+      expect(syllabus_index).not_to be_nil
+      expect(wiki_page_index).to be < syllabus_index
+    end
+
     %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].each do |sort_param|
       it "sorts by #{sort_param} ascending and descending" do
         # Ascending order
