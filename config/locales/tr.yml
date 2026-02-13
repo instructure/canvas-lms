@@ -623,7 +623,7 @@ tr:
   account_id_73966078: account_id
   account_id_f6e26867: "Hesap Id"
   account_level_3c2a42a5: "Hesap Düzeyi"
-  account_level_course_pacing_blackout_dates_ce944dfb: "Hesap düzeyi ders hızı (course pacing) karartma tarihleri"
+  account_level_course_pacing_blackout_dates_ce944dfb: "Hesap düzeyi ders hızı tatil günleri"
   account_level_notification_preferences_require_an__66467cd7: "Hesap düzeyi bildirim tercihlerini güncellemek için bir account_id gerekir."
   account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Hesap düzeyi bildirimler tüm derslere uygulanır. Bildirimler her ders içinde değiştirilebilir ve bu ders ayarları, buradaki bildirimlerin yerini alacaktır."
   account_level_settings_manage_4fca6f8e: "Hesap düzeyi ayarları - yönet"
@@ -2512,7 +2512,7 @@ tr:
   add_theme_32fa3d50: "Tema Ekle"
   add_to_calendar_1d4a0e81: "Yapay zekâ (AI) analiz çıktıları için ek açıklama metinleri ekleyin."
   add_to_course_481a51c4: "Derse ekle..."
-  add_to_course_pacing_blackout_dates_2459cfd2: "Bu ders için Yapay Zekâ özelliklerini etkinleştir."
+  add_to_course_pacing_blackout_dates_2459cfd2: "Ders Hızı tatil günlerine ekle"
   add_to_do_7537af64: "Yapılacaklar listesi ekle"
   add_to_do_7def3c37: "Yapılacaklar listesi ekle"
   add_to_import_queue_1bf7013b: "Bu kullanıcı için Yapay Zekâ özelliklerini etkinleştir."
@@ -4229,6 +4229,7 @@ tr:
       ungraded_survey: "Notlandırılmamış Anket"
   assignment_reply_to_topic_a27c95b2: "%{assignment} Konuya Yanıt Ver"
   assignment_required_replies_num_4409b178: "%{assignment} Gerekli Yanıtlar (%{num})"
+  assignment_rubric_details_1b6723b2: "Ödev Değerlendirme Listesi Detayları"
   assignment_scheduling_e2a3eaf6: "Ödev Zamanlama"
   assignment_score_summary_f1dc9708: "Sınav Not Özeti"
   assignment_selection_6bff05c4: "Ödev Seçimi"
@@ -9330,7 +9331,7 @@ tr:
         course_lock_all_announcements: "Duyurulara yorum yapılmasını engelle"
         course_name: İsim
         course_offline_export: "Çevrimdışı Ders"
-        course_paces: "Kullanıcının sayfaları yayımlamasına ve yayından kaldırmasına izin verir."
+        course_paces: "Ders Hızı"
         course_section_name: "Yeni Bölüm Ekle"
         course_status_published: "Ders Yayınlanıyor"
         course_status_unpublished: "Ders Yayınlanmıyor"
@@ -9339,7 +9340,7 @@ tr:
         custom_course_visibility: Özelleştir
         default_due_time: "Kullanıcının kullanıcıları rastgele bir hesap veya ders grubuna atamasına izin verir."
         disable_csp: "Kullanıcının, başka bir kullanıcı adına erişim belirteçlerini (access tokens) yeniden oluşturmasına izin verir."
-        enable_course_paces: "Kullanıcının, Ders Ayarları'nda bir dersi ders şablonu olmaktan çıkarmasına (remove as template) izin verir."
+        enable_course_paces: "Ders Hızını Etkinleştir."
         enrollment_term_id: Dönem
         enrollments_from_homeroom: Kayıtlar
         friendly_name: "Kullanıcının bir öğrencinin bölüm kaydını veya rolünü kaldırmasına izin verir."
