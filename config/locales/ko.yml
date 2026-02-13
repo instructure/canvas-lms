@@ -3842,6 +3842,7 @@ ko:
       ungraded_survey: "평가 안 된 설문"
   assignment_reply_to_topic_a27c95b2: "%{assignment} 주제에 대해 답변"
   assignment_required_replies_num_4409b178: "%{assignment} 필요한 답변(%{num})"
+  assignment_rubric_details_1b6723b2: "과제 루브릭 세부 정보"
   assignment_scheduling_e2a3eaf6: "과제 일정"
   assignment_score_summary_f1dc9708: "과제 점수 요약"
   assignment_selection_6bff05c4: "과제 선택"
