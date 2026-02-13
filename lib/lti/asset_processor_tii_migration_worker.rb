@@ -23,6 +23,7 @@ module Lti
     TII_TOOL_VENDOR_CODE = Rails.env.development? ? "Instructure.com" : "turnitin.com"
     TII_TOOL_PRODUCT_CODE = Rails.env.development? ? "similarity detection reference tool" : "turnitin-lti"
     MIGRATED_ASSET_REPORT_TYPE = "originality_report"
+    TRUSTED_MIGRATION_DOMAINS = %w[turnitin.com turnitin.dev turnitin.net turnitin.org turnitinuk.com].freeze
     PROGRESS_TAG = "lti_tii_ap_migration"
     COORDINATOR_TAG = "lti_tii_ap_migration_coordinator"
 
@@ -458,9 +459,8 @@ module Lti
       # Construct migration endpoint URL from base endpoint
       uri = URI.parse(endpoint)
 
-      # Validate that the endpoint is from turnitin.com or a subdomain
-      unless uri.host == "turnitin.com" || uri.host&.end_with?(".turnitin.com")
-        Rails.logger.error("Invalid migration endpoint host: #{uri.host}. Must be turnitin.com or a subdomain")
+      unless trusted_migration_host?(uri.host)
+        Rails.logger.error("Invalid migration endpoint host: #{uri.host}. Must be a trusted Turnitin domain")
         return nil
       end
 
@@ -469,6 +469,14 @@ module Lti
       capture_and_log_exception(e)
       Rails.logger.error("Failed to extract migration endpoint from Tool Proxy: #{e.message}")
       nil
+    end
+
+    def trusted_migration_host?(host)
+      return false if host.blank?
+
+      extra = Setting.get("asset_processor_tii_migration_extra_domains", "").split(",").map(&:strip).reject(&:empty?)
+      domains = TRUSTED_MIGRATION_DOMAINS + extra
+      domains.any? { |domain| host == domain || host.end_with?(".#{domain}") }
     end
 
     def construct_pns_url(deployment)
