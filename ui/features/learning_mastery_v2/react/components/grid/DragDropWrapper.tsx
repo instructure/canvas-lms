@@ -25,6 +25,7 @@ import {
   DragSourceMonitor,
   DropTargetMonitor,
   ConnectDragSource,
+  ConnectDragPreview,
   ConnectDropTarget,
 } from 'react-dnd'
 import {flowRight as compose} from 'es-toolkit/compat'
@@ -37,6 +38,7 @@ interface DragItem {
 
 export interface DragDropConnectorProps {
   connectDragSource?: ConnectDragSource
+  connectDragPreview?: ConnectDragPreview
   connectDropTarget?: ConnectDropTarget
   isDragging?: boolean
 }
@@ -102,6 +104,7 @@ export default compose(
     dragSource,
     (connect, monitor) => ({
       connectDragSource: connect.dragSource(),
+      connectDragPreview: connect.dragPreview(),
       isDragging: monitor.isDragging(),
     }),
   ),

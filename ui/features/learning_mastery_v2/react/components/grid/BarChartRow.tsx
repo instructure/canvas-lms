@@ -18,6 +18,7 @@
 
 import React, {useCallback} from 'react'
 import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {colors} from '@instructure/canvas-theme'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {
   BAR_CHART_HEIGHT,
@@ -79,6 +80,8 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
+              boxShadow={`-2px 0 0 0 ${colors.contrasts.grey1214}`}
+              shadow="above"
             />
           )
         } else if (column.key.startsWith('outcome-')) {
@@ -90,6 +93,8 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
+              boxShadow={`-2px 0 0 0 ${colors.contrasts.grey1214}`}
+              shadow="above"
             >
               <MasteryDistributionChartCell
                 key={`outcomes-chart-${outcome.id}`}
@@ -110,6 +115,8 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
+              boxShadow={`-2px 0 0 0 ${colors.contrasts.grey1214}`}
+              shadow="above"
             >
               <MasteryDistributionChartCell
                 key={`alignment-chart-${alignment.alignment_id}`}

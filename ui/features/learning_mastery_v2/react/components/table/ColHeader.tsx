@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {DragDropConnectorProps} from '../grid/DragDropWrapper'
 import {View, ViewProps} from '@instructure/ui-view'
 
@@ -33,6 +33,7 @@ export const ColHeader = ({
   children,
   isSticky,
   connectDragSource,
+  connectDragPreview,
   connectDropTarget,
   isDragging,
   isStacked,
@@ -42,15 +43,38 @@ export const ColHeader = ({
   // Filter out drag-drop specific props that shouldn't be passed to DOM
   const {onMove, onDragEnd, itemId, index, type, component, ...cleanViewProps} = viewProps as any
 
-  const content = (
+  // Use an empty image as the drag preview to prevent the browser from
+  // screenshotting the table structure when dragging a <th> child
+  useEffect(() => {
+    if (connectDragPreview) {
+      const emptyImage = new Image()
+      emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      connectDragPreview(emptyImage, {captureDraggingState: true})
+    }
+  }, [connectDragPreview])
+
+  const headerContent = (
+    <div
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        cursor: isDragging !== undefined ? 'grab' : 'default',
+        transition: 'opacity 0.15s ease-in-out',
+        width: cleanViewProps.width,
+      }}
+      data-testid="col-header-content"
+    >
+      {children}
+    </div>
+  )
+
+  return (
     <View
       data-cell-id={dataCellId}
       as={isStacked ? 'div' : 'th'}
       scope="col"
       focusPosition="inset"
       elementRef={ref => {
-        if (connectDragSource && connectDropTarget && ref instanceof HTMLElement) {
-          connectDragSource(ref)
+        if (connectDropTarget && ref instanceof HTMLElement) {
           connectDropTarget(ref as any)
         }
       }}
@@ -61,19 +85,7 @@ export const ColHeader = ({
       stacking="above"
       {...cleanViewProps}
     >
-      <div
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-          cursor: isDragging !== undefined ? 'grab' : 'default',
-          transition: 'opacity 0.15s ease-in-out',
-          width: cleanViewProps.width,
-        }}
-        data-testid="col-header-content"
-      >
-        {children}
-      </div>
+      {connectDragSource ? connectDragSource(headerContent) : headerContent}
     </View>
   )
-
-  return content
 }

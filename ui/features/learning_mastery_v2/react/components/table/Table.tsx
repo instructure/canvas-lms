@@ -83,6 +83,8 @@ const TableComponent: React.FC<TableProps> = ({
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, rowIndex: number, colIndex: number) => {
+      if (event.target !== event.currentTarget) return
+
       const {key} = event
       let newRowIndex = rowIndex
       let newColIndex = colIndex
