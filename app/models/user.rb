@@ -2528,6 +2528,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  def active_non_student_enrollment?
+    return @_active_non_student_enrollment if defined?(@_active_non_student_enrollment)
+
+    @_active_non_student_enrollment = Rails.cache.fetch_with_batched_keys(["has_active_non_student_enrollment", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
+      enrollments.shard(in_region_associated_shards).where.not(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
+                 .where.not(workflow_state: %w[rejected inactive deleted completed]).exists?
+    end
+  end
+
   def account_membership?
     return @_account_membership if defined?(@_account_membership)
 
