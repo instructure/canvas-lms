@@ -37,7 +37,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {FormMessage} from '@instructure/ui-form-field'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
-import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
@@ -68,11 +67,8 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       const [isChecked, setChecked] = useState(false)
       const [generateLoading, setGenerateLoading] = useState(false)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const {selectedItem} = useAccessibilityCheckerContext()
-      const {isAiAltTextGenerationEnabled} = useAccessibilityScansStore(
-        useShallow(state => ({
-          isAiAltTextGenerationEnabled: state.isAiAltTextGenerationEnabled,
-        })),
+      const [isAiAltTextGenerationEnabled, selectedItem] = useAccessibilityScansStore(
+        useShallow(state => [state.isAiAltTextGenerationEnabled, state.selectedScan]),
       )
       const charCountId = useId()
 

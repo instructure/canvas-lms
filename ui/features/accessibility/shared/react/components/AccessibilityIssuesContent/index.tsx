@@ -36,7 +36,6 @@ import {IconExternalLinkLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {useNextResource} from '../../hooks/useNextResource'
-import {useAccessibilityCheckerContext} from '../../hooks/useAccessibilityCheckerContext'
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
 import {
   useAccessibilityScansStore,
@@ -78,28 +77,6 @@ function renderSpinner() {
 }
 
 export const AccessibilityWizard = () => {
-  // Get context
-  const {selectedItem, setSelectedItem, isTrayOpen, setIsTrayOpen} =
-    useAccessibilityCheckerContext()
-
-  // All other state hooks
-  const [isRequestInFlight, setIsRequestInFlight] = useState(false)
-  const [currentIssueIndex, setCurrentIssueIndex] = useState(0)
-  const [isRemediated, setIsRemediated] = useState<boolean>(false)
-  const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
-  const [isGenerateLoading, setIsGenerateLoading] = useState<boolean>(false)
-  const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
-  const [formError, setFormError] = useState<string | null>()
-  const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
-  const [issues, setIssues] = useState<AccessibilityIssue[]>(selectedItem?.issues || [])
-  const [allIssuesSkipped, setAllIssuesSkipped] = useState<boolean>(false)
-  const [pendingModalAction, setPendingModalAction] = useState<(() => void) | null>(null)
-  const previousActiveRef = useRef<number | undefined>()
-
-  const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
-  const {trackA11yIssueEvent, trackA11yEvent} = useA11yTracking()
-
-  // Extract store state
   const [
     accessibilityScans,
     nextResource,
@@ -107,6 +84,13 @@ export const AccessibilityWizard = () => {
     isCloseIssuesEnabled,
     issuesSummary,
     isGA2FeaturesEnabled,
+    selectedScan,
+    setSelectedScan,
+    selectedIssue,
+    selectedIssueIndex,
+    setSelectedIssue,
+    isTrayOpen,
+    setIsTrayOpen,
   ] = useAccessibilityScansStore(
     useShallow(state => [
       state.accessibilityScans,
@@ -115,8 +99,31 @@ export const AccessibilityWizard = () => {
       state.isCloseIssuesEnabled,
       state.issuesSummary,
       state.isGA2FeaturesEnabled,
+      state.selectedScan,
+      state.setSelectedScan,
+      state.selectedIssue,
+      state.selectedIssueIndex,
+      state.setSelectedIssue,
+      state.isTrayOpen,
+      state.setIsTrayOpen,
     ]),
   )
+
+  // All other state hooks
+  const [isRequestInFlight, setIsRequestInFlight] = useState(false)
+  const [isRemediated, setIsRemediated] = useState<boolean>(false)
+  const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
+  const [isGenerateLoading, setIsGenerateLoading] = useState<boolean>(false)
+  const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>()
+  const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
+  const issues = selectedScan?.issues || []
+  const [allIssuesSkipped, setAllIssuesSkipped] = useState<boolean>(false)
+  const [pendingModalAction, setPendingModalAction] = useState<(() => void) | null>(null)
+  const previousActiveRef = useRef<number | undefined>()
+
+  const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
+  const {trackA11yIssueEvent, trackA11yEvent} = useA11yTracking()
 
   // Helper to wrap actions with unsaved changes check
   const useModalCheck = (action: () => void) =>
@@ -129,9 +136,9 @@ export const AccessibilityWizard = () => {
     }, [action, isGA2FeaturesEnabled, isRemediated])
 
   const onClose = useCallback(() => {
-    setSelectedItem(null)
+    setSelectedScan(null)
     setIsTrayOpen(false)
-  }, [setSelectedItem, setIsTrayOpen])
+  }, [setSelectedScan, setIsTrayOpen])
 
   const onDismiss = useModalCheck(onClose)
 
@@ -145,13 +152,6 @@ export const AccessibilityWizard = () => {
   const previewRef: Ref<PreviewHandle> = useRef<PreviewHandle>(null)
   const formRef: Ref<FormHandle> = useRef<FormHandle>(null)
   const regionRef = useRef<HTMLDivElement | null>(null)
-
-  const {currentIssue} = useMemo(
-    () => ({
-      currentIssue: issues.find((_, idx) => idx === currentIssueIndex),
-    }),
-    [currentIssueIndex, issues],
-  )
 
   // This debounces the preview update to prevent excessive API calls when the user is typing.
   const updatePreview = useDebouncedCallback((formValue: FormValue) => {
@@ -173,35 +173,35 @@ export const AccessibilityWizard = () => {
 
   // Executor functions (without unsaved check)
   const executeSkip = useCallback(() => {
-    if (currentIssue && selectedItem) {
-      trackA11yIssueEvent('IssueSkipped', selectedItem.resourceType, currentIssue.ruleId)
+    if (selectedIssue && selectedScan) {
+      trackA11yIssueEvent('IssueSkipped', selectedScan.resourceType, selectedIssue.ruleId)
     }
 
-    if (isCloseIssuesEnabled && currentIssueIndex === issues.length - 1) {
+    if (isCloseIssuesEnabled && selectedIssueIndex === issues.length - 1) {
       setAllIssuesSkipped(true)
     } else {
-      setCurrentIssueIndex(prev => Math.min(prev + 1, issues.length - 1))
+      setSelectedIssue(issues[Math.min(selectedIssueIndex + 1, issues.length - 1)])
     }
     setIsRemediated(false)
   }, [
     isCloseIssuesEnabled,
-    currentIssueIndex,
+    selectedIssueIndex,
     issues.length,
-    currentIssue,
-    selectedItem,
+    selectedIssue,
+    selectedScan,
     trackA11yIssueEvent,
   ])
 
   const executeBack = useCallback(() => {
-    setCurrentIssueIndex(prev => Math.max(prev - 1, 0))
+    setSelectedIssue(issues[Math.max(selectedIssueIndex - 1, 0)])
     setIsRemediated(false)
-  }, [])
+  }, [selectedIssueIndex, issues])
 
   const executeBackToStart = useCallback(() => {
     setAllIssuesSkipped(false)
-    setCurrentIssueIndex(0)
+    setSelectedIssue(issues[0])
     setIsRemediated(false)
-  }, [])
+  }, [issues])
 
   const handleSkip = useModalCheck(executeSkip)
   const handlePrevious = useModalCheck(executeBack)
@@ -212,7 +212,7 @@ export const AccessibilityWizard = () => {
     const nextItem = nextResource.item
     if (!nextItem) return
 
-    setSelectedItem(nextItem)
+    setSelectedScan(nextItem)
 
     if (accessibilityScans) {
       const newNextResource = getNextResource(accessibilityScans, nextItem)
@@ -220,7 +220,7 @@ export const AccessibilityWizard = () => {
         setNextResource(newNextResource)
       }
     }
-  }, [accessibilityScans, nextResource, setSelectedItem, setNextResource, getNextResource])
+  }, [accessibilityScans, nextResource, setSelectedScan, setNextResource, getNextResource])
 
   const handlePreviewApply = useCallback(() => {
     if (formError) {
@@ -288,9 +288,9 @@ export const AccessibilityWizard = () => {
   const updateAccessibilityIssues = useCallback(
     (updatedIssues: AccessibilityIssue[]) => {
       if (!accessibilityScans) return
-      if (!selectedItem) return
+      if (!selectedScan) return
 
-      const target = findById(accessibilityScans, selectedItem.id)
+      const target = findById(accessibilityScans, selectedScan.id)
 
       if (!target) return
 
@@ -302,21 +302,21 @@ export const AccessibilityWizard = () => {
 
       setAccessibilityScans(updated)
     },
-    [accessibilityScans, selectedItem, setAccessibilityScans],
+    [accessibilityScans, selectedScan, setAccessibilityScans],
   )
 
   const handleSaveAndNext = useCallback(
     async (formValue: any) => {
-      if (!currentIssue) return
-      if (!selectedItem) return
+      if (!selectedIssue) return
+      if (!selectedScan) return
 
-      trackA11yIssueEvent('IssueFixed', selectedItem.resourceType, currentIssue.ruleId)
+      trackA11yIssueEvent('IssueFixed', selectedScan.resourceType, selectedIssue.ruleId)
 
       try {
         setIsRequestInFlight(true)
 
         await doFetchApi({
-          path: getCourseBasedPath(`/accessibility_issues/${currentIssue.id}`),
+          path: getCourseBasedPath(`/accessibility_issues/${selectedIssue.id}`),
           method: 'PATCH',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -330,7 +330,7 @@ export const AccessibilityWizard = () => {
         }, 1500)
 
         const newScanResponse = await doFetchApi({
-          path: getResourceScanPath(selectedItem),
+          path: getResourceScanPath(selectedScan),
           method: 'POST',
         })
 
@@ -338,13 +338,11 @@ export const AccessibilityWizard = () => {
         const newScanIssues = newScan.issues ?? []
         const hadIssuesBefore = issues.length > 0
 
-        setIssues(newScanIssues)
-
         if (hadIssuesBefore && newScanIssues.length === 0) {
           const courseId = window.ENV.current_context?.id
 
           trackA11yEvent('ResourceRemediated', {
-            resourceId: selectedItem.resourceId,
+            resourceId: selectedScan.resourceId,
             courseId,
           })
         }
@@ -362,8 +360,12 @@ export const AccessibilityWizard = () => {
             }
           }
         }
+
         updateAccessibilityIssues(newScanIssues)
-        setCurrentIssueIndex(prev => Math.min(prev, Math.max(0, newScanIssues.length - 1)))
+        setSelectedScan(newScan)
+        setSelectedIssue(
+          newScanIssues[Math.min(selectedIssueIndex, Math.max(0, newScanIssues.length - 1))],
+        )
         doFetchAccessibilityIssuesSummary({filters})
       } catch (err: any) {
         console.error('Error saving accessibility issue. Error is: ' + err.message)
@@ -372,9 +374,9 @@ export const AccessibilityWizard = () => {
       }
     },
     [
-      selectedItem,
+      selectedScan,
       formRef,
-      currentIssue,
+      selectedIssue,
       updateAccessibilityIssues,
       accessibilityScans,
       nextResource,
@@ -445,16 +447,16 @@ export const AccessibilityWizard = () => {
   const applyButtonText = useMemo(() => {
     const defaultApplyText = I18n.t('Apply')
 
-    if (!currentIssue) {
+    if (!selectedIssue) {
       return null
     }
 
-    if (currentIssue.form.type === FormType.Button) {
-      return currentIssue.form.label || defaultApplyText
+    if (selectedIssue.form.type === FormType.Button) {
+      return selectedIssue.form.label || defaultApplyText
     }
 
-    return currentIssue.form.action || defaultApplyText
-  }, [currentIssue])
+    return selectedIssue.form.action || defaultApplyText
+  }, [selectedIssue])
 
   const handleClearError = useCallback(() => {
     setFormError(null)
@@ -470,14 +472,14 @@ export const AccessibilityWizard = () => {
         setFormError(null)
       }
 
-      if (['small-text-contrast', 'large-text-contrast'].includes(currentIssue?.ruleId ?? '')) {
+      if (['small-text-contrast', 'large-text-contrast'].includes(selectedIssue?.ruleId ?? '')) {
         // Reset remediation state when color changes after being applied
         if (isRemediated) {
           setIsRemediated(false)
         }
       }
     },
-    [currentIssue, isRemediated],
+    [selectedIssue, isRemediated],
   )
 
   useEffect(() => {
@@ -491,18 +493,11 @@ export const AccessibilityWizard = () => {
   }, [assertiveAlertMessage, setAssertiveAlertMessage])
 
   useEffect(() => {
-    // issues are saved into local state, so the state does not update when "selectedItem" changes.
-    // this effect ensures that issues state is updated on external "selectedItem" change.
-    setIssues(selectedItem?.issues || [])
-    setCurrentIssueIndex(0)
-  }, [selectedItem, setIssues, setCurrentIssueIndex])
-
-  useEffect(() => {
     setIsRemediated(false)
     setIsFormLocked(false)
     setFormError(null)
     setIsSaveButtonEnabled(true)
-  }, [currentIssue])
+  }, [selectedIssue])
 
   useEffect(() => {
     const previousActive = previousActiveRef.current
@@ -516,18 +511,18 @@ export const AccessibilityWizard = () => {
     previousActiveRef.current = currentActive
   }, [issuesSummary?.active, trackA11yEvent])
 
-  const trayTitle = selectedItem?.resourceName ?? ''
+  const trayTitle = selectedScan?.resourceName ?? ''
   const isUnsavedModalOpen = pendingModalAction !== null
 
   const renderTrayContent = () => {
-    if (!selectedItem) {
+    if (!selectedScan) {
       return <Spinner renderTitle={I18n.t('Loading accessibility issues...')} />
     }
 
     if (allIssuesSkipped && isCloseIssuesEnabled) {
       return (
         <CloseRemediationView
-          scan={selectedItem}
+          scan={selectedScan}
           onBack={handleBackToStart}
           nextResource={nextResource || defaultNextResource}
           onClose={onClose}
@@ -536,11 +531,11 @@ export const AccessibilityWizard = () => {
       )
     }
 
-    if (!currentIssue) {
+    if (!selectedIssue) {
       return (
         <>
           <SuccessView
-            title={selectedItem.resourceName}
+            title={selectedScan.resourceName}
             nextResource={nextResource || defaultNextResource}
             onClose={onClose}
             handleSkip={handleSkip}
@@ -568,7 +563,7 @@ export const AccessibilityWizard = () => {
       <ApplyButton
         onApply={handlePreviewApply}
         onUndo={handlePreviewUndo}
-        undoMessage={currentIssue.form.undoText}
+        undoMessage={selectedIssue.form.undoText}
         isApplied={isRemediated}
         isLoading={isFormLocked}
         isDisabled={isGenerateLoading}
@@ -599,11 +594,11 @@ export const AccessibilityWizard = () => {
                   }}
                 >
                   {I18n.t('Issue %{current}/%{total}: %{message}', {
-                    current: currentIssueIndex + 1,
+                    current: selectedIssueIndex + 1,
                     total: issues.length,
-                    message: currentIssue.displayName,
+                    message: selectedIssue.displayName,
                   })}
-                  <WhyMattersPopover issue={currentIssue} />
+                  <WhyMattersPopover issue={selectedIssue} />
                 </Text>
               </Flex>
 
@@ -614,7 +609,7 @@ export const AccessibilityWizard = () => {
                   </Heading>
                   <Flex gap="small">
                     <Link
-                      href={selectedItem?.resourceUrl}
+                      href={selectedScan?.resourceUrl}
                       variant="standalone"
                       target="_blank"
                       iconPlacement="end"
@@ -622,8 +617,8 @@ export const AccessibilityWizard = () => {
                       onClick={() =>
                         trackA11yIssueEvent(
                           'PageViewOpened',
-                          selectedItem.resourceType,
-                          currentIssue.ruleId,
+                          selectedScan.resourceType,
+                          selectedIssue.ruleId,
                         )
                       }
                     >
@@ -632,9 +627,9 @@ export const AccessibilityWizard = () => {
                     </Link>
                     <Link
                       href={
-                        selectedItem?.resourceType === 'Syllabus'
-                          ? selectedItem.resourceUrl // Syllabus is edited inline, no separate edit page
-                          : `${selectedItem.resourceUrl}/edit`
+                        selectedScan?.resourceType === 'Syllabus'
+                          ? selectedScan.resourceUrl // Syllabus is edited inline, no separate edit page
+                          : `${selectedScan.resourceUrl}/edit`
                       }
                       variant="standalone"
                       target="_blank"
@@ -643,8 +638,8 @@ export const AccessibilityWizard = () => {
                       onClick={() =>
                         trackA11yIssueEvent(
                           'PageEditorOpened',
-                          selectedItem.resourceType,
-                          currentIssue.ruleId,
+                          selectedScan.resourceType,
+                          selectedIssue.ruleId,
                         )
                       }
                     >
@@ -654,22 +649,22 @@ export const AccessibilityWizard = () => {
                   </Flex>
                 </Flex>
 
-                <ProblemArea previewRef={previewRef} item={selectedItem} issue={currentIssue} />
+                <ProblemArea previewRef={previewRef} item={selectedScan} issue={selectedIssue} />
               </Flex>
 
               <Flex gap="x-small" direction="column">
                 <Heading level="h4" variant="titleCardMini">
                   {I18n.t('Issue description')}
                 </Heading>
-                <Text weight="weightRegular">{currentIssue.message}</Text>
+                <Text weight="weightRegular">{selectedIssue.message}</Text>
               </Flex>
             </Flex>
 
             <Flex direction="column">
               <Form
-                key={currentIssue.id}
+                key={selectedIssue.id}
                 ref={formRef}
-                issue={currentIssue}
+                issue={selectedIssue}
                 error={formError}
                 onReload={updatePreview}
                 onClearError={handleClearError}
@@ -678,9 +673,9 @@ export const AccessibilityWizard = () => {
                 previewRef={previewRef}
                 onGenerateLoadingChange={setIsGenerateLoading}
               />
-              {currentIssue.form.canGenerateFix &&
+              {selectedIssue.form.canGenerateFix &&
                 formError &&
-                currentIssue.form.type === FormType.Button && (
+                selectedIssue.form.type === FormType.Button && (
                   <View as="div" margin="x-small 0">
                     <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
                   </View>
@@ -689,7 +684,7 @@ export const AccessibilityWizard = () => {
 
             <View>
               {previewActionButton}
-              {formError && currentIssue.form.type === FormType.Button && (
+              {formError && selectedIssue.form.type === FormType.Button && (
                 <View as="div" margin="x-small 0">
                   <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
                 </View>
@@ -709,13 +704,13 @@ export const AccessibilityWizard = () => {
             onSaveAndNext={handleApplyAndSaveAndNext}
             onBackToStart={handleBackToStart}
             showBackToStart={
-              !isCloseIssuesEnabled && currentIssueIndex === issues.length - 1 && issues.length > 1
+              !isCloseIssuesEnabled && selectedIssueIndex === issues.length - 1 && issues.length > 1
             }
             isBackToStartDisabled={isFormLocked}
-            isBackDisabled={currentIssueIndex === 0 || isFormLocked}
+            isBackDisabled={selectedIssueIndex === 0 || isFormLocked}
             isSkipDisabled={
               isFormLocked ||
-              (issues.length === 1 && !isCloseIssuesEnabled && currentIssueIndex === 0)
+              (issues.length === 1 && !isCloseIssuesEnabled && selectedIssueIndex === 0)
             }
             isSaveAndNextDisabled={
               !isRemediated || isFormLocked || !!formError || !isSaveButtonEnabled

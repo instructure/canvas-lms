@@ -18,20 +18,23 @@
 
 import {useCallback} from 'react'
 import {useNextResource} from '../hooks/useNextResource'
-import {useAccessibilityCheckerContext} from './useAccessibilityCheckerContext'
 import {useAccessibilityScansStore} from '../stores/AccessibilityScansStore'
 import {findById} from '../utils/apiData'
 import {AccessibilityResourceScan} from '../types'
 import {useShallow} from 'zustand/react/shallow'
 
 export function useAccessibilityIssueSelect() {
-  const {setSelectedItem, setIsTrayOpen} = useAccessibilityCheckerContext()
-
   const {getNextResource} = useNextResource()
 
-  const [accessibilityScans, setNextResource] = useAccessibilityScansStore(
-    useShallow(state => [state.accessibilityScans, state.setNextResource]),
-  )
+  const [accessibilityScans, setNextResource, setSelectedItem, setIsTrayOpen] =
+    useAccessibilityScansStore(
+      useShallow(state => [
+        state.accessibilityScans,
+        state.setNextResource,
+        state.setSelectedScan,
+        state.setIsTrayOpen,
+      ]),
+    )
 
   const selectIssue = useCallback(
     (item: AccessibilityResourceScan, openTray: boolean = true) => {
