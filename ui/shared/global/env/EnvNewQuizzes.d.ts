@@ -57,6 +57,9 @@ export interface NewQuizzesContext {
     custom_canvas_enrollment_state?: string
     custom_canvas_permissions?: string
 
+    // Module context
+    custom_canvas_module_item_id?: string | number
+
     // Tool context
     custom_canvas_tool_id?: string | number
 
