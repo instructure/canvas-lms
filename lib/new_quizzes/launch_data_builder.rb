@@ -72,6 +72,7 @@ module NewQuizzes
         resource_link_id:,
         resource_link_title:,
         launch_presentation_return_url: return_url,
+        platform_redirect_url:,
 
         # UI version (extracted from launch URL in Consul)
         ui_version: Services::NewQuizzes.ui_version
@@ -161,6 +162,15 @@ module NewQuizzes
       # This intelligently determines the best return URL based on the referer
       # (quizzes page, gradebook, modules, etc.)
       @controller&.set_return_url
+    end
+
+    # For module item launches, construct the assignment URL with module_item_id.
+    # This mirrors the LTI flow where requestFullWindowLaunch.ts appends
+    # platform_redirect_url=window.location (the assignment page) to the second launch.
+    def platform_redirect_url
+      return nil unless @controller && @controller.params[:module_item_id].present? && @assignment
+
+      @controller.course_assignment_url(@context, @assignment, module_item_id: @controller.params[:module_item_id])
     end
 
     def roles
