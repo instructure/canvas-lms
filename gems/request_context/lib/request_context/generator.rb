@@ -97,7 +97,7 @@ module RequestContext
 
     def self.store_interaction_seconds_update(page_view, interaction_seconds)
       if page_view
-        add_meta_header("r", "#{page_view.request_id}|#{page_view.created_at.iso8601(2)}|#{interaction_seconds}")
+        add_meta_header("r", "#{page_view.request_id}|#{page_view.created_at.utc.iso8601(2)}|#{interaction_seconds}")
       end
     end
 

@@ -1991,7 +1991,7 @@ class ApplicationController < ActionController::Base
     return unless page_views_enabled?
 
     page_view_info = CanvasSecurity::PageViewJwt.decode(params[:page_view_token])
-    @page_view = PageView.find_for_update(page_view_info[:request_id])
+    @page_view = PageView.find_for_update(page_view_info[:request_id], page_view_info[:created_at])
     if @page_view
       if @page_view.id
         response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
