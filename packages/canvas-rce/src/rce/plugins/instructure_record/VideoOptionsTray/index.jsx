@@ -76,6 +76,7 @@ export default function VideoOptionsTray({
   studioOptions = null,
   forBlockEditorUse = false,
   onStudioEmbedOptionChanged = () => {},
+  onCaptionsModified = null,
 }) {
   const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
   const isEmbedImprovements = RCEGlobals.getFeatures()?.rce_studio_embed_improvements
@@ -404,9 +405,11 @@ export default function VideoOptionsTray({
                                     ...prev.filter(s => s.locale !== subtitle.locale),
                                     subtitle,
                                   ])
+                                  onCaptionsModified?.()
                                 }}
                                 onCaptionDeleted={locale => {
                                   setSubtitles(prev => prev.filter(s => s.locale !== locale))
+                                  onCaptionsModified?.()
                                 }}
                               />
                             )}
@@ -497,4 +500,5 @@ VideoOptionsTray.propTypes = {
   studioOptions: parsedStudioOptionsPropType,
   requestSubtitlesFromIframe: func,
   onStudioEmbedOptionChanged: func,
+  onCaptionsModified: func,
 }

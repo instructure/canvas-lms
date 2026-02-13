@@ -63,6 +63,7 @@ export default class TrayController {
     this._renderId = 0
     this._skipFocusOnExit = false
     this._announcer = this.createAnnouncer()
+    this._captionsModified = false
   }
 
   createAnnouncer() {
@@ -99,6 +100,7 @@ export default class TrayController {
     this._editor = editor
     this.$videoContainer = findMediaPlayerIframe(editor.selection.getNode())
     this._shouldOpen = true
+    this._captionsModified = false
 
     if (bridge.focusedEditor) {
       // Dismiss any content trays that may already be open
@@ -188,14 +190,18 @@ export default class TrayController {
           .updateMediaObject(data)
           .then(_r => {
             if (this.$videoContainer && videoOptions.displayAs === 'embed') {
-              this.$videoContainer.contentWindow.postMessage(
-                {
-                  subject: 'reload_media',
-                  media_object_id: videoOptions.media_object_id,
-                  attachment_id: data.attachment_id,
-                },
-                bridge.canvasOrigin,
-              )
+              if (isCaptionImprovements) {
+                this._reloadVideoPlayer()
+              } else {
+                this.$videoContainer.contentWindow.postMessage(
+                  {
+                    subject: 'reload_media',
+                    media_object_id: videoOptions.media_object_id,
+                    attachment_id: data.attachment_id,
+                  },
+                  bridge.canvasOrigin,
+                )
+              }
             }
           })
           .catch(ex => {
@@ -207,7 +213,20 @@ export default class TrayController {
     this._announcer.textContent = formatMessage('Media options saved.')
   }
 
+  _reloadVideoPlayer() {
+    if (this.$videoContainer?.contentWindow?.location) {
+      this.$videoContainer.contentWindow.location.reload()
+    }
+  }
+
   _dismissTray() {
+    const isCaptionImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements || false
+
+    // Reload if captions were modified AND feature flag enabled
+    if (isCaptionImprovements && this._captionsModified && this.$videoContainer) {
+      this._reloadVideoPlayer()
+    }
+
     if (this.$videoContainer && !this._skipFocusOnExit) {
       this._editor?.selection?.select(this.$videoContainer)
     }
@@ -269,6 +288,9 @@ export default class TrayController {
           this._applyVideoOptions(videoOptions)
         }}
         onRequestClose={() => this._dismissTray()}
+        onCaptionsModified={() => {
+          this._captionsModified = true
+        }}
         open={this._shouldOpen}
         trayProps={trayProps}
         studioOptions={

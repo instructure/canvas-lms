@@ -43,6 +43,7 @@ export default function AudioOptionsTray({
   trayProps,
   audioOptions,
   requestSubtitlesFromIframe,
+  onCaptionsModified,
 }) {
   const [subtitles, setSubtitles] = useState(audioOptions.tracks || [])
   const api = new RceApiSource(trayProps)
@@ -141,9 +142,11 @@ export default function AudioOptionsTray({
                                 ...prev.filter(s => s.locale !== subtitle.locale),
                                 subtitle,
                               ])
+                              onCaptionsModified?.()
                             }}
                             onCaptionDeleted={locale => {
                               setSubtitles(prev => prev.filter(s => s.locale !== locale))
+                              onCaptionsModified?.()
                             }}
                           />
                         )}
@@ -190,6 +193,7 @@ AudioOptionsTray.propTypes = {
       }),
     ),
   }).isRequired,
+  onCaptionsModified: func,
 }
 
 AudioOptionsTray.defaultProps = {
@@ -198,4 +202,5 @@ AudioOptionsTray.defaultProps = {
   onDismiss: null,
   onSave: null,
   requestSubtitlesFromIframe: () => {},
+  onCaptionsModified: null,
 }

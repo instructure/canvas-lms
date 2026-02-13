@@ -33,6 +33,7 @@ export default class TrayController {
     this._shouldOpen = false
     this._editor = null
     this._audioContainer = null
+    this._captionsModified = false
   }
 
   get container() {
@@ -53,6 +54,7 @@ export default class TrayController {
     this._shouldOpen = true
     this._editor = editor
     this._audioContainer = findMediaPlayerIframe(editor.selection.getNode())
+    this._captionsModified = false
 
     if (bridge.focusedEditor) {
       // Dismiss any content trays that may already be open
@@ -69,7 +71,20 @@ export default class TrayController {
     }
   }
 
+  _reloadAudioPlayer() {
+    if (this._audioContainer?.contentWindow?.location) {
+      this._audioContainer.contentWindow.location.reload()
+    }
+  }
+
   _dismissTray() {
+    const isCaptionImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements || false
+
+    // Reload if captions were modified AND feature flag enabled
+    if (isCaptionImprovements && this._captionsModified && this._audioContainer) {
+      this._reloadAudioPlayer()
+    }
+
     if (this._audioContainer) {
       this._editor.selection.select(this._audioContainer)
     }
@@ -154,6 +169,9 @@ export default class TrayController {
           this._dismissTray()
         }}
         onDismiss={() => this._dismissTray()}
+        onCaptionsModified={() => {
+          this._captionsModified = true
+        }}
         open={this._shouldOpen}
         trayProps={trayProps}
         requestSubtitlesFromIframe={cb => this.requestSubtitlesFromIframe(cb)}

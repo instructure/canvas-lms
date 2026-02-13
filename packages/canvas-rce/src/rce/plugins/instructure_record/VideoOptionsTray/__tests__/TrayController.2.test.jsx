@@ -25,6 +25,7 @@ import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import bridge from '../../../../../bridge'
+import RCEGlobals from '../../../../RCEGlobals'
 
 import {findMediaPlayerIframe} from '../../../shared/iframeUtils'
 
@@ -375,6 +376,136 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       trayController.hideTrayForEditor(editors[0])
       await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
       expect(bridge.focusActiveEditor).toHaveBeenCalledWith(false)
+    })
+  })
+
+  describe('caption reload on tray dismiss', () => {
+    it('does NOT reload iframe on dismiss when feature flag is OFF', async () => {
+      // Mock feature flag OFF
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: false,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadVideoPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadVideoPlayer')
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+
+      // Assert: reload should NOT be called (old behavior preserved)
+      expect(reloadSpy).not.toHaveBeenCalled()
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('reloads iframe on dismiss when feature flag is ON and captions were modified', async () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadVideoPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadVideoPlayer')
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+
+      // Assert: reload SHOULD be called
+      expect(reloadSpy).toHaveBeenCalledTimes(1)
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('does NOT reload iframe on dismiss when feature flag is ON but captions were NOT modified', async () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadVideoPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadVideoPlayer')
+
+      // Do NOT modify captions (trayController._captionsModified stays false)
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull())
+
+      // Assert: reload should NOT be called (no changes made)
+      expect(reloadSpy).not.toHaveBeenCalled()
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('resets caption modified flag when opening tray again', () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+      expect(trayController._captionsModified).toBe(true)
+
+      // Close and reopen
+      trayController.hideTrayForEditor(editors[0])
+      trayController.showTrayForEditor(editors[0])
+
+      // Assert: flag should be reset to false
+      expect(trayController._captionsModified).toBe(false)
+
+      // Cleanup
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('does not crash when video container is null on dismiss', async () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+
+      // Clear video container (edge case)
+      trayController.$videoContainer = null
+
+      // Close tray - should not crash
+      expect(() => {
+        trayController.hideTrayForEditor(editors[0])
+      }).not.toThrow()
+
+      // Cleanup
+      getFeaturesSpy.mockRestore()
     })
   })
 })
