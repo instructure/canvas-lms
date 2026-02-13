@@ -1680,19 +1680,19 @@ describe DiscussionTopic do
       end
 
       it "does not allow observers to see replies to a discussion linked students haven't posted in" do
-        expect(@topic.initial_post_required?(@observer)).to be
+        expect(@topic.initial_post_required?(@observer)).to be true
       end
 
       # previously this worked for exactly one observer enrollment, whichever became @context_enrollment
       # so test both ways
       it "allows observers to see replies in a discussion a linked student has posted in (1/2)" do
         @topic.reply_from(user: @student, text: "wat")
-        expect(@topic.initial_post_required?(@observer)).not_to be
+        expect(@topic.initial_post_required?(@observer)).to be false
       end
 
       it "allows observers to see replies in a discussion a linked student has posted in (2/2)" do
         @topic.reply_from(user: @other_student, text: "wat")
-        expect(@topic.initial_post_required?(@observer)).not_to be
+        expect(@topic.initial_post_required?(@observer)).to be false
       end
     end
   end

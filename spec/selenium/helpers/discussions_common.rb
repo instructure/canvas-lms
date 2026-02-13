@@ -277,7 +277,7 @@ module DiscussionsCommon
   end
 
   def wait_for_subscription_icon_to_load(expected_class)
-    expect(f(".subscription-toggler")).to be
+    expect(f(".subscription-toggler")).not_to be_nil
     driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
     expect(f(".subscription-toggler")).to have_class(expected_class)
   end

@@ -42,7 +42,7 @@ describe "quizzes stats" do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      expect(f(".icon-stats")).to be
+      expect(f(".icon-stats")).not_to be_nil
 
       expect(fj("ul.page-action-list")).to include_text("Quiz Statistics")
     end
