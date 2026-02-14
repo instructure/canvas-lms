@@ -22,5 +22,8 @@ import GraphiQLApp from './react/GraphiQLApp'
 import ready from '@instructure/ready'
 
 ready(() => {
-  render(<GraphiQLApp />, document.getElementById('graphiql'))
+  const container = document.getElementById('graphiql')
+  if (container) {
+    render(<GraphiQLApp />, container)
+  }
 })
