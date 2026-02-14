@@ -248,7 +248,7 @@ describe('AssignmentGroup#expandPeerReviewSubAssignments', () => {
   beforeEach(() => {
     fakeENV.setup({
       current_user_roles: ['student'],
-      FLAGS: {peer_review_allocation_and_grading: true},
+      PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: true,
     })
   })
 
@@ -285,7 +285,7 @@ describe('AssignmentGroup#expandPeerReviewSubAssignments', () => {
   })
 
   test('does not add peer review sub-assignments when flag is disabled', () => {
-    fakeENV.setup({FLAGS: {peer_review_allocation_and_grading: false}})
+    fakeENV.setup({PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: false})
 
     const group = new AssignmentGroup({
       name: 'Assignments',
