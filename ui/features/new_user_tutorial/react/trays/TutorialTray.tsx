@@ -17,9 +17,8 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import plainStoreShape from '@canvas/util/react/proptypes/plainStoreShape'
+import type {CanvasStore} from '@canvas/backbone/createStore'
 import {Tray} from '@instructure/ui-tray'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -28,19 +27,26 @@ import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
 
 const I18n = createI18nScope('new_user_tutorial')
 
-class TutorialTray extends React.Component {
-  static propTypes = {
-    // Used as a label for the content (screenreader-only)
-    label: PropTypes.string.isRequired,
-    // The specific tray that will be wrapped, unusable without this.
-    children: PropTypes.node.isRequired,
-    // The store to control the status of everything
-    store: PropTypes.shape(plainStoreShape).isRequired,
-    // Should return an element that focus can be set to
-    returnFocusToFunc: PropTypes.func.isRequired,
-  }
+interface TutorialState {
+  isCollapsed: boolean
+}
 
-  constructor(props) {
+interface TutorialTrayState extends TutorialState {
+  endUserTutorialShown: boolean
+}
+
+interface TutorialTrayProps {
+  label: string
+  children: React.ReactNode
+  store: CanvasStore<TutorialState>
+  returnFocusToFunc: () => HTMLElement
+}
+
+class TutorialTray extends React.Component<TutorialTrayProps, TutorialTrayState> {
+  private toggleButton?: NewUserTutorialToggleButton | null
+  private endTutorialButton?: Button | null
+
+  constructor(props: TutorialTrayProps) {
     super(props)
     this.state = {
       ...props.store.getState(),
@@ -82,7 +88,7 @@ class TutorialTray extends React.Component {
   }
 
   handleEntering = () => {
-    this.toggleButton.focus()
+    this.toggleButton?.focus()
   }
 
   handleExiting = () => {
@@ -106,7 +112,6 @@ class TutorialTray extends React.Component {
               ref={c => {
                 this.toggleButton = c
               }}
-              onClick={this.handleToggleClick}
               store={this.props.store}
             />
           </View>
