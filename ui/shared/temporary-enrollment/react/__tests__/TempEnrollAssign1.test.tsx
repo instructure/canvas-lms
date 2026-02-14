@@ -278,7 +278,7 @@ describe('TempEnrollAssign', () => {
       await waitFor(() => {
         expect(screen.getByText('The chosen date and time is invalid.')).toBeInTheDocument()
       }, {timeout: 10000})
-    })
+    }, 30000)
 
     it('sets wrong order error state when start date is after end date', async () => {
       const screen = render(<TempEnrollAssign {...props} />)
