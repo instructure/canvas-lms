@@ -158,4 +158,8 @@ export interface EnvGradebookSpeedGrader {
   ENTRY_ID: string
 
   use_comment_library_v2?: boolean
+  /**
+   * Optional custom title for submission download dialog
+   */
+  SUBMISSION_DOWNLOAD_DIALOG_TITLE?: string
 }

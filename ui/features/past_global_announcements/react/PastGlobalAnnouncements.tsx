@@ -32,9 +32,15 @@ import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalW
 const I18n = createI18nScope('past_global_announcements')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
-const PastGlobalAnnouncements = ({breakpoints}) => {
+interface PastGlobalAnnouncementsProps {
+  breakpoints?: {desktop?: boolean; mobileOnly?: boolean}
+}
+
+const PastGlobalAnnouncements = ({breakpoints = {}}: PastGlobalAnnouncementsProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
+  // @ts-expect-error - global_notifications is a page-specific ENV property
   const activeAnnouncements = AnnouncementFactory(ENV.global_notifications.current, 'Current')
+  // @ts-expect-error - global_notifications is a page-specific ENV property
   const pastAnnouncements = AnnouncementFactory(ENV.global_notifications.past, 'Past')
 
   const renderTabs = () => {
@@ -80,9 +86,10 @@ const PastGlobalAnnouncements = ({breakpoints}) => {
       <Flex margin="medium 0">
         <Flex.Item width="100%">
           <SimpleSelect
-            value={selectedIndex}
-            onChange={(e, {_id, value}) => setSelectedIndex(value)}
+            value={String(selectedIndex)}
+            onChange={(_e, {value}) => setSelectedIndex(Number(value))}
             renderLabel={<ScreenReaderContent>{I18n.t('Select View')}</ScreenReaderContent>}
+            // @ts-expect-error - margin prop works at runtime via InstUI theme system
             margin="0 0 medium 0"
             data-testid="GlobalAnnouncementSelect"
           >
