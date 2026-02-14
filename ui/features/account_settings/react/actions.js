@@ -23,9 +23,44 @@ function pluralize(word) {
   return word
 }
 
-export const WHITELISTS_LOADED = 'WHITELISTS_LOADED'
-export function setWhitelistsLoaded(value) {
-  return {type: WHITELISTS_LOADED, payload: value}
+export function getCspSettings(context, contextId, isSubAccount) {
+  context = pluralize(context)
+  return (dispatch, _getState, {axios}) => {
+    return axios
+      .get(`/api/v1/${context}/${contextId}/csp_settings`)
+      .then(response => {
+        const settings = {
+          domains: {
+            effective: response.data.effective_whitelist || [],
+            account: response.data.current_account_whitelist || [],
+            tools: response.data.tools_whitelist || {},
+          },
+          isSubAccount,
+          enabled: response.data.enabled,
+          inherited: response.data.inherited,
+        }
+        dispatch(setCspSettings(settings))
+      })
+      .catch(() => {
+        dispatch(setErrorType('GET_CSP_SETTINGS'))
+      })
+  }
+}
+
+export const SET_CSP_SETTINGS = 'SET_CSP_SETTINGS'
+export function setCspSettings(settings) {
+  return {
+    type: SET_CSP_SETTINGS,
+    payload: settings,
+  }
+}
+
+export const SET_ERROR = 'SET_ERROR'
+export function setErrorType(value) {
+  return {
+    type: SET_ERROR,
+    payload: value,
+  }
 }
 
 export const SET_DIRTY = 'SET_DIRTY'
@@ -72,15 +107,10 @@ export function setCspEnabled(context, contextId, value) {
       .then(response => {
         dispatch(setCspEnabledAction(response.data.enabled))
       })
+      .catch(() => {
+        dispatch(setErrorType(SET_CSP_ENABLED))
+      })
   }
-}
-
-export function getCspEnabled(context, contextId) {
-  context = pluralize(context)
-  return (dispatch, _getState, {axios}) =>
-    axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
-      dispatch(setCspEnabledAction(response.data.enabled))
-    })
 }
 
 export const SET_CSP_INHERITED = 'SET_CSP_INHERITED'
@@ -131,15 +161,10 @@ export function setCspInherited(context, contextId, value) {
           dispatch(setDirtyAction(true))
         }
       })
+      .catch(() => {
+        dispatch(setErrorType(SET_CSP_INHERITED))
+      })
   }
-}
-
-export function getCspInherited(context, contextId) {
-  context = pluralize(context)
-  return (dispatch, _getState, {axios}) =>
-    axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
-      dispatch(setCspInheritedAction(response.data.inherited))
-    })
 }
 
 export const ADD_DOMAIN = 'ADD_DOMAIN'
@@ -202,23 +227,12 @@ export function addDomain(context, contextId, domain, afterAdd = () => {}) {
         // This isn't really necessary but since the allowed domain list is unique,
         // it doesn't hurt.
         dispatch(addDomainAction(domain, 'account'))
+        afterAdd()
       })
-      .then(afterAdd)
+      .catch(() => {
+        dispatch(setErrorType(ADD_DOMAIN))
+      })
   }
-}
-
-export function getCurrentWhitelist(context, contextId) {
-  context = pluralize(context)
-  return (dispatch, _getState, {axios}) =>
-    axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
-      const addDomainMap = {
-        effective: response.data.effective_whitelist || [],
-        account: response.data.current_account_whitelist || [],
-        tools: response.data.tools_whitelist || {},
-      }
-      dispatch(addDomainBulkAction(addDomainMap))
-      dispatch(setWhitelistsLoaded(true))
-    })
 }
 
 export const REMOVE_DOMAIN = 'REMOVE_DOMAIN'
@@ -249,22 +263,17 @@ export function removeDomain(context, contextId, domain) {
         // This isn't really necessary but doesn't hurt
         dispatch(removeDomainAction(domain))
       })
+      .catch(() => {
+        dispatch(setErrorType(REMOVE_DOMAIN))
+      })
   }
 }
 
-export const COPY_INHERITED_SUCCESS = 'COPY_INHERITED_SUCCESS'
-export const COPY_INHERITED_FAILURE = 'COPY_INHERITED_FAILURE'
+export const COPY_INHERITED = 'COPY_INHERITED'
 
-export function copyInheritedAction(newWhitelist, error) {
-  if (error) {
-    return {
-      type: COPY_INHERITED_FAILURE,
-      payload: new Error(error),
-      error: true,
-    }
-  }
+export function copyInheritedAction(newWhitelist) {
   return {
-    type: COPY_INHERITED_SUCCESS,
+    type: COPY_INHERITED,
     payload: newWhitelist,
   }
 }
@@ -287,6 +296,9 @@ export function copyInheritedIfNeeded(context, contextId, modifiedDomainOption =
         .then(response => {
           dispatch(setDirtyAction(false))
           dispatch(copyInheritedAction(response.data.current_account_whitelist))
+        })
+        .catch(() => {
+          dispatch(setErrorType(COPY_INHERITED))
         })
     }
   }

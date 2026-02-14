@@ -17,6 +17,75 @@
  */
 
 import * as Actions from '../actions'
+import {fakeAxios} from '../components/__tests__/utils'
+
+describe('getCspSettings', () => {
+  const fakeTools = {
+    'instructure.com': [
+      {
+        id: '1',
+        name: 'Cool Tool 1',
+        account_id: '1',
+      },
+    ],
+    'bridgelms.com': [
+      {
+        id: '2',
+        name: 'Cool Tool 2',
+        account_id: '1',
+      },
+    ],
+  }
+  const fakeEffectiveList = ['effective.example']
+  const fakeAccountList = ['account.example']
+
+  it('dispatches a SET_CSP_SETTINGS action with the settings on success', async () => {
+    const thunk = Actions.getCspSettings('account', 3, true)
+    const fakeDispatch = vi.fn()
+    const overrideAxios = {
+      ...fakeAxios,
+      get: vi.fn(() =>
+        Promise.resolve({
+          data: {
+            enabled: true,
+            inherited: false,
+            effective_whitelist: fakeEffectiveList,
+            current_account_whitelist: fakeAccountList,
+            tools_whitelist: fakeTools,
+          },
+        }),
+      ),
+    }
+    await thunk(fakeDispatch, null, {axios: overrideAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: {
+        enabled: true,
+        inherited: false,
+        domains: {
+          effective: fakeEffectiveList,
+          account: fakeAccountList,
+          tools: fakeTools,
+        },
+        isSubAccount: true,
+      },
+      type: 'SET_CSP_SETTINGS',
+    })
+  })
+
+  it('dispatches a SET_ERROR action on failure', async () => {
+    const thunk = Actions.getCspSettings('account', 3, true)
+    const fakeDispatch = vi.fn()
+    const overrideAxios = {
+      ...fakeAxios,
+      get: vi.fn(() => Promise.reject(new Error('Network error'))),
+    }
+    await thunk(fakeDispatch, null, {axios: overrideAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: 'GET_CSP_SETTINGS',
+      type: 'SET_ERROR',
+    })
+  })
+})
 
 describe('setCspEnabledAction', () => {
   it('creates a SET_CSP_ENABLED action when passed a boolean value', () => {
@@ -44,9 +113,7 @@ describe('setCspEnabled', () => {
   it('converts non-plural contexts to plural', () => {
     const thunk = Actions.setCspEnabled('course', 1, true)
     const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      put: vi.fn(() => ({then() {}})),
-    }
+
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAxios.put).toHaveBeenCalledWith(expect.stringContaining('courses'), {
       status: 'enabled',
@@ -56,27 +123,20 @@ describe('setCspEnabled', () => {
   it('does not modify plural contexts', () => {
     const thunk = Actions.setCspEnabled('courses', 1, true)
     const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      put: vi.fn(() => ({then() {}})),
-    }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAxios.put).toHaveBeenCalledWith(expect.stringContaining('courses'), {
       status: 'enabled',
     })
   })
 
-  it('dispatches an optimistic action followed by the final result', () => {
+  it('dispatches an optimistic action followed by the final result', async () => {
     const thunk = Actions.setCspEnabled('courses', 1, true)
     const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      put: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {data: {enabled: true}}
-          func(fakeResponse)
-        },
-      })),
+    const overrideAxios = {
+      ...fakeAxios,
+      put: vi.fn(() => Promise.resolve({data: {enabled: true}})),
     }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
+    await thunk(fakeDispatch, null, {axios: overrideAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: true,
       type: 'SET_CSP_ENABLED_OPTIMISTIC',
@@ -86,34 +146,18 @@ describe('setCspEnabled', () => {
       type: 'SET_CSP_ENABLED',
     })
   })
-})
 
-describe('getCspEnabled', () => {
-  it('converts non-plural contexts to plural', () => {
-    const thunk = Actions.getCspEnabled('course', 1)
+  it('dispatches a SET_ERROR action on failure', async () => {
+    const thunk = Actions.setCspEnabled('courses', 1, true)
     const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      get: vi.fn(() => ({then() {}})),
+    const overrideAxios = {
+      ...fakeAxios,
+      put: vi.fn(() => Promise.reject(new Error('Network error'))),
     }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
-    expect(fakeAxios.get).toHaveBeenCalledWith(expect.stringContaining('courses'))
-  })
-
-  it('dispatches a SET_CSP_ENABLED action when complete', () => {
-    const thunk = Actions.getCspEnabled('courses', 1)
-    const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      get: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {data: {enabled: true}}
-          func(fakeResponse)
-        },
-      })),
-    }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
+    await thunk(fakeDispatch, null, {axios: overrideAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
-      payload: true,
-      type: 'SET_CSP_ENABLED',
+      payload: 'SET_CSP_ENABLED',
+      type: 'SET_ERROR',
     })
   })
 })
@@ -149,19 +193,10 @@ describe('addDomainAction', () => {
 })
 
 describe('addDomain', () => {
-  it('dispatches an optimistic action followed by the final result', () => {
+  it('dispatches an optimistic action followed by the final result', async () => {
     const thunk = Actions.addDomain('account', 1, 'instructure.com')
     const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      post: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {}
-          func(fakeResponse)
-          return {then() {}}
-        },
-      })),
-    }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
+    await thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: {account: 'instructure.com'},
       type: 'ADD_DOMAIN_OPTIMISTIC',
@@ -172,25 +207,26 @@ describe('addDomain', () => {
     })
   })
 
-  it('calls the afterAdd function after dispatching', () => {
+  it('calls the afterAdd function after dispatching', async () => {
     const fakeAfterAdd = vi.fn()
     const thunk = Actions.addDomain('account', 1, 'instructure.com', fakeAfterAdd)
     const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      post: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {}
-          func(fakeResponse)
-          return {
-            then(fn) {
-              fn()
-            },
-          }
-        },
-      })),
-    }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
+    await thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAfterAdd).toHaveBeenCalled()
+  })
+
+  it('dispatches a SET_ERROR action on failure', async () => {
+    const thunk = Actions.addDomain('account', 1, 'instructure.com')
+    const fakeDispatch = vi.fn()
+    const overrideAxios = {
+      ...fakeAxios,
+      post: vi.fn(() => Promise.reject(new Error('Network error'))),
+    }
+    await thunk(fakeDispatch, null, {axios: overrideAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: 'ADD_DOMAIN',
+      type: 'SET_ERROR',
+    })
   })
 })
 
@@ -235,54 +271,6 @@ describe('addDomainBulkAction', () => {
   })
 })
 
-describe('getCurrentWhitelist', () => {
-  it('dispatches a bulk domain action ', () => {
-    const thunk = Actions.getCurrentWhitelist('account', 1)
-    const fakeDispatch = vi.fn()
-    const fakeGetState = () => ({enabled: true})
-    const fakeAxios = {
-      get: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {
-            data: {
-              enabled: true,
-              current_account_whitelist: ['instructure.com', 'canvaslms.com'],
-              effective_whitelist: ['bridgelms.com'],
-              tools_whitelist: {
-                'lti-tool.com': [
-                  {
-                    id: '1',
-                    name: 'Cool Tool 1',
-                    account_id: '1',
-                  },
-                ],
-              },
-            },
-          }
-          func(fakeResponse)
-        },
-      })),
-    }
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
-    expect(fakeDispatch).toHaveBeenCalledWith({
-      payload: {
-        effective: ['bridgelms.com'],
-        account: ['instructure.com', 'canvaslms.com'],
-        tools: {
-          'lti-tool.com': [
-            {
-              id: '1',
-              name: 'Cool Tool 1',
-              account_id: '1',
-            },
-          ],
-        },
-      },
-      type: 'ADD_DOMAIN_BULK',
-    })
-  })
-})
-
 describe('removeDomainAction', () => {
   it('creates an REMOVE_DOMAIN action when passed a string value', () => {
     const action = Actions.removeDomainAction('instructure.com')
@@ -307,18 +295,10 @@ describe('removeDomainAction', () => {
 })
 
 describe('removeDomain', () => {
-  it('dispatches an optimistic action followed by the final result', () => {
+  it('dispatches an optimistic action followed by the final result', async () => {
     const thunk = Actions.removeDomain('account', 1, 'instructure.com')
     const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      delete: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {}
-          func(fakeResponse)
-        },
-      })),
-    }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
+    await thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: 'instructure.com',
       type: 'REMOVE_DOMAIN_OPTIMISTIC',
@@ -326,6 +306,20 @@ describe('removeDomain', () => {
     expect(fakeDispatch).toHaveBeenNthCalledWith(2, {
       payload: 'instructure.com',
       type: 'REMOVE_DOMAIN',
+    })
+  })
+
+  it('dispatches a SET_ERROR action on failure', async () => {
+    const thunk = Actions.removeDomain('account', 1, 'instructure.com')
+    const fakeDispatch = vi.fn()
+    const overrideAxios = {
+      ...fakeAxios,
+      delete: vi.fn(() => Promise.reject(new Error('Network error'))),
+    }
+    await thunk(fakeDispatch, null, {axios: overrideAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: 'REMOVE_DOMAIN',
+      type: 'SET_ERROR',
     })
   })
 })
@@ -353,23 +347,19 @@ describe('setCspInheritedAction', () => {
 })
 
 describe('setCspInherited', () => {
-  it('dispatches a optimistic value followed by the actual result', () => {
+  it('dispatches a optimistic value followed by the actual result', async () => {
     const thunk = Actions.setCspInherited('account', 1, true)
     const fakeDispatch = vi.fn()
     const fakeGetState = () => ({})
-    const fakeAxios = {
-      put: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {
-            data: {
-              inherited: true,
-            },
-          }
-          func(fakeResponse)
-        },
-      })),
+    const overrideAxios = {
+      ...fakeAxios,
+      put: vi.fn(() =>
+        Promise.resolve({
+          data: {inherited: true, enabled: false},
+        }),
+      ),
     }
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    await thunk(fakeDispatch, fakeGetState, {axios: overrideAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: true,
       type: 'SET_CSP_INHERITED_OPTIMISTIC',
@@ -380,24 +370,19 @@ describe('setCspInherited', () => {
     })
   })
 
-  it('updates the enabled status and domain list when successful', () => {
+  it('updates the enabled status and domain list when successful', async () => {
     const thunk = Actions.setCspInherited('account', 1, false)
     const fakeDispatch = vi.fn()
     const fakeGetState = () => ({})
-    const fakeAxios = {
-      put: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {
-            data: {
-              inherited: true,
-              enabled: true,
-            },
-          }
-          func(fakeResponse)
-        },
-      })),
+    const overrideAxios = {
+      ...fakeAxios,
+      put: vi.fn(() =>
+        Promise.resolve({
+          data: {inherited: true, enabled: true},
+        }),
+      ),
     }
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    await thunk(fakeDispatch, fakeGetState, {axios: overrideAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: true,
       type: 'SET_CSP_ENABLED',
@@ -408,48 +393,37 @@ describe('setCspInherited', () => {
     })
   })
 
-  it('sets the dirty status when cspInherited is true but then switches to false with no account whitelist', () => {
+  it('sets the dirty status when cspInherited is true but then switches to false with no account whitelist', async () => {
     const thunk = Actions.setCspInherited('account', 1, false)
     const fakeDispatch = vi.fn()
     const fakeGetState = () => ({cspInherited: true})
-    const fakeAxios = {
-      put: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {
-            data: {
-              inherited: false,
-              enabled: true,
-              current_account_whitelist: [],
-            },
-          }
-          func(fakeResponse)
-        },
-      })),
+    const overrideAxios = {
+      ...fakeAxios,
+      put: vi.fn(() =>
+        Promise.resolve({
+          data: {inherited: false, enabled: true, current_account_whitelist: []},
+        }),
+      ),
     }
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    await thunk(fakeDispatch, fakeGetState, {axios: overrideAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: true,
       type: 'SET_DIRTY',
     })
   })
-})
 
-describe('getCspInherited', () => {
-  it('dispatches a SET_CSP_INHERITED action when complete', () => {
-    const thunk = Actions.getCspInherited('account', 1)
+  it('dispatches a SET_ERROR action on failure', async () => {
+    const thunk = Actions.setCspInherited('account', 1, false)
     const fakeDispatch = vi.fn()
-    const fakeAxios = {
-      get: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {data: {inherited: true}}
-          func(fakeResponse)
-        },
-      })),
+    const fakeGetState = () => ({cspInherited: true})
+    const overrideAxios = {
+      ...fakeAxios,
+      put: vi.fn(() => Promise.reject(new Error('Network error'))),
     }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
+    await thunk(fakeDispatch, fakeGetState, {axios: overrideAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
-      payload: true,
-      type: 'SET_CSP_INHERITED',
+      payload: 'SET_CSP_INHERITED',
+      type: 'SET_ERROR',
     })
   })
 })
@@ -471,96 +445,86 @@ describe('setDirtyAction', () => {
 })
 
 describe('copyInheritedAction', () => {
-  it('creates a COPY_INHERITED_SUCCESS action', () => {
+  it('creates COPY_INHERITED action', () => {
     const action = Actions.copyInheritedAction([])
-    expect(action.type).toBe('COPY_INHERITED_SUCCESS')
+    expect(action.type).toBe('COPY_INHERITED')
     expect(action.payload).toEqual([])
     expect(action.error).toBeUndefined()
-  })
-  it('creates an error action if passed an error param', () => {
-    const error = new Error('something happened')
-    const action = Actions.copyInheritedAction([], error)
-    expect(action.type).toBe('COPY_INHERITED_FAILURE')
-    expect(action.error).toBe(true)
-    expect(action.payload).toBeInstanceOf(Error)
-    expect(action.payload.message).toContain('something happened')
   })
 })
 
 describe('copyInheritedIfNeeded', () => {
-  it('does does nothing if isDirty state is false', () => {
+  it('does does nothing if isDirty state is false', async () => {
     const thunk = Actions.copyInheritedIfNeeded('account', 1)
     const fakeDispatch = vi.fn()
     const fakeGetState = () => ({
       isDirty: false,
       whitelistedDomains: {inherited: ['canvaslms.com']},
     })
-    const fakeAxios = {}
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    await thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeDispatch).not.toHaveBeenCalled()
   })
 
-  it('dispatches a setDirtyAction and a copyInherited action when the request completes', () => {
+  it('dispatches a setDirtyAction and a copyInherited action when the request completes', async () => {
     const thunk = Actions.copyInheritedIfNeeded('account', 1)
     const fakeDispatch = vi.fn()
     const fakeGetState = () => ({isDirty: true, whitelistedDomains: {inherited: ['canvaslms.com']}})
-    const fakeAxios = {
-      post: vi.fn(() => ({
-        then(func) {
-          const fakeResponse = {
-            data: {
-              inherited: false,
-              enabled: true,
-              current_account_whitelist: ['canvaslms.com'],
-            },
-          }
-          func(fakeResponse)
-        },
-      })),
+    const overrideAxios = {
+      ...fakeAxios,
+      post: vi.fn(() =>
+        Promise.resolve({
+          data: {inherited: false, enabled: true, current_account_whitelist: ['canvaslms.com']},
+        }),
+      ),
     }
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    await thunk(fakeDispatch, fakeGetState, {axios: overrideAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: false,
       type: 'SET_DIRTY',
     })
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: ['canvaslms.com'],
-      type: 'COPY_INHERITED_SUCCESS',
+      type: 'COPY_INHERITED',
     })
   })
 
-  it('adds the modifiedDomainOption.add domain to the list of domains to be copied', () => {
+  it('adds the modifiedDomainOption.add domain to the list of domains to be copied', async () => {
     const thunk = Actions.copyInheritedIfNeeded('account', 1, {add: 'instructure.com'})
     const fakeDispatch = vi.fn()
     const fakeGetState = () => ({isDirty: true, whitelistedDomains: {inherited: ['canvaslms.com']}})
-    const fakeAxios = {
-      post: vi.fn(() => ({
-        then: vi.fn(),
-      })),
-    }
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    await thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeAxios.post).toHaveBeenCalledWith(
       '/api/v1/accounts/1/csp_settings/domains/batch_create',
       {domains: ['canvaslms.com', 'instructure.com']},
     )
   })
 
-  it('removes the modifiedDomainOption.delete domain from the list of domains to be copied', () => {
+  it('removes the modifiedDomainOption.delete domain from the list of domains to be copied', async () => {
     const thunk = Actions.copyInheritedIfNeeded('account', 1, {delete: 'instructure.com'})
     const fakeDispatch = vi.fn()
     const fakeGetState = () => ({
       isDirty: true,
       whitelistedDomains: {inherited: ['canvaslms.com', 'instructure.com']},
     })
-    const fakeAxios = {
-      post: vi.fn(() => ({
-        then: vi.fn(),
-      })),
-    }
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    await thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeAxios.post).toHaveBeenCalledWith(
       '/api/v1/accounts/1/csp_settings/domains/batch_create',
       {domains: ['canvaslms.com']},
     )
+  })
+
+  it('dispatches a SET_ERROR action on failure', async () => {
+    const thunk = Actions.copyInheritedIfNeeded('account', 1)
+    const fakeDispatch = vi.fn()
+    const fakeGetState = () => ({isDirty: true, whitelistedDomains: {inherited: ['canvaslms.com']}})
+    const overrideAxios = {
+      ...fakeAxios,
+      post: vi.fn(() => Promise.reject(new Error('Network error'))),
+    }
+    await thunk(fakeDispatch, fakeGetState, {axios: overrideAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: 'COPY_INHERITED',
+      type: 'SET_ERROR',
+    })
   })
 })
