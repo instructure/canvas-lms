@@ -16,10 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import jobs from './jquery/index'
+import jobs from './jquery'
+
+declare global {
+  interface Window {
+    jobs: any
+    running: any
+    tags: any
+    Jobs: any
+    Workers: any
+    Tags: any
+  }
+}
+
+interface JobsEnv {
+  JOBS: {
+    opts: any
+    running_opts: any
+    tags_opts: any
+  }
+}
 
 // TODO: get this stuff off window, need to move the domready stuff out of
 // jobs.js into here
-window.jobs = new jobs.Jobs(ENV.JOBS.opts).init()
-window.running = new jobs.Workers(ENV.JOBS.running_opts).init()
-window.tags = new jobs.Tags(ENV.JOBS.tags_opts).init()
+window.jobs = new jobs.Jobs((ENV as unknown as JobsEnv).JOBS.opts).init()
+window.running = new jobs.Workers((ENV as unknown as JobsEnv).JOBS.running_opts).init()
+window.tags = new jobs.Tags((ENV as unknown as JobsEnv).JOBS.tags_opts).init()
