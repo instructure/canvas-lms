@@ -22,7 +22,7 @@ import FileNotFound from '../FileNotFound'
 
 describe('FileNotFound Component', () => {
   test('it renders', () => {
-    const {getByText, unmount} = render(<FileNotFound contextCode="fakeContextCode" />)
+    const {unmount} = render(<FileNotFound contextCode="fakeContextCode" />)
 
     // If you have specific text or elements to check that render, use `getByText` or similar queries.
     // For example, if 'File Not Found' text should be present, uncomment the next line:
