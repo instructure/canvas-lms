@@ -37,11 +37,13 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
     })
 
     it('checks that the document contains active announcements', () => {
+      // @ts-expect-error - WithBreakpoints HOC injects breakpoints prop
       const {getByText} = render(<PastGlobalAnnouncements />)
       expect(getByText('This is an active announcement')).toBeVisible()
     })
 
     it('checks that the document contains past announcements', async () => {
+      // @ts-expect-error - WithBreakpoints HOC injects breakpoints prop
       const {findByText} = render(<PastGlobalAnnouncements />)
       fireEvent.click(await findByText('Recent'))
       expect(await findByText('This is a past announcement')).toBeVisible()
@@ -63,11 +65,13 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
     })
 
     it('checks that a dessert svg is rendered in the current section', async () => {
+      // @ts-expect-error - WithBreakpoints HOC injects breakpoints prop
       const {findByTestId} = render(<PastGlobalAnnouncements />)
       expect(await findByTestId('NoGlobalAnnouncementImageCurrent')).toBeVisible()
     })
 
     it('checks that a dessert svg is rendered in the past section', async () => {
+      // @ts-expect-error - WithBreakpoints HOC injects breakpoints prop
       const {findByTestId, findByText} = render(<PastGlobalAnnouncements />)
       fireEvent.click(await findByText('Recent'))
       expect(await findByTestId('NoGlobalAnnouncementImagePast')).toBeVisible()
@@ -86,6 +90,7 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
         },
       })
 
+      // @ts-expect-error - WithBreakpoints HOC injects breakpoints prop
       const {findByText} = render(<PastGlobalAnnouncements />)
       expect(await findByText('This is current page one')).toBeVisible()
       fireEvent.click(await findByText('2'))
@@ -105,6 +110,7 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
         },
       })
 
+      // @ts-expect-error - WithBreakpoints HOC injects breakpoints prop
       const {findByText} = render(<PastGlobalAnnouncements />)
       fireEvent.click(await findByText('Recent'))
       expect(await findByText('This is past page one')).toBeVisible()

@@ -24,8 +24,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('past_global_announcements')
 
-const AnnouncementFactory = (announcements, section) => {
-  const styles = {
+const AnnouncementFactory = (announcements: string[], section: string) => {
+  const styles: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',

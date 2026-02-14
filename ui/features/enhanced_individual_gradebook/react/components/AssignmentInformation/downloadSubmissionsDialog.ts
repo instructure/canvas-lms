@@ -27,7 +27,17 @@ const I18n = createI18nScope('submissions')
 
 const MAX_RETRIES = 3
 
-export default function (url, onClose) {
+interface AttachmentData {
+  workflow_state: 'zipped' | 'errored' | 'processing'
+  file_state?: string
+  readable_size?: string
+}
+
+interface ResponseData {
+  attachment?: AttachmentData
+}
+
+export default function downloadSubmissionsDialog(url: string, onClose: () => void): void {
   let retryCount = 0
   let cancelled = false
   const title = ENV.SUBMISSION_DOWNLOAD_DIALOG_TITLE || I18n.t('Download Assignment Submissions')
@@ -43,17 +53,17 @@ export default function (url, onClose) {
     })
     .on('dialogclose', onClose)
   $('#download_submissions_dialog .progress').progressbar({value: 0})
-  const checkForChange = function () {
+  const checkForChange = function (): void {
     if (cancelled || $('#download_submissions_dialog:visible').length === 0) {
       return
     }
     $('#download_submissions_dialog .status_loader').css('visibility', 'visible')
-    let lastProgress = null
+    let lastProgress: number | null = null
     $.ajaxJSON(
       url,
       'GET',
       {},
-      data => {
+      (data: ResponseData) => {
         if (data && data.attachment) {
           const attachment = data.attachment
           if (attachment.workflow_state === 'zipped') {
@@ -81,13 +91,13 @@ export default function (url, onClose) {
             )
             cancelled = true
           } else {
-            let progress = parseInt(attachment.file_state, 10)
+            let progress = parseInt(attachment.file_state || '0', 10)
             if (Number.isNaN(Number(progress))) {
               progress = 0
             }
             progress += 5
             $('#download_submissions_dialog .progress').progressbar('value', progress)
-            let message = null
+            let message: string
             if (progress >= 95) {
               message = I18n.t('#submissions.creating_zip', 'Creating zip file...')
             } else {

@@ -29,7 +29,12 @@ const I18n = createI18nScope('past_global_announcements')
  * on initialization. This isn't true paging but paging was implemented
  * to enhance the user experience.
  */
-export default class AnnouncementPagination extends React.Component {
+interface AnnouncementPaginationProps {
+  announcements: string[]
+  section: string
+}
+
+export default class AnnouncementPagination extends React.Component<AnnouncementPaginationProps> {
   state = {
     currentPage: 0,
   }
