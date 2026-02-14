@@ -18,8 +18,6 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {Text} from '@instructure/ui-text'
-import {IconWarningLine, IconInfoLine} from '@instructure/ui-icons'
 import Message from '../../SubmissionStatus/Message'
 
 describe('Message', () => {
