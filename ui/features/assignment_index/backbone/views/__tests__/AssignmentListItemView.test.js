@@ -142,9 +142,9 @@ const createView = (model, options = {}) => {
   ENV.FLAGS = {
     show_additional_speed_grader_link: options.show_additional_speed_grader_link,
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
-    peer_review_allocation_and_grading: options.peer_review_allocation_and_grading,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
+  ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = options.peer_review_allocation_and_grading
   ENV.SETTINGS = {}
 
   const view = new AssignmentListItemView({
