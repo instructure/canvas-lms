@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -27,7 +26,19 @@ const I18n = createI18nScope('new_user_tutorial')
 
 const API_URL = '/api/v1/users/self/features/flags/new_user_tutorial_on_off'
 
-export default function ConfirmEndTutorialDialog({isOpen, handleRequestClose}) {
+interface ConfirmEndTutorialDialogProps {
+  isOpen?: boolean
+  handleRequestClose: () => void
+}
+
+interface ConfirmEndTutorialDialogComponent extends React.FC<ConfirmEndTutorialDialogProps> {
+  onSuccess: () => void
+}
+
+const ConfirmEndTutorialDialog: ConfirmEndTutorialDialogComponent = ({
+  isOpen = false,
+  handleRequestClose,
+}) => {
   return (
     <Modal
       open={isOpen}
@@ -55,13 +66,7 @@ export default function ConfirmEndTutorialDialog({isOpen, handleRequestClose}) {
     </Modal>
   )
 }
+
 ConfirmEndTutorialDialog.onSuccess = () => window.location.reload()
 
-ConfirmEndTutorialDialog.propTypes = {
-  isOpen: PropTypes.bool,
-  handleRequestClose: PropTypes.func.isRequired,
-}
-
-ConfirmEndTutorialDialog.defaultProps = {
-  isOpen: false,
-}
+export default ConfirmEndTutorialDialog

@@ -17,20 +17,28 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoveStartLine, IconMoveEndLine} from '@instructure/ui-icons'
-import plainStoreShape from '@canvas/util/react/proptypes/plainStoreShape'
+import type {CanvasStore} from '@canvas/backbone/createStore'
 
 const I18n = createI18nScope('new_user_tutorial')
 
-class NewUserTutorialToggleButton extends React.Component {
-  static propTypes = {
-    store: PropTypes.shape(plainStoreShape).isRequired,
-  }
+interface TutorialState {
+  isCollapsed: boolean
+}
 
-  constructor(props) {
+interface NewUserTutorialToggleButtonProps {
+  store: CanvasStore<TutorialState>
+}
+
+class NewUserTutorialToggleButton extends React.Component<
+  NewUserTutorialToggleButtonProps,
+  TutorialState
+> {
+  private button?: IconButton | null
+
+  constructor(props: NewUserTutorialToggleButtonProps) {
     super(props)
     this.state = props.store.getState()
   }
@@ -44,14 +52,14 @@ class NewUserTutorialToggleButton extends React.Component {
   }
 
   focus() {
-    this.button.focus()
+    this.button?.focus()
   }
 
   handleStoreChange = () => {
     this.setState(this.props.store.getState())
   }
 
-  handleButtonClick = event => {
+  handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
 
     this.props.store.setState({
@@ -67,9 +75,8 @@ class NewUserTutorialToggleButton extends React.Component {
         ref={c => {
           this.button = c
         }}
-        variant="icon"
         id="new_user_tutorial_toggle"
-        onClick={this.handleButtonClick}
+        onClick={this.handleButtonClick as any}
         withBackground={false}
         withBorder={false}
         screenReaderLabel={
