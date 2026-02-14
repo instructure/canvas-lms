@@ -70,35 +70,26 @@ describe Validators::AccountSettingsValidator do
       expect(account.errors[:settings]).to include("discovery_page.primary[0].label is required")
     end
 
-    it "fails with invalid icon_url (not a URL)" do
+    it "fails with invalid icon value" do
       account.settings[:discovery_page] = {
-        primary: [valid_discovery_page_entry.merge(icon_url: "not-a-url")],
+        primary: [valid_discovery_page_entry.merge(icon: "invalid-icon")],
         secondary: []
       }
       expect(account).not_to be_valid
-      expect(account.errors[:settings]).to include("discovery_page.primary[0].icon_url must be a valid URL")
+      expect(account.errors[:settings].first).to include("discovery_page.primary[0].icon must be one of:")
     end
 
-    it "fails with invalid icon_url (ftp protocol)" do
+    it "passes with valid icon value" do
       account.settings[:discovery_page] = {
-        primary: [valid_discovery_page_entry.merge(icon_url: "ftp://example.com/icon.png")],
-        secondary: []
-      }
-      expect(account).not_to be_valid
-      expect(account.errors[:settings]).to include("discovery_page.primary[0].icon_url must be a valid URL")
-    end
-
-    it "passes with valid http icon_url" do
-      account.settings[:discovery_page] = {
-        primary: [valid_discovery_page_entry.merge(icon_url: "http://example.com/icon.png")],
+        primary: [valid_discovery_page_entry.merge(icon: "google")],
         secondary: []
       }
       expect(account).to be_valid
     end
 
-    it "passes with valid https icon_url" do
+    it "allows icon to be omitted" do
       account.settings[:discovery_page] = {
-        primary: [valid_discovery_page_entry.merge(icon_url: "https://example.com/icon.png")],
+        primary: [valid_discovery_page_entry],
         secondary: []
       }
       expect(account).to be_valid

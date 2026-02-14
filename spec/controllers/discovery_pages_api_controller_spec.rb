@@ -31,7 +31,7 @@ describe DiscoveryPagesApiController do
           { authentication_provider_id: auth_provider.id, label: "Test Provider" }
         ],
         secondary: [
-          { authentication_provider_id: secondary_auth_provider.id, label: "Other Provider", icon_url: "https://example.com/icon.png" }
+          { authentication_provider_id: secondary_auth_provider.id, label: "Other Provider", icon: "google" }
         ],
         active: false
       }
@@ -70,7 +70,7 @@ describe DiscoveryPagesApiController do
         expect(json["discovery_page"]["primary"][0]["authentication_provider_id"]).to eq(auth_provider.id.to_s)
         expect(json["discovery_page"]["primary"][0]["label"]).to eq("Test Provider")
         expect(json["discovery_page"]["secondary"].length).to eq(1)
-        expect(json["discovery_page"]["secondary"][0]["icon_url"]).to eq("https://example.com/icon.png")
+        expect(json["discovery_page"]["secondary"][0]["icon"]).to eq("google")
       end
 
       it "persists settings to the domain root account" do
@@ -94,10 +94,10 @@ describe DiscoveryPagesApiController do
         expect(response).to have_http_status(:unprocessable_content)
       end
 
-      it "returns 422 when icon_url is invalid" do
+      it "returns 422 when icon is not a valid enum value" do
         invalid_page = {
           primary: [
-            { authentication_provider_id: auth_provider.id, label: "Test", icon_url: "not-a-url" }
+            { authentication_provider_id: auth_provider.id, label: "Test", icon: "invalid-icon" }
           ],
           secondary: []
         }
@@ -107,7 +107,7 @@ describe DiscoveryPagesApiController do
         expect(response).to have_http_status(:unprocessable_content)
       end
 
-      it "allows icon_url to be omitted" do
+      it "allows icon to be omitted" do
         page_without_icon = {
           primary: [
             { authentication_provider_id: auth_provider.id, label: "Test Provider" }
