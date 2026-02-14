@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import React from 'react'
-import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -28,9 +27,20 @@ const LABEL_TEXT = I18n.t(
   'Please let them know which page you were viewing and the link you clicked on.',
 )
 
-class FileNotFound extends React.Component {
-  constructor() {
-    super()
+interface FileNotFoundProps {
+  contextCode: string
+}
+
+interface FileNotFoundState {
+  status: 'composing' | 'sent'
+}
+
+class FileNotFound extends React.Component<FileNotFoundProps, FileNotFoundState> {
+  private formRef: React.RefObject<HTMLFormElement>
+  private messageRef: React.RefObject<HTMLTextAreaElement>
+
+  constructor(props: FileNotFoundProps) {
+    super(props)
     this.state = {
       status: 'composing',
     }
@@ -38,7 +48,7 @@ class FileNotFound extends React.Component {
     this.messageRef = React.createRef()
   }
 
-  submitMessage = e => {
+  submitMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const conversationData = {
       subject: I18n.t('Broken file link found in your course'),
@@ -47,11 +57,13 @@ class FileNotFound extends React.Component {
         'This most likely happened because you imported course content without its associated files.',
       )}
 
-        ${I18n.t('This student wrote:')} ${this.messageRef.current.value}`,
+        ${I18n.t('This student wrote:')} ${this.messageRef.current?.value}`,
       context_code: this.props.contextCode,
     }
 
     const dfd = $.post('/api/v1/conversations', conversationData)
+    // @ts-expect-error - jQuery plugin disableWhileLoading is not typed, and findDOMNode is deprecated but required for jQuery plugin
+    // eslint-disable-next-line react/no-find-dom-node
     $(ReactDOM.findDOMNode(this.formRef.current)).disableWhileLoading(dfd)
 
     dfd.done(() => this.setState({status: 'sent'}))
@@ -86,10 +98,6 @@ class FileNotFound extends React.Component {
       return <p>{I18n.t('Your message has been sent. Thank you!')}</p>
     }
   }
-}
-
-FileNotFound.propTypes = {
-  contextCode: PropTypes.string.isRequired,
 }
 
 export default FileNotFound
