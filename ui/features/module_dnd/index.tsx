@@ -20,9 +20,11 @@ import {addEmptyModuleUI, MODULE_ITEM_LIST} from '@canvas/context-modules/utils/
 import ready from '@instructure/ready'
 
 ready(() => {
-  const zones = document.querySelectorAll('.editable_context_module:not(#context_module_blank)')
-  zones.forEach(zone => {
-    const content = zone.querySelector('.content')
+  const zones = document.querySelectorAll<HTMLElement>(
+    '.editable_context_module:not(#context_module_blank)',
+  )
+  zones.forEach((zone: Element) => {
+    const content = zone.querySelector<HTMLElement>('.content')
     if (!content) return
     const itemslist = content?.querySelector('.context_module_items')
     if (!itemslist) {
@@ -30,7 +32,7 @@ ready(() => {
     }
     const moduleDnd = zone.querySelector('.module_dnd')
     if (moduleDnd) {
-      addEmptyModuleUI(zone)
+      addEmptyModuleUI(zone as HTMLElement)
     }
   })
 })
