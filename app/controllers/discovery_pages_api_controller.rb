@@ -57,10 +57,11 @@
 #           "example": "Students",
 #           "type": "string"
 #         },
-#         "icon_url": {
-#           "description": "URL to an icon image for this provider button",
-#           "example": "https://example.com/icons/students.svg",
-#           "type": "string"
+#         "icon": {
+#           "description": "Icon key for this provider button",
+#           "example": "google",
+#           "type": "string",
+#           "enum": ["apple", "auth0", "classlink", "default", "facebook", "github", "google", "linkedin", "microsoft", "okta", "onelogin", "ping"]
 #         }
 #       }
 #     }
@@ -84,7 +85,7 @@ class DiscoveryPagesApiController < ApplicationController
   #         {
   #           "authentication_provider_id": 1,
   #           "label": "Students",
-  #           "icon_url": "https://example.com/icons/students.svg"
+  #           "icon": "google"
   #         }
   #       ],
   #       "secondary": [
@@ -111,8 +112,8 @@ class DiscoveryPagesApiController < ApplicationController
   # @argument discovery_page[primary][][label] [Required, String]
   #   The display label for this authentication provider button.
   #
-  # @argument discovery_page[primary][][icon_url] [String]
-  #   URL to an icon image for this authentication provider button.
+  # @argument discovery_page[primary][][icon] [String]
+  #   Icon key for this authentication provider button.
   #
   # @argument discovery_page[secondary][][authentication_provider_id] [Required, Integer]
   #   The ID of an active authentication provider for this account.
@@ -120,8 +121,8 @@ class DiscoveryPagesApiController < ApplicationController
   # @argument discovery_page[secondary][][label] [Required, String]
   #   The display label for this authentication provider button.
   #
-  # @argument discovery_page[secondary][][icon_url] [String]
-  #   URL to an icon image for this authentication provider button.
+  # @argument discovery_page[secondary][][icon] [String]
+  #   Icon key for this authentication provider button.
   #
   # @argument discovery_page[active] [Boolean]
   #   Whether the discovery page is enabled. Defaults to false if not provided.
@@ -138,12 +139,12 @@ class DiscoveryPagesApiController < ApplicationController
   #           {
   #             "authentication_provider_id": 1,
   #             "label": "Students",
-  #             "icon_url": "https://example.com/icons/students.svg"
+  #             "icon": "google"
   #           },
   #           {
   #             "authentication_provider_id": 2,
   #             "label": "Faculty",
-  #             "icon_url": "https://example.com/icons/faculty.svg"
+  #             "icon": "okta"
   #           }
   #         ],
   #         "secondary": [
@@ -163,12 +164,12 @@ class DiscoveryPagesApiController < ApplicationController
   #         {
   #           "authentication_provider_id": 1,
   #           "label": "Students",
-  #           "icon_url": "https://example.com/icons/students.svg"
+  #           "icon": "google"
   #         },
   #         {
   #           "authentication_provider_id": 2,
   #           "label": "Faculty",
-  #           "icon_url": "https://example.com/icons/faculty.svg"
+  #           "icon": "okta"
   #         }
   #       ],
   #       "secondary": [
