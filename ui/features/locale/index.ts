@@ -19,6 +19,8 @@
 import $ from 'jquery'
 import ready from '@instructure/ready'
 
+// ENV.crowdsourced_locales is a page-specific property not in GlobalEnv
+
 ready(() => {
   const $select = $('select.locale')
 
@@ -26,7 +28,9 @@ ready(() => {
   $warningLink.hide()
 
   function checkWarningIcon() {
-    if (Array.from(ENV.crowdsourced_locales).includes($select.val())) {
+    const selectedLocale = $select.val()
+    // @ts-expect-error - crowdsourced_locales is a page-specific ENV property
+    if (typeof selectedLocale === 'string' && ENV.crowdsourced_locales.includes(selectedLocale)) {
       $warningLink.show()
     } else {
       $warningLink.hide()
