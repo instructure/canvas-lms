@@ -53,15 +53,17 @@ import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import type {Root} from 'react-dom/client'
 
+// @ts-expect-error - INST is a Canvas global not in Window types
 if (!('INST' in window)) window.INST = {}
 
 const I18n = createI18nScope('assignment')
 
 // Keep track of React roots
-const roots = new Map()
+const roots = new Map<string, Root>()
 
-function createOrUpdateRoot(elementId, component) {
+function createOrUpdateRoot(elementId: string, component: React.ReactElement) {
   const container = document.getElementById(elementId)
   if (!container) return
 
@@ -73,7 +75,7 @@ function createOrUpdateRoot(elementId, component) {
   root.render(component)
 }
 
-function unmountRoot(elementId) {
+function unmountRoot(elementId: string) {
   const root = roots.get(elementId)
   if (root) {
     root.unmount()
@@ -84,7 +86,7 @@ function unmountRoot(elementId) {
 ready(() => {
   const comments = document.getElementsByClassName('comment_content')
   Array.from(comments).forEach(comment => {
-    const content = comment.dataset.content
+    const content = (comment instanceof HTMLElement ? comment.dataset.content : '') || ''
     const formattedComment = containsHtmlTags(content)
       ? sanitizeHtml(content)
       : formatMessage(content)
@@ -96,13 +98,14 @@ ready(() => {
   renderCoursePacingNotice()
 })
 
-let studentGroupSelectionRequestTrackers = []
+let studentGroupSelectionRequestTrackers: Array<{selectedStudentGroupId: string}> = []
 
-function onStudentGroupSelected(selectedStudentGroupId) {
+function onStudentGroupSelected(selectedStudentGroupId: string) {
   if (selectedStudentGroupId !== '0') {
     const tracker = {selectedStudentGroupId}
     studentGroupSelectionRequestTrackers.push(tracker)
 
+    // @ts-expect-error
     ENV.selected_student_group_id = selectedStudentGroupId
     renderStudentGroupFilter()
     renderSpeedGraderLink()
@@ -127,13 +130,16 @@ function onStudentGroupSelected(selectedStudentGroupId) {
 
 function renderSpeedGraderLink() {
   const disabled =
+    // @ts-expect-error
     ENV.SETTINGS.filter_speed_grader_by_student_group &&
+    // @ts-expect-error
     (!ENV.selected_student_group_id || studentGroupSelectionRequestTrackers.length > 0)
 
   createOrUpdateRoot(
     'speed_grader_link_mount_point',
     <SpeedGraderLink
       disabled={disabled}
+      // @ts-expect-error
       href={ENV.speed_grader_url}
       disabledTip={I18n.t('Must select a student group first')}
     />,
@@ -144,9 +150,11 @@ function renderStudentGroupFilter() {
   createOrUpdateRoot(
     'student_group_filter_mount_point',
     <StudentGroupFilter
+      // @ts-expect-error
       categories={ENV.group_categories}
       label={I18n.t('Select Group to Grade')}
       onChange={onStudentGroupSelected}
+      // @ts-expect-error
       value={ENV.selected_student_group_id}
     />,
   )
@@ -208,15 +216,17 @@ $(() => {
     })
     model.doNotParse()
 
+    // @ts-expect-error
     new SpeedgraderLinkView({model, el: '#assignment-speedgrader-link'}).render()
     const pbv = new PublishButtonView({model, el: $el})
     pbv.render()
 
+    // @ts-expect-error
     pbv.on('publish', () => {
       $('#moderated_grading_button').show()
       $('#speed-grader-link-container').removeClass('hidden')
     })
-
+    // @ts-expect-error
     pbv.on('unpublish', () => {
       $('#moderated_grading_button').hide()
       $('#speed-grader-link-container').addClass('hidden')
@@ -225,6 +235,7 @@ $(() => {
 
   // Add module sequence footer
   promiseToGetModuleSequenceFooter.then(() => {
+    // @ts-expect-error
     $('#sequence_footer').moduleSequenceFooter({
       courseID: ENV.COURSE_ID,
       assetType: 'Assignment',
@@ -240,9 +251,14 @@ $(() => {
   return vddTooltip()
 })
 
-function renderItemAssignToTray(open, returnFocusTo, itemProps) {
+function renderItemAssignToTray(
+  open: boolean,
+  returnFocusTo: JQuery | null,
+  itemProps: Record<string, string | number | undefined>,
+) {
   createOrUpdateRoot(
     'assign-to-mount-point',
+    // @ts-expect-error - itemProps are dynamically built from DOM data attributes
     <ItemAssignToManager
       open={open}
       onClose={() => {
@@ -288,11 +304,12 @@ $(() =>
   }),
 )
 
-function openSendTo(event, open = true) {
+function openSendTo(event: JQuery.ClickEvent | null, open = true) {
   if (event) event.preventDefault()
 
   createOrUpdateRoot(
     'direct-share-mount-point',
+    // @ts-expect-error
     <DirectShareUserModal
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -306,7 +323,7 @@ function openSendTo(event, open = true) {
   )
 }
 
-function openCopyTo(event, open = true) {
+function openCopyTo(event: JQuery.ClickEvent | null, open = true) {
   if (event) event.preventDefault()
 
   createOrUpdateRoot(
@@ -331,7 +348,9 @@ $(() => {
 
 // -- This is all for the _grade_assignment sidebar partial
 $(() => {
+  // @ts-expect-error
   if (ENV.speed_grader_url) {
+    // @ts-expect-error
     if (ENV.SETTINGS.filter_speed_grader_by_student_group) {
       renderStudentGroupFilter()
     }
@@ -348,25 +367,28 @@ $(() => {
     const envRubricAssociation = ENV.rubric_association
     const assignmentRubric = envRubric
       ? {
-          ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
-          association_count: ENV.assigned_rubric?.association_count,
+          ...mapRubricUnderscoredKeysToCamelCase(envRubric),
+          association_count: envRubric.association_count,
         }
       : undefined
     const assignmentRubricAssociation = envRubricAssociation
-      ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
+      ? // @ts-expect-error
+        mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
       : undefined
 
     createOrUpdateRoot(
       'enhanced-rubric-assignment-edit-mount-point',
       <RubricAssignmentContainer
-        assignmentId={ENV.ASSIGNMENT_ID}
+        assignmentId={String(ENV.ASSIGNMENT_ID)}
         assignmentRubric={assignmentRubric}
         assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
         assignmentRubricAssociation={assignmentRubricAssociation}
-        canManageRubrics={ENV.PERMISSIONS.manage_rubrics}
-        courseId={ENV.COURSE_ID}
-        currentUserId={ENV.current_user_id}
+        canManageRubrics={ENV.PERMISSIONS?.manage_rubrics ?? false}
+        courseId={String(ENV.COURSE_ID)}
+        currentUserId={ENV.current_user_id!}
+        // @ts-expect-error
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
+        // @ts-expect-error
         aiRubricsEnabled={ENV.ai_rubrics_enabled}
       />,
     )
@@ -374,7 +396,7 @@ $(() => {
 
   createOrUpdateRoot(
     'enhanced-rubric-self-assessment-edit',
-    <RubricSelfAssessmentSettingsWrapper assignmentId={ENV.ASSIGNMENT_ID} />,
+    <RubricSelfAssessmentSettingsWrapper assignmentId={String(ENV.ASSIGNMENT_ID)} />,
   )
 })
 
@@ -385,7 +407,10 @@ $(() => {
     createOrUpdateRoot(
       'peer-review-assignment-widget-mount-point',
       <QueryClientProvider client={queryClient}>
-        <PeerReviewWidget assignmentId={ENV.ASSIGNMENT_ID} courseId={ENV.COURSE_ID} />
+        <PeerReviewWidget
+          assignmentId={String(ENV.ASSIGNMENT_ID)}
+          courseId={String(ENV.COURSE_ID)}
+        />
       </QueryClientProvider>,
     )
   }
@@ -399,19 +424,24 @@ $(() => {
 
   $('.download_submissions_link').click(function (event) {
     event.preventDefault()
+    // @ts-expect-error
     INST.downloadSubmissions($(this).attr('href'))
     $('.upload_submissions_link').slideDown()
   })
 
+  // @ts-expect-error
   setupSubmitHandler(ENV.USER_ASSET_STRING)
 
-  $('#edit_assignment_form').bind('assignment_updated', (_, data) => {
-    if (data.assignment && data.assignment.peer_reviews) {
-      $('.assignment_peer_reviews_link').slideDown()
-    } else {
-      $('.assignment_peer_reviews_link').slideUp()
-    }
-  })
+  $('#edit_assignment_form').bind(
+    'assignment_updated',
+    (_, data: {assignment?: {peer_reviews?: boolean}}) => {
+      if (data.assignment && data.assignment.peer_reviews) {
+        $('.assignment_peer_reviews_link').slideDown()
+      } else {
+        $('.assignment_peer_reviews_link').slideUp()
+      }
+    },
+  )
 })
 
 $(() => {
@@ -422,8 +452,8 @@ $(() => {
     AssignmentExternalTools.attach(
       document.getElementById('assignment_external_tools'),
       'assignment_view',
-      parseInt(ENV.COURSE_ID, 10),
-      parseInt(ENV.ASSIGNMENT_ID, 10),
+      parseInt(String(ENV.COURSE_ID), 10),
+      parseInt(String(ENV.ASSIGNMENT_ID), 10),
     )
   }
 })
@@ -442,6 +472,7 @@ if (ENV.FEATURES.lti_asset_processor) {
   ready(() => {
     createOrUpdateRoot(
       'assignment_asset_processor_eula',
+      // @ts-expect-error
       <AssignmentAssetProcessorEula launches={ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS} />,
     )
   })

@@ -22,7 +22,7 @@ import {cleanup} from '@testing-library/react'
 import {isAccessible} from '@canvas/test-utils/assertions'
 
 describe('SpeedgraderLinkView', () => {
-  let model, container
+  let model: InstanceType<typeof Assignment>, container: HTMLDivElement
 
   beforeEach(() => {
     // Set up document for accessibility testing
@@ -44,6 +44,7 @@ describe('SpeedgraderLinkView', () => {
         <li id="assignment-speedgrader-link" class="hidden"></li>
       </ul>
     `
+    // @ts-expect-error
     new SpeedgraderLinkView({
       model,
       el: document.querySelector('#assignment-speedgrader-link'),
@@ -58,15 +59,17 @@ describe('SpeedgraderLinkView', () => {
   it('should be accessible', async () => {
     const element = document.querySelector('#assignment-speedgrader-link')
     expect(element).not.toBeNull()
-    await isAccessible(element, {a11yReport: true})
+    await isAccessible(element!, {a11yReport: true})
   })
 
   it('toggles visibility of speedgrader link on change', () => {
     const speedgraderLink = document.querySelector('#assignment-speedgrader-link')
-    expect(speedgraderLink.classList.contains('hidden')).toBe(true)
+    expect(speedgraderLink!.classList.contains('hidden')).toBe(true)
+    // @ts-expect-error - Backbone model .set() not in Assignment type declarations
     model.set('published', true)
-    expect(speedgraderLink.classList.contains('hidden')).toBe(false)
+    expect(speedgraderLink!.classList.contains('hidden')).toBe(false)
+    // @ts-expect-error - Backbone model .set() not in Assignment type declarations
     model.set('published', false)
-    expect(speedgraderLink.classList.contains('hidden')).toBe(true)
+    expect(speedgraderLink!.classList.contains('hidden')).toBe(true)
   })
 })

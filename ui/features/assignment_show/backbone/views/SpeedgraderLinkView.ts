@@ -19,14 +19,18 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 
+// @ts-expect-error
 extend(SpeedgraderLinkView, Backbone.View)
 
-function SpeedgraderLinkView() {
+// @ts-expect-error
+function SpeedgraderLinkView(this: any) {
   this.toggleSpeedgraderLink = this.toggleSpeedgraderLink.bind(this)
+  // @ts-expect-error
   return SpeedgraderLinkView.__super__.constructor.apply(this, arguments)
 }
 
 SpeedgraderLinkView.prototype.initialize = function () {
+  // @ts-expect-error
   SpeedgraderLinkView.__super__.initialize.apply(this, arguments)
   return this.model.on('change:published', this.toggleSpeedgraderLink)
 }
