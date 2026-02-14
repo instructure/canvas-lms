@@ -25,7 +25,11 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('groups')
 
-const GroupCategoryProgress = props => {
+type Props = {
+  progressPercent: number
+}
+
+const GroupCategoryProgress = (props: Props) => {
   return (
     <Flex justifyItems="center">
       <Flex.Item>
@@ -34,6 +38,7 @@ const GroupCategoryProgress = props => {
             <ProgressBar
               label={I18n.t('Percent complete')}
               size="large"
+              // @ts-expect-error - formatValueText prop works at runtime but not in types
               formatValueText={() =>
                 I18n.t('%{progress} percent', {progress: props.progressPercent})
               }

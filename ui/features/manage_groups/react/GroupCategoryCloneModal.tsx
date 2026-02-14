@@ -26,25 +26,44 @@ import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {captureException} from '@sentry/react'
-import {shape, string} from 'prop-types'
 import React, {useEffect, useState, useRef} from 'react'
 
 const I18n = createI18nScope('groups')
 
-GroupCategoryCloneModal.propTypes = {
-  groupCategory: shape({
-    id: string,
-    name: string,
-  }),
+type GroupCategory = {
+  id: string
+  name: string
+}
+
+type Props = {
+  groupCategory: GroupCategory
+  open: boolean
+  onDismiss: () => void
+}
+
+type ApiResponse = {
+  json: {
+    group_category: {
+      id: string
+    }
+  }
+}
+
+type MessageType = {
+  type: 'newError' | 'error' | 'hint' | 'success' | 'screenreader-only'
+  text: string
 }
 
 export const CATEGORY_NAME_MAX_LENGTH = 255
 
-export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) {
+export default function GroupCategoryCloneModal({
+  groupCategory,
+  ...modalProps
+}: Props): JSX.Element {
   const [name, setName] = useState('')
-  const [status, setStatus] = useState(null)
-  const [categoryNameMessages, setCategoryNameMessages] = useState([])
-  const categoryNameRef = useRef(null)
+  const [status, setStatus] = useState<'info' | 'error' | undefined>(undefined)
+  const [categoryNameMessages, setCategoryNameMessages] = useState<MessageType[]>([])
+  const categoryNameRef = useRef<TextInput | null>(null)
 
   useEffect(() => {
     if (groupCategory.name)
@@ -56,7 +75,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
   }, [groupCategory.name, modalProps.open])
 
   function handleSend() {
-    const categoryNameErrors = []
+    const categoryNameErrors: MessageType[] = []
     const trimmedName = name.trim()
     if (!trimmedName.length) {
       categoryNameErrors.push({type: 'newError', text: I18n.t('Group set name is required')})
@@ -75,6 +94,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
 
     setStatus('info')
     startSendOperation(trimmedName)
+      // @ts-expect-error - doFetchApi returns untyped result
       .then(res => notifyDidSave(res))
       .catch(err => {
         console.error(err)
@@ -84,7 +104,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
       })
   }
 
-  function startSendOperation(name) {
+  function startSendOperation(name: string) {
     const path = `/group_categories/${groupCategory.id}/clone_with_name`
     return doFetchApi({
       method: 'POST',
@@ -93,26 +113,26 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
     })
   }
 
-  function refreshGroupSet(res) {
+  function refreshGroupSet(res: ApiResponse) {
     window.location.hash = `#tab-${res.json.group_category.id}`
     reloadWindow()
   }
 
-  function notifyDidSave(res) {
+  function notifyDidSave(res: ApiResponse) {
     showFlashSuccess(I18n.t('Group set cloned successfully'))()
     modalProps.onDismiss()
     refreshGroupSet(res)
   }
 
   function resetState() {
-    setStatus(null)
+    setStatus(undefined)
   }
 
-  function handleCategoryNameRef(ref) {
+  function handleCategoryNameRef(ref: TextInput | null) {
     categoryNameRef.current = ref
   }
 
-  function handleCategoryNameChange(value) {
+  function handleCategoryNameChange(value: string) {
     setName(value)
     setCategoryNameMessages([])
   }
@@ -153,23 +173,26 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
 
   return (
     <CanvasModal
+      label={I18n.t('Clone Group Set')}
       size="small"
       shouldCloseOnDocumentClick={false}
       footer={<Footer />}
       {...modalProps}
     >
-      {alert}
-      <TextInput
-        id="cloned_category_name"
-        data-testid="cloned_category_name_input"
-        renderLabel={I18n.t('Group Set Name')}
-        placeholder={I18n.t('Name')}
-        value={name}
-        onChange={(_event, value) => handleCategoryNameChange(value)}
-        isRequired={true}
-        messages={categoryNameMessages}
-        ref={ref => handleCategoryNameRef(ref)}
-      />
+      <>
+        {alert}
+        <TextInput
+          id="cloned_category_name"
+          data-testid="cloned_category_name_input"
+          renderLabel={I18n.t('Group Set Name')}
+          placeholder={I18n.t('Name')}
+          value={name}
+          onChange={(_event, value) => handleCategoryNameChange(value)}
+          isRequired={true}
+          messages={categoryNameMessages}
+          ref={ref => handleCategoryNameRef(ref)}
+        />
+      </>
     </CanvasModal>
   )
 }

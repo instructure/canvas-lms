@@ -19,7 +19,6 @@
 import {chunk} from 'es-toolkit/compat'
 import React, {useEffect, useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -35,24 +34,39 @@ import {captureException} from '@sentry/react'
 
 const I18n = createI18nScope('groups')
 
-GroupCategoryMessageAllUnassignedModal.propTypes = {
-  groupCategory: shape({name: string.isRequired}),
-  recipients: arrayOf(shape({id: string.isRequired, short_name: string.isRequired})),
-  open: bool.isRequired,
-  onDismiss: func.isRequired,
+type GroupCategory = {
+  name: string
+}
+
+type Recipient = {
+  id: string
+  short_name: string
+}
+
+type Props = {
+  groupCategory: GroupCategory
+  recipients: Recipient[]
+  open: boolean
+  onDismiss: () => void
+}
+
+type MessageType = {
+  type: 'newError' | 'error' | 'hint' | 'success' | 'screenreader-only'
+  text: string
 }
 
 export default function GroupCategoryMessageAllUnassignedModal({
   groupCategory,
   recipients,
   ...modalProps
-}) {
+}: Props): JSX.Element {
   const [message, setMessage] = useState('')
-  const [errorMessage, setErrorMessage] = useState([])
-  const [status, setStatus] = useState(null)
-  const messageTextAreaRef = useRef(null)
+  const [errorMessage, setErrorMessage] = useState<MessageType[]>([])
+  const [status, setStatus] = useState<'info' | 'error' | undefined>(undefined)
+  const messageTextAreaRef = useRef<TextArea | null>(null)
 
   const contextAssetString = ENV.context_asset_string
+  // @ts-expect-error - MAX_GROUP_CONVERSATION_SIZE is a page-specific ENV property
   const chunkSize = ENV.MAX_GROUP_CONVERSATION_SIZE || 100
 
   const payload = {
@@ -67,7 +81,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
 
   function resetState() {
     setMessage('')
-    setStatus(null)
+    setStatus(undefined)
   }
 
   function handleSend() {
@@ -78,7 +92,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
     }
     setStatus('info')
     const chunks = chunk(payload.recipients, chunkSize)
-    const promiseArray = []
+    const promiseArray: Promise<unknown>[] = []
 
     chunks.forEach(chunk => {
       const chunkData = {...payload, recipients: chunk}
@@ -149,34 +163,36 @@ export default function GroupCategoryMessageAllUnassignedModal({
       footer={<Footer />}
       {...modalProps}
     >
-      <FormFieldGroup
-        description={I18n.t('Recipients: Students who have not joined a group')}
-        layout="stacked"
-        rowSpacing="small"
-      >
-        <Flex>
-          <Flex.Item>{renderSelectedUserTags()}</Flex.Item>
-        </Flex>
-        <TextArea
-          id="message_all_unassigned"
-          data-testid="message_all_unassigned_textarea"
-          ref={ref => (messageTextAreaRef.current = ref)}
-          label={
-            <ScreenReaderContent>
-              {I18n.t('Required input. Message all unassigned students.')}
-            </ScreenReaderContent>
-          }
-          placeholder={I18n.t('Type message here...')}
-          height="200px"
-          value={message}
-          messages={errorMessage}
-          onChange={e => {
-            setErrorMessage([])
-            setMessage(e.target.value)
-          }}
-        />
-      </FormFieldGroup>
-      {alert}
+      <>
+        <FormFieldGroup
+          description={I18n.t('Recipients: Students who have not joined a group')}
+          layout="stacked"
+          rowSpacing="small"
+        >
+          <Flex>
+            <Flex.Item>{renderSelectedUserTags()}</Flex.Item>
+          </Flex>
+          <TextArea
+            id="message_all_unassigned"
+            data-testid="message_all_unassigned_textarea"
+            ref={ref => (messageTextAreaRef.current = ref)}
+            label={
+              <ScreenReaderContent>
+                {I18n.t('Required input. Message all unassigned students.')}
+              </ScreenReaderContent>
+            }
+            placeholder={I18n.t('Type message here...')}
+            height="200px"
+            value={message}
+            messages={errorMessage}
+            onChange={e => {
+              setErrorMessage([])
+              setMessage(e.target.value)
+            }}
+          />
+        </FormFieldGroup>
+        {alert}
+      </>
     </CanvasModal>
   )
 }
