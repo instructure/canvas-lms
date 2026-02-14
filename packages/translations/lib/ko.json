@@ -68,6 +68,12 @@
     "all_apps_a50dea49": {
         "message": "모든 앱"
     },
+    "allow_media_download_16dcf2bd": {
+        "message": "미디어 다운로드 허용"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "대화 기록 다운로드 허용"
+    },
     "alpha_15d59033": {
         "message": "알파"
     },
@@ -269,6 +275,9 @@
     "change_text_color_1aecb912": {
         "message": "텍스트 색 변경"
     },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "이 페이지를 저장한 후에 변경 사항이 적용됩니다."
+    },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "변경한 사항은 저장되지 않을 수 있습니다."
     },
@@ -346,6 +355,9 @@
     },
     "clubs_suit_c1ffedff": {
         "message": "클럽(슈트)"
+    },
+    "collab_575ac7bc": {
+        "message": "공동 작업"
     },
     "collaborations_5c56c15f": {
         "message": "공동 작업"
@@ -704,6 +716,9 @@
     "embed_image_1080badc": {
         "message": "이미지 포함"
     },
+    "embed_options_44c4cba8": {
+        "message": "포함 옵션"
+    },
     "embed_video_a97a64af": {
         "message": "동영상 포함"
     },
@@ -832,6 +847,12 @@
     },
     "file_name_8fd421ff": {
         "message": "파일 이름"
+    },
+    "file_preview_21667a6e": {
+        "message": "파일 미리 보기"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "{ fileName }의 파일 미리 보기"
     },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "파일 스토리지 할당량 초과"
@@ -1271,6 +1292,9 @@
     "latvian_2bbb6aab": {
         "message": "라트비아어"
     },
+    "learn_ad3b3505": {
+        "message": "학습"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "인접한 링크에 대해 자세히 알아보기"
     },
@@ -1415,6 +1439,9 @@
     "loading_preview_9f077aa1": {
         "message": "미리 보기 로드"
     },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "속도를 1x로 잠금"
+    },
     "locked_762f138b": {
         "message": "잠김"
     },
@@ -1459,6 +1486,9 @@
     },
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "미디어 파일을 처리 중입니다. 나중에 다시 시도하세요."
+    },
+    "media_options_saved_560c4ec8": {
+        "message": "미디어 옵션을 저장했습니다."
     },
     "media_title_2112243b": {
         "message": "미디어 제목"
@@ -1697,6 +1727,9 @@
     "operators_a2ef9a93": {
         "message": "연산자"
     },
+    "options_3ab0ea65": {
+        "message": "옵션"
+    },
     "or_9b70ccaa": {
         "message": "또는"
     },
@@ -1823,6 +1856,9 @@
     "please_enter_a_file_name_f159edc1": {
         "message": "파일 이름을 입력하세요"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "지원되는 플랫폼에서 유효한 동영상 URL을 입력하세요."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "지원하는 유형의 파일을 선택하세요"
     },
@@ -1945,6 +1981,12 @@
     },
     "religion_icon_246e0be1": {
         "message": "종교 아이콘"
+    },
+    "remove_f47dc62a": {
+        "message": "제거"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "{ filename } 제거"
     },
     "remove_heading_style_5fdc8855": {
         "message": "머리글 스타일 제거"
@@ -2465,6 +2507,9 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "동여상은 브라우저에서 정확한 제목을 표시할 것이지만 데이터베이스에서 업데이트하지 못했습니다."
     },
+    "thumbnail_e0de666f": {
+        "message": "썸네일"
+    },
     "timebar_a4d18443": {
         "message": "시간 표시줄"
     },
@@ -2690,6 +2735,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "{ title }의 동영상 플레이어"
     },
+    "video_url_889d3263": {
+        "message": "동영상 URL"
+    },
     "vietnamese_e7a76583": {
         "message": "베트남어"
     },
@@ -2815,6 +2863,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "웹캠이 이미 사용 중일 수 있습니다."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "YouTube 포함 URL"
     },
     "zeta_5ef24f0e": {
         "message": "제타"

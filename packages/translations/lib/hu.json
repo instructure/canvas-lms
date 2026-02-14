@@ -758,6 +758,9 @@
     "f_function_fe422d65": {
         "message": "F (függvény)"
     },
+    "failed_276786d": {
+        "message": "Sikertelen"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Nem sikerült beolvasni a fájl tartalmát"
     },
