@@ -17,6 +17,7 @@
  */
 
 import {start} from '../index'
+import {fakeAxios} from '../components/__tests__/utils'
 
 describe('start', () => {
   beforeEach(() => {
@@ -33,11 +34,6 @@ describe('start', () => {
     const fixtures = document.createElement('div')
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
-
-    const fakeAxios = {
-      put: vi.fn(() => ({then() {}})),
-      get: vi.fn(() => ({then() {}})),
-    }
 
     expect(() => {
       start(fixtures, {

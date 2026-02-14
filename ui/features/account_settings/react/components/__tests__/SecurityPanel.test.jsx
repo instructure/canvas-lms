@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent} from '@testing-library/react'
+import {fireEvent, waitFor} from '@testing-library/react'
 import {ConnectedSecurityPanel} from '../SecurityPanel'
 import {renderWithRedux} from './utils'
 
@@ -36,29 +36,38 @@ describe('ConnectedSecurityPanel', () => {
     }
   })
 
-  it('updates CSP enabled status when the checkbox is clicked', () => {
+  it('updates CSP enabled status when the checkbox is clicked', async () => {
     const {getByLabelText} = renderWithRedux(<ConnectedSecurityPanel {...defaultProps} />)
 
+    await waitFor(() => {
+      expect(getByLabelText('Enable Content Security Policy')).toBeInTheDocument()
+    })
     const checkbox = getByLabelText('Enable Content Security Policy')
     fireEvent.click(checkbox)
     expect(checkbox.checked).toBeTruthy()
   })
 
   describe('isSubAccount prop', () => {
-    it('updates CSP inherited status when the inherit checkbox is clicked', () => {
+    it('updates CSP inherited status when the inherit checkbox is clicked', async () => {
       const {getByLabelText} = renderWithRedux(
         <ConnectedSecurityPanel {...defaultProps} isSubAccount={true} />,
       )
 
+      await waitFor(() => {
+        expect(getByLabelText('Inherit Content Security Policy')).toBeInTheDocument()
+      })
       const checkbox = getByLabelText('Inherit Content Security Policy')
       fireEvent.click(checkbox)
       expect(checkbox.checked).toBeTruthy()
     })
 
-    it('disables the enable checkbox when the inherit option is set to true', () => {
+    it('disables the enable checkbox when the inherit option is set to true', async () => {
       const {getByLabelText} = renderWithRedux(
         <ConnectedSecurityPanel {...defaultProps} isSubAccount={true} />,
       )
+      await waitFor(() => {
+        expect(getByLabelText('Inherit Content Security Policy')).toBeInTheDocument()
+      })
 
       const checkbox = getByLabelText('Inherit Content Security Policy')
       fireEvent.click(checkbox)

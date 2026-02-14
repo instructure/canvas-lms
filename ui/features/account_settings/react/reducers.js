@@ -28,8 +28,9 @@ import {
   SET_CSP_INHERITED,
   SET_CSP_INHERITED_OPTIMISTIC,
   SET_DIRTY,
-  COPY_INHERITED_SUCCESS,
-  WHITELISTS_LOADED,
+  COPY_INHERITED,
+  SET_ERROR,
+  SET_CSP_SETTINGS,
 } from './actions'
 
 export function cspEnabled(state = false, action) {
@@ -37,6 +38,8 @@ export function cspEnabled(state = false, action) {
     case SET_CSP_ENABLED:
     case SET_CSP_ENABLED_OPTIMISTIC:
       return action.payload
+    case SET_CSP_SETTINGS:
+      return action.payload.enabled !== undefined ? action.payload.enabled : state
     default:
       return state
   }
@@ -47,6 +50,12 @@ export function cspInherited(state = false, action) {
     case SET_CSP_INHERITED:
     case SET_CSP_INHERITED_OPTIMISTIC:
       return action.payload
+    case SET_CSP_SETTINGS:
+      if (action.payload.inherited !== undefined && action.payload.isSubAccount) {
+        return action.payload.inherited
+      } else {
+        return state
+      }
     default:
       return state
   }
@@ -63,7 +72,16 @@ export function isDirty(state = false, action) {
 
 export function whitelistsHaveLoaded(state = false, action) {
   switch (action.type) {
-    case WHITELISTS_LOADED:
+    case SET_CSP_SETTINGS:
+      return action.payload.domains ? true : state
+    default:
+      return state
+  }
+}
+
+export function errorType(state = '', action) {
+  switch (action.type) {
+    case SET_ERROR:
       return action.payload
     default:
       return state
@@ -73,6 +91,25 @@ export function whitelistsHaveLoaded(state = false, action) {
 function getInheritedList(toolsWhiteList, effectiveWhitelist) {
   const toolsKeys = Object.keys(toolsWhiteList)
   return effectiveWhitelist.filter(domain => !toolsKeys.includes(domain))
+}
+
+function generateDomainArray(state, domains, reset) {
+  const newState = {...state}
+  Object.keys(domains).forEach(domainType => {
+    if (domainType === 'tools') {
+      Object.keys(domains[domainType]).forEach(x => {
+        newState[domainType][x] = domains[domainType][x]
+      })
+    } else {
+      const uniqueDomains = reset ? new Set() : new Set(state[domainType])
+      domains[domainType].forEach(x => uniqueDomains.add(x))
+      newState[domainType] = Array.from(uniqueDomains)
+    }
+  })
+  if (newState.tools && newState.effective) {
+    newState.inherited = getInheritedList(newState.tools, newState.effective)
+  }
+  return newState
 }
 
 export function whitelistedDomains(
@@ -91,22 +128,13 @@ export function whitelistedDomains(
       return newState
     }
     case ADD_DOMAIN_BULK: {
-      const newState = {...state}
-      Object.keys(action.payload).forEach(domainType => {
-        if (domainType === 'tools') {
-          Object.keys(action.payload[domainType]).forEach(x => {
-            newState[domainType][x] = action.payload[domainType][x]
-          })
-        } else {
-          const uniqueDomains = action.reset ? new Set() : new Set(state[domainType])
-          action.payload[domainType].forEach(x => uniqueDomains.add(x))
-          newState[domainType] = Array.from(uniqueDomains)
-        }
-      })
-      if (newState.tools && newState.effective) {
-        newState.inherited = getInheritedList(newState.tools, newState.effective)
+      return generateDomainArray(state, action.payload, action.reset)
+    }
+    case SET_CSP_SETTINGS: {
+      if (action.payload.domains) {
+        return generateDomainArray(state, action.payload.domains, action.reset)
       }
-      return newState
+      return state
     }
     case REMOVE_DOMAIN:
     case REMOVE_DOMAIN_OPTIMISTIC: {
@@ -123,7 +151,7 @@ export function whitelistedDomains(
       return newState
     }
 
-    case COPY_INHERITED_SUCCESS: {
+    case COPY_INHERITED: {
       const newState = {...state}
       newState.account = action.payload
       return newState
@@ -140,4 +168,5 @@ export default combineReducers({
   isDirty,
   whitelistedDomains,
   whitelistsHaveLoaded,
+  errorType,
 })

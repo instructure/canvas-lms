@@ -24,6 +24,7 @@ export const defaultState = {
   cspEnabled: false,
   cspInherited: false,
   isDirty: false,
+  errorType: '',
   whitelistsHaveLoaded: false,
   whitelistedDomains: {
     account: [],

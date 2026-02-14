@@ -26,14 +26,10 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {
-  getCspEnabled,
-  setCspEnabled,
-  getCurrentWhitelist,
-  getCspInherited,
-  setCspInherited,
-} from '../actions'
+import {getCspSettings, setCspEnabled, setCspInherited, setErrorType} from '../actions'
 import {ConnectedWhitelist} from './Whitelist'
+import {Alert} from '@instructure/ui-alerts'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('security_panel')
 
@@ -43,16 +39,15 @@ export class SecurityPanel extends Component {
     contextId: string.isRequired,
     cspEnabled: bool.isRequired,
     cspInherited: bool.isRequired,
-    getCspEnabled: func.isRequired,
+    getCspSettings: func.isRequired,
     setCspEnabled: func.isRequired,
-    getCspInherited: func.isRequired,
     setCspInherited: func.isRequired,
-    getCurrentWhitelist: func.isRequired,
+    setErrorType: func.isRequired,
+    errorType: string,
     isSubAccount: bool,
     whitelistsHaveLoaded: bool,
     maxDomains: number.isRequired,
     accountId: string.isRequired,
-    liveRegion: arrayOf(element).isRequired,
   }
 
   static defaultProps = {
@@ -68,14 +63,56 @@ export class SecurityPanel extends Component {
   }
 
   componentDidMount() {
-    this.props.getCspEnabled(this.props.context, this.props.contextId)
-    this.props.getCurrentWhitelist(this.props.context, this.props.contextId)
-    if (this.props.isSubAccount) {
-      this.props.getCspInherited(this.props.context, this.props.contextId)
+    this.props.getCspSettings(this.props.context, this.props.contextId, this.props.isSubAccount)
+  }
+
+  componentDidUpdate(prevProps) {
+    // all put/post/delete errors should be flash errors
+    const renderAsFlashAlert =
+      this.props.errorType !== '' &&
+      this.props.errorType !== 'GET_CSP_SETTINGS' &&
+      prevProps.errorType !== this.props.errorType
+    if (renderAsFlashAlert) {
+      let errorMessage = ''
+      switch (this.props.errorType) {
+        case 'SET_CSP_ENABLED':
+          errorMessage = I18n.t('Failed to update Content Security Policy')
+          break
+        case 'SET_CSP_INHERITED':
+          errorMessage = I18n.t('Failed to update Content Security Policy inheritance')
+          break
+        case 'ADD_DOMAIN':
+          errorMessage = I18n.t('Failed to add to allowed domains')
+          break
+        case 'REMOVE_DOMAIN':
+          errorMessage = I18n.t('Failed to remove from allowed domains')
+          break
+        case 'COPY_INHERITED':
+          errorMessage = I18n.t('Failed to copy inherited domains')
+          break
+        default:
+          errorMessage = I18n.t('An error has occurred')
+      }
+      showFlashError(errorMessage)()
+      this.props.setErrorType('')
     }
   }
 
   render() {
+    // If we failed to load the settings, we should show an error message instead of the panel
+    if (this.props.errorType !== '' && this.props.errorType === 'GET_CSP_SETTINGS') {
+      return (
+        <View as="div" margin="large" textAlign="center">
+          <Alert variant="error">{I18n.t('Failed to load Content Security Policy settings')}</Alert>
+        </View>
+      )
+    } else if (!this.props.whitelistsHaveLoaded) {
+      return (
+        <View as="div" margin="large" textAlign="center">
+          <Spinner size="large" renderTitle={I18n.t('Loading')} />
+        </View>
+      )
+    }
     return (
       <div>
         <Heading margin="small 0" level="h3" as="h2" border="bottom">
@@ -119,21 +156,14 @@ export class SecurityPanel extends Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Col>
-              {!this.props.whitelistsHaveLoaded ? (
-                <View as="div" margin="large" padding="large" textAlign="center">
-                  <Spinner size="large" renderTitle={I18n.t('Loading')} />
-                </View>
-              ) : (
-                <ConnectedWhitelist
-                  context={this.props.context}
-                  contextId={this.props.contextId}
-                  isSubAccount={this.props.isSubAccount}
-                  inherited={this.props.cspInherited}
-                  maxDomains={this.props.maxDomains}
-                  accountId={this.props.accountId}
-                  liveRegion={this.props.liveRegion}
-                />
-              )}
+              <ConnectedWhitelist
+                context={this.props.context}
+                contextId={this.props.contextId}
+                isSubAccount={this.props.isSubAccount}
+                inherited={this.props.cspInherited}
+                maxDomains={this.props.maxDomains}
+                accountId={this.props.accountId}
+              />
             </Grid.Col>
           </Grid.Row>
         </Grid>
@@ -148,15 +178,15 @@ function mapStateToProps(state, ownProps) {
     cspEnabled: state.cspEnabled,
     cspInherited: state.cspInherited,
     whitelistsHaveLoaded: state.whitelistsHaveLoaded,
+    errorType: state.errorType,
   }
 }
 
 const mapDispatchToProps = {
-  getCspEnabled,
+  getCspSettings,
   setCspEnabled,
-  getCspInherited,
   setCspInherited,
-  getCurrentWhitelist,
+  setErrorType,
 }
 
 export const ConnectedSecurityPanel = connect(mapStateToProps, mapDispatchToProps)(SecurityPanel)

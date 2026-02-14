@@ -262,29 +262,18 @@ $(document).ready(function () {
     const splitContext = window.ENV.context_asset_string.split('_')
     const api = axios.create({})
 
-    api
-      .get(`/api/v1/${splitContext[0]}s/${splitContext[1]}/csp_settings`)
-      .then(() => {
-        import(
-          /* webpackChunkName: "[request]" */
-          '../react/index'
-        )
-          .then(({start}) => {
-            start(document.getElementById('tab-security-mount'), {
-              context: splitContext[0],
-              contextId: splitContext[1],
-              isSubAccount: !ENV.ACCOUNT.root_account,
-              initialCspSettings: ENV.CSP,
-              liveRegion: [
-                document.getElementById('flash_message_holder'),
-                document.getElementById('flash_screenreader_holder'),
-              ],
-              api,
-            })
-          })
-          .catch(() => {
-            $('#tab-security-mount').text(I18n.t('Security Tab failed to load.'))
-          })
+    import(
+      /* webpackChunkName: "[request]" */
+      '../react/index'
+    )
+      .then(({start}) => {
+        start(document.getElementById('tab-security-mount'), {
+          context: splitContext[0],
+          contextId: splitContext[1],
+          isSubAccount: !ENV.ACCOUNT.root_account,
+          initialCspSettings: ENV.CSP,
+          api,
+        })
       })
       .catch(() => {
         $('#tab-security-mount').text(I18n.t('Security Tab failed to load.'))
