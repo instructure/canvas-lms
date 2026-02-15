@@ -21,10 +21,11 @@ import {render} from '@testing-library/react'
 import ChildChangeLog from '../ChildChangeLog'
 import loadStates from '@canvas/blueprint-courses/react/loadStates'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
+import type {Migration, LoadState} from '@canvas/blueprint-courses/react/types'
 
 const defaultProps = () => ({
-  status: loadStates.states.not_loaded,
-  migration: getSampleData().history[0],
+  status: 'not_loaded' as LoadState,
+  migration: getSampleData().history[0] as Migration,
 })
 
 describe('ChildChangeLog component', () => {
@@ -36,7 +37,7 @@ describe('ChildChangeLog component', () => {
 
   test('renders loading indicator if in loading state', () => {
     const props = defaultProps()
-    props.status = loadStates.states.loading
+    props.status = 'loading' as LoadState
     const {container} = render(<ChildChangeLog {...props} />)
     const node = container.querySelector('.bcc__change-log__loading')
     expect(node).toBeInTheDocument()
@@ -44,7 +45,7 @@ describe('ChildChangeLog component', () => {
 
   test('renders history item when in loaded state', () => {
     const props = defaultProps()
-    props.status = loadStates.states.loaded
+    props.status = 'loaded' as LoadState
     const {container} = render(<ChildChangeLog {...props} />)
     const node = container.querySelector('.bcs__history-item')
     expect(node).toBeInTheDocument()
@@ -52,7 +53,7 @@ describe('ChildChangeLog component', () => {
 
   test('does not render history item when in loading state', () => {
     const props = defaultProps()
-    props.status = loadStates.states.loading
+    props.status = 'loading' as LoadState
     const {container} = render(<ChildChangeLog {...props} />)
     const node = container.querySelector('.bcs__history-item')
     expect(node).not.toBeInTheDocument()

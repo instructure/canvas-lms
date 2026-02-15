@@ -22,18 +22,18 @@ import cx from 'classnames'
 
 import {Text} from '@instructure/ui-text'
 
-import propTypes from '@canvas/blueprint-courses/react/propTypes'
+import type {Term, CourseInfo} from '@canvas/blueprint-courses/react/types'
 
 const I18n = createI18nScope('blueprint_MasterChildStack')
 
-export default class MasterChildStack extends Component {
-  static propTypes = {
-    terms: propTypes.termList.isRequired,
-    child: propTypes.courseInfo.isRequired,
-    master: propTypes.courseInfo.isRequired,
-  }
+export interface MasterChildStackProps {
+  terms: Term[]
+  child: CourseInfo
+  master: CourseInfo
+}
 
-  renderBox(course, isMaster) {
+export default class MasterChildStack extends Component<MasterChildStackProps> {
+  renderBox(course: CourseInfo, isMaster: boolean): React.JSX.Element {
     const term = this.props.terms.find(t => t.id === course.enrollment_term_id)
     const termName = term ? term.name : ''
     const classes = cx('bcc__master-child-stack__box', {
@@ -62,7 +62,7 @@ export default class MasterChildStack extends Component {
     )
   }
 
-  render() {
+  render(): React.JSX.Element {
     return (
       <div className="bcc__master-child-stack">
         {this.renderBox(this.props.master, true)}

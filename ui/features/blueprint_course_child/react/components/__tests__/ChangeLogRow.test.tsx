@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ChangeLogRow, {ChangeRow} from '../ChangeLogRow'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
+import type {MigrationChange} from '@canvas/blueprint-courses/react/types'
 
 describe('ChangeLogRow component', () => {
   const defaultProps = () => ({
@@ -52,13 +53,17 @@ describe('ChangeLogRow component', () => {
   })
 
   test('renders the ChangeRow component', () => {
-    const {container} = render(<ChangeRow change={getSampleData().history[0].changes[0]} />)
+    const {container} = render(
+      <ChangeRow change={getSampleData().history[0].changes[0] as MigrationChange} />,
+    )
     const node = container.querySelector('.bcs__history-item__change-log-row')
     expect(node).toBeTruthy()
   })
 
   test('renders lock icon when its a ChangeRow component', () => {
-    const {container} = render(<ChangeRow change={getSampleData().history[0].changes[0]} />)
+    const {container} = render(
+      <ChangeRow change={getSampleData().history[0].changes[0] as MigrationChange} />,
+    )
     const node = container.querySelector(
       '.bcs__history-item__content .bcs__history-item__lock-icon',
     )

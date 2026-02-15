@@ -18,61 +18,66 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
+import type {Dispatch} from 'redux'
 
 import BlueprintModal from '@canvas/blueprint-courses/react/components/BlueprintModal'
 import MasterChildStack from './MasterChildStack'
 import {ConnectedChildChangeLog as ChildChangeLog} from './ChildChangeLog'
 
 import actions from '@canvas/blueprint-courses/react/actions'
-import propTypes from '@canvas/blueprint-courses/react/propTypes'
+import type {
+  BlueprintState,
+  Term,
+  CourseInfo,
+  RouteParams,
+} from '@canvas/blueprint-courses/react/types'
 
 const I18n = createI18nScope('blueprint_coursesChildContent')
 
-export default class ChildContent extends Component {
-  static propTypes = {
-    realRef: PropTypes.func,
-    routeTo: PropTypes.func.isRequired,
-    isChangeLogOpen: PropTypes.bool.isRequired,
-    selectChangeLog: PropTypes.func.isRequired,
-    terms: propTypes.termList.isRequired,
-    childCourse: propTypes.courseInfo.isRequired,
-    masterCourse: propTypes.courseInfo.isRequired,
-  }
+export interface ChildContentProps {
+  realRef?: (ref: ChildContent | null) => void
+  routeTo: (path: string) => void
+  isChangeLogOpen: boolean
+  selectChangeLog: (params: RouteParams | null) => void
+  terms: Term[]
+  childCourse: CourseInfo
+  masterCourse: CourseInfo
+}
 
+export default class ChildContent extends Component<ChildContentProps> {
   static defaultProps = {
     realRef: () => {},
   }
 
-  componentDidMount() {
-    this.props.realRef(this)
+  componentDidMount(): void {
+    this.props.realRef?.(this)
   }
 
-  componentDidUpdate(prevProps /* , prevState */) {
+  componentDidUpdate(prevProps: ChildContentProps): void {
     // it's awkward to reach outside the component to give the Modal's trigger
     // focus when it closes but the way our opening is decoupled from the button
     // through 'router' makes that impossible
     if (prevProps.isChangeLogOpen && !this.props.isChangeLogOpen) {
-      const infoButton = document.querySelector('.blueprint_information_button')
+      const infoButton = document.querySelector<HTMLElement>('.blueprint_information_button')
       if (infoButton) infoButton.focus()
     }
   }
 
-  clearRoutes = () => {
+  clearRoutes = (): void => {
     this.props.routeTo('#!/blueprint')
   }
 
-  showChangeLog(params) {
+  showChangeLog(params: RouteParams): void {
     this.props.selectChangeLog(params)
   }
 
-  hideChangeLog() {
+  hideChangeLog(): void {
     this.props.selectChangeLog(null)
   }
 
-  render() {
+  render(): React.JSX.Element {
     const {terms, childCourse, masterCourse, isChangeLogOpen} = this.props
     const childTerm = terms.find(term => term.id === childCourse.enrollment_term_id)
     const childTermName = childTerm ? childTerm.name : ''
@@ -102,11 +107,13 @@ export default class ChildContent extends Component {
   }
 }
 
-const connectState = state => ({
+const connectState = (state: BlueprintState) => ({
   isChangeLogOpen: !!state.selectedChangeLog,
   childCourse: state.course,
   masterCourse: state.masterCourse,
   terms: state.terms,
 })
-const connectActions = dispatch => bindActionCreators(actions, dispatch)
+
+const connectActions = (dispatch: Dispatch) => bindActionCreators(actions, dispatch)
+
 export const ConnectedChildContent = connect(connectState, connectActions)(ChildContent)
