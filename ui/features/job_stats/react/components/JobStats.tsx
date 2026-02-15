@@ -31,12 +31,43 @@ import StuckModal from './StuckModal'
 
 const I18n = createI18nScope('jobs_v2')
 
+export interface JobCluster {
+  id: string
+  database_server_id?: string
+  block_stranded_shard_ids: string[]
+  jobs_held_shard_ids: string[]
+  domain?: string
+  counts: {
+    running: number
+    queued: number
+    future: number
+    blocked: number
+  }
+  loading?: boolean
+  error?: Error | string | null
+  message?: string
+}
+
+interface UnstuckQueue {
+  [shard_id: string]: string
+}
+
+interface UnstuckResponse {
+  progress: {
+    url: string
+  }
+}
+
+interface ProgressResponse {
+  workflow_state: string
+}
+
 export default function JobStats() {
-  const [clusters, setClusters] = useState()
+  const [clusters, setClusters] = useState<JobCluster[] | undefined>()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState()
-  const [unstuckQueue, setUnstuckQueue] = useState({})
-  const [stuckModalShard, setStuckModalShard] = useState()
+  const [error, setError] = useState<Error | string | undefined>()
+  const [unstuckQueue, setUnstuckQueue] = useState<UnstuckQueue>({})
+  const [stuckModalShard, setStuckModalShard] = useState<JobCluster | undefined>()
 
   useFetchApi(
     {
@@ -50,37 +81,39 @@ export default function JobStats() {
   )
 
   const updateRow = useCallback(
-    (shard_id, data) => {
+    (shard_id: string, data: Partial<JobCluster>) => {
       setClusters(
-        clusters.map(cluster => (cluster.id === shard_id ? {...cluster, ...data} : cluster)),
+        clusters?.map(cluster => (cluster.id === shard_id ? {...cluster, ...data} : cluster)),
       )
     },
     [clusters],
   )
 
   const onRefresh = useCallback(
-    shard_id => {
+    (shard_id: string) => {
       updateRow(shard_id, {loading: true, error: null, message: I18n.t('Refreshing...')})
-      doFetchApi({
+      doFetchApi<JobCluster[]>({
         path: '/api/v1/jobs2/clusters',
         params: {job_shards: [shard_id]},
       })
         .then(({json}) => {
-          updateRow(shard_id, {...json[0], loading: false, error: null})
+          if (json && json[0]) {
+            updateRow(shard_id, {...json[0], loading: false, error: null})
+          }
         })
-        .catch(e => {
+        .catch((e: Error) => {
           updateRow(shard_id, {loading: false, error: e})
         })
     },
     [updateRow],
   )
 
-  const addUnstuckJob = (shard_id, progress_url) => {
+  const addUnstuckJob = (shard_id: string, progress_url: string) => {
     setUnstuckQueue({...unstuckQueue, [shard_id]: progress_url})
   }
 
   const removeUnstuckJob = useCallback(
-    shard_id => {
+    (shard_id: string) => {
       const newQueue = {...unstuckQueue}
       delete newQueue[shard_id]
       setUnstuckQueue(newQueue)
@@ -88,10 +121,11 @@ export default function JobStats() {
     [unstuckQueue],
   )
 
-  const confirmUnblock = async shard_id => {
-    const cluster = clusters.find(c => c.id === shard_id)
+  const confirmUnblock = async (shard_id: string) => {
+    const cluster = clusters?.find(c => c.id === shard_id)
     const blocked_shards =
-      cluster.block_stranded_shard_ids.length > 0 || cluster.jobs_held_shard_ids.length > 0
+      (cluster?.block_stranded_shard_ids.length ?? 0) > 0 ||
+      (cluster?.jobs_held_shard_ids.length ?? 0) > 0
     const result = await showConfirmationDialog({
       label: I18n.t('Unblock Jobs in Cluster'),
       body: (
@@ -111,21 +145,25 @@ export default function JobStats() {
           </Flex.Item>
         </Flex>
       ),
+      confirmText: I18n.t('Confirm'),
+      confirmColor: 'primary',
     })
     if (result) onUnblock(shard_id)
   }
 
-  const onUnblock = shard_id => {
+  const onUnblock = (shard_id: string) => {
     updateRow(shard_id, {loading: true, error: null, message: I18n.t('Unblocking...')})
-    doFetchApi({
+    doFetchApi<UnstuckResponse>({
       method: 'PUT',
       path: '/api/v1/jobs2/unstuck',
       params: {job_shards: [shard_id]},
     })
       .then(({json}) => {
-        addUnstuckJob(shard_id, json.progress.url)
+        if (json) {
+          addUnstuckJob(shard_id, json.progress.url)
+        }
       })
-      .catch(e => {
+      .catch((e: Error) => {
         updateRow(shard_id, {loading: false, error: e})
       })
   }
@@ -137,16 +175,16 @@ export default function JobStats() {
     const intervalId = setInterval(() => {
       for (const shard_id in unstuckQueue) {
         const progress_url = unstuckQueue[shard_id]
-        doFetchApi({
+        doFetchApi<ProgressResponse>({
           path: progress_url,
         })
           .then(({json}) => {
-            if (json.workflow_state === 'completed') {
+            if (json && json.workflow_state === 'completed') {
               removeUnstuckJob(shard_id)
               onRefresh(shard_id)
             }
           })
-          .catch(e => {
+          .catch((e: Error) => {
             removeUnstuckJob(shard_id)
             updateRow(shard_id, {loading: false, error: e})
           })
@@ -174,7 +212,7 @@ export default function JobStats() {
         <StuckModal
           shard={stuckModalShard}
           isOpen={true}
-          onClose={() => setStuckModalShard(null)}
+          onClose={() => setStuckModalShard(undefined)}
         />
       )}
     </>

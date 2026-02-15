@@ -28,11 +28,29 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Pill} from '@instructure/ui-pill'
 import CopyToClipboardButton from '@canvas/copy-to-clipboard-button'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import type {JobCluster} from './JobStats'
 
 const I18n = createI18nScope('jobs_v2')
 
-export default function JobStatsTable({clusters, onRefresh, onUnblock, onShowStuckModal}) {
-  const ShardIndicator = ({policy, shards}) => {
+interface JobStatsTableProps {
+  clusters: JobCluster[]
+  onRefresh: (shard_id: string) => void
+  onUnblock: (shard_id: string) => void
+  onShowStuckModal: (cluster: JobCluster) => void
+}
+
+interface ShardIndicatorProps {
+  policy: string
+  shards: string[]
+}
+
+export default function JobStatsTable({
+  clusters,
+  onRefresh,
+  onUnblock,
+  onShowStuckModal,
+}: JobStatsTableProps) {
+  const ShardIndicator = ({policy, shards}: ShardIndicatorProps) => {
     return (
       <>
         <Tooltip
@@ -58,7 +76,7 @@ export default function JobStatsTable({clusters, onRefresh, onUnblock, onShowStu
     )
   }
 
-  const rowName = row => row.database_server_id || row.id || 'default'
+  const rowName = (row: JobCluster) => row.database_server_id || row.id || 'default'
   const unblockText = I18n.t('Unblock')
 
   return (
@@ -123,13 +141,17 @@ export default function JobStatsTable({clusters, onRefresh, onUnblock, onShowStu
                   <IconRefreshLine />
                 </IconButton>
               </Tooltip>
-              {ENV?.manage_jobs && row.counts.blocked > 0 ? (
+              {(ENV as {manage_jobs?: boolean})?.manage_jobs && row.counts.blocked > 0 ? (
                 <Tooltip renderTip={unblockText}>
                   <IconButton
                     withBackground={false}
                     withBorder={false}
                     interaction={
-                      row.loading || row.block_stranded || row.jobs_held ? 'disabled' : 'enabled'
+                      row.loading ||
+                      row.block_stranded_shard_ids.length > 0 ||
+                      row.jobs_held_shard_ids.length > 0
+                        ? 'disabled'
+                        : 'enabled'
                     }
                     screenReaderLabel={unblockText}
                     onClick={() => onUnblock(row.id)}
