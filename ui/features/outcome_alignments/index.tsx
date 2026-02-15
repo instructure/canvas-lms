@@ -21,19 +21,31 @@ import {legacyRender} from '@canvas/react'
 import {View} from '@instructure/ui-view'
 import ready from '@instructure/ready'
 
+// @ts-expect-error - local workspace lacks module declarations for outcomes-ui
 import {AlignmentWidget} from '@instructure/outcomes-ui'
 
+type CanvasOutcomesConfig = {
+  host: string
+  jwt: string
+  context_uuid: string
+  artifact_type: string
+  artifact_id: string | number
+}
+
 ready(() => {
-  const container = document.getElementById('canvas_outcomes_alignment_widget')
-  if (ENV.canvas_outcomes && ENV.canvas_outcomes.host) {
+  const container = document.querySelector<HTMLElement>('#canvas_outcomes_alignment_widget')
+  // @ts-expect-error - page-specific ENV property for outcomes alignment widget
+  const canvasOutcomes: CanvasOutcomesConfig | undefined = ENV.canvas_outcomes
+
+  if (container && canvasOutcomes?.host) {
     legacyRender(
       <View as="div" borderWidth="small none none none" padding="medium none">
         <AlignmentWidget
-          host={ENV.canvas_outcomes.host}
-          jwt={ENV.canvas_outcomes.jwt}
-          contextUuid={ENV.canvas_outcomes.context_uuid}
-          artifactType={ENV.canvas_outcomes.artifact_type}
-          artifactId={ENV.canvas_outcomes.artifact_id}
+          host={canvasOutcomes.host}
+          jwt={canvasOutcomes.jwt}
+          contextUuid={canvasOutcomes.context_uuid}
+          artifactType={canvasOutcomes.artifact_type}
+          artifactId={canvasOutcomes.artifact_id}
         />
       </View>,
       container,
