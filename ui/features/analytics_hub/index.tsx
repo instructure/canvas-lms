@@ -19,12 +19,14 @@ import ready from '@instructure/ready'
 
 ready(() => {
   const mountPoint = document.querySelector('#content-wrapper')
+  if (!mountPoint) return
 
+  // @ts-expect-error - untyped remote module
   import('analyticshub/AnalyticsHub')
     .then(module => {
       module.render(mountPoint)
     })
-    .catch(error => {
+    .catch((error: Error) => {
       console.error('Failed to load analyticshub', error)
     })
 })
