@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import {findDOMNode} from 'react-dom'
+import ReactDOM from 'react-dom'
 import update from 'immutability-helper'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -26,45 +25,45 @@ import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker
 import numberHelper from '@canvas/i18n/numberHelper'
 import round from '@canvas/round'
 import {isEqual} from 'es-toolkit/compat'
+import type {GradingPeriodDraft} from './types'
 
 const I18n = createI18nScope('gradingPeriodForm')
 
-function roundWeight(val) {
-  const value = numberHelper.parse(val)
+interface GradingPeriodFormProps {
+  period?: Partial<GradingPeriodDraft>
+  weighted: boolean
+  disabled: boolean
+  onSave: (period: GradingPeriodDraft) => void
+  onCancel: () => void
+}
+
+interface GradingPeriodFormState {
+  period: GradingPeriodDraft
+  preserveCloseDate: boolean
+}
+
+function roundWeight(val: unknown): number | null {
+  const value = numberHelper.parse(typeof val === 'number' ? val : String(val ?? ''))
   return Number.isNaN(value) ? null : round(value, 2)
 }
 
-function buildPeriod(attr) {
+function buildPeriod(attr: Partial<GradingPeriodDraft> = {}): GradingPeriodDraft {
   return {
     id: attr.id,
-    title: attr.title,
+    title: attr.title ?? '',
     weight: roundWeight(attr.weight),
-    startDate: attr.startDate,
-    endDate: attr.endDate,
-    closeDate: attr.closeDate,
+    startDate: attr.startDate ?? null,
+    endDate: attr.endDate ?? null,
+    closeDate: attr.closeDate ?? null,
   }
 }
 
-class GradingPeriodForm extends React.Component {
-  static propTypes = {
-    period: PropTypes.shape({
-      id: PropTypes.string,
-      title: PropTypes.string.isRequired,
-      weight: PropTypes.number,
-      startDate: PropTypes.instanceOf(Date).isRequired,
-      endDate: PropTypes.instanceOf(Date).isRequired,
-      closeDate: PropTypes.instanceOf(Date),
-    }),
-    weighted: PropTypes.bool.isRequired,
-    disabled: PropTypes.bool.isRequired,
-    onSave: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
-  }
+class GradingPeriodForm extends React.Component<GradingPeriodFormProps, GradingPeriodFormState> {
+  private titleRef: HTMLInputElement | null = null
 
-  constructor(props, context) {
-    super(props, context)
-    const period = buildPeriod(props.period || {})
-    this.titleRef = null
+  constructor(props: GradingPeriodFormProps) {
+    super(props)
+    const period = buildPeriod(props.period ?? {})
 
     this.state = {
       period,
@@ -78,38 +77,38 @@ class GradingPeriodForm extends React.Component {
   }
 
   triggerSave = () => {
-    if (this.props.onSave) {
-      this.props.onSave(this.state.period)
-    }
+    this.props.onSave(this.state.period)
   }
 
   triggerCancel = () => {
-    if (this.props.onCancel) {
-      this.setState({period: buildPeriod({})}, this.props.onCancel)
-    }
+    this.setState({period: buildPeriod({})}, this.props.onCancel)
   }
 
-  hasDistinctCloseDate = ({endDate, closeDate}) => closeDate && !isEqual(endDate, closeDate)
+  hasDistinctCloseDate = ({
+    endDate,
+    closeDate,
+  }: Pick<GradingPeriodDraft, 'endDate' | 'closeDate'>) =>
+    !!closeDate && !isEqual(endDate, closeDate)
 
-  mergePeriod = attr => update(this.state.period, {$merge: attr})
+  mergePeriod = (attr: Partial<GradingPeriodDraft>) => update(this.state.period, {$merge: attr})
 
-  changeTitle = e => {
+  changeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const period = this.mergePeriod({title: e.target.value})
     this.setState({period})
   }
 
-  changeWeight = e => {
+  changeWeight = (e: React.ChangeEvent<HTMLInputElement>) => {
     const period = this.mergePeriod({weight: roundWeight(e.target.value)})
     this.setState({period})
   }
 
-  changeStartDate = date => {
+  changeStartDate = (date: Date | null) => {
     const period = this.mergePeriod({startDate: date})
     this.setState({period})
   }
 
-  changeEndDate = date => {
-    const attr = {endDate: date}
+  changeEndDate = (date: Date | null) => {
+    const attr: Partial<GradingPeriodDraft> = {endDate: date}
     if (!this.state.preserveCloseDate && !this.hasDistinctCloseDate(this.state.period)) {
       attr.closeDate = date
     }
@@ -117,29 +116,31 @@ class GradingPeriodForm extends React.Component {
     this.setState({period})
   }
 
-  changeCloseDate = date => {
+  changeCloseDate = (date: Date | null) => {
     const period = this.mergePeriod({closeDate: date})
     this.setState({period, preserveCloseDate: !!date})
   }
 
   hackTheDatepickers = () => {
     // This can be replaced when we have an extensible datepicker
-    const $form = findDOMNode(this)
-    const $appends = $form.querySelectorAll('.input-append')
-    $appends.forEach($el => {
-      $el.classList.add('ic-Input-group')
+    const formNode = ReactDOM.findDOMNode(this)
+    if (!(formNode instanceof HTMLElement)) return
+
+    const appends = formNode.querySelectorAll<HTMLElement>('.input-append')
+    appends.forEach(el => {
+      el.classList.add('ic-Input-group')
     })
 
-    const $dateFields = $form.querySelectorAll('.date_field')
-    $dateFields.forEach($el => {
-      $el.classList.remove('date_field')
-      $el.classList.add('ic-Input')
+    const dateFields = formNode.querySelectorAll<HTMLElement>('.date_field')
+    dateFields.forEach(el => {
+      el.classList.remove('date_field')
+      el.classList.add('ic-Input')
     })
 
-    const $buttons = $form.querySelectorAll('.ui-datepicker-trigger')
-    $buttons.forEach($el => {
-      $el.classList.remove('btn')
-      $el.classList.add('Button')
+    const buttons = formNode.querySelectorAll<HTMLElement>('.ui-datepicker-trigger')
+    buttons.forEach(el => {
+      el.classList.remove('btn')
+      el.classList.add('Button')
     })
   }
 
@@ -172,7 +173,7 @@ class GradingPeriodForm extends React.Component {
             id="weight"
             type="text"
             className="span1"
-            defaultValue={I18n.n(this.state.period.weight)}
+            defaultValue={this.state.period.weight == null ? '' : I18n.n(this.state.period.weight)}
             onChange={this.changeWeight}
           />
           <span className="add-on">%</span>

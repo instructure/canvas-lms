@@ -22,18 +22,22 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('SearchGradingPeriodsField')
 
-const SearchGradingPeriodsField = ({changeSearchText}) => {
-  const inputRef = useRef(null)
+interface SearchGradingPeriodsFieldProps {
+  changeSearchText: (searchText: string) => void
+}
+
+const SearchGradingPeriodsField = ({changeSearchText}: SearchGradingPeriodsFieldProps) => {
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const search = useMemo(
     () =>
-      debounce(trimmedText => {
+      debounce((trimmedText: string) => {
         changeSearchText(trimmedText)
       }, 200),
     [changeSearchText],
   )
 
-  const onChange = event => {
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const trimmedText = event.target.value.trim()
     search(trimmedText)
   }

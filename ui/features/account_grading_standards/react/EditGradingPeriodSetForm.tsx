@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {each, filter, map, isEmpty} from 'es-toolkit/compat'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
@@ -25,111 +24,124 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import EnrollmentTermInput from './EnrollmentTermInput'
 import '@canvas/rails-flash-notifications'
+import type {EnrollmentTerm, GradingPeriodSet, GradingPeriodSetEditorData} from './types'
 
 const I18n = createI18nScope('GradingPeriodSetForm')
 
-const {array, bool, func, shape, string} = PropTypes
-
-const buildSet = function (attr = {}) {
+const buildSet = function (
+  attr: Partial<GradingPeriodSetEditorData> = {},
+): GradingPeriodSetEditorData {
   return {
     id: attr.id,
-    title: attr.title || '',
+    title: attr.title ?? '',
     weighted: !!attr.weighted,
     displayTotalsForAllGradingPeriods: !!attr.displayTotalsForAllGradingPeriods,
-    enrollmentTermIDs: attr.enrollmentTermIDs || [],
+    enrollmentTermIDs: attr.enrollmentTermIDs ?? [],
   }
 }
 
-const validateSet = function (set) {
+const validateSet = function (set: GradingPeriodSetEditorData): string[] {
   if (!(set.title || '').trim()) {
     return [I18n.t('All grading period sets must have a title')]
   }
   return []
 }
 
-function replaceSetAttr(set, key, val) {
+function replaceSetAttr<K extends keyof GradingPeriodSetEditorData>(
+  set: GradingPeriodSetEditorData,
+  key: K,
+  val: GradingPeriodSetEditorData[K],
+): {set: GradingPeriodSetEditorData} {
   return {set: {...set, [key]: val}}
 }
 
-class GradingPeriodSetForm extends React.Component {
-  static propTypes = {
-    set: shape({
-      id: string,
-      title: string,
-      displayTotalsForAllGradingPeriods: bool,
-      weighted: bool,
-      enrollmentTermIDs: array,
-    }).isRequired,
-    enrollmentTerms: array.isRequired,
-    disabled: bool,
-    onSave: func.isRequired,
-    onCancel: func.isRequired,
-  }
+interface GradingPeriodSetFormProps {
+  set: GradingPeriodSet
+  enrollmentTerms: EnrollmentTerm[]
+  disabled?: boolean
+  onSave: (set: GradingPeriodSetEditorData) => void
+  onCancel: () => void
+}
 
-  constructor(props) {
+interface GradingPeriodSetFormState {
+  set: GradingPeriodSetEditorData
+}
+
+class GradingPeriodSetForm extends React.Component<
+  GradingPeriodSetFormProps,
+  GradingPeriodSetFormState
+> {
+  titleRef: React.RefObject<HTMLInputElement>
+  cancelButtonRef: Element | null
+  saveButtonRef: Element | null
+  weightedCheckbox: unknown
+  displayTotalsCheckbox: unknown
+
+  constructor(props: GradingPeriodSetFormProps) {
     super(props)
     const associatedEnrollmentTerms = filter(props.enrollmentTerms, {
       gradingPeriodGroupId: props.set.id,
     })
     const set = {
       ...props.set,
-      enrollmentTermIDs: map(associatedEnrollmentTerms, 'id'),
+      enrollmentTermIDs: map(associatedEnrollmentTerms, 'id') as string[],
     }
 
     this.state = {set: buildSet(set)}
-    this.titleRef = React.createRef()
-    this.cancelButtonRef = React.createRef()
-    this.saveButtonRef = React.createRef()
+    this.titleRef = React.createRef<HTMLInputElement>()
+    this.cancelButtonRef = null
+    this.saveButtonRef = null
+    this.weightedCheckbox = null
+    this.displayTotalsCheckbox = null
   }
 
   componentDidMount() {
     this.titleRef.current?.focus()
   }
 
-  changeTitle = e => {
+  changeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState(replaceSetAttr(this.state.set, 'title', e.target.value))
   }
 
-  changeWeighted = e => {
+  changeWeighted = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState(replaceSetAttr(this.state.set, 'weighted', e.target.checked))
   }
 
-  changeDisplayTotals = e => {
+  changeDisplayTotals = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState(
       replaceSetAttr(this.state.set, 'displayTotalsForAllGradingPeriods', e.target.checked),
     )
   }
 
-  changeEnrollmentTermIDs = termIDs => {
+  changeEnrollmentTermIDs = (termIDs: string[]) => {
     const set = {...this.state.set, enrollmentTermIDs: termIDs}
     this.setState({set})
   }
 
-  triggerSave = e => {
+  triggerSave = (e: React.SyntheticEvent<unknown>) => {
     e.preventDefault()
-    if (this.props.onSave) {
-      const validations = validateSet(this.state.set)
-      if (isEmpty(validations)) {
-        this.props.onSave(this.state.set)
-      } else {
-        each(validations, message => {
-          $.flashError(message)
-        })
-      }
+
+    const validations = validateSet(this.state.set)
+    if (isEmpty(validations)) {
+      this.props.onSave(this.state.set)
+    } else {
+      each(validations, message => {
+        $.flashError(message)
+      })
     }
   }
 
-  triggerCancel = e => {
+  triggerCancel = (e: React.SyntheticEvent<unknown>) => {
     e.preventDefault()
-    if (this.props.onCancel) {
-      this.setState({set: buildSet()}, this.props.onCancel)
-    }
+    this.setState({set: buildSet()}, this.props.onCancel)
   }
 
   renderSaveAndCancelButtons = () => (
     <div className="ic-Form-actions below-line">
       <Button
-        ref={this.cancelButtonRef}
+        elementRef={ref => {
+          this.cancelButtonRef = ref
+        }}
         disabled={this.props.disabled}
         onClick={this.triggerCancel}
       >
@@ -137,7 +149,9 @@ class GradingPeriodSetForm extends React.Component {
       </Button>
       &nbsp;
       <Button
-        ref={this.saveButtonRef}
+        elementRef={ref => {
+          this.saveButtonRef = ref
+        }}
         disabled={this.props.disabled}
         color="primary"
         onClick={this.triggerSave}

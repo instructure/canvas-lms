@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import $ from 'jquery'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
@@ -26,42 +25,33 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
+import type {GradingPeriod, Permissions} from './types'
 
 const I18n = createI18nScope('AccountGradingPeriod')
 
-export default class AccountGradingPeriod extends React.Component {
-  static propTypes = {
-    period: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      weight: PropTypes.number,
-      startDate: PropTypes.instanceOf(Date).isRequired,
-      endDate: PropTypes.instanceOf(Date).isRequired,
-      closeDate: PropTypes.instanceOf(Date).isRequired,
-    }).isRequired,
-    weighted: PropTypes.bool,
-    onEdit: PropTypes.func.isRequired,
-    actionsDisabled: PropTypes.bool,
-    readOnly: PropTypes.bool.isRequired,
-    permissions: PropTypes.shape({
-      read: PropTypes.bool.isRequired,
-      create: PropTypes.bool.isRequired,
-      update: PropTypes.bool.isRequired,
-      delete: PropTypes.bool.isRequired,
-    }).isRequired,
-    onDelete: PropTypes.func.isRequired,
-    deleteGradingPeriodURL: PropTypes.string.isRequired,
-  }
+interface AccountGradingPeriodProps {
+  period: GradingPeriod & {id: string}
+  weighted?: boolean
+  onEdit: (period: GradingPeriod) => void
+  actionsDisabled?: boolean
+  readOnly: boolean
+  permissions: Permissions
+  onDelete: (periodId: string) => void
+  deleteGradingPeriodURL: string
+}
 
-  constructor(props) {
+export default class AccountGradingPeriod extends React.Component<AccountGradingPeriodProps> {
+  _refs: Record<string, Element | null>
+
+  constructor(props: AccountGradingPeriodProps) {
     super(props)
     this._refs = {}
   }
 
-  promptDeleteGradingPeriod = event => {
+  promptDeleteGradingPeriod = (event: React.SyntheticEvent<unknown>) => {
     event.stopPropagation()
     const confirmMessage = I18n.t('Are you sure you want to delete this grading period?')
-    if (!window.confirm(confirmMessage)) return null
+    if (!window.confirm(confirmMessage)) return
     const url = replaceTags(this.props.deleteGradingPeriodURL, 'id', this.props.period.id)
 
     axios
@@ -75,7 +65,7 @@ export default class AccountGradingPeriod extends React.Component {
       })
   }
 
-  onEdit = e => {
+  onEdit = (e: React.SyntheticEvent<unknown>) => {
     e.stopPropagation()
     this.props.onEdit(this.props.period)
   }
@@ -98,6 +88,8 @@ export default class AccountGradingPeriod extends React.Component {
         </IconButton>
       )
     }
+
+    return null
   }
 
   renderDeleteButton() {
@@ -118,6 +110,8 @@ export default class AccountGradingPeriod extends React.Component {
         </IconButton>
       )
     }
+
+    return null
   }
 
   renderWeight() {
@@ -134,6 +128,8 @@ export default class AccountGradingPeriod extends React.Component {
         </div>
       )
     }
+
+    return null
   }
 
   render() {

@@ -17,27 +17,57 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import setsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
+import type {GradingPeriodSetCreateParams} from '@canvas/grading/jquery/gradingPeriodSetsApi'
+import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
 import EnrollmentTermInput from './EnrollmentTermInput'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import type {EnrollmentTerm, GradingPeriodSet, Permissions} from './types'
 
 const I18n = createI18nScope('NewGradingPeriodSetForm')
 
-export default class NewGradingPeriodSetForm extends React.Component {
-  static propTypes = {
-    enrollmentTerms: PropTypes.array.isRequired,
-    closeForm: PropTypes.func.isRequired,
-    addGradingPeriodSet: PropTypes.func.isRequired,
-    urls: PropTypes.shape({
-      gradingPeriodSetsURL: PropTypes.string.isRequired,
-    }).isRequired,
+const normalizePermissions = (value: unknown): Permissions => {
+  const source =
+    typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {}
+  return {
+    read: !!source.read,
+    create: !!source.create,
+    update: !!source.update,
+    delete: !!source.delete,
   }
+}
 
-  state = {
+interface NewGradingPeriodSetFormProps {
+  enrollmentTerms: EnrollmentTerm[]
+  closeForm: () => void
+  addGradingPeriodSet: (set: GradingPeriodSet, termIDs: string[]) => void
+  urls: {
+    gradingPeriodSetsURL: string
+  }
+}
+
+interface NewGradingPeriodSetFormState {
+  buttonsDisabled: boolean
+  title: string
+  weighted: boolean
+  displayTotalsForAllGradingPeriods: boolean
+  selectedEnrollmentTermIDs: string[]
+}
+
+export default class NewGradingPeriodSetForm extends React.Component<
+  NewGradingPeriodSetFormProps,
+  NewGradingPeriodSetFormState
+> {
+  inputRef: React.RefObject<HTMLInputElement>
+  cancelButtonRef: Element | null
+  createButtonRef: Element | null
+  weightedCheckbox: unknown
+  displayTotalsCheckbox: unknown
+
+  state: NewGradingPeriodSetFormState = {
     buttonsDisabled: false,
     title: '',
     weighted: false,
@@ -45,18 +75,20 @@ export default class NewGradingPeriodSetForm extends React.Component {
     selectedEnrollmentTermIDs: [],
   }
 
-  constructor(props) {
+  constructor(props: NewGradingPeriodSetFormProps) {
     super(props)
-    this.inputRef = React.createRef()
-    this.cancelButtonRef = React.createRef()
-    this.createButtonRef = React.createRef()
+    this.inputRef = React.createRef<HTMLInputElement>()
+    this.cancelButtonRef = null
+    this.createButtonRef = null
+    this.weightedCheckbox = null
+    this.displayTotalsCheckbox = null
   }
 
   componentDidMount() {
-    this.inputRef.current.focus()
+    this.inputRef.current?.focus()
   }
 
-  setSelectedEnrollmentTermIDs = termIDs => {
+  setSelectedEnrollmentTermIDs = (termIDs: string[]) => {
     this.setState({
       selectedEnrollmentTermIDs: termIDs,
     })
@@ -65,19 +97,19 @@ export default class NewGradingPeriodSetForm extends React.Component {
   isTitlePresent = () => {
     if (this.state.title.trim() !== '') {
       return true
-    } else {
-      showFlashAlert({type: 'error', message: I18n.t('A name for this set is required')})
-      return false
     }
+
+    showFlashAlert({type: 'error', message: I18n.t('A name for this set is required')})
+    return false
   }
 
   isValid = () => this.isTitlePresent()
 
-  submit = event => {
+  submit = (event: React.SyntheticEvent<unknown>) => {
     event.preventDefault()
     this.setState({buttonsDisabled: true}, () => {
       if (this.isValid()) {
-        const set = {
+        const set: GradingPeriodSetCreateParams = {
           title: this.state.title.trim(),
           weighted: this.state.weighted,
           displayTotalsForAllGradingPeriods: this.state.displayTotalsForAllGradingPeriods,
@@ -90,9 +122,13 @@ export default class NewGradingPeriodSetForm extends React.Component {
     })
   }
 
-  submitSucceeded = set => {
+  submitSucceeded = (set: CamelizedGradingPeriodSet) => {
+    const normalizedSet: GradingPeriodSet = {
+      ...set,
+      permissions: normalizePermissions(set.permissions),
+    }
     showFlashAlert({type: 'success', message: I18n.t('Successfully created a set')})
-    this.props.addGradingPeriodSet(set, this.state.selectedEnrollmentTermIDs)
+    this.props.addGradingPeriodSet(normalizedSet, this.state.selectedEnrollmentTermIDs)
   }
 
   submitFailed = () => {
@@ -100,15 +136,15 @@ export default class NewGradingPeriodSetForm extends React.Component {
     this.setState({buttonsDisabled: false})
   }
 
-  onSetTitleChange = event => {
+  onSetTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({title: event.target.value})
   }
 
-  onSetWeightedChange = event => {
+  onSetWeightedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({weighted: event.target.checked})
   }
 
-  onSetDisplayTotalsChanged = event => {
+  onSetDisplayTotalsChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({displayTotalsForAllGradingPeriods: event.target.checked})
   }
 
@@ -166,7 +202,9 @@ export default class NewGradingPeriodSetForm extends React.Component {
                 <Button
                   disabled={this.state.buttonsDisabled}
                   onClick={this.props.closeForm}
-                  ref={this.cancelButtonRef}
+                  elementRef={ref => {
+                    this.cancelButtonRef = ref
+                  }}
                 >
                   {I18n.t('Cancel')}
                 </Button>
@@ -175,7 +213,9 @@ export default class NewGradingPeriodSetForm extends React.Component {
                   disabled={this.state.buttonsDisabled}
                   color="primary"
                   onClick={this.submit}
-                  ref={this.createButtonRef}
+                  elementRef={ref => {
+                    this.createButtonRef = ref
+                  }}
                 >
                   {I18n.t('Create')}
                 </Button>

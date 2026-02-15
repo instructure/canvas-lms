@@ -17,7 +17,6 @@
  */
 
 import React, {useCallback, useEffect, useRef} from 'react'
-import PropTypes from 'prop-types'
 import {
   compact,
   difference,
@@ -25,10 +24,8 @@ import {
   find,
   includes,
   isDate,
-  map,
   reject,
   some,
-  sortBy,
   union,
   without,
 } from 'es-toolkit/compat'
@@ -44,14 +41,40 @@ import EnrollmentTermsDropdown from './EnrollmentTermsDropdown'
 import NewGradingPeriodSetForm from './NewGradingPeriodSetForm'
 import EditGradingPeriodSetForm from './EditGradingPeriodSetForm'
 import SetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
+import type {GradingPeriodSetUpdateParams} from '@canvas/grading/jquery/gradingPeriodSetsApi'
+import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
 import TermsApi from '../enrollmentTermsApi'
+import type {EnrollmentTerm as ApiEnrollmentTerm} from '../enrollmentTermsApi'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import {useSetState} from 'react-use'
+import type {
+  CollectionUrls,
+  EnrollmentTerm,
+  GradingPeriodSet as GradingPeriodSetData,
+  Permissions,
+} from './types'
 
 const I18n = createI18nScope('GradingPeriodSetCollection')
 
-const presentEnrollmentTerms = function (enrollmentTerms) {
-  return map(enrollmentTerms, term => {
+const normalizePermissions = (value: unknown): Permissions => {
+  const source =
+    typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {}
+
+  return {
+    read: !!source.read,
+    create: !!source.create,
+    update: !!source.update,
+    delete: !!source.delete,
+  }
+}
+
+const normalizeSet = (set: CamelizedGradingPeriodSet): GradingPeriodSetData => ({
+  ...set,
+  permissions: normalizePermissions(set.permissions),
+})
+
+const presentEnrollmentTerms = function (enrollmentTerms: EnrollmentTerm[]): EnrollmentTerm[] {
+  return enrollmentTerms.map(term => {
     const newTerm = {...term}
 
     if (newTerm.name) {
@@ -68,12 +91,32 @@ const presentEnrollmentTerms = function (enrollmentTerms) {
   })
 }
 
-const getEditGradingPeriodSetRef = function (set) {
+const getEditGradingPeriodSetRef = function (set: GradingPeriodSetData): string {
   return `edit-grading-period-set-${set.id}`
 }
 
-const GradingPeriodSetCollection = ({readOnly, urls}) => {
-  const [state, setState] = useSetState({
+interface GradingPeriodSetCollectionProps {
+  readOnly: boolean
+  urls: CollectionUrls
+}
+
+interface EditSetState {
+  id: string | null
+  saving: boolean
+}
+
+interface CollectionState {
+  enrollmentTerms: EnrollmentTerm[]
+  sets: GradingPeriodSetData[]
+  expandedSetIDs: string[]
+  showNewSetForm: boolean
+  searchText: string
+  selectedTermID: string
+  editSet: EditSetState
+}
+
+const GradingPeriodSetCollection = ({readOnly, urls}: GradingPeriodSetCollectionProps) => {
+  const [state, setState] = useSetState<CollectionState>({
     enrollmentTerms: [],
     sets: [],
     expandedSetIDs: [],
@@ -86,9 +129,8 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
     },
   })
 
-  const addSetFormButtonRef = useRef(null)
-  const newSetFormRef = useRef(null)
-  const setRefs = useRef({})
+  const addSetFormButtonRef = useRef<HTMLButtonElement | null>(null)
+  const setRefs = useRef<Record<string, unknown>>({})
 
   // TODO: use TanStack Query
   useEffect(() => {
@@ -98,15 +140,17 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   }, [])
 
   const onTermsLoaded = useCallback(
-    terms => {
+    (terms: EnrollmentTerm[]) => {
       setState({enrollmentTerms: presentEnrollmentTerms(terms)})
     },
     [setState],
   )
 
   const onSetsLoaded = useCallback(
-    sets => {
-      const sortedSets = sortBy(sets, 'createdAt').reverse()
+    (sets: CamelizedGradingPeriodSet[]) => {
+      const sortedSets = sets
+        .map(normalizeSet)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       setState({sets: sortedSets})
     },
     [setState],
@@ -114,7 +158,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
 
   const getSets = useCallback(() => {
     SetsApi.list()
-      .then(sets => {
+      .then((sets: CamelizedGradingPeriodSet[]) => {
         onSetsLoaded(sets)
       })
       .catch(_ => {
@@ -124,7 +168,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
 
   const getTerms = useCallback(() => {
     TermsApi.list()
-      .then(terms => {
+      .then((terms: ApiEnrollmentTerm[]) => {
         onTermsLoaded(terms)
       })
       .catch(_ => {
@@ -133,50 +177,47 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   }, [onTermsLoaded])
 
   const associateTermsWithSet = useCallback(
-    (setID, termIDs) =>
-      map(state.enrollmentTerms, term => {
+    (setID: string, termIDs: string[]) =>
+      state.enrollmentTerms.map(term => {
         if (includes(termIDs, term.id)) {
-          const newTerm = {...term}
-          newTerm.gradingPeriodGroupId = setID
-          return newTerm
-        } else {
-          return term
+          return {...term, gradingPeriodGroupId: setID}
         }
+
+        return term
       }),
     [state.enrollmentTerms],
   )
 
   const addGradingPeriodSet = useCallback(
-    (set, termIDs) => {
-      setState(
-        {
-          sets: [set].concat(state.sets),
-          expandedSetIDs: state.expandedSetIDs.concat([set.id]),
-          enrollmentTerms: associateTermsWithSet(set.id, termIDs),
-          showNewSetForm: false,
-        },
-        () => {
-          addSetFormButtonRef.current?.focus()
-        },
-      )
+    (set: GradingPeriodSetData, termIDs: string[]) => {
+      setState({
+        sets: [set].concat(state.sets),
+        expandedSetIDs: state.expandedSetIDs.concat([set.id]),
+        enrollmentTerms: associateTermsWithSet(set.id, termIDs),
+        showNewSetForm: false,
+      })
+
+      requestAnimationFrame(() => {
+        addSetFormButtonRef.current?.focus()
+      })
     },
     [state.sets, state.expandedSetIDs, setState, associateTermsWithSet],
   )
 
   const onSetUpdated = useCallback(
-    updatedSet => {
-      const sets = map(state.sets, set =>
-        set.id === updatedSet.id ? {...set, ...updatedSet} : set,
-      )
+    (updatedSet: GradingPeriodSetData) => {
+      const sets = state.sets.map(set => (set.id === updatedSet.id ? {...set, ...updatedSet} : set))
 
-      const terms = map(state.enrollmentTerms, term => {
-        if (includes(updatedSet.enrollmentTermIDs, term.id)) {
+      const terms = state.enrollmentTerms.map(term => {
+        if (includes(updatedSet.enrollmentTermIDs ?? [], term.id)) {
           return {...term, gradingPeriodGroupId: updatedSet.id}
-        } else if (term.gradingPeriodGroupId === updatedSet.id) {
-          return {...term, gradingPeriodGroupId: null}
-        } else {
-          return term
         }
+
+        if (term.gradingPeriodGroupId === updatedSet.id) {
+          return {...term, gradingPeriodGroupId: null}
+        }
+
+        return term
       })
 
       setState({sets, enrollmentTerms: terms})
@@ -185,20 +226,20 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
     [state.sets, state.enrollmentTerms, setState],
   )
 
-  const setAndGradingPeriodTitles = useCallback(set => {
-    const titles = map(set.gradingPeriods, 'title')
+  const setAndGradingPeriodTitles = useCallback((set: GradingPeriodSetData) => {
+    const titles = set.gradingPeriods.map(period => period.title)
     titles.unshift(set.title)
     return compact(titles)
   }, [])
 
   const searchTextMatchesTitles = useCallback(
-    titles =>
+    (titles: string[]) =>
       some(titles, title => SearchHelpers.substringMatchRegex(state.searchText).test(title)),
     [state.searchText],
   )
 
   const filterSetsBySearchText = useCallback(
-    (sets, searchText) => {
+    (sets: GradingPeriodSetData[], searchText: string) => {
       if (searchText === '') return sets
 
       return filter(sets, set => {
@@ -210,7 +251,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   )
 
   const changeSearchText = useCallback(
-    searchText => {
+    (searchText: string) => {
       if (searchText !== state.searchText) {
         setState({searchText})
       }
@@ -218,23 +259,27 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
     [state.searchText, setState],
   )
 
-  const filterSetsBySelectedTerm = useCallback((sets, terms, selectedTermID) => {
-    if (selectedTermID === '0') return sets
+  const filterSetsBySelectedTerm = useCallback(
+    (sets: GradingPeriodSetData[], terms: EnrollmentTerm[], selectedTermID: string) => {
+      if (selectedTermID === '0') return sets
 
-    const activeTerm = find(terms, {id: selectedTermID})
-    const setID = activeTerm.gradingPeriodGroupId
-    return filter(sets, {id: setID})
-  }, [])
+      const activeTerm = find(terms, {id: selectedTermID}) as EnrollmentTerm | undefined
+      if (!activeTerm?.gradingPeriodGroupId) return []
+
+      return filter(sets, {id: activeTerm.gradingPeriodGroupId})
+    },
+    [],
+  )
 
   const changeSelectedEnrollmentTerm = useCallback(
-    event => {
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
       setState({selectedTermID: event.target.value})
     },
     [setState],
   )
 
   const alertForMatchingSets = useCallback(
-    numSets => {
+    (numSets: number) => {
       let msg
       if (state.selectedTermID === '0' && state.searchText === '') {
         msg = I18n.t('Showing all sets of grading periods.')
@@ -256,8 +301,11 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
 
   const getVisibleSets = useCallback(() => {
     const setsFilteredBySearchText = filterSetsBySearchText(state.sets, state.searchText)
-    const filterByTermArgs = [setsFilteredBySearchText, state.enrollmentTerms, state.selectedTermID]
-    const visibleSets = filterSetsBySelectedTerm(...filterByTermArgs)
+    const visibleSets = filterSetsBySelectedTerm(
+      setsFilteredBySearchText,
+      state.enrollmentTerms,
+      state.selectedTermID,
+    )
     alertForMatchingSets(visibleSets.length)
     return visibleSets
   }, [
@@ -271,7 +319,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   ])
 
   const toggleSetBody = useCallback(
-    setId => {
+    (setId: string) => {
       if (includes(state.expandedSetIDs, setId)) {
         setState({expandedSetIDs: without(state.expandedSetIDs, setId)})
       } else {
@@ -282,37 +330,45 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   )
 
   const editGradingPeriodSet = useCallback(
-    set => {
+    (set: GradingPeriodSetData) => {
       setState({editSet: {id: set.id, saving: false}})
     },
     [setState],
   )
 
   const nodeToFocusOnAfterSetDeletion = useCallback(
-    setID => {
+    (setID: string): HTMLElement | null => {
       const index = state.sets.findIndex(set => set.id === setID)
       if (index < 1) {
         return addSetFormButtonRef.current
-      } else {
-        const prevSet = state.sets[index - 1]
-        return setRefs.current[`show-grading-period-set-${prevSet.id}`]?._refs.editButton
       }
+
+      const prevSet = state.sets[index - 1]
+      const prevSetRef = setRefs.current[`show-grading-period-set-${prevSet.id}`] as
+        | {_refs?: {editButton?: Element | null}}
+        | undefined
+      const editButton = prevSetRef?._refs?.editButton
+      return editButton instanceof HTMLElement ? editButton : null
     },
     [state.sets],
   )
 
   const removeGradingPeriodSet = useCallback(
-    setID => {
+    (setID: string) => {
       const newSets = reject(state.sets, set => set.id === setID)
       const nodeToFocus = nodeToFocusOnAfterSetDeletion(setID)
-      setState({sets: newSets}, () => nodeToFocus?.focus())
+      setState({sets: newSets})
+
+      requestAnimationFrame(() => {
+        nodeToFocus?.focus()
+      })
     },
     [state.sets, nodeToFocusOnAfterSetDeletion, setState],
   )
 
   const updateSetPeriods = useCallback(
-    (setID, gradingPeriods) => {
-      const newSets = map(state.sets, set => {
+    (setID: string, gradingPeriods: GradingPeriodSetData['gradingPeriods']) => {
+      const newSets = state.sets.map(set => {
         if (set.id === setID) {
           return {...set, gradingPeriods}
         }
@@ -328,16 +384,18 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   }, [setState])
 
   const closeNewSetForm = useCallback(() => {
-    setState({showNewSetForm: false}, () => {
+    setState({showNewSetForm: false})
+
+    requestAnimationFrame(() => {
       addSetFormButtonRef.current?.focus()
     })
   }, [setState])
 
   const termsBelongingToActiveSets = useCallback(() => {
-    const setIDs = map(state.sets, 'id')
+    const setIDs = state.sets.map(set => set.id)
     return filter(state.enrollmentTerms, term => {
       const setID = term.gradingPeriodGroupId
-      return setID && includes(setIDs, setID)
+      return !!setID && includes(setIDs, setID)
     })
   }, [state.sets, state.enrollmentTerms])
 
@@ -347,7 +405,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   )
 
   const selectableTermsForEditSetForm = useCallback(
-    setID => {
+    (setID: string) => {
       const termsBelongingToThisSet = filter(termsBelongingToActiveSets(), {
         gradingPeriodGroupId: setID,
       })
@@ -357,29 +415,49 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   )
 
   const closeEditSetForm = useCallback(
-    _id => {
+    (_id: string) => {
       setState({editSet: {id: null, saving: false}})
     },
     [setState],
   )
 
-  const getShowGradingPeriodSetRef = useCallback(set => `show-grading-period-set-${set.id}`, [])
+  const getShowGradingPeriodSetRef = useCallback(
+    (set: GradingPeriodSetData) => `show-grading-period-set-${set.id}`,
+    [],
+  )
 
   const renderEditGradingPeriodSetForm = useCallback(
-    set => {
+    (set: GradingPeriodSetData) => {
       const cancelCallback = () => {
         closeEditSetForm(set.id)
       }
 
-      const saveCallback = set => {
+      const saveCallback = (editedSet: {
+        id?: string
+        title: string
+        weighted: boolean
+        displayTotalsForAllGradingPeriods: boolean
+        enrollmentTermIDs: string[]
+      }) => {
+        if (!editedSet.id) return
+
         setState({editSet: {...state.editSet, saving: true}})
-        SetsApi.update(set)
+        const payload: GradingPeriodSetUpdateParams = {
+          id: editedSet.id,
+          title: editedSet.title,
+          weighted: editedSet.weighted,
+          displayTotalsForAllGradingPeriods: editedSet.displayTotalsForAllGradingPeriods,
+          enrollmentTermIDs: editedSet.enrollmentTermIDs,
+        }
+
+        SetsApi.update(payload)
           .then(updated => {
-            onSetUpdated(updated)
+            onSetUpdated(normalizeSet(updated as CamelizedGradingPeriodSet))
             closeEditSetForm(set.id)
           })
           .catch(_ => {
             $.flashError(I18n.t('An error occured while updating the grading period set.'))
+            setState({editSet: {id: editedSet.id ?? null, saving: false}})
           })
       }
 
@@ -401,17 +479,16 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   )
 
   const renderNewGradingPeriodSetForm = useCallback(() => {
-    if (state.showNewSetForm) {
-      return (
-        <NewGradingPeriodSetForm
-          ref={newSetFormRef}
-          closeForm={closeNewSetForm}
-          urls={urls}
-          enrollmentTerms={termsNotBelongingToActiveSets()}
-          addGradingPeriodSet={addGradingPeriodSet}
-        />
-      )
-    }
+    if (!state.showNewSetForm) return null
+
+    return (
+      <NewGradingPeriodSetForm
+        closeForm={closeNewSetForm}
+        urls={urls}
+        enrollmentTerms={termsNotBelongingToActiveSets()}
+        addGradingPeriodSet={addGradingPeriodSet}
+      />
+    )
   }, [
     state.showNewSetForm,
     urls,
@@ -425,7 +502,9 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
     if (!readOnly) {
       return (
         <Button
-          ref={addSetFormButtonRef}
+          elementRef={ref => {
+            addSetFormButtonRef.current = ref as HTMLButtonElement | null
+          }}
           color="primary"
           disabled={disable}
           onClick={openNewSetForm}
@@ -439,6 +518,8 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
         </Button>
       )
     }
+
+    return null
   }, [state.showNewSetForm, state.editSet.id, readOnly, openNewSetForm])
 
   const renderSets = useCallback(() => {
@@ -448,31 +529,31 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
       deleteGradingPeriodURL: urls.deleteGradingPeriodURL,
     }
 
-    return map(getVisibleSets(), set => {
+    return getVisibleSets().map(set => {
       if (state.editSet.id === set.id) {
         return renderEditGradingPeriodSetForm(set)
-      } else {
-        return (
-          <GradingPeriodSet
-            key={set.id}
-            ref={ref => {
-              setRefs.current[getShowGradingPeriodSetRef(set)] = ref
-            }}
-            set={set}
-            gradingPeriods={set.gradingPeriods}
-            urls={urlsForSet}
-            actionsDisabled={!!state.editSet.id}
-            readOnly={readOnly}
-            permissions={set.permissions}
-            terms={state.enrollmentTerms}
-            expanded={includes(state.expandedSetIDs, set.id)}
-            onEdit={editGradingPeriodSet}
-            onDelete={removeGradingPeriodSet}
-            onPeriodsChange={updateSetPeriods}
-            onToggleBody={() => toggleSetBody(set.id)}
-          />
-        )
       }
+
+      return (
+        <GradingPeriodSet
+          key={set.id}
+          ref={ref => {
+            setRefs.current[getShowGradingPeriodSetRef(set)] = ref
+          }}
+          set={set}
+          gradingPeriods={set.gradingPeriods}
+          urls={urlsForSet}
+          actionsDisabled={!!state.editSet.id}
+          readOnly={readOnly}
+          permissions={set.permissions}
+          terms={state.enrollmentTerms}
+          expanded={includes(state.expandedSetIDs, set.id)}
+          onEdit={editGradingPeriodSet}
+          onDelete={removeGradingPeriodSet}
+          onPeriodsChange={updateSetPeriods}
+          onToggleBody={() => toggleSetBody(set.id)}
+        />
+      )
     })
   }, [
     urls,
@@ -509,16 +590,6 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
       <div id="grading-period-sets">{renderSets()}</div>
     </div>
   )
-}
-
-GradingPeriodSetCollection.propTypes = {
-  readOnly: PropTypes.bool.isRequired,
-  urls: PropTypes.shape({
-    gradingPeriodSetsURL: PropTypes.string.isRequired,
-    gradingPeriodsUpdateURL: PropTypes.string.isRequired,
-    enrollmentTermsURL: PropTypes.string.isRequired,
-    deleteGradingPeriodURL: PropTypes.string.isRequired,
-  }).isRequired,
 }
 
 export default GradingPeriodSetCollection
