@@ -25,8 +25,35 @@ import ValidatorResultsRow from './ValidatorResultsRow'
 
 const I18n = createI18nScope('link_validator')
 
-export default class ValidatorResults extends React.Component {
-  state = {
+interface InvalidLink {
+  reason: string
+  url: string
+  link_text?: string
+  image?: boolean
+}
+
+interface ValidationIssue {
+  content_url: string
+  invalid_links: InvalidLink[]
+  name: string
+  type: string
+}
+
+interface ValidatorResultsProps {
+  results: ValidationIssue[]
+  displayResults: boolean
+  error: boolean
+}
+
+interface ValidatorResultsState {
+  showUnpublished: boolean
+}
+
+export default class ValidatorResults extends React.Component<
+  ValidatorResultsProps,
+  ValidatorResultsState
+> {
+  state: ValidatorResultsState = {
     showUnpublished: true,
   }
 
@@ -34,16 +61,16 @@ export default class ValidatorResults extends React.Component {
     this.setState({showUnpublished: !this.state.showUnpublished})
   }
 
-  getDisplayMessage = number =>
+  getDisplayMessage = (number: number): string =>
     I18n.t({one: 'Found 1 broken link', other: 'Found %{count} broken links'}, {count: number})
 
   render() {
-    let alertMessage,
-      numberofBrokenLinks = 0,
-      showUnpublishedBox
-    const allResults = [],
-      errorMessage = I18n.t('An error occured. Please try again.'),
-      noBrokenLinksMessage = I18n.t('No broken links found')
+    let alertMessage: JSX.Element | null = null
+    let numberofBrokenLinks = 0
+    let showUnpublishedBox: JSX.Element | null = null
+    const allResults: JSX.Element[] = []
+    const errorMessage = I18n.t('An error occured. Please try again.')
+    const noBrokenLinksMessage = I18n.t('No broken links found')
 
     if (this.props.error) {
       alertMessage = <div className="alert alert-error">{errorMessage}</div>

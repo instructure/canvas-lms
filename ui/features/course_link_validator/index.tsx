@@ -26,8 +26,8 @@ ready(() => {
 
   legacyRender(
     <LinkValidator
-      pollTimeout={ENV.validation_poll_timeout}
-      pollTimeoutInitial={ENV.validation_poll_timeout_initial}
+      pollTimeout={ENV.validation_poll_timeout ?? 3000}
+      pollTimeoutInitial={ENV.validation_poll_timeout_initial ?? 5000}
     />,
     linkValidatorWrapper,
   )

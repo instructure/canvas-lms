@@ -21,14 +21,50 @@ import '@canvas/rails-flash-notifications'
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatorResults from './ValidatorResults'
-import {number} from 'prop-types'
 import {Confetti} from '@canvas/confetti'
 import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('link_validator')
 
-class LinkValidator extends React.Component {
-  state = {
+interface LinkValidatorProps {
+  pollTimeout: number
+  pollTimeoutInitial: number
+}
+
+interface LinkValidatorState {
+  results: ValidationIssue[]
+  displayResults: boolean
+  error: boolean
+  showConfetti: boolean
+  buttonMessage?: string
+  buttonDisabled?: boolean
+  buttonMessageStyle?: React.CSSProperties
+}
+
+interface ValidationIssue {
+  content_url: string
+  invalid_links: InvalidLink[]
+  name: string
+  type: string
+}
+
+interface InvalidLink {
+  reason: string
+  url: string
+  link_text?: string
+  image?: boolean
+}
+
+interface ValidationResponse {
+  workflow_state: 'queued' | 'running' | 'completed' | 'failed'
+  results?: {
+    version: number
+    issues: ValidationIssue[]
+  }
+}
+
+class LinkValidator extends React.Component<LinkValidatorProps, LinkValidatorState> {
+  state: LinkValidatorState = {
     results: [],
     displayResults: false,
     error: false,
@@ -40,17 +76,17 @@ class LinkValidator extends React.Component {
     this.getResults(true)
   }
 
-  getResults = initial_load => {
+  getResults = (initial_load?: boolean) => {
     $.ajax({
       url: ENV.validation_api_url,
       dataType: 'json',
-      success: data => {
+      success: (data: ValidationResponse) => {
         // Keep trying until the request has been completed
         if (data.workflow_state === 'queued' || data.workflow_state === 'running') {
           setTimeout(() => {
             this.getResults()
           }, this.props.pollTimeout)
-        } else if (data.workflow_state === 'completed' && data.results.version == 2) {
+        } else if (data.workflow_state === 'completed' && data.results?.version === 2) {
           this.setState({
             buttonMessage: I18n.t('Restart Link Validation'),
             buttonDisabled: false,
@@ -147,11 +183,6 @@ class LinkValidator extends React.Component {
       </div>
     )
   }
-}
-
-LinkValidator.propTypes = {
-  pollTimeout: number.isRequired,
-  pollTimeoutInitial: number.isRequired,
 }
 
 export default LinkValidator
