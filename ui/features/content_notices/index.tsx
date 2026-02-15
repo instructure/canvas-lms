@@ -22,6 +22,21 @@ import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import ready from '@instructure/ready'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+interface ContentNotice {
+  tag: string
+  variant: 'info' | 'success' | 'warning' | 'error'
+  text: string
+  link_text?: string | null
+  link_target?: string | null
+}
+
+interface ContentNoticesEnv extends GlobalEnv {
+  CONTENT_NOTICES: ContentNotice[]
+}
+
+declare const ENV: ContentNoticesEnv
 
 ready(() => {
   const container = document.getElementById('content_notice_container')
@@ -42,6 +57,6 @@ ready(() => {
       )
     })
 
-    legacyRender(alerts, container)
+    legacyRender(<>{alerts}</>, container)
   }
 })
