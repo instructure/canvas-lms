@@ -24,13 +24,28 @@ import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
+import type {JobCluster} from './JobStats'
 
 const I18n = createI18nScope('jobs_v2')
 
-export default function StuckList({shard, type}) {
-  const [list, setList] = useState()
+interface StuckItem {
+  name: string
+  count: number
+}
+
+interface StuckListProps {
+  shard: JobCluster
+  type: 'strand' | 'singleton'
+}
+
+interface StuckTableProps {
+  caption: string
+}
+
+export default function StuckList({shard, type}: StuckListProps) {
+  const [list, setList] = useState<StuckItem[] | undefined>()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState()
+  const [error, setError] = useState<Error | string | undefined>()
 
   useFetchApi(
     {
@@ -44,7 +59,7 @@ export default function StuckList({shard, type}) {
     [],
   )
 
-  const StuckTable = ({caption}) => {
+  const StuckTable = ({caption}: StuckTableProps) => {
     return (
       <Table caption={caption} margin="0 0 small 0">
         <Table.Head>
@@ -58,7 +73,7 @@ export default function StuckList({shard, type}) {
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          {list.map(row => (
+          {list?.map(row => (
             <Table.Row key={row.name}>
               <Table.Cell>
                 {shard.domain ? (
@@ -87,7 +102,7 @@ export default function StuckList({shard, type}) {
   const caption = type === 'singleton' ? I18n.t('Blocked singletons') : I18n.t('Blocked strands')
   return (
     <>
-      {list?.length > 0 ? <StuckTable caption={caption} /> : null}
+      {list && list.length > 0 ? <StuckTable caption={caption} /> : null}
       {loading ? <Spinner size="small" renderTitle={I18n.t('Loading')} /> : null}
       {error && <Alert variant="error">{`${error}`}</Alert>}
     </>

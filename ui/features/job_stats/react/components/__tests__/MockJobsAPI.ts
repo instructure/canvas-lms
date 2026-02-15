@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function fakeLinkHeader(path) {
+function fakeLinkHeader(path: string) {
   return {
     current: {page: '1', url: `${path}?page=1`},
     last: {page: '1', url: `${path}?page=1`},
@@ -87,9 +87,16 @@ const fakeStuckResult = [
   {name: 'baz', count: 2},
 ]
 
-export default function mockJobsApi({path, params}) {
+interface MockJobsApiParams {
+  path: string
+  params?: {
+    job_shards?: string[]
+  }
+}
+
+export default function mockJobsApi({path, params}: MockJobsApiParams) {
   if (path === '/api/v1/jobs2/clusters') {
-    if (params.job_shards) {
+    if (params?.job_shards) {
       return Promise.resolve({json: refreshedCluster, link: fakeLinkHeader(path)})
     } else {
       return Promise.resolve({json: fakeCluster, link: fakeLinkHeader(path)})
