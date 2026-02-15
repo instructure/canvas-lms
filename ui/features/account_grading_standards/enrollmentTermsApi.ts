@@ -20,7 +20,29 @@ import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 
 const listUrl = () => ENV.ENROLLMENT_TERMS_URL
 
-const deserializeTerms = termGroups =>
+interface RawTerm {
+  id: number
+  name: string
+  start_at: string | null
+  end_at: string | null
+  created_at: string | null
+  grading_period_group_id: number | string | null
+}
+
+interface RawTermGroup {
+  enrollment_terms: RawTerm[]
+}
+
+export interface EnrollmentTerm {
+  id: string
+  name: string
+  startAt: Date | null
+  endAt: Date | null
+  createdAt: Date | null
+  gradingPeriodGroupId: string | null
+}
+
+const deserializeTerms = (termGroups: RawTermGroup[]): EnrollmentTerm[] =>
   flatten(
     map(termGroups, group =>
       map(group.enrollment_terms, term => {
@@ -40,13 +62,14 @@ const deserializeTerms = termGroups =>
 
 export default {
   list() {
-    return new Promise((resolve, reject) => {
+    return new Promise<EnrollmentTerm[]>((resolve, reject) => {
       const dispatch = new NaiveRequestDispatch()
 
       dispatch
+        // NaiveRequestDispatch is not typed and returns jQuery-style deferred chains.
         .getDepaginated(listUrl())
-        .then(response => resolve(deserializeTerms(response)))
-        .fail(error => reject(error))
+        .then((response: RawTermGroup[]) => resolve(deserializeTerms(response)))
+        .fail((error: unknown) => reject(error))
     })
   },
 }

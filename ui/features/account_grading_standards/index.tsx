@@ -17,24 +17,25 @@
  */
 
 import React from 'react'
-import {legacyRender} from '@canvas/react'
+import ReactDOM from 'react-dom'
 import AccountTabContainer from './react/AccountTabContainer'
 import ready from '@instructure/ready'
+import type {CollectionUrls} from './react/types'
 
 ready(() => {
-  legacyRender(
-    <AccountTabContainer
-      {...{
-        readOnly: ENV.GRADING_PERIODS_READ_ONLY,
-        urls: {
-          enrollmentTermsURL: ENV.ENROLLMENT_TERMS_URL,
-          gradingPeriodsUpdateURL: ENV.GRADING_PERIODS_UPDATE_URL,
-          gradingPeriodSetsURL: ENV.GRADING_PERIOD_SETS_URL,
-          deleteGradingPeriodURL: ENV.DELETE_GRADING_PERIOD_URL,
-        },
-      }}
-    />,
-    document.getElementById('react_grading_tabs'),
+  const mountPoint = document.getElementById('react_grading_tabs')
+  if (!mountPoint) return
+
+  const urls: CollectionUrls = {
+    enrollmentTermsURL: ENV.ENROLLMENT_TERMS_URL ?? '',
+    gradingPeriodsUpdateURL: ENV.GRADING_PERIODS_UPDATE_URL ?? '',
+    gradingPeriodSetsURL: ENV.GRADING_PERIOD_SETS_URL ?? '',
+    deleteGradingPeriodURL: ENV.DELETE_GRADING_PERIOD_URL ?? '',
+  }
+
+  ReactDOM.render(
+    <AccountTabContainer readOnly={!!ENV.GRADING_PERIODS_READ_ONLY} urls={urls} />,
+    mountPoint,
   )
 })
 

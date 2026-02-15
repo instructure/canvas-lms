@@ -17,28 +17,29 @@
  */
 
 import React from 'react'
-import {bool, string, shape} from 'prop-types'
 import GradingStandardCollection from '@canvas/grading-standard-collection'
 import GradingPeriodSetCollection from './GradingPeriodSetCollection'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import 'jqueryui/tabs'
+import type {CollectionUrls} from './types'
 
 const I18n = createI18nScope('AccountTabContainer')
 
-class AccountTabContainer extends React.Component {
-  static propTypes = {
-    readOnly: bool.isRequired,
-    urls: shape({
-      gradingPeriodSetsURL: string.isRequired,
-      gradingPeriodsUpdateURL: string.isRequired,
-      enrollmentTermsURL: string.isRequired,
-      deleteGradingPeriodURL: string.isRequired,
-    }).isRequired,
-  }
+interface AccountTabContainerProps {
+  readOnly: boolean
+  urls: CollectionUrls
+}
+
+class AccountTabContainer extends React.Component<AccountTabContainerProps> {
+  private tabContainer: HTMLDivElement | null = null
+  private gradingPeriods: HTMLDivElement | null = null
+  private gradingStandards: HTMLDivElement | null = null
 
   componentDidMount() {
-    $(this.tabContainer).children('.ui-tabs-minimal').tabs()
+    if (this.tabContainer) {
+      $(this.tabContainer).children('.ui-tabs-minimal').tabs()
+    }
   }
 
   render() {

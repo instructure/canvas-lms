@@ -19,45 +19,39 @@
 import React, {useRef} from 'react'
 import {sortBy, map, filter} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import type {EnrollmentTerm} from './types'
 
 const I18n = createI18nScope('EnrollmentTermsDropdown')
 
-interface Term {
-  id: string | number
-  displayName: string
-  startAt?: string
-  createdAt: string
-}
-
 interface EnrollmentTermsDropdownProps {
-  terms: Term[]
+  terms: EnrollmentTerm[]
   changeSelectedEnrollmentTerm: (event: React.ChangeEvent<HTMLSelectElement>) => void
 }
 
-const EnrollmentTermsDropdown: React.FC<EnrollmentTermsDropdownProps> = ({
+const EnrollmentTermsDropdown = ({
   terms,
   changeSelectedEnrollmentTerm,
-}) => {
+}: EnrollmentTermsDropdownProps) => {
   const termsDropdownRef = useRef<HTMLSelectElement>(null)
 
-  const sortedTerms = (termsList: Term[]): Term[] => {
-    const dated = filter(termsList, (term): term is Term => !!term.startAt) as Term[]
+  const sortedTerms = (termsList: EnrollmentTerm[]): EnrollmentTerm[] => {
+    const dated = filter(termsList, term => !!term.startAt)
     const datedTermsSortedByStart = sortBy(dated, term => term.startAt).reverse()
 
-    const undated = filter(termsList, (term): term is Term => !term.startAt) as Term[]
+    const undated = filter(termsList, term => !term.startAt)
     const undatedTermsSortedByCreate = sortBy(undated, term => term.createdAt).reverse()
     return datedTermsSortedByStart.concat(undatedTermsSortedByCreate)
   }
 
-  const termOptions = (termsList: Term[]) => {
+  const termOptions = (termsList: EnrollmentTerm[]) => {
     const allTermsOption = (
       <option key={0} value={0}>
         {I18n.t('All Terms')}
       </option>
     )
-    const options = map(sortedTerms(termsList), (term: Term) => (
+    const options = map(sortedTerms(termsList), term => (
       <option key={term.id} value={term.id}>
-        {term.displayName}
+        {term.displayName ?? term.name}
       </option>
     ))
 
