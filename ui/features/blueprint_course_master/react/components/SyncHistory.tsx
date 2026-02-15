@@ -20,6 +20,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
+import type {Dispatch} from 'redux'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import select from '@canvas/obj-select'
 
@@ -30,12 +31,32 @@ import SyncHistoryItem from '@canvas/blueprint-courses/react/components/SyncHist
 import actions from '@canvas/blueprint-courses/react/actions'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import LoadStates from '@canvas/blueprint-courses/react/loadStates'
+import type {Course, Migration} from '../types'
 
 const I18n = createI18nScope('blueprint_settingsSyncHistory')
+const loadStates = LoadStates as unknown as {
+  hasLoaded: (state: string) => boolean
+  isLoading: (state: string) => boolean
+}
 
 const {func, bool} = PropTypes
 
-export default class SyncHistory extends Component {
+interface SyncHistoryProps {
+  migrations: Migration[]
+  loadHistory: () => void
+  isLoadingHistory: boolean
+  hasLoadedHistory: boolean
+  associations: Course[]
+  loadAssociations: () => void
+  isLoadingAssociations: boolean
+  hasLoadedAssociations: boolean
+}
+
+interface SyncHistoryState {
+  associations: Record<string, Course>
+}
+
+export default class SyncHistory extends Component<SyncHistoryProps, SyncHistoryState> {
   static propTypes = {
     migrations: propTypes.migrationList,
     loadHistory: func.isRequired,
@@ -52,7 +73,7 @@ export default class SyncHistory extends Component {
     associations: [],
   }
 
-  constructor(props) {
+  constructor(props: SyncHistoryProps) {
     super(props)
     this.state = {
       associations: this.mapAssociations(props.associations),
@@ -68,14 +89,19 @@ export default class SyncHistory extends Component {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: SyncHistoryProps) {
     this.setState({
       associations: this.mapAssociations(nextProps.associations),
     })
   }
 
-  mapAssociations(assocs = []) {
-    return assocs.reduce((map, asc) => Object.assign(map, {[asc.id]: asc}), {})
+  mapAssociations(assocs: Course[] = []) {
+    return assocs.reduce<Record<string, Course>>((map, asc) => {
+      if (asc.id) {
+        map[asc.id] = asc
+      }
+      return map
+    }, {})
   }
 
   renderLoading() {
@@ -95,9 +121,10 @@ export default class SyncHistory extends Component {
   render() {
     // inject course data into exceptions
     const migrations = this.props.migrations.map(mig => {
-      mig.changes.map(change => {
-        change.exceptions.map(ex => Object.assign(ex, this.state.associations[ex.course_id] || {}))
-        return change
+      mig.changes.forEach(change => {
+        change.exceptions?.forEach(ex =>
+          Object.assign(ex, this.state.associations[ex.course_id] || {}),
+        )
       })
       return mig
     })
@@ -111,12 +138,14 @@ export default class SyncHistory extends Component {
   }
 }
 
-const connectState = state => {
-  const selectedChange = state.selectedChangeLog && state.changeLogs[state.selectedChangeLog]
+const connectState = (state: Record<string, unknown>) => {
+  const selectedChangeLogId = state.selectedChangeLog as string | null | undefined
+  const changeLogs = (state.changeLogs ?? {}) as Record<string, {status: string; data?: Migration}>
+  const selectedChange = selectedChangeLogId ? changeLogs[selectedChangeLogId] : null
   const historyState = selectedChange
     ? {
-        hasLoadedHistory: LoadStates.hasLoaded(selectedChange.status),
-        isLoadingHistory: LoadStates.isLoading(selectedChange.status),
+        hasLoadedHistory: loadStates.hasLoaded(selectedChange.status),
+        isLoadingHistory: loadStates.isLoading(selectedChange.status),
         migrations: selectedChange.data ? [selectedChange.data] : [],
       }
     : select(state, ['hasLoadedHistory', 'isLoadingHistory', 'migrations'])
@@ -130,5 +159,8 @@ const connectState = state => {
     historyState,
   )
 }
-const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedSyncHistory = connect(connectState, connectActions)(SyncHistory)
+const connectActions = (dispatch: Dispatch) => bindActionCreators(actions, dispatch)
+export const ConnectedSyncHistory = connect(
+  connectState,
+  connectActions,
+)(SyncHistory) as unknown as React.ComponentType<Record<string, unknown>>

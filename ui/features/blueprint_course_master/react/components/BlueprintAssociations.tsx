@@ -20,8 +20,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {debounce} from 'es-toolkit/compat'
 import React from 'react'
-import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
+import type {Dispatch} from 'redux'
 import {bindActionCreators} from 'redux'
 import select from '@canvas/obj-select'
 import '@canvas/rails-flash-notifications'
@@ -32,50 +32,54 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 
-import CoursePicker from './CoursePicker'
+import type CoursePicker from './CoursePicker'
+import CoursePickerComponent from './CoursePicker'
 import AssociationsTable from './AssociationsTable'
 
 import actions from '@canvas/blueprint-courses/react/actions'
-import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import FocusManager from '../focusManager'
+import type {Term, Account, Course} from '../types'
 
 const I18n = createI18nScope('BlueprintAssociations')
 
-const {func, bool} = PropTypes
+export interface BlueprintAssociationsProps {
+  loadCourses: () => void
+  addAssociations: (courses: string[]) => void
+  removeAssociations: (courses: string[]) => void
+  terms: Term[]
+  subAccounts: Account[]
+  courses: Course[]
+  existingAssociations: Course[]
+  addedAssociations: Course[]
+  removedAssociations: Course[]
+  hasLoadedCourses: boolean
+  isLoadingCourses: boolean
+  isLoadingAssociations: boolean
+  isSavingAssociations: boolean
+  hasUnsyncedChanges: boolean
+  isExpanded?: boolean
+}
 
-export default class BlueprintAssociations extends React.Component {
-  static propTypes = {
-    loadCourses: func.isRequired,
-    addAssociations: func.isRequired,
-    removeAssociations: func.isRequired,
+interface SelectionChanges {
+  added: string[]
+  removed: string[]
+}
 
-    terms: propTypes.termList.isRequired,
-    subAccounts: propTypes.accountList.isRequired,
-    courses: propTypes.courseList.isRequired,
-    existingAssociations: propTypes.courseList.isRequired,
-    addedAssociations: propTypes.courseList.isRequired,
-    removedAssociations: propTypes.courseList.isRequired,
-
-    hasLoadedCourses: bool.isRequired,
-    isLoadingCourses: bool.isRequired,
-    isLoadingAssociations: bool.isRequired,
-    isSavingAssociations: bool.isRequired,
-    hasUnsyncedChanges: bool.isRequired,
-
-    isExpanded: bool,
-  }
-
+export default class BlueprintAssociations extends React.Component<BlueprintAssociationsProps> {
   static defaultProps = {
     isExpanded: false,
   }
 
-  componentDidMount() {
+  coursePicker: CoursePicker | null = null
+  focusManager = new FocusManager()
+
+  componentDidMount(): void {
     if (!this.props.hasLoadedCourses) {
       this.props.loadCourses()
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: BlueprintAssociationsProps): void {
     if (!this.props.isSavingAssociations && nextProps.isSavingAssociations) {
       $.screenReaderFlashMessage(I18n.t('Saving associations started'))
     }
@@ -85,18 +89,20 @@ export default class BlueprintAssociations extends React.Component {
 
       // when saving is done, reload courses in course picker
       // this will remove courses we just associated from the picker
-      this.coursePicker.reloadCourses()
+      this.coursePicker?.reloadCourses()
     }
   }
 
-  onSelectedChanged = ({added, removed}) => {
+  onSelectedChanged = (selected: string[] | SelectionChanges): void => {
+    const changes = Array.isArray(selected)
+      ? ({added: selected, removed: []} as SelectionChanges)
+      : selected
+    const {added, removed} = changes
     if (added.length) this.props.addAssociations(added)
     if (removed.length) this.props.removeAssociations(removed)
   }
 
-  focusManager = new FocusManager()
-
-  maybeRenderSyncWarning() {
+  maybeRenderSyncWarning(): React.JSX.Element | null {
     const {hasUnsyncedChanges, existingAssociations, addedAssociations} = this.props
     if (hasUnsyncedChanges && existingAssociations.length > 0 && addedAssociations.length > 0) {
       return (
@@ -116,7 +122,7 @@ export default class BlueprintAssociations extends React.Component {
     return null
   }
 
-  renderLoadingOverlay() {
+  renderLoadingOverlay(): React.JSX.Element | null {
     if (this.props.isSavingAssociations) {
       const title = I18n.t('Saving Associations')
       return (
@@ -132,7 +138,7 @@ export default class BlueprintAssociations extends React.Component {
     return null
   }
 
-  render() {
+  render(): React.JSX.Element {
     return (
       <div className="bca__wrapper">
         {this.maybeRenderSyncWarning()}
@@ -140,7 +146,7 @@ export default class BlueprintAssociations extends React.Component {
         <Heading level="h3">{I18n.t('Search Courses')}</Heading>
         <br />
         <div className="bca-course-associations">
-          <CoursePicker
+          <CoursePickerComponent
             ref={c => {
               this.coursePicker = c
             }}
@@ -149,7 +155,9 @@ export default class BlueprintAssociations extends React.Component {
             subAccounts={this.props.subAccounts}
             loadCourses={debounce(this.props.loadCourses, 200)}
             isLoadingCourses={this.props.isLoadingCourses}
-            selectedCourses={this.props.addedAssociations.map(course => course.id)}
+            selectedCourses={this.props.addedAssociations
+              .map(course => course.id)
+              .filter((id): id is string => Boolean(id))}
             onSelectedChanged={this.onSelectedChanged}
             isExpanded={this.props.isExpanded}
             detailsRef={this.focusManager.registerBeforeRef}
@@ -165,7 +173,6 @@ export default class BlueprintAssociations extends React.Component {
             onRemoveAssociations={this.props.removeAssociations}
             onRestoreAssociations={this.props.addAssociations}
             isLoadingAssociations={this.props.isLoadingAssociations}
-            handleFocusLoss={this.catchAssociationsFocus}
             focusManager={this.focusManager}
           />
         </div>
@@ -174,7 +181,7 @@ export default class BlueprintAssociations extends React.Component {
   }
 }
 
-const connectState = state =>
+const connectState = (state: Record<string, unknown>) =>
   Object.assign(
     select(state, [
       'existingAssociations',
@@ -189,11 +196,13 @@ const connectState = state =>
       'isSavingAssociations',
     ]),
     {
-      hasUnsyncedChanges: !state.hasLoadedUnsyncedChanges || state.unsyncedChanges.length > 0,
+      hasUnsyncedChanges:
+        !(state as {hasLoadedUnsyncedChanges?: boolean}).hasLoadedUnsyncedChanges ||
+        ((state as {unsyncedChanges?: unknown[]}).unsyncedChanges?.length ?? 0) > 0,
     },
   )
-const connectActions = dispatch => bindActionCreators(actions, dispatch)
+const connectActions = (dispatch: Dispatch) => bindActionCreators(actions, dispatch)
 export const ConnectedBlueprintAssociations = connect(
   connectState,
   connectActions,
-)(BlueprintAssociations)
+)(BlueprintAssociations) as unknown as React.ComponentType<Record<string, unknown>>

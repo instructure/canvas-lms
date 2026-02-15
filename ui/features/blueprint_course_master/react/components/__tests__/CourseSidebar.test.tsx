@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import $ from 'jquery'
 import 'jquery-migrate' // required
 import {Provider} from 'react-redux'
 import {render, waitFor} from '@testing-library/react'
@@ -26,44 +25,81 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
 import {ConnectedCourseSidebar} from '../CourseSidebar'
-import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 import getSampleData from './getSampleData'
 
 import {createStore, applyMiddleware} from 'redux'
 import {thunk} from 'redux-thunk'
 import rootReducer from '@canvas/blueprint-courses/react/reducer'
+import type {Course, MigrationState, UnsyncedChange} from '../../types'
+import type CourseSidebar from '../CourseSidebar'
 
-let sidebarContentRef = null
+let sidebarContentRef: HTMLSpanElement | null = null
 
-const initialState = {
+interface CourseSidebarTestState extends Record<string, unknown> {
+  masterCourse: {id: string; enrollment_term_id: string; name: string}
+  existingAssociations: Course[]
+  associations: Course[]
+  unsyncedChanges: UnsyncedChange[]
+  migrationStatus: MigrationState
+  canManageCourse: boolean
+  hasLoadedAssociations: boolean
+  hasLoadedUnsyncedChanges: boolean
+  hasCheckedMigration: boolean
+  canAutoPublishCourses: boolean
+  hasAssociationChanges: boolean
+  willAddAssociations: boolean
+  willPublishCourses: boolean
+  isSavingAssociations: boolean
+  isLoadingUnsyncedChanges: boolean
+  isLoadingBeginMigration: boolean
+}
+
+const initialState: CourseSidebarTestState = {
   masterCourse: getSampleData().masterCourse,
-  existingAssociations: getSampleData().courses,
-  unsyncedChanges: getSampleData().unsyncedChanges,
-  migrationStatus: MigrationStates.states.unknown,
+  existingAssociations: getSampleData().courses as Course[],
+  associations: getSampleData().courses as Course[],
+  unsyncedChanges: getSampleData().unsyncedChanges as UnsyncedChange[],
+  migrationStatus: 'unknown',
   canManageCourse: true,
   hasLoadedAssociations: true,
   hasLoadedUnsyncedChanges: true,
+  hasCheckedMigration: false,
   canAutoPublishCourses: false,
+  hasAssociationChanges: false,
+  willAddAssociations: false,
+  willPublishCourses: false,
+  isSavingAssociations: false,
+  isLoadingUnsyncedChanges: false,
   isLoadingBeginMigration: false,
 }
 
 const defaultProps = () => ({
-  contentRef: cr => {
+  contentRef: (cr: HTMLSpanElement | null) => {
     sidebarContentRef = cr
   },
   routeTo: () => {},
+  realRef: (_c: CourseSidebar | null) => {},
 })
 
-function mockStore(initialState) {
-  return applyMiddleware(thunk)(createStore)(rootReducer, initialState)
+function mockStore(storeInitialState: CourseSidebarTestState) {
+  return applyMiddleware(thunk)(createStore)(rootReducer, storeInitialState)
 }
 
-function connect(props = defaultProps(), storeState = initialState) {
+function connect(props = defaultProps(), storeState: CourseSidebarTestState = initialState) {
   return (
     <Provider store={mockStore(storeState)}>
-      <ConnectedCourseSidebar {...props} />
+      <ConnectedCourseSidebar
+        {...(props as unknown as React.ComponentProps<typeof ConnectedCourseSidebar>)}
+      />
     </Provider>
   )
+}
+
+function getSidebarContent(): HTMLSpanElement {
+  if (!sidebarContentRef) {
+    throw new Error('sidebar content ref was not set')
+  }
+  return sidebarContentRef
 }
 
 const server = setupServer(
@@ -83,7 +119,7 @@ describe('Course Sidebar component', () => {
   test('renders the closed CourseSidebar component', () => {
     const tree = render(connect())
     const node = tree.container.querySelector('button')
-    expect(node.textContent.trim()).toEqual('Open Blueprint Sidebar')
+    expect(node?.textContent?.trim()).toEqual('Open Blueprint Sidebar')
     tree.unmount()
   })
 
@@ -91,29 +127,26 @@ describe('Course Sidebar component', () => {
     const tree = render(connect())
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     await waitFor(() => {
       expect(sidebarContentRef).toBeTruthy()
     })
 
-    const sidebar = $(sidebarContentRef)
-    const rows = sidebar.find('.bcs__row')
+    const sidebar = getSidebarContent()
+    const rows = sidebar.querySelectorAll('.bcs__row')
 
-    // associations
-    expect(rows.eq(0).find('button#mcSidebarAsscBtn').length).toBeTruthy()
-    expect(rows.eq(0).text().trim()).toEqual(
+    expect(rows[0]?.querySelector('button#mcSidebarAsscBtn')).toBeTruthy()
+    expect(rows[0]?.textContent?.trim()).toEqual(
       `Associations${initialState.existingAssociations.length}`,
     )
 
-    // sync history
-    expect(rows.eq(1).find('button#mcSyncHistoryBtn').length).toBeTruthy()
+    expect(rows[1]?.querySelector('button#mcSyncHistoryBtn')).toBeTruthy()
 
-    // unsynced changes
-    expect(rows.eq(2).find('button#mcUnsyncedChangesBtn').length).toBeTruthy()
-    expect(rows.eq(2).find('span').eq(0).text()).toEqual('Unsynced Changes')
+    expect(rows[2]?.querySelector('button#mcUnsyncedChangesBtn')).toBeTruthy()
+    expect(rows[2]?.querySelector('span')?.textContent).toEqual('Unsynced Changes')
 
-    const count = Number(rows.eq(2).find('.bcs__row-right-content').text())
+    const count = Number(rows[2]?.querySelector('.bcs__row-right-content')?.textContent)
     expect(count).toEqual(initialState.unsyncedChanges.length)
     tree.unmount()
   })
@@ -125,13 +158,11 @@ describe('Course Sidebar component', () => {
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     expect(sidebarContentRef).toBeTruthy()
-    const sidebar = $(sidebarContentRef)
-
-    // no unsynced changes
-    expect(sidebar.find('button#mcUnsyncedChangesBtn').length).toBeFalsy()
+    const sidebar = getSidebarContent()
+    expect(sidebar.querySelector('button#mcUnsyncedChangesBtn')).toBeFalsy()
     tree.unmount()
   })
 
@@ -139,33 +170,30 @@ describe('Course Sidebar component', () => {
     const props = defaultProps()
     const state = {...initialState}
     state.existingAssociations = []
+    state.associations = []
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     expect(sidebarContentRef).toBeTruthy()
-    const sidebar = $(sidebarContentRef)
-
-    // no unsynced changes
-    expect(sidebar.find('button#mcUnsyncedChangesBtn').length).toBeFalsy()
+    const sidebar = getSidebarContent()
+    expect(sidebar.querySelector('button#mcUnsyncedChangesBtn')).toBeFalsy()
     tree.unmount()
   })
 
   test('renders no Uncynced Changes link if sync is in progress', async () => {
     const props = defaultProps()
     const state = {...initialState}
-    state.migrationStatus = MigrationStates.states.imports_queued
+    state.migrationStatus = 'imports_queued'
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     expect(sidebarContentRef).toBeTruthy()
-    const sidebar = $(sidebarContentRef)
-
-    // no unsynced changes
-    expect(sidebar.find('button#mcUnsyncedChangesBtn').length).toBeFalsy()
+    const sidebar = getSidebarContent()
+    expect(sidebar.querySelector('button#mcUnsyncedChangesBtn')).toBeFalsy()
     tree.unmount()
   })
 
@@ -176,13 +204,11 @@ describe('Course Sidebar component', () => {
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     expect(sidebarContentRef).toBeTruthy()
-    const sidebar = $(sidebarContentRef)
-
-    // no unsynced changes
-    expect(sidebar.find('button#mcSidebarAsscBtn').length).toBeFalsy()
+    const sidebar = getSidebarContent()
+    expect(sidebar.querySelector('button#mcSidebarAsscBtn')).toBeFalsy()
     tree.unmount()
   })
 
@@ -190,19 +216,18 @@ describe('Course Sidebar component', () => {
     const props = defaultProps()
     const state = {...initialState}
     state.unsyncedChanges = []
-    state.migrationStatus = MigrationStates.states.imports_queued
+    state.migrationStatus = 'imports_queued'
     state.hasCheckedMigration = true
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     await waitFor(() => {
       expect(sidebarContentRef).toBeTruthy()
     })
-    const sidebar = $(sidebarContentRef)
-
-    expect(sidebar.find('.bcs__migration-sync').length).toBeTruthy()
+    const sidebar = getSidebarContent()
+    expect(sidebar.querySelector('.bcs__migration-sync')).toBeTruthy()
     tree.unmount()
   })
 
@@ -212,14 +237,13 @@ describe('Course Sidebar component', () => {
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     await waitFor(() => {
       expect(sidebarContentRef).toBeTruthy()
     })
-    const sidebar = $(sidebarContentRef)
-
-    expect(sidebar.find('.bcs__migration-sync').length).toBeTruthy()
+    const sidebar = getSidebarContent()
+    expect(sidebar.querySelector('.bcs__migration-sync')).toBeTruthy()
     tree.unmount()
   })
 
@@ -227,15 +251,15 @@ describe('Course Sidebar component', () => {
     const props = defaultProps()
     const state = {...initialState}
     state.existingAssociations = []
+    state.associations = []
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     expect(sidebarContentRef).toBeTruthy()
-    const sidebar = $(sidebarContentRef)
-
-    expect(sidebar.find('.bcs__migration-sync').length).toBeFalsy()
+    const sidebar = getSidebarContent()
+    expect(sidebar.querySelector('.bcs__migration-sync')).toBeFalsy()
     tree.unmount()
   })
 
@@ -246,12 +270,11 @@ describe('Course Sidebar component', () => {
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup()
-    await user.click(button)
+    await user.click(button!)
 
     expect(sidebarContentRef).toBeTruthy()
-    const sidebar = $(sidebarContentRef)
-
-    expect(sidebar.find('.bcs__migration-sync').length).toBeFalsy()
+    const sidebar = getSidebarContent()
+    expect(sidebar.querySelector('.bcs__migration-sync')).toBeFalsy()
     tree.unmount()
   })
 })

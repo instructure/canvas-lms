@@ -35,12 +35,30 @@ import {Flex} from '@instructure/ui-flex'
 
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import FocusManager from '../focusManager'
+import type {Course} from '../types'
 
 const I18n = createI18nScope('blueprint_settingsAssociationsTable')
 
 const {func, bool, instanceOf} = PropTypes
 
-export default class AssociationsTable extends React.Component {
+interface AssociationsTableProps {
+  existingAssociations: Course[]
+  addedAssociations: Course[]
+  removedAssociations: Course[]
+  onRemoveAssociations: (courseIds: string[]) => void
+  onRestoreAssociations: (courseIds: string[]) => void
+  isLoadingAssociations: boolean
+  focusManager: FocusManager
+}
+
+interface AssociationsTableState {
+  visibleExisting: Course[]
+}
+
+export default class AssociationsTable extends React.Component<
+  AssociationsTableProps,
+  AssociationsTableState
+> {
   static propTypes = {
     existingAssociations: propTypes.courseList.isRequired,
     addedAssociations: propTypes.courseList.isRequired,
@@ -51,7 +69,9 @@ export default class AssociationsTable extends React.Component {
     focusManager: instanceOf(FocusManager).isRequired,
   }
 
-  constructor(props) {
+  wrapper: React.RefObject<HTMLDivElement>
+
+  constructor(props: AssociationsTableProps) {
     super(props)
     this.wrapper = React.createRef()
     this.state = {
@@ -63,11 +83,11 @@ export default class AssociationsTable extends React.Component {
     this.fixIcons()
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const removedIds = nextProps.removedAssociations.map(course => course.id)
+  UNSAFE_componentWillReceiveProps(nextProps: AssociationsTableProps) {
+    const removedIds = nextProps.removedAssociations.map((course: Course) => course.id)
     this.setState({
       visibleExisting: nextProps.existingAssociations.filter(
-        assoc => !removedIds.includes(assoc.id),
+        (assoc: Course) => !removedIds.includes(assoc.id),
       ),
     })
 
@@ -84,22 +104,23 @@ export default class AssociationsTable extends React.Component {
     this.fixIcons()
   }
 
-  onRemove = (courseId, courseName, focusIndex) => {
+  onRemove = (courseId: string | null, courseName: string, focusIndex: number) => {
+    if (!courseId) return
     setTimeout(() => this.props.focusManager.movePrev(focusIndex), 400)
 
     $.screenReaderFlashMessage(I18n.t('Removed course association %{course}', {course: courseName}))
     this.props.onRemoveAssociations([courseId])
   }
 
-  onRestore = (courseId, courseName) => {
+  onRestore = (courseId: string | null, courseName: string) => {
+    if (!courseId) return
     // re-focus the restored association
-    setTimeout(
-      () =>
-        document
-          .querySelector(`.bca-associations-table button[data-course-id="${courseId}"]`)
-          .focus(),
-      400,
-    )
+    setTimeout(() => {
+      const element = document.querySelector<HTMLButtonElement>(
+        `.bca-associations-table button[data-course-id="${courseId}"]`,
+      )
+      element?.focus()
+    }, 400)
 
     $.screenReaderFlashMessage(
       I18n.t('Restored course association %{course}', {course: courseName}),
@@ -144,7 +165,7 @@ export default class AssociationsTable extends React.Component {
     )
   }
 
-  renderCellText(text) {
+  renderCellText(text?: string) {
     return (
       <Text color="secondary" size="small">
         {text}
@@ -152,14 +173,14 @@ export default class AssociationsTable extends React.Component {
     )
   }
 
-  renderStatusPill(course) {
+  renderStatusPill(course: Course) {
     if (course.concluded) {
       return <Pill color="info">{I18n.t('Concluded')}</Pill>
     }
     return null
   }
 
-  renderCourseLink(course) {
+  renderCourseLink(course: Course) {
     if (!course.id) {
       return this.renderCellText(course.name)
     }
@@ -171,7 +192,7 @@ export default class AssociationsTable extends React.Component {
     )
   }
 
-  renderRemoveButton(course, focusNode) {
+  renderRemoveButton(course: Course, focusNode: {index: number; ref: (element: any) => void}) {
     return (
       <IconButton
         withBackground={false}
@@ -187,7 +208,7 @@ export default class AssociationsTable extends React.Component {
     )
   }
 
-  renderRestoreLink(course, focusNode) {
+  renderRestoreLink(course: Course, focusNode: {index: number; ref: (element: any) => void}) {
     return (
       <View display="inline-block" margin="xx-small none">
         <Link
@@ -207,10 +228,10 @@ export default class AssociationsTable extends React.Component {
     )
   }
 
-  renderRows(associations, removing = false) {
+  renderRows(associations: Course[], removing = false) {
     const shouldRenderStatusPill = !!window.ENV.FEATURES.ux_list_concluded_courses_in_bp
 
-    return associations.map(course => {
+    return associations.map((course: Course) => {
       const focusNode = this.props.focusManager.allocateNext()
 
       return (

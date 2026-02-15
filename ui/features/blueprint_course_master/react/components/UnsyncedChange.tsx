@@ -23,14 +23,24 @@ import {Table} from '@instructure/ui-table'
 import {View} from '@instructure/ui-view'
 
 import {IconLock, IconUnlock} from '@canvas/blueprint-courses/react/components/BlueprintLocks'
-import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import {itemTypeLabels, changeTypeLabels} from '@canvas/blueprint-courses/react/labels'
-import {captionLanguageForLocale} from '@instructure/canvas-media'
+import type {UnsyncedChange as UnsyncedChangeType} from '../types'
 
-const UnsyncedChange = props => {
+export interface UnsyncedChangeProps {
+  change: UnsyncedChangeType
+}
+
+const captionLanguageForLocale = (locale: string): string => {
+  const languageName = new Intl.DisplayNames(['en'], {type: 'language'}).of(locale)
+  return languageName ?? locale
+}
+
+const UnsyncedChange = (props: UnsyncedChangeProps) => {
   const {asset_type, asset_name, change_type, locked, locale} = props.change
-  const changeLabel = changeTypeLabels[change_type] || change_type
-  const typeLabel = itemTypeLabels[asset_type] || asset_type
+  const changeLabels = changeTypeLabels as unknown as Record<string, string>
+  const itemLabels = itemTypeLabels as unknown as Record<string, string>
+  const changeLabel = changeLabels[change_type] || change_type
+  const typeLabel = itemLabels[asset_type] || asset_type
   const name = locale ? `${asset_name} (${captionLanguageForLocale(locale)})` : asset_name
 
   return (
@@ -38,7 +48,11 @@ const UnsyncedChange = props => {
       <Table.Cell>
         <div className="bcs__unsynced-item__name">
           <Text size="large" color="secondary">
-            {locked ? <IconLock /> : <IconUnlock />}
+            {locked ? (
+              <IconLock data-testid="lock-icon" />
+            ) : (
+              <IconUnlock data-testid="unlock-icon" />
+            )}
           </Text>
           <View padding="0 0 0 small">
             <Text size="small" weight="bold">
@@ -59,10 +73,6 @@ const UnsyncedChange = props => {
       </Table.Cell>
     </Table.Row>
   )
-}
-
-UnsyncedChange.propTypes = {
-  change: propTypes.unsyncedChange.isRequired,
 }
 
 UnsyncedChange.displayName = 'Row'

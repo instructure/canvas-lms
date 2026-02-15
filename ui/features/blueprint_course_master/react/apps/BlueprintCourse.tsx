@@ -19,53 +19,74 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
+import type {Store} from 'redux'
 
+import type CourseSidebar from '../components/CourseSidebar'
 import {ConnectedCourseSidebar} from '../components/CourseSidebar'
 import FlashNotifications from '@canvas/blueprint-courses/react/flashNotifications'
 import createStore from '@canvas/blueprint-courses/react/store'
 import Router from '@canvas/blueprint-courses/react/router'
 
+interface RouteParams {
+  params: Record<string, string>
+}
+
+interface Route {
+  path: string
+  onEnter: (params: RouteParams) => void
+  onExit: () => void
+}
+
 export default class BlueprintCourse {
-  constructor(root, data) {
+  root: Element
+  store: Store
+  router: Router
+  app!: CourseSidebar
+  routes: Route[]
+
+  constructor(root: Element, data: unknown) {
     this.root = root
     this.store = createStore(data)
     this.router = new Router()
+    this.routes = [
+      {
+        path: Router.PATHS.singleMigration,
+        onEnter: ({params}) => this.app.showChangeLog(params),
+        onExit: () => this.app.hideChangeLog(),
+      },
+    ]
   }
 
-  routes = [
-    {
-      path: Router.PATHS.singleMigration,
-      onEnter: ({params}) => this.app.showChangeLog(params),
-      onExit: () => this.app.hideChangeLog(),
-    },
-  ]
-
-  setupRouter() {
+  setupRouter(): void {
     this.router.registerRoutes(this.routes)
     this.router.start()
   }
 
-  unmount() {
+  unmount(): void {
     ReactDOM.unmountComponentAtNode(this.root)
   }
 
-  render() {
+  render(): void {
     const routeTo = isBlueprintShabang() ? this.router.page : noop
+    const sidebarProps = {
+      routeTo,
+      realRef: (c: CourseSidebar | null) => {
+        if (c) {
+          this.app = c
+        }
+      },
+      contentRef: null,
+    } as unknown as React.ComponentProps<typeof ConnectedCourseSidebar>
 
     ReactDOM.render(
       <Provider store={this.store}>
-        <ConnectedCourseSidebar
-          routeTo={routeTo}
-          realRef={c => {
-            this.app = c
-          }}
-        />
+        <ConnectedCourseSidebar {...sidebarProps} />
       </Provider>,
       this.root,
     )
   }
 
-  start() {
+  start(): void {
     FlashNotifications.subscribe(this.store)
     this.render()
     if (isBlueprintShabang()) {
@@ -74,8 +95,8 @@ export default class BlueprintCourse {
   }
 }
 
-function noop() {}
+function noop(): void {}
 
-function isBlueprintShabang() {
+function isBlueprintShabang(): boolean {
   return window.location.hash.indexOf('#!/blueprint') === 0
 }

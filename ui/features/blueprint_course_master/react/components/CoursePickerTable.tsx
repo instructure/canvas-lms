@@ -19,7 +19,6 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import {findDOMNode} from 'react-dom'
 import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
@@ -30,12 +29,32 @@ import {Flex} from '@instructure/ui-flex'
 import '@canvas/rails-flash-notifications'
 
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
+import type {Course} from '../types'
 
 const I18n = createI18nScope('blueprint_settingsCoursePickerTable')
 
 const {arrayOf, string} = PropTypes
 
-export default class CoursePickerTable extends React.Component {
+interface SelectionChanges {
+  added: string[]
+  removed: string[]
+}
+
+interface CoursePickerTableProps {
+  courses: Course[]
+  selectedCourses: string[]
+  onSelectedChanged?: (selection: SelectionChanges) => void
+}
+
+interface CoursePickerTableState {
+  selected: Record<string, boolean>
+  selectedAll: boolean
+}
+
+export default class CoursePickerTable extends React.Component<
+  CoursePickerTableProps,
+  CoursePickerTableState
+> {
   static propTypes = {
     courses: propTypes.courseList.isRequired,
     selectedCourses: arrayOf(string).isRequired,
@@ -46,22 +65,23 @@ export default class CoursePickerTable extends React.Component {
     onSelectedChanged: () => {},
   }
 
-  constructor(props) {
+  tableRef: React.RefObject<HTMLDivElement>
+  selectAllCheckbox: Checkbox | null = null
+
+  constructor(props: CoursePickerTableProps) {
     super(props)
     this.state = {
       selected: this.parseSelectedCourses(props.selectedCourses),
       selectedAll: false,
     }
     this.tableRef = React.createRef()
-    this.tableBody = React.createRef()
-    this.selectAllCheckbox = React.createRef()
   }
 
   componentDidMount() {
     this.fixIcons()
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: CoursePickerTableProps) {
     this.setState({
       selected: this.parseSelectedCourses(nextProps.selectedCourses),
       selectedAll: nextProps.selectedCourses.length === nextProps.courses.length,
@@ -72,7 +92,7 @@ export default class CoursePickerTable extends React.Component {
     this.fixIcons()
   }
 
-  onSelectToggle = e => {
+  onSelectToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const index = this.props.courses.findIndex(c => c.id === e.target.value)
     const course = this.props.courses[index]
     const srMsg = e.target.checked
@@ -87,13 +107,15 @@ export default class CoursePickerTable extends React.Component {
     }, 0)
   }
 
-  onSelectAllToggle = e => {
+  onSelectAllToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     $.screenReaderFlashMessage(
       e.target.checked ? I18n.t('Selected all courses') : I18n.t('Unselected all courses'),
     )
 
-    const selected = this.props.courses.reduce((selectedMap, course) => {
-      selectedMap[course.id] = e.target.checked
+    const selected = this.props.courses.reduce<Record<string, boolean>>((selectedMap, course) => {
+      if (course.id) {
+        selectedMap[course.id] = e.target.checked
+      }
       return selectedMap
     }, {})
     this.updateSelected(selected, e.target.checked)
@@ -113,38 +135,43 @@ export default class CoursePickerTable extends React.Component {
     }
   }
 
-  parseSelectedCourses(courses = []) {
-    return courses.reduce((selected, courseId) => {
+  parseSelectedCourses(courses: string[] = []) {
+    return courses.reduce<Record<string, boolean>>((selected, courseId) => {
       selected[courseId] = true
       return selected
     }, {})
   }
 
-  updateSelected(selectedDiff, selectedAll) {
+  updateSelected(selectedDiff: Record<string, boolean>, selectedAll: boolean) {
     const oldSelected = this.state.selected
-    const added = []
-    const removed = []
+    const added: string[] = []
+    const removed: string[] = []
 
     this.props.courses.forEach(({id}) => {
+      if (!id) {
+        return
+      }
       if (oldSelected[id] === true && selectedDiff[id] === false) removed.push(id)
       if (oldSelected[id] !== true && selectedDiff[id] === true) added.push(id)
     })
 
-    this.props.onSelectedChanged({added, removed})
+    this.props.onSelectedChanged?.({added, removed})
     this.setState({selectedAll})
   }
 
-  handleFocusLoss(index) {
+  handleFocusLoss(index: number) {
     if (this.props.courses.length === 0) {
-      this.selectAllCheckbox.current.focus()
+      this.selectAllCheckbox?.focus()
     } else if (index >= this.props.courses.length) {
       this.handleFocusLoss(index - 1)
     } else {
-      // eslint-disable-next-line react/no-find-dom-node
-      const elt = findDOMNode(this.tableBody.current)
-      elt
-        .querySelectorAll('[data-testid="bca-table__course-row"] input[type="checkbox"]')
-        [index].focus()
+      const elt = this.tableRef.current
+      if (elt) {
+        const checkbox = elt.querySelectorAll<HTMLInputElement>(
+          '[data-testid="bca-table__course-row"] input[type="checkbox"]',
+        )[index]
+        checkbox?.focus()
+      }
     }
   }
 
@@ -173,7 +200,7 @@ export default class CoursePickerTable extends React.Component {
     )
   }
 
-  renderCellText(text) {
+  renderCellText(text?: string) {
     return (
       <Text color="secondary" size="small">
         {text}
@@ -181,7 +208,7 @@ export default class CoursePickerTable extends React.Component {
     )
   }
 
-  renderStatusPill(course) {
+  renderStatusPill(course: Course) {
     if (course.concluded) {
       return <Pill color="info">{I18n.t('Concluded')}</Pill>
     }
@@ -191,13 +218,13 @@ export default class CoursePickerTable extends React.Component {
   renderRows() {
     const shouldRenderStatusPill = !!window.ENV.FEATURES.ux_list_concluded_courses_in_bp
 
-    return this.props.courses.map(course => (
+    return this.props.courses.map((course: Course) => (
       <Table.Row id={`course_${course.id}`} key={course.id} data-testid="bca-table__course-row">
         <Table.Cell>
           <Checkbox
             onChange={this.onSelectToggle}
-            value={course.id}
-            checked={this.state.selected[course.id] === true}
+            value={course.id ?? ''}
+            checked={course.id ? this.state.selected[course.id] === true : false}
             label={
               <ScreenReaderContent>
                 {I18n.t('Toggle select course %{name}', {
@@ -219,7 +246,9 @@ export default class CoursePickerTable extends React.Component {
         <Table.Cell>
           {this.renderCellText(
             course.teachers
-              ? course.teachers.map(teacher => teacher.display_name).join(', ')
+              ? course.teachers
+                  .map((teacher: {display_name: string}) => teacher.display_name)
+                  .join(', ')
               : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count}),
           )}
         </Table.Cell>
@@ -255,7 +284,9 @@ export default class CoursePickerTable extends React.Component {
             onChange={this.onSelectAllToggle}
             value="all"
             checked={this.state.selectedAll}
-            ref={this.selectAllCheckbox}
+            ref={(c: Checkbox | null) => {
+              this.selectAllCheckbox = c
+            }}
             label={
               <Text size="small">
                 {I18n.t(
@@ -276,7 +307,7 @@ export default class CoursePickerTable extends React.Component {
         {this.renderStickyHeaders()}
         <div className="bca-table__content-wrapper">
           <Table caption={I18n.t('Blueprint Courses')}>
-            <Table.Body ref={this.tableBody}>{this.renderBodyContent()}</Table.Body>
+            <Table.Body>{this.renderBodyContent()}</Table.Body>
           </Table>
         </div>
       </div>

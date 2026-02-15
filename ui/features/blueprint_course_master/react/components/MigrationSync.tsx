@@ -18,8 +18,8 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
+import type {Dispatch} from 'redux'
 import {bindActionCreators} from 'redux'
 import select from '@canvas/obj-select'
 import cx from 'classnames'
@@ -31,25 +31,30 @@ import {Button} from '@instructure/ui-buttons'
 import {IconRefreshLine} from '@instructure/ui-icons'
 
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
-import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import actions from '@canvas/blueprint-courses/react/actions'
+import type {MigrationState} from '../types'
 
 const I18n = createI18nScope('blueprint_settingsMigrationSync')
+const migrationStates = MigrationStates as unknown as {
+  isLoadingState: (state: MigrationState) => boolean
+  getLoadingValue: (state: MigrationState) => number
+  maxLoadingValue: number
+}
 
-export default class MigrationSync extends Component {
-  static propTypes = {
-    id: PropTypes.string,
-    migrationStatus: propTypes.migrationState.isRequired,
-    hasCheckedMigration: PropTypes.bool.isRequired,
-    isLoadingBeginMigration: PropTypes.bool.isRequired,
-    checkMigration: PropTypes.func.isRequired,
-    beginMigration: PropTypes.func.isRequired,
-    stopMigrationStatusPoll: PropTypes.func.isRequired,
-    showProgress: PropTypes.bool,
-    willSendNotification: PropTypes.bool,
-    onClick: PropTypes.func,
-  }
+export interface MigrationSyncProps {
+  id?: string
+  migrationStatus: MigrationState
+  hasCheckedMigration: boolean
+  isLoadingBeginMigration: boolean
+  checkMigration: (check: boolean) => void
+  beginMigration: () => void
+  stopMigrationStatusPoll: () => void
+  showProgress?: boolean
+  willSendNotification?: boolean
+  onClick?: (() => void) | null
+}
 
+export default class MigrationSync extends Component<MigrationSyncProps> {
   static defaultProps = {
     id: 'migration_sync',
     showProgress: true,
@@ -57,22 +62,19 @@ export default class MigrationSync extends Component {
     onClick: null,
   }
 
-  constructor(props) {
-    super(props)
-    this.intId = null
-  }
+  syncBtn: Button | null = null
 
-  UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount(): void {
     if (!this.props.hasCheckedMigration) {
       this.props.checkMigration(true)
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     this.props.stopMigrationStatusPoll()
   }
 
-  handleSyncClick = () => {
+  handleSyncClick = (): void => {
     this.props.beginMigration()
     if (this.props.onClick) {
       this.props.onClick()
@@ -82,7 +84,7 @@ export default class MigrationSync extends Component {
   render() {
     const {migrationStatus} = this.props
     const isSyncing =
-      MigrationStates.isLoadingState(migrationStatus) || this.props.isLoadingBeginMigration
+      migrationStates.isLoadingState(migrationStatus) || this.props.isLoadingBeginMigration
     const iconClasses = cx({
       'bcs__sync-btn-icon': true,
       'bcs__sync-btn-icon__active': isSyncing,
@@ -97,10 +99,9 @@ export default class MigrationSync extends Component {
             </Text>
             <ProgressBar
               screenReaderLabel={I18n.t('Sync in progress')}
-              renderLabel={I18n.t('Sync in progress')}
-              size="x-small"
-              valueNow={MigrationStates.getLoadingValue(migrationStatus)}
-              valueMax={MigrationStates.maxLoadingValue}
+              size="small"
+              valueNow={migrationStates.getLoadingValue(migrationStatus)}
+              valueMax={migrationStates.maxLoadingValue}
             />
             {this.props.willSendNotification && (
               <Text as="p" size="small">
@@ -135,12 +136,15 @@ export default class MigrationSync extends Component {
   }
 }
 
-const connectState = state =>
+const connectState = (state: Record<string, unknown>) =>
   select(state, [
     'migrationStatus',
     'isLoadingBeginMigration',
     'hasCheckedMigration',
     'willSendNotification',
   ])
-const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedMigrationSync = connect(connectState, connectActions)(MigrationSync)
+const connectActions = (dispatch: Dispatch) => bindActionCreators(actions, dispatch)
+export const ConnectedMigrationSync = connect(
+  connectState,
+  connectActions,
+)(MigrationSync) as unknown as React.ComponentType<Record<string, unknown>>

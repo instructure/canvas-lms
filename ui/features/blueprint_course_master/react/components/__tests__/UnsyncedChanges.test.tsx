@@ -22,10 +22,10 @@ import {render} from '@testing-library/react'
 import {getByText, getAllByText} from '@testing-library/dom'
 import createStore from '@canvas/blueprint-courses/react/store'
 import {ConnectedUnsyncedChanges} from '../UnsyncedChanges'
-import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
+import type {UnsyncedChange} from '../../types'
 
 const noop = () => {}
-const unsyncedChanges = [
+const unsyncedChanges: UnsyncedChange[] = [
   {
     asset_id: '22',
     asset_type: 'assignment',
@@ -65,28 +65,38 @@ const defaultProps = {
   unsyncedChanges,
   isLoadingUnsyncedChanges: false,
   hasLoadedUnsyncedChanges: true,
-  migrationStatus: MigrationStates.unknown,
+  migrationStatus: 'unknown' as const,
 
   willSendNotification: false,
   willIncludeCustomNotificationMessage: false,
+  willIncludeCourseSettings: false,
+  willSendItemNotifications: false,
+  itemNotificationFeatureEnabled: false,
   notificationMessage: '',
 }
 const actionProps = {
   loadUnsyncedChanges: noop,
   enableSendNotification: noop,
   includeCustomNotificationMessage: noop,
+  includeCourseSettings: noop,
+  enableItemNotifications: noop,
   setNotificationMessage: noop,
 }
 
-function mockStore(props = {...defaultProps}) {
+function mockStore(props: Record<string, unknown> = {...defaultProps}) {
   return createStore({...props})
 }
 
-function connect(props = {...defaultProps}) {
-  const store = mockStore()
+function connect(
+  props = {...defaultProps} as React.ComponentProps<typeof ConnectedUnsyncedChanges>,
+) {
+  const store = mockStore(props)
   return (
     <Provider store={store}>
-      <ConnectedUnsyncedChanges {...props} {...actionProps} />
+      <ConnectedUnsyncedChanges
+        {...(props as unknown as React.ComponentProps<typeof ConnectedUnsyncedChanges>)}
+        {...(actionProps as unknown as React.ComponentProps<typeof ConnectedUnsyncedChanges>)}
+      />
     </Provider>
   )
 }

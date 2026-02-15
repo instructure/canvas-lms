@@ -22,15 +22,16 @@ import userEvent from '@testing-library/user-event'
 import AssociationsTable from '../AssociationsTable'
 import FocusManager from '../../focusManager'
 import getSampleData from './getSampleData'
+import type {Course} from '../../types'
 
 describe('AssociationsTable component', () => {
   const focusManager = new FocusManager()
   focusManager.before = document.body
 
   const defaultProps = () => ({
-    existingAssociations: getSampleData().courses,
-    addedAssociations: [],
-    removedAssociations: [],
+    existingAssociations: getSampleData().courses as Course[],
+    addedAssociations: [] as Course[],
+    removedAssociations: [] as Course[],
     onRemoveAssociations: () => {},
     onRestoreAssociations: () => {},
     isLoadingAssociations: false,
@@ -71,7 +72,7 @@ describe('AssociationsTable component', () => {
   })
 
   test('renders concluded pill when course is concluded', () => {
-    window.ENV = {FEATURES: {ux_list_concluded_courses_in_bp: true}}
+    window.ENV.FEATURES = {...window.ENV.FEATURES, ux_list_concluded_courses_in_bp: true}
 
     const props = defaultProps()
     props.existingAssociations = [
@@ -83,7 +84,7 @@ describe('AssociationsTable component', () => {
         teachers: [{display_name: 'Teacher One'}],
         sis_course_id: '1001',
         concluded: true,
-      },
+      } as Course,
     ]
 
     const {getByText} = render(<AssociationsTable {...props} />)
@@ -102,7 +103,7 @@ describe('AssociationsTable component', () => {
         teachers: [{display_name: 'Teacher One'}],
         sis_course_id: '1001',
         concluded: false,
-      },
+      } as Course,
     ]
 
     const {queryByText} = render(<AssociationsTable {...props} />)
@@ -111,7 +112,7 @@ describe('AssociationsTable component', () => {
   })
 
   test('renders concluded pill in removedAssociations when course is concluded', () => {
-    window.ENV = {FEATURES: {ux_list_concluded_courses_in_bp: true}}
+    window.ENV.FEATURES = {...window.ENV.FEATURES, ux_list_concluded_courses_in_bp: true}
 
     const props = defaultProps()
     props.existingAssociations = []
@@ -124,7 +125,7 @@ describe('AssociationsTable component', () => {
         teachers: [{display_name: 'Teacher One'}],
         sis_course_id: '1001',
         concluded: true,
-      },
+      } as Course,
     ]
 
     const {getByText} = render(<AssociationsTable {...props} />)
@@ -153,7 +154,7 @@ describe('AssociationsTable component', () => {
         term: {id: '1', name: 'Term One'},
         teachers: [{display_name: 'Teacher'}],
         sis_course_id: '9001',
-      },
+      } as Course,
     ]
     props.removedAssociations = [
       {
@@ -163,7 +164,7 @@ describe('AssociationsTable component', () => {
         term: {id: '1', name: 'Term One'},
         teachers: [{display_name: 'Teacher'}],
         sis_course_id: '8001',
-      },
+      } as Course,
     ]
 
     const {container} = render(<AssociationsTable {...props} />)
@@ -193,12 +194,12 @@ describe('AssociationsTable component', () => {
         term: {id: '1', name: 'Term One'},
         teachers: [{display_name: 'Teacher'}],
         sis_course_id: '1001',
-      },
+      } as unknown as Course,
     ]
 
     const {container} = render(<AssociationsTable {...props} />)
     const firstCell = container.querySelector('tr[data-testid="associations-course-row"] td')
-    const link = firstCell.querySelector('a[href^="/courses/"]')
+    const link = firstCell?.querySelector('a[href^="/courses/"]')
 
     expect(link).not.toBeInTheDocument()
     expect(firstCell).toHaveTextContent('Course Without ID')

@@ -23,7 +23,7 @@ import getSampleData from './getSampleData'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('CoursePicker component', () => {
-  let originalENV
+  let originalENV: typeof window.ENV
 
   beforeEach(() => {
     originalENV = window.ENV
@@ -73,11 +73,11 @@ describe('CoursePicker component', () => {
 
   test('calls loadCourses when filters are updated', () => {
     const props = defaultProps()
-    const ref = React.createRef()
+    const ref = React.createRef<CoursePicker>()
     render(<CoursePicker {...props} ref={ref} />)
     const picker = ref.current
 
-    picker.onFilterChange({
+    picker?.onFilterChange({
       term: '',
       subAccount: '',
       search: 'one',
@@ -93,13 +93,13 @@ describe('CoursePicker component', () => {
 
   test('calls onSelectedChanged when course selection changes', () => {
     const props = defaultProps()
-    const ref = React.createRef()
+    const ref = React.createRef<CoursePicker>()
     render(<CoursePicker {...props} ref={ref} />)
     const picker = ref.current
 
-    picker.onSelectedChanged(['1', '2'])
+    picker?.onSelectedChanged({added: ['1', '2'], removed: []})
 
     expect(props.onSelectedChanged).toHaveBeenCalledTimes(1)
-    expect(props.onSelectedChanged).toHaveBeenCalledWith(['1', '2'])
+    expect(props.onSelectedChanged).toHaveBeenCalledWith({added: ['1', '2'], removed: []})
   })
 })
