@@ -41,7 +41,12 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('link_validator')
 
-const TYPE_INFO = {
+interface TypeInfo {
+  icon: React.ComponentType<any>
+  label: string
+}
+
+const TYPE_INFO: Record<string, TypeInfo> = {
   course_card_image: {icon: IconSettingsLine, label: I18n.t('Course Settings')},
   syllabus: {icon: IconSyllabusLine, label: I18n.t('Syllabus')},
   assignment: {icon: IconAssignmentLine, label: I18n.t('Assignment')},
@@ -54,7 +59,7 @@ const TYPE_INFO = {
   quiz_question: {icon: IconQuestionLine, label: I18n.t('Quiz Question')},
 }
 
-const REASON_DESCRIPTION = {
+const REASON_DESCRIPTION: Record<string, string> = {
   course_mismatch: I18n.t(
     'Links to other courses in this resource may not be accessible by the students in this course:',
   ),
@@ -65,7 +70,33 @@ const REASON_DESCRIPTION = {
   deleted: I18n.t('Deleted content referenced in this resource:'),
 }
 
-function simplifyReason(link) {
+interface InvalidLink {
+  reason: string
+  url: string
+  link_text?: string
+  image?: boolean
+}
+
+interface ValidationResult {
+  content_url: string
+  invalid_links: InvalidLink[]
+  name: string
+  type: string
+}
+
+interface ValidatorResultsRowProps {
+  result: ValidationResult
+}
+
+type SimplifiedReason =
+  | 'course_mismatch'
+  | 'unpublished_item'
+  | 'deleted'
+  | 'missing_item'
+  | 'broken_image'
+  | 'broken_link'
+
+function simplifyReason(link: InvalidLink): SimplifiedReason {
   switch (link.reason) {
     case 'course_mismatch':
     case 'unpublished_item':
@@ -77,26 +108,26 @@ function simplifyReason(link) {
   }
 }
 
-function getLinkText(link) {
+function getLinkText(link: InvalidLink): string {
   if (link.link_text) {
     return link.link_text
   }
   return link.url.substring(link.url.lastIndexOf('/') + 1)
 }
 
-export default function ValidatorResultsRow(props) {
+export default function ValidatorResultsRow(props: ValidatorResultsRowProps) {
   const invalid_links = props.result.invalid_links
-  const errorsByReason = {}
+  const errorsByReason: Record<string, InvalidLink[]> = {}
   invalid_links.forEach(link => {
     const reason = simplifyReason(link)
     errorsByReason[reason] = errorsByReason[reason] || []
     errorsByReason[reason].push(link)
   })
 
-  const rows = []
+  const rows: JSX.Element[] = []
   Object.keys(errorsByReason).forEach(reason => {
     const errors = errorsByReason[reason]
-    const links = []
+    const links: JSX.Element[] = []
 
     errors.forEach(error => {
       const IconClass = error.image ? IconImageSolid : IconLinkSolid
@@ -121,7 +152,8 @@ export default function ValidatorResultsRow(props) {
     )
   })
 
-  let TypeIcon, label
+  let TypeIcon: React.ComponentType<any>
+  let label: string
   const typeInfo = TYPE_INFO[props.result.type]
   if (typeInfo) {
     TypeIcon = typeInfo.icon
@@ -139,11 +171,7 @@ export default function ValidatorResultsRow(props) {
         </Flex.Item>
         <Flex.Item margin="none none none small">
           <Heading level="h3" as="h2">
-            <Link
-              href={props.result.content_url}
-              isWithinText={false}
-              themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: '1.25rem'}}
-            >
+            <Link href={props.result.content_url} isWithinText={false}>
               {props.result.name}
             </Link>
           </Heading>
