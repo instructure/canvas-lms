@@ -20,13 +20,14 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import BlueprintAssociations from '../BlueprintAssociations'
 import getSampleData from './getSampleData'
+import type {Course} from '../../types'
 
 describe('BlueprintAssociations component', () => {
   const defaultProps = () => ({
-    courses: [],
-    existingAssociations: [],
-    addedAssociations: [],
-    removedAssociations: [],
+    courses: [] as Course[],
+    existingAssociations: [] as Course[],
+    addedAssociations: [] as Course[],
+    removedAssociations: [] as Course[],
     addAssociations: () => {},
     removeAssociations: () => {},
     loadCourses: () => {},
@@ -68,8 +69,8 @@ describe('BlueprintAssociations component', () => {
 
   test('render save warning if there are existing associations, new associations, and unsynced changes', () => {
     const props = defaultProps()
-    props.existingAssociations = getSampleData().courses
-    props.addedAssociations = getSampleData().courses
+    props.existingAssociations = getSampleData().courses as Course[]
+    props.addedAssociations = getSampleData().courses as Course[]
     props.hasUnsyncedChanges = true
     const {getByText} = render(<BlueprintAssociations {...props} />)
     const node = getByText('Warning:')
@@ -78,8 +79,8 @@ describe('BlueprintAssociations component', () => {
 
   test('render no save warning if there are existing associations, new associations, but no unsynced changes', () => {
     const props = defaultProps()
-    props.existingAssociations = getSampleData().courses
-    props.addedAssociations = getSampleData().courses
+    props.existingAssociations = getSampleData().courses as Course[]
+    props.addedAssociations = getSampleData().courses as Course[]
     props.hasUnsyncedChanges = false
     const {queryByText} = render(<BlueprintAssociations {...props} />)
     const node = queryByText('Warning:')
@@ -88,7 +89,7 @@ describe('BlueprintAssociations component', () => {
 
   test('render no save warning if there are existing associations, unsynced changes, but no new associations', () => {
     const props = defaultProps()
-    props.existingAssociations = getSampleData().courses
+    props.existingAssociations = getSampleData().courses as Course[]
     props.addedAssociations = []
     props.hasUnsyncedChanges = true
     const {queryByText} = render(<BlueprintAssociations {...props} />)
@@ -99,7 +100,7 @@ describe('BlueprintAssociations component', () => {
   test('render no save warning if there are new associations, unsynced changes, but no existing associations', () => {
     const props = defaultProps()
     props.existingAssociations = []
-    props.addedAssociations = getSampleData().courses
+    props.addedAssociations = getSampleData().courses as Course[]
     props.hasUnsyncedChanges = true
     const {queryByText} = render(<BlueprintAssociations {...props} />)
     const node = queryByText('Warning:')

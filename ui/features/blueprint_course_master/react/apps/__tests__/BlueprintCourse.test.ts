@@ -20,8 +20,8 @@ import BlueprintCourse from '../BlueprintCourse'
 import select from '@canvas/obj-select'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
-let blueprint = null
-let container = null
+let blueprint: BlueprintCourse | null = null
+let container: HTMLDivElement | null = null
 
 const defaultData = () =>
   Object.assign(select(getSampleData(), ['terms', 'masterCourse', ['childCourse', 'course']]), {
@@ -41,17 +41,21 @@ describe('BlueprintCourse app', () => {
       blueprint.unmount()
       blueprint = null
     }
-    document.body.removeChild(container)
-    container = null
+    if (container) {
+      document.body.removeChild(container)
+      container = null
+    }
   })
 
   test('mounts BlueprintSidebar to container component', () => {
+    if (!container) throw new Error('container is null')
     blueprint = new BlueprintCourse(container, defaultData())
     blueprint.render()
     expect(container.querySelector('.bcs__wrapper')).not.toBeNull()
   })
 
   test('unmounts BlueprintSidebar from container component', () => {
+    if (!container) throw new Error('container is null')
     blueprint = new BlueprintCourse(container, defaultData())
     blueprint.render()
     blueprint.unmount()
@@ -59,13 +63,13 @@ describe('BlueprintCourse app', () => {
   })
 
   test('change log route onEnter calls app showChangeLog with params from URL', () => {
+    if (!container) throw new Error('container is null')
     blueprint = new BlueprintCourse(container, defaultData())
     blueprint.render()
     blueprint.app.showChangeLog = vi.fn()
-    blueprint.routes[0].onEnter(
-      {params: {blueprintType: 'template', templateId: '2', changeId: '3'}},
-      () => {},
-    )
+    blueprint.routes[0].onEnter({
+      params: {blueprintType: 'template', templateId: '2', changeId: '3'},
+    })
     expect(blueprint.app.showChangeLog).toHaveBeenCalledTimes(1)
     expect(blueprint.app.showChangeLog).toHaveBeenCalledWith({
       blueprintType: 'template',
@@ -74,11 +78,12 @@ describe('BlueprintCourse app', () => {
     })
 
     blueprint.app.hideChangeLog = vi.fn()
-    blueprint.routes[0].onExit({}, () => {})
+    blueprint.routes[0].onExit()
     expect(blueprint.app.hideChangeLog).toHaveBeenCalledTimes(1)
   })
 
   test('start does not call setupRouter() when shabang is missing in the URL', () => {
+    if (!container) throw new Error('container is null')
     blueprint = new BlueprintCourse(container, defaultData())
     const renderSpy = vi.spyOn(blueprint, 'render')
     const setupRouterSpy = vi.spyOn(blueprint, 'setupRouter')
@@ -90,6 +95,7 @@ describe('BlueprintCourse app', () => {
   })
 
   test('start calls render() and setupRouter() when shabang is in the URL', () => {
+    if (!container) throw new Error('container is null')
     window.location.hash = '#!/blueprint'
     blueprint = new BlueprintCourse(container, defaultData())
     const renderSpy = vi.spyOn(blueprint, 'render')

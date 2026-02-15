@@ -23,7 +23,11 @@ import getSampleData from './getSampleData'
 import userEvent from '@testing-library/user-event'
 
 describe('CoursePickerTable component', () => {
-  const defaultProps = () => ({
+  const defaultProps = (): {
+    courses: any[]
+    selectedCourses: string[]
+    onSelectedChanged: (changes: any) => void
+  } => ({
     courses: getSampleData().courses,
     selectedCourses: [],
     onSelectedChanged: () => {},
@@ -100,50 +104,55 @@ describe('CoursePickerTable component', () => {
 
   test('handleFocusLoss focuses the next item', () => {
     const props = defaultProps()
-    const ref = React.createRef()
+    const ref = React.createRef<CoursePickerTable>()
     const {container} = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
     const check = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
-    )[0]
+    )[0] as HTMLInputElement
     check.focus = vi.fn()
 
-    instance.handleFocusLoss(0)
+    instance?.handleFocusLoss(0)
     expect(check.focus).toHaveBeenCalledTimes(1)
   })
 
   test('handleFocusLoss focuses the previous item if called on the last item', () => {
     const props = defaultProps()
-    const ref = React.createRef()
+    const ref = React.createRef<CoursePickerTable>()
     const {container} = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
     const check = container.querySelectorAll(
       '[data-testid="bca-table__course-row"] input[type="checkbox"]',
-    )[1]
+    )[1] as HTMLInputElement
     check.focus = vi.fn()
 
-    instance.handleFocusLoss(2)
+    instance?.handleFocusLoss(2)
     expect(check.focus).toHaveBeenCalledTimes(1)
   })
 
   test('handleFocusLoss focuses on select all if no items left', () => {
     const props = defaultProps()
     props.courses = []
-    const ref = React.createRef()
+    const ref = React.createRef<CoursePickerTable>()
     const {container} = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
-    const check = container.querySelectorAll('.bca-table__select-all input[type="checkbox"]')[0]
+    const check = container.querySelectorAll(
+      '.bca-table__select-all input[type="checkbox"]',
+    )[0] as HTMLInputElement
     check.focus = vi.fn()
 
-    instance.handleFocusLoss(1)
+    instance?.handleFocusLoss(1)
     expect(check.focus).toHaveBeenCalledTimes(1)
   })
 
   test('renders concluded pill when course is concluded', () => {
-    window.ENV = {FEATURES: {ux_list_concluded_courses_in_bp: true}}
+    window.ENV = {
+      ...window.ENV,
+      FEATURES: {...(window.ENV.FEATURES || {}), ux_list_concluded_courses_in_bp: true},
+    }
 
     const props = defaultProps()
     props.courses = [
@@ -155,7 +164,7 @@ describe('CoursePickerTable component', () => {
         teachers: [{display_name: 'Teacher One'}],
         sis_course_id: '1001',
         concluded: true,
-      },
+      } as any,
     ]
 
     const {getByText} = render(<CoursePickerTable {...props} />)
@@ -174,7 +183,7 @@ describe('CoursePickerTable component', () => {
         teachers: [{display_name: 'Teacher One'}],
         sis_course_id: '1001',
         concluded: false,
-      },
+      } as any,
     ]
 
     const {queryByText} = render(<CoursePickerTable {...props} />)

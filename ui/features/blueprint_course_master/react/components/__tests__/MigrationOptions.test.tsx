@@ -19,13 +19,12 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import MigrationOptions from '../MigrationOptions'
-import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
 const noop = () => {}
 
 describe('MigrationOptions component', () => {
   const defaultProps = {
-    migrationStatus: MigrationStates.states.unknown,
+    migrationStatus: 'unknown' as const,
     willSendNotification: false,
     willIncludeCustomNotificationMessage: false,
     willIncludeCourseSettings: false,
@@ -47,7 +46,7 @@ describe('MigrationOptions component', () => {
 
   test('renders the course-settings and notification-enable checkboxes', () => {
     const {container} = render(<MigrationOptions {...defaultProps} />)
-    const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+    const checkboxes = container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
     expect(checkboxes).toHaveLength(2)
     expect(checkboxes[0].checked).toEqual(false)
     expect(checkboxes[1].checked).toEqual(false)
@@ -57,7 +56,7 @@ describe('MigrationOptions component', () => {
     const props = {...defaultProps}
     props.itemNotificationFeatureEnabled = true
     const {container} = render(<MigrationOptions {...props} />)
-    const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+    const checkboxes = container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
     expect(checkboxes).toHaveLength(3)
     expect(checkboxes[2].checked).toEqual(false)
   })
@@ -68,15 +67,15 @@ describe('MigrationOptions component', () => {
 
     const {container, getByLabelText} = render(<MigrationOptions {...props} />)
 
-    const courseSettingsCheckbox = getByLabelText('Include Course Settings')
+    const courseSettingsCheckbox = getByLabelText('Include Course Settings') as HTMLInputElement
     expect(courseSettingsCheckbox).toBeTruthy()
     expect(courseSettingsCheckbox.checked).toEqual(false)
 
-    const notificationCheckbox = getByLabelText('Send Notification')
+    const notificationCheckbox = getByLabelText('Send Notification') as HTMLInputElement
     expect(notificationCheckbox).toBeTruthy()
     expect(notificationCheckbox.checked).toEqual(true)
 
-    const checkbox3 = getByLabelText('Add a Message (0/140)')
+    const checkbox3 = getByLabelText('Add a Message (0/140)') as HTMLInputElement
     expect(checkbox3).toBeTruthy()
     expect(checkbox3.checked).toEqual(false)
 

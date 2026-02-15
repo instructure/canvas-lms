@@ -27,12 +27,38 @@ import '@canvas/rails-flash-notifications'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import CourseFilter from './CourseFilter'
 import CoursePickerTable from './CoursePickerTable'
+import type {Account, Course, CourseFilterFilters, Term} from '../types'
 
 const I18n = createI18nScope('blueprint_settingsCoursePicker')
 
 const {func, bool, arrayOf, string} = PropTypes
 
-export default class CoursePicker extends React.Component {
+interface SelectionChanges {
+  added: string[]
+  removed: string[]
+}
+
+type FilterParams = Omit<CourseFilterFilters, 'isActive'> | CourseFilterFilters
+
+interface CoursePickerProps {
+  courses: Course[]
+  terms: Term[]
+  subAccounts: Account[]
+  selectedCourses: string[]
+  loadCourses: (filters?: FilterParams) => void
+  isLoadingCourses: boolean
+  onSelectedChanged?: (selected: SelectionChanges) => void
+  detailsRef?: (element: {focus: () => void} | null) => void
+  isExpanded?: boolean
+}
+
+interface CoursePickerState {
+  isExpanded: boolean
+  announceChanges: boolean
+  filters?: FilterParams
+}
+
+export default class CoursePicker extends React.Component<CoursePickerProps, CoursePickerState> {
   static propTypes = {
     courses: propTypes.courseList.isRequired,
     terms: propTypes.termList.isRequired,
@@ -51,10 +77,14 @@ export default class CoursePicker extends React.Component {
     isExpanded: true,
   }
 
-  constructor(props) {
+  _homeRef: HTMLDivElement | null = null
+  filter: CourseFilter | null = null
+  coursesToggle: unknown = null
+
+  constructor(props: CoursePickerProps) {
     super(props)
     this.state = {
-      isExpanded: props.isExpanded,
+      isExpanded: props.isExpanded ?? true,
       announceChanges: false,
     }
     this._homeRef = null
@@ -64,7 +94,7 @@ export default class CoursePicker extends React.Component {
     this.fixIcons()
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: CoursePickerProps) {
     if (this.state.announceChanges && !this.props.isLoadingCourses && nextProps.isLoadingCourses) {
       $.screenReaderFlashMessage(I18n.t('Loading courses started'))
     }
@@ -93,13 +123,13 @@ export default class CoursePicker extends React.Component {
     })
   }
 
-  onSelectedChanged = selected => {
-    this.props.onSelectedChanged(selected)
+  onSelectedChanged = (selected: SelectionChanges) => {
+    this.props.onSelectedChanged?.(selected)
     this.setState({isExpanded: true})
   }
 
   // when the filter updates, load new courses
-  onFilterChange = filters => {
+  onFilterChange = (filters: FilterParams) => {
     this.props.loadCourses(filters)
 
     this.setState({
@@ -110,7 +140,7 @@ export default class CoursePicker extends React.Component {
   }
 
   // when user clicks "Courses" button to toggle visibility
-  onToggleCoursePicker = (event, isExpanded) => {
+  onToggleCoursePicker = (_event: unknown, isExpanded: boolean) => {
     this.setState({isExpanded})
   }
 
@@ -155,7 +185,9 @@ export default class CoursePicker extends React.Component {
             summary={
               <span
                 ref={c => {
-                  if (c) this.props.detailsRef(c.parentElement.parentElement)
+                  this.props.detailsRef?.(
+                    (c?.parentElement?.parentElement as {focus: () => void}) ?? null,
+                  )
                 }}
               >
                 <Text>{I18n.t('Courses')}</Text>

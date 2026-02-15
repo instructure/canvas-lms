@@ -24,13 +24,21 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
+import type {Account, CourseFilterFilters, Term} from '../types'
 
 const I18n = createI18nScope('blueprint_settingsCourseFilter')
 
 const {func} = PropTypes
 const MIN_SEACH = 3 // min search term length for API
 
-export default class CourseFilter extends React.Component {
+interface CourseFilterProps {
+  onChange?: (filters: CourseFilterFilters) => void
+  onActivate?: () => void
+  terms: Term[]
+  subAccounts: Account[]
+}
+
+export default class CourseFilter extends React.Component<CourseFilterProps, CourseFilterFilters> {
   static propTypes = {
     onChange: func,
     onActivate: func,
@@ -43,7 +51,10 @@ export default class CourseFilter extends React.Component {
     onActivate: () => {},
   }
 
-  constructor(props) {
+  searchInput: TextInput | null = null
+  wrapper: HTMLDivElement | null = null
+
+  constructor(props: CourseFilterProps) {
     super(props)
     this.state = {
       isActive: false,
@@ -53,13 +64,13 @@ export default class CourseFilter extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_prevProps: CourseFilterProps, prevState: CourseFilterFilters) {
     if (
       prevState.search !== this.state.search ||
       prevState.term !== this.state.term ||
       prevState.subAccount !== this.state.subAccount
     ) {
-      this.props.onChange(this.state)
+      this.props.onChange?.(this.state)
     }
   }
 
@@ -70,7 +81,8 @@ export default class CourseFilter extends React.Component {
   }
 
   getSearchText() {
-    const searchText = this.searchInput.value.trim().toLowerCase()
+    const searchInput = this.searchInput as unknown as {value?: string} | null
+    const searchText = searchInput?.value?.trim().toLowerCase() ?? ''
     return searchText.length >= MIN_SEACH ? searchText : ''
   }
 
@@ -81,7 +93,7 @@ export default class CourseFilter extends React.Component {
           isActive: true,
         },
         () => {
-          this.props.onActivate()
+          this.props.onActivate?.()
         },
       )
     }
@@ -91,10 +103,11 @@ export default class CourseFilter extends React.Component {
     // the timeout prevents the courses from jumping between open between and close when you tab through the form elements
     setTimeout(() => {
       if (this.state.isActive) {
-        const search = this.searchInput.value
+        const searchInput = this.searchInput as unknown as {value?: string} | null
+        const search = searchInput?.value
         const isEmpty = !search
 
-        if (isEmpty && !this.wrapper.contains(document.activeElement)) {
+        if (isEmpty && this.wrapper && !this.wrapper.contains(document.activeElement)) {
           this.setState({
             isActive: false,
           })
@@ -152,7 +165,7 @@ export default class CourseFilter extends React.Component {
               id="termsFilter"
               key="terms"
               value={this.state.term}
-              onChange={(e, value) => this.setState({term: value})}
+              onChange={(_e: unknown, value: string) => this.setState({term: value})}
               label={<ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>}
             >
               {termOptions}
@@ -163,7 +176,7 @@ export default class CourseFilter extends React.Component {
               id="subAccountsFilter"
               key="subAccounts"
               value={this.state.subAccount}
-              onChange={(e, value) => this.setState({subAccount: value})}
+              onChange={(_e: unknown, value: string) => this.setState({subAccount: value})}
               label={<ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>}
             >
               {subAccountOptions}

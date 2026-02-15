@@ -40,9 +40,16 @@ import userEvent from '@testing-library/user-event'
 import CourseFilter from '../CourseFilter'
 import getSampleData from './getSampleData'
 
-const defaultProps = () => ({
+const defaultProps = (): {
+  subAccounts: {id: string; name: string}[]
+  terms: {id: string; name: string}[]
+  onChange?: (filter: any) => void
+  onActivate?: () => void
+} => ({
   subAccounts: getSampleData().subAccounts,
   terms: getSampleData().terms,
+  onChange: () => {},
+  onActivate: () => {},
 })
 
 describe('CourseFilter', () => {
@@ -54,8 +61,8 @@ describe('CourseFilter', () => {
 
   it('onChange fires with search filter when text is entered in search box', async () => {
     const props = defaultProps()
-    const onChangePromise = new Promise(resolve => {
-      props.onChange = filter => {
+    const onChangePromise = new Promise<void>(resolve => {
+      props.onChange = (filter: {search?: string}) => {
         expect(filter.search).toBe('giraffe')
         resolve()
       }
@@ -98,7 +105,7 @@ describe('CourseFilter', () => {
   describe('CourseFilter > Filter behavior', () => {
     it('onChange fires with term filter when term is selected', async () => {
       const props = defaultProps()
-      const onChangeMock = vi.fn(filter => {
+      const onChangeMock = vi.fn((filter: {term?: string}) => {
         expect(filter.term).toBe('1')
       })
       props.onChange = onChangeMock
@@ -112,7 +119,7 @@ describe('CourseFilter', () => {
 
     it('onChange fires with subaccount filter when a subaccount is selected', async () => {
       const props = defaultProps()
-      const onChangeMock = vi.fn(filter => {
+      const onChangeMock = vi.fn((filter: {subAccount?: string}) => {
         expect(filter.subAccount).toBe('1')
       })
       props.onChange = onChangeMock

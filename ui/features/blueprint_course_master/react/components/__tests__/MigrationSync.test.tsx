@@ -20,13 +20,14 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MigrationSync from '../MigrationSync'
+import type {MigrationSyncProps} from '../MigrationSync'
 
 describe('MigrationSync component', () => {
-  const defaultProps = () => ({
+  const defaultProps = (): MigrationSyncProps => ({
     migrationStatus: 'void',
     hasCheckedMigration: true,
     isLoadingBeginMigration: false,
-    checkMigration: () => {},
+    checkMigration: (_check: boolean) => {},
     beginMigration: () => {},
     stopMigrationStatusPoll: () => {},
   })
@@ -57,7 +58,7 @@ describe('MigrationSync component', () => {
     const props = defaultProps()
     props.beginMigration = vi.fn()
     const tree = render(<MigrationSync {...props} />)
-    const button = tree.container.querySelector('.bcs__migration-sync button')
+    const button = tree.container.querySelector('.bcs__migration-sync button') as HTMLButtonElement
     const user = userEvent.setup({delay: null})
     await user.click(button)
     expect(props.beginMigration).toHaveBeenCalledTimes(1)

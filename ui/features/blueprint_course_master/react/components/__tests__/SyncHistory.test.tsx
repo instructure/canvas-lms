@@ -21,19 +21,24 @@ import {render} from '@testing-library/react'
 import SyncHistory from '../SyncHistory'
 import getSampleData from './getSampleData'
 
+const SyncHistoryComponent = SyncHistory as unknown as React.ComponentType<Record<string, unknown>>
+
 describe('SyncHistory component', () => {
-  const defaultProps = () => ({
+  const defaultProps = (): React.ComponentProps<typeof SyncHistory> => ({
     loadHistory: () => {},
     isLoadingHistory: false,
     hasLoadedHistory: false,
     loadAssociations: () => {},
     isLoadingAssociations: false,
     hasLoadedAssociations: false,
-    migrations: getSampleData().history,
+    associations: [] as never[],
+    migrations: getSampleData().history as unknown as React.ComponentProps<
+      typeof SyncHistory
+    >['migrations'],
   })
 
   test('renders the SyncHistory component', () => {
-    const {container} = render(<SyncHistory {...defaultProps()} />)
+    const {container} = render(<SyncHistoryComponent {...defaultProps()} />)
     const node = container.querySelector('.bcs__history')
     expect(node).toBeTruthy()
   })
@@ -41,13 +46,13 @@ describe('SyncHistory component', () => {
   test('displays spinner when loading courses', () => {
     const props = defaultProps()
     props.isLoadingHistory = true
-    const {container} = render(<SyncHistory {...props} />)
+    const {container} = render(<SyncHistoryComponent {...props} />)
     const spinner = container.querySelector('svg[role="img"]')
     expect(spinner).toBeTruthy()
   })
 
   test('renders SyncHistoryItem components for each migration', () => {
-    const tree = render(<SyncHistory {...defaultProps()} />)
+    const tree = render(<SyncHistoryComponent {...defaultProps()} />)
     const node = tree.container.querySelectorAll('.bcs__history-item')
     expect(node).toHaveLength(1)
   })

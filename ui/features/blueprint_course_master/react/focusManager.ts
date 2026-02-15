@@ -16,17 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+interface Focusable {
+  focus(): void
+}
+
+interface AllocateNextResult {
+  index: number
+  ref: (element: Focusable | null) => void
+}
+
 // manages focus for a set of react components
 // useful in a11y situations where managing focus from deleting or otherwise
 // changing DOM structure
 export default class FocusManager {
-  constructor() {
-    this.items = []
-    this.before = null
-    this.after = null
-  }
+  items: Array<Focusable | null> = []
+  before: Focusable | null = null
+  after: Focusable | null = null
 
-  reset() {
+  reset(): void {
     this.items = []
   }
 
@@ -36,33 +43,34 @@ export default class FocusManager {
   //  ref: a react ref function to be passed to the component to register it with
   //  the FocusManager
   // }
-  allocateNext() {
+  allocateNext(): AllocateNextResult {
     const index = this.items.length
     this.items.push(null)
     return {index, ref: this.registerItemRef(index)}
   }
 
   // register a node at a specified index
-  registerItem(c, index) {
-    this.items[index] = c
+  registerItem(element: Focusable | null, index: number): void {
+    this.items[index] = element
   }
 
   // returns a react ref function that registers a component at the given index
   // inside the items array of the FocusManager
-  registerItemRef = index => c => this.registerItem(c, index)
+  registerItemRef = (index: number) => (element: Focusable | null) =>
+    this.registerItem(element, index)
 
   // register the node to go to if we try to go back from our first item
-  registerBeforeRef = c => {
-    this.before = c
+  registerBeforeRef = (element: Focusable | null): void => {
+    this.before = element
   }
 
   // register the node to go to if we try to go forward from our last item
-  registerAfterRef = c => {
-    this.after = c
+  registerAfterRef = (element: Focusable | null): void => {
+    this.after = element
   }
 
   // based on the given index, move focus to the item before it in the items list
-  movePrev(index) {
+  movePrev(index: number): void {
     if (index - 1 < 0) {
       this.moveBefore()
     } else {
@@ -71,7 +79,7 @@ export default class FocusManager {
   }
 
   // based on the given index, move focus to the item after it in the items list
-  moveNext(index) {
+  moveNext(index: number): void {
     if (index + 1 >= this.items.length) {
       this.moveAfter()
     } else {
@@ -80,17 +88,17 @@ export default class FocusManager {
   }
 
   // move focus to the node we designated to come before our list of items
-  moveBefore() {
+  moveBefore(): void {
     this.focus(this.before)
   }
 
   // move focus to the node we designated to come after our list of items
-  moveAfter() {
+  moveAfter(): void {
     this.focus(this.after)
   }
 
   // moves focus to the node passed on, or show a console warning
-  focus(thing) {
+  focus(thing: Focusable | null): void {
     if (thing && thing.focus) {
       thing.focus()
     } else {
