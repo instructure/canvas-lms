@@ -17,8 +17,6 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from 'prop-types'
-
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
@@ -29,23 +27,24 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import ChangeLogRow, {ChangeRow} from './ChangeLogRow'
 import SyncHistoryItem from '@canvas/blueprint-courses/react/components/SyncHistoryItem'
 
-import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import LoadStates from '@canvas/blueprint-courses/react/loadStates'
+import type {BlueprintState, Migration, LoadState} from '@canvas/blueprint-courses/react/types'
 
 const I18n = createI18nScope('blueprint_coursesChildChangeLog')
 
-export default class ChildChangeLog extends Component {
-  static propTypes = {
-    status: PropTypes.oneOf(LoadStates.statesList),
-    migration: propTypes.migration,
-  }
+export interface ChildChangeLogProps {
+  status: LoadState | null
+  migration: Migration | null
+}
 
+export default class ChildChangeLog extends Component<ChildChangeLogProps> {
   static defaultProps = {
     migration: null,
     status: null,
   }
 
-  renderLoading() {
+  renderLoading(): React.JSX.Element | null {
+    // @ts-expect-error - LoadStates is untyped JS module
     if (this.props.status && LoadStates.isLoading(this.props.status)) {
       const title = I18n.t('Loading Change Log')
       return (
@@ -61,7 +60,7 @@ export default class ChildChangeLog extends Component {
     return null
   }
 
-  renderChanges() {
+  renderChanges(): React.JSX.Element | null {
     const {migration} = this.props
     if (migration) {
       return (
@@ -84,14 +83,17 @@ export default class ChildChangeLog extends Component {
     return null
   }
 
-  render() {
+  render(): React.JSX.Element {
     return <div className="bcc__change-log">{this.renderLoading() || this.renderChanges()}</div>
   }
 }
 
-const connectState = state => ({
-  status: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].status,
-  migration: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].data,
+const connectState = (state: BlueprintState) => ({
+  status: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog]?.status,
+  migration: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog]?.data,
 })
+
 const connectActions = () => ({})
+
+// @ts-expect-error - Redux connect type inference issue with optional props
 export const ConnectedChildChangeLog = connect(connectState, connectActions)(ChildChangeLog)

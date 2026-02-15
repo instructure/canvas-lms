@@ -59,20 +59,24 @@ describe('ChildCourse class', () => {
   test('change log route onEnter calls app showChangeLog with params from URL', () => {
     child = new ChildCourse(container, defaultData())
     child.render()
-    child.app.showChangeLog = vi.fn()
+    if (child.app) {
+      child.app.showChangeLog = vi.fn()
+    }
     child.routes[0].onEnter({
       params: {blueprintType: 'template', templateId: '2', changeId: '3'},
     } as any)
-    expect(child.app.showChangeLog).toHaveBeenCalledTimes(1)
-    expect(child.app.showChangeLog).toHaveBeenCalledWith({
+    expect(child.app?.showChangeLog).toHaveBeenCalledTimes(1)
+    expect(child.app?.showChangeLog).toHaveBeenCalledWith({
       blueprintType: 'template',
       templateId: '2',
       changeId: '3',
     })
 
-    child.app.hideChangeLog = vi.fn()
+    if (child.app) {
+      child.app.hideChangeLog = vi.fn()
+    }
     child.routes[0].onExit()
-    expect(child.app.hideChangeLog).toHaveBeenCalledTimes(1)
+    expect(child.app?.hideChangeLog).toHaveBeenCalledTimes(1)
   })
 
   test.skip('start calls render() and setupRouter()', () => {

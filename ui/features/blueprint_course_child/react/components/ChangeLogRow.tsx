@@ -18,7 +18,6 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import {string, bool, node} from 'prop-types'
 import cx from 'classnames'
 import shortId from '@canvas/shortid'
 
@@ -26,21 +25,21 @@ import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 import {IconLock, IconUnlock} from '@canvas/blueprint-courses/react/components/BlueprintLocks'
 
-import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import {itemTypeLabels, changeTypeLabels} from '@canvas/blueprint-courses/react/labels'
+import type {MigrationChange} from '@canvas/blueprint-courses/react/types'
 
 const I18n = createI18nScope('blueprint_coursesChangeLogRow')
 
-export default class ChangeLogRow extends Component {
-  static propTypes = {
-    col1: string.isRequired,
-    col2: string.isRequired,
-    col3: string.isRequired,
-    col4: string.isRequired,
-    isHeading: bool,
-    children: node,
-  }
+export interface ChangeLogRowProps {
+  col1: string
+  col2: string
+  col3: string
+  col4: string
+  isHeading?: boolean
+  children?: React.ReactNode
+}
 
+export default class ChangeLogRow extends Component<ChangeLogRowProps> {
   static defaultProps = {
     isHeading: false,
     children: null,
@@ -48,13 +47,13 @@ export default class ChangeLogRow extends Component {
 
   colIds = [shortId(), shortId(), shortId(), shortId()]
 
-  renderText = text => (
+  renderText = (text: string): React.JSX.Element => (
     <Text size="small" weight={this.props.isHeading ? 'bold' : 'normal'}>
       {text}
     </Text>
   )
 
-  renderRow() {
+  renderRow(): React.JSX.Element {
     const {col1, col2, col3, col4, isHeading} = this.props
     const cellRole = isHeading ? 'columnheader' : 'gridcell'
     return (
@@ -85,7 +84,7 @@ export default class ChangeLogRow extends Component {
     )
   }
 
-  render() {
+  render(): React.JSX.Element {
     const classes = cx({
       'bcs__history-item__change': true,
       'bcs__history-item__change-log-row': true,
@@ -103,21 +102,28 @@ export default class ChangeLogRow extends Component {
   }
 }
 
-export const ChangeRow = ({change}) => (
-  <ChangeLogRow
-    col1={change.asset_name}
-    col2={itemTypeLabels[change.asset_type]}
-    col3={changeTypeLabels[change.change_type]}
-    col4={change.exceptions && change.exceptions.length ? I18n.t('No') : I18n.t('Yes')}
-  >
-    <div className="bcs__history-item__lock-icon">
-      <Text size="large" color="secondary">
-        {change.locked ? <IconLock /> : <IconUnlock />}
-      </Text>
-    </div>
-  </ChangeLogRow>
-)
+export interface ChangeRowProps {
+  change: MigrationChange
+}
 
-ChangeRow.propTypes = {
-  change: propTypes.migrationChange.isRequired,
+export const ChangeRow = ({change}: ChangeRowProps): React.JSX.Element => {
+  const assetTypeKey = change.asset_type === 'media_tracks' ? 'media_track' : change.asset_type
+  return (
+    <ChangeLogRow
+      col1={change.asset_name}
+      col2={itemTypeLabels[assetTypeKey as keyof typeof itemTypeLabels]}
+      col3={changeTypeLabels[change.change_type]}
+      col4={change.exceptions && change.exceptions.length ? I18n.t('No') : I18n.t('Yes')}
+    >
+      <div className="bcs__history-item__lock-icon">
+        <Text size="large" color="secondary">
+          {change.locked ? (
+            <IconLock data-testid="icon-lock" />
+          ) : (
+            <IconUnlock data-testid="icon-unlock" />
+          )}
+        </Text>
+      </div>
+    </ChangeLogRow>
+  )
 }

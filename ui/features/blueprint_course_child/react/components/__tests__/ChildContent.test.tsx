@@ -41,37 +41,37 @@ describe('ChildContent app', () => {
   test('clearRoutes removes blueprint path', () => {
     const props = defaultProps()
     props.routeTo = vi.fn()
-    const ref = React.createRef()
+    const ref = React.createRef<ChildContent>()
     render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
-    instance.clearRoutes()
+    instance?.clearRoutes()
     expect(props.routeTo).toHaveBeenCalledWith('#!/blueprint')
   })
 
   test('showChangeLog calls selectChangeLog prop with argument', () => {
     const props = defaultProps()
     props.selectChangeLog = vi.fn()
-    const ref = React.createRef()
+    const ref = React.createRef<ChildContent>()
     render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
-    instance.showChangeLog('5')
-    expect(props.selectChangeLog).toHaveBeenCalledWith('5')
+    instance?.showChangeLog({blueprintId: '5', changeId: '5'})
+    expect(props.selectChangeLog).toHaveBeenCalledWith({blueprintId: '5', changeId: '5'})
   })
 
   test('hideChangeLog calls selectChangeLog prop with null', () => {
     const props = defaultProps()
     props.selectChangeLog = vi.fn()
-    const ref = React.createRef()
+    const ref = React.createRef<ChildContent>()
     render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
-    instance.hideChangeLog()
+    instance?.hideChangeLog()
     expect(props.selectChangeLog).toHaveBeenCalledWith(null)
   })
 
   test('realRef gets called with component instance on mount', () => {
     const props = defaultProps()
     props.realRef = vi.fn()
-    const ref = React.createRef()
+    const ref = React.createRef<ChildContent>()
     const tree = render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
     expect(props.realRef).toHaveBeenCalledTimes(1)
