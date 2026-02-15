@@ -26,8 +26,10 @@ ready(() => {
   const coursePublishButtonContainer = document.getElementById('course_publish_button')
   if (coursePublishButtonContainer) {
     const publishButton = React.createElement(CoursePublishButton, {
-      isPublished: ENV.COURSE.is_published,
-      courseId: ENV.COURSE_ID || ENV.COURSE.id,
+      // @ts-expect-error - COURSE is a page-specific ENV property
+      isPublished: ENV.COURSE?.is_published,
+      // @ts-expect-error - COURSE is a page-specific ENV property
+      courseId: ENV.COURSE_ID || ENV.COURSE?.id,
       shouldRedirect: true,
     })
     const root = createRoot(coursePublishButtonContainer)
