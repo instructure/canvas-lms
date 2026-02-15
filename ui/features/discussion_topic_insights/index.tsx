@@ -26,5 +26,7 @@ ready(() => {
   mountNutritionFacts('discussioninsights')
   document.querySelector('body')?.classList.add('full-width')
   const contentElement = document.getElementById('discussion-insights-container')
-  render(<DiscussionInsightsApp />, contentElement)
+  if (contentElement) {
+    render(<DiscussionInsightsApp />, contentElement)
+  }
 })
