@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {createRoot} from 'react-dom/client'
+import {createRoot, type Root} from 'react-dom/client'
 import round from '@canvas/round'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -55,10 +55,15 @@ import {
 const I18n = createI18nScope('submissions')
 /* global rubricAssessment */
 
+// Legacy global from rubric_assessment jQuery plugin
+declare const rubricAssessment: any
+
+// @ts-expect-error - Canvas ENV global not fully typed
 const rubricAssessments = ENV.rubricAssessments
 
 $('#content').addClass('padless')
 let fileIndex = 1
+// @ts-expect-error - Legacy jQuery-based submission data structure not fully typed
 function submissionLoaded(data) {
   if (data.submission) {
     const d = []
@@ -68,8 +73,10 @@ function submissionLoaded(data) {
   for (const jdx in data) {
     const submission = data[jdx].submission
     const comments = submission.visible_submission_comments || submission.submission_comments
+    // @ts-expect-error - Canvas ENV.SUBMISSION global not typed in GlobalEnv
     const anonymizableId = ENV.SUBMISSION.user_id ? 'user_id' : 'anonymous_id'
     // Be sure not to compare numeric and stringified user IDs
+    // @ts-expect-error - Canvas ENV.SUBMISSION global not typed in GlobalEnv
     if (submission[anonymizableId].toString() !== ENV.SUBMISSION[anonymizableId]) {
       continue
     }
@@ -120,19 +127,25 @@ function submissionLoaded(data) {
   }
   $('.submission_header').loadingImage('remove')
 }
-function callIfSet(value, fn, ...additionalArgs) {
+function callIfSet<T, R>(
+  this: any,
+  value: T | null | undefined,
+  fn: (this: any, val: T, ...args: any[]) => R,
+  ...additionalArgs: any[]
+): R | string {
   return value == null ? '' : fn.call(this, value, ...additionalArgs)
 }
-function roundAndFormat(value) {
+function roundAndFormat(value: number): string {
   return I18n.n(round(value, round.DEFAULT))
 }
-function formatGradeOptions() {
-  if (ENV.GRADING_TYPE === 'letter_grade') {
-    return {gradingType: ENV.GRADING_TYPE}
+function formatGradeOptions(): {gradingType?: string} {
+  if ((ENV as any).GRADING_TYPE === 'letter_grade') {
+    return {gradingType: (ENV as any).GRADING_TYPE}
   }
 
   return {}
 }
+// @ts-expect-error - Legacy submission object structure not fully typed
 function showGrade(submission) {
   if (['pass', 'fail', 'complete', 'incomplete'].indexOf(submission.entered_grade) > -1) {
     $('.grading_box').val(submission.entered_grade)
@@ -162,11 +175,11 @@ function showGrade(submission) {
     $('.late-penalty-display').hide()
   }
 }
-function makeRubricAccessible($rubric) {
+function makeRubricAccessible($rubric: JQuery): void {
   $rubric.show()
   const $tabs = $rubric.find(':tabbable')
   const tabBounds = [$tabs.first()[0], $tabs.last()[0]]
-  const keyCodes = {
+  const keyCodes: Record<number, string> = {
     9: 'tab',
     13: 'enter',
     27: 'esc',
@@ -197,25 +210,25 @@ function makeRubricAccessible($rubric) {
   })
   $rubric
     .siblings()
-    .attr('data-hide_from_rubric', true)
+    .attr('data-hide_from_rubric', 'true')
     .end()
     .parentsUntil('#application')
     .siblings()
     .not('#aria_alerts')
-    .attr('data-hide_from_rubric', true)
+    .attr('data-hide_from_rubric', 'true')
   $rubric.hide()
 }
-function toggleRubric($rubric) {
+function toggleRubric($rubric: JQuery): void {
   const ariaSetting = $rubric.is(':visible')
-  $('#application').find('[data-hide_from_rubric]').attr('aria-hidden', ariaSetting)
+  $('#application').find('[data-hide_from_rubric]').attr('aria-hidden', String(ariaSetting))
 }
-function closeRubric() {
+function closeRubric(): void {
   $('#rubric_holder').fadeOut(function () {
     toggleRubric($(this))
     $('.assess_submission_link').focus()
   })
 }
-function openRubric() {
+function openRubric(): void {
   validateComments()
   $('#rubric_holder').fadeIn(function () {
     toggleRubric($(this))
@@ -224,13 +237,14 @@ function openRubric() {
   })
 }
 
-function validateComments() {
+function validateComments(): void {
   $('.rubric-comment textarea').each(function () {
     validateComment($(this))
   })
 }
 
-function validateComment($commentTextArea) {
+function validateComment($commentTextArea: JQuery): void {
+  // @ts-expect-error - jQuery val() can return string or string[] depending on context
   const newValue = $commentTextArea.val().trim()
   if (newValue !== '') {
     handleValidationClear($commentTextArea)
@@ -240,7 +254,7 @@ function validateComment($commentTextArea) {
   }
 }
 
-function handleValidationClear($textArea) {
+function handleValidationClear($textArea: JQuery): void {
   const $wrapper = $textArea.closest('.rubric-comment')
   if ($wrapper.find('.error-message').length) {
     setTimeout(() => {
@@ -251,7 +265,7 @@ function handleValidationClear($textArea) {
   }
 }
 
-function refreshEventHandlers() {
+function refreshEventHandlers(): void {
   $('.add-comment-button-wrapper button')
     .off('click.commentHandler')
     .on('click.commentHandler', function () {
@@ -273,7 +287,7 @@ function refreshEventHandlers() {
 
   addEvents()
 }
-function showErrorMessage(selector, message) {
+function showErrorMessage(selector: JQuery, message: string): void {
   let errorContainer = selector.find('.error-message')
   if (errorContainer.length) return
   errorContainer = $('<div />', {
@@ -294,7 +308,7 @@ function showErrorMessage(selector, message) {
   selector.find('.error-textarea').next('span').css('border-color', theme.colors?.ui?.surfaceError)
 }
 
-function windowResize() {
+function windowResize(): void {
   const $frame = $('#preview_frame')
   const margin_top = 20
   const height = window.screen.height - margin_top
@@ -303,7 +317,7 @@ function windowResize() {
   $('.comments').css({maxHeight: height})
 }
 
-function insertEmoji(emoji) {
+function insertEmoji(emoji: {native: string}): void {
   const $textarea = $('.grading_comment')
   $textarea.val((_i, text) => text + emoji.native)
   $textarea.focus()
@@ -312,7 +326,7 @@ function insertEmoji(emoji) {
 // This `setup` function allows us to control when the setup is triggered.
 // submissions.js requires this file and then immediately triggers it,
 // while submissionsSpec.jsx triggers it after setup is complete.
-export function setup() {
+export function setup(): void {
   $(document).ready(function () {
     // Render Checkpoint Score Boxes if applicable
     // The mount point is only available if checkpoints are enabled and the assignment has checkpoints
@@ -322,20 +336,20 @@ export function setup() {
       const root = createRoot(mountPoint)
       const props = {
         assignment: {
-          grading_type: ENV.GRADING_TYPE,
-          total_score: ENV.SUBMISSION.submission.grade || '',
+          grading_type: (ENV as any).GRADING_TYPE,
+          total_score: (ENV as any).SUBMISSION.submission.grade || '',
           checkpoint_submissions: [
             {
-              tag: 'reply_to_topic',
-              points_possible: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.points_possible,
-              submission_score: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.entered_score,
-              submission_id: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.submission_id,
+              tag: 'reply_to_topic' as const,
+              points_possible: (ENV as any).CHECKPOINT_SUBMISSIONS.reply_to_topic.points_possible,
+              submission_score: (ENV as any).CHECKPOINT_SUBMISSIONS.reply_to_topic.entered_score,
+              submission_id: (ENV as any).CHECKPOINT_SUBMISSIONS.reply_to_topic.submission_id,
             },
             {
-              tag: 'reply_to_entry',
-              points_possible: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.points_possible,
-              submission_score: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.entered_score,
-              submission_id: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.submission_id,
+              tag: 'reply_to_entry' as const,
+              points_possible: (ENV as any).CHECKPOINT_SUBMISSIONS.reply_to_entry.points_possible,
+              submission_score: (ENV as any).CHECKPOINT_SUBMISSIONS.reply_to_entry.entered_score,
+              submission_id: (ENV as any).CHECKPOINT_SUBMISSIONS.reply_to_entry.submission_id,
             },
           ],
         },
@@ -343,7 +357,7 @@ export function setup() {
       root.render(<CheckpointGradeRoot {...props} />)
     }
 
-    if (ENV.EMOJIS_ENABLED) {
+    if ((ENV as any).EMOJIS_ENABLED) {
       ReactDOM.render(
         <EmojiPicker insertEmoji={insertEmoji} />,
         document.getElementById('emoji-picker-container'),
@@ -354,17 +368,19 @@ export function setup() {
         document.getElementById('emoji-quick-picker-container'),
       )
     }
-    let textAreaErrorRoot
+    let textAreaErrorRoot: Root | undefined
     const comments = document.getElementsByClassName('comment_content')
     Array.from(comments).forEach(comment => {
-      const content = comment.dataset.content
+      const content = comment instanceof HTMLElement ? (comment.dataset.content ?? '') : ''
       const formattedComment = containsHtmlTags(content)
         ? sanitizeHtml(content)
         : formatMessage(content)
-      comment.innerHTML = formattedComment
+      if (comment instanceof HTMLElement) {
+        comment.innerHTML = formattedComment
+      }
     })
     const textAreaContainer = document.getElementById('textarea-container')
-    const textAreaElement = document.querySelector('textarea.grading_comment')
+    const textAreaElement = document.querySelector<HTMLTextAreaElement>('textarea.grading_comment')
     const clearTextAreaErrors = () => {
       if (textAreaErrorRoot) {
         textAreaErrorRoot.unmount()
@@ -392,23 +408,23 @@ export function setup() {
     $(document).bind('comment_change', _event => {
       $('.save_comment_button').prop('disabled', true)
       $('.submission_header').loadingImage()
-      const url = $('.update_submission_url').attr('href')
-      const method = $('.update_submission_url').attr('title')
-      const formData = {
-        'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
+      const url = $('.update_submission_url').attr('href') ?? ''
+      const method = $('.update_submission_url').attr('title') ?? 'POST'
+      const formData: Record<string, string | number> = {
+        'submission[assignment_id]': (ENV as any).SUBMISSION.assignment_id,
         'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       }
       const fileInputs = $("#add_comment_form input[type='file']")
       let hasFiles = false
       fileInputs.each((_idx, input) => {
-        if (input.files.length > 0) {
+        if (input instanceof HTMLInputElement && input.files && input.files.length > 0) {
           hasFiles = true
           return
         }
       })
 
-      const anonymizableIdKey = ENV.SUBMISSION.user_id ? 'user_id' : 'anonymous_id'
-      formData[`submission[${anonymizableIdKey}]`] = ENV.SUBMISSION[anonymizableIdKey]
+      const anonymizableIdKey = (ENV as any).SUBMISSION.user_id ? 'user_id' : 'anonymous_id'
+      formData[`submission[${anonymizableIdKey}]`] = (ENV as any).SUBMISSION[anonymizableIdKey]
 
       if ($('#media_media_recording:visible').length > 0) {
         const comment_id = $('#media_media_recording').data('comment_id')
@@ -417,8 +433,10 @@ export function setup() {
         formData['submission[media_comment_id]'] = comment_id
         formData['submission[comment]'] = ''
       } else {
-        if ($('.grading_comment').val() && $('.grading_comment').val != '') {
-          formData['submission[comment]'] = $('.grading_comment').val()
+        const commentVal = $('.grading_comment').val()
+        if (commentVal && commentVal !== '') {
+          formData['submission[comment]'] =
+            typeof commentVal === 'string' ? commentVal : String(commentVal)
         }
         if (!formData['submission[comment]'] && hasFiles) {
           formData['submission[comment]'] = I18n.t(
@@ -439,20 +457,22 @@ export function setup() {
         textAreaContainer?.classList.add('error-outline')
         textAreaContainer?.setAttribute('aria-label', message)
         const textAreaErrorContainer = document.getElementById('textarea-error-container')
-        textAreaErrorRoot = createRoot(textAreaErrorContainer)
-        textAreaErrorRoot.render(
-          <FormattedErrorMessage
-            message={message}
-            margin="xx-small 0 small 0"
-            iconMargin="0 xx-small xxx-small 0"
-          />,
-        )
+        if (textAreaErrorContainer) {
+          textAreaErrorRoot = createRoot(textAreaErrorContainer)
+          textAreaErrorRoot.render(
+            <FormattedErrorMessage
+              message={message}
+              margin="xx-small 0 small 0"
+              iconMargin="0 xx-small xxx-small 0"
+            />,
+          )
+        }
         return
       }
       if (hasFiles) {
-        $.ajaxJSONFiles(url + '.text', method, formData, fileInputs, submissionLoaded)
+        ;($ as any).ajaxJSONFiles(url + '.text', method, formData, fileInputs, submissionLoaded)
       } else {
-        $.ajaxJSON(url, method, formData, submissionLoaded)
+        ;($ as any).ajaxJSON(url, method, formData, submissionLoaded)
       }
     })
     $('.cancel_comment_button').click(_event => {
@@ -466,16 +486,17 @@ export function setup() {
     $(document).bind('grading_change', _event => {
       $('.save_comment_button').prop('disabled', true)
       $('.submission_header').loadingImage()
-      const url = $('.update_submission_url').attr('href')
-      const method = $('.update_submission_url').attr('title')
-      const formData = {
-        'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
-        'submission[user_id]': ENV.SUBMISSION.user_id,
+      const url = $('.update_submission_url').attr('href') ?? ''
+      const method = $('.update_submission_url').attr('title') ?? 'POST'
+      const formData: Record<string, string | number> = {
+        'submission[assignment_id]': (ENV as any).SUBMISSION.assignment_id,
+        'submission[user_id]': (ENV as any).SUBMISSION.user_id,
         'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       }
       if ($('.grading_value:visible').length > 0) {
-        formData['submission[grade]'] = GradeFormatHelper.delocalizeGrade($('.grading_value').val())
-        $.ajaxJSON(url, method, formData, submissionLoaded)
+        formData['submission[grade]'] = GradeFormatHelper.delocalizeGrade(
+          $('.grading_value').val(),
+        )($ as any).ajaxJSON(url, method, formData, submissionLoaded)
       } else {
         $('.submission_header').loadingImage('remove')
         $('.save_comment_button').prop('disabled', false)
@@ -488,11 +509,14 @@ export function setup() {
       $('#add_comment_form .comment_attachments').append($attachment.slideDown())
     })
     document.addEventListener('change', function (event) {
-      if (event.target.matches('#add_comment_form input[type="file"]')) {
+      if (
+        event.target instanceof HTMLInputElement &&
+        event.target.matches('#add_comment_form input[type="file"]')
+      ) {
         const inputElement = event.target
         const parentElement = inputElement.parentNode
 
-        if (inputElement.files && inputElement.files.length > 0) {
+        if (parentElement && inputElement.files && inputElement.files.length > 0) {
           const fileName = inputElement.files[0].name
 
           // Hide the input element
@@ -511,7 +535,7 @@ export function setup() {
           const container = document.createElement('div')
           parentElement.appendChild(container)
           const fileRoot = createRoot(container)
-          const removeFile = (root, input) => {
+          const removeFile = (root: Root, input: HTMLInputElement) => {
             root.unmount()
             input.remove()
           }
@@ -549,8 +573,10 @@ export function setup() {
       $rubricComments.each(function () {
         const $wrapper = $(this)
         const $commentTextArea = $wrapper.find('textarea')
+        const val = $commentTextArea.val()
+        const textVal = typeof val === 'string' ? val : Array.isArray(val) ? val.join('') : ''
 
-        if ($commentTextArea.length > 0 && $commentTextArea.val().trim() === '') {
+        if ($commentTextArea.length > 0 && textVal.trim() === '') {
           showErrorMessage($wrapper, I18n.t('A comment is required.'))
           hasError = true
         } else {
@@ -571,12 +597,12 @@ export function setup() {
       const url = $('.update_rubric_assessment_url').attr('href')
       const method = 'POST'
       $rubric.loadingImage()
-      $.ajaxJSON(url, method, submitted_data, data => {
+      ;($ as any).ajaxJSON(url, method, submitted_data, (data: any) => {
         $rubric.loadingImage('remove')
         const assessment = data
         let found = false
         if (assessment.rubric_association) {
-          rubricAssessment.updateRubricAssociation($rubric, data.rubric_association)
+          ;(rubricAssessment as any).updateRubricAssociation($rubric, data.rubric_association)
           delete assessment.rubric_association
         }
         for (const idx in rubricAssessments) {
@@ -628,8 +654,8 @@ export function setup() {
     $('.assess_submission_link').click(event => {
       event.preventDefault()
       $('#rubric_assessments_select').change()
-      if (ENV.mark_rubric_comments_read_url) {
-        $.ajaxJSON(ENV.mark_rubric_comments_read_url, 'PUT', {}, () => {})
+      if ((ENV as any).mark_rubric_comments_read_url) {
+        ;($ as any).ajaxJSON((ENV as any).mark_rubric_comments_read_url, 'PUT', {}, () => {})
         $('.rubric_comment.unread_indicator').hide()
         $('.submission-details-header__rubric .assess_submission_link').attr('title', '')
       }
@@ -638,7 +664,7 @@ export function setup() {
     $('#rubric_assessments_select')
       .change(function () {
         const id = $(this).val()
-        let found = null
+        let found: any = null
         for (const idx in rubricAssessments) {
           const assessment = rubricAssessments[idx].rubric_assessment
           if (assessment.id == id) {
@@ -647,9 +673,14 @@ export function setup() {
         }
 
         const container = $('#rubric_holder .rubric')
-        rubricAssessment.populateNewRubric(container, found, ENV.rubricAssociation)
+        ;(rubricAssessment as any).populateNewRubric(
+          container,
+          found,
+          (ENV as any).rubricAssociation,
+        )
 
-        const current_user = !found || found.assessor_id == ENV.RUBRIC_ASSESSMENT.assessor_id
+        const current_user =
+          !found || found.assessor_id == (ENV as any).RUBRIC_ASSESSMENT.assessor_id
         $('#rubric_holder .save_rubric_button').showIf(current_user)
       })
       .change()
@@ -660,7 +691,7 @@ export function setup() {
       $recording.mediaComment(
         'create',
         'any',
-        (id, type) => {
+        (id: any, type: any) => {
           $('#media_media_recording').data('comment_id', id).data('comment_type', type)
           $(document).triggerHandler('comment_change')
           $('#add_comment_form').show()
@@ -702,20 +733,21 @@ export function setup() {
         e.stopPropagation()
       })
 
-    showGrade(ENV.SUBMISSION.submission)
+    showGrade((ENV as any).SUBMISSION.submission)
   })
 }
 // necessary for tests
-export function teardown() {
+export function teardown(): void {
   $(window).unbind('resize', windowResize)
   $(document).unbind('comment_change')
   $(document).unbind('grading_change')
 }
-$(document).fragmentChange((event, hash) => {
+// @ts-expect-error - Legacy jQuery plugin fragmentChange not fully typed
+$(document).fragmentChange((event: any, hash: any) => {
   if (hash === '#rubric') {
     $('.assess_submission_link:visible:first').click()
   } else if (hash.match(/^#comment/)) {
-    let params = null
+    let params: any = null
     try {
       params = JSON.parse(hash.substring(8))
     } catch (e) {
@@ -727,10 +759,10 @@ $(document).fragmentChange((event, hash) => {
     $('.grading_comment').focus().select()
   }
 })
-INST.refreshGrades = function () {
+;(INST as any).refreshGrades = function () {
   const url = $('.submission_data_url').attr('href')
   setTimeout(() => {
-    $.ajaxJSON(url, 'GET', {}, submissionLoaded)
+    ;($ as any).ajaxJSON(url, 'GET', {}, submissionLoaded)
   }, 500)
 }
 
@@ -739,7 +771,7 @@ $(document).ready(() => {
     'message',
     event => {
       if (event.data === 'refreshGrades') {
-        INST.refreshGrades()
+        ;(INST as any).refreshGrades()
       }
     },
     false,
