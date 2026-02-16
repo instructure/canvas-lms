@@ -21,24 +21,59 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('user')
 
+type Identifier = string | number
+
+interface RosterSection extends Record<string, unknown> {
+  id: Identifier
+  name: string
+}
+
+interface RosterEnrollment extends Record<string, unknown> {
+  id?: Identifier
+  course_section_id: Identifier
+  enrollment_state: string
+  html_url?: string
+  total_activity_time?: number
+}
+
+interface RosterUserAttributes extends Record<string, unknown> {
+  enrollments: RosterEnrollment[]
+  avatar_url?: string
+}
+
+interface SectionCollectionLike {
+  get: (id: Identifier) => {attributes: RosterSection} | undefined
+}
+
+interface RosterUserCollectionLike {
+  sections?: SectionCollectionLike | null
+}
+
 class RosterUser extends User {
-  html_url() {
+  declare attributes: RosterUserAttributes
+  declare collection?: RosterUserCollectionLike
+  declare defaults: {avatar_url: string}
+  declare computedAttributes: Array<string | {name: string; deps: string[]}>
+  declare get: <K extends keyof RosterUserAttributes>(key: K) => RosterUserAttributes[K]
+
+  html_url(): string | undefined {
     return this.get('enrollments')[0]?.html_url
   }
 
-  sections() {
+  sections(): Array<Record<string, unknown>> {
     if (!(this.collection instanceof Object)) return []
     const {sections} = this.collection
     if (sections === null || typeof sections === 'undefined') return []
-    const user_sections = []
+    const user_sections: Array<Record<string, unknown>> = []
     for (const {course_section_id, enrollment_state} of this.get('enrollments')) {
       const user_section = sections.get(course_section_id)
       if (user_section) {
-        const section = {
+        const section: Record<string, unknown> & {name?: string} = {
           ...user_section.attributes,
         }
         if (enrollment_state === 'inactive') {
-          section.name = I18n.t('%{section_name} - Inactive', {section_name: section.name})
+          const sectionName = typeof section.name === 'string' ? section.name : ''
+          section.name = I18n.t('%{section_name} - Inactive', {section_name: sectionName})
         }
         user_sections.push(section)
       }
@@ -46,8 +81,8 @@ class RosterUser extends User {
     return user_sections
   }
 
-  total_activity_string() {
-    const times = this.get('enrollments').map(e => e.total_activity_time)
+  total_activity_string(): string {
+    const times = this.get('enrollments').map(e => Number(e.total_activity_time ?? 0))
     const maxTime = Math.max(...times)
     return maxTime ? secondsToTime(maxTime) : ''
   }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck - Legacy Backbone view with complex dynamic typing
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *

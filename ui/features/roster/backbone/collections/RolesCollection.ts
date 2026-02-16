@@ -19,7 +19,34 @@ import Backbone from '@canvas/backbone'
 
 import Role from '../models/Role'
 
+interface RolesCollectionOptions extends Record<string, unknown> {
+  contextAssetString?: string
+}
+
 export default class RolesCollection extends Backbone.Collection {
+  static sortOrder = [
+    'NoPermissions',
+    'AccountMembership',
+    'StudentEnrollment',
+    'TaEnrollment',
+    'TeacherEnrollment',
+    'DesignerEnrollment',
+    'ObserverEnrollment',
+  ]
+
+  declare model: typeof Role
+  declare models: Role[]
+  declare options: RolesCollectionOptions
+  declare size: () => number
+  declare fetch: (options?: Record<string, unknown>) => JQuery.jqXHR
+  declare sort: () => void
+
+  constructor(models: Role[] | null = null, options: RolesCollectionOptions = {}) {
+    super(models, options)
+    this.options = options
+    if (models?.length) this.sort()
+  }
+
   // Method Summary
   //   Roles are ordered by base_role_type then alphabetically within those
   //   base role types. The order that these base role types live is defined
@@ -29,10 +56,10 @@ export default class RolesCollection extends Backbone.Collection {
   //   underlining implementation which is just ordering based on alphabetical
   //   correctness.
   // @api backbone override
-  comparator(role) {
-    const base_role_type = role.get('base_role_type')
-    const index = RolesCollection.prototype.sortOrder.indexOf(base_role_type)
-    const role_name = role.get('role')
+  comparator(role: Role): string {
+    const base_role_type = role.get('base_role_type') ?? ''
+    const index = RolesCollection.sortOrder.indexOf(base_role_type)
+    const role_name = role.get('role') ?? ''
 
     let position_string = `${index}_${base_role_type}_${role_name}`
 
@@ -45,15 +72,10 @@ export default class RolesCollection extends Backbone.Collection {
 
     return position_string
   }
+
+  url(): string {
+    const accountId = this.options.contextAssetString?.split('_')[1]
+    return `/api/v1/accounts/${accountId}/roles`
+  }
 }
 RolesCollection.prototype.model = Role
-
-RolesCollection.prototype.sortOrder = [
-  'NoPermissions',
-  'AccountMembership',
-  'StudentEnrollment',
-  'TaEnrollment',
-  'TeacherEnrollment',
-  'DesignerEnrollment',
-  'ObserverEnrollment',
-]
