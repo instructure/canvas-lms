@@ -41,8 +41,14 @@ const I18n = createI18nScope('quiz_statistics.summary')
 
 const NA_LABEL = I18n.t('not_available_abbrev', 'N/A')
 
-const Column = props => (
+interface ColumnProps {
+  icon: React.ReactNode
+  label: string
+}
+
+const Column = (props: ColumnProps) => (
   <th scope="col">
+    {/* @ts-expect-error - SightedUserContent legacy component doesn't have typed props */}
     <SightedUserContent tagName="i" className="inline">
       {props.icon}
     </SightedUserContent>{' '}
@@ -50,7 +56,29 @@ const Column = props => (
   </th>
 )
 
-class Summary extends React.Component {
+interface QuizReport {
+  id: string | number
+  includesAllVersions?: boolean
+  [key: string]: unknown
+}
+
+interface Scores {
+  [key: string]: unknown
+}
+
+export interface SummaryProps {
+  loading?: boolean
+  quizReports?: QuizReport[]
+  pointsPossible?: number
+  scoreAverage?: number
+  scoreHigh?: number
+  scoreLow?: number
+  scoreStdev?: number
+  durationAverage?: number
+  scores?: Scores
+}
+
+class Summary extends React.Component<SummaryProps> {
   static defaultProps = {
     quizReports: [],
     pointsPossible: 0,
@@ -79,12 +107,13 @@ class Summary extends React.Component {
           <div className="pull-right inline">
             <SectionSelect />
             {this.props.quizReports
-              .filter(report => report.includesAllVersions === config.includesAllVersions)
+              ?.filter(report => report.includesAllVersions === config.includesAllVersions)
               .map(this.renderReport.bind(this))}
           </div>
         </header>
 
         <table className="text-left">
+          {/* @ts-expect-error - ScreenReaderContent legacy component doesn't have typed props */}
           <ScreenReaderContent tagName="caption" forceSentenceDelimiter={true}>
             {I18n.t('table_description', 'Summary statistics for all turned in submissions')}
           </ScreenReaderContent>
@@ -105,18 +134,21 @@ class Summary extends React.Component {
           <tbody>
             <tr>
               <td className="emphasized">
-                {isLoading ? NA_LABEL : this.ratioFor(this.props.scoreAverage) + '%'}
+                {isLoading ? NA_LABEL : this.ratioFor(this.props.scoreAverage ?? 0) + '%'}
               </td>
-              <td>{isLoading ? NA_LABEL : this.ratioFor(this.props.scoreHigh) + '%'}</td>
-              <td>{isLoading ? NA_LABEL : this.ratioFor(this.props.scoreLow) + '%'}</td>
-              <td>{isLoading ? NA_LABEL : formatNumber(round(this.props.scoreStdev, 2), 2)}</td>
+              <td>{isLoading ? NA_LABEL : this.ratioFor(this.props.scoreHigh ?? 0) + '%'}</td>
+              <td>{isLoading ? NA_LABEL : this.ratioFor(this.props.scoreLow ?? 0) + '%'}</td>
+              <td>
+                {isLoading ? NA_LABEL : formatNumber(round(this.props.scoreStdev ?? 0, 2), 2)}
+              </td>
 
               {isLoading ? (
                 <td key="duration">{NA_LABEL}</td>
               ) : (
                 <td key="duration">
+                  {/* @ts-expect-error - ScreenReaderContent legacy component doesn't have typed props */}
                   <ScreenReaderContent forceSentenceDelimiter={true}>
-                    {secondsToTime.toReadableString(this.props.durationAverage)}
+                    {secondsToTime.toReadableString(this.props.durationAverage ?? 0)}
                   </ScreenReaderContent>
                   {/*
                     try to hide the [HH:]MM:SS timestamp from SR users because
@@ -124,7 +156,7 @@ class Summary extends React.Component {
                     modes such as the Speak-All mode (at least on VoiceOver)
                   */}
                   <SightedUserContent>
-                    {secondsToTime(this.props.durationAverage)}
+                    {secondsToTime(this.props.durationAverage ?? 0)}
                   </SightedUserContent>
                 </td>
               )}
@@ -134,23 +166,23 @@ class Summary extends React.Component {
 
         <ScorePercentileChart
           key="chart"
-          scores={this.props.scores}
-          scoreAverage={this.props.scoreAverage}
-          pointsPossible={this.props.pointsPossible}
+          scores={this.props.scores ?? {}}
+          scoreAverage={this.props.scoreAverage ?? 0}
+          pointsPossible={this.props.pointsPossible ?? 0}
         />
       </div>
     )
   }
 
-  renderReport(reportProps) {
+  renderReport(reportProps: QuizReport) {
     return <Report key={'report-' + reportProps.id} {...reportProps} />
   }
 
-  ratioFor(score) {
+  ratioFor(score: number) {
     const quizPoints = parseNumber(this.props.pointsPossible)
 
     if (quizPoints > 0) {
-      return round((score / quizPoints) * 100.0, 0, 0)
+      return round((score / quizPoints) * 100.0, 0)
     } else {
       return 0
     }

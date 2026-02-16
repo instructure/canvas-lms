@@ -29,10 +29,14 @@ import {IconQuestionLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('quiz_statistics.discrimination_index')
 
-const DiscriminationIndex = ({discriminationIndex: di = 0}) => {
+export interface DiscriminationIndexProps {
+  discriminationIndex?: number
+}
+
+const DiscriminationIndex = ({discriminationIndex: di = 0}: DiscriminationIndexProps) => {
   const [displayingHelp, displayHelp] = useState(false)
   const passing = di > K.DISCRIMINATION_INDEX_THRESHOLD ? '+' : '-'
-  const sign = di == 0 ? '' : di > 0 ? '+' : '-' // "", "-", or "+"
+  const sign = di === 0 ? '' : di > 0 ? '+' : '-' // "", "-", or "+"
   const className = {
     index: true,
     positive: passing === '+',
@@ -59,7 +63,7 @@ const DiscriminationIndex = ({discriminationIndex: di = 0}) => {
                 'discrimination_index_dialog_trigger',
                 'Learn more about the Discrimination Index.',
               )}
-              tabIndex="0"
+              tabIndex={0}
               onClick={() => displayHelp(true)}
             >
               <IconQuestionLine />
@@ -69,12 +73,14 @@ const DiscriminationIndex = ({discriminationIndex: di = 0}) => {
               open={displayingHelp}
               onDismiss={() => displayHelp(false)}
               label={I18n.t('discrimination_index_dialog_title', 'The Discrimination Index Chart')}
+              footer={null}
             >
               <Help style={{width: 480}} />
             </CanvasModal>
           </p>
         </SightedUserContent>
 
+        {/* @ts-expect-error - ScreenReaderContent legacy component doesn't have typed props */}
         <ScreenReaderContent>
           {I18n.t('audible_discrimination_index', 'Discrimination Index: %{number}.', {
             number: formatNumber(di),
