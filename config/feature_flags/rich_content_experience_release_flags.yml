@@ -473,3 +473,11 @@ a11y_checker_ai_features:
   description: |-
     Enable the new Accessibility Checker AI Features.
   shadow: true
+
+accessibility_automatic_scanning:
+  applies_to: RootAccount
+  state: hidden
+  display_name: Accessibility Checker Automatic Resource Scan
+  description: |-
+    Enable the new Accessibility Checker Automatic Resource Scan.
+  shadow: true
