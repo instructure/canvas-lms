@@ -21,21 +21,23 @@ module Accessibility
     extend ActiveSupport::Concern
 
     included do
-      before_save :capture_changed_a11y_attributes
+      before_save :capture_changed_a11y_attributes, if: :accessibility_automatic_scanning_enabled?
 
-      after_commit :reset_a11y_content_changed_flag, on: [:create, :update]
+      after_commit :reset_a11y_content_changed_flag,
+                   on: [:create, :update],
+                   if: :accessibility_automatic_scanning_enabled?
 
       after_commit :normalize_graded_discussion_topic_scan,
                    on: :update,
-                   if: :needs_normalizing?
+                   if: -> { accessibility_automatic_scanning_enabled? && needs_normalizing? }
 
       after_commit :trigger_accessibility_scan_on_create,
                    on: :create,
-                   if: :should_run_accessibility_scan?
+                   if: -> { accessibility_automatic_scanning_enabled? && should_run_accessibility_scan? }
 
       after_commit :trigger_accessibility_scan_on_update,
                    on: :update,
-                   if: :should_run_accessibility_scan?
+                   if: -> { accessibility_automatic_scanning_enabled? && should_run_accessibility_scan? }
 
       after_commit :remove_accessibility_scan,
                    on: :update,
@@ -59,6 +61,11 @@ module Accessibility
     end
 
     private
+
+    def accessibility_automatic_scanning_enabled?
+      course = is_a?(Course) ? self : context
+      course.is_a?(Course) && course.root_account.feature_enabled?(:accessibility_automatic_scanning)
+    end
 
     def capture_changed_a11y_attributes
       # In case of multiple saves in one transaction, we have to keep track
