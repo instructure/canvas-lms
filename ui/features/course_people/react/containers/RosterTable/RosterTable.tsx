@@ -28,22 +28,60 @@ import RosterTableLastActivity from '../../components/RosterTableLastActivity/Ro
 import RosterTableRoles from '../../components/RosterTableRoles/RosterTableRoles'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import {arrayOf, object, shape} from 'prop-types'
 import {OBSERVER_ENROLLMENT, STUDENT_ENROLLMENT} from '../../../util/constants'
 import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('course_people')
 
+interface Section {
+  name: string
+}
+
+interface Enrollment {
+  id: string
+  type: string
+  canBeRemoved: boolean
+  section: Section
+  totalActivityTime?: number
+  htmlUrl: string
+  state: string
+  sisRole: string
+  lastActivityAt: string | null
+}
+
+interface CourseUserNode {
+  name: string
+  _id: string
+  sisId?: string
+  enrollments: Enrollment[]
+  loginId?: string
+  avatarUrl?: string
+  pronouns?: string
+}
+
+interface RosterTableProps {
+  data: {
+    course: {
+      usersConnection: {
+        nodes: CourseUserNode[]
+      }
+    }
+  }
+}
+
 // InstUI Table.ColHeader id prop is not passed to HTML <th> element
-const idProps = name => ({
+const idProps = (name: string) => ({
   id: name,
   'data-testid': name,
 })
 
-const RosterTable = ({data}) => {
+const RosterTable: React.FC<RosterTableProps> = ({data}) => {
   const {view_user_logins, read_sis, read_reports, can_allow_admin_actions, manage_students} =
+    // @ts-expect-error - permissions property is not in GlobalEnv type yet
     ENV?.permissions || {}
-  const showCourseSections = ENV?.course?.hideSectionsOnCourseUsersPage === false
+  const showCourseSections =
+    // @ts-expect-error - hideSectionsOnCourseUsersPage property is not in Course type yet
+    ENV?.course?.hideSectionsOnCourseUsersPage === false
 
   const tableRows = data.course.usersConnection.nodes.map(node => {
     const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = node
@@ -98,7 +136,9 @@ const RosterTable = ({data}) => {
         {read_reports && (
           <Table.Cell>
             <Text wrap="break-word">
-              {totalActivityTime > 0 && secondsToStopwatchTime(totalActivityTime)}
+              {totalActivityTime &&
+                totalActivityTime > 0 &&
+                secondsToStopwatchTime(totalActivityTime)}
             </Text>
           </Table.Cell>
         )}
@@ -152,17 +192,5 @@ const RosterTable = ({data}) => {
     </Table>
   )
 }
-
-RosterTable.propTypes = {
-  data: shape({
-    course: shape({
-      usersConnection: shape({
-        nodes: arrayOf(object).isRequired,
-      }).isRequired,
-    }).isRequired,
-  }).isRequired,
-}
-
-RosterTable.defaultProps = {}
 
 export default RosterTable

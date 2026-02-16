@@ -46,7 +46,7 @@ const teacherEnrollment = {
 const noLastActivityEnrollment = {
   id: '4',
   type: 'StudentEnrollment',
-  lastActivityAt: null,
+  lastActivityAt: null as string | null,
 }
 
 const DEFAULT_PROPS = {
@@ -54,12 +54,13 @@ const DEFAULT_PROPS = {
 }
 
 describe('RosterTableLastActivity', () => {
-  const setup = props => {
+  const setup = (props: typeof DEFAULT_PROPS) => {
     return render(<RosterTableLastActivity {...props} />)
   }
 
   beforeAll(() => {
-    ENV = {
+    window.ENV = {
+      ...window.ENV,
       TIMEZONE: 'America/Detroit',
       CONTEXT_TIMEZONE: 'America/Chicago',
     }
@@ -101,7 +102,7 @@ describe('RosterTableLastActivity', () => {
   })
 
   it('should not render any content if the user last activity is null', () => {
-    const container = setup({enrollments: [noLastActivityEnrollment]})
+    const container = setup({enrollments: [noLastActivityEnrollment] as any})
     expect(container.queryAllByText(/.+/i)).toHaveLength(0)
     expect(container.queryAllByRole('tooltip')).toHaveLength(0)
   })

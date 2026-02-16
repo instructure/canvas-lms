@@ -27,7 +27,7 @@ const DEFAULT_PROPS = {
 }
 
 describe('AvatarLink', () => {
-  const setup = props => {
+  const setup = (props: typeof DEFAULT_PROPS | {name: string; avatarUrl: null; href: string}) => {
     return render(<AvatarLink {...props} />)
   }
 

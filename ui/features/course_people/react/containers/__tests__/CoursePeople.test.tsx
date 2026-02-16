@@ -47,10 +47,10 @@ describe('CoursePeople', () => {
   const setOnFailure = vi.fn()
   const setOnSuccess = vi.fn()
   const mockUsers = [DESIGNER_1, TEACHER_1, TA_1, STUDENT_1, STUDENT_2, STUDENT_3, OBSERVER_1].map(
-    user => mockUser(user),
+    (user: any) => mockUser(user),
   )
 
-  const setup = mocks => {
+  const setup = (mocks: ReturnType<typeof getRosterQueryMock>) => {
     return render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
@@ -61,7 +61,18 @@ describe('CoursePeople', () => {
   }
 
   beforeEach(() => {
-    window.ENV = SITE_ADMIN_ENV
+    window.ENV = {
+      ...SITE_ADMIN_ENV,
+      course: {
+        id: SITE_ADMIN_ENV.course.id,
+        name: 'Test Course',
+        start_at: '2021-01-01T00:00:00Z',
+        end_at: '2021-12-31T23:59:59Z',
+        created_at: '2021-01-01T00:00:00Z',
+        // @ts-expect-error hideSectionsOnCourseUsersPage is not in Course type yet
+        hideSectionsOnCourseUsersPage: SITE_ADMIN_ENV.course.hideSectionsOnCourseUsersPage,
+      },
+    }
     window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
@@ -70,18 +81,18 @@ describe('CoursePeople', () => {
       }
     })
 
-    responsiveQuerySizes.mockImplementation(() => ({
+    ;(responsiveQuerySizes as ReturnType<typeof vi.fn>).mockImplementation(() => ({
       desktop: {minWidth: '1024px'},
     }))
   })
 
   it('should render', () => {
-    const container = setup(getRosterQueryMock({mockUsers}))
+    const container = setup(getRosterQueryMock({mockUsers: mockUsers as any}))
     expect(container).toBeTruthy()
   })
 
   it('should render a roster table with user data on desktop size screens', async () => {
-    const container = setup(getRosterQueryMock({mockUsers}))
+    const container = setup(getRosterQueryMock({mockUsers: mockUsers as any}))
     expect(await container.findByRole('table')).toBeInTheDocument()
     const rows = container.getAllByTestId('roster-table-data-row')
     expect(rows).toHaveLength(mockUsers.length)
@@ -89,24 +100,27 @@ describe('CoursePeople', () => {
     rows.forEach((row, index) => {
       const {name, sisId, loginId, enrollments} = mockUsers[index]
       const {type, section, lastActivityAt, totalActivityTime} = enrollments[0]
-      const textToCheck = [name, sisId, loginId]
+      const textToCheck: Array<string | RegExp | null> = [name, sisId, loginId]
       if (type !== OBSERVER_ENROLLMENT) {
         textToCheck.push(section.name, getRoleName(enrollments[0]))
         lastActivityAt && textToCheck.push(DATETIME_PATTERN)
       }
       totalActivityTime && textToCheck.push(STOPWATCH_PATTERN)
 
-      textToCheck.forEach(text =>
-        expect(within(row).getAllByText(text).length).toBeGreaterThanOrEqual(1),
-      )
+      textToCheck.forEach((text: string | RegExp | null) => {
+        if (text !== null) {
+          const matches = within(row).queryAllByText(text)
+          expect(matches.length).toBeGreaterThanOrEqual(1)
+        }
+      })
     })
   })
 
   it('should render cards with user data on tablet size screens and smaller', async () => {
-    responsiveQuerySizes.mockImplementation(() => ({
+    ;(responsiveQuerySizes as ReturnType<typeof vi.fn>).mockImplementation(() => ({
       tablet: {maxWidth: '100px'},
     }))
-    const container = setup(getRosterQueryMock({mockUsers}))
+    const container = setup(getRosterQueryMock({mockUsers: mockUsers as any}))
     expect(await container.findByRole('list')).toBeInTheDocument()
     const list = container.getAllByRole('listitem')
     expect(list).toHaveLength(mockUsers.length)
@@ -114,16 +128,19 @@ describe('CoursePeople', () => {
     list.forEach((listItem, index) => {
       const {name, sisId, loginId, enrollments} = mockUsers[index]
       const {type, section, lastActivityAt, totalActivityTime} = enrollments[0]
-      const textToCheck = [name, sisId, loginId]
+      const textToCheck: Array<string | RegExp | null> = [name, sisId, loginId]
       if (type !== OBSERVER_ENROLLMENT) {
         textToCheck.push(section.name, getRoleName(enrollments[0]))
         lastActivityAt && textToCheck.push(DATETIME_PATTERN)
       }
       totalActivityTime && textToCheck.push(STOPWATCH_PATTERN)
 
-      textToCheck.forEach(text =>
-        expect(within(listItem).getAllByText(text).length).toBeGreaterThanOrEqual(1),
-      )
+      textToCheck.forEach((text: string | RegExp | null) => {
+        if (text !== null) {
+          const matches = within(listItem).queryAllByText(text)
+          expect(matches.length).toBeGreaterThanOrEqual(1)
+        }
+      })
     })
   })
 })

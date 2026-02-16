@@ -27,7 +27,7 @@ import {responsiveQuerySizes} from '../../util/utils'
 
 const CoursePeople = () => {
   const {loading, data} = useQuery(ROSTER_QUERY, {
-    variables: {courseID: ENV.course.id},
+    variables: {courseID: ENV.course?.id},
     fetchPolicy: 'cache-and-network',
     errorPolicy: 'all',
   })
@@ -36,8 +36,8 @@ const CoursePeople = () => {
     <Responsive
       match="media"
       query={responsiveQuerySizes({tablet: true})}
-      render={(props, matches) => {
-        if (matches.includes('tablet')) return <RosterCardView data={data} />
+      render={(_props, matches) => {
+        if (matches?.includes('tablet')) return <RosterCardView data={data} />
         return <RosterTable data={data} />
       }}
     />

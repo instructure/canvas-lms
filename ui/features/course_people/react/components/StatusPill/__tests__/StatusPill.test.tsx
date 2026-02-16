@@ -21,7 +21,7 @@ import React from 'react'
 import StatusPill, {ACTIVE_STATE, INACTIVE_STATE, PENDING_STATE, PILL_MAP} from '../StatusPill'
 
 describe('StatusPill', () => {
-  const setup = state => {
+  const setup = (state: string) => {
     return render(<StatusPill state={state} />)
   }
 

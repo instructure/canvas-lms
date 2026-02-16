@@ -29,21 +29,60 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Table} from '@instructure/ui-table'
-import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {OBSERVER_ENROLLMENT, STUDENT_ENROLLMENT} from '../../../util/constants'
 
 const I18n = createI18nScope('course_people')
 
+interface RosterCardSection {
+  _id: string
+  name: string
+}
+
+interface RosterCardAssociatedUser {
+  _id: string
+  name: string
+}
+
+interface RosterCardEnrollment {
+  id: string
+  type: string
+  state: string
+  htmlUrl: string
+  totalActivityTime?: number
+  canBeRemoved: boolean
+  sisRole: string
+  lastActivityAt: string | null
+  section: RosterCardSection
+  associatedUser?: RosterCardAssociatedUser
+}
+
+interface CourseUsersConnectionNode {
+  name: string
+  _id: string
+  sisId?: string
+  enrollments: RosterCardEnrollment[]
+  loginId?: string
+  avatarUrl?: string
+  pronouns?: string
+}
+
+interface RosterCardProps {
+  courseUsersConnectionNode: CourseUsersConnectionNode
+}
+
 // InstUI Table.ColHeader id prop is not passed to HTML <th> element
-const idProps = name => ({
+const idProps = (name: string) => ({
   id: name,
   'data-testid': name,
 })
 
-const RosterCard = ({courseUsersConnectionNode}) => {
+const RosterCard: React.FC<RosterCardProps> = ({courseUsersConnectionNode}) => {
   const {view_user_logins, read_sis, read_reports, can_allow_admin_actions, manage_students} =
+    // @ts-expect-error - permissions property is not in GlobalEnv type yet
     ENV?.permissions || {}
-  const showCourseSections = ENV?.course?.hideSectionsOnCourseUsersPage === false
+  const showCourseSections =
+    // @ts-expect-error - hideSectionsOnCourseUsersPage property is not in Course type yet
+    ENV?.course?.hideSectionsOnCourseUsersPage === false
 
   const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = courseUsersConnectionNode
   const {totalActivityTime, htmlUrl, state} = enrollments[0]
@@ -64,6 +103,7 @@ const RosterCard = ({courseUsersConnectionNode}) => {
           </Table.Cell>
         )}
         <Table.Cell>
+          {/* @ts-expect-error - enrollment type mismatch between components */}
           <RosterTableRoles enrollments={[enrollment]} />
         </Table.Cell>
         {read_reports && (
@@ -74,7 +114,9 @@ const RosterCard = ({courseUsersConnectionNode}) => {
         {read_reports && (
           <Table.Cell>
             <Text wrap="break-word">
-              {totalActivityTime > 0 && secondsToStopwatchTime(totalActivityTime)}
+              {totalActivityTime &&
+                totalActivityTime > 0 &&
+                secondsToStopwatchTime(totalActivityTime)}
             </Text>
           </Table.Cell>
         )}
@@ -147,36 +189,5 @@ const RosterCard = ({courseUsersConnectionNode}) => {
     </View>
   )
 }
-
-RosterCard.propTypes = {
-  courseUsersConnectionNode: shape({
-    name: string.isRequired,
-    _id: string.isRequired,
-    sisId: string,
-    enrollments: arrayOf(
-      shape({
-        totalActivityTime: number,
-        htmlUrl: string.isRequired,
-        state: string.isRequired,
-        canBeRemoved: bool.isRequired,
-        id: string.isRequired,
-        section: shape({
-          _id: string.isRequired,
-          name: string.isRequired,
-        }),
-        type: string.isRequired,
-        associatedUser: shape({
-          _id: string.isRequired,
-          name: string.isRequired,
-        }),
-      }),
-    ),
-    loginId: string,
-    avatarUrl: string,
-    pronouns: string,
-  }),
-}
-
-RosterCard.defaultProps = {}
 
 export default RosterCard
