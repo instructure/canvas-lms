@@ -24,9 +24,9 @@ import AdminSplit from './react/index'
 ready(() => {
   legacyRender(
     <AdminSplit
-      user={ENV.ADMIN_SPLIT_USER}
-      splitUrl={ENV.ADMIN_SPLIT_URL}
-      splitUsers={ENV.ADMIN_SPLIT_USERS}
+      user={ENV.ADMIN_SPLIT_USER!}
+      splitUrl={ENV.ADMIN_SPLIT_URL!}
+      splitUsers={ENV.ADMIN_SPLIT_USERS!}
     />,
     document.getElementById('admin_split'),
   )
