@@ -22,24 +22,28 @@ import {render} from '@canvas/react'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconUploadLine, IconWarningLine} from '@instructure/ui-icons'
 import ready from '@instructure/ready'
+import {createRoot} from 'react-dom/client'
 
 const I18n = createI18nScope('progress_pill')
 
+type ProgressIconReturn = [React.JSX.Element, string] | null
+
+function progressIcon(presenterObject: Element): ProgressIconReturn {
+  switch (presenterObject.textContent) {
+    case 'pending':
+      return [<IconUploadLine />, I18n.t('Uploading Submission')]
+    case 'failed':
+      return [<IconWarningLine />, I18n.t('Submission Failed to Submit')]
+    default:
+      return null
+  }
+}
+
 ready(() => {
   const presenter = document.querySelectorAll('.assignment_presenter_for_submission')
-  const progressIcon = presenterObject => {
-    switch (presenterObject.innerText) {
-      case 'pending':
-        return [<IconUploadLine />, I18n.t('Uploading Submission')]
-      case 'failed':
-        return [<IconWarningLine />, I18n.t('Submission Failed to Submit')]
-      default:
-        return null
-    }
-  }
-
   const progressElements = document.querySelectorAll('.react_pill_container')
-  const roots = []
+  const roots: ReturnType<typeof createRoot>[] = []
+
   for (let i = 0; i < progressElements.length; i++) {
     const icon = progressIcon(presenter[i])
     if (icon !== null) {
