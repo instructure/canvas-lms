@@ -30,6 +30,8 @@ import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import RCEGlobals from '../../../../RCEGlobals'
+import bridge from '../../../../../bridge'
+import {findMediaPlayerIframe} from '../../../shared/iframeUtils'
 
 const mockVideoPlayers = [
   {
@@ -64,14 +66,20 @@ const mockVideoPlayers = [
   },
 ]
 
+let previousOrigin = ''
+
 beforeAll(() => {
-  contentSelection.asVideoElement = jest.fn(elem => {
+  jest.spyOn(contentSelection, 'asVideoElement').mockImplementation(elem => {
     const vid = elem.parentElement.getAttribute('id')
     return mockVideoPlayers.find(vp => vp.id === vid)
   })
+
+  previousOrigin = bridge.canvasOrigin
+  bridge.canvasOrigin = 'http://localhost'
 })
 
 afterAll(() => {
+  bridge.canvasOrigin = previousOrigin
   jest.restoreAllMocks()
 })
 
@@ -91,6 +99,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       $videos.push($video)
       editor.appendElement($video)
       editor.setSelectedNode($video)
+      findMediaPlayerIframe($video).contentWindow.postMessage = jest.fn()
     })
 
     trayController = new TrayController()
@@ -138,7 +147,10 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
       it('uses the selected video from the editor', async () => {
         trayController.showTrayForEditor(editors[0])
-        expect(getVideoOptionsFromTray().titleText).toEqual($videos[0].getAttribute('title'))
+        window.postMessage({subject: 'media_player.iframe_ready', mediaId: $videos[0].id}, '*')
+        await waitFor(() => {
+          expect(getVideoOptionsFromTray().titleText).toEqual($videos[0].getAttribute('title'))
+        })
       })
     })
 

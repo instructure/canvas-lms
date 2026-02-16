@@ -77,6 +77,7 @@ export default function VideoOptionsTray({
   forBlockEditorUse = false,
   onStudioEmbedOptionChanged = () => {},
   onCaptionsModified = null,
+  isLoading = false,
 }) {
   const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
   const isEmbedImprovements = RCEGlobals.getFeatures()?.rce_studio_embed_improvements
@@ -128,8 +129,10 @@ export default function VideoOptionsTray({
   }, [videoOptions.attachmentId])
 
   useEffect(() => {
-    if (subtitles.length === 0) requestSubtitlesFromIframe(setSubtitles)
-  }, [])
+    if (!isLoading && subtitles.length === 0) {
+      requestSubtitlesFromIframe(setSubtitles)
+    }
+  }, [isLoading, subtitles.length, requestSubtitlesFromIframe])
 
   function handleTitleTextChange(event) {
     setTitleText(event.target.value)
@@ -269,7 +272,7 @@ export default function VideoOptionsTray({
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            {loading && videoOptions.attachmentId ? (
+            {(loading && videoOptions.attachmentId) || isLoading ? (
               <Flex.Item textAlign="center" margin="xx-large" padding="xx-large">
                 <Spinner renderTitle={formatMessage('Loading')} />
               </Flex.Item>
@@ -366,6 +369,7 @@ export default function VideoOptionsTray({
                           >
                             {!isAsrCaptioningImprovements && (
                               <ClosedCaptionPanel
+                                key={subtitles.reduce((acc, track) => acc + track.locale, '')}
                                 subtitles={subtitles.map(st => ({
                                   locale: st.locale,
                                   inherited: st.inherited,
@@ -501,4 +505,5 @@ VideoOptionsTray.propTypes = {
   requestSubtitlesFromIframe: func,
   onStudioEmbedOptionChanged: func,
   onCaptionsModified: func,
+  isLoading: bool,
 }
