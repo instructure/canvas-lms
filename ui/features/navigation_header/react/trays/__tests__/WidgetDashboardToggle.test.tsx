@@ -42,7 +42,7 @@ describe('WidgetDashboardToggle', () => {
   })
 
   describe('when widget dashboard is off', () => {
-    let capturedRequests
+    let capturedRequests: unknown[]
 
     beforeEach(() => {
       capturedRequests = []
@@ -89,7 +89,7 @@ describe('WidgetDashboardToggle', () => {
   })
 
   describe('when widget dashboard is on', () => {
-    let capturedRequests
+    let capturedRequests: unknown[]
 
     beforeEach(() => {
       capturedRequests = []

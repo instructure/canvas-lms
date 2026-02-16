@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback} from 'react'
+import React, {useState, useCallback, type ReactNode} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {string, node} from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {Grid} from '@instructure/ui-grid'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -61,7 +60,22 @@ import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('MobileNavigation')
 
-const icons = {
+interface Tab {
+  id: string
+  type: string
+  label: string
+  html_url: string
+  hidden?: boolean
+  unused?: boolean
+}
+
+interface MobileContextMenuProps {
+  spinner: ReactNode
+  contextType?: string
+  contextId?: string
+}
+
+const icons: Record<string, React.ComponentType> = {
   home: IconHomeLine,
   announcements: IconAnnouncementLine,
   assignments: IconAssignmentLine,
@@ -98,26 +112,31 @@ const icons = {
   jobs: IconHourGlassLine,
 }
 
-const getIcon = tab => icons[tab.id] || (tab.type === 'external' ? IconLtiLine : IconEmptyLine)
+const getIcon = (tab: Tab): React.ComponentType =>
+  icons[tab.id] || (tab.type === 'external' ? IconLtiLine : IconEmptyLine)
 
-function srText(tab) {
+function srText(tab: Tab): string {
   if (tab.hidden) return I18n.t('Disabled. Not visible to students.')
   if (tab.unused) return I18n.t('No content. Not visible to students.')
   return ''
 }
 
-export default function MobileContextMenu({spinner, contextType, contextId}) {
-  const [tabs, setTabs] = useState(null)
+export default function MobileContextMenu({
+  spinner,
+  contextType,
+  contextId,
+}: MobileContextMenuProps): React.JSX.Element {
+  const [tabs, setTabs] = useState<Tab[] | null>(null)
   const [defaultContextType, defaultContextId] = splitAssetString(ENV.context_asset_string)
 
   useFetchApi({
     path: `/api/v1/${encodeURIComponent(contextType || defaultContextType)}/${encodeURIComponent(
       contextId || defaultContextId,
     )}/tabs`,
-    success: useCallback(r => setTabs(r), []),
+    success: useCallback((r: Tab[]) => setTabs(r), []),
   })
 
-  if (tabs === null) return spinner
+  if (tabs === null) return <>{spinner}</>
 
   const tabsToDisplay = tabs.filter(t => !(t.type === 'external' && t.hidden))
 
@@ -126,6 +145,7 @@ export default function MobileContextMenu({spinner, contextType, contextId}) {
       {tabsToDisplay.map(tab => {
         const Icon = getIcon(tab)
         const isTabOff = tab.hidden || tab.unused
+        // @ts-expect-error - active_context_tab not in GlobalEnv type definition
         const isCurrentTab = ENV?.active_context_tab === tab.id
         return (
           <Grid.Row key={tab.id}>
@@ -141,10 +161,4 @@ export default function MobileContextMenu({spinner, contextType, contextId}) {
       })}
     </Grid>
   )
-}
-
-MobileContextMenu.propTypes = {
-  spinner: node.isRequired,
-  contextType: string,
-  contextId: string,
 }

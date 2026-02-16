@@ -74,6 +74,7 @@ describe('MobileContextMenu', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
+    // @ts-expect-error - partial ENV for testing
     window.ENV = {context_asset_string: 'courses_1'}
     server.use(http.get('*', () => HttpResponse.json(tabsFromApi)))
   })

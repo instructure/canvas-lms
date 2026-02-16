@@ -21,7 +21,7 @@ import NewTabIndicator from '../NewTabIndicator'
 
 describe('NewTabIndicator', () => {
   beforeEach(() => {
-    ENV.current_user_id = 12
+    ENV.current_user_id = '12'
     ENV.current_user_visited_tabs = null
   })
 
