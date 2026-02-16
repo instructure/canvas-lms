@@ -2136,6 +2136,7 @@ el:
       graded_quiz: "Βαθμολογημένο κουίζ"
       graded_survey: "Βαθμολογημένη Δημοσκόπηση"
       ungraded_survey: "Μη Βαθμολογημένη Δημοσκόπηση"
+  assignment_rubric_details_1b6723b2: "Λεπτομέρειες Ρουμπρίκας Εργασίας"
   assignment_selection_6bff05c4: "Επιλογή Εργασίας"
   assignment_title_8a707dd2: "τίτλος εργασίας"
   assignment_url_37c849c6: "url εργασίας"
@@ -7921,6 +7922,7 @@ el:
     lock_module_until: "Κλειδωμένο έως"
   language_6b3e2c7c: Γλώσσα
   last_activity_a983e541: "Τελευταία Δραστηριότητα"
+  last_e159dbd: Τελευταίο
   last_enrollment_activity_10fe15ba: "Δραστηριότητα Τελευταίας Εγγραφής"
   last_error_a3832668: "Τελευταίο Σφάλμα"
   last_export_899a04c5: "Τελευταία Εξαγωγή"
