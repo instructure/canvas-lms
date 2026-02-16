@@ -54,6 +54,8 @@ export const SUBJECT_IGNORE_LIST = [
   'betterchat.is_mini_chat',
   'defaultToolContentReady',
   'assignment.set_ab_guid',
+  'media_player.iframe_ready',
+  'media_player.get_ready_state',
 ] as const
 
 /**

@@ -102,20 +102,43 @@ ready(() => {
         (media_id === event?.data?.media_object_id || attachment_id === event?.data?.attachment_id)
       ) {
         document.getElementsByTagName('video')[0].load()
-      } else if (event?.data?.subject === 'media_tracks_request') {
+        return
+      }
+
+      if (event?.data?.subject === 'media_tracks_request') {
         const tracks = mediaTracks?.map(t => ({
           locale: t.language,
           language: t.label,
           inherited: t.inherited,
         }))
-        if (tracks)
+        if (tracks) {
           event?.source?.postMessage(
             {subject: 'media_tracks_response', payload: tracks},
             {targetOrigin: event.origin},
           )
+        }
+        return
+      }
+
+      if (event.data?.subject === 'media_player.get_ready_state') {
+        event.source?.postMessage(
+          {
+            subject: 'media_player.iframe_ready',
+            mediaId: media_id,
+          },
+          {targetOrigin: event.origin},
+        )
       }
     },
     false,
+  )
+
+  window?.top?.postMessage(
+    {
+      subject: 'media_player.iframe_ready',
+      mediaId: media_id,
+    },
+    {targetOrigin: window?.top?.location.origin},
   )
 
   document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
@@ -123,11 +146,11 @@ ready(() => {
   // with scrollbars, even though everything is the right size.
   document.documentElement.setAttribute('style', 'overflow: hidden;')
   const div = document.body.firstElementChild
-  let explicitSize;
+  let explicitSize
   if (isStandalone()) {
     // we're standalone mode
     div?.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
-    explicitSize = { width: 640, height: 408 };
+    explicitSize = {width: 640, height: 408}
   }
 
   const aria_label = !media_object.title ? undefined : media_object.title

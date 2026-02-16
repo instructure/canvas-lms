@@ -62,14 +62,19 @@ const mockVideoPlayers = [
   },
 ]
 
+let previousOrigin = ''
+
 beforeAll(() => {
-  contentSelection.asVideoElement = jest.fn(elem => {
-    const vid = elem.parentElement.getAttribute('id')
-    return mockVideoPlayers.find(vp => vp.id === vid)
+  jest.spyOn(contentSelection, 'asVideoElement').mockImplementation(elem => {
+    const vid = elem?.parentElement?.getAttribute('id')
+    return vid ? mockVideoPlayers.find(vp => vp.id === vid) : {}
   })
+  previousOrigin = bridge.canvasOrigin
+  bridge.canvasOrigin = 'http://localhost'
 })
 
 afterAll(() => {
+  bridge.canvasOrigin = previousOrigin
   jest.restoreAllMocks()
 })
 
@@ -89,6 +94,8 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       $videos.push($video)
       editor.appendElement($video)
       editor.setSelectedNode($video)
+      const iframe = findMediaPlayerIframe($video)
+      iframe.contentWindow.postMessage = jest.fn()
     })
 
     trayController = new TrayController()
@@ -292,17 +299,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   })
 
   describe('#requestSubtitlesFromIframe', () => {
-    let previousOrigin = ''
-
-    beforeAll(() => {
-      previousOrigin = bridge.canvasOrigin
-      bridge.canvasOrigin = 'http://localhost'
-    })
-
-    afterAll(() => {
-      bridge.canvasOrigin = previousOrigin
-    })
-
     it('posts message to iframe onload', () => {
       const postMessageMock = jest.fn()
       const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
