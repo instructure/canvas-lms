@@ -18,12 +18,22 @@
 import {Model} from '@canvas/backbone'
 import {isEmpty} from 'es-toolkit/compat'
 
-export default class Role extends Model {
-  initialize() {
-    return super.initialize(...arguments)
-  }
+type RoleId = string | number
 
-  isNew() {
+interface RoleAttributes extends Record<string, unknown> {
+  id?: RoleId | null
+  base_role_type?: string
+  role?: string
+  workflow_state?: string
+}
+
+export default class Role extends Model {
+  declare attributes: RoleAttributes
+  declare id?: RoleId
+  declare resourceName: string
+  declare get: <K extends keyof RoleAttributes>(key: K) => RoleAttributes[K]
+
+  isNew(): boolean {
     return this.get('id') == null
   }
 
@@ -31,7 +41,7 @@ export default class Role extends Model {
   //   urlRoot is used in url to generate the a restful url
   //
   // @api override backbone
-  urlRoot() {
+  urlRoot(): string {
     return `/api/v1/accounts/${ENV.ACCOUNT_ID}/roles`
   }
 
@@ -42,12 +52,12 @@ export default class Role extends Model {
   //   in the error object to any validation function you make. It's
   //   passed by reference dawg.
   // @api override backbone
-  validate(_attrs) {
+  validate(_attrs: Record<string, unknown>): Record<string, unknown> | undefined {
     const errors = {}
     if (!isEmpty(errors)) return errors
   }
 
-  editable() {
+  editable(): boolean {
     return this.get('workflow_state') !== 'built_in'
   }
 }

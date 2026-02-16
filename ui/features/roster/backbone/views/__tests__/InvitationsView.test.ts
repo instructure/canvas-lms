@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck - Legacy Backbone test with complex mock typing
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *

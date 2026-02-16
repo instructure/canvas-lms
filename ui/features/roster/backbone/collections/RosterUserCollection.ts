@@ -18,9 +18,30 @@
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import RosterUser from '../models/RosterUser'
 
+type Identifier = string | number
+
+interface RosterUserCollectionOptions extends Record<string, unknown> {
+  course_id?: Identifier
+  sections?: unknown
+  params?: Record<string, unknown>
+}
+
 export default class RosterUserCollection extends PaginatedCollection {
-  constructor(models, options = {}) {
+  selectedUserIds: string[]
+  masterSelected: boolean
+  deselectedUserIds: string[]
+  lastCheckedIndex: number | null
+  course_id?: Identifier
+  sections?: unknown
+
+  declare model: typeof RosterUser
+  declare options: RosterUserCollectionOptions
+
+  constructor(models?: RosterUser[] | null, options: RosterUserCollectionOptions = {}) {
     super(models, options)
+    this.options = options
+    this.course_id = options.course_id
+    this.sections = options.sections
     // Keep track of selected user IDs in this collection
     this.selectedUserIds = []
     // Flag to remember if the 'master checkbox' is fully checked
@@ -33,16 +54,8 @@ export default class RosterUserCollection extends PaginatedCollection {
     this.lastCheckedIndex = null
   }
 
-  url() {
-    return `/api/v1/courses/${this.options.course_id}/users?include_inactive=true`
+  url(): string {
+    return `/api/v1/courses/${this.course_id}/users?include_inactive=true`
   }
 }
 RosterUserCollection.prototype.model = RosterUser
-
-// #
-// The course id the users belong to
-RosterUserCollection.optionProperty('course_id')
-
-// #
-// A SectionCollection
-RosterUserCollection.optionProperty('sections')

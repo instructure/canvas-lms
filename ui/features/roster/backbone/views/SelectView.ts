@@ -17,7 +17,11 @@
 
 import InputView from '@canvas/backbone-input-view'
 
-class SelectView extends InputView {}
+class SelectView extends InputView {
+  declare tagName: string
+  declare className: string
+  declare events: Record<string, string>
+}
 
 SelectView.prototype.tagName = 'select'
 SelectView.prototype.className = 'select-view'
