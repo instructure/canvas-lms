@@ -287,13 +287,15 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                     )}
                   </Button>
                 </Flex.Item>
-                <Flex.Item>
-                  <Text size="small">
-                    {I18n.t(
-                      'AI alt text generation is only available for images uploaded to Canvas.',
-                    )}
-                  </Text>
-                </Flex.Item>
+                {!issue.form.isCanvasImage && (
+                  <Flex.Item>
+                    <Text data-testid="alt-text-generation-not-available-message" size="small">
+                      {I18n.t(
+                        'AI alt text generation is only available for images uploaded to Canvas.',
+                      )}
+                    </Text>
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex>
           )}
