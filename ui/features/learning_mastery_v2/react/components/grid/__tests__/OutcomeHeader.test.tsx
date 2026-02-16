@@ -25,8 +25,18 @@ import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 describe('OutcomeHeader', () => {
+  let showFlashAlertSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    showFlashAlertSpy = vi.spyOn(FlashAlert, 'showFlashAlert')
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
   const outcome: Outcome = {
     id: '1',
     title: 'outcome 1',
@@ -101,5 +111,55 @@ describe('OutcomeHeader', () => {
     await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
     await user.click(screen.getByText('Show Outcome Distribution'))
     expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
+  })
+
+  it('announces to screen readers when showing contributing scores', async () => {
+    const user = userEvent.setup()
+    const props = defaultProps()
+    props.contributingScoresForOutcome = {
+      isVisible: () => false,
+      toggleVisibility: vi.fn(),
+      data: undefined,
+      alignments: undefined,
+      scoresForUser: vi.fn(() => []),
+      isLoading: false,
+      error: undefined,
+    }
+    render(<OutcomeHeader {...props} />)
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    await user.click(screen.getByText('Show Contributing Scores'))
+
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'Showing Contributing Scores for outcome 1',
+      type: 'info',
+      srOnly: true,
+      politeness: 'polite',
+    })
+    expect(props.contributingScoresForOutcome.toggleVisibility).toHaveBeenCalled()
+  })
+
+  it('announces to screen readers when hiding contributing scores', async () => {
+    const user = userEvent.setup()
+    const props = defaultProps()
+    props.contributingScoresForOutcome = {
+      isVisible: () => true,
+      toggleVisibility: vi.fn(),
+      data: undefined,
+      alignments: undefined,
+      scoresForUser: vi.fn(() => []),
+      isLoading: false,
+      error: undefined,
+    }
+    render(<OutcomeHeader {...props} />)
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    await user.click(screen.getByText('Hide Contributing Scores'))
+
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'Contributing Scores for outcome 1 Hidden',
+      type: 'info',
+      srOnly: true,
+      politeness: 'polite',
+    })
+    expect(props.contributingScoresForOutcome.toggleVisibility).toHaveBeenCalled()
   })
 })
