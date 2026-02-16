@@ -14431,6 +14431,12 @@ da:
   enter_at_least_one_3545756d: "Indtast mindst ét."
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Indtast \"{{CANVAS_USER_ID}}\" for at erstatte denne brugers unikke Canvas-id"
   enter_custom_fields_in_key_value_format_one_per_li_e315e12c: "Indtast brugerdefinerede felter i key=value-format, ét pr. linje"
+  enter_each_objective_on_a_new_line_or_separated_by_452bc446: |-
+      Indtast hvert mål på en ny linje eller adskilt af semikolon.
+      Eksempel: 
+        - Forstå fotosyntese
+        - Forklar cellulær respiration
+        - Beskriv ATP-produktion
   enter_email_address_25b6381d: "Indtast e-mailadresse"
   enter_end_date_244b4f16: "Indtast slutdato"
   enter_end_time_e141e029: "Indtast sluttidspunkt"
