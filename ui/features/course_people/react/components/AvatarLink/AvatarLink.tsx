@@ -17,30 +17,29 @@
  */
 
 import React from 'react'
-import {string} from 'prop-types'
 import {Avatar} from '@instructure/ui-avatar'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
 
-const AvatarLink = ({avatarUrl = null, name, href}) => {
+interface AvatarLinkProps {
+  avatarUrl?: string | null
+  name: string
+  href: string
+}
+
+const AvatarLink: React.FC<AvatarLinkProps> = ({avatarUrl = null, name, href}) => {
   return (
     <Link href={href}>
       <Avatar
         size="small"
-        src={avatarUrl}
+        src={avatarUrl || undefined}
         name={name}
         alt={I18n.t('Avatar for %{user_name}', {user_name: name})}
       />
     </Link>
   )
-}
-
-AvatarLink.propTypes = {
-  avatarUrl: string,
-  name: string.isRequired,
-  href: string.isRequired,
 }
 
 export default AvatarLink

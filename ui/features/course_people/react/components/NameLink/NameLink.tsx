@@ -17,14 +17,25 @@
  */
 
 import React from 'react'
-import {arrayOf, shape, string} from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 import {STUDENT_ENROLLMENT} from '../../../util/constants'
 
-const NameLink = ({studentId, htmlUrl, name, pronouns, enrollments}) => {
-  const formatPronouns = pronounString => {
+interface Enrollment {
+  type: string
+}
+
+interface NameLinkProps {
+  studentId: string
+  htmlUrl: string
+  name: string
+  pronouns?: string | null
+  enrollments: Enrollment[]
+}
+
+const NameLink: React.FC<NameLinkProps> = ({studentId, htmlUrl, name, pronouns, enrollments}) => {
+  const formatPronouns = (pronounString?: string | null) => {
     if (!pronounString) return ''
     return <Text fontStyle="italic" data-testid="user-pronouns">{` (${pronounString})`}</Text>
   }
@@ -39,7 +50,7 @@ const NameLink = ({studentId, htmlUrl, name, pronouns, enrollments}) => {
           : ''
       }
       data-student_id={studentId}
-      data-course_id={ENV.course.id}
+      data-course_id={ENV.course?.id}
     >
       <Link isWithinText={false} href={htmlUrl} margin="0 x-small 0 0">
         <Text wrap="break-word">{name}</Text>
@@ -47,18 +58,6 @@ const NameLink = ({studentId, htmlUrl, name, pronouns, enrollments}) => {
       </Link>
     </span>
   )
-}
-
-NameLink.propTypes = {
-  studentId: string.isRequired,
-  htmlUrl: string.isRequired,
-  name: string.isRequired,
-  pronouns: string,
-  enrollments: arrayOf(shape({type: string})),
-}
-
-NameLink.defaultProps = {
-  pronouns: null,
 }
 
 export default NameLink

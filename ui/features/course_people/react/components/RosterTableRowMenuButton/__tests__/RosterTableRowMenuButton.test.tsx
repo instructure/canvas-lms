@@ -25,7 +25,7 @@ const DEFAULT_PROPS = {
 }
 
 describe('RowMenuButton', () => {
-  const setup = props => {
+  const setup = (props: typeof DEFAULT_PROPS) => {
     return render(<RosterTableRowMenuButton {...props} />)
   }
 

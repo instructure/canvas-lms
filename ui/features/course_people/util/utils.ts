@@ -18,7 +18,7 @@
 
 const {floor} = Math
 
-const padToTwoDigits = duration => {
+const padToTwoDigits = (duration: number): string => {
   const padding = duration >= 0 && duration < 10 ? '0' : ''
   return padding + duration.toFixed()
 }
@@ -30,7 +30,7 @@ const padToTwoDigits = duration => {
 //   84 seconds    => 01:24
 //   7230 seconds  => 02:00:30
 //   7530 seconds  => 02:05:30
-export const secondsToStopwatchTime = inputSeconds => {
+export const secondsToStopwatchTime = (inputSeconds: number): string => {
   if (inputSeconds > 3600) {
     const hours = floor(inputSeconds / 3600)
     const minutes = floor((inputSeconds - hours * 3600) / 60)
@@ -41,8 +41,23 @@ export const secondsToStopwatchTime = inputSeconds => {
   }
 }
 
-export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
-  const querySizes = {}
+interface ResponsiveQuerySizesOptions {
+  mobile?: boolean
+  tablet?: boolean
+  desktop?: boolean
+}
+
+interface QuerySize {
+  maxWidth?: string
+  minWidth?: string
+}
+
+export const responsiveQuerySizes = ({
+  mobile = false,
+  tablet = false,
+  desktop = false,
+}: ResponsiveQuerySizesOptions = {}): Record<string, QuerySize> => {
+  const querySizes: Record<string, QuerySize> = {}
   if (mobile) {
     querySizes.mobile = {maxWidth: '767px'}
   }

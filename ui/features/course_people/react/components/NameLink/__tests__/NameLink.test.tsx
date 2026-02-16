@@ -31,16 +31,31 @@ const DEFAULT_PROPS = {
 }
 
 describe('NameLink', () => {
-  const setup = props => {
+  const setup = (props: typeof DEFAULT_PROPS) => {
     return render(<NameLink {...props} />)
   }
 
   beforeEach(() => {
     window.ENV = {
       STUDENT_CONTEXT_CARDS_ENABLED: true,
-      course: {id: '1'},
-      current_user: {id: '999'},
-    }
+      course: {
+        id: '1',
+        name: 'Test Course',
+        start_at: '2021-01-01T00:00:00Z',
+        end_at: '2021-12-31T23:59:59Z',
+        created_at: '2021-01-01T00:00:00Z',
+      },
+      current_user: {
+        id: '999',
+        anonymous_id: 'anon999',
+        display_name: 'Test User',
+        avatar_image_url: 'http://test.host/avatar.png',
+        html_url: 'http://test.host/users/999',
+        pronouns: null,
+        fake_student: false,
+        avatar_is_fallback: false,
+      },
+    } as any
   })
 
   it('should render', () => {
@@ -70,7 +85,7 @@ describe('NameLink', () => {
     const pronounOptions = ['He/His', 'She/Her', 'They/Them']
     pronounOptions.forEach(pronounOption => {
       container.rerender(<NameLink {...DEFAULT_PROPS} pronouns={pronounOption} />)
-      const pronounElement = container.getByTestId('user-pronouns', {name: `(${pronounOption})`})
+      const pronounElement = container.getByTestId('user-pronouns')
       expect(pronounElement).toBeInTheDocument()
     })
   })
@@ -80,6 +95,6 @@ describe('NameLink', () => {
     const {firstChild} = setup(propsWithStudentEnrollment).container
     expect(firstChild).toHaveAttribute('class', 'student_context_card_trigger')
     expect(firstChild).toHaveAttribute('data-student_id', DEFAULT_PROPS.studentId)
-    expect(firstChild).toHaveAttribute('data-course_id', window.ENV.course.id)
+    expect(firstChild).toHaveAttribute('data-course_id', window.ENV.course!.id)
   })
 })

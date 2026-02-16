@@ -55,7 +55,7 @@ const observerEnrollment = {
   associatedUser: {
     id: studentEnrollment.id,
     name: 'Student A',
-  },
+  } as any,
 }
 
 const customObserverEnrollment = {
@@ -65,7 +65,7 @@ const customObserverEnrollment = {
   associatedUser: {
     id: customStudentEnrollment.id,
     name: 'Student B',
-  },
+  } as any,
 }
 
 const DEFAULT_PROPS = {
@@ -73,7 +73,7 @@ const DEFAULT_PROPS = {
 }
 
 describe('RosterTableRoles', () => {
-  const setup = props => {
+  const setup = (props: any) => {
     return render(<RosterTableRoles {...props} />)
   }
 

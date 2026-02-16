@@ -35,15 +35,15 @@ import {
   SITE_ADMIN_ENV,
 } from '../../../../util/test-constants'
 
-const mockSettingsToProps = mockSettings => ({
+const mockSettingsToProps = (mockSettings: Parameters<typeof getRosterQueryMock>[0]) => ({
   data: getRosterQueryMock(mockSettings)[0].result.data,
 })
 
 const mockUsers = [DESIGNER_1, TEACHER_1, TA_1, STUDENT_1, STUDENT_2, STUDENT_3, OBSERVER_1].map(
-  user => mockUser(user),
+  (user: any) => mockUser(user),
 )
 
-const DEFAULT_PROPS = mockSettingsToProps({mockUsers})
+const DEFAULT_PROPS = mockSettingsToProps({mockUsers: mockUsers as any})
 
 describe('RosterCardView', () => {
   const setup = (props = DEFAULT_PROPS) => {
@@ -51,7 +51,18 @@ describe('RosterCardView', () => {
   }
 
   beforeEach(() => {
-    window.ENV = SITE_ADMIN_ENV
+    window.ENV = {
+      ...SITE_ADMIN_ENV,
+      course: {
+        id: SITE_ADMIN_ENV.course.id,
+        name: 'Test Course',
+        start_at: '2021-01-01T00:00:00Z',
+        end_at: '2021-12-31T23:59:59Z',
+        created_at: '2021-01-01T00:00:00Z',
+        // @ts-expect-error hideSectionsOnCourseUsersPage is not in Course type yet
+        hideSectionsOnCourseUsersPage: SITE_ADMIN_ENV.course.hideSectionsOnCourseUsersPage,
+      },
+    }
   })
 
   it('should render', () => {
@@ -68,16 +79,19 @@ describe('RosterCardView', () => {
     list.forEach((listItem, index) => {
       const {name, sisId, loginId, enrollments} = mockUsers[index]
       const {type, section, lastActivityAt, totalActivityTime} = enrollments[0]
-      const textToCheck = [name, sisId, loginId]
+      const textToCheck: Array<string | RegExp | null> = [name, sisId, loginId]
       if (type !== OBSERVER_ENROLLMENT) {
         textToCheck.push(section.name, getRoleName(enrollments[0]))
         lastActivityAt && textToCheck.push(DATETIME_PATTERN)
       }
       totalActivityTime && textToCheck.push(STOPWATCH_PATTERN)
 
-      textToCheck.forEach(text =>
-        expect(within(listItem).getAllByText(text).length).toBeGreaterThanOrEqual(1),
-      )
+      textToCheck.forEach((text: string | RegExp | null) => {
+        if (text !== null) {
+          const matches = within(listItem).queryAllByText(text)
+          expect(matches.length).toBeGreaterThanOrEqual(1)
+        }
+      })
     })
   })
 })

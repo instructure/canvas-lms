@@ -36,15 +36,15 @@ import {
   SITE_ADMIN_ENV,
 } from '../../../../util/test-constants'
 
-const mockSettingsToProps = mockSettings => ({
+const mockSettingsToProps = (mockSettings: Parameters<typeof getRosterQueryMock>[0]) => ({
   data: getRosterQueryMock(mockSettings)[0].result.data,
 })
 
 const mockUsers = [DESIGNER_1, TEACHER_1, TA_1, STUDENT_1, STUDENT_2, STUDENT_3, OBSERVER_1].map(
-  user => mockUser(user),
+  (user: any) => mockUser(user),
 )
 
-const DEFAULT_PROPS = mockSettingsToProps({mockUsers})
+const DEFAULT_PROPS = mockSettingsToProps({mockUsers: mockUsers as any})
 
 describe('RosterTable', () => {
   const setup = (props = DEFAULT_PROPS) => {
@@ -218,7 +218,7 @@ describe('RosterTable', () => {
 
     // Check there is no login id data
     const rows = await findAllByTestId('roster-table-data-row')
-    const loginIdByUser = mockUsers.map(user => user.enrollments[0].loginId)
+    const loginIdByUser = mockUsers.map(user => user.loginId)
     rows.forEach((row, index) => {
       if (loginIdByUser[index]) {
         expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
@@ -236,7 +236,7 @@ describe('RosterTable', () => {
     })
     const {findAllByTestId} = setup()
     const rows = await findAllByTestId('roster-table-data-row')
-    const sisIdByUser = mockUsers.map(user => user.enrollments[0].sisId)
+    const sisIdByUser = mockUsers.map(user => user.sisId)
 
     // Check there is no column header
     expect(queryAllByText(document.body, 'SIS ID')).toHaveLength(0)
@@ -299,7 +299,10 @@ describe('RosterTable', () => {
   })
 
   describe('Administrative Links', () => {
-    const checkContainerForButtons = async ({findAllByTestId, findByRole}, users) => {
+    const checkContainerForButtons = async (
+      {findAllByTestId, findByRole}: {findAllByTestId: any; findByRole: any},
+      users: ReturnType<typeof mockUser>[],
+    ) => {
       // Wait for rows to render
       const rows = await findAllByTestId('roster-table-data-row')
       expect(rows).toHaveLength(users.length)
@@ -352,7 +355,7 @@ describe('RosterTable', () => {
             manage_students: true,
           },
         })
-        const renderResult = setup(mockSettingsToProps({mockUsers: mockStudents}))
+        const renderResult = setup(mockSettingsToProps({mockUsers: mockStudents as any}))
         await checkContainerForButtons(renderResult, mockStudents)
       })
 
@@ -364,7 +367,7 @@ describe('RosterTable', () => {
             can_allow_admin_actions: true,
           },
         })
-        const renderResult = setup(mockSettingsToProps({mockUsers: mockAdmin}))
+        const renderResult = setup(mockSettingsToProps({mockUsers: mockAdmin as any}))
         await checkContainerForButtons(renderResult, mockAdmin)
       })
     })

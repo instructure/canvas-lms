@@ -17,13 +17,22 @@
  */
 
 import React from 'react'
-import {arrayOf, object} from 'prop-types'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
 const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
 
-const RosterTableLastActivity = ({enrollments}) => {
+interface Enrollment {
+  id: string
+  type: string
+  lastActivityAt: string | null
+}
+
+interface RosterTableLastActivityProps {
+  enrollments: Enrollment[]
+}
+
+const RosterTableLastActivity: React.FC<RosterTableLastActivityProps> = ({enrollments = []}) => {
   const lastActivityComponents = enrollments.map(enrollment => {
     if (enrollment.type === OBSERVER_ENROLLMENT) return null
     if (enrollment.lastActivityAt === null) return null
@@ -40,14 +49,6 @@ const RosterTableLastActivity = ({enrollments}) => {
   })
 
   return lastActivityComponents
-}
-
-RosterTableLastActivity.propTypes = {
-  enrollments: arrayOf(object),
-}
-
-RosterTableLastActivity.defaultProps = {
-  enrollments: [],
 }
 
 export default RosterTableLastActivity

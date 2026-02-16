@@ -34,17 +34,23 @@ import {
 } from '../../../../util/test-constants'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-const userToProps = user => ({
-  courseUsersConnectionNode: getRosterQueryMock({mockUsers: [mockUser(user)]})[0].result.data.course
-    .usersConnection.nodes[0],
+type UserToPropsReturn = {
+  courseUsersConnectionNode: any
+}
+
+const userToProps = (user: Parameters<typeof mockUser>[0]): UserToPropsReturn => ({
+  courseUsersConnectionNode: getRosterQueryMock({mockUsers: [mockUser(user)] as any})[0].result.data
+    .course.usersConnection.nodes[0] as any,
 })
 
-const mockSettingsToProps = mockSettings => ({
-  courseUsersConnectionNode:
-    getRosterQueryMock(mockSettings)[0].result.data.course.usersConnection.nodes[0],
+const mockSettingsToProps = (
+  mockSettings: Parameters<typeof getRosterQueryMock>[0],
+): UserToPropsReturn => ({
+  courseUsersConnectionNode: getRosterQueryMock(mockSettings)[0].result.data.course.usersConnection
+    .nodes[0] as any,
 })
 
-const DEFAULT_PROPS = userToProps(STUDENT_1)
+const DEFAULT_PROPS: UserToPropsReturn = userToProps(STUDENT_1 as any)
 
 describe('RosterCard', () => {
   beforeEach(() => {
@@ -96,7 +102,7 @@ describe('RosterCard', () => {
   })
 
   it('should not display last activity if user is an observer', async () => {
-    const container = setup(userToProps(OBSERVER_1))
+    const container = setup(userToProps(OBSERVER_1 as any))
     const rows = await container.findAllByTestId('enrollment-table-data-row')
     rows.forEach(row => {
       expect(queryAllByText(row, DATETIME_PATTERN)).toHaveLength(0)
@@ -201,17 +207,17 @@ describe('RosterCard', () => {
       },
     })
     const {enrollments} = DEFAULT_PROPS.courseUsersConnectionNode
-    const sections = enrollments.map(enrollment => enrollment.section.name)
+    const sections = enrollments.map((enrollment: any) => enrollment.section.name)
     const container = setup()
     const rows = await container.findAllByTestId('enrollment-table-data-row')
     expect(queryAllByText(rows[0], /Sections/i)).toHaveLength(0)
-    sections.forEach(section => {
+    sections.forEach((section: string) => {
       expect(container.queryByText(section)).toBe(null)
     })
   })
 
   describe('Administrative Links', () => {
-    const checkContainerForButtons = (container, name) => {
+    const checkContainerForButtons = (container: ReturnType<typeof setup>, name: string) => {
       const menuButton = container.getByRole('button', {name: `Manage ${name}`})
       expect(menuButton).toBeTruthy()
     }
@@ -247,7 +253,7 @@ describe('RosterCard', () => {
             manage_students: true,
           },
         })
-        const container = setup(mockSettingsToProps({mockUsers: [mockStudent]}))
+        const container = setup(mockSettingsToProps({mockUsers: [mockStudent] as any}))
         checkContainerForButtons(container, mockStudent.name)
       })
 
@@ -259,7 +265,7 @@ describe('RosterCard', () => {
             can_allow_admin_actions: true,
           },
         })
-        const container = setup(mockSettingsToProps({mockUsers: [mockTeacher]}))
+        const container = setup(mockSettingsToProps({mockUsers: [mockTeacher] as any}))
         checkContainerForButtons(container, mockTeacher.name)
       })
     })
