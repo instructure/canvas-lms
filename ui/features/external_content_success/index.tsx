@@ -25,18 +25,36 @@ import React from 'react'
 import {render} from '@canvas/react'
 import {Alert} from '@instructure/ui-alerts'
 import replaceTags from '@canvas/util/replaceTags'
-import {postMessageExternalContentReady} from '@canvas/external-tools/messages'
+import {
+  postMessageExternalContentReady,
+  type Lti1p1ContentItem,
+  type Service,
+} from '@canvas/external-tools/messages'
 import ready from '@instructure/ready'
 
 const I18n = createI18nScope('external_content.success')
 
-const ExternalContentSuccess = {}
+interface LtiResponseMessages {
+  lti_errormsg?: string
+  lti_msg?: string
+}
 
-ready(() => {
-  const {lti_response_messages, service_id, retrieved_data: data, service} = ENV
-  const parentWindow = window.parent || window.opener
+interface ExternalContentSuccessModule {
+  dataReady: (contentItems: Lti1p1ContentItem[], service_id: string | number) => void
+  a2DataReady: (data: unknown) => void
+  processLtiMessages: (
+    messages: LtiResponseMessages | undefined,
+    target: Element | null,
+  ) => Promise<void>
+  start: () => Promise<void>
+}
 
-  ExternalContentSuccess.dataReady = function (contentItems, service_id) {
+const ExternalContentSuccess: ExternalContentSuccessModule = {
+  dataReady(contentItems: Lti1p1ContentItem[], service_id: string | number) {
+    // @ts-expect-error - Canvas ENV global not typed
+    const {service}: {service: Service} = ENV
+    const parentWindow = window.parent || window.opener
+
     postMessageExternalContentReady(parentWindow, {contentItems, service_id, service})
 
     setTimeout(() => {
@@ -44,43 +62,49 @@ ready(() => {
         I18n.t('popup_success', 'Success! This popup should close on its own...'),
       )
     }, 1000)
-  }
+  },
 
   // Handles lti 1.0 responses for Assignments 2 which expects a
   // vanilla JS event from LTI tools in the following form.
-  ExternalContentSuccess.a2DataReady = function (data) {
+  a2DataReady(data: unknown) {
+    const parentWindow = window.parent || window.opener
     parentWindow.postMessage(
       {
         subject: 'A2ExternalContentReady',
         content_items: data,
+        // @ts-expect-error - Canvas ENV global not typed
         msg: ENV.message,
+        // @ts-expect-error - Canvas ENV global not typed
         log: ENV.log,
+        // @ts-expect-error - Canvas ENV global not typed
         errormsg: ENV.error_message,
+        // @ts-expect-error - Canvas ENV global not typed
         errorlog: ENV.error_log,
+        // @ts-expect-error - Canvas ENV global not typed
         ltiEndpoint: ENV.lti_endpoint,
       },
       ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
     )
-  }
+  },
 
-  ExternalContentSuccess.processLtiMessages = async (messages, target) => {
+  async processLtiMessages(
+    messages: LtiResponseMessages | undefined,
+    target: Element | null,
+  ): Promise<void> {
     const errorMessage = messages?.lti_errormsg
     const message = messages?.lti_msg
 
-    if (errorMessage || message) {
+    if ((errorMessage || message) && target?.parentNode) {
       const wrapper = document.createElement('div')
       wrapper.setAttribute('id', 'lti_messages_wrapper')
       target.parentNode.insertBefore(wrapper, target)
 
-      let root
-      await new Promise(resolve => {
+      let root: ReturnType<typeof render> | undefined
+      await new Promise<void>(resolve => {
         root = render(
           <>
-            {[
-              [errorMessage, true],
-              [message, false],
-            ]
-              .filter(([msg, _]) => msg !== undefined)
+            {[[errorMessage, true] as const, [message, false] as const]
+              .filter(([msg]) => msg !== undefined)
               .map(([msg, isError], index) => {
                 return (
                   <Alert
@@ -98,28 +122,34 @@ ready(() => {
           wrapper,
         )
       })
-      root.unmount()
+      root?.unmount()
     }
-  }
+  },
 
-  ExternalContentSuccess.start = async function () {
+  async start(): Promise<void> {
+    // @ts-expect-error - Canvas ENV global not typed
+    const {lti_response_messages, service_id, retrieved_data: data} = ENV
+
     await this.processLtiMessages(lti_response_messages, document.querySelector('.ic-app'))
 
+    // @ts-expect-error - Canvas ENV global not typed
     if (ENV.oembed) {
       const url = replaceTags(
         replaceTags(
-          $('#oembed_retrieve_url').attr('href'),
+          $('#oembed_retrieve_url').attr('href') ?? '',
           'endpoint',
+          // @ts-expect-error - Canvas ENV global not typed
           encodeURIComponent(ENV.oembed.endpoint),
         ),
         'url',
+        // @ts-expect-error - Canvas ENV global not typed
         encodeURIComponent(ENV.oembed.url),
       )
       $.ajaxJSON(
         url,
         'GET',
         {},
-        data => ExternalContentSuccess.dataReady(data),
+        (responseData: Lti1p1ContentItem[]) => ExternalContentSuccess.dataReady(responseData, ''),
         () =>
           $('#dialog_message').text(
             I18n.t(
@@ -132,8 +162,10 @@ ready(() => {
       ExternalContentSuccess.dataReady(data, service_id)
       ExternalContentSuccess.a2DataReady(data)
     }
-  }
+  },
+}
 
+ready(() => {
   ExternalContentSuccess.start()
 })
 
