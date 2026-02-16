@@ -165,6 +165,49 @@ describe('CheckboxTextInput', () => {
     expect(button).toBeDisabled()
   })
 
+  it('shows message when the image is from an external source', () => {
+    const propsWithGenerateDisabled = {
+      ...defaultProps,
+      issue: {
+        ...defaultProps.issue,
+        form: {
+          ...defaultProps.issue.form,
+          canGenerateFix: true,
+          isCanvasImage: false,
+          generateButtonLabel: 'Generate Alt Text',
+        },
+      },
+    }
+
+    render(<CheckboxTextInput {...propsWithGenerateDisabled} />)
+
+    const message = screen.getByTestId('alt-text-generation-not-available-message')
+    expect(message).toBeInTheDocument()
+    expect(message).toHaveTextContent(
+      'AI alt text generation is only available for images uploaded to Canvas.',
+    )
+  })
+
+  it('does not show message when the image is from Canvas', () => {
+    const propsWithGenerateEnabled = {
+      ...defaultProps,
+      issue: {
+        ...defaultProps.issue,
+        form: {
+          ...defaultProps.issue.form,
+          canGenerateFix: true,
+          isCanvasImage: true,
+          generateButtonLabel: 'Generate Alt Text',
+        },
+      },
+    }
+
+    render(<CheckboxTextInput {...propsWithGenerateEnabled} />)
+
+    const message = screen.queryByTestId('alt-text-generation-not-available-message')
+    expect(message).not.toBeInTheDocument()
+  })
+
   it('calls API and updates value when generate button is clicked', async () => {
     const propsWithGenerateOption = {
       ...defaultProps,
