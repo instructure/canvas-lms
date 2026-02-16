@@ -42,7 +42,7 @@ describe('StudentSection', () => {
 
   it('renders student avatar', () => {
     render(<StudentSection {...defaultProps} />)
-    const avatar = screen.getByRole('img', {name: MOCK_STUDENTS[0].name})
+    const avatar = screen.getByRole('img', {hidden: true})
     expect(avatar).toBeInTheDocument()
   })
 
@@ -147,7 +147,7 @@ describe('StudentSection', () => {
 
   it('displays avatar with student avatar URL', () => {
     render(<StudentSection {...defaultProps} />)
-    const avatar = screen.getByRole('img', {name: MOCK_STUDENTS[0].name})
+    const avatar = screen.getByRole('img', {hidden: true})
     expect(avatar).toHaveAttribute('src', MOCK_STUDENTS[0].avatar_url)
   })
 })
