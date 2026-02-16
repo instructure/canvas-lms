@@ -17,28 +17,32 @@
  */
 
 import React from 'react'
-import {bool, func} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import contentShareShape from '@canvas/content-sharing/react/proptypes/contentShare'
+import type {ContentShare} from '../types'
 
 const I18n = createI18nScope('content_share_preview_overlay')
 
-PreviewModal.propTypes = {
-  open: bool,
-  share: contentShareShape,
-  onDismiss: func,
+export interface PreviewModalProps {
+  open?: boolean
+  share?: ContentShare | null
+  onDismiss?: () => void
 }
 
-export default function PreviewModal({open, share, onDismiss}) {
-  function sharePreviewUrl() {
-    if (!share) return null
+export default function PreviewModal({
+  open,
+  share,
+  onDismiss,
+}: PreviewModalProps): React.JSX.Element {
+  function sharePreviewUrl(): string | null {
+    if (!share || !share.content_export?.attachment?.url) return null
     const downloadUrl = encodeURIComponent(share.content_export.attachment.url)
+    // @ts-expect-error - COMMON_CARTRIDGE_VIEWER_URL not in GlobalEnv types
     return `${ENV.COMMON_CARTRIDGE_VIEWER_URL}?cartridge=${downloadUrl}`
   }
 
-  function Footer() {
+  function Footer(): React.JSX.Element {
     return <Button onClick={onDismiss}>{I18n.t('Close')}</Button>
   }
 
@@ -55,7 +59,7 @@ export default function PreviewModal({open, share, onDismiss}) {
       <iframe
         style={{width: '100%', height: '100%', border: 'none', display: 'block'}}
         title={I18n.t('Content Share Preview')}
-        src={sharePreviewUrl()}
+        src={sharePreviewUrl() || undefined}
       />
     </CanvasModal>
   )

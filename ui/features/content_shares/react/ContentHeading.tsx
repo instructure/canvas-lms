@@ -17,32 +17,35 @@
  */
 
 import React from 'react'
-import {string} from 'prop-types'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 
-ContentHeading.propTypes = {
-  svgUrl: string,
-  heading: string,
-  description: string,
+export interface ContentHeadingProps {
+  svgUrl?: string
+  heading?: string
+  description?: string
 }
 
-export default function ContentHeading(props) {
+export default function ContentHeading({
+  svgUrl,
+  heading,
+  description,
+}: ContentHeadingProps): React.JSX.Element {
   return (
     <Flex margin="0 0 medium">
       <Flex.Item size="3.5em">
         <PresentationContent>
-          <SVGWrapper url={props.svgUrl} />
+          <SVGWrapper url={svgUrl} />
         </PresentationContent>
       </Flex.Item>
       <Flex.Item padding="0 medium">
         <Heading level="h1" as="h2">
-          {props.heading}
+          {heading}
         </Heading>
-        <Text>{props.description}</Text>
+        <Text>{description}</Text>
       </Flex.Item>
     </Flex>
   )

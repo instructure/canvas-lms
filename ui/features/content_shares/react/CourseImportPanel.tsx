@@ -18,28 +18,42 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import {func} from 'prop-types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import contentShareShape from '@canvas/content-sharing/react/proptypes/contentShare'
 import DirectShareOperationStatus from '@canvas/direct-sharing/react/components/DirectShareOperationStatus'
 import ConfirmActionButtonBar from '@canvas/direct-sharing/react/components/ConfirmActionButtonBar'
 import CourseAndModulePicker from '@canvas/direct-sharing/react/components/CourseAndModulePicker'
+import type {ContentShare} from '../types'
 
 const I18n = createI18nScope('direct_share_course_import_panel')
 
-CourseImportPanel.propTypes = {
-  contentShare: contentShareShape.isRequired,
-  onClose: func,
-  onImport: func,
+interface Course {
+  id: string
 }
 
-export default function CourseImportPanel({contentShare, onClose, onImport}) {
-  const [selectedCourse, setSelectedCourse] = useState(null)
-  const [selectedModule, setSelectedModule] = useState(null)
-  const [selectedPosition, setSelectedPosition] = useState(null)
-  const [startImportOperationPromise, setStartImportOperationPromise] = useState(null)
+interface Module {
+  id: string
+}
 
-  function startImportOperation() {
+export interface CourseImportPanelProps {
+  contentShare: ContentShare
+  onClose?: () => void
+  onImport?: (share: ContentShare) => void
+}
+
+export default function CourseImportPanel({
+  contentShare,
+  onClose,
+  onImport,
+}: CourseImportPanelProps): React.JSX.Element {
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+  const [selectedModule, setSelectedModule] = useState<Module | null>(null)
+  const [selectedPosition, setSelectedPosition] = useState<number | null>(null)
+  const [startImportOperationPromise, setStartImportOperationPromise] =
+    useState<Promise<unknown> | null>(null)
+
+  function startImportOperation(): void {
+    if (!selectedCourse || !contentShare.content_export) return
+
     setStartImportOperationPromise(
       doFetchApi({
         method: 'POST',
@@ -56,10 +70,10 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
         },
       }),
     )
-    onImport(contentShare)
+    onImport?.(contentShare)
   }
 
-  function handleSelectedCourse(course) {
+  function handleSelectedCourse(course: Course): void {
     setSelectedModule(null)
     setSelectedCourse(course)
   }
