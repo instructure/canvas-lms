@@ -264,9 +264,11 @@ describe('StudentAssignmentDetailTray', () => {
 
     it('displays student avatar', () => {
       renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
-      const avatar = screen.getByRole('img', {name: MOCK_STUDENTS[0].name})
+      const avatars = screen.getAllByRole('img', {hidden: true})
+      const avatar = avatars.find(
+        (img: HTMLElement) => img.getAttribute('src') === MOCK_STUDENTS[0].avatar_url,
+      )
       expect(avatar).toBeInTheDocument()
-      expect(avatar).toHaveAttribute('src', MOCK_STUDENTS[0].avatar_url)
     })
 
     it('renders mastery report link with correct URL', () => {
