@@ -19,12 +19,17 @@
 import $ from 'jquery'
 import {raw} from '@instructure/html-escape'
 
-$(document).ready(() => {
-  const $start_debugging = $('.start_debugging'),
-    $stop_debugging = $('.stop_debugging'),
-    $refresh_debugging = $('.refresh_debugging')
+interface DebugResponse {
+  debugging?: boolean
+  debug_data?: string
+}
 
-  const stop_debugging = function ($link) {
+$(document).ready(() => {
+  const $start_debugging = $('.start_debugging')
+  const $stop_debugging = $('.stop_debugging')
+  const $refresh_debugging = $('.refresh_debugging')
+
+  const stop_debugging = ($link: JQuery) => {
     const $container = $link.closest('div.debugging')
     $container.find('.start_debugging').show()
     $container.find('.refresh_debugging').hide()
@@ -34,21 +39,21 @@ $(document).ready(() => {
     debug_data.hide()
   }
 
-  const load_debug_data = function ($link, new_debug_session) {
+  const load_debug_data = ($link: JQuery, new_debug_session: boolean) => {
     const url = $link.attr('href')
-    let method = 'GET'
-    let debug_data
+    let method: 'GET' | 'PUT' = 'GET'
+    let debug_data: JQuery
     if (new_debug_session) {
       method = 'PUT'
     }
-    $.ajaxJSON(url, method, {}, data => {
+    $.ajaxJSON(url, method, {}, (data: DebugResponse) => {
       if (data) {
         if (data.debugging) {
           debug_data = $link.closest('div.debugging').find('.debug_data')
-          debug_data.html(raw(data.debug_data))
+          debug_data.html(raw(data.debug_data || '').toString())
           debug_data.show()
         } else {
-          stop_debugging()
+          stop_debugging($link)
         }
       }
     })
@@ -75,6 +80,6 @@ $(document).ready(() => {
     stop_debugging($link)
 
     const url = $link.attr('href')
-    $.ajaxJSON(url, 'DELETE', {}, _data => {})
+    $.ajaxJSON(url, 'DELETE', {}, (_data: unknown) => {})
   })
 })

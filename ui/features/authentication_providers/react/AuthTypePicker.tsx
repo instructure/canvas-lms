@@ -17,13 +17,25 @@
  */
 
 import React, {useState} from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {FormField} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('authentication_providers')
 
-export default function AuthTypePicker({onChange, authTypes}) {
+export interface AuthType {
+  value: string
+  name: string
+}
+
+export interface AuthTypePickerProps {
+  authTypes: AuthType[]
+  onChange?: (authType: string) => void
+}
+
+export default function AuthTypePicker({
+  onChange = () => {},
+  authTypes = [],
+}: AuthTypePickerProps): React.JSX.Element {
   const [selectedAuthType, setSelectedAuthType] = useState('default')
 
   return (
@@ -48,19 +60,4 @@ export default function AuthTypePicker({onChange, authTypes}) {
       </FormField>
     </div>
   )
-}
-
-AuthTypePicker.propTypes = {
-  authTypes: PropTypes.arrayOf(
-    PropTypes.shape({
-      value: PropTypes.string,
-      name: PropTypes.string,
-    }),
-  ).isRequired,
-  onChange: PropTypes.func,
-}
-
-AuthTypePicker.defaultProps = {
-  authTypes: [],
-  onChange() {},
 }

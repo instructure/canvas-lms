@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import React from 'react'
 import {legacyRender} from '@canvas/react'
-import AuthTypePicker from '../react/AuthTypePicker'
+import AuthTypePicker, {type AuthType} from '../react/AuthTypePicker'
 import authenticationProviders from './index'
 import $ from 'jquery'
 import ready from '@instructure/ready'
@@ -32,7 +32,12 @@ const I18n = createI18nScope('authentication_providers')
 
 ready(() => {
   const selectorNode = document.getElementById('add-authentication-provider')
-  const authTypeOptions = JSON.parse(selectorNode.getAttribute('data-options'))
+  if (!selectorNode) return
+
+  const dataOptions = selectorNode.getAttribute('data-options')
+  if (!dataOptions) return
+
+  const authTypeOptions: AuthType[] = JSON.parse(dataOptions)
 
   authTypeOptions.unshift({
     name: I18n.t('Choose an authentication service'),
@@ -48,8 +53,8 @@ ready(() => {
   )
 })
 
-$('.parent_reg_warning').click(function () {
-  let msg
+$('.parent_reg_warning').click(function (this: HTMLElement) {
+  let msg: string
   const parent_reg_selected = $('#parent_reg_selected').attr('data-parent-reg-selected')
   if ($(this).is(':checked') && parent_reg_selected === 'true') {
     msg = I18n.t(
@@ -68,7 +73,7 @@ $('.parent_reg_warning').click(function () {
   }
 })
 
-$('.add_federated_attribute_button').click(function (event) {
+$('.add_federated_attribute_button').click(function (this: HTMLElement, event: JQuery.ClickEvent) {
   const $federated_attributes = $(this).closest('.federated_attributes')
   const $template = $federated_attributes.find('.attribute_template').clone(true)
   $template.removeClass('attribute_template')
@@ -77,7 +82,7 @@ $('.add_federated_attribute_button').click(function (event) {
     .add($template.find('select'))
   const $canvas_attribute_select = $federated_attributes.find('.add_attribute .canvas_attribute')
   const $selected_canvas_attribute = $canvas_attribute_select.find('option:selected')
-  const id_suffix = $template.data('idsuffix')
+  const id_suffix = $template.data('idsuffix') as string
   const canvas_attribute_html = $selected_canvas_attribute.text()
   const provisioning_only_checkbox_name = `authentication_provider[federated_attributes][${canvas_attribute_html}][provisioning_only]`
   const provisioning_only_checkbox_id = `aacfa_${canvas_attribute_html}_provisioning_only_${id_suffix}`
@@ -114,7 +119,7 @@ $('.add_federated_attribute_button').click(function (event) {
   event.preventDefault()
 })
 
-$('.remove_federated_attribute').click(function () {
+$('.remove_federated_attribute').click(function (this: HTMLElement) {
   const $attribute_row = $(this).closest('tr')
   const $federated_attributes = $attribute_row.closest('.federated_attributes')
   const $canvas_attribute_select = $federated_attributes.find('.add_attribute .canvas_attribute')
@@ -136,7 +141,7 @@ $('.remove_federated_attribute').click(function () {
   }
 })
 
-$('.jit_provisioning_checkbox').click(function () {
+$('.jit_provisioning_checkbox').click(function (this: HTMLElement) {
   const $provisioning_elements = $(this)
     .closest('.authentication_provider_form')
     .find('.provisioning_only_column')
