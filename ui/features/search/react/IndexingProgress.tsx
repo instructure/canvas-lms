@@ -23,7 +23,11 @@ import {ProgressBar} from '@instructure/ui-progress'
 
 const I18n = createI18nScope('SmartSearch')
 
-export default function IndexingProgress({progress}) {
+interface IndexingProgressProps {
+  progress: number
+}
+
+export default function IndexingProgress({progress}: IndexingProgressProps) {
   return (
     <div>
       <Text as="p">
