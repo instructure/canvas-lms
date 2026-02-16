@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {arrayOf, func} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Menu} from '@instructure/ui-menu'
@@ -30,44 +29,51 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
-import contentShareShape from '@canvas/content-sharing/react/proptypes/contentShare'
+import type {ContentShare, ContentExport, ContentShareType, ReadState} from '../types'
 
 const I18n = createI18nScope('content_share')
 
-const friendlyShareNames = {
+const friendlyShareNames: Record<ContentShareType, string> = {
   assignment: I18n.t('Assignment'),
   attachment: I18n.t('File'),
   discussion_topic: I18n.t('Discussion Topic'),
   module: I18n.t('Module'),
   page: I18n.t('Page'),
   quiz: I18n.t('Quiz'),
+  module_item: I18n.t('Module Item'),
 }
 
-ReceivedTable.propTypes = {
-  shares: arrayOf(contentShareShape),
-  onPreview: func,
-  onImport: func,
-  onRemove: func,
-  onUpdate: func,
+export interface ReceivedTableProps {
+  shares?: ContentShare[]
+  onPreview?: (share: ContentShare) => void
+  onImport?: (share: ContentShare) => void
+  onRemove?: (share: ContentShare) => void
+  onUpdate?: (id: string, updates: {read_state: ReadState}) => void
 }
 
-export default function ReceivedTable({shares, onPreview, onImport, onRemove, onUpdate}) {
-  function renderActionMenu(share) {
-    const items = []
+export default function ReceivedTable({
+  shares = [],
+  onPreview,
+  onImport,
+  onRemove,
+  onUpdate,
+}: ReceivedTableProps): React.JSX.Element {
+  function renderActionMenu(share: ContentShare): React.JSX.Element {
+    const items: React.JSX.Element[] = []
     if (share.content_export?.workflow_state === 'exported') {
       items.push(
-        <Menu.Item key="prv" data-testid="preview-menu-action" onSelect={() => onPreview(share)}>
+        <Menu.Item key="prv" data-testid="preview-menu-action" onSelect={() => onPreview?.(share)}>
           <IconEyeLine /> <View margin="0 0 0 x-small">{I18n.t('Preview')}</View>
         </Menu.Item>,
       )
       items.push(
-        <Menu.Item key="imp" data-testid="import-menu-action" onSelect={() => onImport(share)}>
+        <Menu.Item key="imp" data-testid="import-menu-action" onSelect={() => onImport?.(share)}>
           <IconImportLine /> <View margin="0 0 0 x-small">{I18n.t('Import')}</View>
         </Menu.Item>,
       )
     }
     items.push(
-      <Menu.Item key="rmv" data-testid="remove-menu-action" onSelect={() => onRemove(share)}>
+      <Menu.Item key="rmv" data-testid="remove-menu-action" onSelect={() => onRemove?.(share)}>
         <IconTrashLine /> <View margin="0 0 0 x-small">{I18n.t('Remove')}</View>
       </Menu.Item>,
     )
@@ -89,15 +95,15 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
     )
   }
 
-  function renderUnreadBadge({id, name, read_state}) {
-    function setReadState() {
-      if (typeof onUpdate === 'function') onUpdate(id, {read_state: 'read'})
+  function renderUnreadBadge({id, name, read_state}: ContentShare): React.JSX.Element {
+    function setReadState(): void {
+      onUpdate?.(id, {read_state: 'read'})
     }
-    function setUnreadState() {
-      if (typeof onUpdate === 'function') onUpdate(id, {read_state: 'unread'})
+    function setUnreadState(): void {
+      onUpdate?.(id, {read_state: 'unread'})
     }
 
-    function srText() {
+    function srText(): string {
       if (read_state === 'unread') {
         return I18n.t('%{name} mark as read', {name})
       }
@@ -141,8 +147,8 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
     }
   }
 
-  function renderReceivedColumn(content_export) {
-    if (content_export && content_export.workflow_state === 'exported') {
+  function renderReceivedColumn(content_export?: ContentExport): React.JSX.Element {
+    if (content_export?.workflow_state === 'exported' && content_export.created_at) {
       return <FriendlyDatetime dateTime={content_export.created_at} />
     } else if (
       !content_export ||
@@ -163,7 +169,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
     }
   }
 
-  function renderRow(share) {
+  function renderRow(share: ContentShare): React.JSX.Element {
     return (
       <Table.Row key={share.id}>
         <Table.Cell textAlign="end">{renderUnreadBadge(share)}</Table.Cell>

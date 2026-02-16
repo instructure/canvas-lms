@@ -30,20 +30,30 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import type {Links} from '@canvas/parse-link-header/parseLinkHeader'
+import type {ContentShare, ReadState} from '../types'
 
 const I18n = createI18nScope('content_share')
 
 const CourseImportPanel = lazy(() => import('./CourseImportPanel'))
-const NoContent = () => <Text size="large">{I18n.t('No content has been shared with you.')}</Text>
+const NoContent = (): React.JSX.Element => (
+  <Text size="large">{I18n.t('No content has been shared with you.')}</Text>
+)
 
-export default function ReceivedContentView() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [shares, setShares] = useState([])
-  const [responseMeta, setResponseMeta] = useState({})
-  const [currentPage, setCurrentPage] = useState(1)
-  const [currentContentShare, setCurrentContentShare] = useState(null)
-  const [whichModalOpen, setWhichModalOpen] = useState(null)
+type ModalType = 'preview' | 'import' | null
+
+interface ResponseMeta {
+  link?: Links
+}
+
+export default function ReceivedContentView(): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [shares, setShares] = useState<ContentShare[]>([])
+  const [responseMeta, setResponseMeta] = useState<ResponseMeta>({})
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [currentContentShare, setCurrentContentShare] = useState<ContentShare | null>(null)
+  const [whichModalOpen, setWhichModalOpen] = useState<ModalType>(null)
 
   const sharesUrl = '/api/v1/users/self/content_shares'
 
@@ -69,40 +79,42 @@ export default function ReceivedContentView() {
     }
   }, [shares, isLoading])
 
-  function removeShareFromList(doomedShare) {
-    setShares(shares.filter(share => share.id !== doomedShare.id))
+  function removeShareFromList(doomedShare: ContentShare): void {
+    setShares(prevShares => prevShares.filter(share => share.id !== doomedShare.id))
   }
 
   // Handle an update to a read state from the displayed table
-  function onUpdate(share_id, updateParms) {
+  function onUpdate(share_id: string, updateParms: {read_state: ReadState}): void {
     doFetchApi({
       method: 'PUT',
       path: `${sharesUrl}/${share_id}`,
       body: updateParms,
     })
       .then(r => {
-        const {id, read_state} = r.json
-        setShares(shares.map(share => (share.id === id ? {...share, read_state} : share)))
+        const {id, read_state} = r.json as {id: string; read_state: ReadState}
+        setShares(prevShares =>
+          prevShares.map(share => (share.id === id ? {...share, read_state} : share)),
+        )
       })
       .catch(setError)
   }
 
-  function markRead(share) {
+  function markRead(share: ContentShare): void {
     onUpdate(share.id, {read_state: 'read'})
   }
 
-  function onPreview(share) {
+  function onPreview(share: ContentShare): void {
     setCurrentContentShare(share)
     setWhichModalOpen('preview')
     markRead(share)
   }
 
-  function onImport(share) {
+  function onImport(share: ContentShare): void {
     setCurrentContentShare(share)
     setWhichModalOpen('import')
   }
 
-  function onRemove(share) {
+  function onRemove(share: ContentShare): void {
     const shouldRemove = window.confirm(I18n.t('Are you sure you want to remove this item?'))
     if (shouldRemove) {
       doFetchApi({path: `${sharesUrl}/${share.id}`, method: 'DELETE'})
@@ -113,12 +125,12 @@ export default function ReceivedContentView() {
     }
   }
 
-  function closeModal() {
+  function closeModal(): void {
     setWhichModalOpen(null)
   }
 
-  function renderBody() {
-    const someContent = Array.isArray(shares) && shares.length > 0
+  function renderBody(): React.JSX.Element {
+    const someContent = shares.length > 0
 
     if (isLoading) return <Spinner renderTitle={I18n.t('Loading')} />
     if (someContent)
@@ -134,8 +146,8 @@ export default function ReceivedContentView() {
     return <NoContent />
   }
 
-  function renderPagination() {
-    if (responseMeta.link) {
+  function renderPagination(): React.JSX.Element | undefined {
+    if (responseMeta.link?.last?.page) {
       const last = parseInt(responseMeta.link.last.page, 10)
       if (!Number.isNaN(last)) {
         return (
@@ -179,11 +191,13 @@ export default function ReceivedContentView() {
         padding="medium"
         onDismiss={closeModal}
       >
-        <CourseImportPanel
-          contentShare={currentContentShare}
-          onClose={closeModal}
-          onImport={markRead}
-        />
+        {currentContentShare && (
+          <CourseImportPanel
+            contentShare={currentContentShare}
+            onClose={closeModal}
+            onImport={markRead}
+          />
+        )}
       </CanvasLazyTray>
     </>
   )
