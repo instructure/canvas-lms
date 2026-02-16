@@ -28,8 +28,36 @@ import Errors from './components/Errors'
 
 const I18n = createI18nScope('webzip_exports')
 
-class WebZipExportApp extends React.Component {
-  static webZipFormat(webZipExports, newExportId = null) {
+interface WebZipExport {
+  created_at: string
+  zip_attachment?: {
+    url: string
+  }
+  workflow_state: string
+  progress_id: string
+}
+
+interface FormattedExport {
+  date: string
+  link: string
+  workflowState: string
+  progressId: string
+  newExport: boolean
+}
+
+interface WebZipExportAppState {
+  exports: FormattedExport[]
+  errors: Error[]
+  loaded: boolean
+}
+
+class WebZipExportApp extends React.Component<Record<string, never>, WebZipExportAppState> {
+  private finishedStates: string[]
+
+  static webZipFormat(
+    webZipExports: WebZipExport[],
+    newExportId: string | null = null,
+  ): FormattedExport[] {
     return webZipExports
       .map(webZipExport => {
         const url = webZipExport.zip_attachment ? webZipExport.zip_attachment.url : ''
@@ -45,50 +73,51 @@ class WebZipExportApp extends React.Component {
       .reverse()
   }
 
-  constructor(props) {
+  constructor(props: Record<string, never>) {
     super(props)
     this.finishedStates = ['generated', 'failed']
     this.state = {exports: [], errors: [], loaded: false}
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.getExports()
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(): void {
     const newExport = this.findNewExport()
     if (newExport && newExport.link) {
       this.downloadLink(newExport.link)
     }
   }
 
-  getExports = (newExportId = null) => {
+  getExports = (newExportId: string | null = null): void => {
+    // @ts-expect-error - ENV global not typed
     const courseId = splitAssetString(ENV.context_asset_string)[1]
     this.loadExistingExports(courseId, newExportId)
   }
 
-  getExportsInProgress() {
+  getExportsInProgress(): FormattedExport | undefined {
     return this.state.exports.find(ex => !this.finishedStates.includes(ex.workflowState))
   }
 
-  getFinishedExports() {
+  getFinishedExports(): FormattedExport[] {
     return this.state.exports.filter(ex => this.finishedStates.includes(ex.workflowState))
   }
 
-  findNewExport() {
+  findNewExport(): FormattedExport | undefined {
     return this.state.exports.find(ex => ex.newExport)
   }
 
-  loadExistingExports(courseId, newExportId = null) {
+  loadExistingExports(courseId: string, newExportId: string | null = null): void {
     doFetchApi({path: `/api/v1/courses/${courseId}/web_zip_exports`})
       .then(({json}) => {
         this.setState({
           loaded: true,
-          exports: WebZipExportApp.webZipFormat(json, newExportId),
+          exports: WebZipExportApp.webZipFormat(json as WebZipExport[], newExportId),
           errors: [],
         })
       })
-      .catch(error => {
+      .catch((error: Error) => {
         this.setState({
           exports: [],
           errors: [error],
@@ -97,11 +126,11 @@ class WebZipExportApp extends React.Component {
       })
   }
 
-  downloadLink(link) {
+  downloadLink(link: string): void {
     assignLocation(link)
   }
 
-  render() {
+  render(): React.JSX.Element {
     let app = null
     const webzipInProgress = this.getExportsInProgress()
     const finishedExports = this.getFinishedExports()
