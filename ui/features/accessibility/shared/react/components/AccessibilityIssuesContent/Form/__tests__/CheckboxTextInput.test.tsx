@@ -165,6 +165,34 @@ describe('CheckboxTextInput', () => {
     expect(button).toBeDisabled()
   })
 
+  it('disables generate button when checkbox is checked', () => {
+    const propsWithGenerateOption = {
+      ...defaultProps,
+      issue: {
+        ...defaultProps.issue,
+        form: {
+          ...defaultProps.issue.form,
+          canGenerateFix: true,
+          isCanvasImage: true,
+          generateButtonLabel: 'Generate Alt Text',
+        },
+      },
+    }
+
+    render(<CheckboxTextInput {...propsWithGenerateOption} />)
+
+    const generateButton = screen.getByTestId('generate-alt-text-button')
+    const checkbox = screen.getByTestId('decorative-img-checkbox')
+
+    expect(generateButton).not.toBeDisabled()
+    expect(checkbox).not.toBeChecked()
+
+    fireEvent.click(checkbox)
+
+    expect(checkbox).toBeChecked()
+    expect(generateButton).toBeDisabled()
+  })
+
   it('shows message when the image is from an external source', () => {
     const propsWithGenerateDisabled = {
       ...defaultProps,
