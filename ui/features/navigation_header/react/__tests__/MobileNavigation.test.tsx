@@ -29,11 +29,14 @@ import {http, HttpResponse} from 'msw'
 const server = setupServer()
 
 const setOnSuccess = vi.fn()
+const setOnFailure = vi.fn()
 
-const render = children =>
+const render = (children: React.ReactNode) =>
   testingLibraryRender(
     <MockedQueryProvider>
-      <AlertManagerContext.Provider value={{setOnSuccess}}>{children}</AlertManagerContext.Provider>
+      <AlertManagerContext.Provider value={{setOnSuccess, setOnFailure}}>
+        {children}
+      </AlertManagerContext.Provider>
     </MockedQueryProvider>,
   )
 
@@ -82,16 +85,17 @@ describe('MobileNavigation', () => {
     })
 
     it('does not announce anything on the first render', () => {
-      render(<MobileNavigation navIsOpen={false} />, setOnSuccess)
+      render(<MobileNavigation navIsOpen={false} />)
       expect(setOnSuccess).toHaveBeenCalledTimes(0)
     })
 
     it('announces when global navigation menu opens', async () => {
       // Render the component
-      render(<MobileNavigation navIsOpen={false} />, setOnSuccess)
+      render(<MobileNavigation navIsOpen={false} />)
 
       // Click the hamburger menu to open the global nav
       const globalNavButton = document.querySelector('.mobile-header-hamburger')
+      if (!globalNavButton) throw new Error('Global nav button not found')
       await userEvent.click(globalNavButton)
 
       // Verify that the open announcement was made
@@ -116,10 +120,12 @@ describe('MobileNavigation', () => {
     })
 
     it('announces when navigation menu expanded/collapsed', async () => {
-      render(<MobileNavigation navIsOpen={false} />, setOnSuccess)
+      render(<MobileNavigation navIsOpen={false} />)
       const navButton = document.querySelector('.mobile-header-arrow')
+      if (!navButton) throw new Error('Nav button not found')
       await userEvent.click(navButton)
       expect(setOnSuccess).toHaveBeenCalledWith('Navigation menu is now open', true)
+      if (!navButton) throw new Error('Nav button not found')
       await userEvent.click(navButton)
       expect(setOnSuccess).toHaveBeenCalledWith('Navigation menu is now closed', true)
     })
@@ -143,12 +149,12 @@ describe('MobileNavigation', () => {
 
         // Manually update the badge element to simulate what the component would do
         const badge = document.getElementById('mobileHeaderInboxUnreadBadge')
-        badge.style.display = ''
+        if (badge) badge.style.display = ''
       })
 
       // Verify the badge is displayed
       const badge = document.getElementById('mobileHeaderInboxUnreadBadge')
-      expect(badge.style.display).toBe('')
+      if (badge) expect(badge.style.display).toBe('')
     })
   })
 })
