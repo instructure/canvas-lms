@@ -25,9 +25,11 @@ import ready from '@instructure/ready'
 ready(() => {
   const container = document.getElementById('modules_homepage_user_create')
   if (container) {
+    // @ts-expect-error - legacy jQuery module not typed
     render(<ModulesHomePage onCreateButtonClick={modules.addModule} />, container)
   }
 
+  // @ts-expect-error - ENV global not fully typed
   if (ENV.NO_MODULE_PROGRESSIONS) {
     document.querySelectorAll('.module_progressions_link').forEach(el => el.remove())
   }

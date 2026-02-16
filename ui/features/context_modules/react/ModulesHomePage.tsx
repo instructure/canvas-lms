@@ -17,13 +17,18 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {IconModuleSolid} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('modules_home_page')
 
-function ModulesHomePage({onCreateButtonClick}) {
+export interface ModulesHomePageProps {
+  onCreateButtonClick?: () => void
+}
+
+export default function ModulesHomePage({
+  onCreateButtonClick = () => {},
+}: ModulesHomePageProps): React.JSX.Element {
   return (
     <ul className="ic-EmptyStateList">
       <li className="ic-EmptyStateList__Item">
@@ -37,13 +42,3 @@ function ModulesHomePage({onCreateButtonClick}) {
     </ul>
   )
 }
-
-ModulesHomePage.propTypes = {
-  onCreateButtonClick: PropTypes.func,
-}
-
-ModulesHomePage.defaultProps = {
-  onCreateButtonClick: () => {},
-}
-
-export default ModulesHomePage
