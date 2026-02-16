@@ -30,6 +30,7 @@ import {DragDropConnectorProps} from './DragDropWrapper'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {ColumnHeader} from './ColumnHeader'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -70,6 +71,22 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
     sorting.setSortOrder(SortOrder.DESC)
   }
 
+  const handleToggleContributingScores = () => {
+    const wasVisible = contributingScoresForOutcome.isVisible()
+    contributingScoresForOutcome.toggleVisibility()
+
+    const message = wasVisible
+      ? I18n.t('Contributing Scores for %{outcome} Hidden', {outcome: outcome.title})
+      : I18n.t('Showing Contributing Scores for %{outcome}', {outcome: outcome.title})
+
+    showFlashAlert({
+      message,
+      type: 'info',
+      srOnly: true,
+      politeness: 'polite',
+    })
+  }
+
   const sortMenuGroup = (
     <Menu.Group label={I18n.t('Sort')} key="sort">
       <Menu.Item
@@ -95,7 +112,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
 
   const displayMenuGroup = (
     <Menu.Group label={I18n.t('Display')} key="display">
-      <Menu.Item onClick={contributingScoresForOutcome.toggleVisibility}>
+      <Menu.Item onClick={handleToggleContributingScores}>
         {contributingScoresForOutcome.isVisible()
           ? I18n.t('Hide Contributing Scores')
           : I18n.t('Show Contributing Scores')}
