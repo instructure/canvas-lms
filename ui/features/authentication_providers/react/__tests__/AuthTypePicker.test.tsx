@@ -19,15 +19,15 @@
 import React from 'react'
 import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import AuthTypePicker from '../AuthTypePicker'
+import AuthTypePicker, {type AuthTypePickerProps, type AuthType} from '../AuthTypePicker'
 
-const authTypes = [
+const authTypes: AuthType[] = [
   {name: 'TypeOne', value: '1'},
   {name: 'TypeTwo', value: '2'},
 ]
 
-const renderAuthTypePicker = props => {
-  const activeProps = {
+const renderAuthTypePicker = (props?: Partial<AuthTypePickerProps>) => {
+  const activeProps: AuthTypePickerProps = {
     authTypes,
     ...props,
   }
