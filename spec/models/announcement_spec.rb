@@ -791,6 +791,7 @@ describe Announcement do
     context "when a11y_checker_additional_resources is enabled" do
       before do
         Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        course.root_account.enable_feature!(:accessibility_automatic_scanning)
         course.root_account.enable_feature!(:a11y_checker)
         course.enable_feature!(:a11y_checker_eap)
         Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
@@ -812,6 +813,37 @@ describe Announcement do
 
       it "triggers destroy when deleting announcement" do
         announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+
+        expect { announcement.destroy! }.to change { AccessibilityResourceScan.where(announcement_id: announcement.id).count }.from(1).to(0)
+      end
+    end
+
+    context "when automatic scanning feature flag is disabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+        course.root_account.enable_feature!(:a11y_checker)
+        course.root_account.disable_feature!(:accessibility_automatic_scanning)
+        course.enable_feature!(:a11y_checker_eap)
+        Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+      end
+
+      it "does not trigger accessibility scan on create" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+      end
+
+      it "does not trigger accessibility scan on update" do
+        announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        announcement.update!(message: "Updated message")
+      end
+
+      it "still triggers destroy when deleting announcement" do
+        announcement = Announcement.create!(title: "Test Announcement", message: "Test message", course:)
+        AccessibilityResourceScan.create!(context: announcement, course:)
 
         expect { announcement.destroy! }.to change { AccessibilityResourceScan.where(announcement_id: announcement.id).count }.from(1).to(0)
       end
