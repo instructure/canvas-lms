@@ -297,7 +297,7 @@ const defaultTinymceConfig = {
     nav: [],
     section: [],
     summary: [],
-    time: [],
+    time: ['datetime'],
   }),
 
   extended_valid_elements: elemsToTinyStringConfig({

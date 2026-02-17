@@ -263,6 +263,7 @@ module CanvasSanitize # :nodoc:
                    "mozallowfullscreen"].freeze,
       "ol" => ["start", "type"].freeze,
       "q" => ["cite"].freeze,
+      "time" => ["datetime"].freeze,
       "table" => %w[summary width border cellpadding cellspacing center frame rules].freeze,
       "tr" => %w[align valign dir].freeze,
       "td" => %w[abbr axis colspan rowspan width align valign dir].freeze,
