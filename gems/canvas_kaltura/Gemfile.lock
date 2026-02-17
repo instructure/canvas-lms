@@ -106,6 +106,9 @@ GEM
     crass (1.0.6)
     csv (3.3.5)
     date (3.5.1)
+    debug (1.11.1)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
     diff-lcs (1.6.2)
     digest-murmurhash (1.1.1)
     drb (2.2.3)
@@ -235,6 +238,7 @@ DEPENDENCIES
   canvas_slug!
   canvas_sort!
   config_file!
+  debug
   legacy_multipart!
   rake
   rspec (~> 3.12)
