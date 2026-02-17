@@ -227,12 +227,6 @@ describe Lti::ApplyRegistrationUpdateRequestService do
           described_class.call(registration_update_request: nil, applied_by:, overlay_data: nil, comment: nil)
         end.to raise_error(ArgumentError, "registration_update_request is required")
       end
-
-      it "raises error when applied_by is nil" do
-        expect do
-          described_class.call(registration_update_request: update_request, applied_by: nil, overlay_data: nil, comment: nil)
-        end.to raise_error(ArgumentError, "applied_by is required")
-      end
     end
 
     context "with non-dynamic registrations" do

@@ -28,7 +28,7 @@ module Lti
   #
   # @return [Hash] containing the updated lti_registration
   class ApplyRegistrationUpdateRequestService < ApplicationService
-    def initialize(registration_update_request:, applied_by:, overlay_data:, comment: nil)
+    def initialize(registration_update_request:, applied_by: nil, overlay_data: {}, comment: nil)
       @registration_update_request = registration_update_request
       @applied_by = applied_by
       @overlay_data = overlay_data
@@ -38,7 +38,6 @@ module Lti
 
     def call
       raise ArgumentError, "registration_update_request is required" unless @registration_update_request
-      raise ArgumentError, "applied_by is required" unless @applied_by
 
       registration = @registration_update_request.lti_registration
       raise ArgumentError, "Registration not found" unless registration
