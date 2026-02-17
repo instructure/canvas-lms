@@ -3614,7 +3614,7 @@ class ApplicationController < ActionController::Base
   def widget_dashboard_eligible?
     return false unless @current_user
 
-    @current_user.observer_enrollments.active.any? || !@current_user.non_student_enrollment?
+    @current_user.observer_enrollments.active_or_pending.any? || !@current_user.active_non_student_enrollment?
   end
 
   def use_classic_font?
