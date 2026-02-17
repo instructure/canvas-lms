@@ -631,12 +631,6 @@ pipeline {
   post {
     always {
       script {
-        // Restore the correct build result for skipped builds (e.g., translation builds)
-        if (env.SKIP_BUILD == 'true' && env.SKIP_BUILD_RESULT) {
-          currentBuild.result = env.SKIP_BUILD_RESULT
-          echo "Build was skipped - setting result to ${env.SKIP_BUILD_RESULT}"
-        }
-
         if (env.SKIP_BUILD != 'true') {
           // Only run the post-build cleanup if the build wasn't skipped, since skipped builds may not have set up docker or other resources
           pipelineHelpers.postBuildAlways()
