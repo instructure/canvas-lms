@@ -23,6 +23,8 @@
   set_active_tab "settings"
 
   can_manage = can_do(@context, @current_user, :manage)
+  can_edit_course_content = can_do(@context, @current_user, :manage_course_content_edit)
+  can_manage = can_manage && can_edit_course_content
   can_set_grading_scheme = can_do(@context, @current_user, :set_grading_scheme)
 
   can_manage_courses = can_do(@context.account, @current_user, :manage_courses_admin)
@@ -427,7 +429,7 @@
         </div>
         <div id="course_grading_scheme">
           <div class="checkbox-flex-container">
-            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_set_grading_scheme %>
+            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_set_grading_scheme || !can_edit_course_content %>
             <%= f.label :course_grading_standard_enabled, :en => "Enable course grading scheme" %>
           </div>
           <% if Account.site_admin.feature_enabled?(:grading_scheme_updates) %>
@@ -463,7 +465,7 @@
       </div><div class="form-row course-visibility-row">
         <div class="form-label"><label for="course_visibility"><%= before_label('course_visibility', %{Visibility}) %></label></div>
         <div colspan="3" id="course_visibility">
-          <% if can_do(@context, @current_user, :manage_course_visibility) %>
+          <% if can_manage && can_do(@context, @current_user, :manage_course_visibility) %>
             <span>
               <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] }, {}, {"aria-label" => t("Course Visibility Options")} %>
               <span id="visibility_mount"></span>
