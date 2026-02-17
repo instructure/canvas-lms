@@ -461,6 +461,7 @@ class Account < ActiveRecord::Base
   add_setting :thousand_separator, inheritable: true
   add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
   add_setting :discovery_page, root_only: true
+  add_setting :onetrust_consent_domain_id, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)

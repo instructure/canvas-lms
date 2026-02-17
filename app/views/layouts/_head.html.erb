@@ -34,6 +34,24 @@
   <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Italic.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
   <%= stylesheet_link_tag(css_url_for('fonts')) %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
+  <% if @js_env && @js_env[:ONETRUST_CONSENT_SCRIPT_ID].present? %>
+  <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="<%= @js_env[:ONETRUST_CONSENT_SCRIPT_ID] %>" ></script>
+  <script type="text/javascript">
+    window.OT_CONSENT_STATE = null;
+    window.addEventListener('OneTrustGroupsUpdated', e => {
+      if (e.detail.includes('C0002')) {
+        window.OT_CONSENT_STATE = true;
+      } else {
+        window.OT_CONSENT_STATE = false;
+      }
+    });
+  function OptanonWrapper() {
+    OneTrust.OnConsentChanged(function() {
+      console.log(`OneTrust cookie consent preferences have been updated: ${JSON.stringify(OnetrustActiveGroups)}`);
+    });
+   }
+  </script>
+  <% end %>
   <% unless params && (params[:controller]&.starts_with?('login/') || params[:controller]&.starts_with?('oauth'))  # some windows apps need to do the oauth login dance from an ie11 webview %>
   <% end %>
   <%= yield :head %>

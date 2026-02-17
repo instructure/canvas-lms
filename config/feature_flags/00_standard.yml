@@ -382,6 +382,13 @@ send_usage_metrics:
   applies_to: RootAccount
   visible_on: usage_metrics_allowed_hook
   shadow: true
+cookie_consent_necessary:
+  state: hidden
+  display_name: Cookie Consent Necessary
+  description: Indicates if cookie consent is necessary
+  applies_to: RootAccount
+  visible_on: usage_metrics_allowed_hook
+  shadow: true
 new_quiz_public_api:
   applies_to: SiteAdmin
   state: hidden

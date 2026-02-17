@@ -345,7 +345,16 @@ class ApplicationController < ActionController::Base
           canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme),
           lti_asset_processor_course: @context.try(:feature_enabled?, :lti_asset_processor_course)
         )
-        @js_env[:PENDO_APP_ID] = usage_metrics_api_key if load_usage_metrics?
+
+        if load_usage_metrics?
+          @js_env[:PENDO_APP_ID] = usage_metrics_api_key
+          if cached_features[:cookie_consent_necessary] && !@domain_root_account&.feature_enabled?(:pendo_extended)
+            domain_lookup_key = request.host.end_with?(".instructure.com") ? :domain_id : :vanity_domain_id
+            onetrust_domain_id = @domain_root_account&.settings&.[](:onetrust_consent_domain_id) || DynamicSettings.find("onetrust-cookie-consent")[domain_lookup_key]
+            @js_env[:ONETRUST_CONSENT_DOMAIN_ID] = onetrust_domain_id unless onetrust_domain_id.blank? || onetrust_domain_id == "-"
+          end
+        end
+
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(["user_display_json", @current_user].cache_key, expires_in: 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback, :email]) } : {}
         @js_env[:current_user_is_admin] = @context.account_membership_allows(@current_user) if @context.is_a?(Course)
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
@@ -534,6 +543,7 @@ class ApplicationController < ActionController::Base
     api_rate_limits
     buttons_and_icons_root_account
     canvas_apps_sub_account_access
+    cookie_consent_necessary
     course_pace_allow_bulk_pace_assign
     course_pace_download_document
     course_pace_draft_state
@@ -2899,6 +2909,12 @@ class ApplicationController < ActionController::Base
     @embedded_view = params[:embedded]
     @headers = false if params[:no_headers]
     (@body_classes ||= []) << "embedded" if @embedded_view
+  end
+
+  def in_mobile_webview?
+    # TODO: we need to set up adding :mobile_webview to the session
+    # when /login/session_token is called with mobile_webview=1
+    session&.dig(:mobile_webview) || params[:embedded] || params[:embed]
   end
 
   def stringify_json_ids?
