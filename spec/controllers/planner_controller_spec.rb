@@ -746,6 +746,20 @@ describe PlannerController do
             assignment_ids = response_json.pluck("plannable_id")
             expect(assignment_ids).not_to include(submitted_assignment.id, unsubmitted_assignment.id)
           end
+
+          it "excludes assignments from courses the student is not enrolled in" do
+            unenrolled_course = course_factory(active_all: true)
+            other_assignment = assignment_model(course: unenrolled_course, due_at: 1.week.from_now)
+
+            get :index, params: {
+              filter: "incomplete_items",
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 4.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            expect(response_json.pluck("plannable_id")).not_to include(other_assignment.id)
+          end
         end
 
         context "complete_items filter" do

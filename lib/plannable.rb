@@ -21,6 +21,21 @@
 module Plannable
   ACTIVE_WORKFLOW_STATES = ["active", "published"].freeze
 
+  # Reduces an array of AR scopes into an Arel UNION node.
+  # Using Arel avoids string-based SQL interpolation (which triggers brakeman warnings).
+  def self.union_arel(*scopes)
+    scopes.flat_map { |s| s.is_a?(Array) ? s : [s] }.map(&:arel).reduce { |acc, a| Arel::Nodes::Union.new(acc, a) }
+  end
+
+  def self.submittable_override_assignment_scopes(user, marked_complete:)
+    [Quizzes::Quiz, DiscussionTopic, WikiPage].map do |klass|
+      klass.joins(:planner_overrides)
+           .merge(PlannerOverride.where(user_id: user.id, marked_complete:))
+           .where.not(assignment_id: nil)
+           .select(:assignment_id)
+    end
+  end
+
   def self.included(base)
     base.class_eval do
       has_many :planner_overrides, as: :plannable
@@ -37,17 +52,28 @@ module Plannable
         )
 
         if [Assignment, SubAssignment].include?(klass)
-          scope = scope.where.not(
-            Submission.where(user:)
-                      .where("submissions.assignment_id = assignments.id")
-                      .where.not(submitted_at: nil)
-                      .where(redo_request: [false, nil])
-                      .joins("LEFT JOIN #{PlannerOverride.quoted_table_name} ON
-                              planner_overrides.plannable_id = submissions.assignment_id
-                              AND planner_overrides.plannable_type = 'Assignment'
-                              AND planner_overrides.user_id = #{user.id}")
-                      .where("planner_overrides.marked_complete IS NOT FALSE").arel.exists
-          )
+          if Account.site_admin.feature_enabled?(:planner_submittable_completion_filter)
+            # Exclude assignments whose submittable (quiz, discussion, wiki page) is marked complete.
+            Plannable.submittable_override_assignment_scopes(user, marked_complete: true).each do |subquery|
+              scope = scope.where.not(id: subquery)
+            end
+          end
+
+          submission_scope = Submission.where(user:)
+                                       .where("submissions.assignment_id = assignments.id")
+                                       .where.not(submitted_at: nil)
+                                       .where(redo_request: [false, nil])
+                                       .joins("LEFT JOIN #{PlannerOverride.quoted_table_name} ON
+                                               planner_overrides.plannable_id = submissions.assignment_id
+                                               AND planner_overrides.plannable_type = 'Assignment'
+                                               AND planner_overrides.user_id = #{user.id}")
+                                       .where("planner_overrides.marked_complete IS NOT FALSE")
+          if Account.site_admin.feature_enabled?(:planner_submittable_completion_filter)
+            Plannable.submittable_override_assignment_scopes(user, marked_complete: false).each do |subquery|
+              submission_scope = submission_scope.where.not(assignment_id: subquery)
+            end
+          end
+          scope = scope.where.not(submission_scope.arel.exists)
         end
         scope
       }
@@ -58,9 +84,13 @@ module Plannable
       # 2. For Assignments/SubAssignments: it has a submission (submitted_at present)
       #    AND (no redo_request OR redo_request is false)
       #    AND (no PlannerOverride OR PlannerOverride.marked_complete is not explicitly false)
+      #    AND its submittable object (if any) does not have PlannerOverride.marked_complete: false
+      # 3. For Assignments: it has an associated submittable object (quiz, discussion, wiki_page)
+      #    with a PlannerOverride marked_complete: true
       #
-      # In other words: PlannerOverride.marked_complete: false can override submission status,
-      # allowing users to mark submitted assignments as incomplete if they need to revise them.
+      # In other words: PlannerOverride.marked_complete: false (on either the assignment or its
+      # submittable) can override submission status, allowing users to mark submitted assignments
+      # as incomplete if they need to revise them.
       scope :complete_for_planner, lambda { |user|
         overridden_complete_ids = PlannerOverride.where(
           plannable_type: klass.name,
@@ -81,9 +111,16 @@ module Plannable
                           .where(submissions: { redo_request: [false, nil] })
                           .where("planner_overrides.marked_complete IS NOT FALSE")
                           .select("#{klass.table_name}.id")
+          if Account.site_admin.feature_enabled?(:planner_submittable_completion_filter)
+            Plannable.submittable_override_assignment_scopes(user, marked_complete: false).each do |subquery|
+              submitted_ids = submitted_ids.where.not(id: subquery)
+            end
 
-          union_sql = "((#{overridden_complete_ids.to_sql}) UNION (#{submitted_ids.to_sql}))"
-          where("#{klass.table_name}.id IN #{union_sql}")
+            submittable_scopes = Plannable.submittable_override_assignment_scopes(user, marked_complete: true)
+            where(klass.arel_table[:id].in(Plannable.union_arel(overridden_complete_ids, submitted_ids, submittable_scopes)))
+          else
+            where(klass.arel_table[:id].in(Plannable.union_arel(overridden_complete_ids, submitted_ids)))
+          end
         else
           where(id: overridden_complete_ids)
         end

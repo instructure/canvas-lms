@@ -260,6 +260,21 @@ syllabus_versioning:
     ci:
       state: allowed_on
 
+planner_submittable_completion_filter:
+  state: hidden
+  display_name: Planner Submittable Completion Filter
+  description: |-
+    When enabled, the planner's complete/incomplete filters will correctly
+    account for graded quizzes, graded discussions, and wiki page assignments
+    whose completion state is tracked via a planner override on the submittable
+    object rather than the assignment directly.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 widget_dashboard:
   state: hidden
   display_name: Customizable Dashboard for Learners

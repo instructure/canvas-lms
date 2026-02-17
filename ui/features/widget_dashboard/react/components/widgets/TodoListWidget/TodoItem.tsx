@@ -51,12 +51,12 @@ const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const previousLoadingRef = useRef<boolean>(false)
 
-  const isMarkedComplete =
-    item.planner_override?.marked_complete ||
-    (item.submissions &&
+  const isMarkedComplete = item.planner_override
+    ? item.planner_override.marked_complete
+    : item.submissions &&
       typeof item.submissions === 'object' &&
       item.submissions.submitted &&
-      !item.submissions.redo_request)
+      !item.submissions.redo_request
 
   // For planner notes, course_id may be in plannable.course_id instead of item.course_id
   const courseId = item.course_id || item.plannable.course_id
