@@ -75,6 +75,15 @@ const TableComponent: React.FC<TableProps> = ({
     (rowIndex: number, colIndex: number) => {
       const cell = getCellElement(rowIndex, colIndex)
       if (cell) {
+        if (rowIndex === -1) {
+          const focusable = cell.querySelector<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+          )
+          if (focusable) {
+            focusable.focus()
+            return
+          }
+        }
         cell.focus()
       }
     },
@@ -83,7 +92,16 @@ const TableComponent: React.FC<TableProps> = ({
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, rowIndex: number, colIndex: number) => {
-      if (event.target !== event.currentTarget) return
+      // Allow arrow key navigation from the cell itself or from buttons within the cell
+      // (e.g., header options menu), but prevent navigation from other interactive elements
+      // (e.g., chart components that have their own keyboard navigation)
+      if (event.target !== event.currentTarget) {
+        const target = event.target as HTMLElement
+        const isButton = target.tagName === 'BUTTON' || target.getAttribute('role') === 'button'
+        if (!isButton) {
+          return
+        }
+      }
 
       const {key} = event
       let newRowIndex = rowIndex
@@ -129,7 +147,6 @@ const TableComponent: React.FC<TableProps> = ({
         width: col.width,
         isSticky: col.isSticky,
         'data-cell-id': `header-${colIndex}`,
-        tabIndex: 0,
         onKeyDown: (e: React.KeyboardEvent) => handleKeyDown(e, -1, colIndex),
         ...col.colHeaderProps,
       }

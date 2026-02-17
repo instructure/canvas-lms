@@ -155,6 +155,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         sorting={sorting}
         nameDisplayFormat={gradebookSettings.nameDisplayFormat}
         onChangeNameDisplayFormat={onChangeNameDisplayFormat}
+        titleId="ilmgb-student-header"
       />
     ),
     [sorting, gradebookSettings.nameDisplayFormat, onChangeNameDisplayFormat],
@@ -178,7 +179,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   )
 
   const renderOutcomeHeader = useCallback(
-    (outcome: Outcome, contributingScoreForOutcome: any) => () => {
+    (outcome: Outcome, contributingScoreForOutcome: any, titleId?: string) => () => {
       return (
         <OutcomeHeader
           outcome={outcome}
@@ -187,6 +188,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
           courseId={courseId}
           sorting={sorting}
           contributingScoresForOutcome={contributingScoreForOutcome}
+          titleId={titleId}
         />
       )
     },
@@ -209,8 +211,13 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   )
 
   const renderContributingScoreHeader = useCallback(
-    (alignment: ContributingScoreAlignment) => () => (
-      <ContributingScoreHeader alignment={alignment} courseId={courseId} sorting={sorting} />
+    (alignment: ContributingScoreAlignment, titleId?: string) => () => (
+      <ContributingScoreHeader
+        alignment={alignment}
+        courseId={courseId}
+        sorting={sorting}
+        titleId={titleId}
+      />
     ),
     [courseId, sorting],
   )
@@ -269,6 +276,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
       colHeaderProps: {
         'data-testid': 'student-header',
         width: STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING,
+        ariaLabelId: 'ilmgb-student-header',
         ...commonColHeaderProps,
       },
       cellProps: {
@@ -279,15 +287,17 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
     {
       outcomes.map(outcome => {
         const contributingScoreForOutcome = contributingScores.forOutcome(outcome.id)
+        const titleId = `ilmgb-outcome-header-${outcome.id}`
         columns.push({
           key: `outcome-${outcome.id}`,
-          header: renderOutcomeHeader(outcome, contributingScoreForOutcome),
+          header: renderOutcomeHeader(outcome, contributingScoreForOutcome, titleId),
           render: renderOutcomeCell(outcome),
           draggable: true,
           data: {outcome},
           colHeaderProps: {
             'data-testid': `outcome-header-${outcome.id}`,
             width: COLUMN_WIDTH + COLUMN_PADDING,
+            ariaLabelId: titleId,
             ...commonColHeaderProps,
           },
           cellProps: {
@@ -298,9 +308,10 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         if (contributingScoreForOutcome.isVisible()) {
           ;(contributingScoreForOutcome.alignments || []).forEach(
             (alignment: ContributingScoreAlignment) => {
+              const titleId = `ilmgb-contributing-score-header-${outcome.id}-${alignment.alignment_id}`
               columns.push({
                 key: `contributing-score-${outcome.id}-${alignment.alignment_id}`,
-                header: renderContributingScoreHeader(alignment),
+                header: renderContributingScoreHeader(alignment, titleId),
                 render: renderContributingScoreCell(
                   outcome,
                   alignment,
@@ -316,6 +327,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
                 colHeaderProps: {
                   'data-testid': `contributing-score-header-${outcome.id}-${alignment.alignment_id}`,
                   width: COLUMN_WIDTH + COLUMN_PADDING,
+                  ariaLabelId: titleId,
                   ...commonColHeaderProps,
                 },
               } as Column)

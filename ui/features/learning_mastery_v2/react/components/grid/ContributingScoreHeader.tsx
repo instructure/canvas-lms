@@ -32,12 +32,14 @@ export interface ContributingScoreHeaderProps {
   alignment: ContributingScoreAlignment
   courseId: string
   sorting: Sorting
+  titleId?: string
 }
 
 export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = ({
   alignment,
   courseId,
   sorting,
+  titleId,
 }) => {
   const isCurrentlySelected =
     sorting.sortBy === SortBy.ContributingScore &&
@@ -95,6 +97,7 @@ export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = (
   return (
     <ColumnHeader
       title={alignment.associated_asset_name}
+      titleId={titleId}
       optionsMenuTriggerLabel={I18n.t('%{assignment} options', {
         assignment: alignment.associated_asset_name,
       })}
