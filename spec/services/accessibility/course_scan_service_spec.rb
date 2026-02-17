@@ -336,6 +336,56 @@ describe Accessibility::CourseScanService do
           )
         end
       end
+
+      context "when scanning syllabus with existing scan record" do
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+          Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+          course.update!(syllabus_body: "<p>Course syllabus content</p>")
+        end
+
+        context "when no scan exists for syllabus" do
+          it "calls call_sync" do
+            scanner_service = instance_double(Accessibility::ResourceScannerService)
+            allow(Accessibility::ResourceScannerService).to receive(:new).with(
+              resource: an_instance_of(Accessibility::SyllabusResource)
+            ).and_return(scanner_service)
+            allow(scanner_service).to receive(:call_sync)
+            allow(scanner_service).to receive(:scan_resource)
+
+            subject.scan_course
+
+            expect(scanner_service).to have_received(:call_sync)
+            expect(scanner_service).not_to have_received(:scan_resource)
+          end
+        end
+
+        context "when a scan exists for syllabus" do
+          let!(:existing_syllabus_scan) do
+            AccessibilityResourceScan.create!(
+              course:,
+              is_syllabus: true,
+              workflow_state: "completed",
+              resource_workflow_state: "published",
+              issue_count: 2
+            )
+          end
+
+          it "calls scan_resource with the existing scan" do
+            scanner_service = instance_double(Accessibility::ResourceScannerService)
+            allow(Accessibility::ResourceScannerService).to receive(:new).with(
+              resource: an_instance_of(Accessibility::SyllabusResource)
+            ).and_return(scanner_service)
+            allow(scanner_service).to receive(:call_sync)
+            allow(scanner_service).to receive(:scan_resource)
+
+            subject.scan_course
+
+            expect(scanner_service).to have_received(:scan_resource).with(scan: existing_syllabus_scan)
+            expect(scanner_service).not_to have_received(:call_sync)
+          end
+        end
+      end
     end
 
     context "when determining if resources need scanning" do
@@ -646,6 +696,18 @@ describe Accessibility::CourseScanService do
           expect(scan.error_message).to be_nil
         end
 
+        it "calls call_sync when no existing scan is found" do
+          scanner_service = instance_double(Accessibility::ResourceScannerService)
+          allow(Accessibility::ResourceScannerService).to receive(:new).and_return(scanner_service)
+          allow(scanner_service).to receive(:call_sync)
+          allow(scanner_service).to receive(:scan_resource)
+
+          subject.scan_course
+
+          expect(scanner_service).to have_received(:call_sync)
+          expect(scanner_service).not_to have_received(:scan_resource)
+        end
+
         it "calls scan_resource with the newly created scan" do
           call_count = 0
           allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource) do |_, scan:|
@@ -686,6 +748,18 @@ describe Accessibility::CourseScanService do
 
           subject.scan_course
           expect(received_scan).to eq(existing_scan)
+        end
+
+        it "calls scan_resource with the existing scan and not call_sync" do
+          scanner_service = instance_double(Accessibility::ResourceScannerService)
+          allow(Accessibility::ResourceScannerService).to receive(:new).and_return(scanner_service)
+          allow(scanner_service).to receive(:call_sync)
+          allow(scanner_service).to receive(:scan_resource)
+
+          subject.scan_course
+
+          expect(scanner_service).to have_received(:scan_resource).with(scan: existing_scan)
+          expect(scanner_service).not_to have_received(:call_sync)
         end
 
         it "calls scan_resource with the existing scan" do
