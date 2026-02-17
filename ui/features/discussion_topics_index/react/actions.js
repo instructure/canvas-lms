@@ -326,6 +326,13 @@ function saveCourseSettings(dispatch, getState, userSettings, courseSettings) {
   apiClient
     .saveCourseSettings(getState(), courseSettings)
     .then(resp => {
+      // Update window.ENV so that UNSAFE_componentWillReceiveProps
+      // reads the saved values when isSavingSettings flips to false
+      if (window.ENV?.COURSE_DISCUSSION_SETTINGS) {
+        window.ENV.COURSE_DISCUSSION_SETTINGS.use_default =
+          resp.data.use_default_discussion_settings
+        window.ENV.COURSE_DISCUSSION_SETTINGS.defaults = resp.data.default_discussion_settings || {}
+      }
       $.screenReaderFlashMessage(I18n.t('Saved discussion settings successfully'))
       dispatch(actions.savingSettingsSuccess({userSettings, courseSettings: resp.data}))
     })

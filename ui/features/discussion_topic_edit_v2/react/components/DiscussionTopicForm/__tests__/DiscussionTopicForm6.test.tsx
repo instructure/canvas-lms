@@ -55,7 +55,6 @@ describe('DiscussionTopicForm', () => {
   beforeEach(() => {
     window.ENV = {
       DISCUSSION_TOPIC: {
-        // @ts-expect-error
         PERMISSIONS: {
           CAN_ATTACH: true,
           CAN_MODERATE: true,

@@ -5348,7 +5348,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "23:59:59",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
         end
 
@@ -5429,7 +5431,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "09:00:00",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
           @course.reload
           expect(@course.allow_final_grade_override?).to be true
@@ -5572,7 +5576,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "23:59:59",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
         end
 

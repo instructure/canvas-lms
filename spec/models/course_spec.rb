@@ -8288,6 +8288,71 @@ describe Course do
       end
     end
 
+    describe "#snapshot_account_default_discussion_settings" do
+      let(:account) { Account.default }
+      let(:template_defaults) do
+        {
+          anonymous_state: "full_anonymity",
+          require_initial_post: false,
+          allow_rating: false,
+          sort_order: "desc"
+        }
+      end
+      let(:template_course) do
+        Course.create!(template: true).tap do |c|
+          c.default_discussion_settings = template_defaults
+          c.save!
+        end
+      end
+
+      before do
+        account.enable_feature!(:default_discussion_options)
+        account.update!(course_template: template_course)
+      end
+
+      it "snapshots template default discussion settings onto new course" do
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to include(
+          anonymous_state: "full_anonymity",
+          require_initial_post: false,
+          allow_rating: false,
+          sort_order: "desc"
+        )
+      end
+
+      it "snapshots use_default_discussion_settings from template when true" do
+        template_course.use_default_discussion_settings = true
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.use_default_discussion_settings).to be true
+      end
+
+      it "snapshots use_default_discussion_settings from template when false" do
+        template_course.use_default_discussion_settings = false
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.use_default_discussion_settings).to be false
+      end
+
+      it "does not snapshot when template has no default_discussion_settings" do
+        template_course.default_discussion_settings = nil
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to be_nil
+      end
+
+      it "does not snapshot when account has no course template" do
+        account.update!(course_template_id: 0)
+
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to be_nil
+        expect(course.use_default_discussion_settings).to be false
+      end
+    end
+
     describe "#copy_from_course_template" do
       it "copies unpublished content" do
         course = Course.create!(template: true)

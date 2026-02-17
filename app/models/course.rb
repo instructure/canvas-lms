@@ -340,6 +340,7 @@ class Course < ApplicationRecord
   prepend Profile::Association
 
   before_create :set_restrict_quantitative_data_when_needed
+  before_create :snapshot_account_default_discussion_settings
 
   before_save :assign_uuid
   before_validation :assert_defaults
@@ -4050,6 +4051,8 @@ class Course < ApplicationRecord
   add_setting :allow_student_forum_attachments, boolean: true, default: true
   add_setting :allow_student_discussion_reporting, boolean: true, default: true
   add_setting :allow_student_anonymous_discussion_topics, boolean: true, default: false
+  add_setting :use_default_discussion_settings, boolean: true, default: false
+  add_setting :default_discussion_settings, arbitrary: true
   add_setting :show_total_grade_as_points, boolean: true, default: false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :default_student_gradebook_view, boolean: true, default: false
@@ -4932,6 +4935,18 @@ class Course < ApplicationRecord
        account.restrict_quantitative_data[:locked] == true
       self.restrict_quantitative_data = true
     end
+  end
+
+  def snapshot_account_default_discussion_settings
+    return unless account&.root_account&.feature_enabled?(:default_discussion_options)
+    # When a course is created, snapshot the course template's default
+    # discussion settings so that discussions use the defaults active at
+    # creation time.
+    return unless (template = account&.effective_course_template)
+
+    self.use_default_discussion_settings = template.use_default_discussion_settings?
+    defaults = template.default_discussion_settings
+    self.default_discussion_settings = defaults if defaults.present?
   end
 
   def log_create_to_publish_time

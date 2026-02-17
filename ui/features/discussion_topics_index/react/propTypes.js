@@ -24,6 +24,11 @@ propTypes.permissions = shape({
   create: bool,
   manage_content: bool,
   moderate: bool,
+  change_settings: bool,
+  apply_default_discussion_options: bool,
+  edit_discussion_anonymity: bool,
+  edit_discussion_options: bool,
+  edit_discussion_views: bool,
 })
 
 propTypes.discussionTopicMenuTools = shape({

@@ -349,6 +349,7 @@ export type RootAccountFeatureId =
   | 'course_pace_weighted_assignments'
   | 'course_paces_skip_selected_days'
   | 'create_course_subaccount_picker'
+  | 'default_discussion_options'
   | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
   | 'institutional_tags'

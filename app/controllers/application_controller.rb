@@ -616,6 +616,7 @@ class ApplicationController < ActionController::Base
     youtube_migration
     educator_dashboard
     widget_dashboard
+    default_discussion_options
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[

@@ -146,6 +146,46 @@ describe('Discussions redux actions', () => {
     })
   })
 
+  describe('saveSettings', () => {
+    it('updates window.ENV.COURSE_DISCUSSION_SETTINGS after a successful course settings save', async () => {
+      const userSettingsState = {manual_mark_as_read: false}
+      const stateWithUser = () => ({
+        ...getState(),
+        userSettings: userSettingsState,
+      })
+
+      window.ENV = window.ENV || {}
+      window.ENV.COURSE_DISCUSSION_SETTINGS = {
+        use_default: false,
+        defaults: {},
+      }
+
+      const savedCourseSettings = {
+        use_default_discussion_settings: true,
+        default_discussion_settings: {disallow_threaded_replies: true},
+      }
+      apiClient.saveUserSettings.mockResolvedValue({data: userSettingsState})
+      apiClient.saveCourseSettings.mockResolvedValue({data: savedCourseSettings})
+
+      const dispatch = vi.fn()
+      const courseSettings = {
+        use_default_discussion_settings: true,
+        default_discussion_settings: {disallow_threaded_replies: true},
+      }
+
+      // The thunk doesn't return its promise, so flush the queue manually
+      actions.saveSettings({markAsRead: false}, courseSettings)(dispatch, stateWithUser)
+      await new Promise(resolve => setImmediate(resolve))
+
+      expect(window.ENV.COURSE_DISCUSSION_SETTINGS.use_default).toBe(true)
+      expect(window.ENV.COURSE_DISCUSSION_SETTINGS.defaults).toEqual({
+        disallow_threaded_replies: true,
+      })
+
+      delete window.ENV.COURSE_DISCUSSION_SETTINGS
+    })
+  })
+
   describe('handleDrop', () => {
     it('throws exception if updating a non-existent field', () => {
       const state = {
