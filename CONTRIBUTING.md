@@ -100,7 +100,7 @@ Guidelines
 
 ### What is it and why do I need to sign it?
 
-The Instructure Contributor Agreement (ICA) is a contributor license agreement which grants us intellectual property rights in material you contribute to a project we own or manage.  Signing the agreement creates a written record which allows us to track our legal rights when we use and distribute any project containing contributor material.  
+The [Instructure Contributor Agreement](https://cla-assistant.io/instructure/canvas-lms) (ICA) is a contributor license agreement which grants us intellectual property rights in material you contribute to a project we own or manage.  Signing the agreement creates a written record which allows us to track our legal rights when we use and distribute any project containing contributor material.
 
 ### What rights am I giving to Instructure? 
 
