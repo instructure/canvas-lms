@@ -455,6 +455,38 @@ describe SplitUsers do
         expect(source_user.communication_channels.where.not(workflow_state: "retired")
           .map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
       end
+
+      it "restores context module progressions" do
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        context_module = course1.context_modules.create!(name: "Module 1")
+        cmp = ContextModuleProgression.create!(user: restored_user, context_module:)
+
+        UserMerge.from(restored_user).into(source_user)
+        expect(cmp.reload.user_id).to eq source_user.id
+        SplitUsers.split_db_users(source_user)
+        expect(cmp.reload.user_id).to eq restored_user.id
+      end
+
+      it "handles conflicting context module progressions" do
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        course1.enroll_student(source_user, enrollment_state: "active")
+        context_module = course1.context_modules.create!(name: "Module 1")
+        ContextModuleProgression.create!(user: restored_user, context_module:)
+        source_cmp = ContextModuleProgression.create!(user: source_user, context_module:)
+
+        UserMerge.from(restored_user).into(source_user)
+        # create the conflict scenario: restored_user gets a new progression post-merge
+        restored_user.context_module_progressions.where(context_module:).find_each(&:destroy)
+        conflicting_cmp = ContextModuleProgression.create!(user: restored_user, context_module:)
+
+        expect do
+          SplitUsers.split_db_users(source_user)
+        end.not_to raise_error
+
+        # source user's progression stays with source user since restored user already has one
+        expect(source_cmp.reload.user_id).to eq source_user.id
+        expect(conflicting_cmp.reload.user_id).to eq restored_user.id
+      end
     end
 
     it "restores submissions" do
