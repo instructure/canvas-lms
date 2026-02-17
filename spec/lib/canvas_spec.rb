@@ -339,4 +339,48 @@ describe Canvas do
       expect(config["key"]).to eq("value")
     end
   end
+
+  describe ".load_config_file_or_consul" do
+    let(:sample_config) do
+      {
+        "key" => "value",
+        "nested" => { "data" => "test" }
+      }
+    end
+
+    it "loads from ConfigFile when available" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(sample_config)
+      config = Canvas.load_config_file_or_consul("test_config")
+      expect(config).to eq(sample_config)
+    end
+
+    it "does not query Consul when ConfigFile returns data" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(sample_config)
+      expect(DynamicSettings).not_to receive(:find)
+      Canvas.load_config_file_or_consul("test_config")
+    end
+
+    it "falls back to Consul when ConfigFile returns nil" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(nil)
+      stub_consul_config("test_config", sample_config)
+      config = Canvas.load_config_file_or_consul("test_config")
+      expect(config).to eq(sample_config)
+    end
+
+    it "returns nil when neither ConfigFile nor Consul has the config" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(nil)
+      stub_consul_unavailable("test_config")
+      config = Canvas.load_config_file_or_consul("test_config")
+      expect(config).to be_nil
+    end
+
+    it "passes keyword arguments to load_config_from_consul_only" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(nil)
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      expect(DynamicSettings).to receive(:find).with(hash_including(tree: :private, cluster: "cluster21")).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(nil)
+
+      Canvas.load_config_file_or_consul("test_config", cluster: "cluster21")
+    end
+  end
 end
