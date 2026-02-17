@@ -769,6 +769,10 @@ module SwaggerYard
           end
 
           def process_returns_tags(docstring, operation)
+            # Check the raw docstring text to detect array syntax
+            raw_text = docstring.to_raw
+            is_array_return = !!(raw_text =~ /@returns\s+\[.+\]/)
+
             docstring.tags(:returns).each do |tag|
               types = tag.types || ["String"]
               desc = tag.text.to_s.strip
@@ -782,9 +786,20 @@ module SwaggerYard
 
               # Track the model usage for this operation if we found one
               if model_name
-                track_operation_model(operation.operation_id, model_name, response_schema)
+                # Override is_array detection based on raw docstring
+                track_operation_model_with_array(operation.operation_id, model_name, response_schema, is_array_return)
               end
             end
+          end
+
+          def track_operation_model_with_array(operation_id, model_name, response_schema, is_array)
+            return unless model_schema_exists?(model_name)
+
+            SwaggerYard::CanvasAdapter.operation_models[operation_id] ||= {}
+            SwaggerYard::CanvasAdapter.operation_models[operation_id]["200"] = {
+              model: model_name,
+              is_array: is_array || response_schema.to_s.include?("array")
+            }
           end
 
           def add_pagination_parameters_if_needed(_docstring, operation, yard_object)
@@ -893,18 +908,6 @@ module SwaggerYard
             # rubocop:enable Lint/DuplicateBranch
           end
 
-          def track_operation_model(operation_id, model_name, response_schema)
-            return unless model_schema_exists?(model_name)
-
-            # Debug: log tracking attempts
-            # puts "Tracking: #{operation_id} -> #{model_name} (array: #{response_schema.include?('array')})"
-
-            SwaggerYard::CanvasAdapter.operation_models[operation_id] ||= {}
-            SwaggerYard::CanvasAdapter.operation_models[operation_id]["200"] = {
-              model: model_name,
-              is_array: response_schema.include?("array")
-            }
-          end
 
           def process_example_tags(docstring, operation)
             process_example_request_tag(docstring, operation)
