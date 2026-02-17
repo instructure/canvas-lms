@@ -368,12 +368,11 @@ module SwaggerYard
       fix_refs_recursive(openapi_schema)
     end
 
-    # Convert properties from Canvas format to OpenAPI format
-    # Mark non-required fields as nullable (Canvas returns null for missing optional fields)
+    # Convert properties from Canvas format to OpenAPI format (mark non-required fields as nullable)
     def self.convert_properties(properties, required_fields = [])
       properties.each_with_object({}) do |(prop_name, prop_def), result|
         is_required = required_fields.include?(prop_name)
-        result[prop_name] = convert_single_property(prop_def, is_required)
+        result[prop_name] = convert_single_property(prop_def, is_required:)
       end
     end
 
@@ -384,8 +383,7 @@ module SwaggerYard
       convert_property_type(converted_prop, prop_def)
       copy_basic_property_fields(converted_prop, prop_def)
 
-      # Mark non-required fields as nullable (Canvas returns null for missing optional fields)
-      # Skip if already nullable or if it's an array (arrays themselves aren't nullable, but can be empty)
+      # Mark non-required fields as nullable. Skip if already nullable or if it's an array
       if !is_required && !converted_prop["nullable"] && converted_prop["type"] != "array"
         converted_prop["nullable"] = true
       end
@@ -797,13 +795,13 @@ module SwaggerYard
               operation.add_response_type(response_type, desc)
 
               # Track model for post-processing schema replacement
-              if model_info[:model_name]
-                track_operation_model_with_array(
-                  operation.operation_id,
-                  model_info[:model_name],
-                  model_info[:is_array]
-                )
-              end
+              next unless model_info[:model_name]
+
+              track_operation_model_with_array(
+                operation.operation_id,
+                model_info[:model_name],
+                model_info[:is_array]
+              )
             end
           end
 
@@ -824,9 +822,9 @@ module SwaggerYard
             end
 
             {
-              model_name: model_name,
+              model_name:,
               is_array: is_array_from_raw,
-              types: types
+              types:
             }
           end
 
@@ -836,7 +834,7 @@ module SwaggerYard
             SwaggerYard::CanvasAdapter.operation_models[operation_id] ||= {}
             SwaggerYard::CanvasAdapter.operation_models[operation_id]["200"] = {
               model: model_name,
-              is_array: is_array
+              is_array:
             }
           end
 
@@ -945,7 +943,6 @@ module SwaggerYard
             end
             # rubocop:enable Lint/DuplicateBranch
           end
-
 
           def process_example_tags(docstring, operation)
             process_example_request_tag(docstring, operation)
