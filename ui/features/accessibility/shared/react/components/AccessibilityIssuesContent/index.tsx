@@ -213,6 +213,7 @@ export const AccessibilityWizard = () => {
     if (!nextItem) return
 
     setSelectedScan(nextItem)
+    setAllIssuesSkipped(false)
 
     if (accessibilityScans) {
       const newNextResource = getNextResource(accessibilityScans, nextItem)
