@@ -17,10 +17,22 @@
  */
 
 import groovy.transform.Field
+import hudson.model.Result
+import jenkins.model.CauseOfInterruption
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 // Helper functions extracted from Jenkinsfile to reduce bytecode size
 
 @Field final static GERRIT_CHANGE_ID_REGEX = /Change\-Id: (.*)/
+
+def haltBuildWithResult(Result result, String reason) {
+  // Mark the current build with the specified result
+  currentBuild.rawBuild.@result = result
+  // Create a custom interruption cause
+  def cause = new CauseOfInterruption.UserInterruption(reason)
+  // Throw a FlowInterruptedException to halt the build with the specified result
+  throw new FlowInterruptedException(result, false, cause)
+}
 
 def getDockerWorkDir() {
   if (env.GERRIT_PROJECT == 'qti_migration_tool') {
@@ -193,15 +205,14 @@ def configureBuildStage(buildParameters) {
     env.GERRIT_CHANGE_SUBJECT =~ /translations?$/) {
     env.SKIP_BUILD = 'true'
     if (configuration.isChangeMerged()) {
-      // Post-merge translation: will be set to SUCCESS in post block
-      env.SKIP_BUILD_RESULT = 'SUCCESS'
+      // Post-merge translation: halt with SUCCESS status
       echo "Translation build from svc.cloudjenkins@instructure.com - post-merge build will be skipped"
+      haltBuildWithResult(Result.SUCCESS, "Skipping translation build from svc.cloudjenkins@instructure.com")
     } else {
-      // Pre-merge translation: will be set to NOT_BUILT in post block
-      env.SKIP_BUILD_RESULT = 'NOT_BUILT'
+      // Pre-merge translation: halt with NOT_BUILT status
       echo "Translation build from svc.cloudjenkins@instructure.com - pre-merge build will be skipped"
+      haltBuildWithResult(Result.NOT_BUILT, "Skipping translation build from svc.cloudjenkins@instructure.com")
     }
-    error "Skipping translation build from svc.cloudjenkins@instructure.com"
   }
 
   if (commitMessageFlag('skip-ci') as Boolean) {
