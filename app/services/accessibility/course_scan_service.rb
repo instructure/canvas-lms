@@ -133,7 +133,12 @@ class Accessibility::CourseScanService < ApplicationService
 
     resource = Accessibility::SyllabusResource.new(@course)
 
-    Accessibility::ResourceScannerService.new(resource:).scan_resource(scan:)
+    resource_scanner_service = Accessibility::ResourceScannerService.new(resource:)
+    if scan
+      resource_scanner_service.scan_resource(scan:)
+    else
+      resource_scanner_service.call_sync
+    end
   end
 
   def needs_scan?(resource, scan)
