@@ -66,8 +66,14 @@ export const ContributingScoreCellContent: React.FC<ContributingScoreCellContent
           outcome={outcome}
           scoreDisplayFormat={scoreDisplayFormat}
         />
-        {focus && (
+        <div
+          style={{
+            opacity: focus ? 1 : 0,
+            pointerEvents: focus ? 'auto' : 'none',
+          }}
+        >
           <IconButton
+            aria-haspopup="dialog"
             withBackground={false}
             withBorder={false}
             size="small"
@@ -77,7 +83,7 @@ export const ContributingScoreCellContent: React.FC<ContributingScoreCellContent
             onClick={onAction}
             disabled={!onAction}
           />
-        )}
+        </div>
       </Flex>
     </View>
   )
