@@ -26,14 +26,10 @@ import {canvasThemeLocal} from '@instructure/ui-themes'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Heading} from '@instructure/ui-heading'
-import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tray} from '@instructure/ui-tray'
 import {FormFieldMessage} from '@instructure/ui-form-field'
-import {IconExternalLinkLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {useNextResource} from '../../hooks/useNextResource'
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
@@ -58,11 +54,11 @@ import {PreviewHandle} from './Preview'
 import SuccessView from './SuccessView'
 import CloseRemediationView from './CloseRemediationView'
 import WhyMattersPopover from './WhyMattersPopover'
-import {ProblemArea} from './ProblemArea/ProblemArea'
 import {useA11yTracking} from '../../hooks/useA11yTracking'
 import UnsavedChangesModal from './UnsavedChangesModal'
 import {WizardHeader} from './WizardHeader/WizardHeader'
 import {WizardErrorBoundary} from './WizardErrorBoundary/WizardErrorBoundary'
+import {ProblemAreaAndIssueDescriptionSection} from './ProblemAreaAndIssueDescriptionSection'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -603,62 +599,25 @@ export const AccessibilityWizard = () => {
                 </Text>
               </Flex>
 
-              <Flex gap="x-small" direction="column">
-                <Flex justifyItems="space-between">
-                  <Heading level="h4" variant="titleCardMini">
-                    {I18n.t('Problem area')}
-                  </Heading>
-                  <Flex gap="small">
-                    <Link
-                      href={selectedScan?.resourceUrl}
-                      variant="standalone"
-                      target="_blank"
-                      iconPlacement="end"
-                      renderIcon={<IconExternalLinkLine size="x-small" />}
-                      onClick={() =>
-                        trackA11yIssueEvent(
-                          'PageViewOpened',
-                          selectedScan.resourceType,
-                          selectedIssue.ruleId,
-                        )
-                      }
-                    >
-                      {I18n.t('Open Page')}
-                      <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
-                    </Link>
-                    <Link
-                      href={
-                        selectedScan?.resourceType === 'Syllabus'
-                          ? selectedScan.resourceUrl // Syllabus is edited inline, no separate edit page
-                          : `${selectedScan.resourceUrl}/edit`
-                      }
-                      variant="standalone"
-                      target="_blank"
-                      iconPlacement="end"
-                      renderIcon={<IconExternalLinkLine size="x-small" />}
-                      onClick={() =>
-                        trackA11yIssueEvent(
-                          'PageEditorOpened',
-                          selectedScan.resourceType,
-                          selectedIssue.ruleId,
-                        )
-                      }
-                    >
-                      {I18n.t('Edit Page')}
-                      <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
-                    </Link>
-                  </Flex>
-                </Flex>
-
-                <ProblemArea previewRef={previewRef} item={selectedScan} issue={selectedIssue} />
-              </Flex>
-
-              <Flex gap="x-small" direction="column">
-                <Heading level="h4" variant="titleCardMini">
-                  {I18n.t('Issue description')}
-                </Heading>
-                <Text weight="weightRegular">{selectedIssue.message}</Text>
-              </Flex>
+              <ProblemAreaAndIssueDescriptionSection
+                previewRef={previewRef}
+                selectedScan={selectedScan}
+                selectedIssue={selectedIssue}
+                onOpenPage={() =>
+                  trackA11yIssueEvent(
+                    'PageViewOpened',
+                    selectedScan.resourceType,
+                    selectedIssue.ruleId,
+                  )
+                }
+                onEditPage={() =>
+                  trackA11yIssueEvent(
+                    'PageEditorOpened',
+                    selectedScan.resourceType,
+                    selectedIssue.ruleId,
+                  )
+                }
+              />
             </Flex>
 
             <Flex direction="column">
