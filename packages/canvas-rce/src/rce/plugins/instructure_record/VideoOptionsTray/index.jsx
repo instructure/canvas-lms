@@ -388,6 +388,7 @@ export default function VideoOptionsTray({
                                   locale: st.locale,
                                   inherited: st.inherited,
                                   file: {name: st.language || st.locale},
+                                  asr: Boolean(st.asr),
                                 }))}
                                 uploadMediaTranslations={Bridge.uploadMediaTranslations}
                                 userLocale={Bridge.userLocale}

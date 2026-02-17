@@ -40,6 +40,7 @@ export interface SubtitleFile {
 export interface Subtitle {
   locale: string // Language code (e.g., 'en', 'fr', 'es')
   inherited?: boolean // Whether caption is inherited from parent course
+  asr?: boolean // Whether caption is auto-generated
   file: SubtitleFile
   isNew?: boolean // Whether this is a newly added caption
   status?: CaptionUploadStatus // Upload state (processing, failed, or uploaded)

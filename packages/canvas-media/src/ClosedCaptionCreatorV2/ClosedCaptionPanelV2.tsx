@@ -19,16 +19,18 @@
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import formatMessage from 'format-message'
 import {useMemo} from 'react'
+import {sortedAsrLanguageList} from '../asrClosedCaptionLanguages'
 import {sortedClosedCaptionLanguageList} from '../closedCaptionLanguages'
 import {AutoCaptioning} from './AutoCaptioning'
 import {CaptionCreationModePicker} from './CaptionCreationModePicker'
 import {CaptionRow} from './CaptionRow'
 import {useClosedCaptionState} from './hooks/useClosedCaptionState'
+import {useClosedCaptionUpload} from './hooks/useClosedCaptionUpload'
 import {useLanguageFiltering} from './hooks/useLanguageFiltering'
 import {ManualCaptionCreator} from './ManualCaptionCreator'
 import type {CaptionUploadConfig, Subtitle} from './types'
-import {useClosedCaptionUpload} from './hooks/useClosedCaptionUpload'
 
 /**
  * Props for ClosedCaptionPanel component
@@ -54,11 +56,13 @@ export function ClosedCaptionPanelV2({
   onCaptionUploaded,
   onCaptionDeleted,
 }: ClosedCaptionPanelProps) {
-  // Get sorted language list based on user locale
+  // Get sorted language lists based on user locale
   const closedCaptionLanguages = useMemo(
     () => sortedClosedCaptionLanguageList(userLocale),
     [userLocale],
   )
+
+  const asrLanguages = useMemo(() => sortedAsrLanguageList(userLocale), [userLocale])
 
   // State management
   const state = useClosedCaptionState({
@@ -67,9 +71,15 @@ export function ClosedCaptionPanelV2({
     closedCaptionLanguages,
   })
 
-  // Filter available languages
-  const {availableLanguages} = useLanguageFiltering({
+  // Filter available languages for manual upload (all caption languages)
+  const {availableLanguages: availableManualLanguages} = useLanguageFiltering({
     allLanguages: closedCaptionLanguages,
+    subtitles: state.subtitles,
+  })
+
+  // Filter available languages for auto-captioning (ASR-only languages)
+  const {availableLanguages: availableAsrLanguages} = useLanguageFiltering({
+    allLanguages: asrLanguages,
     subtitles: state.subtitles,
   })
 
@@ -92,6 +102,9 @@ export function ClosedCaptionPanelV2({
       state.handleCaptionUploadFailed(locale, '{captionName} caption delete failed')
     },
   })
+
+  // Check if an auto-captioned subtitle already exists
+  const hasAutoCaptionAlready = state.subtitles.some(subtitle => subtitle.asr === true)
 
   return (
     <Flex direction="column" gap="medium" data-testid="ClosedCaptionPanel" width="100%">
@@ -119,7 +132,11 @@ export function ClosedCaptionPanelV2({
               <CaptionRow
                 key={subtitle.locale}
                 status={status}
-                captionName={language?.label || ''}
+                captionName={
+                  subtitle.asr
+                    ? formatMessage('{languageLabel} (Automatic)', {languageLabel: language?.label})
+                    : language?.label || ''
+                }
                 errorMessage={subtitle.errorMessage}
                 liveRegion={liveRegion}
                 isInherited={subtitle.inherited}
@@ -131,12 +148,15 @@ export function ClosedCaptionPanelV2({
       )}
 
       {state.creationMode === null && (
-        <CaptionCreationModePicker onSelect={state.handleCreationModeSelect} />
+        <CaptionCreationModePicker
+          onSelect={state.handleCreationModeSelect}
+          showAutoOption={!hasAutoCaptionAlready}
+        />
       )}
 
       {state.creationMode === 'manual' && (
         <ManualCaptionCreator
-          languages={availableLanguages}
+          languages={availableManualLanguages}
           liveRegion={liveRegion}
           mountNode={mountNode}
           onCancel={state.handleCancelCreation}
@@ -152,7 +172,32 @@ export function ClosedCaptionPanelV2({
       )}
 
       {state.creationMode === 'auto' && (
-        <AutoCaptioning handleCancel={state.handleCancelCreation} />
+        <AutoCaptioning
+          onCancel={state.handleCancelCreation}
+          liveRegion={liveRegion}
+          mountNode={mountNode}
+          languages={availableAsrLanguages}
+          onPrimary={(languageId: string) => {
+            const language = asrLanguages.find(l => l.id === languageId)
+            if (language) {
+              // Note - this is THROWAWAY code for now - only for simulation
+              state.handleCaptionProcessing(
+                languageId,
+                new File([], `auto-generated-${languageId}.vtt`),
+                true,
+              )
+              state.handleCaptionUploaded({
+                locale: languageId,
+                file: {
+                  name: `auto-generated-${languageId}.vtt`,
+                  url: '#',
+                },
+                asr: true,
+                status: 'uploaded',
+              })
+            }
+          }}
+        />
       )}
     </Flex>
   )

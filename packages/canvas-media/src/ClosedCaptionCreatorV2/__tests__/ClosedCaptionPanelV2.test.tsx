@@ -17,11 +17,11 @@
  */
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {HttpResponse, http} from 'msw'
+import {setupServer} from 'msw/node'
 import {vi} from 'vitest'
 import {ClosedCaptionPanelV2} from '../ClosedCaptionPanelV2'
 import type {Subtitle} from '../types'
-import {HttpResponse, http} from 'msw'
-import {setupServer} from 'msw/node'
 
 const server = setupServer()
 
@@ -78,6 +78,38 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
   it('shows add new and request buttons by default', () => {
     renderComponent()
+
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.getByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+  })
+
+  it('hides request button when auto-caption already exists', () => {
+    const subtitlesWithAsr: Subtitle[] = [
+      {locale: 'en', file: {name: 'auto-generated-en.vtt'}, asr: true},
+    ]
+
+    renderComponent({subtitles: subtitlesWithAsr})
+
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
+  })
+
+  it('hides request button when inherited auto-caption exists', () => {
+    const subtitlesWithInheritedAsr: Subtitle[] = [
+      {locale: 'en', file: {name: 'auto-generated-en.vtt'}, asr: true, inherited: true},
+    ]
+
+    renderComponent({subtitles: subtitlesWithInheritedAsr})
+
+    // Request button should be hidden even for inherited ASR
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
+  })
+
+  it('shows request button when only manual captions exist', () => {
+    const subtitlesManualOnly: Subtitle[] = [{locale: 'en', file: {name: 'english.vtt'}}]
+
+    renderComponent({subtitles: subtitlesManualOnly})
 
     expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
     expect(screen.getByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
@@ -146,6 +178,45 @@ describe('<ClosedCaptionPanelV2 />', () => {
     expect(await screen.findByText('English')).toBeInTheDocument()
   })
 
+  it('filters asr languages from manual upload dropdown', () => {
+    const subtitlesWithAsr: Subtitle[] = [
+      {locale: 'en', file: {name: 'auto-generated-en.vtt'}, asr: true},
+    ]
+
+    renderComponent({subtitles: subtitlesWithAsr})
+
+    // Verify the ASR caption shows with "(Automatic)" label
+    expect(screen.getByText('English (Automatic)')).toBeInTheDocument()
+
+    // Open manual caption creator
+    fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+    // Open the language dropdown
+    const selectPlaceholder = screen.getByText('Select Language')
+    fireEvent.click(selectPlaceholder)
+
+    // English should not be in the dropdown (filtered out)
+    expect(screen.queryByText('English')).not.toBeInTheDocument()
+  })
+
+  it('filters manual languages from asr request dropdown', () => {
+    const subtitlesManualOnly: Subtitle[] = [{locale: 'en', file: {name: 'english.vtt'}}]
+
+    renderComponent({subtitles: subtitlesManualOnly})
+
+    // Open auto-caption request form
+    fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+
+    // Open the language dropdown
+    const selectPlaceholder = screen.getByText('Select Language')
+    fireEvent.click(selectPlaceholder)
+
+    // English should not be in the ASR dropdown (filtered out)
+    const dropdownOptions = screen.queryAllByText('English')
+    // Should only find 1 instance (the caption row)
+    expect(dropdownOptions).toHaveLength(1)
+  })
+
   it('once a language is added and uploaded, it is removed from the available options dropdown', async () => {
     // Mock successful upload
     server.use(
@@ -184,6 +255,56 @@ describe('<ClosedCaptionPanelV2 />', () => {
     const dropdownOptions = screen.queryAllByText('English')
     // Should only find 1 instance (the caption row), not in dropdown
     expect(dropdownOptions).toHaveLength(1)
+  })
+
+  it('canceling auto-caption request returns to button picker without creating caption', () => {
+    renderComponent()
+
+    // Click Request button
+    fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+
+    // Form should be visible
+    expect(screen.getByText('Language Spoken in This Media*')).toBeInTheDocument()
+
+    // Select a language
+    const selectPlaceholder = screen.getByText('Select Language')
+    fireEvent.click(selectPlaceholder)
+    fireEvent.click(screen.getByText('German'))
+
+    // Click Cancel
+    const cancelButton = screen.getByText('Cancel')
+    fireEvent.click(cancelButton)
+
+    // Both buttons should be visible again
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.getByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+
+    // No caption should have been created (no "(Automatic)" label)
+    expect(screen.queryByText('German (Automatic)')).not.toBeInTheDocument()
+  })
+
+  it('auto-caption request creates caption with asr flag', () => {
+    renderComponent()
+
+    // Click Request button
+    fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+
+    // Select a language from ASR dropdown
+    const selectPlaceholder = screen.getByText('Select Language')
+    fireEvent.click(selectPlaceholder)
+    fireEvent.click(screen.getByText('Spanish'))
+
+    // Click Request in the form
+    const requestButtonInForm = screen.getByText('Request')
+    fireEvent.click(requestButtonInForm)
+
+    // Caption should appear with "(Automatic)" label
+
+    expect(screen.getByText('Spanish (Automatic)')).toBeInTheDocument()
+
+    // Buttons should be visible again (but not Request since ASR exists)
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
   })
 
   it('if captions are provided as props, they are rendered with delete icon', () => {
