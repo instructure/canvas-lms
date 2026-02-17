@@ -30,6 +30,7 @@ export type Rubric = {
   unassessed?: boolean
   canUpdateRubric?: boolean
   hasRubricAssociations?: boolean
+  public?: boolean
 }
 
 export type RubricAssociation = {

@@ -34,6 +34,7 @@ export type RubricUnderscoreType = {
   rating_order: string
   free_form_criterion_comments: boolean
   points_possible: number
+  public: boolean
   unassessed?: boolean
   workflow_state: string
   can_update?: boolean
@@ -123,6 +124,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     ratingOrder: rubric.rating_order,
     freeFormCriterionComments: rubric.free_form_criterion_comments,
     pointsPossible: rubric.points_possible,
+    public: rubric.public,
     criteriaCount: criteria.length,
     hidePoints: rubric.hide_points,
     id: rubric.id,

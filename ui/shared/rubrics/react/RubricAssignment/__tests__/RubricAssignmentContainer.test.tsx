@@ -311,6 +311,17 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(queryAllByText('Unlink Rubric')).toHaveLength(2)
     })
 
+    it('should render "Unlink Rubric" for the trash icon tooltip and modal when associationCount is 1 but public is true', () => {
+      const {getByTestId, queryAllByText} = renderComponent({
+        assignmentRubric: {...RUBRIC, association_count: 1, public: true},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      fireEvent.mouseOver(getByTestId('remove-assignment-rubric-button'))
+      expect(queryAllByText('Delete Rubric')).toHaveLength(0)
+      expect(queryAllByText('Unlink Rubric')).toHaveLength(2)
+    })
+
     it('should render "Delete Rubric" for the trash icon tooltip and modal when associationCount is 0', () => {
       const {getByTestId, queryAllByText} = renderComponent({
         assignmentRubric: {...RUBRIC, association_count: 0},
