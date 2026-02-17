@@ -67,6 +67,11 @@ class NavMenuLink < ActiveRecord::Base
     false
   end
 
+  # This clears tabs caches for all contexts in root account, so this method
+  # should only be used for account-context links (less frequently edited than
+  # course-context links). When editing course-context links, the course-nav
+  # cache is busted implicitly because the course updated_at is modified in
+  # course_controller.
   def self.sync_with_link_objects(context:, link_objects:)
     link_objects = link_objects.map(&:with_indifferent_access)
 
@@ -78,6 +83,10 @@ class NavMenuLink < ActiveRecord::Base
         NavMenuLink.create!(url: link[:url]&.to_s, label: link[:label]&.to_s, context:, course_nav: true)
       end
       where(context:, id: link_ids_to_remove.to_a).destroy_all
+    end
+
+    if link_ids_to_remove.any? || link_objects.any? { |link| link[:type] == "new" }
+      Lti::NavigationCache.new(context.root_account).invalidate_cache_key
     end
   end
 end

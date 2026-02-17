@@ -189,5 +189,71 @@ describe NavMenuLink do
 
       expect(NavMenuLink.active.where(id: other_link.id).exists?).to be true
     end
+
+    describe "navigation cache invalidation" do
+      it "invalidates navigation cache when new links are added" do
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+          { type: "existing", id: @link2.id.to_s, label: "Existing Link 2" },
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ]
+
+        nav_cache = instance_double(Lti::NavigationCache)
+        expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+
+        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+      end
+
+      it "invalidates navigation cache when links are removed" do
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" }
+        ]
+
+        nav_cache = instance_double(Lti::NavigationCache)
+        expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+
+        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+      end
+
+      it "invalidates navigation cache when links are both added and removed" do
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ]
+
+        nav_cache = instance_double(Lti::NavigationCache)
+        expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+
+        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+      end
+
+      it "does not invalidate navigation cache when no changes are made" do
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+          { type: "existing", id: @link2.id.to_s, label: "Existing Link 2" }
+        ]
+
+        expect(Lti::NavigationCache).not_to receive(:new)
+
+        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+      end
+
+      it "uses the root account for cache invalidation in subaccounts" do
+        root_account = @account.root_account
+        subaccount = Account.create!(parent_account: root_account)
+        link_objects = [
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ]
+
+        nav_cache = instance_double(Lti::NavigationCache)
+        expect(Lti::NavigationCache).to receive(:new).with(root_account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+
+        NavMenuLink.sync_with_link_objects(context: subaccount, link_objects:)
+      end
+    end
   end
 end
