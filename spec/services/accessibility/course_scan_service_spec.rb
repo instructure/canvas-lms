@@ -70,7 +70,10 @@ describe Accessibility::CourseScanService do
     end
 
     before do
-      allow(Accessibility::ResourceScannerService).to receive(:call)
+      scanner_service_double = instance_double(Accessibility::ResourceScannerService)
+      allow(scanner_service_double).to receive(:call_sync)
+      allow(scanner_service_double).to receive(:scan_resource)
+      allow(Accessibility::ResourceScannerService).to receive(:new).and_return(scanner_service_double)
     end
 
     it "calls scan_course on a new service instance" do
@@ -121,8 +124,12 @@ describe Accessibility::CourseScanService do
   end
 
   describe "#scan_course" do
+    let(:scanner_service_double) { instance_double(Accessibility::ResourceScannerService) }
+
     before do
-      allow(Accessibility::ResourceScannerService).to receive(:call)
+      allow(scanner_service_double).to receive(:call_sync)
+      allow(scanner_service_double).to receive(:scan_resource)
+      allow(Accessibility::ResourceScannerService).to receive(:new).and_return(scanner_service_double)
     end
 
     context "when scanning wiki pages" do
@@ -135,11 +142,11 @@ describe Accessibility::CourseScanService do
       end
 
       it "scans the active wiki page" do
-        expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: wiki_page1)
+        expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: wiki_page1)
       end
 
       it "does not scan the deleted wiki page" do
-        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: wiki_page2)
+        expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: wiki_page2)
       end
     end
 
@@ -162,23 +169,23 @@ describe Accessibility::CourseScanService do
       end
 
       it "scans the active assignment" do
-        expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: assignment1)
+        expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: assignment1)
       end
 
       it "does not scan the deleted assignment" do
-        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: assignment2)
+        expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: assignment2)
       end
 
       it "does not scan the New Quizzes assignment" do
-        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: quiz_lti_assignment)
+        expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: quiz_lti_assignment)
       end
 
       it "does not scan the Classic Quiz assignment" do
-        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: classic_quiz_assignment)
+        expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: classic_quiz_assignment)
       end
 
       it "does not scan the external tool assignment" do
-        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: external_tool_assignment)
+        expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: external_tool_assignment)
       end
     end
 
@@ -208,29 +215,31 @@ describe Accessibility::CourseScanService do
         end
 
         it "scans the published and unpublished discussion topics" do
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: discussion_topic1)
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: discussion_topic2)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: discussion_topic1)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: discussion_topic2)
         end
 
         it "does not scan the deleted discussion topic" do
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic3)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: discussion_topic3)
         end
 
         it "scans announcements and delayed announcements" do
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: announcement)
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: delayed_announcement)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: announcement)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: delayed_announcement)
         end
 
         it "does not scan deleted announcements" do
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: deleted_announcement)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: deleted_announcement)
         end
 
         it "does not scan graded discussions" do
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: graded_discussion)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: graded_discussion)
         end
 
         it "creates scan records with announcement_id filled and not discussion_topic_id" do
-          allow(Accessibility::ResourceScannerService).to receive(:call).and_call_original
+          # Override parent stubs to allow real implementation
+          allow(Accessibility::ResourceScannerService).to receive(:new).and_call_original
+          allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:call_sync).and_call_original
           allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource).and_wrap_original do |_, scan:|
             scan.update!(
               workflow_state: :completed,
@@ -255,15 +264,15 @@ describe Accessibility::CourseScanService do
         end
 
         it "does not scan any discussion topics" do
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic1)
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic2)
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic3)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: discussion_topic1)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: discussion_topic2)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: discussion_topic3)
         end
 
         it "does not scan any announcements" do
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: announcement)
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: delayed_announcement)
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: deleted_announcement)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: announcement)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: delayed_announcement)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: deleted_announcement)
         end
       end
     end
@@ -282,7 +291,7 @@ describe Accessibility::CourseScanService do
           end
 
           it "scans the syllabus" do
-            expect(Accessibility::ResourceScannerService).to have_received(:call).with(
+            expect(Accessibility::ResourceScannerService).to have_received(:new).with(
               resource: an_instance_of(Accessibility::SyllabusResource)
             )
           end
@@ -295,7 +304,7 @@ describe Accessibility::CourseScanService do
           end
 
           it "does not scan the syllabus" do
-            expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(
+            expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(
               resource: an_instance_of(Accessibility::SyllabusResource)
             )
           end
@@ -308,7 +317,7 @@ describe Accessibility::CourseScanService do
           end
 
           it "does not scan the syllabus" do
-            expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(
+            expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(
               resource: an_instance_of(Accessibility::SyllabusResource)
             )
           end
@@ -322,9 +331,59 @@ describe Accessibility::CourseScanService do
         end
 
         it "does not scan the syllabus" do
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(
             resource: an_instance_of(Accessibility::SyllabusResource)
           )
+        end
+      end
+
+      context "when scanning syllabus with existing scan record" do
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+          Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+          course.update!(syllabus_body: "<p>Course syllabus content</p>")
+        end
+
+        context "when no scan exists for syllabus" do
+          it "calls call_sync" do
+            scanner_service = instance_double(Accessibility::ResourceScannerService)
+            allow(Accessibility::ResourceScannerService).to receive(:new).with(
+              resource: an_instance_of(Accessibility::SyllabusResource)
+            ).and_return(scanner_service)
+            allow(scanner_service).to receive(:call_sync)
+            allow(scanner_service).to receive(:scan_resource)
+
+            subject.scan_course
+
+            expect(scanner_service).to have_received(:call_sync)
+            expect(scanner_service).not_to have_received(:scan_resource)
+          end
+        end
+
+        context "when a scan exists for syllabus" do
+          let!(:existing_syllabus_scan) do
+            AccessibilityResourceScan.create!(
+              course:,
+              is_syllabus: true,
+              workflow_state: "completed",
+              resource_workflow_state: "published",
+              issue_count: 2
+            )
+          end
+
+          it "calls scan_resource with the existing scan" do
+            scanner_service = instance_double(Accessibility::ResourceScannerService)
+            allow(Accessibility::ResourceScannerService).to receive(:new).with(
+              resource: an_instance_of(Accessibility::SyllabusResource)
+            ).and_return(scanner_service)
+            allow(scanner_service).to receive(:call_sync)
+            allow(scanner_service).to receive(:scan_resource)
+
+            subject.scan_course
+
+            expect(scanner_service).to have_received(:scan_resource).with(scan: existing_syllabus_scan)
+            expect(scanner_service).not_to have_received(:call_sync)
+          end
         end
       end
     end
@@ -347,27 +406,27 @@ describe Accessibility::CourseScanService do
       context "when there is no previous scan" do
         it "scans the wiki page" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: wiki_page)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: wiki_page)
         end
 
         it "scans the assignment" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: assignment)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: assignment)
         end
 
         it "scans the discussion topic" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: discussion_topic)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: discussion_topic)
         end
 
         it "scans the announcement" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: announcement)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: announcement)
         end
 
         it "scans the syllabus" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(
             resource: an_instance_of(Accessibility::SyllabusResource)
           )
         end
@@ -425,27 +484,27 @@ describe Accessibility::CourseScanService do
 
         it "does not scan the wiki page" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: wiki_page)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: wiki_page)
         end
 
         it "does not scan the assignment" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: assignment)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: assignment)
         end
 
         it "does not scan the discussion topic" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: discussion_topic)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: discussion_topic)
         end
 
         it "does not scan the announcement" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: announcement)
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: announcement)
         end
 
         it "does not scan the syllabus" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(
+          expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(
             resource: an_instance_of(Accessibility::SyllabusResource)
           )
         end
@@ -503,27 +562,27 @@ describe Accessibility::CourseScanService do
 
         it "scans the wiki page" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: wiki_page)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: wiki_page)
         end
 
         it "scans the assignment" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: assignment)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: assignment)
         end
 
         it "scans the discussion topic" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: discussion_topic)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: discussion_topic)
         end
 
         it "scans the announcement" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: announcement)
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: announcement)
         end
 
         it "scans the syllabus" do
           subject.scan_course
-          expect(Accessibility::ResourceScannerService).to have_received(:call).with(
+          expect(Accessibility::ResourceScannerService).to have_received(:new).with(
             resource: an_instance_of(Accessibility::SyllabusResource)
           )
         end
@@ -558,12 +617,12 @@ describe Accessibility::CourseScanService do
 
           it "scans the wiki page regardless of timestamp" do
             subject.scan_course
-            expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: wiki_page)
+            expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: wiki_page)
           end
 
           it "scans the assignment regardless of timestamp" do
             subject.scan_course
-            expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: assignment)
+            expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: assignment)
           end
         end
       end
@@ -597,13 +656,169 @@ describe Accessibility::CourseScanService do
 
           it "does not scan the wiki page" do
             subject.scan_course
-            expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: wiki_page)
+            expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: wiki_page)
           end
 
           it "does not scan the assignment" do
             subject.scan_course
-            expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: assignment)
+            expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: assignment)
           end
+        end
+      end
+    end
+
+    context "scan creation and processing" do
+      let!(:wiki_page) { wiki_page_model(course:, body: "<p>test</p>") }
+
+      before do
+        # Override parent stubs to allow real implementation
+        allow(Accessibility::ResourceScannerService).to receive(:new).and_call_original
+        allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:call_sync).and_call_original
+        allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource)
+      end
+
+      context "when no scan exists for the resource" do
+        it "creates a new scan" do
+          expect do
+            subject.scan_course
+          end.to change { AccessibilityResourceScan.where(wiki_page_id: wiki_page.id).count }.by(1)
+        end
+
+        it "creates the scan with correct attributes" do
+          subject.scan_course
+          scan = AccessibilityResourceScan.where(wiki_page_id: wiki_page.id).first
+
+          expect(scan.course_id).to eq(course.id)
+          expect(scan.workflow_state).to eq("queued")
+          expect(scan.resource_name).to eq(wiki_page.title)
+          expect(scan.resource_workflow_state).to eq("published")
+          expect(scan.issue_count).to eq(0)
+          expect(scan.error_message).to be_nil
+        end
+
+        it "calls call_sync when no existing scan is found" do
+          scanner_service = instance_double(Accessibility::ResourceScannerService)
+          allow(Accessibility::ResourceScannerService).to receive(:new).and_return(scanner_service)
+          allow(scanner_service).to receive(:call_sync)
+          allow(scanner_service).to receive(:scan_resource)
+
+          subject.scan_course
+
+          expect(scanner_service).to have_received(:call_sync)
+          expect(scanner_service).not_to have_received(:scan_resource)
+        end
+
+        it "calls scan_resource with the newly created scan" do
+          call_count = 0
+          allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource) do |_, scan:|
+            call_count += 1
+            expect(scan).to be_an(AccessibilityResourceScan)
+            expect(scan.wiki_page_id).to eq(wiki_page.id)
+          end
+
+          subject.scan_course
+          expect(call_count).to eq(1)
+        end
+      end
+
+      context "when a scan already exists for the resource" do
+        let!(:existing_scan) do
+          AccessibilityResourceScan.create!(
+            course:,
+            context: wiki_page,
+            workflow_state: "completed",
+            resource_workflow_state: "published",
+            resource_updated_at: wiki_page.updated_at - 1.hour,
+            issue_count: 5,
+            error_message: nil
+          )
+        end
+
+        it "does not create a new scan" do
+          expect do
+            subject.scan_course
+          end.not_to change { AccessibilityResourceScan.where(wiki_page_id: wiki_page.id).count }
+        end
+
+        it "uses the existing scan" do
+          received_scan = nil
+          allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource) do |_, scan:|
+            received_scan = scan
+          end
+
+          subject.scan_course
+          expect(received_scan).to eq(existing_scan)
+        end
+
+        it "calls scan_resource with the existing scan and not call_sync" do
+          scanner_service = instance_double(Accessibility::ResourceScannerService)
+          allow(Accessibility::ResourceScannerService).to receive(:new).and_return(scanner_service)
+          allow(scanner_service).to receive(:call_sync)
+          allow(scanner_service).to receive(:scan_resource)
+
+          subject.scan_course
+
+          expect(scanner_service).to have_received(:scan_resource).with(scan: existing_scan)
+          expect(scanner_service).not_to have_received(:call_sync)
+        end
+
+        it "calls scan_resource with the existing scan" do
+          call_count = 0
+          allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource) do |_, scan:|
+            call_count += 1
+            expect(scan).to eq(existing_scan)
+          end
+
+          subject.scan_course
+          expect(call_count).to eq(1)
+        end
+      end
+
+      context "when scan is queued" do
+        before do
+          AccessibilityResourceScan.create!(
+            course:,
+            context: wiki_page,
+            workflow_state: "queued",
+            resource_workflow_state: "published",
+            resource_updated_at: wiki_page.updated_at,
+            issue_count: 0,
+            error_message: nil
+          )
+        end
+
+        it "skips processing the resource" do
+          call_count = 0
+          allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource) do
+            call_count += 1
+          end
+
+          subject.scan_course
+          expect(call_count).to eq(0)
+        end
+      end
+
+      context "when scan is in_progress" do
+        before do
+          AccessibilityResourceScan.create!(
+            course:,
+            context: wiki_page,
+            workflow_state: "in_progress",
+            resource_workflow_state: "published",
+            resource_updated_at: wiki_page.updated_at,
+            issue_count: 0,
+            error_message: nil
+          )
+        end
+
+        it "skips processing the resource" do
+          call_count = 0
+          allow_any_instance_of(Accessibility::ResourceScannerService).to receive(:scan_resource) do
+            call_count += 1
+          end
+
+          subject.scan_course
+          expect(call_count).to eq(0)
         end
       end
     end

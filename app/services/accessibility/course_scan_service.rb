@@ -38,9 +38,9 @@ class Accessibility::CourseScanService < ApplicationService
 
     progress = Progress.create!(tag: SCAN_TAG, context: course)
 
-    # By default this will be 1 concurrent run / course, which is fine
     n_strand = [SCAN_TAG, course.global_id]
-    progress.process_job(self, :scan, { n_strand: })
+    singleton = "#{SCAN_TAG}_#{course.global_id}"
+    progress.process_job(self, :scan, { n_strand:, singleton: })
     progress
   end
 
@@ -80,6 +80,7 @@ class Accessibility::CourseScanService < ApplicationService
   def initialize(course:)
     super()
     @course = course
+    @root_account = course.root_account
   end
 
   def scan_course
@@ -95,20 +96,30 @@ class Accessibility::CourseScanService < ApplicationService
 
   private
 
-  def scan_resources(resources, column_name)
-    resource_ids = resources.pluck(:id)
+  def scan_resources(resources, resource_id_column)
+    batch_size = Setting.get("accessibility_scan_batch_size", "200").to_i
 
-    scans_by_resource_id = AccessibilityResourceScan
-                           .where(column_name => resource_ids)
-                           .index_by(&column_name)
+    resources.in_batches(of: batch_size) do |resource_batch|
+      loaded_resource_batch = resource_batch.to_a
+      resource_batch_ids = loaded_resource_batch.map(&:id)
 
-    resources.find_each do |resource|
-      last_scan = scans_by_resource_id[resource.id]
-      if Account.site_admin.feature_enabled?(:a11y_checker_course_scan_conditional_resource_scan)
-        next unless needs_scan?(resource, last_scan)
+      scans_by_resource_id = AccessibilityResourceScan
+                             .where(root_account: @root_account)
+                             .where(resource_id_column => resource_batch_ids)
+                             .index_by(&resource_id_column)
+
+      loaded_resource_batch.each do |resource|
+        scan = scans_by_resource_id[resource.id]
+
+        next unless needs_scan?(resource, scan)
+
+        resource_scanner_service = Accessibility::ResourceScannerService.new(resource:)
+        if scan
+          resource_scanner_service.scan_resource(scan:)
+        else
+          resource_scanner_service.call_sync
+        end
       end
-
-      Accessibility::ResourceScannerService.call(resource:)
     end
   end
 
@@ -116,21 +127,29 @@ class Accessibility::CourseScanService < ApplicationService
     # Skip if syllabus is empty
     return if @course.syllabus_body.blank?
 
-    last_scan = AccessibilityResourceScan.find_by(course_id: @course.id, is_syllabus: true)
+    scan = AccessibilityResourceScan.find_by(course_id: @course.id, is_syllabus: true)
 
-    if Account.site_admin.feature_enabled?(:a11y_checker_course_scan_conditional_resource_scan)
-      return unless needs_scan?(@course, last_scan)
-    end
+    return unless needs_scan?(@course, scan)
+
     resource = Accessibility::SyllabusResource.new(@course)
 
-    Accessibility::ResourceScannerService.call(resource:)
+    resource_scanner_service = Accessibility::ResourceScannerService.new(resource:)
+    if scan
+      resource_scanner_service.scan_resource(scan:)
+    else
+      resource_scanner_service.call_sync
+    end
   end
 
-  def needs_scan?(resource, last_scan)
-    return true if last_scan.nil?
+  def needs_scan?(resource, scan)
+    return true if scan.nil?
 
-    # last_scan.resource_updated_at is not used here purposefully to avoid issues with clock skew
+    return false if scan.workflow_state.in?(%w[queued in_progress])
+
+    return true unless Account.site_admin.feature_enabled?(:a11y_checker_course_scan_conditional_resource_scan)
+
+    # scan.resource_updated_at is not used here purposefully to avoid issues with clock skew
     # when after_commit triggers scans on updates. Instead, we rely on the scan's updated_at timestamp.
-    resource.updated_at > last_scan.updated_at
+    resource.updated_at > scan.updated_at
   end
 end

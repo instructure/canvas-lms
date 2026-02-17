@@ -1671,6 +1671,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
   context "accessibility scanning" do
     before do
       Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+      @course.root_account.enable_feature!(:accessibility_automatic_scanning)
       @course.account.enable_feature!(:a11y_checker)
       @course.enable_feature!(:a11y_checker_eap)
       @course.reload
@@ -2051,6 +2052,16 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       @topic.skip_accessibility_scan = true
       @topic.title = "Updated title"
       @topic.save!
+    end
+
+    it "does not trigger accessibility scan when accessibility_automatic_scanning feature is disabled" do
+      @course.root_account.disable_feature!(:accessibility_automatic_scanning)
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
     end
   end
 end

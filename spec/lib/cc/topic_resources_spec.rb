@@ -70,6 +70,7 @@ describe CC::TopicResources do
     allow(mock_course.root_account).to receive(:feature_enabled?).with(:horizon_course_setting)
     allow(mock_course.root_account).to receive(:feature_enabled?).with(:file_association_access)
     allow(mock_course.root_account).to receive(:feature_enabled?).with(:allow_attachment_association_creation)
+    allow(mock_course.root_account).to receive(:feature_enabled?).with(:accessibility_automatic_scanning).and_return(false)
     allow(mock_course.root_account).to receive(:feature_enabled?).with(:lti_asset_processor).and_return(false)
   end
 
