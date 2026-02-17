@@ -23,6 +23,11 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 describe('getFirstPageUrl', () => {
   beforeEach(() => {
     fakeENV.setup()
+    // Clear all cookies
+    document.cookie.split(';').forEach(cookie => {
+      const [name] = cookie.split('=')
+      document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
+    })
   })
 
   afterEach(() => {
@@ -63,6 +68,34 @@ describe('getFirstPageUrl', () => {
     document.cookie = `${OBSERVER_COOKIE_PREFIX}${ENV.current_user_id}=27`
     expect(getFirstPageUrl()).toEqual(
       '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=27',
+    )
+  })
+
+  it('defaults to first observee when no cookie is set and observer has no enrollments', () => {
+    fakeENV.setup({
+      current_user_roles: ['user', 'observer'],
+      current_user_id: '1',
+      OBSERVED_USERS_LIST: [
+        {id: '17', name: 'Student 1'},
+        {id: '27', name: 'Student 2'},
+      ],
+    })
+    expect(getFirstPageUrl()).toEqual(
+      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=17',
+    )
+  })
+
+  it('returns default url when no cookie is set and observer is first in list', () => {
+    fakeENV.setup({
+      current_user_roles: ['user', 'observer'],
+      current_user_id: '1',
+      OBSERVED_USERS_LIST: [
+        {id: '1', name: 'Observer'},
+        {id: '17', name: 'Student 1'},
+      ],
+    })
+    expect(getFirstPageUrl()).toEqual(
+      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname',
     )
   })
 })
