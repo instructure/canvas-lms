@@ -40,7 +40,9 @@ export default function NavMenuLinksSettings(): JSX.Element {
 
   return (
     <View>
-      <h2 id="custom-links" className="screenreader-only">{I18n.t('Custom Links')}</h2>
+      <h2 id="custom-links" className="screenreader-only">
+        {I18n.t('Custom Links')}
+      </h2>
       <legend>{I18n.t('Custom Links')}</legend>
       <ul className="ic-Sortable-list">
         {links.map((link, index) => (
@@ -69,12 +71,12 @@ function NavMenuLink({label, onDelete}: NavMenuLinkProps): JSX.Element {
   return (
     <li className="ic-Sortable-item">
       <div className="ic-Sortable-item__Text">
-        <Flex alignItems="center" gap="x-small">
+        <Flex alignItems="center" gap="x-small" wrap="wrap" width="100%">
           <Flex.Item>
             <IconLinkLine size="x-small" />
           </Flex.Item>
-          <Flex.Item margin="0 xx-small 0 xxx-small">
-            <Text>{label}</Text>
+          <Flex.Item margin="0 xx-small 0 xxx-small" shouldGrow shouldShrink size="0">
+            <Text wrap="break-word">{label}</Text>
           </Flex.Item>
           <Flex.Item>
             <Tag text={I18n.t('Course Navigation')} />
