@@ -35,7 +35,7 @@ interface UseClosedCaptionStateReturn {
   handleCreationModeSelect: (mode: CaptionCreationMode) => void
   handleCancelCreation: () => void
   handleDeleteRow: (locale: string) => void
-  handleCaptionProcessing: (locale: string, file: File) => void
+  handleCaptionProcessing: (locale: string, file: File, isAsr?: boolean) => void
   handleCaptionUploaded: (subtitle: Subtitle) => void
   handleCaptionUploadFailed: (locale: string, errorMessage: string) => void
 }
@@ -93,7 +93,7 @@ export function useClosedCaptionState({
   // (handleLanguageSelected + handleFileSelected already add to list with isNew=true)
   // Just need to mark as processing
   const handleCaptionProcessing = useCallback(
-    (locale: string, file: File) => {
+    (locale: string, file: File, isAsr?: boolean) => {
       setSubtitles(prev => {
         const updatedSubtitles: Subtitle[] = [
           ...prev,
@@ -101,6 +101,7 @@ export function useClosedCaptionState({
             locale,
             file: {name: file.name},
             status: 'processing' as const,
+            ...(isAsr && {asr: true}),
           },
         ]
         onUpdateSubtitles(updatedSubtitles)

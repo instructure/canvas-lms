@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
-import {arrayOf, bool, func, shape, string} from 'prop-types'
-import {Flex} from '@instructure/ui-flex'
-import {Tray} from '@instructure/ui-tray'
-import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Spinner} from '@instructure/ui-spinner'
-import {StoreProvider} from '../../shared/StoreContext'
-import Bridge from '../../../../bridge'
-import RceApiSource, {originFromHost} from '../../../../rcs/api'
-import formatMessage from '../../../../format-message'
-import {getTrayHeight} from '../../shared/trayUtils'
-import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
+import {Flex} from '@instructure/ui-flex'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
+import {Spinner} from '@instructure/ui-spinner'
+import {Tray} from '@instructure/ui-tray'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import Bridge from '../../../../bridge'
+import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../../rce/RCEGlobals'
+import RceApiSource, {originFromHost} from '../../../../rcs/api'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
+import {StoreProvider} from '../../shared/StoreContext'
+import {getTrayHeight} from '../../shared/trayUtils'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
@@ -122,6 +122,7 @@ export default function AudioOptionsTray({
                               subtitles={subtitles.map(st => ({
                                 locale: st.locale,
                                 file: {name: st.language || st.locale},
+                                asr: Boolean(st.asr),
                               }))}
                               uploadMediaTranslations={Bridge.uploadMediaTranslations}
                               languages={Bridge.languages}
