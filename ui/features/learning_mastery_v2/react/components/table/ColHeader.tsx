@@ -26,6 +26,7 @@ export type ColHeaderProps = {
   isStacked?: boolean
   'data-cell-id'?: string
   'data-testid'?: string
+  ariaLabelId?: string
 } & Partial<DragDropConnectorProps> &
   ViewProps
 
@@ -38,6 +39,7 @@ export const ColHeader = ({
   isDragging,
   isStacked,
   'data-cell-id': dataCellId,
+  ariaLabelId,
   ...viewProps
 }: ColHeaderProps) => {
   // Filter out drag-drop specific props that shouldn't be passed to DOM
@@ -71,6 +73,7 @@ export const ColHeader = ({
     <View
       data-cell-id={dataCellId}
       as={isStacked ? 'div' : 'th'}
+      aria-labelledby={isStacked ? undefined : ariaLabelId}
       scope="col"
       focusPosition="inset"
       elementRef={ref => {

@@ -40,12 +40,14 @@ export interface StudentHeaderProps {
   sorting: Sorting
   nameDisplayFormat: NameDisplayFormat
   onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
+  titleId?: string
 }
 
 export const StudentHeader: React.FC<StudentHeaderProps> = ({
   sorting,
   nameDisplayFormat,
   onChangeNameDisplayFormat,
+  titleId,
 }) => {
   const handleNameDisplayFormatChange = React.useCallback(
     (format: NameDisplayFormat) => {
@@ -137,6 +139,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
   return (
     <ColumnHeader
       title={I18n.t('Students')}
+      titleId={titleId}
       optionsMenuTriggerLabel={I18n.t('Student Options')}
       optionsMenuItems={[displayAsMenuGroup, sortByMenuGroup, sortOrderMenuGroup]}
       columnWidth={STUDENT_COLUMN_WIDTH}
