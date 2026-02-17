@@ -642,9 +642,21 @@ module SwaggerYard
         schemas.size
       end
 
+      # Replace generic response schemas with proper model references
+      #
+      # During YARD parsing, we track which operations return which models (see CanvasAdapter).
+      # This method performs post-processing to replace generic "type: object" schemas
+      # with proper "$ref" references to model schemas.
+      #
+      # Example transformations:
+      #   @returns User          -> { "$ref": "#/components/schemas/User" }
+      #   @returns [User]        -> { type: array, items: { "$ref": "#/components/schemas/User" } }
+      #   @returns Section       -> { "$ref": "#/components/schemas/Section" }
+      #
+      # Returns: count of schemas replaced
       def replace_responses_with_schema_refs!(openapi_spec)
         operation_models = SwaggerYard::CanvasAdapter.operation_models
-        return if operation_models.empty?
+        return 0 if operation_models.empty?
 
         replaced_count = 0
         openapi_spec["paths"]&.each_value do |methods|

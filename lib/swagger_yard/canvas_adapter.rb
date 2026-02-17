@@ -769,36 +769,64 @@ module SwaggerYard
           end
 
           def process_returns_tags(docstring, operation)
-            # Check the raw docstring text to detect array syntax
             raw_text = docstring.to_raw
-            is_array_return = !!(raw_text =~ /@returns\s+\[.+\]/)
 
             docstring.tags(:returns).each do |tag|
               types = tag.types || ["String"]
               desc = tag.text.to_s.strip
 
-              # Extract model name from types before building schema
-              model_name = extract_model_name_from_types(types)
+              # Determine model name and array status from the raw tag text
+              # This handles Canvas's common @returns patterns:
+              # 1. @returns [User]        -> model=User, is_array=true (parsed by YARD correctly)
+              # 2. @returns User          -> model=User, is_array=false (YARD defaults types to ["String"])
+              # 3. @returns [User] desc   -> model=User, is_array=true + description
+              model_info = extract_return_model_info(types, desc, raw_text)
 
-              response_schema = build_response_schema(types, desc)
+              response_schema = build_response_schema(model_info[:types], desc)
               response_type = SwaggerYard::Type.new(response_schema)
               operation.add_response_type(response_type, desc)
 
-              # Track the model usage for this operation if we found one
-              if model_name
-                # Override is_array detection based on raw docstring
-                track_operation_model_with_array(operation.operation_id, model_name, response_schema, is_array_return)
+              # Track model for post-processing schema replacement
+              if model_info[:model_name]
+                track_operation_model_with_array(
+                  operation.operation_id,
+                  model_info[:model_name],
+                  model_info[:is_array]
+                )
               end
             end
           end
 
-          def track_operation_model_with_array(operation_id, model_name, response_schema, is_array)
+          # Extract model name and array status from a @returns tag
+          # Returns: { model_name: String|nil, is_array: Boolean, types: Array }
+          def extract_return_model_info(types, description, raw_text)
+            # Check raw text for array syntax: @returns [Model]
+            is_array_from_raw = !!(raw_text =~ /@returns\s+\[.+\]/)
+
+            # Try extracting model from parsed types first
+            model_name = extract_model_name_from_types(types)
+
+            # Handle Canvas pattern: @returns Model (no brackets)
+            # YARD parses this as types=["String"] with description="Model"
+            if types == ["String"] && description =~ /^[A-Z]\w+$/ && model_schema_exists?(description)
+              model_name = description
+              types = [description]
+            end
+
+            {
+              model_name: model_name,
+              is_array: is_array_from_raw,
+              types: types
+            }
+          end
+
+          def track_operation_model_with_array(operation_id, model_name, is_array)
             return unless model_schema_exists?(model_name)
 
             SwaggerYard::CanvasAdapter.operation_models[operation_id] ||= {}
             SwaggerYard::CanvasAdapter.operation_models[operation_id]["200"] = {
               model: model_name,
-              is_array: is_array || response_schema.to_s.include?("array")
+              is_array: is_array
             }
           end
 
