@@ -65,6 +65,9 @@ development:
         app-host: "rce.canvas.docker"
         # if you're running canvas-rce-api with docker-compose/rce-api.override.yml in .env
         app-host: "http://rce.canvas.docker:3000"
+      onetrust-cookie-consent:
+        domain_id: "stub-key-please-see-MRA-plugin"
+        vanity_domain_id: "stub-key-please-see-MRA-plugin"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
       csp-logging:
@@ -78,6 +81,7 @@ development:
 
   private:
     canvas:
+      pendo_app_id: "stub-key-please-see-MRA-plugin"
       auditors.yml: |
         write_paths:
           - active_record
