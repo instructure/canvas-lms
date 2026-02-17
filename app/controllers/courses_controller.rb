@@ -1881,6 +1881,23 @@ class CoursesController < ApplicationController
     # Remove the conditional release param if the account is locking the feature
     params[:conditional_release] = nil if params.key?(:conditional_release) && @course.account.conditional_release[:locked]
 
+    if params.key?(:default_discussion_settings) &&
+       (dds_params = params[:default_discussion_settings]).is_a?(ActionController::Parameters)
+      @course.default_discussion_settings = dds_params.permit(
+        :anonymous_state,
+        :disallow_threaded_replies,
+        :require_initial_post,
+        :podcast_enabled,
+        :podcast_has_student_posts,
+        :allow_rating,
+        :only_graders_can_rate,
+        :expanded,
+        :expanded_locked,
+        :sort_order,
+        :sort_order_locked
+      ).to_h
+    end
+
     @course.attributes = params.permit(
       :allow_final_grade_override,
       :allow_student_discussion_topics,
@@ -1888,6 +1905,7 @@ class CoursesController < ApplicationController
       :allow_student_discussion_editing,
       :allow_student_discussion_reporting,
       :allow_student_anonymous_discussion_topics,
+      :use_default_discussion_settings,
       :filter_speed_grader_by_student_group,
       :show_total_grade_as_points,
       :allow_student_organized_groups,
