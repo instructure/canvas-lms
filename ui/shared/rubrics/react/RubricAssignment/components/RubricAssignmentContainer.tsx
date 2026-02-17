@@ -88,8 +88,8 @@ export const RubricAssignmentContainer = ({
   const [_criteriaViaLlm, setCriteriaViaLlm] = useState(false)
   const [assignmentPoints, setAssignmentPoints] = useState(assignmentPointsPossible)
 
-  const deleteTooltipText =
-    (rubric?.association_count ?? 0) > 1 ? I18n.t('Unlink Rubric') : I18n.t('Delete Rubric')
+  const shouldUnlink = ((rubric?.association_count ?? 0) > 1 || rubric?.public) ?? false
+  const removeTooltipText = shouldUnlink ? I18n.t('Unlink Rubric') : I18n.t('Delete Rubric')
 
   const handleSaveRubric = (
     savedRubricResponse: SaveRubricResponse,
@@ -232,11 +232,11 @@ export const RubricAssignmentContainer = ({
                         <IconEditLine />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip renderTip={deleteTooltipText}>
+                    <Tooltip renderTip={removeTooltipText}>
                       <IconButton
                         margin="0 0 0 small"
                         data-testid="remove-assignment-rubric-button"
-                        screenReaderLabel={deleteTooltipText}
+                        screenReaderLabel={removeTooltipText}
                         onClick={() => setIsDeleteConfirmModalOpen(true)}
                       >
                         <IconTrashLine />
@@ -290,12 +290,14 @@ export const RubricAssignmentContainer = ({
           </View>
         )}
       </View>
-      <DeleteConfirmModal
-        associationCount={rubric?.association_count ?? 0}
-        isOpen={isDeleteConfirmModalOpen}
-        onConfirm={() => handleRemoveRubric()}
-        onDismiss={() => setIsDeleteConfirmModalOpen(false)}
-      />
+      {rubric && rubricAssociation && (
+        <DeleteConfirmModal
+          isOpen={isDeleteConfirmModalOpen}
+          shouldUnlink={shouldUnlink}
+          onConfirm={() => handleRemoveRubric()}
+          onDismiss={() => setIsDeleteConfirmModalOpen(false)}
+        />
+      )}
       <RubricCreateModal
         assignmentId={assignmentId}
         assignmentPointsPossible={assignmentPoints}

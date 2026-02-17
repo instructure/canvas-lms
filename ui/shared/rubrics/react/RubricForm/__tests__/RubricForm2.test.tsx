@@ -101,6 +101,7 @@ describe('RubricForm Tests', () => {
                 ratings: [],
               },
             ],
+            public: false,
           },
           rubricAssociation: {
             hidePoints: false,
@@ -158,6 +159,7 @@ describe('RubricForm Tests', () => {
             criteriaCount: 1,
             pointsPossible: 10,
             title: 'Rubric with Outcome',
+            public: false,
             criteria: [
               {
                 id: '2',

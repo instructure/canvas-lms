@@ -27,6 +27,7 @@ export const RUBRIC: AssignmentRubric = {
   buttonDisplay: 'numeric',
   ratingOrder: 'ascending',
   freeFormCriterionComments: false,
+  public: false,
   criteria: [
     {
       id: '1',

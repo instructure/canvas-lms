@@ -61,6 +61,7 @@ const MOCK_RUBRIC: AssignmentRubric = {
   buttonDisplay: 'numeric',
   ratingOrder: 'descending',
   freeFormCriterionComments: false,
+  public: false,
   criteria: [
     {
       id: '1',
