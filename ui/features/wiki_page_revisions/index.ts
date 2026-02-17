@@ -26,7 +26,9 @@ import WikiPageRevisionsView from './backbone/views/WikiPageRevisionsView'
 $('body').addClass('show revisions')
 
 ready(() => {
+  // @ts-expect-error - ENV properties not in GlobalEnv type
   const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
+    // @ts-expect-error - ENV properties not in GlobalEnv type
     revision: ENV.WIKI_PAGE_REVISION,
     contextAssetString: ENV.context_asset_string,
   })
@@ -34,20 +36,27 @@ ready(() => {
 
   const revisionsView = new WikiPageRevisionsView({
     collection: revisions,
+    // @ts-expect-error - ENV properties not in GlobalEnv type
     pages_path: ENV.WIKI_PAGES_PATH,
   })
 
   const contentView = new WikiPageContentView()
+  // @ts-expect-error - Backbone view properties
   contentView.$el.appendTo('#wiki_page_revisions')
+  // @ts-expect-error - Backbone view properties
   contentView.on('render', () => revisionsView.reposition())
+  // @ts-expect-error - Backbone view properties
   contentView.render()
 
-  revisionsView.on('selectionChanged', newSelection => {
+  // @ts-expect-error - Backbone view properties
+  revisionsView.on('selectionChanged', (newSelection: any) => {
     contentView.setModel(newSelection.model)
     if (!newSelection.model.get('title') || newSelection.model.get('title') === '') {
+      // @ts-expect-error - Backbone view properties
       return contentView.$el.disableWhileLoading(newSelection.model.fetch())
     }
   })
+  // @ts-expect-error - Backbone view properties
   revisionsView.$el.appendTo('#wiki_page_revisions')
   revisionsView.render()
 
