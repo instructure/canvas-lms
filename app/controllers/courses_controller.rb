@@ -1617,7 +1617,8 @@ class CoursesController < ApplicationController
         can_allow_course_admin_actions: @context.grants_right?(@current_user, session, :allow_course_admin_actions),
         add_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_add),
         edit_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_edit),
-        delete_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_delete)
+        delete_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_delete),
+        manage_course_content_edit: @context.grants_right?(@current_user, session, :manage_course_content_edit)
       }
 
       js_env({

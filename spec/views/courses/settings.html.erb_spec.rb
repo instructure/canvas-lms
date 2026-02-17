@@ -295,6 +295,44 @@ describe "courses/settings" do
     end
   end
 
+  describe "manage_course_content_edit permission" do
+    before :once do
+      RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+    end
+
+    before do
+      view_context(@course, @user)
+      assign(:current_user, @user)
+    end
+
+    it "disables the course form when user lacks manage_course_content_edit" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      form = doc.at_css("form#course_form")
+      expect(form["disabled"]).to eq "disabled"
+    end
+
+    it "does not show the save button when user lacks manage_course_content_edit" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css("footer.sticky-footer button[type=submit]")).to be_nil
+    end
+
+    it "disables visibility controls when user lacks manage_course_content_edit" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      visibility_select = doc.at_css("select#course_course_visibility")
+      expect(visibility_select["disabled"]).to eq "disabled"
+    end
+
+    it "disables grading scheme checkbox when user lacks manage_course_content_edit" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      checkbox = doc.at_css("input#course_course_grading_standard_enabled")
+      expect(checkbox["disabled"]).to eq "disabled"
+    end
+  end
+
   describe "course pacing setting" do
     context "with course_pace_enable_from_account_setting ff off" do
       it "is visible" do
