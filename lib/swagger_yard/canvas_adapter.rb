@@ -345,15 +345,17 @@ module SwaggerYard
         "type" => "object"
       }
 
-      # Copy properties
-      if canvas_schema["properties"]
-        openapi_schema["properties"] = convert_properties(canvas_schema["properties"])
-      end
-
-      # Copy required fields - ensure it's an array
+      # Extract required fields list first
+      required_fields = []
       if canvas_schema["required"]
         required = canvas_schema["required"]
-        openapi_schema["required"] = required.is_a?(String) ? [required] : required
+        required_fields = required.is_a?(String) ? [required] : Array(required)
+        openapi_schema["required"] = required_fields
+      end
+
+      # Copy properties with nullable marking for non-required fields
+      if canvas_schema["properties"]
+        openapi_schema["properties"] = convert_properties(canvas_schema["properties"], required_fields)
       end
 
       # Copy description
@@ -367,18 +369,26 @@ module SwaggerYard
     end
 
     # Convert properties from Canvas format to OpenAPI format
-    def self.convert_properties(properties)
-      properties.transform_values do |prop_def|
-        convert_single_property(prop_def)
+    # Mark non-required fields as nullable (Canvas returns null for missing optional fields)
+    def self.convert_properties(properties, required_fields = [])
+      properties.each_with_object({}) do |(prop_name, prop_def), result|
+        is_required = required_fields.include?(prop_name)
+        result[prop_name] = convert_single_property(prop_def, is_required)
       end
     end
 
-    def self.convert_single_property(prop_def)
+    def self.convert_single_property(prop_def, is_required = true)
       return { "$ref" => "#/components/schemas/#{sanitize_schema_name(prop_def["$ref"])}" } if prop_def["$ref"]
 
       converted_prop = {}
       convert_property_type(converted_prop, prop_def)
       copy_basic_property_fields(converted_prop, prop_def)
+
+      # Mark non-required fields as nullable (Canvas returns null for missing optional fields)
+      # Skip if already nullable or if it's an array (arrays themselves aren't nullable, but can be empty)
+      if !is_required && !converted_prop["nullable"] && converted_prop["type"] != "array"
+        converted_prop["nullable"] = true
+      end
 
       # Handle enums and items carefully for arrays
       if converted_prop["type"] == "array"
