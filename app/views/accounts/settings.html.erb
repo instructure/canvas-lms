@@ -1454,9 +1454,9 @@ acknowledge that you have read and agreed to the
               </div>
               <span class="notification_account_content_text">
                 <% if @account.site_admin? %>
-                  <%= t("This is a message from *Canvas Administration*", wrapper: '<b>\1</b>') %>
+                  <%= t("This is an announcement from *Canvas Administration*", wrapper: '<b>\1</b>') %>
                 <% else %>
-                  <%= t("This is a message from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
+                  <%= t("This is an announcement from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
                 <% end %>
               </span>
             </div>
