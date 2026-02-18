@@ -28,20 +28,57 @@ import ReactDOM from 'react-dom/client'
 import SisImportForm from '../react/SisImportForm'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
+import type {SisImport} from 'api'
 
 const I18n = createI18nScope('sis_import')
 
+// @ts-expect-error TS2430 - SisBatch extends SisImport with additional canvas-specific fields
+interface SisBatch extends SisImport {
+  processing_errors?: Array<[string, string]>
+  processing_warnings?: Array<[string, string]>
+  data?: {
+    import_type?: string
+    counts?: {
+      accounts: number
+      terms: number
+      courses: number
+      sections: number
+      users: number
+      logins: number
+      enrollments: number
+      xlists: number
+      admins: number
+      group_categories: number
+      groups: number
+      group_memberships: number
+      differentiation_tag_sets: number
+      differentiation_tags: number
+      differentiation_tag_memberships: number
+      user_observers: number
+      change_sis_ids: number
+    }
+  }
+}
+
+interface OnSuccessData {
+  id?: string
+  error_message?: string
+  batch_in_progress?: boolean
+}
+
 $(document).ready(function (_event) {
   const mountNode = document.getElementById('attachment_mount')
+  if (!mountNode) return
+
   const root = ReactDOM.createRoot(mountNode)
   root.render(
     <QueryClientProvider client={queryClient}>
       <SisImportForm onSuccess={onSuccess} />
     </QueryClientProvider>,
   )
-  let state = 'nothing'
+  let state: 'nothing' | 'updating' | 'checking' = 'nothing'
 
-  function createMessageHtml(batch) {
+  function createMessageHtml(batch: SisBatch): string {
     let output = ''
     if (batch.processing_errors && batch.processing_errors.length > 0) {
       output +=
@@ -66,7 +103,7 @@ $(document).ready(function (_event) {
     return output
   }
 
-  function createCountsHtml(batch) {
+  function createCountsHtml(batch: SisBatch): string {
     if (!(batch.data && batch.data.counts)) {
       return ''
     }
@@ -221,7 +258,7 @@ $(document).ready(function (_event) {
     return output
   }
 
-  function startPoll() {
+  function startPoll(): void {
     $('#sis_importer')
       .html(
         htmlEscape(I18n.t('status.processing', 'Processing')) +
@@ -235,10 +272,10 @@ $(document).ready(function (_event) {
     $('.copy_progress').progressbar()
     state = 'nothing'
     let fakeTickCount = 0
-    const tick = function () {
+    const tick = function (): void {
       if (state === 'nothing') {
         fakeTickCount++
-        const progress = ($('.copy_progress').progressbar('option', 'value') || 0) + 0.25
+        const progress = (($('.copy_progress').progressbar('option', 'value') as number) || 0) + 0.25
         if (fakeTickCount < 10) {
           $('.copy_progress').progressbar('option', 'value', progress)
         }
@@ -249,20 +286,20 @@ $(document).ready(function (_event) {
         setTimeout(tick, 10000)
       }
     }
-    const checkup = function () {
-      let lastProgress = null
+    const checkup = function (): void {
+      let lastProgress: number | null = null
       let waitTime = 1500
       $.ajaxJSON(
         window.location.href,
         'GET',
         {},
-        data => {
+        (data: SisBatch) => {
           state = 'updating'
           const sis_batch = data
           let progress = 0
           if (sis_batch) {
             progress = Math.max(
-              $('.copy_progress').progressbar('option', 'value') || 0,
+              ($('.copy_progress').progressbar('option', 'value') as number) || 0,
               sis_batch.progress,
             )
             $('.copy_progress').progressbar('option', 'value', progress)
@@ -279,7 +316,7 @@ $(document).ready(function (_event) {
                     'The import is complete and all records were successfully imported.',
                   ),
                 ) + createCountsHtml(sis_batch),
-              ),
+              ) as unknown as string,
             )
           } else if (sis_batch.workflow_state === 'failed') {
             const code = 'sis_batch_' + sis_batch.id
@@ -302,7 +339,7 @@ $(document).ready(function (_event) {
                 I18n.t('errors.import_failed_messages', 'The import failed with these messages:'),
               )
               message += createMessageHtml(sis_batch)
-              $('.sis_messages .sis_error_message').html(raw(message))
+              $('.sis_messages .sis_error_message').html(raw(message) as unknown as string)
             }
             $('.sis_messages').show()
           } else if (sis_batch.workflow_state === 'imported_with_messages') {
@@ -317,10 +354,10 @@ $(document).ready(function (_event) {
               )
               message += createMessageHtml(sis_batch)
               message += createCountsHtml(sis_batch)
-              $('.sis_messages').show().html(raw(message))
+              $('.sis_messages').show().html(raw(message) as unknown as string)
             }
           } else {
-            if (progress == lastProgress) {
+            if (progress === lastProgress) {
               waitTime = Math.max(waitTime + 500, 30000)
             } else {
               waitTime = 1500
@@ -338,13 +375,13 @@ $(document).ready(function (_event) {
     setTimeout(tick, 1000)
   }
 
-  function onSuccess(data) {
+  function onSuccess(data: OnSuccessData): void {
     root.render(null)
     if (data && data.id) {
       startPoll()
     } else {
       // show error message
-      $('.sis_messages .sis_error_message').text(data.error_message)
+      $('.sis_messages .sis_error_message').text(data.error_message || '')
       $('.sis_messages').show()
       if (data.batch_in_progress) {
         startPoll()
@@ -352,9 +389,9 @@ $(document).ready(function (_event) {
     }
   }
 
-  function check_if_importing() {
+  function check_if_importing(): void {
     state = 'checking'
-    $.ajaxJSON(window.location.href, 'GET', {}, data => {
+    $.ajaxJSON(window.location.href, 'GET', {}, (data: SisBatch) => {
       state = 'nothing'
       const sis_batch = data
       if (

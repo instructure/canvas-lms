@@ -24,7 +24,11 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('SIS_Import')
 
-function BatchImportAlert({margin}) {
+interface BatchImportAlertProps {
+  margin: string
+}
+
+function BatchImportAlert({margin}: BatchImportAlertProps) {
   const fullBatchWarning = I18n.t(
     'If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above. See the documentation for details.',
   )
@@ -35,7 +39,13 @@ function BatchImportAlert({margin}) {
   )
 }
 
-export function ConfirmationModal({isOpen, onSubmit, onRequestClose}) {
+interface ConfirmationModalProps {
+  isOpen: boolean
+  onSubmit: () => void
+  onRequestClose: () => void
+}
+
+export function ConfirmationModal({isOpen, onSubmit, onRequestClose}: ConfirmationModalProps) {
   return (
     <Modal
       as="form"
