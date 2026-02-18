@@ -188,4 +188,58 @@ describe "student dashboard todo widget", :ignore_js_errors do
       expect(driver.current_url).to include("/courses/#{@course2.id}")
     end
   end
+
+  context "todo widget create todo" do
+    before :once do
+      @create_student = user_with_pseudonym(active_all: true, name: "Create Student")
+      @create_course = course_factory(active_all: true, course_name: "Create Test Course")
+      @create_course.enroll_student(@create_student, enrollment_state: :active)
+      enable_widget_dashboard_for(@create_student)
+      add_widget_to_dashboard(@create_student, :todo_list, 1)
+    end
+
+    before do
+      user_session(@create_student)
+    end
+
+    it "creates todo with required fields" do
+      go_to_dashboard
+
+      expect(new_todo_button).to be_displayed
+      new_todo_button.click
+      create_todo_title_input.send_keys("Study for midterm")
+      create_todo_submit_button.click
+
+      new_note = PlannerNote.last
+      expect(todo_item(new_note.id).text).to include("Study for midterm")
+      expect(todo_item(new_note.id).text).to include("To Do")
+    end
+
+    it "creates todo with optional course selection" do
+      go_to_dashboard
+
+      expect(new_todo_button).to be_displayed
+      new_todo_button.click
+      create_todo_title_input.send_keys("Review lecture notes")
+      click_INSTUI_Select_option(create_todo_course_select_selector, "Create Test Course")
+      create_todo_submit_button.click
+      verify_todo_add_modal_closed
+
+      new_note = PlannerNote.last
+      expect(todo_item(new_note.id).text).to include("Review lecture notes")
+      expect(todo_item_course_link(new_note.id).text).to include("Create Test Course")
+    end
+
+    it "can cancel todo creation" do
+      go_to_dashboard
+
+      expect(new_todo_button).to be_displayed
+      new_todo_button.click
+      create_todo_title_input.send_keys("This todo won't be created")
+      expect(create_todo_cancel_button).to be_displayed
+      create_todo_cancel_button.click
+      verify_todo_add_modal_closed
+      expect(no_todo_items_message).to be_displayed
+    end
+  end
 end
