@@ -3023,6 +3023,30 @@ describe DiscussionTopicsController do
       expect(response).to have_http_status :bad_request
     end
 
+    it "allows updating an announcement when one enrolled section was deleted via SIS" do
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept!
+      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+      ann = @course.announcements.create!(
+        message: "testing",
+        is_section_specific: true,
+        course_sections: [section1, section2]
+      )
+
+      section2.update!(workflow_state: "deleted")
+      section2.enrollments.update_all(workflow_state: "deleted")
+
+      put("update", params: {
+            course_id: @course.id,
+            topic_id: ann.id,
+            title: "Updated Announcement",
+          })
+      expect(response).to have_http_status :ok
+    end
+
     it "Allows an admin to update a section-specific discussion" do
       account = @course.root_account
       section = @course.course_sections.create!(name: "Section")

@@ -1340,14 +1340,16 @@ class DiscussionTopicsController < ApplicationController
 
     visibilities = @context.course_section_visibility(@current_user)
 
+    section_ids = @topic.course_sections.map(&:id)
+    active_section_ids = @context.active_course_sections.where(id: section_ids).pluck(:id)
     invalid_sections =
       case visibilities
       when :all
         []
       when :none
-        @topic.course_sections.map(&:id)
+        active_section_ids
       else
-        @topic.course_sections.map(&:id) - visibilities
+        active_section_ids - visibilities
       end
 
     unless invalid_sections.empty?
