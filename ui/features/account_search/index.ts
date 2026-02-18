@@ -21,6 +21,7 @@ import ready from '@instructure/ready'
 
 ready(() => {
   $('.account_search_form').submit(function () {
+    // @ts-expect-error -- loadingImage type does not support string for horizontal
     $(this).loadingImage({horizontal: 'middle'})
     $(this).find('button').prop('disabled', true)
   })
