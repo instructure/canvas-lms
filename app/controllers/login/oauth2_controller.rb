@@ -50,7 +50,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       @aac.instance_debugging = true
     end
     attempts = 0
-    timeout_options = { raise_on_timeout: true, fallback_timeout_length: 10.seconds, exception_class: Timeout::Error }
+    timeout_options = @aac.creation_timeout_options
     begin
       Canvas.timeout_protection("oauth:#{@aac.global_id}", timeout_options) do
         token = nil
