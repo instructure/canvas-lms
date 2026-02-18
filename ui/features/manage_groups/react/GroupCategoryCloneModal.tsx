@@ -37,6 +37,7 @@ type GroupCategory = {
 
 type Props = {
   groupCategory: GroupCategory
+  label: string
   open: boolean
   onDismiss: () => void
 }
@@ -173,7 +174,6 @@ export default function GroupCategoryCloneModal({
 
   return (
     <CanvasModal
-      label={I18n.t('Clone Group Set')}
       size="small"
       shouldCloseOnDocumentClick={false}
       footer={<Footer />}
