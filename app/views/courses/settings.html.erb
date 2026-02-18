@@ -81,6 +81,9 @@
 <% if @context.feature_enabled?(:ams_course_integration) %>
   <% tabs << { id: "quiz_settings", title: t('tabs.quiz_settings', default: "Quiz Settings"), contentMount: "tab-quiz-settings-mount" } %>
 <% end %>
+<% if @context.account.feature_enabled?(:intelligent_insights_modernisation) %>
+  <% tabs << { id: "criteria",   title: t('tabs.criteria',    default: "Course Criteria"),       contentMount: "tab-criteria-mount" } %>
+<% end %>
 <%= tag.div id: "course_settings_tabs_mount",
             data: {
               component: "SettingsTabs",
@@ -869,6 +872,9 @@
       <%= f.text_field :name, :id => "course_section_name_edit", :'aria-label' => t('buttons.edit_section_name', "Edit section name") %>
     <% end %>
   </div>
+  <% if @context.account.feature_enabled?(:intelligent_insights_modernisation) %>
+    <div id="tab-criteria-mount"></div>
+  <% end %>
   <% if can_do(@context, @current_user, :update) && !@context.elementary_homeroom_course? %>
   <div id="tab-navigation-mount">
     <h2 class="screenreader-only"><%= t('headings.navigation', %{Course Navigation}) %></h2>

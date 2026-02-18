@@ -56,6 +56,7 @@ const CourseApps = React.lazy(() => import('./react/components/CourseApps'))
 const CourseNavigationSettings = React.lazy(
   () => import('./react/components/CourseNavigationSettings'),
 )
+const CanvasCourseCriteria = React.lazy(() => import('./react/components/CanvasCourseCriteria'))
 
 const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
 const ErrorMessage = () => (
@@ -259,6 +260,30 @@ ready(() => {
         </ErrorBoundary>
       </Suspense>,
       navSettingsContainer,
+    )
+  }
+
+  const criteriaContainer = document.getElementById('tab-criteria-mount')
+  if (criteriaContainer) {
+    render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <CanvasCourseCriteria />
+        </ErrorBoundary>
+      </Suspense>,
+      criteriaContainer,
+    )
+  }
+
+  const sidebarCriteriaContainer = document.getElementById('criteria-mount')
+  if (sidebarCriteriaContainer) {
+    render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <CanvasCourseCriteria />
+        </ErrorBoundary>
+      </Suspense>,
+      sidebarCriteriaContainer,
     )
   }
 })
