@@ -309,6 +309,7 @@ class UserMerge
       from_user.update_shadow_records_synchronously!
       from_user.save!
 
+      target_user.update_shadow_records_synchronously!
       target_user.save!
     end
 
