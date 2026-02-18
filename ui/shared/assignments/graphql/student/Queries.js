@@ -97,7 +97,7 @@ export const COURSE_PROFICIENCY_RATINGS_QUERY = gql`
 export const STUDENT_VIEW_QUERY = gql`
   query GetStudentAssignment($assignmentLid: ID!, $submissionID: ID!) {
     assignment(id: $assignmentLid) {
-      ...Assignment
+      ...StudentAssignment
       rubric {
         ...Rubric
       }
@@ -107,7 +107,7 @@ export const STUDENT_VIEW_QUERY = gql`
       }
     }
     submission(id: $submissionID) {
-      ...Submission
+      ...StudentAssignmentSubmission
     }
   }
   ${Assignment.fragment}
@@ -118,7 +118,7 @@ export const STUDENT_VIEW_QUERY = gql`
 export const STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION = gql`
   query GetStudentAssignmentWithReviewerSubmission($assignmentLid: ID!, $submissionID: ID!, $reviewerSubmissionID: ID!) {
     assignment(id: $assignmentLid) {
-      ...Assignment
+      ...StudentAssignment
       rubric {
         ...Rubric
       }
@@ -128,10 +128,10 @@ export const STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION = gql`
       }
     }
     submission(id: $submissionID) {
-      ...Submission
+      ...StudentAssignmentSubmission
     }
     reviewerSubmission: submission(id: $reviewerSubmissionID) {
-      ...Submission
+      ...StudentAssignmentSubmission
     }
   }
   ${Assignment.fragment}
@@ -142,7 +142,7 @@ export const STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION = gql`
 export const LOGGED_OUT_STUDENT_VIEW_QUERY = gql`
   query GetStudentAssignmentLoggedOut($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {
-      ...Assignment
+      ...StudentAssignment
       rubric {
         ...Rubric
       }
