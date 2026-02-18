@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
 import $ from 'jquery'
 import {render, rerender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -27,8 +28,14 @@ import SelfUnenrollmentModal from './react/SelfUnenrollmentModal'
 
 const I18n = createI18nScope('courses.show')
 
+interface WikiPageData {
+  wiki_page: {
+    body: string
+  }
+}
+
 $(document).ready(() => {
-  let unenrollmentRoot = null
+  let unenrollmentRoot: ReturnType<typeof render> | null = null
 
   $('.self_unenrollment_link').click(_event => {
     const mountPoint = document.getElementById('self_unenrollment_modal_mount_point')
@@ -47,6 +54,7 @@ $(document).ready(() => {
       unenrollmentRoot = render(
         <SelfUnenrollmentModal
           unenrollmentApiUrl={apiUrl}
+          // @ts-expect-error - rerender accepts null to unmount
           onClose={() => rerender(unenrollmentRoot, null)}
         />,
         mountPoint,
@@ -56,6 +64,7 @@ $(document).ready(() => {
         unenrollmentRoot,
         <SelfUnenrollmentModal
           unenrollmentApiUrl={apiUrl}
+          // @ts-expect-error - rerender accepts null to unmount
           onClose={() => rerender(unenrollmentRoot, null)}
         />,
       )
@@ -65,31 +74,38 @@ $(document).ready(() => {
   $('.re_send_confirmation_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
+    const href = $link.attr('href')
+    if (!href) return
+
     $link.text(I18n.t('re_sending', 'Re-Sending...'))
     $.ajaxJSON(
-      $link.attr('href'),
+      href,
       'POST',
       {},
-      _data => $link.text(I18n.t('send_done', 'Done! Message may take a few minutes.')),
-      _data => $link.text(I18n.t('send_failed', 'Request failed. Try again.')),
+      () => $link.text(I18n.t('send_done', 'Done! Message may take a few minutes.')),
+      () => $link.text(I18n.t('send_failed', 'Request failed. Try again.')),
     )
   })
 
   $('.home_page_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
+    const href = $(this).attr('href')
+    if (!href) return
+
     $('.floating_links').hide()
     $('#course_messages').slideUp(() => $('.floating_links').show())
 
     $('#home_page').slideDown().loadingImage()
     $link.hide()
-    $.ajaxJSON($(this).attr('href'), 'GET', {}, data => {
+    $.ajaxJSON(href, 'GET', {}, (data: WikiPageData) => {
       $('#home_page').loadingImage('remove')
       let bodyHtml = htmlEscape($.trim(data.wiki_page.body))
       if (bodyHtml.length === 0) {
         bodyHtml = htmlEscape(I18n.t('empty_body', 'No Content'))
       }
       $('#home_page_content').html(bodyHtml)
+      // @ts-expect-error - jQuery scrollTo plugin not fully typed
       $('html,body').scrollTo($('#home_page'))
     })
   })
