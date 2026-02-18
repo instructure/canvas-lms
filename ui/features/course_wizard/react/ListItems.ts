@@ -19,15 +19,28 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_wizard')
+
+export interface ListItem {
+  key: string
+  complete: boolean
+  title: string
+  text: string
+  url?: string
+  non_registered_text?: string
+  iconClass: string
+  warning?: string
+}
+
 /**
  * Returns an array containing all the possible items for the checklist
  * For many ListItems, the ! is added for the complete property
  *  because the ENV is checking if the step is nil? or empty?
  */
-export default [
+const ListItems: ListItem[] = [
   {
     key: 'content_import',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return !ENV.COURSE_WIZARD.checklist_states.import_step
     },
     get title() {
@@ -39,6 +52,7 @@ export default [
       )
     },
     get url() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.urls.content_import
     },
     iconClass: 'icon-upload',
@@ -46,6 +60,7 @@ export default [
   {
     key: 'add_assignments',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return !ENV.COURSE_WIZARD.checklist_states.assignment_step
     },
     get title() {
@@ -57,6 +72,7 @@ export default [
       )
     },
     get url() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.urls.add_assignments
     },
     iconClass: 'icon-assignment',
@@ -64,6 +80,7 @@ export default [
   {
     key: 'add_students',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return !ENV.COURSE_WIZARD.checklist_states.add_student_step
     },
     get title() {
@@ -75,6 +92,7 @@ export default [
       )
     },
     get url() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.urls.add_students
     },
     iconClass: 'icon-group-new',
@@ -82,6 +100,7 @@ export default [
   {
     key: 'add_files',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return !ENV.COURSE_WIZARD.checklist_states.import_step
     } /* Super odd in the existing wizard this is set to display: none */,
     get title() {
@@ -93,6 +112,7 @@ export default [
       )
     },
     get url() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.urls.add_files
     },
     iconClass: 'icon-note-light',
@@ -100,6 +120,7 @@ export default [
   {
     key: 'select_navigation',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return !ENV.COURSE_WIZARD.checklist_states.navigation_step
     },
     get title() {
@@ -111,6 +132,7 @@ export default [
       )
     },
     get url() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.urls.select_navigation
     },
     iconClass: 'icon-hamburger',
@@ -118,6 +140,7 @@ export default [
   {
     key: 'home_page',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.checklist_states.home_page_step
     },
     get title() {
@@ -133,6 +156,7 @@ export default [
   {
     key: 'course_calendar',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return !ENV.COURSE_WIZARD.checklist_states.calendar_event_step
     },
     get title() {
@@ -144,6 +168,7 @@ export default [
       )
     },
     get url() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.urls.course_calendar
     },
     iconClass: 'icon-calendar-month',
@@ -151,6 +176,7 @@ export default [
   {
     key: 'add_tas',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return !ENV.COURSE_WIZARD.checklist_states.add_ta_step
     },
     get title() {
@@ -162,6 +188,7 @@ export default [
       )
     },
     get url() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.urls.add_tas
     },
     iconClass: 'icon-educators',
@@ -169,6 +196,7 @@ export default [
   {
     key: 'publish_course',
     get complete() {
+      // @ts-expect-error - ENV.COURSE_WIZARD not typed in GlobalEnv
       return ENV.COURSE_WIZARD.checklist_states.publish_step
     },
     get title() {
@@ -187,3 +215,5 @@ export default [
     iconClass: 'icon-publish icon-Solid',
   },
 ]
+
+export default ListItems

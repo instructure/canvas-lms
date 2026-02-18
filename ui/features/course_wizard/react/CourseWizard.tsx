@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import React, {useState, useRef} from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import InfoFrame from './InfoFrame'
@@ -27,13 +26,17 @@ import '@canvas/rails-flash-notifications'
 
 const I18n = createI18nScope('course_wizard')
 
-export default function CourseWizard({onHideWizard}) {
-  const [selectedItem, setSelectedItem] = useState('')
-  const closeLink = useRef()
+export interface CourseWizardProps {
+  onHideWizard: () => void
+}
+
+export default function CourseWizard({onHideWizard}: CourseWizardProps): React.JSX.Element {
+  const [selectedItem, setSelectedItem] = useState<string>('')
+  const closeLink = useRef<HTMLButtonElement>(null)
   return (
     <Overlay
       onOpen={() => {
-        closeLink.current.focus()
+        closeLink.current?.focus()
         $.screenReaderFlashMessageExclusive(I18n.t('Course Setup Wizard is showing.'))
       }}
       open={true}
@@ -85,8 +88,4 @@ export default function CourseWizard({onHideWizard}) {
       </Mask>
     </Overlay>
   )
-}
-
-CourseWizard.propTypes = {
-  onHideWizard: PropTypes.func.isRequired,
 }
