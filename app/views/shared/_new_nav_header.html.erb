@@ -76,6 +76,9 @@
   <% if !!@domain_root_account&.feature_enabled?(:top_navigation_placement) %>
     <div id="mobile-top-nav-tools-mount-point"></div>
   <% end %>
+  <% if add_oak_bundle? %>
+    <div id="oak-mobile-mount-point"></div>
+  <% end %>
   <% if show_blueprint_button? %>
     <button class="mobile-header-blueprint-button Button Button--icon-action-rev Button--large" aria-label="<%= t "Open Blueprint Sidebar" %>">
       <i class="icon-blueprint"></i>
