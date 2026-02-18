@@ -323,19 +323,13 @@ class GroupsController < ApplicationController
     @groups = all_groups = @groups.order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                   .eager_load(:group_category).preload(:root_account)
 
-    # run this only for students
-    if params[:section_restricted] && @context.is_a?(Course) && @context.user_is_student?(@current_user)
-      is_current_user_section_restricted = @context.membership_for_user(@current_user)&.limit_privileges_to_course_section
-      if is_current_user_section_restricted
-        # Gets all groups in the context
-        group_scope = @context.groups.active.eager_load(:group_category).preload(:root_account)
-        # Find all groups from that scope that can be limited from the section restriction parameter
-        groups_with_restricted_categories_or_teacher_assigned = group_scope.where(group_categories: { self_signup: nil }).or(group_scope.where(group_categories: { self_signup: "restricted" }))
-        # Find all groups that have users with different sections than the current user and DONT have the current_user in them
-        groups_with_no_common_section_with_current_user = groups_with_restricted_categories_or_teacher_assigned.reject { |g| g.has_common_section_with_user?(@current_user) || g.includes_user?(@current_user) }
-        # Remove the groups found above from the groups returned by the api
-        @groups = all_groups -= groups_with_no_common_section_with_current_user
-      end
+    if params[:section_restricted] && @context.is_a?(Course) && @context.user_is_student?(@current_user) && @context.membership_for_user(@current_user)&.limit_privileges_to_course_section
+      candidate_ids = all_groups
+                      .where(group_categories: { self_signup: [nil, "restricted"] })
+                      .pluck(:id)
+
+      hidden_ids = Group.ids_hidden_by_section_restriction(candidate_ids, @current_user, @context)
+      @groups = all_groups = all_groups.where.not(id: hidden_ids)
     end
 
     unless api_request?

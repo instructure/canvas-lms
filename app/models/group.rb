@@ -303,6 +303,68 @@ class Group < ActiveRecord::Base
     Group.find(ids)
   end
 
+  # Returns a Set of group IDs that should be hidden from the given user
+  # due to course section restrictions.
+  def self.ids_hidden_by_section_restriction(candidate_group_ids, user, course)
+    return Set.new if candidate_group_ids.empty?
+
+    membership_pairs = GroupMembership.active
+                                      .joins(:user)
+                                      .where(group_id: candidate_group_ids)
+                                      .where("users.workflow_state<>'deleted'")
+                                      .pluck(:group_id, :user_id)
+
+    user_member_group_ids = membership_pairs.filter_map { |(gid, uid)| gid if uid == user.id }.to_set
+
+    group_member_scope = GroupMembership.active
+                                        .joins(:user)
+                                        .where(group_id: candidate_group_ids)
+                                        .where("users.workflow_state<>'deleted'")
+                                        .select(:user_id)
+
+    enrolled_user_ids = course.enrollments
+                              .active_or_pending
+                              .where(user_id: group_member_scope)
+                              .distinct
+                              .pluck(:user_id)
+                              .to_set
+    enrolled_user_ids << user.id
+
+    members_by_group = Hash.new { |h, k| h[k] = Set.new }
+    membership_pairs.each do |(gid, uid)|
+      members_by_group[gid] << uid if enrolled_user_ids.include?(uid)
+    end
+    # The viewer must appear in every group's set because the section check
+    # asks: "is there a section common to all members AND the viewer?"
+    candidate_group_ids.each { |gid| members_by_group[gid] << user.id }
+
+    student_section_pairs = Enrollment
+                            .where(
+                              type: %w[StudentEnrollment StudentViewEnrollment],
+                              course_section_id: course.course_sections.active.select(:id),
+                              user_id: enrolled_user_ids
+                            )
+                            .merge(Enrollment.active_or_pending)
+                            .pluck(:user_id, :course_section_id)
+
+    sections_by_user = Hash.new { |h, k| h[k] = Set.new }
+    student_section_pairs.each { |(uid, sid)| sections_by_user[uid] << sid }
+
+    hidden = Set.new
+    candidate_group_ids.each do |gid|
+      next if user_member_group_ids.include?(gid)
+
+      hidden << gid unless shares_any_section?(members_by_group[gid], sections_by_user)
+    end
+    hidden
+  end
+
+  def self.shares_any_section?(user_ids, sections_by_user)
+    common_sections = user_ids.map { |uid| sections_by_user[uid] }.reduce(:&)
+    common_sections&.any? || false
+  end
+  private_class_method :shares_any_section?
+
   def self.not_in_group_sql_fragment(groups)
     return nil if groups.empty?
 

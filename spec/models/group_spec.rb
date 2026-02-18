@@ -659,6 +659,83 @@ describe Group do
     end
   end
 
+  describe ".ids_hidden_by_section_restriction" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @section1 = @course.default_section
+      @section2 = @course.course_sections.create!
+    end
+
+    it "hides a group whose members are only in a different section" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      other = @section2.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(other)
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).to include(group.id)
+    end
+
+    it "never hides a group the user is a member of" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      other = @section2.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(other)
+      group.add_user(viewer)
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+
+    it "does not hide an empty group" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+
+    it "does not hide a group with members in the same section" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      same_section = @section1.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(same_section)
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+
+    it "returns an empty Set for empty input" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+
+      hidden = Group.ids_hidden_by_section_restriction([], viewer, @course)
+      expect(hidden).to eq(Set.new)
+    end
+
+    it "does not hide a group when the viewer shares a section via a second enrollment" do
+      viewer = user_model
+      @course.enroll_user(viewer, "StudentEnrollment", section: @section1, enrollment_state: "active")
+      @course.enroll_user(viewer, "StudentEnrollment", section: @section2, enrollment_state: "active", allow_multiple_enrollments: true)
+      other = @section2.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(other)
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+
+    it "excludes members with inactive enrollments from the section check" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      other = @section1.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(other)
+      Enrollment.where(user_id: other.id, course_id: @course.id).update_all(workflow_state: "inactive")
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+  end
+
   context "tabs_available" do
     before :once do
       course_with_teacher(active_course: true)
