@@ -53,6 +53,8 @@ vi.mock('jquery-ui', () => {
   return $
 })
 
+const assetProcessorRoots = []
+
 vi.mock('../../../react/AssetProcessorsForAssignment', () => {
   const rootMap = new WeakMap()
   return {
@@ -70,6 +72,7 @@ vi.mock('../../../react/AssetProcessorsForAssignment', () => {
       if (!root) {
         root = createRoot(container)
         rootMap.set(container, root)
+        assetProcessorRoots.push(root)
       }
       root.render(el)
     },
@@ -226,7 +229,6 @@ describe('EditView - Quizzes 2 Behavior', () => {
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
     server.resetHandlers()
-    vi.resetModules()
     vi.clearAllMocks()
     window.ENV = null
   })
@@ -244,6 +246,13 @@ describe('EditView - Quizzes 2 Behavior', () => {
   })
 
   afterEach(() => {
+    // Unmount any React roots created by the AssetProcessorsForAssignment mock
+    // before tearing down the DOM, to avoid "window is not defined" errors
+    // from React trying to flush work after the JSDOM environment is gone.
+    while (assetProcessorRoots.length > 0) {
+      assetProcessorRoots.pop().unmount()
+    }
+    view?.remove()
     document.getElementById('fixtures').innerHTML = ''
   })
 
