@@ -267,7 +267,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
             />
           </View>
 
-          {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && (
+          {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
             <Flex as="div" gap="small" direction="column">
               <Flex as="div" gap="x-small" direction="column">
                 <Flex.Item overflowX="visible" overflowY="visible">

@@ -487,7 +487,7 @@ describe('CheckboxTextInput', () => {
       expect(textarea).toBeDisabled()
     })
 
-    it('keeps generate button visible but disabled when isDisabled is true', () => {
+    it('hides generate button when isDisabled is true', () => {
       const propsWithGenerate = {
         ...defaultProps,
         isDisabled: true,
@@ -504,9 +504,27 @@ describe('CheckboxTextInput', () => {
 
       render(<CheckboxTextInput {...propsWithGenerate} />)
 
-      const button = screen.getByTestId('generate-alt-text-button')
-      expect(button).toBeInTheDocument()
-      expect(button).toBeDisabled()
+      expect(screen.queryByTestId('generate-alt-text-button')).not.toBeInTheDocument()
+    })
+
+    it('shows generate button when isDisabled is false', () => {
+      const propsWithGenerate = {
+        ...defaultProps,
+        isDisabled: false,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            isCanvasImage: true,
+            generateButtonLabel: 'Generate Alt Text',
+          },
+        },
+      }
+
+      render(<CheckboxTextInput {...propsWithGenerate} />)
+
+      expect(screen.getByTestId('generate-alt-text-button')).toBeInTheDocument()
     })
   })
 })
