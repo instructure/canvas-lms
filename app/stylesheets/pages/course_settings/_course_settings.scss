@@ -320,6 +320,11 @@ ul.user_list div.enrollment_type.pending {
   }
 }
 
+#right-side .course-criteria {
+  max-width: 240px;
+  overflow: hidden;
+}
+
 .course-settings-sub-navigation-lti .new_badge {
   background-color: #bc3aa6;
   color: white;

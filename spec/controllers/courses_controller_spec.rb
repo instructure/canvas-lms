@@ -2518,6 +2518,48 @@ describe CoursesController do
         expect(assigns[:js_env][:ACTIVE_TAG_CONVERSION_JOB]).to be_truthy
       end
     end
+
+    context "intelligent_insights_modernisation feature flag" do
+      let(:launch_url) { "https://example.com/canvas_course_criteria" }
+
+      before do
+        allow(Services::CanvasCourseCriteria).to receive(:launch_url).and_return(launch_url)
+        user_session(@teacher)
+      end
+
+      context "when feature is enabled" do
+        before do
+          @course.account.enable_feature!(:intelligent_insights_modernisation)
+        end
+
+        it "sets canvas_course_criteria launch_url in remote_env" do
+          get "show", params: { id: @course.id }
+          expect(controller.remote_env[:canvas_course_criteria]).to eq({ launch_url: })
+        end
+
+        it "sets CANVAS_COURSE_CRITERIA.COURSE_ID in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA][:COURSE_ID]).to eq(@course.id)
+        end
+
+        it "sets CANVAS_COURSE_CRITERIA.ACCOUNT_ID in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA][:ACCOUNT_ID]).to eq(@course.account.id.to_s)
+        end
+      end
+
+      context "when feature is disabled" do
+        it "does not set canvas_course_criteria in remote_env" do
+          get "show", params: { id: @course.id }
+          expect(controller.remote_env[:canvas_course_criteria]).to be_nil
+        end
+
+        it "does not set CANVAS_COURSE_CRITERIA in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA]).to be_nil
+        end
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do
