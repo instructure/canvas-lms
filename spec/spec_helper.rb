@@ -552,7 +552,7 @@ RSpec.configure do |config|
   end
 
   config.after(:context) do
-    non_empty_tables = TestDatabaseUtils.non_empty_tables
+    non_empty_tables = ActiveRecord::Base.connection.non_empty_tables
     next if non_empty_tables.empty?
 
     message = "Test database is not empty! Tables with data: #{non_empty_tables.join(", ")}"
