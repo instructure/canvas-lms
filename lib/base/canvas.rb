@@ -259,11 +259,13 @@ module Canvas
     timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || 15).to_f
 
     exception_class = options[:exception_class]
+    cutoff = options[:cutoff]
+
     if Canvas.redis_enabled?
       if timeout_protection_method(service_name) == "percentage"
         percent_short_circuit_timeout(Canvas.redis, service_name, timeout, exception_class, &)
       else
-        short_circuit_timeout(Canvas.redis, service_name, timeout, exception_class, &)
+        short_circuit_timeout(Canvas.redis, service_name, timeout, exception_class, cutoff:, &)
       end
     else
       Timeout.timeout(timeout, exception_class, &)
@@ -286,9 +288,9 @@ module Canvas
      Setting.get("service_generic_cutoff", 3.to_s)).to_i
   end
 
-  def self.short_circuit_timeout(redis, service_name, timeout, exception_class, &)
+  def self.short_circuit_timeout(redis, service_name, timeout, exception_class, cutoff: nil, &)
     redis_key = "service:timeouts:#{service_name}:error_count"
-    cutoff = timeout_protection_cutoff(service_name)
+    cutoff ||= timeout_protection_cutoff(service_name)
 
     error_count = redis.get(redis_key, failsafe: 0)
     if error_count.to_i >= cutoff

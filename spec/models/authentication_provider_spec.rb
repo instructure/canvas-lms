@@ -788,4 +788,16 @@ describe AuthenticationProvider do
       end
     end
   end
+
+  describe "#creation_timeout_options" do
+    it "returns timeout protection options for OAuth callbacks" do
+      provider = account.authentication_providers.create!(auth_type: "openid_connect")
+      options = provider.creation_timeout_options
+      expect(options).to eq({
+                              raise_on_timeout: true,
+                              fallback_timeout_length: 10.seconds,
+                              exception_class: Timeout::Error
+                            })
+    end
+  end
 end

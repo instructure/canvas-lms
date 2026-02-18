@@ -160,6 +160,10 @@ class AuthenticationProvider < ActiveRecord::Base
     root_account.authentication_providers.where.not(workflow_state: :active).find_by(auth_type:)
   end
 
+  def creation_timeout_options
+    { raise_on_timeout: true, fallback_timeout_length: 10.seconds, exception_class: Timeout::Error }
+  end
+
   def login_authentication_provider_path
     unless self.class.valid_auth_types.include? self.class.sti_name
       raise ActionController::UrlGenerationError, "No route matches #{self.class.sti_name} authentication provider"

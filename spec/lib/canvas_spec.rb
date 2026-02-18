@@ -84,6 +84,29 @@ describe Canvas do
         expect(Canvas).to receive(:percent_short_circuit_timeout).once
         Canvas.timeout_protection("spec") { nil }
       end
+
+      it "uses custom cutoff option to override default cutoff" do
+        Setting.set("service_spec_cutoff", "5")
+        Canvas.redis.set("service:timeouts:spec:error_count", "2")
+        ran = false
+        result = Canvas.timeout_protection("spec", cutoff: 2) { ran = true }
+        expect(ran).to be false
+        expect(result).to be_nil
+      end
+
+      it "uses custom cutoff of 0 to always short-circuit" do
+        Canvas.redis.set("service:timeouts:spec:error_count", "0")
+        ran = false
+        result = Canvas.timeout_protection("spec", cutoff: 0) { ran = true }
+        expect(ran).to be false
+        expect(result).to be_nil
+      end
+
+      it "uses custom cutoff with raise_on_timeout option" do
+        Canvas.redis.set("service:timeouts:spec:error_count", "2")
+        expect { Canvas.timeout_protection("spec", cutoff: 1, raise_on_timeout: true) { nil } }
+          .to raise_error(Timeout::Error)
+      end
     end
   end
 
@@ -134,6 +157,28 @@ describe Canvas do
         expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Canvas::TimeoutCutoff)
         expect(Canvas.redis.get(key)).to eq "42"
+      end
+
+      it "uses custom cutoff parameter to override Setting" do
+        Setting.set("service_spec_cutoff", "10")
+        Canvas.redis.set("service:timeouts:spec:error_count", "3")
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil, cutoff: 3) { nil } }
+          .to raise_error(Canvas::TimeoutCutoff)
+      end
+
+      it "uses nil cutoff to fall back to Setting" do
+        Setting.set("service_spec_cutoff", "2")
+        Canvas.redis.set("service:timeouts:spec:error_count", "2")
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil, cutoff: nil) { nil } }
+          .to raise_error(Canvas::TimeoutCutoff)
+      end
+
+      it "allows execution when error count is below custom cutoff" do
+        Canvas.redis.set("service:timeouts:spec:error_count", "1")
+        expect(Timeout).to receive(:timeout).with(15, nil).and_yield
+        ran = false
+        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil, cutoff: 5) { ran = true }
+        expect(ran).to be true
       end
     end
 
