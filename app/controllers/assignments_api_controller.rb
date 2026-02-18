@@ -780,6 +780,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::Quiz
   include Api::V1::Progress
   include Api::V1::AccessibilityResourceScan
+  include Api::V1::AssessmentRequest
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
@@ -1781,6 +1782,29 @@ class AssignmentsApiController < ApplicationController
     @assignment = api_find(@context.active_assignments, params[:assignment_id])
     scan = Accessibility::ResourceScannerService.new(resource: @assignment).call
     render json: accessibility_resource_scan_json(scan)
+  end
+
+  # @API Check allocation conversion
+  # Returns a list of allocation objects that would be converted.
+  #
+  # @returns [AssessmentRequest]
+  def check_allocation_conversion
+    @assignment = api_find(@context.active_assignments, params[:assignment_id])
+    return render_unauthorized_action unless @assignment.grants_right?(@current_user, session, :update)
+
+    # TODO: [EGG-1716]: Handle checking for allocation rules to convert
+    if @context.feature_enabled?(:peer_review_allocation_and_grading)
+      assessment_requests = AssessmentRequest.for_assignment(@assignment.id).incomplete
+
+      # This timestamp comparison identifies assessment requests created with the legacy peer reviews flow
+      if @assignment.peer_review_sub_assignment
+        assessment_requests = assessment_requests.where(
+          assessment_requests: { created_at: ...@assignment.peer_review_sub_assignment.created_at }
+        )
+      end
+
+      render json: assessment_requests_json(assessment_requests, @current_user, session)
+    end
   end
 
   private
