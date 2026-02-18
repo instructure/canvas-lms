@@ -11162,6 +11162,166 @@ describe AssignmentsApiController, type: :request do
       end
     end
   end
+
+  describe "GET check_allocation_conversion" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+      @student3 = student_in_course(active_all: true).user
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true,
+        automatic_peer_reviews: true,
+        peer_review_count: 1
+      )
+    end
+
+    def check_allocation_conversion_request(user, assignment_id, expected_status: 200)
+      url = "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/check_allocation_conversion"
+      path = {
+        controller: "assignments_api",
+        action: "check_allocation_conversion",
+        format: "json",
+        course_id: @course.id.to_s,
+        assignment_id:
+      }
+      api_call_as_user(user, :get, url, path, {}, {}, { expected_status: })
+    end
+
+    context "when peer_review_allocation_and_grading feature is enabled" do
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "requires update permissions" do
+        check_allocation_conversion_request(@student1, @assignment.id.to_s, expected_status: 403)
+      end
+
+      it "returns empty array when no assessment requests exist" do
+        json = check_allocation_conversion_request(@teacher, @assignment.id.to_s)
+
+        expect(json).to eq([])
+      end
+
+      it "returns assessment requests that would be converted" do
+        submission1 = @assignment.submit_homework(@student1, body: "student 1 submission")
+        submission2 = @assignment.submit_homework(@student2, body: "student 2 submission")
+
+        assessment_request1 = AssessmentRequest.create!(
+          user: @student1,
+          asset: submission2,
+          assessor_asset: submission1,
+          assessor: @student2,
+          workflow_state: "assigned"
+        )
+        assessment_request2 = AssessmentRequest.create!(
+          user: @student2,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student1,
+          workflow_state: "assigned"
+        )
+
+        json = check_allocation_conversion_request(@teacher, @assignment.id.to_s)
+
+        expect(json.length).to eq(2)
+        expect(json.pluck("id")).to contain_exactly(assessment_request1.id, assessment_request2.id)
+        expect(json.first["workflow_state"]).to eq("assigned")
+      end
+
+      it "only returns assigned assessment requests, not completed ones" do
+        submission1 = @assignment.submit_homework(@student1, body: "student 1 submission")
+        submission2 = @assignment.submit_homework(@student2, body: "student 2 submission")
+        submission3 = @assignment.submit_homework(@student3, body: "student 3 submission")
+
+        assigned_request = AssessmentRequest.create!(
+          user: @student1,
+          asset: submission2,
+          assessor_asset: submission1,
+          assessor: @student2,
+          workflow_state: "assigned"
+        )
+        AssessmentRequest.create!(
+          user: @student2,
+          asset: submission3,
+          assessor_asset: submission2,
+          assessor: @student3,
+          workflow_state: "completed"
+        )
+
+        json = check_allocation_conversion_request(@teacher, @assignment.id.to_s)
+
+        expect(json.length).to eq(1)
+        expect(json.first["id"]).to eq(assigned_request.id)
+        expect(json.first["workflow_state"]).to eq("assigned")
+      end
+
+      it "only returns legacy assessment requests created before peer_review_sub_assignment" do
+        submission1 = @assignment.submit_homework(@student1, body: "student 1 submission")
+        submission2 = @assignment.submit_homework(@student2, body: "student 2 submission")
+        submission3 = @assignment.submit_homework(@student3, body: "student 3 submission")
+
+        legacy_request = AssessmentRequest.create!(
+          user: @student1,
+          asset: submission2,
+          assessor_asset: submission1,
+          assessor: @student2,
+          workflow_state: "assigned",
+          created_at: 2.days.ago
+        )
+
+        # Create peer_review_sub_assignment (marks the conversion point)
+        peer_review_sub = PeerReview::PeerReviewCreatorService.call(parent_assignment: @assignment)
+
+        # Create new assessment request (after conversion, should not be returned)
+        # This would get created by a student accessing the new student peer review page and getting
+        # their peer review allocations
+        AssessmentRequest.create!(
+          user: @student2,
+          asset: submission3,
+          assessor_asset: submission2,
+          assessor: @student3,
+          workflow_state: "assigned",
+          created_at: peer_review_sub.created_at + 1.hour
+        )
+
+        json = check_allocation_conversion_request(@teacher, @assignment.id.to_s)
+
+        expect(json.length).to eq(1)
+        expect(json.first["id"]).to eq(legacy_request.id)
+      end
+
+      it "returns all assessment requests when no peer_review_sub_assignment exists" do
+        submission1 = @assignment.submit_homework(@student1, body: "student 1 submission")
+        submission2 = @assignment.submit_homework(@student2, body: "student 2 submission")
+
+        request1 = AssessmentRequest.create!(
+          user: @student1,
+          asset: submission2,
+          assessor_asset: submission1,
+          assessor: @student2,
+          workflow_state: "assigned"
+        )
+        request2 = AssessmentRequest.create!(
+          user: @student2,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student1,
+          workflow_state: "assigned"
+        )
+
+        json = check_allocation_conversion_request(@teacher, @assignment.id.to_s)
+
+        expect(json.length).to eq(2)
+        expect(json.pluck("id")).to contain_exactly(request1.id, request2.id)
+      end
+
+      it "returns 404 for non-existent assignment" do
+        check_allocation_conversion_request(@teacher, "999999", expected_status: 404)
+      end
+    end
+  end
 end
 
 def api_get_assignments_index_from_course_as_user(course, user, params = {})

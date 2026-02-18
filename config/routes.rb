@@ -1509,6 +1509,7 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
       post "courses/:course_id/assignments/:assignment_id/accessibility/scan", action: :accessibility_scan, as: "assignment_accessibility_scan"
       post "courses/:course_id/assignments/:assignment_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "assignment_accessibility_queue_scan"
+      get "courses/:course_id/assignments/:assignment_id/check_allocation_conversion", action: :check_allocation_conversion
     end
 
     scope(controller: "assignment_extensions") do
