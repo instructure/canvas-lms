@@ -853,6 +853,22 @@ describe SplitUsers do
         SplitUsers.split_db_users(shard1_source_user)
         expect(shard1_source_user.communication_channels.count).to eq 1
       end
+
+      it "completes split when cross-shard attachment content is missing" do
+        Attachment.create!(
+          user: restored_user,
+          context: restored_user,
+          filename: "test.txt",
+          uploaded_data: StringIO.new("first")
+        )
+        UserMerge.from(restored_user).into(shard1_source_user)
+
+        allow_any_instance_of(Attachment).to receive(:copy_attachment_content)
+          .and_raise(CanvasHttp::InvalidResponseCodeError.new(404, "File not found"))
+
+        expect { SplitUsers.split_db_users(shard1_source_user) }.not_to raise_error
+        expect(restored_user.reload).to be_registered
+      end
     end
   end
 end
