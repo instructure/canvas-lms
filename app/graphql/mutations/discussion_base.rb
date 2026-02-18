@@ -189,14 +189,16 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   def verify_specific_section_visibilities(discussion_topic)
     return unless discussion_topic.is_section_specific && discussion_topic.context.is_a?(Course)
 
+    section_ids = discussion_topic.course_sections.map(&:id)
+    active_section_ids = discussion_topic.context.active_course_sections.where(id: section_ids).pluck(:id)
     visibilities = discussion_topic.context.course_section_visibility(current_user)
     case visibilities
     when :all
       []
     when :none
-      discussion_topic.course_sections.map(&:id)
+      active_section_ids
     else
-      discussion_topic.course_sections.map(&:id) - visibilities
+      active_section_ids - visibilities
     end
   end
 
