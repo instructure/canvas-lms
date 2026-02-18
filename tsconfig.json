@@ -18,7 +18,7 @@
     "baseUrl": "./ui",
     "paths": {
       "@canvas/*": ["shared/*"],
-      "@instructure/*": ["./packages/*"]
+      "@instructure/*": ["../packages/*"]
     },
     "plugins": [
       {
@@ -28,6 +28,6 @@
     ],
     "types": ["vitest/globals", "jqueryui"]
   },
-  "include": ["ui/**/*.ts", "ui/**/*.tsx"],
+  "include": ["ui/**/*.ts", "ui/**/*.tsx", "ui/**/*.d.ts"],
   "exclude": ["node_modules"]
 }
