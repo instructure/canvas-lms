@@ -32,19 +32,22 @@ ready(() => {
   const sortingTable = params.get('focus')
   if (sortingTable) {
     const sortingCol = params.get(sortingTable + '_sort')
-    const focusedHeader = document.querySelector('a#' + sortingTable + '_' + sortingCol)
+    const focusedHeader = document.querySelector<HTMLAnchorElement>(
+      'a#' + sortingTable + '_' + sortingCol,
+    )
     if (focusedHeader) focusedHeader.focus()
   }
   if (ENV?.FEATURES?.dashboard_graphql_integration) {
     addFavoriteClickListener()
   }
 
+  // @ts-expect-error - enable_content_a11y_checker not in Canvas Setting type union yet
   if (ENV?.SETTINGS?.enable_content_a11y_checker) {
     renderAccessibilityCells()
   }
 })
 
-function addFavoriteClickListener() {
+function addFavoriteClickListener(): void {
   document
     .querySelectorAll('.course-list-favoritable, .course-list-favorite-course')
     .forEach(element => {
@@ -52,19 +55,20 @@ function addFavoriteClickListener() {
     })
 }
 
-function handleFavoriteCourseClick() {
+function handleFavoriteCourseClick(): void {
   clearDashboardCache()
 }
 
-function renderAccessibilityCells() {
+function renderAccessibilityCells(): void {
   // Issue count pills
   document.querySelectorAll('.status-pill').forEach(element => {
     createRoot(element).render(
       React.createElement(
+        // @ts-expect-error - InstUI component type issue with React.createElement
         Pill,
         {
           color: 'warning',
-          themeOverride: componentTheme => {
+          themeOverride: (componentTheme: {warningColor: string}) => {
             return {
               background: componentTheme.warningColor,
               warningColor: 'white',
@@ -80,13 +84,18 @@ function renderAccessibilityCells() {
   document.querySelectorAll('.course-list-checking-spinner').forEach(element => {
     createRoot(element).render(
       React.createElement(
+        // @ts-expect-error - InstUI component type issue with React.createElement
         PresentationContent,
         null,
-        React.createElement(Spinner, {
-          as: 'div',
-          renderTitle: I18n.t('Checking course accessibility...'),
-          size: 'x-small',
-        }),
+        React.createElement(
+          // @ts-expect-error - InstUI component type issue with React.createElement
+          Spinner,
+          {
+            as: 'div',
+            renderTitle: I18n.t('Checking course accessibility...'),
+            size: 'x-small',
+          },
+        ),
       ),
     )
   })
