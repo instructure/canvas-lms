@@ -29,9 +29,9 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 const I18n = createI18nScope('canvascareer')
 
 ready(() => {
-  const body = document.querySelector('body')
+  const body = document.body
   const mountPoint = document.createElement('div')
-  const fixedBottom = document.querySelector('#fixed_bottom')
+  const fixedBottom = document.querySelector<HTMLElement>('#fixed_bottom')
   const fixedBottomOffset = fixedBottom?.offsetHeight || 0
 
   mountPoint.id = 'canvascareer'
@@ -65,24 +65,32 @@ ready(() => {
     mountPoint,
   )
 
-  let bundles = []
+  let bundles: Array<Promise<unknown>> = []
+  // @ts-expect-error - window.REMOTES is not in global types
   if (window.REMOTES.canvas_career_learner) {
     bundles = [
+      // @ts-expect-error - remote module types are provided at runtime
       import('canvas_career_learner/bootstrap'),
+      // @ts-expect-error - remote module types are provided at runtime
       import('canvas_career_learner/setupEnvContext'),
     ]
+    // @ts-expect-error - window.REMOTES is not in global types
   } else if (window.REMOTES.canvas_career_learning_provider) {
     bundles = [
+      // @ts-expect-error - remote module types are provided at runtime
       import('canvas_career_learning_provider/bootstrap'),
+      // @ts-expect-error - remote module types are provided at runtime
       import('canvas_career_learning_provider/setupEnvContext'),
     ]
   }
 
   Promise.all(bundles)
+    // @ts-expect-error - remote module exports are runtime-provided and untyped
     .then(([{mount}, {setupEnvContext}]) => {
+      // @ts-expect-error - window.REMOTES is not in global types
       mount(mountPoint, setupEnvContext(), window.REMOTES.canvas_career_config)
     })
-    .catch(error => {
+    .catch((error: Error) => {
       console.error('Failed to load Canvas Career', error)
       captureException(error)
 
