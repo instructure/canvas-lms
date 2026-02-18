@@ -1,0 +1,142 @@
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
+
+import {find, defer, reduce, throttle} from 'es-toolkit/compat'
+import $ from 'jquery'
+
+// @ts-expect-error - Legacy Backbone typing
+let $document, $window
+const CLASS_ATTRIBUTE = 'ui-cnvs-scrollable'
+const SCROLL_RATE = 10
+
+let $footer = ($window = $document = null)
+// @ts-expect-error - Legacy Backbone typing
+const p = str => parseInt(str, 10)
+
+export default {
+  // @ts-expect-error - Legacy Backbone typing
+  afterRender() {
+    // @ts-expect-error - Backbone View property
+    if (this._rendered) return
+
+    // @ts-expect-error - Backbone View property
+    this.$el.addClass(CLASS_ATTRIBUTE)
+    // @ts-expect-error - Backbone View property
+    this.$el.css('overflowY', 'auto')
+
+    this._initializeDragAndDropHandling()
+    defer(() => this._initializeAutoResize())
+
+    // @ts-expect-error - Backbone View property
+    return (this._rendered = true)
+  },
+
+  _initializeAutoResize() {
+    // @ts-expect-error - Legacy Backbone typing
+    if (!$window) $window = $(window)
+    // This procedure for finding $minHeightParent is not optimal. It's an
+    // attempt to find the first container with a min-height. (There will be
+    // at least one, the #main div whose min-height is 450px.) The number 30
+    // here is a weak way to skip over a more recent parent container whose
+    // min-height is inexplicably set to 30px.
+    // @ts-expect-error - Backbone View property
+    const minHeightParent = find(this.$el.parents().toArray(), el => p($(el).css('minHeight')) > 30)
+    if (!minHeightParent) return // bail out; probably in a test
+    const $minHeightParent = $(minHeightParent)
+    const oldMaxHeight = $minHeightParent.css('maxHeight')
+    $minHeightParent.css('maxHeight', $minHeightParent.css('minHeight'))
+    // @ts-expect-error - Legacy Backbone typing
+    let verticalOffset = $minHeightParent.offset().top || 0
+    verticalOffset += p($minHeightParent.css('paddingTop'))
+    // @ts-expect-error - Backbone View property
+    this._minHeight = $minHeightParent.height() + verticalOffset
+    $minHeightParent.css('maxHeight', oldMaxHeight)
+    $window.resize(throttle(() => this._resize(), 50))
+    return this._resize()
+  },
+
+  // @ts-expect-error - Legacy Backbone typing
+  _resize() {
+    // @ts-expect-error - Legacy Backbone typing
+    if (!$footer) $footer = $('#footer')
+    // @ts-expect-error - Legacy Backbone typing
+    if (!$document) $document = $(document)
+    const bottomSpacing = reduce(
+      // @ts-expect-error - Backbone View property
+      this.$el.parents(),
+      (sum, el) => {
+        const $el = $(el)
+        sum += p($el.css('marginBottom'))
+        sum += p($el.css('paddingBottom'))
+        return (sum += p($el.css('borderBottomWidth')))
+      },
+      0,
+    )
+    this._resize = function () {
+      // @ts-expect-error - Backbone View property
+      const offsetTop = this.$el.offset().top
+      // @ts-expect-error - Legacy Backbone typing
+      let availableHeight = $window.height()
+      // @ts-expect-error - Legacy Backbone typing
+      availableHeight -= $footer.outerHeight(true)
+      availableHeight -= offsetTop
+      availableHeight -= bottomSpacing
+      // @ts-expect-error - Backbone View property
+      return this.$el.height(Math.max(availableHeight, this._minHeight - offsetTop))
+    }
+    return this._resize()
+  },
+
+  // @ts-expect-error - Legacy Backbone typing
+  _initializeDragAndDropHandling() {
+    // @ts-expect-error - Backbone View property
+    this.$el.on('dragstart', (_event, _ui) => (this._$pointerScrollable = this.$el))
+
+    // @ts-expect-error - Backbone View property
+    this.$el.on('drag', ({pageX, pageY}, ui) => {
+      // @ts-expect-error - Backbone View property
+      clearTimeout(this._checkScrollTimeout)
+      // @ts-expect-error - Backbone View property
+      this._checkScroll = () => {
+        ui.helper.hide()
+        // @ts-expect-error - Legacy Backbone typing
+        const $pointerElement = $(document.elementFromPoint(pageX, pageY))
+        ui.helper.show()
+        // @ts-expect-error - Backbone View property
+        let $scrollable = $pointerElement.closest(`.${CLASS_ATTRIBUTE}`)
+        // @ts-expect-error - Backbone View property
+        if (!$scrollable.length) $scrollable = this._$pointerScrollable
+        const scrollTop = $scrollable.scrollTop()
+        const offsetTop = $scrollable.offset().top
+        if (scrollTop > 0 && ui.offset.top < offsetTop) {
+          $scrollable.scrollTop(scrollTop - SCROLL_RATE)
+        } else if (ui.offset.top + ui.helper.height() > offsetTop + $scrollable.height()) {
+          $scrollable.scrollTop(scrollTop + SCROLL_RATE)
+        }
+        // @ts-expect-error - Backbone View property
+        this._$pointerScrollable = $scrollable
+        // @ts-expect-error - Backbone View property
+        return (this._checkScrollTimeout = setTimeout(this._checkScroll, 50))
+      }
+      // @ts-expect-error - Backbone View property
+      return this._checkScroll()
+    })
+
+    // @ts-expect-error - Backbone View property
+    return this.$el.on('dragstop', (_event, _ui) => clearTimeout(this._checkScrollTimeout))
+  },
+}
