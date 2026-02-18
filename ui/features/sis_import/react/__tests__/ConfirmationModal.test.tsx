@@ -36,7 +36,7 @@ describe('ConfirmationModal', () => {
   it('does not submit form', async () => {
     const {getByText} = renderConfirmationModal()
 
-    await userEvent.click(getByText('Cancel').closest('button'))
+    await userEvent.click(getByText('Cancel').closest('button')!)
 
     expect(onSubmit).toHaveBeenCalledTimes(0)
     expect(onClose).toHaveBeenCalledTimes(1)
@@ -45,7 +45,7 @@ describe('ConfirmationModal', () => {
   it('will submit form', async () => {
     const {getByText} = renderConfirmationModal()
 
-    await userEvent.click(getByText('Confirm').closest('button'))
+    await userEvent.click(getByText('Confirm').closest('button')!)
 
     expect(onSubmit).toHaveBeenCalledTimes(1)
     expect(onClose).toHaveBeenCalledTimes(0)
