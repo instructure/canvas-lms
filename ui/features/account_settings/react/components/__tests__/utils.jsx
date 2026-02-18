@@ -21,15 +21,11 @@ import {Provider} from 'react-redux'
 import {render} from '@testing-library/react'
 import {configStore} from '../../store'
 
-const fakeAxios = {
-  delete: vi.fn(() => ({then() {}})),
-  get: vi.fn(() => ({then() {}})),
-  post: vi.fn(() => ({
-    then() {
-      return {then() {}}
-    },
-  })),
-  put: vi.fn(() => ({then() {}})),
+export const fakeAxios = {
+  delete: vi.fn(() => Promise.resolve({data: {}})),
+  get: vi.fn(() => Promise.resolve({data: {}})),
+  post: vi.fn(() => Promise.resolve({data: {}})),
+  put: vi.fn(() => Promise.resolve({data: {}})),
 }
 
 // This is modified from a version by Kent C. Dodds described here:

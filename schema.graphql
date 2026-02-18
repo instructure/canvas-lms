@@ -10989,7 +10989,12 @@ enum SubmissionState {
 }
 
 type SubmissionStatistics {
-  missingSubmissionsCount: Int!
+  missingSubmissionsCount(
+    """
+    Only count missing submissions from current grading period (default: true)
+    """
+    onlyCurrentGradingPeriod: Boolean = true
+  ): Int!
   submissionsDueCount(endDate: ISO8601DateTime, startDate: ISO8601DateTime): Int!
   submissionsDueThisWeekCount: Int!
   submissionsOverdueCount(endDate: ISO8601DateTime, startDate: ISO8601DateTime): Int!
@@ -11952,6 +11957,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
     ID of the observed user
     """
     observedUserId: ID
+
+    """
+    Only include missing submissions from current grading period (default: true)
+    """
+    onlyCurrentGradingPeriod: Boolean = true
 
     """
     Show only submitted assignments

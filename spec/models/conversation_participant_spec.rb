@@ -496,6 +496,63 @@ describe ConversationParticipant do
         end
       end
 
+      context "cross-shard RecordNotUnique handling" do
+        let(:u1) { @shard1.activate { User.create! } }
+        let(:u2) { @shard1.activate { User.create! } }
+
+        it "merges workflow state when the target user has a CP only on self's shard" do
+          other = User.create!
+
+          # Conversation lives on default shard; u1 gets CPs on both shards
+          other_cp = other.initiate_conversation([u1])
+          other_cp.add_message("hello")
+          convo = other_cp.conversation
+
+          # Grab u1's cross-shard CP (lives on @shard1, not conversation.shard)
+          cp = u1.all_conversations.first
+          cp.update_attribute(:workflow_state, "unread")
+
+          # Place a CP for u2 on @shard1 only — invisible from conversation.shard
+          @shard1.activate do
+            ConversationParticipant.create!(conversation: convo, user: u2, workflow_state: "read")
+          end
+
+          cp.move_to_user(u2)
+
+          expect { cp.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          u2_cp = u2.all_conversations.first
+          expect(u2_cp.workflow_state).to eq "unread"
+        end
+
+        it "handles RecordNotUnique in a group conversation without affecting other participants" do
+          other = User.create!
+          third = User.create!
+
+          # Group conversation on default shard
+          other_cp = other.initiate_conversation([u1, third])
+          other_cp.add_message("hello")
+          convo = other_cp.conversation
+
+          cp = u1.all_conversations.first
+          cp.update_attribute(:workflow_state, "unread")
+
+          @shard1.activate do
+            ConversationParticipant.create!(conversation: convo, user: u2, workflow_state: "read")
+          end
+
+          cp.move_to_user(u2)
+
+          expect { cp.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          u2_cp = u2.all_conversations.first
+          expect(u2_cp.workflow_state).to eq "unread"
+
+          # Other participants on conversation's shard are unaffected
+          convo.reload
+          expect(convo.conversation_participants.where(user_id: other).exists?).to be true
+          expect(convo.conversation_participants.where(user_id: third).exists?).to be true
+        end
+      end
+
       describe "for_masquerading_user scope" do
         it "finds participants with global ids in root_account_ids" do
           @a1 = Account.create

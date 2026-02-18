@@ -694,11 +694,12 @@ module Types
       argument :include_no_due_date, Boolean, required: false, description: "Include assignments with no due date"
       argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
       argument :observed_user_id, ID, required: false, description: "ID of the observed user"
+      argument :only_current_grading_period, Boolean, required: false, default_value: true, description: "Only include missing submissions from current grading period (default: true)"
       argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
       argument :order_by, CourseWorkSubmissionsOrderField, required: false, description: "Field to order results by"
       argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
     end
-    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil, order_by: nil)
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil, order_by: nil, only_current_grading_period: true)
       return [] unless object == current_user
 
       # Get active course enrollments using the same filtering as dashboard
@@ -780,6 +781,9 @@ module Types
         # Add overdue filter if requested
         if include_overdue
           submissions_query = submissions_query.merge(Submission.missing)
+          if only_current_grading_period
+            submissions_query = submissions_query.merge(Submission.in_current_grading_period_for_courses(active_course_ids))
+          end
         end
 
         # Add no due date filter if requested

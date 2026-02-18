@@ -28,6 +28,7 @@ import {
   RatingDistribution,
 } from '@canvas/outcomes/react/types/mastery_distribution'
 import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 vi.mock('../../charts/MasteryDistributionChart', () => ({
   MasteryDistributionChart: ({
@@ -64,7 +65,45 @@ vi.mock('@canvas/message-students-modal', () => {
   }
 })
 
+vi.mock(
+  '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager',
+  () => {
+    return {
+      default: function DifferentiationTagModalManager({
+        isOpen,
+        onClose,
+        onCreationSuccess,
+        courseId,
+      }: any) {
+        return isOpen ? (
+          <div data-testid="differentiation-tag-modal" data-course-id={courseId}>
+            <h2>Create Differentiation Tag</h2>
+            <button onClick={onClose}>Close Modal</button>
+            <button data-testid="create-tag-button" onClick={() => onCreationSuccess?.(123)}>
+              Create Tag
+            </button>
+            <button data-testid="create-tag-no-id-button" onClick={() => onCreationSuccess?.(0)}>
+              Create Tag No ID
+            </button>
+          </div>
+        ) : null
+      },
+    }
+  },
+)
+
+const mockAddTagMembership = vi.fn()
+vi.mock('@canvas/differentiation-tags/react/hooks/useAddTagMembership', () => ({
+  useAddTagMembership: () => ({
+    mutate: mockAddTagMembership,
+  }),
+}))
+
 describe('OutcomeDistributionPopover', () => {
+  beforeEach(() => {
+    mockAddTagMembership.mockClear()
+  })
+
   const outcome: Outcome = {
     id: '1',
     title: 'outcome 1',
@@ -81,11 +120,22 @@ describe('OutcomeDistributionPopover', () => {
     context_id: '5',
   }
 
-  const renderWithContext = (component: React.ReactElement) => {
+  const renderWithContext = (
+    component: React.ReactElement,
+    contextValue = {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: false}},
+  ) => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+
     return render(
-      <LMGBContext.Provider value={{env: {accountLevelMasteryScalesFF: false}}}>
-        {component}
-      </LMGBContext.Provider>,
+      <QueryClientProvider client={queryClient}>
+        <LMGBContext.Provider value={contextValue}>{component}</LMGBContext.Provider>
+      </QueryClientProvider>,
     )
   }
 
@@ -125,7 +175,7 @@ describe('OutcomeDistributionPopover', () => {
 
   it('toggles outcome info section when info button is clicked', async () => {
     const user = userEvent.setup()
-    render(
+    renderWithContext(
       <OutcomeDistributionPopover
         outcome={outcome}
         courseId="5"
@@ -149,7 +199,7 @@ describe('OutcomeDistributionPopover', () => {
 
   it('displays configure mastery link when info is shown', async () => {
     const user = userEvent.setup()
-    render(
+    renderWithContext(
       <OutcomeDistributionPopover
         outcome={outcome}
         courseId="5"
@@ -169,7 +219,7 @@ describe('OutcomeDistributionPopover', () => {
 
   it('displays the calculation method correctly', async () => {
     const user = userEvent.setup()
-    render(
+    renderWithContext(
       <OutcomeDistributionPopover
         outcome={outcome}
         courseId="5"
@@ -187,7 +237,7 @@ describe('OutcomeDistributionPopover', () => {
 
   it('displays mastery scale points', async () => {
     const user = userEvent.setup()
-    render(
+    renderWithContext(
       <OutcomeDistributionPopover
         outcome={outcome}
         courseId="5"
@@ -600,6 +650,262 @@ describe('OutcomeDistributionPopover', () => {
       await user.click(messageLink)
 
       expect(screen.queryByTestId('message-students-modal')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Differentiation Tag functionality', () => {
+    const mockStudents: Student[] = [
+      {
+        id: '1',
+        name: 'Alice Johnson',
+        display_name: 'Alice Johnson',
+        sortable_name: 'Johnson, Alice',
+        avatar_url: 'https://example.com/alice.jpg',
+      },
+      {
+        id: '2',
+        name: 'Bob Smith',
+        display_name: 'Bob Smith',
+        sortable_name: 'Smith, Bob',
+        avatar_url: 'https://example.com/bob.jpg',
+      },
+      {
+        id: '3',
+        name: 'Charlie Brown',
+        display_name: 'Charlie Brown',
+        sortable_name: 'Brown, Charlie',
+        avatar_url: 'https://example.com/charlie.jpg',
+      },
+    ]
+
+    const mockRatings: RatingDistribution[] = [
+      {
+        description: 'Mastery',
+        points: 3,
+        color: '#127A1B',
+        count: 3,
+        student_ids: ['1', '2', '3'],
+      },
+    ]
+
+    const mockOutcomeDistribution: OutcomeDistribution = {
+      outcome_id: '1',
+      ratings: mockRatings,
+      total_students: 3,
+    }
+
+    it('does not show Create Differentiation Tag link when allowDifferentiationTags is false', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+        {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: false}},
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      expect(screen.queryByTestId('create-differentiation-tag-link')).not.toBeInTheDocument()
+    })
+
+    it('shows Create Differentiation Tag link when allowDifferentiationTags is true and a rating is selected', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+        {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: true}},
+      )
+
+      expect(screen.queryByTestId('create-differentiation-tag-link')).not.toBeInTheDocument()
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const link = await screen.findByTestId('create-differentiation-tag-link')
+      expect(link).toBeInTheDocument()
+    })
+
+    it('hides Create Differentiation Tag link when rating is deselected', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+        {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: true}},
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+
+      await user.click(masteryBar)
+
+      expect(await screen.findByTestId('create-differentiation-tag-link')).toBeInTheDocument()
+
+      await user.click(masteryBar)
+
+      expect(screen.queryByTestId('create-differentiation-tag-link')).not.toBeInTheDocument()
+    })
+
+    it('opens DifferentiationTagModal when link is clicked', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+        {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: true}},
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const differentiationTagLink = await screen.findByTestId('create-differentiation-tag-link')
+      await user.click(differentiationTagLink)
+
+      expect(await screen.findByTestId('differentiation-tag-modal')).toBeInTheDocument()
+    })
+
+    it('passes courseId to DifferentiationTagModalManager', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+        {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: true}},
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const differentiationTagLink = await screen.findByTestId('create-differentiation-tag-link')
+      await user.click(differentiationTagLink)
+
+      const modal = await screen.findByTestId('differentiation-tag-modal')
+      expect(modal).toHaveAttribute('data-course-id', '5')
+    })
+
+    it('closes DifferentiationTagModal when close button is clicked', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+        {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: true}},
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const differentiationTagLink = await screen.findByTestId('create-differentiation-tag-link')
+      await user.click(differentiationTagLink)
+
+      expect(await screen.findByTestId('differentiation-tag-modal')).toBeInTheDocument()
+
+      const closeButton = screen.getByText('Close Modal')
+      await user.click(closeButton)
+
+      expect(screen.queryByTestId('differentiation-tag-modal')).not.toBeInTheDocument()
+    })
+
+    it('calls addTagMembership when a tag is created successfully', async () => {
+      const user = userEvent.setup()
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+        {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: true}},
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const differentiationTagLink = await screen.findByTestId('create-differentiation-tag-link')
+      await user.click(differentiationTagLink)
+
+      expect(await screen.findByTestId('differentiation-tag-modal')).toBeInTheDocument()
+
+      const createTagButton = screen.getByTestId('create-tag-button')
+      await user.click(createTagButton)
+
+      expect(mockAddTagMembership).toHaveBeenCalledWith({
+        groupId: 123,
+        userIds: [1, 2, 3],
+      })
+
+      expect(screen.queryByTestId('differentiation-tag-modal')).not.toBeInTheDocument()
+    })
+
+    it('does not call addTagMembership when tag creation returns no categoryID', async () => {
+      const user = userEvent.setup()
+
+      renderWithContext(
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={mockOutcomeDistribution}
+          distributionStudents={mockStudents}
+          courseId="5"
+          isOpen={true}
+          onCloseHandler={vi.fn()}
+          renderTrigger={<button>Trigger</button>}
+        />,
+        {env: {accountLevelMasteryScalesFF: false, allowDifferentiationTags: true}},
+      )
+
+      const masteryBar = screen.getByTestId('bar-mastery')
+      await user.click(masteryBar)
+
+      const differentiationTagLink = await screen.findByTestId('create-differentiation-tag-link')
+      await user.click(differentiationTagLink)
+
+      expect(await screen.findByTestId('differentiation-tag-modal')).toBeInTheDocument()
+
+      const createTagNoIdButton = screen.getByTestId('create-tag-no-id-button')
+      await user.click(createTagNoIdButton)
+
+      expect(mockAddTagMembership).not.toHaveBeenCalled()
+      expect(screen.queryByTestId('differentiation-tag-modal')).not.toBeInTheDocument()
     })
   })
 })

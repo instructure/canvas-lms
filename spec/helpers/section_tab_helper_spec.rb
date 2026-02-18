@@ -599,7 +599,8 @@ describe SectionTabHelper do
           NavMenuLinkTabs.make_tab(
             id: "nav_menu_link_123",
             label: "External Resource",
-            url: "https://example.com"
+            url: "https://example.com",
+            link_context_type: "course"
           )
         end
         let(:string) do

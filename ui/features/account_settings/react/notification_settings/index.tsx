@@ -47,14 +47,14 @@ export default function NotificationSettings(props: NotificationSettingsProps): 
   const [externalWarning, setExternalWarning] = useState(props.externalWarning)
   const [customNameOption, setCustomNameOption] = useState(props.customNameOption)
   const [customName, setCustomName] = useState(props.customName?.trim())
-  const [error, setError] = useState(false)
+  const [error, setErrorType] = useState(false)
   const [updateButtonDisabled, setUpdateButtonDisabled] = useState<ButtonInteraction>('enabled')
   const customNameInputElement = useRef<HTMLElement | null>(null)
 
   function validateCustomName(value: string | undefined): boolean {
     if (customNameOption !== 'custom') return true
     const isEmpty = typeof value === 'undefined' || value.trim().length === 0
-    setError(isEmpty)
+    setErrorType(isEmpty)
     return !isEmpty
   }
 
@@ -64,7 +64,7 @@ export default function NotificationSettings(props: NotificationSettingsProps): 
         setCustomNameOption(value)
         if (value === 'custom') return
         setCustomName('')
-        setError(false)
+        setErrorType(false)
         return
       }
     }

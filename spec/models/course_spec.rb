@@ -3242,6 +3242,24 @@ describe Course do
           tabs = @course.tabs_available(@student)
           expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
         end
+
+        it "includes link_context_type in tab_configuration" do
+          l2 = NavMenuLink.create!(context: @course.account, course_nav: true, url: "https://example.com", label: "l2")
+          @course.tab_configuration = [
+            { "id" => Course::TAB_HOME },
+            { "id" => "nav_menu_link_#{link.id}" },
+            { "id" => "nav_menu_link_#{l2.id}" },
+          ]
+          @course.save!
+
+          tabs = @course.tabs_available(@teacher)
+          expect(tabs[1][:id]).to eq("nav_menu_link_#{link.id}")
+          expect(tabs[1][:link_context_type]).to eq("course")
+
+          expect(tabs[2][:id]).to eq("nav_menu_link_#{l2.id}")
+          expect(tabs[2][:link_context_type]).to eq("account")
+          expect(tabs[2][:label]).to eq("l2")
+        end
       end
 
       it "handles hidden_unused correctly for discussions" do

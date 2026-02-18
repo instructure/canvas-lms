@@ -355,6 +355,28 @@ CanvasRails::Application.routes.draw do
           as: :resource_link_id
 
       get :tool_launch
+
+      # New Quizzes native experience routes
+      # All routes render the app shell and let React Router handle navigation
+      scope(controller: :new_quizzes) do
+        get "launch", action: :launch, as: :new_quizzes_launch
+        get "build(/*path)", action: :launch, as: :new_quizzes_build
+        get "reporting(/*path)", action: :launch, as: :new_quizzes_reporting
+        get "moderation(/*path)", action: :launch, as: :new_quizzes_moderation
+        get "exports(/*path)", action: :launch, as: :new_quizzes_exports
+        get "taking(/*path)", action: :launch, as: :new_quizzes_taking
+        get "observing(/*path)", action: :launch, as: :new_quizzes_observing
+        get "errors(/*path)", action: :launch, as: :new_quizzes_errors
+        get "version", action: :launch, as: :new_quizzes_version
+        get "course_concluded", action: :launch, as: :new_quizzes_course_concluded
+        get "banks(/*path)", action: :launch, as: :new_quizzes_assignment_banks
+      end
+    end
+
+    # New Quizzes native experience routes
+    # All routes render the app shell and let React Router handle navigation
+    scope(controller: :new_quizzes) do
+      get "banks(/*path)", action: :banks, as: :new_quizzes_banks
     end
 
     resources :grading_standards, only: %i[index create update destroy]
@@ -803,6 +825,12 @@ CanvasRails::Application.routes.draw do
       collection do
         get :retrieve
       end
+    end
+
+    # New Quizzes native experience routes
+    # All routes render the app shell and let React Router handle navigation
+    scope(controller: :new_quizzes) do
+      get "banks(/*path)", action: :banks, as: :new_quizzes_banks
     end
 
     get "lti/resource/:resource_link_id",

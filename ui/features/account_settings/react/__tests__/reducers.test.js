@@ -18,6 +18,7 @@
 
 import {cspEnabled, whitelistedDomains, cspInherited, isDirty} from '../reducers'
 import {
+  SET_CSP_SETTINGS,
   SET_CSP_ENABLED,
   SET_CSP_ENABLED_OPTIMISTIC,
   ADD_DOMAIN,
@@ -28,13 +29,14 @@ import {
   SET_CSP_INHERITED,
   SET_CSP_INHERITED_OPTIMISTIC,
   SET_DIRTY,
-  COPY_INHERITED_SUCCESS,
+  COPY_INHERITED,
 } from '../actions'
 
 describe('cspEnabled', () => {
   const testMatrix = [
     [{type: SET_CSP_ENABLED, payload: true}, undefined, true],
     [{type: SET_CSP_ENABLED_OPTIMISTIC, payload: false}, undefined, false],
+    [{type: SET_CSP_SETTINGS, payload: {enabled: true}}, undefined, true],
   ]
   it.each(testMatrix)(
     'with %p action and %p value the cspEnabled state becomes %p',
@@ -51,6 +53,14 @@ describe('whitelistedDomains', () => {
       {type: ADD_DOMAIN_OPTIMISTIC, payload: {account: 'instructure.com'}},
       [],
       {account: ['instructure.com']},
+    ],
+    [
+      {
+        type: SET_CSP_SETTINGS,
+        payload: {domains: {account: ['instructure.com'], effective: ['myschool.org']}},
+      },
+      [],
+      {account: ['instructure.com'], effective: ['myschool.org']},
     ],
   ]
   it.each(testMatrix)(
@@ -208,8 +218,8 @@ describe('whitelistedDomains', () => {
     })
   })
 
-  it('sets the account state to the payload of a COPY_INHERITED_SUCCESS action', () => {
-    const action = {type: COPY_INHERITED_SUCCESS, payload: ['canvaslms.com', 'bridgelms.com']}
+  it('sets the account state to the payload of a COPY_INHERITED action', () => {
+    const action = {type: COPY_INHERITED, payload: ['canvaslms.com', 'bridgelms.com']}
     expect(whitelistedDomains(undefined, action).account).toEqual(action.payload)
   })
 })
@@ -218,6 +228,8 @@ describe('cspInherited', () => {
   const testMatrix = [
     [{type: SET_CSP_INHERITED, payload: true}, undefined, true],
     [{type: SET_CSP_INHERITED_OPTIMISTIC, payload: false}, undefined, false],
+    [{type: SET_CSP_SETTINGS, payload: {inherited: true, isSubAccount: true}}, undefined, true],
+    [{type: SET_CSP_SETTINGS, payload: {inherited: true, isSubAccount: false}}, undefined, false],
   ]
   it.each(testMatrix)(
     'with %p action and %p value the cspInherited state becomes %p',

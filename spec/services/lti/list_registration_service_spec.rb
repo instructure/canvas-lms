@@ -111,6 +111,40 @@ describe Lti::ListRegistrationService do
       end
     end
 
+    context "when sorting by workflow_state" do
+      let(:sort_field) { :on }
+      let(:sort_direction) { :asc }
+
+      it "sorts registrations by workflow_state when flag is enabled" do
+        account.enable_feature!(:lti_deactivate_registrations)
+
+        active_reg = lti_registration_model(account:, name: "Active reg")
+        lti_registration_account_binding_model(registration: active_reg, account:, workflow_state: "on")
+
+        inactive_reg = lti_registration_model(account:, name: "Inactive reg")
+        lti_registration_account_binding_model(registration: inactive_reg, account:, workflow_state: "on")
+        inactive_reg.deactivate!
+
+        result = service.call
+        workflow_states = result[:registrations].map(&:workflow_state)
+        expect(workflow_states).to eq(%w[active inactive])
+      end
+
+      it "sorts registrations by account binding state when flag is disabled" do
+        account.disable_feature!(:lti_deactivate_registrations)
+
+        off_reg = lti_registration_model(account:, name: "Off reg")
+        lti_registration_account_binding_model(registration: off_reg, account:, workflow_state: "off")
+
+        on_reg = lti_registration_model(account:, name: "On reg")
+        lti_registration_account_binding_model(registration: on_reg, account:, workflow_state: "on")
+
+        result = service.call
+        names = result[:registrations].map(&:name)
+        expect(names).to eq(["Off reg", "On reg"])
+      end
+    end
+
     context "with sharding and site admin forced-on registrations" do
       specs_require_sharding
 

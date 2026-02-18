@@ -22,7 +22,7 @@ import React from 'react'
 
 import {AccessibilityWizard} from '../index'
 import userEvent from '@testing-library/user-event'
-import {multiIssueItem, checkboxTextInputRuleItem} from './__mocks__'
+import {multiIssueItem, checkboxTextInputRuleItem, buttonRuleItem} from './__mocks__'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {
@@ -245,11 +245,109 @@ describe('AccessibilityWizard', () => {
       })
 
       // Click "Back to start" button
-      const backToStart = screen.getByRole('button', {name: /back to start/i})
+      const backToStart = screen.getByTestId('back-to-start-button')
       fireEvent.click(backToStart)
 
       await waitFor(() => {
         expect(mockSetSelectedIssue).toHaveBeenCalledWith(baseItem.issues![0])
+      })
+    })
+
+    it('resets allIssuesSkipped when navigating to next resource', async () => {
+      setupMockStore({
+        ...defaultStore,
+        selectedIssue: defaultStore.selectedScan!.issues![1],
+        selectedIssueIndex: 1,
+        nextResource: {index: 1, item: buttonRuleItem},
+        isCloseIssuesEnabled: true,
+      })
+
+      render(<AccessibilityWizard />, {wrapper: createWrapper()})
+
+      const skip = screen.getByTestId('skip-button')
+      fireEvent.click(skip)
+
+      await waitFor(() => {
+        expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+      })
+
+      const nextResourceButton = screen.getByTestId('next-resource-button')
+      fireEvent.click(nextResourceButton)
+
+      await waitFor(() => {
+        expect(mockSetSelectedScan).toHaveBeenCalledWith(buttonRuleItem)
+      })
+    })
+
+    it('shows "Next resource" button when there are more resources', async () => {
+      setupMockStore({
+        ...defaultStore,
+        selectedIssue: defaultStore.selectedScan!.issues![1],
+        selectedIssueIndex: 1,
+        nextResource: {index: 1, item: buttonRuleItem},
+        isCloseIssuesEnabled: true,
+      })
+
+      render(<AccessibilityWizard />, {wrapper: createWrapper()})
+
+      const skip = screen.getByTestId('skip-button')
+      fireEvent.click(skip)
+
+      await waitFor(() => {
+        expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+      })
+
+      expect(screen.getByTestId('next-resource-button')).toBeInTheDocument()
+      expect(screen.getByTestId('close-remediation-button')).toBeInTheDocument()
+      expect(screen.queryByTestId('close-remediation-view-button')).not.toBeInTheDocument()
+    })
+
+    it('shows "Close" button when there are no more resources', async () => {
+      setupMockStore({
+        ...defaultStore,
+        selectedIssue: defaultStore.selectedScan!.issues![1],
+        selectedIssueIndex: 1,
+        nextResource: {index: -1, item: null},
+        isCloseIssuesEnabled: true,
+      })
+
+      render(<AccessibilityWizard />, {wrapper: createWrapper()})
+
+      const skip = screen.getByTestId('skip-button')
+      fireEvent.click(skip)
+
+      await waitFor(() => {
+        expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+      })
+
+      expect(screen.queryByTestId('next-resource-button')).not.toBeInTheDocument()
+      expect(screen.getByTestId('close-remediation-view-button')).toBeInTheDocument()
+      expect(screen.getByTestId('close-remediation-button')).toBeInTheDocument()
+    })
+
+    it('calls setSelectedScan when clicking "Next resource" button', async () => {
+      setupMockStore({
+        ...defaultStore,
+        selectedIssue: defaultStore.selectedScan!.issues![1],
+        selectedIssueIndex: 1,
+        nextResource: {index: 1, item: buttonRuleItem},
+        isCloseIssuesEnabled: true,
+      })
+
+      render(<AccessibilityWizard />, {wrapper: createWrapper()})
+
+      const skip = screen.getByTestId('skip-button')
+      fireEvent.click(skip)
+
+      await waitFor(() => {
+        expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
+      })
+
+      const nextResourceButton = screen.getByTestId('next-resource-button')
+      fireEvent.click(nextResourceButton)
+
+      await waitFor(() => {
+        expect(mockSetSelectedScan).toHaveBeenCalledWith(buttonRuleItem)
       })
     })
   })

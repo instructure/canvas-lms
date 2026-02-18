@@ -165,6 +165,77 @@ describe('CheckboxTextInput', () => {
     expect(button).toBeDisabled()
   })
 
+  it('disables generate button when checkbox is checked', () => {
+    const propsWithGenerateOption = {
+      ...defaultProps,
+      issue: {
+        ...defaultProps.issue,
+        form: {
+          ...defaultProps.issue.form,
+          canGenerateFix: true,
+          isCanvasImage: true,
+          generateButtonLabel: 'Generate Alt Text',
+        },
+      },
+    }
+
+    render(<CheckboxTextInput {...propsWithGenerateOption} />)
+
+    const generateButton = screen.getByTestId('generate-alt-text-button')
+    const checkbox = screen.getByTestId('decorative-img-checkbox')
+
+    expect(generateButton).not.toBeDisabled()
+    expect(checkbox).not.toBeChecked()
+
+    fireEvent.click(checkbox)
+
+    expect(checkbox).toBeChecked()
+    expect(generateButton).toBeDisabled()
+  })
+
+  it('shows message when the image is from an external source', () => {
+    const propsWithGenerateDisabled = {
+      ...defaultProps,
+      issue: {
+        ...defaultProps.issue,
+        form: {
+          ...defaultProps.issue.form,
+          canGenerateFix: true,
+          isCanvasImage: false,
+          generateButtonLabel: 'Generate Alt Text',
+        },
+      },
+    }
+
+    render(<CheckboxTextInput {...propsWithGenerateDisabled} />)
+
+    const message = screen.getByTestId('alt-text-generation-not-available-message')
+    expect(message).toBeInTheDocument()
+    expect(message).toHaveTextContent(
+      'AI alt text generation is only available for images uploaded to Canvas.',
+    )
+  })
+
+  it('does not show message when the image is from Canvas', () => {
+    const propsWithGenerateEnabled = {
+      ...defaultProps,
+      issue: {
+        ...defaultProps.issue,
+        form: {
+          ...defaultProps.issue.form,
+          canGenerateFix: true,
+          isCanvasImage: true,
+          generateButtonLabel: 'Generate Alt Text',
+        },
+      },
+    }
+
+    render(<CheckboxTextInput {...propsWithGenerateEnabled} />)
+
+    const message = screen.queryByTestId('alt-text-generation-not-available-message')
+    expect(message).not.toBeInTheDocument()
+  })
+
   it('calls API and updates value when generate button is clicked', async () => {
     const propsWithGenerateOption = {
       ...defaultProps,

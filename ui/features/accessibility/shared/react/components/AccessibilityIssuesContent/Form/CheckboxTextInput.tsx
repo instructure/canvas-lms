@@ -233,6 +233,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         <Flex direction="column" gap="mediumSmall">
           <View as="div">
             <Checkbox
+              data-testid="decorative-img-checkbox"
               inputRef={el => (checkboxRef.current = el)}
               label={issue.form.checkboxLabel}
               checked={isChecked}
@@ -275,7 +276,9 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                     color="ai-primary"
                     renderIcon={() => <IconAiSolid />}
                     onClick={handleGenerateClick}
-                    disabled={generateLoading || isDisabled || !issue.form.isCanvasImage}
+                    disabled={
+                      generateLoading || isChecked || isDisabled || !issue.form.isCanvasImage
+                    }
                   >
                     {generateLoading ? (
                       <>
@@ -287,13 +290,15 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                     )}
                   </Button>
                 </Flex.Item>
-                <Flex.Item>
-                  <Text size="small">
-                    {I18n.t(
-                      'AI alt text generation is only available for images uploaded to Canvas.',
-                    )}
-                  </Text>
-                </Flex.Item>
+                {!issue.form.isCanvasImage && (
+                  <Flex.Item>
+                    <Text data-testid="alt-text-generation-not-available-message" size="small">
+                      {I18n.t(
+                        'AI alt text generation is only available for images uploaded to Canvas.',
+                      )}
+                    </Text>
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex>
           )}

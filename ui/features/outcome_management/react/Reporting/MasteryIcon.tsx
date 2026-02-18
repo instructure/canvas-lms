@@ -19,12 +19,17 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Img} from '@instructure/ui-img'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import type {MasteryLevel} from './types'
+import type {MasteryLevelResult} from '@canvas/outcomes/react/utils/icons'
+import {colors} from '@instructure/canvas-theme'
 
 const I18n = createI18nScope('outcome_management')
 
 interface MasteryIconProps {
-  masteryLevel: MasteryLevel
+  masteryLevel: MasteryLevelResult
+  description?: string
 }
 
 const masteryLevelToIcon: Record<MasteryLevel, {url: string; alt: string}> = {
@@ -54,8 +59,23 @@ const masteryLevelToIcon: Record<MasteryLevel, {url: string; alt: string}> = {
   },
 }
 
-const MasteryIcon = ({masteryLevel}: MasteryIconProps) => {
-  const {url, alt} = masteryLevelToIcon[masteryLevel]
+const MasteryIcon = ({masteryLevel, description}: MasteryIconProps) => {
+  // If masteryLevel is a number, render a numeric badge
+  if (typeof masteryLevel === 'number') {
+    const label = description || I18n.t('Level %{level}', {level: masteryLevel})
+
+    return (
+      <>
+        <Text size="small" weight="bold" color="primary">
+          {masteryLevel}
+        </Text>
+        <ScreenReaderContent>{label}</ScreenReaderContent>
+      </>
+    )
+  }
+
+  // Otherwise, use icon mapping for standard mastery levels
+  const {url, alt} = masteryLevelToIcon[masteryLevel as MasteryLevel]
 
   return (
     <>

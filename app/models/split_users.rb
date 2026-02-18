@@ -196,6 +196,10 @@ class SplitUsers
     Shard.partition_by_shard(enrollment_ids) do |enrollments|
       restore_enrollments(enrollments)
     end
+    observer_enrollment_ids = records.where(context_type: "Enrollment").where.not(previous_user_id: [source_user, restored_user]).pluck(:context_id)
+    Shard.partition_by_shard(observer_enrollment_ids) do |shard_enrollment_ids|
+      restore_associated_user_ids(shard_enrollment_ids)
+    end
     Shard.partition_by_shard(pseudonyms) do |shard_pseudonyms|
       move_new_enrollments(enrollment_ids, shard_pseudonyms)
     end
@@ -236,6 +240,19 @@ class SplitUsers
                        type: e.type,
                        role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
     end
+  end
+
+  def restore_associated_user_ids(enrollment_ids)
+    ObserverEnrollment.where(id: enrollment_ids, associated_user_id: source_user)
+                      .where(<<~SQL.squish)
+                        NOT EXISTS(SELECT 1 FROM #{Enrollment.quoted_table_name} e2
+                          WHERE e2.user_id = enrollments.user_id
+                          AND e2.course_section_id = enrollments.course_section_id
+                          AND e2.type = enrollments.type
+                          AND e2.role_id = enrollments.role_id
+                          AND e2.associated_user_id = #{restored_user.id})
+                      SQL
+                      .update_all(associated_user_id: restored_user.id, updated_at: Time.now.utc)
   end
 
   def fix_communication_channels(cc_records)
@@ -372,10 +389,18 @@ class SplitUsers
         relation = update[:table].classify.constantize.all
         relation = relation.instance_exec(&update[:scope]) if update[:scope]
 
-        relation
-          .where(update[:context_id] || :context_id => shard_course,
-                 update[:foreign_key] || :user_id => source_user_id)
-          .update_all(update[:foreign_key] || :user_id => target_user_id)
+        scope = relation
+                .where(update[:context_id] || :context_id => shard_course,
+                       update[:foreign_key] || :user_id => source_user_id)
+
+        # skip progressions where the target user already has one for the same module
+        if update[:table] == "context_module_progressions"
+          scope = scope.where.not(
+            context_module_id: ContextModuleProgression.where(user_id: target_user_id).select(:context_module_id)
+          )
+        end
+
+        scope.update_all(update[:foreign_key] || :user_id => target_user_id)
       end
     end
   end

@@ -40,7 +40,7 @@ export type NavigationTab = Omit<EnvNavigationTab, 'id'> & {
   // MoveItemTray also requires every item to have a string unique id
   internalId: string
 } & ( // existing tab (link or otherwise)
-    | {type: 'existing'; externalId: number | string}
+    | {type: 'existing'; externalId: number | string; link_context_type?: 'course' | 'account'}
     // new unsaved link tab
     | ({type: 'newLink'; externalId?: never} & NavMenuLinkTabHrefAndArgs)
   )
@@ -59,6 +59,7 @@ type EnvNavigationTab = {
   position?: number
   immovable?: boolean
   args?: unknown
+  link_context_type?: 'course' | 'account'
 }
 
 export type CourseNavigationTabToSave =

@@ -83,12 +83,12 @@ const EmptyState = () => (
     <Text as="p" size="content">
       {I18n.t('You can create rules that support your learning goals for the assignment.')}
     </Text>
-    <Text size="content">
-      {/* TODO: Replace with link to documentation in EGG-1588 */}
+    {/* TODO: Add text and replace with link to documentation in EGG-1588 */}
+    {/* <Text size="content">
       <Link href="#" isWithinText={false} target="_blank">
         {I18n.t('Learn more about how peer review allocation works.')}
       </Link>
-    </Text>
+    </Text> */}
   </Flex>
 )
 

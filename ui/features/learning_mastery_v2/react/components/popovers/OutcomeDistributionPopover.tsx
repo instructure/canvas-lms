@@ -38,6 +38,8 @@ import {
 import {Avatar} from '@instructure/ui-avatar'
 import MessageStudents from '@canvas/message-students-modal'
 import {Link} from '@instructure/ui-link'
+import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
+import {useAddTagMembership} from '@canvas/differentiation-tags/react/hooks/useAddTagMembership'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -188,7 +190,9 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   const [showInfo, setShowInfo] = useState(false)
   const [selectedRating, setSelectedRating] = useState<RatingDistribution | null>(null)
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false)
-  const {accountLevelMasteryScalesFF} = useLMGBContext()
+  const [isDifferentiationTagModalOpen, setIsDifferentiationTagModalOpen] = useState(false)
+  const {accountLevelMasteryScalesFF, allowDifferentiationTags} = useLMGBContext()
+  const {mutate: addTagMembership} = useAddTagMembership()
   const calculationMethod = getCalculationMethod(outcome)
 
   const selectedStudents = useMemo(() => {
@@ -215,6 +219,24 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
       }
     },
     [outcomeDistribution?.ratings],
+  )
+
+  const handleTagCreationSuccess = React.useCallback(
+    (newCategoryID: number) => {
+      setIsDifferentiationTagModalOpen(false)
+      if (!newCategoryID) {
+        return
+      }
+
+      // Assign selected students to the new tag
+      const studentIds = selectedStudents.map(student => parseInt(student.id, 10))
+
+      addTagMembership({
+        groupId: newCategoryID,
+        userIds: studentIds,
+      })
+    },
+    [selectedStudents, addTagMembership],
   )
 
   // When the feature flag is on, use proficiency context for mastery scale
@@ -250,6 +272,16 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
           groupConversation={true}
           recipients={messageRecipients}
           title={I18n.t('Send a message to students')}
+        />
+      )}
+      {isDifferentiationTagModalOpen && (
+        <DifferentiationTagModalManager
+          isOpen={isDifferentiationTagModalOpen}
+          onClose={() => setIsDifferentiationTagModalOpen(false)}
+          mode="create"
+          differentiationTagCategoryId={undefined}
+          onCreationSuccess={handleTagCreationSuccess}
+          courseId={Number(courseId)}
         />
       )}
       <Popover
@@ -349,14 +381,27 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
               )}
               {selectedRating && (
                 <Flex.Item>
-                  <Link
-                    onClick={() => setIsMessageModalOpen(true)}
-                    data-testid="message-students-link"
-                    iconPlacement="end"
-                    renderIcon={IconArrowOpenEndLine}
-                  >
-                    <Text size="small">{I18n.t('Message Students')}</Text>
-                  </Link>
+                  <>
+                    {allowDifferentiationTags && (
+                      <Link
+                        margin="0 xx-small 0 0"
+                        onClick={() => setIsDifferentiationTagModalOpen(true)}
+                        data-testid="create-differentiation-tag-link"
+                        iconPlacement="end"
+                        renderIcon={IconArrowOpenEndLine}
+                      >
+                        <Text size="small">{I18n.t('Create Differentiation Tag')}</Text>
+                      </Link>
+                    )}
+                    <Link
+                      onClick={() => setIsMessageModalOpen(true)}
+                      data-testid="message-students-link"
+                      iconPlacement="end"
+                      renderIcon={IconArrowOpenEndLine}
+                    >
+                      <Text size="small">{I18n.t('Message Students')}</Text>
+                    </Link>
+                  </>
                 </Flex.Item>
               )}
             </Flex>

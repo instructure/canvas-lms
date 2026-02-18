@@ -37,8 +37,8 @@ const transformOutcomeData = (
     const totalAlignmentsCount = outcome.alignments?.length || 0
     const masteryScore = score ?? null
 
-    // static score handling will be fixed in https://instructure.atlassian.net/browse/OUTC-504
-    const masteryLevel = getTagIcon(score, outcome.mastery_points) as MasteryLevel
+    // Dynamic score handling with proficiency ratings
+    const masteryLevel = getTagIcon(score, outcome.mastery_points, outcome.ratings) as MasteryLevel
 
     return {
       id: outcome.id,
@@ -50,6 +50,7 @@ const transformOutcomeData = (
       masteryScore,
       masteryLevel,
       masteryPoints: outcome.mastery_points,
+      ratings: outcome.ratings,
     }
   })
 }

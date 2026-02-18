@@ -1527,7 +1527,12 @@ class AccountsController < ApplicationController
         set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
         set_course_template
 
-        if @account.update(strong_account_params)
+        nav_menu_links_success = NavMenuLink.sync_with_link_objects_json(
+          context: @account,
+          link_objects_json: params[:account].delete(:nav_menu_links)
+        )
+
+        if nav_menu_links_success && @account.update(strong_account_params)
           update_user_dashboards
           format.html { redirect_to account_settings_url(@account) }
           format.json { render json: @account }
@@ -1659,6 +1664,14 @@ class AccountsController < ApplicationController
                  account_roles: @account_roles,
                }
              })
+
+      if @account.root_account.feature_enabled?(:nav_menu_links)
+        js_env({
+                 NAV_MENU_LINKS:
+                   NavMenuLink.active.where(context: @account).order(:id).as_existing_link_objects
+               })
+      end
+
       js_env(edit_help_links_env, true)
       if @account.root_account?
         js_env(EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||

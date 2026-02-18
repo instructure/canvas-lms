@@ -904,7 +904,7 @@
           <div id="custom_help_link_settings"></div>
         <% end %>
 
-        <% if @account.feature_enabled?(:nav_menu_links) %>
+        <% if @account.root_account&.feature_enabled?(:nav_menu_links) %>
           <div id="nav_menu_links_settings"></div>
         <% end %>
 

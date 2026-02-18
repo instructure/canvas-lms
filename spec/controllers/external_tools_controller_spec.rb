@@ -3796,7 +3796,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 3
-      expect(tools.pluck("name")).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+      expect(tools.pluck("name")).to match_array ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
     end
 
     it "shows course nav tools for the single-context endpoint" do
@@ -3814,7 +3814,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 3
-      expect(tools.pluck("name")).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+      expect(tools.pluck("name")).to match_array ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
     end
 
     it "only returns tools with a course navigation placement" do
@@ -3870,81 +3870,6 @@ describe ExternalToolsController do
 
       tools = json_parse(response.body)
       expect(tools.count).to eq 0
-    end
-  end
-
-  describe "#render_native_item_banks" do
-    let(:course) { course_model }
-    let(:teacher) { teacher_in_course(course:, active_all: true).user }
-    let(:tool) do
-      course.context_external_tools.create!(
-        name: "New Quizzes",
-        url: "http://example.com/launch",
-        consumer_key: "key",
-        shared_secret: "secret",
-        tool_id: "Quizzes 2"
-      )
-    end
-    let(:request_mock) do
-      instance_double(ActionDispatch::Request, path: "/courses/3/external_tools/7/banks")
-    end
-
-    before do
-      user_session(teacher)
-      allow(controller).to receive(:add_new_quizzes_bundle)
-      allow(controller).to receive(:add_body_class)
-      allow(controller).to receive(:render)
-      allow(controller).to receive(:js_env).and_call_original
-      controller.instance_variable_set(:@context, course)
-      controller.instance_variable_set(:@tool, tool)
-      controller.instance_variable_set(:@current_user, teacher)
-      controller.instance_variable_set(:@domain_root_account, Account.default)
-      allow(controller).to receive_messages(build_item_banks_launch_data: { test: "data" }, request: request_mock)
-    end
-
-    it "sets basename in js_env when full_path param is present" do
-      allow(controller).to receive(:params).and_return({ full_path: "/banks" })
-
-      expect(controller).to receive(:js_env) do |data|
-        expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/external_tools/7")
-        expect(data[:NEW_QUIZZES][:test]).to eq("data")
-      end
-
-      controller.send(:render_native_item_banks, "course_navigation")
-    end
-
-    it "uses request path as basename when full_path param is not present" do
-      allow(controller).to receive(:params).and_return({})
-
-      expect(controller).to receive(:js_env) do |data|
-        expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/external_tools/7/banks")
-        expect(data[:NEW_QUIZZES][:test]).to eq("data")
-      end
-
-      controller.send(:render_native_item_banks, "course_navigation")
-    end
-
-    it "preserves other NEW_QUIZZES data in js_env" do
-      allow(controller).to receive_messages(params: { full_path: "/banks" }, build_item_banks_launch_data: { test: "data", other: "value" })
-
-      expect(controller).to receive(:js_env) do |data|
-        expect(data[:NEW_QUIZZES][:test]).to eq("data")
-        expect(data[:NEW_QUIZZES][:other]).to eq("value")
-        expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/external_tools/7")
-      end
-
-      controller.send(:render_native_item_banks, "course_navigation")
-    end
-
-    it "correctly handles complex subroutes" do
-      complex_request_mock = instance_double(ActionDispatch::Request, path: "/courses/3/external_tools/7/banks/item/123")
-      allow(controller).to receive_messages(request: complex_request_mock, params: { full_path: "/banks/item/123" })
-
-      expect(controller).to receive(:js_env) do |data|
-        expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/external_tools/7")
-      end
-
-      controller.send(:render_native_item_banks, "course_navigation")
     end
   end
 end

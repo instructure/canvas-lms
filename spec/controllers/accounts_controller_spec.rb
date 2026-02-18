@@ -3221,4 +3221,107 @@ describe AccountsController do
       end
     end
   end
+
+  describe "nav_menu_links in update action" do
+    before :once do
+      account_with_admin
+    end
+
+    before do
+      user_session(@admin)
+    end
+
+    it "creates new links, preserves existing links, and removes unspecified links" do
+      # Create two existing links
+      link_to_keep = NavMenuLink.create!(
+        context: @account,
+        label: "Keep This",
+        url: "https://example.com/keep",
+        course_nav: true
+      )
+      link_to_remove = NavMenuLink.create!(
+        context: @account,
+        label: "Remove This",
+        url: "https://example.com/remove",
+        course_nav: true
+      )
+
+      # Update: keep one existing link, remove the other, and add a new link
+      link_objects = [
+        { type: "existing", id: link_to_keep.id.to_s, label: "Keep This" },
+        { type: "new", url: "https://example.com/new", label: "New Link" }
+      ].to_json
+
+      expect do
+        post "update", params: {
+          id: @account.id,
+          account: { nav_menu_links: link_objects }
+        }
+      end.not_to change { NavMenuLink.active.where(context: @account).count }
+
+      # Verify preservation
+      expect(NavMenuLink.active.where(id: link_to_keep.id).exists?).to be true
+      # Verify removal
+      expect(NavMenuLink.active.where(id: link_to_remove.id).exists?).to be false
+      # Verify creation
+      expect(NavMenuLink.active.where(context: @account, label: "New Link").exists?).to be true
+    end
+
+    it "does not sync links when no links are provided" do
+      expect do
+        post "update", params: {
+          id: @account.id,
+          account: { name: "Updated Account Name" }
+        }
+      end.not_to change { NavMenuLink.active.where(context: @account).count }
+    end
+
+    it "returns with flash error when given invalid nav_menu_links data" do
+      post "update", params: {
+        id: @account.id,
+        account: { nav_menu_links: "invalid data" }
+      }
+      expect(flash[:error]).to include("settings update failed")
+    end
+  end
+
+  describe "settings action with nav_menu_links" do
+    before :once do
+      account_with_admin
+
+      @link1 = NavMenuLink.create!(
+        context: @account,
+        label: "Link One",
+        url: "https://example.com/1",
+        course_nav: true
+      )
+      @link2 = NavMenuLink.create!(
+        context: @account,
+        label: "Link Two",
+        url: "https://example.com/2",
+        course_nav: true
+      )
+    end
+
+    before do
+      user_session(@admin)
+    end
+
+    it "includes NAV_MENU_LINKS in js_env" do
+      get "settings", params: { account_id: @account.id }
+
+      expect(assigns[:js_env][:NAV_MENU_LINKS]).to eq([
+                                                        { type: "existing", id: @link1.id, label: "Link One" },
+                                                        { type: "existing", id: @link2.id, label: "Link Two" }
+                                                      ])
+    end
+
+    context "with nav_menu_links FF off" do
+      it "does not include NAV_MENU_LINKS" do
+        @account.root_account.disable_feature!(:nav_menu_links)
+        get "settings", params: { account_id: @account.id }
+        expect(assigns[:js_env]).not_to have_key(:NAV_MENU_LINKS)
+      end
+    end
+  end
 end

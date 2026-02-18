@@ -31,6 +31,16 @@ class Lti::Registration < ActiveRecord::Base
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
+  workflow do
+    state :active do
+      event :deactivate, transitions_to: :inactive
+    end
+    state :inactive do
+      event :activate, transitions_to: :active
+    end
+    state :deleted
+  end
+
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
   belongs_to :updated_by, class_name: "User", inverse_of: :updated_lti_registrations, optional: true
@@ -58,7 +68,7 @@ class Lti::Registration < ActiveRecord::Base
   validate :account_is_root_account
   validate :template_registration_must_be_in_site_admin, if: :template_registration_id?
 
-  scope :active, -> { where(workflow_state: "active") }
+  scope :active, -> { where.not(workflow_state: "deleted") }
   scope :site_admin, -> { where(account: Account.site_admin) }
 
   resolves_root_account through: :account

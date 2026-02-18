@@ -837,6 +837,25 @@ describe CoursesController, type: :request do
         expect(entry["sis_course_id"]).to eq "TEST-SIS-ONE.2011"
       end
 
+      it "allows an admin with :read_roster to access the endpoint" do
+        role = custom_account_role("less_limited", account: Account.default)
+        role.role_overrides.create!(account: Account.default,
+                                    permission: :read_roster,
+                                    enabled: true)
+        less_limited_admin = account_admin_user(account: Account.default,
+                                                role:)
+        api_call_as_user(less_limited_admin,
+                         :get,
+                         "/api/v1/users/#{@student.id}/courses",
+                         { user_id: @student.to_param,
+                           controller: "courses",
+                           action: "user_index",
+                           format: "json" },
+                         {},
+                         {},
+                         { expected_status: 200 })
+      end
+
       context "with temporary enrollments enabled" do
         before :once do
           Account.default.enable_feature! :temporary_enrollments

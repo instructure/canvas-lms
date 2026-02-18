@@ -73,6 +73,43 @@ RSpec.describe Lti::Registration do
     end
   end
 
+  describe "workflow states" do
+    let(:registration) { lti_registration_model }
+
+    it "defaults to active" do
+      expect(registration).to be_active
+    end
+
+    it "transitions from active to inactive via deactivate!" do
+      registration.deactivate!
+      expect(registration).to be_inactive
+    end
+
+    it "transitions from inactive to active via activate!" do
+      registration.deactivate!
+      registration.activate!
+      expect(registration).to be_active
+    end
+
+    describe ".active scope" do
+      let!(:active_reg) { lti_registration_model(account:) }
+      let!(:inactive_reg) { lti_registration_model(account:).tap(&:deactivate!) }
+      let!(:deleted_reg) { lti_registration_model(account:).tap(&:destroy) }
+
+      it "includes active registrations" do
+        expect(Lti::Registration.active).to include(active_reg)
+      end
+
+      it "includes inactive registrations" do
+        expect(Lti::Registration.active).to include(inactive_reg)
+      end
+
+      it "excludes deleted registrations" do
+        expect(Lti::Registration.active).not_to include(deleted_reg)
+      end
+    end
+  end
+
   describe "#dynamic_registration?" do
     subject { registration.dynamic_registration? }
 
