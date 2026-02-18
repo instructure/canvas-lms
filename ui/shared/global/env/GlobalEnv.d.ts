@@ -28,6 +28,7 @@ import {EnvChangePassword} from './EnvChangePassword'
 import {EnvCommon} from './EnvCommon'
 import {EnvContextModules} from './EnvContextModules'
 import {EnvCourse} from './EnvCourse'
+import {EnvCourseLinkValidator} from './EnvCourseLinkValidator'
 import {EnvCoursePaces} from './EnvCoursePaces'
 import {EnvDeepLinking} from './EnvDeepLinking'
 import {EnvDeveloperKeys} from './EnvDeveloperKeys'
@@ -71,6 +72,7 @@ export type GlobalEnv =
         EnvAccessibilityChecker &
         EnvAssignments &
         EnvCourse &
+        EnvCourseLinkValidator &
         EnvCoursePaces &
         EnvDeepLinking &
         EnvGradebook &

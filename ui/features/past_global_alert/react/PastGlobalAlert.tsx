@@ -23,8 +23,12 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('past_global_announcements')
 
-export default class PastGlobalAlert extends React.Component {
-  state = {
+interface State {
+  shouldRender: boolean
+}
+
+export default class PastGlobalAlert extends React.Component<{}, State> {
+  state: State = {
     shouldRender: false,
   }
 
