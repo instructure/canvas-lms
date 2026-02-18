@@ -167,7 +167,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
 `
 
 export const UPDATE_SUBMISSIONS_READ_STATE = gql`
-  mutation UpdateSubmissionsReadState($submissionIds: [ID!]!, $read: Boolean!) {
+  mutation InboxUpdateSubmissionsReadState($submissionIds: [ID!]!, $read: Boolean!) {
     updateSubmissionsReadState(input: {submissionIds: $submissionIds, read: $read}) {
       submissions {
         _id

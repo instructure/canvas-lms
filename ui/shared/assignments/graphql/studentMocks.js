@@ -45,7 +45,7 @@ async function loadDefaultMocks() {
 const SUBMISSION_QUERY = gql`
   query SubmissionQuery($submissionID: ID!) {
     submission(id: "1") {
-      ...Submission
+      ...StudentAssignmentSubmission
     }
   }
   ${Submission.fragment}
@@ -54,7 +54,7 @@ const SUBMISSION_QUERY = gql`
 const ASSIGNMENT_QUERY = gql`
   query AssignmentQuery {
     assignment(id: "1") {
-      ...Assignment
+      ...StudentAssignment
       rubric {
         id
       }
