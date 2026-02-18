@@ -159,5 +159,16 @@ describe "student dashboard", :ignore_js_errors do
       filter_inbox_messages_by("All")
       expect(all_inbox_message_items.size).to eq(3)
     end
+
+    it "shows empty state for all todo filter options when no items exist" do
+      add_widget_to_dashboard(@student, :todo_list, 1)
+      go_to_dashboard
+
+      expect(no_todo_items_message.text).to eq("No upcoming items")
+      filter_todos_by("Complete")
+      expect(no_todo_items_message.text).to eq("No upcoming items")
+      filter_todos_by("All")
+      expect(no_todo_items_message.text).to eq("No upcoming items")
+    end
   end
 end

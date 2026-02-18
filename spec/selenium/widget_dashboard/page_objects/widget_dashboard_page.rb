@@ -352,6 +352,34 @@ module WidgetDashboardPage
     "[data-testid='todo-item-course-link-#{item_id}']"
   end
 
+  def no_todo_items_message_selector
+    "[data-testid='no-todos-message']"
+  end
+
+  def new_todo_button_selector
+    "[data-testid='new-todo-button']"
+  end
+
+  def create_todo_modal_selector
+    "[role='dialog'][aria-label='Add To Do']"
+  end
+
+  def create_todo_title_input_selector
+    "[data-testid='create-todo-title-input']"
+  end
+
+  def create_todo_course_select_selector
+    "[data-testid='create-todo-course-select']"
+  end
+
+  def create_todo_cancel_button_selector
+    "[data-testid='create-todo-cancel-button']"
+  end
+
+  def create_todo_submit_button_selector
+    "[data-testid='create-todo-submit-button']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -689,6 +717,26 @@ module WidgetDashboardPage
     f(todo_item_course_link_selector(item_id))
   end
 
+  def no_todo_items_message
+    f(no_todo_items_message_selector)
+  end
+
+  def new_todo_button
+    f(new_todo_button_selector)
+  end
+
+  def create_todo_title_input
+    f(create_todo_title_input_selector)
+  end
+
+  def create_todo_cancel_button
+    f(create_todo_cancel_button_selector)
+  end
+
+  def create_todo_submit_button
+    f(create_todo_submit_button_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -818,5 +866,10 @@ module WidgetDashboardPage
     todo_filter_select.click
     click_INSTUI_Select_option(todo_filter_select_selector, filter_value)
     wait_for_ajaximations
+  end
+
+  def verify_todo_add_modal_closed
+    # Retry the block every polling interval for up to 1 second
+    keep_trying_until(1) { element_exists?(create_todo_modal_selector) == false }
   end
 end
