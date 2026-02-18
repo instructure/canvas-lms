@@ -903,6 +903,8 @@ describe UserMerge do
       end
 
       it "moves lti ids to the new user if possible" do
+        expect(@user1).to receive(:update_shadow_records_synchronously!).and_call_original
+        expect(@user2).to receive(:update_shadow_records_synchronously!).and_call_original
         UserMerge.from(@user1).into(@user2)
 
         expect(@user1.reload).to be_deleted
