@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {groupBy} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
@@ -46,6 +45,18 @@ export type GroupedLtiAssetReports = {
   processor: LtiAssetProcessor
   reportGroups: LtiAssetReportGroup[]
 }[]
+
+function groupBy<T>(array: T[], keyFn: (item: T) => string): Record<string, T[]> {
+  const result: Record<string, T[]> = {}
+  for (const item of array) {
+    const key = keyFn(item)
+    if (!result[key]) {
+      result[key] = []
+    }
+    result[key].push(item)
+  }
+  return result
+}
 
 /**
  * Filter reports to those specified by the ReportsAssetSelector (usually
