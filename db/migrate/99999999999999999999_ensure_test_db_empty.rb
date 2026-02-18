@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec/support/test_database_utils"
-
 class EnsureTestDbEmpty < ActiveRecord::Migration[7.0]
   tag :postdeploy
   disable_ddl_transaction!
@@ -29,7 +27,7 @@ class EnsureTestDbEmpty < ActiveRecord::Migration[7.0]
   end
 
   def up
-    non_empty_tables = TestDatabaseUtils.non_empty_tables
+    non_empty_tables = connection.non_empty_tables
 
     # If you're seeing this error, you've created a migration or modified a non-migration method
     # called by a hook that creates data. Go look in the mentioned table to see what data
