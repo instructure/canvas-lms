@@ -1,5 +1,8 @@
  Plagiarism Detection Platform
 ==============
+
+<div class="warning-message">We strongly recommend using <a href="./file.document_processor.html">Document Processors</a> (The 1EdTech LTI Asset Processor standard) instead of the older Plagiarism Detection Platform. Going forward, Document Processors will be the preferred method for integrating plagiarism detection tools (and more) with Canvas.</div>
+
 The plagiarism detection platform provides a standard way for LTI2 tool providers (TPs) to seamlessly integrate plagiarism detection tools with Canvas. Part of this platform is the introduction of Originality Reports which can be created, edited, and retrieved by TPs. TPs are also given a means of subscribing to webhooks to notify them of changes to assignments and submissions.
 
 This document provides details to guide TPs toward leveraging the plagiarism detection platform. The document is divided into three sections that cover the plagiarism detection platform:
