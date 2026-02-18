@@ -102,7 +102,7 @@ function LtiAssetReportsCardGroup({
     <Flex direction="column" gap="x-small" margin="xx-small 0 0 0">
       {showDisplayName && displayName && (
         <View as="div" maxWidth="80%">
-          <Text weight="bold" size="medium" wrap="break-word">
+          <Text weight="bold" size="small" wrap="break-word">
             {displayName}
           </Text>
         </View>
