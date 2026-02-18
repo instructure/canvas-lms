@@ -26,7 +26,7 @@ const CourseWizard = React.lazy(() => import('./react/CourseWizard'))
  * This essentially handles binding the button events and calling out to the
  * CourseWizard React component that is the actual wizard.
  */
-function renderWizard(showWizard) {
+function renderWizard(showWizard: boolean): void {
   legacyRender(
     <Suspense fallback={<div />}>
       {showWizard && <CourseWizard onHideWizard={() => renderWizard(false)} />}
