@@ -17,7 +17,6 @@
  */
 
 import CourseHomeDialog from '@canvas/course-homepage/react/Dialog'
-import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
 import ObserverOptions from '@canvas/observer-picker'
 import {
   getHandleChangeObservedUser,
@@ -29,32 +28,45 @@ import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import PropTypes from 'prop-types'
 import {legacyRender, render} from '@canvas/react'
 import {initializePlanner, renderToDoSidebar} from '@canvas/planner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import * as apiClient from '@canvas/courses/courseAPIClient'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 import CourseDifferentiationTagConverterMessage from '@canvas/differentiation-tags/react/DifferentiationTagConverterMessage/course-conversion/CourseDifferentiationTagConverterMessage'
 
 const I18n = createI18nScope('courses_show')
 
-const defaultViewStore = createStore({
-  selectedDefaultView: ENV.COURSE.default_view,
-  savedDefaultView: ENV.COURSE.default_view,
+interface DefaultViewStore {
+  selectedDefaultView: string
+  savedDefaultView: string
+}
+
+// @ts-expect-error - Canvas ENV global not fully typed
+const defaultViewStore: DefaultViewStore = createStore({
+  selectedDefaultView: ENV.COURSE?.default_view,
+  savedDefaultView: ENV.COURSE?.default_view,
 })
 
-class ChooseHomePageButton extends React.Component {
-  state = {
+interface ChooseHomePageButtonProps {
+  store: DefaultViewStore
+}
+
+interface ChooseHomePageButtonState {
+  dialogOpen: boolean
+}
+
+class ChooseHomePageButton extends React.Component<
+  ChooseHomePageButtonProps,
+  ChooseHomePageButtonState
+> {
+  state: ChooseHomePageButtonState = {
     dialogOpen: false,
   }
 
-  static propTypes = {
-    store: PropTypes.object.isRequired,
-  }
+  chooseButton: HTMLButtonElement | null = null
 
-  render() {
+  render(): React.JSX.Element {
     return (
       <div>
         <button
@@ -71,8 +83,11 @@ class ChooseHomePageButton extends React.Component {
             store={this.props.store}
             open={this.state.dialogOpen}
             onRequestClose={this.onClose}
+            // @ts-expect-error - Canvas ENV global not fully typed
             courseId={ENV.COURSE.id}
+            // @ts-expect-error - Canvas ENV global not fully typed
             wikiFrontPageTitle={ENV.COURSE.front_page_title}
+            // @ts-expect-error - Canvas ENV global not fully typed
             wikiUrl={ENV.COURSE.pages_url}
             returnFocusTo={this.chooseButton}
             isPublishing={false}
@@ -82,20 +97,20 @@ class ChooseHomePageButton extends React.Component {
     )
   }
 
-  onClick = () => {
+  onClick = (): void => {
     this.setState({dialogOpen: true})
   }
 
-  onClose = () => {
+  onClose = (): void => {
     this.setState({dialogOpen: false})
   }
 }
 
-const addToDoSidebar = parent => {
+const addToDoSidebar = (parent: Element): void => {
   initializePlanner({
     env: window.ENV, // missing STUDENT_PLANNER_COURSES, which is what we want
-    flashError: message => showFlashAlert({message, type: 'error'}),
-    flashMessage: message => showFlashAlert({message, type: 'info'}),
+    flashError: (message: string) => showFlashAlert({message, type: 'error'}),
+    flashMessage: (message: string) => showFlashAlert({message, type: 'info'}),
     srFlashMessage: $.screenReaderFlashMessage,
     convertApiUserContent: apiUserContent.convert,
     dateTimeFormatters: {
@@ -103,7 +118,7 @@ const addToDoSidebar = parent => {
       timeString,
       datetimeString,
     },
-    forCourse: ENV.COURSE.id,
+    forCourse: ENV.COURSE?.id,
   })
     .then(() => {
       renderToDoSidebar(parent)
@@ -129,6 +144,7 @@ $(() => {
     legacyRender(
       <View as="div" maxWidth="12em">
         <ObserverOptions
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={autoFocusObserverPicker()}
           canAddObservee={!!ENV.OBSERVER_OPTIONS?.CAN_ADD_OBSERVEE}
           currentUserRoles={ENV.current_user_roles}
@@ -148,7 +164,8 @@ $(() => {
   if (diffTagOverrideConversionContainer) {
     render(
       <CourseDifferentiationTagConverterMessage
-        courseId={ENV.COURSE.id}
+        courseId={ENV.COURSE?.id || ''}
+        // @ts-expect-error - ACTIVE_TAG_CONVERSION_JOB not in ENV type
         activeConversionJob={ENV.ACTIVE_TAG_CONVERSION_JOB}
       />,
       diffTagOverrideConversionContainer,
