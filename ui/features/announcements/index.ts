@@ -23,11 +23,14 @@ ready(() => {
   const root = document.querySelector('#content')
   const [contextType, contextId] = ENV.context_asset_string.split('_')
   const app = createAnnouncementsIndex(root, {
+    // @ts-expect-error - ENV properties not in GlobalEnv type
     atomFeedUrl: ENV.atom_feed_url,
     contextType,
     contextId,
     masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
+    // @ts-expect-error - ENV properties not in GlobalEnv type
     permissions: ENV.permissions,
+    // @ts-expect-error - ENV properties not in GlobalEnv type
     announcementsLocked: ENV.ANNOUNCEMENTS_LOCKED,
   })
 
