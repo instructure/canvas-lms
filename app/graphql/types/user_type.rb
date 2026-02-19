@@ -737,6 +737,7 @@ module Types
                           .where(assignments: { workflow_state: "published" })
                           .where(courses: { workflow_state: "available" })
                           .where.not(workflow_state: "deleted")
+                          .where(assignments: { has_sub_assignments: false })
 
       # Filter by submission status
       submissions_query = if only_submitted

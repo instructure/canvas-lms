@@ -7446,6 +7446,7 @@ enum NodeType {
   Progress
   Rubric
   Section
+  SubAssignment
   Submission
   Term
   UsageRights
