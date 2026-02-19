@@ -630,6 +630,20 @@ module Canvas::LiveEvents
                            })
   end
 
+  def self.wiki_page_published(page)
+    post_event_stringified("wiki_page_published", {
+                             wiki_page_id: page.global_id,
+                             title: LiveEvents.truncate(page.title)
+                           })
+  end
+
+  def self.wiki_page_unpublished(page)
+    post_event_stringified("wiki_page_unpublished", {
+                             wiki_page_id: page.global_id,
+                             title: LiveEvents.truncate(page.title)
+                           })
+  end
+
   def self.attachment_created(attachment)
     post_event_stringified("attachment_created", get_attachment_data(attachment))
   end

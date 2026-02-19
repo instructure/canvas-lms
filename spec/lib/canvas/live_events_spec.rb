@@ -331,6 +331,36 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".wiki_page_published" do
+    before do
+      course_with_teacher
+      @page = @course.wiki_pages.create(title: "a page", body: "some body", workflow_state: "unpublished")
+    end
+
+    it "posts a wiki_page_published event with the page id and title" do
+      expect_event("wiki_page_published", {
+                     wiki_page_id: @page.global_id.to_s,
+                     title: "a page"
+                   })
+      Canvas::LiveEvents.wiki_page_published(@page)
+    end
+  end
+
+  describe ".wiki_page_unpublished" do
+    before do
+      course_with_teacher
+      @page = @course.wiki_pages.create(title: "a page", body: "some body")
+    end
+
+    it "posts a wiki_page_unpublished event with the page id and title" do
+      expect_event("wiki_page_unpublished", {
+                     wiki_page_id: @page.global_id.to_s,
+                     title: "a page"
+                   })
+      Canvas::LiveEvents.wiki_page_unpublished(@page)
+    end
+  end
+
   describe ".conversation_forwarded" do
     before do
       @user1 = user_model
