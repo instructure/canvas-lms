@@ -356,5 +356,30 @@ RSpec.describe Accessibility::PreviewController do
         end
       end
     end
+
+    context "when the resource has been updated since the issue was detected" do
+      let!(:wiki_page) { course.wiki_pages.create!(title: "Stale Page", body: "Original body") }
+      let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: nil) }
+      let(:params) do
+        {
+          course_id: course.id,
+          issue_id: issue.id.to_s
+        }
+      end
+
+      before do
+        allow_any_instance_of(Accessibility::ContentLoader).to receive(:resource_updated_since_issue?).and_return(true)
+      end
+
+      it "returns conflict status" do
+        get :show, params:, format: :json
+        expect(response).to have_http_status(:conflict)
+      end
+
+      it "returns a stale resource error message" do
+        get :show, params:, format: :json
+        expect(response.parsed_body["error"]).to include("Resource has been updated since this issue was detected")
+      end
+    end
   end
 end

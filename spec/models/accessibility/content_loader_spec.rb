@@ -218,6 +218,29 @@ describe Accessibility::ContentLoader do
     end
   end
 
+  describe "#resource_updated_since_issue?" do
+    let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: nil) }
+    let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+    context "when resource was updated after the issue was created" do
+      it "returns true" do
+        issue.update_columns(created_at: 1.hour.ago)
+        wiki_page.update_columns(updated_at: Time.now.utc)
+
+        expect(content_loader.resource_updated_since_issue?).to be true
+      end
+    end
+
+    context "when resource was updated before the issue was created" do
+      it "returns false" do
+        wiki_page.update_columns(updated_at: 1.hour.ago)
+        issue.update_columns(created_at: Time.now.utc)
+
+        expect(content_loader.resource_updated_since_issue?).to be false
+      end
+    end
+  end
+
   describe "issue preview with rule_id" do
     let(:test_content) do
       "<html><body><div><h1>Test Element</h1></div></body></html>"
