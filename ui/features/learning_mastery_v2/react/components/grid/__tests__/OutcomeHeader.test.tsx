@@ -28,6 +28,14 @@ import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useCont
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
+vi.mock('@instructure/ui-icons', async () => {
+  const actual = await vi.importActual('@instructure/ui-icons')
+  return {
+    ...actual,
+    IconOutcomesLine: () => <span data-testid="icon-outcomes-line">OutcomeIcon</span>,
+  }
+})
+
 describe('OutcomeHeader', () => {
   let showFlashAlertSpy: ReturnType<typeof vi.spyOn>
 
@@ -174,5 +182,10 @@ describe('OutcomeHeader', () => {
       politeness: 'polite',
     })
     expect(props.contributingScoresForOutcome.toggleVisibility).toHaveBeenCalled()
+  })
+
+  it('renders the IconOutcomesLine icon', () => {
+    render(<OutcomeHeader {...defaultProps()} />)
+    expect(screen.getByTestId('icon-outcomes-line')).toBeInTheDocument()
   })
 })
