@@ -41,7 +41,7 @@ describe NavMenuLinkTabs do
         { "id" => "nav_menu_link_#{@link_deleted.id}" },
       ]
 
-      NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+      NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: true)
     end
 
     it "preserves existing links and passes through non-link" do
@@ -83,7 +83,7 @@ describe NavMenuLinkTabs do
           { "id" => "nav_menu_link_#{@account_link.id}" }
         ]
 
-        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: true)
 
         expect(result.length).to eq(2)
         expect(result[1]).to eq({ "id" => "nav_menu_link_#{@account_link.id}" })
@@ -105,7 +105,7 @@ describe NavMenuLinkTabs do
           { "id" => "people" }
         ]
 
-        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: true)
 
         expect(result.length).to eq(4)
         expect(result[0]["id"]).to eq("assignments")
@@ -124,11 +124,73 @@ describe NavMenuLinkTabs do
           { "id" => "nav_menu_link_#{NavMenuLink.last.id + 1}" } # Non-existent link
         ]
 
-        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: true)
 
         # Should filter out the other account's link
         expect(result.length).to eq(1)
         expect(result[0]["id"]).to eq("assignments")
+      end
+    end
+
+    context "with can_manage_links: false" do
+      it "skips creating new links" do
+        @link1 = NavMenuLink.create!(context: @course, course_nav: true, label: "Existing Link", url: "https://existing.com")
+
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{@link1.id}" },
+          { "href" => "nav_menu_link_url", "args" => ["https://new.com"], "label" => "New Link" },
+        ]
+
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: false)
+
+        # Should preserve existing link
+        expect(result[1]).to eq({ "id" => "nav_menu_link_#{@link1.id}" })
+
+        # Should not create new link
+        expect(result.length).to eq(2) # assignments + existing link (new link skipped)
+
+        links = NavMenuLink.active.where(context: @course).to_a
+        expect(links.length).to eq(1)
+        expect(links[0].id).to eq(@link1.id)
+      end
+
+      it "skips deleting existing links" do
+        @link1 = NavMenuLink.create!(context: @course, course_nav: true, label: "Keep Link", url: "https://keep.com")
+        @link2 = NavMenuLink.create!(context: @course, course_nav: true, label: "Also Keep", url: "https://alsokeep.com")
+
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{@link1.id}" },
+          # link2 is not in tabs, but should not be deleted when can_manage_links: false
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: false)
+
+        # Both links should still exist
+        links = NavMenuLink.active.where(context: @course).to_a
+        expect(links.map(&:id)).to contain_exactly(@link1.id, @link2.id)
+      end
+
+      it "still allows rearranging existing links" do
+        @link1 = NavMenuLink.create!(context: @course, course_nav: true, label: "Link 1", url: "https://link1.com")
+        @link2 = NavMenuLink.create!(context: @course, course_nav: true, label: "Link 2", url: "https://link2.com")
+
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{@link2.id}" }, # link2 first
+          { "id" => "nav_menu_link_#{@link1.id}" }, # link1 second
+          { "id" => "people" }
+        ]
+
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: false)
+
+        expect(result[1]["id"]).to eq("nav_menu_link_#{@link2.id}")
+        expect(result[2]["id"]).to eq("nav_menu_link_#{@link1.id}")
+
+        # Both links should still exist
+        links = NavMenuLink.active.where(context: @course).to_a
+        expect(links.length).to eq(2)
       end
     end
   end

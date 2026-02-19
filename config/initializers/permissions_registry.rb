@@ -379,6 +379,34 @@ BASE_PERMISSIONS = {
       { description: -> { I18n.t("To manage lock settings for object types, Courses - manage must also be enabled.") } }
     ]
   },
+  manage_nav_menu_links: {
+    label: -> { I18n.t("Navigation Menu Links - manage") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:nav_menu_links) },
+    account_details: [
+      { title: -> { I18n.t("Navigation (Account)") },
+        description: -> { I18n.t("Allows user to add and remove custom links in Account Navigation, User Navigation, and Course Navigation from the account settings page.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Navigation (Account)") },
+        description: -> { I18n.t("Users can still rearrange navigation links without this permission.") } },
+      { description: -> { I18n.t("To access account settings, Account-level settings - manage must also be enabled.") } },
+      { title: -> { I18n.t("Feature Flag") },
+        description: -> { I18n.t("This permission requires the Custom Links feature flag to be enabled.") } }
+    ],
+    course_details: [
+      { title: -> { I18n.t("Navigation (Course)") },
+        description: -> { I18n.t("Allows user to add and remove custom links in Course Navigation.") } }
+    ],
+    course_considerations: [
+      { title: -> { I18n.t("Navigation (Course)") },
+        description: -> { I18n.t("Users can still rearrange and hide navigation links without this permission.") } },
+      { description: -> { I18n.t("To access course settings, Courses - manage must be enabled.") } },
+      { title: -> { I18n.t("Feature Flag") },
+        description: -> { I18n.t("This permission requires the Custom Links feature flag to be enabled.") } }
+    ]
+  },
   manage_role_overrides: {
     label: -> { I18n.t("Permissions - manage") },
     account_only: true,

@@ -3283,6 +3283,52 @@ describe AccountsController do
       }
       expect(flash[:error]).to include("settings update failed")
     end
+
+    context "with manage_nav_menu_links permission" do
+      it "passes can_manage_links: true when user has permission" do
+        @account.root_account.enable_feature!(:nav_menu_links)
+
+        link_objects = [
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ].to_json
+
+        expect(NavMenuLink).to receive(:sync_with_link_objects_json)
+          .with(hash_including(can_manage_links: true))
+          .and_call_original
+
+        post "update", params: {
+          id: @account.id,
+          account: { nav_menu_links: link_objects }
+        }
+
+        expect(response).to be_redirect
+      end
+
+      it "passes can_manage_links: false when user lacks permission" do
+        @account.root_account.enable_feature!(:nav_menu_links)
+
+        # Revoke permission from admin role (by default, admins have this permission)
+        role = @admin.account_users.first.role
+        @account.root_account.role_overrides.create!(permission: :manage_nav_menu_links, role:, enabled: false)
+
+        link_objects = [
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ].to_json
+
+        expect(NavMenuLink).to receive(:sync_with_link_objects_json)
+          .with(hash_including(can_manage_links: false))
+          .and_call_original
+
+        post "update", params: {
+          id: @account.id,
+          account: { nav_menu_links: link_objects, name: "Updated Name" }
+        }
+
+        expect(response).to be_redirect
+        # Account update should still succeed
+        expect(@account.reload.name).to eq("Updated Name")
+      end
+    end
   end
 
   describe "settings action with nav_menu_links" do

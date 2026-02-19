@@ -30,6 +30,12 @@ import {Tag} from '@instructure/ui-tag'
 
 const I18n = createI18nScope('account_settings')
 
+declare const ENV: {
+  PERMISSIONS?: {
+    manage_nav_menu_links?: boolean
+  }
+}
+
 /**
  * Manage NavMenuLinks with an account context (i.e., for all courses in the account)
  * Note: NavMenuLinks with a course context are managed by CourseNavigationSettings.
@@ -49,14 +55,16 @@ export default function NavMenuLinksSettings(): JSX.Element {
           <NavMenuLink key={index} label={link.label} onDelete={() => deleteLink(index)} />
         ))}
       </ul>
-      <View as="div" padding="medium 0 0 0">
-        <Button type="button" onClick={() => setIsAddLinkModalOpen(true)}>
-          {I18n.t('Add a Link')}
-        </Button>
-        {isAddLinkModalOpen && (
-          <AddLinkModal onDismiss={() => setIsAddLinkModalOpen(false)} onAdd={appendLink} />
-        )}
-      </View>
+      {ENV.PERMISSIONS?.manage_nav_menu_links && (
+        <View as="div" padding="medium 0 0 0">
+          <Button type="button" onClick={() => setIsAddLinkModalOpen(true)}>
+            {I18n.t('Add a Link')}
+          </Button>
+          {isAddLinkModalOpen && (
+            <AddLinkModal onDismiss={() => setIsAddLinkModalOpen(false)} onAdd={appendLink} />
+          )}
+        </View>
+      )}
       <input type="hidden" name="account[nav_menu_links]" value={JSON.stringify(links)} />
     </View>
   )
@@ -83,28 +91,30 @@ function NavMenuLink({label, onDelete}: NavMenuLinkProps): JSX.Element {
           </Flex.Item>
         </Flex>
       </div>
-      <div className="ic-Sortable-item__Actions">
-        <Menu
-          trigger={
-            <IconButton
-              screenReaderLabel={I18n.t('Settings for %{linkLabel}', {linkLabel: label})}
-              size="small"
-              withBackground={false}
-              withBorder={false}
-              renderIcon={IconMoreSolid}
-            />
-          }
-        >
-          <Menu.Item data-pendo="navigation-menu-delete" onClick={onDelete} type="button">
-            <Flex>
-              <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
-                <IconTrashLine />
-              </Flex.Item>
-              <Flex.Item>{I18n.t('Delete')}</Flex.Item>
-            </Flex>
-          </Menu.Item>
-        </Menu>
-      </div>
+      {ENV.PERMISSIONS?.manage_nav_menu_links && (
+        <div className="ic-Sortable-item__Actions">
+          <Menu
+            trigger={
+              <IconButton
+                screenReaderLabel={I18n.t('Settings for %{linkLabel}', {linkLabel: label})}
+                size="small"
+                withBackground={false}
+                withBorder={false}
+                renderIcon={IconMoreSolid}
+              />
+            }
+          >
+            <Menu.Item data-pendo="navigation-menu-delete" onClick={onDelete} type="button">
+              <Flex>
+                <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
+                  <IconTrashLine />
+                </Flex.Item>
+                <Flex.Item>{I18n.t('Delete')}</Flex.Item>
+              </Flex>
+            </Menu.Item>
+          </Menu>
+        </div>
+      )}
     </li>
   )
 }

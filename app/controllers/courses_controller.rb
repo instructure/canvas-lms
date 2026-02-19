@@ -1618,7 +1618,8 @@ class CoursesController < ApplicationController
         add_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_add),
         edit_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_edit),
         delete_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_delete),
-        manage_course_content_edit: @context.grants_right?(@current_user, session, :manage_course_content_edit)
+        manage_course_content_edit: @context.grants_right?(@current_user, session, :manage_course_content_edit),
+        manage_nav_menu_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links)
       }
 
       js_env({
@@ -1932,7 +1933,8 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :update)
       @context.tab_configuration = NavMenuLinkTabs.sync_course_links_with_tabs(
         course: @context,
-        tabs: JSON.parse(params[:tabs_json]).compact
+        tabs: JSON.parse(params[:tabs_json]).compact,
+        can_manage_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links)
       )
       @context.save
       respond_to do |format|
