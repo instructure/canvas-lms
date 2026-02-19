@@ -266,4 +266,59 @@ describe('GradebookTable', () => {
       expect(screen.getAllByText('outcome 1')[0]).toBeInTheDocument()
     })
   })
+
+  describe('aria-label attributes', () => {
+    it('adds aria-label to outcome column headers with format "Outcome, [title]"', () => {
+      renderWithQueryClient(<GradebookTable {...defaultProps} />)
+
+      expect(screen.getByRole('columnheader', {name: 'Outcome, outcome 1'})).toBeInTheDocument()
+      expect(screen.getByRole('columnheader', {name: 'Outcome, outcome 2'})).toBeInTheDocument()
+    })
+
+    it('adds aria-label to contributing score column headers with format "Assignment, [name]"', () => {
+      const mockContributingScoresWithVisible = {
+        ...mockContributingScores,
+        forOutcome: vi.fn().mockReturnValue({
+          isVisible: vi.fn().mockReturnValue(true),
+          scoresForUser: vi.fn().mockReturnValue([{score: 3}, {score: 4}]),
+          alignments: [
+            {
+              alignment_id: 'A_1',
+              associated_asset_id: '1',
+              associated_asset_name: 'Assignment 1',
+              associated_asset_type: 'Assignment',
+              html_url: '/courses/1/assignments/1',
+            },
+            {
+              alignment_id: 'A_2',
+              associated_asset_id: '2',
+              associated_asset_name: 'Assignment 2',
+              associated_asset_type: 'Assignment',
+              html_url: '/courses/1/assignments/2',
+            },
+          ],
+        }),
+      }
+
+      const props = {
+        ...defaultProps,
+        contributingScores: mockContributingScoresWithVisible,
+      }
+
+      vi.mocked(useContributingScores).mockReturnValue(mockContributingScoresWithVisible as any)
+
+      renderWithQueryClient(<GradebookTable {...props} />)
+
+      const assignment1Headers = screen.getAllByRole('columnheader', {
+        name: 'Assignment, Assignment 1',
+      })
+      const assignment2Headers = screen.getAllByRole('columnheader', {
+        name: 'Assignment, Assignment 2',
+      })
+
+      // Should have one header per outcome (2 outcomes with contributing scores)
+      expect(assignment1Headers).toHaveLength(2)
+      expect(assignment2Headers).toHaveLength(2)
+    })
+  })
 })

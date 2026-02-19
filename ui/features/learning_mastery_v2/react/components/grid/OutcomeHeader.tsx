@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {IconArrowUpLine, IconArrowDownLine} from '@instructure/ui-icons'
+import {IconArrowUpLine, IconArrowDownLine, IconOutcomesLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -129,6 +129,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
       <ColumnHeader
         title={outcome.title}
         titleId={titleId}
+        icon={<IconOutcomesLine />}
         optionsMenuTriggerLabel={I18n.t('%{outcome} options', {outcome: outcome.title})}
         optionsMenuItems={[sortMenuGroup, <Menu.Separator key="separator" />, displayMenuGroup]}
       />

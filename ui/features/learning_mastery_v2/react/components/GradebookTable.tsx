@@ -296,8 +296,8 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
           data: {outcome},
           colHeaderProps: {
             'data-testid': `outcome-header-${outcome.id}`,
+            'aria-label': I18n.t('Outcome, %{title}', {title: outcome.title}),
             width: COLUMN_WIDTH + COLUMN_PADDING,
-            ariaLabelId: titleId,
             ...commonColHeaderProps,
           },
           cellProps: {
@@ -326,8 +326,10 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
                 },
                 colHeaderProps: {
                   'data-testid': `contributing-score-header-${outcome.id}-${alignment.alignment_id}`,
+                  'aria-label': I18n.t('Assignment, %{name}', {
+                    name: alignment.associated_asset_name,
+                  }),
                   width: COLUMN_WIDTH + COLUMN_PADDING,
-                  ariaLabelId: titleId,
                   ...commonColHeaderProps,
                 },
               } as Column)

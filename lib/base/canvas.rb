@@ -199,7 +199,7 @@ module Canvas
     revision&.delete("-")
   end
 
-  DEFAULT_RETRY_CALLBACK = lambda do |ex, tries|
+  DEFAULT_RETRY_CALLBACK = lambda do |ex, tries, *|
     Rails.logger.debug do
       {
         error_class: ex.class,
@@ -218,9 +218,9 @@ module Canvas
   def self.retriable(opts = {}, &)
     if opts[:on_retry]
       original_callback = opts[:on_retry]
-      opts[:on_retry] = lambda do |ex, tries|
-        original_callback.call(ex, tries)
-        DEFAULT_RETRY_CALLBACK.call(ex, tries)
+      opts[:on_retry] = lambda do |*args|
+        original_callback.call(*args)
+        DEFAULT_RETRY_CALLBACK.call(*args)
       end
     end
     options = DEFAULT_RETRIABLE_OPTIONS.merge(opts)

@@ -32,6 +32,7 @@ export interface ColumnHeaderProps {
   optionsMenuTriggerLabel?: string
   optionsMenuItems?: React.ReactNode[]
   columnWidth?: number
+  icon?: React.ReactNode
 }
 
 export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
@@ -40,6 +41,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   optionsMenuTriggerLabel,
   optionsMenuItems = [],
   columnWidth = COLUMN_WIDTH,
+  icon,
 }) => {
   return (
     <View background="secondary" as="div" width={columnWidth} data-testid="column-header">
@@ -51,9 +53,14 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
       >
         <Flex.Item size="80%">
           <AccessibleContent alt={title} id={titleId}>
-            <Text weight="bold">
-              <TruncateWithTooltip>{title}</TruncateWithTooltip>
-            </Text>
+            <Flex gap="xx-small" alignItems="center">
+              {icon && <Flex.Item>{icon}</Flex.Item>}
+              <Flex.Item shouldGrow={true} shouldShrink={true}>
+                <Text weight="bold">
+                  <TruncateWithTooltip>{title}</TruncateWithTooltip>
+                </Text>
+              </Flex.Item>
+            </Flex>
           </AccessibleContent>
         </Flex.Item>
         {optionsMenuItems.length > 0 && (

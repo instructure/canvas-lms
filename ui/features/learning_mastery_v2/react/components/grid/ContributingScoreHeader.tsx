@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {IconArrowUpLine, IconArrowDownLine} from '@instructure/ui-icons'
+import {IconArrowUpLine, IconArrowDownLine, IconAssignmentLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {openWindow} from '@canvas/util/globalUtils'
@@ -98,6 +98,7 @@ export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = (
     <ColumnHeader
       title={alignment.associated_asset_name}
       titleId={titleId}
+      icon={<IconAssignmentLine />}
       optionsMenuTriggerLabel={I18n.t('%{assignment} options', {
         assignment: alignment.associated_asset_name,
       })}

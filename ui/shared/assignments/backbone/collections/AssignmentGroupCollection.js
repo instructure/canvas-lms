@@ -26,7 +26,7 @@ const PER_PAGE_LIMIT = 50
 
 export default class AssignmentGroupCollection extends PaginatedCollection {
   expandPeerReviewSubAssignments() {
-    if (!ENV.FLAGS.peer_review_allocation_and_grading || !isStudent()) {
+    if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !isStudent()) {
       return
     }
 

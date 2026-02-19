@@ -2430,10 +2430,12 @@ class CoursesController < ApplicationController
             QUIZ_LTI_ENABLED: @context.feature_enabled?(:quizzes_next) &&
               !@context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
               @context.quiz_lti_tool.present?,
+            # Exposed at top level for consistency with other pages from which the AssignTo modal is accessed
+            # such as assignment index, modules, individual assignment and assignment create/edit pages
+            PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
             FLAGS: {
               newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
               show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
-              peer_review_allocation_and_grading: @context.feature_enabled?(:peer_review_allocation_and_grading)
             }
           )
           js_env(COURSE_HOME: true)

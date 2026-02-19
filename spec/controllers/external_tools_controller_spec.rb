@@ -2011,6 +2011,55 @@ describe ExternalToolsController do
           expect(response).to have_http_status(:unauthorized)
         end
       end
+
+      context "when assignment is locked by dates" do
+        before do
+          assignment.update!(due_at: 2.days.ago, unlock_at: 3.days.ago, lock_at: 1.day.ago)
+        end
+
+        context "with New Quizzes tool" do
+          let(:tool) do
+            account.context_external_tools.create!({
+                                                     name: "Quizzes.Next",
+                                                     url: "http://example.com/launch",
+                                                     domain: "example.com",
+                                                     consumer_key: "test_key",
+                                                     shared_secret: "test_secret",
+                                                     tool_id: "Quizzes 2",
+                                                     privacy_level: "public",
+                                                     settings: {
+                                                       custom_fields: { "canvas_assignment_due_at" => "$Canvas.assignment.dueAt.iso8601" }
+                                                     }
+                                                   })
+          end
+
+          it "does not allow student launch when assignment is locked" do
+            user_session(@student)
+            get :retrieve, params: retrieve_params
+            expect(response).to have_http_status(:unauthorized)
+          end
+
+          it "allows teachers to launch even when locked" do
+            user_session(@teacher)
+            get :retrieve, params: retrieve_params
+            expect(response).to be_successful
+          end
+        end
+
+        context "with non-New Quizzes tool" do
+          it "allows student launch even when assignment is locked" do
+            user_session(@student)
+            get :retrieve, params: retrieve_params
+            expect(response).to be_successful
+          end
+
+          it "allows teachers to launch when locked" do
+            user_session(@teacher)
+            get :retrieve, params: retrieve_params
+            expect(response).to be_successful
+          end
+        end
+      end
     end
   end
 
