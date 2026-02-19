@@ -112,7 +112,7 @@ export const AIAnalysisTab: React.FC<AIAnalysisTabProps> = ({
   }
 
   // Empty state
-  if (!evaluation) {
+  if (!evaluation || !evaluation.learning_objectives_evaluation) {
     return (
       <View as="div" padding="large">
         <Flex direction="column" alignItems="center" gap="medium">
