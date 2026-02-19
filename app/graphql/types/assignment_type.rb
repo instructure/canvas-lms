@@ -611,9 +611,14 @@ module Types
 
     field :html_url, UrlType, null: true
     def html_url
+      object_for_url = if object.is_a?(SubAssignment) && object.parent_assignment&.discussion_topic
+                         object.parent_assignment
+                       else
+                         assignment
+                       end
       GraphQLHelpers::UrlHelpers.course_assignment_url(
-        course_id: assignment.context_id,
-        id: assignment.id,
+        course_id: object_for_url.context_id,
+        id: object_for_url.id,
         host: context[:request].host_with_port
       )
     end

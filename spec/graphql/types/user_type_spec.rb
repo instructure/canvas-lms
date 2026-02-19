@@ -3702,6 +3702,39 @@ describe Types::UserType do
         end
       end
     end
+
+    it "excludes parent assignments with checkpoints, shows only SubAssignments" do
+      Timecop.freeze(@frozen_time) do
+        @course.account.enable_feature!(:discussion_checkpoints)
+
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+        parent_assignment = topic.assignment
+        parent_assignment.update!(has_sub_assignments: true)
+
+        checkpoint1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: @frozen_time + 1.day }],
+          points_possible: 5
+        )
+        checkpoint2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: @frozen_time + 2.days }],
+          points_possible: 10
+        )
+
+        # Create submissions for all (parent + checkpoints)
+        parent_assignment.submissions.find_or_create_by(user: @student)
+        checkpoint1.submissions.find_or_create_by(user: @student)
+        checkpoint2.submissions.find_or_create_by(user: @student)
+
+        ids = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { _id } } } }")
+
+        expect(ids).not_to include(parent_assignment.id.to_s)
+        expect(ids).to include(checkpoint1.id.to_s, checkpoint2.id.to_s)
+      end
+    end
   end
 
   context "courseWorkSubmissionsConnection with observed user" do

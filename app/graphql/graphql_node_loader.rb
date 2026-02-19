@@ -39,7 +39,9 @@ module GraphQLNodeLoader
     when "CourseBySis"
       Loaders::SISIDLoader.for(Course, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "Assignment"
-      Loaders::IDLoader.for(Assignment).load(id).then(check_read_permission)
+      Loaders::IDLoader.for(AbstractAssignment).load(id).then(check_read_permission)
+    when "SubAssignment"
+      Loaders::IDLoader.for(SubAssignment).load(id).then(check_read_permission)
     when "AbstractAssignment"
       include_types = id[:include_types]
       include_types = ["Assignment"] if include_types.blank?

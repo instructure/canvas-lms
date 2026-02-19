@@ -50,6 +50,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "Progress"
   value "Rubric"
   value "Section"
+  value "SubAssignment"
   value "Submission"
   value "Term"
   value "UsageRights"

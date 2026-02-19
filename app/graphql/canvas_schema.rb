@@ -63,7 +63,7 @@ class CanvasSchema < GraphQL::Schema
     when AccountNotification then Types::AccountNotificationType
     when Course then Types::CourseType
     when AllocationRule then Types::AllocationRuleType
-    when Assignment then Types::AssignmentType
+    when Assignment, SubAssignment then Types::AssignmentType
     when PeerReviewSubAssignment then Types::PeerReviewSubAssignmentType
     when AssignmentGroup then Types::AssignmentGroupType
     when CommentBankItem then Types::CommentBankItemType
