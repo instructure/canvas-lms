@@ -126,17 +126,17 @@ describe NavMenuLink do
   end
 
   describe ".sync_with_link_objects_json" do
-    it "parses valid JSON, calls sync_with_link_objects, and returns true on success" do
+    it "parses valid JSON, calls sync_with_link_objects when permission granted, and returns true on success" do
       json_data = '[{"type":"new","url":"https://example.com","label":"New Link"}]'
       expect(NavMenuLink).to receive(:sync_with_link_objects).with(context: @account, link_objects: JSON.parse(json_data))
-      result = NavMenuLink.sync_with_link_objects_json(context: @account, link_objects_json: json_data)
+      result = NavMenuLink.sync_with_link_objects_json(context: @account, link_objects_json: json_data, can_manage_links: true)
       expect(result).to be true
     end
 
     it "logs error and returns false on invalid JSON" do
       invalid_json = "not valid json"
       expect(Rails.logger).to receive(:error).with(/Failed to parse link_objects_json/)
-      result = NavMenuLink.sync_with_link_objects_json(context: @account, link_objects_json: invalid_json)
+      result = NavMenuLink.sync_with_link_objects_json(context: @account, link_objects_json: invalid_json, can_manage_links: true)
       expect(result).to be false
     end
   end
@@ -155,7 +155,7 @@ describe NavMenuLink do
       ]
 
       expect do
-        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
       end.to change { NavMenuLink.active.where(context: @account).count }.by(1)
 
       expect(NavMenuLink.active.where(id: @link1.id).exists?).to be true
@@ -170,7 +170,7 @@ describe NavMenuLink do
       ]
 
       expect do
-        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
       end.to change { NavMenuLink.active.where(context: @account).count }.by(-1)
 
       new_link = NavMenuLink.active.where(context: @account).order(:id).last
@@ -185,7 +185,7 @@ describe NavMenuLink do
         { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" }
       ]
 
-      NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+      NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
 
       expect(NavMenuLink.active.where(id: other_link.id).exists?).to be true
     end
@@ -202,7 +202,7 @@ describe NavMenuLink do
         expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
         expect(nav_cache).to receive(:invalidate_cache_key)
 
-        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
       end
 
       it "invalidates navigation cache when links are removed" do
@@ -214,7 +214,7 @@ describe NavMenuLink do
         expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
         expect(nav_cache).to receive(:invalidate_cache_key)
 
-        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
       end
 
       it "invalidates navigation cache when links are both added and removed" do
@@ -227,7 +227,7 @@ describe NavMenuLink do
         expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
         expect(nav_cache).to receive(:invalidate_cache_key)
 
-        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
       end
 
       it "does not invalidate navigation cache when no changes are made" do
@@ -238,7 +238,7 @@ describe NavMenuLink do
 
         expect(Lti::NavigationCache).not_to receive(:new)
 
-        NavMenuLink.sync_with_link_objects(context: @account, link_objects:)
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
       end
 
       it "uses the root account for cache invalidation in subaccounts" do
@@ -252,7 +252,28 @@ describe NavMenuLink do
         expect(Lti::NavigationCache).to receive(:new).with(root_account).and_return(nav_cache)
         expect(nav_cache).to receive(:invalidate_cache_key)
 
-        NavMenuLink.sync_with_link_objects(context: subaccount, link_objects:)
+        NavMenuLink.send(:sync_with_link_objects, context: subaccount, link_objects:)
+      end
+    end
+
+    context "with can_manage_links: false" do
+      it "returns true without making changes, calling sync_with_link_objects, or invalidating cache" do
+        initial_count = NavMenuLink.active.where(context: @account).count
+
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ]
+
+        expect(NavMenuLink).not_to receive(:sync_with_link_objects)
+        expect(Lti::NavigationCache).not_to receive(:new)
+
+        result = NavMenuLink.sync_with_link_objects_json(context: @account, link_objects_json: link_objects.to_json, can_manage_links: false)
+
+        expect(result).to be true
+        expect(NavMenuLink.active.where(context: @account).count).to eq(initial_count)
+        expect(NavMenuLink.active.where(context: @account, label: "New Link").exists?).to be false
+        expect(NavMenuLink.active.where(id: @link2.id).exists?).to be true
       end
     end
   end

@@ -1561,7 +1561,8 @@ class AccountsController < ApplicationController
 
         nav_menu_links_success = NavMenuLink.sync_with_link_objects_json(
           context: @account,
-          link_objects_json: params[:account].delete(:nav_menu_links)
+          link_objects_json: params[:account].delete(:nav_menu_links),
+          can_manage_links: @account.grants_right?(@current_user, session, :manage_nav_menu_links)
         )
 
         if nav_menu_links_success && @account.update(strong_account_params)
@@ -1665,7 +1666,8 @@ class AccountsController < ApplicationController
         manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags),
         add_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_add),
         edit_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_edit),
-        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete)
+        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete),
+        manage_nav_menu_links: @account.grants_right?(@current_user, session, :manage_nav_menu_links)
       }
 
       can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually].any? { |perm| js_permissions[perm] }

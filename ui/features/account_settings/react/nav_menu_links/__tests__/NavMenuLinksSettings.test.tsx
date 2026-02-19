@@ -21,6 +21,7 @@ import React from 'react'
 import {render, fireEvent, within} from '@testing-library/react'
 import NavMenuLinksSettings from '../NavMenuLinksSettings'
 import {useNavMenuLinksStore} from '../useNavMenuLinksStore'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the store
 vi.mock('../useNavMenuLinksStore')
@@ -45,6 +46,15 @@ vi.mock('@canvas/nav-menu-links/react/components/AddLinkModal', () => ({
 describe('NavMenuLinksSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    fakeENV.setup({
+      PERMISSIONS: {
+        manage_nav_menu_links: true,
+      },
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   it('renders empty list when no links exist', () => {

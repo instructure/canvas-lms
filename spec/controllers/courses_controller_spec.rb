@@ -6624,7 +6624,8 @@ describe CoursesController do
           tabs: [
             { "id" => "assignments", "label" => "Assignments" },
             { "id" => "announcements", "label" => "Announcements", "hidden" => true }
-          ]
+          ],
+          can_manage_links: false
         )
         .and_return(processed_tabs)
 
@@ -6644,6 +6645,47 @@ describe CoursesController do
       put :update_nav, params: { course_id: @course.id, tabs_json: }
 
       expect(response).to be_unauthorized
+    end
+
+    context "with manage_nav_menu_links permission" do
+      it "passes can_manage_links: true when user has permission" do
+        user_session(@teacher)
+        @course.root_account.enable_feature!(:nav_menu_links)
+
+        # Grant the permission
+        role = @teacher.enrollments.first.role
+        @course.root_account.role_overrides.create!(permission: :manage_nav_menu_links, role:, enabled: true)
+
+        tabs_json = [
+          { id: "assignments" },
+          { href: "nav_menu_link_url", args: ["https://example.com"], label: "New Link" }
+        ].to_json
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(hash_including(can_manage_links: true))
+          .and_call_original
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
+      end
+
+      it "passes can_manage_links: false when user lacks permission" do
+        user_session(@teacher)
+        @course.root_account.enable_feature!(:nav_menu_links)
+
+        # Permission is not granted (default is false)
+
+        tabs_json = [{ id: "assignments" }].to_json
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(hash_including(can_manage_links: false))
+          .and_call_original
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
+      end
     end
   end
 end

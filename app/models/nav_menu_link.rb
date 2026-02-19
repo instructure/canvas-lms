@@ -56,11 +56,10 @@ class NavMenuLink < ActiveRecord::Base
     end
   end
 
-  def self.sync_with_link_objects_json(context:, link_objects_json:)
-    if context.root_account.feature_enabled?(:nav_menu_links) && link_objects_json
+  def self.sync_with_link_objects_json(context:, link_objects_json:, can_manage_links: false)
+    if context.root_account.feature_enabled?(:nav_menu_links) && link_objects_json && can_manage_links
       sync_with_link_objects(context:, link_objects: JSON.parse(link_objects_json))
     end
-
     true
   rescue JSON::ParserError => e
     Rails.logger.error("Failed to parse link_objects_json: #{e.message}")
@@ -76,17 +75,20 @@ class NavMenuLink < ActiveRecord::Base
     link_objects = link_objects.map(&:with_indifferent_access)
 
     current_link_ids = Set.new(active.where(context:).pluck(:id).map(&:to_s))
-    link_ids_to_remove = current_link_ids - link_objects.pluck(:id).compact.map(&:to_s)
+    link_ids_to_remove = current_link_ids - link_objects.filter_map { |obj| obj[:id]&.to_s }
+
+    new_links = link_objects.select { |link| link[:type] == "new" }
 
     transaction do
-      link_objects.select { |link| link[:type] == "new" }.each do |link|
+      new_links.each do |link|
         NavMenuLink.create!(url: link[:url]&.to_s, label: link[:label]&.to_s, context:, course_nav: true)
       end
-      where(context:, id: link_ids_to_remove.to_a).destroy_all
+      where(context:, id: link_ids_to_remove.to_a).destroy_all if link_ids_to_remove.any?
     end
 
-    if link_ids_to_remove.any? || link_objects.any? { |link| link[:type] == "new" }
+    if link_ids_to_remove.any? || new_links.any?
       Lti::NavigationCache.new(context.root_account).invalidate_cache_key
     end
   end
+  private_class_method :sync_with_link_objects
 end

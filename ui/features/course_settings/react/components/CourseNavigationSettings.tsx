@@ -57,6 +57,9 @@ const I18n = createI18nScope('course_navigation_settings')
 
 declare const ENV: EnvCommon & {
   COURSE_SETTINGS_NAVIGATION_TABS?: NavigationTab[]
+  PERMISSIONS?: {
+    manage_nav_menu_links?: boolean
+  }
 }
 
 /**
@@ -179,7 +182,7 @@ export default function CourseNavigationSettings({
           </Droppable>
         </div>
 
-        {ENV.FEATURES?.nav_menu_links && (
+        {ENV.FEATURES?.nav_menu_links && ENV.PERMISSIONS?.manage_nav_menu_links && (
           <View as="div" padding="medium 0 0 0">
             <Button type="button" onClick={() => setIsAddLinkModalOpen(true)}>
               {I18n.t('Add a Link')}
@@ -320,7 +323,7 @@ const NavItem = React.memo(
                   <Flex.Item>{I18n.t('Move')}</Flex.Item>
                 </Flex>
               </Menu.Item>
-              {isLinkTab(tab) && (
+              {isLinkTab(tab) && ENV.PERMISSIONS?.manage_nav_menu_links && (
                 <Menu.Item
                   data-pendo="navigation-menu-delete"
                   onClick={() => onDelete(tab.internalId)}
