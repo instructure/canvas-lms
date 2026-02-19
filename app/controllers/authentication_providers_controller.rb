@@ -831,7 +831,7 @@ class AuthenticationProvidersController < ApplicationController
       unknown_user_url: account.unknown_user_url
     }
 
-    if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page)
+    if account.discovery_page_allowed?
       settings[:discovery_page_active] = account.discovery_page_active?
     end
 
@@ -883,7 +883,7 @@ class AuthenticationProvidersController < ApplicationController
       unknown_user_url
     ]
 
-    if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page)
+    if @account.discovery_page_allowed?
       permitted_params << :discovery_page_active
     end
 

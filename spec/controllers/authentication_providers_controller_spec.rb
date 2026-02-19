@@ -438,10 +438,10 @@ describe AuthenticationProvidersController do
 
   describe "discovery_page_active SSO setting" do
     before do
-      Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
+      allow_any_instance_of(Account).to receive(:discovery_page_allowed?).and_return(true)
     end
 
-    it "includes discovery_page_active in the sso_settings response when feature flag is enabled" do
+    it "includes discovery_page_active in the sso_settings response when allowed" do
       account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
       account.save!
       get :show_sso_settings, params: { account_id: account.id }, format: :json
@@ -450,8 +450,8 @@ describe AuthenticationProvidersController do
       expect(json["sso_settings"]["discovery_page_active"]).to be(true)
     end
 
-    it "does not include discovery_page_active when feature flag is disabled" do
-      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+    it "does not include discovery_page_active when not allowed" do
+      allow_any_instance_of(Account).to receive(:discovery_page_allowed?).and_return(false)
       account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
       account.save!
       get :show_sso_settings, params: { account_id: account.id }, format: :json
@@ -470,8 +470,8 @@ describe AuthenticationProvidersController do
       expect(account.discovery_page_active?).to be(true)
     end
 
-    it "ignores discovery_page_active parameter when feature flag is disabled" do
-      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+    it "ignores discovery_page_active parameter when not allowed" do
+      allow_any_instance_of(Account).to receive(:discovery_page_allowed?).and_return(false)
       put :update_sso_settings, params: {
         account_id: account.id,
         sso_settings: { discovery_page_active: true }
