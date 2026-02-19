@@ -77,18 +77,19 @@ describe('AIExperienceForm', () => {
 
       expect(screen.getByLabelText(/Title/)).toBeInTheDocument()
       expect(screen.getByLabelText(/Description/)).toBeInTheDocument()
-      expect(screen.getByLabelText(/Facts Students Should Know/)).toBeInTheDocument()
-      expect(screen.getByLabelText(/Learning Objectives/)).toBeInTheDocument()
-      expect(screen.getByLabelText(/Pedagogical Guidance/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Text source/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Learning objective targets/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Customize agent/)).toBeInTheDocument()
     })
 
-    it('renders configuration section with gradient header', () => {
+    it('renders configuration section', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
       expect(screen.getByText('Configurations')).toBeInTheDocument()
-      expect(screen.getByText('Learning Design')).toBeInTheDocument()
       expect(
-        screen.getByText('What should students know and how should the AI behave?'),
+        screen.getByText(
+          'Define the sourcing, completion rules, and personality of this IgniteAI.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -128,12 +129,12 @@ describe('AIExperienceForm', () => {
 
       const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
       const descriptionInput = screen.getByLabelText(/Description/) as HTMLTextAreaElement
-      const factsInput = screen.getByLabelText(/Facts Students Should Know/) as HTMLTextAreaElement
+      const factsInput = screen.getByLabelText(/Text source/) as HTMLTextAreaElement
       const learningObjectivesInput = screen.getByLabelText(
-        /Learning Objectives/,
+        /Learning objective targets/,
       ) as HTMLTextAreaElement
       const pedagogicalGuidanceInput = screen.getByLabelText(
-        /Pedagogical Guidance/,
+        /Customize agent/,
       ) as HTMLTextAreaElement
 
       fireEvent.change(titleInput, {target: {value: 'New Title'}})
@@ -233,12 +234,12 @@ describe('AIExperienceForm', () => {
 
       // Fill in required fields
       const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
-      const factsInput = screen.getByLabelText(/Facts Students Should Know/) as HTMLTextAreaElement
+      const factsInput = screen.getByLabelText(/Text source/) as HTMLTextAreaElement
       const learningObjectivesInput = screen.getByLabelText(
-        /Learning Objectives/,
+        /Learning objective targets/,
       ) as HTMLTextAreaElement
       const pedagogicalGuidanceInput = screen.getByLabelText(
-        /Pedagogical Guidance/,
+        /Customize agent/,
       ) as HTMLTextAreaElement
 
       fireEvent.change(titleInput, {target: {value: 'Preview Title'}})
@@ -414,12 +415,12 @@ describe('AIExperienceForm', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
       const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
-      const factsInput = screen.getByLabelText(/Facts Students Should Know/) as HTMLTextAreaElement
+      const factsInput = screen.getByLabelText(/Text source/) as HTMLTextAreaElement
       const learningObjectivesInput = screen.getByLabelText(
-        /Learning Objectives/,
+        /Learning objective targets/,
       ) as HTMLTextAreaElement
       const pedagogicalGuidanceInput = screen.getByLabelText(
-        /Pedagogical Guidance/,
+        /Customize agent/,
       ) as HTMLTextAreaElement
 
       fireEvent.change(titleInput, {target: {value: 'New Title'}})
