@@ -17,14 +17,16 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
+import {flushSync} from 'react-dom'
 import ThemeEditorImageRow from '../ThemeEditorImageRow'
 
-let elem, props
+let elem, props, root
 
 describe('ThemeEditorImageRow Component', () => {
   beforeEach(() => {
     elem = document.createElement('div')
+    root = createRoot(elem)
     props = {
       varDef: {
         type: 'image',
@@ -37,11 +39,15 @@ describe('ThemeEditorImageRow Component', () => {
     }
   })
 
+  afterEach(() => {
+    root.unmount()
+  })
+
   test('renders with human name heading', () => {
     const expected = 'Human'
     props.varDef.human_name = expected
 
-    ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
+    flushSync(() => root.render(<ThemeEditorImageRow {...props} />))
     const subject = elem.getElementsByTagName('h3')[0]
     expect(subject.textContent).toBe(expected)
   })
@@ -50,7 +56,7 @@ describe('ThemeEditorImageRow Component', () => {
     const expected = 'Halp!'
     props.varDef.helper_text = expected
 
-    ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
+    flushSync(() => root.render(<ThemeEditorImageRow {...props} />))
     const subject = elem.getElementsByClassName('Theme__editor-upload_restrictions')[0]
     expect(subject.textContent).toBe(expected)
   })
@@ -59,7 +65,7 @@ describe('ThemeEditorImageRow Component', () => {
     const expected = 'image.png'
     props.placeholder = expected
 
-    ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
+    flushSync(() => root.render(<ThemeEditorImageRow {...props} />))
     const subject = elem.getElementsByTagName('img')[0]
     expect(subject.src.split('/').pop()).toBe(expected)
   })
@@ -69,14 +75,15 @@ describe('ThemeEditorImageRow Component', () => {
     props.placeholder = 'other.png'
     props.userInput = {val: expected}
 
-    ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
+    flushSync(() => root.render(<ThemeEditorImageRow {...props} />))
     const subject = elem.getElementsByTagName('img')[0]
     expect(subject.src.split('/').pop()).toBe(expected)
   })
 
   test('setValue clears file input and calls onChange when arg is null', () => {
-    // eslint-disable-next-line react/no-render-return-value
-    const component = ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
+    const ref = React.createRef()
+    flushSync(() => root.render(<ThemeEditorImageRow {...props} ref={ref} />))
+    const component = ref.current
     const subject = component.fileInput
     subject.setAttribute('type', 'text')
     subject.value = 'foo'
@@ -86,8 +93,9 @@ describe('ThemeEditorImageRow Component', () => {
   })
 
   test('setValue clears file input and calls onChange when arg is empty string', () => {
-    // eslint-disable-next-line react/no-render-return-value
-    const component = ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
+    const ref = React.createRef()
+    flushSync(() => root.render(<ThemeEditorImageRow {...props} ref={ref} />))
+    const component = ref.current
     const subject = component.fileInput
     subject.setAttribute('type', 'text')
     subject.value = 'foo'
@@ -98,8 +106,9 @@ describe('ThemeEditorImageRow Component', () => {
 
   // we can't mutate window.URL
   test.skip('setValue calls onChange with blob url of input file', () => {
-    // eslint-disable-next-line react/no-render-return-value
-    const component = ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
+    const ref = React.createRef()
+    flushSync(() => root.render(<ThemeEditorImageRow {...props} ref={ref} />))
+    const component = ref.current
     const blob = new Blob(['foo'], {type: 'text/plain'})
     const originalCreateObjectURL = window.URL.createObjectURL
     const expected = 'blob:url'
