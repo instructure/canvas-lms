@@ -434,6 +434,149 @@ RSpec.describe PeerReview::DateOverriderService do
       expect(service).to receive(:update_only_visible_to_overrides)
       service.call
     end
+
+    context "with overrides" do
+      let(:section1) { course.course_sections.create!(name: "Section 1") }
+      let(:section2) { course.course_sections.create!(name: "Section 2") }
+
+      it "returns count when creating new overrides" do
+        parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          due_at: 1.week.from_now
+        )
+        parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          due_at: 2.weeks.from_now
+        )
+
+        overrides = [
+          { course_section_id: section1.id, due_at: 1.week.from_now },
+          { course_section_id: section2.id, due_at: 2.weeks.from_now }
+        ]
+
+        result = described_class.call(
+          peer_review_sub_assignment:,
+          overrides:
+        )
+
+        expect(result).to eq(2)
+      end
+
+      it "returns count when updating existing overrides" do
+        parent_override = parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          due_at: 1.week.from_now
+        )
+
+        existing_override = peer_review_sub_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          due_at: 1.week.from_now,
+          parent_override:
+        )
+
+        overrides = [
+          { id: existing_override.id, course_section_id: section1.id, due_at: 3.weeks.from_now }
+        ]
+
+        result = described_class.call(
+          peer_review_sub_assignment:,
+          overrides:
+        )
+
+        expect(result).to eq(1)
+      end
+
+      it "returns count when deleting overrides" do
+        parent_override1 = parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          due_at: 1.week.from_now
+        )
+        parent_override2 = parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          due_at: 2.weeks.from_now
+        )
+
+        peer_review_sub_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          due_at: 1.week.from_now,
+          parent_override: parent_override1
+        )
+        peer_review_sub_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          due_at: 2.weeks.from_now,
+          parent_override: parent_override2
+        )
+
+        result = described_class.call(
+          peer_review_sub_assignment:,
+          overrides: []
+        )
+
+        expect(result).to eq(2)
+      end
+
+      it "returns total count for mixed operations (create, update, delete)" do
+        parent_override1 = parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          due_at: 1.week.from_now
+        )
+        parent_override2 = parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          due_at: 2.weeks.from_now
+        )
+
+        existing_override = peer_review_sub_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          due_at: 1.week.from_now,
+          parent_override: parent_override1
+        )
+        peer_review_sub_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          due_at: 2.weeks.from_now,
+          parent_override: parent_override2
+        )
+
+        section3 = course.course_sections.create!(name: "Section 3")
+        parent_assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section3.id,
+          due_at: 3.weeks.from_now
+        )
+
+        overrides = [
+          { id: existing_override.id, course_section_id: section1.id, due_at: 3.weeks.from_now },
+          { course_section_id: section3.id, due_at: 4.weeks.from_now }
+        ]
+
+        result = described_class.call(
+          peer_review_sub_assignment:,
+          overrides:
+        )
+
+        expect(result).to eq(3)
+      end
+
+      it "returns 0 when no overrides change" do
+        result = described_class.call(
+          peer_review_sub_assignment:,
+          overrides: []
+        )
+
+        expect(result).to eq(0)
+      end
+    end
   end
 
   describe "#refresh_parent_associations" do

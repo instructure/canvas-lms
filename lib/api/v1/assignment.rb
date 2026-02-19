@@ -718,6 +718,16 @@ module Api::V1::Assignment
 
     calc_grades = calculate_grades ? value_to_boolean(calculate_grades) : true
     SubmissionLifecycleManager.recompute(prepared_create[:assignment], update_grades: calc_grades, executing_user: user)
+
+    # Recompute peer review sub assignment to ensure cached_due_date is updated
+    if has_peer_reviews && prepared_create[:assignment].peer_review_sub_assignment.present?
+      SubmissionLifecycleManager.recompute(
+        prepared_create[:assignment].peer_review_sub_assignment,
+        update_grades: calc_grades,
+        executing_user: user
+      )
+    end
+
     response
   rescue ActiveRecord::RecordInvalid
     false
@@ -738,6 +748,8 @@ module Api::V1::Assignment
 
     has_peer_reviews = prepared_update[:assignment].peer_reviews
     peer_review_grading_enabled = prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
+
+    should_recompute_peer_review_sub = false
 
     prepared_update[:assignment].skip_peer_review_sub_assignment_sync = true if prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
 
@@ -770,6 +782,12 @@ module Api::V1::Assignment
                                        assignment_params[:peer_review]
                                      )
                                    end
+
+              if peer_review_result.is_a?(Hash)
+                peer_review_overrides_affected = peer_review_result[:overrides_affected] || 0
+                peer_review_cached_due_dates_changed = peer_review_result[:peer_review_sub_assignment]&.update_cached_due_dates? || false
+                should_recompute_peer_review_sub = peer_review_overrides_affected > 0 || peer_review_cached_due_dates_changed
+              end
             else
               prepared_update[:assignment]&.peer_review_sub_assignment&.destroy
             end
@@ -800,6 +818,19 @@ module Api::V1::Assignment
       assignment.clear_cache_key(:availability)
       assignment.quiz.clear_cache_key(:availability) if assignment.quiz?
       SubmissionLifecycleManager.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
+    end
+
+    # Recompute peer review sub assignment to ensure cached_due_date is updated
+    if should_recompute_peer_review_sub &&
+       has_peer_reviews &&
+       peer_review_grading_enabled &&
+       prepared_update[:assignment].peer_review_sub_assignment.present?
+      prepared_update[:assignment].peer_review_sub_assignment.clear_cache_key(:availability)
+      SubmissionLifecycleManager.recompute(
+        prepared_update[:assignment].peer_review_sub_assignment,
+        update_grades: true,
+        executing_user: user
+      )
     end
 
     # At present, when an assignment linked to a LTI tool is copied, there is no way for canvas
@@ -1671,15 +1702,16 @@ module Api::V1::Assignment
       **peer_review_params
     )
 
+    overrides_affected = 0
     unless overrides.nil?
-      PeerReview::DateOverriderService.call(
+      overrides_affected = PeerReview::DateOverriderService.call(
         peer_review_sub_assignment:,
         overrides:,
         reload_associations: true
       )
     end
 
-    peer_review_sub_assignment
+    { peer_review_sub_assignment:, overrides_affected: }
   rescue PeerReview::PeerReviewError => e
     parent_assignment.errors.add(:base, "Peer Review: #{e.message}")
     false
@@ -1694,15 +1726,16 @@ module Api::V1::Assignment
       **peer_review_params
     )
 
+    overrides_affected = 0
     unless overrides.nil?
-      PeerReview::DateOverriderService.call(
+      overrides_affected = PeerReview::DateOverriderService.call(
         peer_review_sub_assignment:,
         overrides:,
         reload_associations: true
       )
     end
 
-    peer_review_sub_assignment
+    { peer_review_sub_assignment:, overrides_affected: }
   rescue PeerReview::PeerReviewError => e
     parent_assignment.errors.add(:base, "Peer Review: #{e.message}")
     false
