@@ -133,6 +133,11 @@ type Account implements LegacyIDInterface & Node {
     first: Int
 
     """
+    Filter by rubric ID
+    """
+    id: ID
+
+    """
     Returns the last _n_ elements from the list.
     """
     last: Int
@@ -2537,6 +2542,11 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     Returns the first _n_ elements from the list.
     """
     first: Int
+
+    """
+    Filter by rubric ID
+    """
+    id: ID
 
     """
     Returns the last _n_ elements from the list.

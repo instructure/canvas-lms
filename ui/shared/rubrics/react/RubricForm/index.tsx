@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {View} from '@instructure/ui-view'
@@ -60,6 +61,7 @@ import {EditConfirmModal} from '../RubricAssignment/components/EditConfirmModal'
 import {SaveRubricConfirmationModal} from './components/SaveRubricConfirmationModal'
 import {AssignmentPointsDifferenceModal} from './components/AssignmentPointsDifferenceModal'
 import {useGenerateCriteria} from './hooks/useGenerateCriteria'
+import {RubricGenericErrorPage} from './components/RubricGenericErrorPage'
 
 const I18n = createI18nScope('rubrics-form')
 
@@ -195,11 +197,11 @@ export const RubricForm = ({
     })
 
   const header = isNewRubric ? I18n.t('Create New Rubric') : I18n.t('Edit Rubric')
-  const queryKey = ['fetch-rubric', rubricId ?? '']
+  const queryKey = ['fetch-rubric', rubricId ?? '', accountId ?? '', courseId ?? '']
   const formValid = !validationErrors.title?.message && rubricForm.criteria.length > 0
   const criteriaBeingGenerated = generateCriteriaIsPending || regenerateCriteriaIsPending
 
-  const {data, isLoading} = useQuery({
+  const {data, isLoading, isError, error, isSuccess} = useQuery({
     queryKey,
     queryFn: fetchRubric,
     enabled: !!rubricId && canManageRubrics && !rubric,
@@ -362,6 +364,14 @@ export const RubricForm = ({
 
   if (isLoading && !!rubricId) {
     return <LoadingIndicator />
+  }
+
+  if (!isLoading && isError && error && !!rubricId) {
+    return <RubricGenericErrorPage />
+  }
+
+  if (isSuccess && !data && !!rubricId) {
+    return <NotFoundArtwork />
   }
 
   return (

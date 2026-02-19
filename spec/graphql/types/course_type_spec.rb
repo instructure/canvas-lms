@@ -3080,4 +3080,65 @@ describe Types::CourseType do
       expect(result).to be(false)
     end
   end
+
+  context "rubrics_connection field" do
+    before(:once) do
+      @rubric1 = rubric_model(context: @course, title: "Rubric 1")
+      @rubric2 = rubric_model(context: @course, title: "Rubric 2")
+      @rubric3 = rubric_model(context: @course, title: "Rubric 3")
+
+      # Create rubric associations to make them bookmarked
+      @rubric1.associate_with(@course, @course, purpose: "bookmark")
+      @rubric2.associate_with(@course, @course, purpose: "bookmark")
+      @rubric3.associate_with(@course, @course, purpose: "bookmark")
+    end
+
+    it "returns all rubrics without filter" do
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection { nodes { _id } }
+      GQL
+
+      expect(result).to contain_exactly(@rubric1.id.to_s, @rubric2.id.to_s, @rubric3.id.to_s)
+    end
+
+    it "filters by rubric id" do
+      result_ids = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { _id } }
+      GQL
+      result_titles = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { title } }
+      GQL
+
+      expect(result_ids.length).to eq(1)
+      expect(result_ids[0]).to eq(@rubric2.id.to_s)
+      expect(result_titles[0]).to eq("Rubric 2")
+    end
+
+    it "returns empty array when filtered id does not match" do
+      non_existent_id = @rubric3.id + 999
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{non_existent_id}") { nodes { _id } }
+      GQL
+
+      expect(result).to eq([])
+    end
+
+    it "does not return deleted rubrics" do
+      @rubric2.destroy
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection { nodes { _id } }
+      GQL
+
+      expect(result).to contain_exactly(@rubric1.id.to_s, @rubric3.id.to_s)
+    end
+
+    it "does not return deleted rubrics even when filtered by id" do
+      @rubric2.destroy
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { _id } }
+      GQL
+
+      expect(result).to eq([])
+    end
+  end
 end
