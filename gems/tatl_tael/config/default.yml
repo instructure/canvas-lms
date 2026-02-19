@@ -211,3 +211,19 @@ ByRoleLinter:
     Please consider using a different query such as byText or byLabelText.
   Regexes:
     ByRole: !ruby/regexp '/getByRole\(|findByRole\(|queryByRole\(|getAllByRole\(|findAllByRole\(|queryAllByRole\(/'
+
+Simple/LtiAssetProcessorSharedLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+      - "ui/shared/lti-asset-processor/shared-with-sg/replicated/**"
+  Message: |-
+    You have modified files in the
+    ui/shared/lti-asset-processor/shared-with-sg/replicated directory. These
+    files are shared with the speedgrader repository. Most changes (except
+    automatically-applied linting changes) will need to be copied to the
+    speedgrader repository using the asset-processors-code-copy script (in the
+    interop-team-scripts repo) to keep them in sync.
+
+    Please coordinate with the interop team to ensure the changes are properly
+    replicated.

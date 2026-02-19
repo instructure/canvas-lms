@@ -17,8 +17,8 @@
  */
 
 import {screen} from '@testing-library/react'
+import {describe, expect, it} from 'vitest'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {describe, expect, it} from '../../../__tests__/testPlatformShims'
 import {ToolIconOrDefault} from '../ToolIconOrDefault'
 
 describe('ToolIconOrDefault', () => {
@@ -96,7 +96,7 @@ describe('ToolIconOrDefault', () => {
         <ToolIconOrDefault {...defaultProps} iconUrl={null} size={48} />,
       )
       const img = container.querySelector('img')
-      expect(img).toHaveStyle({height: "48px", width: "48px"})
+      expect(img).toHaveStyle({height: '48px', width: '48px'})
     })
   })
 })

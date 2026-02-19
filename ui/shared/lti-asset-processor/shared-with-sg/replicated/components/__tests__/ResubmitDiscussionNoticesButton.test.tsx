@@ -18,8 +18,8 @@
 
 import '../../../__tests__/mockedDependenciesShims'
 import {fireEvent, screen} from '@testing-library/react'
+import {describe, expect, it, vi} from 'vitest'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {describe, expect, fn, it} from '../../../__tests__/testPlatformShims'
 import {useResubmitDiscussionNotices} from '../../../dependenciesShims'
 import {ResubmitDiscussionNoticesButton} from '../ResubmitDiscussionNoticesButton'
 
@@ -50,7 +50,7 @@ describe('ResubmitDiscussionNoticesButton', () => {
   })
 
   it('calls mutate when clicked', () => {
-    const mockMutate = fn()
+    const mockMutate = vi.fn()
     ;(useResubmitDiscussionNotices as any).mockReturnValue({
       mutate: mockMutate,
       isIdle: true,
@@ -67,7 +67,7 @@ describe('ResubmitDiscussionNoticesButton', () => {
 
   it('disables button when mutation is pending', () => {
     ;(useResubmitDiscussionNotices as any).mockReturnValue({
-      mutate: fn(),
+      mutate: vi.fn(),
       isIdle: false,
       isError: false,
       variables: {assignmentId: '123', studentId: '456'},
@@ -81,7 +81,7 @@ describe('ResubmitDiscussionNoticesButton', () => {
 
   it('disables button after successful submission', () => {
     ;(useResubmitDiscussionNotices as any).mockReturnValue({
-      mutate: fn(),
+      mutate: vi.fn(),
       isIdle: false,
       isError: false,
       variables: {assignmentId: '123', studentId: '456'},
@@ -95,7 +95,7 @@ describe('ResubmitDiscussionNoticesButton', () => {
 
   it('enables button when error occurs', () => {
     ;(useResubmitDiscussionNotices as any).mockReturnValue({
-      mutate: fn(),
+      mutate: vi.fn(),
       isIdle: false,
       isError: true,
       variables: {assignmentId: '123', studentId: '456'},
@@ -116,7 +116,7 @@ describe('ResubmitDiscussionNoticesButton', () => {
 
   it('does not disable button for different student', () => {
     ;(useResubmitDiscussionNotices as any).mockReturnValue({
-      mutate: fn(),
+      mutate: vi.fn(),
       isIdle: false,
       isError: false,
       variables: {assignmentId: '123', studentId: '789'}, // Different student

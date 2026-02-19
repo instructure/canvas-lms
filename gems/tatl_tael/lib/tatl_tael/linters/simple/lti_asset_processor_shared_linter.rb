@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2026 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,7 +21,7 @@ require_relative "../simple_linter"
 module TatlTael
   module Linters
     module Simple
-      class PublicJsSpecsLinter < SimpleLinter
+      class LtiAssetProcessorSharedLinter < SimpleLinter
       end
     end
   end

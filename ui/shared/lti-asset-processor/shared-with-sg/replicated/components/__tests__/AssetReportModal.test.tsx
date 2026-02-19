@@ -18,8 +18,8 @@
 
 import '../../../__tests__/mockedDependenciesShims'
 import {screen} from '@testing-library/react'
+import {vi} from 'vitest'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {fn} from '../../../__tests__/testPlatformShims'
 import {useResubmitDiscussionNotices} from '../../../dependenciesShims'
 import type {LtiAssetProcessor} from '../../types/LtiAssetProcessors'
 import type {LtiAssetReport} from '../../types/LtiAssetReports'
@@ -98,12 +98,12 @@ describe('AssetReportModal', () => {
     },
   ]
 
-  const mockOnClose = fn()
+  const mockOnClose = vi.fn()
 
   beforeEach(() => {
     mockOnClose.mockClear()
     ;(useResubmitDiscussionNotices as any).mockReturnValue({
-      mutate: fn(),
+      mutate: vi.fn(),
       isIdle: true,
       isError: false,
       variables: undefined,

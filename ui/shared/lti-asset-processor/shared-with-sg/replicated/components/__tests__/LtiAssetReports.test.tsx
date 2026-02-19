@@ -19,8 +19,8 @@
 import {fireEvent, waitFor} from '@testing-library/react'
 import {HttpResponse, http} from 'msw'
 import {setupServer} from 'msw/node'
+import {describe, expect, it, vi} from 'vitest'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {clearAllMocks, describe, expect, fn, it} from '../../../__tests__/testPlatformShims'
 import {defaultLtiAssetProcessors} from '../../__fixtures__/default/ltiAssetProcessors'
 import {
   defaultLtiAssetReportsForDiscussion,
@@ -36,7 +36,7 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const mockResubmitLtiAssetReports = fn((_params: ResubmitLtiAssetReportsParams) =>
+const mockResubmitLtiAssetReports = vi.fn((_params: ResubmitLtiAssetReportsParams) =>
   Promise.resolve(),
 )
 
@@ -75,7 +75,7 @@ describe('LtiAssetReports', () => {
   }
 
   beforeEach(() => {
-    clearAllMocks()
+    vi.clearAllMocks()
 
     attachments = [
       {_id: '20001', displayName: 'file1.pdf'},
@@ -139,7 +139,7 @@ describe('LtiAssetReports', () => {
   it('renders View Report button if launchUrlPath is present', () => {
     firstRep.launchUrlPath = null
     const {getAllByText} = setup('online_upload')
-    expect(getAllByText(/View .* Report/)).toHaveLength(3)
+    expect(getAllByText(/^View .+ Report$/)).toHaveLength(3)
   })
 
   it('renders error message (and comment) for failed reports', () => {

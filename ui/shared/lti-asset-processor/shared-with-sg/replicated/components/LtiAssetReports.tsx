@@ -19,8 +19,8 @@
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useFormatDateTime, useResubmitLtiAssetReports} from '../../dependenciesShims'
 import {
