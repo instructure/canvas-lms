@@ -339,14 +339,14 @@ describe('useQueryPageViewsPaginated', () => {
 
     expect(result.current.views).toHaveLength(0)
     expect(result.current.currentPage).toBe(1)
-    expect(result.current.totalPages).toBe(2) // Even empty first page shows potential next page
-    expect(result.current.hasReachedEnd).toBe(false) // Empty first page doesn't trigger hasReachedEnd
+    expect(result.current.totalPages).toBe(1)
+    expect(result.current.hasReachedEnd).toBe(true)
   })
 
   it('should handle date range parameters', async () => {
     const mockViews = createMockPageViews('127', 1, 5)
 
-    vi.mocked(doFetchApi).mockImplementation((options) => {
+    vi.mocked(doFetchApi).mockImplementation(options => {
       // Verify that the date parameters are passed correctly
       expect(options.params?.start_time).toBe('2023-01-01T00:00:00.000Z')
       expect(options.params?.end_time).toBe('2023-01-31T23:59:59.999Z')
@@ -481,5 +481,111 @@ describe('useQueryPageViewsPaginated', () => {
 
     // Should have made the right number of API calls (not excessive)
     expect(vi.mocked(doFetchApi).mock.calls.length).toBeLessThanOrEqual(4) // 1, 2, back to 1 (cached), back to 2 (cached or new)
+  })
+
+  it('should detect end of pagination when navigating to last page with no next link', async () => {
+    const page1Views = createMockPageViews('132', 1, 100) // 100 items on page 1
+    const page2Views = createMockPageViews('132', 2, 50) // 50 items on page 2 (last page)
+
+    // Mock page 1 WITH next link
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
+      json: page1Views,
+      link: {
+        next: {
+          url: `http://localhost/api/v1/users/132/page_views?page=${btoa('bookmark:2')}&per_page=100`,
+          rel: 'next',
+        },
+      },
+      response: {} as Response,
+      text: JSON.stringify(page1Views),
+    })
+
+    // Mock page 2 WITHOUT next link (this is the last page)
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
+      json: page2Views,
+      link: undefined, // NO next link - this should set hasReachedEnd = true
+      response: {} as Response,
+      text: JSON.stringify(page2Views),
+    })
+
+    const {result} = renderHook(
+      () =>
+        useQueryPageViewsPaginated({
+          userId: '132',
+          pageSize: 100,
+        }),
+      {
+        wrapper: createWrapper(),
+      },
+    )
+
+    // Wait for page 1 load
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(result.current.currentPage).toBe(1)
+    expect(result.current.totalPages).toBe(2) // Should show page 2 is available
+    expect(result.current.hasReachedEnd).toBe(false)
+
+    // Navigate to page 2
+    act(() => {
+      result.current.setCurrentPage(2)
+    })
+
+    // Wait for page 2 to load
+    await waitFor(() => {
+      expect(result.current.currentPage).toBe(2)
+      expect(result.current.views).toHaveLength(50)
+    })
+
+    // At this point, no more pages should be available
+    expect(result.current.hasReachedEnd).toBe(true)
+    expect(result.current.totalPages).toBe(2) // Should still be 2
+
+    // Should have made exactly 2 API calls
+    expect(vi.mocked(doFetchApi).mock.calls).toHaveLength(2)
+  })
+
+  it('should throw error when try to paginate further after reaching end', async () => {
+    const page1Views = createMockPageViews('133', 1, 10)
+
+    // Mock page 1 WITHOUT next link (only one page)
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
+      json: page1Views,
+      link: undefined, // NO next link - this should set hasReachedEnd = true
+      response: {} as Response,
+      text: JSON.stringify(page1Views),
+    })
+
+    const {result} = renderHook(
+      () =>
+        useQueryPageViewsPaginated({
+          userId: '133',
+          pageSize: 10,
+        }),
+      {
+        wrapper: createWrapper(),
+      },
+    )
+
+    // Wait for page 1 load
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(result.current.currentPage).toBe(1)
+    expect(result.current.hasReachedEnd).toBe(true)
+
+    // Attempt to go to page 2, which should not be allowed
+    act(() => {
+      result.current.setCurrentPage(2)
+    })
+
+    // Wait for error state
+    await waitFor(() => {
+      expect(result.current.error).toBeDefined()
+      expect(result.current.error?.message).toContain('No more pages available')
+    })
   })
 })

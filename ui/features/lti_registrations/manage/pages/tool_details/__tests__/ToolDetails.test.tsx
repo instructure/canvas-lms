@@ -126,4 +126,49 @@ describe('ToolDetailsInner', () => {
 
     delete window.ENV.turnitinAPClientId
   })
+
+  it('shows the "Reinstall App" button when dynamic_registration_url is present and reinstall is not disabled', async () => {
+    const registration = mockRegistrationWithAllInformation({
+      n: 'test',
+      i: 1,
+      registration: {
+        dynamic_registration_url: 'https://example.com/register',
+        reinstall_disabled: false,
+      },
+    })
+
+    const wrapper = renderToolDetailsInner(registration)
+
+    expect(wrapper.queryByText('Reinstall App')).toBeInTheDocument()
+  })
+
+  it('does not show the "Reinstall App" button when reinstall_disabled is true', async () => {
+    const registration = mockRegistrationWithAllInformation({
+      n: 'test',
+      i: 1,
+      registration: {
+        dynamic_registration_url: 'https://example.com/register',
+        reinstall_disabled: true,
+      },
+    })
+
+    const wrapper = renderToolDetailsInner(registration)
+
+    expect(wrapper.queryByText('Reinstall App')).not.toBeInTheDocument()
+  })
+
+  it('does not show the "Reinstall App" button when dynamic_registration_url is not present', async () => {
+    const registration = mockRegistrationWithAllInformation({
+      n: 'test',
+      i: 1,
+      registration: {
+        dynamic_registration_url: null,
+        reinstall_disabled: false,
+      },
+    })
+
+    const wrapper = renderToolDetailsInner(registration)
+
+    expect(wrapper.queryByText('Reinstall App')).not.toBeInTheDocument()
+  })
 })

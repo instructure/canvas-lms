@@ -24,6 +24,24 @@ module Services
       config["launch_url"]
     end
 
+    def self.ui_version
+      url = launch_url
+      return nil unless url
+
+      uri = URI.parse(url)
+      path_segments = uri.path.split("/").reject(&:empty?)
+
+      # Expected format: /<version>/remoteEntry.js
+      unless path_segments.length >= 2 && path_segments.last == "remoteEntry.js"
+        raise URI::InvalidURIError, "Launch URL does not match expected format: /<version>/remoteEntry.js"
+      end
+
+      path_segments[-2]
+    rescue URI::InvalidURIError => e
+      Rails.logger.error("Failed to parse New Quizzes launch URL: #{e.message}")
+      nil
+    end
+
     class << self
       private
 

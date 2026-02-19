@@ -248,11 +248,11 @@ body:not(.course-menu-expanded) {
   }
 
   @include desktop-only {
-    body:not(.no-headers):not(.content-only) & {
+    body:not(.no-headers):not(.content-only):not(.hide-global-nav) & {
       margin-#{direction(left)}: $ic-header-primary-width - 30;
     }
 
-    body:not(.no-headers):not(.content-only).primary-nav-expanded & {
+    body:not(.no-headers):not(.content-only):not(.hide-global-nav).primary-nav-expanded & {
       margin-#{direction(left)}: $ic-header-primary-width;
     }
   }

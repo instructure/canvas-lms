@@ -36,6 +36,7 @@ export const IssuesTableColumns = {
   ResourceType: 'resource-type-header',
   State: 'state-header',
   LastEdited: 'last-edited-header',
+  Actions: 'actions-header',
 }
 
 export const IssuesTableColumnHeaders = [
@@ -44,6 +45,7 @@ export const IssuesTableColumnHeaders = [
   {id: IssuesTableColumns.ResourceType, name: I18n.t('Type')},
   {id: IssuesTableColumns.State, name: I18n.t('State')},
   {id: IssuesTableColumns.LastEdited, name: I18n.t('Last edited')},
+  {id: IssuesTableColumns.Actions, name: ''},
 ]
 
 export const IssuesTableHeaderApiNames: Record<string, string> = {
@@ -63,7 +65,7 @@ export const FILTER_GROUP_MAPPING: FilterGroupMapping = {
 export const issueTypeOptions: {value: keyof FilterGroupMapping | IssueRuleType; label: string}[] =
   [
     {value: 'alt-text', label: I18n.t('Alt text')},
-    {value: 'heading-order', label: I18n.t('Heading order')},
+    {value: 'heading-order', label: I18n.t('Skipped heading level')},
     {value: 'paragraphs-for-headings', label: I18n.t('Heading length')},
     {value: 'adjacent-links', label: I18n.t('Duplicate links')},
     {value: 'table-header', label: I18n.t('Missing table headers')},
@@ -76,6 +78,7 @@ export const issueTypeOptions: {value: keyof FilterGroupMapping | IssueRuleType;
 export const artifactTypeOptions = [
   {value: 'wiki_page', label: I18n.t('Pages')},
   {value: 'assignment', label: I18n.t('Assignments')},
+  {value: 'discussion_topic', label: I18n.t('Discussion topics'), requiresFeatureFlag: true},
 ]
 
 export const stateOptions = [

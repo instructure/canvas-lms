@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
@@ -35,11 +35,7 @@ function reloadStudentGroup() {
 }
 
 function editGroup(group, open = true) {
-  if (!root) {
-    root = createRoot(mountPoint)
-  }
-
-  root.render(
+  const element = (
     <GroupModal
       group={{
         name: group.get('name'),
@@ -57,8 +53,14 @@ function editGroup(group, open = true) {
         editGroup(group, false)
         document.getElementById('edit_group').focus()
       }}
-    />,
+    />
   )
+
+  if (!root) {
+    root = render(element, mountPoint)
+  } else {
+    rerender(root, element)
+  }
 }
 
 ready(() => {

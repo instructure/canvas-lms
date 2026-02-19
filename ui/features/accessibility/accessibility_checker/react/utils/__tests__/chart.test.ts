@@ -41,7 +41,7 @@ const sampleData: IssueDataPoint[] = [
 const parsedIssueDataPoints: IssueDataPoint[] = [
   {
     id: 'heading-order',
-    issue: 'Heading order',
+    issue: 'Skipped heading level',
     count: 1,
     severity: 'Low',
   },

@@ -222,6 +222,14 @@ describe "teacher k5 course dashboard" do
     it "shows the k5 navigation tabs and LTIs on the settings page" do
       get "/courses/#{@subject_course.id}/settings#tab-navigation"
 
+      # Wait for React component to load
+      wait_for_ajaximations
+
+      # Wait specifically for navigation items to render
+      wait_for(method: nil, timeout: 10) do
+        ff(".course-nav-tabs-list .course-nav-tab").any? || ff(".navitem").any?
+      end
+
       navigation_list = navigation_items
       # AI Experiences is excluded from subject tabs
       expect(navigation_list.count).to eq(7)

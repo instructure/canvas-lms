@@ -55,8 +55,7 @@ const ProgressionModuleHeader = ({bridge}: Props) => {
     <Flex margin="0 0 medium">
       <Flex.Item>
         <Heading level="h1">
-          {/* @ts-expect-error renderTitle may return null, but React handles this */}
-          <span dangerouslySetInnerHTML={{__html: renderTitle()}} />
+          <span dangerouslySetInnerHTML={{__html: renderTitle() || ''}} />
         </Heading>
       </Flex.Item>
     </Flex>

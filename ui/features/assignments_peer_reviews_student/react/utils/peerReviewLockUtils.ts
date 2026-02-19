@@ -38,7 +38,25 @@ export function getPeerReviewUnlockDate(assignment: Assignment): string | null {
 }
 
 /**
- * Determines if the peer review is currently locked for the student.
+ * Gets the lock date for peer reviews.
+ */
+export function getPeerReviewLockDate(assignment: Assignment): string | null {
+  const allAssignedToDates = assignment.assignedToDates
+  if (!allAssignedToDates || allAssignedToDates.length === 0) {
+    return null
+  }
+
+  const assignedToDates = allAssignedToDates[0]
+  const peerReviewDates = assignedToDates.peerReviewDates
+  if (!peerReviewDates) {
+    return null
+  }
+
+  return peerReviewDates.lockAt
+}
+
+/**
+ * Determines if the peer review is currently locked for the student (not yet unlocked).
  */
 export function isPeerReviewLocked(assignment: Assignment): boolean {
   const unlockDate = getPeerReviewUnlockDate(assignment)
@@ -51,4 +69,20 @@ export function isPeerReviewLocked(assignment: Assignment): boolean {
   const unlock = new Date(unlockDate)
 
   return now < unlock
+}
+
+/**
+ * Determines if the peer review is past the lock date (i.e., closed for submissions).
+ */
+export function isPeerReviewPastLockDate(assignment: Assignment): boolean {
+  const lockDate = getPeerReviewLockDate(assignment)
+
+  if (!lockDate) {
+    return false
+  }
+
+  const now = new Date()
+  const lock = new Date(lockDate)
+
+  return now > lock
 }

@@ -25,6 +25,7 @@ import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import Fixtures from './Fixtures'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 const defaultProps = () => ({
   fetchHistoryStatus: 'started',
@@ -277,8 +278,11 @@ describe('SearchForm', () => {
           }
 
           beforeEach(() => {
-            // @ts-expect-error
-            window.ENV = {OVERRIDE_GRADES_ENABLED: true}
+            fakeEnv.setup({OVERRIDE_GRADES_ENABLED: true})
+          })
+
+          afterEach(() => {
+            fakeEnv.teardown()
           })
 
           test('is shown', () => {
@@ -307,10 +311,10 @@ describe('SearchForm', () => {
         })
 
         test('is not shown if the OVERRIDE_GRADES_ENABLED environment variable is set to false', () => {
-          // @ts-expect-error
-          window.ENV = {OVERRIDE_GRADES_ENABLED: false}
+          fakeEnv.setup({OVERRIDE_GRADES_ENABLED: false})
           mountComponent()
           expect(document.querySelector('#show_final_grade_overrides_only')).not.toBeInTheDocument()
+          fakeEnv.teardown()
         })
       })
     })

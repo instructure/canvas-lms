@@ -29,7 +29,7 @@ import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {
   ContributingScoreAlignment,
   ContributingScoresManager,
-} from '../../hooks/useContributingScores'
+} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {CellWithAction} from './CellWithAction'
 import {FocusableCell} from './FocusableCell'
 

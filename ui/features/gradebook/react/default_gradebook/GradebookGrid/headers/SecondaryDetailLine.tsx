@@ -33,9 +33,8 @@ type SecondaryDetailLineProps = {
 }
 
 function SecondaryDetailLine(props: SecondaryDetailLineProps) {
-  // Anonymized assignments should hide grades unless the assignment is a NQ with anonymous participants
   const anonymous =
-    props.assignment.anonymizeStudents && !props.assignment.newQuizzesAnonymousParticipants
+    props.assignment.anonymizeStudents || props.assignment.newQuizzesAnonymousParticipants
   const unpublished = !props.assignment.published
 
   if (anonymous || unpublished) {

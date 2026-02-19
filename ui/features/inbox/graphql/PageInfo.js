@@ -21,7 +21,7 @@ import {gql} from '@apollo/client'
 
 export const PageInfo = {
   fragment: gql`
-    fragment PageInfo on PageInfo {
+    fragment InboxPageInfo on PageInfo {
       endCursor
       hasNextPage
     }

@@ -23,6 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {IconCoursesLine, IconInfoLine, IconSubaccountsLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {renderExceptionCounts} from './renderExceptionCounts'
@@ -87,6 +88,22 @@ export const ContextCard = ({
   const contextUrl =
     typeof account_id !== 'undefined' ? `/accounts/${account_id}` : `/courses/${course_id}`
 
+  // Generate a unique ID for this context card based on course_id or account_id
+  const contextType = typeof account_id !== 'undefined' ? 'account' : 'course'
+  const contextId = contextType === 'account' ? account_id : course_id
+  const availabilityId =
+    typeof available !== 'undefined' ? `availability-${contextType}-${contextId}` : ''
+  const pathId = `path-${contextType}-${contextId}`
+  const exceptionCountsId = `exceptions-${contextType}-${contextId}`
+  const inheritNoteId = inherit_note ? `inherit-note-${contextType}-${contextId}` : ''
+
+  // ariaDescribedBy is a string of IDs that reference the other elements
+  // that should be read when a screenreader focuses on the name of this exception.
+  // If there is a way for the referenced element to possibly not exist, make sure
+  // that its ID is blank in this array (like if 'available' is undefined or
+  // 'inherit_note' is false.
+  const ariaDescribedBy = [availabilityId, pathId, exceptionCountsId, inheritNoteId].join(' ')
+
   return (
     <div style={{marginLeft}}>
       <View
@@ -94,6 +111,7 @@ export const ContextCard = ({
         padding="x-small x-small x-small small"
         borderWidth="0 0 0 large"
         borderColor={borderColor(course_id)}
+        focusWithin={true}
       >
         <Flex as="div">
           <Flex.Item margin="0 small 0 0" as="div">
@@ -105,7 +123,7 @@ export const ContextCard = ({
           </Flex.Item>
           <Flex.Item as="div" shouldShrink>
             <Flex as="div" margin="0" alignItems="center">
-              <Heading level="h4" margin="0 xx-small 0 0">
+              <Heading level="h4" margin="0 xx-small 0 0" aria-describedby={ariaDescribedBy}>
                 <Text weight="bold">
                   <Link href={contextUrl} data-pendo="lti-registrations-availability-context-link">
                     {context_name}
@@ -113,17 +131,30 @@ export const ContextCard = ({
                 </Text>
               </Heading>
               {typeof available !== 'undefined' ? (
-                <Tag text={available ? I18n.t('Available') : I18n.t('Not Available')} />
+                <span id={availabilityId} aria-hidden="true">
+                  <Tag text={available ? I18n.t('Available') : I18n.t('Not Available')} />
+                </span>
               ) : null}
             </Flex>
             <Flex.Item shouldGrow>
-              <ContextPath path={path_segments} />
+              {path_segments.length > 0 ? (
+                <div>
+                  <div aria-hidden="true">
+                    <ContextPath path={path_segments} />
+                  </div>
+                  <ScreenReaderContent id={pathId} aria-hidden="true">
+                    {I18n.t('Exists under %{path_segments}', {
+                      path_segments,
+                    })}
+                  </ScreenReaderContent>
+                </div>
+              ) : null}
             </Flex.Item>
-            <View as="div" margin="0">
+            <View as="div" margin="0" id={exceptionCountsId} aria-hidden="true">
               {exception_counts && account_id && renderExceptionCounts(exception_counts)}
             </View>
             {inherit_note && (
-              <View as="div" margin="0">
+              <View as="div" margin="0" id={inheritNoteId} aria-hidden="true">
                 <Flex alignItems="center">
                   <Flex.Item margin="0 xx-small 0 0">
                     <IconInfoLine />

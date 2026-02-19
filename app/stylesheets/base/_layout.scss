@@ -31,6 +31,13 @@ body {
     .ic-app-nav-toggle-and-crumbs { display: none; }
     #footer { display: none; }
   }
+  &.hide-global-nav {
+    // Hide desktop header completely
+    #header { display: none !important; }
+
+    // On mobile, only hide the burger menu, keep the rest of mobile header
+    #mobile-header .mobile-header-hamburger { display: none !important; }
+  }
   &.embedded {
     #application {
       height: 100%;

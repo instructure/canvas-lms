@@ -71,7 +71,10 @@ module NewQuizzes
         # Parameters not included in VariableExpander
         resource_link_id:,
         resource_link_title:,
-        launch_presentation_return_url: return_url
+        launch_presentation_return_url: return_url,
+
+        # UI version (extracted from launch URL in Consul)
+        ui_version: Services::NewQuizzes.ui_version
       }.merge(standard_params)
 
       # Assignment-specific outcome service parameters
@@ -154,9 +157,10 @@ module NewQuizzes
     end
 
     def return_url
-      # Generate return URL - for native launches, this could be used by the tool
-      # to navigate back to Canvas after completion
-      @controller&.named_context_url(@context, :context_external_content_success_url, "external_tool_redirect", include_host: true)
+      # Generate return URL - match LTI launch behavior by using set_return_url
+      # This intelligently determines the best return URL based on the referer
+      # (quizzes page, gradebook, modules, etc.)
+      @controller&.set_return_url
     end
 
     def roles

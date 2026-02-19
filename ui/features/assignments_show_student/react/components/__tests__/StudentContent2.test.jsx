@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
@@ -60,9 +60,9 @@ describe('StudentContent Attempt Select', () => {
       Submission: {...SubmissionMocks.submitted},
     })
     const {queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
   })
@@ -73,9 +73,9 @@ describe('StudentContent Attempt Select', () => {
       Submission: {...SubmissionMocks.submitted},
     })
     const {queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
   })
@@ -100,9 +100,9 @@ describe('StudentContent Attempt Select', () => {
       ],
     }
     const {queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
   })
@@ -114,9 +114,9 @@ describe('StudentContent Attempt Select', () => {
     props.assignment.env.peerReviewModeEnabled = false
     props.allSubmissions = [props.submission]
     const {queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(queryByTestId('attemptSelect')).toBeInTheDocument()
   })

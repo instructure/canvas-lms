@@ -263,54 +263,6 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels, false)
       check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels)
     end
-
-    describe "equella settings" do
-      def add_equella_feature
-        equella_url = "http://oer.equella.com/signon.do"
-        f("#account_settings_equella_endpoint").send_keys(equella_url)
-        f("#account_settings_equella_teaser").send_keys("equella feature")
-        click_submit
-        expect(Account.default.settings[:equella_endpoint]).to eq equella_url
-        expect(Account.default.settings[:equella_teaser]).to eq "equella feature"
-        expect(f("#account_settings_equella_endpoint")).to have_value equella_url
-        expect(f("#account_settings_equella_teaser")).to have_value "equella feature"
-      end
-
-      before do
-        equella = f("#enable_equella")
-        scroll_into_view(equella)
-        equella.click
-      end
-
-      it "adds an equella feature" do
-        add_equella_feature
-      end
-
-      it "edits an equella feature" do
-        add_equella_feature
-        new_equella_url = "http://oer.equella.com/signon.be"
-        replace_content(f("#account_settings_equella_endpoint"), new_equella_url)
-        replace_content(f("#account_settings_equella_teaser"), "new equella feature")
-        click_submit
-        expect(Account.default.settings[:equella_endpoint]).to eq new_equella_url
-        expect(Account.default.settings[:equella_teaser]).to eq "new equella feature"
-        expect(f("#account_settings_equella_endpoint")).to have_value new_equella_url
-        expect(f("#account_settings_equella_teaser")).to have_value "new equella feature"
-      end
-
-      it "deletes an equella feature" do
-        add_equella_feature
-        expect(fj("#account_settings_equella_endpoint:visible")).to be_displayed
-        expect(fj("#account_settings_equella_teaser:visible")).to be_displayed
-        replace_content(f("#account_settings_equella_endpoint"), "")
-        replace_content(f("#account_settings_equella_teaser"), "")
-        click_submit
-        expect(Account.default.settings[:equella_endpoint]).to be_nil
-        expect(Account.default.settings[:equella_teaser]).to be_nil
-        expect(f("#account_settings")).not_to contain_jqcss("#account_settings_equella_endpoint:visible")
-        expect(f("#account_settings")).not_to contain_jqcss("#account_settings_equella_teaser:visible")
-      end
-    end
   end
 
   context "enabled web services" do

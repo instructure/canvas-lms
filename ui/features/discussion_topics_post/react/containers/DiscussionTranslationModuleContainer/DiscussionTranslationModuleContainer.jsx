@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useMemo, useState} from 'react'
+import React, {useContext, useMemo, useState, useEffect, useRef} from 'react'
 import {TranslationControls} from '../../components/TranslationControls/TranslationControls'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -30,6 +30,7 @@ import {TranslationTriggerModal} from '../../components/TranslationTriggerModal/
 import {useTranslationStore} from '../../hooks/useTranslationStore'
 import {useTranslation} from '../../hooks/useTranslation'
 import {useObserverContext} from '../../utils/ObserverContext'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
   const I18n = useI18nScope('discussions_posts')
@@ -45,13 +46,20 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
   const entries = useTranslationStore(state => state.entries)
 
   const translationControlsRef = React.createRef()
-  const {setTranslateTargetLanguage, setShowTranslationControl, clearQueue} = useContext(
-    DiscussionManagerUtilityContext,
-  )
+  const {setTranslateTargetLanguage, setShowTranslationControl, clearQueue, translationLanguages} =
+    useContext(DiscussionManagerUtilityContext)
   const {startObserving, stopObserving} = useObserverContext()
 
   const isLoading = useMemo(() => {
     return Object.values(entries).some(entry => entry.loading)
+  }, [entries])
+
+  const hasErrors = useMemo(() => {
+    return Object.values(entries).some(entry => entry.error)
+  }, [entries])
+
+  const hasTranslations = useMemo(() => {
+    return Object.values(entries).some(entry => entry.translatedMessage || entry.translatedTitle)
   }, [entries])
 
   const {preferredLanguage, savePreferredLanguage} = useTranslation()
@@ -59,6 +67,58 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
   const [selectedLanguage, setSelectedLanguage] = useState(
     preferredLanguage || activeLanguage || '',
   )
+
+  const previousLoadingRef = useRef(false)
+  const announcedLanguageRef = useRef(null)
+
+  useEffect(() => {
+    // Only announce for the initial batch when language changes
+    const isNewTranslationSession = activeLanguage !== announcedLanguageRef.current
+
+    if (isLoading && !previousLoadingRef.current && isTranslateAll && isNewTranslationSession) {
+      const contentType = isAnnouncement ? I18n.t('Announcement') : I18n.t('Discussion')
+      showFlashAlert({
+        message: I18n.t('Translating %{contentType}', {contentType}),
+        srOnly: true,
+        politeness: 'polite',
+      })
+      previousLoadingRef.current = true
+    } else if (
+      !isLoading &&
+      previousLoadingRef.current &&
+      activeLanguage &&
+      isTranslateAll &&
+      isNewTranslationSession
+    ) {
+      if (hasErrors) {
+        const contentType = isAnnouncement ? I18n.t('Announcement') : I18n.t('Discussion')
+        showFlashAlert({
+          message: I18n.t('%{contentType} translation failed', {contentType}),
+          srOnly: true,
+          politeness: 'assertive',
+        })
+      } else if (hasTranslations) {
+        const languageName =
+          translationLanguages.current.find(lang => lang.id === activeLanguage)?.name ||
+          activeLanguage
+        const contentType = isAnnouncement ? I18n.t('Announcement') : I18n.t('Discussion')
+        showFlashAlert({
+          message: I18n.t(
+            '%{contentType} description translated to %{language}. Replies will translate as you navigate the page.',
+            {
+              contentType,
+              language: languageName,
+            },
+          ),
+          srOnly: true,
+          politeness: 'polite',
+        })
+      }
+      previousLoadingRef.current = false
+      announcedLanguageRef.current = activeLanguage
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, activeLanguage, hasErrors, hasTranslations, isAnnouncement, isTranslateAll, I18n])
 
   const closeTranslationModule = () => {
     if (isTranslateAll) {
@@ -80,6 +140,9 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
     // Then stop observing and clear queue
     stopObserving()
     clearQueue()
+    // Reset announcement tracking
+    announcedLanguageRef.current = null
+    previousLoadingRef.current = false
     setModalOpen(false)
     setShowTranslationControl(false)
   }
@@ -95,6 +158,18 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
     setTranslateTargetLanguage(null)
     setIsLanguageNotSelectedError(false)
     setIsLanguageAlreadyActiveError(false)
+
+    // Reset announcement tracking
+    announcedLanguageRef.current = null
+    previousLoadingRef.current = false
+
+    // Announce reset to screen readers
+    const contentType = isAnnouncement ? I18n.t('Announcement') : I18n.t('Discussion')
+    showFlashAlert({
+      message: I18n.t('%{contentType} Translation reset', {contentType}),
+      srOnly: true,
+      politeness: 'polite',
+    })
   }
 
   const translateDiscussion = () => {

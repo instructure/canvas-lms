@@ -511,11 +511,11 @@ class ProfileController < ApplicationController
       params[:link_urls].zip(params[:link_titles])
                         .reject { |url, title| url.blank? && title.blank? }
                         .each do |url, title|
-        new_link = @profile.links.build(url:, title:)
-        # since every time we update links, we delete and recreate everything,
-        # deleting invalid link records will make sure the rest of the
-        # valid ones still save
-        new_link.delete unless new_link.valid?
+                          new_link = @profile.links.build(url:, title:)
+                          # since every time we update links, we delete and recreate everything,
+                          # deleting invalid link records will make sure the rest of the
+                          # valid ones still save
+                          new_link.delete unless new_link.valid?
       end
     elsif params[:delete_links]
       @profile.links = []

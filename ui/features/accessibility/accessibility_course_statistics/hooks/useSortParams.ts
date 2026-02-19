@@ -48,6 +48,7 @@ export const useSortParams = ({
         const newParams = new URLSearchParams(params)
         newParams.set('sort', columnId)
         newParams.set('order', newOrder)
+        newParams.set('page', '1')
         return newParams
       })
     },

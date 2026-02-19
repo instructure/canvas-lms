@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconXLine} from '@instructure/ui-icons'
@@ -37,6 +37,7 @@ import AppliedFilters from './AppliedFilters'
 import CustomToggleGroup from './CustomToggleGroup'
 import {Alert} from '@instructure/ui-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {useAccessibilityScansStore} from '../../../../../shared/react/stores/AccessibilityScansStore'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -61,10 +62,37 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   const [toDate, setToDate] = useState<FilterOption | null>(null)
   const [filterCount, setFilterCount] = useState(0)
   const [alertMessage, setAlertMessage] = useState<string | null>(null)
+  const [toDateError, setToDateError] = useState<Array<{type: 'error'; text: string}>>([])
   const toggleButtonRef = React.useRef<CustomToggleGroup | null>(null)
+
+  const additionalResourcesEnabled = useAccessibilityScansStore(
+    state => state.additionalResourcesEnabled,
+  )
+
+  const filteredArtifactTypeOptions = useMemo(() => {
+    return artifactTypeOptions.filter(
+      option => !option.requiresFeatureFlag || additionalResourcesEnabled,
+    )
+  }, [additionalResourcesEnabled])
 
   const dateFormatter = useDateTimeFormat('date.formats.medium_with_weekday')
   const dateFormatHint = useDateFormatPattern()
+
+  const getDisabledDatesForFromDate = useCallback(
+    (isoDate: string) => {
+      if (!toDate?.value) return false
+      return new Date(isoDate) > new Date(toDate.value)
+    },
+    [toDate],
+  )
+
+  const getDisabledDatesForToDate = useCallback(
+    (isoDate: string) => {
+      if (!fromDate?.value) return false
+      return new Date(isoDate) < new Date(fromDate.value)
+    },
+    [fromDate],
+  )
 
   useEffect(() => {
     const filters = getFilters(appliedFilters)
@@ -104,8 +132,8 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
       const msg =
         appliedFilters.length > 0
-          ? I18n.t('Filters applied. Accessibility issues updated.')
-          : I18n.t('Filters cleared. Accessibility issues updated.')
+          ? I18n.t('Filter updated. Showing matching resources.')
+          : I18n.t('Filters cleared. Showing all resources.')
 
       setTimeout(() => setAlertMessage(msg), 3000)
     },
@@ -124,16 +152,36 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   }, [handleFilterChange])
 
   const handleApply = useCallback(() => {
+    if (fromDate?.value && toDate?.value) {
+      const from = new Date(fromDate.value)
+      const to = new Date(toDate.value)
+
+      if (from > to) {
+        setToDateError([
+          {
+            type: 'error',
+            text: I18n.t('End date must be after the start date.'),
+          },
+        ])
+        return
+      }
+    }
+
+    setToDateError([])
+
     const filters = getFilterSelections()
     setFilterCount(appliedFilters.length)
     handleFilterChange(filters)
     setIsOpen(false)
     toggleButtonRef.current?.focus()
-  }, [appliedFilters, handleFilterChange, getFilterSelections])
+  }, [fromDate, toDate, appliedFilters, handleFilterChange, getFilterSelections])
 
   const handleDateChange = useCallback(
     (dateFieldId: 'fromDate' | 'toDate') => (date: Date | null) => {
       const setDate = dateFieldId === 'fromDate' ? setFromDate : setToDate
+
+      setToDateError([])
+
       if (!date) {
         setDate(null)
         return
@@ -259,6 +307,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             calendarIcon: I18n.t('Choose a date for Last edited from'),
                           }}
                           onSelectedDateChange={handleDateChange('fromDate')}
+                          disabledDates={getDisabledDatesForFromDate}
                         />
                       </Flex.Item>
                       <Flex.Item overflowY="visible" height="auto">
@@ -271,6 +320,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                                 date_format: dateFormatHint,
                               }),
                             },
+                            ...toDateError,
                           ]}
                           width="100%"
                           selectedDate={toDate?.value ?? null}
@@ -281,6 +331,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                             calendarIcon: I18n.t('Choose a date for Last edited to'),
                           }}
                           onSelectedDateChange={handleDateChange('toDate')}
+                          disabledDates={getDisabledDatesForToDate}
                         />
                       </Flex.Item>
                     </Flex>
@@ -299,7 +350,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                           data-testid="resource-type-checkbox-group"
                           name="resource-type-checkbox-group"
                           description={I18n.t('Resource type')}
-                          options={artifactTypeOptions}
+                          options={filteredArtifactTypeOptions}
                           selected={selectedArtifactType}
                           onUpdate={setSelectedArtifactType}
                         />
@@ -333,6 +384,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                   <Flex.Item>
                     <Button
                       data-testid="apply-filters-button"
+                      data-pendo="apply-filters-button"
                       size="medium"
                       onClick={handleApply}
                       color="primary"

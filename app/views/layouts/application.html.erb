@@ -41,6 +41,7 @@
   js_env notices: flash_notices()
   student_view_text = @context.is_a?(Course) && @context.horizon_course? ? t('View as Learner') : t('View as Student')
   enable_content_view_if_requested
+  enable_hide_global_nav_if_requested
 -%>
 <%= render :partial => "layouts/head" %>
 <%-
@@ -99,8 +100,10 @@
   body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :full_width_everywhere) || @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
   body_classes << "context-#{@context.asset_string}" if @context
   body_classes << "responsive_student_grades_page" if !!@domain_root_account&.feature_enabled?(:responsive_student_grades_page)
+  body_classes << 'content-only' if @content_only
+  body_classes << 'hide-global-nav' if @hide_global_nav
 -%>
-<body class="<%= (@content_only ? (body_classes + ['content-only']) : body_classes).uniq.join(" ") %>">
+<body class="<%= body_classes.uniq.join(" ") %>">
 <%if !@content_only && @current_user && @real_current_user && @real_current_user != @current_user %>
   <div role="alert" class="screenreader-only">
     <% if @current_user.fake_student? %>
@@ -159,46 +162,25 @@
           <% end %>
 
           <div id="nutrition_facts_container"></div>
-          <div class="right-of-crumbs <%= 'right-of-crumbs-no-reverse' if Account.site_admin.feature_enabled?(:top_navigation_placement_a11y_fixes) %>">
-            <% if Account.site_admin.feature_enabled?(:top_navigation_placement_a11y_fixes) %>
-              <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
-                <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
-              <% end %>
+          <div class="right-of-crumbs right-of-crumbs-no-reverse">
+            <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
+              <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
+            <% end %>
             <% if show_student_view_button? %>
-                <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>
-                  <i class="icon-student-view"></i> <%= student_view_text %>
-                <% end %>
-              <% end %>
-              <% if show_immersive_reader? %>
-                <div id="immersive_reader_mount_point"></div>
-              <% end %>
-              <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
-                <div id="top-nav-tools-mount-point"></div>
-              <% end %>
-              <% if tutorials_enabled? %>
-                <div class="TutorialToggleHolder"></div>
-              <% end %>
-              <div id="ai-information-mount"></div>
-            <% else %>
-              <div id="ai-information-mount"></div>
-              <% if tutorials_enabled? %>
-                <div class="TutorialToggleHolder"></div>
-              <% end %>
-              <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
-                <div id="top-nav-tools-mount-point"></div>
-              <% end %>
-              <% if show_immersive_reader? %>
-                <div id="immersive_reader_mount_point"></div>
-              <% end %>
-            <% if show_student_view_button? %>
-                <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>
-                  <i class="icon-student-view"></i> <%= student_view_text %>
-                <% end %>
-              <% end %>
-              <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
-                <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
+              <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>
+                <i class="icon-student-view"></i> <%= student_view_text %>
               <% end %>
             <% end %>
+            <% if show_immersive_reader? %>
+              <div id="immersive_reader_mount_point"></div>
+            <% end %>
+            <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
+              <div id="top-nav-tools-mount-point"></div>
+            <% end %>
+            <% if tutorials_enabled? %>
+              <div class="TutorialToggleHolder"></div>
+            <% end %>
+            <div id="ai-information-mount"></div>
           </div>
 
         </div>
@@ -310,15 +292,6 @@
       <% end %>
       <% if @page_view %>
         <div id="page_view_id"><%= @page_view.id %></div>
-      <% end %>
-      <% if equella_enabled? %>
-        <a id="equella_endpoint_url" href="<%= @equella_settings[:endpoint] %>">&nbsp;</a>
-        <a id="equella_callback_url" href="<%= external_content_success_url('equella') %>">&nbsp;</a>
-        <a id="equella_cancel_url" href="<%= external_content_cancel_url('equella') %>">&nbsp;</a>
-        <a id="equella_action" href="<%= @equella_settings[:default_action] %>">&nbsp;</a>
-        <% if @equella_settings[:teaser] %>
-          <div id="equella_teaser"><%= @equella_settings[:teaser] %></div>
-        <% end %>
       <% end %>
     </div>
   <div id='aria_alerts' class='hide-text affix' role="alert" aria-live="assertive"></div>

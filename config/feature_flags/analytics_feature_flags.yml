@@ -95,6 +95,15 @@ k20_course_readiness_criteria_set_results_preview:
   root_opt_in: true
   beta: true
   shadow: true
+k20_course_readiness_top_level_dashboard:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Top Level Dashboard
+  description:
+    k20_course_readiness_top_level_dashboard: Enables the Intelligent Insights - Course Readiness - Top Level Dashboard feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_criteria_set_preview:
   state: hidden
   applies_to: Account
@@ -164,6 +173,24 @@ k20_improved_criteria_builder:
   display_name: Intelligent Insights - Improved Criteria Builder
   description:
     k20_improved_criteria_builder: Enables the Intelligent Insights - Improved Criteria Builder feature
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_accessibility_insights:
+  state: hidden
+  applies_to: Account
+  display_name:  Intelligent Insights - Accessibility Insights
+  description:
+    intelligent-insights-accessibility-insights: Enables the Intelligent Insights - Accessibility Insights feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_modernisation:
+  state: hidden
+  applies_to: Account
+  display_name:  Intelligent Insights - Modernisation
+  description:
+    intelligent-insights-modernisation: Enables the Intelligent Insights - Modernisation feature.
   root_opt_in: true
   beta: true
   shadow: true

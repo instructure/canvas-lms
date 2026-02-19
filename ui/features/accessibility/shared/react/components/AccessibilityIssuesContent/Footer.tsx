@@ -29,41 +29,84 @@ interface Props {
   onSkip: () => void
   onSaveAndNext: () => void
   onBack?: () => void
+  onBackToStart?: () => void
   isBackDisabled?: boolean
   isSkipDisabled?: boolean
   isSaveAndNextDisabled?: boolean
+  isBackToStartDisabled?: boolean
+  showBackToStart?: boolean
 }
+
+const BackButton: React.FC<{onClick?: () => void; isDisabled?: boolean}> = ({
+  onClick,
+  isDisabled,
+}) => (
+  <Button
+    data-testid="back-button"
+    onClick={onClick}
+    disabled={isDisabled}
+    aria-label={I18n.t('Back to previous issue')}
+  >
+    {I18n.t('Back')}
+  </Button>
+)
+
+const SkipButton: React.FC<{onClick?: () => void; isDisabled?: boolean}> = ({
+  onClick,
+  isDisabled,
+}) => (
+  <Button
+    data-testid="skip-button"
+    onClick={onClick}
+    disabled={isDisabled}
+    aria-label={I18n.t('Skip issue')}
+  >
+    {I18n.t('Skip')}
+  </Button>
+)
+
+const BackToStartButton: React.FC<{onClick?: () => void; isDisabled?: boolean}> = ({
+  onClick,
+  isDisabled,
+}) => (
+  <Button
+    data-testid="back-to-start-button"
+    onClick={onClick}
+    disabled={isDisabled}
+    aria-label={I18n.t('Back to start')}
+  >
+    {I18n.t('Back to start')}
+  </Button>
+)
 
 const Footer: React.FC<Props> = ({
   nextButtonName,
   onSkip,
   onSaveAndNext,
   onBack,
+  onBackToStart,
   isBackDisabled,
   isSkipDisabled,
   isSaveAndNextDisabled,
+  isBackToStartDisabled,
+  showBackToStart,
 }: Props) => {
   return (
     <View as="footer" background="secondary">
       <Flex justifyItems="space-between" alignItems="center" padding="small">
         <Flex.Item>
           <Flex gap="small">
-            <Button
-              data-testid="back-button"
-              onClick={onBack}
-              disabled={isBackDisabled}
-              aria-label={I18n.t('Back to previous issue')}
-            >
-              {I18n.t('Back')}
-            </Button>
-            <Button
-              data-testid="skip-button"
-              onClick={onSkip}
-              disabled={isSkipDisabled}
-              aria-label={I18n.t('Skip issue')}
-            >
-              {I18n.t('Skip')}
-            </Button>
+            {showBackToStart ? (
+              <>
+                <BackToStartButton onClick={onBackToStart} isDisabled={isBackToStartDisabled} />
+                <BackButton onClick={onBack} isDisabled={isBackDisabled} />
+              </>
+            ) : (
+              <>
+                <BackButton onClick={onBack} isDisabled={isBackDisabled} />
+                <SkipButton onClick={onSkip} isDisabled={isSkipDisabled} />
+              </>
+            )}
           </Flex>
         </Flex.Item>
 

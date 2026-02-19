@@ -39,12 +39,29 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({
   title,
   onClick,
 }) => {
+  const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
   const titleText = useMemo(() => {
     if (content?.type === 'ExternalUrl') {
+      const linkTarget = content?.newTab && seamlessRedirectEnabled ? '_blank' : undefined
+      const linkRel = linkTarget ? 'noopener noreferrer' : undefined
+      const linkUrl =
+        content?.newTab && seamlessRedirectEnabled && url.includes('?')
+          ? `${url}&follow_redirect=1`
+          : content?.newTab && seamlessRedirectEnabled
+            ? `${url}?follow_redirect=1`
+            : url
+
       return (
         <Flex direction="row" gap="small" alignItems="center" wrap="no-wrap">
           <Flex.Item>
-            <Link href={url} isWithinText={false} onClick={onClick}>
+            <Link
+              href={linkUrl}
+              isWithinText={false}
+              onClick={onClick}
+              target={linkTarget}
+              rel={linkRel}
+            >
               <Text
                 weight={content?.newTab ? 'normal' : 'bold'}
                 color={content?.newTab ? 'brand' : 'primary'}
@@ -81,7 +98,7 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({
         </Link>
       )
     }
-  }, [content, url, onClick, title])
+  }, [content, url, onClick, title, seamlessRedirectEnabled, moduleItemId])
 
   return (
     <View as="div" padding="0 xx-small" className="module-title">

@@ -45,7 +45,7 @@ export default function ImportGroupsModal(props) {
       apiClient
         .createImport(props.groupCategoryId, file)
         .then(resp => {
-          props.setProgress(resp.data)
+          props.setProgress(resp.json)
         })
         .catch(() => {
           showFlashAlert({

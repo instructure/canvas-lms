@@ -895,6 +895,10 @@ class Attachment < ActiveRecord::Base
       shard.activate do
         Attachment.where(id: atts).update_all(replacement_attachment_id: id) # so we can find the new file in content links
         copy_access_attributes!(atts)
+        # move attachment_associations to the new replaced attachment (this is needed to be able to verify access to theses attachments)
+        AttachmentAssociation.where(attachment_id: atts).find_in_batches do |batch|
+          AttachmentAssociation.where(id: batch.map(&:id)).update_all(attachment_id: id)
+        end
         atts.each do |a|
           # update content tags to refer to the new file
           if ContentTag.where(content_id: a, content_type: "Attachment").update_all(content_id: id, updated_at: Time.now.utc) > 0
@@ -1765,9 +1769,9 @@ class Attachment < ActiveRecord::Base
         .where(attachments: { id: attachments, context_type: "User" })
         .where.not(attachments: { uuid: nil })
         .in_batches do |batch|
-      batch_ids = batch.pluck(:id)
-      batch.update_all(avatar_image_url: nil)
-      Canvas::LiveEvents.delay_if_production.users_bulk_updated(batch_ids)
+          batch_ids = batch.pluck(:id)
+          batch.update_all(avatar_image_url: nil)
+          Canvas::LiveEvents.delay_if_production.users_bulk_updated(batch_ids)
     end
     while SubmissionDraftAttachment.where(attachment_id: attachments).limit(1000).destroy_all.count > 0 do end
 

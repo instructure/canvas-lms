@@ -70,6 +70,7 @@ describe('CommentsTrayContentWithApollo', () => {
     open: false,
     onSuccessfulPeerReview: jest.fn(),
     reviewerSubmission: reviewerSubmission,
+    isReadOnly: false,
   }
 
   it('renders TrayContent when renderTray is false', () => {
@@ -279,6 +280,52 @@ describe('CommentsTrayContentWithApollo', () => {
       expect(props.reviewerSubmission.assignedAssessments).toHaveLength(2)
       expect(props.reviewerSubmission.assignedAssessments[0].workflowState).toBe('assigned')
       expect(props.reviewerSubmission.assignedAssessments[1].workflowState).toBe('completed')
+    })
+  })
+
+  describe('Read-only mode', () => {
+    it('passes isReadOnly prop to TrayContent when true', () => {
+      render(
+        <CommentsTrayContentWithApollo {...defaultProps} isReadOnly={true} renderTray={false} />,
+      )
+
+      const trayContent = screen.getByTestId('tray-content')
+      const props = JSON.parse(trayContent.textContent || '{}')
+
+      expect(props.isReadOnly).toBe(true)
+    })
+
+    it('passes isReadOnly prop to TrayContent when false', () => {
+      render(
+        <CommentsTrayContentWithApollo {...defaultProps} isReadOnly={false} renderTray={false} />,
+      )
+
+      const trayContent = screen.getByTestId('tray-content')
+      const props = JSON.parse(trayContent.textContent || '{}')
+
+      expect(props.isReadOnly).toBe(false)
+    })
+
+    it('passes isReadOnly prop to CommentsTray when true', () => {
+      render(
+        <CommentsTrayContentWithApollo {...defaultProps} isReadOnly={true} renderTray={true} />,
+      )
+
+      const commentsTray = screen.getByTestId('comments-tray')
+      const props = JSON.parse(commentsTray.textContent || '{}')
+
+      expect(props.isReadOnly).toBe(true)
+    })
+
+    it('passes isReadOnly prop to CommentsTray when false', () => {
+      render(
+        <CommentsTrayContentWithApollo {...defaultProps} isReadOnly={false} renderTray={true} />,
+      )
+
+      const commentsTray = screen.getByTestId('comments-tray')
+      const props = JSON.parse(commentsTray.textContent || '{}')
+
+      expect(props.isReadOnly).toBe(false)
     })
   })
 })

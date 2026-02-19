@@ -37,7 +37,7 @@ import useRollups from '@canvas/outcomes/react/hooks/useRollups'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
 import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
-import {useContributingScores} from './hooks/useContributingScores'
+import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {StudentAssignmentDetailTray} from './components/trays/StudentAssignmentDetailTray'
 import {useStudentAssignmentTray} from './hooks/useStudentAssignmentTray'
 

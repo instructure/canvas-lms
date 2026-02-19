@@ -103,6 +103,7 @@ class CustomToggleGroup extends Component<ToggleGroupProps> {
     return (
       <IconButton
         {...props}
+        data-testid="filter-resources-toggle"
         withBackground={false}
         withBorder={false}
         size={size === 'large' ? 'medium' : 'small'}

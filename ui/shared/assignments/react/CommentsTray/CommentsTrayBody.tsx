@@ -169,6 +169,7 @@ export default function CommentsTrayBody(props) {
             submission={props.submission}
             isPeerReviewEnabled={props.isPeerReviewEnabled}
             reviewerSubmission={props.reviewerSubmission}
+            suppressSuccessAlert={props.suppressSuccessAlert}
           />
         </Flex.Item>
 
@@ -225,9 +226,11 @@ CommentsTrayBody.propTypes = {
   isPeerReviewEnabled: bool,
   onSuccessfulPeerReview: func,
   usePeerReviewModal: bool,
+  suppressSuccessAlert: bool,
 }
 
 CommentsTrayBody.defaultProps = {
   isPeerReviewEnabled: false,
   usePeerReviewModal: true,
+  suppressSuccessAlert: false,
 }

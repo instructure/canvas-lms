@@ -22,6 +22,7 @@ import {useEditor} from '@craftjs/core'
 import {render, screen, waitFor, getByText} from '@testing-library/react'
 import CreateFromTemplate from '../CreateFromTemplate'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 type EnvWithWikiPage = GlobalEnv & {
   WIKI_PAGE: any
@@ -138,9 +139,11 @@ const getByTagText = (tag: string) => {
 
 describe('CreateFromTemplate', () => {
   beforeAll(() => {
-    // @ts-expect-error
-    window.ENV ||= {}
-    window.ENV.WIKI_PAGE = undefined
+    fakeEnv.setup({WIKI_PAGE: undefined})
+  })
+
+  afterAll(() => {
+    fakeEnv.teardown()
   })
 
   it('renders', async () => {

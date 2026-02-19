@@ -29,7 +29,8 @@ module PageViews
         body = JSON.parse(response.body)
         status = body["status"].to_s.downcase.to_sym
         format = body["format"].to_s.downcase.to_sym
-        return Common::PollingResponse.new(query_id:, status:, format:)
+        error_code = body["errorCode"]
+        return Common::PollingResponse.new(query_id:, status:, format:, error_code:)
       end
     end
   end

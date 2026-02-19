@@ -208,8 +208,8 @@ class SubmissionList
   def process
     @list = submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : CanvasSort::Last, a[:safe_grader_id], a[:assignment_id]] }
                               .each_with_object({}) do |se, d|
-      d[se[:graded_on]] ||= []
-      d[se[:graded_on]] << se
+                                d[se[:graded_on]] ||= []
+                                d[se[:graded_on]] << se
     end
   end
 

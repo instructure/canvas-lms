@@ -67,8 +67,9 @@ describe Accessibility::Rules::ImgAltRule do
 
       result = rule.fix!(img_element, nil)
 
-      expect(result).to be_a(Array)
-      expect(result.length).to eq(2)
+      expect(result).to be_a(Hash)
+      expect(result[:changed]).to eq(img_element)
+      expect(result[:content_preview]).to be_a(String)
       expect(img_element["role"]).to eq("presentation")
       expect(img_element["alt"]).to eq("")
     end
@@ -82,15 +83,15 @@ describe Accessibility::Rules::ImgAltRule do
 
       result = rule.fix!(img_element, "Descriptive alt text")
 
-      expect(result).to be_a(Array)
-      expect(result.length).to eq(2)
-      expect(result[1]).to include("display: flex")
-      expect(result[1]).to include("justify-content: center")
-      expect(result[1]).to include("align-items: center")
-      expect(result[1]).to include("max-width: 100%")
-      expect(result[1]).to include("max-height: 100%")
-      expect(result[1]).to include("object-fit: contain")
-      expect(result[1]).to include('alt="Descriptive alt text"')
+      expect(result).to be_a(Hash)
+      expect(result[:changed]).to eq(img_element)
+      expect(result[:content_preview]).to include("display: flex")
+      expect(result[:content_preview]).to include("justify-content: center")
+      expect(result[:content_preview]).to include("align-items: center")
+      expect(result[:content_preview]).to include("max-width: 100%")
+      expect(result[:content_preview]).to include("max-height: 100%")
+      expect(result[:content_preview]).to include("object-fit: contain")
+      expect(result[:content_preview]).to include('alt="Descriptive alt text"')
     end
 
     it "raises an error when alt text is a generic filename" do

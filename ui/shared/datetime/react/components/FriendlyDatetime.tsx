@@ -73,9 +73,7 @@ class FriendlyDatetime extends Component<Props> {
       const fudged = fudgeDateForProfileTimezone(datetime)
       let friendly
       if (this.props.format) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore - format_'s third argument (zone) is optional at runtime but required by tsgo
-        friendly = format_(datetime, this.props.format)
+        friendly = format_(datetime, this.props.format, undefined)
       } else if (showTime) {
         friendly = datetimeString(datetime)
       } else {

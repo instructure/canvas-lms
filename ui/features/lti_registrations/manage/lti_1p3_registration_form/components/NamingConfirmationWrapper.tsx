@@ -16,21 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirmation'
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
+import type {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {getDefaultPlacementTextFromConfig} from './helpers'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
+import {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 
 export type NamingConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
+  existingRegistration?: LtiRegistrationWithConfiguration
 }
 
 export const NamingConfirmationWrapper = ({
   overlayStore,
   internalConfig,
+  registrationUpdateRequest,
+  existingRegistration,
 }: NamingConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
@@ -51,6 +58,8 @@ export const NamingConfirmationWrapper = ({
         onUpdateDescription={actions.setDescription}
         placements={placements}
         onUpdatePlacementLabel={actions.setPlacementLabel}
+        registrationUpdateRequest={registrationUpdateRequest}
+        existingRegistration={existingRegistration}
       />
     </RegistrationModalBody>
   )

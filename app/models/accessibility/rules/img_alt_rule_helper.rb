@@ -54,7 +54,7 @@ module Accessibility
         if value.blank?
           elem["role"] = "presentation"
           elem["alt"] = ""
-          return [elem, adjust_img_style(elem)]
+          return { changed: elem, content_preview: adjust_img_style(elem) }
         end
 
         if filename_like?(value)
@@ -66,7 +66,7 @@ module Accessibility
         end
 
         elem["alt"] = value
-        [elem, adjust_img_style(elem)]
+        { changed: elem, content_preview: adjust_img_style(elem) }
       end
     end
   end

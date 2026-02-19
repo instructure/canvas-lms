@@ -260,7 +260,7 @@ module Api::V1::PlannerItem
           .where(id: u_topic_ids)
           .group("discussion_topics.id, dtp.id")
           .each do |pi|
-          topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
+            topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
         end
       end
     end

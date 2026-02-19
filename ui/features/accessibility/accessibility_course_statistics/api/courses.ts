@@ -16,21 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from '@canvas/axios'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {Course, CoursesResponse} from '../types/course'
 import type {SortOrder} from '../react/components/SortableTableHeader'
 
-const COURSES_PER_PAGE = 15
+const COURSES_PER_PAGE = 14
 const TEACHER_LIMIT = 25
 
 interface FetchCoursesParams {
   accountId: string
   sort: string
   order: SortOrder
+  page?: number
 }
 
 export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesResponse> => {
-  const {accountId, sort, order} = params
+  const {accountId, sort, order, page = 1} = params
 
   const queryParams: Record<string, any> = {
     include: [
@@ -43,16 +44,21 @@ export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesR
     teacher_limit: TEACHER_LIMIT,
     per_page: COURSES_PER_PAGE,
     no_avatar_fallback: 1,
+    page,
   }
 
   queryParams.sort = sort
   queryParams.order = order
 
-  const response = await axios.get<Course[]>(`/api/v1/accounts/${accountId}/courses`, {
+  const response = await doFetchApi<Course[]>({
+    path: `/api/v1/accounts/${accountId}/courses`,
     params: queryParams,
   })
 
+  const pageCount = Number.parseInt(response.link?.last?.page ?? '1', 10)
+
   return {
-    courses: response.data,
+    courses: response.json || [],
+    pageCount,
   }
 }

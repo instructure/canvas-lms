@@ -57,7 +57,7 @@ class Score < ActiveRecord::Base
   end
 
   def destroy
-    score_metadata.destroy if score_metadata.present?
+    score_metadata&.destroy
     super
   end
 
@@ -67,7 +67,7 @@ class Score < ActiveRecord::Base
   end
 
   def undestroy
-    score_metadata.undestroy if score_metadata.present?
+    score_metadata&.undestroy
     super
   end
 

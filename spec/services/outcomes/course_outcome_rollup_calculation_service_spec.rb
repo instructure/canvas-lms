@@ -134,6 +134,7 @@ describe Outcomes::CourseOutcomeRollupCalculationService do
           expect(rollup.submitted_at).to be_present
           expect(rollup.title).to be_present
           expect(rollup.hide_points).to be false
+          expect(rollup.results_count).to eq(1)
         end
       end
 
@@ -287,6 +288,7 @@ describe Outcomes::CourseOutcomeRollupCalculationService do
         students.each_with_index do |student, i|
           rollup = rollups.find_by(user_id: student.id)
           expect(rollup.aggregate_score).to eq(2.0 + i)
+          expect(rollup.results_count).to eq(1)
           expect(rollup.last_calculated_at).to be > 30.minutes.ago
         end
       end
@@ -648,6 +650,35 @@ describe Outcomes::CourseOutcomeRollupCalculationService do
 
         expect(rollups.count).to eq(1)
         expect(rollups.first.aggregate_score).to eq(0.0)
+      end
+
+      it "correctly stores results_count reflecting number of aggregated results" do
+        assignments = Array.new(3) { assignment_model(context: course) }
+        alignments = assignments.map { |a| outcome.align(a, course) }
+
+        alignments.each_with_index do |align, i|
+          LearningOutcomeResult.create!(
+            learning_outcome: outcome,
+            context: course,
+            user: students[0],
+            alignment: align,
+            score: 2.0 + i,
+            possible: 5.0
+          )
+        end
+
+        subject.call
+
+        rollup = OutcomeRollup.find_by(
+          course_id: course.id,
+          outcome_id: outcome.id,
+          user_id: students[0].id,
+          workflow_state: "active"
+        )
+
+        expect(rollup).to be_present
+        expect(rollup.results_count).to eq(3)
+        expect(rollup.aggregate_score).to be_present
       end
     end
 

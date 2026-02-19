@@ -20,6 +20,7 @@ export const HORIZON_PARAMS = {
   content_only: 'true',
   instui_theme: 'career',
   force_classic: 'true',
+  hide_global_nav: 'true',
 }
 
 /**

@@ -55,6 +55,20 @@ module ModuleVisibility
           visible_modules | modules_visible_to_adhoc_overrides
         end
       end
+
+      def invalidate_cache(course_ids: nil, user_ids: nil, context_module_ids: nil, include_concluded: true)
+        unless course_ids || context_module_ids
+          raise ArgumentError, "at least one non nil course_id or context_module_id is required (for query performance reasons)"
+        end
+
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        context_module_ids = Array(context_module_ids) if context_module_ids
+
+        key = service_cache_key(service: name, course_ids:, user_ids:, additional_ids: context_module_ids, include_concluded:)
+
+        Rails.cache.delete(key)
+      end
     end
   end
 end

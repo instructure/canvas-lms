@@ -143,7 +143,7 @@ module Types
     field :position, Integer, null: true
     def position
       position = current_user.dashboard_positions[course.asset_string]
-      position.present? ? position.to_i : nil
+      position.presence&.to_i
     end
 
     field :published, Boolean, null: true

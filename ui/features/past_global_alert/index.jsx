@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import PastGlobalAlert from './react/PastGlobalAlert'
 
 $(() => {
-  ReactDOM.render(<PastGlobalAlert />, $('<div/>').appendTo('#announcementWrapper')[0])
+  legacyRender(<PastGlobalAlert />, $('<div/>').appendTo('#announcementWrapper')[0])
 })

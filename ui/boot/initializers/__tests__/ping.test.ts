@@ -35,8 +35,9 @@ vi.mock('es-toolkit', () => ({
   throttle: (fn: () => void) => fn,
 }))
 
+import fakeEnv from '@canvas/test-utils/fakeENV'
+
 describe('ping initializer', () => {
-  let originalEnv: typeof window.ENV
   let intervalCallback: (() => void) | null
   let originalSetInterval: typeof setInterval
   let originalDateNow: typeof Date.now
@@ -47,8 +48,6 @@ describe('ping initializer', () => {
 
     mockPost.mockClear()
     mockFail.mockClear()
-
-    originalEnv = window.ENV
 
     intervalCallback = null
     originalSetInterval = global.setInterval
@@ -72,7 +71,7 @@ describe('ping initializer', () => {
   })
 
   afterEach(() => {
-    window.ENV = originalEnv
+    fakeEnv.teardown()
     global.setInterval = originalSetInterval
     Date.now = originalDateNow
     vi.restoreAllMocks()
@@ -80,8 +79,7 @@ describe('ping initializer', () => {
 
   describe('when ENV.ping_url is set', () => {
     beforeEach(() => {
-      // @ts-expect-error - partial ENV for testing
-      window.ENV = {ping_url: '/api/v1/courses/123/ping'}
+      fakeEnv.setup({ping_url: '/api/v1/courses/123/ping'})
     })
 
     it('registers activity event listeners', () => {
@@ -222,8 +220,7 @@ describe('ping initializer', () => {
 
   describe('when ENV.ping_url is not set', () => {
     it('does not set up any intervals or listeners', () => {
-      // @ts-expect-error - partial ENV for testing
-      window.ENV = {}
+      fakeEnv.setup({})
       require('../ping')
 
       expect(global.setInterval).not.toHaveBeenCalled()

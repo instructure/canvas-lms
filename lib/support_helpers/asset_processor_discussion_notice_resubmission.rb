@@ -53,7 +53,7 @@ module SupportHelpers
         DiscussionTopic.where(assignment_id: asset_processor_assignment_ids)
                        .preload(assignment: :lti_asset_processors)
                        .find_each do |topic|
-          process_discussion_topic(topic)
+                         process_discussion_topic(topic)
         end
       end
     end
@@ -87,21 +87,21 @@ module SupportHelpers
         .where(id: latest_version_ids)
         .preload(:discussion_entry, :user, :root_account)
         .find_each do |discussion_entry_version|
-        next unless discussion_entry_version.discussion_entry
-        next unless discussion_entry_version.user
+          next unless discussion_entry_version.discussion_entry
+          next unless discussion_entry_version.user
 
-        # Get submission - may be nil for teacher comments
-        submission = submissions_by_user_id[discussion_entry_version.user_id]
+          # Get submission - may be nil for teacher comments
+          submission = submissions_by_user_id[discussion_entry_version.user_id]
 
-        Lti::AssetProcessorDiscussionNotifier.notify_asset_processors_of_discussion(
-          assignment: topic.assignment,
-          submission:,
-          discussion_entry_versions: [discussion_entry_version],
-          contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
-          current_user: discussion_entry_version.user,
-          asset_processor: nil,
-          tool_id: @tool_id
-        )
+          Lti::AssetProcessorDiscussionNotifier.notify_asset_processors_of_discussion(
+            assignment: topic.assignment,
+            submission:,
+            discussion_entry_versions: [discussion_entry_version],
+            contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
+            current_user: discussion_entry_version.user,
+            asset_processor: nil,
+            tool_id: @tool_id
+          )
       end
     end
   end

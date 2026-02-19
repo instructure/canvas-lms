@@ -45,6 +45,8 @@ const ModuleItemTitleStudent = ({
   url,
   onClick,
 }: ModuleItemTitleStudentProps) => {
+  const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
   const titleText = useMemo(() => {
     if (
       progression?.locked ||
@@ -72,16 +74,45 @@ const ModuleItemTitleStudent = ({
       )
     }
 
+    const linkTarget =
+      content?.type === 'ExternalUrl' && content?.newTab && seamlessRedirectEnabled
+        ? '_blank'
+        : undefined
+    const linkRel = linkTarget ? 'noopener noreferrer' : undefined
+    const linkUrl =
+      content?.type === 'ExternalUrl' &&
+      content?.newTab &&
+      seamlessRedirectEnabled &&
+      url.includes('?')
+        ? `${url}&follow_redirect=1`
+        : content?.type === 'ExternalUrl' && content?.newTab && seamlessRedirectEnabled
+          ? `${url}?follow_redirect=1`
+          : url
+
     return (
       <View as="div" padding="0 xx-small">
-        <Link href={url} variant="standalone" onClick={onClick}>
+        <Link
+          href={linkUrl}
+          variant="standalone"
+          onClick={onClick}
+          target={linkTarget}
+          rel={linkRel}
+        >
           <Text weight="bold" color="primary" data-testid="module-item-title">
             {title || missingTitleText}
           </Text>
         </Link>
       </View>
     )
-  }, [content, progression, position, requireSequentialProgress, url, onClick])
+  }, [
+    content,
+    progression,
+    position,
+    requireSequentialProgress,
+    url,
+    onClick,
+    seamlessRedirectEnabled,
+  ])
 
   return titleText
 }

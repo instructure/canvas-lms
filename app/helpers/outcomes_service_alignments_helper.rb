@@ -54,10 +54,10 @@ module OutcomesServiceAlignmentsHelper
                         .where(context:, submission_types: "external_tool")
                         .pluck(:id)
                         .map do |id|
-      {
-        associated_asset_type: "canvas.assignment.quizzes",
-        assocated_asset_id: id.to_s
-      }
+                          {
+                            associated_asset_type: "canvas.assignment.quizzes",
+                            assocated_asset_id: id.to_s
+                          }
     end
 
     active_outcome_ids = ContentTag
@@ -71,12 +71,12 @@ module OutcomesServiceAlignmentsHelper
     os_aligned_outcomes
       .slice(*active_outcome_ids)
       .each do |key, value|
-      active_os_alignments.merge!(key => value.filter do |a|
-                                           active_new_quizes.include?({
-                                                                        associated_asset_type: a[:associated_asset_type],
-                                                                        assocated_asset_id: a[:associated_asset_id]
-                                                                      })
-                                         end)
+        active_os_alignments.merge!(key => value.filter do |a|
+                                             active_new_quizes.include?({
+                                                                          associated_asset_type: a[:associated_asset_type],
+                                                                          assocated_asset_id: a[:associated_asset_id]
+                                                                        })
+                                           end)
     end
 
     # remove outcomes without alignments

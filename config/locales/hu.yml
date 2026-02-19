@@ -5765,6 +5765,7 @@ hu:
   close_the_window_and_try_again_7353f8e: "Csukja be az ablakot, és próbálja újra."
   close_total_grade_override_tray_d3b1d190: "Zárja be a teljes érdemjegy felülbírálati tálcát"
   close_warning_d61daf2c: "Figyelmeztetés bezárása"
+  closed_983a96fe: Lezárva
   closed_captions_subtitles_e6aaa016: "Zárt feliratok"
   closed_for_comments_e395b42f: "Nem fűzhető hozzá megjegyzés"
   closes_5c6b4367: "Bezár:"
@@ -6314,6 +6315,7 @@ hu:
   confirmation_code_required_22984955: "Megerősítő kód (kötelező)"
   confirmation_failed_please_try_again_ae566d37: "A megerősítés sikertelen. Kérjük, próbálja újra!"
   confirming_2df4b68f: Jóváhagyás...
+  confirming_course_name_5a509f48: "%{course_name} megerősítése..."
   confused_panda_questioning_what_to_do_next_42941484: "Zavart Panda azt kérdezi, mit tegyen ezután"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Fontolja meg több beküldési típus kiválasztását, hogy megfeleljen azoknak a hallgatóknak, akik esetleg nem tudnak megjegyzéseket létrehozni."
   consortium_parent_keys_803547b: "Konzorcium szülői kulcsok"
@@ -7581,6 +7583,7 @@ hu:
   course_id_8bd2a21c: Kurzusazonosító
   course_id_a7c924d5: kurzusazonosító
   course_id_b0bc82d4: Kurzusazonosító
+  course_id_course_id_2841413a: "Kurzusazonosító \"%{course_id}\""
   course_id_f8640bb8: kurzus_azonosító
   course_image_for_course_cfbb08df: "A %{course} kurzus képe"
   course_image_settings_eba3ec55: "Kurzuskép szerkesztése"
@@ -7668,6 +7671,7 @@ hu:
   course_name_63b973d1: "Kurzus neve"
   course_name_cannot_be_added_to_the_courses_menu_un_fb0af421: "%{course_name} csak akkor adható hozzá a kurzusok menüponthoz, ha a kurzus aktív."
   course_name_is_required_90919349: "A kurzusnév megadása kötelező"
+  course_name_not_authorized_for_cross_listing_353e500f: "%{course_name} kurzusra nem engedélyezett a keresztlistázás"
   course_name_successfully_added_48116a50: " %{course_name} sikeresen hozzáadva!"
   course_navigation_dd035109: Kurzusnavigáció
   course_navigation_settings: 
@@ -8421,6 +8425,9 @@ hu:
   criterion_updated_36c0b3dc: "Kritérium frissítve"
   croatian_d713d655: Horvát
   cropper_associated_features_in_buttons_icons_be12ae42: "Cropper és kapcsolódó funkciók a gombok és ikonok között"
+  cross_list_section_27801ec9: "Kereszt-lista szekció"
+  cross_list_this_section_889f7287: "Szekció keresztlistázása"
+  cross_list_this_section_90aea97f: "Szekció keresztlistázása"
   cross_listing_3318526a: Keresztlistázás
   crumbs: 
     access_report: "Hozzáférési jelentés"
@@ -17128,6 +17135,7 @@ hu:
   no_grading_periods_set_up_a20a8819: "Nincs beállítva osztályzási időszak"
   no_grading_schemes_to_display_8b0e92e7: "Nincs megjeleníthető osztályzási rendszer"
   no_integrations_available_6729d0ca: "Nem állnak rendelkezésre integrációk"
+  no_items_20cde5bf: "Nincsenek elemek."
   no_items_found_870b2d0d: "Nincs találat"
   no_items_in_module_21f111a2: "Nincsenek elemek a modulban"
   no_job_selected_d6c5e6f4: "Nincs kiválasztott job"
@@ -17234,6 +17242,7 @@ hu:
   not_available_at_the_subaccount_level_6ee9b41f: "Alfiók szinten nem áll rendelkezésre"
   not_available_ca8cb4eb: "Nem elérhető"
   not_available_during_sync_ae645e8c: "Szinkronizálás közben nem elérhető"
+  not_available_until_14e61f1e: "Nem érhető el eddig"
   not_available_until_date_3c1c73c2: "Nem érhető el eddig: %{date}"
   not_available_until_next_submission_2175158: "A következő beadásig nem érhető el"
   not_calculated_in_final_grade_2b7d5bd1: "Nem számít bele a végső osztályzatba"
@@ -17913,6 +17922,7 @@ hu:
   or_9b70ccaa: Vagy
   or_choose_files_b795006d: "vagy válassza ki a fájlokat"
   or_ef4e808: vagy
+  or_enter_the_course_s_id_46e0792a: "Vagy írjon be kurzusazonosítót"
   or_in_the_courses_list_6201030: "...vagy a kurzusok listájában."
   orange_81386a62: Narancs
   orbis_report_header_assignment_id: feladatazonosító
@@ -20991,6 +21001,7 @@ hu:
   rce_enhancements_5701e06: RCE-fejlesztések
   rce_icon_maker_2114f87: "RCE Icon Készítő"
   re_activate_user_f7d77c9a: "Felhasználó újbóli aktiválása"
+  re_cross_list_this_section_faf7df4d: "Szekció keresztlistázásának újbóli végrehajtása"
   re_reported_b9671073: Újrajelentett
   re_send_confirmation_bcc66940: "Megerősítés újraküldése"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Közvetlen értesítés újraküldése a felhasználóknak, amikor a hirdetmény megkezdődik                        "
@@ -22091,6 +22102,7 @@ hu:
   search_for_a_deleted_course_by_id_f553398d: "Törölt kurzus keresése azonosító alapján"
   search_for_a_deleted_user_by_id_32f109e7: "Törölt felhasználó keresése azonosító alapján"
   search_for_assignment_8149cb1: "Feladat keresése"
+  search_for_course_e1a1dfc6: "Kurzusok keresése"
   search_for_files_7541fb28: "Fájlok keresése"
   search_for_people_by_id_or_name_36107593: "Résztvevő keresése azonosító vagy név alapján"
   search_for_sections_62e90cf4: "Szekciók keresése"
@@ -22169,6 +22181,7 @@ hu:
   section_size_1f3b7f18: "Szekció mérete"
   section_specific_topics_must_have_sections_11868960: "A szekcióspecifikus témáknak rendelkezniük kell szekciókkal"
   section_starts_at_65eaed1: "A szekció kezdődik ekkor:"
+  section_successfully_cross_listed_86eb2765: "Szekció keresztlistázása sikeres!"
   section_successfully_de_cross_listed_df3b64e: "Szekció keresztlistázásának törlése sikeres!"
   sections: 
     section_created: "Szekció sikeresen létrehozva!"
@@ -22399,6 +22412,7 @@ hu:
   selected_calendars_cc7f325b: "Kiválasztott naptárak"
   selected_content_contains_non_lti_links_f9dfd762: "A kiválasztott tartalom nem LTI linkeket tartalmaz."
   selected_content_is_not_an_lti_link_11780d96: "A kiválasztott tartalom nem LTI-link."
+  selected_course_9bf57f33: "Kiválasztott kurzus"
   selected_course_course_a581f834: "Kiválasztott kurzus %{course}"
   selected_emojis_will_not_be_available_in_the_emoji_412d8776: "A kiválasztott emojik nem lesznek elérhetőek az \"Emoji-kiválasztó\" menüben a hallgatók vagy az oktatók számára."
   selected_external_tool_tool_bae095ba: "Kiválasztott külső eszköz:: %{tool}"
@@ -23727,6 +23741,7 @@ hu:
   start_a_new_subject_7271b3ec: "Új téma indítása"
   start_and_end_date_filter_selections_55bcd8b8: "Kezdő és befejező dátum szűrő kiválasztása"
   start_assignment_d56256d3: "Feladat kezdése"
+  start_at_c29f35f1: "Kezdés ideje"
   start_at_c7a5789: "Kezdje itt:"
   start_at_end_at_b375cbe7: "| %{start_at} - %{end_at}"
   start_auto_refresh_e2feafb2: "Automatikus frissítés indítása"

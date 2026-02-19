@@ -43,7 +43,8 @@ module Canvas
       "Assignment" => %w[availability conditional_release needs_grading],
       "Quizzes::Quiz" => %w[availability],
       "DiscussionTopic" => %w[availability],
-      "WikiPage" => %w[availability]
+      "WikiPage" => %w[availability],
+      "ContextModule" => %w[availability]
     }.freeze
 
     PREFER_MULTI_CACHE_TYPES = {

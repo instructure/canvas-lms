@@ -565,4 +565,101 @@ describe WikiPagesApiController, type: :request do
       end
     end
   end
+
+  describe "POST accessibility_queue_scan" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @student = student_in_course(active_all: true).user
+      @wiki_page = @course.wiki_pages.create!(
+        title: "Test Page",
+        body: "<h1>Title</h1><p>Content</p>"
+      )
+    end
+
+    def accessibility_queue_scan_request(user, page_url, expected_status: 200)
+      url = "/api/v1/courses/#{@course.id}/pages/#{page_url}/accessibility/queue_scan"
+      path = {
+        controller: "wiki_pages_api",
+        action: "accessibility_queue_scan",
+        format: "json",
+        course_id: @course.id.to_s,
+        url_or_id: page_url
+      }
+      api_call_as_user(user, :post, url, path, {}, {}, { expected_status: })
+    end
+
+    context "when a11y_checker feature is enabled" do
+      before do
+        @course.account.enable_feature!(:a11y_checker)
+        @course.enable_feature!(:a11y_checker_eap)
+      end
+
+      it "requires manage course content permissions" do
+        accessibility_queue_scan_request(@student, @wiki_page.url, expected_status: 403)
+      end
+
+      it "queues an asynchronous accessibility scan and returns scan object with queued state" do
+        json = accessibility_queue_scan_request(@teacher, @wiki_page.url)
+
+        expect(json["id"]).to be_present
+        expect(json["resource_id"]).to eq(@wiki_page.id)
+        expect(json["resource_type"]).to eq("WikiPage")
+        expect(json["resource_name"]).to eq("Test Page")
+        expect(json["workflow_state"]).to eq("queued")
+      end
+
+      it "returns 404 for non-existent page" do
+        accessibility_queue_scan_request(@teacher, "nonexistent-page", expected_status: 404)
+      end
+
+      it "calls ResourceScannerService with the wiki page using async call method" do
+        service = Accessibility::ResourceScannerService.new(resource: @wiki_page)
+
+        expect(Accessibility::ResourceScannerService).to receive(:new)
+          .with(resource: @wiki_page)
+          .and_return(service)
+        # Stub delay to prevent actual job queueing but allow scan creation
+        expect(service).to receive(:delay).and_return(service)
+        expect(service).to receive(:scan_resource)
+
+        accessibility_queue_scan_request(@teacher, @wiki_page.url)
+      end
+
+      it "does not queue duplicate scans if one is already queued" do
+        # Create an existing queued scan
+        existing_scan = AccessibilityResourceScan.create!(
+          context: @wiki_page,
+          course_id: @course.id,
+          workflow_state: "queued",
+          resource_name: @wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: @wiki_page.updated_at
+        )
+
+        # Should not create a new delayed job
+        expect(Delayed::Job).not_to receive(:enqueue)
+
+        json = accessibility_queue_scan_request(@teacher, @wiki_page.url)
+
+        # Should return the existing scan
+        expect(json["id"]).to eq(existing_scan.id)
+        expect(json["workflow_state"]).to eq("queued")
+      end
+    end
+
+    context "when a11y_checker feature is disabled" do
+      before do
+        @course.account.disable_feature!(:a11y_checker)
+        @course.disable_feature!(:a11y_checker_eap)
+      end
+
+      it "returns forbidden even for teachers" do
+        accessibility_queue_scan_request(@teacher, @wiki_page.url, expected_status: 403)
+      end
+
+      it "returns forbidden for students" do
+        accessibility_queue_scan_request(@student, @wiki_page.url, expected_status: 403)
+      end
+    end
+  end
 end

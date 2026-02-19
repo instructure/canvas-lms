@@ -181,6 +181,7 @@ function Assignment() {
   this.peerReviewsAssignAt = this.peerReviewsAssignAt.bind(this)
   this.peerReviewSubmissionRequired = this.peerReviewSubmissionRequired.bind(this)
   this.peerReviewAcrossSections = this.peerReviewAcrossSections.bind(this)
+  this.hasPeerReviewSubmissions = this.hasPeerReviewSubmissions.bind(this)
   this.pointsPossible = this.pointsPossible.bind(this)
   this.pollUntilFinished = this.pollUntilFinished.bind(this)
   this.pollUntilFinishedCloningAlignment = this.pollUntilFinishedCloningAlignment.bind(this)

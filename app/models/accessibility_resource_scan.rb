@@ -39,9 +39,39 @@ class AccessibilityResourceScan < ActiveRecord::Base
 
   scope :running, -> { where(workflow_state: %w[queued in_progress]) }
   scope :for_course, ->(course) { where(course:) }
+  scope :open, -> { where(closed_at: nil) }
+  scope :closed, -> { where.not(closed_at: nil) }
+
+  def closed?
+    closed_at.present?
+  end
+
+  def open?
+    closed_at.nil?
+  end
 
   def update_issue_count!
     update!(issue_count: accessibility_issues.active.count)
+  end
+
+  # Bulk close all active issues for this scan without triggering callbacks (performance optimization)
+  # WARNING: This uses update_all which skips validations and callbacks.
+  # If you add callbacks that MUST run when closing issues, refactor this to use find_each with update!
+  def bulk_close_issues!(user_id:)
+    raise "Resource is already closed" if closed?
+
+    ActiveRecord::Base.transaction do
+      accessibility_issues.active.update_all(
+        workflow_state: "closed",
+        updated_by_id: user_id,
+        updated_at: Time.current
+      )
+
+      update!(
+        closed_at: Time.current,
+        issue_count: 0
+      )
+    end
   end
 
   def context_url
@@ -56,6 +86,8 @@ class AccessibilityResourceScan < ActiveRecord::Base
       url_helpers.course_assignment_path(course_id, context_id)
     when "Attachment"
       url_helpers.course_files_path(course_id, preview: context_id)
+    when "DiscussionTopic"
+      url_helpers.course_discussion_topic_path(course_id, context_id)
     end
   end
 

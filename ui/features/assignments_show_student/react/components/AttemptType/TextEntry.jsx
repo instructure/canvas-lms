@@ -249,6 +249,13 @@ export default class TextEntry extends React.Component {
     return (
       <div
         data-testid="read-only-content"
+        style={{
+          contain: 'layout',
+          position: 'relative',
+          overflow: 'auto',
+          minHeight: '400px',
+          width: '100%',
+        }}
         dangerouslySetInnerHTML={{
           __html: apiUserContent.convert(this.props.submission.body),
         }}

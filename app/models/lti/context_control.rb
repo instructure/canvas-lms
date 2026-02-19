@@ -254,7 +254,7 @@ class Lti::ContextControl < ActiveRecord::Base
       .where(deployment_id:, registration_id:)
       .where.not(id:)
       .in_batches do |batch|
-      batch.update_all(workflow_state: "deleted", updated_at: Time.current, updated_by_id:)
+        batch.update_all(workflow_state: "deleted", updated_at: Time.current, updated_by_id:)
     end
   end
 

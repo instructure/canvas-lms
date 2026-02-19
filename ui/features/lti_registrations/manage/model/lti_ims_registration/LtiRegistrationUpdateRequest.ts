@@ -26,10 +26,12 @@ import {ZAccountId} from '../AccountId'
 export const ZLtiRegistrationUpdateRequest = z.object({
   id: ZLtiRegistrationUpdateRequestId,
   root_account_id: ZAccountId,
-  uuid: ZDynamicRegistrationTokenUUID,
+  uuid: ZDynamicRegistrationTokenUUID.optional().nullable(),
   lti_registration_id: ZLtiRegistrationId,
   internal_lti_configuration: ZInternalLtiConfiguration,
-  created_by: z.union([z.string(), ZUser]),
+  created_by: z.union([z.string(), ZUser]).optional().nullable(),
+  comment: z.string().optional().nullable(),
+  status: z.enum(['applied', 'rejected', 'pending']).optional().nullable(),
 })
 
 export interface LtiRegistrationUpdateRequest

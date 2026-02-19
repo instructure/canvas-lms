@@ -59,7 +59,8 @@ export type AccessibilityScansState = {
   nextResource: NextResource
   isAiAltTextGenerationEnabled?: boolean
   isAiTableCaptionGenerationEnabled?: boolean
-  discussionTopicsEnabled?: boolean
+  additionalResourcesEnabled?: boolean
+  isCloseIssuesEnabled?: boolean
 }
 
 export type AccessibilityScansActions = {
@@ -101,10 +102,11 @@ export const initialState: AccessibilityScansState = {
   accessibilityScans: null,
   issuesSummary: null,
   nextResource: defaultNextResource,
-  discussionTopicsEnabled: window.ENV.FEATURES?.a11y_checker_additional_resources || false,
+  additionalResourcesEnabled: window.ENV.FEATURES?.a11y_checker_additional_resources || false,
   isAiAltTextGenerationEnabled: window.ENV.FEATURES?.a11y_checker_ai_alt_text_generation || false,
   isAiTableCaptionGenerationEnabled:
     window.ENV.FEATURES?.a11y_checker_ai_table_caption_generation || false,
+  isCloseIssuesEnabled: window.ENV.FEATURES?.a11y_checker_close_issues || false,
 }
 
 export const defaultStateToFetch: NewStateToFetch = {

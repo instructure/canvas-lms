@@ -142,7 +142,10 @@ describe('TurnitinAPMigrationModal Render', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json(mockMigrations, {status: 200})
+          return HttpResponse.json(
+            {accounts: mockMigrations, coordinator_progress: null},
+            {status: 200},
+          )
         },
       ),
     )
@@ -176,7 +179,7 @@ describe('TurnitinAPMigrationModal Render', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json([])
+          return HttpResponse.json({accounts: [], coordinator_progress: null})
         },
       ),
     )
@@ -193,7 +196,7 @@ describe('TurnitinAPMigrationModal Render', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json(mockMigrations)
+          return HttpResponse.json({accounts: mockMigrations, coordinator_progress: null})
         },
       ),
     )
@@ -218,7 +221,7 @@ describe('TurnitinAPMigrationModal Render', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json(mockMigrations)
+          return HttpResponse.json({accounts: mockMigrations, coordinator_progress: null})
         },
       ),
     )
@@ -239,7 +242,7 @@ describe('TurnitinAPMigrationModal Render', () => {
       http.get(
         `/api/v1/accounts/${defaultProps.rootAccountId}/asset_processors/tii_migrations`,
         () => {
-          return HttpResponse.json(mockMigrations)
+          return HttpResponse.json({accounts: mockMigrations, coordinator_progress: null})
         },
       ),
     )

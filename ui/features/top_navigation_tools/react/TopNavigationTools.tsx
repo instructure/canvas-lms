@@ -61,8 +61,6 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
   const pinned_tools = props.tools.filter(tool => tool.pinned)
   const menu_tools = props.tools.filter(tool => !tool.pinned)
 
-  const a11yFixes = ENV.FEATURES?.top_navigation_placement_a11y_fixes
-
   const menuToolsElement = menu_tools.length > 0 && (
     <Flex.Item>
       <Menu
@@ -119,24 +117,9 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
   })
 
   return (
-    <Flex
-      as="div"
-      gap="small"
-      width="100%"
-      height="100%"
-      direction={a11yFixes ? undefined : 'row-reverse'}
-    >
-      {a11yFixes ? (
-        <>
-          {pinnedToolsElements}
-          {menuToolsElement}
-        </>
-      ) : (
-        <>
-          {menuToolsElement}
-          {pinnedToolsElements}
-        </>
-      )}
+    <Flex as="div" gap="small" width="100%" height="100%">
+      {pinnedToolsElements}
+      {menuToolsElement}
     </Flex>
   )
 }

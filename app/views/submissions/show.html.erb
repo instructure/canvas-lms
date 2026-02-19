@@ -159,7 +159,8 @@
           <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
         <% end %>
         <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && @submission.posted? %>
-          <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
+          <% vericite_data = @submission.vericite_data(true) %>
+          <% if (vericite_score = vericite_data[@submission.asset_string]) && vericite_data[:provider] == :vericite && vericite_score[:similarity_score] %>
             <% if show_updated_plagiarism_icons %>
               <%=
                 render partial: 'shared/originality_score_icon', locals: {

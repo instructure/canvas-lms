@@ -25,6 +25,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -46,11 +47,11 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
   }, [])
 
   useEffect(() => {
-    if (alertMessage !== null) {
-      const timeout = setTimeout(() => setAlertMessage(null), 3000)
-      return () => clearTimeout(timeout)
-    }
-  }, [alertMessage, setAlertMessage])
+    if (alertMessage === null) return // Don't set timeout for null
+
+    const timeout = setTimeout(() => setAlertMessage(null), 3000)
+    return () => clearTimeout(timeout)
+  }, [alertMessage])
 
   const shouldSearch = (searchString: string) => {
     const searchQueryLength = searchString.trim().length
@@ -60,12 +61,16 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
   const debouncedOnSearchChange = useDebouncedCallback((value: string) => {
     if (shouldSearch(value)) {
       onSearchChange(value).then(result => {
+        if (!result) return // Handle failure case properly
+
         const msg =
           value.length > 0
-            ? I18n.t('Search filter applied. Accessibility issues updated.')
-            : I18n.t('Search filter cleared. Accessibility issues updated.')
+            ? I18n.t('Showing resources matching %{searchTerm}.', {
+                searchTerm: value,
+              })
+            : I18n.t('Search filter cleared. Showing all resources.')
 
-        setTimeout(() => result && setAlertMessage(msg), 1500)
+        setTimeout(() => setAlertMessage(msg), 1500)
       })
     }
   }, 300)
@@ -103,7 +108,10 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
             value={searchInput}
             renderBeforeInput={() => <IconSearchLine inline={false} />}
             renderAfterInput={clearButton}
-            renderLabel={''}
+            renderLabel={
+              <ScreenReaderContent>{I18n.t('Search resource titles')}</ScreenReaderContent>
+            }
+            type="search"
             onChange={event => handleChange(event.target.value)}
             messages={[
               {

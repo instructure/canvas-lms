@@ -62,7 +62,7 @@ module Api::V1::OutcomeResults
   # Public: Serializes outcomes in a hash that can be added to the linked hash.
   #
   # Returns a Hash containing serialized outcomes.
-  def outcome_results_include_outcomes_json(outcomes, context, percents = {})
+  def outcome_results_include_outcomes_json(outcomes, context, percents = {}, outcome_links = [])
     alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
       ActiveRecord::Associations.preload(outcomes_slice, [:context])
@@ -70,6 +70,12 @@ module Api::V1::OutcomeResults
                 .pluck(:learning_outcome_id, :content_type, :content_id).each do |lo_id, content_type, content_id|
         (alignment_asset_string_map[lo_id] ||= []) << "#{content_type.underscore}_#{content_id}"
       end
+    end
+
+    # Build mapping from outcome_id to group_id (associated_asset_id from ContentTag)
+    outcome_to_group_map = {}
+    outcome_links.each do |link|
+      outcome_to_group_map[link.content_id] = link.associated_asset_id
     end
     assessed_outcomes = []
     outcomes.map(&:id).each_slice(100) do |outcome_ids|
@@ -99,6 +105,7 @@ module Api::V1::OutcomeResults
       )
 
       hash[:alignments] = alignment_asset_string_map[o.id]
+      hash[:group_id] = outcome_to_group_map[o.id]&.to_s
       hash
     end
   end
@@ -359,7 +366,8 @@ module Api::V1::OutcomeResults
       {
         user_id: result.user_id.to_s,
         alignment_id: alignment.prefixed_id,
-        score: result.score
+        score: result.score,
+        submitted_or_assessed_at: result.submitted_or_assessed_at&.iso8601
       }
     end
   end

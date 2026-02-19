@@ -23,137 +23,96 @@ RSpec.describe Accessibility::GenerateController do
   describe "#create_table_caption" do
     let!(:course) { Course.create! }
     let!(:user) { User.create! }
-    let(:accessibility_issue_instance) { instance_double(Accessibility::Issue) }
+    let!(:wiki_page) { course.wiki_pages.create!(title: "test page", body: "<table><tr><td>Data</td></tr></table>") }
 
     before do
-      allow(controller).to receive_messages(require_context: true, require_user: true, check_authorized_action: true)
+      allow(controller).to receive_messages(
+        require_context: true,
+        require_user: true,
+        check_authorized_action: true
+      )
       controller.instance_variable_set(:@context, course)
       controller.instance_variable_set(:@current_user, user)
+      controller.instance_variable_set(:@domain_root_account, Account.default)
 
-      allow(Accessibility::Issue).to receive(:new).with(context: course).and_return(accessibility_issue_instance)
-      allow(LLMConfigs).to receive(:config_for).with("alt_text_generate").and_return({})
-      allow(InstLLMHelper).to receive(:with_rate_limit).and_yield
-      allow(course).to receive(:a11y_checker_enabled?).and_return(true)
+      allow(course).to receive_messages(a11y_checker_enabled?: true, root_account: Account.default)
       Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+
+      stub_const("CedarClient", Class.new do
+        def self.conversation(*)
+          Struct.new(:response, keyword_init: true).new(response: "Generated Caption")
+        end
+      end)
     end
 
-    context "for a wiki page" do
-      let!(:wiki_page) { course.wiki_pages.create!(title: "test page", body: "test body") }
+    context "when generation succeeds" do
       let(:params) do
         {
           course_id: course.id,
-          rule: "some_rule",
-          content_type: "WikiPage",
+          content_type: "Page",
           content_id: wiki_page.id.to_s,
-          path: "some_path",
-          value: "some_value"
+          path: "./table"
         }
       end
-      let(:response_data) { { json: { "result" => "success" }, status: :ok } }
 
-      it "returns the correct response" do
-        expect(accessibility_issue_instance).to receive(:generate_fix).with("some_rule", "WikiPage", wiki_page.id.to_s, "some_path", "some_value").and_return(response_data)
-
+      it "returns the generated caption" do
         post :create_table_caption, params:, format: :json
+
         expect(response).to have_http_status(:ok)
-        expect(response.parsed_body).to eq({ "result" => "success" })
+        expect(response.parsed_body).to eq({ "value" => "Generated Caption" })
       end
     end
 
-    context "for an assignment" do
-      let!(:assignment) { course.assignments.create! }
+    context "with missing parameters" do
       let(:params) do
         {
           course_id: course.id,
-          rule: "another_rule",
-          content_type: "Assignment",
-          content_id: assignment.id.to_s,
-          path: "another_path",
-          value: "another_value"
+          content_type: "Page"
         }
       end
-      let(:response_data) { { json: { "result" => "success" }, status: :ok } }
 
-      it "returns the correct response" do
-        expect(accessibility_issue_instance).to receive(:generate_fix).with("another_rule", "Assignment", assignment.id.to_s, "another_path", "another_value").and_return(response_data)
-
+      it "returns bad request" do
         post :create_table_caption, params:, format: :json
-        expect(response).to have_http_status(:ok)
-        expect(response.parsed_body).to eq({ "result" => "success" })
-      end
-    end
 
-    context "with missing params" do
-      let(:params) do
-        {
-          course_id: course.id,
-          rule: "some_rule"
-        }
-      end
-      let(:error_response) { { json: { "error" => "missing params" }, status: :bad_request } }
-
-      it "returns an error" do
-        expect(accessibility_issue_instance).to receive(:generate_fix).with("some_rule", nil, nil, nil, nil).and_return(error_response)
-
-        post :create_table_caption, params:, format: :json
         expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body).to eq({ "error" => "missing params" })
+        expect(response.parsed_body).to have_key("error")
       end
     end
 
-    context "when rate limit is exceeded" do
+    context "when resource is not found" do
       let(:params) do
         {
           course_id: course.id,
-          rule: "img-alt",
-          content_type: "WikiPage",
-          content_id: "123",
-          path: "img_path",
-          value: "test_value"
+          content_type: "Page",
+          content_id: "999999",
+          path: "./table"
         }
       end
 
-      before do
-        # Override the previous mock to throw the rate limit exception
-        # The error requires a limit parameter
-        rate_limit_error = InstLLMHelper::RateLimitExceededError.new(limit: 10)
-        allow(InstLLMHelper).to receive(:with_rate_limit).and_raise(rate_limit_error)
-      end
-
-      it "returns a too many requests status with appropriate error message" do
+      it "returns bad request" do
         post :create_table_caption, params:, format: :json
 
-        expect(response).to have_http_status(:too_many_requests)
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body).to have_key("error")
       end
     end
 
-    context "rate limiting" do
+    context "when element is not a table" do
+      let!(:wiki_page_no_table) { course.wiki_pages.create!(title: "test page", body: "<div>No table</div>") }
       let(:params) do
         {
           course_id: course.id,
-          rule: "some_rule",
-          content_type: "Assignment",
-          content_id: "123",
-          path: "some_path",
-          value: "some_value"
+          content_type: "Page",
+          content_id: wiki_page_no_table.id.to_s,
+          path: "./div"
         }
       end
 
-      it "uses InstLLMHelper with rate limiting" do
-        allow(LLMConfigs).to receive(:config_for).and_call_original
-        allow(InstLLMHelper).to receive(:with_rate_limit).and_call_original
-
-        config = {}
-        allow(LLMConfigs).to receive(:config_for).with("alt_text_generate").and_return(config)
-
-        expect(InstLLMHelper).to receive(:with_rate_limit) do |args|
-          expect(args[:user]).to eq user
-          expect(args[:llm_config]).to eq config
-        end.and_yield
-
-        allow(accessibility_issue_instance).to receive(:generate_fix).and_return({ json: {}, status: :ok })
-
+      it "returns bad request" do
         post :create_table_caption, params:, format: :json
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body).to have_key("error")
       end
     end
   end

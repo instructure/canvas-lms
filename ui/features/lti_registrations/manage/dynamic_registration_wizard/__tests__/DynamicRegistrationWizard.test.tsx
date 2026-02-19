@@ -64,6 +64,7 @@ describe('DynamicRegistrationWizard', () => {
       defaultProps.accountId,
       'https://example.com',
       defaultProps.unifiedToolId,
+      undefined,
     )
     // Ignore screenreader title.
     expect(screen.getByText(/Loading/i, {ignore: 'title'})).toBeInTheDocument()
@@ -90,6 +91,7 @@ describe('DynamicRegistrationWizard', () => {
       accountId,
       defaultProps.dynamicRegistrationUrl,
       unifiedToolId,
+      undefined,
     )
     const frame = await waitFor(() => screen.getByTestId('dynamic-reg-wizard-iframe'))
     expect(frame).toBeInTheDocument()

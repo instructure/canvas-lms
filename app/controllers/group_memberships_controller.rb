@@ -220,12 +220,13 @@ class GroupMembershipsController < ApplicationController
         memberships = @group.bulk_add_users_to_differentiation_tag(active_user_ids)
         membership_errors = memberships.select { |m| m.errors.any? }
 
-        # Recompute submissions for the added users
+        # Recompute submissions and invalidate visibility caches for the added users
         # - Typically this is handled by update_cached_due_dates callback in group_membership.rb, but since we are
         #   bulk creating memberships, it will bypass callbacks.
         added_user_ids = (memberships - membership_errors).map(&:user_id)
         assignments = AssignmentOverride.active.where(set_type: "Group", set_id: @group.id).pluck(:assignment_id)
         SubmissionLifecycleManager.recompute_users_for_course(added_user_ids, @group.context_id, assignments) if assignments.any?
+        GroupMembership.invalidate_visibility_caches_for_group(@group, added_user_ids)
 
         if membership_errors.any? || invalid_user_ids.any?
           render json: {

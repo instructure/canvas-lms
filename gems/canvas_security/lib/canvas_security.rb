@@ -352,7 +352,7 @@ module CanvasSecurity
         # the db may not exist yet
       end
     else
-      abort "encryption key is incorrect. if you have intentionally changed it, you may want to run `rake db:reset_encryption_key_hash`"
+      abort "encryption key is incorrect. if you have intentionally changed it, you may want to run `rake db:reset_encryption_key_hash`" # rubocop:disable Rails/Exit
     end
   end
 

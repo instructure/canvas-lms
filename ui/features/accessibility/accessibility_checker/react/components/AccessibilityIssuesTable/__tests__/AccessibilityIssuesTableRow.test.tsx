@@ -22,7 +22,21 @@ import {Table} from '@instructure/ui-table'
 import {AccessibilityIssuesTableRow} from '../AccessibilityIssuesTableRow'
 import {mockScan1} from '../../../../../shared/react/stores/mockData'
 
+const mockMutate = vi.fn()
+
+vi.mock('../../../../../shared/react/hooks/useQueueScanResource', () => ({
+  useQueueScanResource: vi.fn(() => ({mutate: mockMutate})),
+}))
+
+vi.mock('../Cells/ActionsMenuCell', () => ({
+  ActionsMenuCell: () => null,
+}))
+
 describe('AccessibilityIssuesTableRow', () => {
+  beforeEach(() => {
+    mockMutate.mockClear()
+  })
+
   it('renders without crashing', () => {
     render(
       <Table caption="Test table">
@@ -32,5 +46,17 @@ describe('AccessibilityIssuesTableRow', () => {
       </Table>,
     )
     expect(screen.getByTestId('issue-row-1')).toBeInTheDocument()
+  })
+
+  it('has data-pendo attribute on resource link', () => {
+    render(
+      <Table caption="Test table">
+        <Table.Body>
+          <AccessibilityIssuesTableRow item={mockScan1} isMobile={false} />
+        </Table.Body>
+      </Table>,
+    )
+    const link = screen.getByRole('link', {name: 'Test Page 1'})
+    expect(link).toHaveAttribute('data-pendo', 'navigate-to-resource-url')
   })
 })

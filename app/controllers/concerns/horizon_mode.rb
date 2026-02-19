@@ -79,7 +79,7 @@ module HorizonMode
   end
 
   def horizon_params
-    { content_only: "true", instui_theme: "career", force_classic: "true" }.symbolize_keys
+    { content_only: "true", instui_theme: "career", force_classic: "true", hide_global_nav: "true" }.symbolize_keys
   end
 
   def entering_student_view?
@@ -99,6 +99,7 @@ module HorizonMode
     query_params.delete("instui_theme")
     query_params.delete("force_classic")
     query_params.delete("content_only")
+    query_params.delete("hide_global_nav")
     uri.query = query_params.empty? ? nil : query_params.to_query
     uri.to_s
   end

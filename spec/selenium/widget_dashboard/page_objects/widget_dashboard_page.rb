@@ -73,6 +73,22 @@ module WidgetDashboardPage
     "[data-testid='message-button-#{account_id}-#{course_id}']"
   end
 
+  def course_filter_select_selector
+    "[data-testid='course-filter-select']"
+  end
+
+  def role_filter_select_selector
+    "[data-testid='role-filter-select']"
+  end
+
+  def people_course_filter_select_selector
+    "#{widget_container_selector("people")} [data-testid='course-filter-select']"
+  end
+
+  def people_role_filter_select_selector
+    "#{widget_container_selector("people")} [data-testid='role-filter-select']"
+  end
+
   def send_message_to_modal_selector(teacher_name)
     "span[role = 'dialog'][aria-label='Send Message to #{teacher_name}']"
   end
@@ -246,6 +262,27 @@ module WidgetDashboardPage
     "#{add_widget_modal_selector} [data-testid='close-button']"
   end
 
+  # Inbox widget selectors
+  def inbox_filter_select_selector
+    "[data-testid='inbox-filter-select']"
+  end
+
+  def inbox_message_item_prefix_selector
+    "[data-testid*='message-item-']"
+  end
+
+  def inbox_message_item_selector(message_id)
+    "[data-testid='message-item-#{message_id}']"
+  end
+
+  def inbox_no_messages_message_selector
+    "[data-testid='no-messages-message']"
+  end
+
+  def inbox_show_all_messages_link_selector
+    "[data-testid='show-all-messages-link']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -298,6 +335,18 @@ module WidgetDashboardPage
 
   def message_instructor_button(account_id, course_id)
     f(message_instructor_button_selector(account_id, course_id))
+  end
+
+  def course_filter_select
+    f(course_filter_select_selector)
+  end
+
+  def role_filter_select
+    f(role_filter_select_selector)
+  end
+
+  def filter_option(option_text)
+    fj(filter_option_selector(option_text))
   end
 
   def send_message_to_modal(teacher_name)
@@ -476,6 +525,27 @@ module WidgetDashboardPage
     f(add_widget_modal_close_button_selector)
   end
 
+  # Inbox widget elements
+  def inbox_filter_select
+    f(inbox_filter_select_selector)
+  end
+
+  def all_inbox_message_items
+    ff(inbox_message_item_prefix_selector)
+  end
+
+  def inbox_message_item(message_id)
+    f(inbox_message_item_selector(message_id))
+  end
+
+  def inbox_no_messages_message
+    f(inbox_no_messages_message_selector)
+  end
+
+  def inbox_show_all_messages_link
+    f(inbox_show_all_messages_link_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -489,6 +559,16 @@ module WidgetDashboardPage
       click_INSTUI_Select_option(course_work_course_filter_select_selector, filter_value)
     when :date
       click_INSTUI_Select_option(course_work_date_filter_select_selector, filter_value)
+    end
+    wait_for_ajaximations
+  end
+
+  def filter_people_by(filter_type, filter_value)
+    case filter_type
+    when :course
+      click_INSTUI_Select_option(people_course_filter_select_selector, filter_value)
+    when :role
+      click_INSTUI_Select_option(people_role_filter_select_selector, filter_value)
     end
     wait_for_ajaximations
   end
@@ -560,5 +640,21 @@ module WidgetDashboardPage
     column_2_widgets = all_widget_on_column(2)
     expect(column_1_widgets.length).to eq(2)
     expect(column_2_widgets.length).to eq(2)
+  end
+
+  def filter_inbox_messages_by(filter_value)
+    expect(inbox_filter_select).to be_displayed
+    inbox_filter_select.click
+    click_INSTUI_Select_option(inbox_filter_select_selector, filter_value)
+    wait_for_ajaximations
+  end
+
+  def click_inbox_show_all_messages_link
+    expect(inbox_show_all_messages_link).to be_displayed
+    inbox_show_all_messages_link.click
+  end
+
+  def verify_inbox_message_count(expected_count)
+    expect(all_inbox_message_items.size).to eq(expected_count)
   end
 end

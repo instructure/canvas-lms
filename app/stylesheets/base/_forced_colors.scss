@@ -24,4 +24,8 @@
     *:not(:focus-visible) {
         outline: none !important;
     }
+
+    *:focus {
+        outline: auto !important;
+    }
  }

@@ -478,7 +478,7 @@ class AppointmentGroup < ActiveRecord::Base
       ).update_all(changed)
     end
 
-    @new_appointments.each(&:reload) if @new_appointments.present?
+    @new_appointments&.each(&:reload)
   end
 
   def participant_type

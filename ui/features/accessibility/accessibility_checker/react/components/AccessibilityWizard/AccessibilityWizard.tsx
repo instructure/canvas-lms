@@ -64,6 +64,7 @@ export const AccessibilityWizard = () => {
             as="div"
             position="sticky"
             insetBlockStart="0"
+            padding="medium small mediumSmall small"
             elementRef={(el: Element | null) => {
               if (el instanceof HTMLElement) {
                 el.style.zIndex = '10'

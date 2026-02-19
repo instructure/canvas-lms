@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import JobsIndex from './react'
 import ready from '@instructure/ready'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
@@ -28,10 +28,10 @@ ready(() => {
     throw new Error('Failed to find root container element')
   }
 
-  const root = createRoot(container)
-  root.render(
+  render(
     <ApolloProvider client={createClient()}>
       <JobsIndex />
     </ApolloProvider>,
+    container,
   )
 })

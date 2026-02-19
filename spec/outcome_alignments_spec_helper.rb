@@ -30,13 +30,13 @@ module OutcomeAlignmentsSpecHelper
       item_alignments = (1..num_items)
                         .to_a
                         .map do |idx|
-        {
-          artifact_type: "quizzes.item",
-          artifact_id: (100 + idx).to_s,
-          associated_asset_type: "canvas.assignment.quizzes",
-          associated_asset_id: associated_asset_id.to_s,
-          title: "Question Number #{100 + idx}"
-        }
+                          {
+                            artifact_type: "quizzes.item",
+                            artifact_id: (100 + idx).to_s,
+                            associated_asset_type: "canvas.assignment.quizzes",
+                            associated_asset_id: associated_asset_id.to_s,
+                            title: "Question Number #{100 + idx}"
+                          }
       end
       alignments = []
       alignments << quiz_alignment if with_quiz

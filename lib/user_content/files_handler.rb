@@ -91,13 +91,13 @@ module UserContent
       end
 
       def path
-        if Attachment.relative_context?(attachment.context_type)
+        if match.media_iframe_url?
+          "media_attachment_iframe_url"
+        elsif Attachment.relative_context?(attachment.context_type)
           if match.preview?
             "#{attachment.context_type.downcase}_file_preview_url"
           elsif match.download? || match.download_frd?
             "#{attachment.context_type.downcase}_file_download_url"
-          elsif match.media_iframe_url?
-            "media_attachment_iframe_url"
           else
             "#{attachment.context_type.downcase}_file_url"
           end
@@ -150,8 +150,13 @@ module UserContent
 
       unless @_attachment
         @_attachment = preloaded_attachments[match.obj_id] unless preloaded_attachments[match.obj_id]&.replacement_attachment_id
-        @_attachment ||= Attachment.find_by(id: match.obj_id) if context.is_a?(User) || context.nil? || location.present?
-        @_attachment ||= context.attachments.find_by(id: match.obj_id)
+        if location.present?
+          attachment = Attachment.find_by(id: match.obj_id)
+          @_attachment ||= attachment.context.attachments.find_by(id: attachment)
+        else
+          @_attachment ||= Attachment.find_by(id: match.obj_id) if context.is_a?(User) || context.nil?
+          @_attachment ||= context&.attachments&.find_by(id: match.obj_id)
+        end
       end
       @_attachment
     end

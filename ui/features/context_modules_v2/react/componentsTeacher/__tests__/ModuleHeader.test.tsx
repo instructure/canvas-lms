@@ -24,6 +24,7 @@ import {graphql, HttpResponse} from 'msw'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleHeader from '../ModuleHeader'
 import {PAGE_SIZE, MODULE_ITEMS, MODULES} from '../../utils/constants'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 vi.mock('@canvas/context-modules/react/publishing/publishingContext', async () => {
   const actual = await vi.importActual('@canvas/context-modules/react/publishing/publishingContext')
@@ -165,14 +166,16 @@ const setUp = (props: ModuleHeaderProps, courseId = 'test-course-id') => {
 
 describe('ModuleHeader', () => {
   beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
+  afterEach(() => {
+    server.resetHandlers()
+    fakeEnv.teardown()
+  })
   afterAll(() => server.close())
 
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeEnv.setup({
       TIMEZONE: 'UTC',
-    }
+    })
   })
 
   it('renders module name', () => {

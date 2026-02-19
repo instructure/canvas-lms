@@ -26,7 +26,7 @@ import {AssignmentOverride} from './AssignmentOverride'
 
 export const DiscussionTopic = {
   fragment: gql`
-    fragment DiscussionTopic on Discussion {
+    fragment EditV2DiscussionTopic on Discussion {
       _id
       id
       title
@@ -55,20 +55,20 @@ export const DiscussionTopic = {
       onlyVisibleToOverrides
       isSectionSpecific
       courseSections {
-        ...Section
+        ...EditV2Section
       }
       groupSet {
-        ...GroupSet
+        ...EditV2GroupSet
       }
       attachment {
-        ...Attachment
+        ...EditV2Attachment
       }
       assignment {
-        ...Assignment
+        ...EditV2Assignment
       }
       ungradedDiscussionOverrides {
         nodes {
-          ...AssignmentOverride
+          ...EditV2AssignmentOverride
         }
       }
       entryCounts {

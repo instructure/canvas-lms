@@ -6693,6 +6693,7 @@ tr:
   close_submission_tray_c4988fa8: "Ödev gönderimi kenar çubuğunu kapat"
   close_the_user_tags_modal_52c6c43c: "Anonim öğrenci"
   close_total_grade_override_tray_d3b1d190: "Anonim Öğrenci"
+  closed_983a96fe: Kapalı
   closed_captioning_2a2f4d8a: "Anonim konular şu anda kullanılamıyor."
   closed_for_comments_e395b42f: "Yorumlara Kapatıldı"
   closes_5c6b4367: "Kapatılıyor:"
@@ -7267,6 +7268,7 @@ tr:
   confirmation_failed_please_try_again_9b7bab7b: "Tüm gönderim türleri"
   confirmation_failed_please_try_again_ae566d37: "Onaylama başarısız. Lütfen tekrar deneyin."
   confirming_2df4b68f: Onaylanıyor...
+  confirming_course_name_5a509f48: "%{course_name} Onaylanıyor..."
   consumer_key_57d9fcf1: "Kullanıcı anahtarı"
   consumer_key_6f94ba11: "Kullanıcı Anahtarı"
   contact_a6e7f6da: İletişim
@@ -8714,6 +8716,7 @@ tr:
   course_id_8bd2a21c: "Ders ID'si"
   course_id_a7c924d5: "ders id"
   course_id_b0bc82d4: "Ders Id"
+  course_id_course_id_2841413a: "Ders ID \"%{course_id}\""
   course_id_f8640bb8: course_id
   course_id_is_required_c4f2f16a: "Takvim kaldırıldı"
   course_id_is_required_fb6931dd: "Diğer Takvimler"
@@ -8809,6 +8812,7 @@ tr:
   course_name_is_required_90919349: "Ders adı zorunludur"
   course_name_is_required_d987f1c3: "Araçla ilişkili ödevler için gönderim sonuçları oluşturabilir ve güncelleyebilir"
   course_name_must_be_255_characters_or_less_e7afed1a: "Araçla ilişkili ödevler için gönderim sonuçları oluşturabilir ve güncelleyebilir."
+  course_name_not_authorized_for_cross_listing_353e500f: "%{course_name} çarpraz listeleme için yetkili değil"
   course_name_successfully_added_48116a50: "%{course_name} başarıyla eklendi!"
   course_navigation_dd035109: "Ders Gezinme Menüsü"
   course_navigation_default_9f015ac9: "Araçla ilişkili not defterinde ödev verileri oluşturabilir ve görüntüleyebilir"
@@ -9739,6 +9743,9 @@ tr:
   criterion_score_8e9d1e60: "Kullanıcının Outcomes Calculation sekmesini görüntülemesine ve ders düzeyinde kazanım yeterliliği (outcome proficiency) hesaplamalarını ayarlamasına izin verir."
   criterion_updated_36c0b3dc: "Kriter Güncellendi"
   croatian_d713d655: "Kullanıcının Outcomes Calculations sekmesini görüntülemesine ve hesap ile ders düzeyinde kazanım yeterliliği hesaplamalarını ayarlamasına izin verir."
+  cross_list_section_27801ec9: "Çarpraz Liste Bölümü"
+  cross_list_this_section_889f7287: "Bu Bölümün Çarpraz Listesini Oluştur"
+  cross_list_this_section_90aea97f: "Bu Bölümün Çarpraz Listesini Oluştur"
   cross_listing_3318526a: "Kullanıcının Outcomes Manage sekmesini hesap ve ders düzeylerinde görüntülemesine izin verir."
   crowdsourced: true
   crumbs: 
@@ -20427,6 +20434,7 @@ tr:
   no_integrations_available_6729d0ca: "Kullanılabilir entegrasyon yok"
   no_issuer_configured_for_openid_connect_provider_8b78f00e: "OpenID Connect sağlayıcısı için yapılandırılmış bir issuer yok"
   no_issues_fce85bba: "İmzalı kimlik doğrulama verisi bulunamadı"
+  no_items_20cde5bf: "Öğe bulunamadı."
   no_items_found_870b2d0d: "Hiçbir öğe bulunamadı"
   no_items_in_this_module_917bc681: "İmzalı jwk bulunamadı"
   no_job_selected_d6c5e6f4: "Bu sınıf için seçilebilir görüntülü görüşme aracı yok"
@@ -20571,6 +20579,7 @@ tr:
   not_available_at_the_subaccount_level_6ee9b41f: "Alt hesap düzeyinde kullanılamaz"
   not_available_ca8cb4eb: Kullanılamıyor
   not_available_during_sync_ae645e8c: "Senkronizasyon sırasında kullanılamaz"
+  not_available_until_14e61f1e: "Şu zamana kadar kullanılamaz"
   not_available_until_5de20e84: "Şu zamana kadar kullanılamaz"
   not_available_until_date_3c1c73c2: "%{date} tarihine kadar kullanılamaz"
   not_available_until_next_submission_2175158: "Bir sonraki gönderime kadar kullanılamaz"
@@ -21121,6 +21130,7 @@ tr:
   options_for_title_label_17f821ff: "%{title_label}için seçenekler"
   or_a01eec62: VEYA
   or_ef4e808: veya
+  or_enter_the_course_s_id_46e0792a: "veya Dersin Numarasını Girin"
   orange_81386a62: Turuncu
   orbis_report_header_assignment_id: "ödev id'si"
   orbis_report_header_assignment_title: "ödev başlığı"
@@ -23982,6 +23992,7 @@ tr:
       page_title: "Oran Sınırlandırma"
   ratings_2433172b: Oranlar
   rce_enhancements_5701e06: "RCE İyileştirmeleri"
+  re_cross_list_this_section_faf7df4d: "Bu Bölümü Çarpraz Listeden Kaldır"
   re_send_confirmation_bcc66940: "Onayı Tekrar Yolla"
   re_sending_379a8580: "Yeniden Gönderiliyor..."
   re_submit_assignment_b3e2bd28: "Ödevi Yeniden Gönder"
@@ -24631,6 +24642,7 @@ tr:
   search_for_a_course_58fdc7a6: "Ders arayınız"
   search_for_a_deleted_course_by_id_f553398d: "ID 'ye Göre silinmiş ders ara"
   search_for_assignment_8149cb1: "Ödevlerde Ara"
+  search_for_course_e1a1dfc6: "Ders Ara"
   search_for_files_7541fb28: "Dosyaları ara"
   search_for_people_by_id_or_name_36107593: "İsme veya ID'ye göre kişileri ara"
   search_grading_periods_e947a3e9: "Notlandırma Peryotlarında Ara"
@@ -24677,6 +24689,7 @@ tr:
   section_sis_94511bcd: "bölüm öbs"
   section_sis_id_6f989834: "bölüm öbs id"
   section_specific_topics_must_have_sections_11868960: "Bölüme özel konularda bölüm olmak zorunda"
+  section_successfully_cross_listed_86eb2765: "Bölümün çarpraz listesi başarılı bir şekilde  oluşturuldu!"
   section_successfully_de_cross_listed_df3b64e: "Bölüm çarpraz listeden başarılı bir şekilde kaldırıldı!"
   sections: 
     section_created: "Bölüm başarıyla oluşturuldu!"
@@ -24782,6 +24795,7 @@ tr:
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "İlişkilendirmek istediğiniz dosyayı seçin veya \"Yeni Dosya\" yı seçerek br dosya ekleyin."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Bu *modül* ile ilişkilendirmek istediğiniz bir dosya seçin ya da \"Yeni Dosya\" yı seçerek bir dosya ekleyin."
   selected_answer: "Bu cevabı seçtiniz."
+  selected_course_9bf57f33: "Seçilen Dersler"
   selected_subtree_a7693937: "Seçili %{subtree}"
   selective_import_aff12a7c: "Seçmeli aktarım"
   self_enrollments: 
@@ -25873,6 +25887,7 @@ tr:
   starred_5a9efa8a: "Yıldız konulmuş"
   start_5a4cfcd6: Başlat
   start_a_new_course_57ae2480: "Yeni bir Ders Aç"
+  start_at_c29f35f1: "Şu Tarihte Başlat"
   start_date_e937be8a: "Başlangıç Tarihi"
   start_participating_f0c75256: "Katılımı Başlat"
   started_5e138638: Başladı

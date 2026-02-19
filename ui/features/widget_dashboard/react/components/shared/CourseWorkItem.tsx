@@ -69,7 +69,7 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
           )}
           <Flex.Item shouldGrow shouldShrink>
             <Flex direction="column" gap="0">
-              <Flex.Item>
+              <Flex.Item overflowY="visible">
                 <Link
                   href={item.htmlUrl}
                   isWithinText={false}
@@ -80,7 +80,7 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                   </Text>
                 </Link>
               </Flex.Item>
-              <Flex.Item>
+              <Flex.Item overflowY="visible">
                 <Flex direction="row" gap="x-small" alignItems="center">
                   <Text size="x-small" color="secondary">
                     {item.course.name}

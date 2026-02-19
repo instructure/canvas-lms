@@ -45,8 +45,13 @@ import {
 import {GradebookPagination} from './pagination/GradebookPagination'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import DragDropWrapper from './grid/DragDropWrapper'
-import {ContributingScoreAlignment, ContributingScoresManager} from '../hooks/useContributingScores'
+import {
+  ContributingScoreAlignment,
+  ContributingScoresManager,
+} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {ContributingScoreHeader} from './grid/ContributingScoreHeader'
+import {BarChartRow} from './grid/BarChartRow'
+import {getScoresForOutcome} from '../utils/scoreUtils'
 
 export interface GradebookProps {
   courseId: string
@@ -83,6 +88,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
   onOpenStudentAssignmentTray,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
+  const barChartRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
   const [outcomes, setOutcomes] = useState<Outcome[]>(initialOutcomes)
 
@@ -116,6 +122,10 @@ const GradebookComponent: React.FC<GradebookProps> = ({
       if (headerRow.current && e.target instanceof HTMLElement) {
         headerRow.current.scrollLeft = e.target.scrollLeft
       }
+
+      if (barChartRow.current && e.target instanceof HTMLElement) {
+        barChartRow.current.scrollLeft = e.target.scrollLeft
+      }
     }
 
     if (gridRef.current) {
@@ -131,7 +141,14 @@ const GradebookComponent: React.FC<GradebookProps> = ({
 
   return (
     <>
-      <Flex padding="medium 0 0 0">
+      <BarChartRow
+        outcomes={outcomes}
+        rollups={rollups}
+        students={students}
+        contributingScores={contributingScores}
+        barChartRowRef={barChartRow}
+      />
+      <Flex>
         <Flex.Item>
           <View borderWidth="large 0 medium 0">
             <StudentHeader
@@ -158,6 +175,8 @@ const GradebookComponent: React.FC<GradebookProps> = ({
             >
               {outcomes.map((outcome, index) => {
                 const contributingScoreForOutcome = contributingScores.forOutcome(outcome.id)
+                const scores = getScoresForOutcome(rollups, outcome.id)
+
                 return (
                   <Fragment key={outcome.id}>
                     <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}>
@@ -169,6 +188,7 @@ const GradebookComponent: React.FC<GradebookProps> = ({
                         outcome={outcome}
                         sorting={sorting}
                         contributingScoresForOutcome={contributingScoreForOutcome}
+                        scores={scores}
                         onMove={handleOutcomeMove}
                         onDragEnd={handleOutcomeDragEnd}
                       />

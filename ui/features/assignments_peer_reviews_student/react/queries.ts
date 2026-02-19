@@ -32,11 +32,13 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
       peerReviews {
         count
         submissionRequired
+        pointsPossible
+        anonymousReviews
       }
       submissionsConnection(filter: {userId: $userId}) {
         nodes {
           _id
-          submissionStatus
+          submittedAt
         }
       }
       assignedToDates {
@@ -52,12 +54,37 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
         available
         workflowState
         createdAt
+        rubricAssessment {
+          _id
+          assessmentRatings {
+            _id
+            criterion {
+              _id
+            }
+            comments
+            commentsHtml
+            description
+            points
+          }
+        }
+        anonymousId
+        anonymizedUser {
+          _id
+          displayName: shortName
+        }
         submission {
           _id
+          id
           attempt
           body
           submissionType
           url
+          submittedAt
+          mediaObject {
+            _id
+            mediaType
+            title
+          }
           attachments {
             _id
             displayName
@@ -67,10 +94,42 @@ export const PEER_REVIEW_ASSIGNMENT_QUERY = gql`
             submissionPreviewUrl
             url
           }
+          user {
+            _id
+          }
+          anonymousId
         }
       }
       rubric {
         _id
+        title
+        criteria {
+          _id
+          description
+          longDescription
+          points
+          criterionUseRange
+          ratings {
+            _id
+            description
+            longDescription
+            points
+          }
+          ignoreForScoring
+          masteryPoints
+          learningOutcomeId
+        }
+        freeFormCriterionComments
+        hideScoreTotal
+        pointsPossible
+        ratingOrder
+        buttonDisplay
+      }
+      rubricAssociation {
+        _id
+        hidePoints
+        hideScoreTotal
+        useForGrading
       }
     }
   }
@@ -86,6 +145,26 @@ export const REVIEWER_SUBMISSION_QUERY = gql`
         assetId
         workflowState
         assetSubmissionType
+      }
+      rubricAssessmentsConnection(filter: {forAttempt: 0}) {
+        nodes {
+          _id
+          assessmentType
+          score
+          assessor {
+            _id
+          }
+          assessmentRatings {
+            _id
+            criterion {
+              _id
+            }
+            comments
+            commentsHtml
+            description
+            points
+          }
+        }
       }
     }
   }

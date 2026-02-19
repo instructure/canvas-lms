@@ -129,6 +129,12 @@ module StudentDashboardCommon
     @graded_discussion.grade_student(@student, grade: "9", grader: @teacher1)
   end
 
+  def dashboard_conversation_setup
+    add_widget_to_dashboard(@student, :inbox, 2)
+    create_multiple_conversations(@student, @teacher1, 3, "unread")
+    create_multiple_conversations(@student, @teacher2, 2, "read")
+  end
+
   def observed_student_setup
     @student2 = user_factory(active_all: true, name: "student2")
     @course1.enroll_student(@student2, enrollment_state: :active)
@@ -318,5 +324,44 @@ module StudentDashboardCommon
                                                           submission_type:
                                                           "online_text_entry",
                                                           body: "Individual submission")
+  end
+
+  # Add specific widget to the user's dashboard
+  def add_widget_to_dashboard(user, widget_name, target_column)
+    case widget_name
+    when :inbox
+      widget_id = "inbox-widget"
+      widget_type = "inbox"
+      title = "Inbox"
+    end
+
+    config = user.get_preference(:widget_dashboard_config) || {}
+    layout = config["layout"] || { "columns" => target_column, "widgets" => [] }
+
+    # Add the widget to the layout if not already present
+    widgets = layout["widgets"] || []
+    unless widgets.any? { |w| w["type"] == widget_type }
+      widgets << {
+        "id" => widget_id,
+        "type" => widget_type,
+        "position" => { "col" => 1, "row" => 1, "relative" => 1 },
+        "title" => title
+      }
+    end
+
+    layout["widgets"] = widgets
+    config["layout"] = layout
+    user.set_preference(:widget_dashboard_config, config)
+    user.save!
+  end
+
+  # Create multiple conversations for a user
+  def create_multiple_conversations(user, sender, count, workflow_state)
+    count.times do |i|
+      subject = "Conversation #{i + 1}"
+      body = "This is message #{i + 1}"
+
+      conversation(user, sender, private: false, subject:, body:, workflow_state:)
+    end
   end
 end

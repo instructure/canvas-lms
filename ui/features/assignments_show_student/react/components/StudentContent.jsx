@@ -43,7 +43,6 @@ import UnavailablePeerReview from '../UnavailablePeerReview'
 import VisualOnFocusMessage from './VisualOnFocusMessage'
 import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
-import {queryClient} from '@canvas/query'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiToolIframe} from './LtiToolIframe'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
@@ -221,7 +220,7 @@ function renderContentBaseOnAvailability(
     const rubricsQueryClient = new QueryClient()
 
     return (
-      <QueryClientProvider client={queryClient}>
+      <>
         <Flex margin="medium 0 0 0" alignItems="start">
           <div style={{flexGrow: 1}}>
             {/* EVAL-3711 Remove ICE Feature Flag */}
@@ -272,6 +271,8 @@ function renderContentBaseOnAvailability(
             </View>
           )}
         </Flex>
+        <LtiToolIframe assignment={assignment} submission={submission} />
+        <div id="assignment_external_tools" />
         {assignment.expectsSubmission ? (
           <ContentTabs
             assignment={assignment}
@@ -286,12 +287,10 @@ function renderContentBaseOnAvailability(
             submission={submission}
           />
         )}
-        <LtiToolIframe assignment={assignment} submission={submission} />
-        <div id="assignment_external_tools" />
         {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && (
           <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />
         )}
-      </QueryClientProvider>
+      </>
     )
   }
 }

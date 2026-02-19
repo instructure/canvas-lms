@@ -643,7 +643,7 @@ class LearningOutcome < ActiveRecord::Base
                 (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_id END) context_id
               SQL
               .map do |ct|
-      Outcomes::LearningOutcomeGroupChildren.new(ct.context).clear_total_outcomes_cache
+                Outcomes::LearningOutcomeGroupChildren.new(ct.context).clear_total_outcomes_cache
     end
   end
 

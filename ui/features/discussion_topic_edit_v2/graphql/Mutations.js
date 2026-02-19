@@ -146,7 +146,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
           }
         }
         attachment {
-          ...Attachment
+          ...EditV2Attachment
         }
       }
       errors {
@@ -248,7 +248,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         sortOrder
         sortOrderLocked
         attachment {
-          ...Attachment
+          ...EditV2Attachment
         }
         assignment {
           _id

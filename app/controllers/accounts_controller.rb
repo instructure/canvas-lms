@@ -2271,8 +2271,6 @@ class AccountsController < ApplicationController
                                    :enable_profiles,
                                    :enable_gravatar,
                                    :enable_turnitin,
-                                   :equella_endpoint,
-                                   :equella_teaser,
                                    :external_notification_warning,
                                    :global_includes,
                                    :google_docs_domain,

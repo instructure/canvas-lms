@@ -22,6 +22,7 @@ import PasswordComplexityConfiguration from '../PasswordComplexityConfiguration'
 import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 const MOCK_MINIMUM_CHARACTER_LENGTH = '8'
 const MOCK_MAXIMUM_LOGIN_ATTEMPTS = '10'
@@ -65,17 +66,12 @@ const getViewOptionsButton = async () => {
 describe('PasswordComplexityConfiguration Component', () => {
   beforeAll(() => {
     server.listen()
-    if (!window.ENV) {
-      // @ts-expect-error
-      window.ENV = {}
-    }
-    window.ENV.DOMAIN_ROOT_ACCOUNT_ID = '1'
+    fakeEnv.setup({DOMAIN_ROOT_ACCOUNT_ID: '1'})
   })
 
   afterAll(() => {
     server.close()
-    // @ts-expect-error
-    delete window.ENV.DOMAIN_ROOT_ACCOUNT_ID
+    fakeEnv.teardown()
   })
 
   afterEach(() => {

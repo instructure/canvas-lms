@@ -210,6 +210,7 @@ class User < ActiveRecord::Base
   has_many :stream_item_instances, dependent: :delete_all
   has_many :all_conversations, -> { preload(:conversation) }, class_name: "ConversationParticipant"
   has_many :conversation_batches, -> { preload(:root_conversation_message) }
+  has_many :authored_conversation_messages, foreign_key: :author_id, class_name: "ConversationMessage", inverse_of: :author
   has_many :favorites
   has_many :messages
   has_many :sis_batches
@@ -232,6 +233,7 @@ class User < ActiveRecord::Base
   has_many :submission_comments, foreign_key: "author_id", inverse_of: :author
 
   has_one :profile, class_name: "UserProfile"
+  has_many :profile_links, through: :profile, source: :links
 
   has_many :progresses, as: :context, inverse_of: :context
   has_many :one_time_passwords, -> { order(:id) }, inverse_of: :user
@@ -3979,5 +3981,9 @@ class User < ActiveRecord::Base
 
   def all_attachments_frd
     Attachment.where(user: self).or(Attachment.where(context: self))
+  end
+
+  def all_calendar_events
+    CalendarEvent.where(user: self).or(CalendarEvent.where(context: self))
   end
 end

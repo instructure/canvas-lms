@@ -39,6 +39,7 @@ interface PreviewProps {
   issue: AccessibilityIssue
   resourceId: number
   itemType: ResourceType
+  onPreviewChange?: (response: PreviewResponse | null) => void
 }
 
 interface PreviewOverlayProps {
@@ -77,7 +78,7 @@ const PreviewOverlay = ({isLoading, error}: PreviewOverlayProps) => {
 const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = forwardRef<
   PreviewHandle,
   PreviewProps
->(({issue, resourceId, itemType}: PreviewProps, ref) => {
+>(({issue, resourceId, itemType, onPreviewChange}: PreviewProps, ref) => {
   const [contentResponse, setContentResponse] = useState<PreviewResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -95,6 +96,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         setContentResponse(result.json || null)
         setError(null)
         onSuccess?.()
+        onPreviewChange?.(result.json || null)
       } catch (error: any) {
         let responseError = error?.message || error?.toString()
         let hasContent = false
@@ -106,6 +108,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
 
             if (json.content) {
               setContentResponse(json)
+              onPreviewChange?.(json)
               hasContent = true
             }
           } catch {

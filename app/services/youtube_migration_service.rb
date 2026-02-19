@@ -423,10 +423,10 @@ class YoutubeMigrationService
                                          .active
                                          .without_assessment_question_association
                                          .flat_map do |question|
-        QUESTION_RCE_FIELDS.map do |field|
-          embeds, error = scan_resource(question, field, question.question_data[field], resource_group_key)
-          [embeds, error]
-        end
+                                           QUESTION_RCE_FIELDS.map do |field|
+                                             embeds, error = scan_resource(question, field, question.question_data[field], resource_group_key)
+                                             [embeds, error]
+                                           end
       end
 
       embeds = (description_embeds + questions_embeds_with_errors.flat_map(&:first)).flatten

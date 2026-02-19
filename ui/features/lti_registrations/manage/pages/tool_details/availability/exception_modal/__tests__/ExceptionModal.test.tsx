@@ -73,7 +73,6 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 describe('ExceptionModal', () => {
-  // Utility to wrap render with QueryClientProvider
   function renderWithQueryClient(ui: React.ReactElement) {
     const queryClient = new QueryClient()
     return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
@@ -141,35 +140,28 @@ describe('ExceptionModal', () => {
       />,
     )
 
-    // Search for "Subaccount"
     const input = screen.getByPlaceholderText(/search by sub-accounts or courses/i)
 
     input.focus()
     await userEvent.paste('Subaccount')
-    // Wait for options to appear
     const subaccount_1 = await screen.findByText('Subaccount 101', {}, {timeout: 3000})
     await screen.findByText('Subaccount 102')
 
-    // Select first subaccount
     await userEvent.click(subaccount_1)
 
-    expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
+    expect(screen.getAllByText('Subaccount 101').length).toBeGreaterThan(0)
 
-    // Search for "Course"
     await userEvent.clear(input)
     await userEvent.paste('Course')
     await screen.findByText('Course 201')
     await screen.findByText('Course 202')
 
-    // Select first course
     await userEvent.click(screen.getByText('Course 201'))
-    expect(screen.getByText('Course 201')).toBeInTheDocument()
+    expect(screen.getAllByText('Course 201').length).toBeGreaterThan(0)
 
-    // Both contexts should be listed
-    expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
-    expect(screen.getByText('Course 201')).toBeInTheDocument()
+    expect(screen.getAllByText('Subaccount 101').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Course 201').length).toBeGreaterThan(0)
 
-    // Close the modal
     await clickOrFail(screen.getByText('Close').closest('button'))
     expect(onClose).toHaveBeenCalled()
   })
@@ -188,29 +180,22 @@ describe('ExceptionModal', () => {
       />,
     )
 
-    // Add a context
     const input = screen.getByPlaceholderText(/search by sub-accounts or courses/i)
     await userEvent.click(input)
     await userEvent.paste('Subaccount')
-    // Wait for dropdown to appear and be interactive
     const subaccount_1 = await screen.findByText('Subaccount 101', {}, {timeout: 5000})
-    // Use fireEvent for more reliable clicking in dropdowns
     fireEvent.click(subaccount_1)
-    // Wait for the item to be added to the exceptions list
     await waitFor(
       () => {
         const addedItems = screen.getAllByText('Subaccount 101')
-        expect(addedItems.length).toBeGreaterThan(1) // Should be in both the input and the added list
+        expect(addedItems.length).toBeGreaterThan(1)
       },
       {timeout: 5000},
     )
 
-    // Find and click the delete/remove button for the added exception
-    // (Assume the button has an accessible label like "Remove Subaccount 101" or a role "button" near the exception name)
     const removeBtn = screen.getByText(/delete exception.*subaccount 101/i).closest('button')
     await clickOrFail(removeBtn)
 
-    // The exception should be removed from the list
     expect(screen.queryByText('Subaccount 101')).not.toBeInTheDocument()
   })
 
@@ -228,28 +213,23 @@ describe('ExceptionModal', () => {
       />,
     )
 
-    // Add a context
     const input = screen.getByPlaceholderText(/search by sub-accounts or courses/i)
     input.focus()
     await userEvent.paste('Subaccount')
     const subaccount_1 = await screen.findByText('Subaccount 101', {}, {timeout: 3000})
     await userEvent.click(subaccount_1)
-    await waitFor(() => expect(screen.getByText('Subaccount 101')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getAllByText('Subaccount 101').length).toBeGreaterThan(0))
 
-    // Find the select for availability by its current value
     const select = screen.getByDisplayValue(/not available/i)
 
-    select.click() // Open the select dropdown
+    select.click()
 
-    // Click on the "Available" option
     const availableOption = screen.getByText('Available')
     await userEvent.click(availableOption)
 
     expect(select).toHaveDisplayValue(/available/i)
 
-    // Change back to "Not Available"
-    select.click() // Open the select dropdown
-    // Click on the "Available" option
+    select.click()
     const notAvailableOption = screen.getByText('Not Available')
     await userEvent.click(notAvailableOption)
     expect(select).toHaveDisplayValue(/not available/i)
@@ -270,20 +250,17 @@ describe('ExceptionModal', () => {
       />,
     )
 
-    // Add a context
     const input = screen.getByPlaceholderText(/search by sub-accounts or courses/i)
     input.focus()
     await userEvent.paste('Subaccount')
     const subaccount_1 = await screen.findByText('Subaccount 101', {}, {timeout: 3000})
     await userEvent.click(subaccount_1)
-    await waitFor(() => expect(screen.getByText('Subaccount 101')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getAllByText('Subaccount 101').length).toBeGreaterThan(0))
 
-    // Click Save
     const saveBtn = screen.getByText('Save').closest('button')
     await clickOrFail(saveBtn)
 
     expect(onConfirm).toHaveBeenCalledTimes(1)
-    // Should be called with an array of controls, containing the selected context
     expect(onConfirm.mock.calls[0][0]).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -310,42 +287,30 @@ describe('ExceptionModal', () => {
       />,
     )
 
-    // Open the browse popover
     const browseBtn = screen.getByText(/browse sub-accounts or courses/i).closest('button')
     await clickOrFail(browseBtn)
 
-    // Wait for the popover to appear and search input to be present
     const browseSearchInput = await screen.findByPlaceholderText(/search\.\.\./i)
 
-    // Filter for subaccount
     browseSearchInput.focus()
     await userEvent.paste('Subaccount')
 
-    // Wait for subaccount option to appear and click it to drill down
     const subaccountOption = await screen.findByText('Subaccount 101')
     await userEvent.click(subaccountOption)
 
-    // Now the "Select" link should appear for the subaccount
     const selectSubaccount = await screen.findByText('Select')
     await userEvent.click(selectSubaccount)
 
-    // The popover should close and the exception should be added
-    expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
+    expect(screen.getAllByText('Subaccount 101').length).toBeGreaterThan(0)
 
-    // Open the browse popover again
     await clickOrFail(browseBtn)
-    // Filter for course
     browseSearchInput.focus()
     await userEvent.paste('Course')
-    // Wait for course option to appear
     const courseOption = await screen.findByText('Course 201')
-    // Click the course row to add it
     await userEvent.click(courseOption)
 
-    // The exception should be added
-    expect(screen.getByText('Course 201')).toBeInTheDocument()
+    expect(screen.getAllByText('Course 201').length).toBeGreaterThan(0)
 
-    // Click Save and assert onConfirm is called with both contexts
     const saveBtn = screen.getByText('Save').closest('button')
     await clickOrFail(saveBtn)
 
@@ -382,17 +347,14 @@ describe('ExceptionModal', () => {
       />,
     )
 
-    // Open the browse popover
     const browseBtn = screen.getByText(/browse sub-accounts or courses/i).closest('button')
     await clickOrFail(browseBtn)
 
-    // Wait for the popover to appear
     await screen.findByPlaceholderText(/search\.\.\./i)
 
     const courseOption = await screen.findByText('Course 201')
     const subaccountOption = await screen.findByText('Subaccount 101')
 
-    // Ensure subaccount appears before course
     expect(subaccountOption.compareDocumentPosition(courseOption)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
@@ -442,8 +404,7 @@ describe('ExceptionModal', () => {
 
     expect(input).toHaveValue('')
 
-    await userEvent.click(input) // Refocus the input
-    // Subaccount 102 should be in the list since we cleared the filter
+    await userEvent.click(input)
     expect(await screen.findByText('Subaccount 102')).toBeInTheDocument()
   })
 })

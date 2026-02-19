@@ -347,9 +347,7 @@ function getModulePublishState(moduleId: CanvasId) {
 export function disableContextModulesPublishMenu(disabled: boolean) {
   // I'm not crazy about leaning on a global, but it's actually
   // the cleanest way to go about disabling the Publish All button
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore - window.modules is a Canvas global not in TS types
-  window.modules?.updatePublishMenuDisabledState(disabled)
+  ;(window as any).modules?.updatePublishMenuDisabledState(disabled)
 }
 
 // this little trick is so that I can spy on funcions

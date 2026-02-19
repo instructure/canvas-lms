@@ -128,6 +128,24 @@ describe UserContent::FilesHandler do
           expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key("verifier")
         end
       end
+
+      context "when URL is a media_attachments_iframe with /download in path" do
+        let(:uri_match) do
+          UserContent::FilesHandler::UriMatch.new(
+            UserContent::HtmlRewriter::UriMatch.new(
+              "/media_attachments_iframe/#{attachment.id}/download?wrap=1",
+              "media_attachments_iframe",
+              Attachment,
+              attachment.id,
+              "/download?wrap=1"
+            )
+          )
+        end
+
+        it "returns media_attachment_iframe_url" do
+          expect(processed_url).to match(%r{^/media_attachments_iframe/#{attachment.id}})
+        end
+      end
     end
   end
 
@@ -221,6 +239,45 @@ describe UserContent::FilesHandler do
             preloaded_attachments:,
             is_public:,
             in_app:
+          ).processed_url
+
+          expect(processed_url).to include "/courses/#{course.id}/files/#{replacement_attachment.id}/"
+        end
+      end
+
+      context "with location parameter" do
+        let(:location) { "wiki_page_123" }
+
+        it "follows replacement chain when attachment is replaced" do
+          replacement_attachment = attachment_with_context(course, { filename: "replacement.mp4", content_type: "video" })
+          attachment.update!(replacement_attachment_id: replacement_attachment.id, file_state: "deleted", deleted_at: Time.zone.now)
+
+          handler = UserContent::FilesHandler.new(
+            match: uri_match,
+            context: course,
+            user: current_user,
+            preloaded_attachments: {},
+            is_public:,
+            in_app:,
+            location:
+          )
+
+          result_attachment = handler.send(:attachment)
+          expect(result_attachment).to eq replacement_attachment
+        end
+
+        it "returns replacement attachment url in processed_url" do
+          replacement_attachment = attachment_with_context(course, { filename: "replacement.mp4", content_type: "video" })
+          attachment.update!(replacement_attachment_id: replacement_attachment.id, file_state: "deleted", deleted_at: Time.zone.now)
+
+          processed_url = UserContent::FilesHandler.new(
+            match: uri_match,
+            context: course,
+            user: current_user,
+            preloaded_attachments: {},
+            is_public:,
+            in_app:,
+            location:
           ).processed_url
 
           expect(processed_url).to include "/courses/#{course.id}/files/#{replacement_attachment.id}/"

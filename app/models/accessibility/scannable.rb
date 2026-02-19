@@ -23,6 +23,8 @@ module Accessibility
     included do
       before_save :capture_content_changes
 
+      after_commit :reset_a11y_content_changed_flag, on: [:create, :update]
+
       after_commit :trigger_accessibility_scan_on_create,
                    on: :create,
                    if: :should_run_accessibility_scan?
@@ -55,14 +57,23 @@ module Accessibility
     private
 
     def capture_content_changes
+      # In case of multiple saves in one transaction, we have to keep track
+      # Whether there was any change to the a11y_scannable_attributes during any of the saves
+      # This will essentially address the below scenario to work well
+      #
+      # Save1 changes an a11y_scannable_attribute -> @capture_content_changes = true
+      # Save2 just touches record -> overwrites @capture_content_changes = false
+      # The @capture_content_changes.present? will fail when the after_commit runs on the update
+      # So a11y checker will not be called, despite there was a change in Save1
+      #
       # Capture content changes before they're lost by subsequent touch operations.
       # Rails' dirty tracking gets cleared when associations touch the parent record,
       # so we store the change state here to check later in after_commit.
-      @content_changed = if a11y_scannable_attributes.present?
-                           a11y_scannable_attributes.any? { |attr| send("#{attr}_changed?") }
-                         else
-                           false
-                         end
+      @capture_content_changes ||= if a11y_scannable_attributes.present?
+                                     a11y_scannable_attributes.any? { |attr| send("#{attr}_changed?") }
+                                   else
+                                     false
+                                   end
     end
 
     def should_run_accessibility_scan?
@@ -86,7 +97,7 @@ module Accessibility
     end
 
     def trigger_accessibility_scan_on_update
-      return unless @content_changed.present?
+      return unless @capture_content_changes.present?
 
       Accessibility::ResourceScannerService.call(resource: self)
     end
@@ -101,6 +112,10 @@ module Accessibility
 
     def excluded_from_accessibility_scan?
       false
+    end
+
+    def reset_a11y_content_changed_flag
+      @capture_content_changes = false
     end
   end
 end

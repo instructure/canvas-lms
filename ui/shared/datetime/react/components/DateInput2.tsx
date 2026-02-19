@@ -124,6 +124,10 @@ export type CanvasDateInput2Props = {
    */
   isInline?: boolean
   /**
+   * Marks the input as required and adds an asterisk to the label.
+   */
+  isRequired?: boolean
+  /**
    * Passed on to `DateInput2`. Text to show when input is empty.
    */
   placeholder?: string
@@ -162,6 +166,7 @@ export default function CanvasDateInput2({
   inputRef,
   interaction = 'enabled',
   invalidDateMessage,
+  isRequired = false,
   locale,
   messages = [], // message type 'newError' to be used for validation error messages
   onBlur,
@@ -318,6 +323,7 @@ export default function CanvasDateInput2({
       timezone={timezone}
       onRequestValidateDate={onRequestValidateDate}
       interaction={interaction}
+      isRequired={isRequired}
       width={width}
       disabledDates={disabledDates}
       data-testid={dataTestid}

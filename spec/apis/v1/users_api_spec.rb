@@ -777,7 +777,7 @@ describe "Users API", type: :request do
     end
 
     it "returns page view history" do
-      stub_const("Api::MAX_PER_PAGE", 2)
+      stub_const("PageViewsController::PAGE_VIEWS_MAX_PER_PAGE", 2)
       json = api_call(:get,
                       "/api/v1/users/#{@student.id}/page_views?per_page=1000",
                       { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", per_page: "1000" })
@@ -801,7 +801,7 @@ describe "Users API", type: :request do
     end
 
     it "recognizes start_time parameter" do
-      stub_const("Api::MAX_PER_PAGE", 3)
+      stub_const("PageViewsController::PAGE_VIEWS_MAX_PER_PAGE", 3)
       start_time = @timestamp.iso8601
       json = api_call(:get,
                       "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
@@ -811,7 +811,7 @@ describe "Users API", type: :request do
     end
 
     it "recognizes end_time parameter" do
-      stub_const("Api::MAX_PER_PAGE", 3)
+      stub_const("PageViewsController::PAGE_VIEWS_MAX_PER_PAGE", 3)
       end_time = @timestamp.iso8601
       json = api_call(:get,
                       "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
@@ -1290,6 +1290,15 @@ describe "Users API", type: :request do
                  { role_filter_id: student_role.id.to_s },
                  {},
                  { skip_token_auth: true })
+        expect(response).to be_successful
+        expect(response.headers["Link"]).to include("last")
+      end
+
+      it "sets pagination totals/last page link with include[]=ui_invoked" do
+        api_call(:get,
+                 "/api/v1/accounts/#{root_account.id}/users",
+                 { controller: "users", action: "api_index", format: "json", account_id: root_account.id.to_param, per_page: 1 },
+                 { role_filter_id: student_role.id.to_s, include: %w[ui_invoked] })
         expect(response).to be_successful
         expect(response.headers["Link"]).to include("last")
       end

@@ -19,10 +19,11 @@
 import $ from 'jquery'
 import {reduce, pick} from 'es-toolkit/compat'
 import editorOptions from './editorOptions'
-import loadEventListeners from './loadEventListeners'
 import polyfill from './polyfill'
 import getRCSProps from './getRCSProps'
 import shouldUseFeature, {Feature} from './shouldUseFeature'
+
+window.INST = window.INST || {}
 
 const RCELoader = {
   loadingPromise: null,
@@ -59,20 +60,12 @@ const RCELoader = {
    *
    * @return {Promise}
    */
-  // @ts-expect-error - JS file with object method syntax not recognized by TS
-  loadRCE(cb = () => {}) {
-    return import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
-      .then(RCE => {
-        this.RCE = RCE
-        loadEventListeners()
-        return RCE
-      })
-      .then(() => {
-        this.loadingCallbacks.forEach(loadingCallback => loadingCallback(this.RCE))
-        this.loadingCallbacks = []
-        // eslint-disable-next-line promise/no-callback-in-promise
-        cb(this.RCE)
-      })
+  async loadRCE(cb) {
+    const RCE = await import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
+    this.RCE = RCE
+    this.loadingCallbacks.forEach(loadingCallback => loadingCallback(this.RCE))
+    this.loadingCallbacks = []
+    if (typeof cb === 'function') cb(this.RCE)
   },
 
   /**

@@ -21,15 +21,18 @@ import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverla
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
+import {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 
 export type NamingConfirmationWrapperProps = {
   overlayStore: DynamicRegistrationOverlayStore
   registration: LtiRegistrationWithConfiguration
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
 }
 
 export const NamingConfirmationWrapper = ({
   overlayStore,
   registration,
+  registrationUpdateRequest,
 }: NamingConfirmationWrapperProps) => {
   const [state, actions] = useOverlayStore(overlayStore)
 
@@ -49,6 +52,7 @@ export const NamingConfirmationWrapper = ({
       description={state.overlay.description ?? registration.configuration.description ?? ''}
       onUpdateDescription={actions.updateDescription}
       placements={placements}
+      registrationUpdateRequest={registrationUpdateRequest}
       onUpdatePlacementLabel={(placement, value) => {
         actions.updatePlacement(placement)(overlay => ({
           ...overlay,

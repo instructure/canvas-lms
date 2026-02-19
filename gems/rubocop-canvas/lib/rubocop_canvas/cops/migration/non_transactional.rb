@@ -126,6 +126,8 @@ module RuboCop
         end
 
         def check_if_not_exists(node)
+          return unless @non_transactional
+
           if @in_change_table
             if if_not_exists?(node)
               add_offense(node,
@@ -137,7 +139,7 @@ module RuboCop
                           message: "Non-transactional migrations should be idempotent; add `unless t.column_exists?(:name)` or equivalent",
                           severity: :error)
             end
-          elsif @non_transactional && !if_not_exists?(node)
+          elsif !if_not_exists?(node)
             add_offense(node,
                         message: "Non-transactional migrations should be idempotent; add `if_not_exists: true`",
                         severity: :error)
@@ -145,6 +147,8 @@ module RuboCop
         end
 
         def check_if_exists(node)
+          return unless @non_transactional
+
           if @in_change_table
             if if_exists?(node)
               add_offense(node,
@@ -156,7 +160,7 @@ module RuboCop
                           message: "Non-transactional migrations should be idempotent; add `if t.column_exists?(:name)` or equivalent",
                           severity: :error)
             end
-          elsif @non_transactional && !if_exists?(node)
+          elsif !if_exists?(node)
             add_offense(node,
                         message: "Non-transactional migrations should be idempotent; add `if_exists: true`",
                         severity: :error)

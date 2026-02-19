@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map} from 'es-toolkit/compat'
@@ -137,11 +137,11 @@ ready(() => {
   // Add the loading indicator now that the collections are fetching
   const node = document.querySelector('#loading_indicator')
   if (node instanceof HTMLElement) {
-    const root = createRoot(node)
-    root.render(
+    const root = render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
       </View>,
+      node,
     )
 
     // Cleanup on unmount

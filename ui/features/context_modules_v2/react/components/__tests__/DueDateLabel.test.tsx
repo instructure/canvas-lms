@@ -108,17 +108,15 @@ describe('DueDateLabel', () => {
     it('shows tooltip with details upon hover', async () => {
       const container = setUp(contentWithManyDueDates)
       const dueAtFormat = '%b %-d at %l:%M%P'
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
       const dueDate1 = format(
         contentWithManyDueDates.assignedToDates?.[0].dueAt,
         dueAtFormat,
+        undefined,
       ) as string
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore - format's third argument (zone) is optional at runtime but required by tsgo
       const dueDate2 = format(
         contentWithManyDueDates.assignedToDates?.[1].dueAt,
         dueAtFormat,
+        undefined,
       ) as string
 
       fireEvent.mouseOver(container.getByText('Multiple Due Dates'))

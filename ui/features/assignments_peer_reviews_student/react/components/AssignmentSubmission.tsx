@@ -26,17 +26,21 @@ import {
   Submission,
   Assignment,
   ReviewerSubmission,
+  RubricAssessmentRating,
 } from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import CommentsTrayContentWithApollo from './CommentsTrayContentWithApollo'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {IconDiscussionLine} from '@instructure/ui-icons'
-import {Heading} from '@instructure/ui-heading'
+import {Button} from '@instructure/ui-buttons'
+import {IconDiscussionLine, IconRubricLine} from '@instructure/ui-icons'
 import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-modules/utils/miscHelpers'
 import UrlSubmissionDisplay from '@canvas/assignments/react/UrlSubmissionDisplay'
 import FileSubmissionPreview from '@canvas/assignments/react/FileSubmissionPreview'
+import StudentAnnotationPreview from '@canvas/assignments/react/StudentAnnotationPreview'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useRubricAssessment} from '../hooks/useRubricAssessment'
+import {RubricPanel} from './RubricPanel'
+import {CommentsPanel} from './CommentsPanel'
+import {MediaRecordingSubmissionDisplay} from './MediaRecordingSubmissionDisplay'
 
 const I18n = createI18nScope('peer_reviews_student')
 
@@ -44,25 +48,37 @@ interface AssignmentSubmissionProps {
   submission: Submission
   assignment: Assignment
   isPeerReviewCompleted: boolean
+  rubricAssessment?: {
+    _id: string
+    assessmentRatings: RubricAssessmentRating[]
+  } | null
   reviewerSubmission?: ReviewerSubmission | null
   isMobile?: boolean
   handleNextPeerReview: () => void
-  onCommentSubmitted: () => void
+  onPeerReviewSubmitted: () => void
   hasSeenPeerReviewModal: boolean
+  isReadOnly?: boolean
+  isAnonymous: boolean
+  submissionUserId?: string
 }
 
 const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   submission,
   assignment,
   isPeerReviewCompleted,
+  rubricAssessment,
   reviewerSubmission,
   handleNextPeerReview,
-  onCommentSubmitted,
+  onPeerReviewSubmitted,
   isMobile = false,
   hasSeenPeerReviewModal,
+  isReadOnly = false,
+  isAnonymous,
+  submissionUserId,
 }) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
-  const [showComments, setShowComments] = useState(false)
+  const [showComments, setShowComments] = useState(true)
+  const [showRubric, setShowRubric] = useState(false)
   const [peerReviewCommentCompleted, setPeerReviewCommentCompleted] =
     useState(isPeerReviewCompleted)
   const [initialIsPeerReviewCompleted, setInitialIsPeerReviewCompleted] =
@@ -77,23 +93,64 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     }
   }, [submission._id, isPeerReviewCompleted])
 
+  const {
+    rubricAssessmentData,
+    rubricAssessmentCompleted,
+    rubricViewMode,
+    setRubricViewMode,
+    handleRubricSubmit,
+    resetRubricAssessment,
+  } = useRubricAssessment({
+    assignment,
+    submissionId: submission._id,
+    submissionUserId: submission.user?._id,
+    submissionAnonymousId: submission.anonymousId,
+    rubricAssessment,
+    isPeerReviewCompleted,
+    onRubricSubmitted: onPeerReviewSubmitted,
+  })
+
+  useEffect(() => {
+    setPeerReviewCommentCompleted(isPeerReviewCompleted)
+  }, [isPeerReviewCompleted])
+
   const handleToggleComments = () => {
+    if (!showComments) {
+      setShowRubric(false)
+    }
     setShowComments(!showComments)
   }
 
+  const handleToggleRubric = () => {
+    if (!showRubric) {
+      setShowComments(false)
+    }
+    setShowRubric(!showRubric)
+  }
+
   const handlePeerReviewCompletion = () => {
-    if (peerReviewCommentCompleted) {
-      // reset the value
-      setPeerReviewCommentCompleted(false)
-      handleNextPeerReview()
-    } else {
+    if (assignment.rubric && !rubricAssessmentCompleted) {
+      showFlashAlert({
+        message: I18n.t('You must fill out the rubric in order to submit your peer review.'),
+        type: 'error',
+      })
+      return
+    }
+
+    if (!assignment.rubric && !peerReviewCommentCompleted) {
       showFlashAlert({
         message: I18n.t(
           'Before you can submit this peer review, you must leave a comment for your peer.',
         ),
         type: 'error',
       })
+      return
     }
+
+    // reset the values
+    setPeerReviewCommentCompleted(false)
+    resetRubricAssessment()
+    handleNextPeerReview()
   }
 
   const renderTextEntry = () => {
@@ -177,7 +234,25 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
       case 'online_url':
         return renderUrlEntry()
       case 'online_upload':
-        return <FileSubmissionPreview submission={submission} />
+        return (
+          <FileSubmissionPreview
+            submission={submission}
+            assignment={assignment}
+            userId={submissionUserId}
+          />
+        )
+      case 'student_annotation':
+        return <StudentAnnotationPreview submission={submission} />
+      case 'media_recording': {
+        if (!submission.mediaObject?._id) {
+          return renderError(
+            I18n.t('Media Recording Error'),
+            I18n.t('Student Peer Review Submission Error Page.'),
+            I18n.t('The media recording is missing or unavailable.'),
+          )
+        }
+        return <MediaRecordingSubmissionDisplay mediaObject={submission.mediaObject} />
+      }
       default:
         return renderError(
           I18n.t('Submission type error'),
@@ -191,58 +266,42 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     <View
       as="div"
       minHeight="calc(720px - 10.75rem)"
-      height="calc(100vh - 22rem)"
+      height={isAnonymous ? 'calc(100vh - 22rem)' : 'calc(100vh - 24rem)'}
       overflowY="hidden"
     >
       <Flex as="div" height="100%" alignItems="start">
         <Flex.Item as="div" height="100%" shouldGrow>
           {renderSubmissionType()}
         </Flex.Item>
+        {showRubric && assignment.rubric && (
+          <RubricPanel
+            assignment={assignment}
+            rubricAssessmentData={rubricAssessmentData}
+            rubricViewMode={rubricViewMode}
+            isPeerReviewCompleted={isPeerReviewCompleted}
+            rubricAssessmentCompleted={rubricAssessmentCompleted}
+            onClose={() => setShowRubric(false)}
+            onSubmit={handleRubricSubmit}
+            onViewModeChange={setRubricViewMode}
+            isReadOnly={isReadOnly}
+          />
+        )}
         {showComments && (
-          <Flex.Item
-            as="div"
-            direction="column"
-            size="327px"
-            height="100%"
-            padding="small"
-            overflowY="auto"
-          >
-            <Flex as="div" direction="column" justifyItems="space-between" height="100%">
-              <Flex.Item>
-                <Flex as="div" direction="row" justifyItems="space-between">
-                  <Flex.Item>
-                    <Heading variant="titleModule" level="h2">
-                      {I18n.t('Peer Comments')}
-                    </Heading>
-                  </Flex.Item>
-                  <Flex.Item>
-                    <CloseButton
-                      screenReaderLabel={I18n.t('Close Peer Comments')}
-                      size="small"
-                      onClick={() => setShowComments(false)}
-                      data-testid="close-comments-button"
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item>
-                <CommentsTrayContentWithApollo
-                  submission={submission}
-                  assignment={assignment}
-                  isPeerReviewEnabled={true}
-                  reviewerSubmission={reviewerSubmission}
-                  renderTray={isMobile}
-                  closeTray={() => setShowComments(false)}
-                  open={showComments}
-                  onSuccessfulPeerReview={() => {
-                    setPeerReviewCommentCompleted(true)
-                    onCommentSubmitted()
-                  }}
-                  usePeerReviewModal={false}
-                />
-              </Flex.Item>
-            </Flex>
-          </Flex.Item>
+          <CommentsPanel
+            submission={submission}
+            assignment={assignment}
+            reviewerSubmission={reviewerSubmission}
+            isMobile={isMobile}
+            isOpen={showComments}
+            onClose={() => setShowComments(false)}
+            onSuccessfulPeerReview={() => {
+              setPeerReviewCommentCompleted(true)
+              onPeerReviewSubmitted()
+            }}
+            isReadOnly={isReadOnly}
+            // Suppress the success alert since the modal and peer review container already provide completion feedback
+            suppressSuccessAlert={true}
+          />
         )}
       </Flex>
       <footer
@@ -268,16 +327,32 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             justifyItems={isMobile ? 'start' : 'space-between'}
           >
             <Flex.Item margin={isMobile ? '0 0 small 0' : '0'}>
-              <Button
-                renderIcon={<IconDiscussionLine />}
-                onClick={handleToggleComments}
-                data-testid="toggle-comments-button"
-                size={isMobile ? 'small' : 'medium'}
-              >
-                {showComments ? I18n.t('Hide Comments') : I18n.t('Show Comments')}
-              </Button>
+              <Flex gap="small">
+                {assignment.rubric && (
+                  <Flex.Item>
+                    <Button
+                      renderIcon={<IconRubricLine />}
+                      onClick={handleToggleRubric}
+                      data-testid="toggle-rubric-button"
+                      size={isMobile ? 'small' : 'medium'}
+                    >
+                      {showRubric ? I18n.t('Hide Rubric') : I18n.t('Show Rubric')}
+                    </Button>
+                  </Flex.Item>
+                )}
+                <Flex.Item>
+                  <Button
+                    renderIcon={<IconDiscussionLine />}
+                    onClick={handleToggleComments}
+                    data-testid="toggle-comments-button"
+                    size={isMobile ? 'small' : 'medium'}
+                  >
+                    {showComments ? I18n.t('Hide Comments') : I18n.t('Show Comments')}
+                  </Button>
+                </Flex.Item>
+              </Flex>
             </Flex.Item>
-            {!initialIsPeerReviewCompleted && !hasSeenPeerReviewModal && (
+            {!isReadOnly && !initialIsPeerReviewCompleted && !hasSeenPeerReviewModal && (
               <Flex.Item>
                 <Button
                   color="primary"

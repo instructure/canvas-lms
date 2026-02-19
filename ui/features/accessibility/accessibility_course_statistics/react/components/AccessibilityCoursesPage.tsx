@@ -21,9 +21,11 @@ import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Billboard} from '@instructure/ui-billboard'
+import {Pagination} from '@instructure/ui-pagination'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useCourses} from '../../hooks/useCourses'
 import {useSortParams} from '../../hooks/useSortParams'
+import {usePaginationParam} from '../../hooks/usePaginationParam'
 import {CoursesTable} from './CoursesTable'
 import {AccessibilityGenericErrorPage} from './AccessibilityGenericErrorPage'
 import EmptyDesert from '@canvas/images/react/EmptyDesert'
@@ -72,7 +74,36 @@ const CoursesContent: React.FC<{
   }
 
   return (
-    <CoursesTable courses={data.courses} sort={sort} order={order} onChangeSort={onChangeSort} />
+    <CoursesTable
+      courses={data.courses}
+      sort={sort}
+      order={order}
+      onChangeSort={onChangeSort}
+    />
+  )
+}
+
+const CoursesPagination: React.FC<{
+  currentPage: number
+  pageCount?: number
+  onPageChange: (page: number) => void
+}> = ({currentPage, pageCount, onPageChange}) => {
+  if (!pageCount || pageCount <= 1) {
+    return null
+  }
+
+  return (
+    <Pagination
+      data-testid="courses-pagination"
+      as="nav"
+      variant="compact"
+      labelNext={I18n.t('Next Page')}
+      labelPrev={I18n.t('Previous Page')}
+      margin="small"
+      currentPage={currentPage}
+      onPageChange={onPageChange}
+      totalPageNumber={pageCount}
+    />
   )
 }
 
@@ -82,7 +113,8 @@ export const AccessibilityCoursesPage: React.FC = () => {
     defaultSort: 'course_name',
     defaultOrder: 'asc',
   })
-  const {data, isLoading, isError} = useCourses({accountId, sort, order})
+  const {page, handlePageChange} = usePaginationParam()
+  const {data, isLoading, isError} = useCourses({accountId, sort, order, page})
 
   return (
     <View as="div">
@@ -97,6 +129,12 @@ export const AccessibilityCoursesPage: React.FC = () => {
         sort={sort}
         order={order}
         onChangeSort={handleChangeSort}
+      />
+
+      <CoursesPagination
+        currentPage={page}
+        pageCount={data?.pageCount}
+        onPageChange={handlePageChange}
       />
     </View>
   )

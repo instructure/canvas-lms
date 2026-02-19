@@ -148,7 +148,11 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
   }, [refetchInitial])
 
   const currentPage = allPages[currentPageIndex] || []
-  const hasMorePages = currentPageIndex < nextUrls.length && !!nextUrls[currentPageIndex]
+  const lastLoadedPageIndex = allPages.length - 1
+  const hasMorePages =
+    lastLoadedPageIndex >= 0 &&
+    lastLoadedPageIndex < nextUrls.length &&
+    !!nextUrls[lastLoadedPageIndex]
   const totalPages = allPages.length + (hasMorePages ? 1 : 0)
 
   return {

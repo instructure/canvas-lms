@@ -25,8 +25,10 @@ describe Accessibility::ContentLoader do
   let(:course) { course_model }
   let(:assignment) { assignment_model(course:, description: assignment_content) }
   let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: page_content) }
+  let(:discussion_topic) { discussion_topic_model(context: course, message: discussion_content) }
   let(:assignment_content) { "<div><h1>Assignment Title</h1><p>Assignment description</p></div>" }
   let(:page_content) { "<div><h2>Page Title</h2><p>Page body content</p></div>" }
+  let(:discussion_content) { "<div><h3>Discussion Title</h3><p>Discussion message</p></div>" }
 
   describe "#content" do
     context "for Assignments" do
@@ -36,7 +38,7 @@ describe Accessibility::ContentLoader do
       it "returns assignment description" do
         result = content_loader.content
 
-        expect(result).to eq(assignment_content)
+        expect(result).to eq({ content: assignment_content, metadata: {} })
       end
     end
 
@@ -47,7 +49,18 @@ describe Accessibility::ContentLoader do
       it "returns page body" do
         result = content_loader.content
 
-        expect(result).to eq(page_content)
+        expect(result).to eq({ content: page_content, metadata: {} })
+      end
+    end
+
+    context "for DiscussionTopics" do
+      let!(:issue) { accessibility_issue_model(course:, context: discussion_topic, node_path: nil) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+      it "returns discussion topic message" do
+        result = content_loader.content
+
+        expect(result).to eq({ content: discussion_content, metadata: {} })
       end
     end
 
@@ -78,7 +91,7 @@ describe Accessibility::ContentLoader do
       it "returns the element's HTML" do
         result = content_loader.content
 
-        expect(result).to eq("<h2>Page Title</h2>")
+        expect(result).to eq({ content: "<h2>Page Title</h2>", metadata: {} })
       end
     end
 
@@ -88,7 +101,7 @@ describe Accessibility::ContentLoader do
       it "returns the first h2 element" do
         result = content_loader.content
 
-        expect(result).to eq("<h2>Page Title</h2>")
+        expect(result).to eq({ content: "<h2>Page Title</h2>", metadata: {} })
       end
     end
 
@@ -98,7 +111,19 @@ describe Accessibility::ContentLoader do
       it "returns paragraph content" do
         result = content_loader.content
 
-        expect(result).to eq("<p>Page body content</p>")
+        expect(result).to eq({ content: "<p>Page body content</p>", metadata: {} })
+      end
+    end
+
+    context "when extracting from discussion topic" do
+      let!(:issue) { accessibility_issue_model(course:, context: discussion_topic, node_path: xpath) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+      let(:xpath) { ".//h3" }
+
+      it "returns discussion topic element" do
+        result = content_loader.content
+
+        expect(result).to eq({ content: "<h3>Discussion Title</h3>", metadata: {} })
       end
     end
 
@@ -108,7 +133,7 @@ describe Accessibility::ContentLoader do
       it "returns div content with all children" do
         result = content_loader.content
 
-        expect(result).to eq("<div><h2>Page Title</h2><p>Page body content</p></div>")
+        expect(result).to eq({ content: "<div><h2>Page Title</h2><p>Page body content</p></div>", metadata: {} })
       end
     end
 
@@ -128,7 +153,7 @@ describe Accessibility::ContentLoader do
       it "returns full content" do
         result = content_loader.content
 
-        expect(result).to eq(page_content)
+        expect(result).to eq({ content: page_content, metadata: {} })
       end
     end
 
@@ -138,7 +163,7 @@ describe Accessibility::ContentLoader do
       it "returns full content" do
         result = content_loader.content
 
-        expect(result).to eq(page_content)
+        expect(result).to eq({ content: page_content, metadata: {} })
       end
     end
 
@@ -190,7 +215,7 @@ describe Accessibility::ContentLoader do
         result = content_loader.content
 
         expect(mock_rule_instance).to have_received(:issue_preview)
-        expect(result).to eq("<h1>Test Element</h1><p>Extra context</p>")
+        expect(result).to eq({ content: "<h1>Test Element</h1><p>Extra context</p>", metadata: {} })
       end
     end
 
@@ -205,7 +230,7 @@ describe Accessibility::ContentLoader do
       it "falls back to returning the element's HTML" do
         result = content_loader.content
 
-        expect(result).to eq("<h1>Test Element</h1>")
+        expect(result).to eq({ content: "<h1>Test Element</h1>", metadata: {} })
       end
     end
 
@@ -216,7 +241,7 @@ describe Accessibility::ContentLoader do
       it "returns the element's HTML without using issue_preview" do
         result = content_loader.content
 
-        expect(result).to eq("<h1>Test Element</h1>")
+        expect(result).to eq({ content: "<h1>Test Element</h1>", metadata: {} })
       end
     end
 
@@ -234,7 +259,7 @@ describe Accessibility::ContentLoader do
         result = content_loader.content
 
         expect(mock_rule_instance).to have_received(:issue_preview)
-        expect(result).to eq("<h1>Test Element</h1>")
+        expect(result).to eq({ content: "<h1>Test Element</h1>", metadata: {} })
       end
     end
   end

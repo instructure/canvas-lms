@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/client/testing'
 import {render, waitFor} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -63,9 +63,9 @@ describe('StudentContent External Tools', () => {
   it('renders the assignment_external_tools mount point', async () => {
     const props = await mockAssignmentAndSubmission()
     const {container} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
 
     const mountPoint = container.querySelector('#assignment_external_tools')
@@ -75,9 +75,9 @@ describe('StudentContent External Tools', () => {
   it('attaches AssignmentExternalTools with correct parameters', async () => {
     const props = await mockAssignmentAndSubmission()
     const {container} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
 
     await waitFor(() => {
@@ -93,9 +93,9 @@ describe('StudentContent External Tools', () => {
   it('attaches AssignmentExternalTools only once', async () => {
     const props = await mockAssignmentAndSubmission()
     const {rerender} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
 
     await waitFor(() => {
@@ -103,9 +103,9 @@ describe('StudentContent External Tools', () => {
     })
 
     rerender(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
 
     expect(AssignmentExternalTools.attach).toHaveBeenCalledTimes(1)

@@ -61,9 +61,9 @@ module Accessibility
       end
 
       def fix!(elem, value)
-        return nil unless self.class.list?(elem) && value == "true"
+        return { changed: nil } unless self.class.list?(elem) && value == "true"
 
-        fix_list_by_type(elem)
+        { changed: fix_list_by_type(elem) }
       end
 
       def fix_list_by_type(elem)
@@ -84,24 +84,25 @@ module Accessibility
         list_elems.each do |le|
           if self.class.br_children?(le)
             le.inner_html.split(%r{<br\s*/?>}).each do |text|
-              text = text.gsub(LIST_LIKE_REGEX, "").strip
+              text = text.strip
               next if text.empty?
 
               li = elem.document.create_element("li")
               extend_nokogiri_element(li)
 
-              li.content = text
+              li.inner_html = text
               list_container.add_child(li)
+              self.class.strip_list_marker_from_node(li)
             end
           else
             li = elem.document.create_element("li")
             extend_nokogiri_element(li)
 
             le.children.each do |child|
-              self.class.strip_list_marker_from_node(child)
               li.add_child(child)
             end
             list_container.add_child(li)
+            self.class.strip_list_marker_from_node(li)
           end
         end
 
@@ -130,14 +131,7 @@ module Accessibility
       # Helper methods
 
       def self.list_check_helper?(elem, regex)
-        if elem.tag_name.downcase == "p"
-          return true if regex.match?(elem.content)
-
-          elem.children.each do |child|
-            return true if regex.match?(child.content)
-          end
-        end
-        false
+        elem.tag_name.downcase == "p" && regex.match?(elem.content)
       end
 
       def self.list?(elem)

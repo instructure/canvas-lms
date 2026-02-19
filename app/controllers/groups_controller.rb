@@ -819,7 +819,11 @@ class GroupsController < ApplicationController
                     else
                       User.where(id: user_ids)
                     end
+            # Capture users being removed before set_users destroys their memberships
+            removed_user_ids = @group.group_memberships.where.not(user_id: user_ids).pluck(:user_id)
             @memberships = @group.set_users(users)
+            # Invalidate visibility caches for removed users (set_users uses destroy_all which bypasses callbacks)
+            GroupMembership.invalidate_visibility_caches_for_group(@group, removed_user_ids) if removed_user_ids.any?
           end
         end
 
@@ -1032,7 +1036,7 @@ class GroupsController < ApplicationController
   # Upload a file to the group.
   #
   # This API endpoint is the first step in uploading a file to a group.
-  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # See the {file:file.file_uploads.html File Upload Documentation} for details on
   # the file upload workflow.
   #
   # Only those with the "Manage Files" permission on a group can upload files

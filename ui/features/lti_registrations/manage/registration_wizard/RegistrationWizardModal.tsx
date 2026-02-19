@@ -22,9 +22,6 @@ import {useCallback} from 'react'
 import {isSuccessful} from '../../common/lib/apiResult/ApiResult'
 import {DynamicRegistrationWizard} from '../dynamic_registration_wizard/DynamicRegistrationWizard'
 import type {DynamicRegistrationWizardService} from '../dynamic_registration_wizard/DynamicRegistrationWizardService'
-import {EditLti1p3RegistrationWizard} from '../lti_1p3_registration_form/EditLti1p3RegistrationWizard'
-import {Lti1p3RegistrationWizard} from '../lti_1p3_registration_form/Lti1p3RegistrationWizard'
-import type {Lti1p3RegistrationWizardService} from '../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 import type {AccountId} from '../model/AccountId'
 import {ResponsiveWrapper} from '../registration_wizard_forms/ResponsiveWrapper'
 import {RegistrationWizardInitialization} from './RegistrationWizardInitialization'
@@ -34,6 +31,9 @@ import {
   type RegistrationWizardModalState,
   type RegistrationWizardModalStateActions,
 } from './RegistrationWizardModalState'
+import {EditLti1p3RegistrationWizard} from '../lti_1p3_registration_form/EditLti1p3RegistrationWizard'
+import {Lti1p3RegistrationWizard} from '../lti_1p3_registration_form/Lti1p3RegistrationWizard'
+import {Lti1p3RegistrationWizardService} from '../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -143,6 +143,7 @@ const ModalBodyWrapper = ({
           unifiedToolId={state.unifiedToolId}
           onDismiss={onDismiss}
           registrationId={state.existingRegistrationId}
+          reinstallingRegistrationId={state.reinstallingRegistrationId}
           onSuccessfulRegistration={id => {
             state.close()
             showFlashSuccess(

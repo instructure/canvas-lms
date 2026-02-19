@@ -45,6 +45,25 @@ describe Quizzes::QuizQuestionsController do
     course_quiz
   end
 
+  describe "GET 'index'" do
+    it "requires authorization" do
+      get "index", params: { course_id: @course.id, quiz_id: @quiz.id }
+      assert_unauthorized
+    end
+
+    it "returns quiz questions" do
+      quiz_question
+      user_session(@teacher)
+      get "index", params: { course_id: @course.id, quiz_id: @quiz.id }
+      expect(response).to be_successful
+      expect(assigns[:quiz]).to eq(@quiz)
+      json = json_parse(response.body)
+      expect(json).to be_an(Array)
+      expect(json.length).to eq(1)
+      expect(json.first["id"]).to eq(@question.id)
+    end
+  end
+
   describe "POST 'create'" do
     it "requires authorization" do
       post "create", params: { course_id: @course.id, quiz_id: @quiz, question: {} }

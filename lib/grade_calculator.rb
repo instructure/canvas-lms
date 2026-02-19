@@ -661,8 +661,8 @@ class GradeCalculator
 
     update_columns, update_conditions = assignment_group_columns_to_insert_or_update[:update_columns]
                                         .each_with_object([+"", +""]) do |uc, (cols, conds)|
-      cols << %(#{", " unless cols.empty?}#{uc[:column]} = #{uc[:target]})
-      conds << %(#{" OR " unless conds.empty?}#{table}.#{uc[:column]} IS DISTINCT FROM #{uc[:target]})
+                                          cols << %(#{", " unless cols.empty?}#{uc[:column]} = #{uc[:target]})
+                                          conds << %(#{" OR " unless conds.empty?}#{table}.#{uc[:column]} IS DISTINCT FROM #{uc[:target]})
     end
 
     value_names = assignment_group_columns_to_insert_or_update[:value_names]

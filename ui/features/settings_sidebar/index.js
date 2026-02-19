@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import CoursePublishButton from '@canvas/courses/react/CoursePublishButton'
 
 import ready from '@instructure/ready'
@@ -30,7 +30,6 @@ ready(() => {
       courseId: ENV.COURSE_ID || ENV.COURSE.id,
       shouldRedirect: false,
     })
-    const root = createRoot(coursePublishButtonContainer)
-    root.render(publishButton)
+    render(publishButton, coursePublishButtonContainer)
   }
 })

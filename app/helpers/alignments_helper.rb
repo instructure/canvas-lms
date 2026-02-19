@@ -132,12 +132,12 @@ module AlignmentsHelper
               .joins(:quiz)
               .where(quizzes: { id: quiz_ids })
               .map do |assignment|
-      ::AlignmentWithMetadata.for_assignment(
-        assignment:,
-        alignment_type: ::AlignmentWithMetadata::AlignmentTypes::INDIRECT,
-        outcome_id: outcome.id,
-        context:
-      )
+                ::AlignmentWithMetadata.for_assignment(
+                  assignment:,
+                  alignment_type: ::AlignmentWithMetadata::AlignmentTypes::INDIRECT,
+                  outcome_id: outcome.id,
+                  context:
+                )
     end
   end
 
@@ -171,12 +171,12 @@ module AlignmentsHelper
     Assignment.active
               .where(context:, id: os_aligned_new_quiz_ids)
               .map do |assignment|
-      ::AlignmentWithMetadata.for_assignment(
-        assignment:,
-        alignment_type: ::AlignmentWithMetadata::AlignmentTypes::EXTERNAL,
-        outcome_id: outcome.id,
-        context:
-      )
+                ::AlignmentWithMetadata.for_assignment(
+                  assignment:,
+                  alignment_type: ::AlignmentWithMetadata::AlignmentTypes::EXTERNAL,
+                  outcome_id: outcome.id,
+                  context:
+                )
     end
   end
 

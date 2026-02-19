@@ -73,7 +73,7 @@ export const mockIssue3: AccessibilityIssue = {
   element: 'h4',
   displayName: 'Skipped heading level',
   message:
-    'Make sure heading levels follow a logical order (for example, H2, then H3, then H4).This helps screen reader users understand the structure of the page.',
+    'This heading is more than one level below the previous heading.Heading levels should follow a logical order, for example Heading 2, then H3, then H4.',
   why: 'When heading levels are skipped (for example, from an H2 to an H4, skipping H3), screen reader users may have difficulty understanding the page structure. This creates a confusing outline of the page for assistive technology users.',
   path: './h4',
   issueUrl: 'https://www.w3.org/TR/WCAG20-TECHS/G141.html',
@@ -82,7 +82,7 @@ export const mockIssue3: AccessibilityIssue = {
     type: FormType.RadioInputGroup,
     label: 'How would you like to proceed?',
     value: 'Fix heading hierarchy',
-    options: ['Fix heading hierarchy', 'Remove heading style'],
+    options: ['Fix heading level', 'Turn into a paragraph'],
     undoText: 'Heading hierarchy is now correct',
     canGenerateFix: false,
   },
@@ -114,7 +114,7 @@ export const mockIssue5: AccessibilityIssue = {
   element: 'h4',
   displayName: 'Skipped heading level',
   message:
-    'Make sure heading levels follow a logical order (for example, H2, then H3, then H4).This helps screen reader users understand the structure of the page.',
+    'This heading is more than one level below the previous heading.Heading levels should follow a logical order, for example Heading 2, then H3, then H4.',
   why: 'When heading levels are skipped (for example, from an H2 to an H4, skipping H3), screen reader users may have difficulty understanding the page structure. This creates a confusing outline of the page for assistive technology users.',
   path: './h4',
   issueUrl: 'https://www.w3.org/TR/WCAG20-TECHS/G141.html',
@@ -123,7 +123,7 @@ export const mockIssue5: AccessibilityIssue = {
     type: FormType.RadioInputGroup,
     label: 'How would you like to proceed?',
     value: 'Fix heading hierarchy',
-    options: ['Fix heading hierarchy', 'Remove heading style'],
+    options: ['Fix heading level', 'Turn into a paragraph'],
     undoText: 'Heading hierarchy is now correct',
     canGenerateFix: false,
   },
@@ -131,6 +131,7 @@ export const mockIssue5: AccessibilityIssue = {
 
 export const mockScan1: AccessibilityResourceScan = {
   id: 1,
+  courseId: 14,
   resourceId: 1,
   resourceType: ResourceType.WikiPage,
   resourceName: 'Test Page 1',
@@ -145,6 +146,7 @@ export const mockScan1: AccessibilityResourceScan = {
 
 export const mockScan2: AccessibilityResourceScan = {
   id: 2,
+  courseId: 14,
   resourceId: 2,
   resourceType: ResourceType.WikiPage,
   resourceName: 'Test Page 2',
@@ -159,6 +161,7 @@ export const mockScan2: AccessibilityResourceScan = {
 
 export const mockScan3: AccessibilityResourceScan = {
   id: 3,
+  courseId: 14,
   resourceId: 57,
   resourceType: ResourceType.Assignment,
   resourceName: 'Assignment 1',
@@ -173,6 +176,7 @@ export const mockScan3: AccessibilityResourceScan = {
 
 export const mockScan4: AccessibilityResourceScan = {
   id: 4,
+  courseId: 14,
   resourceId: 56,
   resourceType: ResourceType.Assignment,
   resourceName: 'Assignment 2',
@@ -187,6 +191,7 @@ export const mockScan4: AccessibilityResourceScan = {
 
 export const mockScan5: AccessibilityResourceScan = {
   id: 5,
+  courseId: 14,
   resourceId: 21,
   resourceType: ResourceType.Assignment,
   resourceName: 'Assignment 3',

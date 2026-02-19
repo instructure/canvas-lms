@@ -20,29 +20,33 @@ import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverla
 import {PlacementsConfirmation} from '../../registration_wizard_forms/PlacementsConfirmation'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
-import {InternalOnlyLtiPlacements} from '../../model/LtiPlacement'
-import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
+import {isInternalOnlyLtiPlacement} from '../../model/LtiPlacement'
+import {isPlacementEnabledByFeatureFlag} from '@canvas/lti/model/LtiPlacementFilter'
+import {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 
 export type PlacementsConfirmationProps = {
   registration: LtiRegistrationWithConfiguration
   overlayStore: DynamicRegistrationOverlayStore
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
 }
 
 export const PlacementsConfirmationWrapper = ({
   registration,
   overlayStore,
+  registrationUpdateRequest,
 }: PlacementsConfirmationProps) => {
   const [overlayState, actions] = useOverlayStore(overlayStore)
+  const addedPlacements = Object.keys(overlayState.overlay.placements ?? {})
   const requestedPlacements = Object.keys(overlayState.overlay.placements ?? {})
-  const placements = filterPlacementsByFeatureFlags(
-    registration.configuration.placements
-      .filter(
-        p =>
-          !InternalOnlyLtiPlacements.includes(p.placement as any) ||
-          requestedPlacements.includes(p.placement),
-      )
-      .map(p => p.placement),
-  )
+  const placements = registration.configuration.placements
+    .map(p => p.placement)
+    .filter(isPlacementEnabledByFeatureFlag)
+    .filter(p => !isInternalOnlyLtiPlacement(p) || requestedPlacements.includes(p))
+    .filter(p => addedPlacements.includes(p))
+
+  const newPlacements = (
+    registrationUpdateRequest?.internal_lti_configuration?.placements || []
+  ).map(p => p.placement)
 
   const handleToggleAllowFullscreen = () => {
     return actions.updatePlacement('top_navigation')(prevState => {
@@ -55,11 +59,12 @@ export const PlacementsConfirmationWrapper = ({
 
   return (
     <PlacementsConfirmation
+      registrationUpdateRequest={registrationUpdateRequest}
       appName={registration.name}
       availablePlacements={placements}
-      enabledPlacements={placements.filter(
-        p => !overlayState.overlay.disabled_placements?.includes(p),
-      )}
+      enabledPlacements={placements
+        .concat(newPlacements)
+        .filter(p => !overlayState.overlay.disabled_placements?.includes(p))}
       courseNavigationDefaultHidden={
         overlayState.overlay.placements?.course_navigation?.default === 'disabled'
       }

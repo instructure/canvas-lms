@@ -24,7 +24,7 @@ import '@canvas/jquery/jquery.instructure_forms'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('user_profile')
@@ -59,9 +59,13 @@ export default class ProfileShow extends Backbone.View {
         profilePicLink.addEventListener('click', event => {
           event.preventDefault()
           if (avatarRoot === null) {
-            avatarRoot = createRoot(avatarModalMount)
+            avatarRoot = render(
+              <AvatarModal onClose={() => rerender(avatarRoot, null)} />,
+              avatarModalMount,
+            )
+          } else {
+            rerender(avatarRoot, <AvatarModal onClose={() => rerender(avatarRoot, null)} />)
           }
-          avatarRoot.render(<AvatarModal onClose={() => avatarRoot.render(null)} />)
         })
       })
     }

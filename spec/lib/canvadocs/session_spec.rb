@@ -24,6 +24,9 @@ describe Canvadocs::Session do
   def submissions
     [@submission]
   end
+
+  attr_reader :attachment
+
   describe ".observing?" do
     it "returns true if the user is acting as an observer" do
       course = course_factory(active_all: true)
@@ -162,6 +165,32 @@ describe Canvadocs::Session do
       @assignment.ensure_post_policy(post_manually: false)
       permissions = canvadoc_permissions_for_user(@student, true)
       expect(permissions).not_to have_key(:user_filter)
+    end
+
+    # specific logic had to be added for "student annotation" assignments because the same document
+    # is shared among multiple students (and associated with multiple submissions)
+    context "student annotation assignments" do
+      before do
+        @attachment = attachment_model(context: @course)
+        @assignment = @course.assignments.create!(title: "annotation assignment", submission_types: "student_annotation", anonymous_peer_reviews: true, peer_reviews: true, annotatable_attachment: @attachment)
+        @peer_student = user_factory(active_all: true, active_state: "active")
+        @submitted_student = user_factory(active_all: true, active_state: "active")
+
+        # create submissions and assessment request
+        peer_submission = submission_model(user: @peer_student, course: @course, assignment: @assignment)
+        @submission = submission_model(user: @submitted_student, course: @course, assignment: @assignment)
+        @submission.assessment_requests.create!(assessor: @peer_student, user: @submitted_student, asset: @submission, assessor_asset: peer_submission)
+      end
+
+      it "returns 'read' for peer reviewers on student annotation assignments" do
+        permissions = canvadoc_permissions_for_user(@peer_student, true)
+        expect(permissions[:permissions]).to eq "read"
+      end
+
+      it "returns 'readwrite' for students on student annotation assignments" do
+        permissions = canvadoc_permissions_for_user(@submitted_student, true)
+        expect(permissions[:permissions]).to eq "readwrite"
+      end
     end
 
     context "cross-shard user" do

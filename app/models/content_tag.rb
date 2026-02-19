@@ -732,10 +732,10 @@ class ContentTag < ActiveRecord::Base
       .where(id: ids)
       .preload(:associated_asset, :context)
       .find_each do |item|
-      possible_tool = Lti::ToolFinder.from_url(item.url, item.context, exclude_tool_id: new_tool_id)
-      next if possible_tool.nil? || possible_tool.id != tool_id
+        possible_tool = Lti::ToolFinder.from_url(item.url, item.context, exclude_tool_id: new_tool_id)
+        next if possible_tool.nil? || possible_tool.id != tool_id
 
-      yield item
+        yield item
     end
   end
 

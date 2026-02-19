@@ -75,6 +75,7 @@ export const RubricSearchTray = ({
       size="small"
       placement="end"
       shouldCloseOnDocumentClick={true}
+      id="enhanced-rubric-assignment-search-tray"
     >
       <View as="div" padding="medium" data-testid="rubric-search-tray">
         <Flex>
@@ -139,7 +140,7 @@ export const RubricSearchTray = ({
         </View>
       )}
 
-      <View as="footer" margin="small 0 0" height="62px">
+      <View as="footer" margin="small 0 0" height="62px" id="rubric-search-footer-container">
         <View as="hr" margin="0" />
         <RubricSearchFooter
           disabled={!selectedRubricId}

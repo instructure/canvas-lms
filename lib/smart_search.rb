@@ -194,7 +194,7 @@ module SmartSearch
              .group("#{scope.table_name}.id")
              .having("COALESCE(MAX(#{scope.embedding_class.table_name}.version), 0) < ?", EMBEDDING_VERSION)
              .find_each(strategy: :pluck_ids) do |item|
-          item.generate_embeddings(synchronous: true)
+               item.generate_embeddings(synchronous: true)
         end
       end
 
@@ -251,20 +251,20 @@ module SmartSearch
         content_migration.source_course.shard.activate do
           klass.embedding_class.where(:version => EMBEDDING_VERSION, fk => id_mapping.keys)
                .find_in_batches(batch_size: 50) do |src_embeddings|
-            dest_embeddings = src_embeddings.map do |src_embedding|
-              {
-                :embedding => src_embedding.embedding,
-                fk => id_mapping[src_embedding[fk]],
-                :version => EMBEDDING_VERSION,
-                :root_account_id => content_migration.context.root_account_id,
-                :created_at => Time.now.utc,
-                :updated_at => Time.now.utc
-              }
-            end
+                 dest_embeddings = src_embeddings.map do |src_embedding|
+                   {
+                     :embedding => src_embedding.embedding,
+                     fk => id_mapping[src_embedding[fk]],
+                     :version => EMBEDDING_VERSION,
+                     :root_account_id => content_migration.context.root_account_id,
+                     :created_at => Time.now.utc,
+                     :updated_at => Time.now.utc
+                   }
+                 end
 
-            content_migration.context.shard.activate do
-              klass.embedding_class.insert_all(dest_embeddings)
-            end
+                 content_migration.context.shard.activate do
+                   klass.embedding_class.insert_all(dest_embeddings)
+                 end
           end
         end
       end

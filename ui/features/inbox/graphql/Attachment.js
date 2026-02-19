@@ -20,7 +20,7 @@ import {shape, string} from 'prop-types'
 
 export const Attachment = {
   fragment: gql`
-    fragment Attachment on File {
+    fragment InboxAttachment on File {
       _id
       displayName
       id

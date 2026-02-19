@@ -20,6 +20,8 @@ declare module '@instructure.ai/aiinfo' {
   export interface AiInformation {
     data: Array<{
       featureName: string
+      privacyNoticeText: string
+      privacyNoticeUrl: string
       permissionLevel: string
       modelName: string
       description: string

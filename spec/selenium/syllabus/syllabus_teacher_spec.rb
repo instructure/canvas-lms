@@ -135,6 +135,31 @@ describe "course syllabus" do
         expect(course_pacing_notice).to be_displayed
       end
     end
+
+    context "timezone information accessibility" do
+      it "displays timezone information in InstUI tooltip" do
+        @course1.time_zone = "America/Denver"
+        @course1.save!
+        @teacher1.time_zone = "America/New_York"
+        @teacher1.save!
+        @assignment1.due_at = Time.zone.parse("2024-01-15 23:59:00")
+        @assignment1.save!
+
+        visit_syllabus_page(@course1.id)
+        wait_for_dom_ready
+
+        due_date_cell = f(".dates")
+        tooltip_trigger = due_date_cell.find_element(:css, ".tooltip-time-mount span")
+
+        driver.action.move_to(tooltip_trigger).perform
+        wait_for_ajaximations
+
+        tooltip = f("[role='tooltip']")
+        expect(tooltip).to be_displayed
+        expect(tooltip.text).to include("Local:")
+        expect(tooltip.text).to include("Course:")
+      end
+    end
   end
 
   context "in a public course" do

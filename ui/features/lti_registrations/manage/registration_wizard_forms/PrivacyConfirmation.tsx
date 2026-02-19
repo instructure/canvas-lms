@@ -28,6 +28,8 @@ import {
   type LtiPrivacyLevel,
 } from '../model/LtiPrivacyLevel'
 import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../model/i18nLtiPrivacyLevel'
+import {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
+import {Pill} from '@instructure/ui-pill'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -46,10 +48,21 @@ export type PrivacyConfirmationProps = {
    * @returns
    */
   privacyLevelOnChange: (privacyLevel: LtiPrivacyLevel) => void
+  /**
+   * The default privacy level that is set in the registration
+   */
+  defaultPrivacyLevel?: LtiPrivacyLevel
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
 }
 
 export const PrivacyConfirmation = React.memo(
-  ({appName, selectedPrivacyLevel, privacyLevelOnChange}: PrivacyConfirmationProps) => {
+  ({
+    appName,
+    selectedPrivacyLevel,
+    privacyLevelOnChange,
+    registrationUpdateRequest,
+    defaultPrivacyLevel,
+  }: PrivacyConfirmationProps) => {
     const messages = [
       {
         text: (
@@ -60,6 +73,8 @@ export const PrivacyConfirmation = React.memo(
         type: 'hint' as const,
       },
     ]
+
+    const updatedPrivacyLevel = registrationUpdateRequest?.internal_lti_configuration?.privacy_level
 
     return (
       <>
@@ -91,6 +106,19 @@ export const PrivacyConfirmation = React.memo(
               </SimpleSelect.Option>
             ))}
           </SimpleSelect>
+          {updatedPrivacyLevel !== undefined &&
+            defaultPrivacyLevel !== undefined &&
+            updatedPrivacyLevel !== selectedPrivacyLevel &&
+            updatedPrivacyLevel !== defaultPrivacyLevel && (
+              <>
+                <Pill color="success">New</Pill>
+                <Text size="small" fontStyle="italic">
+                  {I18n.t('Changed from *%{oldPrivacyLevel}*', {
+                    oldPrivacyLevel: i18nLtiPrivacyLevel(defaultPrivacyLevel),
+                  })}
+                </Text>
+              </>
+            )}
         </View>
       </>
     )

@@ -82,10 +82,7 @@ describe('CanvasStudioPlayer', () => {
 
     it('renders without crashing when provided with media sources', () => {
       const {container} = render(
-        <CanvasStudioPlayer
-          media_id="dummy_media_id"
-          media_sources={[defaultMediaObject()]}
-        />,
+        <CanvasStudioPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />,
       )
       expect(container.querySelector('[data-testid="mock-studio-player"]')).toBeInTheDocument()
     })
@@ -217,6 +214,27 @@ describe('CanvasStudioPlayer', () => {
         />,
       )
       expect(container.querySelector('[data-testid="mock-studio-player"]')).toBeInTheDocument()
+    })
+
+    it('fetches new media when media_id prop changes', async () => {
+      const fetchedIds: string[] = []
+      server.use(
+        http.get('/media_objects/:id/info', ({params}) => {
+          fetchedIds.push(params.id as string)
+          return HttpResponse.json({
+            media_sources: [defaultMediaObject()],
+            media_tracks: [],
+          })
+        }),
+      )
+
+      const {rerender} = render(<CanvasStudioPlayer media_id="media-1" />)
+
+      await waitFor(() => expect(fetchedIds).toContain('media-1'), {timeout: 3000})
+
+      rerender(<CanvasStudioPlayer media_id="media-2" />)
+
+      await waitFor(() => expect(fetchedIds).toContain('media-2'), {timeout: 3000})
     })
   })
 

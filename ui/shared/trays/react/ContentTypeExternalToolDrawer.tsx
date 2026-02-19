@@ -70,7 +70,7 @@ export default function ContentTypeExternalToolDrawer({
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const pageContentRef = useRef<HTMLDivElement>(null)
   const initDrawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
-  const STD_TRAY_WIDTH = window.ENV.FEATURES?.increased_top_nav_pane_size ? '33vw' : '320px'
+  const STD_TRAY_WIDTH = '33vw'
 
   const {isMaxTablet} = useBreakpoints()
   const globalNavWidth = useGlobalNavWidth()

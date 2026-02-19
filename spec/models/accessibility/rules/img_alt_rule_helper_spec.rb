@@ -67,16 +67,16 @@ describe Accessibility::Rules::ImgAltRuleHelper do
 
       result = described_class.fix_alt_text!(elem, nil)
 
-      expect(result).to be_a(Array)
-      expect(result.length).to eq(2)
+      expect(result).to be_a(Hash)
+      expect(result[:changed]).to eq(elem)
       expect(elem["role"]).to eq("presentation")
       expect(elem["alt"]).to eq("")
-      expect(result[1]).to include("display: flex")
-      expect(result[1]).to include("justify-content: center")
-      expect(result[1]).to include("align-items: center")
-      expect(result[1]).to include("max-width: 100%")
-      expect(result[1]).to include("max-height: 100%")
-      expect(result[1]).to include("object-fit: contain")
+      expect(result[:content_preview]).to include("display: flex")
+      expect(result[:content_preview]).to include("justify-content: center")
+      expect(result[:content_preview]).to include("align-items: center")
+      expect(result[:content_preview]).to include("max-width: 100%")
+      expect(result[:content_preview]).to include("max-height: 100%")
+      expect(result[:content_preview]).to include("object-fit: contain")
     end
 
     it "sets alt text for valid values" do
@@ -86,15 +86,15 @@ describe Accessibility::Rules::ImgAltRuleHelper do
 
       result = described_class.fix_alt_text!(elem, "A beautiful landscape")
 
-      expect(result).to be_a(Array)
-      expect(result.length).to eq(2)
+      expect(result).to be_a(Hash)
+      expect(result[:changed]).to eq(elem)
       expect(elem["alt"]).to eq("A beautiful landscape")
-      expect(result[1]).to include("display: flex")
-      expect(result[1]).to include("justify-content: center")
-      expect(result[1]).to include("align-items: center")
-      expect(result[1]).to include("max-width: 100%")
-      expect(result[1]).to include("max-height: 100%")
-      expect(result[1]).to include("object-fit: contain")
+      expect(result[:content_preview]).to include("display: flex")
+      expect(result[:content_preview]).to include("justify-content: center")
+      expect(result[:content_preview]).to include("align-items: center")
+      expect(result[:content_preview]).to include("max-width: 100%")
+      expect(result[:content_preview]).to include("max-height: 100%")
+      expect(result[:content_preview]).to include("object-fit: contain")
     end
 
     it "raises error for filename-like values" do

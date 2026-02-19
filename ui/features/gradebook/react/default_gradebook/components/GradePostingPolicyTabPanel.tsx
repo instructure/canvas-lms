@@ -50,8 +50,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
     this.handlePostPolicySelected = this.handlePostPolicySelected.bind(this)
   }
 
-  // @ts-expect-error
-  handlePostPolicySelected(_e, value) {
+  handlePostPolicySelected(_e: React.SyntheticEvent, value: string) {
     if (value === AUTOMATIC_POST && this.props.anonymousAssignmentsPresent) {
       showFlashAlert({
         message: I18n.t(

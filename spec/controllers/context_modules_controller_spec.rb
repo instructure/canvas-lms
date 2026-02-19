@@ -963,6 +963,46 @@ describe ContextModulesController do
       get "item_redirect", params: { course_id: @course.id, id: tag.id }
       expect(@module.evaluate_for(@user).requirements_met).to be_blank
     end
+
+    context "with seamless redirect feature flag" do
+      before do
+        Account.site_admin.enable_feature!(:module_external_url_seamless_redirect)
+      end
+
+      it "redirects directly to external URL for new_tab items when follow_redirect param present" do
+        user_session(@student)
+        @module = @course.context_modules.create!
+        tag = @module.add_item type: "external_url", url: "http://example.com/lolcats", title: "lol", new_tab: true
+        tag.publish if tag.unpublished?
+        @module.completion_requirements = { tag.id => { type: "must_view" } }
+        @module.save!
+        get "item_redirect", params: { course_id: @course.id, id: tag.id, follow_redirect: "1" }
+        expect(response).to redirect_to("http://example.com/lolcats")
+        requirements_met = @module.evaluate_for(@user).requirements_met
+        expect(requirements_met[0][:type]).to eq "must_view"
+        expect(requirements_met[0][:id]).to eq tag.id
+      end
+
+      it "renders intermediate page for prev/next navigation (no follow_redirect param)" do
+        user_session(@student)
+        @module = @course.context_modules.create!
+        tag = @module.add_item type: "external_url", url: "http://example.com/lolcats", title: "lol", new_tab: true
+        tag.publish if tag.unpublished?
+        @module.save!
+        get "item_redirect", params: { course_id: @course.id, id: tag.id }
+        expect(response).to render_template("context_modules/url_show")
+      end
+
+      it "still renders view for non-new_tab external URLs" do
+        user_session(@student)
+        @module = @course.context_modules.create!
+        tag = @module.add_item type: "external_url", url: "http://example.com/lolcats", title: "lol", new_tab: false
+        tag.publish if tag.unpublished?
+        @module.save!
+        get "item_redirect", params: { course_id: @course.id, id: tag.id, follow_redirect: "1" }
+        expect(response).to render_template("context_modules/url_show")
+      end
+    end
   end
 
   describe "POST 'reorder'" do

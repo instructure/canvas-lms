@@ -19,10 +19,12 @@
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconEndSolid, IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import type {MasteryFilter} from './types'
 
 const I18n = createI18nScope('outcome_reporting')
 
@@ -30,19 +32,40 @@ interface OutcomesControlsBarProps {
   search: string
   onSearchChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void
   onSearchClearHandler: () => void
+  masteryFilter: MasteryFilter
+  onMasteryFilterChange: (filter: MasteryFilter) => void
 }
 
 const OutcomesControlsBar = ({
   search,
   onSearchChangeHandler,
   onSearchClearHandler,
+  masteryFilter,
+  onMasteryFilterChange,
 }: OutcomesControlsBarProps) => {
   return (
     <View as="div" padding="small 0">
       <Flex gap="small" alignItems="end">
-        <Flex.Item width="10rem">
-          {/* Placeholder for filter dropdown */}
-          <View as="div" height="2.5rem" padding="x-small"></View>
+        <Flex.Item width="16rem">
+          <SimpleSelect
+            data-testid="mastery-filter-select"
+            renderLabel={<ScreenReaderContent>{I18n.t('Filter by mastery')}</ScreenReaderContent>}
+            value={masteryFilter}
+            onChange={(_e, data) => onMasteryFilterChange(data.value as MasteryFilter)}
+          >
+            <SimpleSelect.Option id="all" value="all">
+              {I18n.t('Show All')}
+            </SimpleSelect.Option>
+            <SimpleSelect.Option id="mastery" value="mastery">
+              {I18n.t('At or above Mastery')}
+            </SimpleSelect.Option>
+            <SimpleSelect.Option id="not_started" value="not_started">
+              {I18n.t('Not Started')}
+            </SimpleSelect.Option>
+            <SimpleSelect.Option id="in_progress" value="in_progress">
+              {I18n.t('In Progress')}
+            </SimpleSelect.Option>
+          </SimpleSelect>
         </Flex.Item>
         <Flex.Item shouldGrow={true}>
           <TextInput

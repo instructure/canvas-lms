@@ -23,16 +23,16 @@ import {MediaTrack} from './MediaTrack'
 
 export const MediaComment = {
   fragment: gql`
-    fragment MediaComment on MediaObject {
+    fragment InboxMediaComment on MediaObject {
       _id
       id
       title
       canAddCaptions
       mediaSources {
-        ...MediaSource
+        ...InboxMediaSource
       }
       mediaTracks {
-        ...MediaTrack
+        ...InboxMediaTrack
       }
     }
     ${MediaSource.fragment}

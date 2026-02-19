@@ -49,7 +49,7 @@ module Lti
 
     def resubmit_discussion_notices_all
       topic = assignment.discussion_topic
-      return render json: { error: "Not a discussion assignment" }, status: :unprocessable_entity unless topic
+      return render json: { error: "Not a discussion assignment" }, status: :unprocessable_content unless topic
       return render status: :forbidden, plain: "invalid_request" unless context.grants_any_right?(@current_user, session, :manage_grades)
 
       entry_ids = topic.discussion_entries.active.where(user_id: student.id).pluck(:id)
@@ -64,15 +64,15 @@ module Lti
           .order(:discussion_entry_id, version: :desc)
           .preload(:discussion_entry, :user, :root_account)
           .find_in_batches(batch_size: 100) do |versions|
-          Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
-            assignment:,
-            submission:,
-            discussion_entry_versions: versions,
-            contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
-            current_user: student,
-            asset_processor: nil,
-            tool_id: nil
-          )
+            Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
+              assignment:,
+              submission:,
+              discussion_entry_versions: versions,
+              contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
+              current_user: student,
+              asset_processor: nil,
+              tool_id: nil
+            )
         end
       end
 

@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconUploadLine, IconWarningLine} from '@instructure/ui-icons'
 import ready from '@instructure/ready'
@@ -43,8 +43,7 @@ ready(() => {
   for (let i = 0; i < progressElements.length; i++) {
     const icon = progressIcon(presenter[i])
     if (icon !== null) {
-      const root = createRoot(progressElements[i])
-      root.render(<Tooltip renderTip={icon[1]}>{icon[0]}</Tooltip>)
+      const root = render(<Tooltip renderTip={icon[1]}>{icon[0]}</Tooltip>, progressElements[i])
       roots.push(root)
     }
   }

@@ -52,7 +52,7 @@ describe Accessibility::Rules::HeadingsSequenceRule do
   context "when fixing heading sequences" do
     it "fixes a skipped heading level" do
       input_html = '<div id="test-element"><h2>First heading</h2><h4 id="test-element">Skipped heading level</h4></div>'
-      fixed_html = fix_issue(:headings_sequence, input_html, ".//h4[@id='test-element']", "Fix heading hierarchy")
+      fixed_html = fix_issue(:headings_sequence, input_html, ".//h4[@id='test-element']", "Fix heading level")
 
       expect(fixed_html).to include('<h3 id="test-element">Skipped heading level</h3>')
       expect(fixed_html).not_to include('<h4 id="test-element">Skipped heading level</h4>')
@@ -60,7 +60,7 @@ describe Accessibility::Rules::HeadingsSequenceRule do
 
     it "removes heading style" do
       input_html = '<div id="test-element"><h2>First heading</h2><h4 id="test-element">Skipped heading level</h4></div>'
-      fixed_html = fix_issue(:headings_sequence, input_html, ".//h4[@id='test-element']", "Remove heading style")
+      fixed_html = fix_issue(:headings_sequence, input_html, ".//h4[@id='test-element']", "Turn into a paragraph")
 
       expect(fixed_html).to include('<p id="test-element">Skipped heading level</p>')
       expect(fixed_html).not_to include('<h4 id="test-element">Skipped heading level</h4>')

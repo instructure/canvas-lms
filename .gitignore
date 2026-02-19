@@ -15,6 +15,7 @@
 .swc
 .idea/
 /.claude/
+CLAUDE.local.md
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb

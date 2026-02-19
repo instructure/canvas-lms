@@ -1028,34 +1028,80 @@ end
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
     def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil, sort: {})
-      scope = if horizon_courses
+      @course_ids = course_ids
+      @order_by = order_by
+      @current_only = current_only
+      @exclude_concluded = exclude_concluded
+      @exclude_pending_enrollments = exclude_pending_enrollments
+      @horizon_courses = horizon_courses
+      @sort = sort
+
+      scope = build_scope
+
+      super(scope, :user_id)
+    end
+
+    def perform(user_ids)
+      users = User.where(id: user_ids).index_by { |u| Shard.global_id_for(u.id) }
+
+      users_by_shard = users.each_value.with_object({}) do |user, hash|
+        user.in_region_associated_shards.each do |shard|
+          hash[shard] ||= []
+          hash[shard] << user
+        end
+      end
+
+      all_enrollments = []
+      users_by_shard.each do |shard, shard_users|
+        shard.activate do
+          scope = build_scope
+          local_user_ids = shard_users.map(&:id)
+          all_enrollments.concat(scope.where(user_id: local_user_ids).to_a)
+        end
+      end
+
+      enrollments_by_user = all_enrollments.group_by { |e| Shard.global_id_for(e.user_id) }
+
+      user_ids.each do |id|
+        if users[id]
+          fulfill(id, enrollments_by_user[id] || [])
+        else
+          fulfill(id, nil)
+        end
+      end
+    end
+
+    private
+
+    def build_scope
+      scope = if @horizon_courses
                 Enrollment.horizon
-              elsif horizon_courses == false
+              elsif @horizon_courses == false
                 Enrollment.not_horizon
               else
                 Enrollment.joins(:course)
               end
 
-      scope = if current_only
+      scope = if @current_only
                 scope.current.active_by_date
               else
                 scope.where.not(enrollments: { workflow_state: "deleted" })
                      .where.not(courses: { workflow_state: "deleted" })
               end
 
-      scope = scope.where(course_id: course_ids) if course_ids.present?
+      scope = scope.where(course_id: @course_ids) if @course_ids.present?
 
-      scope = scope.where.not(enrollments: { workflow_state: "completed" }) if exclude_concluded
+      scope = scope.where.not(enrollments: { workflow_state: "completed" }) if @exclude_concluded
 
-      scope = scope.excluding_pending if exclude_pending_enrollments
+      scope = scope.excluding_pending if @exclude_pending_enrollments
 
-      order_by.each { |o| scope = scope.order(o) }
+      @order_by.each { |o| scope = scope.order(o) }
 
-      if sort.present?
-        sort_direction = (sort[:direction] == "desc") ? "DESC" : "ASC"
-        reversed_sort_direction = (sort[:direction] == "desc") ? "ASC" : "DESC"
+      if @sort.present?
+        sort_direction = (@sort[:direction] == "desc") ? "DESC" : "ASC"
+        reversed_sort_direction = (@sort[:direction] == "desc") ? "ASC" : "DESC"
 
-        case sort[:field]
+        case @sort[:field]
         when "last_activity_at"
           # The order for last_activity_at is intentionally reversed because last activity is
           # a timestamp and we want the most recent activity to appear first in ascending order
@@ -1082,7 +1128,7 @@ module Loaders
         end
       end
 
-      super(scope, :user_id)
+      scope
     end
   end
 end

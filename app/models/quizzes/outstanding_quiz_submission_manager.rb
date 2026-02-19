@@ -38,9 +38,9 @@ module Quizzes
                              .eager_load(:quiz)
                              .needs_grading
                              .each do |quiz_submission|
-        Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-                                                                          finished_at: quiz_submission.finished_at_fallback
-                                                                        })
+                               Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
+                                                                                                 finished_at: quiz_submission.finished_at_fallback
+                                                                                               })
       end
     end
 

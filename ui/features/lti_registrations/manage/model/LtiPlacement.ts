@@ -185,6 +185,10 @@ export const InternalOnlyLtiPlacements = [
   LtiPlacements.AnalyticsHub,
 ] as const
 
+export const isInternalOnlyLtiPlacement = (placement: string): boolean => {
+  return InternalOnlyLtiPlacements.includes(placement as any)
+}
+
 export const ZLtiPlacement = z.enum(AllLtiPlacements)
 export type LtiPlacement = z.infer<typeof ZLtiPlacement>
 

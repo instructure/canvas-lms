@@ -212,7 +212,7 @@ export const useResetLtiRegistration = () => {
           path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`,
           method: 'PUT',
         },
-        ZLtiRegistrationWithConfiguration,
+        z.unknown(),
       ),
     onSettled: (_, __, {ltiRegistrationId, accountId}) => {
       refreshRegistrationWithAllInfo(ltiRegistrationId, accountId)

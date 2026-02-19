@@ -371,7 +371,8 @@ class PlannerController < ApplicationController
   end
 
   def calendar_events_collection(completion_filter: nil)
-    scope = CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes)
+    section_codes = @user.section_context_codes(@context_codes, false, include_concluded: false)
+    scope = CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes, section_codes)
                          .between(@start_date, @end_date)
     scope = apply_completion_filter(scope, @user, completion_filter)
     item_collection("calendar_events",

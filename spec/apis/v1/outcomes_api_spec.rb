@@ -74,6 +74,8 @@ describe "Outcomes API", type: :request do
       retval["points_possible"] = presets[:points_possible] || proficiency.points_possible
       retval["mastery_points"]  = presets[:mastery_points]  || proficiency.mastery_points
       retval["ratings"]         = presets[:ratings]         || proficiency.ratings_hash.map(&:stringify_keys)
+      retval["proficiency_context_type"] = presets[:proficiency_context_type] || proficiency.context_type
+      retval["proficiency_context_id"] = presets[:proficiency_context_id] || proficiency.context_id.to_s
     elsif (criterion = outcome.data && outcome.data[:rubric_criterion])
       retval["points_possible"] = presets[:points_possible] || criterion[:points_possible].to_i
       retval["mastery_points"]  = presets[:mastery_points]  || criterion[:mastery_points].to_i

@@ -2,9 +2,25 @@ oak_for_admins:
   state: allowed
   shadow: false
   applies_to: RootAccount
-  visible_on: oak_flag_visible_on_hook
+  visible_on: oak_visible_on_hook
   display_name: IgniteAI Agent - Admins
   description: Enables the IgniteAI Agent feature for the root account for admins only. The IgniteAI Agent is an AI companion for admins and teachers to help them with their day-to-day tasks in Canvas LMS. The feature is currently in development, not yet available for general use.
+
+oak_for_teachers:
+  state: allowed
+  shadow: true
+  applies_to: RootAccount
+  visible_on: oak_visible_on_hook
+  display_name: IgniteAI Agent - Teachers
+  description: Enables IgniteAI Agent feature for Teachers. IgniteAI Agent is an AI companion for admins and teachers to help them with their day-to-day tasks in Canvas LMS.
+
+oak_for_users:
+  state: allowed_on
+  shadow: false
+  applies_to: User
+  visible_on: oak_for_users_visible_on_hook
+  display_name: Display IgniteAI Agent Button
+  description: Displays the IgniteAI Agent button in the lower right corner of some pages for admins and teachers. The IgniteAI Agent is an AI companion that can help with day-to-day tasks in Canvas LMS. Refresh the page to see changes.
 
 # The feature flags below are temporary and will be removed at Teacher Enablement (around February 17th).
 

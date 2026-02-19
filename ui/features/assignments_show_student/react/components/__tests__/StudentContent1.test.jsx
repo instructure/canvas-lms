@@ -18,6 +18,9 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
 import {
   mockAssignmentAndSubmission,
   mockQuery,
@@ -75,9 +78,9 @@ describe('Assignment Student Content View', () => {
   it('renders the student header if the assignment is unlocked', async () => {
     const props = await mockAssignmentAndSubmission()
     const {getByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(getByTestId('assignments-2-student-view')).toBeInTheDocument()
   })
@@ -110,18 +113,20 @@ describe('Assignment Student Content View', () => {
       },
     ]
     const {getByTestId} = render(
-      <MockedProvider mocks={mocks}>
-        <StudentContent {...props} />
-      </MockedProvider>,
+      <QueryClientProvider client={queryClient}>
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </QueryClientProvider>,
     )
     expect(getByTestId('assignment-student-header')).toBeInTheDocument()
   })
   it('renders the assignment details and student content if the assignment is unlocked', async () => {
     const props = await mockAssignmentAndSubmission()
     const {getByText, queryByText} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(getByText('Details')).toBeInTheDocument()
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
@@ -130,9 +135,9 @@ describe('Assignment Student Content View', () => {
     window.ENV.stickers_enabled = true
     const props = await mockAssignmentAndSubmission({Submission: {sticker: 'apple'}})
     const {getByRole} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     const sticker = getByRole('img', {name: 'A sticker with a picture of an apple.'})
     expect(sticker).toBeInTheDocument()
@@ -141,9 +146,9 @@ describe('Assignment Student Content View', () => {
     window.ENV.stickers_enabled = true
     const props = await mockAssignmentAndSubmission()
     const {queryByRole} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     const sticker = queryByRole('img', {name: 'A sticker with a picture of an apple.'})
     expect(sticker).not.toBeInTheDocument()
@@ -152,9 +157,9 @@ describe('Assignment Student Content View', () => {
     window.ENV.stickers_enabled = false
     const props = await mockAssignmentAndSubmission({Submission: {sticker: 'apple'}})
     const {queryByRole} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     const sticker = queryByRole('button', {name: 'A sticker with a picture of an apple.'})
     expect(sticker).not.toBeInTheDocument()
@@ -173,13 +178,13 @@ describe('Assignment Student Content View', () => {
       },
     })
     const {container} = render(
-      <StudentViewContext.Provider
-        value={{lastSubmittedSubmission: props.submission, latestSubmission: props.submission}}
-      >
-        <MockedProvider>
+      <MockedQueryProvider>
+        <StudentViewContext.Provider
+          value={{lastSubmittedSubmission: props.submission, latestSubmission: props.submission}}
+        >
           <StudentContent {...props} />
-        </MockedProvider>
-      </StudentViewContext.Provider>,
+        </StudentViewContext.Provider>
+      </MockedQueryProvider>,
     )
     expect(container).toHaveTextContent(/Attempt 1 Score:\s*N\/A/)
   })
@@ -202,13 +207,13 @@ describe('Assignment Student Content View', () => {
       },
     })
     const {container} = render(
-      <StudentViewContext.Provider
-        value={{lastSubmittedSubmission, latestSubmission: props.submission}}
-      >
-        <MockedProvider>
+      <MockedQueryProvider>
+        <StudentViewContext.Provider
+          value={{lastSubmittedSubmission, latestSubmission: props.submission}}
+        >
           <StudentContent {...props} />
-        </MockedProvider>
-      </StudentViewContext.Provider>,
+        </StudentViewContext.Provider>
+      </MockedQueryProvider>,
     )
     expect(container).toHaveTextContent(/Attempt 7 Score:\s*131\/150/)
   })
@@ -231,13 +236,13 @@ describe('Assignment Student Content View', () => {
       },
     })
     const {container} = render(
-      <StudentViewContext.Provider
-        value={{lastSubmittedSubmission, latestSubmission: props.submission}}
-      >
-        <MockedProvider>
+      <MockedQueryProvider>
+        <StudentViewContext.Provider
+          value={{lastSubmittedSubmission, latestSubmission: props.submission}}
+        >
           <StudentContent {...props} />
-        </MockedProvider>
-      </StudentViewContext.Provider>,
+        </StudentViewContext.Provider>
+      </MockedQueryProvider>,
     )
     expect(container).toHaveTextContent(/Attempt 7 Score:\s*N\/A/)
   })
@@ -260,13 +265,13 @@ describe('Assignment Student Content View', () => {
       },
     })
     const {container} = render(
-      <StudentViewContext.Provider
-        value={{lastSubmittedSubmission, latestSubmission: props.submission}}
-      >
-        <MockedProvider>
+      <MockedQueryProvider>
+        <StudentViewContext.Provider
+          value={{lastSubmittedSubmission, latestSubmission: props.submission}}
+        >
           <StudentContent {...props} />
-        </MockedProvider>
-      </StudentViewContext.Provider>,
+        </StudentViewContext.Provider>
+      </MockedQueryProvider>,
     )
     expect(container).toHaveTextContent(/Offline Score:\s*131\/150/)
   })
@@ -276,9 +281,9 @@ describe('Assignment Student Content View', () => {
     })
     props.allSubmissions = [props.submission]
     const {queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(queryByTestId('attemptSelect')).toBeInTheDocument()
   })
@@ -286,9 +291,9 @@ describe('Assignment Student Content View', () => {
     const props = await mockAssignmentAndSubmission({Query: {submission: null}})
     props.allSubmissions = [{id: '1', _id: '1'}]
     const {queryByTestId} = render(
-      <MockedProvider>
+      <MockedQueryProvider>
         <StudentContent {...props} />
-      </MockedProvider>,
+      </MockedQueryProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
   })

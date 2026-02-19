@@ -23,6 +23,7 @@ import {
   getProps,
 } from '../confetti.utils'
 import type {ConfettiObject} from '../../types'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 describe('confetti.utils', () => {
   describe('getRandomInt', () => {
@@ -86,21 +87,22 @@ describe('confetti.utils', () => {
   })
 
   describe('getBrandingColors', () => {
+    afterEach(() => {
+      fakeEnv.teardown()
+    })
+
     it('should return null when confetti branding is disabled', () => {
-      // @ts-expect-error
-      window.ENV = {confetti_branding_enabled: false}
+      fakeEnv.setup({confetti_branding_enabled: false})
       expect(getBrandingColors()).toBeNull()
     })
 
     it('should return null when confetti branding is enabled but there is no active brand config', () => {
-      // @ts-expect-error
-      window.ENV = {confetti_branding_enabled: true}
+      fakeEnv.setup({confetti_branding_enabled: true})
       expect(getBrandingColors()).toBeNull()
     })
 
     it('should return colors when confetti branding is enabled and there are active brand config variables', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeEnv.setup({
         confetti_branding_enabled: true,
         active_brand_config: {
           variables: {
@@ -108,7 +110,7 @@ describe('confetti.utils', () => {
             'ic-brand-global-nav-bgd': '#000000',
           },
         },
-      }
+      })
       expect(getBrandingColors()).toEqual([
         [0, 0, 0],
         [0, 0, 0],
@@ -116,21 +118,19 @@ describe('confetti.utils', () => {
     })
 
     it('provides only the secondary color when primary is not specified', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeEnv.setup({
         confetti_branding_enabled: true,
         active_brand_config: {
           variables: {
             'ic-brand-global-nav-bgd': '#ffffff',
           },
         },
-      }
+      })
       expect(getBrandingColors()).toEqual([[255, 255, 255]])
     })
 
     it('provides both colors when both are specified', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeEnv.setup({
         confetti_branding_enabled: true,
         active_brand_config: {
           variables: {
@@ -138,7 +138,7 @@ describe('confetti.utils', () => {
             'ic-brand-global-nav-bgd': '#ffffff',
           },
         },
-      }
+      })
       expect(getBrandingColors()).toEqual([
         [0, 0, 0],
         [255, 255, 255],
@@ -146,20 +146,18 @@ describe('confetti.utils', () => {
     })
 
     it('does not provide any colors if none are specified', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeEnv.setup({
         confetti_branding_enabled: true,
         active_brand_config: {
           variables: {},
         },
-      }
+      })
       expect(getBrandingColors()).toEqual(null)
     })
 
     describe('confetti_branding flag is disabled', () => {
       it('does not provide any custom colors', () => {
-        // @ts-expect-error
-        window.ENV = {
+        fakeEnv.setup({
           confetti_branding_enabled: false,
           active_brand_config: {
             variables: {
@@ -167,7 +165,7 @@ describe('confetti.utils', () => {
               'ic-brand-global-nav-bgd': '#ffffff',
             },
           },
-        }
+        })
         expect(getBrandingColors()).toEqual(null)
       })
     })
@@ -175,20 +173,18 @@ describe('confetti.utils', () => {
 
   describe('logo', () => {
     it('returns a logo when branding enabled', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeEnv.setup({
         confetti_branding_enabled: true,
         active_brand_config: {variables: {'ic-brand-header-image': 'test'}},
-      }
+      })
       expect(getProps()[2]).toBeDefined()
     })
 
     it('does not return a logo when branding disabled', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeEnv.setup({
         confetti_branding_enabled: false,
         active_brand_config: {variables: {'ic-brand-header-image': 'test'}},
-      }
+      })
       expect(getProps()[2]).not.toBeDefined()
     })
   })
@@ -204,22 +200,20 @@ describe('confetti.utils', () => {
     })
 
     it('return a brand logo when branding enabled', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeEnv.setup({
         confetti_branding_enabled: true,
         active_brand_config: {variables: {'ic-brand-header-image': 'test'}},
-      }
+      })
       const prop = getProps()[2]
       // @ts-expect-error
       expect(prop.src).toBe('test')
     })
 
     it('does not return a brand logo when branding disabled', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeEnv.setup({
         confetti_branding_enabled: false,
         active_brand_config: {variables: {'ic-brand-header-image': 'test'}},
-      }
+      })
       expect(getProps()[2]).not.toBeDefined()
     })
   })

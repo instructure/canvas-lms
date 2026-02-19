@@ -105,8 +105,22 @@ let upload_form: UploadForm | undefined
 let currentQuizType: 'graded_quiz' | 'graded_survey' | 'ungraded_survey' = 'graded_quiz'
 let isAnonymousSubmission = false
 
+const MODULE_ITEM_DIALOG_HEIGHT_DEFAULT = 550
+const MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR = 650
+
 const isNewQuizzesSurveysEnabled = () => {
   return ENV?.FEATURES?.new_quizzes_surveys === true
+}
+
+const resizeModuleItemDialog = (height: number) => {
+  const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
+  if (fullSizeModal) {
+    const $dialog = $('#select_context_content_dialog')
+    if ($dialog.hasClass('ui-dialog-content')) {
+      $dialog.dialog('option', 'height', height)
+      $dialog.dialog('option', 'position', {my: 'center', at: 'center', of: window})
+    }
+  }
 }
 
 export const externalContentReadyHandler = (event: MessageEvent, tool: LtiLaunchDefinition) => {
@@ -600,6 +614,15 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
       },
       open() {
         $(this).parent().find('.ui-dialog-titlebar-close').focus()
+
+        if (isNewQuizzesSurveysEnabled()) {
+          const itemType = $('#add_module_item_select').val()
+          const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
+          const isCreatingNew = $('#quizs_select').val() === 'new'
+          if (itemType === 'quiz' && isNewQuizzesChecked && isCreatingNew) {
+            resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR)
+          }
+        }
       },
       modal: true,
       zIndex: 1000,
@@ -921,6 +944,10 @@ $(document).ready(function () {
       $('.add_item_button').addClass('disabled').attr('aria-disabled', 'true')
     }
 
+    if (selectedOption !== 'quiz') {
+      resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_DEFAULT)
+    }
+
     $('#select_context_content_dialog .module_item_option').hide()
     if ($(this).val() === 'attachment') {
       legacyRender(
@@ -1016,10 +1043,20 @@ $(document).ready(function () {
       )
     }
 
-    if (isEqualOrIsArrayWithEqualValue($(this).val(), 'new')) {
+    const isCreatingNew = isEqualOrIsArrayWithEqualValue($(this).val(), 'new')
+    if (isCreatingNew) {
       $(this).parents('.module_item_option').find('.new').show().focus().select()
+
+      if (isNewQuizzesSurveysEnabled()) {
+        const itemType = $('#add_module_item_select').val()
+        const isNewQuizzesChecked = $('#new_quizzes_radio').is(':checked')
+        if (itemType === 'quiz' && isNewQuizzesChecked) {
+          resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR)
+        }
+      }
     } else {
       $(this).parents('.module_item_option').find('.new').hide()
+      resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_DEFAULT)
     }
   })
 
@@ -1032,10 +1069,16 @@ $(document).ready(function () {
     const isNewQuizzes = $(this).val() === 'assignment'
     const $quizTypeSelectorRow = $('#quiz_type_selector_row')
     const $anonymousSubmissionRow = $('#anonymous_submission_selector_row')
+    const $dialog = $('#select_context_content_dialog')
+    const isCreatingNew = $('#quizs_select').val() === 'new'
 
     if (isNewQuizzes) {
       $quizTypeSelectorRow.show()
       renderQuizTypeSelector()
+
+      if (isCreatingNew) {
+        resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_WITH_QUIZ_TYPE_SELECTOR)
+      }
     } else {
       // Hide both quiz type selector and anonymous submission selector
       $quizTypeSelectorRow.hide()
@@ -1046,6 +1089,8 @@ $(document).ready(function () {
       // Reset state
       currentQuizType = 'graded_quiz'
       isAnonymousSubmission = false
+
+      resizeModuleItemDialog(MODULE_ITEM_DIALOG_HEIGHT_DEFAULT)
     }
   })
 

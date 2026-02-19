@@ -53,6 +53,10 @@ export function useQueryPageViewsPaginated(options: UseQueryPageViewsPaginatedOp
       options.pageSize,
     ],
     queryFn: async () => {
+      if (hasReachedEnd && currentPage > maxDiscoveredPage) {
+        throw new Error('No more pages available')
+      }
+
       // Build API request
       const bookmark = pageBookmarks[currentPage]
       const params = {
@@ -95,6 +99,8 @@ export function useQueryPageViewsPaginated(options: UseQueryPageViewsPaginatedOp
         const nextPageNumber = currentPage + 1
         setPageBookmarks(prev => ({...prev, [nextPageNumber]: nextBookmark}))
         setMaxDiscoveredPage(prev => Math.max(prev, nextPageNumber))
+      } else {
+        setHasReachedEnd(true)
       }
 
       return {views, nextBookmark}

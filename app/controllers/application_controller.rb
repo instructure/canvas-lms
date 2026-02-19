@@ -458,6 +458,7 @@ class ApplicationController < ActionController::Base
     a11y_checker_ai_alt_text_generation
     a11y_checker_ai_table_caption_generation
     a11y_checker_additional_resources
+    a11y_checker_close_issues
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player
@@ -490,11 +491,9 @@ class ApplicationController < ActionController::Base
     scheduled_feedback_releases
     speedgrader_studio_media_capture
     student_access_token_management
-    top_navigation_placement_a11y_fixes
     validate_call_to_action
     block_content_editor_ai_alt_text
     ux_list_concluded_courses_in_bp
-    assign_to_in_edit_pages_rewrite
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
@@ -515,7 +514,6 @@ class ApplicationController < ActionController::Base
     disable_iframe_sandbox_file_show
     extended_submission_state
     file_verifiers_for_quiz_links
-    increased_top_nav_pane_size
     instui_nav
     login_registration_ui_identity
     lti_apps_page_ai_translation
@@ -2316,7 +2314,11 @@ class ApplicationController < ActionController::Base
         render "context_modules/lock_explanation"
       else
         tag.context_module_action(@current_user, :read)
-        render "context_modules/url_show"
+        if tag.new_tab && params[:follow_redirect] && Account.site_admin.feature_enabled?(:module_external_url_seamless_redirect)
+          redirect_to tag.url, allow_other_host: true
+        else
+          render "context_modules/url_show"
+        end
       end
     elsif tag.content_type == "ContextExternalTool"
       timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -2505,6 +2507,7 @@ class ApplicationController < ActionController::Base
     end
     named_context_url(@context, :context_external_content_success_url, "external_tool_redirect", include_host: true)
   end
+  public :set_return_url
 
   def lti_launch_params(adapter)
     adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool), lti_turnitin_outcomes_placement_url(@tool.id))

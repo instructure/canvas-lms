@@ -314,10 +314,14 @@ describe('AssignmentPostingPolicyTray ScheduledReleasePolicy tests', () => {
     await waitFor(() => {
       expect(saveButton).toBeDisabled()
       expect(
-        screen.getByText('Grades release date must be the same or after comments release date'),
+        screen.getByText(
+          'Grades release date and time must be the same or after comments release date',
+        ),
       ).toBeInTheDocument()
       expect(
-        screen.getByText('Comments release date must be the same or before grades release date'),
+        screen.getByText(
+          'Comments release date and time must be the same or before grades release date',
+        ),
       ).toBeInTheDocument()
     })
   })

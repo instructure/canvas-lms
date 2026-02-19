@@ -161,7 +161,9 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
         <Flex.Item overflowX="visible" overflowY="visible">
           {renderFilterSelect()}
         </Flex.Item>
-        <Flex.Item shouldGrow>{renderContent()}</Flex.Item>
+        <Flex.Item overflowY="visible" shouldGrow>
+          {renderContent()}
+        </Flex.Item>
       </Flex>
     </TemplateWidget>
   )

@@ -11,6 +11,26 @@
 # development:
 #   addr: "https://vault.dev.domain"
 #   token: s.wOrq9dO9kzOcuvB06CMviJhZ
+#
+# AWS IAM Authentication (alternative to token-based auth):
+# Set these environment variables to enable:
+#   VAULT_IAM_AUTH_ENABLED=true           (required to enable IAM auth)
+#   VAULT_AWS_AUTH_ROLE=<role>            (required - Vault role name)
+#   VAULT_AWS_AUTH_PATH=aws               (optional, default: "aws")
+#   VAULT_AWS_AUTH_HEADER_VALUE=vault.example.com  (optional, X-Vault-AWS-IAM-Server-ID)
+#
+# AWS credentials are sourced from standard AWS SDK chain:
+# - Environment variables (AWS_ACCESS_KEY_ID, etc.)
+# - EC2 instance profile
+# - ECS task role
+#
+# When IAM auth is enabled, the token/token_path configuration is ignored.
+#
+# Vault Address (environment variable alternative):
+#   VAULT_ADDR=https://vault.example.com:8200
+#
+# This standard HashiCorp environment variable will be used if it is set,
+# useful for Kubernetes deployments.
 
 # if you don't want to run vault, you can make use
 # of a "vault_contents.yml" file in this directory and

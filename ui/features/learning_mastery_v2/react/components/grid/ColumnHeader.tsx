@@ -49,9 +49,8 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
       <Flex
         alignItems="center"
         justifyItems="space-between"
-        gap="small"
         height={CELL_HEIGHT}
-        padding="none small"
+        padding="none xx-small"
       >
         <Flex.Item size="80%">
           <Text weight="bold">

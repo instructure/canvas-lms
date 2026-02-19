@@ -175,10 +175,11 @@ class Role < ActiveRecord::Base
     ENROLLMENT_TYPES.include?(base_role_type)
   end
 
-  def label
+  def label(current_account = nil)
     if built_in?
       if course_role?
-        RoleOverride.enrollment_type_labels(account || root_account).detect { |label| label[:name] == name }[:label].call
+        context_account = current_account || account || root_account
+        RoleOverride.enrollment_type_labels(context_account).detect { |label| label[:name] == name }[:label].call
       elsif name == "AccountAdmin"
         RoleOverride::ACCOUNT_ADMIN_LABEL.call
       else

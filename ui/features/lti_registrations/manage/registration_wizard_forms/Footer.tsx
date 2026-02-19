@@ -28,6 +28,8 @@ export type FooterProps = {
   reviewing: boolean
   currentScreen: 'first' | 'intermediate' | 'last'
   disableNextButton?: boolean
+  nextButtonText?: string
+  hideFooter?: boolean
   onPreviousClicked: () => void
   onNextClicked: () => void
 }
@@ -37,19 +39,29 @@ export const Footer = ({
   currentScreen,
   disableNextButton = false,
   updating = false,
+  nextButtonText,
+  hideFooter = false,
   onNextClicked,
   onPreviousClicked,
 }: FooterProps) => {
-  let nextButtonLabel: string
+  if (hideFooter) {
+    return null
+  }
+
   const onLastScreen = currentScreen === 'last'
-  if (onLastScreen && !updating) {
-    nextButtonLabel = I18n.t('Install App')
-  } else if (onLastScreen && updating) {
-    nextButtonLabel = I18n.t('Update App')
-  } else if (reviewing) {
-    nextButtonLabel = I18n.t('Back to Review')
+  let nextButtonLabel: string
+  if (nextButtonText) {
+    nextButtonLabel = nextButtonText
   } else {
-    nextButtonLabel = I18n.t('Next')
+    if (onLastScreen && !updating) {
+      nextButtonLabel = I18n.t('Install App')
+    } else if (onLastScreen && updating) {
+      nextButtonLabel = I18n.t('Update')
+    } else if (reviewing) {
+      nextButtonLabel = I18n.t('Back to Review')
+    } else {
+      nextButtonLabel = I18n.t('Next')
+    }
   }
   return (
     <Modal.Footer>

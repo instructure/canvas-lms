@@ -319,6 +319,42 @@ RSpec.describe Accessibility::PreviewController do
           expect(response.parsed_body).to eq({ "content" => "<h1>Title</h1>" })
         end
       end
+
+      context "with rule that provides metadata" do
+        let!(:wiki_page) do
+          course.wiki_pages.create!(
+            title: "Test Page",
+            body: '<div><span style="color: #FF0000; background-color: #FFFFFF;">Low contrast text</span></div>'
+          )
+        end
+        let!(:issue) { accessibility_issue_model(course:, context: wiki_page, rule_type: "small-text-contrast", node_path: ".//span") }
+        let(:mock_rule_instance) { double("RuleInstance") }
+        let(:mock_rule_registry) { { "small-text-contrast" => mock_rule_instance } }
+        let(:params) do
+          {
+            course_id: course.id,
+            issue_id: issue.id.to_s
+          }
+        end
+
+        before do
+          allow(Accessibility::Rule).to receive(:registry).and_return(mock_rule_registry)
+          allow(mock_rule_instance).to receive_messages(
+            issue_preview: '<span style="color: #FF0000; background-color: #FFFFFF;">Low contrast text</span>',
+            issue_metadata: { foreground: "#FF0000", background: "#FFFFFF" }
+          )
+        end
+
+        it "includes metadata in the response" do
+          get :show, params:, format: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body).to eq({
+                                               "content" => '<span style="color: #FF0000; background-color: #FFFFFF;">Low contrast text</span>',
+                                               "foreground" => "#FF0000",
+                                               "background" => "#FFFFFF"
+                                             })
+        end
+      end
     end
   end
 end

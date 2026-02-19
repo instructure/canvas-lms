@@ -24,11 +24,17 @@ interface UseCoursesOptions {
   accountId: string
   sort: string
   order: SortOrder
+  page: number
 }
 
-export const useCourses = ({accountId, sort, order}: UseCoursesOptions) => {
+export const useCourses = ({
+  accountId,
+  sort,
+  order,
+  page,
+}: UseCoursesOptions) => {
   return useQuery({
-    queryKey: ['accessibility-courses', accountId, sort, order],
-    queryFn: () => fetchCourses({accountId, sort, order}),
+    queryKey: ['accessibility-courses', accountId, sort, order, page],
+    queryFn: () => fetchCourses({accountId, sort, order, page}),
   })
 }

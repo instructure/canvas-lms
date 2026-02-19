@@ -377,6 +377,14 @@ module ConversationsHelper
     if context.is_a?(Course) && (context.workflow_state == "completed" || soft_concluded_course_for_user?(context, @current_user))
       raise CourseConcludedError
     end
+
+    if context.is_a?(Course) && recipients.present?
+      # Is there anyone in my recipient list that is not enrolled in this course?
+      enrolled_count = context.enrollments.active.where(user: recipients).select(:user_id).distinct.count
+      if enrolled_count != recipients.size
+        raise InvalidRecipientsError
+      end
+    end
   end
 
   def validate_message_ids(message_ids, conversation, current_user: @current_user)

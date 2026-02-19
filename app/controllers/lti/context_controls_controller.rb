@@ -425,10 +425,10 @@ module Lti
                                       root_account: @account,
                                       current_user: @current_user,
                                       comment: params[:comment]) do
-          # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time, hence the split
-          # upsert needed here to restore any previously deleted controls
-          control_ids = Lti::ContextControl.upsert_all(controls.filter { |c| c[:course_id].present? }, unique_by: [:course_id, :deployment_id], returning: :id).rows.flatten
-          control_ids + Lti::ContextControl.upsert_all(controls.filter { |c| c[:account_id].present? }, unique_by: [:account_id, :deployment_id], returning: :id).rows.flatten
+            # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time, hence the split
+            # upsert needed here to restore any previously deleted controls
+            control_ids = Lti::ContextControl.upsert_all(controls.filter { |c| c[:course_id].present? }, unique_by: [:course_id, :deployment_id], returning: :id).rows.flatten
+            control_ids + Lti::ContextControl.upsert_all(controls.filter { |c| c[:account_id].present? }, unique_by: [:account_id, :deployment_id], returning: :id).rows.flatten
         end
       end
 
@@ -472,7 +472,7 @@ module Lti
       available = value_to_boolean(params.require(:available))
       Lti::RegistrationHistoryEntry
         .track_control_changes(control:, current_user: @current_user, comment: params[:comment]) do
-        control.update!(available:)
+          control.update!(available:)
       end
 
       invalidate_navigation_cache_for_deployments(control.deployment)
@@ -501,12 +501,12 @@ module Lti
     def delete
       Lti::RegistrationHistoryEntry
         .track_control_changes(control:, current_user: @current_user, comment: params[:comment]) do
-        if control.destroy
-          invalidate_navigation_cache_for_deployments(control.deployment)
-          render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
-        else
-          render_errors(control.errors.full_messages, status: :unprocessable_entity)
-        end
+          if control.destroy
+            invalidate_navigation_cache_for_deployments(control.deployment)
+            render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
+          else
+            render_errors(control.errors.full_messages, status: :unprocessable_entity)
+          end
       end
     rescue => e
       report_error(e)

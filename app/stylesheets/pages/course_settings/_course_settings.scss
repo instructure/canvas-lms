@@ -532,3 +532,33 @@ td.center-text {
 #csp_options {
   margin-top: 10px;
 }
+
+
+/* New Course Navigation Settings Component - scoped to avoid global conflicts */
+
+.course-nav-tabs-list .course-nav-tab {
+  border: solid #ddd;
+  border-width: 0px 1px 1px 1px;
+}
+
+.course-nav-tabs-list .course-nav-tab.course-nav-tab-first {
+  border-width: 1px;
+}
+
+.course-nav-tabs-list .course-nav-tab:focus {
+  border-radius: 0.25rem;
+}
+
+.course-nav-tabs-list .course-nav-tab-dragging {
+  background-color: $ic-list-item-background--selected;
+  padding: 0rem 0.25rem 0rem 0.25rem;
+  border-radius: 0.25rem;
+  border: 2px solid var(--ic-brand-primary);
+  box-shadow: 2px 2px 4px;
+}
+
+.course-nav-tabs-list {
+  display: inline-block;
+  width: 400px;
+  max-width: calc(100vw - 22px);
+}

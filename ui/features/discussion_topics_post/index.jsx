@@ -20,7 +20,7 @@ import {DiscussionTopicsPost} from './react/index'
 import ready from '@instructure/ready'
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import DiscussionTopicKeyboardShortcutModal from './react/KeyboardShortcuts/DiscussionTopicKeyboardShortcutModal'
 import {Portal} from '@instructure/ui-portal'
 import {mountNutritionFacts} from '@canvas/nutrition-facts'
@@ -90,7 +90,7 @@ ready(() => {
   const navbarHeight = navbar?.getBoundingClientRect().height ?? 72
 
   setTimeout(() => {
-    ReactDOM.render(
+    legacyRender(
       <DiscussionPageLayout navbarHeight={navbarHeight} />,
       document.getElementById('content'),
     )

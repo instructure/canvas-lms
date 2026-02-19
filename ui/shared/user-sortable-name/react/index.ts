@@ -25,9 +25,7 @@ export const computeShortAndSortableNamesFromName = (names: {
   short_name: string
   sortable_name: string
 }) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore - nameParts' second argument (prior_parts) is optional at runtime but required by tsgo
-  const sortable_name_parts = nameParts(names.sortable_name)
+  const sortable_name_parts = nameParts(names.sortable_name, undefined)
 
   if (
     $.trim(names.sortable_name) === '' ||

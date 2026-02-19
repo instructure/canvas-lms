@@ -23,8 +23,20 @@ const config: CodegenConfig = {
   documents: [
     'ui/**/*.tsx',
     'ui/**/*.ts',
+    'ui/**/*.jsx',
+    'ui/**/*.js',
+    '!ui/**/__tests__/**/*',
+    '!ui/**/*.test.*',
+    '!ui/**/Mocks.*',
     '!ui/features/context_modules_v2/**/*',
     '!ui/features/grade_summary/**/*',
+    // Self-contained graphql modules with internal fragment systems - excluded to avoid duplicate names
+    // TODO: Refactor these to use unique fragment names, then remove exclusions
+    '!ui/features/discussion_topic_edit_v2/graphql/**/*',
+    '!ui/features/discussion_topics_post/graphql/**/*',
+    '!ui/shared/assignments/graphql/student/**/*',
+    '!ui/shared/assignments/graphql/studentMocks.*',
+    '!ui/shared/outcomes/react/treeBrowser.*',
   ],
   ignoreNoDocuments: true,
   generates: {

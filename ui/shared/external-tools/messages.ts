@@ -19,7 +19,7 @@
 export const EXTERNAL_CONTENT_READY = 'externalContentReady'
 export const EXTERNAL_CONTENT_CANCEL = 'externalContentCancel'
 
-export type Service = 'equella' | 'external_tool_dialog' | 'external_tool_redirect'
+export type Service = 'external_tool_dialog' | 'external_tool_redirect'
 
 export type ExternalContentReadyInnerData = {
   contentItems: Lti1p1ContentItem[]

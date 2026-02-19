@@ -18,7 +18,7 @@
 
 import './jquery/index'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import GeneratePairingCode from '@canvas/generate-pairing-code'
 import ready from '@instructure/ready'
 import ManageTempEnrollButton from '@canvas/temporary-enrollment/react/ManageTempEnrollButton'
@@ -52,9 +52,9 @@ ready(() => {
   const roles = Array.prototype.slice.call(ENV.COURSE_ROLES)
 
   if (pairing_container) {
-    const pairingRoot = createRoot(pairing_container)
-    pairingRoot.render(
+    render(
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
+      pairing_container,
     )
   }
 
@@ -64,8 +64,7 @@ ready(() => {
     )
 
     if (temp_enrollments_container) {
-      const tempEnrollRoot = createRoot(temp_enrollments_container)
-      tempEnrollRoot.render(
+      render(
         <ManageTempEnrollButton
           user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}
           modifyPermissions={modifyPermissions}
@@ -73,6 +72,7 @@ ready(() => {
           rolePermissions={rolePermissions}
           can_read_sis={permissions.can_read_sis}
         />,
+        temp_enrollments_container,
       )
     }
   }
@@ -81,7 +81,7 @@ ready(() => {
     const dsrModalContainer = document.getElementById('dsr-modal-mount-point')
 
     if (dsrModalContainer) {
-      createRoot(dsrModalContainer).render(
+      render(
         <CreateDSRModal
           accountId={ENV.ACCOUNT_ID}
           user={{
@@ -94,6 +94,7 @@ ready(() => {
             Export DSR Report
           </Button>
         </CreateDSRModal>,
+        dsrModalContainer,
       )
     }
   }
@@ -103,11 +104,11 @@ ready(() => {
     ENV.PERMISSIONS.can_view_user_generated_access_tokens
   ) {
     const accessTokensContainer = document.getElementById('user_access_tokens_react_mount_point')
-    const accessTokensRoot = createRoot(accessTokensContainer)
-    accessTokensRoot.render(
+    render(
       <QueryClientProvider client={queryClient}>
         <AccessTokensSection userId={ENV.USER_ID} />
       </QueryClientProvider>,
+      accessTokensContainer,
     )
   }
 })

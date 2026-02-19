@@ -33,25 +33,25 @@ module Accessibility
         Accessibility::Forms::RadioInputGroupField.new(
           label: I18n.t("How would you like to proceed?"),
           undo_text: I18n.t("Reformatted"),
-          value: I18n.t("Change it to Heading 2"),
+          value: I18n.t("Change heading level to Heading 2"),
           action: I18n.t("Reformat"),
           options: [
-            I18n.t("Change it to Heading 2"),
-            I18n.t("Turn into paragraph")
+            I18n.t("Change heading level to Heading 2"),
+            I18n.t("Turn into a paragraph")
           ]
         )
       end
 
       def fix!(elem, value)
         case value
-        when I18n.t("Change it to Heading 2")
+        when I18n.t("Change heading level to Heading 2")
           elem.name = "h2"
-        when I18n.t("Turn into paragraph")
+        when I18n.t("Turn into a paragraph")
           elem.name = "p"
         else
           raise ArgumentError, "Invalid value for form: #{value}"
         end
-        elem
+        { changed: elem }
       end
 
       def display_name

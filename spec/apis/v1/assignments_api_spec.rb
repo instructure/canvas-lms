@@ -3704,6 +3704,68 @@ describe AssignmentsApiController, type: :request do
           expect(overrides_after.first.id).to eq(section_override_id)
           expect(overrides_after.first.due_at.to_i).to eq(new_section_due_date.to_i)
         end
+
+        it "creates peer review override during initial assignment creation (regression test)" do
+          # Regression test for bug where peer review overrides failed during initial
+          # assignment creation because parent assignment overrides association was stale
+          section_due_date = 1.week.from_now
+          peer_review_due_date = 2.weeks.from_now
+
+          post "/api/v1/courses/#{@course.id}/assignments",
+               params: {
+                 assignment: {
+                   name: "Regression Test Assignment",
+                   points_possible: 100,
+                   peer_reviews: true,
+                   assignment_overrides: [
+                     {
+                       course_section_id: @section1.id,
+                       due_at: section_due_date.iso8601
+                     }
+                   ],
+                   peer_review: {
+                     points_possible: 10,
+                     peer_review_overrides: [
+                       {
+                         course_section_id: @section1.id,
+                         due_at: peer_review_due_date.iso8601
+                       }
+                     ]
+                   }
+                 }
+               }.to_json,
+               headers: {
+                 "CONTENT_TYPE" => "application/json",
+                 "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@teacher)}"
+               }
+
+          expect(response).to be_successful
+          assignment = Assignment.where(title: "Regression Test Assignment").first
+          expect(assignment).to be_present
+          expect(assignment.peer_reviews).to be true
+
+          parent_overrides = assignment.assignment_overrides.active
+          expect(parent_overrides.count).to eq(1)
+          parent_override = parent_overrides.first
+          expect(parent_override.set_type).to eq("CourseSection")
+          expect(parent_override.set_id).to eq(@section1.id)
+          expect(parent_override.due_at.to_i).to eq(section_due_date.to_i)
+
+          peer_review_sub = assignment.peer_review_sub_assignment
+          expect(peer_review_sub).to be_present
+          expect(peer_review_sub.points_possible).to eq(10)
+
+          # Verify peer review override was created successfully (this was failing before the fix)
+          peer_overrides = peer_review_sub.assignment_overrides.active
+          expect(peer_overrides.count).to eq(1)
+          peer_override = peer_overrides.first
+          expect(peer_override.set_type).to eq("CourseSection")
+          expect(peer_override.set_id).to eq(@section1.id)
+          expect(peer_override.due_at.to_i).to eq(peer_review_due_date.to_i)
+
+          expect(peer_override.parent_override).to be_present
+          expect(peer_override.parent_override.id).to eq(parent_override.id)
+        end
       end
     end
 
@@ -10952,6 +11014,103 @@ describe AssignmentsApiController, type: :request do
 
       it "returns forbidden for students" do
         accessibility_scan_request(@student, @assignment.id.to_s, expected_status: 403)
+      end
+    end
+  end
+
+  describe "POST accessibility_queue_scan" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @student = student_in_course(active_all: true).user
+      @assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        description: "<h1>Title</h1><p>Content</p>"
+      )
+    end
+
+    def accessibility_queue_scan_request(user, assignment_id, expected_status: 200)
+      url = "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/accessibility/queue_scan"
+      path = {
+        controller: "assignments_api",
+        action: "accessibility_queue_scan",
+        format: "json",
+        course_id: @course.id.to_s,
+        assignment_id:
+      }
+      api_call_as_user(user, :post, url, path, {}, {}, { expected_status: })
+    end
+
+    context "when a11y_checker feature is enabled" do
+      before do
+        @course.account.enable_feature!(:a11y_checker)
+        @course.enable_feature!(:a11y_checker_eap)
+      end
+
+      it "requires manage course content permissions" do
+        accessibility_queue_scan_request(@student, @assignment.id.to_s, expected_status: 403)
+      end
+
+      it "queues an asynchronous accessibility scan and returns scan object with queued state" do
+        json = accessibility_queue_scan_request(@teacher, @assignment.id.to_s)
+
+        expect(json["id"]).to be_present
+        expect(json["resource_id"]).to eq(@assignment.id)
+        expect(json["resource_type"]).to eq("Assignment")
+        expect(json["resource_name"]).to eq("Test Assignment")
+        expect(json["workflow_state"]).to eq("queued")
+      end
+
+      it "returns 404 for non-existent assignment" do
+        accessibility_queue_scan_request(@teacher, "999999", expected_status: 404)
+      end
+
+      it "calls ResourceScannerService with the assignment using async call method" do
+        service = Accessibility::ResourceScannerService.new(resource: @assignment)
+
+        expect(Accessibility::ResourceScannerService).to receive(:new)
+          .with(resource: @assignment)
+          .and_return(service)
+        # Stub delay to prevent actual job queueing but allow scan creation
+        expect(service).to receive(:delay).and_return(service)
+        expect(service).to receive(:scan_resource)
+
+        accessibility_queue_scan_request(@teacher, @assignment.id.to_s)
+      end
+
+      it "does not queue duplicate scans if one is already queued" do
+        # Create an existing queued scan
+        existing_scan = AccessibilityResourceScan.create!(
+          context: @assignment,
+          course_id: @course.id,
+          workflow_state: "queued",
+          resource_name: @assignment.title,
+          resource_workflow_state: "published",
+          resource_updated_at: @assignment.updated_at
+        )
+
+        # Should not create a new delayed job
+        expect(Delayed::Job).not_to receive(:enqueue)
+
+        json = accessibility_queue_scan_request(@teacher, @assignment.id.to_s)
+
+        # Should return the existing scan
+        expect(json["id"]).to eq(existing_scan.id)
+        expect(json["workflow_state"]).to eq("queued")
+      end
+    end
+
+    context "when a11y_checker feature is disabled" do
+      before do
+        @course.account.disable_feature!(:a11y_checker)
+        @course.disable_feature!(:a11y_checker_eap)
+      end
+
+      it "returns forbidden even for teachers" do
+        accessibility_queue_scan_request(@teacher, @assignment.id.to_s, expected_status: 403)
+      end
+
+      it "returns forbidden for students" do
+        accessibility_queue_scan_request(@student, @assignment.id.to_s, expected_status: 403)
       end
     end
   end

@@ -275,6 +275,7 @@ describe('EditView - Quiz Type Handling', () => {
   describe('handleQuizTypeChange', () => {
     beforeEach(() => {
       // Setup additional DOM elements for tests
+      $('#assignment_group_selector').css('display', 'block')
       $('#fixtures').append(`
         <div id="graded_assignment_fields" style="display: block;">
           <div id="omit-from-final-grade" style="display: block;">
@@ -286,6 +287,7 @@ describe('EditView - Quiz Type Handling', () => {
         </div>
       `)
       // Re-cache the elements in the view
+      view.$assignmentGroupSelector = $('#assignment_group_selector')
       view.$gradedAssignmentFields = $('#graded_assignment_fields')
     })
 
@@ -338,6 +340,24 @@ describe('EditView - Quiz Type Handling', () => {
       expect($gradedFields.css('display')).not.toBe('none')
       view.handleQuizTypeChange('graded_survey')
       expect($gradedFields.css('display')).toBe('none')
+    })
+
+    test('shows assignment group selector when graded_survey is selected', () => {
+      const $assignmentGroupSelector = $('#assignment_group_selector')
+
+      view.handleQuizTypeChange('ungraded_survey')
+      expect($assignmentGroupSelector.css('display')).toBe('none')
+
+      view.handleQuizTypeChange('graded_survey')
+      expect($assignmentGroupSelector.css('display')).not.toBe('none')
+    })
+
+    test('hides assignment group selector when ungraded_survey is selected', () => {
+      const $assignmentGroupSelector = $('#assignment_group_selector')
+
+      expect($assignmentGroupSelector.css('display')).not.toBe('none')
+      view.handleQuizTypeChange('ungraded_survey')
+      expect($assignmentGroupSelector.css('display')).toBe('none')
     })
 
     test('shows graded assignment fields when graded_quiz is selected', () => {

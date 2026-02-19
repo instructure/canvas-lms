@@ -126,8 +126,8 @@ export function cellMapForSubmission(
 ): Cell {
   if (
     !assignment.published ||
-    // Anonymized assignments should hide grades unless the assignment is a NQ with anonymous participants
-    (assignment.anonymize_students && !assignment.new_quizzes_anonymous_participants)
+    assignment.anonymize_students ||
+    assignment.new_quizzes_anonymous_participants
   ) {
     return {locked: true, hideGrade: true}
   } else if (assignment.moderated_grading && !assignment.grades_published) {

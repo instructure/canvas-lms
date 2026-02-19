@@ -182,4 +182,57 @@ describe ConversationsHelper do
       end
     end
   end
+
+  describe "validate_context" do
+    before do
+      @current_user = user_teacher
+    end
+
+    context "when recipients belong to the course context" do
+      it "does not raise error" do
+        expect { validate_context(course, [user_student]) }.not_to raise_error
+      end
+    end
+
+    context "when recipients do not belong to the course context" do
+      let(:other_course) { course_factory(account:, active_all: true) }
+      let(:other_student) { other_course.enroll_student(user_factory, enrollment_state: "active").user }
+
+      it "raises InvalidRecipientsError" do
+        expect { validate_context(course, [other_student]) }.to raise_error(ConversationsHelper::InvalidRecipientsError)
+      end
+
+      it "raises InvalidRecipientsError when mixing valid and invalid recipients" do
+        expect { validate_context(course, [user_student, other_student]) }.to raise_error(ConversationsHelper::InvalidRecipientsError)
+      end
+    end
+
+    context "when context is not a course" do
+      it "does not validate recipients for group context" do
+        group = course.groups.create!(name: "Test Group")
+        other_course = course_factory(account:, active_all: true)
+        other_student = other_course.enroll_student(user_factory, enrollment_state: "active").user
+        expect { validate_context(group, [other_student]) }.not_to raise_error
+      end
+    end
+
+    context "cross-shard recipients" do
+      specs_require_sharding
+
+      it "correctly validates recipients from different shards enrolled in course" do
+        @shard1.activate do
+          student_on_shard1 = user_factory
+          course.enroll_student(student_on_shard1, enrollment_state: "active")
+          expect { validate_context(course, [student_on_shard1]) }.not_to raise_error
+        end
+      end
+
+      it "rejects recipients from different shard not enrolled in course" do
+        @shard1.activate do
+          student_on_shard1 = user_factory
+          expect { validate_context(course, [student_on_shard1]) }.to raise_error(ConversationsHelper::InvalidRecipientsError)
+        end
+      end
+    end
+  end
 end

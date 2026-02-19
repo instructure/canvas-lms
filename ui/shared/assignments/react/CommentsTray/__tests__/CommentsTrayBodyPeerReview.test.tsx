@@ -453,5 +453,62 @@ describe('CommentsTrayBody - peer review mode enabled', () => {
 
       expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
     })
+
+    it('does not display alert when suppressSuccessAlert is true using assessmentRequestsForCurrentUser', async () => {
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [{_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'test comment'}],
+        },
+      }
+      const comments = await mockComments(overrides)
+      const props = await getPropsWithAssessmentRequests('completed')
+      props.submission.gradeHidden = true
+      const commentProps = {...props, comments, suppressSuccessAlert: true}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('suppressSuccessAlert prop', () => {
+    it('does not display an alert when suppressSuccessAlert is true and peer review is completed', async () => {
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [
+            {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: 'first comment'},
+            {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'last comment'},
+            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', htmlComment: 'middle comment'},
+          ],
+        },
+      }
+      const comments = await mockComments(overrides)
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.submission.gradeHidden = true
+      props.isPeerReviewEnabled = true
+      const commentProps = {...props, comments, suppressSuccessAlert: true}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+
+    it('displays an alert when suppressSuccessAlert is false and peer review is completed', async () => {
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [
+            {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: 'first comment'},
+            {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'last comment'},
+            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', htmlComment: 'middle comment'},
+          ],
+        },
+      }
+      const comments = await mockComments(overrides)
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.submission.gradeHidden = true
+      props.isPeerReviewEnabled = true
+      const commentProps = {...props, comments, suppressSuccessAlert: false}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
+
+      expect(queryByText('Your peer review is complete!')).toBeInTheDocument()
+    })
   })
 })

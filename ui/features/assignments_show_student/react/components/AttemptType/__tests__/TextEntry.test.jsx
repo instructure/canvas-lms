@@ -206,6 +206,28 @@ describe('TextEntry', () => {
           expect(queryByTestId('text-editor')).not.toBeInTheDocument()
         })
 
+        it('applies CSS containment to read-only content to prevent overlay attacks', async () => {
+          const props = await makeProps({
+            readOnly: true,
+            submission: {
+              id: '1',
+              _id: '1',
+              body: '<div style="position: fixed; z-index: 9999;">overlay</div>',
+              state: 'submitted',
+            },
+          })
+          const {queryByTestId} = await renderEditor(props)
+          const container = queryByTestId('read-only-content')
+          expect(container).toBeInTheDocument()
+          expect(container).toHaveStyle({
+            contain: 'layout',
+            position: 'relative',
+            overflow: 'auto',
+            minHeight: '400px',
+            width: '100%',
+          })
+        })
+
         it('renders the content in the rce component when readOnly is false', async () => {
           const props = await makeProps({
             readOnly: false,

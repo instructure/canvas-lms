@@ -31,6 +31,7 @@ class RubricAssessmentCSVImporter
   def parse
     assessment_by_student = Hash.new { |hash, key| hash[key] = [] }
     criteria_assessment_indices = {}
+    @criteria_ratings_lookup = build_criteria_ratings_lookup if @rubric_association.hide_points
 
     csv_stream do |row|
       criteria_assessment_indices = parse_assessment_headers(row) if criteria_assessment_indices.empty?
@@ -38,6 +39,14 @@ class RubricAssessmentCSVImporter
     end
 
     assessment_by_student
+  end
+
+  def build_criteria_ratings_lookup
+    @rubric.criteria.each_with_object({}) do |criterion, hash|
+      hash[criterion[:id]] = criterion[:ratings]&.each_with_object({}) do |rating, ratings_hash|
+        ratings_hash[rating[:description]] = rating[:points]
+      end || {}
+    end
   end
 
   def parse_assessment_headers(row)
@@ -64,20 +73,27 @@ class RubricAssessmentCSVImporter
     criteria_assessment_indices.each.filter_map do |_, criteria_indices|
       next if criteria_indices[:id].nil?
 
-      assesment_hash = {
+      assessment_hash = {
         id: criteria_indices[:id],
         comments: row[criteria_indices["Comments"]]
       }
 
-      unless @rubric_association.hide_points
-        assesment_hash[:points] = row[criteria_indices["Points"]]
+      rating_description = row[criteria_indices["Rating"]]
+
+      if @rubric_association.hide_points && @criteria_ratings_lookup
+        # When points are hidden, use hash lookup to find the rating points by description
+        if rating_description && @criteria_ratings_lookup[criteria_indices[:id]]
+          assessment_hash[:points] = @criteria_ratings_lookup[criteria_indices[:id]][rating_description]
+        end
+      else
+        assessment_hash[:points] = row[criteria_indices["Points"]]
       end
 
       unless @rubric.free_form_criterion_comments
-        assesment_hash[:rating] = row[criteria_indices["Rating"]]
+        assessment_hash[:rating] = rating_description
       end
 
-      assesment_hash
+      assessment_hash
     end
   end
 

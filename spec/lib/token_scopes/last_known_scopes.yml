@@ -49,6 +49,8 @@
   path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
 - verb: POST
   path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations/migrate_all'
 - verb: GET
   path: '/api/v1/accounts/:account_id/authentication_providers'
 - verb: POST
@@ -656,6 +658,8 @@
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments'
 - verb: POST
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/accessibility/queue_scan'
+- verb: POST
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/accessibility/scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/allocate'
@@ -943,6 +947,8 @@
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/accessibility/scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/duplicate'
 - verb: GET
@@ -1311,6 +1317,8 @@
   path: '/api/v1/courses/:course_id/pages/:url_or_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/pages/:url_or_id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/pages/:url_or_id/accessibility/queue_scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/pages/:url_or_id/accessibility/scan'
 - verb: GET
@@ -1770,6 +1778,8 @@
 - verb: PUT
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id'
 - verb: POST
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/accessibility/scan'
+- verb: POST
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/duplicate'
 - verb: GET
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/entries'
@@ -2075,6 +2085,12 @@
   path: '/api/v1/progress/:id'
 - verb: POST
   path: '/api/v1/progress/:id/cancel'
+- verb: GET
+  path: '/api/v1/question_banks'
+- verb: GET
+  path: '/api/v1/question_banks/:id'
+- verb: GET
+  path: '/api/v1/question_banks/:id/questions'
 - verb: GET
   path: '/api/v1/quiz_submissions/:quiz_submission_id/questions'
 - verb: POST

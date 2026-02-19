@@ -46,4 +46,10 @@ body.is-masquerading-or-student-view {
     // don't obstruct the "border" of the student view
     #{direction(right)}: 3px;
   }
+
+  // Ensure rubric assignment search tray footer buttons are not hidden behind masquerade bar
+  // by allowing the content to scroll down far enough to show the button above the bar
+  #rubric-search-footer-container {
+    height: calc(#{$rubric-builder-footer-height} + #{$student-view-banner-height});
+  }
 }

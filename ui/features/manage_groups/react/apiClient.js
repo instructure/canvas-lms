@@ -16,12 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from '@canvas/axios'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export function createImport(groupCategoryId, file) {
   const data = new FormData()
   // xsslint safeString.identifier file
   data.append('attachment', file)
-  const url = `/api/v1/group_categories/${groupCategoryId}/import`
-  return axios.post(url, data)
+  return doFetchApi({
+    path: `/api/v1/group_categories/${groupCategoryId}/import`,
+    method: 'POST',
+    body: data,
+  })
 }

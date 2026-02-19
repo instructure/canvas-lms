@@ -27,6 +27,12 @@ import {IconInfoLine, IconArrowOpenDownLine, IconArrowOpenEndLine} from '@instru
 import {Tooltip} from '@instructure/ui-tooltip'
 import type {Outcome, SortColumn} from './types'
 import MasteryBadge from './MasteryBadge'
+import OutcomesTableRowExpansion from './OutcomesTableRowExpansion'
+import {
+  useContributingScores,
+  type ContributingScoresManager,
+} from '@canvas/outcomes/react/hooks/useContributingScores'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const I18n = createI18nScope('outcome_management')
 
@@ -71,9 +77,17 @@ interface OutcomesTableRowProps {
   outcome: Outcome
   isExpanded: boolean
   onToggleRowExpansion: (id: number | string) => void
+  studentId: string
+  contributingScores: ContributingScoresManager
 }
 
-const OutcomesTableRow = ({outcome, isExpanded, onToggleRowExpansion}: OutcomesTableRowProps) => {
+const OutcomesTableRow = ({
+  outcome,
+  isExpanded,
+  onToggleRowExpansion,
+  studentId,
+  contributingScores,
+}: OutcomesTableRowProps) => {
   const {
     id,
     code,
@@ -155,9 +169,11 @@ const OutcomesTableRow = ({outcome, isExpanded, onToggleRowExpansion}: OutcomesT
       {isExpanded && (
         <Table.Row>
           <Table.Cell colSpan={3}>
-            <View as="div" padding="small 0">
-              <Text>{description}</Text>
-            </View>
+            <OutcomesTableRowExpansion
+              outcomeId={id}
+              studentId={studentId}
+              contributingScores={contributingScores}
+            />
           </Table.Cell>
         </Table.Row>
       )}
@@ -167,12 +183,21 @@ const OutcomesTableRow = ({outcome, isExpanded, onToggleRowExpansion}: OutcomesT
 
 interface StudentOutcomesTableProps {
   outcomes: Outcome[]
+  studentId: string
 }
 
-const StudentOutcomesTable = ({outcomes = []}: StudentOutcomesTableProps) => {
+const StudentOutcomesTable = ({outcomes = [], studentId}: StudentOutcomesTableProps) => {
+  const {contextId} = useCanvasContext()
   const [expandedRows, setExpandedRows] = useState<Set<number | string>>(new Set())
   const [sortColumn, setSortColumn] = useState<SortColumn>('code')
   const [sortDirection, setSortDirection] = useState<'ascending' | 'descending'>('ascending')
+
+  const {contributingScores} = useContributingScores({
+    courseId: contextId,
+    studentIds: [studentId],
+    outcomeIds: outcomes.map(o => o.id),
+    enabled: true,
+  })
 
   const toggleRowExpansion = (id: number | string) => {
     setExpandedRows(prev => {
@@ -246,6 +271,8 @@ const StudentOutcomesTable = ({outcomes = []}: StudentOutcomesTableProps) => {
                 outcome={outcome}
                 isExpanded={isExpanded}
                 onToggleRowExpansion={toggleRowExpansion}
+                studentId={studentId}
+                contributingScores={contributingScores}
               />
             )
           })}

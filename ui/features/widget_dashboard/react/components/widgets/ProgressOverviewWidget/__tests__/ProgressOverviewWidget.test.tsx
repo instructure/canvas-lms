@@ -44,48 +44,51 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
 
 const mockProgressData = [
   {
-    course: {
-      _id: '1',
-      name: 'Environmental Science',
-      courseCode: 'ENVS150',
-      submissionStatistics: {
-        submittedAndGradedCount: 8,
-        submittedNotGradedCount: 2,
-        missingSubmissionsCount: 1,
-        submissionsDueCount: 3,
-      },
+    _id: '1',
+    name: 'Environmental Science',
+    courseCode: 'ENVS150',
+    submissionStatistics: {
+      submittedAndGradedCount: 8,
+      submittedNotGradedCount: 2,
+      missingSubmissionsCount: 1,
+      submissionsDueCount: 3,
     },
   },
   {
-    course: {
-      _id: '2',
-      name: 'Calculus II',
-      courseCode: 'MATH201',
-      submissionStatistics: {
-        submittedAndGradedCount: 5,
-        submittedNotGradedCount: 1,
-        missingSubmissionsCount: 2,
-        submissionsDueCount: 4,
-      },
+    _id: '2',
+    name: 'Calculus II',
+    courseCode: 'MATH201',
+    submissionStatistics: {
+      submittedAndGradedCount: 5,
+      submittedNotGradedCount: 1,
+      missingSubmissionsCount: 2,
+      submissionsDueCount: 4,
     },
+  },
+]
+
+const mockSharedCourseData = [
+  {
+    courseId: '1',
+    courseCode: 'ENVS150',
+    courseName: 'Environmental Science',
+    currentGrade: 85,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: '2025-01-01T00:00:00Z',
+  },
+  {
+    courseId: '2',
+    courseCode: 'MATH201',
+    courseName: 'Calculus II',
+    currentGrade: 90,
+    gradingScheme: 'percentage' as const,
+    lastUpdated: '2025-01-02T00:00:00Z',
   },
 ]
 
 const mockGqlResponse = {
   data: {
-    legacyNode: {
-      _id: '123',
-      enrollmentsConnection: {
-        nodes: mockProgressData,
-        pageInfo: {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          startCursor: null,
-          endCursor: null,
-          totalCount: 2,
-        },
-      },
-    },
+    courses: mockProgressData,
   },
 }
 
@@ -108,7 +111,7 @@ const setup = (props: Partial<BaseWidgetProps> = {}, dashboardProps = {}) => {
 
   const result = render(
     <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider {...dashboardProps}>
+      <WidgetDashboardProvider sharedCourseData={mockSharedCourseData} {...dashboardProps}>
         <WidgetDashboardEditProvider>
           <WidgetLayoutProvider>
             <ProgressOverviewWidget {...defaultProps} />
@@ -128,7 +131,7 @@ const setup = (props: Partial<BaseWidgetProps> = {}, dashboardProps = {}) => {
 }
 
 const server = setupServer(
-  graphql.query('GetUserProgressOverview', () => {
+  graphql.query('GetProgressOverview', () => {
     return HttpResponse.json(mockGqlResponse)
   }),
 )
@@ -183,28 +186,16 @@ describe('ProgressOverviewWidget', () => {
 
   it('displays no courses message when empty', async () => {
     server.use(
-      graphql.query('GetUserProgressOverview', () => {
+      graphql.query('GetProgressOverview', () => {
         return HttpResponse.json({
           data: {
-            legacyNode: {
-              _id: '123',
-              enrollmentsConnection: {
-                nodes: [],
-                pageInfo: {
-                  hasNextPage: false,
-                  hasPreviousPage: false,
-                  startCursor: null,
-                  endCursor: null,
-                  totalCount: 0,
-                },
-              },
-            },
+            courses: [],
           },
         })
       }),
     )
 
-    const {cleanup} = setup()
+    const {cleanup} = setup({}, {sharedCourseData: []})
 
     await waitFor(() => {
       expect(screen.getByTestId('no-courses-message')).toBeInTheDocument()
@@ -216,7 +207,7 @@ describe('ProgressOverviewWidget', () => {
 
   it('displays error message on failure', async () => {
     server.use(
-      graphql.query('GetUserProgressOverview', () => {
+      graphql.query('GetProgressOverview', () => {
         return HttpResponse.json({errors: [{message: 'Failed to fetch'}]}, {status: 500})
       }),
     )
@@ -248,32 +239,18 @@ describe('ProgressOverviewWidget', () => {
 
   it('filters out courses with null submissionStatistics', async () => {
     server.use(
-      graphql.query('GetUserProgressOverview', () => {
+      graphql.query('GetProgressOverview', () => {
         return HttpResponse.json({
           data: {
-            legacyNode: {
-              _id: '123',
-              enrollmentsConnection: {
-                nodes: [
-                  mockProgressData[0],
-                  {
-                    course: {
-                      _id: '3',
-                      name: 'Course Without Stats',
-                      courseCode: 'TEST303',
-                      submissionStatistics: null,
-                    },
-                  },
-                ],
-                pageInfo: {
-                  hasNextPage: false,
-                  hasPreviousPage: false,
-                  startCursor: null,
-                  endCursor: null,
-                  totalCount: 1,
-                },
+            courses: [
+              mockProgressData[0],
+              {
+                _id: '3',
+                name: 'Course Without Stats',
+                courseCode: 'TEST303',
+                submissionStatistics: null,
               },
-            },
+            ],
           },
         })
       }),
@@ -294,7 +271,7 @@ describe('ProgressOverviewWidget', () => {
     const observedUserId = '456'
 
     server.use(
-      graphql.query('GetUserProgressOverview', ({variables}) => {
+      graphql.query('GetProgressOverview', ({variables}) => {
         expect(variables.observedUserId).toBe(observedUserId)
         return HttpResponse.json(mockGqlResponse)
       }),
@@ -322,31 +299,39 @@ describe('ProgressOverviewWidget', () => {
   })
 
   it('shows pagination when more than one page', async () => {
-    const mockDataWithPagination = {
-      data: {
-        legacyNode: {
-          _id: '123',
-          enrollmentsConnection: {
-            nodes: mockProgressData,
-            pageInfo: {
-              hasNextPage: true,
-              hasPreviousPage: false,
-              startCursor: null,
-              endCursor: 'cursor1',
-              totalCount: 10,
-            },
-          },
-        },
+    // Create 10 courses to have multiple pages (page size is 5)
+    const tenCourses = Array.from({length: 10}, (_, i) => ({
+      _id: `${i + 1}`,
+      name: `Course ${i + 1}`,
+      courseCode: `C${i + 1}`,
+      submissionStatistics: {
+        submittedAndGradedCount: 5,
+        submittedNotGradedCount: 2,
+        missingSubmissionsCount: 1,
+        submissionsDueCount: 3,
       },
-    }
+    }))
+
+    const tenSharedCourses = Array.from({length: 10}, (_, i) => ({
+      courseId: `${i + 1}`,
+      courseCode: `C${i + 1}`,
+      courseName: `Course ${i + 1}`,
+      currentGrade: 85,
+      gradingScheme: 'percentage' as const,
+      lastUpdated: '2025-01-01T00:00:00Z',
+    }))
 
     server.use(
-      graphql.query('GetUserProgressOverview', () => {
-        return HttpResponse.json(mockDataWithPagination)
+      graphql.query('GetProgressOverview', () => {
+        return HttpResponse.json({
+          data: {
+            courses: tenCourses,
+          },
+        })
       }),
     )
 
-    const {cleanup} = setup()
+    const {cleanup} = setup({}, {sharedCourseData: tenSharedCourses})
 
     await waitFor(() => {
       expect(screen.getByTestId('pagination-container')).toBeInTheDocument()
@@ -356,57 +341,55 @@ describe('ProgressOverviewWidget', () => {
   })
 
   it('handles pagination navigation', async () => {
-    const page1Data = {
-      data: {
-        legacyNode: {
-          _id: '123',
-          enrollmentsConnection: {
-            nodes: [mockProgressData[0]],
-            pageInfo: {
-              hasNextPage: true,
-              hasPreviousPage: false,
-              startCursor: null,
-              endCursor: 'cursor1',
-              totalCount: 6,
-            },
-          },
-        },
+    // Create 10 courses for pagination (page size is 5, so 2 pages)
+    const tenCourses = Array.from({length: 10}, (_, i) => ({
+      _id: `${i + 1}`,
+      name: `Course ${i + 1}`,
+      courseCode: `C${i + 1}`,
+      submissionStatistics: {
+        submittedAndGradedCount: 5,
+        submittedNotGradedCount: 2,
+        missingSubmissionsCount: 1,
+        submissionsDueCount: 3,
       },
-    }
+    }))
 
-    const page2Data = {
-      data: {
-        legacyNode: {
-          _id: '123',
-          enrollmentsConnection: {
-            nodes: [mockProgressData[1]],
-            pageInfo: {
-              hasNextPage: false,
-              hasPreviousPage: true,
-              startCursor: 'cursor1',
-              endCursor: null,
-              totalCount: 6,
-            },
-          },
-        },
-      },
-    }
+    const tenSharedCourses = Array.from({length: 10}, (_, i) => ({
+      courseId: `${i + 1}`,
+      courseCode: `C${i + 1}`,
+      courseName: `Course ${i + 1}`,
+      currentGrade: 85,
+      gradingScheme: 'percentage' as const,
+      lastUpdated: '2025-01-01T00:00:00Z',
+    }))
 
-    let requestCount = 0
     server.use(
-      graphql.query('GetUserProgressOverview', ({variables}) => {
-        requestCount++
-        if (variables.after) {
-          return HttpResponse.json(page2Data)
-        }
-        return HttpResponse.json(page1Data)
+      graphql.query('GetProgressOverview', () => {
+        return HttpResponse.json({
+          data: {
+            courses: tenCourses,
+          },
+        })
       }),
     )
 
-    const {cleanup} = setup()
+    const {cleanup} = setup({}, {sharedCourseData: tenSharedCourses})
 
     await waitFor(() => {
       expect(screen.getByTestId('course-progress-item-1')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-progress-item-1')).toBeInTheDocument()
+    expect(screen.queryByTestId('course-progress-item-6')).not.toBeInTheDocument()
+
+    cleanup()
+  })
+
+  it('renders progress legend', async () => {
+    const {cleanup} = setup()
+
+    await waitFor(() => {
+      expect(screen.getByTestId('progress-legend')).toBeInTheDocument()
     })
 
     cleanup()

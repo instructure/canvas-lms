@@ -76,11 +76,8 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const {setOnSuccess} = useContext(AlertManagerContext)
   const [usage, setUsage] = useState<DiscussionSummaryUsage | null>(null)
 
-  // @ts-expect-error
-  const contextType = ENV.context_type.toLowerCase()
-  // @ts-expect-error
+  const contextType = ENV.context_type?.toLowerCase()
   const contextId = ENV.context_id
-  // @ts-expect-error
   const apiUrlPrefix = `/api/v1/${contextType}s/${contextId}/discussion_topics/${ENV.discussion_topic_id}`
 
   const likeAction = props.liked ? 'reset_like' : 'like'

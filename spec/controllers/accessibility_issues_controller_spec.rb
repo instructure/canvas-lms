@@ -232,7 +232,7 @@ describe AccessibilityIssuesController do
                     course_id: course.id,
                     id: issue.id,
                     workflow_state: "resolved",
-                    value: "Change it to Heading 2"
+                    value: "Change heading level to Heading 2"
                   },
                   format: :json
           end

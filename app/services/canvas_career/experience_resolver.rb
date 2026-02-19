@@ -224,14 +224,16 @@ module CanvasCareer
 
       @_has_career_account_users = begin
         career_account_ids = @domain_root_account.settings[:horizon_account_ids]
-        return false if career_account_ids.blank? || account_user_account_ids.blank?
-
+        if career_account_ids.blank? || account_user_account_ids.blank?
+          false
         # Check if any directly-set account users are career accounts (optimization to avoid account chain query)
-        return true if account_user_account_ids.intersect?(career_account_ids)
-
-        # Check if any of those accounts' ancestors are career accounts (load the account chain for each
-        # account user and see if any of those are career accounts)
-        account_user_account_chain_ids.values.flatten.intersect?(career_account_ids)
+        elsif account_user_account_ids.intersect?(career_account_ids)
+          true
+        else
+          # Check if any of those accounts' ancestors are career accounts (load the account chain for each
+          # account user and see if any of those are career accounts)
+          account_user_account_chain_ids.values.flatten.intersect?(career_account_ids)
+        end
       end
     end
 
@@ -240,15 +242,17 @@ module CanvasCareer
 
       @_has_academic_account_users = begin
         career_account_ids = @domain_root_account.settings[:horizon_account_ids]
-        return false if account_user_account_ids.blank?
-
-        # Short-circuit if none of their account users are possibly on a career account
-        return true if career_account_ids.blank?
-
-        # For each account user, check if its part of a career account (load the account chain for each account
-        # user - if any chain does not intersect with the career accounts, then it is an academic account)
-        account_user_account_ids.any? do |account_id|
-          !account_user_account_chain_ids[account_id].intersect?(career_account_ids)
+        if account_user_account_ids.blank?
+          false
+        elsif career_account_ids.blank?
+          # Short-circuit if none of their account users are possibly on a career account
+          true
+        else
+          # For each account user, check if its part of a career account (load the account chain for each account
+          # user - if any chain does not intersect with the career accounts, then it is an academic account)
+          account_user_account_ids.any? do |account_id|
+            !account_user_account_chain_ids[account_id].intersect?(career_account_ids)
+          end
         end
       end
     end

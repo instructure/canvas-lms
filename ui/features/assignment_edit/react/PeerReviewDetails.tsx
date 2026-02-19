@@ -17,6 +17,10 @@
  */
 import React, {useState, useEffect, useRef, useCallback} from 'react'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
+import {
+  useSettingDependency,
+  SETTING_MESSAGES,
+} from '@canvas/assignments/react/hooks/useSettingDependency'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {Checkbox} from '@instructure/ui-checkbox'
 
@@ -261,21 +265,15 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
     }
     validatePeerReviewDetails()
   }
-  useEffect(() => {
-    const handlePeerReviewToggle = (event: MessageEvent) => {
-      if (event.data?.subject === 'ASGMT.togglePeerReviews') {
-        setPeerReviewEnabled(event.data.enabled)
-        if (!event.data.enabled) {
-          setPeerReviewChecked(false)
-        }
-      }
-    }
-    // Listen for peer review toggle messages from EditView
-    window.addEventListener('message', handlePeerReviewToggle as EventListener)
-    return () => {
-      window.removeEventListener('message', handlePeerReviewToggle as EventListener)
-    }
-  }, [])
+  useSettingDependency(SETTING_MESSAGES.TOGGLE_PEER_REVIEWS, {
+    onDisabled: () => {
+      setPeerReviewEnabled(false)
+      setPeerReviewChecked(false)
+    },
+    onEnabled: () => {
+      setPeerReviewEnabled(true)
+    },
+  })
   useEffect(() => {
     const handleGroupCategoryChange = () => {
       setIsGroupAssignment(getIsGroupAssignment(assignment))
@@ -311,6 +309,12 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
     <Flex as="div" direction="column" width="100%">
       {/* Hidden inputs to preserve values when Advanced Configuration is collapsed or peer reviews disabled */}
       <Flex.Item>
+        <input
+          type="hidden"
+          id="assignment_peer_reviews_hidden"
+          name="peer_reviews_hidden"
+          value={peerReviewChecked ? 'true' : 'false'}
+        />
         <input
           type="hidden"
           id="peer_reviews_across_sections_checkbox_hidden"

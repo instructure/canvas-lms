@@ -16,19 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {PostMessage} from '../PostMessage'
-import {render, cleanup} from '@testing-library/react'
+import {render, cleanup, waitFor} from '@testing-library/react'
 import {DiscussionManagerUtilityContext, SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
 import {responsiveQuerySizes} from '../../../utils'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {ObserverContext} from '../../../utils/ObserverContext'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 vi.mock('../../../utils')
 
 vi.mock('../../../hooks/useTranslationStore')
 
+vi.mock('@canvas/alerts/react/FlashAlert')
+
 const useTranslationStoreMock = useTranslationStore as unknown as any
 const responsiveQuerySizesMock = responsiveQuerySizes as any
+const flashAlertMock = showFlashAlert as any
 
 const mediaQueryMock = {
   matches: true,
@@ -106,7 +110,7 @@ describe('PostMessage AI translation', () => {
     useTranslationStoreMock.mockImplementation((selector: any) => {
       return selector({...initalMockState})
     })
-    ;(useTranslationStoreMock as any).getState = vi.fn(() => ({...initalMockState}))
+    useTranslationStoreMock.getState = vi.fn(() => ({...initalMockState}))
   })
 
   it('should display loading spinner and text while translation is in progress', async () => {
@@ -520,7 +524,7 @@ describe('PostMessage AI translation', () => {
       useTranslationStoreMock.mockImplementation((selector: any) => {
         return selector(state)
       })
-      ;(useTranslationStoreMock as any).getState = vi.fn(() => state)
+      useTranslationStoreMock.getState = vi.fn(() => state)
 
       const {queryByTestId} = setup(
         {},
@@ -534,6 +538,264 @@ describe('PostMessage AI translation', () => {
       expect(queryByTestId('hide-translation-link')).not.toBeInTheDocument()
     })
   })
+
+  describe('screen reader announcements for single entry translation', () => {
+    beforeEach(() => {
+      ;(showFlashAlert as any).mockClear()
+    })
+
+    it('should announce when single entry translation starts loading', async () => {
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {loading: false},
+          },
+          translateAll: false,
+        }
+        return selector(state)
+      })
+
+      const {rerender} = setup()
+
+      // Simulate translation starting
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {loading: true},
+          },
+          translateAll: false,
+        }
+        return selector(state)
+      })
+
+      rerender(
+        <ObserverContext.Provider
+          value={{
+            observerRef: {current: undefined},
+            nodesRef: {current: new Map()},
+            startObserving: () => {},
+            stopObserving: () => {},
+          }}
+        >
+          <DiscussionManagerUtilityContext.Provider value={{...defaultProviderProps} as any}>
+            <SearchContext.Provider value={{searchTerm: ''} as any}>
+              <PostMessage
+                discussionEntry={{id: '1'}}
+                author={User.mock()}
+                timingDisplay="Jan 1 2000"
+                message="Posts are fun"
+                title="Thoughts"
+              />
+            </SearchContext.Provider>
+          </DiscussionManagerUtilityContext.Provider>
+        </ObserverContext.Provider>,
+      )
+
+      await waitFor(() => {
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'Translating Text',
+          srOnly: true,
+          politeness: 'polite',
+        })
+      })
+    })
+
+    it('should announce when single entry translation completes successfully', async () => {
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {loading: true},
+          },
+          translateAll: false,
+        }
+        return selector(state)
+      })
+
+      const {rerender} = setup()
+
+      flashAlertMock.mockClear()
+
+      // Simulate translation completion
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {
+              loading: false,
+              language: 'en',
+              translatedMessage: 'Translated message',
+            },
+          },
+          translateAll: false,
+        }
+        return selector(state)
+      })
+
+      rerender(
+        <ObserverContext.Provider
+          value={{
+            observerRef: {current: undefined},
+            nodesRef: {current: new Map()},
+            startObserving: () => {},
+            stopObserving: () => {},
+          }}
+        >
+          <DiscussionManagerUtilityContext.Provider value={{...defaultProviderProps} as any}>
+            <SearchContext.Provider value={{searchTerm: ''} as any}>
+              <PostMessage
+                discussionEntry={{id: '1'}}
+                author={User.mock()}
+                timingDisplay="Jan 1 2000"
+                message="Posts are fun"
+                title="Thoughts"
+              />
+            </SearchContext.Provider>
+          </DiscussionManagerUtilityContext.Provider>
+        </ObserverContext.Provider>,
+      )
+
+      await waitFor(() => {
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'Text Translated to English',
+          srOnly: true,
+          politeness: 'polite',
+        })
+      })
+    })
+
+    it('should announce error when single entry translation fails', async () => {
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {loading: true},
+          },
+          translateAll: false,
+        }
+        return selector(state)
+      })
+
+      const {rerender} = setup()
+
+      flashAlertMock.mockClear()
+
+      // Simulate translation error
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {
+              loading: false,
+              error: {type: 'newError', message: 'Translation failed'},
+            },
+          },
+          translateAll: false,
+        }
+        return selector(state)
+      })
+
+      rerender(
+        <ObserverContext.Provider
+          value={{
+            observerRef: {current: undefined},
+            nodesRef: {current: new Map()},
+            startObserving: () => {},
+            stopObserving: () => {},
+          }}
+        >
+          <DiscussionManagerUtilityContext.Provider value={{...defaultProviderProps} as any}>
+            <SearchContext.Provider value={{searchTerm: ''} as any}>
+              <PostMessage
+                discussionEntry={{id: '1'}}
+                author={User.mock()}
+                timingDisplay="Jan 1 2000"
+                message="Posts are fun"
+                title="Thoughts"
+              />
+            </SearchContext.Provider>
+          </DiscussionManagerUtilityContext.Provider>
+        </ObserverContext.Provider>,
+      )
+
+      await waitFor(() => {
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: 'Translation failed',
+          srOnly: true,
+          politeness: 'assertive',
+        })
+      })
+    })
+
+    it('should NOT announce when translateAll is true (handled by DiscussionTranslationModuleContainer)', async () => {
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {loading: false},
+          },
+          translateAll: true, // translateAll is active
+        }
+        return selector(state)
+      })
+      useTranslationStoreMock.getState = vi.fn(() => ({
+        ...initalMockState,
+        translateAll: true,
+      }))
+
+      const {rerender} = setup({}, {enqueueTranslation: vi.fn(), entryTranslatingSet: new Set()})
+      flashAlertMock.mockClear()
+
+      // Simulate translation starting
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            '1': {loading: true},
+          },
+          translateAll: true,
+        }
+        return selector(state)
+      })
+      useTranslationStoreMock.getState = vi.fn(() => ({
+        ...initalMockState,
+        translateAll: true,
+      }))
+
+      rerender(
+        <ObserverContext.Provider
+          value={{
+            observerRef: {current: undefined},
+            nodesRef: {current: new Map()},
+            startObserving: () => {},
+            stopObserving: () => {},
+          }}
+        >
+          <DiscussionManagerUtilityContext.Provider
+            value={{...defaultProviderProps, enqueueTranslation: vi.fn()} as any}
+          >
+            <SearchContext.Provider value={{searchTerm: ''} as any}>
+              <PostMessage
+                discussionEntry={{id: '1'}}
+                author={User.mock()}
+                timingDisplay="Jan 1 2000"
+                message="Posts are fun"
+                title="Thoughts"
+              />
+            </SearchContext.Provider>
+          </DiscussionManagerUtilityContext.Provider>
+        </ObserverContext.Provider>,
+      )
+
+      // Wait a bit to ensure no announcement is made
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Should NOT announce because translateAll is true
+      expect(showFlashAlert).not.toHaveBeenCalled()
+    })
+  })
 })
 
 describe('PostMessage intersection observer registration', () => {
@@ -542,7 +804,7 @@ describe('PostMessage intersection observer registration', () => {
     useTranslationStoreMock.mockImplementation((selector: any) => {
       return selector({...initalMockState})
     })
-    ;(useTranslationStoreMock as any).getState = vi.fn(() => ({...initalMockState}))
+    useTranslationStoreMock.getState = vi.fn(() => ({...initalMockState}))
   })
 
   it('should register the component with the observer during mount', () => {

@@ -22,7 +22,7 @@ import template from '../../jst/index.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import AddPeopleApp from '@canvas/add-people'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -164,8 +164,7 @@ export default class RosterView extends Backbone.View {
   afterRender() {
     const container = this.$el.find('#search_input_container')[0]
     if (container) {
-      this.root = createRoot(container)
-      this.root.render(
+      this.root = render(
         <TextInput
           onChange={e => {
             // Sends events to hidden input to utilize backbone
@@ -185,6 +184,7 @@ export default class RosterView extends Backbone.View {
           }
           renderBeforeInput={() => <IconSearchLine />}
         />,
+        container,
       )
     }
 
@@ -291,10 +291,7 @@ export default class RosterView extends Backbone.View {
       ENV.permissions.can_manage_differentiation_tags &&
       ENV.permissions.allow_assign_to_differentiation_tags
     ) {
-      if (!this.userDTManager) {
-        this.userDTManager = createRoot(userDTManager)
-      }
-      this.userDTManager.render(
+      const component = (
         <QueryClientProvider client={queryClient}>
           <AlertManager>
             <UserDifferentiationTagManager
@@ -304,8 +301,13 @@ export default class RosterView extends Backbone.View {
               userExceptions={exceptions}
             />
           </AlertManager>
-        </QueryClientProvider>,
+        </QueryClientProvider>
       )
+      if (!this.userDTManager) {
+        this.userDTManager = render(component, userDTManager)
+      } else {
+        rerender(this.userDTManager, component)
+      }
     }
   }
 
@@ -316,10 +318,12 @@ export default class RosterView extends Backbone.View {
       ENV.permissions.can_manage_differentiation_tags &&
       ENV.permissions.allow_assign_to_differentiation_tags
     ) {
+      const component = <PeopleFilter courseId={ENV.course.id} />
       if (!this.peopleFilter) {
-        this.peopleFilter = createRoot(peopleFilter)
+        this.peopleFilter = render(component, peopleFilter)
+      } else {
+        rerender(this.peopleFilter, component)
       }
-      this.peopleFilter.render(<PeopleFilter courseId={ENV.course.id} />)
     }
   }
 

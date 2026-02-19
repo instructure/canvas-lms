@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {findDOMNode} from 'react-dom'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -25,7 +25,7 @@ const I18n = createI18nScope('react_collaborations')
 
 class DeleteConfirmation extends React.Component {
   componentDidMount() {
-    ReactDOM.findDOMNode(this).focus()
+    findDOMNode(this).focus()
   }
 
   render() {

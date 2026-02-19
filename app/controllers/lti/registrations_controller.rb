@@ -1827,7 +1827,7 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @example_request
   #
-  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/configuration/validate' \
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/:id/update_requests/:update_request_id/apply' \
   #        -d '{"overlay": <LtiConfigurationOverlay>, "accepted": boolean}' \
   #        -H "Content-Type: application/json" \
   #        -H "Authorization: Bearer <token>"

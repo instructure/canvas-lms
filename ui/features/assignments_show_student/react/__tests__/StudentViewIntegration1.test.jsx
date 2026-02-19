@@ -30,6 +30,7 @@ import {
   USER_GROUPS_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import {MockedProvider} from '@apollo/client/testing'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import StudentViewQuery from '../components/StudentViewQuery'
@@ -127,9 +128,11 @@ describe('student view integration tests', () => {
     it('renders normally', async () => {
       const mocks = await createGraphqlMocks()
       const {findByTestId} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" submissionID="1" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" submissionID="1" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       await act(async () => {
@@ -142,9 +145,11 @@ describe('student view integration tests', () => {
       const mocks = await createGraphqlMocks()
       mocks[0].error = new Error('aw shucks')
       const {findByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" submissionID="1" />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" submissionID="1" />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       await act(async () => {
@@ -169,11 +174,13 @@ describe('student view integration tests', () => {
       })
 
       const {findByTestId} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
-          <MockedProvider mocks={mocks} cache={createCache()}>
-            <StudentViewQuery assignmentLid="1" submissionID="1" />
-          </MockedProvider>
-        </AlertManagerContext.Provider>,
+        <MockedQueryProvider>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+            <MockedProvider mocks={mocks} cache={createCache()}>
+              <StudentViewQuery assignmentLid="1" submissionID="1" />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        </MockedQueryProvider>,
       )
 
       const fileInput = await findByTestId('input-file-drop')
@@ -204,11 +211,13 @@ describe('student view integration tests', () => {
       })
 
       const {findAllByRole, findByRole, findByTestId} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
-          <MockedProvider mocks={mocks} cache={createCache()}>
-            <StudentViewQuery assignmentLid="1" submissionID="1" />
-          </MockedProvider>
-        </AlertManagerContext.Provider>,
+        <MockedQueryProvider>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+            <MockedProvider mocks={mocks} cache={createCache()}>
+              <StudentViewQuery assignmentLid="1" submissionID="1" />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        </MockedQueryProvider>,
       )
 
       const files = [new File(['foo'], 'test.jpg', {type: 'image/jpg'})]
@@ -238,11 +247,13 @@ describe('student view integration tests', () => {
       })
 
       const {findByTestId, findAllByRole} = render(
-        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
-          <MockedProvider mocks={mocks} cache={createCache()}>
-            <StudentViewQuery assignmentLid="1" submissionID="1" />
-          </MockedProvider>
-        </AlertManagerContext.Provider>,
+        <MockedQueryProvider>
+          <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+            <MockedProvider mocks={mocks} cache={createCache()}>
+              <StudentViewQuery assignmentLid="1" submissionID="1" />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        </MockedQueryProvider>,
       )
 
       const files = [

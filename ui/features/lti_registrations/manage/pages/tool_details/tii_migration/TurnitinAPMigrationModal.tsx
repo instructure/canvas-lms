@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -21,20 +21,22 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-link'
-import {TextInput} from '@instructure/ui-text-input'
-import {Checkbox} from '@instructure/ui-checkbox'
-import {IconAssignmentLine} from '@instructure/ui-icons'
 import {
   useTurnitinMigrationData,
   useMigrationMutation,
+  useMigrateAllMutation,
+  hasEligibleMigrations,
+  isBulkMigrationInProgress,
   type TiiApMigration,
   cancelMigrationQueries,
 } from './TurnitinApMigrationModalState'
+import {MigrationModalStateRenderer} from './MigrationModalStateRenderer'
+import {MigrationInfoAlert} from './MigrationInfoAlert'
+import {MigrationRow} from './MigrationRow'
+import {MigrationEmailNotification} from './MigrationEmailNotification'
 import {validateEmailForNewUser} from '@canvas/add-people/react/helpers'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
@@ -45,158 +47,33 @@ export type TurnitinAPMigrationModalProps = {
   rootAccountId: string
 }
 
-const MigrationStatusDetails = (migration: TiiApMigration) => {
-  const workflowState = migration.migration_progress?.workflow_state || 'ready'
-  const reportUrl = migration.migration_progress?.results?.migration_report_url
-
-  switch (workflowState) {
-    case 'ready':
-      return (
-        <Text size="small" color="secondary">
-          {I18n.t('Migration not started yet')}
-        </Text>
-      )
-    case 'running':
-    case 'queued':
-      return (
-        <Text size="small" color="secondary">
-          {I18n.t('Migration is currently in progress')}
-        </Text>
-      )
-    case 'completed':
-      return (
-        <Text size="small" color="secondary">
-          {I18n.t('Migration completed!')}{' '}
-          {reportUrl && (
-            <Link href={reportUrl} target="_blank" rel="noopener noreferrer" isWithinText={true}>
-              {I18n.t('Download Report')}
-            </Link>
-          )}
-        </Text>
-      )
-    case 'failed':
-      return (
-        <Text size="small" color="secondary">
-          {I18n.t('Migration failed.')}{' '}
-          {reportUrl && (
-            <Link href={reportUrl} target="_blank" rel="noopener noreferrer" isWithinText={true}>
-              {I18n.t('Download Report')}
-            </Link>
-          )}
-        </Text>
-      )
-    default:
-      return workflowState satisfies never
-  }
-}
-
-const MigrationActionButton = ({
-  migration,
-  startMigration,
-  isPending,
-  emailError,
-}: {
-  migration: TiiApMigration
-  startMigration: (subAccountId: string) => void
-  isPending: boolean
-  emailError?: boolean
-}) => {
-  const workflowState = migration.migration_progress?.workflow_state || 'ready'
-
-  switch (workflowState) {
-    case 'running':
-    case 'queued':
-      return (
-        <Button color="primary" interaction="disabled">
-          {I18n.t('Migrating...')}
-        </Button>
-      )
-    case 'failed':
-      return null // TODO we might allow retry in future
-    case 'ready':
-      return (
-        <Button
-          color="primary"
-          interaction={isPending || emailError ? 'disabled' : 'enabled'}
-          onClick={() => startMigration(migration.account_id)}
-        >
-          {I18n.t('Migrate')}
-        </Button>
-      )
-    case 'completed':
-      return null
-    default:
-      return workflowState satisfies never
-  }
-}
-
-/**
- * Individual migration row component
- */
-const MigrationRow = ({
-  migration,
-  startMigration,
-  isPending,
-  emailError,
-}: {
-  migration: TiiApMigration
-  startMigration: (subAccountId: string) => void
-  isPending: boolean
-  emailError?: boolean
-}) => {
-  return (
-    <View
-      key={migration.account_id}
-      as="div"
-      borderWidth="0 0 0 large"
-      padding="none small"
-      borderColor="#C1368F"
-      margin="small none"
-    >
-      <Flex justifyItems="space-between" alignItems="center">
-        <Flex.Item margin="0 small 0 0" as="div">
-          <IconAssignmentLine size="x-small" color="secondary" />
-        </Flex.Item>
-        <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <Flex direction="column" gap="x-small">
-            <View as="div">
-              <Flex gap="x-small" alignItems="center">
-                <Link
-                  href={`/accounts/${migration.account_id}`}
-                  isWithinText={false}
-                  target="_blank"
-                >
-                  {migration.account_name}
-                </Link>
-              </Flex>
-              <MigrationStatusDetails {...migration} />
-            </View>
-          </Flex>
-        </Flex.Item>
-
-        <Flex.Item>
-          <MigrationActionButton
-            migration={migration}
-            startMigration={startMigration}
-            isPending={isPending}
-            emailError={emailError}
-          />
-        </Flex.Item>
-      </Flex>
-    </View>
-  )
-}
-
 export const TurnitinAPMigrationModal = ({
   onClose,
   rootAccountId,
 }: TurnitinAPMigrationModalProps) => {
-  const {data: migrations, isLoading, error} = useTurnitinMigrationData(rootAccountId)
+  const {data, isLoading, error} = useTurnitinMigrationData(rootAccountId)
   const {mutate: startMigrationMutation} = useMigrationMutation(rootAccountId, {
     onError: (_error: Error) => {
       showFlashError(I18n.t('Failed to start migration. Please try again later.'))()
     },
   })
+  const {mutate: startMigrateAllMutation, isPending: isMigrateAllPending} = useMigrateAllMutation(
+    rootAccountId,
+    {
+      onError: (_error: Error) => {
+        showFlashError(I18n.t('Failed to start migration for all accounts. Please try again.'))()
+      },
+    },
+  )
+
+  const migrations = data?.accounts
+  const coordinatorProgress = data?.coordinator_progress
+  const canShowMigrateAll = hasEligibleMigrations(data)
+  const isBulkInProgress = isBulkMigrationInProgress(data)
+  const isCoordinatorInProgress =
+    coordinatorProgress?.workflow_state === 'running' ||
+    coordinatorProgress?.workflow_state === 'queued'
+  const showConsolidatedReport = !!coordinatorProgress?.consolidated_report_url
 
   const [email, setEmail] = React.useState('')
   const [emailNotification, setEmailNotification] = React.useState(false)
@@ -210,7 +87,6 @@ export const TurnitinAPMigrationModal = ({
 
   const handleEmailChange = (_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setEmail(value)
-    // Validate on change
     if (value) {
       const error = validateEmailForNewUser({email: value})
       setEmailError(error || undefined)
@@ -228,6 +104,18 @@ export const TurnitinAPMigrationModal = ({
 
     startMigrationMutation({
       subAccountId,
+      email: emailNotification && email ? email : undefined,
+    })
+  }
+
+  const startMigrateAll = () => {
+    if (emailNotification && !email) {
+      setEmailError(I18n.t('Email address is required for report notification.'))
+      emailInputElement?.focus()
+      return
+    }
+
+    startMigrateAllMutation({
       email: emailNotification && email ? email : undefined,
     })
   }
@@ -252,47 +140,58 @@ export const TurnitinAPMigrationModal = ({
 
       <Modal.Body overflow="scroll">
         {isLoading ? (
-          <View as="div" textAlign="center" padding="large" height="25rem">
-            <Text>{I18n.t('Loading migration data...')}</Text>
-          </View>
+          <MigrationModalStateRenderer state="loading" />
         ) : error ? (
-          <View as="div" textAlign="center" padding="large" height="25rem">
-            <Alert variant="error" margin="0 0 medium 0">
-              {I18n.t('Failed to load migration data. Please try again.')}
-            </Alert>
-          </View>
+          <MigrationModalStateRenderer state="error" />
         ) : !migrations || migrations.length === 0 ? (
-          <View as="div" textAlign="center" padding="large" height="25rem">
-            <Text>{I18n.t('There is nothing to migrate.')}</Text>
-          </View>
+          <MigrationModalStateRenderer state="empty" />
         ) : (
           <Flex direction="column" height="25rem">
             <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="auto" margin="0 0 0 0">
-              <View as="div" margin="0 0 medium 0">
-                <Alert
-                  variant="info"
-                  renderCloseButtonLabel={I18n.t('Close')}
-                  margin="0 0 medium 0"
-                >
-                  <Flex gap="small" direction="column">
-                    <Text>
-                      {I18n.t(
-                        'We are replacing LTI 2.0 (CPF) with LTI 1.3 (Asset/Document Processor). Below are the migrations that need to occur in order to easily start using LTI 1.3 on all of your assignments.',
-                      )}
-                    </Text>
-                    <Text>
-                      {I18n.t(
-                        'Once you click the button to start the migration, reports will not be visible in SpeedGrader until they have been migrated.',
-                      )}
-                    </Text>
-                  </Flex>
-                </Alert>
-              </View>
+              <MigrationInfoAlert />
 
               <View as="div" margin="0 0 medium 0">
-                <Heading level="h3" margin="0 0 small 0">
-                  {I18n.t('Migrations to be Performed:')}
-                </Heading>
+                <Flex gap="medium" justifyItems="space-between" margin="0 0 small 0">
+                  <Flex.Item shouldGrow={true}>
+                    <Heading level="h3" margin="0">
+                      {I18n.t('Migrations to be Performed:')}
+                    </Heading>
+                  </Flex.Item>
+                  {showConsolidatedReport ? (
+                    <Flex.Item>
+                      <Link
+                        href={coordinatorProgress.consolidated_report_url!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        isWithinText={false}
+                      >
+                        {I18n.t('Download Consolidated Report')}
+                      </Link>
+                    </Flex.Item>
+                  ) : (
+                    (canShowMigrateAll || isCoordinatorInProgress) && (
+                      <Flex.Item>
+                        <Button
+                          color="secondary"
+                          interaction={
+                            isMigrateAllPending ||
+                            !!emailError ||
+                            isLoading ||
+                            isCoordinatorInProgress
+                              ? 'disabled'
+                              : 'enabled'
+                          }
+                          onClick={startMigrateAll}
+                          data-pendo="lti-registrations-migrate-all"
+                        >
+                          {isMigrateAllPending || isCoordinatorInProgress
+                            ? I18n.t('Migrating All...')
+                            : I18n.t('Migrate All')}
+                        </Button>
+                      </Flex.Item>
+                    )
+                  )}
+                </Flex>
 
                 <View as="div" padding="0">
                   {migrations.map((migration: TiiApMigration) => (
@@ -302,53 +201,29 @@ export const TurnitinAPMigrationModal = ({
                       startMigration={startMigration}
                       isPending={!!migration.migrateClicked}
                       emailError={!!emailError}
+                      isBulkInProgress={isBulkInProgress}
                     />
                   ))}
                 </View>
               </View>
             </Flex.Item>
 
-            <Flex.Item padding="small none none none">
-              <View as="div" borderWidth="small 0 0 0" padding="small 0 0 0">
-                <Flex direction="column" gap="small">
-                  <Flex.Item>
-                    <Checkbox
-                      label={I18n.t('Email report upon completion of a migration')}
-                      checked={emailNotification}
-                      onChange={e => {
-                        setEmailNotification(e.target.checked)
-                        if (!e.target.checked) {
-                          setEmailError(undefined)
-                          setEmail('')
-                        }
-                      }}
-                    />
-                  </Flex.Item>
-                  {emailNotification && (
-                    <Flex.Item>
-                      <TextInput
-                        value={email}
-                        onChange={handleEmailChange}
-                        placeholder={I18n.t('Enter email address')}
-                        isRequired={true}
-                        messages={emailError ? [{text: emailError, type: 'error'}] : undefined}
-                        inputRef={ref => {
-                          if (ref instanceof HTMLInputElement) {
-                            setEmailInputElement(ref)
-                          }
-                        }}
-                      />
-                    </Flex.Item>
-                  )}
-                </Flex>
-              </View>
-            </Flex.Item>
+            <MigrationEmailNotification
+              emailNotification={emailNotification}
+              setEmailNotification={setEmailNotification}
+              email={email}
+              setEmail={setEmail}
+              emailError={emailError}
+              setEmailError={setEmailError}
+              handleEmailChange={handleEmailChange}
+              setEmailInputElement={setEmailInputElement}
+            />
           </Flex>
         )}
       </Modal.Body>
 
       <Modal.Footer>
-        <Button onClick={handleClose} margin="0 small 0 0">
+        <Button onClick={handleClose} margin="0 0 0 0">
           {I18n.t('Close')}
         </Button>
       </Modal.Footer>

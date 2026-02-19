@@ -23,6 +23,7 @@ import ContentMigrationsForm from '../migrations_form'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {completeUpload} from '@canvas/upload-file'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 const server = setupServer()
 
@@ -100,10 +101,11 @@ describe('ContentMigrationForm', () => {
     postCalled = false
     postRequestBody = null
 
-    window.ENV.COURSE_ID = '0'
-    window.ENV.NEW_QUIZZES_MIGRATION = true
-    // @ts-expect-error
-    window.ENV.current_user = {id: '1'}
+    fakeEnv.setup({
+      COURSE_ID: '0',
+      NEW_QUIZZES_MIGRATION: true,
+      current_user: {id: '1'},
+    })
 
     server.use(
       http.get('/api/v1/courses/0/content_migrations/migrators', () => {
@@ -135,6 +137,7 @@ describe('ContentMigrationForm', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    fakeEnv.teardown()
   })
 
   it('does not show any form by default', () => {

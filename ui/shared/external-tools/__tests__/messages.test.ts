@@ -55,7 +55,7 @@ describe('1.1 content item messages', () => {
     const externalContentReady = (props = {}) => ({
       subject: EXTERNAL_CONTENT_READY,
       contentItems: [{url: 'test'}],
-      service: 'equella',
+      service: 'external_tool_dialog',
       service_id: '1',
       ...props,
     })
@@ -63,7 +63,7 @@ describe('1.1 content item messages', () => {
     const LtiDeepLinkingResponse = (props = {}) => ({
       subject: 'LtiDeepLinkingResponse',
       contentItems: [{url: 'test'}],
-      service: 'equella',
+      service: 'external_tool_dialog',
       service_id: '1',
       ...props,
     })
@@ -181,7 +181,7 @@ describe('1.1 content item messages', () => {
           postMessage: postMessageFn,
         })
         const contentItem: Lti1p1ContentItem = {url: 'test', '@type': 'FileItem'}
-        const service: Service = 'equella'
+        const service: Service = 'external_tool_dialog'
         const eventData: ExternalContentReadyInnerData = {
           contentItems: [contentItem],
           service,

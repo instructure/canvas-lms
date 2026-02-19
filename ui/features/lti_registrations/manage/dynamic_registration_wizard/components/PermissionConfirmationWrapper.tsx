@@ -20,15 +20,18 @@ import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverla
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {PermissionConfirmation} from '../../registration_wizard_forms/PermissionConfirmation'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
+import {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 
 export type PermissionConfirmationWrapperProps = {
   registration: LtiRegistrationWithConfiguration
   overlayStore: DynamicRegistrationOverlayStore
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
 }
 
 export const PermissionConfirmationWrapper = ({
   registration,
   overlayStore,
+  registrationUpdateRequest,
 }: PermissionConfirmationWrapperProps) => {
   const [state, actions] = useOverlayStore(overlayStore)
   return (
@@ -36,9 +39,10 @@ export const PermissionConfirmationWrapper = ({
       showAllSettings={false}
       mode="new"
       appName={registration.name}
-      scopesSelected={registration.configuration.scopes.filter(
-        s => !state.overlay.disabled_scopes?.includes(s),
-      )}
+      scopesSelected={registration.configuration.scopes
+        .concat(registrationUpdateRequest?.internal_lti_configuration?.scopes || [])
+        .filter(s => !state.overlay.disabled_scopes?.includes(s))}
+      registrationUpdateRequest={registrationUpdateRequest}
       scopesSupported={registration.configuration.scopes}
       onScopeToggled={actions.toggleDisabledScope}
     />

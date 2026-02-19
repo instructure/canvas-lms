@@ -20,7 +20,7 @@ import {shape, string} from 'prop-types'
 
 export const MediaTrack = {
   fragment: gql`
-    fragment MediaTrack on MediaTrack {
+    fragment InboxMediaTrack on MediaTrack {
       _id
       content
       locale

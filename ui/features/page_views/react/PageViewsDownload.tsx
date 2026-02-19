@@ -28,6 +28,7 @@ import {
   AsyncPageViewJobStatus,
   AsyncPageviewJob,
   displayTTL,
+  errorCodeDisplayName,
   isInProgress,
   notExpired,
   statusColor,
@@ -271,6 +272,12 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
                   <Table.Cell id={`export-status-${record.query_id}`}>
                     <div aria-live="polite">
                       <Pill color={statusColor(record)}>{statusDisplayName(record)}</Pill>
+                      {record.status === AsyncPageViewJobStatus.Failed && (
+                        <>
+                          {' '}
+                          <Text color="warning">{errorCodeDisplayName(record)}</Text>
+                        </>
+                      )}
                     </div>
                   </Table.Cell>
                   <Table.Cell id={`export-ttl-${record.query_id}`}>{displayTTL(record)}</Table.Cell>

@@ -20,6 +20,32 @@ import {render, screen, fireEvent} from '@testing-library/react'
 import StudentOutcomesTable from '../StudentOutcomesTable'
 import {Outcome} from '../types'
 
+vi.mock('@canvas/outcomes/react/hooks/useCanvasContext', () => ({
+  __esModule: true,
+  default: () => ({
+    contextId: '1',
+    accountLevelMasteryScalesFF: false,
+  }),
+}))
+
+vi.mock('@canvas/outcomes/react/hooks/useContributingScores', () => ({
+  useContributingScores: () => ({
+    isLoading: false,
+    error: null,
+    contributingScores: {
+      forOutcome: () => ({
+        isVisible: () => false,
+        toggleVisibility: vi.fn(),
+        data: undefined,
+        alignments: [],
+        scoresForUser: () => [],
+        isLoading: false,
+        error: undefined,
+      }),
+    },
+  }),
+}))
+
 describe('StudentOutcomesTable', () => {
   const testOutcomes: Outcome[] = [
     {
@@ -45,16 +71,18 @@ describe('StudentOutcomesTable', () => {
   ]
 
   it('renders the component', () => {
-    render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
     expect(screen.getByText('Student Outcomes')).toBeInTheDocument()
   })
 
   it('renders without errors', () => {
-    expect(() => render(<StudentOutcomesTable outcomes={testOutcomes} />)).not.toThrow()
+    expect(() =>
+      render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />),
+    ).not.toThrow()
   })
 
   it('renders outcomes in the table', () => {
-    render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
     expect(screen.getByText('N-CN.1')).toBeInTheDocument()
     expect(screen.getByText('Test Outcome 1')).toBeInTheDocument()
     expect(screen.getByText('A-SSE.2')).toBeInTheDocument()
@@ -62,19 +90,19 @@ describe('StudentOutcomesTable', () => {
   })
 
   it('displays assessment counts correctly', () => {
-    render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
     expect(screen.getByText('3 of 5 alignments')).toBeInTheDocument()
     expect(screen.getByText('0 of 3 alignments')).toBeInTheDocument()
   })
 
   it('displays mastery scores correctly', () => {
-    render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
     expect(screen.getByText('2.5')).toBeInTheDocument()
     expect(screen.getByText('--')).toBeInTheDocument()
   })
 
   it('expands and collapses rows when clicking expand button', () => {
-    render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
 
     const expandButton = screen.getByTestId('outcome-expand-button-1')
 
@@ -96,7 +124,7 @@ describe('StudentOutcomesTable', () => {
 
   it('sorts by code by default in ascending order', () => {
     const unsortedOutcomes = [{...testOutcomes[1]}, {...testOutcomes[0]}]
-    const {container} = render(<StudentOutcomesTable outcomes={unsortedOutcomes} />)
+    const {container} = render(<StudentOutcomesTable outcomes={unsortedOutcomes} studentId="1" />)
 
     const rows = container.querySelectorAll('tbody tr')
     expect(rows[0].textContent).toContain('A-SSE.2')
@@ -104,7 +132,7 @@ describe('StudentOutcomesTable', () => {
   })
 
   it('sorts by assessed count when clicking the Times Assessed header', () => {
-    const {container} = render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    const {container} = render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
 
     const assessedHeader = screen.getByText('Times Assessed').closest('th')
     const sortButton = assessedHeader?.querySelector('button')
@@ -117,7 +145,7 @@ describe('StudentOutcomesTable', () => {
   })
 
   it('sorts by mastery score when clicking the Mastery header', () => {
-    const {container} = render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    const {container} = render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
 
     const masteryHeader = screen.getByText('Mastery').closest('th')
     const sortButton = masteryHeader?.querySelector('button')
@@ -130,7 +158,7 @@ describe('StudentOutcomesTable', () => {
   })
 
   it('toggles sort direction when clicking the same column header twice', () => {
-    const {container} = render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    const {container} = render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
 
     // Initially sorted by code ascending (A-SSE.2 comes first)
     let rows = container.querySelectorAll('tbody tr')
@@ -156,7 +184,7 @@ describe('StudentOutcomesTable', () => {
   })
 
   it('displays outcome information tooltip button', () => {
-    render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
     expect(screen.getByTestId('outcome-info-button-1')).toBeInTheDocument()
     expect(screen.getByTestId('outcome-info-button-2')).toBeInTheDocument()
   })
@@ -174,12 +202,12 @@ describe('StudentOutcomesTable', () => {
         masteryLevel: 'unassessed' as const,
       },
     ]
-    render(<StudentOutcomesTable outcomes={zeroAlignmentOutcome} />)
+    render(<StudentOutcomesTable outcomes={zeroAlignmentOutcome} studentId="1" />)
     expect(screen.getByText('0 alignments')).toBeInTheDocument()
   })
 
   it('renders mastery icons with correct alt text', () => {
-    render(<StudentOutcomesTable outcomes={testOutcomes} />)
+    render(<StudentOutcomesTable outcomes={testOutcomes} studentId="1" />)
     expect(screen.getByAltText('Near Mastery')).toBeInTheDocument()
     expect(screen.getByAltText('Unassessed')).toBeInTheDocument()
   })

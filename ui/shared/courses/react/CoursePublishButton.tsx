@@ -173,8 +173,7 @@ const CoursePublishButton = ({
       onToggle={handleMenuToggle}
       trigger={
         <Button
-          // @ts-expect-error
-          renderIcon={coursePublished ? IconPublishSolid : IconNoLine}
+          renderIcon={coursePublished ? <IconPublishSolid /> : <IconNoLine />}
           color="primary-inverse"
           themeOverride={buttonThemeOverride}
         >

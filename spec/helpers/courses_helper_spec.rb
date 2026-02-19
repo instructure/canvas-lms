@@ -259,6 +259,103 @@ describe CoursesHelper do
         end
       end
     end
+
+    context "with course setup" do
+      before(:once) do
+        course_with_teacher(active_all: true)
+      end
+
+      before do
+        @context = @course
+        @domain_root_account = Account.default
+        @current_user = @teacher
+        allow(@context).to receive(:tabs_available).and_return([
+                                                                 { id: "home", label: "Home", hidden: false },
+                                                                 { id: "assignments", label: "Assignments", hidden: false },
+                                                                 { id: "disabled_tab", label: "Disabled", hidden: true }
+                                                               ])
+      end
+
+      it "includes immovable property for disabled tabs" do
+        allow(@context).to receive(:tab_enabled?) do |tab|
+          tab[:id] != "disabled_tab"
+        end
+        allow(self).to receive(:sortable_tabs_tab_disabled_message).and_return("Test message")
+
+        tabs = sortable_tabs
+        disabled_tab = tabs.find { |t| t[:id] == "disabled_tab" }
+        enabled_tab = tabs.find { |t| t[:id] == "home" }
+
+        expect(disabled_tab[:immovable]).to be true
+        expect(enabled_tab.key?(:immovable)).to be false
+      end
+
+      it "includes disabled_message for all tabs" do
+        allow(@context).to receive(:tab_enabled?).and_return(true)
+        allow(self).to receive(:sortable_tabs_tab_disabled_message).and_return("Test message")
+
+        tabs = sortable_tabs
+        expect(tabs.first[:disabled_message]).to eq "Test message"
+      end
+
+      it "filters out settings tab" do
+        allow(@context).to receive_messages(tabs_available: [
+                                              { id: Course::TAB_SETTINGS, label: "Settings" },
+                                              { id: "home", label: "Home" }
+                                            ],
+                                            tab_enabled?: true)
+        allow(self).to receive(:sortable_tabs_tab_disabled_message).and_return("Test message")
+
+        tabs = sortable_tabs
+        settings_tab = tabs.find { |t| t[:id] == Course::TAB_SETTINGS }
+        expect(settings_tab).to be_nil
+      end
+    end
+  end
+
+  describe "#sortable_tabs_tab_disabled_message" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    before do
+      @context = @course
+    end
+
+    it "returns K5 message for elementary subject courses" do
+      allow(@context).to receive(:elementary_subject_course?).and_return(true)
+      tab = { id: "home" }
+      expect(I18n).to receive(:t).with("courses.settings.tab_hidden_if_disabled_k5", "Tab disabled, won't appear in subject navigation").and_return("K5 message")
+      expect(sortable_tabs_tab_disabled_message(tab)).to eq "K5 message"
+    end
+
+    it "returns external tab message for external tabs" do
+      allow(@context).to receive(:elementary_subject_course?).and_return(false)
+      tab = { id: "external_tool_1", external: true }
+      expect(I18n).to receive(:t).with("courses.settings.tab_hidden_if_disabled", "Page disabled, won't appear in navigation").and_return("External disabled")
+      expect(sortable_tabs_tab_disabled_message(tab)).to eq "External disabled"
+    end
+
+    it "returns can't disable message for grades tab" do
+      allow(@context).to receive(:elementary_subject_course?).and_return(false)
+      tab = { id: Course::TAB_GRADES }
+      expect(I18n).to receive(:t).with("courses.settings.tab_cant_disable", "This page can't be disabled, only hidden").and_return("Can't disable")
+      expect(sortable_tabs_tab_disabled_message(tab)).to eq "Can't disable"
+    end
+
+    it "returns can't disable message for discussions tab" do
+      allow(@context).to receive(:elementary_subject_course?).and_return(false)
+      tab = { id: Course::TAB_DISCUSSIONS }
+      expect(I18n).to receive(:t).with("courses.settings.tab_cant_disable", "This page can't be disabled, only hidden").and_return("Can't disable")
+      expect(sortable_tabs_tab_disabled_message(tab)).to eq "Can't disable"
+    end
+
+    it "returns default disabled message for regular tabs" do
+      allow(@context).to receive(:elementary_subject_course?).and_return(false)
+      tab = { id: "assignments" }
+      expect(I18n).to receive(:t).with("courses.settings.tab_disabled", "Page disabled, will redirect to course home page").and_return("Default disabled")
+      expect(sortable_tabs_tab_disabled_message(tab)).to eq "Default disabled"
+    end
   end
 
   describe "#format_course_section_date" do

@@ -53,6 +53,7 @@ import {alert} from '@canvas/instui-bindings/react/Alert'
 import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
 import type {AccountId} from '../../model/AccountId'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {useRegistrationUpdateWizardModalState} from '../../registration_update_wizard/RegistrationUpdateWizardModalState'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -262,7 +263,7 @@ const Columns: ReadonlyArray<Column> = [
             renderIcon={() => <IconRefreshLine />}
             data-pendo="lti-registrations-update-available-button"
             onClick={() => {
-              // todo: initiate the update wizard
+              useRegistrationUpdateWizardModalState.getState().open(r, pendingUpdate)
             }}
           >
             {I18n.t('Update Available')}
@@ -445,7 +446,7 @@ const CondensedColumns: ReadonlyArray<Column> = [
             renderIcon={() => <IconRefreshLine />}
             data-pendo="lti-registrations-update-available-button"
             onClick={() => {
-              // todo: initiate the update wizard
+              useRegistrationUpdateWizardModalState.getState().open(r, pendingUpdate)
             }}
           >
             {I18n.t('Update Available')}

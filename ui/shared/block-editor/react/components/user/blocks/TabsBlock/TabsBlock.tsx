@@ -85,8 +85,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   )
 
   const handleTabTitleChange = useCallback(
-    // @ts-expect-error
-    e => {
+    (e: {target: {value: string}}) => {
       setProp((props: TabsBlockProps) => {
         if (!props.tabs) return
         props.tabs[activeTabIndex].title = e.target.value
@@ -104,8 +103,11 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
         e.preventDefault()
         e.stopPropagation()
         setEditable(false)
-        // @ts-expect-error
-        document.getElementById(`tab-${tabs[activeTabIndex].id}`)?.focus()
+        const tabId = tabs?.[activeTabIndex]?.id
+        const tabElement = tabId
+          ? (document.getElementById(`tab-${tabId}`) as HTMLElement | null)
+          : null
+        tabElement?.focus()
       } else if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.stopPropagation()
       }

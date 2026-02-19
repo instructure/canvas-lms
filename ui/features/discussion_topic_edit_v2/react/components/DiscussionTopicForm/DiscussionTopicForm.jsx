@@ -290,7 +290,10 @@ function DiscussionTopicForm({
   useEffect(() => {
     const graphqlAps = currentDiscussionTopic?.assignment?.ltiAssetProcessorsConnection?.nodes || []
     setFromExistingAttachedProcessors(graphqlAps.map(existingAttachedAssetProcessorFromGraphql))
-  }, [currentDiscussionTopic?.assignment?.ltiAssetProcessorsConnection, setFromExistingAttachedProcessors])
+  }, [
+    currentDiscussionTopic?.assignment?.ltiAssetProcessorsConnection,
+    setFromExistingAttachedProcessors,
+  ])
 
   const [displayGradeAs, setDisplayGradeAs] = useState(
     currentDiscussionTopic?.assignment?.gradingType || 'points',
@@ -1066,7 +1069,6 @@ function DiscussionTopicForm({
                     }}
                     height={300}
                     defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
-                    autosave={false}
                     resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
                     resourceId={currentDiscussionTopic?._id}
                   />

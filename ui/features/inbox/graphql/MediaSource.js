@@ -20,7 +20,7 @@ import {shape, string} from 'prop-types'
 
 export const MediaSource = {
   fragment: gql`
-    fragment MediaSource on MediaSource {
+    fragment InboxMediaSource on MediaSource {
       type: contentType
       src: url
       height

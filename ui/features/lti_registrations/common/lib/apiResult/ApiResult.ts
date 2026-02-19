@@ -188,25 +188,40 @@ export const isSuccessful = <A>(result: ApiResult<A>): result is SuccessfulApiRe
   return result._type === 'Success'
 }
 
-export const combineApiResults = <A, B>(a: ApiResult<A>, b: ApiResult<B>): ApiResult<[A, B]> => {
-  if (isUnsuccessful(a)) {
-    return a
-  } else if (isUnsuccessful(b)) {
-    return b
-  } else {
-    return success([a.data, b.data], {...a.links, ...b.links})
+/**
+ * Combines two `ApiResult`s into one, returning a success if both are successful
+ * or the first unsuccessful result
+ *
+ * @param resultA
+ * @param resultB
+ * @returns
+ */
+export const combineApiResults =
+  <A, B>(resultA: ApiResult<A>, resultB: ApiResult<B>) =>
+  <Z>(combine: (a: A, b: B) => Z): ApiResult<Z> => {
+    if (isUnsuccessful(resultA)) {
+      return resultA
+    } else if (isUnsuccessful(resultB)) {
+      return resultB
+    } else {
+      return success(combine(resultA.data, resultB.data))
+    }
   }
-}
 
-export const combineAllApiResults = <T extends ApiResult<unknown>[]>(
-  results: T,
-): ApiResult<{[K in keyof T]: T[K] extends ApiResult<infer U> ? U : never}> => {
+/**
+ * Combines an array of `ApiResult`s into one, returning a success if all are successful
+ * or the first unsuccessful result
+ * @param results
+ * @returns
+ */
+export const combineAllApiResults = <Results extends ApiResult<any>[]>(
+  results: Results,
+): ApiResult<{[K in keyof Results]: Results[K] extends ApiResult<infer A> ? A : never}> => {
   return results.reduce(
-    (acc: ApiResult<unknown[]>, curr) => {
-      return mapApiResult(combineApiResults(acc, curr), ([rest, currData]) => {
-        return [...rest, currData]
-      })
-    },
-    success([] as unknown[], {}),
-  ) as ApiResult<{[K in keyof T]: T[K] extends ApiResult<infer U> ? U : never}>
+    (acc: ApiResult<any[]>, result: ApiResult<any>) =>
+      combineApiResults(acc, result)((a, b) => [...a, b]),
+    success([]),
+  ) as ApiResult<{
+    [K in keyof Results]: Results[K] extends ApiResult<infer A> ? A : never
+  }>
 }

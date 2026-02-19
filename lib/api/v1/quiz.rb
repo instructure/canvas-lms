@@ -248,10 +248,12 @@ module Api::V1::Quiz
   end
 
   def quiz_client_ip
-    return request.remote_ip unless Account.site_admin.feature_enabled?(:use_client_ip_in_classic_quizzes)
+    return request.remote_ip unless Account.site_admin.feature_enabled?(:classic_quizzes_client_ip)
 
-    Rails.logger.info("Using Client-Ip for Classic Quizzes")
-    request.headers["Client-Ip"]
+    x_forwarded_for = request.headers["X-Forwarded-For"]
+    client_ip = x_forwarded_for&.split(",")&.first&.strip
+    Rails.logger.info("Using quiz_client_ip for Classic Quizzes: #{client_ip}")
+    client_ip
   end
 
   protected

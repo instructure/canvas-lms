@@ -41,6 +41,7 @@ class AssignmentsController < ApplicationController
   include HorizonMode
 
   before_action :load_canvas_career, only: %i[index show syllabus]
+  before_action :redirect_peer_review_sub_assignment, only: [:show]
 
   include K5Mode
 
@@ -261,6 +262,7 @@ class AssignmentsController < ApplicationController
     js_env({
              ASSIGNMENT_ID: @assignment.id,
              EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
+             restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user)
            })
 
     if @context.root_account.feature_enabled?(:instui_nav)
@@ -1346,5 +1348,13 @@ class AssignmentsController < ApplicationController
     return unless @context_enrollment&.student?
 
     js_env ASSET_PROCESSOR_EULA_LAUNCH_URLS: Lti::EulaUiService.eula_launch_urls(user: @current_user, assignment: @assignment)
+  end
+
+  def redirect_peer_review_sub_assignment
+    return unless params[:id]
+    return unless @context.feature_enabled?(:peer_review_allocation_and_grading)
+
+    peer_review = PeerReviewSubAssignment.active.find_by(id: params[:id], context: @context)
+    redirect_to course_assignment_path(@context, peer_review.parent_assignment_id) if peer_review
   end
 end

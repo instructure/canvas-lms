@@ -22,7 +22,7 @@ import {gql} from '@apollo/client'
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 
 export const CREATE_SUBMISSION_COMMENT = gql`
-  mutation CreateSubmissionComment(
+  mutation CreateSpeedGraderSubmissionComment(
     $submissionId: ID!
     $comment: String!
     $fileIds: [ID!]

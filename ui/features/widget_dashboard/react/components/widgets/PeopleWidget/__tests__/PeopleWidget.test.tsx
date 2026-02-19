@@ -170,6 +170,14 @@ describe('PeopleWidget', () => {
     expect(screen.getByText('Test People Widget')).toBeInTheDocument()
   })
 
+  it('renders course and role filters', async () => {
+    renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+    await screen.findByText('John Doe')
+    expect(screen.getByTestId('course-filter-select')).toBeInTheDocument()
+    expect(screen.getByTestId('role-filter-select')).toBeInTheDocument()
+  })
+
   it('handles external loading state', () => {
     renderWithQueryClient(<PeopleWidget {...buildDefaultProps({isLoading: true})} />)
     expect(screen.getByText('Loading people data...')).toBeInTheDocument()

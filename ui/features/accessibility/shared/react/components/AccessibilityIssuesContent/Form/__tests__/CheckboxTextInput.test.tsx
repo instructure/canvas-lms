@@ -36,16 +36,19 @@ vi.mock('../../../../stores/AccessibilityScansStore')
 
 // Create a fully typed mock context
 const mockContextValue: AccessibilityCheckerContextType = {
-  selectedItem: getAsAccessibilityResourceScan({
-    id: 123,
-    type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
-    title: 'Mock Page',
-    published: true,
-    updatedAt: '2023-01-01',
-    count: 0,
-    url: 'http://example.com',
-    editUrl: 'http://example.com/edit',
-  }),
+  selectedItem: getAsAccessibilityResourceScan(
+    {
+      id: 123,
+      type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
+      title: 'Mock Page',
+      published: true,
+      updatedAt: '2023-01-01',
+      count: 0,
+      url: 'http://example.com',
+      editUrl: 'http://example.com/edit',
+    },
+    1,
+  ),
   setSelectedItem: vi.fn(),
   isTrayOpen: false,
   setIsTrayOpen: vi.fn(),
@@ -478,47 +481,6 @@ describe('CheckboxTextInput', () => {
       )
 
       expect(screen.queryByTestId('generate-alt-text-button')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('action buttons', () => {
-    it('renders custom action buttons when provided', () => {
-      const actionButtons = <button data-testid="custom-action-button">Custom Action</button>
-
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...defaultProps} actionButtons={actionButtons} />
-        </AccessibilityCheckerContext.Provider>,
-      )
-
-      expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
-      expect(screen.getByText('Custom Action')).toBeInTheDocument()
-    })
-
-    it('renders action buttons alongside generate button', () => {
-      const actionButtons = <button data-testid="custom-action-button">Custom Action</button>
-      const propsWithGenerateOption = {
-        ...defaultProps,
-        issue: {
-          ...defaultProps.issue,
-          form: {
-            ...defaultProps.issue.form,
-            canGenerateFix: true,
-            isCanvasImage: true,
-            generateButtonLabel: 'Generate Alt Text',
-          },
-        },
-        actionButtons,
-      }
-
-      render(
-        <AccessibilityCheckerContext.Provider value={mockContextValue}>
-          <CheckboxTextInput {...propsWithGenerateOption} />
-        </AccessibilityCheckerContext.Provider>,
-      )
-
-      expect(screen.getByTestId('generate-alt-text-button')).toBeInTheDocument()
-      expect(screen.getByTestId('custom-action-button')).toBeInTheDocument()
     })
   })
 

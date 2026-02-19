@@ -23,15 +23,7 @@ import React from 'react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {K5Course} from '../K5Course'
-import {MOCK_GROUPS} from './mocks'
-import fakeENV from '@canvas/test-utils/fakeENV'
-import {
-  defaultProps,
-  defaultEnv,
-  createModulesPartial,
-  cleanupModulesContainer,
-} from './K5CourseTestHelpers'
-import {
+import {MOCK_GROUPS,
   MOCK_COURSE_SYLLABUS,
   MOCK_COURSE_APPS,
   MOCK_COURSE_TABS,
@@ -39,6 +31,13 @@ import {
   MOCK_ASSIGNMENT_GROUPS,
   MOCK_ENROLLMENTS,
 } from './mocks'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {
+  defaultProps,
+  defaultEnv,
+  createModulesPartial,
+  cleanupModulesContainer,
+} from './K5CourseTestHelpers'
 
 vi.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: vi.fn(),

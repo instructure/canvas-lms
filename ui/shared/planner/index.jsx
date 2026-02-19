@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense} from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Provider} from 'react-redux'
 import moment from 'moment-timezone'
 import {Spinner} from '@instructure/ui-spinner'
@@ -292,8 +292,7 @@ export function createPlannerApp() {
 createPlannerApp.scrollEventsRegistered = false
 
 function renderApp(element) {
-  const root = createRoot(element)
-  root.render(createPlannerApp())
+  render(createPlannerApp(), element)
 }
 
 // This method allows you to render the header items into a separate DOM node
@@ -302,8 +301,7 @@ function renderHeader(element, auxElement) {
 
   // Using this pattern because default params don't merge objects
 
-  const root = createRoot(element)
-  root.render(
+  render(
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
         <Suspense fallback={loading()}>
@@ -318,6 +316,7 @@ function renderHeader(element, auxElement) {
         </Suspense>
       </Provider>
     </DynamicUiProvider>,
+    element,
   )
 }
 
@@ -333,8 +332,7 @@ export function renderToDoSidebar(element) {
     initializedOptions.env.current_user_roles.includes('teacher') &&
     initializedOptions.env.current_user_roles.includes('student')
 
-  const root = createRoot(element)
-  root.render(
+  render(
     <Provider store={store}>
       <Suspense fallback={loading()}>
         <ToDoSidebar
@@ -346,6 +344,7 @@ export function renderToDoSidebar(element) {
         />
       </Suspense>
     </Provider>,
+    element,
   )
 }
 

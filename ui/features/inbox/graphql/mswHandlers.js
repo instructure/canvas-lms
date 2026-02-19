@@ -295,7 +295,7 @@ export const handlers = [
     return HttpResponse.json({data})
   }),
 
-  graphql.query('GetSubmissionComments', ({variables}) => {
+  graphql.query('GetInboxSubmissionComments', ({variables}) => {
     return HttpResponse.json({
       data: {
         legacyNode: {
@@ -529,7 +529,7 @@ export const handlers = [
     return HttpResponse.json({data})
   }),
 
-  graphql.query('GetAddressBookRecipients', ({variables}) => {
+  graphql.query('GetInboxAddressBookRecipients', ({variables}) => {
     const data = {
       legacyNode: {
         id: 'VXNlci0x',

@@ -52,7 +52,7 @@ module Types
 
           Loaders::DiscussionEntryUserLoader.load_many(mentioned_user_ids).then do |users|
             mentioned_spans.each do |span|
-              user = users.find { |u| u.id == span["data-mention"].to_i }
+              user = users.find { |u| u&.id == span["data-mention"].to_i }
               if user
                 mention_node = span.children.find { |node| node.text? && node.content.start_with?("@") }
                 mention_node.content = "@" + user.name if mention_node

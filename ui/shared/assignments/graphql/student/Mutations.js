@@ -67,7 +67,7 @@ export const CREATE_SUBMISSION = gql`
 `
 
 export const CREATE_SUBMISSION_COMMENT = gql`
-  mutation CreateSubmissionComment(
+  mutation CreateStudentSubmissionComment(
     $id: ID!
     $submissionAttempt: Int!
     $comment: String!

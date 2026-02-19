@@ -511,10 +511,10 @@ class Login::SamlController < ApplicationController
         if aac.account.feature_enabled?(:saml_enforce_one_time_use)
           response.errors << "OneTimeUse condition violated"
           return :one_time_use_violation
-        elsif Account.site_admin.feature_enabled?(:saml_count_one_time_use_usage)
+        else
           increment_statsd(:one_time_use_soft_violation)
         end
-      elsif Account.site_admin.feature_enabled?(:saml_count_one_time_use_usage)
+      else
         # just log that we saw it
         increment_statsd(:one_time_use_passed)
       end

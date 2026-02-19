@@ -21,8 +21,8 @@ import {executeGraphQLQuery} from '../utils/graphql'
 import type {CourseInstructorForComponent} from '../hooks/useCourseInstructors'
 
 export const COURSE_INSTRUCTORS_PAGINATED_QUERY = gql`
-  query GetCourseInstructorsPaginated($courseIds: [ID!]!, $first: Int, $after: String, $observedUserId: ID) {
-    courseInstructorsConnection(courseIds: $courseIds, first: $first, after: $after, observedUserId: $observedUserId) {
+  query GetCourseInstructorsPaginated($courseIds: [ID!]!, $first: Int, $after: String, $observedUserId: ID, $enrollmentTypes: [String!]) {
+    courseInstructorsConnection(courseIds: $courseIds, first: $first, after: $after, observedUserId: $observedUserId, enrollmentTypes: $enrollmentTypes) {
       nodes {
         user {
           _id
@@ -93,6 +93,7 @@ export const fetchPaginatedCourseInstructors = async (
   limit: number = 5,
   after?: string,
   observedUserId?: string,
+  enrollmentTypes?: string[],
 ): Promise<{
   data: CourseInstructorForComponent[]
   hasNextPage: boolean
@@ -108,6 +109,7 @@ export const fetchPaginatedCourseInstructors = async (
       first: limit,
       after,
       observedUserId,
+      enrollmentTypes,
     },
   )
 

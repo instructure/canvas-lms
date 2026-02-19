@@ -17,10 +17,13 @@
  */
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {DateTimeInput} from '@instructure/ui-date-time-input'
-import {FormMessage} from '@instructure/ui-form-field'
+import {FormFieldGroup, FormMessage} from '@instructure/ui-form-field'
+import {TimeSelect} from '@instructure/ui-time-select'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
+import {combineDateTime} from './utils/utils'
 
 const I18n = createI18nScope('assignment_scheduled_release_policy')
 
@@ -38,51 +41,105 @@ export const SeparateScheduledRelease = ({
   postCommentsAt,
   handleChange,
 }: SeparateScheduledReleaseProps) => {
-  const onChangeGradeReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
-    handleChange({postGradesAt: isoDate})
+  const onGradeDateChange = (date: Date | null) => {
+    const newDateTime = combineDateTime(date?.toISOString(), postGradesAt)
+    handleChange({postGradesAt: newDateTime})
   }
 
-  const onChangeCommentReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
-    handleChange({postCommentsAt: isoDate})
+  const onGradeTimeChange = (
+    _e: React.SyntheticEvent,
+    data: {value: string; inputText: string},
+  ) => {
+    const newDateTime = combineDateTime(postGradesAt, data.value)
+    handleChange({postGradesAt: newDateTime})
   }
+
+  const onCommentDateChange = (date: Date | null) => {
+    const newDateTime = combineDateTime(date?.toISOString(), postCommentsAt)
+    handleChange({postCommentsAt: newDateTime})
+  }
+
+  const onCommentTimeChange = (
+    _e: React.SyntheticEvent,
+    data: {value: string; inputText: string},
+  ) => {
+    const newDateTime = combineDateTime(postCommentsAt, data.value)
+    handleChange({postCommentsAt: newDateTime})
+  }
+
+  const dateFormatter = useDateTimeFormat('date.formats.compact')
 
   return (
     <View as="div" margin="0 medium 0">
       <View as="div" margin="medium 0" data-testid="separate-scheduled-post-datetime-grade">
-        <DateTimeInput
-          description={<ScreenReaderContent>{I18n.t('Grades Release Date')}</ScreenReaderContent>}
-          datePlaceholder={I18n.t('Select Date')}
-          dateRenderLabel={I18n.t('Grades Release Date')}
-          timeRenderLabel={I18n.t('Time')}
-          prevMonthLabel={I18n.t('Previous month')}
-          nextMonthLabel={I18n.t('Next month')}
-          onChange={onChangeGradeReleaseDate}
+        <FormFieldGroup
+          description={
+            <ScreenReaderContent>{I18n.t('Grades Release Date and Time')}</ScreenReaderContent>
+          }
           layout="stacked"
-          value={postGradesAt ?? undefined}
-          invalidDateTimeMessage={I18n.t('Invalid date!')}
-          messages={gradeErrorMessages}
-          allowNonStepInput={true}
-          timeStep={15}
-          isRequired
-        />
+        >
+          <CanvasDateInput2
+            renderLabel={I18n.t('Grades Release Date')}
+            screenReaderLabels={{
+              calendarIcon: I18n.t('Calendar'),
+              nextMonthButton: I18n.t('Next month'),
+              prevMonthButton: I18n.t('Previous month'),
+            }}
+            placeholder={I18n.t('Select Date')}
+            selectedDate={postGradesAt}
+            formatDate={dateFormatter}
+            onSelectedDateChange={onGradeDateChange}
+            interaction="enabled"
+            invalidDateMessage={I18n.t('Invalid date')}
+            isRequired
+            messages={gradeErrorMessages}
+          />
+          <TimeSelect
+            width="100%"
+            renderLabel={I18n.t('Release Time')}
+            placeholder={I18n.t('Choose release time')}
+            value={postGradesAt ?? undefined}
+            step={15}
+            format="LT"
+            isRequired
+            onChange={onGradeTimeChange}
+          />
+        </FormFieldGroup>
       </View>
       <View as="div" margin="medium 0" data-testid="separate-scheduled-post-datetime-comment">
-        <DateTimeInput
-          description={<ScreenReaderContent>{I18n.t('Comments Release Date')}</ScreenReaderContent>}
-          datePlaceholder={I18n.t('Select Date')}
-          dateRenderLabel={I18n.t('Comments Release Date')}
-          timeRenderLabel={I18n.t('Time')}
-          prevMonthLabel={I18n.t('Previous month')}
-          nextMonthLabel={I18n.t('Next month')}
-          onChange={onChangeCommentReleaseDate}
+        <FormFieldGroup
+          description={
+            <ScreenReaderContent>{I18n.t('Comments Release Date and Time')}</ScreenReaderContent>
+          }
           layout="stacked"
-          value={postCommentsAt ?? undefined}
-          invalidDateTimeMessage={I18n.t('Invalid date!')}
-          messages={commentErrorMessages}
-          allowNonStepInput={true}
-          timeStep={15}
-          isRequired
-        />
+        >
+          <CanvasDateInput2
+            renderLabel={I18n.t('Comments Release Date')}
+            screenReaderLabels={{
+              calendarIcon: I18n.t('Calendar'),
+              nextMonthButton: I18n.t('Next month'),
+              prevMonthButton: I18n.t('Previous month'),
+            }}
+            placeholder={I18n.t('Select Date')}
+            selectedDate={postCommentsAt}
+            formatDate={dateFormatter}
+            onSelectedDateChange={onCommentDateChange}
+            interaction="enabled"
+            invalidDateMessage={I18n.t('Invalid date')}
+            isRequired
+            messages={commentErrorMessages}
+          />
+          <TimeSelect
+            width="100%"
+            renderLabel={I18n.t('Release Time')}
+            placeholder={I18n.t('Choose release time')}
+            value={postCommentsAt ?? undefined}
+            step={15}
+            format="LT"
+            isRequired
+            onChange={onCommentTimeChange}
+          />
+        </FormFieldGroup>
       </View>
     </View>
   )

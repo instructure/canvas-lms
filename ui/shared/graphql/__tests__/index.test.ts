@@ -66,7 +66,7 @@ describe('@canvas/graphql', () => {
 
   describe('executeQuery', () => {
     const testQuery = gql`
-      query TestQuery($courseId: ID!) {
+      query TestQueryGraphQL($courseId: ID!) {
         course(id: $courseId) {
           _id
         }

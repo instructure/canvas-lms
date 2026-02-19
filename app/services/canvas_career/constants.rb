@@ -136,7 +136,8 @@ module CanvasCareer
       ACADEMIC_CONTENT_ONLY_CAREER_THEME = {
         content_only: "true",
         instui_theme: "career",
-        force_classic: "true"
+        force_classic: "true",
+        hide_global_nav: "true"
       }.freeze
     end
   end

@@ -153,6 +153,9 @@ class ContextModulesController < ApplicationController
         hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
         hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
       end
+      if Account.site_admin.feature_enabled?(:module_external_url_seamless_redirect)
+        hash[:MODULE_FEATURES][:SEAMLESS_EXTERNAL_URL_REDIRECT] = true
+      end
 
       if @context.use_modules_rewrite_view?(@current_user, session)
         tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(@current_user).count }

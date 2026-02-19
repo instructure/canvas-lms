@@ -1922,6 +1922,19 @@ describe Enrollment do
           @enrollment.save!
           @enrollment.accept
         end
+
+        it "clears the user invitation cache when accepting" do
+          @enrollment.workflow_state = "invited"
+          @enrollment.save!
+
+          invitations_before = @user.cached_invitations
+          expect(invitations_before).to include(@enrollment)
+
+          @enrollment.accept!
+
+          invitations_after = @user.cached_invitations
+          expect(invitations_after).not_to include(@enrollment)
+        end
       end
 
       context "as a teacher" do
@@ -3979,6 +3992,67 @@ describe Enrollment do
         @enrollment1.deactivate
         expect(other_course_rule.reload.workflow_state).to eq "active"
       end
+    end
+  end
+
+  describe "web conference syncing" do
+    include ExternalToolsSpecHelper
+
+    before do
+      allow(WebConference).to receive(:plugins).and_return(
+        [
+          web_conference_plugin_mock("big_blue_button", { domain: "bbb.instructure.com", secret_dec: "secret" })
+        ]
+      )
+    end
+
+    let(:course) { course_factory(active_all: true) }
+    let(:user) { user_model }
+    let(:teacher) { user_model }
+    let(:conference) do
+      conference = BigBlueButtonConference.create!(
+        title: "Test Conference",
+        user: teacher,
+        context: course
+      )
+      conference.invite_all_enabled = true
+      conference.save!
+      conference
+    end
+
+    it "syncs new active enrollments to invite_all conferences" do
+      conference # Force lazy evaluation to create conference first
+      enrollment = course.enroll_student(user, enrollment_state: "invited")
+
+      expect do
+        enrollment.workflow_state = "active"
+        enrollment.save!
+      end.to change { conference.reload.invitees.include?(user) }.from(false).to(true)
+    end
+
+    it "does not sync to conferences without invite_all" do
+      conference.invite_all_enabled = false
+      conference.save!
+
+      enrollment = course.enroll_student(user, enrollment_state: "invited")
+
+      expect do
+        enrollment.workflow_state = "active"
+        enrollment.save!
+      end.not_to change { conference.reload.invitees.include?(user) }
+    end
+
+    it "respects remove_observers setting" do
+      conference.remove_observers_enabled = true
+      conference.save!
+
+      observer = user_model
+      enrollment = course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "invited")
+
+      expect do
+        enrollment.workflow_state = "active"
+        enrollment.save!
+      end.not_to change { conference.reload.invitees.include?(observer) }
     end
   end
 end

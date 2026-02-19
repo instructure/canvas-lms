@@ -57,6 +57,8 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   serialize :question_data
   after_save :update_quiz
 
+  delegate :assessment_question_bank, to: :assessment_question, allow_nil: true
+
   resolves_root_account through: :quiz
 
   include MasterCourses::CollectionRestrictor

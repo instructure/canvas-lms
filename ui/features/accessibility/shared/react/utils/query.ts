@@ -104,11 +104,19 @@ export const getCourseBasedPath = (newPath = ''): string => {
 }
 
 /**
- * Gets the resource scan path for a given resource scan
- * @returns - the resource scan path (e.g. /courses/1/pages/1/accessibility/scan)
+ * Gets the resource scan api path for a given resource scan
+ * @returns - the resource scan path (e.g. /api/v1/courses/1/pages/1/accessibility/scan)
  */
 export const getResourceScanPath = (resourceScan: AccessibilityResourceScan): string => {
   return `/api/v1/${resourceScan.resourceUrl}/accessibility/scan`.replaceAll('//', '/')
+}
+
+/**
+ * Gets the resource queue scan api path for a given resource scan
+ * @returns - the resource scan path (e.g. /api/v1/courses/1/pages/1/accessibility/queue_scan)
+ */
+export const getResourceQueueScanPath = (resourceScan: AccessibilityResourceScan): string => {
+  return `/api/v1/${resourceScan.resourceUrl}/accessibility/queue_scan`.replaceAll('//', '/')
 }
 
 /**

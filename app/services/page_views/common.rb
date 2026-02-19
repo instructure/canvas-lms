@@ -43,7 +43,7 @@ module PageViews
 
     DownloadableResult = Struct.new(:format, :filename, :content, :compressed?)
 
-    PollingResponse = Struct.new(:query_id, :status, :format)
+    PollingResponse = Struct.new(:query_id, :status, :format, :error_code)
 
     class ConfigurationError < StandardError; end
     class InvalidRequestError < StandardError; end

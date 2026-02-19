@@ -210,11 +210,10 @@ describe('PlacementsConfirmation', () => {
     expect(boxes).toHaveLength(0)
   })
 
-  describe('when increased_top_nav_pane_size FF is enabled', () => {
+  describe('top navigation fullscreen functionality', () => {
     beforeEach(() => {
       fakeENV.setup({
         FEATURES: {
-          increased_top_nav_pane_size: true,
           top_navigation_placement: true,
         },
       })

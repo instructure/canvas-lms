@@ -49,6 +49,34 @@ describe "layouts/application" do
     end
   end
 
+  context "with hide_global_nav=true" do
+    before do
+      allow(controller).to receive(:params).and_return({ hide_global_nav: "true" })
+    end
+
+    it "adds hide-global-nav class to body" do
+      render "layouts/application"
+      expect(doc.at_css("body.hide-global-nav")).to be_present
+    end
+
+    it "still renders the navigation header partial (CSS will hide elements)" do
+      render "layouts/application"
+      # The header should be rendered in HTML (CSS will selectively hide elements)
+      expect(doc.at_css("header#header.ic-app-header")).to be_present
+    end
+
+    it "still renders breadcrumbs (unlike content_only)" do
+      @context = course_factory
+      assign(:context, @context)
+      allow(view).to receive_messages(
+        crumbs: [["Home", "/"], ["Courses", "/courses"]],
+        render_crumbs: "<a href='/'>Home</a>".html_safe
+      )
+      render "layouts/application"
+      expect(doc.at_css(".ic-app-nav-toggle-and-crumbs")).to be_present
+    end
+  end
+
   context "with @show_footer" do
     it "shows footer when true" do
       assign(:show_footer, true)
@@ -130,32 +158,7 @@ describe "layouts/application" do
           assign(:domain_root_account, Account.default)
         end
 
-        context "when top_navigation_placement_a11y_fixes is disabled" do
-          before do
-            Account.site_admin.disable_feature!(:top_navigation_placement_a11y_fixes)
-          end
-
-          it "does not add right-of-crumbs-no-reverse class" do
-            render "layouts/application"
-            right_of_crumbs = doc.at_css(".right-of-crumbs")
-            expect(right_of_crumbs).to be_present
-            expect(right_of_crumbs["class"]).not_to include("right-of-crumbs-no-reverse")
-          end
-
-          it "renders elements in reverse order (ai-information first)" do
-            render "layouts/application"
-            right_of_crumbs = doc.at_css(".right-of-crumbs")
-            children = right_of_crumbs.children.select(&:element?)
-            # First element should be ai-information-mount
-            expect(children.first["id"]).to eq("ai-information-mount")
-          end
-        end
-
-        context "when top_navigation_placement_a11y_fixes is enabled" do
-          before do
-            Account.site_admin.enable_feature!(:top_navigation_placement_a11y_fixes)
-          end
-
+        context "top navigation accessibility order" do
           it "adds right-of-crumbs-no-reverse class" do
             render "layouts/application"
             right_of_crumbs = doc.at_css(".right-of-crumbs")
@@ -289,9 +292,8 @@ describe "layouts/application" do
             tool # create the tool
           end
 
-          context "when top_navigation_placement_a11y_fixes is enabled" do
+          context "with student view button" do
             before do
-              Account.site_admin.enable_feature!(:top_navigation_placement_a11y_fixes)
               allow(view).to receive_messages(show_student_view_button?: true, student_view_text: "View as Student")
             end
 
@@ -325,29 +327,6 @@ describe "layouts/application" do
 
               expect(student_view_index).to be < top_nav_tools_index
               expect(top_nav_tools_index).to be < ai_info_index
-            end
-          end
-
-          context "when top_navigation_placement_a11y_fixes is disabled" do
-            before do
-              Account.site_admin.disable_feature!(:top_navigation_placement_a11y_fixes)
-              allow(view).to receive_messages(show_student_view_button?: true, student_view_text: "View as Student")
-            end
-
-            it "renders elements in reverse order (student view after top-nav-tools)" do
-              render "layouts/application"
-
-              right_of_crumbs = doc.at_css(".right-of-crumbs")
-              children = right_of_crumbs.children.select(&:element?)
-              children_ids = children.pluck("id").compact
-
-              student_view_index = children_ids.index("easy_student_view")
-              top_nav_tools_index = children_ids.index("top-nav-tools-mount-point")
-
-              # In reverse order, student view appears AFTER top-nav-tools in DOM
-              expect(student_view_index).to be_present
-              expect(top_nav_tools_index).to be_present
-              expect(top_nav_tools_index).to be < student_view_index
             end
           end
         end

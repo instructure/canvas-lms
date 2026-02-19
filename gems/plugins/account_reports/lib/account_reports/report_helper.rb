@@ -487,7 +487,7 @@ module AccountReports::ReportHelper
       write_report(headers, false, replica) do |csv|
         @account_report.account_report_rows.order(:account_report_runner_id, :row_number)
                        .find_in_batches(strategy: :cursor) do |batch|
-          batch.each { |record| csv << record.row }
+                         batch.each { |record| csv << record.row }
         end
       end
     end
@@ -502,7 +502,7 @@ module AccountReports::ReportHelper
                          @account_report.account_report_rows.where(file:)
                                         .order(:account_report_runner_id, :row_number)
                                         .find_in_batches(strategy: :cursor) do |batch|
-                           batch.each { |record| csv << record.row }
+                                          batch.each { |record| csv << record.row }
                          end
                        end
                      else

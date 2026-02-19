@@ -18,12 +18,13 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {MemoryRouter} from 'react-router-dom'
 import {AccessibilityCoursesPage} from '../AccessibilityCoursesPage'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import {createMockCourses} from '../../../__tests__/factories'
+import {createMockCourses, createMockLinkHeaderString} from '../../../__tests__/factories'
 
 const server = setupServer()
 
@@ -52,9 +53,9 @@ describe('AccessibilityCoursesPage', () => {
     server.close()
   })
 
-  const renderPage = () =>
+  const renderPage = (initialEntries: string[] = ['/']) =>
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={initialEntries}>
         <QueryClientProvider client={queryClient}>
           <AccessibilityCoursesPage />
         </QueryClientProvider>
@@ -146,6 +147,166 @@ describe('AccessibilityCoursesPage', () => {
       expect(screen.getByText('Teacher')).toBeInTheDocument()
       expect(screen.getByText('Sub-Account')).toBeInTheDocument()
       expect(screen.getByText('Students')).toBeInTheDocument()
+    })
+  })
+
+  describe('pagination', () => {
+    it('loads page from URL query parameter on mount', async () => {
+      let lastRequestParams: URLSearchParams | undefined
+
+      const mockCourses = createMockCourses(14)
+      server.use(
+        http.get('/api/v1/accounts/123/courses', ({request}: {request: Request}) => {
+          lastRequestParams = new URL(request.url).searchParams
+          return HttpResponse.json(mockCourses, {
+            headers: {Link: createMockLinkHeaderString(3)},
+          })
+        }),
+      )
+
+      renderPage(['/?page=2'])
+
+      await waitFor(() => {
+        expect(lastRequestParams?.get('page')).toBe('2')
+      })
+    })
+
+    it('does not show pagination when only one page exists', async () => {
+      const mockCourses = createMockCourses(5)
+      server.use(
+        http.get('/api/v1/accounts/123/courses', () => {
+          return HttpResponse.json(mockCourses, {
+            headers: {
+              Link: createMockLinkHeaderString(1),
+            },
+          })
+        }),
+      )
+
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('courses-pagination')).not.toBeInTheDocument()
+      })
+    })
+
+    it('shows pagination when multiple pages exist', async () => {
+      const mockCourses = createMockCourses(15)
+      server.use(
+        http.get('/api/v1/accounts/123/courses', () => {
+          return HttpResponse.json(mockCourses, {
+            headers: {
+              Link: createMockLinkHeaderString(2),
+            },
+          })
+        }),
+      )
+
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('courses-pagination')).toBeInTheDocument()
+      })
+    })
+
+        it('updates page when pagination button is clicked', async () => {
+      const user = userEvent.setup()
+      let lastRequestParams: URLSearchParams | undefined
+
+      const mockCourses = createMockCourses(14)
+      server.use(
+        http.get('/api/v1/accounts/123/courses', ({request}: {request: Request}) => {
+          lastRequestParams = new URL(request.url).searchParams
+          return HttpResponse.json(mockCourses, {
+            headers: {Link: createMockLinkHeaderString(3)},
+          })
+        }),
+      )
+
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('courses-pagination')).toBeInTheDocument()
+      })
+
+      const page2Button = await screen.findByRole('button', {name: '2'})
+      await user.click(page2Button)
+
+      await waitFor(() => {
+        expect(lastRequestParams?.get('page')).toBe('2')
+      })
+    })
+
+    it('resets to page 1 when sorting changes', async () => {
+      const user = userEvent.setup()
+      let lastRequestParams: URLSearchParams | undefined
+
+      const mockCourses = createMockCourses(14)
+      server.use(
+        http.get('/api/v1/accounts/123/courses', ({request}: {request: Request}) => {
+          lastRequestParams = new URL(request.url).searchParams
+          return HttpResponse.json(mockCourses, {
+            headers: {Link: createMockLinkHeaderString(3)},
+          })
+        }),
+      )
+
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('courses-pagination')).toBeInTheDocument()
+      })
+
+      const page2Button = await screen.findByRole('button', {name: '2'})
+      await user.click(page2Button)
+
+      const issuesHeader = await screen.findByText('Issues')
+      await user.click(issuesHeader)
+
+      await waitFor(() => {
+        expect(lastRequestParams?.get('page')).toBe('1')
+        expect(lastRequestParams?.get('sort')).toBe('a11y_active_issue_count')
+      })
+    })
+
+    it('defaults to page 1 when invalid page number is in URL', async () => {
+      let lastRequestParams: URLSearchParams | undefined
+
+      const mockCourses = createMockCourses(14)
+      server.use(
+        http.get('/api/v1/accounts/123/courses', ({request}: {request: Request}) => {
+          lastRequestParams = new URL(request.url).searchParams
+          return HttpResponse.json(mockCourses, {
+            headers: {Link: createMockLinkHeaderString(3)},
+          })
+        }),
+      )
+
+      renderPage(['/?page=invalid'])
+
+      await waitFor(() => {
+        expect(lastRequestParams?.get('page')).toBe('1')
+      })
+    })
+
+    it('defaults to page 1 when negative page number is in URL', async () => {
+      let lastRequestParams: URLSearchParams | undefined
+
+      const mockCourses = createMockCourses(14)
+      server.use(
+        http.get('/api/v1/accounts/123/courses', ({request}: {request: Request}) => {
+          lastRequestParams = new URL(request.url).searchParams
+          return HttpResponse.json(mockCourses, {
+            headers: {Link: createMockLinkHeaderString(3)},
+          })
+        }),
+      )
+
+      renderPage(['/?page=-1'])
+
+      await waitFor(() => {
+        expect(lastRequestParams?.get('page')).toBe('1')
+      })
     })
   })
 })

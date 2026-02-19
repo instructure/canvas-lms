@@ -26,13 +26,47 @@ export interface Attachment {
   url?: string | null
 }
 
+export interface MediaObject {
+  _id: string
+  mediaType: string | null
+  title: string | null
+}
+
+export interface RubricAssessmentRating {
+  _id: string
+  criterion: {
+    _id: string
+  }
+  comments?: string | null
+  commentsHtml?: string | null
+  description?: string | null
+  points: number
+}
+
+export interface RubricAssessmentNode {
+  _id: string
+  assessmentType: string
+  score: number
+  assessor: {
+    _id: string
+  }
+  assessmentRatings: RubricAssessmentRating[]
+}
+
 export interface Submission {
   _id: string
+  id?: string
   attempt: number
   body?: string | null
   submissionType: string
   url?: string | null
   attachments?: Attachment[] | null
+  user?: {
+    _id: string
+  } | null
+  anonymousId?: string | null
+  submittedAt?: string | null
+  mediaObject?: MediaObject | null
 }
 
 export interface PeerReviewDates {
@@ -44,6 +78,48 @@ export interface PeerReviewDates {
 export interface AssignedToDates {
   dueAt: string | null
   peerReviewDates: PeerReviewDates | null
+  user?: {
+    _id: string
+  } | null
+  anonymousId?: string | null
+}
+
+export interface RubricRating {
+  _id: string
+  description: string
+  long_description?: string
+  points: number
+  criterion_id?: string
+}
+
+export interface RubricCriterion {
+  _id: string
+  description: string
+  long_description?: string
+  points: number
+  criterion_use_range?: boolean
+  ratings: RubricRating[]
+  ignore_for_scoring?: boolean
+  mastery_points?: number
+  learning_outcome_id?: string
+}
+
+export interface Rubric {
+  _id: string
+  title: string
+  criteria: RubricCriterion[]
+  free_form_criterion_comments?: boolean
+  hide_score_total?: boolean
+  points_possible: number
+  ratingOrder?: string
+  button_display?: string
+}
+
+export interface RubricAssociation {
+  _id: string
+  hide_points?: boolean
+  hide_score_total?: boolean
+  use_for_grading?: boolean
 }
 
 export interface Assignment {
@@ -59,6 +135,8 @@ export interface Assignment {
   submissionsConnection: SubmissionsConnection | null
   assignedToDates: AssignedToDates[] | null
   assessmentRequestsForCurrentUser: AssessmentRequest[] | null
+  rubric?: Rubric | null
+  rubricAssociation?: RubricAssociation | null
   env?: {
     currentUser?: {
       avatar_image_url?: string
@@ -73,12 +151,23 @@ export interface AssessmentRequest {
   available: boolean | null
   workflowState: string
   createdAt: string
+  anonymousId: string | null
+  anonymizedUser: {
+    _id: string
+    displayName: string
+  } | null
   submission: Submission | null
+  rubricAssessment?: {
+    _id: string
+    assessmentRatings: RubricAssessmentRating[]
+  } | null
 }
 
 interface PeerReviews {
   count: number | null
   submissionRequired: boolean | null
+  pointsPossible: number | null
+  anonymousReviews: boolean | null
 }
 
 interface SubmissionsConnection {
@@ -87,7 +176,7 @@ interface SubmissionsConnection {
 
 interface SubmissionNode {
   _id: string
-  submissionStatus: string | null
+  submittedAt: string | null
 }
 
 export interface ReviewerSubmission {
@@ -99,4 +188,7 @@ export interface ReviewerSubmission {
     workflowState: string
     assetSubmissionType: string | null
   }[]
+  rubricAssessmentsConnection?: {
+    nodes: RubricAssessmentNode[]
+  } | null
 }

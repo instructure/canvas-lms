@@ -59,9 +59,7 @@ module Accessibility
         end
 
         if [I18n.t("The first column"), I18n.t("Both")].include?(value)
-          elem.query_selector_all("tr").each_with_index do |row, index|
-            next if index == 0 # Skip the first row
-
+          elem.query_selector_all("tr").each do |row|
             first_cell = row.query_selector("td")
             if first_cell
               first_cell.name = "th"
@@ -70,7 +68,7 @@ module Accessibility
           end
         end
 
-        elem
+        { changed: elem }
       end
 
       def display_name
@@ -78,7 +76,7 @@ module Accessibility
       end
 
       def message
-        I18n.t("Table headers aren't set up correctly for screen readers to know which headers apply to which cells.")
+        I18n.t("This table headers isn't set up correctly for screen readers to know which cells it applies to.")
       end
 
       def why

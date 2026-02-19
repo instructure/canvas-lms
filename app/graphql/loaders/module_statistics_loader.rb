@@ -54,7 +54,7 @@ module Loaders
                                       .pluck(:content_type, :content_id, :context_module_id)
                                       .group_by { |arr| arr[0] }
                                       .transform_values do |items|
-        items.group_by { |i| i[1] }.transform_values { |group| group.to_set { |i| i[2] } }
+                                        items.group_by { |i| i[1] }.transform_values { |group| group.to_set { |i| i[2] } }
       end
 
       # {"Assignment"=>{content_id_1=>#<Set: {context_module_id_1, context_module_id_2}>, "Quizzes::Quiz"=>{content_id_1=>#<Set: {context_module_id_1}>}

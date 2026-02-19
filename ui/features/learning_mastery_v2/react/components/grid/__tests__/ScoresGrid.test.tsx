@@ -25,7 +25,7 @@ import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {
   ContributingScoresManager,
   ContributingScoreAlignment,
-} from '../../../hooks/useContributingScores'
+} from '@canvas/outcomes/react/hooks/useContributingScores'
 
 describe('ScoresGrid', () => {
   afterEach(() => {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {hasScheduledReleaseChanged, validateRelease} from '../utils/utils'
+import {hasScheduledReleaseChanged, validateRelease, combineDateTime} from '../utils/utils'
 import {ScheduledRelease} from '../ScheduledReleasePolicy'
 
 describe('utils', () => {
@@ -367,10 +367,10 @@ describe('utils', () => {
         expect(errors.grades).toHaveLength(1)
         expect(errors.comments).toHaveLength(1)
         expect(errors.grades[0].text).toContain(
-          'Grades release date must be the same or after comments release date',
+          'Grades release date and time must be the same or after comments release date',
         )
         expect(errors.comments[0].text).toContain(
-          'Comments release date must be the same or before grades release date',
+          'Comments release date and time must be the same or before grades release date',
         )
       })
 
@@ -385,6 +385,72 @@ describe('utils', () => {
         expect(errors.grades).toHaveLength(0)
         expect(errors.comments).toHaveLength(0)
       })
+    })
+  })
+
+  describe('combineDateTime', () => {
+    it('returns undefined when both date and time are null', () => {
+      const result = combineDateTime(null, null)
+      expect(result).toBeUndefined()
+    })
+
+    it('returns undefined when both date and time are undefined', () => {
+      const result = combineDateTime(undefined, undefined)
+      expect(result).toBeUndefined()
+    })
+
+    it('combines date and time correctly when both are provided', () => {
+      const dateString = '2025-12-17T00:00:00.000Z'
+      const timeString = '2025-01-01T14:30:00.000Z'
+
+      const result = combineDateTime(dateString, timeString)
+      const combined = new Date(result!)
+
+      // combineDateTime uses local timezone components
+      const expectedDate = new Date(dateString)
+      const expectedTime = new Date(timeString)
+
+      expect(combined.getFullYear()).toBe(expectedDate.getFullYear())
+      expect(combined.getMonth()).toBe(expectedDate.getMonth())
+      expect(combined.getDate()).toBe(expectedDate.getDate())
+      expect(combined.getHours()).toBe(expectedTime.getHours())
+      expect(combined.getMinutes()).toBe(expectedTime.getMinutes())
+    })
+
+    it('uses midnight as default time when only date is provided', () => {
+      const dateString = '2025-12-17T15:45:30.500Z'
+
+      const result = combineDateTime(dateString, null)
+      const combined = new Date(result!)
+
+      // combineDateTime uses local timezone components
+      const expectedDate = new Date(dateString)
+
+      // Should preserve the date but use midnight time (in local timezone)
+      expect(combined.getFullYear()).toBe(expectedDate.getFullYear())
+      expect(combined.getMonth()).toBe(expectedDate.getMonth())
+      expect(combined.getDate()).toBe(expectedDate.getDate())
+      expect(combined.getHours()).toBe(0)
+      expect(combined.getMinutes()).toBe(0)
+      expect(combined.getSeconds()).toBe(0)
+    })
+
+    it("uses today's date when only time is provided", () => {
+      const now = new Date()
+      const timeString = '2020-01-01T14:30:45.000Z'
+
+      const result = combineDateTime(null, timeString)
+      const combined = new Date(result!)
+      const expectedTime = new Date(timeString)
+
+      // Should use today's date (in local timezone)
+      expect(combined.getFullYear()).toBe(now.getFullYear())
+      expect(combined.getMonth()).toBe(now.getMonth())
+      expect(combined.getDate()).toBe(now.getDate())
+      // Should use time from timeString (in local timezone)
+      expect(combined.getHours()).toBe(expectedTime.getHours())
+      expect(combined.getMinutes()).toBe(expectedTime.getMinutes())
+      expect(combined.getSeconds()).toBe(expectedTime.getSeconds())
     })
   })
 })

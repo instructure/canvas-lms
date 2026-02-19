@@ -29,17 +29,19 @@ interface PeerReviewSelectorProps {
   assessmentRequests: AssessmentRequest[]
   selectedIndex: number
   onSelectionChange: (index: number) => void
+  requiredPeerReviewCount: number
 }
 
 export const PeerReviewSelector = ({
   assessmentRequests,
   selectedIndex,
   onSelectionChange,
+  requiredPeerReviewCount,
 }: PeerReviewSelectorProps) => {
-  const availableAssessments = (assessmentRequests ?? []).filter(
-    assessment => assessment.available === true,
-  )
+  // Include all assessment requests (both available and unavailable due to missing submissions)
+  const availableAssessments = assessmentRequests ?? []
   const hasAssessments = availableAssessments.length > 0
+  const unavailableCount = Math.max(0, requiredPeerReviewCount - availableAssessments.length)
 
   const handleChange = (_event: React.SyntheticEvent, data: {value?: string | number}) => {
     const index = Number(data.value)
@@ -47,15 +49,25 @@ export const PeerReviewSelector = ({
   }
 
   const readyToReview = availableAssessments.filter(
-    assessment => assessment.workflowState === 'assigned',
+    assessment =>
+      assessment.workflowState === 'assigned' &&
+      assessment.submission?.submittedAt !== null &&
+      assessment.submission?.submittedAt !== undefined,
   )
 
   const completedReviews = availableAssessments.filter(
-    assessment => assessment.workflowState === 'completed',
+    assessment =>
+      assessment.workflowState === 'completed' &&
+      assessment.submission?.submittedAt !== null &&
+      assessment.submission?.submittedAt !== undefined,
+  )
+
+  const submissionNotAvailable = availableAssessments.filter(
+    assessment => !assessment.submission?.submittedAt,
   )
 
   const renderChildren = () => {
-    if (!hasAssessments) {
+    if (!hasAssessments && unavailableCount === 0) {
       return (
         <SimpleSelect.Option id="no-peer-reviews" value="no-peer-reviews">
           {I18n.t('No peer reviews available')}
@@ -78,7 +90,7 @@ export const PeerReviewSelector = ({
               >
                 {I18n.t('Peer Review (%{number} of %{total})', {
                   number: index + 1,
-                  total: availableAssessments.length,
+                  total: requiredPeerReviewCount,
                 })}
               </SimpleSelect.Option>
             )
@@ -101,7 +113,45 @@ export const PeerReviewSelector = ({
               >
                 {I18n.t('Peer Review (%{number} of %{total})', {
                   number: index + 1,
-                  total: availableAssessments.length,
+                  total: requiredPeerReviewCount,
+                })}
+              </SimpleSelect.Option>
+            )
+          })}
+        </SimpleSelect.Group>,
+      )
+    }
+
+    if (submissionNotAvailable.length > 0 || unavailableCount > 0) {
+      children.push(
+        <SimpleSelect.Group key="unavailable-group" renderLabel={I18n.t('Not Yet Available')}>
+          {submissionNotAvailable.map(assessment => {
+            const index = availableAssessments.indexOf(assessment)
+            return (
+              <SimpleSelect.Option
+                key={assessment._id}
+                id={`peer-review-option-${index}`}
+                value={String(index)}
+              >
+                {I18n.t('Peer Review (%{number} of %{total})', {
+                  number: index + 1,
+                  total: requiredPeerReviewCount,
+                })}
+              </SimpleSelect.Option>
+            )
+          })}
+          {Array.from({length: unavailableCount}, (_, i) => {
+            const reviewNumber = availableAssessments.length + i + 1
+            const indexValue = availableAssessments.length + i
+            return (
+              <SimpleSelect.Option
+                key={`unavailable-${i}`}
+                id={`peer-review-unavailable-${i}`}
+                value={String(indexValue)}
+              >
+                {I18n.t('Peer Review (%{number} of %{total})', {
+                  number: reviewNumber,
+                  total: requiredPeerReviewCount,
                 })}
               </SimpleSelect.Option>
             )
@@ -113,10 +163,17 @@ export const PeerReviewSelector = ({
     return children
   }
 
+  const totalOptionsCount = availableAssessments.length + unavailableCount
+  const hasOptions = hasAssessments || unavailableCount > 0
+
   return (
     <SimpleSelect
       renderLabel={<ScreenReaderContent>{I18n.t('Select peer to review')}</ScreenReaderContent>}
-      value={hasAssessments ? String(selectedIndex >= 0 ? selectedIndex : 0) : 'no-peer-reviews'}
+      value={
+        hasOptions
+          ? String(selectedIndex >= 0 && selectedIndex < totalOptionsCount ? selectedIndex : 0)
+          : 'no-peer-reviews'
+      }
       onChange={handleChange}
       data-testid="peer-review-selector"
       width="15rem"

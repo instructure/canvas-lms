@@ -96,6 +96,13 @@ const highlightText = (text: string, searchTerm: string): string => {
     )
 }
 
+const addTargetToLinks = (html: string): string => {
+  const isEmbedded = new URLSearchParams(window.location.search).get('embed') === 'true'
+  if (!isEmbedded) return html
+
+  return html.replace(/<a\s/gi, '<a target="_top" ')
+}
+
 export function SearchSpan({...props}: SearchSpanProps) {
   const resourceType = () => {
     if (props.isAnnouncement == null || props.isTopic == null) {
@@ -107,6 +114,9 @@ export function SearchSpan({...props}: SearchSpanProps) {
     }`
   }
 
+  const processedHtml = addSearchHighlighting(props.searchTerm, props.htmlBody, props.isSplitView)
+  const finalHtml = addTargetToLinks(processedHtml)
+
   return (
     <span
       lang={props.lang}
@@ -115,7 +125,7 @@ export function SearchSpan({...props}: SearchSpanProps) {
       data-resource-id={props.resourceId}
       data-testid={props.testId}
       dangerouslySetInnerHTML={{
-        __html: addSearchHighlighting(props.searchTerm, props.htmlBody, props.isSplitView),
+        __html: finalHtml,
       }}
     />
   )

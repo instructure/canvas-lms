@@ -23,28 +23,26 @@ const helper = {
   _parseNumber: parseNumber,
 
   parse(input: number | string) {
-    if (input == null) {
-      return NaN
-    } else if (typeof input === 'number') {
-      return input
+    if (input == null || input === '') return NaN
+    if (typeof input === 'number') return input
+    const inputStr = input.toString().trim()
+    const separator = I18n.lookup('number.format.separator') || '.'
+    const delimiter = I18n.lookup('number.format.delimiter') || ','
+
+    if (helper.isScientific(inputStr)) {
+      const normalized = inputStr.replace(separator, '.')
+      const scientificNum = parseFloat(normalized)
+      if (!Number.isNaN(scientificNum)) {
+        return scientificNum
+      }
     }
 
-    let num = helper._parseNumber(input.toString(), {
-      thousands: I18n.lookup('number.format.delimiter') ?? undefined,
-      decimal: I18n.lookup('number.format.separator') ?? undefined,
+    const num = helper._parseNumber(inputStr, {
+      thousands: delimiter,
+      decimal: separator,
     })
 
-    // fallback to default delimiters if invalid with locale specific ones
-    if (Number.isNaN(Number(num))) {
-      num = helper._parseNumber(input)
-    }
-
-    // final fallback to old parseFloat - this allows us to still support scientific 'e' notation
-    if (Number.isNaN(Number(num)) && helper.isScientific(input.toString())) {
-      num = parseFloat(input)
-    }
-
-    return num
+    return Number.isNaN(Number(num)) ? NaN : num
   },
 
   validate(input: number | string) {
@@ -52,8 +50,14 @@ const helper = {
   },
 
   isScientific(inputString: string) {
-    const scientificPattern = /^[+-]?\d+(\.\d*)?([eE][+-]?\d+)$/
-    return inputString.match(scientificPattern)
+    const separator = I18n.lookup('number.format.separator') || '.'
+    const escapedSeparator = separator === '.' ? '\\.' : separator
+
+    // This pattern ensures the [eE] is present to be considered scientific
+    // and uses the specific locale separator.
+    const pattern = new RegExp(`^[+-]?\\d+(${escapedSeparator}\\d*)?[eE][+-]?\\d+$`)
+
+    return !!inputString.match(pattern)
   },
 }
 

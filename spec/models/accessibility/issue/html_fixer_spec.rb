@@ -29,7 +29,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           "invalid_resource",
           "./div/h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -46,7 +46,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           wiki_page,
           "invalid_path",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -70,7 +70,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           wiki_page,
           "./div/h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -105,6 +105,38 @@ describe Accessibility::Issue::HtmlFixer do
         html_fixer.apply_fix!
       end
     end
+
+    context "with a discussion topic" do
+      let(:discussion_topic) { discussion_topic_model(context: course, message: "<div><h1>Discussion Title</h1></div>") }
+
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          discussion_topic,
+          "./div/h1",
+          "Change heading level to Heading 2"
+        )
+      end
+
+      it "updates the resource successfully" do
+        html_fixer.apply_fix!
+
+        expect(discussion_topic.reload.message).to eq "<div><h2>Discussion Title</h2></div>"
+      end
+
+      it "returns the full document with the fix applied" do
+        result = html_fixer.apply_fix!
+
+        expect(result).to eq(
+          {
+            status: :ok,
+            json: {
+              success: true
+            },
+          }
+        )
+      end
+    end
   end
 
   describe "#preview_fix" do
@@ -118,7 +150,7 @@ describe Accessibility::Issue::HtmlFixer do
               Accessibility::Rules::HeadingsStartAtH2Rule.id,
               wiki_page,
               "invalid_path",
-              "Change it to Heading 2"
+              "Change heading level to Heading 2"
             )
           end
 
@@ -144,7 +176,7 @@ describe Accessibility::Issue::HtmlFixer do
               Accessibility::Rules::HeadingsStartAtH2Rule.id,
               wiki_page,
               "./div/h1",
-              "Change it to Heading 2"
+              "Change heading level to Heading 2"
             )
           end
 
@@ -171,7 +203,7 @@ describe Accessibility::Issue::HtmlFixer do
               Accessibility::Rules::HeadingsStartAtH2Rule.id,
               wiki_page,
               "invalid_path",
-              "Change it to Heading 2"
+              "Change heading level to Heading 2"
             )
           end
 
@@ -197,7 +229,7 @@ describe Accessibility::Issue::HtmlFixer do
               Accessibility::Rules::HeadingsStartAtH2Rule.id,
               wiki_page,
               "./div/h1",
-              "Change it to Heading 2"
+              "Change heading level to Heading 2"
             )
           end
 
@@ -226,7 +258,7 @@ describe Accessibility::Issue::HtmlFixer do
           Accessibility::Rules::HeadingsStartAtH2Rule.id,
           assignment,
           "./div/h1",
-          "Change it to Heading 2"
+          "Change heading level to Heading 2"
         )
       end
 
@@ -238,6 +270,33 @@ describe Accessibility::Issue::HtmlFixer do
             status: :ok,
             json: {
               content: "<div><h2>Assignment Title</h2></div>",
+              path: "./div/h2"
+            },
+          }
+        )
+      end
+    end
+
+    context "with a discussion topic" do
+      let(:discussion_topic) { discussion_topic_model(context: course, message: "<div><h1>Discussion Title</h1></div>") }
+
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          discussion_topic,
+          "./div/h1",
+          "Change heading level to Heading 2"
+        )
+      end
+
+      it "works with discussion topic messages" do
+        result = html_fixer.preview_fix
+
+        expect(result).to eq(
+          {
+            status: :ok,
+            json: {
+              content: "<div><h2>Discussion Title</h2></div>",
               path: "./div/h2"
             },
           }
@@ -271,7 +330,10 @@ describe Accessibility::Issue::HtmlFixer do
           allow(mock_rule).to receive(:test).and_return(nil)
           allow(mock_rule).to receive(:fix!) do |elem, _value|
             elem.content = "Fixed Content"
-            [elem, "<span id='test-element'>Fixed Content</span><p>Extra context</p>"]
+            {
+              changed: elem,
+              content_preview: "<span id='test-element'>Fixed Content</span><p>Extra context</p>"
+            }
           end
         end
 
@@ -308,7 +370,7 @@ describe Accessibility::Issue::HtmlFixer do
           allow(mock_rule).to receive(:test).and_return(nil)
           allow(mock_rule).to receive(:fix!) do |elem, _value|
             elem.content = "New Text"
-            elem
+            { changed: elem }
           end
         end
 
@@ -318,6 +380,40 @@ describe Accessibility::Issue::HtmlFixer do
           expect(result[:status]).to eq(:ok)
           expect(result[:json][:content]).to eq("<span id=\"old-element\">New Text</span>")
         end
+      end
+    end
+  end
+
+  describe ".target_attribute" do
+    context "with WikiPage" do
+      let(:wiki_page) { wiki_page_model(course:) }
+
+      it "returns :body" do
+        expect(described_class.target_attribute(wiki_page)).to eq(:body)
+      end
+    end
+
+    context "with Assignment" do
+      let(:assignment) { assignment_model(course:) }
+
+      it "returns :description" do
+        expect(described_class.target_attribute(assignment)).to eq(:description)
+      end
+    end
+
+    context "with DiscussionTopic" do
+      let(:discussion_topic) { discussion_topic_model(context: course) }
+
+      it "returns :message" do
+        expect(described_class.target_attribute(discussion_topic)).to eq(:message)
+      end
+    end
+
+    context "with unsupported resource type" do
+      it "raises ArgumentError" do
+        expect do
+          described_class.target_attribute("invalid_resource")
+        end.to raise_error(ArgumentError, "Unsupported resource type: String")
       end
     end
   end

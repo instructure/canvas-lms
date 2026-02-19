@@ -62,18 +62,6 @@ federated_pseudonym_attributes:
       state: allowed
     ci:
       state: allowed
-saml_count_one_time_use_usage:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Count SAML OneTimeUse Condition Usage
-  description: Send metrics to DataDog on OneTimeUse condition usage in SAML assertions.
-  environments:
-    development:
-      state: allowed
-    beta:
-      state: hidden
-    production:
-      state: hidden
 saml_enforce_one_time_use:
   state: hidden
   applies_to: RootAccount

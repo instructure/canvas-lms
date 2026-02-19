@@ -67,9 +67,9 @@ afterEach(() => {
 afterAll(() => server.close())
 
 describe('planner rendering', () => {
-  let sidebarRoot = null
-  let plannerRoot = null
-  let headerRoot = null
+  const sidebarRoot = null
+  const plannerRoot = null
+  const headerRoot = null
 
   beforeEach(() => {
     document.body.innerHTML = ''

@@ -28,7 +28,7 @@ import {
 } from '../../../../contexts/AccessibilityCheckerContext'
 import {FormType, IssueWorkflowState} from '../../../../types'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
-import TextInputForm from '../TextInput'
+import TextInputForm from '../TextInputForm'
 import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
 
 const server = setupServer()
@@ -87,16 +87,19 @@ describe('TextInputForm', () => {
 
   // Create a fully typed mock context
   const mockContextValue: AccessibilityCheckerContextType = {
-    selectedItem: getAsAccessibilityResourceScan({
-      id: 123,
-      type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
-      title: 'Mock Page',
-      published: true,
-      updatedAt: '2023-01-01',
-      count: 0,
-      url: 'http://example.com',
-      editUrl: 'http://example.com/edit',
-    }),
+    selectedItem: getAsAccessibilityResourceScan(
+      {
+        id: 123,
+        type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
+        title: 'Mock Page',
+        published: true,
+        updatedAt: '2023-01-01',
+        count: 0,
+        url: 'http://example.com',
+        editUrl: 'http://example.com/edit',
+      },
+      1,
+    ),
     setSelectedItem: vi.fn(),
     isTrayOpen: false,
     setIsTrayOpen: vi.fn(),

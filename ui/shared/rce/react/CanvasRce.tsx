@@ -24,10 +24,11 @@ import RCE, {type RCEPropTypes} from '@instructure/canvas-rce/es/rce/RCE'
 import RCEWrapper from '@instructure/canvas-rce/es/rce/RCEWrapper'
 import getRCSProps from '../getRCSProps'
 import EditorConfig from '../tinymce.config'
-import loadEventListeners from '../loadEventListeners'
 import shouldUseFeature, {Feature} from '../shouldUseFeature'
 import tinymce, {Editor} from 'tinymce'
 import type {EditorOptions} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
+
+window.INST = window.INST || {}
 
 // the ref you add via <CanvasRce ref={yourRef} /> will be a reference
 // to the underlying RCEWrapper. You probably shouldn't use it until
@@ -102,10 +103,6 @@ const CanvasRce = forwardRef(function CanvasRce(
       rce_wrapper?.destroy()
     }
   }, [rceRef, refCreated])
-
-  useEffect(() => {
-    loadEventListeners()
-  }, [])
 
   return (
     <RCE

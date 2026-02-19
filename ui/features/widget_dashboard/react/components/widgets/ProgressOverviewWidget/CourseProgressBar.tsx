@@ -19,6 +19,7 @@
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {GRADED_COLOR, UNGRADED_COLOR, MISSING_COLOR, UPCOMING_COLOR} from './ProgressLegend'
 
 export interface CourseProgressBarProps {
   submittedAndGradedCount: number
@@ -50,7 +51,7 @@ export function calculateProgressSegments(
   if (total === 0) {
     return [
       {
-        color: '#D8E7F3',
+        color: UPCOMING_COLOR,
         percentage: 100,
         label: 'No assignments',
         testId: 'no-assignments',
@@ -62,7 +63,7 @@ export function calculateProgressSegments(
 
   if (submittedAndGradedCount > 0) {
     segments.push({
-      color: '#1E9975',
+      color: GRADED_COLOR,
       percentage: (submittedAndGradedCount / total) * 100,
       label: 'Submitted and graded',
       testId: 'graded',
@@ -71,7 +72,7 @@ export function calculateProgressSegments(
 
   if (submittedNotGradedCount > 0) {
     segments.push({
-      color: '#2573DF',
+      color: UNGRADED_COLOR,
       percentage: (submittedNotGradedCount / total) * 100,
       label: 'Submitted not graded',
       testId: 'not-graded',
@@ -80,7 +81,7 @@ export function calculateProgressSegments(
 
   if (missingSubmissionsCount > 0) {
     segments.push({
-      color: '#DB6414',
+      color: MISSING_COLOR,
       percentage: (missingSubmissionsCount / total) * 100,
       label: 'Missing',
       testId: 'missing',
@@ -89,7 +90,7 @@ export function calculateProgressSegments(
 
   if (submissionsDueCount > 0) {
     segments.push({
-      color: '#D8E7F3',
+      color: UPCOMING_COLOR,
       percentage: (submissionsDueCount / total) * 100,
       label: 'Due',
       testId: 'due',

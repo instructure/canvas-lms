@@ -1194,7 +1194,7 @@ module UsefulBatchEnumerator
     @relation.except(:select)
              .select(*)
              .in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
-      yield relation.pluck(*)
+               yield relation.pluck(*)
     end
   end
 

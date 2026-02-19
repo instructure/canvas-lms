@@ -20,20 +20,35 @@
 
 class Loaders::AssignmentRubricAssessmentsCountLoader < GraphQL::Batch::Loader
   def perform(assignments)
-    assignments.each { |assignment| fulfill(assignment, count_assessments(assignment)) }
-  end
+    assignment_ids = assignments.map(&:id)
 
-  def count_assessments(assignment)
-    rubric_association = assignment.rubric_association
-    return 0 unless rubric_association
+    # Single query with subqueries to count assessments
+    # Only count assessments where:
+    # 1. The user has a submission for that assignment
+    # 2. The user has an active/completed enrollment in the assignment's course
+    counts_by_assignment = RubricAssessment
+                           .joins(:rubric_association)
+                           .joins("INNER JOIN #{Assignment.quoted_table_name} a ON a.id = rubric_associations.association_id")
+                           .where(rubric_associations: { association_type: "Assignment", association_id: assignment_ids })
+                           .where(
+                             "EXISTS (
+          SELECT 1 FROM #{Submission.quoted_table_name} s
+          WHERE s.assignment_id = rubric_associations.association_id
+            AND s.user_id = #{RubricAssessment.quoted_table_name}.user_id
+        )"
+                           )
+                           .where(
+                             "EXISTS (
+          SELECT 1 FROM #{Enrollment.quoted_table_name} e
+          WHERE e.user_id = #{RubricAssessment.quoted_table_name}.user_id
+            AND e.course_id = a.context_id
+            AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+            AND e.workflow_state IN ('active', 'completed')
+        )"
+                           )
+                           .group("rubric_associations.association_id")
+                           .count("#{RubricAssessment.quoted_table_name}.id")
 
-    students_with_submissions = Submission.where(assignment_id: assignment.id).select(:user_id)
-    active_enrollments = Enrollment.where(user_id: students_with_submissions)
-                                   .where(course_id: assignment.context_id)
-                                   .where(Enrollment.active_or_completed_student_conditions)
-    students = User.where(id: active_enrollments.pluck(:user_id))
-    return 0 unless students
-
-    RubricAssessment.where(rubric_association:, user_id: students.pluck(:id)).count
+    assignments.each { |assignment| fulfill(assignment, counts_by_assignment.fetch(assignment.id, 0)) }
   end
 end

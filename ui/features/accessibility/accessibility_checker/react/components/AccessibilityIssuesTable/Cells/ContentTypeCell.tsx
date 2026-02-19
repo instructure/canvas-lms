@@ -17,7 +17,12 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import {IconAssignmentLine, IconDocumentLine, IconMsWordLine} from '@instructure/ui-icons'
+import {
+  IconAssignmentLine,
+  IconDiscussionLine,
+  IconDocumentLine,
+  IconMsWordLine,
+} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -38,6 +43,8 @@ function getIconByContentType(contentType: ResourceType) {
       return <IconAssignmentLine aria-hidden="true" />
     case ResourceType.Attachment:
       return <IconMsWordLine aria-hidden="true" />
+    case ResourceType.DiscussionTopic:
+      return <IconDiscussionLine aria-hidden="true" />
   }
 }
 
@@ -49,6 +56,8 @@ function getTextByContentType(contentType: ResourceType) {
       return I18n.t('Assignment')
     case ResourceType.Attachment:
       return I18n.t('Attachment')
+    case ResourceType.DiscussionTopic:
+      return I18n.t('Discussion topic')
   }
 }
 

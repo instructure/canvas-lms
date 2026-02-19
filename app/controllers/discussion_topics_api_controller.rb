@@ -24,6 +24,7 @@ require "benchmark"
 class DiscussionTopicsApiController < ApplicationController
   include Api::V1::DiscussionTopics
   include Api::V1::User
+  include Api::V1::AccessibilityResourceScan
   include SubmittableHelper
   include LocaleSelection
 
@@ -36,7 +37,8 @@ class DiscussionTopicsApiController < ApplicationController
                                                   migrate_disallow
                                                   show
                                                   unsubscribe_topic
-                                                  update_discussion_types]
+                                                  update_discussion_types
+                                                  accessibility_scan]
   before_action only: %i[replies
                          entries
                          add_entry
@@ -1122,6 +1124,14 @@ class DiscussionTopicsApiController < ApplicationController
     InstStatsd::Statsd.distribution("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_not_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED })
 
     render json: { success: "true" }
+  end
+
+  def accessibility_scan
+    return unless authorized_action(@topic, @current_user, :update)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    scan = Accessibility::ResourceScannerService.new(resource: @topic).call_sync
+    render json: accessibility_resource_scan_json(scan)
   end
 
   protected

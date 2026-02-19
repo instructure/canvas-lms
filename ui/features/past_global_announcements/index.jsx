@@ -18,11 +18,10 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import PastGlobalAnnouncements from './react/PastGlobalAnnouncements'
 
 $(() => {
   const container = $('<div/>').appendTo('#content')[0]
-  const root = createRoot(container)
-  root.render(<PastGlobalAnnouncements />)
+  render(<PastGlobalAnnouncements />, container)
 })

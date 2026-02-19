@@ -55,7 +55,7 @@ module Types
     def attachments_connection
       load_association(:attachment_associations).then do |attachment_associations|
         Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load_many(attachment_associations)
-      end
+      end.then(&:compact)
     end
 
     # Temporary fix for grahpql pagination
@@ -64,7 +64,7 @@ module Types
       context.scoped_set!(:asset_location, object.asset_string)
       load_association(:attachment_associations).then do |attachment_associations|
         Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load_many(attachment_associations)
-      end
+      end.then(&:compact)
     end
   end
 end

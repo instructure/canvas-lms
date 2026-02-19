@@ -44,7 +44,7 @@ module Accessibility
           checkbox_subtext: I18n.t("Screen readers should skip purely decorative images."),
           undo_text: I18n.t("Alt text updated"),
           input_label: I18n.t("Alt text"),
-          input_description: I18n.t("Describe the content or purpose of this image."),
+          input_description: I18n.t("Describe what this image is meant to convey."),
           input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
           is_canvas_image: Accessibility::AiGenerationService.extract_attachment_id_from_element(elem).present?,
@@ -62,7 +62,7 @@ module Accessibility
       end
 
       def message
-        I18n.t("This text (alt text) is read by screen readers and displayed if the image fails to load. Replace the filename with a meaningful description.")
+        I18n.t("Alt text is just the filename. Replace it with a description that tells users who can't see or load the image what it's meant to convey.")
       end
 
       def issue_preview(elem)

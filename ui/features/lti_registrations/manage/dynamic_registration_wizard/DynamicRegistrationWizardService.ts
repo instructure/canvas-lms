@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {fetchRegistrationToken, getLtiRegistrationByUUID} from '../api/ltiImsRegistration'
+import type {
+  applyLtiRegistrationUpdateRequest,
+  fetchRegistrationToken,
+  getLtiRegistrationByUUID,
+  getLtiRegistrationUpdateRequestByUUID,
+} from '../api/ltiImsRegistration'
 import type {
   deleteRegistration,
   fetchLtiRegistration,
@@ -24,8 +29,10 @@ import type {
 } from '../api/registrations'
 export interface DynamicRegistrationWizardService {
   fetchRegistrationToken: typeof fetchRegistrationToken
+  getLtiRegistrationUpdateRequestByUUID: typeof getLtiRegistrationUpdateRequestByUUID
   getRegistrationByUUID: typeof getLtiRegistrationByUUID
   fetchLtiRegistration: typeof fetchLtiRegistration
   updateRegistration: typeof updateRegistration
+  applyLtiRegistrationUpdateRequest: typeof applyLtiRegistrationUpdateRequest
   deleteRegistration: typeof deleteRegistration
 }

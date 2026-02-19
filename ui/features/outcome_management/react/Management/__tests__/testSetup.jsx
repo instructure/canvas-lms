@@ -30,7 +30,7 @@ import {
   groupMocks,
 } from '@canvas/outcomes/mocks/Management'
 
-// Note: vi.mock calls must be in each test file for proper hoisting
+// Note: jest.mock calls must be in each test file for proper hoisting
 
 // Track current cache for teardown
 let currentCache = null
@@ -40,10 +40,10 @@ let currentCache = null
  */
 export const createDefaultProps = (overrides = {}, mocks = {}) => {
   const {
-    onLhsSelectedGroupIdChangedMock = vi.fn(),
-    handleFileDropMock = vi.fn(),
-    setTargetGroupIdsToRefetchMock = vi.fn(),
-    setImportsTargetGroupMock = vi.fn(),
+    onLhsSelectedGroupIdChangedMock = jest.fn(),
+    handleFileDropMock = jest.fn(),
+    setTargetGroupIdsToRefetchMock = jest.fn(),
+    setImportsTargetGroupMock = jest.fn(),
   } = mocks
 
   return {
@@ -152,10 +152,10 @@ export const setupTest = (options = {}) => {
   const {isMobileView = false} = options
   const cache = createCache()
   currentCache = cache
-  const onLhsSelectedGroupIdChangedMock = vi.fn()
-  const handleFileDropMock = vi.fn()
-  const setTargetGroupIdsToRefetchMock = vi.fn()
-  const setImportsTargetGroupMock = vi.fn()
+  const onLhsSelectedGroupIdChangedMock = jest.fn()
+  const handleFileDropMock = jest.fn()
+  const setTargetGroupIdsToRefetchMock = jest.fn()
+  const setImportsTargetGroupMock = jest.fn()
 
   fakeEnv.setup({
     PERMISSIONS: {

@@ -153,6 +153,9 @@ describe('assitnToHelper', () => {
           },
         ] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(generateDateDetailsPayload(cards, false, [])).toEqual(expectedPayload)
     })
@@ -235,6 +238,9 @@ describe('assitnToHelper', () => {
           },
         ] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
@@ -267,6 +273,9 @@ describe('assitnToHelper', () => {
           },
         ] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
@@ -287,6 +296,9 @@ describe('assitnToHelper', () => {
       const expectedPayload = <DateDetailsPayload>{
         assignment_overrides: [] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
@@ -327,6 +339,9 @@ describe('assitnToHelper', () => {
           },
         ] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(generateDateDetailsPayload(cards, false, [])).toEqual(expectedPayload)
     })
@@ -376,6 +391,9 @@ describe('assitnToHelper', () => {
           },
         ] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(generateDateDetailsPayload(cards, true, ['section-2', 'student-1'])).toEqual(
         expectedPayload,
@@ -451,6 +469,9 @@ describe('assitnToHelper', () => {
           },
         ] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(
         generateDateDetailsPayload(
@@ -531,6 +552,9 @@ describe('assitnToHelper', () => {
           },
         ] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(
         generateDateDetailsPayload(
@@ -587,6 +611,39 @@ describe('assitnToHelper', () => {
         only_visible_to_overrides: false,
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
+    })
+
+    it('clears base dates when only_visible_to_overrides is true and no everyone card', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['section-1'] as string[],
+          due_at: '2021-01-01T00:00:00Z',
+          unlock_at: '2021-01-01T00:00:00Z',
+          lock_at: '2021-01-03T00:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+      const expectedPayload = <DateDetailsPayload>{
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        assignment_overrides: [
+          {
+            due_at: '2021-01-01T00:00:00Z',
+            id: undefined,
+            lock_at: '2021-01-03T00:00:00Z',
+            course_section_id: '1',
+            unlock_at: '2021-01-01T00:00:00Z',
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
+            unassign_item: false,
+          },
+        ] as unknown as DateDetailsOverride[],
+        only_visible_to_overrides: true,
+      }
+      expect(generateDateDetailsPayload(cards, false, [])).toEqual(expectedPayload)
     })
 
     it('only_visible_to_overrides is true if there are module overrides and no everyone card', () => {
@@ -664,6 +721,9 @@ describe('assitnToHelper', () => {
           },
         ] as unknown as DateDetailsOverride[],
         only_visible_to_overrides: true,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })

@@ -47,20 +47,13 @@
   <td class="dates{{#unless last}} not_last{{/unless}}">
     {{#if start_at}}
     {{#if due_at}}
-    {{t "due by"}} <span {{contextSensitiveDatetimeTitle (unfudge due_at)}}>{{tTimeHours due_at}}</span>
+    <span class="tooltip-time-mount" data-datetime="{{unfudge due_at}}" data-time-text="{{tTimeHours due_at}}" data-label="{{t "due by"}}"></span>
     {{else}}{{#if todo_at}}
-    {{t "to do:"}} <span {{contextSensitiveDatetimeTitle (unfudge todo_at)}}>{{tTimeHours todo_at}}</span>
+    <span class="tooltip-time-mount" data-datetime="{{unfudge todo_at}}" data-time-text="{{tTimeHours todo_at}}" data-label="{{t "to do:"}}"></span>
     {{else}}
-    <span {{contextSensitiveDatetimeTitle (unfudge start_at)}}>{{tTimeHours start_at}}</span>
+    <span class="tooltip-time-mount" data-datetime="{{unfudge start_at}}" data-time-text="{{tTimeHours start_at}}"></span>
     {{#unless same_time}}
-    {{t "to" }}
-    <span {{contextSensitiveDatetimeTitle (unfudge end_at)}}>
-      {{#if same_day}}
-      {{tTimeHours end_at}}
-      {{else}}
-      {{tEventToString end_at 'short' 'tiny_on_the_hour'}}
-      {{/if}}
-    </span>
+    <br><span class="tooltip-time-mount" data-datetime="{{unfudge end_at}}" data-time-text="{{tTimeHours end_at}}" data-label="{{t "to"}}"></span>
     {{/unless}}
     {{/if}}{{/if}}
     {{else}}

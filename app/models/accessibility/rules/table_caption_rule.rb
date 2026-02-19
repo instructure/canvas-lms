@@ -44,45 +44,16 @@ module Accessibility
         )
       end
 
-      def generate_fix(elem)
-        llm_config = LLMConfigs.config_for("table_caption_generate")
-        unless llm_config
-          raise "LLM configuration not found for: table_caption_generate"
-        end
-
-        unless elem.tag_name.downcase == "table"
-          raise "HTML fragment is not a table."
-        end
-
-        table_preview = self.class.extract_table_preview(elem)
-
-        # Convert Nokogiri element to HTML string
-        table_html = table_preview.to_html
-
-        prompt, = llm_config.generate_prompt_and_options(substitutions: {
-                                                           HTML_TABLE: table_html,
-                                                         })
-
-        response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: prompt }]
-        )
-        response.message[:content]
-      rescue => e
-        Rails.logger.error("Error generating table caption: #{e.message}")
-        Rails.logger.error e.backtrace.join("\n")
-        nil
-      end
-
       def fix!(elem, value)
         raise StandardError, "Caption cannot be empty." if value.blank?
 
         caption = elem.at_css("caption")
         unless caption
           caption = elem.document.create_element("caption")
-          self.class.prepend(elem, caption)
+          TableCaptionRuleHelper.prepend(elem, caption)
         end
         caption.content = value
-        elem
+        { changed: elem }
       end
 
       def display_name
@@ -95,39 +66,6 @@ module Accessibility
 
       def why
         I18n.t("Tables should have a table caption, a title for the table to help learners understand what the table is about.")
-      end
-
-      # Helper methods
-
-      def self.prepend(parent, child)
-        if parent.first_element_child
-          parent.first_element_child.add_previous_sibling(child)
-        else
-          parent.add_child(child)
-        end
-      end
-
-      def self.extract_table_preview(elem, rows_count = 5)
-        return nil unless elem.name.downcase == "table"
-
-        # Clone the table to avoid modifying the original
-        table = elem.dup
-
-        # Find all body rows (not in thead)
-        data_rows = []
-        table.css("tr").each do |row|
-          # Skip header rows (in thead or containing th elements when there's no thead)
-          next if row.parent && row.parent.name == "thead"
-
-          data_rows << row
-        end
-
-        # Keep only the first rows_count rows
-        rows_to_remove = data_rows[rows_count..]
-        rows_to_remove&.each(&:remove) if rows_to_remove&.any?
-
-        # Return the preview table
-        table
       end
     end
   end

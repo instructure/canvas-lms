@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {
   mockAssignmentAndSubmission,
   mockQuery,
@@ -70,9 +70,9 @@ describe('Assignment Student Content View', () => {
       }
       props.assignment.env.originalityReportsForA2Enabled = true
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
     })
@@ -92,9 +92,9 @@ describe('Assignment Student Content View', () => {
       }
       props.assignment.env.originalityReportsForA2Enabled = false
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -119,9 +119,9 @@ describe('Assignment Student Content View', () => {
       props.assignment.originalityReportVisibility = 'after_due_date'
       props.assignment.env.originalityReportsForA2Enabled = true
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -146,9 +146,9 @@ describe('Assignment Student Content View', () => {
       props.assignment.originalityReportVisibility = 'after_due_date'
       props.assignment.env.originalityReportsForA2Enabled = true
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
     })
@@ -177,9 +177,9 @@ describe('Assignment Student Content View', () => {
       }
       props.assignment.env.originalityReportsForA2Enabled = true
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
     })
@@ -225,9 +225,9 @@ describe('Assignment Student Content View', () => {
         },
       ]
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -236,9 +236,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission({Query: {submission: null}})
       props.allSubmissions = [{id: '1', _id: '1'}]
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -247,9 +247,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.currentUser = null
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -258,9 +258,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.modulePrereq = 'simulate not null'
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -269,9 +269,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.unlockDate = 'soon'
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -281,9 +281,9 @@ describe('Assignment Student Content View', () => {
       props.submission.turnitinData = null
       props.assignment.env.unlockDate = 'soon'
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -302,9 +302,9 @@ describe('Assignment Student Content View', () => {
 
     it('not renders the anonymous label', () => {
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
     })
@@ -323,9 +323,9 @@ describe('Assignment Student Content View', () => {
 
     it('not renders the anonymous label', () => {
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
     })
@@ -345,9 +345,9 @@ describe('Assignment Student Content View', () => {
     it('renders a label graded anonymously', () => {
       props.submission.gradedAnonymously = true
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent(
         'Anonymous Grading:yes',
@@ -357,9 +357,9 @@ describe('Assignment Student Content View', () => {
     it('renders a label graded visibly', () => {
       props.submission.gradedAnonymously = false
       const {queryByTestId} = render(
-        <MockedProvider>
+        <MockedQueryProvider>
           <StudentContent {...props} />
-        </MockedProvider>,
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent(
         'Anonymous Grading:no',

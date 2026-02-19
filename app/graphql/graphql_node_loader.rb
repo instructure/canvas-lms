@@ -40,6 +40,25 @@ module GraphQLNodeLoader
       Loaders::SISIDLoader.for(Course, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "Assignment"
       Loaders::IDLoader.for(Assignment).load(id).then(check_read_permission)
+    when "AbstractAssignment"
+      include_types = id[:include_types]
+      include_types = ["Assignment"] if include_types.blank?
+      actual_id = id[:id]
+
+      Loaders::IDLoader.for(AbstractAssignment).load(actual_id).then do |record|
+        next nil unless record
+        next nil unless include_types.include?(record.type)
+
+        if record.is_a?(PeerReviewSubAssignment)
+          Loaders::AssociationLoader.for(AbstractAssignment, :context).load(record).then do
+            next nil unless record.context.feature_enabled?(:peer_review_allocation_and_grading)
+
+            record
+          end
+        else
+          record
+        end
+      end.then(check_read_permission)
     when "PeerReviewSubAssignment"
       Loaders::IDLoader.for(PeerReviewSubAssignment).load(id).then do |peer_review_sub_assignment|
         next nil unless peer_review_sub_assignment

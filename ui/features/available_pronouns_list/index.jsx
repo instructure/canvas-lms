@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import PronounsInput from './react/PronounsInput'
 
 $(() => {
-  ReactDOM.render(<PronounsInput />, $('<div/>').appendTo('#personal_pronouns_options')[0])
+  legacyRender(<PronounsInput />, $('<div/>').appendTo('#personal_pronouns_options')[0])
 })

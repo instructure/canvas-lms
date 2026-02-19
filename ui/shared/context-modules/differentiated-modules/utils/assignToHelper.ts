@@ -269,6 +269,13 @@ const defaultDateDetailsPayload = (
     payload.only_visible_to_overrides = false
   } else {
     payload.only_visible_to_overrides = true
+
+    // Clear base dates when only override dates are relevant
+    if (everyoneCard === undefined) {
+      payload.due_at = null
+      payload.unlock_at = null
+      payload.lock_at = null
+    }
   }
   return payload
 }

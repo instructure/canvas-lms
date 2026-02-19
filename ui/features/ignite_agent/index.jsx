@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect, useRef} from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {captureException} from '@sentry/browser'
 import {getCurrentTheme} from '@instructure/theme-registry'
 import {Portal} from '@instructure/ui-portal'
@@ -148,12 +148,12 @@ function initIgniteAgent() {
     document.body.appendChild(chatOverlayMountPoint)
   }
 
-  const root = createRoot(agentMountPoint)
-  root.render(
+  render(
     <IgniteAgent
       buttonMountPoint={buttonMountPoint}
       chatOverlayMountPoint={chatOverlayMountPoint}
     />,
+    agentMountPoint,
   )
   console.log('[Ignite Agent] Main component initialized.')
 }

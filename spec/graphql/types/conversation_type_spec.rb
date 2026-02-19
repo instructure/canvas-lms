@@ -120,6 +120,21 @@ describe Types::ConversationType do
       expect(result[0][0]).to eq(@attachment.display_name)
     end
 
+    it "filters out nil attachments from orphaned attachment associations" do
+      # Simulate orphaned attachment association by deleting attachment without callbacks
+      Attachment.where(id: @attachment.id).delete_all
+
+      # Should not crash and should return empty array instead of [nil]
+      result = conversation_type.resolve("conversationMessagesConnection { nodes { attachments { displayName } } }")
+      expect(result).to be_an(Array)
+      expect(result).not_to include(nil)
+
+      # Also test attachmentsConnection
+      result = conversation_type.resolve("conversationMessagesConnection { nodes { attachmentsConnection { nodes { displayName } } } }")
+      expect(result).to be_an(Array)
+      expect(result).not_to include(nil)
+    end
+
     it "returns media comments" do
       result = conversation_type.resolve("conversationMessagesConnection { nodes { mediaComment { title } } }")
       expect(result[0]).to eq(@media_object.title)

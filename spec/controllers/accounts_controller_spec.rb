@@ -1302,7 +1302,7 @@ describe AccountsController do
       it "redirects to settings with horizon-specific query parameters" do
         post "update", params: { id: @career_subaccount.id, account: { settings: { default_due_time: { value: "22:00" } } } }
 
-        expected_params = { content_only: "true", instui_theme: "career", force_classic: "true" }
+        expected_params = { content_only: "true", instui_theme: "career", force_classic: "true", hide_global_nav: "true" }
         expect(response).to redirect_to(account_settings_url(@career_subaccount, expected_params))
       end
     end

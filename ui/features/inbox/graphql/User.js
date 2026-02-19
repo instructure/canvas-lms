@@ -20,7 +20,7 @@ import {shape, string} from 'prop-types'
 
 export const User = {
   fragment: gql`
-    fragment User on User {
+    fragment InboxUser on User {
       _id
       id
       avatarUrl

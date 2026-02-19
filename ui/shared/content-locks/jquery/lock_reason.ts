@@ -29,7 +29,7 @@ export default function lockExplanation(
     unlock_at?: string | null
     context_module?: {name?: string}
   },
-  type: 'quiz' | 'assignment' | 'topic' | 'file' | 'page',
+  type: 'quiz' | 'assignment' | 'peer-review-sub-assignment' | 'topic' | 'file' | 'page',
 ): string | SafeString {
   // Any additions to this function should also be added to similar logic in ApplicationController.rb
   if (data.lock_at) {
@@ -41,6 +41,14 @@ export default function lockExplanation(
         return I18n.t('messages.assignment_locked_at', 'This assignment was locked %{at}.', {
           at: lock_at,
         })
+      case 'peer-review-sub-assignment':
+        return I18n.t(
+          'messages.peer_review_sub_assignment_locked_at',
+          'This assignment is no longer available as of %{at}.',
+          {
+            at: lock_at,
+          },
+        )
       case 'topic':
         return I18n.t('messages.topic_locked_at', 'This topic was locked %{at}.', {at: lock_at})
       case 'file':

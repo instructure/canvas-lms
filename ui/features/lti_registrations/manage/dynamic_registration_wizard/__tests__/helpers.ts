@@ -33,10 +33,12 @@ export const mockDynamicRegistrationWizardService = (
   mocked?: Partial<DynamicRegistrationWizardService>,
 ): DynamicRegistrationWizardService => ({
   fetchRegistrationToken: vi.fn(),
+  getLtiRegistrationUpdateRequestByUUID: vi.fn(),
   deleteRegistration: vi.fn(),
   getRegistrationByUUID: vi.fn(),
   fetchLtiRegistration: vi.fn(),
   updateRegistration: vi.fn(),
+  applyLtiRegistrationUpdateRequest: vi.fn(),
   ...mocked,
 })
 

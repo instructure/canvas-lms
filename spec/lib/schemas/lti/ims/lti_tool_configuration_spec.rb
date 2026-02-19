@@ -89,5 +89,31 @@ describe Schemas::Lti::IMS::LtiToolConfiguration do
 
       expect(config_errors).not_to be_empty
     end
+
+    it "accepts disable_reinstall extension" do
+      config_with_extension = valid_configuration.merge(
+        "https://canvas.instructure.com/lti/disable_reinstall" => true
+      )
+
+      config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_errors(
+        config_with_extension,
+        error_format: :hash
+      )
+
+      expect(config_errors).to be_blank
+    end
+
+    it "accepts false value for disable_reinstall extension" do
+      config_with_extension = valid_configuration.merge(
+        "https://canvas.instructure.com/lti/disable_reinstall" => false
+      )
+
+      config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_errors(
+        config_with_extension,
+        error_format: :hash
+      )
+
+      expect(config_errors).to be_blank
+    end
   end
 end

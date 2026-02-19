@@ -163,9 +163,9 @@ const diffLaunchSettings = (
   })
 }
 
-type PlacementMap = Map<LtiPlacement, InternalPlacementConfiguration>
+export type PlacementMap = Map<LtiPlacement, InternalPlacementConfiguration>
 
-const buildPlacementMap = (placements: InternalPlacementConfiguration[]): PlacementMap => {
+export const buildPlacementMap = (placements: InternalPlacementConfiguration[]): PlacementMap => {
   return new Map(placements.map(placement => [placement.placement, placement]))
 }
 
@@ -173,7 +173,7 @@ const placementEnabled = (placementConfig: InternalPlacementConfiguration): bool
   return placementConfig.enabled !== false && placementConfig.enabled !== 'false'
 }
 
-const calculateAddedPlacements = (
+export const calculateAddedPlacements = (
   oldPlacements: PlacementMap,
   newPlacements: PlacementMap,
 ): Array<LtiPlacement> => {
@@ -188,7 +188,7 @@ const calculateAddedPlacements = (
   return added
 }
 
-const calculateRemovedPlacements = (
+export const calculateRemovedPlacements = (
   oldPlacements: PlacementMap,
   newPlacements: PlacementMap,
 ): Array<LtiPlacement> => {

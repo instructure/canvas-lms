@@ -93,9 +93,9 @@ module Interfaces::AssignmentsConnectionInterface
     else
       Loaders::CurrentGradingPeriodLoader.load(course)
                                          .then do |gp, has_grading_periods|
-        apply_assignment_order(
-          assignments_scope(course, gp&.id, has_grading_periods, filter[:user_id], filter[:search_term], filter[:submission_types])
-        )
+                                           apply_assignment_order(
+                                             assignments_scope(course, gp&.id, has_grading_periods, filter[:user_id], filter[:search_term], filter[:submission_types])
+                                           )
       end
     end
   end

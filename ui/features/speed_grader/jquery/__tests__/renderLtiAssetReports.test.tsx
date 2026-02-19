@@ -21,6 +21,7 @@ import {legacyUnmountComponentAtNode} from '@canvas/react'
 import {renderLtiAssetReports} from '../speed_grader'
 import {Attachment, HistoricalSubmission, Submission} from '../speed_grader.d'
 import {LtiAssetReportsForSpeedgraderProps} from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportsForSpeedgrader'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 const SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT = 'speed_grader_lti_asset_reports_mount_point'
 
@@ -41,10 +42,8 @@ describe('renderLtiAssetReports', () => {
     mountPoint.id = SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT
     document.body.appendChild(mountPoint)
     lastRenderedProps = null
-    // @ts-expect-error
-    window.ENV = {FEATURES: {lti_asset_processor: true}}
-    // @ts-expect-error - Reset window.jsonData for each test
-    window.jsonData = {
+    fakeEnv.setup({FEATURES: {lti_asset_processor: true}})
+    ;(window as any).jsonData = {
       submission_types: 'online_text_entry',
       has_sub_assignments: false,
     }
@@ -53,6 +52,7 @@ describe('renderLtiAssetReports', () => {
   afterEach(() => {
     legacyUnmountComponentAtNode(mountPoint)
     document.body.removeChild(mountPoint)
+    fakeEnv.teardown()
   })
 
   const submission: Submission = {
@@ -136,8 +136,7 @@ describe('renderLtiAssetReports', () => {
         submission_types: 'discussion_topic',
         has_sub_assignments: true,
       }
-      // @ts-expect-error
-      window.jsonData = checkpointedJsonData
+      ;(window as any).jsonData = checkpointedJsonData
 
       const historicalSubmission: HistoricalSubmission = {
         attempt: 2,
@@ -165,8 +164,7 @@ describe('renderLtiAssetReports', () => {
         submission_types: 'discussion_topic',
         has_sub_assignments: false, // Not checkpointed
       }
-      // @ts-expect-error
-      window.jsonData = regularDiscussionJsonData
+      ;(window as any).jsonData = regularDiscussionJsonData
 
       const historicalSubmission: HistoricalSubmission = {
         attempt: 3,
@@ -194,8 +192,7 @@ describe('renderLtiAssetReports', () => {
         submission_types: 'online_upload',
         has_sub_assignments: false,
       }
-      // @ts-expect-error
-      window.jsonData = regularJsonData
+      ;(window as any).jsonData = regularJsonData
 
       const historicalSubmission: HistoricalSubmission = {
         attempt: 3,

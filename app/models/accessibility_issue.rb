@@ -26,7 +26,9 @@ class AccessibilityIssue < ActiveRecord::Base
   belongs_to :accessibility_resource_scan
   belongs_to :context, polymorphic: %i[assignment attachment wiki_page discussion_topic announcement], separate_columns: true, optional: true
 
-  enum :workflow_state, %i[active resolved dismissed], validate: true
+  enum :workflow_state, %i[active resolved dismissed closed], validate: true
+
+  scope :rescannable, -> { where(workflow_state: %i[active closed]) }
 
   validates :course, :workflow_state, presence: true
   validates :rule_type, presence: true, inclusion: { in: Accessibility::Rule.registry.keys }

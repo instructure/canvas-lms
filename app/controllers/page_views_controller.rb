@@ -214,6 +214,11 @@
 #           "example": "/api/v1/users/123/page_views/query/550e8400-e29b-41d4-a716-446655440000/results",
 #           "type": "string",
 #           "format": "uri"
+#         },
+#           "error_code": {
+#           "description": "Error code indicating the reason for query failure, if applicable",
+#           "example": "RESULT_SIZE_LIMIT_EXCEEDED",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -251,6 +256,9 @@ class PageViewsController < ApplicationController
   before_action :require_user, only: [:index]
 
   include Api::V1::PageView
+
+  # Maximum records per page for page views API (PV5 supports up to 200)
+  PAGE_VIEWS_MAX_PER_PAGE = 200
 
   # @API List user page views
   # Return a paginated list of the user's page view history in json format,
@@ -309,7 +317,7 @@ class PageViewsController < ApplicationController
     # RCU formula: DynamoDB uses eventually consistent reads (50% cost of strongly consistent)
     # Eventually consistent: 1 RCU per 8192 bytes, avg line = 592 bytes, lines per RCU ≈ 13.838
     # Rate limit cost = actual RCU * 2 multiplier (permissive: higher throughput for clients)
-    per_page = (params[:per_page] || 10).to_i.clamp(1, 200)
+    per_page = (params[:per_page] || 10).to_i.clamp(1, PAGE_VIEWS_MAX_PER_PAGE)
     actual_rcu = (per_page * 0.0723).ceil
     final_cost = actual_rcu * 2
 
@@ -321,7 +329,7 @@ class PageViewsController < ApplicationController
       format.json do
         page_views = @user.page_views(date_options)
         url = api_v1_user_page_views_url(url_options)
-        @page_views = Api.paginate(page_views, self, url, total_entries: nil)
+        @page_views = Api.paginate(page_views, self, url, { total_entries: nil, max_per_page: PAGE_VIEWS_MAX_PER_PAGE })
         render json: page_views_json(@page_views, @current_user, session)
       end
       format.csv do
@@ -467,6 +475,15 @@ class PageViewsController < ApplicationController
   #     "results_url": null
   #   }
   #
+  # @example_response 200
+  #  {
+  #     "query_id": "550e8400-e29b-41d4-a716-446655440000",
+  #     "status": "failed",
+  #     "format": "csv",
+  #     "results_url": null,
+  #     "error_code": "RESULT_SIZE_LIMIT_EXCEEDED"
+  #   }
+  #
   # @example_response 400
   #   {
   #     "error": "Invalid query ID"
@@ -486,7 +503,7 @@ class PageViewsController < ApplicationController
     validate_query_id!
     result = pv5_poll_service.call(params[:query_id])
     results_url = api_v1_page_views_get_query_results_path(params[:user_id], params[:query_id]) if result.status == :finished
-    render json: { query_id: params[:query_id], status: result.status, format: result.format, results_url: }
+    render json: { query_id: params[:query_id], status: result.status, format: result.format, results_url:, error_code: result.error_code }
   rescue PageViews::Common::NotFoundError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("The query was not found.") }, status: :not_found

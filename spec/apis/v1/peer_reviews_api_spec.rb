@@ -520,7 +520,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("feature is not enabled")
 
         # Re-enable for other tests
@@ -540,7 +540,7 @@ describe PeerReviewsApiController, type: :request do
                  @resource_params,
                  {},
                  {},
-                 { expected_status: 400 })
+                 { expected_status: 403 })
       end
 
       it "returns error when student has not submitted" do
@@ -552,7 +552,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("must submit")
       end
 
@@ -566,7 +566,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("no longer available")
       end
 
@@ -580,7 +580,7 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("locked until")
       end
 
@@ -623,8 +623,23 @@ describe PeerReviewsApiController, type: :request do
                         @resource_params,
                         {},
                         {},
-                        { expected_status: 400 })
+                        { expected_status: 403 })
         expect(json["errors"]["base"]).to include("assigned all required")
+      end
+
+      it "returns 403 when student has completed enrollment" do
+        @assignment2.submit_homework(@student1, body: "My submission")
+        @assignment2.submit_homework(@student2, body: "Student2 submission")
+        @student1.enrollments.first.complete!
+        expect(@student1.enrollments.first.workflow_state).to eq("completed")
+        @user = @student1
+        json = api_call(:post,
+                        @resource_path,
+                        @resource_params,
+                        {},
+                        {},
+                        { expected_status: 403 })
+        expect(json["errors"]["base"]).to include("enrollment is not active")
       end
 
       it "returns error when no submissions available" do

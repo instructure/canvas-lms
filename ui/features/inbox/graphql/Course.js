@@ -21,7 +21,7 @@ import {shape, string} from 'prop-types'
 
 export const Course = {
   fragment: gql`
-    fragment Course on Course {
+    fragment InboxCourse on Course {
       _id
       courseNickname
       contextName: name

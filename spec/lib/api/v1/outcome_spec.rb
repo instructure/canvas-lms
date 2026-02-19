@@ -114,6 +114,19 @@ RSpec.describe "Api::V1::Outcome" do
             expect(json["calculation_int"]).to eq(@course_calculation_method.calculation_int)
             expect(json["ratings"]).to eq(@course_proficiency.ratings_hash.map(&:stringify_keys))
           end
+
+          it "returns proficiency context information when mastery scale comes from course" do
+            json = lib.outcome_json(new_outcome({ **outcome_params, context: @account }), nil, nil, context: @course)
+            expect(json["proficiency_context_type"]).to eq("Course")
+            expect(json["proficiency_context_id"]).to eq(@course.id.to_s)
+          end
+
+          it "returns proficiency context information when mastery scale comes from account" do
+            @course_proficiency.destroy
+            json = lib.outcome_json(new_outcome({ **outcome_params, context: @account }), nil, nil, context: @course)
+            expect(json["proficiency_context_type"]).to eq("Account")
+            expect(json["proficiency_context_id"]).to eq(@account.id.to_s)
+          end
         end
 
         describe "disabled" do

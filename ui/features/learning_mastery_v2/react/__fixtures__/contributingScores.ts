@@ -20,7 +20,7 @@ import {
   ContributingScoreAlignment,
   ContributingScore,
   ContributingScoresResponse,
-} from '../hooks/useContributingScores'
+} from '@canvas/outcomes/react/hooks/useContributingScores'
 
 export const MOCK_ALIGNMENTS: ContributingScoreAlignment[] = [
   {

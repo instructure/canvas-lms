@@ -278,7 +278,7 @@ class RubricsController < ApplicationController
       Rubric,
       :process_generate_criteria_via_llm,
       {
-        priority: Delayed::NORMAL_PRIORITY,
+        priority: Delayed::HIGH_PRIORITY,
         n_strand: ["Rubric.process_generate_criteria_via_llm", @domain_root_account.global_id],
         max_attempts: 3,
       },
@@ -346,7 +346,7 @@ class RubricsController < ApplicationController
       Rubric,
       :process_regenerate_criteria_via_llm,
       {
-        priority: Delayed::NORMAL_PRIORITY,
+        priority: Delayed::HIGH_PRIORITY,
         n_strand: ["Rubric.process_regenerate_criteria_via_llm", @domain_root_account.global_id],
         max_attempts: 3,
       },

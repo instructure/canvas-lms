@@ -217,7 +217,7 @@ class Quizzes::QuizReportsController < ApplicationController
       if statistics.csv_attachment.present?
         statistics.csv_attachment.destroy_permanently_plus
         # progress will be present only if the CSV was generated asynchronously
-        statistics.progress.destroy if statistics.progress.present?
+        statistics.progress&.destroy
       # case 2: abort the generation process if we can:
       elsif statistics.progress.blank?
         reject! "report is not being generated", 422

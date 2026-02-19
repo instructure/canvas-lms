@@ -23,7 +23,7 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {Gradebook, GradebookProps} from '../Gradebook'
 import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../__fixtures__/rollups'
-import {ContributingScoresManager} from '../../hooks/useContributingScores'
+import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
 
 // Helper to render with MockedQueryClientProvider
 const renderWithQueryClient = (ui: React.ReactElement) => {

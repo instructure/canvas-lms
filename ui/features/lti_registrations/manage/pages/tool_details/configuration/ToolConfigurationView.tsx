@@ -211,6 +211,8 @@ export const ToolConfigurationView = () => {
     [registration],
   )
 
+  const dynamicRegistrationUrl = registration.dynamic_registration_url
+
   return (
     <div>
       {registration.manual_configuration_id ? (

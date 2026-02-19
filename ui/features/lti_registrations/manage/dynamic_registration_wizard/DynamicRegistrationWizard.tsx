@@ -60,6 +60,14 @@ export type DynamicRegistrationWizardProps = {
   onSuccessfulRegistration: (id: LtiRegistrationId) => void
   service: DynamicRegistrationWizardService
   registrationId?: LtiRegistrationId
+  /**
+   * This differs from the registrationId prop in that it is used
+   * if we are going through the "update" flow of the wizard,
+   * which re-sends a dynamic registration request to the tool,
+   * whereas the registrationId prop is used to locally edit
+   * an existing registration.
+   */
+  reinstallingRegistrationId?: LtiRegistrationId
 }
 
 export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps) => {
@@ -70,6 +78,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     unifiedToolId,
     registrationId,
     onSuccessfulRegistration,
+    reinstallingRegistrationId,
   } = props
   const useDynamicRegistrationWizardState = React.useMemo(() => {
     return mkUseDynamicRegistrationWizardState(service)
@@ -82,7 +91,12 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     if (registrationId) {
       loadRegistration(accountId, registrationId)
     } else {
-      loadRegistrationToken(accountId, dynamicRegistrationUrl, unifiedToolId)
+      loadRegistrationToken(
+        accountId,
+        dynamicRegistrationUrl,
+        unifiedToolId,
+        reinstallingRegistrationId,
+      )
     }
   }, [
     accountId,
@@ -91,6 +105,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     unifiedToolId,
     registrationId,
     loadRegistration,
+    reinstallingRegistrationId,
   ])
 
   const editing = !!props.registrationId
@@ -99,22 +114,24 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
 
   const onCancel = useCallback(async () => {
     if (props.onDismiss() && !editing && isReviewingState(state)) {
-      const result = await dynamicRegistrationWizardState.deleteKey(
-        state._type,
-        accountId,
-        state.registration.id,
-      )
+      if (!reinstallingRegistrationId) {
+        const result = await dynamicRegistrationWizardState.deleteKey(
+          state._type,
+          accountId,
+          state.registration.id,
+        )
 
-      if (isUnsuccessful(result)) {
-        showFlashAlert({
-          message: I18n.t(
-            'Something went wrong deleting the registration. It can still be deleted manually on the Manage page.',
-          ),
-          type: 'error',
-        })
+        if (isUnsuccessful(result)) {
+          showFlashAlert({
+            message: I18n.t(
+              'Something went wrong deleting the registration. It can still be deleted manually on the Manage page.',
+            ),
+            type: 'error',
+          })
+        }
       }
     }
-  }, [editing, state, dynamicRegistrationWizardState, accountId, props])
+  }, [editing, state, dynamicRegistrationWizardState, accountId, props, reinstallingRegistrationId])
 
   const onPreviousClicked = useCallback(() => {
     if (

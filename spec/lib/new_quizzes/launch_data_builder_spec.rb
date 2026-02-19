@@ -33,7 +33,8 @@ module NewQuizzes
              lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
              blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
              lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
-             named_context_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect")
+             named_context_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect",
+             set_return_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect")
     end
     let(:variable_expander) { Lti::VariableExpander.new(account, course, controller, current_user: user, tool:) }
     let(:tag) do
@@ -445,6 +446,51 @@ module NewQuizzes
 
           is_valid = ActiveSupport::SecurityUtils.secure_compare(provided_signature, expected_signature)
           expect(is_valid).to be true
+        end
+      end
+    end
+
+    describe "#build return_url behavior" do
+      it "includes launch_presentation_return_url in build output" do
+        result = builder.build
+        expect(result[:launch_presentation_return_url]).to be_present
+      end
+
+      context "when controller responds to set_return_url" do
+        let(:controller) do
+          double("controller",
+                 request:,
+                 lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
+                 blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
+                 lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+                 set_return_url: "https://canvas.instructure.com/courses/#{course.id}/quizzes")
+        end
+
+        it "uses set_return_url from controller to match LTI launch behavior" do
+          # Simulate return URL based on referer (e.g., quizzes page)
+          expect(controller).to receive(:set_return_url).and_return("https://canvas.instructure.com/courses/#{course.id}/quizzes")
+          result = builder.build
+          expect(result[:launch_presentation_return_url]).to eq("https://canvas.instructure.com/courses/#{course.id}/quizzes")
+        end
+      end
+
+      context "when controller is nil" do
+        subject(:builder) do
+          described_class.new(
+            context: course,
+            assignment:,
+            tool:,
+            tag:,
+            current_user: user,
+            controller: nil,
+            request:,
+            variable_expander:
+          )
+        end
+
+        it "returns nil for launch_presentation_return_url" do
+          result = builder.build
+          expect(result[:launch_presentation_return_url]).to be_nil
         end
       end
     end
