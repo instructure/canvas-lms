@@ -727,7 +727,7 @@ Assignment.prototype.hasPeerReviewSubmissions = function () {
 Assignment.prototype.shouldShowPeerReviewInfo = function () {
   return (
     canManage() &&
-    ENV.FLAGS?.peer_review_allocation_and_grading &&
+    ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED &&
     this.peerReviews() &&
     this.peerReviewSubAssignment() !== null
   )

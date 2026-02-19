@@ -28,6 +28,14 @@ vi.mock('@canvas/util/globalUtils', () => ({
   openWindow: (url: string, target?: string) => mockOpenWindow(url, target),
 }))
 
+vi.mock('@instructure/ui-icons', async () => {
+  const actual = await vi.importActual('@instructure/ui-icons')
+  return {
+    ...actual,
+    IconAssignmentLine: () => <span data-testid="icon-assignment-line">AssignmentIcon</span>,
+  }
+})
+
 describe('ContributingScoreHeader', () => {
   const mockAlignment: ContributingScoreAlignment = {
     alignment_id: '1',
@@ -153,5 +161,10 @@ describe('ContributingScoreHeader', () => {
     await user.click(screen.getByText('Assignment 1 options'))
     const descendingItem = screen.getByText('Descending scores').closest('[role="menuitemradio"]')
     expect(descendingItem).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('renders the IconAssignmentLine icon', () => {
+    render(<ContributingScoreHeader {...defaultProps()} />)
+    expect(screen.getByTestId('icon-assignment-line')).toBeInTheDocument()
   })
 })

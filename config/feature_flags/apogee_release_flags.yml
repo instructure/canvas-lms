@@ -289,7 +289,6 @@ archived_grading_schemes:
       state: allowed_on
 enhanced_rubrics:
   state: hidden
-  beta: true
   applies_to: Course
   root_opt_in: true
   display_name: Enhanced Rubrics
