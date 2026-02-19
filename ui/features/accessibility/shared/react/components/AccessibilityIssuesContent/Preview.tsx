@@ -31,6 +31,8 @@ import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {AccessibilityIssue, FormValue, PreviewResponse, ResourceType} from '../../types'
 import {getAsContentItemType} from '../../utils/apiData'
 import {getCourseBasedPath} from '../../utils/query'
+import {useInstUIRef} from '../../hooks/useInstUIRef'
+import {useWaitForPreviewImages} from '../../hooks/useWaitForPreviewImages'
 
 export interface PreviewHandle {
   update: (formValue: FormValue, onSuccess?: () => void, onError?: (error?: string) => void) => void
@@ -108,6 +110,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
     {issue, resourceId, itemType, onPreviewChange, onStaleConflict, onRescan}: PreviewProps,
     ref,
   ) => {
+    const [previewContentRef, setPreviewContentRef] = useInstUIRef<HTMLElement>()
     const [contentResponse, setContentResponse] = useState<PreviewResponse | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -123,8 +126,12 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         setIsLoading(true)
         try {
           const result = await apiCall()
+          // we dont set isLoading to false here because we want to show the loading spinner
+          // while the images are loading, and we will set isLoading to false once the images
+          // are loaded in the useWaitForPreviewImages hook.
           setContentResponse(result.json || null)
           setError(null)
+
           setIsStale(false)
           onSuccess?.()
           onPreviewChange?.(result.json || null)
@@ -143,20 +150,24 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
           }
 
           if (error?.response?.status === 409) {
+            setIsLoading(false)
             setIsStale(true)
             setError(null)
             onStaleConflict()
+            onError?.(responseError)
           } else if (parsedJson?.content) {
+            // we don't set isLoading to false here because we want to show the loading spinner
+            // while the images are loading, and we will set isLoading to false once the images
+            // are loaded in the useWaitForPreviewImages hook.
             setContentResponse(parsedJson)
             setError(null)
             onPreviewChange?.(parsedJson)
+            onError?.(responseError)
           } else {
+            setIsLoading(false)
             setError(errorMessage)
+            onError?.(responseError)
           }
-
-          onError?.(responseError)
-        } finally {
-          setIsLoading(false)
         }
       },
       [],
@@ -222,12 +233,19 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [resourceId, issue.id])
 
+    useWaitForPreviewImages(
+      previewContentRef,
+      contentResponse,
+      useCallback(() => setIsLoading(false), []),
+    )
+
     return (
       <View as="div" position="relative" id="a11y-issue-preview-container">
         <PreviewOverlay isLoading={isLoading} error={error} isStale={isStale} onRescan={onRescan} />
         <View
           as="div"
           id="a11y-issue-preview"
+          elementRef={setPreviewContentRef}
           borderWidth="small"
           height="15rem"
           overflowY="auto"
