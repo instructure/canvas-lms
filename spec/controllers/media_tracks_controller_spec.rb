@@ -172,6 +172,15 @@ describe MediaTracksController do
         end
       end
 
+      it "includes workflow_state and asr in listed tracks" do
+        @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher.id)
+        get "index", params: { media_object_id: @mo.media_id }
+        expect(response).to be_successful
+        track = response.parsed_body.first
+        expect(track["workflow_state"]).to eq("ready")
+        expect(track["asr"]).to be false
+      end
+
       it "does not list tracks that belong to an attachment other than the one media object belongs to" do
         tracks = {}
         tracks["en"] = @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher.id)
@@ -451,6 +460,15 @@ describe MediaTracksController do
           expect(t["media_object_id"]).to eql tracks[t["locale"]]["media_object_id"]
           expect(t["user_id"]).to eql tracks[t["locale"]]["user_id"]
         end
+      end
+
+      it "includes workflow_state and asr in listed tracks" do
+        @attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher.id, media_object: @mo)
+        get "index", params: { attachment_id: @attachment.id }
+        expect(response).to be_successful
+        track = response.parsed_body.first
+        expect(track["workflow_state"]).to eq("ready")
+        expect(track["asr"]).to be false
       end
 
       it "lists tracks considering other MediaObject's attachments" do

@@ -22,13 +22,22 @@ module Types
   class MediaTrackType < ApplicationObjectType
     implements Interfaces::LegacyIDInterface
 
-    graphql_name "MediaTrack"
+    class WorkflowStateType < Types::BaseEnum
+      graphql_name "MediaTrackWorkflowState"
+      value "ready"
+      value "failed"
+      value "processing"
+    end
 
     field :kind, String, null: true
 
     field :locale, String, null: true
 
     field :content, String, null: false
+
+    field :workflow_state, WorkflowStateType, null: false
+
+    field :asr, Boolean, null: false, method: :asr?
 
     field :media_object, Types::MediaObjectType, null: true
     def media_object

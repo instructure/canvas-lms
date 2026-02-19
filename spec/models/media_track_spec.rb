@@ -77,4 +77,59 @@ describe MediaTrack do
       media_object.media_tracks.create!(locale: "5", content: "en subs")
     end.to raise_error "Validation failed: Locale is invalid"
   end
+
+  describe "#asr?" do
+    it "returns true when kind is subtitles and external_id is present" do
+      track = @media_object.media_tracks.build(kind: "subtitles", locale: "en", content: "blah", external_id: "ext123")
+      expect(track.asr?).to be true
+    end
+
+    it "returns false when kind is not subtitles" do
+      track = @media_object.media_tracks.build(kind: "captions", locale: "en", content: "blah", external_id: "ext123")
+      expect(track.asr?).to be false
+    end
+
+    it "returns false when external_id is blank" do
+      track = @media_object.media_tracks.build(kind: "subtitles", locale: "en", content: "blah")
+      expect(track.asr?).to be false
+    end
+  end
+
+  describe "workflow_state" do
+    it "defaults to ready" do
+      track = @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
+      expect(track.workflow_state).to eq("ready")
+    end
+
+    it "accepts processing, ready, and failed" do
+      %w[processing ready failed].each do |workflow_state|
+        track = @media_object.media_tracks.build(kind: "subtitles", locale: "en", content: "blah", workflow_state:)
+        expect(track).to be_valid
+      end
+    end
+  end
+
+  describe "content validation" do
+    it "requires content for regular tracks" do
+      track = @media_object.media_tracks.build(kind: "subtitles", locale: "en")
+      expect(track).not_to be_valid
+      expect(track.errors[:content]).to be_present
+    end
+
+    it "allows empty content for ASR tracks with processing workflow_state" do
+      track = @media_object.media_tracks.build(kind: "subtitles", locale: "en", external_id: "ext123", workflow_state: "processing")
+      expect(track).to be_valid
+    end
+
+    it "allows empty content for ASR tracks with failed workflow_state" do
+      track = @media_object.media_tracks.build(kind: "subtitles", locale: "en", external_id: "ext123", workflow_state: "failed")
+      expect(track).to be_valid
+    end
+
+    it "requires content for ASR tracks with ready workflow_state" do
+      track = @media_object.media_tracks.build(kind: "subtitles", locale: "en", external_id: "ext123", workflow_state: "ready")
+      expect(track).not_to be_valid
+      expect(track.errors[:content]).to be_present
+    end
+  end
 end
