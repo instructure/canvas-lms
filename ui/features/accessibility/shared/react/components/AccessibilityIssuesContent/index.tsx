@@ -660,7 +660,6 @@ export const AccessibilityWizard = () => {
                 onClearError={handleClearError}
                 onValidationChange={handleValidationChange}
                 isDisabled={isRemediated || isFormLocked}
-                previewRef={previewRef}
                 onGenerateLoadingChange={setIsGenerateLoading}
               />
               {selectedIssue.form.canGenerateFix &&
