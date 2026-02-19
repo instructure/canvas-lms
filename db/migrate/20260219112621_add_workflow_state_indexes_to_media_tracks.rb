@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2023 - present Instructure, Inc.
+# Copyright (C) 2026 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,23 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Api::V1::MediaTrack
-  def media_track_api_json(media_track, include = [])
-    result = {
-      id: media_track.id,
-      locale: media_track.locale,
-      kind: media_track.kind,
-      workflow_state: media_track.workflow_state,
-      asr: media_track.asr?,
-      media_object_id: media_track.media_object_id,
-      user_id: media_track.user_id
-    }
-    if include.present?
-      whitelist = %w[content webvtt_content updated_at created_at]
-      include.each do |field|
-        result[field] = media_track[field] if whitelist.include? field
-      end
-    end
-    result
+class AddWorkflowStateIndexesToMediaTracks < ActiveRecord::Migration[8.0]
+  tag :predeploy
+  disable_ddl_transaction!
+
+  def change
+    add_index :media_tracks, %i[media_object_id workflow_state], algorithm: :concurrently, if_not_exists: true
+    add_index :media_tracks, %i[attachment_id workflow_state], algorithm: :concurrently, if_not_exists: true, where: "attachment_id IS NOT NULL"
   end
 end

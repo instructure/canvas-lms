@@ -6037,11 +6037,19 @@ type MediaTrack implements LegacyIDInterface {
   legacy canvas id
   """
   _id: ID!
+  asr: Boolean!
   content: String!
   kind: String
   locale: String
   mediaObject: MediaObject
   webvttContent: String
+  workflowState: MediaTrackWorkflowState!
+}
+
+enum MediaTrackWorkflowState {
+  failed
+  processing
+  ready
 }
 
 enum MediaType {

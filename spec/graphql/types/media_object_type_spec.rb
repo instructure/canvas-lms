@@ -79,6 +79,21 @@ describe Types::MediaObjectType do
       expect(resolve_media_object_field("mediaTracks { content }")).to eq([])
     end
 
+    it "returns workflow_state for media tracks" do
+      @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
+      expect(resolve_media_object_field("mediaTracks { workflowState }")).to eq(["ready"])
+    end
+
+    it "returns asr false for regular media tracks" do
+      @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
+      expect(resolve_media_object_field("mediaTracks { asr }")).to eq([false])
+    end
+
+    it "returns asr true for ASR media tracks" do
+      @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah", external_id: "ext123")
+      expect(resolve_media_object_field("mediaTracks { asr }")).to eq([true])
+    end
+
     it "returns nil when presented with an unrecognized media type" do
       @media_object.media_type = "fakemediatype"
       @media_object.save!

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2023 - present Instructure, Inc.
+# Copyright (C) 2026 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,23 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Api::V1::MediaTrack
-  def media_track_api_json(media_track, include = [])
-    result = {
-      id: media_track.id,
-      locale: media_track.locale,
-      kind: media_track.kind,
-      workflow_state: media_track.workflow_state,
-      asr: media_track.asr?,
-      media_object_id: media_track.media_object_id,
-      user_id: media_track.user_id
-    }
-    if include.present?
-      whitelist = %w[content webvtt_content updated_at created_at]
-      include.each do |field|
-        result[field] = media_track[field] if whitelist.include? field
-      end
+class AddExternalIdAndWorkflowStateToMediaTracks < ActiveRecord::Migration[8.0]
+  tag :predeploy
+
+  def change
+    change_table :media_tracks, bulk: true do |t|
+      t.string :external_id, limit: 255
+      t.string :workflow_state, null: false, default: "ready", limit: 255
+      t.check_constraint "workflow_state IN ('ready', 'failed', 'processing')", name: "chk_workflow_state_enum"
     end
-    result
   end
 end
