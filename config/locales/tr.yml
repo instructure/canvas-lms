@@ -22479,6 +22479,7 @@ tr:
     send_message: "Mesaj Gönder"
   publish_5211dca3: Yayınla
   publish_aa888e3c: "Yayınla:"
+  publish_all_modules_and_items_8e954cb3: "Tüm modülleri ve içindekileri yayınla"
   publish_btn_module: 
     buttons: 
       publish: Yayınla
@@ -22498,6 +22499,7 @@ tr:
     unpublish: Yayınlanmıyor
     unpublish_click: "yayınlanmıyor, yayınlamak için tıklayın"
     unpublishing: "Yayından kaldırılıyor..."
+  publish_module_and_all_items_d263682e: "Modülü ve içindekileri yayınla"
   publish_the_course_f2f6ef80: "Dersi Yayınla"
   publish_title_102f2d90: "%{title} Yayınla"
   publishable: 
@@ -26949,6 +26951,8 @@ tr:
   unposted_final_grade_aa5facd6: "yayınlanmamış final not"
   unposted_final_score_c19c35b3: "yayınlanmamış final puan"
   unpublish_9f2d730b: "Yayından kaldır"
+  unpublish_all_modules_and_items_ba0291f4: "Tüm moddülleri ve içindekileri yayından kaldır"
+  unpublish_module_and_all_items_e6dd35e5: "Modülü ve içindekileri yayından kaldır"
   unpublish_title_26ae9667: "%{title} Yayından kaldır"
   unpublished_8b6107d6: Yayınlanmamış
   unpublished_assignments_9cdbcc87: "Yayınlanmamış Ödevler"
