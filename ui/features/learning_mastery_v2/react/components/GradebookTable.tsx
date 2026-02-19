@@ -293,6 +293,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
           header: renderOutcomeHeader(outcome, contributingScoreForOutcome, titleId),
           render: renderOutcomeCell(outcome),
           draggable: true,
+          dragLabel: outcome.title,
           data: {outcome},
           colHeaderProps: {
             'data-testid': `outcome-header-${outcome.id}`,

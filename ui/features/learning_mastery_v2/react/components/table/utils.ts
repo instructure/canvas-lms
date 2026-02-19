@@ -26,6 +26,7 @@ export type Column = {
   width?: string | number
   isSticky?: boolean
   draggable?: boolean
+  dragLabel?: string
   data?: Record<string, any>
   isRowHeader?: boolean
   cellProps?: CellProps
