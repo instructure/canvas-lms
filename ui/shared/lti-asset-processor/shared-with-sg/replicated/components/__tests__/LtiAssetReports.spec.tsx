@@ -139,7 +139,7 @@ describe('LtiAssetReports', () => {
   it('renders View Report button if launchUrlPath is present', () => {
     firstRep.launchUrlPath = null
     const {getAllByText} = setup('online_upload')
-    expect(getAllByText('View Report')).toHaveLength(3)
+    expect(getAllByText(/View .* Report/)).toHaveLength(3)
   })
 
   it('renders error message (and comment) for failed reports', () => {

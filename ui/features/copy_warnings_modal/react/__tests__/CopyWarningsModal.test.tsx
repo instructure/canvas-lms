@@ -27,8 +27,8 @@ function renderComponent(errorMessages: string[]) {
 describe('CourseDefaultDueTime', () => {
   describe('can render with the warning message', () => {
     it('renders course default due time', () => {
-      const {getByLabelText} = renderComponent(['This is a test warning message'])
-      expect(getByLabelText('This is a test warning message')).toBeInTheDocument()
+      const {getByText} = renderComponent(['This is a test warning message'])
+      expect(getByText('This is a test warning message')).toBeInTheDocument()
     })
   })
 })

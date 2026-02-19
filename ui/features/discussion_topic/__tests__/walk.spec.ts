@@ -35,7 +35,9 @@ describe('arr/walk', () => {
     expect(str).toBe('ab')
 
     const a: any[] = [{}]
-    walk(a, 'nuthin', (item: any, arr: any[]) => expect(arr).toBe(a))
+    walk(a, 'nuthin', (item: any, arr: any[]) => {
+      expect(arr).toBe(a)
+    })
 
     const treeArray: TreeItem[] = [
       {

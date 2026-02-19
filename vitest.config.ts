@@ -154,7 +154,7 @@ export default defineConfig({
     },
     globals: true,
     setupFiles: 'ui/setup-vitests.tsx',
-    include: ['ui/**/__tests__/**/*.test.?(c|m)[jt]s?(x)'],
+    include: ['ui/**/__tests__/**/*.(test|spec).?(c|m)[jt]s?(x)'],
     exclude: [
       // Exclude non-ui directories that vitest might auto-detect
       '**/node_modules/**',
