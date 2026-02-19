@@ -609,7 +609,8 @@ module Canvas::LiveEvents
     payload = {
       wiki_page_id: page.global_id,
       title: LiveEvents.truncate(page.title),
-      body: LiveEvents.truncate(page.body)
+      body: LiveEvents.truncate(page.body),
+      workflow_state: page.workflow_state
     }
 
     if old_title
