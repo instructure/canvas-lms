@@ -19,7 +19,10 @@
 import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import CheckboxTextInput from '../CheckboxTextInput'
+import CheckboxTextInput, {
+  ALT_TEXT_REQUIRED_MESSAGE,
+  altTextMaxLengthMessage,
+} from '../CheckboxTextInput'
 import {FormType, IssueWorkflowState} from '../../../../types'
 
 const server = setupServer()
@@ -66,6 +69,7 @@ describe('CheckboxTextInput', () => {
     },
     value: '',
     onChangeValue: vi.fn(),
+    onValidationChange: vi.fn(),
   }
 
   it('renders without crashing', () => {
@@ -275,7 +279,39 @@ describe('CheckboxTextInput', () => {
     // Verify the value gets updated with the API response
     await waitFor(() => {
       expect(generateCalled).toBe(true)
-      expect(defaultProps.onChangeValue).toHaveBeenCalledWith(mockGeneratedText)
+      expect(propsWithGenerateOption.onChangeValue).toHaveBeenCalledWith(mockGeneratedText)
+    })
+  })
+
+  it('calls onValidationChange when generate button is clicked', async () => {
+    const mockGeneratedText = 'Generated alt text'
+
+    server.use(
+      http.post('**/generate/alt_text', () => {
+        return HttpResponse.json({value: mockGeneratedText})
+      }),
+    )
+
+    const propsWithGenerateOption = {
+      ...defaultProps,
+      issue: {
+        ...defaultProps.issue,
+        form: {
+          ...defaultProps.issue.form,
+          canGenerateFix: true,
+          isCanvasImage: true,
+          generateButtonLabel: 'Generate Alt Text',
+        },
+      },
+    }
+
+    render(<CheckboxTextInput {...propsWithGenerateOption} />)
+
+    const generateButton = screen.getByTestId('generate-alt-text-button')
+    fireEvent.click(generateButton)
+
+    await waitFor(() => {
+      expect(propsWithGenerateOption.onValidationChange).toHaveBeenCalledWith(true, undefined)
     })
   })
 
@@ -390,7 +426,7 @@ describe('CheckboxTextInput', () => {
       await waitFor(() => {
         expect(onValidationChange).toHaveBeenCalledWith(
           false,
-          'Keep alt text under 100 characters.',
+          altTextMaxLengthMessage(100),
         )
       })
     })
@@ -410,22 +446,19 @@ describe('CheckboxTextInput', () => {
       expect(onValidationChange).toHaveBeenCalledWith(true, undefined)
     })
 
-    it('calls onValidationChange when textarea is empty', async () => {
-      const onValidationChange = vi.fn()
+    it('does not call onValidationChange on initial render', () => {
+      render(<CheckboxTextInput {...defaultProps} />)
 
-      render(<CheckboxTextInput {...defaultProps} onValidationChange={onValidationChange} />)
-
-      expect(onValidationChange).toHaveBeenCalledWith(false, 'Alt text is required.')
+      expect(defaultProps.onValidationChange).not.toHaveBeenCalled()
     })
 
-    it('calls onValidationChange when textarea has only whitespaces input', () => {
-      const onValidationChange = vi.fn()
+    it('calls onValidationChange with invalid when user types only whitespace', () => {
+      render(<CheckboxTextInput {...defaultProps} />)
 
-      render(
-        <CheckboxTextInput {...defaultProps} value="   " onValidationChange={onValidationChange} />,
-      )
+      const textarea = screen.getByTestId('checkbox-text-input-form')
+      fireEvent.change(textarea, {target: {value: '   '}})
 
-      expect(onValidationChange).toHaveBeenCalledWith(false, 'Alt text is required.')
+      expect(defaultProps.onValidationChange).toHaveBeenCalledWith(false, ALT_TEXT_REQUIRED_MESSAGE)
     })
   })
 

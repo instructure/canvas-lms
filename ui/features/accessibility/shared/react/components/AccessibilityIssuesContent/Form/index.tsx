@@ -23,7 +23,6 @@ import TextInputForm from './TextInputForm'
 import RadioInputGroupForm from './RadioInputGroupForm'
 import CheckboxTextInputForm from './CheckboxTextInput'
 import {AccessibilityIssue, FormType, FormValue} from '../../../types'
-import {PreviewHandle} from '../Preview'
 
 export interface FormHandle {
   getValue: () => FormValue
@@ -47,7 +46,6 @@ interface FormProps {
   onClearError?: () => void
   onValidationChange?: (isValid: boolean, errorMessage?: string) => void
   isDisabled?: boolean
-  previewRef?: React.RefObject<PreviewHandle>
   onGenerateLoadingChange?: (loading: boolean) => void
 }
 
@@ -70,7 +68,6 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
       onClearError,
       onValidationChange,
       isDisabled,
-      previewRef,
       onGenerateLoadingChange,
     }: FormProps,
     ref,
@@ -113,7 +110,6 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
         onReload={onReload}
         onValidationChange={onValidationChange}
         isDisabled={isDisabled}
-        previewRef={previewRef}
         onGenerateLoadingChange={onGenerateLoadingChange}
       />
     )

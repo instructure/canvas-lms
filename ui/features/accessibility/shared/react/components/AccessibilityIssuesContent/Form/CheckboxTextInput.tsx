@@ -15,15 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {
-  useState,
-  forwardRef,
-  useRef,
-  useImperativeHandle,
-  useCallback,
-  useEffect,
-  useId,
-} from 'react'
+import React, {useState, forwardRef, useRef, useImperativeHandle} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -36,15 +28,36 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {FormMessage} from '@instructure/ui-form-field'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
 import {FormComponentHandle, FormComponentProps} from './index'
 import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {useShallow} from 'zustand/react/shallow'
+import {useScreenReaderAlert} from '../../../hooks/useScreenReaderAlert'
 
 const I18n = createI18nScope('accessibility_checker')
+
+export const ALT_TEXT_REQUIRED_MESSAGE = I18n.t('Alt text is required.')
+export const altTextMaxLengthMessage = (maxLength: number) =>
+  I18n.t('Keep alt text under %{count} characters.', {count: maxLength})
+
+const validateAltText = (
+  value: string | null,
+  checked: boolean,
+  inputMaxLength: number | undefined,
+): {isValid: boolean; errorMessage: string | undefined} => {
+  if (checked) return {isValid: true, errorMessage: undefined}
+
+  const trimmed = value?.trim()
+  if (!trimmed) return {isValid: false, errorMessage: ALT_TEXT_REQUIRED_MESSAGE}
+
+  if (inputMaxLength && trimmed.length > inputMaxLength) {
+    return {isValid: false, errorMessage: altTextMaxLengthMessage(inputMaxLength)}
+  }
+
+  return {isValid: true, errorMessage: undefined}
+}
 
 const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
@@ -56,101 +69,36 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         onChangeValue,
         onValidationChange,
         isDisabled,
-        previewRef,
         onGenerateLoadingChange,
       }: FormComponentProps,
       ref,
     ) => {
-      const [alertMessage, setAlertMessage] = useState<string | null>(null)
       const checkboxRef = useRef<HTMLInputElement | null>(null)
       const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
       const [isChecked, setChecked] = useState(false)
       const [generateLoading, setGenerateLoading] = useState(false)
       const [generationError, setGenerationError] = useState<string | null>(null)
+      const setAlertMessage = useScreenReaderAlert()
       const [isAiAltTextGenerationEnabled, selectedItem] = useAccessibilityScansStore(
         useShallow(state => [state.isAiAltTextGenerationEnabled, state.selectedScan]),
       )
-      const charCountId = useId()
 
-      const validateValue = useCallback(
-        (currentValue: string | null, checked: boolean) => {
-          if (checked) {
-            return {isValid: true, errorMessage: undefined}
-          }
-          if (currentValue && currentValue.trim()) {
-            if (
-              !issue.form.inputMaxLength ||
-              currentValue.trim().length <= issue.form.inputMaxLength
-            ) {
-              return {isValid: true, errorMessage: undefined}
-            }
-            return {
-              isValid: false,
-              errorMessage: I18n.t('Keep alt text under %{maxLength} characters.', {
-                maxLength: issue.form.inputMaxLength,
-              }),
-            }
-          }
-          return {isValid: false, errorMessage: I18n.t('Alt text is required.')}
-        },
-        [issue.form.inputMaxLength],
-      )
-
-      // Trigger validation on value or checkbox changes
-      useEffect(() => {
-        const {isValid, errorMessage} = validateValue(value, isChecked)
+      const updateField = (value: string | null, checked: boolean) => {
+        const {isValid, errorMessage} = validateAltText(value, checked, issue.form.inputMaxLength)
+        onChangeValue(value)
         onValidationChange?.(isValid, errorMessage)
+        if (!isValid && errorMessage) setAlertMessage(errorMessage)
+      }
 
-        const timeout = setTimeout(() => {
-          const inputLength = value?.length ?? 0
+      const handleCheckboxValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = e.target.checked
+        setChecked(checked)
+        updateField('', checked)
+      }
 
-          const msg = I18n.t(
-            {
-              one: '%{count} / %{maxLength} characters entered.',
-              other: '%{count} / %{maxLength} characters entered.',
-            },
-            {count: inputLength, maxLength: issue.form.inputMaxLength},
-          )
-
-          setAlertMessage(msg)
-        }, 3000)
-
-        return () => clearTimeout(timeout)
-      }, [
-        value,
-        isChecked,
-        issue.form.inputMaxLength,
-        onValidationChange,
-        validateValue,
-        setAlertMessage,
-      ])
-
-      useEffect(() => {
-        const timeout = setTimeout(() => {
-          if (alertMessage) {
-            setAlertMessage(null)
-          }
-        }, 3000)
-
-        return () => clearTimeout(timeout)
-      }, [alertMessage, setAlertMessage])
-
-      const handleCheckboxValueChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-          setChecked(e.target.checked)
-          if (e.target.checked) {
-            onChangeValue('')
-          }
-        },
-        [onChangeValue],
-      )
-
-      const handleTextAreaChange = useCallback(
-        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-          onChangeValue(e.target.value)
-        },
-        [onChangeValue],
-      )
+      const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        updateField(e.target.value, isChecked)
+      }
 
       const shouldShowError = error && !isChecked
       const descriptionMessage: FormMessage = {text: issue.form.inputDescription, type: 'hint'}
@@ -178,11 +126,6 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         [isChecked, value],
       )
 
-      const resetLoadingState = () => {
-        setGenerateLoading(false)
-        onGenerateLoadingChange?.(false)
-      }
-
       const handleGenerateClick = () => {
         setGenerateLoading(true)
         setGenerationError(null)
@@ -202,14 +145,8 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         })
           .then(result => result.json)
           .then(resultJson => {
-            const generatedAltText = resultJson?.value
-            onChangeValue(generatedAltText)
-
-            if (previewRef?.current) {
-              previewRef.current.update(generatedAltText, resetLoadingState, resetLoadingState)
-            } else {
-              resetLoadingState()
-            }
+            const generatedAltText = resultJson?.value || ''
+            updateField(generatedAltText, isChecked)
           })
           .catch(error => {
             console.error('Error generating text input:', error)
@@ -225,7 +162,10 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                   )
 
             setGenerationError(errorMessage)
-            resetLoadingState()
+          })
+          .finally(() => {
+            setGenerateLoading(false)
+            onGenerateLoadingChange?.(false)
           })
       }
 
@@ -264,7 +204,6 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               onChange={handleTextAreaChange}
               required
               messages={formMessages}
-              aria-describedby={charCountId}
             />
           </View>
 
@@ -312,17 +251,6 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                 </Alert>
               </Flex.Item>
             </Flex>
-          )}
-
-          {alertMessage && (
-            <Alert
-              liveRegion={getLiveRegion}
-              liveRegionPoliteness="assertive"
-              isLiveRegionAtomic
-              screenReaderOnly
-            >
-              {alertMessage}
-            </Alert>
           )}
         </Flex>
       )
