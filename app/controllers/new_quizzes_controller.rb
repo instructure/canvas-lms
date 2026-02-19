@@ -73,12 +73,14 @@ class NewQuizzesController < ApplicationController
     @tag = @assignment.external_tool_tag
     return unless @tag
 
+    @resource_url = @tag.url
+    return if params[:content_only]
+
     @module_tag = if params[:module_item_id]
                     @context.context_module_tags.not_deleted.find(params[:module_item_id])
                   else
                     @assignment.context_module_tags.first
                   end
-    @resource_url = @tag.url
   end
 
   def find_assignment_quiz_lti_tool

@@ -697,6 +697,12 @@ class ExternalToolsController < ApplicationController
         prefer_1_1: !!params[:prefer_1_1]
       )
       @tool = tool
+      if @tool.quiz_lti? && params[:assignment_id] && new_quizzes_native_experience_enabled? && new_quizzes_native_experience_sessionless_enabled?
+        @assignment = @context.assignments.find(params[:assignment_id])
+        redirect_params = { context: @context, assignment: @assignment }
+        redirect_params[:content_only] = true if params[:borderless] || params[:display] == "borderless"
+        return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(**redirect_params)
+      end
       placement = placement_from_params
       add_crumb(@tool.name)
       @lti_launch = lti_launch(
@@ -874,10 +880,19 @@ class ExternalToolsController < ApplicationController
       @lti_launch.params = launch_settings["tool_settings"]
       @lti_launch.link_text =  launch_settings["tool_name"]
       @lti_launch.analytics_id = launch_settings["analytics_id"]
+      assignment_id = launch_settings.dig("tool_settings", "custom_canvas_assignment_id")
 
       tool = Lti::ToolFinder.find_by(id: launch_settings.dig("metadata", "tool_id")) ||
              Lti::ToolFinder.from_url(launch_settings["launch_url"], @context)
       if tool
+        if tool.quiz_lti? && assignment_id && new_quizzes_native_experience_enabled? && new_quizzes_native_experience_sessionless_enabled?
+          @assignment = @context.assignments.find(assignment_id)
+          return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(
+            context: @context,
+            assignment: @assignment,
+            content_only: true
+          )
+        end
         # Use domain-specific URL for environment overrides
         launch_url_with_overrides = tool.url_with_environment_overrides(launch_settings["launch_url"])
         @lti_launch.resource_url = launch_url_with_overrides
@@ -2146,5 +2161,11 @@ class ExternalToolsController < ApplicationController
 
     custom_fields = nav_settings[:custom_fields] || {}
     custom_fields[:item_banks].present?
+  end
+
+  def new_quizzes_native_experience_sessionless_enabled?
+    return false unless @context.respond_to?(:feature_enabled?)
+
+    @context.feature_enabled?(:new_quizzes_native_experience_sessionless)
   end
 end

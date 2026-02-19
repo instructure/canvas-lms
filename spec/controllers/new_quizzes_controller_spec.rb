@@ -136,6 +136,27 @@ describe NewQuizzesController do
           expect(response).to render_template("assignments/native_new_quizzes")
         end
       end
+
+      context "with content_only param" do
+        it "renders without looking up module tag" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id,
+            content_only: true
+          }
+          expect(response).to render_template("assignments/native_new_quizzes")
+          expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
+        end
+
+        it "still sets resource_url from the external tool tag" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id,
+            content_only: true
+          }
+          expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
+        end
+      end
     end
 
     context "when user is a student" do
