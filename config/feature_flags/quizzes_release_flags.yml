@@ -139,3 +139,9 @@ new_quizzes_native_experience_respondus:
   state: hidden
   shadow: true
   applies_to: Course
+new_quizzes_native_experience_sessionless:
+  display_name: New Quizzes Native Experience Sessionless Launch
+  description: When enabled, sessionless launches of New Quizzes open directly within Canvas using the native experience.
+  state: hidden
+  shadow: true
+  applies_to: Course

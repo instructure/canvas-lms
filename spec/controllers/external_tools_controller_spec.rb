@@ -2061,6 +2061,119 @@ describe ExternalToolsController do
         end
       end
     end
+
+    context "when tool is quiz_lti and native experience sessionless is enabled" do
+      let(:quiz_lti_tool) do
+        account.context_external_tools.create!(
+          name: "New Quizzes",
+          url: "http://www.example.com/basic_lti",
+          consumer_key: "key",
+          shared_secret: "secret",
+          tool_id: "Quizzes 2",
+          privacy_level: "public"
+        )
+      end
+      let(:assignment) do
+        a = assignment_model(
+          course: @course,
+          name: "NQ Assignment",
+          submission_types: "external_tool"
+        )
+        a.external_tool_tag = ContentTag.create!(
+          context: a,
+          content: quiz_lti_tool,
+          url: quiz_lti_tool.url,
+          content_type: "ContextExternalTool"
+        )
+        a.save!
+        a
+      end
+
+      before do
+        @course.enable_feature!(:new_quizzes_native_experience)
+        @course.enable_feature!(:new_quizzes_native_experience_sessionless)
+        user_session(@teacher)
+      end
+
+      it "redirects to the New Quizzes native launch" do
+        get :retrieve, params: {
+          course_id: @course.id,
+          url: quiz_lti_tool.url,
+          assignment_id: assignment.id
+        }
+        expect(response).to redirect_to(
+          course_assignment_new_quizzes_launch_path(@course, assignment)
+        )
+      end
+
+      context "when borderless param is set" do
+        it "redirects with content_only" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            borderless: true
+          }
+          expect(response).to redirect_to(
+            course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
+          )
+        end
+      end
+
+      context "when display=borderless" do
+        it "redirects with content_only" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            display: "borderless"
+          }
+          expect(response).to redirect_to(
+            course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
+          )
+        end
+      end
+
+      context "when native experience sessionless is disabled" do
+        before do
+          @course.disable_feature!(:new_quizzes_native_experience_sessionless)
+        end
+
+        it "does not redirect" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id
+          }
+          expect(response).not_to be_redirect
+        end
+      end
+
+      context "when native experience is disabled" do
+        before do
+          @course.disable_feature!(:new_quizzes_native_experience)
+        end
+
+        it "does not redirect" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id
+          }
+          expect(response).not_to be_redirect
+        end
+      end
+
+      context "when assignment_id is not provided" do
+        it "does not redirect" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url
+          }
+          expect(response).not_to be_redirect
+        end
+      end
+    end
   end
 
   describe "GET 'resource_selection'" do
@@ -3743,6 +3856,78 @@ describe ExternalToolsController do
       it "uses the environment override URL for the launch" do
         get :sessionless_launch, params: { course_id: @course.id, verifier: }
         expect(assigns(:lti_launch).resource_url).to eq(override_url)
+      end
+    end
+
+    context "when tool is quiz_lti and native experience sessionless is enabled" do
+      let(:quiz_lti_tool) do
+        @course.context_external_tools.create!(
+          name: "New Quizzes",
+          url: "http://www.example.com/quiz_lti_launch",
+          consumer_key: "key",
+          shared_secret: "secret",
+          tool_id: "Quizzes 2",
+          privacy_level: "public",
+          course_navigation: { enabled: true }
+        )
+      end
+      let(:assignment) do
+        a = assignment_model(
+          course: @course,
+          name: "NQ Assignment",
+          submission_types: "external_tool"
+        )
+        a.external_tool_tag = ContentTag.create!(
+          context: a,
+          content: quiz_lti_tool,
+          url: quiz_lti_tool.url,
+          content_type: "ContextExternalTool"
+        )
+        a.save!
+        a
+      end
+      let(:verifier) do
+        get :generate_sessionless_launch, params: {
+          course_id: @course.id,
+          launch_type: "assessment",
+          assignment_id: assignment.id
+        }
+        json = response.parsed_body
+        CGI.parse(URI.parse(json["url"]).query)["verifier"].first
+      end
+
+      before do
+        @course.enable_feature!(:new_quizzes_native_experience)
+        @course.enable_feature!(:new_quizzes_native_experience_sessionless)
+      end
+
+      it "redirects to the New Quizzes native launch with content_only" do
+        get :sessionless_launch, params: { course_id: @course.id, verifier: }
+        expect(response).to redirect_to(
+          course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
+        )
+      end
+
+      context "when native experience sessionless is disabled" do
+        before do
+          @course.disable_feature!(:new_quizzes_native_experience_sessionless)
+        end
+
+        it "does not redirect and renders the LTI launch" do
+          get :sessionless_launch, params: { course_id: @course.id, verifier: }
+          expect(response).not_to be_redirect
+        end
+      end
+
+      context "when native experience is disabled" do
+        before do
+          @course.disable_feature!(:new_quizzes_native_experience)
+        end
+
+        it "does not redirect and renders the LTI launch" do
+          get :sessionless_launch, params: { course_id: @course.id, verifier: }
+          expect(response).not_to be_redirect
+        end
       end
     end
   end
