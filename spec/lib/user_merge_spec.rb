@@ -524,6 +524,29 @@ describe UserMerge do
       expect(merge_data_record2.previous_workflow_state).to eq "active"
     end
 
+    context "destroy_remaining_from_user_enrollments" do
+      before :once do
+        @enrollment = course1.enroll_student(user2, enrollment_state: "active")
+        @merge_object = UserMerge.from(user2)
+        @merge_object.target_user = user1
+        @merge_object.merge_data = UserMergeData.create!(user: user1, from_user: user2)
+        @merge_object.send(:destroy_remaining_from_user_enrollments, :user_id)
+      end
+
+      it "soft-deletes any from_user enrollments remaining after the move" do
+        expect(@enrollment.reload.workflow_state).to eq "deleted"
+        expect(user2.reload.enrollments.active).to be_empty
+      end
+
+      it "records merge_data for remaining from_user enrollments" do
+        @merge_object.merge_data.bulk_insert_merge_data(@merge_object.data)
+
+        record = @merge_object.merge_data.records.find_by(context_type: "Enrollment", context_id: @enrollment)
+        expect(record).to be_present
+        expect(record.previous_workflow_state).to eq "active"
+      end
+    end
+
     it "removes conflicting module progressions" do
       course1.enroll_user(user1, "StudentEnrollment", enrollment_state: "active")
       course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")

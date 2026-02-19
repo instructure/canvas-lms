@@ -661,6 +661,16 @@ class UserMerge
     end
   end
 
+  def destroy_remaining_from_user_enrollments(column)
+    # Safety net: soft-delete any from_user enrollments that are still active
+    # after the move (e.g. if handle_conflicts missed a conflict ;) ).
+    remaining = Enrollment.active.where(column => from_user)
+    return unless remaining.exists?
+
+    merge_data.build_more_data(remaining, data:)
+    remaining.find_each(&:destroy)
+  end
+
   def remove_self_observers
     # prevent observing self by marking them as deleted
     to_delete = Enrollment.active.where("type = 'ObserverEnrollment' AND
@@ -683,6 +693,7 @@ class UserMerge
           target_user.associate_with_shard(from_user.shard) if to_move.exists?
           merge_data.build_more_data(to_move, data:)
           to_move.update_all(column => target_user.id, :updated_at => Time.now.utc)
+          destroy_remaining_from_user_enrollments(column)
         end
       end
     end
