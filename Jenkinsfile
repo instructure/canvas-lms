@@ -52,7 +52,7 @@ pipeline {
   agent { label 'canvas-docker' }
 
   options {
-    timeout(time: 1, unit: 'HOURS')
+    timeout(time: 2, unit: 'HOURS')
     ansiColor('xterm')
     timestamps()
     lock (label: 'canvas_build_global_mutex', quantity: 1)
