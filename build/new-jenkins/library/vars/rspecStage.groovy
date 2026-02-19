@@ -209,10 +209,8 @@ def runRspecQWorkerNode(index, additionalEnvVars = []) {
 
       withEnv(envVars) {
         stage("${index} Run Tests") {
-          try {
+          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
             runRspecqSuite()
-          } finally {
-            buildSummaryReport.trackStage(stageName, stageStartTime)
           }
         }
 
@@ -221,6 +219,7 @@ def runRspecQWorkerNode(index, additionalEnvVars = []) {
         }
       }
     } finally {
+      buildSummaryReport.trackStage(stageName, stageStartTime)
       pipelineHelpers.cleanupDocker()
     }
   }
