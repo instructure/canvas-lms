@@ -17,8 +17,8 @@
  */
 
 import {fireEvent, screen} from '@testing-library/react'
+import {describe, expect, it, vi} from 'vitest'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {fn} from '../../../__tests__/testPlatformShims'
 import type {LtiAssetReport} from '../../types/LtiAssetReports'
 import LtiAssetReportStatus from '../LtiAssetReportStatus'
 
@@ -69,7 +69,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('renders a link with "All good" text when openModal prop is provided', () => {
-      const openModal = fn()
+      const openModal = vi.fn()
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       const link = screen.getByText('All good')
       expect(link).toBeInTheDocument()
@@ -77,7 +77,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('calls openModal when link is clicked', () => {
-      const openModal = fn()
+      const openModal = vi.fn()
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       fireEvent.click(screen.getByText('All good'))
       expect(openModal).toHaveBeenCalledTimes(1)
@@ -99,7 +99,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('renders a link with "Please review" text when openModal prop is provided', () => {
-      const openModal = fn()
+      const openModal = vi.fn()
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       const link = screen.getByText('Please review')
       expect(link).toBeInTheDocument()
@@ -107,7 +107,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('calls openModal when link is clicked', () => {
-      const openModal = fn()
+      const openModal = vi.fn()
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       fireEvent.click(screen.getByText('Please review'))
       expect(openModal).toHaveBeenCalledTimes(1)
@@ -134,7 +134,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('renders link with "Processing" when openModal prop is provided', () => {
-      const openModal = fn()
+      const openModal = vi.fn()
       const reports = [createReport(0, {processingProgress: 'Pending'})]
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       const link = screen.getByText('Processing')
@@ -143,7 +143,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('calls openModal when processing link is clicked', () => {
-      const openModal = fn()
+      const openModal = vi.fn()
       const reports = [createReport(0, {processingProgress: 'Pending'})]
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       fireEvent.click(screen.getByText('Processing'))
@@ -160,7 +160,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('renders link with "No result" when openModal prop is provided', () => {
-      const openModal = fn()
+      const openModal = vi.fn()
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       const link = screen.getByText('No result')
       expect(link).toBeInTheDocument()
@@ -168,7 +168,7 @@ describe('LtiAssetReportStatus', () => {
     })
 
     it('calls openModal when no result link is clicked', () => {
-      const openModal = fn()
+      const openModal = vi.fn()
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       fireEvent.click(screen.getByText('No result'))
       expect(openModal).toHaveBeenCalledTimes(1)

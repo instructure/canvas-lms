@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {describe, expect, it} from '../../../__tests__/testPlatformShims'
+import {describe, expect, it} from 'vitest'
 import {ensureCompatibleSubmissionType} from '../LtiAssetReports'
 
 describe('LtiAssetReports types', () => {

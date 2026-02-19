@@ -19,12 +19,12 @@
 // This import needs to be first to ensure that the mocked dependencies are set up before any other imports.
 
 import {fireEvent, screen} from '@testing-library/react'
+import {describe, expect, it, vi} from 'vitest'
 import {
   mockUseLtiAssetProcessors,
   mockUseLtiAssetReports,
 } from '../../../__tests__/mockedDependenciesShims'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {describe, expect, fn, it} from '../../../__tests__/testPlatformShims'
 import {useLtiAssetProcessors, useLtiAssetReports} from '../../../dependenciesShims'
 import {defaultGetLtiAssetProcessorsResult} from '../../__fixtures__/default/ltiAssetProcessors'
 import {
@@ -361,7 +361,7 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         }),
       )
 
-      const onToggleExpanded = fn()
+      const onToggleExpanded = vi.fn()
       const {rerender} = renderComponent(
         <LtiAssetReportsForSpeedgrader
           assignmentId="123"
@@ -403,7 +403,7 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         }),
       )
 
-      const onToggleExpanded = fn()
+      const onToggleExpanded = vi.fn()
 
       renderComponent(
         <LtiAssetReportsForSpeedgrader
