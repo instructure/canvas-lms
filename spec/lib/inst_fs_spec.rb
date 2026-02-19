@@ -563,11 +563,42 @@ describe InstFS do
 
       it "doesn't retry 504s repeatedly" do
         allow(CanvasHttp).to receive(:post) do
-          instance_double(Net::HTTPGatewayTimeout, code: "504", body: "")
+          instance_double(Net::HTTPGatewayTimeout, code: "504", body: "gateway timeout")
         end
         expect do
           InstFS.direct_upload(file_name: "foo.txt", file_object: StringIO.new("a" * 1000))
-        end.to raise_error(InstFS::ServiceError, "instfs gateway timeout")
+        end.to raise_error(InstFS::ServiceError, "received code \"504\" from service, with message \"gateway timeout\"")
+      end
+
+      it "does a third try when running in a delayed job" do
+        allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
+        call_count = 0
+        allow(CanvasHttp).to receive(:post) do
+          call_count += 1
+          if call_count <= 2
+            instance_double(Net::HTTPGatewayTimeout, code: "504", body: "")
+          else
+            instance_double(Net::HTTPCreated,
+                            code: "201",
+                            body: { instfs_uuid: "new uuid" }.to_json)
+          end
+        end
+        new_uuid = InstFS.direct_upload(file_name: "foo.txt", file_object: StringIO.new("a" * 1000))
+        expect(new_uuid).to eq "new uuid"
+        expect(call_count).to eq 3
+      end
+
+      it "doesn't retry 5xx when file object isn't rewindable" do
+        file_object = instance_double(IO, read: "some data")
+        call_count = 0
+        allow(CanvasHttp).to receive(:post) do
+          call_count += 1
+          instance_double(Net::HTTPGatewayTimeout, code: "504", body: "gateway timeout")
+        end
+        expect do
+          InstFS.direct_upload(file_name: "foo.txt", file_object:)
+        end.to raise_error(InstFS::ServiceError, "received code \"504\" from service, with message \"gateway timeout\"")
+        expect(call_count).to eq 1
       end
 
       context "filesize" do
