@@ -130,6 +130,31 @@ describe "student dashboard", :ignore_js_errors do
       expect(message_instructor_button(@teacher1.id)).to be_displayed
       expect(all_message_buttons.size).to eq(2)
     end
+
+    context "todo widget" do
+      before :once do
+        add_widget_to_dashboard(@student_w_inactive, :todo_list, 1)
+        @concluded_assignment = @concluded_course.assignments.create!(
+          name: "Concluded Course Assignment",
+          points_possible: 10,
+          due_at: 3.days.from_now.end_of_day,
+          submission_types: "online_text_entry"
+        )
+        @past_assignment = @past_course.assignments.create!(
+          name: "Past Course Assignment",
+          points_possible: 10,
+          due_at: 3.days.from_now.end_of_day,
+          submission_types: "online_text_entry"
+        )
+      end
+
+      it "does not show items from concluded or inactive courses" do
+        user_session(@student_w_inactive)
+        go_to_dashboard
+
+        expect(no_todo_items_message).to be_displayed
+      end
+    end
   end
 
   context "new widgets on zero states" do
