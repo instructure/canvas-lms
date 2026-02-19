@@ -51,7 +51,8 @@ module Lti::IMS
         lti_tool_configuration:,
         scopes:,
         developer_key:,
-        lti_registration: developer_key.lti_registration
+        lti_registration: developer_key.lti_registration,
+        root_account: developer_key.root_account
       }.compact)
     end
     let(:developer_key) { lti_developer_key_model }
@@ -1027,6 +1028,43 @@ module Lti::IMS
 
         it "returns the correct internal configuration" do
           expect(subject).to eq(expected_config)
+        end
+      end
+    end
+
+    describe "#reinstall_disabled?" do
+      context "when lti_dr_registrations_update flag is off" do
+        before do
+          registration.root_account.disable_feature!(:lti_dr_registrations_update)
+        end
+
+        it "returns true regardless of the extension value" do
+          expect(registration.reinstall_disabled?).to be true
+        end
+
+        it "returns true even when disable_reinstall extension is false" do
+          lti_tool_configuration[Lti::IMS::Registration::DISABLE_REINSTALL_EXTENSION] = false
+          expect(registration.reinstall_disabled?).to be true
+        end
+      end
+
+      context "when lti_dr_registrations_update flag is on" do
+        before do
+          registration.root_account.enable_feature!(:lti_dr_registrations_update)
+        end
+
+        it "returns true when the disable_reinstall extension is true" do
+          lti_tool_configuration[Lti::IMS::Registration::DISABLE_REINSTALL_EXTENSION] = true
+          expect(registration.reinstall_disabled?).to be true
+        end
+
+        it "returns false when the disable_reinstall extension is not set" do
+          expect(registration.reinstall_disabled?).to be false
+        end
+
+        it "returns false when the disable_reinstall extension is false" do
+          lti_tool_configuration[Lti::IMS::Registration::DISABLE_REINSTALL_EXTENSION] = false
+          expect(registration.reinstall_disabled?).to be false
         end
       end
     end
