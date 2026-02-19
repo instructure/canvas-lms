@@ -19,6 +19,7 @@
 import {useAppendBreadcrumb} from '@canvas/breadcrumbs/useAppendBreadcrumb'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import GenericErrorPage from '@canvas/generic-error-page/react'
+import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Button} from '@instructure/ui-buttons'
@@ -34,6 +35,7 @@ import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
 import {useRegistrationWithAllInfo, useDeleteRegistration} from '../../api/registrations'
+import {FetchApiError} from '@canvas/do-fetch-api-effect'
 import type {AccountId} from '../../model/AccountId'
 import type {LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
 import {type LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
@@ -83,6 +85,12 @@ export const ToolDetailsRequest = ({
       </Flex>
     )
   } else if (result.isError) {
+    const is404 = result.error instanceof FetchApiError && result.error.response.status === 404
+
+    if (is404) {
+      return <NotFoundArtwork />
+    }
+
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
