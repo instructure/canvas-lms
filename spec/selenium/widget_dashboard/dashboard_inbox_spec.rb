@@ -29,6 +29,7 @@ describe "student dashboard inbox widget", :ignore_js_errors do
     dashboard_student_setup
     dashboard_conversation_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   context "inbox widget smoke tests" do

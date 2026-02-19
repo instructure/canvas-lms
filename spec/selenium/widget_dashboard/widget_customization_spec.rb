@@ -28,6 +28,7 @@ describe "student dashboard widget customization tests", :ignore_js_errors do
   before :once do
     dashboard_student_setup
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   before do

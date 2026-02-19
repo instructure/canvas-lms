@@ -261,9 +261,9 @@ RSpec.describe ApplicationController do
             expect(controller.js_env[:widget_dashboard_overridable]).to be false
           end
 
-          it "is not set when feature flag is in 'on' state" do
+          it "is set to false when feature flag is in 'on' state and user has no preference (requires opt-in)" do
             Account.default.enable_feature!(:widget_dashboard)
-            expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            expect(controller.js_env[:widget_dashboard_overridable]).to be false
           end
 
           it "respects user preference when feature is in 'allowed_on' state" do
@@ -271,6 +271,76 @@ RSpec.describe ApplicationController do
             @user.preferences[:widget_dashboard_user_preference] = false
             @user.save!
             expect(controller.js_env[:widget_dashboard_overridable]).to be false
+          end
+
+          context "enrollment-based eligibility" do
+            before do
+              Account.default.set_feature_flag!(:widget_dashboard, "allowed_on")
+            end
+
+            it "is not set for users with teacher enrollment" do
+              course_with_teacher(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is not set for users with TA enrollment" do
+              course_with_ta(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is not set for users with designer enrollment" do
+              course_with_designer(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is set for users with only student enrollment" do
+              course_with_student(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is set for users with observer enrollment" do
+              course_with_observer(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is not set for users with mixed teacher and student enrollment" do
+              course_with_teacher(user: @user, active_all: true)
+              course_with_student(user: @user, active_all: true)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
+
+            it "is set for users with concluded teacher enrollment and active student enrollment" do
+              course1 = course_factory(active_all: true)
+              course1.enroll_teacher(@user).tap do |e|
+                e.accept!
+                e.complete!
+              end
+              course2 = course_factory(active_all: true)
+              course2.enroll_student(@user).tap(&:accept!)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is set for users with concluded observer enrollment and active student enrollment" do
+              course1 = course_factory(active_all: true)
+              course1.enroll_user(@user, "ObserverEnrollment").tap do |e|
+                e.accept!
+                e.complete!
+              end
+              course2 = course_factory(active_all: true)
+              course2.enroll_student(@user).tap(&:accept!)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
+
+            it "is set for users with inactive teacher enrollment and active student enrollment" do
+              course1 = course_factory(active_all: true)
+              course1.enroll_teacher(@user).tap do |e|
+                e.accept!
+                e.deactivate
+              end
+              course2 = course_factory(active_all: true)
+              course2.enroll_student(@user).tap(&:accept!)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be false
+            end
           end
         end
       end

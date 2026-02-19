@@ -29,6 +29,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     dashboard_student_setup # Creates 2 courses and a student enrolled in both
     dashboard_announcement_setup # Creates 5 Unread and 2 Read announcements
     set_widget_dashboard_flag(feature_status: true)
+    enable_widget_dashboard_for(@student)
   end
 
   before do
