@@ -249,37 +249,6 @@ const Columns: ReadonlyArray<Column> = [
     },
   },
   {
-    id: 'status',
-    header: I18n.t('Status'),
-    width: '140px',
-    sortable: true,
-    render: r => {
-      // Check if feature flag is enabled
-      if (!window.ENV.LTI_DR_REGISTRATIONS_UPDATE) {
-        return <div>{I18n.t('Up to date')}</div>
-      }
-
-      const pendingUpdate = r.pending_update
-      if (pendingUpdate) {
-        return (
-          <Button
-            color="secondary"
-            size="small"
-            renderIcon={() => <IconRefreshLine />}
-            data-pendo="lti-registrations-update-available-button"
-            onClick={() => {
-              useRegistrationUpdateWizardModalState.getState().open(r, pendingUpdate)
-            }}
-          >
-            {I18n.t('Update Available')}
-          </Button>
-        )
-      } else {
-        return <div>{I18n.t('Up to date')}</div>
-      }
-    },
-  },
-  {
     id: 'actions',
     width: '60px',
     render: (r, {deleteApp}) => {
@@ -363,7 +332,7 @@ const Columns: ReadonlyArray<Column> = [
   },
 ]
 
-const CondensedColumns: ReadonlyArray<Column> = [
+const CondensedColumnsWithStatus: ReadonlyArray<Column> = [
   {
     id: 'name',
     header: I18n.t('App Name'),
@@ -465,6 +434,81 @@ const CondensedColumns: ReadonlyArray<Column> = [
       } else {
         return <div>{I18n.t('Up to date')}</div>
       }
+    },
+  },
+]
+
+const CondensedColumns: ReadonlyArray<Column> = [
+  {
+    id: 'name',
+    header: I18n.t('App Name'),
+    width: '37%',
+    sortable: true,
+    render: r => {
+      const appName = (
+        <Flex display="inline-flex">
+          <ToolIconOrDefault
+            iconUrl={r.icon_url}
+            toolId={r.id}
+            toolName={r.name}
+            size={27}
+            marginRight={12}
+            hideFromScreenReader={true}
+          />
+          {r.name}
+        </Flex>
+      )
+      return (
+        <Link
+          as={RouterLink}
+          to={`/manage/${r.id}`}
+          isWithinText={false}
+          data-testid={`reg-link-${r.id}`}
+        >
+          {appName}
+        </Link>
+      )
+    },
+  },
+  {
+    id: 'nickname',
+    header: I18n.t('Nickname'),
+    width: '30%',
+    sortable: true,
+    render: r => (r.admin_nickname ? <Text wrap="break-word">{r.admin_nickname}</Text> : null),
+  },
+  {
+    id: 'installed',
+    header: I18n.t('Installed On'),
+    width: '15%',
+    sortable: true,
+    textAlign: 'center',
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
+    render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
+  },
+  {
+    id: 'lti_version',
+    sortable: true,
+    header: I18n.t('Version'),
+    width: '10%',
+    textAlign: 'center',
+
+    render: r => <div>{'legacy_configuration_id' in r ? '1.1' : '1.3'}</div>,
+  },
+  {
+    id: 'on',
+    textAlign: 'center',
+    header: I18n.t('On/Off'),
+    width: '10%',
+    sortable: true,
+    render: r => {
+      const checkWorkflowState = window.ENV.FEATURES.lti_deactivate_registrations
+      const isOn = checkWorkflowState
+        ? r.workflow_state === 'active'
+        : r.account_binding?.workflow_state === 'on'
+
+      return <div>{isOn ? I18n.t('On') : I18n.t('Off')}</div>
     },
   },
 ]
@@ -584,7 +628,11 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
   const responsiveProps = props.responsiveProps
   const deleteMutation = useDeleteRegistration()
   const {page, apps, accountId} = props.tableProps
-  const columns = window.ENV.FEATURES.lti_registrations_next ? CondensedColumns : Columns
+  const columns = window.ENV.FEATURES.lti_registrations_next
+    ? window.ENV.LTI_DR_REGISTRATIONS_UPDATE
+      ? CondensedColumnsWithStatus
+      : CondensedColumns
+    : Columns
 
   const deleteApp = React.useCallback(
     async (app: LtiRegistration) => {
