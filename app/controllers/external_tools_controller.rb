@@ -1150,7 +1150,7 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  def assignment_from_assignment_id(lti_assignment_id: nil)
+  def assignment_from_assignment_id(lti_assignment_id: nil, tool: nil)
     if params[:assignment_id].present?
       assignment = api_find(@context.assignments.active, params[:assignment_id])
     elsif lti_assignment_id.present?
@@ -1159,6 +1159,14 @@ class ExternalToolsController < ApplicationController
     return nil unless assignment
 
     raise Lti::Errors::UnauthorizedError unless assignment.grants_right?(@current_user, :read)
+
+    if tool&.quiz_lti?
+      assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
+      locked = assignment.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
+      unlocked = !locked || assignment.grants_right?(@current_user, session, :update)
+
+      raise Lti::Errors::UnauthorizedError unless unlocked
+    end
 
     assignment
   end
@@ -1178,9 +1186,9 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
     opts[:launch_url] = tool.url_with_environment_overrides(opts[:launch_url])
 
-    assignment = assignment_from_assignment_id(lti_assignment_id: opts.dig(:link_params, :ext, :lti_assignment_id))
+    assignment = assignment_from_assignment_id(lti_assignment_id: opts.dig(:link_params, :ext, :lti_assignment_id), tool:)
 
-    if assignment.present? && @current_user.present?
+    if assignment.present? && @current_user.present? && !tool.quiz_lti?
       assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
     end
 
@@ -1342,7 +1350,7 @@ class ExternalToolsController < ApplicationController
                                                              tool:,
                                                              secure_params: params[:secure_params])
 
-    assignment = assignment_from_assignment_id
+    assignment = assignment_from_assignment_id(tool:)
 
     opts = {
       post_only: @tool.settings["post_only"].present?,
