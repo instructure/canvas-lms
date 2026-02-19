@@ -37,8 +37,9 @@ class PeerReview::DateOverriderService < ApplicationService
   def call
     refresh_parent_associations if @reload_associations
     run_validations
-    create_or_update_peer_review_overrides
+    overrides_affected = create_or_update_peer_review_overrides
     update_only_visible_to_overrides
+    overrides_affected
   end
 
   private
@@ -132,6 +133,8 @@ class PeerReview::DateOverriderService < ApplicationService
         overrides: create_overrides
       )
     end
+
+    override_ids_to_delete.size + update_overrides.size + create_overrides.size
   end
 
   def destroy_overrides(override_ids)
