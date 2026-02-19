@@ -135,6 +135,15 @@ module Canvas::LiveEventsCallbacks
                                              changes["title"]&.first,
                                              changes["body"]&.first)
       end
+      if changes["workflow_state"]
+        _old_state, new_state = changes["workflow_state"]
+        case new_state
+        when "active"
+          Canvas::LiveEvents.wiki_page_published(obj)
+        when "unpublished"
+          Canvas::LiveEvents.wiki_page_unpublished(obj)
+        end
+      end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
     when AssignmentGroup
