@@ -227,7 +227,15 @@ class LLMConversationClient
     response = http.request(request)
 
     unless response.is_a?(Net::HTTPSuccess)
-      raise LlmConversation::Errors::ConversationError, "#{error_message}: #{response.code} - #{response.body}"
+      # Try to extract error message from JSON response
+      begin
+        error_json = JSON.parse(response.body)
+        error_detail = error_json["message"] || error_json["error"] || response.body
+      rescue JSON::ParserError
+        error_detail = response.body
+      end
+
+      raise LlmConversation::Errors::ConversationError, "#{error_message}: #{error_detail}"
     end
 
     JSON.parse(response.body)
