@@ -12123,6 +12123,81 @@ describe AssignmentsApiController, type: :request do
         check_allocation_conversion_request(@teacher, "999999", expected_status: 404)
       end
     end
+
+    context "when peer_review_allocation_and_grading feature is disabled" do
+      before do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns empty array when no allocation rules exist" do
+        json = check_allocation_conversion_request(@teacher, @assignment.id.to_s)
+
+        expect(json).to eq([])
+      end
+
+      it "returns all active allocation rules" do
+        rule1 = AllocationRule.create!(
+          assignment: @assignment,
+          course: @course,
+          assessor: @student1,
+          assessee: @student2,
+          must_review: true,
+          review_permitted: true,
+          applies_to_assessor: true
+        )
+        rule2 = AllocationRule.create!(
+          assignment: @assignment,
+          course: @course,
+          assessor: @student2,
+          assessee: @student3,
+          must_review: false,
+          review_permitted: true,
+          applies_to_assessor: true
+        )
+        rule3 = AllocationRule.create!(
+          assignment: @assignment,
+          course: @course,
+          assessor: @student3,
+          assessee: @student1,
+          must_review: true,
+          review_permitted: false,
+          applies_to_assessor: true
+        )
+
+        json = check_allocation_conversion_request(@teacher, @assignment.id.to_s)
+
+        expect(json.length).to eq(3)
+        expect(json.pluck("id")).to contain_exactly(rule1.id, rule2.id, rule3.id)
+      end
+
+      it "does not include deleted allocation rules" do
+        active_rule = AllocationRule.create!(
+          assignment: @assignment,
+          course: @course,
+          assessor: @student1,
+          assessee: @student2,
+          must_review: true,
+          review_permitted: true,
+          applies_to_assessor: true
+        )
+        deleted_rule = AllocationRule.create!(
+          assignment: @assignment,
+          course: @course,
+          assessor: @student2,
+          assessee: @student3,
+          must_review: true,
+          review_permitted: true,
+          applies_to_assessor: true,
+          workflow_state: "deleted"
+        )
+
+        json = check_allocation_conversion_request(@teacher, @assignment.id.to_s)
+
+        expect(json.length).to eq(1)
+        expect(json.pluck("id")).to contain_exactly(active_rule.id)
+        expect(json.pluck("id")).not_to include(deleted_rule.id)
+      end
+    end
   end
 end
 
