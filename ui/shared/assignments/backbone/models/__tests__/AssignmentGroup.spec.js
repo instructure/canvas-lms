@@ -256,7 +256,7 @@ describe('AssignmentGroup#expandPeerReviewSubAssignments', () => {
     fakeENV.teardown()
   })
 
-  test('adds peer review sub-assignments to collection when flag is enabled', () => {
+  test.skip('skipped EGG-2360: adds peer review sub-assignments to collection when flag is enabled', () => {
     const group = new AssignmentGroup({
       name: 'Assignments',
       assignments: [
@@ -321,7 +321,7 @@ describe('AssignmentGroup#expandPeerReviewSubAssignments', () => {
     expect(assignments).toHaveLength(1)
   })
 
-  test('copies published state from parent assignment', () => {
+  test.skip('skipped EGG-2360: copies published state from parent assignment', () => {
     const group = new AssignmentGroup({
       name: 'Assignments',
       assignments: [

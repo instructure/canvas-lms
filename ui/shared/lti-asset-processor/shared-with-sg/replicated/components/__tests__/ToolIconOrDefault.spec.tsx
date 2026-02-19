@@ -96,7 +96,7 @@ describe('ToolIconOrDefault', () => {
         <ToolIconOrDefault {...defaultProps} iconUrl={null} size={48} />,
       )
       const img = container.querySelector('img')
-      expect(img).toHaveStyle({height: 48, width: 48})
+      expect(img).toHaveStyle({height: "48px", width: "48px"})
     })
   })
 })
