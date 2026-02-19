@@ -29,9 +29,10 @@ export type GenerateCriteriaFormProps = {
   gradeLevel: string
   standard: string
 }
+export type AssociationType = 'Assignment' | 'Account' | 'Course'
 
 export type RubricFormProps = {
-  associationType: 'Assignment' | 'Account' | 'Course'
+  associationType: AssociationType
   associationTypeId?: string
   id?: string
   canUpdateRubric: boolean

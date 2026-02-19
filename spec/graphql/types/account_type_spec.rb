@@ -302,4 +302,65 @@ describe Types::AccountType do
       expect(result).to include("Test Course")
     end
   end
+
+  context "rubrics_connection field" do
+    before(:once) do
+      @rubric1 = rubric_model(context: account, title: "Account Rubric 1")
+      @rubric2 = rubric_model(context: account, title: "Account Rubric 2")
+      @rubric3 = rubric_model(context: account, title: "Account Rubric 3")
+
+      # Create rubric associations to make them bookmarked
+      @rubric1.associate_with(account, account, purpose: "bookmark")
+      @rubric2.associate_with(account, account, purpose: "bookmark")
+      @rubric3.associate_with(account, account, purpose: "bookmark")
+    end
+
+    it "returns all rubrics without filter" do
+      result = account_type.resolve(<<~GQL, current_user: @admin)
+        rubricsConnection { nodes { _id } }
+      GQL
+
+      expect(result).to contain_exactly(@rubric1.id.to_s, @rubric2.id.to_s, @rubric3.id.to_s)
+    end
+
+    it "filters by rubric id" do
+      result_ids = account_type.resolve(<<~GQL, current_user: @admin)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { _id } }
+      GQL
+      result_titles = account_type.resolve(<<~GQL, current_user: @admin)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { title } }
+      GQL
+
+      expect(result_ids.length).to eq(1)
+      expect(result_ids[0]).to eq(@rubric2.id.to_s)
+      expect(result_titles[0]).to eq("Account Rubric 2")
+    end
+
+    it "returns empty array when filtered id does not match" do
+      non_existent_id = @rubric3.id + 999
+      result = account_type.resolve(<<~GQL, current_user: @admin)
+        rubricsConnection(id: "#{non_existent_id}") { nodes { _id } }
+      GQL
+
+      expect(result).to eq([])
+    end
+
+    it "does not return deleted rubrics" do
+      @rubric2.destroy
+      result = account_type.resolve(<<~GQL, current_user: @admin)
+        rubricsConnection { nodes { _id } }
+      GQL
+
+      expect(result).to contain_exactly(@rubric1.id.to_s, @rubric3.id.to_s)
+    end
+
+    it "does not return deleted rubrics even when filtered by id" do
+      @rubric2.destroy
+      result = account_type.resolve(<<~GQL, current_user: @admin)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { _id } }
+      GQL
+
+      expect(result).to eq([])
+    end
+  end
 end
