@@ -67,7 +67,7 @@ If no discovery URL is configured, the first configuration will be used to attem
         </div>
         <%# END discovery url logic %>
 
-        <% if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page) %>
+        <% if @account.discovery_page_allowed? %>
           <%# BEGIN discovery page logic %>
           <div class="ic-Form-control">
             <%= f.label :discovery_page_active, t("Identity Service Discovery Page"), class: 'ic-Label' %>

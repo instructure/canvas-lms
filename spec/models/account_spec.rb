@@ -2624,6 +2624,12 @@ describe Account do
     end
   end
 
+  describe "#discovery_page_allowed?" do
+    it "always returns false" do
+      expect(Account.new.discovery_page_allowed?).to be(false)
+    end
+  end
+
   describe "#multi_parent_sub_accounts_recursive" do
     subject { Account.multi_parent_sub_accounts_recursive(parent_account_ids) }
 

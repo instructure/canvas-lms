@@ -142,7 +142,7 @@ class LoginController < ApplicationController
   private
 
   def redirect_to_discovery_url
-    if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page) &&
+    if @domain_root_account.discovery_page_allowed? &&
        @domain_root_account.discovery_page_active? &&
        !params[:authentication_provider]
       # TODO: redirect to external Identity Service discovery URL (SPA hosted by Identity Service)

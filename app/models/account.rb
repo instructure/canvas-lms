@@ -1867,6 +1867,10 @@ class Account < ActiveRecord::Base
     settings.dig(:discovery_page, :active) == true
   end
 
+  def discovery_page_allowed?
+    false
+  end
+
   def validate_auth_discovery_url
     return if settings[:auth_discovery_url].blank?
 

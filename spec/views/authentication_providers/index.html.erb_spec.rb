@@ -68,8 +68,8 @@ describe "authentication_providers/index" do
   end
 
   describe "Identity Service Discovery Page section" do
-    it "renders when feature flag is enabled" do
-      Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
+    it "renders when discovery page is allowed" do
+      allow(account).to receive(:discovery_page_allowed?).and_return(true)
       render "authentication_providers/index"
       doc = Nokogiri::HTML5(response.body)
       expect(doc.css("#discovery-page-root")).to be_present
@@ -77,8 +77,8 @@ describe "authentication_providers/index" do
       expect(response.body).to include("Identity Service Discovery Page")
     end
 
-    it "does not render when feature flag is disabled" do
-      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+    it "does not render when discovery page is not allowed" do
+      allow(account).to receive(:discovery_page_allowed?).and_return(false)
       render "authentication_providers/index"
       doc = Nokogiri::HTML5(response.body)
       expect(doc.css("#discovery-page-root")).to be_blank
