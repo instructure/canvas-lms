@@ -27,13 +27,15 @@ describe "student dashboard section specific tests", :ignore_js_errors do
 
   before :once do
     multi_section_course_setup # Creates a instructor in 3 sections and a student in one section
-    section_specific_announcements_setup # Creates 7 section specific announcements
-    section_specific_assignments_setup # Creates 7 section specific assignments
     set_widget_dashboard_flag(feature_status: true)
     enable_widget_dashboard_for(@multi_stu_sec1, @multi_stu_sec2)
   end
 
   context "as student" do
+    before :once do
+      section_specific_assignments_setup # Creates 7 section specific assignments
+    end
+
     before do
       user_session(@multi_stu_sec1)
     end
@@ -47,25 +49,10 @@ describe "student dashboard section specific tests", :ignore_js_errors do
 
     it "displays instructor once when student enrolled in multiple sections" do
       @multi_course.enroll_student(@multi_stu_sec1, section: @section2, enrollment_state: "active", allow_multiple_enrollments: true)
-
       go_to_dashboard
 
       expect(instructor_list_item(@shared_teacher.name)).to be_displayed
       expect(all_message_buttons.size).to eq(2)
-    end
-
-    it "displays section specific announcements when student enrolled in multi sections" do
-      go_to_dashboard
-
-      expect(announcement_item(@section1_2_3_ann6.id)).to be_displayed
-      expect(announcement_item(@section2_3_ann5.id)).to be_displayed
-      expect(announcement_item(@section1_2_ann4.id)).to be_displayed
-      widget_pagination_button("Announcements", "2").click
-      expect(announcement_item(@section3_ann3.id)).to be_displayed
-      expect(announcement_item(@section1_ann1.id)).to be_displayed
-      expect(all_message_buttons.size).to eq(2)
-      expect(element_exists?(announcement_item_selector(@section2_ann2.id))).to be_falsey
-      expect(element_exists?(announcement_item_selector(@section2_4_ann7.id))).to be_falsey
     end
 
     it "displays section specific assignments when student enrolled in multi sections" do
@@ -80,10 +67,64 @@ describe "student dashboard section specific tests", :ignore_js_errors do
       expect(element_exists?(course_work_item_selector(@section2_4_hw7.id))).to be_falsey
       expect(all_course_work_items.size).to eq(5)
     end
+
+    it "displays only section specific assignments on todo list widget when student enrolled in multi sections" do
+      add_widget_to_dashboard(@multi_stu_sec1, :todo_list, 1)
+      go_to_dashboard
+
+      expect(todo_item(@section1_hw1.id)).to be_displayed
+      expect(element_exists?(todo_item_selector(@section2_hw2.id))).to be_falsey
+      expect(todo_item(@section3_hw3.id)).to be_displayed
+      expect(todo_item(@section1_2_hw4.id)).to be_displayed
+      expect(todo_item(@section2_3_hw5.id)).to be_displayed
+      expect(todo_item(@section1_2_3_hw6.id)).to be_displayed
+      expect(element_exists?(todo_item_selector(@section2_4_hw7.id))).to be_falsey
+      expect(element_exists?(widget_pagination_container_selector("To-do list"))).to be_falsey
+    end
+  end
+
+  context "as student with announcements setup" do
+    before :once do
+      section_specific_announcements_setup # Creates 7 section specific announcements
+    end
+
+    before do
+      user_session(@multi_stu_sec1)
+    end
+
+    it "displays section specific announcements on announcement widget when student enrolled in multi sections" do
+      go_to_dashboard
+
+      expect(announcement_item(@section1_2_3_ann6.id)).to be_displayed
+      expect(announcement_item(@section2_3_ann5.id)).to be_displayed
+      expect(announcement_item(@section1_2_ann4.id)).to be_displayed
+      widget_pagination_button("Announcements", "2").click
+      expect(announcement_item(@section3_ann3.id)).to be_displayed
+      expect(announcement_item(@section1_ann1.id)).to be_displayed
+      expect(all_message_buttons.size).to eq(2)
+      expect(element_exists?(announcement_item_selector(@section2_ann2.id))).to be_falsey
+      expect(element_exists?(announcement_item_selector(@section2_4_ann7.id))).to be_falsey
+    end
+
+    it "displays only section specific announcements on todo list widget when student enrolled in multi sections" do
+      add_widget_to_dashboard(@multi_stu_sec1, :todo_list, 1)
+      go_to_dashboard
+
+      expect(todo_item(@section1_ann1.id)).to be_displayed
+      expect(element_exists?(todo_item_selector(@section2_ann2.id))).to be_falsey
+      expect(todo_item(@section3_ann3.id)).to be_displayed
+      expect(todo_item(@section1_2_ann4.id)).to be_displayed
+      expect(todo_item(@section2_3_ann5.id)).to be_displayed
+      expect(todo_item(@section1_2_3_ann6.id)).to be_displayed
+      expect(element_exists?(todo_item_selector(@section2_4_ann7.id))).to be_falsey
+      expect(element_exists?(widget_pagination_container_selector("To-do list"))).to be_falsey
+    end
   end
 
   context "as observer" do
     before :once do
+      section_specific_assignments_setup # Creates 7 section specific assignments
+      section_specific_announcements_setup # Creates 7 section specific announcements
       observer_w_section_specific_course_setup
       enable_widget_dashboard_for(@multi_section_observer)
     end
