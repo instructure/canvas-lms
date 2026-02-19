@@ -32,6 +32,10 @@ module Accessibility
       @path = @issue.node_path
     end
 
+    def resource_updated_since_issue?
+      @resource.updated_at > @issue.created_at
+    end
+
     def content
       if @path.present?
         html, metadata = extract_element_from_content

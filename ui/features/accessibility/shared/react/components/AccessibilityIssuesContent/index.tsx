@@ -108,6 +108,8 @@ export const AccessibilityWizard = () => {
   // All other state hooks
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
   const [isRemediated, setIsRemediated] = useState<boolean>(false)
+  const [isResourceStale, setIsResourceStale] = useState<boolean>(false)
+  const handleStaleConflict = useCallback(() => setIsResourceStale(true), [])
   const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
   const [isGenerateLoading, setIsGenerateLoading] = useState<boolean>(false)
   const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
@@ -302,6 +304,62 @@ export const AccessibilityWizard = () => {
     [accessibilityScans, selectedScan, setAccessibilityScans],
   )
 
+  const handleRescan = useCallback(async () => {
+    if (!selectedScan) return
+
+    try {
+      setIsRequestInFlight(true)
+
+      const newScanResponse = await doFetchApi({
+        path: getResourceScanPath(selectedScan),
+        method: 'POST',
+      })
+
+      const newScan = convertKeysToCamelCase(newScanResponse.json!) as AccessibilityResourceScan
+      const newScanIssues = newScan.issues ?? []
+
+      if (accessibilityScans) {
+        const updatedOrderedTableData = updateCountPropertyForItem(accessibilityScans, newScan)
+        setAccessibilityScans(updatedOrderedTableData)
+        if (nextResource) {
+          const nextItem: AccessibilityResourceScan = accessibilityScans[nextResource.index]
+          if (nextItem) {
+            nextItem.issues = getAccessibilityIssuesByItem(accessibilityScans, nextItem)
+
+            const updatedNextResource: NextResource = {index: nextResource.index, item: nextItem}
+            setNextResource(updatedNextResource)
+          }
+        }
+      }
+
+      updateAccessibilityIssues(newScanIssues)
+      setSelectedScan(newScan)
+      setSelectedIssue(
+        newScanIssues[Math.min(selectedIssueIndex, Math.max(0, newScanIssues.length - 1))],
+      )
+      doFetchAccessibilityIssuesSummary({filters})
+      return newScan
+    } catch (err: any) {
+      console.error('Error rescanning resource. Error is: ' + err.message)
+    } finally {
+      setIsRequestInFlight(false)
+    }
+  }, [
+    selectedScan,
+    accessibilityScans,
+    nextResource,
+    selectedIssueIndex,
+    updateAccessibilityIssues,
+    updateCountPropertyForItem,
+    getAccessibilityIssuesByItem,
+    setAccessibilityScans,
+    setNextResource,
+    setSelectedScan,
+    setSelectedIssue,
+    doFetchAccessibilityIssuesSummary,
+    filters,
+  ])
+
   const handleSaveAndNext = useCallback(
     async (formValue: any) => {
       if (!selectedIssue) return
@@ -326,66 +384,23 @@ export const AccessibilityWizard = () => {
           setAssertiveAlertMessage(I18n.t('Issue fix applied successfully'))
         }, 1500)
 
-        const newScanResponse = await doFetchApi({
-          path: getResourceScanPath(selectedScan),
-          method: 'POST',
-        })
-
-        const newScan = convertKeysToCamelCase(newScanResponse.json!) as AccessibilityResourceScan
-        const newScanIssues = newScan.issues ?? []
         const hadIssuesBefore = issues.length > 0
+        const newScan = await handleRescan()
+        const newScanIssues = newScan?.issues ?? []
 
         if (hadIssuesBefore && newScanIssues.length === 0) {
-          const courseId = window.ENV.current_context?.id
-
           trackA11yEvent('ResourceRemediated', {
             resourceId: selectedScan.resourceId,
-            courseId,
+            courseId: window.ENV.current_context?.id,
           })
         }
-
-        if (accessibilityScans) {
-          const updatedOrderedTableData = updateCountPropertyForItem(accessibilityScans, newScan)
-          setAccessibilityScans(updatedOrderedTableData)
-          if (nextResource) {
-            const nextItem: AccessibilityResourceScan = accessibilityScans[nextResource.index]
-            if (nextItem) {
-              nextItem.issues = getAccessibilityIssuesByItem(accessibilityScans, nextItem)
-
-              const updatedNextResource: NextResource = {index: nextResource.index, item: nextItem}
-              setNextResource(updatedNextResource)
-            }
-          }
-        }
-
-        updateAccessibilityIssues(newScanIssues)
-        setSelectedScan(newScan)
-        setSelectedIssue(
-          newScanIssues[Math.min(selectedIssueIndex, Math.max(0, newScanIssues.length - 1))],
-        )
-        doFetchAccessibilityIssuesSummary({filters})
       } catch (err: any) {
         console.error('Error saving accessibility issue. Error is: ' + err.message)
       } finally {
         setIsRequestInFlight(false)
       }
     },
-    [
-      selectedScan,
-      formRef,
-      selectedIssue,
-      updateAccessibilityIssues,
-      accessibilityScans,
-      nextResource,
-      getAccessibilityIssuesByItem,
-      setAccessibilityScans,
-      setNextResource,
-      updateCountPropertyForItem,
-      doFetchAccessibilityIssuesSummary,
-      filters,
-      trackA11yIssueEvent,
-      trackA11yEvent,
-    ],
+    [selectedScan, selectedIssue, issues, handleRescan, trackA11yIssueEvent, trackA11yEvent],
   )
 
   const handleApplyAndSaveAndNext = useCallback(async () => {
@@ -494,7 +509,20 @@ export const AccessibilityWizard = () => {
     setIsFormLocked(false)
     setFormError(null)
     setIsSaveButtonEnabled(true)
+    setIsResourceStale(false)
   }, [selectedIssue])
+
+  useEffect(() => {
+    if (!isResourceStale) return
+    const timer = setTimeout(() => {
+      setAssertiveAlertMessage(
+        I18n.t(
+          'This issue may be outdated. The resource has been updated since this issue was detected. Rescan this resource',
+        ),
+      )
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [isResourceStale])
 
   useEffect(() => {
     const previousActive = previousActiveRef.current
@@ -563,7 +591,7 @@ export const AccessibilityWizard = () => {
         undoMessage={selectedIssue.form.undoText}
         isApplied={isRemediated}
         isLoading={isFormLocked}
-        isDisabled={isGenerateLoading}
+        isDisabled={isGenerateLoading || isResourceStale}
       >
         {applyButtonText}
       </ApplyButton>
@@ -617,6 +645,8 @@ export const AccessibilityWizard = () => {
                     selectedIssue.ruleId,
                   )
                 }
+                onStaleConflict={handleStaleConflict}
+                onRescan={handleRescan}
               />
             </Flex>
 
