@@ -403,14 +403,13 @@ class User < ActiveRecord::Base
   # a student, this first enrollment stays the same, but a new one with an associated_user_id is added. thusly to find
   # course observers, you take the difference between all active observers and active observers with associated users
   scope :observing_full_course, lambda { |course_ids|
-    active_observer_scope = joins(:enrollments).where(enrollments: { type: "ObserverEnrollment", course_id: course_ids, workflow_state: ["active", "invited"] })
-    users_observing_students = active_observer_scope.where.not(enrollments: { associated_user_id: nil }).pluck(:id)
-
-    if users_observing_students == [] || users_observing_students.nil?
-      active_observer_scope
-    else
-      active_observer_scope.where.not(users: { id: users_observing_students })
-    end
+    joins(:observer_enrollments)
+      .where(observer_enrollments: { course_id: course_ids, workflow_state: ["active", "invited"] })
+      .where.not(
+        ObserverEnrollment.where("enrollments.user_id=users.id and observer_enrollments.course_id=enrollments.course_id")
+                          .where(workflow_state: ["active", "invited"])
+                          .where.not(associated_user_id: nil).arel.exists
+      )
   }
 
   scope :linked_through_root_account, lambda { |root_account|
