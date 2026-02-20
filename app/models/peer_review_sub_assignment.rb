@@ -86,6 +86,18 @@ class PeerReviewSubAssignment < AbstractAssignment
     false
   end
 
+  # visibility of peer_review_sub_assignments is determined by the visibility of their parent assignment
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids, assignment_ids = nil, include_concluded = true|
+    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService
+                             .assignments_visible_to_students(user_ids:, course_ids:, assignment_ids:, include_concluded:)
+                             .pluck(:assignment_id)
+    if visible_assignment_ids.any?
+      where(parent_assignment_id: visible_assignment_ids)
+    else
+      none
+    end
+  }
+
   private
 
   def set_default_context

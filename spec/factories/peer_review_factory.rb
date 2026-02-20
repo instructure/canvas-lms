@@ -21,6 +21,7 @@
 module Factories
   def peer_review_model(opts = {})
     @parent_assignment = opts.delete(:parent_assignment)
+    peer_review_count = opts.delete(:peer_review_count) || 1
     course = if @parent_assignment
                opts.delete(:course)
                @parent_assignment.course
@@ -33,10 +34,12 @@ module Factories
       title: "Parent Assignment",
       points_possible: 20,
       peer_reviews: true,
+      peer_review_count:,
       submission_types: "online_text_entry"
     )
 
     @parent_assignment.peer_reviews = true unless @parent_assignment.peer_reviews?
+    @parent_assignment.peer_review_count = peer_review_count unless @parent_assignment.peer_review_count
     @parent_assignment.save!
 
     course.enable_feature!(:peer_review_allocation_and_grading)
