@@ -19,7 +19,6 @@
 import {TextArea} from '@instructure/ui-text-area'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import {useMemo} from 'react'
 
 const I18n = createI18nScope('rubrics-criterion-modal')
 
@@ -32,10 +31,6 @@ export const CriterionDescription = ({
   criterionLongDescription,
   setCriterionLongDescription,
 }: CriterionDescriptionProps) => {
-  const textareaValue = useMemo(() => {
-    return (criterionLongDescription || '').replace(/<br\/>/g, '')
-  }, [criterionLongDescription])
-
   return (
     <View as="div" margin="0">
       <TextArea
@@ -43,7 +38,7 @@ export const CriterionDescription = ({
         placeholder={I18n.t('Enter the description')}
         maxHeight="6.75rem"
         width={'100%'}
-        value={textareaValue}
+        value={criterionLongDescription?.replace(/<br\/>/g, '') ?? ''}
         onChange={e => setCriterionLongDescription(e.target.value)}
         data-testid="rubric-criterion-description-input"
       />
