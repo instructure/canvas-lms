@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, within} from '@testing-library/react'
+import React from 'react'
 
 import DimensionsInput, {useDimensionsState} from '..'
 import DimensionsInputDriver from './DimensionsInputDriver'
@@ -80,6 +80,21 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
     const message = component.getByTestId('message')
     return within(message).getAllByText(/.*/)[0]?.textContent
   }
+
+  describe('hint message', () => {
+    it('shows default aspect ratio hint without additionalHintText', () => {
+      initialState.usePercentageUnits = false
+      renderComponent()
+      expect(currentMessageText()).toEqual('Aspect ratio will be preserved')
+    })
+
+    it('appends additionalHintText to the hint with a period separator', () => {
+      initialState.usePercentageUnits = false
+      props.additionalHintText = 'Some extra info.'
+      renderComponent()
+      expect(currentMessageText()).toEqual('Aspect ratio will be preserved. Some extra info.')
+    })
+  })
 
   describe('"Pixels" radio button', () => {
     beforeEach(() => {
