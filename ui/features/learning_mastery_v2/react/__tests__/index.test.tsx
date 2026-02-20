@@ -30,6 +30,11 @@ import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollup
 import {saveLearningMasteryGradebookSettings} from '../apiClient'
 import {useMasteryDistribution} from '../hooks/useMasteryDistribution'
 
+vi.mock('../components/charts/BarChart', () => ({
+  BarChart: () => null,
+  default: () => null,
+}))
+
 vi.mock('../apiClient')
 
 vi.mock('@canvas/outcomes/react/hooks/useRollups')
