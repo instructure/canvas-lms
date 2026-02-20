@@ -995,6 +995,60 @@ describe Types::SubmissionType do
         end
       end
     end
+
+    context "previewUrl with legacy version missing course_id" do
+      let(:legacy_student) { student_in_course(course: @course, active_all: true).user }
+      let(:legacy_submission) { legacy_student.submissions.find_by!(assignment: legacy_assignment) }
+      let(:legacy_resolver) { GraphQLTypeTester.new(legacy_submission, current_user: @teacher, request: ActionDispatch::TestRequest.create) }
+
+      before do
+        legacy_assignment.submit_homework(legacy_student, submitted_at: 3.hours.ago, **legacy_homework_opts)
+        legacy_assignment.submit_homework(legacy_student, submitted_at: 2.hours.ago, **legacy_homework_opts)
+        legacy_assignment.submit_homework(legacy_student, **legacy_homework_opts)
+        legacy_submission.versions.each do |version|
+          model = version.model
+          model.course_id = nil
+          version.model = model
+          version.save!
+        end
+      end
+
+      context "regular submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy regular", submission_types: "online_text_entry", points_possible: 10) }
+        let(:legacy_homework_opts) { { body: "An attempt" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("http://test.host/courses/#{@course.id}/assignments/#{legacy_assignment.id}/submissions/#{legacy_student.id}"))
+        end
+      end
+
+      context "anonymous submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy anon", submission_types: "online_text_entry", points_possible: 10, anonymous_grading: true) }
+        let(:legacy_homework_opts) { { body: "An attempt" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("http://test.host/courses/#{@course.id}/assignments/#{legacy_assignment.id}/anonymous_submissions/#{legacy_submission.anonymous_id}"))
+        end
+      end
+
+      context "basic_lti_launch submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy lti", submission_types: "external_tool", points_possible: 10) }
+        let(:legacy_homework_opts) { { submission_type: "basic_lti_launch", url: "http://example.com/launch" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("/courses/#{@course.id}/external_tools/retrieve"))
+        end
+      end
+    end
   end
 
   describe "late" do

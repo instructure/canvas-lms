@@ -686,24 +686,28 @@ module Interfaces::SubmissionInterface
 
   field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    if submission.not_submitted? && !submission.partially_submitted?
-      nil
-    elsif submission.submission_type == "basic_lti_launch"
-      GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
-        submission.course_id,
-        assignment_id: submission.assignment_id,
-        url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
-        display: "borderless",
-        host: context[:request].host_with_port,
-        resource_link_lookup_uuid: submission.resource_link_lookup_uuid
-      )
-    else
-      Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+    return nil if submission.not_submitted? && !submission.partially_submitted?
+
+    Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+      # Legacy submission versions serialized before course_id was added to the
+      # submissions table will have course_id: nil. Fall back to the assignment's
+      # context_id, which is always the course for standard assignments.
+      course_id = submission.course_id || assignment.context_id
+      if submission.submission_type == "basic_lti_launch"
+        GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
+          course_id,
+          assignment_id: submission.assignment_id,
+          url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
+          display: "borderless",
+          host: context[:request].host_with_port,
+          resource_link_lookup_uuid: submission.resource_link_lookup_uuid
+        )
+      else
         is_discussion_topic = submission.submission_type == "discussion_topic" || submission.partially_submitted?
         show_full_discussion = is_discussion_topic ? { show_full_discussion_immediately: true } : {}
         if assignment.anonymize_students?
           GraphQLHelpers::UrlHelpers.course_assignment_anonymous_submission_url(
-            submission.course_id,
+            course_id,
             submission.assignment_id,
             submission.anonymous_id,
             host: context[:request].host_with_port,
@@ -713,7 +717,7 @@ module Interfaces::SubmissionInterface
           )
         else
           GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
-            submission.course_id,
+            course_id,
             submission.assignment_id,
             submission.user_id,
             host: context[:request].host_with_port,
