@@ -120,7 +120,7 @@ additional_title_context ||= false
           <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
             <a
               class="item"
-              href="<%= assignment.assignment_path %>#submit"
+              href="<%= assignment.assignment_path %><%= '#submit' unless assignment.peer_review_sub_assignment? %>"
               data-track-category="dashboard"
               data-track-label="todo needs submitting"
             >

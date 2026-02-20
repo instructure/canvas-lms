@@ -195,8 +195,8 @@ module UserLearningObjectScopes
     scope = scope.for_course(course_ids_with_checkpoints_enabled) if object_type == "SubAssignment"
 
     if object_type == "PeerReviewSubAssignment"
-      courses_with_feature = Course.where(id: shard_course_ids).preload(:account).select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
-      scope = scope.for_course(courses_with_feature) if courses_with_feature.any?
+      courses_with_feature = Course.where(id: shard_course_ids).select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
+      scope = scope.for_course(courses_with_feature)
     end
 
     if %w[Assignment SubAssignment PeerReviewSubAssignment].include?(object_type)
@@ -325,6 +325,13 @@ module UserLearningObjectScopes
       ar_scope = ar_scope.incomplete unless scope_only
       ar_scope = ar_scope.for_courses(shard_course_ids)
 
+      # Exclude courses using the new peer review allocation feature since
+      # those surface peer reviews via PeerReviewSubAssignment instead.
+      praa_course_ids = Course.where(id: shard_course_ids)
+                              .select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }
+                              .map(&:id)
+      ar_scope = ar_scope.where.not(assessor_asset: { course_id: praa_course_ids }) if praa_course_ids.any?
+
       # The below merging of scopes mimics a portion of the behavior for checking the access policy
       # for the submissions, ensuring that the user has access and can read & comment on them.
       # The check for making sure that the user is a participant in the course is already made
@@ -345,6 +352,39 @@ module UserLearningObjectScopes
       else
         result = limit ? ar_scope.take(limit) : ar_scope.to_a
         result
+      end
+    end
+  end
+
+  def peer_review_sub_assignments_needing_submitting(
+    limit: ULOS_DEFAULT_LIMIT,
+    due_after: 2.weeks.ago,
+    due_before: 2.weeks.from_now,
+    scope_only: false,
+    include_ignored: false,
+    **opts
+  )
+    params = _params_hash(binding)
+    opts.merge!(params.slice(:limit, :scope_only, :include_ignored))
+    objects_needing("PeerReviewSubAssignment", "submitting", :student, params, 15.minutes, **opts) do |prsa_scope, shard_course_ids|
+      courses_with_peer_review_feature = Course.where(id: shard_course_ids)
+                                               .select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }
+                                               .map(&:id)
+
+      prsa_scope = prsa_scope
+                   .for_course(courses_with_peer_review_feature)
+                   .published
+                   .need_submitting_info(id, nil)
+
+      prsa_scope = prsa_scope.where("assignments.due_at IS NULL OR assignments.due_at > ?", due_after) if due_after
+      prsa_scope = prsa_scope.where("assignments.due_at IS NULL OR assignments.due_at <= ?", due_before) if due_before
+
+      if scope_only
+        prsa_scope
+      elsif limit
+        prsa_scope.take(limit)
+      else
+        prsa_scope.to_a
       end
     end
   end
