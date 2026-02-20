@@ -20,6 +20,8 @@
 require_relative "../spec_helper"
 
 describe "ToDoListPresenter" do
+  include Rails.application.routes.url_helpers
+
   context "moderated assignments" do
     let(:course) { Course.create! }
     let(:student) { course_with_student(course:, active_all: true).user }
@@ -213,6 +215,60 @@ describe "ToDoListPresenter" do
       presenter = ToDoListPresenter.new(nil, reviewer, [course1])
 
       expect(presenter.needs_reviewing.last.submission_path).to include("anonymous_submissions")
+    end
+
+    it "does not filter legacy AssessmentRequest items from needs_reviewing when feature is not enabled" do
+      presenter = ToDoListPresenter.new(nil, reviewer, [course1])
+      expect(presenter.needs_reviewing).not_to be_empty
+    end
+
+    context "with user as teacher in one course and student in another" do
+      let(:teacher_course) { Course.create! }
+      let(:student_course) { Course.create! }
+      let(:mixed_user) do
+        course_with_user("TeacherEnrollment", course: teacher_course, active_all: true).user.tap do |u|
+          course_with_user("StudentEnrollment", course: student_course, user: u, active_all: true)
+        end
+      end
+      let(:reviewee) { course_with_user("StudentEnrollment", course: student_course, active_all: true).user }
+      let(:parent_assignment) do
+        Assignment.create!(
+          context: student_course,
+          title: "PR Assignment",
+          submission_types: "online_text_entry",
+          peer_reviews: true,
+          peer_review_count: 1
+        ).tap(&:publish)
+      end
+      let(:prsa) do
+        student_course.enable_feature!(:peer_review_allocation_and_grading)
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment:,
+          points_possible: 10,
+          grading_type: "points"
+        )
+      end
+
+      before do
+        student_course.offer!
+        prsa # trigger lazy evaluation so PRSA and submissions are created
+      end
+
+      it "includes PRSA items from the student course in needs_submitting on the dashboard" do
+        presenter = ToDoListPresenter.new(nil, mixed_user, nil)
+        expect(presenter.needs_submitting.map { |a| a.assignment.id }).to include(prsa.id)
+      end
+
+      it "does not include PRSA items when scoped to the teacher course" do
+        presenter = ToDoListPresenter.new(nil, mixed_user, [teacher_course])
+        expect(presenter.needs_submitting.map { |a| a.assignment.id }).not_to include(prsa.id)
+      end
+
+      it "links to the peer reviews page for PRSA items" do
+        presenter = ToDoListPresenter.new(self, mixed_user, nil)
+        prsa_presenter = presenter.needs_submitting.find { |a| a.assignment.is_a?(PeerReviewSubAssignment) }
+        expect(prsa_presenter.assignment_path).to eq "/courses/#{student_course.id}/assignments/#{prsa.parent_assignment_id}/peer_reviews"
+      end
     end
 
     context "Assignment Enhancements FF enabled" do

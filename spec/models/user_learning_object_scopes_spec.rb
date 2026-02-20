@@ -617,6 +617,55 @@ describe UserLearningObjectScopes do
       @assessment_request.user.enrollments.update_all(workflow_state: "inactive")
       expect(@reviewer.submissions_needing_peer_review.length).to eq 0
     end
+
+    it "does not include assessment requests for courses with peer_review_allocation_and_grading enabled" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 0
+    end
+  end
+
+  describe "peer_review_sub_assignments_needing_submitting" do
+    before do
+      @reviewer = course_with_student(active_all: true).user
+      @prsa = peer_review_model(course: @course)
+      # peer_review_model enables peer_review_allocation_and_grading
+    end
+
+    it "returns PRSAs as soon as they are created for enrolled students" do
+      expect(@reviewer.peer_review_sub_assignments_needing_submitting).to include(@prsa)
+    end
+
+    it "does not return PRSAs when peer_review_allocation_and_grading is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      expect(@reviewer.peer_review_sub_assignments_needing_submitting).to be_empty
+    end
+
+    it "does not return PRSAs once the peer review has been submitted" do
+      @prsa.find_or_create_submission(@reviewer).update_columns(submission_type: "peer_review", workflow_state: "submitted")
+      expect(@reviewer.peer_review_sub_assignments_needing_submitting).to be_empty
+    end
+
+    it "does not return PRSAs for users with only teacher enrollment (no student enrollment)" do
+      teacher_only = user_model
+      @course.enroll_teacher(teacher_only, enrollment_state: :active)
+      expect(teacher_only.peer_review_sub_assignments_needing_submitting).to be_empty
+    end
+
+    it "returns PRSAs with no due date (due_at: nil)" do
+      @prsa.update_column(:due_at, nil)
+      expect(@reviewer.peer_review_sub_assignments_needing_submitting).to include(@prsa)
+    end
+
+    it "does not return PRSAs with due_at outside the 2-week window" do
+      @prsa.update_column(:due_at, 3.weeks.ago)
+      expect(@reviewer.peer_review_sub_assignments_needing_submitting).to be_empty
+    end
+
+    it "returns PRSAs from the student course for a user with mixed enrollments" do
+      teacher_course = course_factory(active_all: true)
+      teacher_course.enroll_teacher(@reviewer, enrollment_state: :active)
+      expect(@reviewer.peer_review_sub_assignments_needing_submitting).to include(@prsa)
+    end
   end
 
   context "assignments_needing_grading" do
@@ -906,6 +955,12 @@ describe UserLearningObjectScopes do
 
       it "does not include peer review sub assignments when feature flag is disabled" do
         @course.account.disable_feature!(:peer_review_allocation_and_grading)
+        expect(@teacher.assignments_needing_grading(is_peer_review_sub_assignment: true)).to be_empty
+      end
+
+      it "does not include peer review sub assignments when feature flag is disabled even with ungraded submissions" do
+        @peer_review_sub_assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "peer review 1")
+        @peer_review_sub_assignment.submit_homework(@student2, submission_type: "online_text_entry", body: "peer review 2")
         expect(@teacher.assignments_needing_grading(is_peer_review_sub_assignment: true)).to be_empty
       end
 
