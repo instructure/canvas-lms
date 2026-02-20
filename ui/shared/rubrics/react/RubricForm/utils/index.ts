@@ -25,18 +25,6 @@ import type {
 import type {RubricQueryResponse} from '../queries/RubricFormQueries'
 import type {RubricFormProps} from '../types/RubricForm'
 import {isEqual} from 'es-toolkit/compat'
-import {fullyDecodeHtmlEntities} from '@canvas/rubrics/react/RubricAssessment'
-
-const decodedCriteria = (criteria: RubricCriterion[]): RubricCriterion[] => {
-  return criteria.map(criterion => ({
-    ...criterion,
-    longDescription: fullyDecodeHtmlEntities(criterion.longDescription),
-    ratings: criterion.ratings.map(rating => ({
-      ...rating,
-      longDescription: fullyDecodeHtmlEntities(rating.longDescription),
-    })),
-  }))
-}
 
 export const translateRubricQueryResponse = (fields: RubricQueryResponse): RubricFormProps => {
   return {
@@ -46,7 +34,7 @@ export const translateRubricQueryResponse = (fields: RubricQueryResponse): Rubri
     title: fields.title ?? '',
     hasRubricAssociations: fields.hasRubricAssociations ?? false,
     hidePoints: fields.rubricAssociationForContext?.hidePoints ?? false,
-    criteria: decodedCriteria(fields.criteria ?? []),
+    criteria: fields.criteria ?? [],
     pointsPossible: fields.pointsPossible ?? 0,
     buttonDisplay: fields.buttonDisplay ?? 'numeric',
     ratingOrder: fields.ratingOrder ?? 'descending',
@@ -69,7 +57,7 @@ export const translateRubricData = (
     title: rubric.title ?? '',
     hasRubricAssociations: rubric.hasRubricAssociations ?? false,
     hidePoints: rubricAssociation.hidePoints ?? false,
-    criteria: decodedCriteria(rubric.criteria ?? []),
+    criteria: rubric.criteria ?? [],
     pointsPossible: rubric.pointsPossible ?? 0,
     buttonDisplay: rubric.buttonDisplay ?? 'numeric',
     ratingOrder: rubric.ratingOrder ?? 'descending',
@@ -166,10 +154,9 @@ export const hasRubricChanged = (formData: RubricFormProps, rubric: Rubric): boo
     freeFormCriterionComments: formData.freeFormCriterionComments,
     hidePoints: formData.hidePoints,
   }
-  // Decode rubric criteria to match the decoded formData criteria for comparison
   const reducedRubricData = {
     title: rubric.title,
-    criteria: decodedCriteria(rubric.criteria ?? []),
+    criteria: rubric.criteria,
     pointsPossible: rubric.pointsPossible,
     ratingOrder: rubric.ratingOrder,
     freeFormCriterionComments: rubric.freeFormCriterionComments,
