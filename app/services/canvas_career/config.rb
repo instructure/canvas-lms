@@ -47,7 +47,6 @@ module CanvasCareer
     def public_app_config(request)
       config["public_app_config"].tap do |c|
         c["hosts"]["canvas"] = request.base_url
-        c["experience_preferences"] = experience_preferences
         c["experience_mode"] = @root_account.settings[:horizon_academic_mode] ? "academic" : "career"
       end
     end
@@ -60,18 +59,6 @@ module CanvasCareer
 
     def override_service
       @_override_service ||= MicrofrontendsReleaseTagOverrideService.new(@session)
-    end
-
-    def experience_preferences
-      horizon_academic_mode = @root_account.settings[:horizon_academic_mode] || false
-
-      {
-        features: {
-          notebook: true,
-          skillspace: !horizon_academic_mode,
-          learner_assist: !horizon_academic_mode,
-        }
-      }
     end
   end
 end
