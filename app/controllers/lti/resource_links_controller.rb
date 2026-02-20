@@ -311,7 +311,7 @@ class Lti::ResourceLinksController < ApplicationController
     end
 
     if errors.present?
-      return render json: { errors: }, status: :unprocessable_entity
+      return render json: { errors: }, status: :unprocessable_content
     end
 
     links = bulk_create_links(possible_links, @context)

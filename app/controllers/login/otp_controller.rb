@@ -151,7 +151,7 @@ class Login::OtpController < ApplicationController
           flash[:error] = t "Invalid verification code, please try again"
           redirect_to otp_login_url
         end
-        format.json { render json: { error: t("Invalid verification code, please try again") }, status: :unprocessable_entity }
+        format.json { render json: { error: t("Invalid verification code, please try again") }, status: :unprocessable_content }
       end
     end
   end

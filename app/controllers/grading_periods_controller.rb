@@ -144,7 +144,7 @@ class GradingPeriodsController < ApplicationController
             format.json { render json: serialize_json_api(grading_period(inherit: false)) }
           else
             format.json do
-              render json: grading_period(inherit: false).errors, status: :unprocessable_entity
+              render json: grading_period(inherit: false).errors, status: :unprocessable_content
             end
           end
         end
@@ -235,7 +235,7 @@ class GradingPeriodsController < ApplicationController
       respond_to do |format|
         if errors.present?
           format.json do
-            render json: { errors: }, status: :unprocessable_entity
+            render json: { errors: }, status: :unprocessable_content
           end
         else
           periods.each(&:save!)
@@ -264,7 +264,7 @@ class GradingPeriodsController < ApplicationController
       respond_to do |format|
         if errors.present?
           format.json do
-            render json: { errors: }, status: :unprocessable_entity
+            render json: { errors: }, status: :unprocessable_content
           end
         else
           periods.each(&:save!)

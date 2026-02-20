@@ -328,7 +328,7 @@ class FeatureFlagsController < ApplicationController
       if @context.save
         render json: { early_access_program: true }
       else
-        render json: { errors: @context.errors }, status: :unprocessable_entity
+        render json: { errors: @context.errors }, status: :unprocessable_content
       end
     end
   end

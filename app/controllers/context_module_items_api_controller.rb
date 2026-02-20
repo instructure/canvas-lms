@@ -562,7 +562,7 @@ class ContextModuleItemsApiController < ApplicationController
           if module_item_publishable?(@tag)
             @tag.publish
           else
-            return render json: { message: "item can't be published" }, status: :unprocessable_entity
+            return render json: { message: "item can't be published" }, status: :unprocessable_content
           end
         elsif module_item_unpublishable?(@tag)
           @tag.unpublish

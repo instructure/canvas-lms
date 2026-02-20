@@ -445,7 +445,7 @@ class ConferencesController < ApplicationController
         @conference.recording_ready!
         render json: [], status: :accepted
       else
-        render json: signed_id_invalid_json, status: :unprocessable_entity
+        render json: signed_id_invalid_json, status: :unprocessable_content
       end
     rescue Canvas::Security::InvalidToken
       render json: invalid_jwt_token_json, status: :unauthorized

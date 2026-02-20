@@ -117,7 +117,7 @@ class RateLimitingSettingsController < ApplicationController
       respond_to do |format|
         format.json do
           render json: { errors: @oauth_client_config.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       end
     end
@@ -139,7 +139,7 @@ class RateLimitingSettingsController < ApplicationController
       respond_to do |format|
         format.json do
           render json: { errors: @oauth_client_config.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       end
     end

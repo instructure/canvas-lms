@@ -257,7 +257,7 @@ module Lti
 
         Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
           { errors:, registration_attrs: }
-        return render status: :unprocessable_entity, json: { errors: } if errors.present?
+        return render status: :unprocessable_content, json: { errors: } if errors.present?
 
         if jwt["existing_registration"].present?
           registration = Lti::Registration.find(jwt["existing_registration"])
@@ -357,7 +357,7 @@ module Lti
         # of the request and the registration id
         Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
           { errors:, registration_attrs: }
-        return render status: :unprocessable_entity, json: { errors: } if errors.present?
+        return render status: :unprocessable_content, json: { errors: } if errors.present?
 
         if registration.present?
           # Create an LTI RegistrationUpdateRequest

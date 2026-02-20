@@ -701,7 +701,7 @@ class AuthenticationProvidersController < ApplicationController
         end
         format.json do
           msg = "duplicate provider #{account_config.auth_type}"
-          render json: { errors: [{ message: msg }] }, status: :unprocessable_entity
+          render json: { errors: [{ message: msg }] }, status: :unprocessable_content
         end
       end
       return
