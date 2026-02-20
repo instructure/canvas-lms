@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Lti::Registration < ActiveRecord::Base
-  DEFAULT_PRIVACY_LEVEL = "anonymous"
+  DEFAULT_PRIVACY_LEVEL = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
   CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
   TRACKED_ATTRIBUTES = %w[
     admin_nickname

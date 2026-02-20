@@ -56,5 +56,4 @@ export interface DeveloperKey {
   is_lti_key: boolean
   is_lti_registration: boolean
   lti_registration?: LtiRegistration
-  has_overlay?: boolean
 }

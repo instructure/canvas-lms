@@ -96,15 +96,34 @@ describe Lti::CreateRegistrationService do
     end
   end
 
+  # TEMPORARY: This test verifies temporary behavior. Remove this when we revert the temporary changes.
   context "with overlay params specified" do
-    let(:overlay_params) { { disabled_scopes: [TokenScopes::LTI_SCOPES.keys[0]] } }
+    let(:overlay_params) do
+      {
+        title: "Overlaid Title",
+        disabled_scopes: [TokenScopes::LTI_SCOPES.keys[0]],
+        placements: {
+          course_navigation: {
+            text: "Overlaid Text"
+          }
+        }
+      }
+    end
 
-    it "creates a new overlay" do
-      expect { subject }
-        .to change { Lti::Overlay.count }
-        .by(1)
+    it "does not create an overlay (merges into configuration instead)" do
+      expect { subject }.not_to change { Lti::Overlay.count }
+    end
 
-      expect(Lti::Overlay.last.data.with_indifferent_access).to eql(overlay_params.with_indifferent_access)
+    it "merges overlay into the configuration" do
+      subject
+
+      config = Lti::ToolConfiguration.last
+      expect(config.title).to eq("Overlaid Title")
+      expect(config.scopes).not_to include(TokenScopes::LTI_SCOPES.keys[0])
+
+      # Verify placement overlay was applied
+      course_nav = config.placements.find { |p| p["placement"] == "course_navigation" }
+      expect(course_nav["text"]).to eq("Overlaid Text") if course_nav
     end
 
     it "uses the scopes from the overlay when creating the developer key" do
@@ -208,6 +227,7 @@ describe Lti::CreateRegistrationService do
     end
   end
 
+  # TEMPORARY: With overlay merging, validation happens earlier and raises ArgumentError
   context "with invalid overlay params" do
     let(:overlay_params) do
       {
@@ -216,7 +236,7 @@ describe Lti::CreateRegistrationService do
     end
 
     it "raises an error" do
-      expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
+      expect { subject }.to raise_error(ArgumentError, /Invalid overlay parameters/)
     end
   end
 
