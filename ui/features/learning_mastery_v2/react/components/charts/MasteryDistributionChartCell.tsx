@@ -94,6 +94,7 @@ export const MasteryDistributionChartCell: React.FC<MasteryDistributionChartCell
         position: 'absolute',
         top: '5px',
         right: '5px',
+        zIndex: 1,
         opacity: visible ? 1 : 0,
         pointerEvents: visible ? 'auto' : 'none',
       }}
