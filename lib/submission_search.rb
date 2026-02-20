@@ -258,7 +258,7 @@ class SubmissionSearch
     return user_scope unless @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
 
     section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
-    return User.none if section_ids.empty?
+    return user_scope if section_ids.empty?
 
     enrollment_scope = user_ids_by_enrollment_section_filters(section_ids)
 
