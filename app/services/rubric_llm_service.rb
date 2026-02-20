@@ -35,6 +35,27 @@ class RubricLLMService
   REGENERATE_CRITERION_FEATURE_SLUG = "rubric-regenerate-criterion"
   ROUNDING_PRECISION = 2
 
+  BLOOM_TAXONOMY_CONTEXT = <<~TEXT
+    Use Bloom's Taxonomy verbs to set cognitive complexity per rating level:
+    - Exceptional (highest): Create/Evaluate — design, construct, justify, critique, synthesize
+    - Proficient: Analyze — differentiate, examine, organize, investigate, contrast
+    - Developing: Apply/Understand — implement, explain, demonstrate, summarize, classify
+    - Insufficient (lowest): Remember — list, identify, recall, recognize, restate
+
+    Align with DOK levels:
+      DOK 4 (Extended Thinking) → Exceptional
+      DOK 3 (Strategic Thinking) → Proficient
+      DOK 2 (Skill/Concept)      → Developing
+      DOK 1 (Recall/Reproduction)→ Insufficient
+
+    Rules:
+    - Each rating description must use at least one Bloom verb
+    - Phrase lower-level ratings positively and constructively
+      e.g. 'Identifies key ideas but does not yet connect them' NOT 'Poor performance'
+    - Describe observable behaviors and evidence of thinking,
+      not subjective traits (avoid: "good", "bad", "excellent effort")
+  TEXT
+
   def initialize(rubric)
     @rubric = rubric
     @used_ids = {}
@@ -81,6 +102,7 @@ class RubricLLMService
       ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
       GRADE_LEVEL: generate_options[:grade_level] || DEFAULT_GENERATE_OPTIONS[:grade_level],
       STANDARD: generate_options[:standard].presence || "",
+      BLOOM_TAXONOMY_CONTEXT:,
     }
   end
 
@@ -331,9 +353,6 @@ class RubricLLMService
   # Returns [prompt_config_name, regeneration_target_prompt, structure_directives]
   def determine_regeneration_prompt_setup(incoming_criteria, regenerate_options, generate_options)
     criterion_id = regenerate_options[:criterion_id]
-    # Use the current number of criteria, not the original count
-    # This allows users to add/remove criteria manually and have regeneration preserve the current structure
-    current_criteria_count = incoming_criteria.size
     orig_rating_count = generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count])
 
     if criterion_id.present?
@@ -341,7 +360,6 @@ class RubricLLMService
     else
       structure_directives = build_structure_directives_for_llm(
         existing_criteria: incoming_criteria,
-        required_criteria_count: current_criteria_count,
         required_rating_count: orig_rating_count
       )
       ["rubric_regenerate_criteria", incoming_criteria.pluck(:id).join(", "), structure_directives]
@@ -381,9 +399,9 @@ class RubricLLMService
       ADDITIONAL_USER_PROMPT: regenerate_options.fetch(:additional_user_prompt, generate_options.fetch(:additional_prompt_info, "No specific expectations, just improve it.")),
       GRADE_LEVEL: generate_options.fetch(:grade_level, DEFAULT_GENERATE_OPTIONS[:grade_level]),
       STANDARD: generate_options.fetch(:standard, " "),
-      ORIG_CRITERIA_COUNT: criterion_id.present? ? "original count" : (current_criteria_count || generate_options.fetch(:criteria_count, DEFAULT_GENERATE_OPTIONS[:criteria_count])),
-      ORIG_RATING_COUNT: criterion_id.present? ? "original count" : generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count]),
+      CRITERIA_COUNT: criterion_id.present? ? "original count" : (current_criteria_count || generate_options.fetch(:criteria_count, DEFAULT_GENERATE_OPTIONS[:criteria_count])),
       STRUCTURE_DIRECTIVES: structure_directives,
+      BLOOM_TAXONOMY_CONTEXT:,
     }
   end
 
@@ -864,56 +882,20 @@ class RubricLLMService
     end
   end
 
-  # Build human-readable structure enforcement used inside the prompt:
-  # - Ensures exact number of criteria and ratings per criterion
-  # - Lists which new IDs must be created (e.g., criterion:_new_c_3)
-  # - Asks LLM not to reorder existing criteria / invent new ID formats
+  # Build human-readable structure enforcement used inside the prompt.
+  # Only fires when the current rating counts differ from the required count.
   #
-  # Example output lines:
-  #   - Criteria count: current=2, required=3.
-  #     You must append exactly 1 new criteria at the end:
-  #       - criterion:_new_c_3 (with exactly 4 ratings).
-  #     Do not reorder existing criteria. Keep all IDs stable.
-  #
-  #   - Ratings for c1: current=2, required=4. Create 2 new ratings.
+  # Example output:
+  #   - Ratings for c1: current=2, required=4.
+  #     Append 2 new ratings at the end (lowest performance levels),
+  #     using _new_r_N IDs, in descending point order.
   def build_structure_directives_for_llm(
     existing_criteria:,
-    required_criteria_count:,
     required_rating_count:
   )
     lines = []
+    required_rating_count = required_rating_count.to_i
 
-    required_criteria_count = required_criteria_count.to_i
-    required_rating_count   = required_rating_count.to_i
-
-    current_criteria_count = existing_criteria.size
-    if current_criteria_count < required_criteria_count
-      missing = required_criteria_count - current_criteria_count
-      start_index = current_criteria_count + 1
-      end_index   = required_criteria_count
-
-      new_ids = (start_index..end_index).map { |i| "criterion:_new_c_#{i}" }
-
-      lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}."
-
-      lines << if current_criteria_count.zero?
-                 "  You must create exactly the following #{missing} criteria (and no others):"
-               else
-                 "  You must append exactly #{missing} new criteria at the end:"
-               end
-
-      new_ids.each do |cid|
-        lines << "  - #{cid} (with exactly #{required_rating_count} ratings)."
-      end
-
-      lines << "  Do not reorder existing criteria. Keep all IDs stable."
-      lines << "  Do not invent criteria with other IDs. Do not use hierarchical IDs like criterion:1."
-    elsif current_criteria_count > required_criteria_count
-      extra = current_criteria_count - required_criteria_count
-      lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Remove #{extra} criteria (IDs must remain stable for the rest)."
-    end
-
-    # Ratings per criterion
     existing_criteria.each do |crit|
       crit_id = crit[:id].to_s
       ratings = normalize_ratings_array(crit[:ratings])
@@ -921,10 +903,13 @@ class RubricLLMService
 
       if current_rating_count < required_rating_count
         missing = required_rating_count - current_rating_count
-        lines << "- Ratings for #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Create #{missing} new ratings."
+        lines << "- Ratings for #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. " \
+                 "Append #{missing} new rating(s) at the end (lowest performance levels), " \
+                 "using _new_r_N IDs, listed in descending point order."
       elsif current_rating_count > required_rating_count
         extra = current_rating_count - required_rating_count
-        lines << "- Ratings for #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Remove #{extra} ratings."
+        lines << "- Ratings for #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. " \
+                 "Remove the #{extra} lowest-scoring rating(s)."
       end
     end
 
