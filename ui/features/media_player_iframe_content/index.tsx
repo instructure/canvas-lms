@@ -154,6 +154,8 @@ ready(() => {
   }
 
   const aria_label = !media_object.title ? undefined : media_object.title
+  const isAsrCaptioningImprovements = ENV.FEATURES?.rce_asr_captioning_improvements
+
   if (ENV.FEATURES?.consolidated_media_player_iframe) {
     render(
       <CanvasStudioPlayer
@@ -165,6 +167,8 @@ ready(() => {
         is_attachment={is_attachment}
         attachment_id={attachment_id}
         explicitSize={explicitSize}
+        enableSidebar={isAsrCaptioningImprovements}
+        openSidebar={isAsrCaptioningImprovements}
         kebabMenuElements={
           ENV.FEATURES?.rce_studio_embed_improvements
             ? [

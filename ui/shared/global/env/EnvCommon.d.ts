@@ -314,6 +314,7 @@ export type SiteAdminFeatureId =
   | 'multiselect_gradebook_filters'
   | 'new_quizzes_navigation_updates'
   | 'permanent_page_links'
+  | 'rce_asr_captioning_improvements'
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
