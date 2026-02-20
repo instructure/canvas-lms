@@ -117,7 +117,7 @@ class BlackoutDatesController < ApplicationController
     if @blackout_date.save
       render json: @blackout_date.as_json, status: :created
     else
-      render json: { success: false, errors: @blackout_date.errors.full_messages }, status: :unprocessable_entity
+      render json: { success: false, errors: @blackout_date.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -139,7 +139,7 @@ class BlackoutDatesController < ApplicationController
     if @blackout_date.update(blackout_date_params)
       render json: @blackout_date.as_json
     else
-      render json: @blackout_date.errors.full_messages, status: :unprocessable_entity
+      render json: @blackout_date.errors.full_messages, status: :unprocessable_content
     end
   end
 

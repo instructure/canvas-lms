@@ -39,7 +39,7 @@ class MicrofrontendsReleaseTagOverrideController < ApplicationController
 
     redirect_to root_url
   rescue ArgumentError => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: { error: e.message }, status: :unprocessable_content
   end
 
   def destroy

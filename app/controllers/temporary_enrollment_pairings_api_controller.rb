@@ -100,7 +100,7 @@ class TemporaryEnrollmentPairingsApiController < ApplicationController
       render json: @temporary_enrollment_pairing.as_json, status: :created
     else
       render json: { success: false, errors: @temporary_enrollment_pairing.errors.full_messages },
-             status: :unprocessable_entity
+             status: :unprocessable_content
     end
   end
 
