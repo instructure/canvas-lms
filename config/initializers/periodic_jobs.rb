@@ -158,6 +158,10 @@ Rails.configuration.after_initialize do
     end
   end
 
+  Delayed::Periodic.cron "DelayedJobsUnstucker.unstuck", "*/30 * * * *" do
+    with_each_job_cluster(DelayedJobsUnstucker, :unstuck)
+  end
+
   # Process at 5:30 am local time
   Delayed::Periodic.cron "Alerts::DelayedAlertSender.process", "30 5 * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Alerts::DelayedAlertSender, :process, local_offset: true)
