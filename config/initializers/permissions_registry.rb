@@ -1752,8 +1752,6 @@ BASE_PERMISSIONS = {
       { title: -> { I18n.t("People (Course)") },
         description: -> { I18n.t("Allows user to view list of users in the course People page.") } },
       { description: -> { I18n.t("Allows user to view the Prior Enrollments button in the course People page.") } },
-      { title: -> { I18n.t("Subaccounts") },
-        description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
     account_considerations: [
       { title: -> { I18n.t("Account Groups") },
@@ -1960,8 +1958,6 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("To access the Student Interactions report, Reports - manage must also be enabled.") } },
       { title: -> { I18n.t("Student Context Card") },
         description: -> { I18n.t("Student Context Cards must be enabled for an account by an admin.") } },
-      { title: -> { I18n.t("Subaccounts") },
-        description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
     course_details: [
       { title: -> { I18n.t("Analytics") },
