@@ -804,6 +804,20 @@ class Account < ActiveRecord::Base
     domain(ApplicationController.test_cluster_name)
   end
 
+  def primary_domain
+    PrimaryDomain.new(self)
+  end
+
+  PrimaryDomain = Struct.new(:account) do
+    def host
+      account.domain
+    end
+
+    def host_with_test(_request_host = nil)
+      account.environment_specific_domain || host
+    end
+  end
+
   def self.find_by_domain(domain)
     default if HostUrl.default_host == domain
   end
