@@ -123,10 +123,9 @@ describe RubricLLMService do
           extract_text_from_response(text, tag:)
         end
 
-        def public_build_structure_directives_for_llm(existing_criteria:, required_criteria_count:, required_rating_count:)
+        def public_build_structure_directives_for_llm(existing_criteria:, required_rating_count:)
           build_structure_directives_for_llm(
             existing_criteria:,
-            required_criteria_count:,
             required_rating_count:
           )
         end
@@ -1678,41 +1677,18 @@ describe RubricLLMService do
     include_context "service with access to private methods"
 
     describe "#build_structure_directives_for_llm" do
-      it "generates directives for adding missing criteria" do
+      it "generates directives for adding missing ratings" do
         existing_criteria = [
           { id: "c1", ratings: [{ id: "r1" }, { id: "r2" }] }
         ]
 
         directives = service_with_access.public_build_structure_directives_for_llm(
           existing_criteria:,
-          required_criteria_count: 3,
           required_rating_count: 4
         )
 
-        expect(directives).to include("Criteria count: current=1, required=3")
-        expect(directives).to include("You must append exactly 2 new criteria at the end:")
-        expect(directives).to include("criterion:_new_c_2 (with exactly 4 ratings)")
-        expect(directives).to include("criterion:_new_c_3 (with exactly 4 ratings)")
-        expect(directives).to include("Do not reorder existing criteria")
-        expect(directives).to include("Do not invent criteria with other IDs")
-        expect(directives).to include("Ratings for c1: current=2, required=4. Create 2 new ratings")
-      end
-
-      it "generates directives for removing extra criteria" do
-        existing_criteria = [
-          { id: "c1", ratings: [] },
-          { id: "c2", ratings: [] },
-          { id: "c3", ratings: [] }
-        ]
-
-        directives = service_with_access.public_build_structure_directives_for_llm(
-          existing_criteria:,
-          required_criteria_count: 2,
-          required_rating_count: 3
-        )
-
-        expect(directives).to include("Criteria count: current=3, required=2. Remove 1 criteria")
-        expect(directives).to include("IDs must remain stable for the rest")
+        expect(directives).to include("Ratings for c1: current=2, required=4.")
+        expect(directives).to include("Append 2 new rating(s) at the end (lowest performance levels), using _new_r_N IDs, listed in descending point order.")
       end
 
       it "generates directives for adding and removing ratings" do
@@ -1723,27 +1699,13 @@ describe RubricLLMService do
 
         directives = service_with_access.public_build_structure_directives_for_llm(
           existing_criteria:,
-          required_criteria_count: 2,
           required_rating_count: 3
         )
 
-        expect(directives).to include("Ratings for c1: current=1, required=3. Create 2 new ratings")
-        expect(directives).to include("Ratings for c2: current=5, required=3. Remove 2 ratings")
-      end
-
-      it "handles creating all new criteria from scratch" do
-        existing_criteria = []
-
-        directives = service_with_access.public_build_structure_directives_for_llm(
-          existing_criteria:,
-          required_criteria_count: 2,
-          required_rating_count: 3
-        )
-
-        expect(directives).to include("Criteria count: current=0, required=2")
-        expect(directives).to include("You must create exactly the following 2 criteria")
-        expect(directives).to include("criterion:_new_c_1 (with exactly 3 ratings)")
-        expect(directives).to include("criterion:_new_c_2 (with exactly 3 ratings)")
+        expect(directives).to include("Ratings for c1: current=1, required=3.")
+        expect(directives).to include("Append 2 new rating(s) at the end (lowest performance levels), using _new_r_N IDs, listed in descending point order.")
+        expect(directives).to include("Ratings for c2: current=5, required=3.")
+        expect(directives).to include("Remove the 2 lowest-scoring rating(s).")
       end
 
       it "returns keep structure message when counts match" do
@@ -1754,11 +1716,19 @@ describe RubricLLMService do
 
         directives = service_with_access.public_build_structure_directives_for_llm(
           existing_criteria:,
-          required_criteria_count: 2,
           required_rating_count: 3
         )
 
         expect(directives).to eq("Keep the structure, return exactly 2 criteria, keep the rating counts and order as given.")
+      end
+
+      it "returns keep structure message for empty criteria" do
+        directives = service_with_access.public_build_structure_directives_for_llm(
+          existing_criteria: [],
+          required_rating_count: 3
+        )
+
+        expect(directives).to eq("Keep the structure, return exactly 0 criteria, keep the rating counts and order as given.")
       end
 
       it "handles Hash-based ratings format" do
@@ -1774,24 +1744,23 @@ describe RubricLLMService do
 
         directives = service_with_access.public_build_structure_directives_for_llm(
           existing_criteria:,
-          required_criteria_count: 1,
           required_rating_count: 4
         )
 
-        expect(directives).to include("Ratings for c1: current=2, required=4. Create 2 new ratings")
+        expect(directives).to include("Ratings for c1: current=2, required=4.")
+        expect(directives).to include("Append 2 new rating(s) at the end (lowest performance levels), using _new_r_N IDs, listed in descending point order.")
       end
 
-      it "handles edge case with zero required counts" do
-        existing_criteria = [{ id: "c1", ratings: [{ id: "r1" }] }]
+      it "generates remove directives when ratings exceed required count" do
+        existing_criteria = [{ id: "c1", ratings: [{ id: "r1" }, { id: "r2" }] }]
 
         directives = service_with_access.public_build_structure_directives_for_llm(
           existing_criteria:,
-          required_criteria_count: 0,
-          required_rating_count: 0
+          required_rating_count: 1
         )
 
-        expect(directives).to include("Remove 1 criteria")
-        expect(directives).to include("Remove 1 ratings")
+        expect(directives).to include("Ratings for c1: current=2, required=1.")
+        expect(directives).to include("Remove the 1 lowest-scoring rating(s).")
       end
     end
 
