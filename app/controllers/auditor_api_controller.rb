@@ -19,6 +19,8 @@
 #
 
 class AuditorApiController < ApplicationController
+  before_action :require_user
+
   private
 
   def query_options
