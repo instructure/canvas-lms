@@ -788,7 +788,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
             }
           }
         )
-        success_response = double("response", is_a?: true, code: "200", body: "success")
+        success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
         allow(CanvasHttp).to receive(:post).and_return(success_response)
         worker.send(:initialize_proxy_results, domain_tool_proxy)
         worker.send(:tii_tp_migration, domain_tool_proxy, deployment)
@@ -813,7 +813,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           }
         }
       )
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
       worker.send(:initialize_proxy_results, custom_tool_proxy)
       worker.send(:tii_tp_migration, custom_tool_proxy, deployment)

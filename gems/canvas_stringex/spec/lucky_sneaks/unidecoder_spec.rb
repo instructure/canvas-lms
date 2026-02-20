@@ -69,21 +69,13 @@ describe "Unidecoder" do
   end
 
   it "unidecoder_decode" do
-    dont_convert.each do |ascii|
-      expect(ascii).to eq LuckySneaks::Unidecoder.decode(ascii)
-    end
-    convert_pairs.each do |unicode, ascii|
-      expect(ascii).to eq LuckySneaks::Unidecoder.decode(unicode)
-    end
+    expect(dont_convert).to all(satisfy { |ascii| ascii == LuckySneaks::Unidecoder.decode(ascii) })
+    expect(convert_pairs).to all(satisfy { |unicode, ascii| ascii == LuckySneaks::Unidecoder.decode(unicode) })
   end
 
   it "to_ascii" do
-    dont_convert.each do |ascii|
-      expect(ascii).to eq ascii.to_ascii
-    end
-    convert_pairs.each do |unicode, ascii|
-      expect(ascii).to eq unicode.to_ascii
-    end
+    expect(dont_convert).to all(satisfy { |ascii| ascii == ascii.to_ascii })
+    expect(convert_pairs).to all(satisfy { |unicode, ascii| ascii == unicode.to_ascii })
   end
 
   it "unidecoder_encode" do
