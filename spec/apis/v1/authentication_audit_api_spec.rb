@@ -446,6 +446,16 @@ account_admin_user_with_role_changes(
       end
     end
 
+    context "with a suspended user" do
+      before do
+        @pseudonym.update!(workflow_state: "suspended")
+      end
+
+      it "does not authorize the user endpoint for an unprivileged user" do
+        fetch_for_context(@user, expected_status: 403)
+      end
+    end
+
     describe "per-account permissions when fetching by user" do
       before do
         @account = account_model

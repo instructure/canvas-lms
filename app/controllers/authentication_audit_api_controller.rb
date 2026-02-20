@@ -138,7 +138,7 @@ class AuthenticationAuditApiController < AuditorApiController
                                          }).to_a
       end
       visible_accounts = accounts.select { |a| account_visible(a) }
-      if visible_accounts == accounts
+      if accounts.present? && visible_accounts == accounts
         events = Auditors::Authentication.for_user(@user, query_options)
         render_events(events, @user)
       elsif visible_accounts.present?
