@@ -2630,6 +2630,66 @@ describe Account do
     end
   end
 
+  describe "#discovery_page_base_url" do
+    it "returns nil" do
+      expect(Account.new.discovery_page_base_url).to be_nil
+    end
+  end
+
+  describe "#discovery_page_claims_for" do
+    let(:account) { Account.default }
+    let(:user) { user_model }
+    let(:provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+    it "sets sub to the user global_id as a string" do
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:sub]).to eq(user.global_id.to_s)
+    end
+
+    it "sets org to the account uuid" do
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:org]).to eq(account.uuid)
+    end
+
+    it "builds primary links for matching providers" do
+      entry = { authentication_provider_id: provider.id, label: "CAS Login", icon: nil }
+      claims = account.discovery_page_claims_for(user, { primary: [entry], secondary: [] })
+      expect(claims[:primary].length).to eq(1)
+      expect(claims[:primary].first[:label]).to eq("CAS Login")
+    end
+
+    it "skips entries with no matching provider" do
+      entry = { authentication_provider_id: 0, label: "Ghost", icon: nil }
+      claims = account.discovery_page_claims_for(user, { primary: [entry], secondary: [] })
+      expect(claims[:primary]).to be_empty
+    end
+
+    it "treats nil config sections as empty" do
+      claims = account.discovery_page_claims_for(user, { primary: nil, secondary: nil })
+      expect(claims[:primary]).to eq([])
+      expect(claims[:secondary]).to eq([])
+    end
+  end
+
+  describe "#discovery_page_link_for" do
+    let(:account) { Account.default }
+    let(:provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+    it "includes label, icon, and path" do
+      entry = { label: "CAS Login", icon: "cas-icon" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("CAS Login")
+      expect(link[:icon]).to eq("cas-icon")
+      expect(link[:path]).to be_present
+    end
+
+    it "omits nil values via compact" do
+      entry = { label: "CAS Login", icon: nil }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link).not_to have_key(:icon)
+    end
+  end
+
   describe "#multi_parent_sub_accounts_recursive" do
     subject { Account.multi_parent_sub_accounts_recursive(parent_account_ids) }
 

@@ -1340,6 +1340,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :discovery_pages_api) do
       get "discovery_pages", action: :show
       put "discovery_pages", action: :upsert, as: :discovery_pages
+      post "discovery_pages/token", action: :token, as: :discovery_pages_token
     end
 
     scope(controller: :account_notifications) do

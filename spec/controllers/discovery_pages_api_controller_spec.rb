@@ -312,4 +312,131 @@ describe DiscoveryPagesApiController do
       end
     end
   end
+
+  describe "POST 'token'" do
+    let(:past_key) { CanvasSecurity::KeyStorage.new_key }
+    let(:present_key) { CanvasSecurity::KeyStorage.new_key }
+    let(:future_key) { CanvasSecurity::KeyStorage.new_key }
+    let(:fallback_proxy) do
+      DynamicSettings::FallbackProxy.new({
+                                           CanvasSecurity::KeyStorage::PAST => past_key,
+                                           CanvasSecurity::KeyStorage::PRESENT => present_key,
+                                           CanvasSecurity::KeyStorage::FUTURE => future_key
+                                         })
+    end
+
+    before do
+      allow(DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
+    end
+
+    context "when not logged in" do
+      it "redirects to login" do
+        post :token
+        expect(response).to redirect_to(login_url)
+      end
+    end
+
+    context "when logged in without permission" do
+      before do
+        user_factory(active_all: true)
+        user_session(@user)
+      end
+
+      it "returns unauthorized" do
+        post :token
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when logged in with permission" do
+      let(:auth_provider) { account.authentication_providers.create!(auth_type: "saml") }
+      let(:secondary_auth_provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+      before do
+        account_admin_user(account:, active_all: true)
+        user_session(@admin)
+      end
+
+      it "returns a JWT token" do
+        post :token, params: {
+          discovery_page: {
+            primary: [{ authentication_provider_id: auth_provider.id, label: "Students", icon: "google" }],
+            secondary: []
+          }
+        }
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json["token"]).to be_present
+      end
+
+      it "returns a valid RS256-signed JWT" do
+        post :token, params: {
+          discovery_page: {
+            primary: [{ authentication_provider_id: auth_provider.id, label: "Students" }],
+            secondary: []
+          }
+        }
+        token = json_parse(response.body)["token"]
+        decoded = CanvasSecurity.decode_jwt(token, [CanvasSecurity::ServicesJwt::KeyStorage.present_key])
+        expect(decoded["sub"]).to eq(@admin.global_id.to_s)
+      end
+
+      it "includes all required claims" do
+        post :token, params: {
+          discovery_page: {
+            primary: [{ authentication_provider_id: auth_provider.id, label: "Students", icon: "google" }],
+            secondary: [{ authentication_provider_id: secondary_auth_provider.id, label: "Admins" }]
+          }
+        }
+        token = json_parse(response.body)["token"]
+        decoded = CanvasSecurity.decode_jwt(token, [CanvasSecurity::ServicesJwt::KeyStorage.present_key])
+        expect(decoded["sub"]).to eq(@admin.global_id.to_s)
+        expect(decoded["iat"]).to be_a(Integer)
+        expect(decoded["exp"]).to eq(decoded["iat"] + 30)
+        expect(decoded["org"]).to eq(account.uuid)
+        expect(decoded["scope"]).to eq("discovery.preview")
+        expect(decoded).to have_key("aud")
+        expect(decoded["primary"]).to be_an(Array)
+        expect(decoded["primary"].length).to eq(1)
+        expect(decoded["secondary"]).to be_an(Array)
+        expect(decoded["secondary"].length).to eq(1)
+      end
+
+      it "serializes button links in identity service format" do
+        post :token, params: {
+          discovery_page: {
+            primary: [{ authentication_provider_id: auth_provider.id, label: "Students", icon: "google" }],
+            secondary: []
+          }
+        }
+        token = json_parse(response.body)["token"]
+        decoded = CanvasSecurity.decode_jwt(token, [CanvasSecurity::ServicesJwt::KeyStorage.present_key])
+        link = decoded["primary"].first
+        expect(link["label"]).to eq("Students")
+        expect(link["icon"]).to eq("google")
+        expect(link["path"]).to eq(auth_provider.login_authentication_provider_path)
+      end
+
+      it "omits entries for non-existent providers" do
+        post :token, params: {
+          discovery_page: {
+            primary: [
+              { authentication_provider_id: auth_provider.id, label: "Valid" },
+              { authentication_provider_id: 999_999, label: "Invalid" }
+            ],
+            secondary: []
+          }
+        }
+        token = json_parse(response.body)["token"]
+        decoded = CanvasSecurity.decode_jwt(token, [CanvasSecurity::ServicesJwt::KeyStorage.present_key])
+        expect(decoded["primary"].length).to eq(1)
+        expect(decoded["primary"].first["label"]).to eq("Valid")
+      end
+
+      it "returns 400 when no body is provided" do
+        post :token
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+  end
 end
