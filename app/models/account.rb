@@ -1871,6 +1871,33 @@ class Account < ActiveRecord::Base
     false
   end
 
+  def discovery_page_base_url
+    nil
+  end
+
+  def discovery_page_claims_for(user, config)
+    providers = authentication_providers.active.load
+    build_links = lambda do |entries|
+      (entries || []).filter_map do |entry|
+        provider = providers.find { |p| p.id == entry[:authentication_provider_id].to_i }
+        next if provider.nil?
+
+        discovery_page_link_for(provider, entry)
+      end
+    end
+
+    {
+      sub: user.global_id.to_s,
+      org: uuid,
+      primary: build_links.call(config[:primary]),
+      secondary: build_links.call(config[:secondary])
+    }
+  end
+
+  def discovery_page_link_for(provider, entry)
+    { label: entry[:label], icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
+  end
+
   def validate_auth_discovery_url
     return if settings[:auth_discovery_url].blank?
 

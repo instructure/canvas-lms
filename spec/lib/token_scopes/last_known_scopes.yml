@@ -1624,6 +1624,8 @@
 - verb: PUT
   path: '/api/v1/discovery_pages'
 - verb: POST
+  path: '/api/v1/discovery_pages/token'
+- verb: POST
   path: '/api/v1/enqueue_outcome_rollup_calculation'
 - verb: PUT
   path: '/api/v1/eportfolios/:eportfolio_id/moderate'
