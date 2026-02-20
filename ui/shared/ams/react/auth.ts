@@ -43,6 +43,8 @@ export type AuthProps = {
   getAccessToken: () => Promise<TokenResponse>
   refreshToken: (refreshToken?: string | null) => Promise<TokenResponse>
   getUser: () => Promise<User | null>
+  getRcsToken: () => Promise<string>
+  refreshRcsToken: (token: string) => Promise<string>
 }
 
 export const getAccessToken: AuthProps['getAccessToken'] = async () => {
@@ -82,11 +84,73 @@ export const getAccessToken: AuthProps['getAccessToken'] = async () => {
 export const refreshToken: AuthProps['refreshToken'] = async token => {
   if (!token) {
     console.error('[AMS Wrapper] Cannot refresh token: token is undefined')
-    return Promise.reject(new Error('[AMS Wrapper] Refresh token is required but was undefined'))
+    throw new Error('[AMS Wrapper] Refresh token is required but was undefined')
   }
 
   // Since refresh endpoint doesn't support unencrypted tokens, get a new one
   return getAccessToken()
+}
+
+/**
+ * Gets an encrypted service JWT specifically for RCS (Rich Content Service) with 'rich_content' and 'ui' workflows
+ */
+export const getRcsToken: AuthProps['getRcsToken'] = async () => {
+  // Get context from Canvas ENV for JWT request
+  const contextType =
+    ENV.context_asset_string?.split('_')[0] || ENV.current_context?.type || 'account'
+  const contextId =
+    ENV.context_asset_string?.split('_')[1] || ENV.current_context?.id || ENV.ACCOUNT_ID
+  const url = `/api/v1/jwts?workflows[]=rich_content&workflows[]=ui&context_type=${contextType}&context_id=${contextId}`
+
+  const response = await fetch(url, {
+    method: 'POST',
+    ...defaultFetchOptions(),
+  })
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      assignLocation('/login/canvas')
+      throw new Error('Unauthorized - redirecting to login')
+    }
+    throw new Error(
+      `[AMS Wrapper] Failed to get RCS token: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  const data = await response.json()
+  return data.token
+}
+
+/**
+ * Refreshes an encrypted service JWT for RCS using Canvas's refresh endpoint
+ */
+export const refreshRcsToken: AuthProps['refreshRcsToken'] = async (token: string) => {
+  if (!token) {
+    console.error('[AMS Wrapper] Cannot refresh token: token is undefined')
+    throw new Error('[AMS Wrapper] Refresh token is required but was undefined')
+  }
+
+  const response = await fetch('/api/v1/jwts/refresh', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...defaultFetchOptions().headers,
+    },
+    body: JSON.stringify({jwt: token}),
+  })
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      assignLocation('/login/canvas')
+      throw new Error('Unauthorized - redirecting to login')
+    }
+    // If refresh fails, try to get a new RCS token
+    console.warn(`[AMS Wrapper] RCS token refresh failed (${response.status}), getting new token`)
+    return getRcsToken()
+  }
+
+  const data = await response.json()
+  return data.token
 }
 
 export const getUser: AuthProps['getUser'] = async () => {
