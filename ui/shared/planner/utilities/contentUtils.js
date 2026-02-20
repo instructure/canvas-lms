@@ -54,6 +54,8 @@ export function assignmentType(itemType) {
       return I18n.t('Calendar Event')
     case 'Peer Review':
       return I18n.t('Peer Review')
+    case 'Peer Review Sub Assignment':
+      return I18n.t('Peer Review')
     default:
       return I18n.t('Task')
   }

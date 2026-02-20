@@ -115,6 +115,11 @@ module Api::V1::PlannerItem
         hash[:plannable] = plannable_json(unread_attributes.merge(item.attributes).merge(topic.attributes), extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
+      elsif item.is_a?(PeerReviewSubAssignment)
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
+        hash[:plannable_date] = item[:cached_due_date] || item.due_at
+        hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
+        hash[:html_url] = context_url(item.context, :context_assignment_peer_reviews_url, item.parent_assignment_id)
       elsif item.is_a?(AssessmentRequest)
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
         hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at || item.assessor_asset.cached_due_date
@@ -122,12 +127,6 @@ module Api::V1::PlannerItem
         hash[:plannable] = plannable_json(title_date.merge(item.attributes), extra_fields: ASSESSMENT_REQUEST_FIELDS)
         submission = item.asset
         hash[:html_url] = student_peer_review_url(submission.context, submission.assignment, item, user)
-      elsif item.is_a?(PeerReviewSubAssignment)
-        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
-        hash[:plannable_date] = item[:cached_due_date] || item.due_at
-        title = I18n.t("Grade %{peer_review_title}", peer_review_title: item.title)
-        hash[:plannable] = plannable_json(item.attributes.merge(title:), extra_fields: GRADABLE_FIELDS)
-        hash[:html_url] = named_context_url(item.context, :speed_grader_context_gradebook_url, assignment_id: item.id)
       else
         hash[:plannable_date] = item[:cached_due_date] || item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
@@ -163,7 +162,7 @@ module Api::V1::PlannerItem
     notes, context_items = plannable_items.partition { |i| i.is_a?(::PlannerNote) }
     ActiveRecord::Associations.preload(notes, user: { pseudonym: :account }) if notes.any?
     ActiveRecord::Associations.preload(context_items, { context: :root_account }) if context_items.any?
-    ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) }, user, opts:)
+    ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) || i.is_a?(::PeerReviewSubAssignment) }, user, opts:)
     discussions = context_items.select { |i| i.is_a?(::DiscussionTopic) }
     topics_status = topics_status_for(user, discussions.map(&:id))
 
@@ -191,7 +190,7 @@ module Api::V1::PlannerItem
 
   def submission_statuses_for(user, item, opts = {})
     submission_status = { submissions: false }
-    return submission_status unless item.is_a?(Assignment) || item.is_a?(SubAssignment)
+    return submission_status unless item.is_a?(Assignment) || item.is_a?(SubAssignment) || item.is_a?(PeerReviewSubAssignment)
 
     ss = opts[:submission_statuses] || submission_statuses(item, user)
     submission_status[:submissions] = ss[item.id]&.except(:new_activity)
@@ -293,6 +292,10 @@ module Api::V1::PlannerItem
         ss = opts[:submission_statuses] || submission_statuses(item, user)
         return true if ss.dig(item.id, :new_activity) || (unread_count && read_state && (read_state == "unread" || unread_count > 0)) || (topic && (topic.unread?(user) || topic.unread_count(user) > 0))
       end
+    end
+    if item.is_a?(PeerReviewSubAssignment)
+      ss = opts[:submission_statuses] || submission_statuses(item, user)
+      return true if ss.dig(item.id, :new_activity)
     end
     false
   end
