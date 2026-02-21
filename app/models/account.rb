@@ -216,6 +216,7 @@ class Account < ApplicationRecord
   validates :name, length: { maximum: maximum_string_length, allow_blank: true }
   validate :account_chain_loop, if: :parent_account_id_changed?
   validate :validate_auth_discovery_url
+  validate :validate_login_help_url
   validates :workflow_state, presence: true
   validate :no_active_courses, if: ->(a) { a.workflow_state_changed? && !a.active? }
   validate :no_active_sub_accounts, if: ->(a) { a.workflow_state_changed? && !a.active? }
@@ -322,6 +323,7 @@ class Account < ApplicationRecord
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
   add_setting :unknown_user_url, root_only: true
+  add_setting :login_help_url, root_only: true
   add_setting :fft_registration_url, root_only: true
 
   add_setting :restrict_student_future_view, boolean: true, default: false, inheritable: true
@@ -1859,6 +1861,20 @@ class Account < ApplicationRecord
     settings[:unknown_user_url]
   end
 
+  def login_help_url=(url)
+    settings[:login_help_url] = url
+  end
+
+  def login_help_url
+    settings[:login_help_url]
+  end
+
+  def validate_login_help_url
+    validate_url_setting(:login_help_url, :login_help_url) do
+      t("errors.invalid_login_help_url", "The login help URL is not valid")
+    end
+  end
+
   def discovery_page_active=(active)
     settings[:discovery_page] ||= {}
     settings[:discovery_page][:active] = Canvas::Plugin.value_to_boolean(active)
@@ -1900,13 +1916,8 @@ class Account < ApplicationRecord
   end
 
   def validate_auth_discovery_url
-    return if settings[:auth_discovery_url].blank?
-
-    begin
-      value, _uri = CanvasHttp.validate_url(settings[:auth_discovery_url])
-      self.auth_discovery_url = value
-    rescue URI::Error, ArgumentError
-      errors.add(:discovery_url, t("errors.invalid_discovery_url", "The discovery URL is not valid"))
+    validate_url_setting(:auth_discovery_url, :discovery_url) do
+      t("errors.invalid_discovery_url", "The discovery URL is not valid")
     end
   end
 
@@ -1944,6 +1955,17 @@ class Account < ApplicationRecord
 
     if decimal_sep.present? && thousand_sep.present? && decimal_sep == thousand_sep
       errors.add(:separators_cannot_be_the_same, t("Decimal and thousand separators cannot be the same."))
+    end
+  end
+
+  def validate_url_setting(setting, error_field)
+    return if settings[setting].blank?
+
+    begin
+      value, _uri = CanvasHttp.validate_url(settings[setting])
+      public_send(:"#{setting}=", value)
+    rescue URI::Error, ArgumentError
+      errors.add(error_field, yield)
     end
   end
 

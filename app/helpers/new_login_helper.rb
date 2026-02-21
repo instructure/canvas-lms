@@ -152,9 +152,10 @@ module NewLoginHelper
     @domain_root_account&.forgot_password_external_url.presence
   end
 
-  # invalid login FAQ URL as configured in the account settings
+  # URL for login help if configured for account (with global fallback)
   def invalid_login_faq_url
-    Setting.get("invalid_login_faq_url", nil).presence
+    @domain_root_account&.login_help_url.presence ||
+      Setting.get("invalid_login_faq_url", nil).presence
   end
 
   # help link attributes as a hash, or nil if no name is present

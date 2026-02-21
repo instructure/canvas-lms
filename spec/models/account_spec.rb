@@ -3408,6 +3408,42 @@ describe Account do
     end
   end
 
+  context "login_help_url validation" do
+    let(:account) { Account.default }
+
+    it "is valid with a proper https URL" do
+      account.login_help_url = "https://example.com/faq"
+      expect(account).to be_valid
+    end
+
+    it "is valid when the URL is blank" do
+      account.login_help_url = ""
+      expect(account).to be_valid
+    end
+
+    it "is valid when the URL is nil" do
+      account.login_help_url = nil
+      expect(account).to be_valid
+    end
+
+    it "normalizes a URL without a scheme" do
+      account.login_help_url = "example.com/faq"
+      account.validate
+      expect(account.login_help_url).to eq("http://example.com/faq")
+    end
+
+    it "is invalid with a non-URL string" do
+      account.login_help_url = "not a url at all"
+      expect(account).not_to be_valid
+      expect(account.errors[:login_help_url]).to include("The login help URL is not valid")
+    end
+
+    it "is invalid with a javascript: scheme" do
+      account.login_help_url = "javascript:alert(1)"
+      expect(account).not_to be_valid
+    end
+  end
+
   describe "#restricted_file_access_for_user?" do
     let(:root_account) { Account.create!(root_account: nil) }
     let(:sub_account) { Account.create!(root_account:) }
