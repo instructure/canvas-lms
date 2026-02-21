@@ -104,8 +104,9 @@ describe "login/canvas/new_login" do
       self_registration_type: "all",
       account_terms_required?: true
     )
-    # stub settings
-    allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return("http://example.com/faq")
+    # stub account setting
+    account.login_help_url = "http://example.com/faq"
+    # stub global settings
     allow(Setting).to receive(:get).with("terms_of_use_url", anything).and_return("/acceptable_use_policy")
     allow(Setting).to receive(:get).with("privacy_policy_url", anything).and_return("http://example.com/privacy")
     allow(Setting).to receive(:get).with("terms_of_use_fft", anything).and_return("/acceptable_use_policy")

@@ -161,7 +161,8 @@ class Login::CanvasController < ApplicationController
       session[:login_aac] ||= ap.id
       successful_login(user, pseudonym)
     else
-      link_url = Setting.get("invalid_login_faq_url", nil)
+      link_url = @domain_root_account.login_help_url.presence ||
+                 Setting.get("invalid_login_faq_url", nil)
       if link_url
         unsuccessful_login t(
           "Please verify your username or password and try again. Trouble logging in? *Check out our Login FAQs*.",

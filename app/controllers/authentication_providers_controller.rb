@@ -144,6 +144,11 @@
 #           "description": "If an unknown user url is set, Canvas will forward to that url when a service authenticates a user, but that user does not exist in Canvas. The default behavior is to present an error.",
 #           "example": "https://example.com/register_for_canvas",
 #           "type": "string"
+#        },
+#        "login_help_url": {
+#           "description": "A login help URL shown as a 'Trouble logging in?' link on the login page and in failed login messages. Falls back to the global setting if not set.",
+#           "example": "https://example.com/login-help",
+#           "type": "string"
 #        }
 #       }
 #     }
@@ -843,7 +848,8 @@ class AuthenticationProvidersController < ApplicationController
       login_handle_name: account.login_handle_name,
       change_password_url: account.change_password_url,
       auth_discovery_url: account.auth_discovery_url,
-      unknown_user_url: account.unknown_user_url
+      unknown_user_url: account.unknown_user_url,
+      login_help_url: account.login_help_url
     }
 
     if account.discovery_page_allowed?
@@ -896,6 +902,7 @@ class AuthenticationProvidersController < ApplicationController
       change_password_url
       auth_discovery_url
       unknown_user_url
+      login_help_url
     ]
 
     if @account.discovery_page_allowed?
@@ -904,7 +911,21 @@ class AuthenticationProvidersController < ApplicationController
 
     sets = params.fetch(:sso_settings, {}).permit(*permitted_params)
 
-    update_account_settings_from_hash(sets)
+    begin
+      update_account_settings_from_hash(sets)
+    rescue ActiveRecord::RecordInvalid => e
+      errors = e.record&.errors
+      respond_to do |format|
+        format.html do
+          flash[:error] = errors&.map(&:message)&.join(", ") || e.message
+          redirect_to(account_authentication_providers_path(@account))
+        end
+        format.json do
+          render json: errors || { errors: [e.message] }, status: :unprocessable_content
+        end
+      end
+      return
+    end
 
     respond_to do |format|
       format.html { redirect_to(account_authentication_providers_path(@account)) }
