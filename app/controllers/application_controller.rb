@@ -178,14 +178,9 @@ class ApplicationController < ActionController::Base
 
   add_crumb(proc do
     title = I18n.t("links.dashboard", "My Dashboard")
-    crumb = <<~HTML
-      <i class="icon-home"
-         title="#{title}">
-        <span class="screenreader-only">#{title}</span>
-      </i>
-    HTML
-
-    crumb.html_safe
+    helpers.tag.i(class: "icon-home", title:) do
+      helpers.tag.span title, class: "screenreader-only"
+    end
   end,
             :root_path,
             class: "home")
@@ -2797,9 +2792,11 @@ class ApplicationController < ActionController::Base
   # please also note that if the html has any attachments, safe_html should be set to true!!!
   # since we neet to process the attachments in the html.
   def user_content(str, context: @context, user: @current_user, is_public: false, location: nil, safe_html: false)
+    # rubocop:todo Rails/OutputSafety
     return nil unless str
     return AttachmentLocationTagger.tag_url(str, location).html_safe if safe_html && !location.nil?
     return str.html_safe if safe_html
+    # rubocop:enable Rails/OutputSafety
 
     file_association_access_ff_enabled = if context.instance_of?(::User)
                                            context.associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) }

@@ -392,7 +392,7 @@ class ConversationMessage < ActiveRecord::Base
              },
              count: user_names.size,
              user: user_names.first,
-             list_of_users: user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence,
+             list_of_users: user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence, # rubocop:disable Rails/OutputSafety
              current_user: author_name
     end
   end
