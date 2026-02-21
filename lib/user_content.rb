@@ -79,7 +79,7 @@ module UserContent
       end
     end
 
-    html.to_s.html_safe
+    html.to_s.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def self.latex_to_mathml(latex)

@@ -20,23 +20,25 @@
 
 module EportfoliosHelper
   def show_me(link_class)
-    raw("<a href=\"#\" class=\"#{link_class}\"><b>#{h(t("#eportfolios.show_me", "show me"))}</b></a>")
+    tag.a href: "#", class: link_class do
+      tag.b t("#eportfolios.show_me", "show me")
+    end
   end
 
   def edit_icon
-    "<i class='icon-edit'></i>".html_safe
+    tag.i class: "icon-edit"
   end
 
   def delete_icon(png: false)
     if png
       image_tag("delete.png", alt: I18n.t("Delete"))
     else
-      raw("&#215;")
+      "&#215;".html_safe
     end
   end
 
   def help_icon
-    "<i class='icon-question'></i>".html_safe
+    tag.i class: "icon-question"
   end
 
   def edit_link_text

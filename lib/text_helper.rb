@@ -202,7 +202,7 @@ module TextHelper
     # which we don't want
     res = doc.at_css("body")&.inner_html
     res ||= doc.root.children.first&.inner_html || ""
-    res.html_safe
+    res.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def self.make_subject_reply_to(subject)
@@ -249,7 +249,7 @@ module TextHelper
     result = Redcarpet::Markdown.new(Redcarpet::Render::XHTML.new).render(string).strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(%r{</?p>}, "") if inlinify == :auto && result =~ %r{\A<p>.*</p>\z}m && result !~ /.*<p>.*<p>.*/m
-    result.strip.html_safe
+    result.strip.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   delegate :round_if_whole, to: :TextHelper

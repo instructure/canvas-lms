@@ -415,7 +415,7 @@ module QuizzesHelper
     if text.empty?
       ""
     else
-      content_tag(:div, text.join.html_safe, { class: "quiz_comment" })
+      tag.div text.inject(&:<<), class: "quiz_comment"
     end
   end
 
@@ -468,7 +468,7 @@ module QuizzesHelper
     end
 
     # all of our manipulation lost this flag - reset it
-    res.html_safe
+    res.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def multiple_dropdowns_question(options)
@@ -503,7 +503,7 @@ module QuizzesHelper
 
       s["aria-label"] = I18n.t("Multiple dropdowns, read surrounding text")
     end
-    doc.to_s.html_safe
+    doc.to_s.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def duration_in_minutes(duration_seconds)

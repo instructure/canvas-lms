@@ -314,8 +314,6 @@ Rails/FindEach:
   AutoCorrect: false
 Rails/LexicallyScopedActionFilter:
   Severity: convention
-Rails/OutputSafety:
-  Severity: convention
 Rails/RakeEnvironment:
   Severity: convention
   AutoCorrect: false
