@@ -137,8 +137,8 @@ module Canvas::LiveEventsCallbacks
       end
       if changes["workflow_state"]
           Canvas::LiveEvents.wiki_page_updated(obj,
-                                             changes["title"]&.first,
-                                             changes["body"]&.first)
+                                             nil,
+                                             nil
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
