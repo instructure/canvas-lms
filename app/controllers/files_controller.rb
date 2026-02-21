@@ -1192,7 +1192,7 @@ class FilesController < ApplicationController
     return unless quota_exempt? || check_quota_after_attachment
 
     if Attachment.s3_storage?
-      return head(:bad_request) unless @attachment.state == :unattached
+      return head(:bad_request) unless [:unattached, :unattached_temporary].include?(@attachment.state)
 
       details = @attachment.s3object.data
       @attachment.process_s3_details!(details)
