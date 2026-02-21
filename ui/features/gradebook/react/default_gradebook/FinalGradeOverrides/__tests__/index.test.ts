@@ -286,14 +286,14 @@ describe('Gradebook FinalGradeOverrides', () => {
         expect(gradingPeriodId).toEqual('1501')
       })
 
-      it('includes a null grading period id when not filtering to a grading period', async () => {
+      it('includes an undefined grading period id when not filtering to a grading period', async () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
         const gradingPeriodId =
           mockUpdateFinalGradeOverride.mock.calls[
             mockUpdateFinalGradeOverride.mock.calls.length - 1
           ][1]
-        expect(gradingPeriodId).toBe(null)
+        expect(gradingPeriodId).toBeUndefined()
       })
 
       it('includes the grade from the given grade info', async () => {
