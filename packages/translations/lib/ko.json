@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "이미지 추가"
     },
+    "add_new_a9226085": {
+        "message": "새로 추가"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "새 캡션 추가"
+    },
     "add_one_9e34a6f8": {
         "message": "추가하기!"
     },
@@ -248,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "교집합"
     },
+    "caption_manager_aae0906f": {
+        "message": "캡션 매니저"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "{ lang }의 캡션을 추가했습니다"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "{ lang }의 캡션을 삭제했습니다"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "상위 과목에서 상속한 캡션을 제거할 수 없습니다."
     },
@@ -307,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "캡션 파일 선택"
+    },
+    "choose_file_8d89ccab": {
+        "message": "파일 선택"
     },
     "choose_usage_rights_33683854": {
         "message": "사용 권리를 선택..."
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "아래 및 오른쪽 대각선 화살표"
     },
+    "download_captionname_2e5eea35": {
+        "message": "{ captionName } 다운로드"
+    },
     "download_filename_2baae924": {
         "message": "{ filename } 다운로드"
     },
@@ -844,6 +865,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "외부 도구에서 콘텐츠를 가져오지 못함"
+    },
+    "file_d1b70050": {
+        "message": "파일*"
     },
     "file_name_8fd421ff": {
         "message": "파일 이름"
@@ -1276,6 +1300,9 @@
     },
     "lambda_4f602498": {
         "message": "람다"
+    },
+    "language_91effaa0": {
+        "message": "언어*"
     },
     "language_arts_icon_a798b0f8": {
         "message": "어학 아이콘"
@@ -1862,6 +1889,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "지원하는 유형의 파일을 선택하세요"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "언어를 선택하세요"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": ".vtt 또는 .srt 파일을 선택하세요"
+    },
     "plus_d43cd4ec": {
         "message": "더하기"
     },
@@ -1921,6 +1954,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "기수"
+    },
+    "processing_8c569014": {
+        "message": "처리 중..."
     },
     "product_39cf144f": {
         "message": "제품/곱"
@@ -2014,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "모든 { alertFindText }을(를) { alertReplaceText }(으)로 바꿈"
+    },
+    "request_d1129f7d": {
+        "message": "요청"
     },
     "reset_95a81614": {
         "message": "초기화"
@@ -2161,6 +2200,9 @@
     },
     "selected_274ce24f": {
         "message": "선택됨"
+    },
+    "selected_file_name_93fa1a14": {
+        "message": "선택된 파일: { name }"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } 선택됨"
@@ -2590,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "업데이트된 링크"
+    },
+    "upload_8b403d05": {
+        "message": "업로드"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "SRT 또는 WebVTT 형식으로 자막 트랙을 업로드합니다."
     },
     "upload_document_253f0478": {
         "message": "문서 업로드"

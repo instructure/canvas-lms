@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Добавить изображение"
     },
+    "add_new_a9226085": {
+        "message": "Добавить новый"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Добавить новый заголовок"
+    },
     "add_one_9e34a6f8": {
         "message": "Добавьте одну!"
     },
@@ -248,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "Произведение Уитни"
     },
+    "caption_manager_aae0906f": {
+        "message": "Менеджер заголовков"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Были добавлены заголовки для { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Были удалены заголовки для { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Заголовки, унаследованные из родительского курса, не могут быть удалены."
     },
@@ -307,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Выберите файл подписи к изображению"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Выберите файл"
     },
     "choose_usage_rights_33683854": {
         "message": "Выбрать права на использование..."
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Направленная вниз и вправо стрелка"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Скачать { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Скачать { filename }"
     },
@@ -844,6 +865,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Не удалось получить содержимое из внешнего инструмента"
+    },
+    "file_d1b70050": {
+        "message": "Файл*"
     },
     "file_name_8fd421ff": {
         "message": "Имя файла"
@@ -1276,6 +1300,9 @@
     },
     "lambda_4f602498": {
         "message": "Лямбда"
+    },
+    "language_91effaa0": {
+        "message": "Язык*"
     },
     "language_arts_icon_a798b0f8": {
         "message": "Значок языковых дисциплин"
@@ -1862,6 +1889,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Выберите файл поддерживаемого типа"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Выберите язык"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Выберите файл с расширением .vtt или .srt"
+    },
     "plus_d43cd4ec": {
         "message": "Плюс"
     },
@@ -1921,6 +1954,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Простые числа"
+    },
+    "processing_8c569014": {
+        "message": "Выполняется обработка..."
     },
     "product_39cf144f": {
         "message": "Продукт"
@@ -2014,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Заменить все { alertFindText } на { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Запрос"
     },
     "reset_95a81614": {
         "message": "Восстановить"
@@ -2161,6 +2200,9 @@
     },
     "selected_274ce24f": {
         "message": "Выбрано"
+    },
+    "selected_file_name_93fa1a14": {
+        "message": "Выбранный файл: { name }"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Выбранное { linkFileName }"
@@ -2590,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "Обновленная ссылка"
+    },
+    "upload_8b403d05": {
+        "message": "Отправить"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Загрузите запись субтитров в формате SRT или WebVTT."
     },
     "upload_document_253f0478": {
         "message": "Загрузить документ"
