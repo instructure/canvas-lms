@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Afbeelding toevoegen"
     },
+    "add_new_a9226085": {
+        "message": "Nieuwe toevoegen"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Nieuwe ondertiteling toevoegen"
+    },
     "add_one_9e34a6f8": {
         "message": "Voeg er één toe!"
     },
@@ -248,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "Cap-product"
     },
+    "caption_manager_aae0906f": {
+        "message": "Ondertitelingsmanager"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Ondertiteling is verwijderd voor { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Ondertitelingen zijn verwijderd voor { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Ondertiteling overgenomen van een bovenliggende cursus kan niet worden verwijderd."
     },
@@ -307,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Ondertitelingsbestand kiezen"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Bestand kiezen"
     },
     "choose_usage_rights_33683854": {
         "message": "Gebruiksrechten kiezen..."
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Pijl omlaag en rechts diagonaal"
     },
+    "download_captionname_2e5eea35": {
+        "message": "{ captionName } downloaden"
+    },
     "download_filename_2baae924": {
         "message": "{ filename } downloaden"
     },
@@ -844,6 +865,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Kan geen inhoud ophalen uit externe tool"
+    },
+    "file_d1b70050": {
+        "message": "Bestand*"
     },
     "file_name_8fd421ff": {
         "message": "Bestandsnaam"
@@ -1276,6 +1300,9 @@
     },
     "lambda_4f602498": {
         "message": "Lambda"
+    },
+    "language_91effaa0": {
+        "message": "Taal*"
     },
     "language_arts_icon_a798b0f8": {
         "message": "Linguïstiekpictogram"
@@ -1862,6 +1889,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Selecteer een bestand van een ondersteund type"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Selecteer een taal"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Selecteer een .vtt- of .srt-bestand"
+    },
     "plus_d43cd4ec": {
         "message": "Plus"
     },
@@ -1921,6 +1954,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Priemgetallen"
+    },
+    "processing_8c569014": {
+        "message": "Bezig met verwerken..."
     },
     "product_39cf144f": {
         "message": "Product"
@@ -2014,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Alle { alertFindText } zijn vervangen door { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Aanvraag"
     },
     "reset_95a81614": {
         "message": "Opnieuw instellen"
@@ -2161,6 +2200,9 @@
     },
     "selected_274ce24f": {
         "message": "Geselecteerd"
+    },
+    "selected_file_name_93fa1a14": {
+        "message": "Geselecteerd bestand: { name }"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Geselecteerd { linkFileName }"
@@ -2590,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "Bijgewerkte koppeling"
+    },
+    "upload_8b403d05": {
+        "message": "Uploaden"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Upload een ondertitelingstrack of in de SRT- of de *WebVTT*-indeling."
     },
     "upload_document_253f0478": {
         "message": "Document uploaden"
