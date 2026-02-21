@@ -19,6 +19,8 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
+import type GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
+import type {FinalGradeOverrideMap} from '@canvas/grading/grading.d'
 import FinalGradeOverrideDatastore from './FinalGradeOverrideDatastore'
 import type Gradebook from '../Gradebook'
 
@@ -34,8 +36,7 @@ export default class FinalGradeOverrides {
     this._datastore = new FinalGradeOverrideDatastore()
   }
 
-  // @ts-expect-error
-  getGradeForUser(userId) {
+  getGradeForUser(userId: string) {
     let gradingPeriodId: null | string = null
     if (this._gradebook.isFilteringColumnsByGradingPeriod()) {
       gradingPeriodId = this._gradebook.gradingPeriodId
@@ -53,8 +54,7 @@ export default class FinalGradeOverrides {
     return this._datastore.getPendingGradeInfo(userId, gradingPeriodId)
   }
 
-  // @ts-expect-error
-  setGrades(gradeOverrides) {
+  setGrades(gradeOverrides: FinalGradeOverrideMap) {
     this._datastore.setGrades(gradeOverrides)
     const studentIds = Object.keys(gradeOverrides)
     studentIds.forEach(userId => {
@@ -62,8 +62,7 @@ export default class FinalGradeOverrides {
     })
   }
 
-  // @ts-expect-error
-  updateGrade(userId: string, gradeOverrideInfo) {
+  updateGrade(userId: string, gradeOverrideInfo: GradeOverrideInfo) {
     const [enrollment] = this._gradebook.student(userId).enrollments
 
     let gradingPeriodId: null | string = null
@@ -75,10 +74,12 @@ export default class FinalGradeOverrides {
     this._gradebook.gradebookGrid?.updateRowCell(userId, 'total_grade_override')
 
     if (gradeOverrideInfo.valid) {
-      // @ts-expect-error
-      updateFinalGradeOverride(enrollment.id, gradingPeriodId, gradeOverrideInfo.grade)
-        // @ts-expect-error
-        .then(grade => {
+      updateFinalGradeOverride(
+        String(enrollment.id),
+        gradingPeriodId ?? undefined,
+        (gradeOverrideInfo.grade as {percentage: number} | null) ?? undefined,
+      )
+        .then((grade: {percentage: number | null; customGradeStatusId: string | null} | null) => {
           this._datastore.removePendingGradeInfo(userId, gradingPeriodId)
           this._datastore.updateGrade(userId, gradingPeriodId, grade)
           this._gradebook.gradebookGrid?.updateRowCell(userId, 'total_grade_override')
