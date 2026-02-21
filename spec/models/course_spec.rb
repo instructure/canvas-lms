@@ -1830,6 +1830,17 @@ describe Course do
       expect(@course.course_section_visibility(limited_teacher)).to eq [@section2.id]
     end
 
+    it "correctly limits visibilities for a limited teacher observing a student in different section" do
+      limited_teacher = user_with_pseudonym(name: "Limited Teacher")
+      @course.enroll_teacher(limited_teacher,
+                             limit_privileges_to_course_section: true,
+                             section: @section2)
+      student = user_with_pseudonym
+      @course.enroll_student(student, enrollment_state: "active", section: @section1, limit_privileges_to_course_section: true)
+      add_linked_observer(student, limited_teacher)
+      expect(@course.course_section_visibility(limited_teacher)).to eq [@section1.id, @section2.id]
+    end
+
     it "unlimited teachers can see everything" do
       unlimited_teacher = User.create(name: "Unlimited Teacher")
       @course.enroll_teacher(unlimited_teacher, section: @section2)

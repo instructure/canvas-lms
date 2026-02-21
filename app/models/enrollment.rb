@@ -569,6 +569,7 @@ class Enrollment < ActiveRecord::Base
     self.root_account_id = other.root_account_id
     self.sis_batch_id = other.sis_batch_id unless sis_batch_id.nil?
     self.skip_touch_user = other.skip_touch_user
+    self.limit_privileges_to_course_section = other.limit_privileges_to_course_section
     if skip_broadcasts
       save_without_broadcasting!
     else
