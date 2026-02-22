@@ -159,6 +159,32 @@ describe RubricLLMService do
         def public_calculate_points_per_criterion(total_points, criteria_count)
           calculate_points_per_criterion(total_points, criteria_count)
         end
+
+        def public_build_generate_dynamic_content(assignment, generate_options)
+          build_generate_dynamic_content(assignment, generate_options)
+        end
+
+        def public_build_regenerate_dynamic_content(
+          assignment,
+          criteria_as_text,
+          regeneration_target_prompt,
+          regenerate_options,
+          generate_options,
+          criterion_id,
+          structure_directives,
+          current_criteria_count = nil
+        )
+          build_regenerate_dynamic_content(
+            assignment,
+            criteria_as_text,
+            regeneration_target_prompt,
+            regenerate_options,
+            generate_options,
+            criterion_id,
+            structure_directives,
+            current_criteria_count
+          )
+        end
       end.new(rubric)
     end
   end
@@ -1565,6 +1591,99 @@ describe RubricLLMService do
 
         result = service_with_access.public_rebuild_regenerated_criterion(criterion_data, 10.0, false)
         expect(result[:description]).to eq("Valid Description")
+      end
+    end
+  end
+
+  describe "Dynamic Content Building" do
+    include_context "service with access to private methods"
+
+    describe "#build_generate_dynamic_content" do
+      it "strips HTML tags from assignment description" do
+        assignment.update!(description: "<p>Write an <strong>argumentative</strong> essay.</p>")
+
+        result = service_with_access.public_build_generate_dynamic_content(assignment, {})
+        content = JSON.parse(result[:CONTENT])
+
+        expect(content["description"]).to eq("Write an argumentative essay.")
+        expect(content["description"]).not_to match(/<[^>]+>/)
+      end
+
+      it "converts block-level elements preserving text" do
+        assignment.update!(description: "<h1>Prompt</h1><p>Body text here.</p>")
+
+        result = service_with_access.public_build_generate_dynamic_content(assignment, {})
+        content = JSON.parse(result[:CONTENT])
+
+        expect(content["description"]).to include("Prompt")
+        expect(content["description"]).to include("Body text here.")
+        expect(content["description"]).not_to include("<h1>")
+        expect(content["description"]).not_to include("<p>")
+      end
+
+      it "returns empty string for nil description" do
+        assignment.update!(description: nil)
+
+        result = service_with_access.public_build_generate_dynamic_content(assignment, {})
+        content = JSON.parse(result[:CONTENT])
+
+        expect(content["description"]).to eq("")
+      end
+
+      it "returns empty string for blank description" do
+        assignment.update!(description: "   ")
+
+        result = service_with_access.public_build_generate_dynamic_content(assignment, {})
+        content = JSON.parse(result[:CONTENT])
+
+        expect(content["description"]).to eq("")
+      end
+
+      it "preserves plain text descriptions unchanged" do
+        assignment.update!(description: "Write a 5-paragraph essay on climate change.")
+
+        result = service_with_access.public_build_generate_dynamic_content(assignment, {})
+        content = JSON.parse(result[:CONTENT])
+
+        expect(content["description"]).to eq("Write a 5-paragraph essay on climate change.")
+      end
+    end
+
+    describe "#build_regenerate_dynamic_content" do
+      let(:criteria_as_text) { "criterion:c1:description=Clarity" }
+
+      it "strips HTML tags from assignment description" do
+        assignment.update!(description: "<p>Write an <em>analytical</em> essay.</p>")
+
+        result = service_with_access.public_build_regenerate_dynamic_content(
+          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
+        )
+        content = JSON.parse(result[:CONTENT])
+
+        expect(content["description"]).to eq("Write an analytical essay.")
+        expect(content["description"]).not_to match(/<[^>]+>/)
+      end
+
+      it "returns empty string for nil description" do
+        assignment.update!(description: nil)
+
+        result = service_with_access.public_build_regenerate_dynamic_content(
+          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
+        )
+        content = JSON.parse(result[:CONTENT])
+
+        expect(content["description"]).to eq("")
+      end
+
+      it "preserves plain text descriptions unchanged" do
+        assignment.update!(description: "Research and write about climate change.")
+
+        result = service_with_access.public_build_regenerate_dynamic_content(
+          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
+        )
+        content = JSON.parse(result[:CONTENT])
+
+        expect(content["description"]).to eq("Research and write about climate change.")
       end
     end
   end

@@ -19,6 +19,8 @@
 #
 
 class RubricLLMService
+  include HtmlTextHelper
+
   DEFAULT_GENERATE_OPTIONS = {
     criteria_count: 5,
     rating_count: 4,
@@ -70,9 +72,7 @@ class RubricLLMService
       CONTENT: {
         id: assignment.id,
         title: assignment.title,
-        description: assignment.description,
-        grading_type: assignment.grading_type,
-        submission_types: assignment.submission_types,
+        description: html_to_text(assignment.description),
       }.to_json,
       CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
       RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
@@ -301,7 +301,7 @@ class RubricLLMService
       CONTENT: {
         id: assignment.id,
         title: assignment.title,
-        description: assignment.description,
+        description: html_to_text(assignment.description),
       }.to_json,
       EXISTING_CRITERIA: criteria_as_text,
       REGENERATION_TARGET: regeneration_target_prompt,
