@@ -27,6 +27,7 @@ import SyllabusCalendarEventsCollection from './backbone/collections/SyllabusCal
 import SyllabusAppointmentGroupsCollection from './backbone/collections/SyllabusAppointmentGroupsCollection'
 import SyllabusPlannerCollection from './backbone/collections/SyllabusPlannerCollection'
 import SyllabusView from './backbone/views/SyllabusView'
+import type {SyllabusCollectionLike} from './backbone/types'
 import {attachImmersiveReaderButton} from './util/utils'
 import ready from '@instructure/ready'
 import {View} from '@instructure/ui-view'
@@ -34,14 +35,19 @@ import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('syllabus')
 
+type SyllabusCollectionSet =
+  | SyllabusAppointmentGroupsCollection
+  | SyllabusCalendarEventsCollection
+  | SyllabusPlannerCollection
+
 ready(() => {
   const immersive_reader_mount_point = () => document.getElementById('immersive_reader_mount_point')
   const immersive_reader_mobile_mount_point = () =>
     document.getElementById('immersive_reader_mobile_mount_point')
   const showCourseSummary = !!document.getElementById('syllabusContainer')
 
-  let collections = []
-  let deferreds
+  let collections: SyllabusCollectionSet[] = []
+  let deferreds: JQuery.Deferred<void>[] = []
 
   // If we're in a paced course, we're not showing the assignments
   // so skip retrieving them.
@@ -69,20 +75,21 @@ ready(() => {
     // Perform a fetch on each collection
     //   The fetch continues fetching until no next link is returned
     deferreds = map(collections, collection => {
-      const deferred = $.Deferred()
+      const deferred = $.Deferred<void>()
 
       const error = () => deferred.reject()
 
       const success = () => {
         if (collection.canFetch('next')) {
           return collection.fetch({page: 'next', success, error})
-        } else {
-          return deferred.resolve()
         }
+
+        deferred.resolve()
       }
 
       collection.fetch({
         data: {
+          // @ts-expect-error TS2339 (typescriptify) - page-specific ENV property.
           per_page: ENV.SYLLABUS_PER_PAGE || 50,
         },
         success,
@@ -97,7 +104,7 @@ ready(() => {
   const activeMountPoints = [
     immersive_reader_mount_point(),
     immersive_reader_mobile_mount_point(),
-  ].filter(node => !!node)
+  ].filter((node): node is HTMLElement => node instanceof HTMLElement)
 
   if (activeMountPoints.length > 0) {
     attachImmersiveReaderButton(activeMountPoints)
@@ -109,15 +116,16 @@ ready(() => {
     return
   }
 
-  let view
+  let view: SyllabusView | undefined
   if (ENV.IN_PACED_COURSE && !ENV.current_user_is_student) {
     renderCoursePacingNotice()
   } else {
     // Create the aggregation collection and view
-    const acollection = new SyllabusCollection(collections)
+    const acollection = new SyllabusCollection(collections as unknown as SyllabusCollectionLike[])
     view = new SyllabusView({
       el: '#syllabusTableBody',
       collection: acollection,
+      // @ts-expect-error TS2339 (typescriptify) - page-specific ENV property.
       can_read: ENV.CAN_READ,
       is_valid_user: !!ENV.current_user_id,
     })
@@ -125,10 +133,9 @@ ready(() => {
 
   // When all of the fetches have completed, render the view and bind behaviors
   if (view) {
-    $.when
-      .apply(this, deferreds)
+    $.when(...deferreds)
       .then(() => {
-        view.render()
+        view?.render()
         SyllabusBehaviors.bindToSyllabus()
       })
       .fail(() => {})
@@ -156,7 +163,7 @@ ready(() => {
   SyllabusBehaviors.bindToMiniCalendar()
 
   const syllabusRevisionsBtn = document.getElementById('syllabus_revisions_btn')
-  if (syllabusRevisionsBtn) {
+  if (syllabusRevisionsBtn instanceof HTMLButtonElement) {
     const contextInfo = ENV.context_asset_string.split('_')
     const courseId = contextInfo[0] === 'course' ? contextInfo[1] : undefined
     if (courseId) {
@@ -172,13 +179,13 @@ ready(() => {
 function renderCoursePacingNotice() {
   const contextInfo = ENV.context_asset_string.split('_')
   const courseId = contextInfo[0] === 'course' ? contextInfo[1] : undefined
-  const $mountPoint = document.getElementById('syllabusContainer')
-  if ($mountPoint) {
+  const mountPoint = document.getElementById('syllabusContainer')
+  if (mountPoint) {
     // replace the table with the notice
     import(/* webpackChunkName: "[request]" */ '@canvas/due-dates/react/CoursePacingNotice')
       .then(CoursePacingNoticeModule => {
         const renderNotice = CoursePacingNoticeModule.renderCoursePacingNotice
-        renderNotice($mountPoint, courseId)
+        renderNotice(mountPoint, courseId)
       })
       .catch(ex => {
         console.error('Falied loading CoursePacingNotice', ex)

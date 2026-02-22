@@ -33,20 +33,90 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
+import type {SyllabusEventApi} from '../types'
 
 const I18n = createI18nScope('syllabus')
 
-function assignmentSubType(json) {
-  if (/discussion/.test(json.submission_types)) return 'discussion_topic'
-  if (/quiz/.test(json.submission_types)) return 'quiz'
+interface TooltipRoot {
+  unmount: () => void
+}
+
+interface SyllabusViewOverride {
+  title?: string
+}
+
+export interface SyllabusViewEvent {
+  date?: Date | null
+  due_at?: Date
+  end_at?: Date
+  eventCount?: number
+  html_url?: string
+  json: SyllabusEventApi
+  last: boolean
+  orig_date: number | null
+  override: SyllabusViewOverride | null
+  passed?: boolean
+  related_id: string
+  same_day: boolean
+  same_time: boolean
+  start_at?: Date
+  subtype?: string
+  title: string
+  todo_at?: Date
+  type?: string
+  workflow_state?: string
+}
+
+export interface SyllabusViewDate {
+  date: Date | null
+  events: SyllabusViewEvent[]
+  orig_date: number | null
+  passed: boolean
+}
+
+export interface SyllabusViewJson {
+  dates: SyllabusViewDate[]
+  overrides_present: boolean
+}
+
+interface SyllabusViewInit {
+  can_read: boolean
+  is_valid_user: boolean
+}
+
+function assignmentSubType(json: SyllabusEventApi) {
+  const submissionTypes = json.submission_types ?? ''
+  if (/discussion/.test(submissionTypes)) return 'discussion_topic'
+  if (/quiz/.test(submissionTypes)) return 'quiz'
   return undefined
 }
-export default class SyllabusView extends Backbone.View {
+
+// Declaration merging: expose render() inherited from Backbone.View (untyped JS base)
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+interface SyllabusView {
+  render(): this
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+class SyllabusView extends Backbone.View {
+  declare can_participate?: boolean
+  declare can_read: boolean
+  declare is_public_course?: boolean
+  declare is_valid_user: boolean
+  declare template: (json: SyllabusViewJson) => string
+  declare tooltipRoots: TooltipRoot[]
+  declare $: (element: Element | string) => JQuery<HTMLElement>
+  declare $el: JQuery<HTMLElement>
+
+  constructor(options?: Record<string, unknown>) {
+    super(options)
+  }
+
   static initClass() {
     this.prototype.template = template
   }
 
-  initialize({can_read, is_valid_user}) {
+  initialize({can_read, is_valid_user}: SyllabusViewInit) {
     this.can_read = can_read
     this.is_valid_user = is_valid_user
     this.tooltipRoots = []
@@ -115,21 +185,23 @@ export default class SyllabusView extends Backbone.View {
   //    // The original JSON from the model
   //    "json": { ... }
   // }
-  toJSON() {
+  toJSON(): SyllabusViewJson {
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const html_url_for_assignment = this.can_read
     const html_url_for_event = this.can_read && this.is_valid_user // since the calendar page doesn't support anonymous access yet
 
-    const relatedEvents = {}
-    let lastDate = null
-    let lastEvent = null
-    const dateCollator = function (memo, json) {
-      let due_at, end_at, html_url, start_at, todo_at
-      let related_id = json.related_id
-      if (related_id == null) {
-        related_id = json.id
-      }
+    const relatedEvents: Record<string, SyllabusViewEvent[]> = {}
+    let lastDate: SyllabusViewDate | null = null
+    let lastEvent: SyllabusViewEvent | null = null
+    const dateCollator = (memo: SyllabusViewDate[], json: SyllabusEventApi) => {
+      let due_at: Date | undefined
+      let end_at: Date | undefined
+      let html_url: string | undefined
+      let start_at: Date | undefined
+      let todo_at: Date | undefined
+
+      const related_id = String(json.related_id ?? json.id)
       if (json.type === 'assignment' || json.type === 'sub_assignment') {
         if (html_url_for_assignment) {
           html_url = json.html_url
@@ -138,43 +210,41 @@ export default class SyllabusView extends Backbone.View {
         html_url = json.html_url
       }
 
-      const title = json.title
+      const title = json.title ?? ''
 
       if (json.start_at) {
-        start_at = fudgeDateForProfileTimezone(json.start_at)
+        start_at = fudgeDateForProfileTimezone(json.start_at) ?? undefined
       }
       if (json.end_at) {
-        end_at = fudgeDateForProfileTimezone(json.end_at)
+        end_at = fudgeDateForProfileTimezone(json.end_at) ?? undefined
       }
       if (json.type === 'assignment' || json.type === 'sub_assignment') {
         due_at = start_at
-      } else if (json.type === 'wiki_page' || json.type === 'discussion_topic') {
-        todo_at = fudgeDateForProfileTimezone(json.todo_at)
+      } else if ((json.type === 'wiki_page' || json.type === 'discussion_topic') && json.todo_at) {
+        todo_at = fudgeDateForProfileTimezone(json.todo_at) ?? undefined
       }
 
-      let override = null
-      let overrides = null
-      if (json.type === 'assignment') {
-        overrides = json.assignment_overrides
-      } else if (json.type === 'sub_assignment') {
+      let override: SyllabusViewOverride | null = null
+      let overrides = json.assignment_overrides
+      if (json.type === 'sub_assignment') {
         overrides = json.sub_assignment_overrides
       }
 
-      each(overrides != null ? overrides : [], ov => {
+      each(overrides ?? [], ov => {
         if (override == null) {
           override = {}
         }
-        return (override.title = ov.title)
+        override.title = ov.title
       })
 
-      let start_date = null
-      let orig_start_date = null
-      if (start_at) {
+      let start_date: Date | null = null
+      let orig_start_date: number | null = null
+      if (start_at && json.start_at) {
         start_date = new Date(start_at.getFullYear(), start_at.getMonth(), start_at.getDate())
         orig_start_date = Date.parse(json.start_at)
       }
 
-      let end_date = null
+      let end_date: Date | null = null
       if (end_at) {
         end_date = new Date(end_at.getFullYear(), end_at.getMonth(), end_at.getDate())
       }
@@ -187,7 +257,7 @@ export default class SyllabusView extends Backbone.View {
         lastDate = {
           date: start_date,
           orig_date: orig_start_date,
-          passed: start_date && start_date < today,
+          passed: Boolean(start_date && start_date < today),
           events: [],
         }
 
@@ -223,9 +293,9 @@ export default class SyllabusView extends Backbone.View {
       lastDate.events.push(lastEvent)
 
       lastDate.events.forEach(event => {
-        event.eventCount = lastDate.events.length
-        event.date = lastDate.date
-        event.passed = lastDate.passed
+        event.eventCount = lastDate?.events.length
+        event.date = lastDate?.date
+        event.passed = lastDate?.passed
       })
 
       if (!(related_id in relatedEvents)) {
@@ -237,7 +307,11 @@ export default class SyllabusView extends Backbone.View {
     }
 
     // Get the dates and events
-    const dates = reduce(super.toJSON(...arguments), dateCollator, [])
+    const dates = reduce(
+      super.toJSON(...arguments) as SyllabusEventApi[],
+      dateCollator,
+      [] as SyllabusViewDate[],
+    )
 
     // Remove extraneous override information for single events
     let overrides_present = false
@@ -246,8 +320,8 @@ export default class SyllabusView extends Backbone.View {
       if (events.length === 1) {
         events[0].override = null
       } else {
-        for (const event of Array.from(events)) {
-          overrides_present |= event.override !== null
+        for (const event of events) {
+          overrides_present = overrides_present || event.override !== null
         }
       }
     }
@@ -266,9 +340,9 @@ export default class SyllabusView extends Backbone.View {
   mountTimezoneTooltips() {
     this.$el.find('.tooltip-time-mount').each((_, mountPoint) => {
       const $mountPoint = this.$(mountPoint)
-      const datetime = $mountPoint.data('datetime')
-      const timeText = $mountPoint.data('time-text')
-      const label = $mountPoint.data('label')
+      const datetime = $mountPoint.data('datetime') as string | undefined
+      const timeText = ($mountPoint.data('time-text') as string | undefined) ?? ''
+      const label = $mountPoint.data('label') as string | undefined
       if (!datetime) return
 
       const tooltipContent = this.generateTooltipContent(datetime)
@@ -282,11 +356,11 @@ export default class SyllabusView extends Backbone.View {
         </Tooltip>,
         mountPoint,
       )
-      this.tooltipRoots.push(root)
+      this.tooltipRoots.push(root as TooltipRoot)
     })
   }
 
-  generateTooltipContent(datetime) {
+  generateTooltipContent(datetime: string) {
     const localDatetime = datetimeString(datetime)
 
     if (ENV.CONTEXT_TIMEZONE && ENV.TIMEZONE !== ENV.CONTEXT_TIMEZONE) {
@@ -305,9 +379,10 @@ export default class SyllabusView extends Backbone.View {
   }
 
   remove() {
-    this.tooltipRoots?.forEach(root => root?.unmount())
+    this.tooltipRoots.forEach(root => root.unmount())
     this.tooltipRoots = []
     return super.remove(...arguments)
   }
 }
 SyllabusView.initClass()
+export default SyllabusView

@@ -18,16 +18,21 @@
 
 import {each} from 'es-toolkit/compat'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import type {SyllabusEventApi, SyllabusEventType, SyllabusFetchOptions} from '../types'
 
 export default class SyllabusCalendarEventsCollection extends PaginatedCollection {
-  initialize(context_codes, type = 'event') {
-    this.parse = this.parse.bind(this)
+  declare context_codes: string[]
+  declare type: SyllabusEventType
+  declare url: string
+
+  constructor(context_codes: string[], type: SyllabusEventType = 'event') {
+    super()
     this.context_codes = context_codes
     this.type = type
-    return super.initialize(...arguments)
+    this.url = '/api/v1/calendar_events'
   }
 
-  fetch(options = {}) {
+  fetch(options: SyllabusFetchOptions = {}) {
     if (options.remove == null) options.remove = false
     if (options.data == null) options.data = {}
 
@@ -44,40 +49,41 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
   // Overridden to make the id unique when aggregated in
   // a collection with other models, and to exclude
   // 'hidden' events
-  parse(...args) {
-    let normalize
+  parse(resp: SyllabusEventApi[]) {
     const eventType = this.type
+    let normalize: (ev: SyllabusEventApi) => SyllabusEventApi = ev => ev
+
     switch (eventType) {
       case 'assignment':
-        normalize = function (ev) {
+        normalize = ev => {
           ev.related_id = ev.id
 
           let overridden = false
-          each(ev.assignment_overrides != null ? ev.assignment_overrides : [], override => {
+          each(ev.assignment_overrides ?? [], override => {
             if (!overridden) {
               ev.id = `${ev.id}_override_${override.id}`
-              return (overridden = true)
+              overridden = true
             }
           })
           return ev
         }
         break
       case 'sub_assignment':
-        normalize = function (ev) {
+        normalize = ev => {
           ev.related_id = ev.id
 
           let overridden = false
-          each(ev.sub_assignment_overrides != null ? ev.sub_assignment_overrides : [], override => {
+          each(ev.sub_assignment_overrides ?? [], override => {
             if (!overridden) {
               ev.id = `${ev.id}_override_${override.id}`
-              return (overridden = true)
+              overridden = true
             }
           })
           return ev
         }
         break
       case 'event':
-        normalize = function (ev) {
+        normalize = ev => {
           ev.related_id = ev.id = `${eventType}_${ev.id}`
           if (ev.parent_event_id) {
             ev.related_id = `${eventType}_${ev.parent_event_id}`
@@ -85,13 +91,14 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
           return ev
         }
         break
+      default:
+        normalize = ev => ev
     }
 
-    const result = []
-    each(super.parse(...args), ev => {
+    const result: SyllabusEventApi[] = []
+    each(resp, ev => {
       if (!ev.hidden) result.push(normalize(ev))
     })
     return result
   }
 }
-SyllabusCalendarEventsCollection.prototype.url = '/api/v1/calendar_events'

@@ -16,17 +16,31 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import type {SyllabusEventApi, SyllabusFetchOptions} from '../types'
 
-export default class SyllabusCalendarEventsCollection extends PaginatedCollection {
-  constructor(context_codes) {
+interface PlannerNote {
+  html_url: string
+  plannable: {
+    title: string
+    todo_date?: string
+  }
+  plannable_id: number | string
+  plannable_type: string
+}
+
+export default class SyllabusPlannerCollection extends PaginatedCollection {
+  declare context_codes: string[]
+  declare url: string
+
+  constructor(context_codes: string[]) {
     super()
     this.url = '/api/v1/planner/items'
     this.context_codes = context_codes
   }
 
-  fetch(options) {
+  fetch(options: SyllabusFetchOptions = {}) {
     const mergedData = {
-      ...options.data,
+      ...(options.data ?? {}),
       context_codes: this.context_codes,
       filter: 'all_ungraded_todo_items',
     }
@@ -36,8 +50,8 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
 
   // Overridden to make the id unique when aggregated in a collection with other
   // models and to match the fields used by the SyllabusView and template.
-  parse(apiNote) {
-    return apiNote.map(note => ({
+  parse(apiNotes: PlannerNote[]): SyllabusEventApi[] {
+    return apiNotes.map(note => ({
       id: `planner_${note.plannable_type}_${note.plannable_id}`,
       type: note.plannable_type,
       title: note.plannable.title,
