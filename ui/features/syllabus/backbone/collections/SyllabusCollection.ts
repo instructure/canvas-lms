@@ -17,39 +17,55 @@
 //
 
 import Backbone from '@canvas/backbone'
+import type {SyllabusCollectionLike, SyllabusModelLike} from '../types'
+
+interface CollectionMutationOptions {
+  [key: string]: unknown
+}
+
+interface SyllabusCollectionMethods {
+  add(model: SyllabusModelLike, options?: CollectionMutationOptions): unknown
+  reduce<T>(iteratee: (memo: T, model: SyllabusModelLike) => T, initialValue: T): T
+  remove(model: SyllabusModelLike, options?: CollectionMutationOptions): unknown
+}
 
 export default class SyllabusCollection extends Backbone.Collection {
+  private get methods(): SyllabusCollectionMethods {
+    return this as unknown as SyllabusCollectionMethods
+  }
+
   // Attach to externally provided collections
   //
   // This cannot be the initialize method as that would cause the
   // collections to be passed to backbone as if they were model
   // instances... ungoodness.
-  constructor(collections) {
+  constructor(collections: SyllabusCollectionLike[]) {
     super()
 
     for (const collection of collections) {
-      collection.on('add', (model, _collection, options) => this.add(model, options))
-      collection.on('remove', (model, _collection, options) => this.remove(model, options))
-      collection.on('reset', (_collection, _options) => {
-        function find_collection_models(memo, model) {
+      // @ts-expect-error TS2345 - typed callback not assignable to Backbone's (...args: unknown[]) => unknown
+      collection.on('add', (model: SyllabusModelLike, _collection: unknown, options: unknown) =>
+        this.methods.add(model, options as CollectionMutationOptions),
+      )
+      // @ts-expect-error TS2345 - typed callback not assignable to Backbone's (...args: unknown[]) => unknown
+      collection.on('remove', (model: SyllabusModelLike, _collection: unknown, options: unknown) =>
+        this.methods.remove(model, options as CollectionMutationOptions),
+      )
+      collection.on('reset', () => {
+        const findCollectionModels = (memo: SyllabusModelLike[], model: SyllabusModelLike) => {
           if (model.get('collection') === collection) {
-            return memo.push(model)
-          } else {
-            return memo
+            memo.push(model)
           }
+          return memo
         }
 
-        for (const model of this.reduce(find_collection_models, [])) {
-          this.remove(model)
+        for (const model of this.methods.reduce(findCollectionModels, [] as SyllabusModelLike[])) {
+          this.methods.remove(model)
         }
 
-        return (() => {
-          const result = []
-          for (const model of collection.models) {
-            result.push(this.add(model))
-          }
-          return result
-        })()
+        for (const model of collection.models) {
+          this.methods.add(model)
+        }
       })
     }
   }
@@ -78,21 +94,13 @@ export default class SyllabusCollection extends Backbone.Collection {
   //   2) title (alphabetically)
   //      Gives a consistent ordering when start_at and end_at times
   //      on both items match.
-  //
-  comparator(model1, model2) {
+  comparator(model1: SyllabusModelLike, model2: SyllabusModelLike) {
     const m1start_at = model1.get('start_at')
     const m2start_at = model2.get('start_at')
     const m1end_at = model1.get('end_at')
     const m2end_at = model2.get('end_at')
-    let m1title = model1.get('title')
-    let m2title = model2.get('title')
-
-    if (m1title) {
-      m1title = m1title.toLowerCase()
-    }
-    if (m2title) {
-      m2title = m2title.toLowerCase()
-    }
+    const m1title = this.lowercaseTitle(model1.get('title'))
+    const m2title = this.lowercaseTitle(model2.get('title'))
 
     // if the start_at times are different
     if (m1start_at !== m2start_at) {
@@ -137,5 +145,13 @@ export default class SyllabusCollection extends Backbone.Collection {
     }
 
     return 0
+  }
+
+  private lowercaseTitle(title: unknown): string {
+    if (typeof title === 'string') {
+      return title.toLowerCase()
+    }
+
+    return ''
   }
 }

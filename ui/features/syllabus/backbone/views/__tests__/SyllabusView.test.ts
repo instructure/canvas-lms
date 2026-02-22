@@ -20,12 +20,14 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
+// @ts-expect-error TS7016 (typescriptify) - timezone package does not ship per-zone declarations.
 import newYork from 'timezone/America/New_York'
 import SyllabusCollection from '../../collections/SyllabusCollection'
 import SyllabusCalendarEventsCollection from '../../collections/SyllabusCalendarEventsCollection'
 import SyllabusAppointmentGroupsCollection from '../../collections/SyllabusAppointmentGroupsCollection'
 import SyllabusPlannerCollection from '../../collections/SyllabusPlannerCollection'
 import SyllabusView from '../SyllabusView'
+import type {SyllabusViewEvent, SyllabusViewJson} from '../SyllabusView'
 import SyllabusViewPrerendered from '@canvas/syllabus/SyllabusViewPrerendered'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
@@ -66,15 +68,16 @@ const setupServerResponses = () => {
 }
 
 describe('SyllabusView', () => {
-  let view
+  let view: SyllabusView
 
   beforeAll(() => server.listen())
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
-  let fixtures
-  let jumpToToday
-  let miniMonth
-  let syllabusContainer
+
+  let fixtures: HTMLDivElement
+  let jumpToToday: JQuery<HTMLElement>
+  let miniMonth: JQuery<HTMLElement>
+  let syllabusContainer: JQuery<HTMLElement>
 
   beforeEach(async () => {
     fakeENV.setup({TIMEZONE: 'America/Denver', CONTEXT_TIMEZONE: 'America/New_York'})
@@ -113,15 +116,16 @@ describe('SyllabusView', () => {
       new SyllabusPlannerCollection([ENV.context_asset_string]),
     ]
 
+    // @ts-expect-error TS2345 - collection types not assignable to SyllabusCollectionLike[] in tests
     const collection = new SyllabusCollection(collections)
 
     // Wait for all collections to be fetched
-    const fetchPromises = collections.map(col => {
-      return new Promise((resolve, reject) => {
+    const fetchPromises: Promise<void>[] = collections.map(col => {
+      return new Promise<void>((resolve, reject) => {
         col.fetch({
           data: {per_page: 50},
-          success: resolve,
-          error: reject,
+          success: () => resolve(),
+          error: () => reject(new Error('Failed to fetch syllabus collection')),
         })
       })
     })
@@ -157,7 +161,7 @@ describe('SyllabusView', () => {
       const $links = view.$el.find('a[href]')
       expect($links.length).toBeGreaterThan(0)
       $links.each((_, link) => {
-        expect(link.href).toBeTruthy()
+        expect((link as HTMLAnchorElement).href).toBeTruthy()
       })
 
       // Check for specific event types
@@ -187,8 +191,8 @@ describe('SyllabusView', () => {
       view.can_participate = true
     })
 
-    const getCheckpointEvent = subAssignmentTag => {
-      const jsonData = view.toJSON()
+    const getCheckpointEvent = (subAssignmentTag: string): SyllabusViewEvent | undefined => {
+      const jsonData = view.toJSON() as SyllabusViewJson
 
       return jsonData.dates
         .flatMap(date => date.events)
@@ -203,24 +207,24 @@ describe('SyllabusView', () => {
       const replyToTopicEvent = getCheckpointEvent('reply_to_topic')
 
       expect(replyToTopicEvent).toBeDefined()
-      expect(replyToTopicEvent.title).toBe('Graded Discussion with Checkpoints 1 Reply to Topic')
+      expect(replyToTopicEvent?.title).toBe('Graded Discussion with Checkpoints 1 Reply to Topic')
 
       // "Reply to Topic" text should not be duplicated
-      expect(replyToTopicEvent.title).toMatch(/Reply to Topic$/)
-      expect(replyToTopicEvent.title).not.toMatch(/Reply to Topic.*Reply to Topic/)
+      expect(replyToTopicEvent?.title).toMatch(/Reply to Topic$/)
+      expect(replyToTopicEvent?.title).not.toMatch(/Reply to Topic.*Reply to Topic/)
     })
 
     it('renders "Reply to Entry" checkpoint title correctly without duplication', () => {
       const replyToEntryEvent = getCheckpointEvent('reply_to_entry')
 
       expect(replyToEntryEvent).toBeDefined()
-      expect(replyToEntryEvent.title).toBe(
+      expect(replyToEntryEvent?.title).toBe(
         'Graded Discussion with Checkpoints 1 Required Replies (3)',
       )
 
       // "Required Replies (x)" text should not be duplicated
-      expect(replyToEntryEvent.title).toMatch(/Required Replies.*\(\d+\)/)
-      expect(replyToEntryEvent.title).not.toMatch(
+      expect(replyToEntryEvent?.title).toMatch(/Required Replies.*\(\d+\)/)
+      expect(replyToEntryEvent?.title).not.toMatch(
         /Required Replies.*\(\d+\).*Required Replies.*\(\d+\)/,
       )
     })
@@ -236,14 +240,22 @@ describe('SyllabusView', () => {
 
     it('highlights dates with events', () => {
       view.render()
-      const dates = view.toJSON().dates
+      const dates = (view.toJSON() as SyllabusViewJson).dates
       const datesWithEvents = dates.filter(date => date.events && date.events.length > 0)
       expect(datesWithEvents.length).toBeGreaterThan(0)
 
       const $dates = $('.mini_calendar_day', miniMonth)
       const $hasEvents = $dates.filter(function () {
         // Extract date from the cell ID which is in format: mini_day_YYYY_MM_DD
-        const [_, __, year, month, day] = $(this).attr('id').split('_')
+        const id = $(this).attr('id')
+        if (!id) return false
+
+        const dateParts = id.split('_')
+        const year = dateParts[2]
+        const month = dateParts[3]
+        const day = dateParts[4]
+        if (!year || !month || !day) return false
+
         return datesWithEvents.some(eventDate => {
           if (!eventDate.date) return false
           return (
@@ -260,7 +272,7 @@ describe('SyllabusView', () => {
     ;(typeof vi !== 'undefined' ? it.skip : it)('shows event details on hover', () => {
       view.render()
       const $date = $('.mini_calendar_day', miniMonth).eq(5) // Pick a day in the middle of the month
-      $date.simulate('mouseover')
+      ;($date as unknown as {simulate: (name: string) => void}).simulate('mouseover')
       vi.advanceTimersByTime(100)
       expect($('[data-tooltip]').length).toBeGreaterThan(0)
     })
@@ -269,7 +281,7 @@ describe('SyllabusView', () => {
     ;(typeof vi !== 'undefined' ? it.skip : it)('updates main view when clicking a date', () => {
       view.render()
       const $date = $('.mini_calendar_day', miniMonth).eq(5) // Pick a day in the middle of the month
-      $date.simulate('click')
+      ;($date as unknown as {simulate: (name: string) => void}).simulate('click')
       expect(view.$el.find('.date').length).toBeGreaterThan(0)
     })
   })

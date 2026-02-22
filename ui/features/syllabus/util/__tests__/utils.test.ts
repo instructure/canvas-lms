@@ -42,7 +42,8 @@ describe('attachImmersiveReaderButton', () => {
 
     attachImmersiveReaderButton([mountNode])
 
-    const content = initializeReaderButton.mock.calls[0][1].content
-    expect(content()).toEqual(CUSTOM_CONTENT)
+    const mockedInitializeReaderButton = vi.mocked(initializeReaderButton)
+    const content = mockedInitializeReaderButton.mock.calls[0]?.[1]?.content
+    expect(content?.()).toEqual(CUSTOM_CONTENT)
   })
 })

@@ -18,15 +18,21 @@
 
 import {each} from 'es-toolkit/compat'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import type {SyllabusEventApi, SyllabusFetchOptions} from '../types'
 
 export default class SyllabusAppointmentGroupsCollection extends PaginatedCollection {
-  initialize(context_codes, scope = 'reservable') {
+  declare context_codes: string[]
+  declare scope: string
+  declare url: string
+
+  constructor(context_codes: string[], scope = 'reservable') {
+    super()
     this.context_codes = context_codes
     this.scope = scope
-    return super.initialize(...arguments)
+    this.url = '/api/v1/appointment_groups'
   }
 
-  fetch(options = {}) {
+  fetch(options: SyllabusFetchOptions = {}) {
     if (options.remove == null) options.remove = false
 
     if (options.data == null) options.data = {}
@@ -41,9 +47,12 @@ export default class SyllabusAppointmentGroupsCollection extends PaginatedCollec
 
   // Overridden to make the id unique when aggregated in
   // a collection with other models
-  parse(resp) {
-    each(super.parse(...arguments), ev => (ev.related_id = ev.id = `appointment_group_${ev.id}`))
+  parse(resp: SyllabusEventApi[]): SyllabusEventApi[] {
+    each(resp, ev => {
+      const prefixedId = `appointment_group_${ev.id}`
+      ev.related_id = prefixedId
+      ev.id = prefixedId
+    })
     return resp
   }
 }
-SyllabusAppointmentGroupsCollection.prototype.url = '/api/v1/appointment_groups'

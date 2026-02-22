@@ -21,9 +21,10 @@ import {initializeReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 
 const I18n = createI18nScope('syllabus')
 
-export function attachImmersiveReaderButton(mountPoints) {
+export function attachImmersiveReaderButton(mountPoints: HTMLElement[]) {
   const title = I18n.t('Course Syllabus')
-  const content = () => document.querySelector('#course_syllabus').innerHTML
+  const content = () => document.querySelector<HTMLElement>('#course_syllabus')?.innerHTML ?? ''
+
   mountPoints.forEach(node => {
     initializeReaderButton(node, {content, title})
   })
