@@ -362,13 +362,15 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         <BarChartRow
           columns={_columns}
           outcomeDistributions={outcomeDistributions}
+          distributionStudents={distributionStudents}
+          courseId={courseId}
           isLoading={isLoadingDistribution}
           handleKeyDown={handleKeyDown}
           isMobile={isMobile}
         />
       )
     },
-    [outcomeDistributions, isLoadingDistribution, isMobile],
+    [outcomeDistributions, distributionStudents, courseId, isLoadingDistribution, isMobile],
   )
 
   const handleColumnMove = useCallback(

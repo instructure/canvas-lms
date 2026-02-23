@@ -118,20 +118,20 @@ describe('OutcomeHeader', () => {
     expect(screen.getByText('Show Outcome Distribution')).toBeInTheDocument()
   })
 
-  it('renders the outcome description modal when option is selected', async () => {
-    const user = userEvent.setup()
-    renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
-    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
-    await user.click(screen.getByText('Outcome Info'))
-    expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
-  })
-
   it('renders the outcome distribution popover when option is selected', async () => {
     const user = userEvent.setup()
     renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
     await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
     await user.click(screen.getByText('Show Outcome Distribution'))
     expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
+  })
+
+  it('renders the outcome description modal when option is selected', async () => {
+    const user = userEvent.setup()
+    renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    await user.click(screen.getByText('Outcome Info'))
+    expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
   })
 
   it('announces to screen readers when showing contributing scores', async () => {

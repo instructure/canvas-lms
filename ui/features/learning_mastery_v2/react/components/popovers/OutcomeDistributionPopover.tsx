@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactElement, useMemo, useState} from 'react'
+import React, {ReactElement, useEffect, useMemo, useState} from 'react'
 import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -191,6 +191,12 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   const [selectedRating, setSelectedRating] = useState<RatingDistribution | null>(null)
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false)
   const [isDifferentiationTagModalOpen, setIsDifferentiationTagModalOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedRating(null)
+    }
+  }, [isOpen])
   const {accountLevelMasteryScalesFF, allowDifferentiationTags} = useLMGBContext()
   const {mutate: addTagMembership} = useAddTagMembership()
   const calculationMethod = getCalculationMethod(outcome)
