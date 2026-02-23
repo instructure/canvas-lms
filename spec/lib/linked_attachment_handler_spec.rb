@@ -162,5 +162,41 @@ describe LinkedAttachmentHandler do
         expect(aa.context_id).to eql course.local_id
       end
     end
+
+    context "error handling for missing user" do
+      let(:html) do
+        <<~HTML
+          <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a></p>
+        HTML
+      end
+
+      context "in development environment" do
+        it "raises an error when user is missing" do
+          allow(Rails.env).to receive(:development?).and_return(true)
+          expect do
+            course.associate_attachments_to_rce_object(html, nil)
+          end.to raise_error(/User is required/)
+        end
+      end
+
+      context "in production environment" do
+        before do
+          allow(Rails.env).to receive_messages(development?: false, test?: false)
+        end
+
+        it "captures error to Sentry and does not raise" do
+          expect(Sentry).to receive(:capture_message).with(anything, level: :warning)
+          expect do
+            course.associate_attachments_to_rce_object(html, nil)
+          end.not_to raise_error
+        end
+
+        it "does not create associations when user is missing" do
+          allow(Sentry).to receive(:capture_message)
+          course.associate_attachments_to_rce_object(html, nil)
+          expect(fetch_list_with_field_name(nil)).to be_empty
+        end
+      end
+    end
   end
 end
