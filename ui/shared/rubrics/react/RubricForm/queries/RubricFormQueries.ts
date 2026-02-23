@@ -25,6 +25,7 @@ import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/r
 import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
   mapRubricUnderscoredKeysToCamelCase,
+  decodeHTML,
 } from '@canvas/rubrics/react/utils'
 import getCookie from '@instructure/get-cookie'
 import {
@@ -194,7 +195,8 @@ export const saveRubric = async (
      */
     const longDescription = criterion.outcome
       ? criterion.longDescription
-      : criterion.longDescription?.replace(/<br\/>/g, '')
+      : // unescape any escaped html entities
+        decodeHTML(criterion.longDescription?.replace(/<br\/>/g, '') ?? '')
 
     return {
       id: criterion.id,

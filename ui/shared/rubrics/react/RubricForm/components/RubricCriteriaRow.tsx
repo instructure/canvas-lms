@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback, useRef, useEffect} from 'react'
+import {useCallback, useRef, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
+import {formatLongDescriptionHTML} from '@canvas/rubrics/react/utils'
 import {OutcomeTag, escapeNewLineText, rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
 import classnames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
@@ -231,9 +232,9 @@ export const RubricCriteriaRow = ({
                          * and replacing with <br />. this will make sure that we always display the proper
                          * line breaks regardless of the longDescription having <br/> or \n
                          */
-                        dangerouslySetInnerHTML={escapeNewLineText(
-                          longDescription?.replace(/<br\/>/g, ''),
-                        )}
+                        dangerouslySetInnerHTML={{
+                          __html: formatLongDescriptionHTML(longDescription ?? ''),
+                        }}
                       />
                     </View>
                   </>
