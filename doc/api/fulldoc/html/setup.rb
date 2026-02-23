@@ -184,6 +184,8 @@ def init
 
   options[:json_objects_map], options[:json_objects] = DocumentationHelpers.build_json_objects_map(options[:resources])
 
+  generate_url_mappings
+
   generate_assets
 
   serialize_index
@@ -308,4 +310,23 @@ def serialize_markdown_pages
     serialize_redirect(filename)
     options.delete(:file)
   end
+end
+
+def generate_url_mappings
+  require_relative "../../redirect_old_docs/map_urls"
+
+  output_path = options[:serializer].instance_variable_get(:@basepath)
+
+  source_template_file = File.read("doc/api/fulldoc/markdown/sidebar/sidebar.md.erb")
+  erb_renderer = ERB.new(source_template_file)
+  toc_content = erb_renderer.result(binding)
+
+  # Generate url_mappings.json in api_md directory (for docu portal E2E tests)
+  api_md_path = File.join(output_path, "..", "api_md")
+  FileUtils.mkdir_p(api_md_path)
+  url_mappings_file = File.join(api_md_path, "url_mappings.json")
+  DocRedirect::UrlMapper.generate(toc_content, url_mappings_file)
+
+  # Load mappings into options for template access
+  options[:url_mappings] = JSON.parse(File.read(url_mappings_file))
 end
