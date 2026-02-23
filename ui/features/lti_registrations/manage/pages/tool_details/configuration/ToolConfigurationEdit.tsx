@@ -44,6 +44,7 @@ import {PlacementsConfirmationPerfWrapper} from './PlacementsConfirmationPerfWra
 import {PrivacyConfirmationPerfWrapper} from './PrivacyConfirmationPerfWrapper'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
 import {Section} from '../../../components/Section'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -106,6 +107,7 @@ export const ToolConfigurationEdit = () => {
     message: I18n.t('You have unsaved changes. Are you sure you want to leave?'),
     when: isDirty,
   })
+  const isInherited = registration.inherited ?? false
 
   const save = React.useCallback(async () => {
     if (!updateMutation.isPending) {
@@ -224,40 +226,65 @@ export const ToolConfigurationEdit = () => {
         <IconConfirmationPerfWrapper overlayStore={useOverlayState} registration={registration} />
       </Section>
 
-      <Footer save={save} isSaving={updateMutation.isPending} />
+      <Footer save={save} isInherited={isInherited} isSaving={updateMutation.isPending} />
     </div>
   )
 }
 
-const Footer = React.memo(({save, isSaving}: {save: () => Promise<void>; isSaving: boolean}) => {
-  const navigate = useNavigate()
-  return (
-    <ToolConfigurationFooter>
-      <Flex direction="row" justifyItems="end" padding="0 small">
-        <Flex.Item>
-          <Button
-            data-pendo="lti-registrations-cancel-edit"
-            color="secondary"
-            margin="0 xx-small 0 0"
-            onClick={() => {
-              navigate(-1)
-            }}
-          >
-            {I18n.t('Cancel')}
-          </Button>
-        </Flex.Item>
-        <Flex.Item>
-          <Button
-            color="primary"
-            disabled={isSaving}
-            margin="0 0 0 xx-small"
-            onClick={save}
-            data-pendo="lti-registrations-update-tool-configuration"
-          >
-            {I18n.t('Update Configuration')}
-          </Button>
-        </Flex.Item>
-      </Flex>
-    </ToolConfigurationFooter>
-  )
-})
+const Footer = React.memo(
+  ({
+    save,
+    isInherited,
+    isSaving,
+  }: {
+    save: () => Promise<void>
+    isInherited: boolean
+    isSaving: boolean
+  }) => {
+    const navigate = useNavigate()
+    const [editTooltipShowing, setEditTooltipShowing] = React.useState(false)
+    return (
+      <ToolConfigurationFooter>
+        <Flex direction="row" justifyItems="end" padding="0 small">
+          <Flex.Item>
+            <Button
+              data-pendo="lti-registrations-cancel-edit"
+              color="secondary"
+              margin="0 xx-small 0 0"
+              onClick={() => {
+                navigate(-1)
+              }}
+            >
+              {I18n.t('Cancel')}
+            </Button>
+          </Flex.Item>
+          <Flex.Item>
+            <Tooltip
+              renderTip={I18n.t(
+                "This account does not own this app and therefore can't edit its configuration.",
+              )}
+              isShowingContent={editTooltipShowing}
+              onShowContent={() => {
+                // The tooltip should only be shown if they *can't* click the edit button
+                setEditTooltipShowing(isInherited)
+              }}
+              onHideContent={() => {
+                setEditTooltipShowing(false)
+              }}
+            >
+              <Button
+                data-pendo="lti-registrations-update-tool-configuration"
+                color="primary"
+                interaction={isInherited || isSaving ? 'disabled' : 'enabled'}
+                margin="0 0 0 xx-small"
+                onClick={save}
+              >
+                {I18n.t('Update Configuration')}
+              </Button>
+            </Tooltip>
+          </Flex.Item>
+        </Flex>
+      </ToolConfigurationFooter>
+    )
+  },
+)

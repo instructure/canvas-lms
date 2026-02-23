@@ -778,6 +778,107 @@ describe('Tool Configuration View EULA Settings', () => {
   })
 })
 
+describe('Tool Configuration Edit button, inherited registration', () => {
+  it('should disable the Edit button when registration is inherited', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        inherited: true,
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const editButton = getByText('Edit').closest('button')!
+    expect(editButton).toHaveAttribute('disabled')
+  })
+
+  it('should show a tooltip on the Edit button when registration is inherited', async () => {
+    const {getByText, findByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        inherited: true,
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const editButton = getByText('Edit').closest('button')!
+    fireEvent.focus(editButton)
+
+    expect(
+      await findByText(
+        "This account does not own this app and therefore can't edit its configuration.",
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('should enable the Edit button when registration is not inherited', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const editButton = getByText('Edit').closest('button')!
+    expect(editButton).not.toHaveAttribute('disabled')
+  })
+
+  it('should not show the Edit tooltip when registration is not inherited', async () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const editButton = getByText('Edit').closest('button')!
+    fireEvent.focus(editButton)
+
+    const tooltip = editButton
+      .closest('[data-position-target]')
+      ?.parentElement?.querySelector('[role="tooltip"]')
+    expect(tooltip).toBeNull()
+  })
+
+  it('should disable the Restore Default button when registration is inherited', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        inherited: true,
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const restoreButton = getByText('Restore Default').closest('button')!
+    expect(restoreButton).toHaveAttribute('disabled')
+  })
+
+  it('should show a tooltip on the Restore Default button when registration is inherited', async () => {
+    const {getByText, findByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        inherited: true,
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const restoreButton = getByText('Restore Default').closest('button')!
+    fireEvent.focus(restoreButton)
+
+    expect(
+      await findByText(
+        "This account does not own this app and therefore can't reset its configuration.",
+      ),
+    ).toBeInTheDocument()
+  })
+})
+
 describe('Tool Configuration Edit button, keyboard navigation', () => {
   const mockNavigate = vi.fn()
 
