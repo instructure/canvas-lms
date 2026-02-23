@@ -37,7 +37,8 @@ interface UseClosedCaptionStateReturn {
   handleDeleteRow: (locale: string) => void
   handleCaptionProcessing: (locale: string, file: File, isAsr?: boolean) => void
   handleCaptionUploaded: (subtitle: Subtitle) => void
-  handleCaptionUploadFailed: (locale: string, errorMessage: string) => void
+  handleCaptionUploadFailed: (locale: string, failedOperation: 'upload' | 'delete') => void
+  handleCaptionRetrying: (locale: string) => void
 }
 
 /**
@@ -53,7 +54,7 @@ export function useClosedCaptionState({
   const [creationMode, setCreationMode] = useState<CaptionCreationMode | null>(null)
   const [announcement, setAnnouncement] = useState<string | null>(null)
 
-  // Sync internal state when parent passes updated subtitles
+  // Sync internal state when parent passes updated subtitles.
   useEffect(() => {
     setSubtitles(initialSubtitles)
   }, [initialSubtitles])
@@ -100,6 +101,7 @@ export function useClosedCaptionState({
           {
             locale,
             file: {name: file.name},
+            rawFile: file,
             status: 'processing' as const,
             ...(isAsr && {asr: true}),
           },
@@ -137,29 +139,62 @@ export function useClosedCaptionState({
     [closedCaptionLanguages, onUpdateSubtitles, handleCancelCreation],
   )
 
-  // Called when upload fails
+  // Called when upload or delete fails
   const handleCaptionUploadFailed = useCallback(
-    (locale: string, errorMessage: string) => {
+    (locale: string, failedOperation: 'upload' | 'delete') => {
       const language = closedCaptionLanguages.find(l => l.id === locale)
-      const announcedErrorMessage = formatMessage(errorMessage, {
-        captionName: language?.label || locale,
-      })
+      const captionName = language?.label || locale
+
+      const failedMessages = {
+        upload: {
+          display: formatMessage('Upload Failed'),
+          announcement: formatMessage('{captionName} caption upload failed', {captionName}),
+        },
+        delete: {
+          display: formatMessage('Delete Failed'),
+          announcement: formatMessage('{captionName} caption delete failed', {captionName}),
+        },
+      }
+
+      const {display: displayMessage, announcement: announcementMessage} =
+        failedMessages[failedOperation]
 
       setSubtitles(prev => {
         const updatedSubtitles = prev.map(s =>
           s.locale === locale
-            ? {...s, status: 'failed' as const, errorMessage: formatMessage('Failed')}
+            ? {...s, status: 'failed' as const, errorMessage: displayMessage, failedOperation}
             : s,
         )
         onUpdateSubtitles(updatedSubtitles)
         return updatedSubtitles
       })
 
-      setAnnouncement(announcedErrorMessage)
+      setAnnouncement(announcementMessage)
 
       handleCancelCreation()
     },
     [closedCaptionLanguages, handleCancelCreation, onUpdateSubtitles],
+  )
+
+  // Called when retry is triggered for a failed caption.
+  const handleCaptionRetrying = useCallback(
+    (locale: string) => {
+      setSubtitles(prev => {
+        const updatedSubtitles = prev.map(s =>
+          s.locale === locale
+            ? {
+                ...s,
+                status: 'processing' as const,
+                errorMessage: undefined,
+                failedOperation: undefined,
+              }
+            : s,
+        )
+        onUpdateSubtitles(updatedSubtitles)
+        return updatedSubtitles
+      })
+    },
+    [onUpdateSubtitles],
   )
 
   return {
@@ -173,5 +208,6 @@ export function useClosedCaptionState({
     handleCaptionProcessing,
     handleCaptionUploaded,
     handleCaptionUploadFailed,
+    handleCaptionRetrying,
   }
 }

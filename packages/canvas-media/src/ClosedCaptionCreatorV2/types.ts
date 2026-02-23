@@ -45,6 +45,8 @@ export interface Subtitle {
   isNew?: boolean // Whether this is a newly added caption
   status?: CaptionUploadStatus // Upload state (processing, failed, or uploaded)
   errorMessage?: string // Error message if upload failed
+  failedOperation?: 'upload' | 'delete' // Which operation failed, used for retry
+  rawFile?: File // In-memory file kept for upload retry; never persisted to server
 }
 
 /**

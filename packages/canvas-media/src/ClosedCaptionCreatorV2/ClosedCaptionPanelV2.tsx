@@ -30,7 +30,13 @@ import {useClosedCaptionState} from './hooks/useClosedCaptionState'
 import {useClosedCaptionUpload} from './hooks/useClosedCaptionUpload'
 import {useLanguageFiltering} from './hooks/useLanguageFiltering'
 import {ManualCaptionCreator} from './ManualCaptionCreator'
-import type {CaptionUploadConfig, Subtitle} from './types'
+import type {CaptionUploadConfig, LanguageOption, Subtitle} from './types'
+
+function getCaptionName(subtitle: Subtitle, language: LanguageOption | undefined): string {
+  return subtitle.asr
+    ? formatMessage('{languageLabel} (Automatic)', {languageLabel: language?.label})
+    : (language?.label ?? '')
+}
 
 /**
  * Props for ClosedCaptionPanel component
@@ -94,16 +100,35 @@ export function ClosedCaptionPanelV2({
       onCaptionUploaded?.(subtitle)
     },
     onUploadError: (_error, locale) => {
-      state.handleCaptionUploadFailed(locale, '{captionName} caption upload failed')
+      state.handleCaptionUploadFailed(locale, 'upload')
     },
     onDeleteSuccess: locale => {
       state.handleDeleteRow(locale)
       onCaptionDeleted?.(locale)
     },
     onDeleteError: (_error, locale) => {
-      state.handleCaptionUploadFailed(locale, '{captionName} caption delete failed')
+      state.handleCaptionUploadFailed(locale, 'delete')
     },
   })
+
+  function getRetryHandler(subtitle: Subtitle): (() => void) | undefined {
+    const {locale, failedOperation, rawFile} = subtitle
+
+    let retryAction
+
+    if (failedOperation === 'delete') {
+      retryAction = () => upload.deleteCaption(locale)
+    } else if (failedOperation === 'upload' && rawFile) {
+      retryAction = () => upload.uploadCaption(locale, rawFile)
+    }
+
+    if (!retryAction) return undefined
+
+    return () => {
+      state.handleCaptionRetrying(locale)
+      retryAction()
+    }
+  }
 
   // Check if an auto-captioned subtitle already exists
   const hasAutoCaptionAlready = state.subtitles.some(subtitle => subtitle.asr === true)
@@ -127,20 +152,13 @@ export function ClosedCaptionPanelV2({
         <View>
           {state.subtitles.map(subtitle => {
             const language = closedCaptionLanguages.find(l => l.id === subtitle.locale)
-            // Use subtitle status directly (processing, failed, or uploaded)
-            const status = subtitle.status || 'uploaded'
-
             return (
               <CaptionRow
                 key={subtitle.locale}
-                status={status}
-                captionName={
-                  subtitle.asr
-                    ? formatMessage('{languageLabel} (Automatic)', {languageLabel: language?.label})
-                    : language?.label || ''
-                }
+                status={subtitle.status ?? 'uploaded'}
+                captionName={getCaptionName(subtitle, language)}
                 errorMessage={subtitle.errorMessage}
-                liveRegion={liveRegion}
+                onRetry={getRetryHandler(subtitle)}
                 isInherited={subtitle.inherited}
                 onDelete={() => upload.deleteCaption(subtitle.locale)}
               />
@@ -166,7 +184,6 @@ export function ClosedCaptionPanelV2({
             onDirtyStateChanged?.(false)
           }}
           onPrimary={(languageId: string, file: File) => {
-            // Find the language object
             const language = closedCaptionLanguages.find(l => l.id === languageId)
             if (language) {
               state.handleCaptionProcessing(languageId, file)

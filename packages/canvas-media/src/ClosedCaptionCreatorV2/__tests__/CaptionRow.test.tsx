@@ -16,50 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import {vi} from 'vitest'
 import {CaptionRow, type CaptionRowProps} from '../CaptionRow'
-
-const LIVE_REGION_ID = 'flash_screenreader_holder'
 
 function renderComponent(props: CaptionRowProps) {
   return render(<CaptionRow {...props} />)
 }
 
 describe('<CaptionRow />', () => {
-  beforeEach(() => {
-    const liveRegion = document.createElement('div')
-    liveRegion.id = LIVE_REGION_ID
-    liveRegion.setAttribute('role', 'alert')
-    document.body.appendChild(liveRegion)
-  })
-
-  afterEach(() => {
-    const liveRegion = document.getElementById(LIVE_REGION_ID)
-    if (liveRegion) {
-      document.body.removeChild(liveRegion)
-    }
-  })
-
   it('renders uploaded caption row with delete action', () => {
     const onDelete = vi.fn()
     renderComponent({
       status: 'uploaded',
       captionName: 'English Caption',
-      liveRegion: () => document.getElementById(LIVE_REGION_ID),
       onDelete,
     })
 
-    // Caption name should be displayed
     expect(screen.getByText('English Caption')).toBeInTheDocument()
-
-    // Delete button should be present and clickable
     expect(screen.getByText('Delete English Caption')).toBeInTheDocument()
 
-    // Click delete button
     fireEvent.click(screen.getByText('Delete English Caption'))
-
-    // onDelete should be called
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
@@ -70,19 +47,14 @@ describe('<CaptionRow />', () => {
     renderComponent({
       status: 'uploaded',
       captionName: 'Spanish Caption',
-      liveRegion: () => document.getElementById(LIVE_REGION_ID),
       onDownload,
       onDelete,
     })
 
-    // Download button should be present
     const downloadButton = screen.getByText('Download Spanish Caption').closest('button')
     expect(downloadButton).toBeInTheDocument()
 
-    // Click download button
     fireEvent.click(downloadButton!)
-
-    // onDownload should be called
     expect(onDownload).toHaveBeenCalledTimes(1)
   })
 
@@ -90,33 +62,52 @@ describe('<CaptionRow />', () => {
     renderComponent({
       status: 'processing',
       captionName: 'French Caption',
-      liveRegion: () => document.getElementById(LIVE_REGION_ID),
     })
 
-    // Caption name should be displayed
     expect(screen.getByText('French Caption')).toBeInTheDocument()
-
-    // Processing text should be displayed
     expect(screen.getByText('Processing...')).toBeInTheDocument()
-
-    // No action buttons should be present
     expect(screen.queryByText(/delete/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/download/i)).not.toBeInTheDocument()
   })
 
-  it('renders failed state', async () => {
+  it('renders failed state', () => {
     renderComponent({
       status: 'failed',
       captionName: 'German Caption',
       errorMessage: 'File size too large',
-      liveRegion: () => document.getElementById(LIVE_REGION_ID),
     })
 
-    // Caption name should be displayed
     expect(screen.getByText('German Caption')).toBeInTheDocument()
-
-    // Error message should be displayed
     expect(screen.getByText('File size too large')).toBeInTheDocument()
+  })
+
+  it('failed state: shows retry button and calls onRetry when clicked', () => {
+    const onRetry = vi.fn()
+    renderComponent({
+      status: 'failed',
+      captionName: 'Spanish Caption',
+      errorMessage: 'Upload Failed',
+      onRetry,
+    })
+
+    expect(screen.getByText('Spanish Caption')).toBeInTheDocument()
+    expect(screen.getByText('Upload Failed')).toBeInTheDocument()
+
+    const retryButton = screen.getByText('Retry Spanish Caption')
+    expect(retryButton).toBeInTheDocument()
+
+    fireEvent.click(retryButton)
+    expect(onRetry).toHaveBeenCalledTimes(1)
+  })
+
+  it('failed state: does not show retry button when onRetry is not provided', () => {
+    renderComponent({
+      status: 'failed',
+      captionName: 'French Caption',
+      errorMessage: 'Delete Failed',
+    })
+
+    expect(screen.queryByText(/retry/i)).not.toBeInTheDocument()
   })
 
   it('inherited state: disabled delete action and has proper aria label on delete button', () => {
@@ -124,15 +115,12 @@ describe('<CaptionRow />', () => {
     renderComponent({
       status: 'uploaded',
       captionName: 'Inherited Caption',
-      liveRegion: () => document.getElementById(LIVE_REGION_ID),
       isInherited: true,
       onDelete,
     })
 
-    // Caption name should be displayed
     expect(screen.getByText('Inherited Caption')).toBeInTheDocument()
 
-    // Inherited message should be displayed to users (text appears twice - in button and as visible text)
     const inheritedMessages = screen.getAllByText(
       /Captions inherited from a parent course cannot be removed/i,
     )
