@@ -130,6 +130,7 @@ export default function VideoOptionsTray({
   const [studioEmbedOptions, setStudioEmbedOptions] = useState(() =>
     mapStudioEmbedOptions(studioOptions?.embedOptions),
   )
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   const isStudio = !!studioOptions
   const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
@@ -233,6 +234,10 @@ export default function VideoOptionsTray({
       updateMediaObject,
       editLocked,
     })
+  }
+
+  const handleDirtyCheck = isDirty => {
+    setHasUnsavedChanges(isDirty)
   }
 
   const tooltipText = formatMessage('Used by screen readers to describe the video')
@@ -469,6 +474,7 @@ export default function VideoOptionsTray({
                                   setSubtitles(prev => prev.filter(s => s.locale !== locale))
                                   onCaptionsModified?.()
                                 }}
+                                onDirtyStateChanged={handleDirtyCheck}
                               />
                             )}
                           </FormFieldGroup>
@@ -513,13 +519,20 @@ export default function VideoOptionsTray({
                     padding="small medium"
                     textAlign="end"
                   >
-                    <Button
-                      disabled={saveDisabled}
-                      onClick={event => handleSave(event, contentProps.updateMediaObject)}
-                      color="primary"
+                    <Tooltip
+                      renderTip={formatMessage('Unsaved changes will be lost.')}
+                      placement="top"
+                      on={['hover', 'focus']}
+                      preventTooltip={!hasUnsavedChanges}
                     >
-                      {formatMessage('Done')}
-                    </Button>
+                      <Button
+                        interaction={saveDisabled ? 'disabled' : 'enabled'}
+                        onClick={event => handleSave(event, contentProps.updateMediaObject)}
+                        color="primary"
+                      >
+                        {formatMessage('Done')}
+                      </Button>
+                    </Tooltip>
                   </Flex.Item>
                 </Flex>
               </Flex.Item>

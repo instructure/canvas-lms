@@ -36,6 +36,7 @@ interface ManualCaptionCreatorProps {
   onCancel: () => void
   liveRegion: () => HTMLElement | null
   mountNode?: HTMLElement | (() => HTMLElement | null)
+  onDirtyStateChanged?: (isDirty: boolean) => void
 }
 
 export function ManualCaptionCreator({
@@ -44,6 +45,7 @@ export function ManualCaptionCreator({
   onCancel,
   liveRegion,
   mountNode,
+  onDirtyStateChanged,
 }: ManualCaptionCreatorProps) {
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -56,10 +58,12 @@ export function ManualCaptionCreator({
       setSelectedLanguageId(String(data))
       setShowLanguageError(false)
     }
+    onDirtyStateChanged?.(Boolean(data || selectedFile))
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+    onDirtyStateChanged?.(Boolean(file || selectedLanguageId))
     if (!file) return
 
     const validation = validateCaptionFile(file)
@@ -123,6 +127,7 @@ export function ManualCaptionCreator({
             OPTION_SELECTED: '{option} selected.',
           }}
           onChange={handleLanguageChange}
+          liveRegion={liveRegion}
         >
           {languages.map(option => (
             // @ts-expect-error - CanvasSelect.Option is a JS component without TS definitions

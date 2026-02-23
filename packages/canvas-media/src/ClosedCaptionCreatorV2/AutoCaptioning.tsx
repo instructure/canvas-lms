@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import formatMessage from 'format-message'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import CanvasSelect from '../shared/CanvasSelect'
 
 interface AutoCaptioningProps {
@@ -31,6 +31,7 @@ interface AutoCaptioningProps {
   liveRegion: () => HTMLElement | null
   languages: {id: string; label: string}[]
   mountNode?: HTMLElement | (() => HTMLElement | null)
+  onDirtyStateChanged?: (isDirty: boolean) => void
 }
 
 export const AutoCaptioning = ({
@@ -39,6 +40,7 @@ export const AutoCaptioning = ({
   liveRegion,
   languages,
   mountNode,
+  onDirtyStateChanged,
 }: AutoCaptioningProps) => {
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('')
   const [showLanguageError, setShowLanguageError] = useState(false)
@@ -48,6 +50,7 @@ export const AutoCaptioning = ({
       setSelectedLanguageId(languageId)
       setShowLanguageError(false)
     }
+    onDirtyStateChanged?.(Boolean(languageId))
   }
 
   const handlePrimaryClick = () => {
@@ -92,6 +95,7 @@ export const AutoCaptioning = ({
                 ]
               : []
           }
+          liveRegion={liveRegion}
         >
           {languages.map(option => (
             // @ts-expect-error - CanvasSelect.Option is a JS component without TS definitions

@@ -20,6 +20,7 @@ import {
   fireEvent,
   getAllByText,
   getByLabelText,
+  getByText,
   queryByLabelText,
   queryByTestId,
   waitFor,
@@ -91,6 +92,42 @@ export default class VideoOptionsTrayDriver {
 
   get doneButtonDisabled() {
     return this.$doneButton.disabled
+  }
+
+  get $manualCaptionsAddNewButton() {
+    return getByText(this.$closedCaptionPanel, /Add new/i)
+  }
+
+  get $manualCaptionsLanguageSelect() {
+    return getByLabelText(this.$closedCaptionPanel, /Select Language/i)
+  }
+
+  get $manualCaptionsFileInput() {
+    return this.$closedCaptionPanel.querySelector('input[type="file"]')
+  }
+
+  get $manualCaptionsCancelButton() {
+    return getByText(this.$closedCaptionPanel, 'Cancel')
+  }
+
+  get $manualCaptionsUploadButton() {
+    return getByText(this.$closedCaptionPanel, 'Upload')
+  }
+
+  get $automaticCaptionsAddNewButton() {
+    return getByText(this.$closedCaptionPanel, 'Request')
+  }
+
+  get $automaticCaptionsLanguageSelect() {
+    return getByLabelText(this.$closedCaptionPanel, /Select Language/i)
+  }
+
+  get $automaticCaptionsCancelButton() {
+    return getByText(this.$closedCaptionPanel, 'Cancel')
+  }
+
+  get $automaticCaptionsRequestButton() {
+    return getByText(this.$closedCaptionPanel, 'Request')
   }
 
   setTitleText(titleText) {

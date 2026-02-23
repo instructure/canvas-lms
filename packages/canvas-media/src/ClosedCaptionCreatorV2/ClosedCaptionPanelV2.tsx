@@ -44,6 +44,7 @@ export interface ClosedCaptionPanelProps {
   uploadConfig?: CaptionUploadConfig
   onCaptionUploaded?: (subtitle: Subtitle) => void
   onCaptionDeleted?: (locale: string) => void
+  onDirtyStateChanged?: (isDirty: boolean) => void
 }
 
 export function ClosedCaptionPanelV2({
@@ -55,6 +56,7 @@ export function ClosedCaptionPanelV2({
   uploadConfig,
   onCaptionUploaded,
   onCaptionDeleted,
+  onDirtyStateChanged,
 }: ClosedCaptionPanelProps) {
   // Get sorted language lists based on user locale
   const closedCaptionLanguages = useMemo(
@@ -159,7 +161,10 @@ export function ClosedCaptionPanelV2({
           languages={availableManualLanguages}
           liveRegion={liveRegion}
           mountNode={mountNode}
-          onCancel={state.handleCancelCreation}
+          onCancel={() => {
+            state.handleCancelCreation()
+            onDirtyStateChanged?.(false)
+          }}
           onPrimary={(languageId: string, file: File) => {
             // Find the language object
             const language = closedCaptionLanguages.find(l => l.id === languageId)
@@ -167,13 +172,18 @@ export function ClosedCaptionPanelV2({
               state.handleCaptionProcessing(languageId, file)
               upload.uploadCaption(languageId, file)
             }
+            onDirtyStateChanged?.(false)
           }}
+          onDirtyStateChanged={onDirtyStateChanged}
         />
       )}
 
       {state.creationMode === 'auto' && (
         <AutoCaptioning
-          onCancel={state.handleCancelCreation}
+          onCancel={() => {
+            state.handleCancelCreation()
+            onDirtyStateChanged?.(false)
+          }}
           liveRegion={liveRegion}
           mountNode={mountNode}
           languages={availableAsrLanguages}
@@ -186,17 +196,24 @@ export function ClosedCaptionPanelV2({
                 new File([], `auto-generated-${languageId}.vtt`),
                 true,
               )
-              state.handleCaptionUploaded({
-                locale: languageId,
-                file: {
-                  name: `auto-generated-${languageId}.vtt`,
-                  url: '#',
-                },
-                asr: true,
-                status: 'uploaded',
+              // Should be replaced with proper request implementation.
+              // For now simultaneous calls along with handleCaptionProcessing
+              // cause rendering race condition.
+              Promise.resolve(() => {
+                state.handleCaptionUploaded({
+                  locale: languageId,
+                  file: {
+                    name: `auto-generated-${languageId}.vtt`,
+                    url: '#',
+                  },
+                  asr: true,
+                  status: 'uploaded',
+                })
               })
             }
+            onDirtyStateChanged?.(false)
           }}
+          onDirtyStateChanged={onDirtyStateChanged}
         />
       )}
     </Flex>
