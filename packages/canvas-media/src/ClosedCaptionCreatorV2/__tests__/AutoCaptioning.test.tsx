@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {vi} from 'vitest'
 import {AutoCaptioning} from '../AutoCaptioning'
 
@@ -28,13 +28,7 @@ const mockLanguages = [
   {id: 'fr', label: 'French'},
 ]
 
-interface AutoCaptioningProps {
-  onCancel: () => void
-  onPrimary: (languageId: string) => void
-  liveRegion: () => HTMLElement | null
-  languages: {id: string; label: string}[]
-  mountNode?: HTMLElement | (() => HTMLElement | null)
-}
+type AutoCaptioningProps = Parameters<typeof AutoCaptioning>[0]
 
 function renderComponent(props: Partial<AutoCaptioningProps> = {}) {
   const liveRegion = document.getElementById(LIVE_REGION_ID)
@@ -147,5 +141,23 @@ describe('<AutoCaptioning />', () => {
     expect(screen.getByText('Select Language')).toBeInTheDocument()
     expect(screen.getByText('Cancel')).toBeInTheDocument()
     expect(screen.getByText('Request')).toBeInTheDocument()
+  })
+
+  describe('.onDirtyStateChanged', () => {
+    describe('called with true', () => {
+      it('when language is selected', async () => {
+        const onDirtyStateChanged = vi.fn()
+        renderComponent({onDirtyStateChanged})
+
+        // Select a language - click on placeholder text to open, then click option
+        const selectPlaceholder = screen.getByText('Select Language')
+        fireEvent.click(selectPlaceholder)
+        fireEvent.click(screen.getByText('English'))
+
+        await waitFor(() => {
+          expect(onDirtyStateChanged).toHaveBeenCalledWith(true)
+        })
+      })
+    })
   })
 })

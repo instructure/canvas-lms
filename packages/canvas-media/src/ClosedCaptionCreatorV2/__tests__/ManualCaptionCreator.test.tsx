@@ -219,4 +219,35 @@ describe('<ManualCaptionCreator />', () => {
       expect(await screen.findByLabelText(/Selected file: my-captions.vtt/i)).toBeInTheDocument()
     })
   })
+
+  describe('.onDirtyStateChanged', () => {
+    describe('called with true', () => {
+      it('when language is selected', async () => {
+        const onDirtyStateChanged = vi.fn()
+        renderComponent({onDirtyStateChanged})
+
+        // Select a language - click on placeholder text to open, then click option
+        const selectPlaceholder = screen.getByText('Select Language')
+        fireEvent.click(selectPlaceholder)
+        fireEvent.click(screen.getByText('English'))
+
+        await waitFor(() => {
+          expect(onDirtyStateChanged).toHaveBeenCalledWith(true)
+        })
+      })
+
+      it('when file is selected', async () => {
+        const onDirtyStateChanged = vi.fn()
+        renderComponent({onDirtyStateChanged})
+
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+        const validFile = createValidFile('my-captions.vtt')
+        fireEvent.change(fileInput, {target: {files: [validFile]}})
+
+        await waitFor(() => {
+          expect(onDirtyStateChanged).toHaveBeenCalledWith(true)
+        })
+      })
+    })
+  })
 })

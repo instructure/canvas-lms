@@ -21,14 +21,22 @@ import React from 'react'
 import RCEGlobals from '../../../../../rce/RCEGlobals'
 import RceApiSource from '../../../../../rcs/api'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
+import {HttpResponse, http} from 'msw'
+import {setupServer} from 'msw/node'
+
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 
 jest.useFakeTimers()
+const server = setupServer()
 
 describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   let props
   let tray
+
+  beforeAll(() => server.listen({onUnhandledRequest: 'error'}))
+
+  afterAll(() => server.close())
 
   beforeEach(() => {
     createLiveRegion()
@@ -387,6 +395,121 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       fireEvent.click(screen.getByRole('combobox'))
       await screen.findByText('Small', {selector: '[role="option"]'})
       expect(screen.queryByText(/With Transcript/)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('"Done" button', () => {
+    const expectNoTooltip = () => {
+      fireEvent.mouseEnter(tray.$doneButton)
+      expect(screen.queryByText('Unsaved changes will be lost.')).not.toBeInTheDocument()
+    }
+
+    const renderLoadedComponent = async () => {
+      renderComponent()
+      await waitFor(() => {
+        expect(tray.$titleTextField).toBeInTheDocument()
+      })
+    }
+
+    beforeEach(() => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({rce_asr_captioning_improvements: true})
+    })
+
+    describe("doesn't show tooltip", () => {
+      it('by default', async () => {
+        await renderLoadedComponent()
+        expectNoTooltip()
+      })
+
+      describe('with manual captions', () => {
+        it('if there are no changes applied', async () => {
+          await renderLoadedComponent()
+          fireEvent.click(tray.$manualCaptionsAddNewButton)
+          expectNoTooltip()
+        })
+
+        it('if changes are cancelled', async () => {
+          await renderLoadedComponent()
+          fireEvent.click(tray.$manualCaptionsAddNewButton)
+          fireEvent.click(tray.$manualCaptionsLanguageSelect)
+          fireEvent.click(screen.getByText('Catalan'))
+          fireEvent.click(tray.$manualCaptionsCancelButton)
+          expectNoTooltip()
+        })
+
+        it.skip('if changes are applied', async () => {
+          server.use(
+            http.put('**/api/media_objects/*/media_tracks', () => {
+              console.log('darova')
+              return HttpResponse.json({data: 'success'})
+            }),
+          )
+
+          await renderLoadedComponent()
+
+          fireEvent.click(tray.$manualCaptionsAddNewButton)
+          fireEvent.click(tray.$manualCaptionsLanguageSelect)
+          fireEvent.click(screen.getByText('Catalan'))
+          fireEvent.change(tray.$manualCaptionsFileInput, {
+            target: {files: [{name: 'auto-generated-en.vtt'}]},
+          })
+          fireEvent.click(tray.$manualCaptionsUploadButton)
+          expectNoTooltip()
+        })
+      })
+
+      describe('with automatic captions', () => {
+        it('if there are no changes applied', async () => {
+          await renderLoadedComponent()
+          fireEvent.click(tray.$automaticCaptionsAddNewButton)
+          expectNoTooltip()
+        })
+
+        it('if changes are cancelled', async () => {
+          await renderLoadedComponent()
+          fireEvent.click(tray.$automaticCaptionsAddNewButton)
+          fireEvent.click(tray.$automaticCaptionsLanguageSelect)
+          fireEvent.click(screen.getByText('German'))
+          fireEvent.click(tray.$automaticCaptionsCancelButton)
+          expectNoTooltip()
+        })
+
+        it('if changes are applied', async () => {
+          await renderLoadedComponent()
+          fireEvent.click(tray.$automaticCaptionsAddNewButton)
+          fireEvent.click(tray.$automaticCaptionsLanguageSelect)
+          fireEvent.click(screen.getByText('German'))
+          fireEvent.click(tray.$automaticCaptionsRequestButton)
+          expectNoTooltip()
+        })
+      })
+    })
+
+    describe('shows tooltip', () => {
+      const expectTooltip = () => {
+        fireEvent.mouseEnter(tray.$doneButton)
+        expect(screen.getByText('Unsaved changes will be lost.')).toBeInTheDocument()
+      }
+
+      describe('with manual captions', () => {
+        it('if there are changes applied', async () => {
+          await renderLoadedComponent()
+          fireEvent.click(tray.$manualCaptionsAddNewButton)
+          fireEvent.click(tray.$manualCaptionsLanguageSelect)
+          fireEvent.click(screen.getByText('Catalan'))
+          expectTooltip()
+        })
+      })
+
+      describe('with automatic captions', () => {
+        it('if there are changes applied', async () => {
+          await renderLoadedComponent()
+          fireEvent.click(tray.$automaticCaptionsAddNewButton)
+          fireEvent.click(tray.$automaticCaptionsLanguageSelect)
+          fireEvent.click(screen.getByText('German'))
+          expectTooltip()
+        })
+      })
     })
   })
 

@@ -24,7 +24,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tray} from '@instructure/ui-tray'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
+import {Tooltip} from '@instructure/ui-tooltip'
 import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../../rce/RCEGlobals'
@@ -49,6 +50,7 @@ export default function AudioOptionsTray({
 }) {
   const [subtitles, setSubtitles] = useState(audioOptions.tracks || [])
   const api = new RceApiSource(trayProps)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   useEffect(() => {
     if (!isLoading && subtitles.length === 0) {
@@ -69,6 +71,10 @@ export default function AudioOptionsTray({
       attachment_id: audioOptions.attachmentId,
       updateMediaObject: contentProps.updateMediaObject,
     })
+  }
+
+  const handleDirtyCheck = isDirty => {
+    setHasUnsavedChanges(isDirty)
   }
 
   return (
@@ -159,6 +165,7 @@ export default function AudioOptionsTray({
                                 setSubtitles(prev => prev.filter(s => s.locale !== locale))
                                 onCaptionsModified?.()
                               }}
+                              onDirtyStateChanged={handleDirtyCheck}
                             />
                           )}
                         </FormFieldGroup>
@@ -171,9 +178,16 @@ export default function AudioOptionsTray({
                     padding="small medium"
                     textAlign="end"
                   >
-                    <Button onClick={e => handleSave(e, contentProps)} color="primary">
-                      {formatMessage('Done')}
-                    </Button>
+                    <Tooltip
+                      renderTip={formatMessage('Unsaved changes will be lost.')}
+                      placement="top"
+                      on={['hover', 'focus']}
+                      preventTooltip={!hasUnsavedChanges}
+                    >
+                      <Button onClick={e => handleSave(e, contentProps)} color="primary">
+                        {formatMessage('Done')}
+                      </Button>
+                    </Tooltip>
                   </Flex.Item>
                 </Flex>
               </Flex.Item>
