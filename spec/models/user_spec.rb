@@ -3115,6 +3115,46 @@ describe User do
         expect(events_a).to include(reply_to_entry_a)
       end
 
+      it "includes peer review sub assignments when peer review feature is enabled" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = peer_review_model(course: @course, due_at: 2.days.from_now)
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).to include(peer_review)
+      end
+
+      it "does not include peer review sub assignments when peer review feature is disabled" do
+        @course.account.disable_feature!(:peer_review_allocation_and_grading)
+        assignment = assignment_model(
+          course: @course,
+          title: "Parent Assignment",
+          points_possible: 20,
+          peer_reviews: true,
+          submission_types: "online_text_entry",
+          due_at: 1.day.from_now
+        )
+        # Create directly since the feature is disabled (service won't work)
+        peer_review = PeerReviewSubAssignment.create!(
+          parent_assignment: assignment,
+          context: @course,
+          title: "Parent Assignment Peer Review",
+          due_at: 2.days.from_now,
+          workflow_state: "published"
+        )
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(peer_review)
+      end
+
+      it "does not include unpublished peer review sub assignments" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = peer_review_model(course: @course, due_at: 2.days.from_now)
+        peer_review.unpublish!
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(peer_review)
+      end
+
       it "doesn't include events for enrollments that are inactive due to date" do
         @enrollment.start_at = 1.day.ago
         @enrollment.end_at = 2.days.from_now

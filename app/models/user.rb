@@ -2888,6 +2888,29 @@ class User < ActiveRecord::Base
       end
     end
 
+    enabled_peer_review_ids = course_ids_with_peer_review_enabled
+    peer_review_context_codes = context_codes.select do |code|
+      type, id = ActiveRecord::Base.parse_asset_string(code)
+      type == "Course" && enabled_peer_review_ids.include?(id)
+    end
+
+    if peer_review_context_codes.any?
+      peer_review_sub_assignments = PeerReviewSubAssignment.published
+                                                           .for_context_codes(peer_review_context_codes)
+                                                           .due_between_with_overrides(now, opts[:end_at])
+                                                           .include_submitted_count.to_a
+
+      if peer_review_sub_assignments.any?
+        if AssignmentOverrideApplicator.should_preload_override_students?(peer_review_sub_assignments, self, "upcoming_events")
+          AssignmentOverrideApplicator.preload_assignment_override_students(peer_review_sub_assignments, self)
+        end
+
+        events += select_available_assignments(
+          select_upcoming_assignments(peer_review_sub_assignments.map { |a| a.overridden_for(self) }, opts.merge(time: now))
+        )
+      end
+    end
+
     sorted_events = events.sort_by do |e|
       due_date = e.start_at
       if e.respond_to? :dates_hash_visible_to
@@ -2903,6 +2926,10 @@ class User < ActiveRecord::Base
 
   def course_ids_with_checkpoints_enabled
     courses.select(&:discussion_checkpoints_enabled?).map(&:id)
+  end
+
+  def course_ids_with_peer_review_enabled
+    courses.select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
   end
 
   def select_available_assignments(assignments, include_concluded: false)
