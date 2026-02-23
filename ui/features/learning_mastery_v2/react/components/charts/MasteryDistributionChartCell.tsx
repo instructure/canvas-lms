@@ -15,23 +15,35 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {useState} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconFullScreenLine} from '@instructure/ui-icons'
 import {MasteryDistributionChart} from './MasteryDistributionChart'
-import {RatingDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
-import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import {
+  OutcomeDistribution,
+  RatingDistribution,
+} from '@canvas/outcomes/react/types/mastery_distribution'
+import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
 import {
   BAR_CHART_HEIGHT,
   COLUMN_PADDING,
   COLUMN_WIDTH,
 } from '@canvas/outcomes/react/utils/constants'
 import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
+
+const I18n = createI18nScope('learning_mastery_gradebook')
 
 const CELL_WIDTH = COLUMN_WIDTH + COLUMN_PADDING
 
 export interface MasteryDistributionChartCellProps {
   outcome: Outcome
   distributionData?: RatingDistribution[]
+  outcomeDistribution?: OutcomeDistribution
+  distributionStudents?: Student[]
+  courseId?: string
   isLoading: boolean
   loadingTitle?: string
 }
@@ -41,14 +53,70 @@ const containerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  position: 'relative',
+  overflow: 'hidden',
 }
 
 export const MasteryDistributionChartCell: React.FC<MasteryDistributionChartCellProps> = ({
   outcome,
   distributionData,
+  outcomeDistribution,
+  distributionStudents,
+  courseId,
   isLoading,
   loadingTitle = 'Loading distribution',
 }) => {
+  const [hovered, setHovered] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const visible = hovered || focused
+
+  const canExpand = !!courseId
+
+  const expandButtonTrigger = (
+    <IconButton
+      withBackground={false}
+      withBorder={false}
+      size="small"
+      renderIcon={<IconFullScreenLine />}
+      screenReaderLabel={I18n.t('Expand distribution for %{outcome}', {
+        outcome: outcome.title,
+      })}
+      onClick={() => setIsPopoverOpen(true)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+    />
+  )
+
+  const expandButton = canExpand && (
+    <div
+      style={{
+        position: 'absolute',
+        top: '5px',
+        right: '5px',
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? 'auto' : 'none',
+      }}
+    >
+      {courseId ? (
+        <OutcomeDistributionPopover
+          outcome={outcome}
+          outcomeDistribution={outcomeDistribution}
+          distributionStudents={distributionStudents}
+          courseId={courseId}
+          isOpen={isPopoverOpen}
+          onCloseHandler={() => {
+            setIsPopoverOpen(false)
+            setHovered(false)
+          }}
+          renderTrigger={expandButtonTrigger}
+        />
+      ) : (
+        expandButtonTrigger
+      )}
+    </div>
+  )
+
   if (isLoading) {
     return (
       <div style={containerStyle}>
@@ -59,25 +127,19 @@ export const MasteryDistributionChartCell: React.FC<MasteryDistributionChartCell
     )
   }
 
-  if (!distributionData) {
-    return (
-      <div style={containerStyle}>
-        <MasteryDistributionChart
-          outcome={outcome}
-          distributionData={[]}
-          height={BAR_CHART_HEIGHT}
-          width={CELL_WIDTH}
-          isPreview={true}
-        />
-      </div>
-    )
-  }
+  const chartData = distributionData ?? []
 
   return (
-    <div style={containerStyle}>
+    <div
+      data-testid={`mastery-distribution-chart-cell-${outcome.id}`}
+      style={containerStyle}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {expandButton}
       <MasteryDistributionChart
         outcome={outcome}
-        distributionData={distributionData}
+        distributionData={chartData}
         height={BAR_CHART_HEIGHT}
         width={CELL_WIDTH}
         isPreview={true}

@@ -19,7 +19,7 @@
 import {render, screen} from '@testing-library/react'
 import {BarChartRow, BarChartRowProps} from '../BarChartRow'
 import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {MOCK_OUTCOMES} from '../../../__fixtures__/rollups'
+import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../../__fixtures__/rollups'
 import {MOCK_ALIGNMENTS} from '../../../__fixtures__/contributingScores'
 import {Column} from '../../table/utils'
 import {
@@ -51,12 +51,30 @@ const MOCK_OUTCOME_DISTRIBUTIONS: Record<string, OutcomeDistribution> = {
 
 // Mock the MasteryDistributionChartCell component
 vi.mock('../../charts/MasteryDistributionChartCell', () => ({
-  MasteryDistributionChartCell: ({outcome, distributionData, isLoading}: any) => (
+  MasteryDistributionChartCell: ({
+    outcome,
+    distributionData,
+    outcomeDistribution,
+    distributionStudents,
+    courseId,
+    isLoading,
+  }: any) => (
     <div data-testid={`mastery-chart-cell-${outcome.id}`}>
       <span data-testid={`loading-${outcome.id}`}>{String(isLoading)}</span>
       {distributionData && (
         <span data-testid={`distribution-${outcome.id}`}>{JSON.stringify(distributionData)}</span>
       )}
+      {outcomeDistribution && (
+        <span data-testid={`outcome-distribution-${outcome.id}`}>
+          {outcomeDistribution.outcome_id}
+        </span>
+      )}
+      {distributionStudents && (
+        <span data-testid={`distribution-students-${outcome.id}`}>
+          {distributionStudents.length}
+        </span>
+      )}
+      {courseId && <span data-testid={`course-id-${outcome.id}`}>{courseId}</span>}
     </div>
   ),
 }))
@@ -119,6 +137,7 @@ describe('BarChartRow', () => {
   ): BarChartRowProps => ({
     columns: generateColumns(contributingScoresManager),
     outcomeDistributions: MOCK_OUTCOME_DISTRIBUTIONS,
+    courseId: '5',
     isLoading: false,
     handleKeyDown: mockHandleKeyDown,
   })
@@ -304,5 +323,35 @@ describe('BarChartRow', () => {
 
     const charts = container.querySelectorAll('[data-testid^="mastery-chart-cell-"]')
     expect(charts.length).toBeGreaterThan(MOCK_OUTCOMES.length)
+  })
+
+  it('passes outcomeDistribution to outcome chart cells', () => {
+    render(<BarChartRow {...defaultProps()} />)
+
+    expect(screen.getByTestId('outcome-distribution-1')).toHaveTextContent('1')
+    expect(screen.getByTestId('outcome-distribution-2')).toHaveTextContent('2')
+  })
+
+  it('passes distributionStudents to outcome chart cells', () => {
+    const props = {
+      ...defaultProps(),
+      distributionStudents: MOCK_STUDENTS,
+    }
+
+    render(<BarChartRow {...props} />)
+
+    expect(screen.getByTestId('distribution-students-1')).toHaveTextContent(
+      String(MOCK_STUDENTS.length),
+    )
+    expect(screen.getByTestId('distribution-students-2')).toHaveTextContent(
+      String(MOCK_STUDENTS.length),
+    )
+  })
+
+  it('passes courseId to outcome chart cells', () => {
+    render(<BarChartRow {...defaultProps()} />)
+
+    expect(screen.getByTestId('course-id-1')).toHaveTextContent('5')
+    expect(screen.getByTestId('course-id-2')).toHaveTextContent('5')
   })
 })
