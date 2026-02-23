@@ -75,6 +75,7 @@ function FeatureFlagButton({
   disableDefaults,
   displayName,
   appliesTo,
+  rootOptIn = false,
   onStateChange = () => {},
   checkEarlyAccessProgram = async (_featureFlag, _state) => true,
 }) {
@@ -100,7 +101,15 @@ function FeatureFlagButton({
 
     setApiBusy(true)
     try {
-      if (flagUtils.shouldDelete(effectiveFlag, allowsDefaults, state)) {
+      if (
+        flagUtils.shouldDelete({
+          flag: effectiveFlag,
+          allowsDefaults,
+          state,
+          rootOptIn,
+          isRootAccount: ENV.ACCOUNT?.root_account,
+        })
+      ) {
         const {json} = await removeFlag(effectiveFlag.feature)
         // Update to match the new state since this returns the old version not the new one
         json.state = json.parent_state
