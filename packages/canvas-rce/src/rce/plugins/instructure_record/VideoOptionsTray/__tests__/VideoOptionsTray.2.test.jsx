@@ -279,7 +279,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       ['With Transcript (850 x 357px)', 850, 357],
     ])('selecting %s saves correct dimensions', async (label, expectedWidth, expectedHeight) => {
       render(<VideoOptionsTray {...props} />)
-      fireEvent.change(screen.getByPlaceholderText('(Describe the video)'), {
+      fireEvent.change(screen.getByPlaceholderText('Enter a media title'), {
         target: {value: 'A title'},
       })
       fireEvent.click(screen.getByLabelText('Player layout'))
@@ -339,7 +339,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         render(<VideoOptionsTray {...props} />)
         fireEvent.click(screen.getByLabelText('Player layout'))
         fireEvent.click(await screen.findByText('Custom', {selector: '[role="option"]'}))
-        fireEvent.change(screen.getByPlaceholderText('(Describe the video)'), {
+        fireEvent.change(screen.getByPlaceholderText('Enter a media title'), {
           target: {value: 'A title'},
         })
         fireEvent.click(screen.getByText('Done'))
@@ -356,7 +356,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         render(<VideoOptionsTray {...props} />)
         fireEvent.click(screen.getByLabelText('Player layout'))
         fireEvent.click(await screen.findByText('Custom', {selector: '[role="option"]'}))
-        fireEvent.change(screen.getByPlaceholderText('(Describe the video)'), {
+        fireEvent.change(screen.getByPlaceholderText('Enter a media title'), {
           target: {value: 'A title'},
         })
         fireEvent.click(screen.getByText('Done'))

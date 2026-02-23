@@ -16,23 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
-import {IconQuestionLine} from '@instructure/ui-icons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {TextArea} from '@instructure/ui-text-area'
+import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import {arrayOf, bool, func, number, shape, string} from 'prop-types'
-import React, {useCallback, useEffect, useRef, useState} from 'react'
 import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../../rce/RCEGlobals'
@@ -133,6 +132,8 @@ export default function VideoOptionsTray({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const fetchedFromIframeRef = useRef(false)
 
+  const titleInputRef = useRef(null)
+
   const isStudio = !!studioOptions
   const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
   const showSizeControls = (!isStudio || studioOptions.resizable) && !forBlockEditorUse
@@ -220,6 +221,12 @@ export default function VideoOptionsTray({
 
   function handleSave(event, updateMediaObject) {
     event.preventDefault()
+    if (titleText.trim() === '') {
+      if (titleInputRef.current) {
+        titleInputRef.current.focus()
+      }
+      return
+    }
     let appliedHeight = videoHeight
     let appliedWidth = videoWidth
     if (videoSize === CUSTOM) {
@@ -243,31 +250,6 @@ export default function VideoOptionsTray({
     setHasUnsavedChanges(isDirty)
   }
 
-  const tooltipText = formatMessage('Used by screen readers to describe the video')
-  const textAreaLabel = (
-    <Flex alignItems="center">
-      <Flex.Item>{formatMessage('Title')}</Flex.Item>
-      <Flex.Item margin="0 0 0 xx-small">
-        <Tooltip
-          on={['hover', 'focus']}
-          placement="top"
-          renderTip={
-            <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
-              {tooltipText}
-            </View>
-          }
-        >
-          <IconButton
-            renderIcon={IconQuestionLine}
-            size="small"
-            screenReaderLabel={tooltipText}
-            withBackground={false}
-            withBorder={false}
-          />
-        </Tooltip>
-      </Flex.Item>
-    </Flex>
-  )
   const messagesForSize = []
   if (videoSize !== CUSTOM && !isAsrCaptioningImprovements) {
     messagesForSize.push({
@@ -275,9 +257,7 @@ export default function VideoOptionsTray({
       type: 'hint',
     })
   }
-  const saveDisabled =
-    displayAs === 'embed' &&
-    (titleText === '' || (videoSize === CUSTOM && !dimensionsState.isValid))
+  const saveDisabled = displayAs === 'embed' && videoSize === CUSTOM && !dimensionsState.isValid
 
   return (
     <StoreProvider {...trayProps}>
@@ -339,15 +319,24 @@ export default function VideoOptionsTray({
                               <Flex.Item padding="small none none small">{titleText}</Flex.Item>
                             </Flex>
                           ) : (
-                            <TextArea
-                              aria-describedby="alt-text-label-tooltip"
-                              disabled={displayAs === 'link'}
-                              height="4rem"
-                              label={textAreaLabel}
+                            <TextInput
+                              interaction={displayAs === 'link' ? 'disabled' : 'enabled'}
+                              renderLabel={formatMessage('Title')}
                               onChange={handleTitleTextChange}
-                              placeholder={formatMessage('(Describe the video)')}
-                              resize="vertical"
+                              placeholder={formatMessage('Enter a media title')}
                               value={titleText}
+                              inputRef={el => (titleInputRef.current = el)}
+                              messages={
+                                titleText?.trim() === ''
+                                  ? [
+                                      {
+                                        text: formatMessage("Title can't be blank"),
+                                        type: 'newError',
+                                      },
+                                    ]
+                                  : []
+                              }
+                              isRequired
                             />
                           )}
                         </Flex.Item>
