@@ -27,8 +27,10 @@ const EMPTY_OBJ = {}
 // Set up the default InstUI theme
 // Override the fontFamily to include "Lato Extended", which we prefer
 // to load over plain Lato (see LS-1559)
+const typographyBase =
+  'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif'
 const typography = {
-  fontFamily: 'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: ENV.use_dyslexic_font ? `OpenDyslexic, ${typographyBase}` : typographyBase,
 }
 
 type BrandVariables = Record<string, unknown>
