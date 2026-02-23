@@ -102,22 +102,28 @@ export default class TrayController {
     this.$videoContainer = findMediaPlayerIframe(editor.selection.getNode())
     this._shouldOpen = true
     this._captionsModified = false
-    this._isPlayerReady = false
 
     if (bridge.focusedEditor) {
       // Dismiss any content trays that may already be open
       bridge.hideTrays() // Do we need to implement .hideTray functionality in this controller as well?
     }
 
-    this._renderId++
-    this._renderTray()
-    this._announcer.textContent = ''
-    const videoOptions = asVideoElement(this.$videoContainer)
+    const isStudioVideo = isStudioEmbeddedMedia(this.$videoContainer)
+    // for studio embeds we don't need to show spinners
+    // so it is ready by default
+    this._isPlayerReady = isStudioVideo
 
     // Clean broadcast listeners for any existing trays which are not shown (if not cleaned automatically)
     this._iframeLoadingListener?.abort()
 
-    this._listenForPlayerIframeToLoad(videoOptions.id)
+    if (!isStudioVideo) {
+      const videoOptions = asVideoElement(this.$videoContainer)
+      this._listenForPlayerIframeToLoad(videoOptions.id)
+    }
+
+    this._renderId++
+    this._renderTray()
+    this._announcer.textContent = ''
   }
 
   hideTrayForEditor(editor, skipFocusOnExit = false) {
