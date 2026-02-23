@@ -263,14 +263,14 @@ const NavItem = React.memo(
             {tab.immovable ? <span>&nbsp;</span> : <IconDragHandleLine size="x-small" />}
           </View>
           <View as="div" display="inline-block" padding="small 0" margin="0 auto 0 0">
-            <Flex alignItems="center" gap="x-small">
+            <Flex alignItems="center" gap="x-small" wrap="wrap" width="100%">
               {isLinkTab(tab) && (
                 <Flex.Item>
                   <IconLinkLine size="x-small" />
                 </Flex.Item>
               )}
-              <Flex.Item>
-                <Text>{tab.label}</Text>
+              <Flex.Item shouldGrow shouldShrink size="0">
+                <Text wrap="break-word">{tab.label}</Text>
               </Flex.Item>
             </Flex>
             {!isEnabled && tab.disabled_message && (
