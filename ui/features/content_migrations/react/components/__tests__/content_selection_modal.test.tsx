@@ -248,9 +248,11 @@ describe('ContentSelectionModal', () => {
       const xButton = screen.getByText('Close')
       await user.click(xButton)
 
-      expect(
-        screen.queryByRole('heading', {name: 'Select Content for Import'}),
-      ).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('heading', {name: 'Select Content for Import'}),
+        ).not.toBeInTheDocument()
+      })
     })
 
     it('closes with cancel button', async () => {
@@ -261,9 +263,11 @@ describe('ContentSelectionModal', () => {
       const cancelButton = screen.getByText('Cancel')
       await user.click(cancelButton)
 
-      expect(
-        screen.queryByRole('heading', {name: 'Select Content for Import'}),
-      ).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('heading', {name: 'Select Content for Import'}),
+        ).not.toBeInTheDocument()
+      })
     })
 
     describe('response is empty', () => {

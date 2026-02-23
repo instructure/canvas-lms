@@ -122,7 +122,9 @@ it('clicking the close button will close the modal', async () => {
   const closeButton = screen.getByRole('button', {name: /Close/})
   await user.click(closeButton)
 
-  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
 })
 
 it('clicking the ok button will close the modal', async () => {
@@ -144,7 +146,9 @@ it('clicking the ok button will close the modal', async () => {
   const okButton = screen.getByRole('button', {name: 'OK'})
   await user.click(okButton)
 
-  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
 })
 
 it('should use the name in the text when it is provided', async () => {
