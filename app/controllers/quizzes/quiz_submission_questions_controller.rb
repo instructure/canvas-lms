@@ -55,7 +55,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include ::Filters::QuizSubmissions
   include ActionView::Helpers::NumberHelper
 
-  before_action :require_user, :require_quiz_submission, :export_scopes
+  before_action :require_quiz_submission, :export_scopes
   before_action :require_question, only: %i[show flag unflag formatted_answer]
   before_action :prepare_service, only: %i[answer flag unflag]
   before_action :validate_ldb_status!, only: %i[answer flag unflag]

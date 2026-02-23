@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Login::ExternalAuthObserversController < ApplicationController
+  skip_before_action :require_user, only: %i[redirect_login]
+
   def redirect_login
     if observer_email_taken?
       render json: { error: { input_name: "pseudonym[unique_id]", message: t("Email already in use") } }, status: :unprocessable_content

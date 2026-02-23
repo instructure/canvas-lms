@@ -27,7 +27,7 @@ class ExternalContentController < ApplicationController
 
   protect_from_forgery except: [:selection_test, :success], with: :exception
 
-  before_action :require_user, only: :oembed_retrieve
+  skip_before_action :require_user, only: %i[cancel selection_test success]
   before_action :check_disable_oembed_retrieve_feature_flag, only: :oembed_retrieve
   before_action :validate_oembed_token!, only: :oembed_retrieve
 

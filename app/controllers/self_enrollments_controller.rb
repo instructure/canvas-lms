@@ -20,6 +20,7 @@
 
 class SelfEnrollmentsController < ApplicationController
   before_action :infer_signup_info, only: [:new]
+  skip_before_action :require_user, only: :new
 
   include Api::V1::Course
 

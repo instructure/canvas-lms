@@ -1693,9 +1693,9 @@ describe FilesController do
       end
 
       it "requires authorization" do
-        delete "destroy", params: { course_id: @course.id, id: @file.id }
-        expect(response.body).to eql("{\"message\":\"Unauthorized to delete this file\"}")
-        expect(assigns[:attachment].file_state).to eq "available"
+        delete "destroy", params: { course_id: @course.id, id: @file.id }, format: :json
+        expect(response).to have_http_status :unauthorized
+        expect(@file.reload.file_state).to eq "available"
       end
 
       it "deletes file" do
@@ -1708,6 +1708,7 @@ describe FilesController do
     end
 
     it "refuses to delete a file in a submissions folder" do
+      user_session(@teacher)
       file = @student.attachments.create! display_name: "blah", uploaded_data: default_uploaded_data, folder: @student.submissions_folder
       delete "destroy", params: { user_id: @student.id, id: file.id }
       expect(response).to have_http_status :unauthorized

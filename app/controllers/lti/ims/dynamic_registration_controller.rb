@@ -26,7 +26,7 @@ module Lti
     class DynamicRegistrationController < ApplicationController
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
-      before_action :require_user, except: %i[create update show_configuration]
+      skip_before_action :require_user, only: %i[create update show_configuration]
       before_action :require_account, except: %i[create update show_configuration]
       before_action :require_site_admin_modify_permission, only: %w[registration_token update_registration_overlay]
 

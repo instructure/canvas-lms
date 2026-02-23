@@ -25,7 +25,7 @@
 class PlannerController < ApplicationController
   include Api::V1::PlannerItem
 
-  before_action :require_user, unless: :public_access?
+  skip_before_action :require_user, if: :public_access?
   before_action :check_limited_access_for_students, only: %i[index]
   before_action :set_user
   before_action :set_date_range

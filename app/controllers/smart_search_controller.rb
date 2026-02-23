@@ -65,8 +65,6 @@ class SmartSearchController < ApplicationController
   include Api::V1::ContextModule
 
   before_action :require_context
-  before_action :require_user
-
   # TODO: Other ways of tuning results?
   MIN_DISTANCE = 0.70
 

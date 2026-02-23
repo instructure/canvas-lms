@@ -24,8 +24,6 @@
 
 class RubricAssessmentImportsController < ApplicationController
   before_action :require_context
-  before_action :require_user
-
   def show
     import = RubricAssessmentImport.find(params[:id])
     return unless authorized_action(import.assignment.rubric_association, @current_user, :view_rubric_assessments)

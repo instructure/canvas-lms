@@ -68,7 +68,6 @@
 #    }
 #
 class GradingPeriodsController < ApplicationController
-  before_action :require_user
   before_action :get_context
 
   # @API List grading periods

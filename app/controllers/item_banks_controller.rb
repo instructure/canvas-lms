@@ -25,6 +25,7 @@ class ItemBanksController < ApplicationController
   before_action { |c| c.active_tab = "item_banks" }
 
   def show
+    return unless authorized_action(@context, @current_user, :read)
     return render status: :not_found, template: "shared/errors/404_message" unless ams_integration_enabled?
 
     js_env({ context_url: named_context_url(@context, :context_item_banks_url) })

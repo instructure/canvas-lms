@@ -24,6 +24,8 @@ describe HorizonMode do
   controller(ApplicationController) do
     include HorizonMode
 
+    skip_before_action :require_user
+
     def show
       load_canvas_career
       head :ok unless performed?

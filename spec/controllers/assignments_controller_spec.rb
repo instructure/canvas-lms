@@ -40,6 +40,7 @@ describe AssignmentsController do
 
   describe "GET 'index'" do
     it "throws 404 error without a valid context id" do
+      user_session(@student)
       get "index", params: { course_id: "notvalid" }
       assert_status(404)
     end
@@ -2198,6 +2199,7 @@ describe AssignmentsController do
       end
 
       it "notifies user and redirects back to assignments page" do
+        user_session(@student)
         subject
         expect(response).to be_redirect
         expect(flash[:error]).to match(/The assignment you requested is not associated with an LTI tool./)
@@ -2462,6 +2464,7 @@ describe AssignmentsController do
     end
 
     it "defaults to unpublished for draft state" do
+      user_session(@teacher)
       @course.require_assignment_group
 
       get "new", params: { course_id: @course.id }
@@ -2521,6 +2524,7 @@ describe AssignmentsController do
     end
 
     it "set active_tab to assignments" do
+      user_session(@teacher)
       get "new", params: { course_id: @course.id, quiz_lti: true }
       expect(assigns[:active_tab]).to eq("assignments")
     end
@@ -2653,6 +2657,7 @@ describe AssignmentsController do
     end
 
     it "defaults to unpublished if draft state is enabled" do
+      user_session(@teacher)
       post "create", params: { course_id: @course.id, assignment: { title: "some assignment" } }
       expect(assigns[:assignment]).to be_unpublished
     end
@@ -2676,6 +2681,7 @@ describe AssignmentsController do
     end
 
     it "uses the default post-to-SIS setting" do
+      user_session(@teacher)
       a = @course.account
       a.settings[:sis_default_grade_export] = { locked: false, value: true }
       a.save!
@@ -2684,6 +2690,7 @@ describe AssignmentsController do
     end
 
     it "sets important_dates if provided" do
+      user_session(@teacher)
       post "create", params: { course_id: @course.id, assignment: { important_dates: true } }
       expect(assigns[:assignment].important_dates).to be true
     end
@@ -2700,6 +2707,7 @@ describe AssignmentsController do
       end
 
       it "sets new quizzes survey attributes if provided" do
+        user_session(@teacher)
         post "create", params: {
           course_id: @course.id,
           assignment: {

@@ -21,7 +21,7 @@
 class CareerController < ApplicationController
   include HorizonMode
 
-  before_action :require_user, :get_context
+  before_action :get_context
 
   def show
     app = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve

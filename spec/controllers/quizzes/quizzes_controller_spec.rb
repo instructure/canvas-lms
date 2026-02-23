@@ -501,7 +501,6 @@ describe Quizzes::QuizzesController do
     it "requires authorization" do
       get "edit", params: { course_id: @course.id, id: @quiz.id }
       assert_unauthorized
-      expect(assigns[:quiz]).not_to be_nil
     end
 
     it "assigns variables" do
@@ -3006,8 +3005,6 @@ describe Quizzes::QuizzesController do
     it "requires authorization" do
       get "submission_versions", params: { course_id: @course.id, quiz_id: @quiz.id }
       assert_unauthorized
-      expect(assigns[:quiz]).not_to be_nil
-      expect(assigns[:quiz]).to eql(@quiz)
     end
 
     it "assigns variables" do

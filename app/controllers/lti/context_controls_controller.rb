@@ -175,7 +175,6 @@ module Lti
     before_action :require_account_context, except: [:create]
     before_action :require_current_account_context, only: [:create]
     before_action :require_root_account
-    before_action :require_user
     before_action :require_feature_flag
     before_action :require_manage_lti_registrations
     before_action :validate_bulk_params, only: [:create_many]

@@ -608,10 +608,17 @@ class ExternalToolsController < ApplicationController
   class InvalidSettingsError < StandardError; end
 
   before_action :require_context, except: [:all_visible_nav_tools]
-  before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
-  before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
+  before_action :require_tool_create_rights, only: :create
   before_action :require_access_to_context, except: %i[index sessionless_launch all_visible_nav_tools]
-  before_action :require_user, only: [:generate_sessionless_launch, :migration_info]
+  skip_before_action :require_user, only: %i[all_visible_nav_tools
+                                             finished
+                                             index
+                                             jwt_token
+                                             resource_selection
+                                             retrieve
+                                             sessionless_launch
+                                             show
+                                             visible_course_nav_tools]
   before_action :get_context, only: %i[retrieve show resource_selection]
   before_action :parse_context_codes, only: [:all_visible_nav_tools]
   before_action :set_extra_csp_frame_ancestor!, only: %i[retrieve resource_selection]
@@ -2107,12 +2114,6 @@ class ExternalToolsController < ApplicationController
 
   def require_tool_create_rights
     authorized_action(@context, @current_user, :manage_lti_add)
-  end
-
-  def require_tool_configuration
-    return if developer_key.tool_configuration.present?
-
-    head :not_found
   end
 
   def developer_key

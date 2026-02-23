@@ -19,7 +19,6 @@
 #
 
 class GradebookFiltersApiController < ApplicationController
-  before_action :require_user
   before_action :require_context
   before_action :load_gradebook_filter, except: [:index, :create]
 

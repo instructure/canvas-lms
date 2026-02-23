@@ -20,7 +20,6 @@
 module Lti
   class AssetProcessorController < ApplicationController
     before_action { require_feature_enabled :lti_asset_processor }
-    before_action :require_user
     before_action :require_asset_processor, except: [:resubmit_discussion_notices_all]
     before_action :require_context
     before_action :require_access_to_context

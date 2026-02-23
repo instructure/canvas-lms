@@ -87,7 +87,6 @@ module Lti
 
     before_action :require_account_context
     before_action :require_root_account
-    before_action :require_user
     before_action :require_feature_flag
     before_action :require_manage_lti_registrations
 

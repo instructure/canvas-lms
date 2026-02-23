@@ -87,7 +87,7 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_action :require_user, only: %i[create destroy re_send_confirmation delete_push_token]
+  skip_before_action :require_user, only: :confirm
   before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel

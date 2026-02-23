@@ -42,6 +42,7 @@ class AssignmentsController < ApplicationController
 
   before_action :load_canvas_career, only: %i[index show syllabus]
   before_action :redirect_peer_review_sub_assignment, only: [:show]
+  skip_before_action :require_user, only: %i[index show syllabus]
 
   include K5Mode
 

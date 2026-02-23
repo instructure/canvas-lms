@@ -157,7 +157,7 @@ class ConferencesController < ApplicationController
   include CalendarConferencesHelper
 
   before_action :require_context, except: :for_user
-  skip_before_action :load_user, only: [:recording_ready]
+  skip_before_action :load_user, :require_user, only: [:recording_ready]
 
   add_crumb(proc { t "#crumbs.conferences", "Conferences" }) do |c|
     if c.context.present?

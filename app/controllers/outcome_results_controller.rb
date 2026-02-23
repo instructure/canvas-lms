@@ -194,7 +194,6 @@ class OutcomeResultsController < ApplicationController
   include CanvasOutcomesHelper
   include AlignmentsHelper
 
-  before_action :require_user
   before_action :require_context
   before_action :require_outcome_context
   before_action :verify_aggregate_parameter, only: :rollups

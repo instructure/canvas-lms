@@ -37,7 +37,7 @@ describe "Services API", type: :request do
   it "checks for auth on session" do
     post("/api/v1/services/kaltura_session")
     assert_status(401)
-    expect(response.body).to include("must be logged in to use Kaltura")
+    expect(response.body).to include("authorization required")
   end
 
   it "returns the config information for kaltura" do

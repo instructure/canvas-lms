@@ -149,7 +149,7 @@
 #
 class GroupsController < ApplicationController
   before_action :get_context
-  before_action :require_user, only: %w[index accept_invitation activity_stream activity_stream_summary]
+  skip_before_action :require_user, only: %i[preview_html public_feed]
   before_action :check_limited_access_for_students, only: %i[create_file]
 
   include Api::V1::Attachment

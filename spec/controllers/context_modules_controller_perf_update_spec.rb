@@ -312,6 +312,7 @@ describe ContextModulesController do
     context "when modules_perf disabled" do
       before do
         @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
       end
 
       it "renders 404" do
@@ -515,6 +516,7 @@ describe ContextModulesController do
     context "when modules_perf disabled" do
       before do
         @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
       end
 
       it "renders 404" do
@@ -636,6 +638,7 @@ describe ContextModulesController do
     context "when modules_perf disabled" do
       before do
         @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
       end
 
       it "renders 404" do

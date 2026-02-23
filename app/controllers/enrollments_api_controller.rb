@@ -326,8 +326,6 @@
 #
 class EnrollmentsApiController < ApplicationController
   before_action :get_course_from_section, :require_context
-  before_action :require_user
-
   @@errors = {
     missing_parameters: "No parameters given",
     missing_user_id: "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",

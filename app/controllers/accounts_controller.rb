@@ -301,11 +301,13 @@
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, only: %i[index
-                                        help_links
-                                        manually_created_courses_account
-                                        account_calendar_settings
-                                        environment]
+  skip_before_action :require_user, only: %i[acceptable_use_policy
+                                             course_accounts
+                                             course_creation_accounts
+                                             courses_redirect
+                                             horizon_accounts
+                                             manageable_accounts
+                                             terms_of_service]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]

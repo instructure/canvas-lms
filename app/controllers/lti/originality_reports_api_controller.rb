@@ -124,7 +124,7 @@ module Lti
       }.freeze
     ].freeze
 
-    skip_before_action :load_user
+    skip_before_action :load_user, :require_user
     skip_before_action :verify_authenticity_token
     before_action :authorized_lti2_tool
     before_action :attachment_in_context, only: [:create]
@@ -322,7 +322,7 @@ module Lti
     def attachment
       @_attachment ||= begin
         attachment = Attachment.find(params[:file_id]) if params[:file_id].present?
-        if attachment.blank? && params.require(:originality_report)[:file_id].present?
+        if attachment.blank? && params.dig(:originality_report, :file_id).present?
           attachment = Attachment.find(params.require(:originality_report)[:file_id])
         end
         attachment
@@ -387,7 +387,7 @@ module Lti
     end
 
     def attachment_in_context
-      verify_submission_attachment(attachment, submission)
+      params.require(:originality_report) && verify_submission_attachment(attachment, submission)
     end
 
     def report_by_attempt(attempt)

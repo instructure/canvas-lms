@@ -21,6 +21,7 @@
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
+  skip_before_action :require_user, only: :public_feed
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap { |e| e.current_user = @current_user }

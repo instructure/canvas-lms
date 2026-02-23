@@ -58,7 +58,7 @@
 #     }
 #
 class NotificationPreferencesController < ApplicationController
-  before_action :require_user, :get_cc
+  before_action :get_cc
 
   include Api::V1::NotificationPolicy
 

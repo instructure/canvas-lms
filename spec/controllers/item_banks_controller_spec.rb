@@ -23,6 +23,10 @@ describe ItemBanksController do
       course_with_teacher(active_all: true)
     end
 
+    before do
+      user_session(@teacher)
+    end
+
     it "returns a 404 when ams_root_account_integration feature flag is disabled" do
       @course.root_account.disable_feature!(:ams_root_account_integration)
 
