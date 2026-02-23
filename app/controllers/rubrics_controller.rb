@@ -315,6 +315,10 @@ class RubricsController < ApplicationController
         :long_description,
         :points,
         :criterion_use_range,
+        :learning_outcome_id,
+        :ignore_for_scoring,
+        :mastery_points,
+        :generated,
         ratings: %i[id criterion_id description long_description points]
       )
     end
