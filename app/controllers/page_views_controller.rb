@@ -467,6 +467,11 @@ class PageViewsController < ApplicationController
   # Checks the status of a previously initiated page views query. Returns the current
   # processing status and provides a result URL when the query is complete.
   #
+  # The query may fail with status "failed" and error_code
+  # "RESULT_SIZE_LIMIT_EXCEEDED" if the result exceeds 500 MB.
+  # If this happens, narrow the date range or query smaller
+  # time intervals.
+  #
   # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
   #
   # @argument query_id [String]
