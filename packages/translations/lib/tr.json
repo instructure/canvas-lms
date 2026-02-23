@@ -884,6 +884,9 @@
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Bu denklem Temel Görünümde işlenemez."
     },
+    "timebar_a4d18443": {
+        "message": "Zaman çubuğu"
+    },
     "title_ee03d132": {
         "message": "Başlık"
     },
@@ -938,6 +941,9 @@
     "usage_right_ff96f3e2": {
         "message": "Kullanım Şartları:"
     },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Seçeneklerde gezinmek için ok tuşlarını kullanın."
+    },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Ekran okuyucuları tarafından bir görselin içeriğini açıklamak için kullanılır"
     },
@@ -946,6 +952,9 @@
     },
     "user_documents_c206e61f": {
         "message": "Kullanıcı Belgeleri"
+    },
+    "user_files_78e21703": {
+        "message": "Kullanıcı Dosyaları"
     },
     "user_images_b6490852": {
         "message": "Kullanıcı Görselleri"
@@ -968,8 +977,14 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Klavye Kısayollarını Göster"
     },
+    "webcam_disabled_30c66986": {
+        "message": "Web kamerası devre dışı"
+    },
     "webcam_fe91b20f": {
         "message": "Web Kamerası"
+    },
+    "white_87fa64fd": {
+        "message": "Beyaz"
     },
     "width_492fec76": {
         "message": "Genişlik"
@@ -983,8 +998,14 @@
     "wiki_home_9cd54d0": {
         "message": "Wiki Ana Sayfası"
     },
+    "word_count_c77fe3a6": {
+        "message": "Kelime Sayısı"
+    },
     "yes_dde87d5": {
         "message": "Evet"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Yeni bir altyazı dosyası yükleyerek değiştirebilirsiniz."
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Web kameranız kullanılıyor olabilir."
