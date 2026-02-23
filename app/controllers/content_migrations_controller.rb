@@ -167,6 +167,7 @@ class ContentMigrationsController < ApplicationController
                OLD_START_DATE: datetime_string(@context.start_at, :verbose),
                OLD_END_DATE: datetime_string(@context.conclude_at, :verbose),
                SHOW_SELECT: should_show_course_copy_dropdown,
+               COPY_COURSE_INTEGRATION_INFO: Account.site_admin.feature_enabled?(:course_copy_allow_copying_integration_info),
                MISSING_POLICY_ENABLED: @context.late_policy&.missing_submission_deduction_enabled || false
              })
       set_tutorial_js_env
@@ -212,6 +213,7 @@ class ContentMigrationsController < ApplicationController
                  BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context),
                  SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
                    @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses),
+                 COPY_COURSE_INTEGRATION_INFO: Account.site_admin.feature_enabled?(:course_copy_allow_copying_integration_info),
                  MISSING_POLICY_ENABLED: @context.late_policy&.missing_submission_deduction_enabled || false
                })
         set_tutorial_js_env
@@ -340,6 +342,10 @@ class ContentMigrationsController < ApplicationController
   #   Import the "use as blueprint course" setting as well as the list of locked items
   #   from the source course or package. The destination course must not be associated
   #   with an existing blueprint course and cannot have any student or observer enrollments.
+  #
+  # @argument settings[copy_integration_info] [Boolean]
+  #   Whether to copy integration_id and integration_data values from
+  #   source assignments to destination assignments during a course copy.
   #
   # @argument date_shift_options[shift_dates] [Boolean]
   #   Whether to shift dates in the copied course

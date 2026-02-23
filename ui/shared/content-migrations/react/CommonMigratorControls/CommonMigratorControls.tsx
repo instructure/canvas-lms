@@ -40,6 +40,7 @@ type CommonMigratorControlsProps = {
   canOverwriteAssessmentContent?: boolean
   canAdjustDates?: boolean
   canImportBPSettings?: boolean
+  canCopyIntegrationInfo?: boolean
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   fileUploadProgress: number | null
@@ -129,6 +130,7 @@ export const CommonMigratorControls = ({
   canOverwriteAssessmentContent = false,
   canAdjustDates = false,
   canImportBPSettings = false,
+  canCopyIntegrationInfo = false,
   onSubmit,
   onCancel,
   isSubmitting,
@@ -149,6 +151,7 @@ export const CommonMigratorControls = ({
     !!ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
   )
   const [overwriteAssessmentContent, setOverwriteAssessmentContent] = useState<boolean>(false)
+  const [copyIntegrationInfo, setCopyIntegrationInfo] = useState<boolean>(false)
   const [showAdjustDates, setShowAdjustDates] = useState<boolean>(false)
   const [dateAdjustmentConfig, setDateAdjustmentConfig] = useState<DateAdjustmentConfig>({
     adjust_dates: {
@@ -199,6 +202,7 @@ export const CommonMigratorControls = ({
     }
     canImportAsNewQuizzes && (data.settings.import_quizzes_next = importAsNewQuizzes)
     canOverwriteAssessmentContent && (data.settings.overwrite_quizzes = overwriteAssessmentContent)
+    canCopyIntegrationInfo && (data.settings.copy_integration_info = copyIntegrationInfo)
     onSubmit(data)
   }, [
     selectiveImport,
@@ -211,6 +215,8 @@ export const CommonMigratorControls = ({
     importAsNewQuizzes,
     canOverwriteAssessmentContent,
     overwriteAssessmentContent,
+    canCopyIntegrationInfo,
+    copyIntegrationInfo,
     onSubmit,
   ])
 
@@ -262,6 +268,20 @@ export const CommonMigratorControls = ({
               tmp.adjust_dates.enabled = target.checked ? 1 : 0
               setDateAdjustmentConfig(tmp)
             }}
+          />,
+        ]
+      : []),
+    ...(canCopyIntegrationInfo
+      ? [
+          <Checkbox
+            key="copy_integration_info"
+            name="copy_integration_info"
+            value="copy_integration_info"
+            disabled={isSubmitting}
+            label={I18n.t('Copy assignment integration IDs and data')}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setCopyIntegrationInfo(e.target.checked)
+            }
           />,
         ]
       : []),

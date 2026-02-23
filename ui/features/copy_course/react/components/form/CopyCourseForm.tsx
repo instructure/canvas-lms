@@ -249,6 +249,7 @@ export const CopyCourseForm = ({
         canAdjustDates={true}
         canSelectContent={true}
         canImportBPSettings={canImportBpSettings}
+        canCopyIntegrationInfo={!!ENV.COPY_COURSE_INTEGRATION_INFO}
         canImportAsNewQuizzes={canImportAsNewQuizzes}
         newStartDate={isoNewCourseStartDate}
         newEndDate={isoNewCourseEndDate}
