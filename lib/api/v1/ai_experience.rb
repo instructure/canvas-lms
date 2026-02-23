@@ -42,18 +42,19 @@ module Api::V1::AiExperience
       json.delete(:pedagogical_guidance)
     end
 
-    # Include context files if feature flag is enabled
+    # Include context files if feature flag is enabled.
+    # Uses the scoped context_files association which excludes deleted attachments.
     if ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
-      json[:context_files] = ai_experience.ai_experience_context_files.order(:position).map do |context_file|
-        attachment = context_file.attachment
-        {
-          id: attachment.id,
-          filename: attachment.filename,
-          size: attachment.size,
-          content_type: attachment.content_type,
-          url: attachment.public_url,
-          position: context_file.position
-        }
+      json[:context_files] = ai_experience.context_files
+                                          .order("ai_experience_context_files.position")
+                                          .map do |attachment|
+                                            {
+                                              id: attachment.id.to_s,
+                                              display_name: attachment.display_name,
+                                              size: attachment.size,
+                                              content_type: attachment.content_type,
+                                              url: attachment.public_url
+                                            }
       end
     end
 

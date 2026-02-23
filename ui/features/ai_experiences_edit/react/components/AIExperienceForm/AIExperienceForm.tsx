@@ -71,7 +71,9 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         learning_objective: aiExperience.learning_objective || '',
         pedagogical_guidance: aiExperience.pedagogical_guidance || '',
       })
-      // Context files will be managed separately in component state for now
+      if (aiExperience.context_files) {
+        setContextFiles(aiExperience.context_files as ContextFile[])
+      }
     }
   }, [aiExperience])
 
@@ -98,8 +100,6 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
 
   const handleContextFilesChange = (files: ContextFile[]) => {
     setContextFiles(files)
-    // Note: Files are kept in local state only for now (not persisted to backend)
-    // TODO: Integrate with backend when ready
   }
 
   const validateForm = (): Record<string, string> => {
@@ -136,7 +136,11 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       return
     }
 
-    onSubmit(formData)
+    const dataToSubmit: AIExperienceFormData = {
+      ...formData,
+      context_file_ids: contextFiles.map(f => f.id),
+    }
+    onSubmit(dataToSubmit)
   }
 
   const handleCancel = () => {
@@ -164,7 +168,11 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
 
     setShowPreviewModal(false)
     // Save as draft first, then redirect to preview
-    onSubmit(formData, true)
+    const dataToSubmit: AIExperienceFormData = {
+      ...formData,
+      context_file_ids: contextFiles.map(f => f.id),
+    }
+    onSubmit(dataToSubmit, true)
   }
 
   const handleDeleteClick = () => {

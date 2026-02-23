@@ -443,6 +443,101 @@ describe('AIExperienceForm', () => {
     })
   })
 
+  describe('context file handling', () => {
+    const fillRequiredFields = () => {
+      fireEvent.change(screen.getByLabelText(/Title/), {target: {value: 'Title'}})
+      fireEvent.change(screen.getByLabelText(/Text source/), {target: {value: 'Facts'}})
+      fireEvent.change(screen.getByLabelText(/Learning objective targets/), {
+        target: {value: 'Objectives'},
+      })
+      fireEvent.change(screen.getByLabelText(/Customize agent/), {target: {value: 'Guidance'}})
+    }
+
+    it('includes context_file_ids as empty array in submit payload when no files', async () => {
+      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
+      fillRequiredFields()
+      fireEvent.click(screen.getByText('Save as draft'))
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalledWith(expect.objectContaining({context_file_ids: []}))
+      })
+    })
+
+    it('seeds contextFiles state from aiExperience.context_files on edit load', async () => {
+      const aiExperienceWithFiles: AIExperience = {
+        ...mockAiExperience,
+        context_files: [
+          {
+            id: '42',
+            display_name: 'syllabus.pdf',
+            url: 'https://example.com/42',
+            size: 1024,
+            content_type: 'application/pdf',
+          },
+          {
+            id: '99',
+            display_name: 'rubric.pdf',
+            url: 'https://example.com/99',
+            size: 2048,
+            content_type: 'application/pdf',
+          },
+        ],
+      }
+
+      render(
+        <AIExperienceForm
+          aiExperience={aiExperienceWithFiles}
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+        />,
+      )
+
+      fireEvent.click(screen.getByText('Save as draft'))
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({context_file_ids: ['42', '99']}),
+        )
+      })
+    })
+
+    it('includes context_file_ids in preview submit payload', async () => {
+      const aiExperienceWithFiles: AIExperience = {
+        ...mockAiExperience,
+        context_files: [
+          {
+            id: '55',
+            display_name: 'notes.pdf',
+            url: 'https://example.com/55',
+            size: 512,
+            content_type: 'application/pdf',
+          },
+        ],
+      }
+
+      render(
+        <AIExperienceForm
+          aiExperience={aiExperienceWithFiles}
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+        />,
+      )
+
+      fireEvent.click(screen.getByText('Preview'))
+      await waitFor(() => expect(screen.getByText('Preview experience')).toBeInTheDocument())
+      fireEvent.click(screen.getByText('Preview experience'))
+      await waitFor(() => expect(screen.getByText('Confirm')).toBeInTheDocument())
+      fireEvent.click(screen.getByText('Confirm'))
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({context_file_ids: ['55']}),
+          true,
+        )
+      })
+    })
+  })
+
   describe('delete functionality', () => {
     it('renders three-dot menu button', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
