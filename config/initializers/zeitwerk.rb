@@ -26,7 +26,8 @@ Rails.autoloaders.main.ignore(
   # we don't want zeitwerk to try to eager_load some "Version" constant from any plugins
   "#{__dir__}/../../gems/plugins/simply_versioned/lib/simply_versioned/gem_version.rb",
   "#{__dir__}/../../gems/plugins/account_reports/lib/account_reports/version.rb",
-  "#{__dir__}/../../gems/plugins/moodle_importer/lib/moodle_importer/version.rb"
+  "#{__dir__}/../../gems/plugins/moodle_importer/lib/moodle_importer/version.rb",
+  "#{__dir__}/../../gems/plugins/*/lib/cops"
 )
 
 Rails.autoloaders.each do |autoloader|
