@@ -522,4 +522,48 @@ describe AssessmentQuestion do
       expect(question.root_account_id).to eq Account.default.id
     end
   end
+
+  describe "translate_file_link error handling for missing user" do
+    context "in development environment" do
+      it "raises an error when user is missing and not in migration" do
+        @attachment = attachment_in_course(@course)
+        data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+
+        allow(Rails.env).to receive(:development?).and_return(true)
+
+        expect do
+          @bank.assessment_questions.create!(question_data: data, updating_user: nil)
+        end.to raise_error(/User is required/)
+      end
+    end
+
+    context "in production environment" do
+      before do
+        allow(Rails.env).to receive_messages(development?: false, test?: false)
+      end
+
+      it "captures error to Sentry and does not raise" do
+        @attachment = attachment_in_course(@course)
+        data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+
+        expect(Sentry).to receive(:capture_message).with(anything, level: :warning)
+
+        expect do
+          @bank.assessment_questions.create!(question_data: data, updating_user: nil)
+        end.not_to raise_error
+      end
+
+      it "does not clone file when user is missing" do
+        @attachment = attachment_in_course(@course)
+        data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+
+        allow(Sentry).to receive(:capture_message)
+
+        @question = @bank.assessment_questions.create!(question_data: data, updating_user: nil)
+
+        @clone = @question.attachments.where(root_attachment: @attachment).first
+        expect(@clone).to be_nil
+      end
+    end
+  end
 end
