@@ -416,6 +416,44 @@ describe AiExperiencesController do
         expect(json_response["pedagogical_guidance"]).to eq(@ai_experience.pedagogical_guidance)
         expect(json_response["learning_objective"]).to eq(@ai_experience.learning_objective)
       end
+
+      context "with ai_experiences_context_file_upload feature flag" do
+        context "when enabled and context_id is present" do
+          before do
+            @course.enable_feature!(:ai_experiences_context_file_upload)
+            @ai_experience.update_column(:llm_conversation_context_id, "context-uuid")
+          end
+
+          it "calls sync_index_status before rendering" do
+            expect(LLMConversationContextManager).to receive(:sync_index_status).with(ai_experience: @ai_experience)
+            get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+          end
+        end
+
+        context "when disabled" do
+          before do
+            @course.disable_feature!(:ai_experiences_context_file_upload)
+            @ai_experience.update_column(:llm_conversation_context_id, "context-uuid")
+          end
+
+          it "does not call sync_index_status" do
+            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+          end
+        end
+
+        context "when context_id is not present" do
+          before do
+            @course.enable_feature!(:ai_experiences_context_file_upload)
+            @ai_experience.update_column(:llm_conversation_context_id, nil)
+          end
+
+          it "does not call sync_index_status" do
+            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+          end
+        end
+      end
     end
 
     context "as student" do

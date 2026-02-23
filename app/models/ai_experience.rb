@@ -24,7 +24,16 @@ class AiExperience < ApplicationRecord
 
   has_many :ai_conversations, dependent: :destroy
   has_many :ai_experience_context_files, dependent: :destroy
-  has_many :context_files, through: :ai_experience_context_files, source: :attachment, class_name: "Attachment"
+  # Excludes soft-deleted attachments. Note: if an attachment is deleted in Canvas
+  # after being associated, the join record remains but the file is silently omitted
+  # from context_data. The llm-conversation service JSONB will contain stale data
+  # until the next explicit save of this AiExperience — this is intentional to avoid
+  # synchronous service calls in destroy callbacks.
+  has_many :context_files,
+           -> { where.not(attachments: { file_state: "deleted" }) },
+           through: :ai_experience_context_files,
+           source: :attachment,
+           class_name: "Attachment"
 
   validates :title, presence: true, length: { maximum: 255 }
   validates :learning_objective, presence: true
@@ -61,8 +70,16 @@ class AiExperience < ApplicationRecord
   # Manage conversation_context lifecycle in llm-conversation service
   before_create :set_account_associations
   after_create :create_conversation_context
-  after_update :update_conversation_context, if: :should_update_context?
+  # sync_context_files must be defined before maybe_update_conversation_context so
+  # files are persisted before the service is notified of changes.
+  after_save :sync_context_files, if: :pending_context_file_ids?
+  after_save :index_context_files_if_changed
+  after_save :maybe_update_conversation_context
   before_destroy :delete_conversation_context
+
+  def context_file_ids=(ids)
+    @pending_context_file_ids = Array(ids).map(&:to_s)
+  end
 
   def delete
     return false if deleted?
@@ -132,14 +149,49 @@ class AiExperience < ApplicationRecord
     # Don't fail the AiExperience creation if context creation fails
   end
 
+  def pending_context_file_ids?
+    !@pending_context_file_ids.nil?
+  end
+
+  def sync_context_files
+    incoming_ids = @pending_context_file_ids.map(&:to_i)
+    current_ids = ai_experience_context_files.order(:position).pluck(:attachment_id)
+
+    @context_files_changed = incoming_ids != current_ids
+
+    if @context_files_changed
+      ai_experience_context_files.destroy_all
+      incoming_ids.each { |attachment_id| ai_experience_context_files.create!(attachment_id:) }
+    end
+
+    @pending_context_file_ids = nil
+  end
+
+  def index_context_files_if_changed
+    return unless @context_files_changed
+    return unless llm_conversation_context_id.present?
+    return unless course.feature_enabled?(:ai_experiences_context_file_upload)
+
+    LLMConversationContextManager.trigger_indexing(ai_experience: self)
+  rescue LlmConversation::Errors::ConversationError => e
+    Rails.logger.error("Failed to trigger document indexing for AiExperience #{id}: #{e.message}")
+  end
+
+  def maybe_update_conversation_context
+    return if previously_new_record?
+    return unless should_update_context?
+
+    update_conversation_context
+  end
+
   def should_update_context?
     return false unless llm_conversation_context_id.present?
 
     context_changed = saved_change_to_pedagogical_guidance? || saved_change_to_facts? || saved_change_to_learning_objective?
 
-    # Check for context file changes only if feature flag is enabled
     if course.feature_enabled?(:ai_experiences_context_file_upload)
-      context_changed ||= saved_changes.key?("ai_experience_context_files")
+      context_changed ||= @context_files_changed.present?
+      @context_files_changed = nil
     end
 
     context_changed

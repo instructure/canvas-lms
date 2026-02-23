@@ -33,6 +33,14 @@ class LLMConversationContextManager
     new(ai_experience:).delete_context
   end
 
+  def self.sync_index_status(ai_experience:)
+    new(ai_experience:).sync_index_status
+  end
+
+  def self.trigger_indexing(ai_experience:)
+    new(ai_experience:).send(:trigger_document_indexing)
+  end
+
   def initialize(ai_experience:)
     @ai_experience = ai_experience
   end
@@ -88,23 +96,76 @@ class LLMConversationContextManager
     @ai_experience.update_column(:llm_conversation_context_id, nil)
   end
 
+  def sync_index_status
+    return unless @ai_experience.llm_conversation_context_id.present?
+    return unless @ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
+
+    response = make_request(
+      method: :get,
+      path: "/contexts/#{@ai_experience.llm_conversation_context_id}/documents",
+      error_message: "Failed to fetch document index status"
+    )
+
+    documents = response["documents"] || []
+    return if documents.empty?
+
+    statuses = documents.pluck("status")
+    new_status = if statuses.all?("completed")
+                   "completed"
+                 elsif statuses.any?("failed")
+                   "failed"
+                 else
+                   "in_progress"
+                 end
+
+    @ai_experience.update_column(:context_index_status, new_status)
+    new_status
+  rescue LlmConversation::Errors::ConversationError => e
+    Rails.logger.warn("Document index status sync failed for ai_experience #{@ai_experience.id}: #{e.message}")
+  end
+
   private
+
+  def trigger_document_indexing
+    context_id = @ai_experience.llm_conversation_context_id
+    return unless context_id.present?
+
+    # Reload to bypass stale association cache set before after_save callbacks ran
+    files = @ai_experience.context_files.reload
+    return if files.empty?
+
+    files.each do |file|
+      make_request(
+        method: :post,
+        path: "/contexts/#{context_id}/documents",
+        payload: { url: file.public_url, sourceType: "file" },
+        error_message: "Failed to trigger indexing for file #{file.id}"
+      )
+    end
+
+    @ai_experience.update_column(:context_index_status, "in_progress")
+  rescue LlmConversation::Errors::ConversationError => e
+    Rails.logger.warn("Document indexing trigger failed for ai_experience #{@ai_experience.id}: #{e.message}")
+  end
 
   def context_data
     data = {
       scenario: @ai_experience.pedagogical_guidance,
       facts: @ai_experience.facts,
-      learning_objectives: @ai_experience.learning_objective
+      learning_objectives: @ai_experience.learning_objective,
+      root_account_uuid: @ai_experience.course.root_account.uuid
     }
 
-    # Include file data if feature flag is enabled
     if @ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
-      data[:files] = @ai_experience.context_files.map do |file|
+      data[:context_files] = @ai_experience.context_files.map do |file|
         {
-          id: file.id,
-          filename: file.filename,
-          size: file.size,
-          content_type: file.content_type,
+          source: "canvas",
+          sourceType: "file",
+          sourceId: "file-#{file.global_id}",
+          metadata: {
+            courseId: @ai_experience.course.global_id.to_s,
+            title: file.display_name
+          },
           url: file.public_url
         }
       end

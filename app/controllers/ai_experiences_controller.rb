@@ -132,6 +132,11 @@ class AiExperiencesController < ApplicationController
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
     add_crumb @ai_experience.title
+    if @context.feature_enabled?(:ai_experiences_context_file_upload) &&
+       @ai_experience.llm_conversation_context_id.present?
+      LLMConversationContextManager.sync_index_status(ai_experience: @ai_experience)
+    end
+
     respond_to do |format|
       format.html do
         @page_title = @ai_experience.title

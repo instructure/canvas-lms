@@ -227,6 +227,41 @@ describe AiExperience do
         expect(WebMock).not_to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
       end
 
+      context "with ai_experiences_context_file_upload feature flag enabled" do
+        let(:attachment) { attachment_model(context: course) }
+
+        before { course.enable_feature!(:ai_experiences_context_file_upload) }
+
+        it "updates conversation_context when context_file_ids change" do
+          experience.update!(context_file_ids: [attachment.id.to_s])
+
+          expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+
+        it "persists context file join records when context_file_ids are set" do
+          experience.update!(context_file_ids: [attachment.id.to_s])
+
+          expect(experience.ai_experience_context_files.pluck(:attachment_id)).to eq([attachment.id])
+        end
+
+        it "removes context files when context_file_ids is empty" do
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          experience.update!(context_file_ids: [])
+
+          expect(experience.ai_experience_context_files).to be_empty
+          expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+
+        it "does not update conversation_context when context_file_ids unchanged" do
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          experience.update!(context_file_ids: [attachment.id.to_s])
+
+          expect(WebMock).not_to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+      end
+
       it "does not update conversation_context if context_id is not set" do
         experience.update_column(:llm_conversation_context_id, nil)
         experience.update!(pedagogical_guidance: "Updated scenario")
@@ -299,6 +334,27 @@ describe AiExperience do
 
         experience.destroy
       end
+    end
+  end
+
+  describe "context_files association" do
+    let(:experience) { AiExperience.create!(valid_attributes) }
+
+    it "returns active attachments" do
+      attachment = attachment_model(context: course)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+      expect(experience.context_files).to include(attachment)
+    end
+
+    it "excludes soft-deleted attachments" do
+      active = attachment_model(context: course, filename: "active.pdf")
+      deleted = attachment_model(context: course, filename: "deleted.pdf")
+      deleted.update_column(:file_state, "deleted")
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: active)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: deleted)
+
+      expect(experience.context_files).to contain_exactly(active)
     end
   end
 
