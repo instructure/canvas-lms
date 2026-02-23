@@ -27,6 +27,7 @@ class Login::CasController < ApplicationController
 
   before_action :forbid_on_files_domain
   before_action :run_login_hooks, :fix_ms_office_redirects, only: :new
+  skip_before_action :require_user, only: %i[new create destroy]
 
   delegate :client, to: :aac
 

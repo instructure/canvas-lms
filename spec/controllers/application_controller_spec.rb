@@ -3912,6 +3912,8 @@ RSpec.describe ApplicationController, "#compute_http_cost" do
   include WebMock::API
 
   controller do
+    skip_before_action :require_user
+
     def index
       if params[:do_http].to_i > 0
         CanvasHttp.get("http://www.example.com/test")

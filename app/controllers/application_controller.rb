@@ -83,6 +83,7 @@ class ApplicationController < ActionController::Base
   before_action :manage_robots_meta
   # multiple actions might be called on a single controller instance in specs
   before_action :clear_js_env if Rails.env.test?
+  before_action :require_user, except: :rescue_action_dispatch_exception
 
   after_action :log_page_view
   after_action :discard_flash_if_xhr

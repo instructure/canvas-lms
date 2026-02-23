@@ -20,6 +20,7 @@
 module Lti
   class ToolDefaultIconController < ApplicationController
     before_action :require_name, only: :show
+    skip_before_action :load_user, :require_user, only: :show
 
     # Generates an SVG icon for a tool based on its name and/or ID
 

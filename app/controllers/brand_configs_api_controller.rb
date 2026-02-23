@@ -19,7 +19,7 @@
 
 # @API Brand Configs
 class BrandConfigsApiController < ApplicationController
-  before_action :require_user, only: [:show_context]
+  skip_before_action :require_user, only: :show
   before_action :require_context, only: [:show_context]
 
   # @API Get the brand config variables that should be used for this domain

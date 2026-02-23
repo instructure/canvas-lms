@@ -22,7 +22,6 @@ class BrandConfigsController < ApplicationController
   include Api::V1::Account
 
   before_action :require_account_context
-  before_action :require_user
   before_action :require_account_management
   before_action :require_account_branding, except: [:destroy]
   before_action { |c| c.active_tab = "brand_configs" }

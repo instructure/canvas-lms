@@ -270,8 +270,6 @@
 #
 
 class PageViewsController < ApplicationController
-  before_action :require_user, only: [:index]
-
   include Api::V1::PageView
 
   # Maximum records per page for page views API (PV5 supports up to 200)

@@ -22,7 +22,6 @@ module Accessibility
     include AccessibilityFilters
 
     before_action :require_context
-    before_action :require_user
     before_action :check_authorized_action
     before_action :check_close_issues_feature_flag, only: [:close_issues]
 

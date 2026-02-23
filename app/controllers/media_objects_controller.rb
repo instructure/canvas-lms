@@ -80,7 +80,13 @@ class MediaObjectsController < ApplicationController
   before_action :load_media_object_from_service, only: %i[show iframe_media_player]
   before_action :check_media_permissions, except: %i[create_media_object index media_object_thumbnail update_media_object]
   before_action(only: %i[update_media_object]) { check_media_permissions(access_type: :update) }
-  before_action :require_user, only: %i[index update_media_object]
+  skip_before_action :require_user, only: %i[create_media_object
+                                             iframe_media_player
+                                             immersive_view
+                                             media_object_inline
+                                             media_object_redirect
+                                             media_object_thumbnail
+                                             show]
   protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
   def token_auth_allowed?

@@ -133,21 +133,21 @@ module Lti
       end
 
       it "checks that the specified originality report exists" do
-        invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}originality_report/#{@report.id + 1}"
-        get invalid_report_url
+        invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id + 1}"
+        get invalid_report_url, headers: request_headers
 
         expect(response).to have_http_status :not_found
       end
 
       it "checks that the specified submission exists" do
-        invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id + 1}originality_report/#{@report.id}"
-        get invalid_report_url
+        invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id + 1}/originality_report/#{@report.id}"
+        get invalid_report_url, headers: request_headers
 
         expect(response).to have_http_status :not_found
       end
 
       it "requires the plagiarism feature flag" do
-        post @endpoints[:show]
+        get @endpoints[:show]
         expect(response).not_to be_successful
       end
 

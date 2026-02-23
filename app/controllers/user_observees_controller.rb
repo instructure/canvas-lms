@@ -22,8 +22,6 @@
 # API for managing linked observers and observees
 
 class UserObserveesController < ApplicationController
-  before_action :require_user
-
   before_action :self_or_admin_permission_check, except: [:update]
 
   # @API List linked observees

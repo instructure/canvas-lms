@@ -19,7 +19,6 @@
 
 class AccessibilityController < ApplicationController
   before_action :require_context
-  before_action :require_user
   before_action :check_authorized_action
 
   def index

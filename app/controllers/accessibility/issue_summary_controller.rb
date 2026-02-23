@@ -26,7 +26,6 @@ module Accessibility
     include AccessibilityFilters
 
     before_action :require_context
-    before_action :require_user
     before_action :check_authorized_action
 
     def show

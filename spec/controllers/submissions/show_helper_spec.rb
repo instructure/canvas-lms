@@ -23,6 +23,8 @@ describe "Submissions::ShowHelper" do
     controller do
       include Submissions::ShowHelper
 
+      skip_before_action :require_user
+
       def show
         @context = Course.find(params[:context_id])
         @assignment = Assignment.where(id: params[:assignment_id]).where.not(workflow_state: "deleted").first

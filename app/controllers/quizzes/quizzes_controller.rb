@@ -59,8 +59,9 @@ class Quizzes::QuizzesController < ApplicationController
                   submission_versions
                   submission_html
                 ],
-                unless: -> { ams_integration_enabled? }
+                unless: :ams_integration_enabled?
   before_action :set_download_submission_dialog_title, only: [:show, :statistics]
+  skip_before_action :require_user, only: %i[index show]
   after_action :lock_results, only: [:show, :submission_html]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.

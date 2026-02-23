@@ -27,7 +27,6 @@ class NewQuizzesController < ApplicationController
   include NewQuizzesHelper
 
   before_action :require_context
-  before_action :require_user
   before_action :require_new_quizzes_native_experience
 
   def launch

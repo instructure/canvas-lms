@@ -263,7 +263,6 @@ class RubricsApiController < ApplicationController
   include Api::V1::RubricAssessment
   include Api::V1::Attachment
 
-  before_action :require_user
   before_action :require_context, except: [:upload_template]
   before_action :validate_args
 

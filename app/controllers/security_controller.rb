@@ -32,6 +32,7 @@
 #
 class SecurityController < ApplicationController
   skip_before_action :load_user
+  skip_before_action :require_user
 
   def self.messages_supported(account)
     Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys

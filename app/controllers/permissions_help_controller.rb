@@ -47,8 +47,6 @@
 class PermissionsHelpController < ApplicationController
   # these actions access only static (but localized) information about permissions,
   # but require a logged-in user to mitigate possible abuse
-  before_action :require_user
-
   # @API Get help text for permissions
   # Retrieve information about what Canvas permissions do and considerations for their use.
   #

@@ -95,6 +95,7 @@
 #
 class AssignmentGroupsController < ApplicationController
   before_action :require_context
+  skip_before_action :require_user, only: :index
 
   include Api::V1::AssignmentGroup
 

@@ -19,8 +19,6 @@
 #
 
 class SubmissionCommentsController < ApplicationController
-  before_action :require_user
-
   def index
     submission = Submission.preload(assignment: :context, all_submission_comments: :author).find(params[:submission_id])
     course = submission.assignment.context

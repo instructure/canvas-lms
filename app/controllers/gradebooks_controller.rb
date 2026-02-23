@@ -33,7 +33,6 @@ class GradebooksController < ApplicationController
   include Api::V1::RubricAssessment
 
   before_action :require_context
-  before_action :require_user, only: %i[speed_grader speed_grader_settings grade_summary grading_rubrics update_final_grade_overrides]
 
   include HorizonMode
 

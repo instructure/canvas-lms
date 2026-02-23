@@ -29,7 +29,7 @@ class ContextController < ApplicationController
 
   before_action :load_canvas_career, only: [:roster]
 
-  before_action :require_user, only: [:inbox, :report_avatar_image]
+  skip_before_action :require_user, only: :object_snippet
   before_action :reject_student_view_student, only: [:inbox]
   protect_from_forgery except: [:object_snippet], with: :exception
 

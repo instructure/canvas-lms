@@ -19,7 +19,6 @@
 
 class AccessibilityIssuesController < ApplicationController
   before_action :require_context
-  before_action :require_user
   before_action :check_authorized_action
   before_action :set_issue, only: [:update]
 

@@ -25,7 +25,6 @@ class Login::OtpController < ApplicationController
   include Login::Shared
   include Login::OtpHelper
 
-  before_action :require_user
   before_action :require_password_session
   before_action :forbid_on_files_domain
 

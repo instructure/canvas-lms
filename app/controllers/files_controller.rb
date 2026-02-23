@@ -132,7 +132,23 @@ class FilesController < ApplicationController
   # an Account in show_relative
   protect_from_forgery except: [:api_capture, :show_relative], with: :exception
 
-  before_action :require_user, only: :create_pending
+  skip_before_action :require_user, only: %i[api_capture
+                                             api_create
+                                             api_create_success
+                                             api_create_success_cors
+                                             api_index
+                                             api_show
+                                             file_ref
+                                             icon_metadata
+                                             image_thumbnail
+                                             images
+                                             index
+                                             public_url
+                                             react_files
+                                             show
+                                             show_relative
+                                             show_thumbnail
+                                             update_word_count]
   before_action :require_context, except: %i[
     image_thumbnail
     show_thumbnail

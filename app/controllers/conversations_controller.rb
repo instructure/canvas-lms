@@ -158,7 +158,7 @@ class ConversationsController < ApplicationController
   include Api::V1::Progress
   include HorizonMode
 
-  before_action :require_user, except: [:public_feed]
+  skip_before_action :require_user, only: :public_feed
   before_action :reject_student_view_student
   before_action :get_conversation, only: %i[show update destroy add_recipients remove_messages]
   before_action :infer_scope, only: %i[index show create update add_recipients add_message remove_messages]

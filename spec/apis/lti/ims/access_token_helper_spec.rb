@@ -33,6 +33,7 @@ module Lti
         include Lti::IMS::AccessTokenHelper
 
         before_action :authorized_lti2_tool
+        skip_before_action :require_user
 
         def index
           head :ok

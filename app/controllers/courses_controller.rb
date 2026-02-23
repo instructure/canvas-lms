@@ -360,7 +360,15 @@ class CoursesController < ApplicationController
   include ObserverEnrollmentsHelper
   include DefaultDueTimeHelper
 
-  before_action :require_user, only: %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export new_quizzes_selection_update]
+  skip_before_action :require_user, only: %i[api_settings
+                                             enrollment_invitation
+                                             locks
+                                             permissions
+                                             ping
+                                             preview_html
+                                             public_feed
+                                             self_enrollment
+                                             show]
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_context, only: %i[roster locks create_file ping confirm_action copy effective_due_dates offline_web_exports link_validator settings start_offline_web_export statistics user_progress]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]

@@ -67,7 +67,7 @@
 #     }
 
 class DiscoveryPagesApiController < ApplicationController
-  before_action :require_user, :load_context, :require_root_account_management
+  before_action :load_context, :require_root_account_management
 
   # @API Get Discovery Page
   # Get the discovery page configuration for the domain root account.

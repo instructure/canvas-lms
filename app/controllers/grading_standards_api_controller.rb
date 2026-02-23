@@ -90,7 +90,6 @@
 class GradingStandardsApiController < ApplicationController
   include Api::V1::GradingStandard
 
-  before_action :require_user
   before_action :require_context
 
   # @API Create a new grading standard

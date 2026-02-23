@@ -42,7 +42,6 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   include Api::V1::ExternalTools
 
   before_action :require_context, only: [:create, :show]
-  before_action :require_user
   before_action :require_settings_or_url, only: :create
   before_action :require_manage_developer_keys, except: :show
   before_action :require_modify_site_admin_developer_keys, except: :show

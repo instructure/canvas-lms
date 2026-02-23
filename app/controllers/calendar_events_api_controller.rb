@@ -321,7 +321,7 @@ class CalendarEventsApiController < ApplicationController
   include CalendarConferencesHelper
   include ::RruleHelper
 
-  before_action :require_user, except: %w[public_feed index]
+  skip_before_action :require_user, only: %w[public_feed index]
   before_action :get_calendar_context, only: :create
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_authorization, only: %w[index user_index]

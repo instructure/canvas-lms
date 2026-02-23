@@ -48,6 +48,7 @@ module Lti
 
       before_action :require_context, except: [:show]
       skip_before_action :load_user, only: %i[create show re_reg]
+      skip_before_action :require_user, only: %i[create show re_reg]
 
       rescue_from Lti::Errors::InvalidToolProxyError, ::IMS::LTI::Errors::InvalidToolConsumerProfile do |exception|
         render json: exception.as_json, status: :bad_request
