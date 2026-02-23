@@ -123,7 +123,7 @@ describe Api::V1::AiExperience do
     context "with ai_experiences_context_file_upload feature flag enabled" do
       before { @course.enable_feature!(:ai_experiences_context_file_upload) }
 
-      it "includes context_files array when can_manage is true" do
+      it "includes context_files array with correct ContextFile shape" do
         attachment = attachment_model(context: @course, size: 1.megabyte, filename: "test.pdf")
         AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment:)
 
@@ -132,11 +132,15 @@ describe Api::V1::AiExperience do
         expect(json).to have_key(:context_files)
         expect(json[:context_files]).to be_an(Array)
         expect(json[:context_files].length).to eq(1)
-        expect(json[:context_files].first[:id]).to eq(attachment.id)
-        expect(json[:context_files].first[:filename]).to eq("test.pdf")
-        expect(json[:context_files].first).to have_key(:size)
-        expect(json[:context_files].first).to have_key(:content_type)
-        expect(json[:context_files].first).to have_key(:position)
+
+        file_json = json[:context_files].first
+        expect(file_json[:id]).to eq(attachment.id.to_s)
+        expect(file_json[:display_name]).to eq(attachment.display_name)
+        expect(file_json).to have_key(:size)
+        expect(file_json).to have_key(:content_type)
+        expect(file_json).to have_key(:url)
+        expect(file_json).not_to have_key(:filename)
+        expect(file_json).not_to have_key(:position)
       end
 
       it "includes context_files array when can_manage is false" do
@@ -146,8 +150,34 @@ describe Api::V1::AiExperience do
         json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: false)
 
         expect(json).to have_key(:context_files)
-        expect(json[:context_files]).to be_an(Array)
         expect(json[:context_files].length).to eq(1)
+      end
+
+      it "excludes deleted attachments from context_files" do
+        active = attachment_model(context: @course, size: 1.megabyte, filename: "active.pdf")
+        deleted = attachment_model(context: @course, size: 1.megabyte, filename: "deleted.pdf")
+        deleted.update_column(:file_state, "deleted")
+        AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment: active)
+        AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment: deleted)
+
+        json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: true)
+
+        expect(json[:context_files].length).to eq(1)
+        expect(json[:context_files].first[:id]).to eq(active.id.to_s)
+      end
+
+      it "returns context_files ordered by position" do
+        att1 = attachment_model(context: @course, size: 1.megabyte, filename: "first.pdf")
+        att2 = attachment_model(context: @course, size: 1.megabyte, filename: "second.pdf")
+        # Create in reverse order to ensure ordering is by position, not insertion
+        cf2 = AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment: att2)
+        cf1 = AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment: att1)
+        cf1.update_column(:position, 1)
+        cf2.update_column(:position, 2)
+
+        json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: true)
+
+        expect(json[:context_files].pluck(:id)).to eq([att1.id.to_s, att2.id.to_s])
       end
     end
 
