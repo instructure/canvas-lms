@@ -443,8 +443,7 @@ export default function VideoOptionsTray({
                             {isAsrCaptioningImprovements && (
                               <ClosedCaptionPanelV2
                                 subtitles={subtitles.map(st => ({
-                                  locale: st.locale,
-                                  inherited: st.inherited,
+                                  ...st,
                                   file: {name: st.language || st.locale},
                                   asr: Boolean(st.asr),
                                 }))}

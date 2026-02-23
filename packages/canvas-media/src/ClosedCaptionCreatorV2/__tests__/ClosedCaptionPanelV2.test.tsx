@@ -382,8 +382,6 @@ describe('<ClosedCaptionPanelV2 />', () => {
       const uploadButton = screen.getByText('Upload')
       fireEvent.click(uploadButton)
 
-      screen.debug()
-
       // Wait for a11y announcement for upload to complete
       await screen.findByText('Captions have been added for Spanish')
     })
@@ -433,7 +431,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       const uploadButton = screen.getByText('Upload')
       fireEvent.click(uploadButton)
 
-      expect(await screen.findByText('Failed')).toBeInTheDocument()
+      expect(await screen.findByText('Upload Failed')).toBeInTheDocument()
 
       await screen.findByText('German caption upload failed')
     })
@@ -441,7 +439,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     it('a11y: announces when a caption delete fails', async () => {
       server.use(
         http.put('/api/media_objects/*/media_tracks', () =>
-          HttpResponse.json({error: 'Delete failed'}, {status: 400}),
+          HttpResponse.json({error: 'Delete Failed'}, {status: 400}),
         ),
       )
 
@@ -462,7 +460,139 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
       // Caption should still be visible with error message
       expect(screen.getByText('French')).toBeInTheDocument()
-      expect(screen.getByText('Failed')).toBeInTheDocument()
+      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+    })
+
+    it('a11y: retry upload re-announces and succeeds on retry', async () => {
+      let callCount = 0
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => {
+          callCount++
+          if (callCount === 1) {
+            return HttpResponse.json({error: 'Server error'}, {status: 500})
+          }
+          return HttpResponse.json({data: 'success'})
+        }),
+      )
+
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Open manual caption creator
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+      const selectPlaceholder = screen.getByText('Select Language')
+      fireEvent.click(selectPlaceholder)
+      fireEvent.click(screen.getByText('German'))
+
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+
+      fireEvent.click(screen.getByText('Upload'))
+
+      // Wait for upload failure
+      expect(await screen.findByText('Upload Failed')).toBeInTheDocument()
+      expect(screen.getByText('Retry German')).toBeInTheDocument()
+
+      // Click retry
+      fireEvent.click(screen.getByText('Retry German'))
+
+      // Should succeed on second attempt
+      await screen.findByText('Captions have been added for German')
+      expect(screen.queryByText('Upload Failed')).not.toBeInTheDocument()
+    })
+
+    it('retrying one caption does not clear the failed state of another caption', async () => {
+      // First call: delete French fails; second call: upload German succeeds
+      let callCount = 0
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => {
+          callCount++
+          if (callCount === 1) {
+            // French delete fails
+            return HttpResponse.json({error: 'Server error'}, {status: 500})
+          }
+          // German upload retry succeeds
+          return HttpResponse.json({data: 'success'})
+        }),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Delete French → fails
+      fireEvent.click(screen.getByText('Delete French'))
+      await screen.findByText('Delete Failed')
+
+      // Now upload German → also fails
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
+      )
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByText('German'))
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+      fireEvent.click(screen.getByText('Upload'))
+
+      await screen.findByText('Upload Failed')
+
+      // Both failures should be visible simultaneously
+      expect(screen.getByText('French')).toBeInTheDocument()
+      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+      expect(screen.getByText('German')).toBeInTheDocument()
+      expect(screen.getByText('Upload Failed')).toBeInTheDocument()
+
+      // Retry German upload (succeeds)
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+      fireEvent.click(screen.getByText('Retry German'))
+
+      await screen.findByText('Captions have been added for German')
+
+      // French should still show its delete-failed state
+      expect(screen.getByText('French')).toBeInTheDocument()
+      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+    })
+
+    it('a11y: retry delete re-announces and succeeds on retry', async () => {
+      let callCount = 0
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => {
+          callCount++
+          if (callCount === 1) {
+            return HttpResponse.json({error: 'Server error'}, {status: 500})
+          }
+          return HttpResponse.json({data: 'success'})
+        }),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Click delete (fails on first attempt)
+      fireEvent.click(screen.getByText('Delete French'))
+
+      await screen.findByText('Delete Failed')
+      expect(screen.getByText('Retry French')).toBeInTheDocument()
+
+      // Click retry (succeeds on second attempt)
+      fireEvent.click(screen.getByText('Retry French'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('French')).not.toBeInTheDocument()
+      })
     })
   })
 

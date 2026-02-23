@@ -18,7 +18,7 @@
 
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconDownloadLine, IconTrashLine} from '@instructure/ui-icons'
+import {IconDownloadLine, IconRefreshLine, IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
@@ -29,7 +29,6 @@ import formatMessage from 'format-message'
  */
 interface BaseCaptionRowProps {
   captionName: string
-  liveRegion: () => HTMLElement | null
 }
 
 /**
@@ -46,6 +45,7 @@ interface ProcessingCaptionRowProps extends BaseCaptionRowProps {
 interface FailedCaptionRowProps extends BaseCaptionRowProps {
   status: 'failed'
   errorMessage?: string
+  onRetry?: () => void
 }
 
 /**
@@ -103,8 +103,21 @@ export function CaptionRow(props: CaptionRowProps) {
           {status === 'failed' && (
             <Flex alignItems="center" gap="small">
               <Text size="small" color="danger">
-                {props.errorMessage || 'Upload failed'}
+                {props.errorMessage || formatMessage('Upload Failed')}
               </Text>
+              {props.onRetry && (
+                <IconButton
+                  screenReaderLabel={formatMessage('Retry {captionName}', {
+                    captionName: props.captionName,
+                  })}
+                  onClick={props.onRetry}
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                >
+                  <IconRefreshLine />
+                </IconButton>
+              )}
             </Flex>
           )}
 
