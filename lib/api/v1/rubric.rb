@@ -82,12 +82,13 @@ module Api::V1::Rubric
     assigned_rubric = nil
     if assignment.active_rubric_association?
       rubric_association = assignment.rubric_association
-      can_update_rubric = can_do(rubric_association.rubric, @current_user, :update)
       assigned_rubric = rubric_json(rubric_association.rubric, @current_user, session, style: "full")
       assigned_rubric[:unassessed] = Rubric.active.unassessed.where(id: rubric_association.rubric.id).exists?
-      assigned_rubric[:can_update] = can_update_rubric
+      assigned_rubric[:can_update] = can_do(rubric_association.rubric, @current_user, :update)
       assigned_rubric[:association_count] = RubricAssociation.active.where(rubric_id: rubric_association.rubric.id).count
       rubric_association = rubric_association_json(rubric_association, @current_user, session)
+      rubric_association[:can_update] = can_do(assignment.rubric_association, @current_user, :update)
+      rubric_association[:can_delete] = can_do(assignment.rubric_association, @current_user, :delete)
     end
 
     rubrics_hash = {

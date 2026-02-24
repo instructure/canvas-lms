@@ -182,17 +182,16 @@ export const RubricAssignmentContainer = ({
     margin: 'medium 0',
   }
 
-  // If the user doesn't have manage rubric permissions and there is no rubric,
-  // don't show the container at all
-  // TODO: Do deeper permission checks on rubric/association level on EVAL-6460
-  if (!rubric && !canManageRubrics) {
+  // If the user doesn't have manage rubric permissions and
+  // there is no rubric or rubric association, don't show the container at all
+  if ((!rubric || !rubricAssociation) && !canManageRubrics) {
     return null
   }
 
   return (
     <QueryClientProvider client={queryClient}>
       <View as="div" display="inline-block" {...containerStyles}>
-        {rubric ? (
+        {rubric && rubricAssociation ? (
           <>
             <Flex as="div" justifyItems="space-between" alignItems="center">
               <Flex.Item shouldGrow shouldShrink overflowX="hidden">
@@ -219,46 +218,48 @@ export const RubricAssignmentContainer = ({
                   {I18n.t('Preview Rubric')}
                 </Button>
 
-                {/* TODO: Do deeper permission checks on rubric/association level on EVAL-6460 */}
-                {canManageRubrics && (
-                  <>
-                    <Tooltip renderTip={I18n.t('Edit Rubric')}>
-                      <IconButton
-                        margin="0 0 0 small"
-                        screenReaderLabel={I18n.t('Edit Rubric')}
-                        data-testid="edit-assignment-rubric-button"
-                        onClick={handleEditClick}
-                      >
-                        <IconEditLine />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip renderTip={removeTooltipText}>
-                      <IconButton
-                        margin="0 0 0 small"
-                        data-testid="remove-assignment-rubric-button"
-                        screenReaderLabel={removeTooltipText}
-                        onClick={() => setIsDeleteConfirmModalOpen(true)}
-                      >
-                        <IconTrashLine />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip renderTip={I18n.t('Replace Rubric')}>
-                      <IconButton
-                        margin="0 0 0 small"
-                        screenReaderLabel={I18n.t('Replace Rubric')}
-                        data-testid="find-assignment-rubric-icon-button"
-                        onClick={() => setIsSearchTrayOpen(true)}
-                      >
-                        <IconSearchLine />
-                      </IconButton>
-                    </Tooltip>
-                  </>
+                {rubricAssociation.canUpdate && (
+                  <Tooltip renderTip={I18n.t('Edit Rubric')}>
+                    <IconButton
+                      margin="0 0 0 small"
+                      screenReaderLabel={I18n.t('Edit Rubric')}
+                      data-testid="edit-assignment-rubric-button"
+                      onClick={handleEditClick}
+                    >
+                      <IconEditLine />
+                    </IconButton>
+                  </Tooltip>
+                )}
+
+                {rubricAssociation.canDelete && (
+                  <Tooltip renderTip={removeTooltipText}>
+                    <IconButton
+                      margin="0 0 0 small"
+                      data-testid="remove-assignment-rubric-button"
+                      screenReaderLabel={removeTooltipText}
+                      onClick={() => setIsDeleteConfirmModalOpen(true)}
+                    >
+                      <IconTrashLine />
+                    </IconButton>
+                  </Tooltip>
+                )}
+
+                {canManageRubrics && rubricAssociation.canUpdate && (
+                  <Tooltip renderTip={I18n.t('Replace Rubric')}>
+                    <IconButton
+                      margin="0 0 0 small"
+                      screenReaderLabel={I18n.t('Replace Rubric')}
+                      data-testid="find-assignment-rubric-icon-button"
+                      onClick={() => setIsSearchTrayOpen(true)}
+                    >
+                      <IconSearchLine />
+                    </IconButton>
+                  </Tooltip>
                 )}
               </Flex.Item>
             </Flex>
             <View>
-              {/* TODO: Do deeper permission checks on rubric/association level on EVAL-6460 */}
-              {rubricSelfAssessmentFFEnabled && canManageRubrics && (
+              {rubricSelfAssessmentFFEnabled && rubricAssociation.canUpdate && (
                 <>
                   <View as="hr" />
                   <RubricSelfAssessmentSettings assignmentId={assignmentId} rubricId={rubric.id} />

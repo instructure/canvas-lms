@@ -286,7 +286,11 @@ export const saveRubric = async (
       association_count: savedRubric.association_count,
     },
     rubricAssociation: rubric_association
-      ? mapRubricAssociationUnderscoredKeysToCamelCase(rubric_association)
+      ? {
+          ...mapRubricAssociationUnderscoredKeysToCamelCase(rubric_association),
+          canUpdate: rubric_association.permissions?.update,
+          canDelete: rubric_association.permissions?.delete,
+        }
       : undefined,
   }
 }
