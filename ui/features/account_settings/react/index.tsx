@@ -18,27 +18,9 @@
 
 import React from 'react'
 import {render} from '@canvas/react'
-import {Provider} from 'react-redux'
-import {ConnectedSecurityPanel} from './components/SecurityPanel'
-import {configStore, defaultState} from './store'
+import {SecurityPanel} from './components/SecurityPanel'
+import type {SecurityPanelProps} from './components/SecurityPanel'
 
-export function start(element, props = {}, state = defaultState) {
-  const initialState = {...state}
-  if (props.initialCspSettings) {
-    initialState.cspEnabled = props.initialCspSettings.enabled
-    initialState.cspInherited = props.initialCspSettings.inherited
-  }
-  const store = configStore(initialState, props.api)
-
-  const config = {
-    maxDomains: 50,
-    accountId: window.ENV.ACCOUNT.id,
-  }
-
-  render(
-    <Provider store={store}>
-      <ConnectedSecurityPanel {...config} {...props} />
-    </Provider>,
-    element,
-  )
+export function start(element: Element, props: SecurityPanelProps): void {
+  render(<SecurityPanel {...props} />, element)
 }
