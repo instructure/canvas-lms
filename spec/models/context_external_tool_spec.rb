@@ -3441,6 +3441,26 @@ describe ContextExternalTool do
           .to all(eq("deleted"))
       end
     end
+
+    context "when save! fails during destroy" do
+      let(:original_state) { deployment.workflow_state }
+
+      before do
+        # capture the original state before attempting destroy
+        original_state
+        allow(deployment).to receive(:save!).and_raise(
+          ActiveRecord::RecordInvalid.new(deployment)
+        )
+      end
+
+      it "rolls back context control deletions" do
+        expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
+
+        expect(deployment.reload.workflow_state).to eq(original_state)
+        expect(deployment.context_controls.reload.pluck(:workflow_state))
+          .to all(eq("active"))
+      end
+    end
   end
 
   describe "#can_access_content_tag?" do

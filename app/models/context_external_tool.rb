@@ -931,12 +931,14 @@ class ContextExternalTool < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = "deleted"
-    # update all the associated context_control's workflow_state to deleted
-    Lti::ContextControl
-      .where(deployment_id: id)
-      .update_all(workflow_state: "deleted")
-    run_callbacks(:destroy) { save! }
+    transaction do
+      self.workflow_state = "deleted"
+      # update all the associated context_control's workflow_state to deleted
+      Lti::ContextControl
+        .where(deployment_id: id)
+        .update_all(workflow_state: "deleted")
+      run_callbacks(:destroy) { save! }
+    end
   end
 
   def precedence
