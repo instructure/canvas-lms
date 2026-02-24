@@ -21,7 +21,6 @@ import $ from 'jquery'
 // eslint-disable-next-line import/no-named-as-default
 import htmlEscape from '@instructure/html-escape'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import axios from '@canvas/axios'
 import 'jqueryui/tabs'
 import globalAnnouncements from './global_announcements'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -40,6 +39,7 @@ import RQDModal from '../react/components/RQDModal'
 import OpenRegistrationWarning from '../react/components/OpenRegistrationWarning'
 import ServiceDescriptionModal from '../react/components/ServiceDescriptionModal'
 import {LoadTab} from '../../../shared/tabs/react/LoadTab'
+import ready from '@instructure/ready'
 
 const I18n = createI18nScope('account_settings')
 const _settings_smallTablet = window.matchMedia('(min-width: 550px)').matches
@@ -72,7 +72,7 @@ export function addUsersLink(event) {
   $enroll_users_form.find('#admin_role_id').focus().select()
 }
 
-$(document).ready(function () {
+ready(function () {
   // for report configure modals
   let reportMount
   let reportRoot
@@ -260,19 +260,14 @@ $(document).ready(function () {
     if (targetId !== 'tab-security-selected') return
 
     const splitContext = window.ENV.context_asset_string.split('_')
-    const api = axios.create({})
 
-    import(
-      /* webpackChunkName: "[request]" */
-      '../react/index'
-    )
+    import(/* webpackChunkName: "[request]" */ '../react/index')
       .then(({start}) => {
         start(document.getElementById('tab-security-mount'), {
           context: splitContext[0],
           contextId: splitContext[1],
           isSubAccount: !ENV.ACCOUNT.root_account,
           initialCspSettings: ENV.CSP,
-          api,
         })
       })
       .catch(() => {
