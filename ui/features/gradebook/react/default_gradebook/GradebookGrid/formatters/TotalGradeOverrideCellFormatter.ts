@@ -22,8 +22,7 @@ import type Gradebook from '../../Gradebook'
 import useStore from '../../stores'
 import {gradeOverrideCustomStatus} from '../../FinalGradeOverrides/FinalGradeOverride.utils'
 
-// @ts-expect-error
-function renderStartContainer(gradeInfo) {
+function renderStartContainer(gradeInfo: {valid: boolean}) {
   let content = ''
   if (!gradeInfo.valid) {
     content += '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
@@ -32,16 +31,18 @@ function renderStartContainer(gradeInfo) {
   return `<div class="Grid__GradeCell__StartContainer">${content}</div>`
 }
 
-// @ts-expect-error
-function render(formattedGrade, gradeInfo, studentId, selectedGradingPeriodId) {
+function render(
+  formattedGrade: string,
+  gradeInfo: {valid: boolean},
+  studentId: string | null,
+  selectedGradingPeriodId: string | null,
+) {
   const escapedGrade = lodashEscape(formattedGrade)
 
   const {finalGradeOverrides} = useStore.getState()
-  const customGradeStatusId = gradeOverrideCustomStatus(
-    finalGradeOverrides,
-    studentId,
-    selectedGradingPeriodId,
-  )
+  const customGradeStatusId = studentId != null
+    ? gradeOverrideCustomStatus(finalGradeOverrides, studentId, selectedGradingPeriodId ?? undefined)
+    : null
   const colorClass = customGradeStatusId ? `custom-grade-status-${customGradeStatusId}` : ''
 
   // xsslint safeString.identifier escapedGrade
@@ -96,8 +97,7 @@ export default class TotalGradeOverrideCellFormatter {
     this.render = this.render.bind(this)
   }
 
-  // @ts-expect-error
-  render(_row, _cell, _value, _columnDef, student /* dataContext */) {
+  render(_row: unknown, _cell: unknown, _value: unknown, _columnDef: unknown, student: {id: string}) {
     const gradeInfo = this.options.getGradeInfoForUser(student.id)
     const formattedGrade = this.options.formatGradeInfo(gradeInfo)
     const studentId = this.options.customGradeStatusesEnabled ? student.id : null
