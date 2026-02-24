@@ -32,7 +32,8 @@ module Accessibility
 
       render json: {
                id: progress.id,
-               workflow_state: progress.workflow_state
+               workflow_state: progress.workflow_state,
+               created_at: progress.created_at&.iso8601
              },
              status: :ok
     end
@@ -41,7 +42,8 @@ module Accessibility
       progress = Accessibility::CourseScanService.queue_course_scan(@context)
       render json: {
                id: progress.id,
-               workflow_state: progress.workflow_state
+               workflow_state: progress.workflow_state,
+               created_at: progress.created_at&.iso8601
              },
              status: :ok
     rescue Accessibility::CourseScanService::ScanLimitExceededError => e

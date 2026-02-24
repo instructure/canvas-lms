@@ -45,6 +45,100 @@ const renderComponent = () => {
   )
 }
 
+describe('AccessibilityCourseScan last checked date', () => {
+  beforeAll(() => server.listen())
+
+  afterEach(() => {
+    server.resetHandlers()
+    useAccessibilityScansStore.setState(initialState)
+    delete (window.ENV as any).LOCALE
+    delete (window.ENV as any).TIMEZONE
+  })
+
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    window.ENV.LOCALE = 'en-US'
+    ;(window.ENV as any).TIMEZONE = 'UTC'
+  })
+
+  describe('when isAutomaticScanEnabled is false', () => {
+    beforeEach(() => {
+      useAccessibilityScansStore.setState({isAutomaticScanEnabled: false})
+    })
+
+    it('shows "Last checked" with the formatted date when scan is completed', async () => {
+      server.use(
+        http.get(COURSE_SCAN_URL, () =>
+          HttpResponse.json({
+            id: 1,
+            workflow_state: 'completed',
+            created_at: '2026-04-03T13:30:00Z',
+          }),
+        ),
+      )
+
+      renderComponent()
+
+      await waitFor(() => {
+        expect(screen.getByText(/Last checked Apr 3, 2026/)).toBeInTheDocument()
+      })
+    })
+
+    it('does not show "Last checked" when created_at is null', async () => {
+      server.use(
+        http.get(COURSE_SCAN_URL, () =>
+          HttpResponse.json({id: 1, workflow_state: 'completed', created_at: null}),
+        ),
+      )
+
+      renderComponent()
+
+      await waitFor(() => {
+        expect(screen.queryByText(/Last checked/)).not.toBeInTheDocument()
+      })
+    })
+
+    it('does not show "Last checked" when scan is not completed', async () => {
+      server.use(
+        http.get(COURSE_SCAN_URL, () =>
+          HttpResponse.json({id: 1, workflow_state: 'failed', created_at: '2026-04-03T13:30:00Z'}),
+        ),
+      )
+
+      renderComponent()
+
+      await waitFor(() => {
+        expect(screen.queryByText(/Last checked/)).not.toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('when isAutomaticScanEnabled is true', () => {
+    beforeEach(() => {
+      useAccessibilityScansStore.setState({isAutomaticScanEnabled: true})
+    })
+
+    it('does not show "Last checked" even when scan is completed with a date', async () => {
+      server.use(
+        http.get(COURSE_SCAN_URL, () =>
+          HttpResponse.json({
+            id: 1,
+            workflow_state: 'completed',
+            created_at: '2026-04-03T13:30:00Z',
+          }),
+        ),
+      )
+
+      renderComponent()
+
+      await waitFor(() => {
+        expect(screen.queryByText(/Last checked/)).not.toBeInTheDocument()
+      })
+    })
+  })
+})
+
 describe('AccessibilityCourseScan button labels', () => {
   beforeAll(() => server.listen())
 

@@ -21,6 +21,7 @@ export type AccessibilityScanWorkflowState = 'completed' | 'failed' | 'queued' |
 export interface AccessibilityScanResult {
   id: number
   workflow_state: AccessibilityScanWorkflowState
+  created_at: string | null
 }
 
 export interface CourseScanProps {
