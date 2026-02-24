@@ -2263,7 +2263,7 @@ BASE_PERMISSIONS = {
   access_oak_teacher: {
     label: -> { I18n.t("IgniteAI Agent - Faculty & Support") },
     available_to: %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership],
-    true_for: %w[AccountAdmin],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
     account_allows: ->(a) { a.feature_enabled?(:oak_for_teachers) },
     details: [
       { title: -> { I18n.t("IgniteAI Agent - Faculty & Support") },

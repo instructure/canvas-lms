@@ -651,4 +651,24 @@ describe FeatureFlags::Hooks do
       end
     end
   end
+
+  describe "oak_for_teachers_visible_on_hook" do
+    let(:context) { instance_double(Account) }
+
+    it "returns true when oak_for_admins feature is enabled" do
+      allow(context).to receive(:feature_enabled?).with(:oak_for_admins).and_return(true)
+
+      result = FeatureFlags::Hooks.oak_for_teachers_visible_on_hook(context)
+
+      expect(result).to be true
+    end
+
+    it "returns false when oak_for_admins feature is disabled" do
+      allow(context).to receive(:feature_enabled?).with(:oak_for_admins).and_return(false)
+
+      result = FeatureFlags::Hooks.oak_for_teachers_visible_on_hook(context)
+
+      expect(result).to be false
+    end
+  end
 end
