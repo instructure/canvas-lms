@@ -299,7 +299,7 @@ describe('RubricForm Tests', () => {
         const {getByTestId, queryByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 
@@ -324,11 +324,26 @@ describe('RubricForm Tests', () => {
         expect(queryByTestId('edit-confirm-modal')).toBeInTheDocument()
       })
 
+      it('does not render when rubric is unassessed', () => {
+        const {getByTestId, queryByTestId} = renderComponent({
+          rubricId: '1',
+          assignmentId: '1',
+          rubric: {...RUBRIC, unassessed: true},
+          rubricAssociation: RUBRIC_ASSOCIATION,
+        })
+
+        const titleInput = getByTestId('rubric-form-title')
+        fireEvent.change(titleInput, {target: {value: 'Rubric 1 (edited)'}})
+
+        fireEvent.click(getByTestId('save-rubric-button'))
+        expect(queryByTestId('edit-confirm-modal')).toBeNull()
+      })
+
       it('calls save on confirmation', async () => {
         const {getByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 
@@ -348,7 +363,7 @@ describe('RubricForm Tests', () => {
         const {getByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 
