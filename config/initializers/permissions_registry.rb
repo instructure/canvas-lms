@@ -2103,8 +2103,8 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("Allows user to open Analytics Hub, the central library of all things Data, Analytics and Insights.") } }
     ]
   },
-  view_ask_questions_analytics: {
-    label: -> { I18n.t("Ask Your Data") },
+  view_ask_questions_pinboards: {
+    label: -> { I18n.t("Pinboards - view") },
     group: :view_advanced_analytics,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
@@ -2112,13 +2112,27 @@ BASE_PERMISSIONS = {
     account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
     account_details: [
       { title: -> { I18n.t("Account Settings") },
-        description: -> { I18n.t("Allows users to access the Ask Your Data feature of Intelligent Insights.") } },
+        description: -> { I18n.t("Allows view access to Ask Your Data's Pinboards feature of Intelligent Insights. Does not include access to Ask Your Data's Chat feature or AI.") } },
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Provides a scoped access to the Ask Your Data feature.") } }
+    ]
+  },
+  view_ask_questions_analytics: {
+    label: -> { I18n.t("Ask Your Data - use") },
+    group: :view_advanced_analytics,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: true,
+    account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
+    account_details: [
+      { title: -> { I18n.t("Account Settings") },
+        description: -> { I18n.t("Allows users to access, interact with, and use the Ask Your Data feature of Intelligent Insights.") } },
       { title: -> { I18n.t("Subaccounts") },
         description: -> { I18n.t("Provides a scoped access to the Ask Your Data feature.") } }
     ]
   },
   manage_ask_questions_analytics_context: {
-    label: -> { I18n.t("Ask Your Data - Context Library") },
+    label: -> { I18n.t("Ask Your Data's Context Library - modify") },
     group: :view_advanced_analytics,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
@@ -2126,7 +2140,7 @@ BASE_PERMISSIONS = {
     account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
     account_details: [
       { title: -> { I18n.t("Account Settings") },
-        description: -> { I18n.t("Allows Ask Your Data users to access and manage the product's Context Library feature, to influence and tailor AI responses for all users.") } },
+        description: -> { I18n.t("Allows Ask Your Data users to access and modify the product's Context Library feature, to influence and tailor AI responses for all users.") } },
       { title: -> { I18n.t("Subaccounts") },
         description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
