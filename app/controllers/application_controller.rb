@@ -509,6 +509,7 @@ class ApplicationController < ActionController::Base
     ux_list_concluded_courses_in_bp
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
+    accessibility_automatic_scanning
     account_level_mastery_scales
     ams_root_account_integration
     ams_advanced_content_organization

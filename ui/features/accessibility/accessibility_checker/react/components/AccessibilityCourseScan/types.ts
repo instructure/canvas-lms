@@ -29,7 +29,13 @@ export interface CourseScanProps {
   scanDisabled: boolean
 }
 
-export interface ScanViewProps {
+interface ButtonLabel {
+  buttonLabel: string
+}
+
+export interface ScanInProgressViewProps extends ButtonLabel {}
+
+export interface ScanViewProps extends ButtonLabel {
   handleCourseScan?: () => void
   isRequestLoading?: boolean
 }

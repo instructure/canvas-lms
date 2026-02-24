@@ -29,6 +29,7 @@ const I18n = createI18nScope('accessibility_scan')
 
 interface CourseScanWrapperProps {
   children: React.ReactNode
+  buttonLabel?: string
   scanButtonDisabled?: boolean
   handleCourseScan?: () => void
 }
@@ -37,6 +38,7 @@ export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
   children,
   scanButtonDisabled,
   handleCourseScan,
+  buttonLabel,
 }) => {
   return (
     <View as="div">
@@ -65,18 +67,20 @@ export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
                   {I18n.t('Course Accessibility Checker')}
                 </Heading>
               </Flex.Item>
-              <Flex.Item align="start" overflowX="visible" width={props.flexItemWidth}>
-                <Button
-                  color="primary"
-                  margin="small 0"
-                  disabled={scanButtonDisabled}
-                  onClick={handleCourseScan}
-                  display={props.buttonDisplay}
-                  width={props.buttonWidth}
-                >
-                  {I18n.t('Scan Course')}
-                </Button>
-              </Flex.Item>
+              {buttonLabel && (
+                <Flex.Item align="start" overflowX="visible" width={props.flexItemWidth}>
+                  <Button
+                    color="primary"
+                    margin="small 0"
+                    disabled={scanButtonDisabled}
+                    onClick={handleCourseScan}
+                    display={props.buttonDisplay}
+                    width={props.buttonWidth}
+                  >
+                    {buttonLabel}
+                  </Button>
+                </Flex.Item>
+              )}
             </Flex>
           )
         }}

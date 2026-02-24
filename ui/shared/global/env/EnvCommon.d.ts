@@ -326,6 +326,7 @@ export type SiteAdminFeatureId =
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
 export type RootAccountFeatureId =
+  | 'accessibility_automatic_scanning'
   | 'account_level_mastery_scales'
   | 'ams_root_account_integration'
   | 'ams_advanced_content_organization'
