@@ -71,6 +71,12 @@ RSpec.describe Mutations::UpdateDiscussionReadState do
     expect(scope.pluck(:workflow_state)).not_to include("read")
   end
 
+  it "returns not found if user cannot read the topic" do
+    # user model is not part of the course thus he shouldnt have read access
+    result = run_mutation({ id: @topic.id, read: true }, user_model)
+    expect(result.dig("errors", 0, "message")).to eq "not found"
+  end
+
   it "marks all as read" do
     expect(@topic.unread_count(@teacher)).to eq 5
     result = run_mutation({ id: @topic.id, read: true })
