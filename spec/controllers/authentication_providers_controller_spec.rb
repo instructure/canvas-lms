@@ -438,8 +438,7 @@ describe AuthenticationProvidersController do
 
   describe "discovery_page_active SSO setting" do
     before do
-      skip("2026-02-23 AE-3516")
-      allow_any_instance_of(Account).to receive(:discovery_page_allowed?).and_return(true)
+      Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
     end
 
     it "includes discovery_page_active in the sso_settings response when allowed" do
@@ -452,7 +451,7 @@ describe AuthenticationProvidersController do
     end
 
     it "does not include discovery_page_active when not allowed" do
-      allow_any_instance_of(Account).to receive(:discovery_page_allowed?).and_return(false)
+      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
       account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
       account.save!
       get :show_sso_settings, params: { account_id: account.id }, format: :json
@@ -472,7 +471,7 @@ describe AuthenticationProvidersController do
     end
 
     it "ignores discovery_page_active parameter when not allowed" do
-      allow_any_instance_of(Account).to receive(:discovery_page_allowed?).and_return(false)
+      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
       put :update_sso_settings, params: {
         account_id: account.id,
         sso_settings: { discovery_page_active: true }
