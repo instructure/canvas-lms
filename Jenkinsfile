@@ -54,6 +54,7 @@ pipeline {
   agent { label 'canvas-docker' }
 
   options {
+    skipDefaultCheckout()
     timeout(time: 2, unit: 'HOURS')
     ansiColor('xterm')
     timestamps()

@@ -81,6 +81,12 @@ node(nodeLabel()) {
             )
           }
 
+          stage('Setup') {
+            def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+            checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 1)
+            distribution.stashBuildScripts()
+          }
+
           parallel(stages)
           } finally {
             buildSummaryReport.saveRunManifest()

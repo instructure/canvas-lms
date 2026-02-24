@@ -52,7 +52,7 @@ node(nodeLabel()) {
               }
 
               stage("${stageName} - Setup") {
-                jsTestsStage.checkoutCode()
+                distribution.unstashBuildScripts()
                 jsTestsStage.provisionDocker()
                 jsTestsStage.startServices()
               }
@@ -80,6 +80,11 @@ node(nodeLabel()) {
             } finally {
               pipelineHelpers.cleanupDocker()
             }
+          }
+
+          stage('Checkout') {
+            jsTestsStage.checkoutCode()
+            distribution.stashBuildScripts()
           }
 
           parallel(tests)

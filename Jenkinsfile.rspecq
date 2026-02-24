@@ -188,7 +188,8 @@ node(nodeLabel()) {
           stage('Checkout Code') {
             env.CRYSTALBALL_SPEC = '.'
             sh 'rm -vrf ./tmp'
-            checkout scm
+            def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+            checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 1)
             distribution.stashBuildScripts()
           }
 
