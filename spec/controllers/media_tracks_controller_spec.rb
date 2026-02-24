@@ -82,6 +82,220 @@ describe MediaTracksController do
       end
     end
 
+    describe "#create_asr" do
+      let(:kaltura_client) { instance_double(CanvasKaltura::ClientV3) }
+      let(:caption_asset_response) { { id: "caption_asset_123", languageCode: "en", status: "2" } }
+
+      before do
+        allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
+        allow(kaltura_client).to receive_messages(
+          startSession: nil,
+          create_caption_asset: caption_asset_response,
+          caption_asset_contents: "1\n00:00:01,000 --> 00:00:02,000\nHello"
+        )
+      end
+
+      context "feature flag" do
+        it "returns 404 when feature flag is disabled" do
+          Account.site_admin.disable_feature!(:rce_asr_captioning_improvements)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+          expect(response).to have_http_status(:not_found)
+        end
+
+        it "proceeds when feature flag is enabled" do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+          expect(response).to be_successful
+        end
+      end
+
+      context "authorization" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "requires proper permissions" do
+          student_in_course(active_all: true)
+          user_session(@student)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+          expect(response).to be_unauthorized
+        end
+
+        it "allows authorized users to create ASR captions" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+          expect(response).to be_successful
+        end
+      end
+
+      context "locale validation" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "accepts valid locales" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil).exactly(3).times
+          %w[en es fr-CA].each do |locale|
+            post "create_asr", params: { media_object_id: @mo.media_id, locale: }
+            expect(response).to be_successful
+          end
+        end
+
+        it "rejects empty locale" do
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "" }
+          expect(response).to have_http_status(:bad_request)
+          expect(json_parse(response.body)["error"]).to include("Invalid or missing locale")
+        end
+
+        it "rejects locale with special characters" do
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: '<img src="x">' }
+          expect(response).to have_http_status(:bad_request)
+          expect(json_parse(response.body)["error"]).to include("Invalid or missing locale")
+        end
+
+        it "rejects missing locale parameter" do
+          post "create_asr", params: { media_object_id: @mo.media_id }
+          expect(response).to have_http_status(:bad_request)
+        end
+      end
+
+      context "Kaltura integration" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "successfully creates caption asset" do
+          expect(kaltura_client).to receive(:startSession).with(CanvasKaltura::SessionType::ADMIN)
+          expect(kaltura_client).to receive(:create_caption_asset).with(@mo.media_id, "en")
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+          expect(response).to be_successful
+        end
+
+        it "handles Kaltura API failures gracefully" do
+          allow(kaltura_client).to receive(:create_caption_asset).and_return(nil)
+
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(json_parse(response.body)["error"]).to include("Failed to create caption asset")
+        end
+
+        it "does not create a new Kaltura asset when a processing track already exists" do
+          existing_track = @mo.media_tracks.create!(
+            kind: "subtitles",
+            locale: "en",
+            content: "",
+            external_id: "existing_asset_id",
+            workflow_state: "processing",
+            user: @teacher
+          )
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+
+          expect(kaltura_client).not_to have_received(:create_caption_asset)
+          expect(response).to be_successful
+          expect(existing_track.reload.external_id).to eq("existing_asset_id")
+        end
+      end
+
+      context "MediaTrack creation" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "creates track with correct external_id" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+
+          track = @mo.media_tracks.last
+          expect(track.external_id).to eq("caption_asset_123")
+        end
+
+        it "sets workflow_state to ready when caption asset is ready and SRT is available" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+
+          track = @mo.media_tracks.last
+          expect(track.workflow_state).to eq("ready")
+          expect(track.content).to eq("1\n00:00:01,000 --> 00:00:02,000\nHello")
+        end
+
+        it "sets workflow_state to processing when caption asset is not yet ready" do
+          allow(kaltura_client).to receive(:create_caption_asset)
+            .and_return({ id: "caption_asset_123", languageCode: "en", status: "1" })
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+
+          track = @mo.media_tracks.last
+          expect(track.workflow_state).to eq("processing")
+          expect(track.content).to eq("")
+        end
+
+        it "sets workflow_state to failed when caption asset is ready but SRT is unavailable" do
+          allow(kaltura_client).to receive(:caption_asset_contents).and_return(nil)
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+
+          track = @mo.media_tracks.last
+          expect(track.workflow_state).to eq("failed")
+          expect(track.content).to eq("")
+        end
+
+        it "sets kind to subtitles" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+
+          track = @mo.media_tracks.last
+          expect(track.kind).to eq("subtitles")
+        end
+
+        it "associates with correct user" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+
+          track = @mo.media_tracks.last
+          expect(track.user_id).to eq(@teacher.id)
+        end
+
+        it "associates with correct locale" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "es" }
+
+          track = @mo.media_tracks.last
+          expect(track.locale).to eq("es")
+        end
+      end
+
+      context "response format" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "returns media_object_api_json for media_object context" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
+
+          expect(response).to be_successful
+          response_body = json_parse(response.body)
+          expect(response_body["media_id"]).to eq(@mo.media_id)
+          expect(response_body["media_tracks"]).to be_present
+        end
+
+        it "respects the exclude[] option" do
+          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en", exclude: ["tracks"] }
+
+          expect(response).to be_successful
+          response_body = json_parse(response.body)
+          expect(response_body["media_id"]).to eq(@mo.media_id)
+          expect(response_body["media_tracks"]).to be_nil
+        end
+      end
+    end
+
     describe "#show" do
       it "shows a track that belongs to the default attachment" do
         track = @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "subs")
@@ -339,6 +553,213 @@ describe MediaTracksController do
         track2 = attachment2.media_tracks.last
         expect(track2.content).to eq new_content
         expect(attachment2.media_tracks.count).to be(1)
+      end
+    end
+
+    describe "#create_asr" do
+      let(:kaltura_client) { instance_double(CanvasKaltura::ClientV3) }
+      let(:caption_asset_response) { { id: "caption_asset_456", languageCode: "en", status: "2" } }
+
+      before do
+        allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
+        allow(kaltura_client).to receive_messages(
+          startSession: nil,
+          create_caption_asset: caption_asset_response,
+          caption_asset_contents: "1\n00:00:01,000 --> 00:00:02,000\nHello"
+        )
+      end
+
+      context "feature flag" do
+        it "returns 404 when feature flag is disabled" do
+          Account.site_admin.disable_feature!(:rce_asr_captioning_improvements)
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+          expect(response).to have_http_status(:not_found)
+        end
+
+        it "proceeds when feature flag is enabled" do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+          expect(response).to be_successful
+        end
+      end
+
+      context "authorization" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "gives an error if you don't have permission to change the attachment" do
+          expect(Attachment).to receive(:find_by).with(id: @attachment.id.to_s).and_return(@attachment)
+          expect(@attachment).to receive(:editing_restricted?).with(:content).and_return(true)
+
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+          expect(response).to be_unauthorized
+        end
+
+        it "allows authorized users to create ASR captions" do
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+          expect(response).to be_successful
+        end
+
+        it "returns error when attachment has 'maybe' as media_entry_id (pending media object creation)" do
+          # Create an attachment with media_entry_id="maybe" - a placeholder for pending media processing
+          pending_attachment = attachment_model(
+            context: @course,
+            filename: "video.mp4",
+            content_type: "video/mp4",
+            media_entry_id: "maybe"
+          )
+
+          post "create_asr", params: { attachment_id: pending_attachment.id, locale: "en" }
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(json_parse(response.body)["error"]).to eq("Media object not found or not yet processed")
+        end
+      end
+
+      context "locale validation" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "accepts valid locales" do
+          %w[en es fr-CA].each do |locale|
+            post "create_asr", params: { attachment_id: @attachment.id, locale: }
+            expect(response).to be_successful
+          end
+        end
+
+        it "rejects empty locale" do
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "" }
+          expect(response).to have_http_status(:bad_request)
+          expect(json_parse(response.body)["error"]).to include("Invalid or missing locale")
+        end
+
+        it "rejects locale with special characters" do
+          post "create_asr", params: { attachment_id: @attachment.id, locale: '<img src="x">' }
+          expect(response).to have_http_status(:bad_request)
+          expect(json_parse(response.body)["error"]).to include("Invalid or missing locale")
+        end
+      end
+
+      context "Kaltura integration" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "successfully creates caption asset" do
+          expect(kaltura_client).to receive(:startSession).with(CanvasKaltura::SessionType::ADMIN)
+          expect(kaltura_client).to receive(:create_caption_asset).with(@mo.media_id, "en")
+
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+          expect(response).to be_successful
+        end
+
+        it "handles Kaltura API failures gracefully" do
+          allow(kaltura_client).to receive(:create_caption_asset).and_return(nil)
+
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(json_parse(response.body)["error"]).to include("Failed to create caption asset")
+        end
+
+        it "does not create a new Kaltura asset when a processing track already exists" do
+          existing_track = @attachment.media_tracks.create!(
+            kind: "subtitles",
+            locale: "en",
+            content: "",
+            external_id: "existing_asset_id",
+            workflow_state: "processing",
+            user: @teacher,
+            media_object: @mo
+          )
+
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          expect(kaltura_client).not_to have_received(:create_caption_asset)
+          expect(response).to be_successful
+          expect(existing_track.reload.external_id).to eq("existing_asset_id")
+        end
+      end
+
+      context "MediaTrack creation" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "creates track with correct external_id" do
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          track = @attachment.media_tracks.last
+          expect(track.external_id).to eq("caption_asset_456")
+        end
+
+        it "sets workflow_state to ready when caption asset is ready and SRT is available" do
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          track = @attachment.media_tracks.last
+          expect(track.workflow_state).to eq("ready")
+          expect(track.content).to eq("1\n00:00:01,000 --> 00:00:02,000\nHello")
+        end
+
+        it "sets workflow_state to processing when caption asset is not yet ready" do
+          allow(kaltura_client).to receive(:create_caption_asset)
+            .and_return({ id: "caption_asset_456", languageCode: "en", status: "1" })
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          track = @attachment.media_tracks.last
+          expect(track.workflow_state).to eq("processing")
+          expect(track.content).to eq("")
+        end
+
+        it "sets workflow_state to failed when caption asset is ready but SRT is unavailable" do
+          allow(kaltura_client).to receive(:caption_asset_contents).and_return(nil)
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          track = @attachment.media_tracks.last
+          expect(track.workflow_state).to eq("failed")
+          expect(track.content).to eq("")
+        end
+
+        it "sets workflow_state to processing when caption asset generation failes" do
+          allow(kaltura_client).to receive(:create_caption_asset)
+            .and_return({ id: "caption_asset_456", languageCode: "en", status: "-1" })
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          track = @attachment.media_tracks.last
+          expect(track.workflow_state).to eq("failed")
+          expect(track.content).to eq("")
+        end
+
+        it "sets kind to subtitles" do
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          track = @attachment.media_tracks.last
+          expect(track.kind).to eq("subtitles")
+        end
+
+        it "associates with attachment" do
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          track = @attachment.media_tracks.last
+          expect(track.attachment_id).to eq(@attachment.id)
+        end
+      end
+
+      context "response format" do
+        before do
+          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+        end
+
+        it "returns media_track_api_json for attachment context" do
+          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
+
+          expect(response).to be_successful
+          response_body = json_parse(response.body)
+          expect(response_body["media_object_id"]).to eq(@mo.id)
+          expect(response_body["locale"]).to eq("en")
+          expect(response_body["workflow_state"]).to eq("ready")
+          expect(response_body["asr"]).to be true
+        end
       end
     end
 
