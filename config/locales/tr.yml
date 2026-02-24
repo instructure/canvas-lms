@@ -16427,7 +16427,7 @@ tr:
   if_left_blank_the_tool_s_default_icon_will_display_7784a202: "Boş bırakılırsa, aracın varsayılan simgesi görüntülenir."
   if_left_blank_uses_due_date_e3d14dc1: "Boş bırakılırsa, son teslim tarihini kullanır"
   if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "LTI - ekle devre dışıysa, kullanıcılar (kurumunuz için etkinse) Canvas Uygulama Merkezi üzerinden onaylı uygulamaları yine de yükleyebilir. Ancak LTI - sil etkin değilse, el ile eklenen harici uygulamaları silemezler."
-  if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Ustalık ölçekleri etkinse, rapor; hesaplama yöntemi, hesaplama aralığı, ustalık puanları veya derecelendirmeleri içermeyecek şekilde kısaltılır."
+  if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Yeterlik ölçekleri etkinse, rapor; hesaplama yöntemi, hesaplama aralığı, yeterlik puanları veya derecelendirmeleri içermeyecek şekilde kısaltılır."
   if_multiple_roll_call_attendance_assignments_exist_8ccd46d: "Birden fazla \"Yoklama (Roll Call Attendance)\" ödevi varsa, ilk olanı (Ödev ID'ye göre) kullanılır"
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: "Yeni sınavlar etkinse, Yeni Sınavlar'da belirli derslere ve kök hesaba ait öğe bankalarının oluşturulmasına ve yönetilmesine olanak tanır."
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Hiçbiri seçilmezse, alt hesaptaki herkese göster)"
@@ -16448,12 +16448,12 @@ tr:
   if_sis_data_manage_is_disabled_and_sis_data_read_i_3db0be5: "ÖBS Verileri - yönet devre dışı ve ÖBS Verileri - oku etkinse, kullanıcılar yalnızca ders, kullanıcı ve alt hesap ÖBS ID'lerini görüntüleyebilir."
   if_sis_data_manage_is_enabled_and_sis_data_read_is_155d15ef: "ÖBS Verileri - yönet etkin ve ÖBS Verileri - oku devre dışıysa, hesap izni ders iznini geçersiz kılar."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "İstatistikler - görüntüle veya Kullanıcılar - giriş ayrıntılarını yönet etkinse, kullanıcı Yönetici Araçları'nda giriş/çıkış etkinliğini oluşturabilir. Yönetici Araçları'ndaki giriş/çıkış etkinliği seçeneğini gizlemek için bu iki iznin de devre dışı olması gerekir."
-  if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Hesap ve Ders Düzeyi Öğrenme Çıktısı Ustalık Ölçekleri özelliği etkinse, Yönet sekmesi güncellenmiş bir arayüz gösterir. Ayrıca Öğrenme Çıktıları sayfası, ustalık ölçeklerini ve yeterlik hesaplamalarını öğrenme çıktısı yönetiminden ayıran iki ek sekme gösterir."
+  if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Hesap ve Ders Düzeyi Öğrenme Çıktısı Yeterlik Ölçekleri özelliği etkinse, Yönet sekmesi güncellenmiş bir arayüz gösterir. Ayrıca Öğrenme Çıktıları sayfası, yeterlik ölçeklerini ve yeterlik hesaplamalarını öğrenme çıktısı yönetiminden ayıran iki ek sekme gösterir."
   if_the_additional_permissions_are_enabled_but_this_619c2a4a: "Ek izinler etkinleştirilmiş olsa da bu izin etkin değilse, kilit ayarları tek tek tartışmalarda düzenlenebilir."
   if_the_canvas_was_copied_from_a_template_instance__917bb965: "Canvas bir şablon örneğinden kopyalandıysa bu normaldir!"
   if_the_course_content_permission_enabled_and_web_c_85f91e32: "Ders İçeriği izni etkin ve Web Konferansları - oluştur devre dışıysa, kullanıcı konferansları yine de yönetebilir."
   if_the_email_attribute_is_not_set_to_autoconfirm_u_f0322e42: "E-posta özniteliği otomatik doğrulama için ayarlı değilse, kullanıcılara e-posta adreslerinin sahipliğini doğrulamaları için bir e-posta gönderilir. Bu yalnızca, kimlik doğrulama sağlayıcınızın kullanıcı tarafından sağlanmayan (veya sahipliği zaten doğrulanmış) geçerli e-posta adresleri sağladığından eminseniz etkinleştirilmelidir."
-  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Özellik seçeneği etkinse ve bu izin etkinse, Öğrenme Çıktıları sayfası üç sekme içerir: Yönet, Ustalık ve Hesaplama."
+  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Özellik seçeneği etkinse ve bu izin etkinse, Öğrenme Çıktıları sayfası üç sekme içerir: Yönet, Yeterlik ve Hesaplama."
   if_the_open_registration_account_setting_is_enable_10b1965c: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, tasarımcı zaten Canvas hesabına sahip olmasa bile Dersler sayfasından e-posta adresi veya giriş ID üzerinden derse tasarımcı ekleyebilir."
   if_the_open_registration_account_setting_is_enable_1e679e07: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, asistan zaten Canvas hesabına sahip olmasa bile Dersler sayfasından e-posta adresi veya giriş ID üzerinden derse asistan ekleyebilir."
   if_the_open_registration_account_setting_is_enable_2f43fcc0: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, öğrenci zaten Canvas hesabına sahip olmasa bile Kişiler sayfasından e-posta adresi veya giriş ID üzerinden derse öğrenci ekleyebilir."
@@ -16598,7 +16598,7 @@ tr:
   import_a_set_of_outcomes_6b782192: "Öğrenme Çıktıları Setini İçeri Aktar"
   import_anyway_8c996ef6: "Yine de İçe Aktar"
   import_as_a_standalone_module_20abf568: "Bağımsız bir modül olarak içe aktar"
-  import_assessment_as_new_quizzes_help_icon_3e49480f: "Değerlendirmeyi Yeni Sınavlar olarak içe aktar Yardım Simgesi"
+  import_assessment_as_new_quizzes_help_icon_3e49480f: "Değerlendirmeyi Yeni Sınavlar olarak içe aktar yardım simgesi"
   import_assessment_as_new_quizzes_help_modal_918a543d: "Değerlendirmeyi Yeni Sınavlar olarak içe aktar Yardım Penceresi"
   import_blueprint_course_settings_f6195365: "Blueprint Ders ayarlarını içe aktar"
   import_content_b2fd6620: "Derse İçerik Aktar"
@@ -17154,7 +17154,7 @@ tr:
   invalid_microsoft_teams_sync_login_attribute_suffi_3c6eb0e6: "Microsoft Teams Sync oturum açma özniteliği soneki geçersiz. Sonek 255 karakterden kısa olmalı ve boşluk içermemelidir."
   invalid_microsoft_teams_sync_login_attribute_valid_9905edaf: "Microsoft Teams Sync oturum açma özniteliği geçersiz. Geçerli oturum açma öznitelikleri: %{valid_attributes}"
   invalid_module_id_f19ec4bf: "Modül ID geçersiz."
-  invalid_nonce_claim_in_id_token_657b36ae: "ID Token içindeki nonce claim'i geçersiz"
+  invalid_nonce_claim_in_id_token_657b36ae: "ID Anahtar içindeki nonce claim'i geçersiz"
   invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: "Hesapta \"login attribute\" yapılandırması geçersiz veya eksik"
   invalid_or_missing_session_for_oauth_3ce4b605: "oauth için oturum geçersiz veya eksik"
   invalid_pairing_code_dde8d40a: "Eşleştirme kodu geçersiz."
@@ -17410,7 +17410,7 @@ tr:
   k20_course_readiness_gradebook_criteria: "Akıllı Fikirler - Ders Hazırlığı - Not Defteri Ölçütü özelliğini etkinleştirir."
   k20_course_readiness_homepage_criteria: "Akıllı Fikirler - Ders Hazırlığı - Ana Sayfa Ölçütü özelliğini etkinleştirir."
   k20_course_readiness_lti_apps_criteria: "Akıllı Fikirler - Ders Hazırlığı - LTI Uygulamaları Ölçütü özelliğini etkinleştirir."
-  k20_course_readiness_rubric_criteria: "Akıllı Fikirler - Ders Hazırlığı - Rubrik Ölçütü özelliğini etkinleştirir."
+  k20_course_readiness_rubric_criteria: "Akıllı Fikirler - Ders Hazırlığı - Değerlendirme listesi özelliğini etkinleştirir."
   k20_course_readiness_top_level_dashboard: "Akıllı Fikirler - Ders Hazırlığı - Üst Düzey Kontrol Paneli özelliğini etkinleştirir."
   k20_criteria_set_preview: "Akıllı Fikirler - Ölçüt Seti Ön İzleme özelliğini etkinleştirir."
   k20_improved_criteria_builder: "Akıllı Fikirler - Geliştirilmiş Ölçüt Oluşturucu özelliğini etkinleştirir"
@@ -17509,7 +17509,7 @@ tr:
   last_edited_to_942c6281: "Son düzenleme bitişi"
   last_enrollment_activity_10fe15ba: "Son Derse Kayıt Etkinliği"
   last_error_a3832668: "En Son Hata"
-  last_export_899a04c5: "Son Dışa Aktarım:"
+  last_export_899a04c5: "Son Dışa Aktarma: "
   last_failed_at_b714ff2e: "Son hata zamanı"
   last_first_name_95a078f5: "Soyadı, Adı"
   last_item_79583712: "Son Öğe:"
@@ -17661,7 +17661,7 @@ tr:
   learning_outcome_gradebook_for_coursename_4634781b: "%{courseName} için öğrenme çıktısı not defteri"
   learning_outcome_id_88ff198c: "öğrenme çıktı id'si"
   learning_outcome_mastered_7b30ef43: "öğrenme çıktısı ustalaşıldı"
-  learning_outcome_mastery_score_c96330b8: "öğrenme çıktısı ustalık puanı"
+  learning_outcome_mastery_score_c96330b8: "öğrenme çıktısı yeterlik puanı"
   learning_outcome_name_9cb475e6: "öğrenme çıktısı adı"
   learning_outcome_points_possible_628a9d55: "öğrenme çıktısı alınabilecek puan"
   learning_outcome_rating_8143e88c: "öğrenme çıktısı derecelendirmesi"
@@ -18059,7 +18059,7 @@ tr:
   loading_name_data_c66ea65f: "%{name} verileri yükleniyor"
   loading_notifications_651b79d7: "Bildirimler yükleniyor"
   loading_options_c823e98b: "Seçenekler yükleniyor..."
-  loading_outcome_alignments_16e77cc9: "Öğrenme çıktısı eşleştirmeleri yükleniyor"
+  loading_outcome_alignments_16e77cc9: "Öğrenme çıktısı eşleştirmelerı yükleniyor"
   loading_outcome_results_96e21ce4: "Öğrenme çıktısı sonuçları yükleniyor"
   loading_overlay_9f7d692f: "Kaplama yükleniyor"
   loading_page_44db3910: "Sayfa yükleniyor …"
@@ -18135,7 +18135,7 @@ tr:
   lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Alt hesaplar ve dersler için bu ayarı kilitle"
   lock_thread_state_for_students_7a5b64de: "Öğrenciler için iç içe yanıt durumunu kilitle"
   lock_until_549bb904: "Bu tarihe kadar kilitle"
-  locked_1d1eaa8c: "Kilitli: "
+  locked_1d1eaa8c: "Kilitli:"
   locked_762f138b: Kilitli
   locked_796957c7: "Kilitli:"
   locked_at_cda02889: Kilitli
@@ -18149,7 +18149,7 @@ tr:
   locked_objects_by_type_ff376c6c: "Türe Göre Kilitli Nesneler"
   locked_objects_cannot_be_edited_in_associated_cour_1af858c8: "Kilitli nesneler ilişkili derslerde düzenlenemez."
   locked_until_item_name_is_graded_3b8d967f: "\"%{item_name}\" notlandırılana kadar kilitli"
-  locked_until_mastery_path_is_processed_for_item_na_48766cf7: "\"%{item_name}\" için ustalık yolu işlenene kadar kilitli"
+  locked_until_mastery_path_is_processed_for_item_na_48766cf7: "\"%{item_name}\" için yeterlik yolu işlenene kadar kilitli"
   locked_until_title_is_graded_e6307561: "\"%{title}\" notlandırılana kadar kilitli"
   locked_until_unlock_date_498ead5f: "%{unlock_date} tarihine kadar kilitli"
   locking_50fb52fc: kilitleniyor
@@ -18554,17 +18554,17 @@ tr:
   mastery_at_cf0c477b: "Yeterlilik düzeyi"
   mastery_at_e804b49: "Yeterlik düzeyi:"
   mastery_calculation_5fd5f5fe: "Yeterlik Hesaplaması"
-  mastery_calculation_parameters_f072c3: "Ustalık hesaplama parametreleri"
-  mastery_calculation_saved_df378fdd: "Ustalık hesaplaması kaydedildi"
-  mastery_connect_64598f55: "Yeterlik Bağlantısı"
+  mastery_calculation_parameters_f072c3: "Yeterlik hesaplama parametreleri"
+  mastery_calculation_saved_df378fdd: "Yeterlik hesaplaması kaydedildi"
+  mastery_connect_64598f55: "Mastery Connect"
   mastery_level_deleted_88838a33: "Yeterlik düzeyi silindi"
   mastery_levels_7d4ee512: "Yeterlik Düzeyleri"
   mastery_mastery_for_mastery_level_position_5c9c3206: "Yeterlik düzeyi %{position} için yeterlik %{mastery}"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Yeterlik: %{n_mastery_points_precision_2_str} Puan"
-  mastery_path_invalidates_assignment_cache_d95c37d7: "Yeterlik Süreci ödev önbelleğini geçersiz kılar"
-  mastery_path_processing_f4471152: "Yeterlik süreci işleniyor"
-  mastery_path_reload_submission_properties_c4e5d646: "Yeterlik Süreci: Gönderim özelliklerini yeniden yükle"
-  mastery_path_unreleased_items_block_module_progres_768509a7: "Yeterlik Süreci: Yayımlanmamış öğeler modül ilerlemesini engeller"
+  mastery_path_invalidates_assignment_cache_d95c37d7: "Yeterlik Yolu ödev önbelleğini geçersiz kılar"
+  mastery_path_processing_f4471152: "Yeterlik yolu işleniyor"
+  mastery_path_reload_submission_properties_c4e5d646: "Yeterlik Yolu: Gönderim özelliklerini yeniden yükle"
+  mastery_path_unreleased_items_block_module_progres_768509a7: "Yeterlik Yolu: Yayımlanmamış öğeler modül ilerlemesini engeller"
   mastery_paths_breakdown_6e0b5fce: "Yeterlilik Süreçleri Dökümü"
   mastery_paths_cc4096c2: "Yeterlilik Süreçleri"
   mastery_points_f1672cc: "yeterlik puanları"
@@ -18590,7 +18590,7 @@ tr:
       relationships: İlişkiler
   max_attempts_ae7b90bc: "Maksimum Giriş Hakkı"
   max_concurrent_a6f135c: "Azami Eşzamanlı"
-  max_dd02d615: maksimum
+  max_dd02d615: azami
   max_membership_bd0ddc68: max_membership
   max_run_time_6022a5f1: "Azami çalışma süresi"
   max_users_groups_per_appointment_867c505b: "Randevu başına maksimum kullanıcı/grup"
@@ -18613,7 +18613,7 @@ tr:
     titles: 
       record_upload_media_comment: "Medya Yorumunu Kaydet/Yükle"
   media_comment_e494a952: "Medya Yorumu"
-  media_comment_id_94632517: "Medya Yorum ID"
+  media_comment_id_94632517: "Medya Yorumu ID"
   media_comment_submission_14e224dc: "Medya Yorumu Gönderimi"
   media_comment_type_8a81888a: "Medya Yorumu Türü"
   media_comments: 
@@ -19364,14 +19364,14 @@ tr:
         html: 
           body: "Blueprint ders değişiklikleri %{name} ile eşitlendi."
           details_link: "Değişiklikleri görüntüle"
-          subject: "Şablon Senkronizasyonu: %{name}"
-        subject: "Şablon Senkronizasyonu: %{name}"
+          subject: "Şablon  Senronizasyonu: %{name}"
+        subject: "Şablon Senronizasyonu: %{name}"
       sms: 
-        body: "Şablon ders değişiklikleri %{name} ile senkron edildi."
+        body: "Şablon ders değişiklikleri %{name} ile senkronize edildi."
         link_message: "Daha fazla bilgi: %{url}"
       summary: 
-        body: "Şablon Eşitleme: Değişiklikler %{name} ile senkronize edildi."
-        subject: "Şablon Eşitleme: %{name}"
+        body: "Şablon Senronizasyonu: Değişiklikler %{name} ile senkronize edildi."
+        subject: "Şablon Senronizasyonu: %{name}"
     blueprint_sync_complete: 
       email: 
         body: "Şablon dersiniz %{name}, değişiklikleri tüm ilişkili derslerle senkronize edildi."
@@ -19379,14 +19379,14 @@ tr:
         html: 
           body: "Şablon dersiniz %{name}, değişiklikleri tüm ilişkili derslerle senkronize edildi."
           details_link: "Daha fazla bilgi"
-          subject: "Şablon Eşitleme Tamamlandı: %{name}"
-        subject: "Şablon Eşitleme Tamamlandı: %{name}"
+          subject: "Şablon Senronizasyonu Tamamlandı: %{name}"
+        subject: "Şablon Senronizasyonu Tamamlandı: %{name}"
       sms: 
         body: "Şablon ders değişiklikleri %{name} dersinden senkronize edildi."
         link_message: "Daha fazla bilgi: %{url}"
       summary: 
         body: "Şablon Eşitleme: Değişiklikler %{name} dersinden senkronize edildi."
-        subject: "Şablon Senkronizasyonu Tamamlandı: %{name}"
+        subject: "Şablon Senronizasyonu Tamamlandı: %{name}"
     checkpoints_created: 
       email: 
         labels: 
@@ -20649,7 +20649,7 @@ tr:
   method_c2a4e17a: Yöntem
   metrics_c80fba05: Ölçümler
   mexico_52_60d635c7: "Meksika (+52)"
-  mfa_required_ca66e177: "Çoklu Kimlik Doğrulama Gerekli"
+  mfa_required_ca66e177: "MFA Gerekli"
   mfoster_708c21fb: mfoster@*
   miami_utilization_report_9c927880: "Miami Kullanım Raporu"
   mic_a7f3d311: Mikrofon
@@ -20673,7 +20673,7 @@ tr:
   migrating_a_single_classic_quiz_will_leave_html_ri_91795a20: "Tek bir klasik sınavı taşımak, HTML zengin içerik alanlarını olduğu gibi bırakır."
   migrating_all_3353a2c0: "Tümü Aktarılıyor..."
   migrating_f346fb27: Aktarılıyor...
-  migrating_name_e05aa53e: "\"%{name}\" aktarılıyor"
+  migrating_name_e05aa53e: "\"%{name}\" taşınıyor"
   migration: 
     announcement_type: Duyuru
     assignment_group_type: "Ödev Grubu"
@@ -20702,20 +20702,20 @@ tr:
     webct: 
       course_not_found: "Blackboard dersi bulunamadı."
     wiki_page_type: "Wiki Sayfası"
-  migration_completed_a0f768a2: "Aktarım tamamlandı!"
-  migration_completed_f3410fec: "Aktarım Tamamlandı"
-  migration_failed_3820e0c9: "Aktarım başarısız oldu."
-  migration_in_progress_6f0ed4f9: "Aktarım devam ediyor"
-  migration_info_e46b0723: "Aktarım Bilgileri"
-  migration_is_currently_in_progress_f5ef0d9a: "Aktarım şu anda devam ediyor"
+  migration_completed_a0f768a2: "Aktarma tamamlandı!"
+  migration_completed_f3410fec: "Aktarma Tamamlandı"
+  migration_failed_3820e0c9: "Aktarma başarısız oldu."
+  migration_in_progress_6f0ed4f9: "Aktarma devam ediyor"
+  migration_info_e46b0723: "Aktarma Bilgileri"
+  migration_is_currently_in_progress_f5ef0d9a: "Aktarma şu anda devam ediyor"
   migration_issues: 
     errors: 
       valid_workflow_state: "Geçerli bir iş akış durumu göndermeli"
-  migration_not_started_yet_9eefff45: "Aktarım henüz başlamadı"
+  migration_not_started_yet_9eefff45: "Aktarma henüz başlamadı"
   migration_selection_5f1c5f55: "Aktarım Seçimi"
   migration_type_title_issues_e1b5c3b7: "%{migration_type_title} Sorunları"
   migration_type_title_issues_modal_b2527e66: "%{migration_type_title} Sorunları Modali"
-  migrations_to_be_performed_d718149: "Yapılacak Aktarımlar:"
+  migrations_to_be_performed_d718149: "Yapılacak Aktarmalar:"
   min_e10fe94c: dk
   min_to_possible_pts_9f29a2fe: "%{min} ile %{possible} puan arası"
   mini_calendar_fe8003e4: "Mini takvim"
@@ -20729,7 +20729,7 @@ tr:
   misformatted_list_6988022e: "Hatalı biçimlendirilmiş liste"
   missing_1a256b3b: Eksik
   missing_code_parameter_from_external_authenticatio_51146780: "Harici kimlik doğrulama hizmetinden kod parametresi eksik"
-  missing_count_or_until_62ad480c: "SAYI veya ŞU ZAMANA KADAR eksik"
+  missing_count_or_until_62ad480c: "COUNT veya UNTIL eksik"
   missing_course_work_627b2977: "Eksik ders çalışması"
   missing_custom_csrf_token_bde15923: "Özel CSRF anahtarı eksik"
   missing_d59852a7: eksik
@@ -21140,12 +21140,12 @@ tr:
   multi_factor_authentication_backup_codes_4d781044: "Çok Faktörlü Kimlik Doğrulama Yedek Kodları"
   multi_factor_authentication_configured_865b1bde: "Çoklu kimlik doğrulama yapılandırıldı"
   multi_factor_authentication_mfa_enhances_security__5c37b7e2: |-
-      Çok faktörlü kimlik doğrulama (MFA), fiziksel bir cihaz ve Canvas oturum açma parolanızı gerektirerek güvenliği artırır.
+      Çok Faktörlü Kimlik Doğrulama (MFA), fiziksel bir cihaz ve Canvas giriş şifrenizi gerektirerek güvenliği artırır.
       %{otp_via_sms_message}
       
-      iPhone veya Android'de Zaman Tabanlı Tek Kullanımlık Şifre (TOTP) uygulamasıyla QR kodunu tarayarak MFA'yı yapılandırın
-      (ör. Google Authenticator, Microsoft Authenticator, Authy). Kurulumdan sonra, birincil MFA cihazınız kullanılamıyorsa profil
-      sayfanızdan yedek kodları yazdırın.
+      MFA'yı, iPhone veya Android'de Zaman Tabanlı Tek Kullanımlık Şifre (TOTP) uygulamasıyla QR kodunu tarayarak yapılandırın
+      (ör. Google Authenticator, Microsoft Authenticator, Authy). Kurulumdan sonra, birincil MFA cihazınız kullanılamıyorsa
+      profil sayfanızdan yedek kodları yazdırın.
   multi_select_gradebook_filters_95dbb4fc: "Not Defteri Çoklu Seçim Filtreleri"
   multimedia_c6911471: Multimedya
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Aynı değerler birden fazla ad altında kaydedildiği için birden fazlası \"Geçerli tema\" olarak işaretlenir; yani her biri şu anda uygulananla aynıdır"
@@ -21432,7 +21432,7 @@ tr:
   new_group_set_7241a581: "Yeni Grup Seti"
   new_instui_navbar_72a69783: "Yeni InstUI gezinti çubuğu"
   new_login_registration_ui_for_identity_d405c7c1: "Yeni Sayfadaki Zorunlu Ögeler"
-  new_mention_ad04b872: "Yeni Söz Etme"
+  new_mention_ad04b872: "Yeni Bahsetme"
   new_module_493e82d2: "Yeni modül"
   new_module_4e9287e4: "Yeni Modül"
   new_native_features_new_features_including_a_nativ_ddc6bac7: "*Yeni Yerel Özellikler:* *Yerel Keşif Sayfası* (kullanıcıları doğru kimlik doğrulama yöntemine yönlendirmek için) ve *Özel Etiket Metni* seçenekleri dâhil olmak üzere yeni özellikler, yaygın özel betiklerin yerini almak üzere yayımlanıyor."
