@@ -27,6 +27,8 @@ class Mutations::UpdateDiscussionReadState < Mutations::BaseMutation
   field :discussion_topic, Types::DiscussionType, null: false
   def resolve(input:)
     discussion_topic = DiscussionTopic.find(input[:discussion_topic_id])
+    raise ActiveRecord::RecordNotFound unless discussion_topic.grants_right?(current_user, session, :read)
+
     read_state = input[:read] ? :read : :unread
     discussion_topic.change_all_read_state(read_state, current_user, forced: false)
 
