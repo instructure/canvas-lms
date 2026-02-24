@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react'
+import {useEffect, useRef, useId} from 'react'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {
@@ -32,8 +32,13 @@ import {
   ChartConfiguration,
 } from 'chart.js'
 import {colors} from '@instructure/canvas-theme'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend)
+
+const I18n = createI18nScope('accessibility_checker')
 
 const colorMapping: Record<BarChartDataItemColor, string> = {
   red: colors.ui.surfaceError,
@@ -58,6 +63,21 @@ export type BarChartProps = {
 export const BarChart = (props: BarChartProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const chartRef = useRef<ChartJS<'bar'> | null>(null)
+  const descriptionId = useId()
+
+  const total = props.data.reduce((acc, item) => acc + item.value, 0)
+  const ariaLabel = I18n.t(
+    {
+      one: '%{title} bar chart showing %{count} issue.',
+      other: '%{title} bar chart showing %{count} issues.',
+    },
+    {title: props.title, count: total},
+  )
+
+  const screenReaderDescription =
+    props.data.length > 0
+      ? `${I18n.t('Chart data: ')}${props.data.map(item => item.label).join(', ')}.`
+      : I18n.t('No data.')
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -152,7 +172,14 @@ export const BarChart = (props: BarChartProps) => {
         {props.title}
       </Heading>
       <View display="block">
-        <canvas ref={canvasRef} />
+        <canvas
+          ref={canvasRef}
+          role="img"
+          data-testid="bar-chart"
+          aria-label={ariaLabel}
+          aria-describedby={descriptionId}
+        />
+        <ScreenReaderContent id={descriptionId}>{screenReaderDescription}</ScreenReaderContent>
       </View>
     </View>
   )
