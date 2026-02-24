@@ -16,7 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
+import {flushSync} from 'react-dom'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -99,22 +100,23 @@ $.fn.moduleSequenceFooter = function (options = {}) {
             this.msfInstance.previous.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
           }`
 
-          ReactDOM.render(
-            <Tooltip
-              aria-label={label}
-              as={Button}
-              href={this.msfInstance.previous.url}
-              renderTip={this.msfInstance.previous.tooltip}
-              placement="end"
-              offsetX={5}
-              disabled={Boolean(this.msfInstance.previous.modules_tab_disabled)}
-            >
-              <Flex alignItems="center">
-                <IconMiniArrowStartLine /> {I18n.t('Previous')}
-              </Flex>
-            </Tooltip>,
-            previousButton,
-          )
+          flushSync(() => {
+            createRoot(previousButton).render(
+              <Tooltip
+                aria-label={label}
+                as={Button}
+                href={this.msfInstance.previous.url}
+                renderTip={this.msfInstance.previous.tooltip}
+                placement="end"
+                offsetX={5}
+                disabled={Boolean(this.msfInstance.previous.modules_tab_disabled)}
+              >
+                <Flex alignItems="center">
+                  <IconMiniArrowStartLine /> {I18n.t('Previous')}
+                </Flex>
+              </Tooltip>,
+            )
+          })
         }
 
         const nextButton = document.querySelector('.module-sequence-footer-button--next')
@@ -123,22 +125,23 @@ $.fn.moduleSequenceFooter = function (options = {}) {
             this.msfInstance.next.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
           }`
 
-          ReactDOM.render(
-            <Tooltip
-              aria-label={label}
-              as={Button}
-              href={this.msfInstance.next.url}
-              renderTip={this.msfInstance.next.tooltip}
-              placement="start"
-              offsetX={5}
-              disabled={Boolean(this.msfInstance.next.modules_tab_disabled)}
-            >
-              <Flex alignItems="center">
-                {I18n.t('Next')} <IconMiniArrowEndLine />
-              </Flex>
-            </Tooltip>,
-            nextButton,
-          )
+          flushSync(() => {
+            createRoot(nextButton).render(
+              <Tooltip
+                aria-label={label}
+                as={Button}
+                href={this.msfInstance.next.url}
+                renderTip={this.msfInstance.next.tooltip}
+                placement="start"
+                offsetX={5}
+                disabled={Boolean(this.msfInstance.next.modules_tab_disabled)}
+              >
+                <Flex alignItems="center">
+                  {I18n.t('Next')} <IconMiniArrowEndLine />
+                </Flex>
+              </Tooltip>,
+            )
+          })
         }
 
         this.show()
