@@ -36,7 +36,7 @@ describe AccessibilityController do
     context "when tab is enabled" do
       before do
         allow_any_instance_of(AccessibilityController).to receive(:tab_enabled?)
-          .with(Course::TAB_ACCESSIBILITY).and_return(true)
+          .with(Course::TAB_ACCESSIBILITY, { no_render: true }).and_return(true)
       end
 
       it "renders the accessibility checker container" do
@@ -49,7 +49,7 @@ describe AccessibilityController do
     context "when tab is disabled" do
       before do
         allow_any_instance_of(AccessibilityController).to receive(:tab_enabled?)
-          .with(Course::TAB_ACCESSIBILITY).and_return(false)
+          .with(Course::TAB_ACCESSIBILITY, { no_render: true }).and_return(false)
       end
 
       it "returns nothing if not allowed" do
