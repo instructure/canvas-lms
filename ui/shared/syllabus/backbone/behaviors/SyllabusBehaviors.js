@@ -401,10 +401,13 @@ const bindToEditSyllabus = function (course_summary_enabled) {
     $course_syllabus_details.hide()
     easy_student_view.hide()
     $course_syllabus_body = RichContentEditor.freshNode($course_syllabus_body)
-    const currentHTML = $course_syllabus.html()
-    const originalHTML = $course_syllabus.data('syllabus_body')
-    const contentToEdit = currentHTML !== originalHTML ? currentHTML : originalHTML
-    $course_syllabus_body.val(contentToEdit)
+    const revisionPreview = $course_syllabus.data('revision_preview')
+    if (revisionPreview) {
+      $course_syllabus_body.val(revisionPreview)
+      $course_syllabus.removeData('revision_preview')
+    } else {
+      $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
+    }
     RichContentEditor.loadNewEditor($course_syllabus_body, {
       focus: true,
       manageParent: true,
