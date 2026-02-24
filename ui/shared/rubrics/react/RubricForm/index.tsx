@@ -476,7 +476,12 @@ export const RubricForm = ({
         handleSave={() => {
           if (rubric && hasAssignment && isAssignmentPointsDifferent) {
             setIsAssignmentPointsDifferenceModalOpen(true)
-          } else if (rubric && hasAssignment && hasRubricChanged(rubricForm, rubric)) {
+          } else if (
+            rubric &&
+            hasAssignment &&
+            hasRubricChanged(rubricForm, rubric) &&
+            !rubricForm.unassessed
+          ) {
             setIsEditConfirmModalOpen(true)
           } else if (rubricForm.unassessed) {
             handleSave()
