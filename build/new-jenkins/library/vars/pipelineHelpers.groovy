@@ -187,15 +187,10 @@ def copyFromContainer(containerName, containerPath, workspacePath) {
   sh "docker compose -f ${env.COMPOSE_FILE} cp ${containerName}:${containerPath} ${workspacePath}"
 }
 
-// Configure Build stage helper - extracted to reduce Jenkinsfile bytecode
-def configureBuildStage(buildParameters) {
-  def canvasRailsOverrideValue = commitMessageFlag('canvas-rails') as String
-
-  if (canvasRailsOverrideValue) {
-    env.CANVAS_RAILS = canvasRailsOverrideValue
-  }
-
-  // Require valid GERRIT_CHANGE_NUMBER for all builds - many stages will fail without it
+// Pre-pipeline checks - call before pipeline {} in Jenkinsfile to skip
+// builds early without spinning up an agent or running any stages.
+def preBuildChecks() {
+  // Require valid GERRIT_CHANGE_NUMBER - many stages will fail without it
   if (!env.GERRIT_CHANGE_NUMBER || env.GERRIT_CHANGE_NUMBER == '000000') {
     env.SKIP_BUILD = 'true'
     error "GERRIT_CHANGE_NUMBER is not set or invalid (${env.GERRIT_CHANGE_NUMBER}). Cannot proceed with build."
@@ -207,12 +202,21 @@ def configureBuildStage(buildParameters) {
     if (configuration.isChangeMerged()) {
       // Post-merge translation: halt with SUCCESS status
       echo "Translation build from svc.cloudjenkins@instructure.com - post-merge build will be skipped"
-      haltBuildWithResult(Result.SUCCESS, "Skipping translation build from svc.cloudjenkins@instructure.com")
+      haltBuildWithResult(Result.SUCCESS, "svc.cloudjenkins@instructure.com")
     } else {
       // Pre-merge translation: halt with NOT_BUILT status
       echo "Translation build from svc.cloudjenkins@instructure.com - pre-merge build will be skipped"
-      haltBuildWithResult(Result.NOT_BUILT, "Skipping translation build from svc.cloudjenkins@instructure.com")
+      haltBuildWithResult(Result.NOT_BUILT, "svc.cloudjenkins@instructure.com")
     }
+  }
+}
+
+// Configure Build stage helper - extracted to reduce Jenkinsfile bytecode
+def configureBuildStage(buildParameters) {
+  def canvasRailsOverrideValue = commitMessageFlag('canvas-rails') as String
+
+  if (canvasRailsOverrideValue) {
+    env.CANVAS_RAILS = canvasRailsOverrideValue
   }
 
   if (commitMessageFlag('skip-ci') as Boolean) {
