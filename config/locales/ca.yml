@@ -5522,7 +5522,7 @@ ca:
   browser_locale_d3363d4c: "Configuració regional del navegador"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "el nom de dipòsit ha de ser un dels següents: %{bucket_names}"
   bucks_zero_activity_6f9b5ee3: "Sense activitat a Bucks"
-  build_78955b82: Compilació
+  build_78955b82: Crea
   build_name_41ba9e7a: "Compilació %{name}"
   build_quiz_7f4cdc74: "Prova de compilació"
   build_quiz_df7e734a: "Prova sobre la compilació"
