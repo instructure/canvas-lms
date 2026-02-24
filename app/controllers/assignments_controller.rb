@@ -627,6 +627,8 @@ class AssignmentsController < ApplicationController
       assigned_rubric[:can_update] = can_update_rubric
       assigned_rubric[:association_count] = RubricAssociation.active.where(rubric_id: rubric_association.rubric.id).count
       rubric_association = rubric_association_json(rubric_association, @current_user, session)
+      rubric_association[:can_update] = can_do(assignment.rubric_association, @current_user, :update)
+      rubric_association[:can_delete] = can_do(assignment.rubric_association, @current_user, :delete)
     end
 
     render json: { assigned_rubric:, rubric_association: }

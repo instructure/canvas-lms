@@ -27,7 +27,6 @@ import {RUBRIC, RUBRIC_ASSOCIATION, RUBRIC_CONTEXTS, RUBRICS_FOR_CONTEXT} from '
 import {queryClient} from '@canvas/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
-import type {ViewProps} from '@instructure/ui-view'
 
 vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async importOriginal => {
   const actual =
@@ -119,8 +118,24 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
-    it('should not render anything when there is no rubric and manage_rubrics permissions is false', () => {
+    it('should not render anything when there is no rubric, no rubricAssociation, and canManageRubrics is false', () => {
       const {container} = renderComponent({canManageRubrics: false})
+      expect(container.firstChild).toBeNull()
+    })
+
+    it('should not render anything when rubricAssociation is present but rubric is absent, and canManageRubrics is false', () => {
+      const {container} = renderComponent({
+        canManageRubrics: false,
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+      expect(container.firstChild).toBeNull()
+    })
+
+    it('should not render anything when rubric is present but rubricAssociation is absent, and canManageRubrics is false', () => {
+      const {container} = renderComponent({
+        canManageRubrics: false,
+        assignmentRubric: RUBRIC,
+      })
       expect(container.firstChild).toBeNull()
     })
 
@@ -128,7 +143,7 @@ describe('RubricAssignmentContainer Tests', () => {
       const {getByTestId, queryByTestId} = renderComponent({
         canManageRubrics: false,
         assignmentRubric: RUBRIC,
-        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+        assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canUpdate: false, canDelete: false},
       })
       expect(queryByTestId('create-assignment-rubric-button')).toBeNull()
       expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
@@ -214,15 +229,39 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByText('Rubric 1')).toBeInTheDocument() // Check for the text directly
     })
 
-    it('will not render the edit, remove, and replace buttons when can_manage_rubrics is false', () => {
+    it('will not render the edit button when canUpdate is false', () => {
       const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canUpdate: false},
+      })
+      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
+      expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
+    })
+
+    it('will not render the remove button when canDelete is false', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canDelete: false},
+      })
+      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
+      expect(queryByTestId('remove-assignment-rubric-button')).toBeNull()
+    })
+
+    it('will not render the replace button when canManageRubrics is false', () => {
+      const {queryByTestId} = renderComponent({
         assignmentRubric: RUBRIC,
         assignmentRubricAssociation: RUBRIC_ASSOCIATION,
         canManageRubrics: false,
       })
-      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
-      expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
-      expect(queryByTestId('remove-assignment-rubric-button')).toBeNull()
+      expect(queryByTestId('find-assignment-rubric-icon-button')).toBeNull()
+    })
+
+    it('will not render the replace button when canUpdate is false', () => {
+      const {queryByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canUpdate: false},
+        canManageRubrics: true,
+      })
       expect(queryByTestId('find-assignment-rubric-icon-button')).toBeNull()
     })
 
@@ -339,6 +378,15 @@ describe('RubricAssignmentContainer Tests', () => {
           assignmentRubric: RUBRIC,
           assignmentRubricAssociation: RUBRIC_ASSOCIATION,
           rubricSelfAssessmentFFEnabled: false,
+        })
+        expect(queryByTestId('rubric-self-assessment-checkbox')).toBeNull()
+      })
+
+      it('does not render self assessment settings when canUpdate is false', () => {
+        const {queryByTestId} = renderComponent({
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canUpdate: false},
+          rubricSelfAssessmentFFEnabled: true,
         })
         expect(queryByTestId('rubric-self-assessment-checkbox')).toBeNull()
       })

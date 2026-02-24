@@ -191,6 +191,8 @@ export type RubricAssociationUnderscore = {
   hide_points: boolean
   hide_score_total: boolean
   hide_outcome_results: boolean
+  can_update?: boolean
+  can_delete?: boolean
 }
 export const mapRubricAssociationUnderscoredKeysToCamelCase = (
   underscoreAssociation: RubricAssociationUnderscore,
@@ -203,6 +205,8 @@ export const mapRubricAssociationUnderscoredKeysToCamelCase = (
     hidePoints: underscoreAssociation.hide_points,
     hideScoreTotal: underscoreAssociation.hide_score_total,
     useForGrading: underscoreAssociation.use_for_grading,
+    canUpdate: underscoreAssociation.can_update,
+    canDelete: underscoreAssociation.can_delete,
   }
 }
 
