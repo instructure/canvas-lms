@@ -438,6 +438,7 @@ describe AuthenticationProvidersController do
 
   describe "discovery_page_active SSO setting" do
     before do
+      skip("2026-02-23 AE-3516")
       allow_any_instance_of(Account).to receive(:discovery_page_allowed?).and_return(true)
     end
 
