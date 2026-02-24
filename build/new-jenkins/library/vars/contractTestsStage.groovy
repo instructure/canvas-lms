@@ -17,8 +17,7 @@
  */
 
 def setupNode() {
-  def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
-  checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 1)
+  distribution.unstashBuildScripts()
   libraryScript.load('bash/docker-with-flakey-network-protection.sh', './docker-with-flakey-network-protection.sh')
 
   // Pull required images with network protection

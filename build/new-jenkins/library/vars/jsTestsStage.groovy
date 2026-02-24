@@ -67,7 +67,7 @@ def runVitestNode(index, additionalEnvVars = []) {
       }
 
       stage("${stageName} - Setup") {
-        checkoutCode()
+        distribution.unstashBuildScripts()
         provisionDocker()
         startServices()
       }
