@@ -126,6 +126,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             value={value || ''}
             onChange={(_, value) => handleOnChange(value)}
             inputRef={el => (inputRef.current = el)}
+            isRequired
             messages={error ? [{text: error, type: 'newError'}] : []}
             interaction={isDisabled ? 'disabled' : 'enabled'}
           />

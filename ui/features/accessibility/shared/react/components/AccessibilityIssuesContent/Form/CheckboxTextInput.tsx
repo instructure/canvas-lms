@@ -262,6 +262,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               disabled={isChecked || isDisabled}
               value={isChecked ? '' : value || ''}
               onChange={handleTextAreaChange}
+              required
               messages={formMessages}
               aria-describedby={charCountId}
             />
