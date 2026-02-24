@@ -32,6 +32,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
 import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
 import {IssueDataPoint} from '../../../../shared/react/types'
 import {getChartData, getChartOptions, processIssuesToChartData} from '../../utils/chart'
@@ -188,13 +190,9 @@ export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({isMobile}) 
           aria-describedby="chart-description"
           data-testid="issues-by-type-chart"
         />
-        <div
-          className="sr-only"
-          id="chart-description"
-          style={{visibility: 'hidden', overflow: 'hidden', height: 0}}
-        >
+        <ScreenReaderContent id="chart-description">
           {chartScreenReaderDescription}
-        </div>
+        </ScreenReaderContent>
       </Flex.Item>
     </Flex>
   )
