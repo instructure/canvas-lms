@@ -2920,9 +2920,11 @@ CanvasRails::Application.routes.draw do
     scope(controller: :media_tracks) do
       get "media_objects/:media_object_id/media_tracks", action: "index", as: :list_media_tracks
       put "media_objects/:media_object_id/media_tracks", action: "update", as: :update_media_tracks
+      post "media_objects/:media_object_id/asr", action: "create_asr"
 
       get "media_attachments/:attachment_id/media_tracks", action: "index", as: :list_media_attachment_tracks
       put "media_attachments/:attachment_id/media_tracks", action: "update", as: :update_media_attachment_tracks
+      post "media_attachments/:attachment_id/asr", action: "create_asr"
     end
 
     scope(controller: "conditional_release/rules") do

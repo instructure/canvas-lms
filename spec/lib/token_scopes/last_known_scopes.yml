@@ -2017,6 +2017,8 @@
   path: '/api/v1/media_attachments'
 - verb: PUT
   path: '/api/v1/media_attachments/:attachment_id'
+- verb: POST
+  path: '/api/v1/media_attachments/:attachment_id/asr'
 - verb: GET
   path: '/api/v1/media_attachments/:attachment_id/media_tracks'
 - verb: PUT
@@ -2027,6 +2029,8 @@
   path: '/api/v1/media_objects'
 - verb: PUT
   path: '/api/v1/media_objects/:media_object_id'
+- verb: POST
+  path: '/api/v1/media_objects/:media_object_id/asr'
 - verb: GET
   path: '/api/v1/media_objects/:media_object_id/media_tracks'
 - verb: PUT
