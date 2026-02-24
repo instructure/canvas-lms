@@ -159,9 +159,6 @@ beforeEach(() => {
   fakeENV.setup({
     COURSE_SETTINGS_NAVIGATION_TABS: [...defaultEnabledTabs, ...defaultDisabledTabs],
     K5_SUBJECT_COURSE: false,
-    FEATURES: {
-      nav_menu_links: true,
-    },
     PERMISSIONS: {
       manage_nav_menu_links: true,
     },
