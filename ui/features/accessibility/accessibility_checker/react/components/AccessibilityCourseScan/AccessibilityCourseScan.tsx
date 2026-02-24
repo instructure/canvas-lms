@@ -19,6 +19,7 @@
 import React, {useState} from 'react'
 import {QueryClient, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
+
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
 import GenericErrorPage from '@canvas/generic-error-page/react'
@@ -154,6 +155,7 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
         handleCourseScan={handleCourseScan}
         scanButtonDisabled={mutationInProgress || scanDisabled}
         buttonLabel={buttonLabel}
+        lastChecked={!isAutomaticScanEnabled ? data.created_at : undefined}
       >
         {children}
       </ScanHandler>
