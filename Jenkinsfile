@@ -48,6 +48,8 @@ loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFlagPrivateDefaults())
 
+pipelineHelpers.preBuildChecks()
+
 pipeline {
   agent { label 'canvas-docker' }
 
