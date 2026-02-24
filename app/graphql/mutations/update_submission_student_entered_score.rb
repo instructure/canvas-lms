@@ -35,7 +35,7 @@ class Mutations::UpdateSubmissionStudentEnteredScore < Mutations::BaseMutation
       submission.student_entered_score = entered_score
       submission.save!
     else
-      errors[submission.id.to_s] = I18n.t("Not authorized to read Submission")
+      return { errors: { submission.id.to_s => I18n.t("Not authorized to read Submission") } }
     end
 
     response = {}
