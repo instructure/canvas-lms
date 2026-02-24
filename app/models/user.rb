@@ -2700,7 +2700,15 @@ class User < ActiveRecord::Base
 
           # when discussion_checkpoints FF is enabled, we filter out parent assignment submissions
           # when that FF is disabled, we filter out sub_assignment submissions
-          course_ids_with_active_checkpoints = Course.where(id: course_ids).select(&:discussion_checkpoints_enabled?).map(&:id)
+          course_ids_by_account_id = Course.where(id: course_ids)
+                                           .group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
+          course_ids_with_active_checkpoints = if course_ids_by_account_id.any?
+                                                 Account.where(id: course_ids_by_account_id.keys)
+                                                        .select(&:discussion_checkpoints_enabled?)
+                                                        .flat_map { |a| course_ids_by_account_id[a.id] }
+                                               else
+                                                 []
+                                               end
           submissions.delete_if do |sub|
             (sub.assignment.has_sub_assignments? && course_ids_with_active_checkpoints.include?(sub.course_id)) ||
               (sub.assignment.is_a?(SubAssignment) && !course_ids_with_active_checkpoints.include?(sub.course_id))
@@ -2924,7 +2932,13 @@ class User < ActiveRecord::Base
   end
 
   def course_ids_with_checkpoints_enabled
-    courses.select(&:discussion_checkpoints_enabled?).map(&:id)
+    course_ids_by_account_id = courses.group("courses.account_id")
+                                      .pluck(Arel.sql("courses.account_id, ARRAY_AGG(courses.id)")).to_h
+    return [] if course_ids_by_account_id.empty?
+
+    Account.where(id: course_ids_by_account_id.keys)
+           .select(&:discussion_checkpoints_enabled?)
+           .flat_map { |a| course_ids_by_account_id[a.id] }
   end
 
   def course_ids_with_peer_review_enabled
