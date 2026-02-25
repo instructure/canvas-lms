@@ -197,7 +197,7 @@ def preBuildChecks() {
   }
 
   if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' &&
-    env.GERRIT_CHANGE_SUBJECT =~ /translations?$/) {
+    env.GERRIT_CHANGE_SUBJECT.replaceAll(/\p{Punct}+$/, '') =~ /translations?$/) {
     env.SKIP_BUILD = 'true'
     if (configuration.isChangeMerged()) {
       // Post-merge translation: halt with SUCCESS status
