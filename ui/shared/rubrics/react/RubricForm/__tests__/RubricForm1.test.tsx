@@ -32,7 +32,6 @@ vi.mock('../queries/RubricFormQueries', async importOriginal => {
   return {
     ...actual,
     saveRubric: vi.fn(),
-    generateCriteria: vi.fn(),
   }
 })
 
@@ -282,12 +281,17 @@ describe('RubricForm Tests', () => {
     it('renders a lock icon with a tooltip next to the outcome name', async () => {
       queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
-      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+      const {queryAllByTestId, getByTestId, getByText} = renderComponent({rubricId: '1'})
 
       const outcomeLockIcons = queryAllByTestId(/^outcome-lock-icon/)
       expect(outcomeLockIcons).toHaveLength(1)
 
-      expect(getByTestId('outcome-lock-icon-2')).toBeInTheDocument()
+      const lockIcon = getByTestId('outcome-lock-icon-2')
+      expect(lockIcon).toBeInTheDocument()
+
+      // Find the tooltip by its text content
+      const outcomeTooltip = getByText("An outcome can't be edited")
+      expect(outcomeTooltip).toBeInTheDocument()
     })
 
     describe('freeFormCriterionComments', () => {

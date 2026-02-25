@@ -211,6 +211,7 @@ export const saveRubric = async (
       ignore_for_scoring: criterion.ignoreForScoring,
       mastery_points: criterion.masteryPoints,
       criterion_use_range: criterion.criterionUseRange,
+      generated: criterion.isGenerated,
       ratings: criterion.ratings.map(rating => ({
         description: rating.description,
         long_description: rating.longDescription,
@@ -359,6 +360,10 @@ export const regenerateCriteria = async (
         long_description: criterion.longDescription,
         points: criterion.points,
         criterion_use_range: criterion.criterionUseRange,
+        learning_outcome_id: criterion.learningOutcomeId,
+        ignore_for_scoring: criterion.ignoreForScoring,
+        mastery_points: criterion.masteryPoints,
+        generated: criterion.isGenerated,
         ratings: criterion.ratings.map(rating => ({
           id: rating.id,
           criterion_id: criterion.id,

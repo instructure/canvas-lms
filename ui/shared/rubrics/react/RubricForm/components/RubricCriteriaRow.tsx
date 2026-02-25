@@ -52,6 +52,7 @@ type RubricCriteriaRowProps = {
   freeFormCriterionComments: boolean
   hidePoints: boolean
   rowIndex: number
+  isAIRubricsAvailable: boolean
   isGenerated?: boolean
   isRegenerating?: boolean
   nextIsGenerated?: boolean
@@ -75,6 +76,7 @@ export const RubricCriteriaRow = ({
   freeFormCriterionComments,
   hidePoints,
   rowIndex,
+  isAIRubricsAvailable,
   isGenerated,
   isRegenerating = false,
   nextIsGenerated,
@@ -165,7 +167,11 @@ export const RubricCriteriaRow = ({
                         onClick={() => selectLearningOutcome(criterion.learningOutcomeId)}
                       />
                       <Tooltip
-                        renderTip={I18n.t("An outcome can't be edited")}
+                        renderTip={
+                          isAIRubricsAvailable
+                            ? I18n.t("An outcome can't be edited or regenerated")
+                            : I18n.t("An outcome can't be edited")
+                        }
                         data-testid={`outcome-tooltip-${criterion.id}`}
                       >
                         <IconLockLine
@@ -287,6 +293,7 @@ export const RubricCriteriaRow = ({
                       size="small"
                       themeOverride={{smallHeight: '18px'}}
                       data-testid="rubric-criteria-row-edit-button"
+                      disabled={isRegenerating}
                     >
                       {learningOutcomeId ? <IconOutcomesLine /> : <IconEditLine />}
                     </IconButton>
@@ -303,6 +310,7 @@ export const RubricCriteriaRow = ({
                       size="small"
                       themeOverride={{smallHeight: '18px'}}
                       data-testid="rubric-criteria-row-delete-button"
+                      disabled={isRegenerating}
                     >
                       <IconTrashLine />
                     </IconButton>
@@ -319,6 +327,7 @@ export const RubricCriteriaRow = ({
                       size="small"
                       themeOverride={{smallHeight: '18px'}}
                       data-testid="rubric-criteria-row-duplicate-button"
+                      disabled={isRegenerating}
                     >
                       <IconDuplicateLine />
                     </IconButton>
@@ -327,20 +336,23 @@ export const RubricCriteriaRow = ({
               </Flex.Item>
             </Flex>
 
-            {freeFormCriterionComments && showCriteriaRegeneration && onRegenerateCriterion && (
-              <Flex justifyItems="end">
-                <Flex.Item>
-                  <RegenerateCriteria
-                    buttonColor="ai-secondary"
-                    disabled={isRegenerating}
-                    isCriterion={true}
-                    onRegenerate={(additionalPrompt: string) =>
-                      onRegenerateCriterion(criterion, additionalPrompt)
-                    }
-                  />
-                </Flex.Item>
-              </Flex>
-            )}
+            {freeFormCriterionComments &&
+              showCriteriaRegeneration &&
+              onRegenerateCriterion &&
+              !learningOutcomeId && (
+                <Flex justifyItems="end">
+                  <Flex.Item>
+                    <RegenerateCriteria
+                      buttonColor="ai-secondary"
+                      disabled={isRegenerating}
+                      isCriterion={true}
+                      onRegenerate={(additionalPrompt: string) =>
+                        onRegenerateCriterion(criterion, additionalPrompt)
+                      }
+                    />
+                  </Flex.Item>
+                </Flex>
+              )}
 
             {!freeFormCriterionComments && (
               <View as="div" position="relative">
@@ -352,13 +364,14 @@ export const RubricCriteriaRow = ({
                   addExtraBottomSpacing={showCriteriaRegeneration}
                 />
 
-                {showCriteriaRegeneration && onRegenerateCriterion && (
+                {showCriteriaRegeneration && !learningOutcomeId && onRegenerateCriterion && (
                   <div style={{position: 'absolute', right: 0, top: 0}}>
                     <View as="span" margin="0 0 0 medium">
                       <RegenerateCriteria
                         buttonColor="ai-secondary"
                         disabled={isRegenerating}
                         isCriterion={true}
+                        toolTipText={isRegenerating ? I18n.t('Criteria is regenerating') : ''}
                         onRegenerate={(additionalPrompt: string) =>
                           onRegenerateCriterion(criterion, additionalPrompt)
                         }
