@@ -25,6 +25,9 @@
     </a>
     <div id="dsr-modal-mount-point"></div>
     <div id="manage-temp-enrollments-mount-point"></div>
+    <% if @domain_root_account.feature_enabled?(:user_session_termination) && @user.grants_right?(@current_user, :terminate_sessions) %>
+      <div id="terminate-sessions-mount-point"></div>
+    <% end %>
     <% if @context_account.is_a?(Account) &&
           @user.grants_right?(@current_user, :generate_observer_pairing_code) &&
           @user.has_student_enrollment? &&

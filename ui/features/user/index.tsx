@@ -28,6 +28,8 @@ import {IconExportLine} from '@instructure/ui-icons'
 import {AccessTokensSection} from '@canvas/access-tokens/AccessTokensSection'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
+import TerminateSessions from '@canvas/terminate-sessions/react'
+import type {UserId} from '@canvas/access-tokens/UserId'
 
 ready(() => {
   const pairing_container = document.getElementById('pairing-code')
@@ -35,33 +37,24 @@ ready(() => {
   const permissions = ENV.PERMISSIONS
 
   const modifyPermissions = {
-    // @ts-expect-error - ENV global types incomplete for temporary enrollments
-    canAdd: permissions?.can_add_temporary_enrollments,
-    // @ts-expect-error - ENV global types incomplete for temporary enrollments
-    canEdit: permissions?.can_edit_temporary_enrollments,
-    // @ts-expect-error - ENV global types incomplete for temporary enrollments
-    canDelete: permissions?.can_delete_temporary_enrollments,
-    canView: permissions?.can_view_temporary_enrollments,
+    canAdd: permissions?.can_add_temporary_enrollments ?? false,
+    canEdit: permissions?.can_edit_temporary_enrollments ?? false,
+    canDelete: permissions?.can_delete_temporary_enrollments ?? false,
+    canView: permissions?.can_view_temporary_enrollments ?? false,
   }
 
   const rolePermissions = {
-    // @ts-expect-error - ENV global types incomplete for role permissions
-    teacher: permissions?.can_add_teacher,
-    // @ts-expect-error - ENV global types incomplete for role permissions
-    ta: permissions?.can_add_ta,
-    // @ts-expect-error - ENV global types incomplete for role permissions
-    student: permissions?.can_add_student,
-    // @ts-expect-error - ENV global types incomplete for role permissions
-    observer: permissions?.can_add_observer,
-    // @ts-expect-error - ENV global types incomplete for role permissions
-    designer: permissions?.can_add_observer,
+    teacher: permissions?.can_add_teacher ?? false,
+    ta: permissions?.can_add_ta ?? false,
+    student: permissions?.can_add_student ?? false,
+    observer: permissions?.can_add_observer ?? false,
+    designer: permissions?.can_add_designer ?? false,
   }
 
   const roles = Array.prototype.slice.call(ENV.COURSE_ROLES as unknown)
 
   if (pairing_container) {
     render(
-      // @ts-expect-error - ENV global types incomplete for user profile page
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
       pairing_container,
     )
@@ -75,20 +68,17 @@ ready(() => {
     if (temp_enrollments_container) {
       render(
         <ManageTempEnrollButton
-          // @ts-expect-error - ENV global types incomplete for user profile page
-          user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}
+          user={{id: ENV.USER_ID!, name: ENV.CONTEXT_USER_DISPLAY_NAME!}}
           modifyPermissions={modifyPermissions}
           roles={roles}
           rolePermissions={rolePermissions}
-          // @ts-expect-error - ENV global types incomplete for SIS permissions
-          can_read_sis={permissions?.can_read_sis}
+          can_read_sis={permissions?.can_read_sis ?? false}
         />,
         temp_enrollments_container,
       )
     }
   }
 
-  // @ts-expect-error - ENV global types incomplete for DSR permissions
   if (permissions?.can_manage_dsr_requests) {
     const dsrModalContainer = document.getElementById('dsr-modal-mount-point')
 
@@ -97,9 +87,7 @@ ready(() => {
         <CreateDSRModal
           accountId={ENV.ACCOUNT_ID}
           user={{
-            // @ts-expect-error - ENV global types incomplete for user profile page
             id: ENV.USER_ID,
-            // @ts-expect-error - ENV global types incomplete for user profile page
             name: ENV.CONTEXT_USER_DISPLAY_NAME,
           }}
           afterSave={() => {}}
@@ -115,16 +103,27 @@ ready(() => {
 
   if (
     ENV.FEATURES.student_access_token_management &&
-    // @ts-expect-error - ENV global types incomplete for access token permissions
     ENV.PERMISSIONS?.can_view_user_generated_access_tokens
   ) {
     const accessTokensContainer = document.getElementById('user_access_tokens_react_mount_point')
     render(
       <QueryClientProvider client={queryClient}>
-        {/* @ts-expect-error - ENV global types incomplete for user profile page */}
-        <AccessTokensSection userId={ENV.USER_ID} />
+        <AccessTokensSection userId={ENV.USER_ID! as UserId} />
       </QueryClientProvider>,
       accessTokensContainer,
+    )
+  }
+
+  const terminateSessionsContainer = document.getElementById('terminate-sessions-mount-point')
+  if (terminateSessionsContainer) {
+    render(
+      <TerminateSessions
+        user={{
+          id: ENV.USER_ID!,
+          name: ENV.CONTEXT_USER_DISPLAY_NAME!,
+        }}
+      />,
+      terminateSessionsContainer,
     )
   }
 })

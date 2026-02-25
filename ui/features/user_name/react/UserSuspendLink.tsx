@@ -73,7 +73,6 @@ export default function UserSuspendLink() {
   async function handleAction(action: string) {
     try {
       await doFetchApi({
-        // @ts-expect-error
         path: `/api/v1/users/${ENV.USER_ID}`,
         method: 'PUT',
         body: {user: {event: action}},
@@ -126,7 +125,6 @@ export default function UserSuspendLink() {
   }
 
   function renderModal(action: string) {
-    // @ts-expect-error
     const name = ENV.CONTEXT_USER_DISPLAY_NAME
     let modalLabel: string,
       actionColor: 'danger' | 'primary',
