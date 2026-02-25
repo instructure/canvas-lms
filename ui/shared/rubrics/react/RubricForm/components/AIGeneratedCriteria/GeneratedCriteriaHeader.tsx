@@ -28,11 +28,13 @@ const I18n = createI18nScope('rubrics-form-generated-criteria')
 
 type GeneratedCriteriaHeaderProps = {
   aiFeedbackLink?: string
+  canRegenerate?: boolean
   isGenerating?: boolean
   onRegenerateAll: (additionalPrompt: string) => void
 }
 export const GeneratedCriteriaHeader = ({
   aiFeedbackLink,
+  canRegenerate = false,
   isGenerating = false,
   onRegenerateAll,
 }: GeneratedCriteriaHeaderProps) => {
@@ -72,7 +74,10 @@ export const GeneratedCriteriaHeader = ({
             <Flex.Item>
               <RegenerateCriteria
                 buttonColor="ai-primary"
-                disabled={isGenerating}
+                disabled={isGenerating || !canRegenerate}
+                toolTipText={
+                  canRegenerate ? '' : I18n.t('There are no criteria available for regeneration')
+                }
                 onRegenerate={onRegenerateAll}
               />
             </Flex.Item>

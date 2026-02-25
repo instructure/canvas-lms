@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('rubrics-criteria-row')
 
@@ -32,6 +33,7 @@ type RegenerateCriteriaProps = {
   buttonColor: 'ai-primary' | 'ai-secondary'
   disabled?: boolean
   isCriterion?: boolean
+  toolTipText?: string
   onRegenerate: (additionalPrompt: string) => void
 }
 
@@ -39,6 +41,7 @@ const RegenerateCriteria = ({
   buttonColor,
   disabled = false,
   isCriterion = false,
+  toolTipText = '',
   onRegenerate,
 }: RegenerateCriteriaProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -115,15 +118,21 @@ const RegenerateCriteria = ({
           />
         </View>
       </CanvasModal>
-      <Button
-        onClick={() => setIsOpen(true)}
-        data-testid="regenerate-criteria-button"
-        color={buttonColor}
-        renderIcon={buttonColor === 'ai-primary' ? <IconAiSolid /> : <IconAiColoredSolid />}
-        disabled={disabled}
+      <Tooltip
+        renderTip={toolTipText}
+        data-testid="regenerate-criteria-tooltip"
+        preventTooltip={!disabled || toolTipText === ''}
       >
-        {I18n.t('Regenerate')}
-      </Button>
+        <Button
+          onClick={() => setIsOpen(true)}
+          data-testid="regenerate-criteria-button"
+          color={buttonColor}
+          renderIcon={buttonColor === 'ai-primary' ? <IconAiSolid /> : <IconAiColoredSolid />}
+          disabled={disabled}
+        >
+          {I18n.t('Regenerate')}
+        </Button>
+      </Tooltip>
     </>
   )
 }

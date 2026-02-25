@@ -57,13 +57,7 @@ export const useGenerateCriteria = ({
       if (progress.workflow_state === 'completed') {
         const transformed = mapRubricUnderscoredKeysToCamelCase(progress.results)
         const criteria = transformed.criteria ?? []
-        const newCriteria = [
-          ...criteriaRef.current,
-          ...criteria.map(criterion => ({
-            ...criterion,
-            isGenerated: true,
-          })),
-        ]
+        const newCriteria = [...criteriaRef.current, ...criteria]
 
         setRubricFormField('criteria', newCriteria)
         setRubricFormField('pointsPossible', calcPointsPossible(newCriteria))
