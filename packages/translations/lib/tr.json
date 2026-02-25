@@ -569,6 +569,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "Harici bir siteye bağlantılar."
     },
+    "list_collapsed_9ac35920": {
+        "message": "Liste daraltıldı."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liste genişletildi."
+    },
     "lists_cd1336fc": {
         "message": "Listeler"
     },
