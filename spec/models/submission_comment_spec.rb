@@ -1148,6 +1148,43 @@ RSpec.describe SubmissionComment do
     end
   end
 
+  describe "#publishable_for?" do
+    before(:once) do
+      @comment_author = User.create!(name: "Comment Author")
+      @other_user = User.create!(name: "Other User")
+      @draft_comment = @submission.submission_comments.create!(
+        comment: "draft",
+        author: @comment_author,
+        draft: true
+      )
+      @published_comment = @submission.submission_comments.create!(
+        comment: "published",
+        author: @comment_author,
+        draft: false
+      )
+    end
+
+    it "returns true when the comment is a draft and the user is the author" do
+      expect(@draft_comment.publishable_for?(@comment_author)).to be true
+    end
+
+    it "returns false when the comment is published and the user is the author" do
+      expect(@published_comment.publishable_for?(@comment_author)).to be false
+    end
+
+    it "returns false when the comment is a draft and the user is not the author" do
+      expect(@draft_comment.publishable_for?(@other_user)).to be false
+    end
+
+    it "returns false when the comment is published and the user is not the author" do
+      expect(@published_comment.publishable_for?(@other_user)).to be false
+    end
+
+    it "returns false when user is nil" do
+      expect(@draft_comment.publishable_for?(nil)).to be false
+    end
+  end
+
   describe "finalizing draft comments" do
     let(:assignment) { @course.assignments.create! }
     let(:student) { @user }

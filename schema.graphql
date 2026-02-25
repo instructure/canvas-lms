@@ -10318,6 +10318,7 @@ type SubmissionComment implements LegacyIDInterface & Timestamped {
   mediaCommentId: String
   mediaObject: MediaObject
   provisional: Boolean!
+  publishable: Boolean!
   read: Boolean!
   submissionId: ID!
   updatedAt: DateTime
