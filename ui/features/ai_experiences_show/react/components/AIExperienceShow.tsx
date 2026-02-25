@@ -98,6 +98,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                   courseId={aiExperience.course_id!}
                   isPublished={workflowState === 'published'}
                   canUnpublish={aiExperience.can_unpublish ?? true}
+                  canPublish={aiExperience.can_publish ?? true}
                   onPublishChange={setWorkflowState}
                 />
               </Flex.Item>

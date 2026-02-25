@@ -98,6 +98,12 @@ class AiExperiencesController < ApplicationController
     # Students (non-managers) should only see published experiences
     @experiences = @experiences.where(workflow_state: "published") unless can_manage
     @experiences = @experiences.where(workflow_state: params[:workflow_state]) if params[:workflow_state].present?
+
+    # Sync index status for actively indexing experiences
+    if @context.feature_enabled?(:ai_experiences_context_file_upload)
+      sync_in_progress_index_statuses(@experiences)
+    end
+
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences")
     respond_to do |format|
@@ -456,6 +462,18 @@ class AiExperiencesController < ApplicationController
                           end
 
       ai_experience_json(experience, @current_user, session, { submission_status:, can_manage: })
+    end
+  end
+
+  def sync_in_progress_index_statuses(experiences)
+    # Only sync experiences that are actively indexing to minimize API calls
+    experiences_to_sync = experiences.select do |exp|
+      exp.llm_conversation_context_id.present? &&
+        exp.context_index_status == "in_progress"
+    end
+
+    experiences_to_sync.each do |experience|
+      LLMConversationContextManager.sync_index_status(ai_experience: experience)
     end
   end
 end

@@ -27,6 +27,8 @@ export interface AIExperience {
   workflow_state: 'published' | 'unpublished'
   can_manage: boolean
   can_unpublish?: boolean
+  can_publish?: boolean
+  context_index_status?: 'not_started' | 'in_progress' | 'completed' | 'failed'
 }
 
 export interface AIExperienceShowProps {

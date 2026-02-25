@@ -35,6 +35,7 @@ interface AIExperienceRowProps {
   title: string
   workflowState: 'published' | 'unpublished'
   canUnpublish: boolean
+  canPublish: boolean
   createdAt: string
   submissionStatus?: 'not_started' | 'in_progress' | 'submitted'
   onEdit: (id: number) => void
@@ -49,6 +50,7 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
   title,
   workflowState,
   canUnpublish,
+  canPublish,
   createdAt,
   submissionStatus,
   onEdit,
@@ -106,8 +108,8 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
   }, [submissionStatus, id, canManage])
 
   const handlePublishToggle = () => {
-    // Only allow toggle if published and can unpublish, or if unpublished
-    if (isPublished && !canUnpublish) return
+    // Only allow toggle if published and can unpublish, or if unpublished and can publish
+    if ((isPublished && !canUnpublish) || (!isPublished && !canPublish)) return
 
     const newState = isPublished ? 'unpublished' : 'published'
     onPublishToggle(id, newState)
@@ -178,9 +180,15 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
                 </Text>
               </Flex.Item>
               <Flex.Item>
-                {isPublished && !canUnpublish ? (
+                {(isPublished && !canUnpublish) || (!isPublished && !canPublish) ? (
                   <Tooltip
-                    renderTip={I18n.t("Can't unpublish: students have started conversations")}
+                    renderTip={
+                      isPublished
+                        ? I18n.t(
+                            'Cannot unpublish: students have started conversations or source files are still processing',
+                          )
+                        : I18n.t('Cannot publish: source files are still processing')
+                    }
                     on={['hover', 'focus']}
                   >
                     <IconButton
@@ -189,10 +197,20 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
                       withBorder={false}
                       onClick={handlePublishToggle}
                       interaction="disabled"
-                      screenReaderLabel={I18n.t('Cannot unpublish - students have conversations')}
+                      screenReaderLabel={
+                        isPublished
+                          ? I18n.t(
+                              'Cannot unpublish - students have conversations or source files are still processing',
+                            )
+                          : I18n.t('Cannot publish - source files are still processing')
+                      }
                       data-testid="ai-experience-publish-toggle"
                     >
-                      <IconPublishSolid color="success" size="x-small" />
+                      {isPublished ? (
+                        <IconPublishSolid color="success" size="x-small" />
+                      ) : (
+                        <IconUnpublishedLine color="secondary" size="x-small" />
+                      )}
                     </IconButton>
                   </Tooltip>
                 ) : (
