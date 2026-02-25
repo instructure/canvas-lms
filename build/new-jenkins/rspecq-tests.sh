@@ -2,34 +2,21 @@
 
 set -o nounset -o errexit -o errtrace -o pipefail -o xtrace
 
-PROCESSES=$((${RSPEC_PROCESSES:=1}-1))
 SPECS="${CRYSTAL_BALL_SPECS:=.}"
 BUILD_NAME="${BUILD_NAME:=${JOB_NAME}_build${BUILD_NUMBER}}"
+WORKER_NAME="${JOB_NAME}_worker${CI_NODE_INDEX}-${PARALLEL_INDEX}"
 
-for i in $(seq 0 $PROCESSES); do
-  WORKER_NAME="${JOB_NAME}_worker${CI_NODE_INDEX}-${i}"
-
-  commands+=("COVERAGE=${COVERAGE:-0} PARALLEL_INDEX=${i} RAILS_DB_NAME_TEST=canvas_test_${i} RSPEC_SKIP_TRACKER_OUTPUT=log/skipped/skip_report_${CI_NODE_INDEX}_${i}.json bundle exec rspecq \
-                                          --build ${BUILD_NAME} \
-                                          --worker ${WORKER_NAME} \
-                                          --include-pattern '${TEST_PATTERN}'  \
-                                          --exclude-pattern '${EXCLUDE_TESTS}' \
-                                          --junit-output log/results/junit{{JOB_INDEX}}-${i}.xml \
-                                          --queue-wait-timeout 120 \
-                                          -- --require './spec/formatters/error_context/stderr_formatter.rb' \
-                                          --require './spec/formatters/error_context/html_page_formatter.rb' \
-                                          --require './spec/formatters/skip_tracker_formatter.rb' \
-                                          --format ErrorContext::HTMLPageFormatter \
-                                          --format ErrorContext::StderrFormatter \
-                                          --format RSpec::SkipTrackerFormatter \
-                                          ${SPECS}")
-done
-
-for command in "${commands[@]}"; do
-  ./build/new-jenkins/linters/run-and-collect-output.sh "$command" 2>&1 &
-  command_pids[$!]=$command
-done
-
-for command_pid in "${!command_pids[@]}"; do
-  wait $command_pid || last_statuses[$command_pid]=$?
-done
+bundle exec rspecq \
+  --build "${BUILD_NAME}" \
+  --worker "${WORKER_NAME}" \
+  --include-pattern "${TEST_PATTERN}" \
+  --exclude-pattern "${EXCLUDE_TESTS}" \
+  --junit-output "log/results/junit{{JOB_INDEX}}-${PARALLEL_INDEX}.xml" \
+  --queue-wait-timeout 120 \
+  -- --require './spec/formatters/error_context/stderr_formatter.rb' \
+     --require './spec/formatters/error_context/html_page_formatter.rb' \
+     --require './spec/formatters/skip_tracker_formatter.rb' \
+     --format ErrorContext::HTMLPageFormatter \
+     --format ErrorContext::StderrFormatter \
+     --format RSpec::SkipTrackerFormatter \
+     ${SPECS}
