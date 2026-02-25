@@ -27,13 +27,13 @@ module Services
     def self.launch_url
       return "#{config[NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY]}/none/remoteEntry.js" if Rails.env.development?
 
-      "#{cloudfront_host}/#{region}/#{environment}/remoteEntry.js"
+      "#{cloudfront_host}/#{region}/remoteEntry.js"
     end
 
     def self.ui_version
       return "none" if Rails.env.development?
 
-      "#{region}/#{environment}"
+      region
     end
 
     def self.cloudfront_host
