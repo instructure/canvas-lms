@@ -78,10 +78,7 @@ export const Monitor = ({accountId}: MonitorProps) => {
       }
     })
 
-    return () => {
-      store.setBreadcrumbs(initialBreadcrumbs)
-      unmount()
-    }
+    return () => unmount()
   }, [])
 
   return <div ref={root}></div>
