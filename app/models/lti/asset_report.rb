@@ -106,7 +106,9 @@ class Lti::AssetReport < ApplicationRecord
   }
 
   def validate_asset_compatible_with_processor
-    unless asset&.compatible_with_processor?(asset_processor)
+    return if asset&.submission.nil? # submission can be hard-deleted (test student reset)
+
+    unless asset.compatible_with_processor?(asset_processor)
       errors.add(:asset, "internal error, asset (e.g. asset's submission) not compatible with processor")
     end
   end
@@ -161,6 +163,8 @@ class Lti::AssetReport < ApplicationRecord
   end
 
   def visible_to_user?(user)
+    return false if asset.submission.nil?
+
     (visible_to_owner && asset.submission.user_id == user.id) ||
       asset.submission.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
   end
