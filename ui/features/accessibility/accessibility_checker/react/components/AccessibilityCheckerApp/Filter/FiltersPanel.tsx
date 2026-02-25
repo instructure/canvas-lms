@@ -60,7 +60,6 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   const [selectedState, setSelectedState] = useState<FilterOption[]>([{label: 'all', value: 'all'}])
   const [fromDate, setFromDate] = useState<FilterOption | null>(null)
   const [toDate, setToDate] = useState<FilterOption | null>(null)
-  const [filterCount, setFilterCount] = useState(0)
   const [alertMessage, setAlertMessage] = useState<string | null>(null)
   const [toDateError, setToDateError] = useState<Array<{type: 'error'; text: string}>>([])
   const toggleButtonRef = React.useRef<CustomToggleGroup | null>(null)
@@ -93,16 +92,6 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
     },
     [fromDate],
   )
-
-  useEffect(() => {
-    const filters = getFilters(appliedFilters)
-    setSelectedIssues(filters.ruleTypes || [{label: 'all', value: 'all'}])
-    setSelectedArtifactType(filters.artifactTypes || [{label: 'all', value: 'all'}])
-    setSelectedState(filters.workflowStates || [{label: 'all', value: 'all'}])
-    setFromDate(filters.fromDate || null)
-    setToDate(filters.toDate || null)
-    setFilterCount(appliedFilters.length)
-  }, [appliedFilters])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -140,16 +129,20 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
     [onFilterChange],
   )
 
+  const applyFilterState = useCallback((filters: Filters) => {
+    setSelectedIssues(filters.ruleTypes || [{label: 'all', value: 'all'}])
+    setSelectedArtifactType(filters.artifactTypes || [{label: 'all', value: 'all'}])
+    setSelectedState(filters.workflowStates || [{label: 'all', value: 'all'}])
+    setFromDate(filters.fromDate || null)
+    setToDate(filters.toDate || null)
+    setToDateError([])
+  }, [])
+
   const handleReset = useCallback(() => {
-    setSelectedIssues([{label: 'all', value: 'all'}])
-    setSelectedArtifactType([{label: 'all', value: 'all'}])
-    setSelectedState([{label: 'all', value: 'all'}])
-    setFromDate(null)
-    setToDate(null)
-    setFilterCount(0)
+    applyFilterState({})
     handleFilterChange(null)
     setIsOpen(false)
-  }, [handleFilterChange])
+  }, [applyFilterState, handleFilterChange])
 
   const handleApply = useCallback(() => {
     if (fromDate?.value && toDate?.value) {
@@ -170,11 +163,10 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
     setToDateError([])
 
     const filters = getFilterSelections()
-    setFilterCount(appliedFilters.length)
     handleFilterChange(filters)
     setIsOpen(false)
     toggleButtonRef.current?.focus()
-  }, [fromDate, toDate, appliedFilters, handleFilterChange, getFilterSelections])
+  }, [fromDate, toDate, handleFilterChange, getFilterSelections])
 
   const handleDateChange = useCallback(
     (dateFieldId: 'fromDate' | 'toDate') => (date: Date | null) => {
@@ -192,11 +184,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   )
 
   const handleToggle = useCallback(() => {
-    setIsOpen(!isOpen)
-    if (isOpen) {
-      handleApply()
+    // The false state is the opening since we capture this state and change after the toggle via calling the setter
+    if (!isOpen) {
+      applyFilterState(getFilters(appliedFilters))
     }
-  }, [isOpen, handleApply])
+    setIsOpen(!isOpen)
+  }, [applyFilterState, appliedFilters, isOpen])
 
   return (
     <View
@@ -219,9 +212,9 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
               tablet: {
                 showTags: false,
                 buttonText:
-                  filterCount === 1
+                  appliedFilters.length === 1
                     ? I18n.t('Clear 1 filter')
-                    : I18n.t('Clear %{count} filters', {count: filterCount}),
+                    : I18n.t('Clear %{count} filters', {count: appliedFilters.length}),
                 wrap: 'wrap',
               },
               desktop: {showTags: true, buttonText: I18n.t('Clear filters'), wrap: 'no-wrap'},
@@ -243,7 +236,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                       />
                     </Flex.Item>
                   )}
-                  {filterCount > 0 && (
+                  {appliedFilters.length > 0 && (
                     <Flex.Item shouldGrow={false} shouldShrink={false}>
                       <Button
                         data-testid="clear-filters-button"
