@@ -40,7 +40,6 @@ type Module = {
       fetchImpact: typeof fetchImpact
     }
     breadcrumbStore: {
-      getBreadcrumbs: () => Breadcrumb[]
       setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void
     }
     options: Record<string, any>
@@ -52,14 +51,21 @@ export const Monitor = ({accountId}: MonitorProps) => {
 
   React.useEffect(() => {
     let unmount = () => {}
+    let initialBreadcrumbs: Breadcrumb[] = []
 
     const store = useBreadcrumbStore.getState()
-    const initialBreadcrumbs = [...store.state]
+    const basename = getBasename('apps') + '/monitor'
+
+    const unsubscribe = useBreadcrumbStore.subscribe(next => {
+      if (next.state.at(-1)?.url === basename) {
+        initialBreadcrumbs = next.state
+      }
+    })
 
     import('ltiusage/AppModule').then((module: Module) => {
       if (root.current !== null) {
         unmount = module.render({
-          basename: getBasename('apps') + '/monitor',
+          basename,
           mountPoint: root.current,
           config: {
             ...ltiUsageConfig(),
@@ -67,9 +73,14 @@ export const Monitor = ({accountId}: MonitorProps) => {
             fetchImpact,
           },
           breadcrumbStore: {
-            getBreadcrumbs: () => store.state.slice(initialBreadcrumbs.length),
-            setBreadcrumbs: (breadcrumbs: Breadcrumb[]) =>
-              store.setBreadcrumbs([...initialBreadcrumbs, ...breadcrumbs]),
+            setBreadcrumbs: (values: Breadcrumb[]) => {
+              const prefixedValues = values.map(breadcrumb => ({
+                ...breadcrumb,
+                url: `${basename}${breadcrumb.url}`,
+              }))
+
+              store.setBreadcrumbs([...initialBreadcrumbs, ...prefixedValues])
+            },
           },
           options: ltiUsageOptions(),
         })
@@ -78,7 +89,11 @@ export const Monitor = ({accountId}: MonitorProps) => {
       }
     })
 
-    return () => unmount()
+    return () => {
+      store.setBreadcrumbs(initialBreadcrumbs)
+      unsubscribe()
+      unmount()
+    }
   }, [])
 
   return <div ref={root}></div>
