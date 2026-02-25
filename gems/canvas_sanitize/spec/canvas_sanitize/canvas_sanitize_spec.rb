@@ -214,6 +214,12 @@ describe CanvasSanitize do
     expect(res).to eq str
   end
 
+  it "keeps datetime attribute only on time tags" do
+    str = %(<div style="color: red;" datetime="2025-06-15">June 15, 2025</div><span datetime="2025-06-15">June 15, 2025</span><time datetime="2025-06-15">June 15, 2025</time>)
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq %(<div style="color: red;">June 15, 2025</div><span>June 15, 2025</span><time datetime="2025-06-15">June 15, 2025</time>)
+  end
+
   Dir.glob(File.expand_path(File.join(__FILE__, "..", "..", "fixtures", "xss", "*.xss"))) do |filename|
     name = File.split(filename).last
     it "sanitizes xss attempts for #{name}" do
