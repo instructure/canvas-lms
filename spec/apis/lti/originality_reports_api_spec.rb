@@ -151,13 +151,23 @@ module Lti
         expect(response).not_to be_successful
       end
 
-      it "verifies the specified attachment is in the course" do
-        attachment = @attachment.dup
-        attachment.context = @course
-        attachment.save!
+      context "when the requested originality report is in a course the tool lacks access to" do
+        let(:second_account) { account_model }
+        let(:second_course) { course_factory(active_all: true, account: second_account) }
+        let(:second_student) do
+          student_in_course(course: second_course, active_all: true)
+          @student
+        end
+        let(:second_attachment) { attachment_model(context: second_student) }
+        let(:second_assignment) { second_course.assignments.create!(title: "second assignment", points_possible: 12) }
+        let(:second_submission) { second_assignment.submit_homework(second_student, attachments: [second_attachment]) }
+        let!(:second_report) { OriginalityReport.create!(attachment: second_attachment, originality_score: 0.5, submission: second_submission) }
 
-        post @endpoints[:show], params: { originality_report: { file_id: attachment.id, originality_score: 0.4 } }, headers: request_headers
-        expect(response).to have_http_status :not_found
+        it "responds with 401" do
+          endpoint = "/api/lti/assignments/#{second_assignment.id}/submissions/#{second_submission.id}/originality_report/#{second_report.id}"
+          get endpoint, headers: request_headers
+          expect(response).to be_unauthorized
+        end
       end
 
       it "verifies that the specified submission includes the attachment" do
