@@ -170,6 +170,55 @@ RSpec.describe Lti::Asset do
         expect(asset.compatible_with_processor?(lti_asset_processor_model)).to be(false)
       end
     end
+
+    it "is false when submission has been hard-deleted (submission_id is nil)" do
+      asset = lti_asset_model
+      asset.submission.destroy
+      asset.reload
+      expect(asset.submission_id).to be_nil
+      expect(asset.compatible_with_processor?(lti_asset_processor_model)).to be(false)
+    end
+  end
+
+  describe "destruction when submission has been hard-deleted" do
+    it "can be destroyed when submission_id is nil" do
+      asset = lti_asset_model
+      asset.submission.destroy
+      asset.reload
+      expect(asset.submission_id).to be_nil
+      expect { asset.destroy! }.not_to raise_error
+      expect(asset.workflow_state).to eq("deleted")
+    end
+
+    it "cascades destroy to asset reports when submission_id is nil" do
+      asset = lti_asset_model
+      processor = lti_asset_processor_model(assignment: asset.submission.assignment)
+      report = lti_asset_report_model(asset:, asset_processor: processor)
+
+      asset.submission.destroy
+      asset.reload
+
+      expect { asset.destroy! }.not_to raise_error
+      expect(report.reload.workflow_state).to eq("deleted")
+    end
+  end
+
+  describe "validates submission presence on create only" do
+    it "requires submission on create" do
+      asset = Lti::Asset.new(attachment: attachment_model)
+      asset.uuid = SecureRandom.uuid
+      asset.root_account_id = Account.default.id
+      expect(asset).not_to be_valid
+      expect(asset.errors[:submission]).to be_present
+    end
+
+    it "does not require submission on update" do
+      asset = lti_asset_model
+      asset.submission.destroy
+      asset.reload
+      expect(asset.submission_id).to be_nil
+      expect(asset).to be_valid
+    end
   end
 
   describe "#calculate_sha256_checksum!" do
