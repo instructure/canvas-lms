@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('accessibility_checker')
 
-export const getColorMixerSettings = (backgroundColor: string, suggestedColors: string[]) => ({
+export const getColorMixerSettings = (backgroundColor: string) => ({
   popoverAddButtonLabel: I18n.t('Select'),
   popoverCloseButtonLabel: I18n.t('Close'),
   colorMixer: {
@@ -38,10 +38,6 @@ export const getColorMixerSettings = (backgroundColor: string, suggestedColors: 
       'Use arrow keys to navigate the color palette.',
     ),
     withAlpha: false,
-  },
-  colorPreset: {
-    label: I18n.t('Suggested colors'),
-    colors: suggestedColors,
   },
   colorContrast: {
     label: I18n.t('Contrast Ratio'),
