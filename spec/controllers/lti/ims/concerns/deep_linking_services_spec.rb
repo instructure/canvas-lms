@@ -134,17 +134,5 @@ describe Lti::IMS::Concerns::DeepLinkingServices do
         expect(Rails.cache.read(cache_key)).to eq({ "foo" => "bar" })
       end
     end
-
-    context "when the lti_cache_tool_public_jwk_url feature flag is disabled" do
-      it "fetches the JWKs every time" do
-        developer_key.root_account.disable_feature!(:lti_cache_tool_public_jwks_url)
-
-        2.times do |n|
-          stub_jwks_request
-          expect(make_jwt).to be_valid
-          expect(CanvasHttp).to have_received(:get).exactly(n + 1).times
-        end
-      end
-    end
   end
 end
