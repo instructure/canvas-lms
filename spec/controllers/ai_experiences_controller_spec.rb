@@ -123,6 +123,98 @@ describe AiExperiencesController do
         expect(published_exp["pedagogical_guidance"]).to eq("Teacher guidance")
         expect(published_exp["learning_objective"]).to eq("Test objective")
       end
+
+      context "with ai_experiences_context_file_upload feature flag" do
+        before do
+          @course.enable_feature!(:ai_experiences_context_file_upload)
+        end
+
+        context "when experiences have in_progress index status" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "in_progress"
+            )
+          end
+
+          it "syncs index status for in_progress experiences" do
+            expect(LLMConversationContextManager).to receive(:sync_index_status)
+              .with(ai_experience: @ai_experience)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when experiences have completed status" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "completed"
+            )
+          end
+
+          it "does not sync index status for completed experiences" do
+            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when experiences have failed status" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "failed"
+            )
+          end
+
+          it "does not sync index status for failed experiences" do
+            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when experiences have not_started status" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "not_started"
+            )
+          end
+
+          it "does not sync index status for not_started experiences" do
+            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when feature flag is disabled" do
+          before do
+            @course.disable_feature!(:ai_experiences_context_file_upload)
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "in_progress"
+            )
+          end
+
+          it "does not sync index status" do
+            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when context_id is not present" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: nil,
+              context_index_status: "in_progress"
+            )
+          end
+
+          it "does not sync index status" do
+            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+      end
     end
 
     context "as student" do
