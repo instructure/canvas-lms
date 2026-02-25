@@ -405,10 +405,27 @@ module PostgreSQLAdapterExtensions
     non_empty_tables.delete(ActiveRecord::Base.schema_migrations_table_name)
     non_empty_tables.delete(ActiveRecord::Base.internal_metadata_table_name)
     non_empty_tables.delete(Shard.table_name)
-    non_empty_tables.delete(Account.table_name)
-    # Only account should be the dummy account with id=0
-    non_empty_tables << Account.table_name if Account.where.not(id: 0).exists?
+    non_empty_tables.delete(Account.table_name) if non_empty_tables.include?(Account.table_name) && !Account.where.not(id: 0).exists?
+    non_empty_tables.delete(Setting.table_name) if non_empty_tables.include?(Setting.table_name) && !Setting.where.not(name: ["session_secret_key", "encryption_key_hash"]).exists?
     non_empty_tables
+  end
+
+  def non_empty_tables_message(non_empty_tables)
+    message = "Test database is not empty! Tables with data: #{non_empty_tables.join(", ")}"
+    non_empty_tables.each do |table|
+      model = ActiveRecord::Base.descendants.find { |m| m.table_name == table }
+      records = model.limit(5).to_a
+      count = model.count
+
+      message += records.map do |record|
+        "\n  #{record.inspect}"
+      end.join
+
+      if count > 5
+        message += "\n ... #{count - 5} more #{model.name} records"
+      end
+    end
+    message
   end
 
   BLOCKED_INSPECT_IVS = %i[
