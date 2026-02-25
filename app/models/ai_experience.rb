@@ -39,8 +39,9 @@ class AiExperience < ApplicationRecord
   validates :learning_objective, presence: true
   validates :pedagogical_guidance, presence: true
   validates :workflow_state, presence: true, inclusion: { in: %w[unpublished published deleted] }
-  validates :context_index_status, presence: true, inclusion: { in: %w[not_started processing completed failed] }
+  validates :context_index_status, presence: true, inclusion: { in: %w[not_started in_progress completed failed] }
   validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
+  validate :publish_ok?, if: -> { will_save_change_to_workflow_state?(to: "published") }
 
   scope :published, -> { where(workflow_state: "published") }
   scope :unpublished, -> { where(workflow_state: "unpublished") }
@@ -70,12 +71,12 @@ class AiExperience < ApplicationRecord
   # Manage conversation_context lifecycle in llm-conversation service
   before_create :set_account_associations
   after_create :create_conversation_context
+  before_destroy :delete_conversation_context
   # sync_context_files must be defined before maybe_update_conversation_context so
   # files are persisted before the service is notified of changes.
   after_save :sync_context_files, if: :pending_context_file_ids?
   after_save :index_context_files_if_changed
   after_save :maybe_update_conversation_context
-  before_destroy :delete_conversation_context
 
   def context_file_ids=(ids)
     @pending_context_file_ids = Array(ids).map(&:to_s)
@@ -115,9 +116,29 @@ class AiExperience < ApplicationRecord
     return true if new_record?
     return @can_unpublish unless @can_unpublish.nil?
 
-    @can_unpublish = !student_conversations?
+    @can_unpublish = !student_conversations? && indexing_allows_publish_changes?
   end
-  attr_writer :can_unpublish
+
+  def can_publish?
+    return true if new_record?
+    return @can_publish unless @can_publish.nil?
+
+    # Publishing is only restricted by indexing status, not by student conversations
+    @can_publish = indexing_allows_publish_changes?
+  end
+
+  attr_writer :can_unpublish, :can_publish
+
+  def indexing_allows_publish_changes?
+    # If feature flag is disabled, don't restrict based on indexing
+    return true unless course.feature_enabled?(:ai_experiences_context_file_upload)
+
+    # If no context files uploaded, don't restrict
+    return true if llm_conversation_context_id.blank?
+
+    # Only allow publish state changes when indexing is completed
+    context_index_status == "completed"
+  end
 
   def student_conversations?
     # Single efficient query - checks if any conversations exist from students
@@ -214,7 +235,18 @@ class AiExperience < ApplicationRecord
   def unpublish_ok?
     return true if can_unpublish?
 
-    errors.add :workflow_state, I18n.t("Can't unpublish if students have started conversations")
+    if !indexing_allows_publish_changes?
+      errors.add :workflow_state, I18n.t("Cannot unpublish while source files are still processing")
+    elsif student_conversations?
+      errors.add :workflow_state, I18n.t("Cannot unpublish if students have started conversations")
+    end
+    false
+  end
+
+  def publish_ok?
+    return true if can_publish?
+
+    errors.add :workflow_state, I18n.t("Cannot publish while source files are still processing")
     false
   end
 end

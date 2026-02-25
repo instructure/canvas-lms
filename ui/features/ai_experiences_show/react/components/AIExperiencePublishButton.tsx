@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {
   IconArrowOpenDownSolid,
   IconArrowOpenUpSolid,
@@ -39,6 +39,7 @@ interface AIExperiencePublishButtonProps {
   courseId: string | number
   isPublished: boolean
   canUnpublish: boolean
+  canPublish: boolean
   onPublishChange: (newState: 'published' | 'unpublished') => void
 }
 
@@ -47,10 +48,28 @@ const AIExperiencePublishButton: React.FC<AIExperiencePublishButtonProps> = ({
   courseId,
   isPublished,
   canUnpublish,
+  canPublish,
   onPublishChange,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
+
+  // Determine if the button should be disabled based on current state and permissions
+  const isDisabled = isUpdating || (isPublished && !canUnpublish) || (!isPublished && !canPublish)
+
+  // Get the reason why the button is disabled (for screen reader and tooltip)
+  const getDisabledReason = () => {
+    if (isUpdating) return I18n.t('Updating...')
+    if (isPublished && !canUnpublish) {
+      return I18n.t(
+        'Cannot change state: students have conversations or source files are still processing',
+      )
+    }
+    if (!isPublished && !canPublish) {
+      return I18n.t('Cannot publish: source files are still processing')
+    }
+    return ''
+  }
 
   const handlePublish = async (newState: 'published' | 'unpublished') => {
     setIsUpdating(true)
@@ -82,52 +101,71 @@ const AIExperiencePublishButton: React.FC<AIExperiencePublishButtonProps> = ({
     }
   }
 
+  const buttonTrigger = (
+    <Button
+      renderIcon={isPublished ? <IconPublishSolid /> : <IconNoLine />}
+      color="primary-inverse"
+      themeOverride={
+        isPublished
+          ? {
+              borderStyle: 'none',
+              primaryInverseColor: '#03893D',
+            }
+          : {borderStyle: 'none'}
+      }
+      interaction={isDisabled ? 'disabled' : 'enabled'}
+      data-testid="ai-experience-publish-button"
+    >
+      <Flex alignItems="center" gap="x-small">
+        <Flex.Item>{isPublished ? I18n.t('Published') : I18n.t('Unpublished')}</Flex.Item>
+        <Flex.Item>
+          {menuOpen ? (
+            <IconArrowOpenUpSolid size="x-small" />
+          ) : (
+            <IconArrowOpenDownSolid size="x-small" />
+          )}
+        </Flex.Item>
+      </Flex>
+    </Button>
+  )
+
   return (
     <Menu
       placement="bottom end"
       onToggle={show => setMenuOpen(show)}
       trigger={
-        <Button
-          renderIcon={isPublished ? <IconPublishSolid /> : <IconNoLine />}
-          color="primary-inverse"
-          themeOverride={
-            isPublished
-              ? {
-                  borderStyle: 'none',
-                  primaryInverseColor: '#03893D',
-                }
-              : {borderStyle: 'none'}
-          }
-          interaction={isUpdating ? 'disabled' : 'enabled'}
-          data-testid="ai-experience-publish-button"
-        >
-          <Flex alignItems="center" gap="x-small">
-            <Flex.Item>{isPublished ? I18n.t('Published') : I18n.t('Unpublished')}</Flex.Item>
-            <Flex.Item>
-              {menuOpen ? (
-                <IconArrowOpenUpSolid size="x-small" />
-              ) : (
-                <IconArrowOpenDownSolid size="x-small" />
-              )}
-            </Flex.Item>
-          </Flex>
-        </Button>
+        isDisabled && !isUpdating ? (
+          <Tooltip renderTip={getDisabledReason()} on={['hover', 'focus']}>
+            {buttonTrigger}
+          </Tooltip>
+        ) : (
+          buttonTrigger
+        )
       }
     >
       <Menu.Group label={I18n.t('State')} />
       <Menu.Item
-        disabled={isPublished}
+        disabled={isPublished || !canPublish}
         onClick={() => handlePublish('published')}
         data-testid="publish-option"
         themeOverride={{
           labelColor: '#03893D',
         }}
       >
-        <Flex>
-          <Flex.Item margin="0 x-small 0 0">
-            <IconPublishSolid />
-          </Flex.Item>
-          <Flex.Item>{I18n.t('Publish')}</Flex.Item>
+        <Flex direction="column" gap="xx-small">
+          <Flex>
+            <Flex.Item margin="0 x-small 0 0">
+              <IconPublishSolid />
+            </Flex.Item>
+            <Flex.Item>{I18n.t('Publish')}</Flex.Item>
+          </Flex>
+          {!canPublish && !isPublished && (
+            <Flex.Item>
+              <Text size="x-small" color="secondary">
+                {I18n.t('(Context files are being indexed)')}
+              </Text>
+            </Flex.Item>
+          )}
         </Flex>
       </Menu.Item>
       <Menu.Item
