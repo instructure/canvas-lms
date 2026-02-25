@@ -29,7 +29,6 @@ const I18n = createI18nScope('accessibility_checker')
 const SUGGESTION_MESSAGE = I18n.t(
   "Tip: Only #0000 will automatically update to white if the user's background is in dark mode.",
 )
-const SUGGESTED_COLORS = ['#000000', '#248029', '#9242B4', '#2063C1', '#B50000']
 
 export type ContrastErrorCode = 'color_missing' | 'invalid_color_format'
 export const COLOR_REQUIRED_MESSAGE = I18n.t('You must select a color to proceed.')
@@ -84,7 +83,7 @@ const ColorPickerForm: React.FC<FormComponentProps & React.RefAttributes<FormCom
               renderIsRequiredMessage={() =>
                 error ? [] : [{text: COLOR_REQUIRED_MESSAGE, type: 'newError'}]
               }
-              colorMixerSettings={getColorMixerSettings(backgroundColor, SUGGESTED_COLORS)}
+              colorMixerSettings={getColorMixerSettings(backgroundColor)}
               popoverButtonScreenReaderLabel={I18n.t('New text color picker')}
             />
           </View>
