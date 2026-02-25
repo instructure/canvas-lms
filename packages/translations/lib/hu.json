@@ -1262,6 +1262,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "Linkek egy külső oldalra"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Összecsukott lista."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Lista kibontva."
+    },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "A listákat listákként kell formázni."
     },
