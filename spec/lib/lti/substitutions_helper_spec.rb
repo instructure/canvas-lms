@@ -79,12 +79,6 @@ module Lti
     end
 
     describe "#account" do
-      before do
-        # When we remove :lti_variable_expansions_use_group_course_as_course, we can remove
-        # this (only needed to check feature flag):
-        set_up_persistance!
-      end
-
       it "returns the context when context is an account" do
         expect(helper_with_context(:account).account).to eq(account)
       end
@@ -101,35 +95,12 @@ module Lti
         expect(helper_with_context(:course_group, persistence: true).account).to eq(account)
       end
 
-      context "when the feature flag lti_variable_expansions_use_group_course_as_course is disabled" do
-        before do
-          # NOTE: Apparently due to caching inside Account model (?), just
-          # need to disable on the same model object instance (root_account).
-          # e.g. Account.find(root_account.id).disable_feature!(...) won't work :(
-          root_account.disable_feature!(:lti_variable_expansions_use_group_course_as_course)
-        end
-
-        it "returns the root account when context is a course-based group" do
-          expect(helper_with_context(:course_group, persistence: true).account).to eq(root_account)
-        end
-
-        it "returns the root account when context is a account-based group" do
-          expect(helper_with_context(:account_group, persistence: true).account).to eq(root_account)
-        end
-      end
-
       it "returns the root_account by default" do
         expect(helper_with_context(nil).account).to eq(root_account)
       end
     end
 
     describe "#course_or_account" do
-      before do
-        # When we remove :lti_variable_expansions_use_group_course_as_course, we can remove
-        # this (only needed to check feature flag):
-        set_up_persistance!
-      end
-
       it { expect(subject.course_or_account).to eq course }
       it { expect(helper_with_context(:account).course_or_account).to eq account }
       it { expect(helper_with_context(:account_group).course_or_account).to eq account }
@@ -138,24 +109,10 @@ module Lti
     end
 
     describe "#course" do
-      before do
-        # When we remove :lti_variable_expansions_use_group_course_as_course, we can remove
-        # this (only needed to check feature flag):
-        set_up_persistance!
-      end
-
       it { expect(helper_with_context(:course).course).to eq course }
       it { expect(helper_with_context(:account).course).to be_nil }
       it { expect(helper_with_context(:account_group).course).to be_nil }
       it { expect(helper_with_context(:course_group).course).to eq course }
-
-      describe "when the lti_variable_expansions_use_group_course_as_course feature flag is disabled" do
-        before do
-          root_account.disable_feature!(:lti_variable_expansions_use_group_course_as_course)
-        end
-
-        it { expect(helper_with_context(:course_group).course).to be_nil }
-      end
     end
 
     describe "#enrollments_to_lis_roles" do
