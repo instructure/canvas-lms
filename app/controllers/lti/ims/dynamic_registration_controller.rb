@@ -185,6 +185,12 @@ module Lti
         end
 
         ims_registration = Lti::IMS::Registration.find(params[:registration_id])
+
+        # Verify that the developer key from the access token matches the registration's developer key
+        unless validation_result[:developer_key].global_id == ims_registration.developer_key.global_id
+          return render status: :forbidden, json: { errorMessage: "You are not authorized to access this registration" }
+        end
+
         root_deployment = ContextExternalTool.find_by(account: ims_registration.root_account, lti_registration: ims_registration.lti_registration_id)
         render_registration(ims_registration, ims_registration.developer_key, root_deployment)
       end
@@ -351,6 +357,11 @@ module Lti
 
         unless validation_result[:success]
           return render status: validation_result[:status], json: { errorMessage: validation_result[:error] }
+        end
+
+        # Verify that the developer key from the access token matches the registration's developer key
+        unless validation_result[:developer_key].global_id == ims_registration.developer_key.global_id
+          return render status: :forbidden, json: { errorMessage: "You are not authorized to update this registration" }
         end
 
         # create a registration update request based on the body
