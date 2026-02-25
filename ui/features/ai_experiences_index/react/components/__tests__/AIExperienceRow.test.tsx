@@ -27,6 +27,7 @@ const defaultProps = {
   title: 'Customer Service Training',
   workflowState: 'published' as const,
   canUnpublish: true,
+  canPublish: true,
   createdAt: '2025-01-15T10:30:00Z',
   onEdit: vi.fn(),
   onTestConversation: vi.fn(),
@@ -255,6 +256,78 @@ describe('AIExperienceRow', () => {
     it('never displays submission status pill even when provided', () => {
       render(<AIExperienceRow {...defaultProps} submissionStatus="not_started" />)
       expect(screen.queryByText('Not Started')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Publish state restrictions', () => {
+    it('disables publish toggle when canPublish is false and unpublished', () => {
+      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" canPublish={false} />)
+
+      const toggleButton = screen.getByTestId('ai-experience-publish-toggle')
+      expect(toggleButton).toHaveAttribute('disabled')
+    })
+
+    it('shows indexing tooltip when canPublish is false', async () => {
+      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" canPublish={false} />)
+
+      expect(
+        screen.getByText('Cannot publish: source files are still processing'),
+      ).toBeInTheDocument()
+    })
+
+    it('disables unpublish toggle when canUnpublish is false and published', () => {
+      render(<AIExperienceRow {...defaultProps} workflowState="published" canUnpublish={false} />)
+
+      const toggleButton = screen.getByTestId('ai-experience-publish-toggle')
+      expect(toggleButton).toHaveAttribute('disabled')
+    })
+
+    it('shows unpublish tooltip when canUnpublish is false', async () => {
+      render(<AIExperienceRow {...defaultProps} workflowState="published" canUnpublish={false} />)
+
+      expect(
+        screen.getByText(
+          'Cannot unpublish: students have started conversations or source files are still processing',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('allows publish when canPublish is true and unpublished', async () => {
+      const user = userEvent.setup()
+      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" canPublish={true} />)
+
+      const publishButton = screen.getByTestId('ai-experience-publish-toggle')
+      await user.click(publishButton)
+
+      expect(defaultProps.onPublishToggle).toHaveBeenCalledWith(1, 'published')
+    })
+
+    it('allows unpublish when canUnpublish is true and published', async () => {
+      const user = userEvent.setup()
+      render(<AIExperienceRow {...defaultProps} workflowState="published" canUnpublish={true} />)
+
+      const unpublishButton = screen.getByTestId('ai-experience-publish-toggle')
+      await user.click(unpublishButton)
+
+      expect(defaultProps.onPublishToggle).toHaveBeenCalledWith(1, 'unpublished')
+    })
+
+    it('does not call onPublishToggle when canPublish is false', async () => {
+      const user = userEvent.setup()
+      const onPublishToggle = vi.fn()
+      render(
+        <AIExperienceRow
+          {...defaultProps}
+          workflowState="unpublished"
+          canPublish={false}
+          onPublishToggle={onPublishToggle}
+        />,
+      )
+
+      const publishButton = screen.getByTestId('ai-experience-publish-toggle')
+      await user.click(publishButton)
+
+      expect(onPublishToggle).not.toHaveBeenCalled()
     })
   })
 })

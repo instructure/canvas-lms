@@ -481,13 +481,162 @@ describe AiExperience do
       it "prevents unpublishing" do
         experience.workflow_state = "unpublished"
         expect(experience).not_to be_valid
-        expect(experience.errors[:workflow_state]).to include("Can't unpublish if students have started conversations")
+        expect(experience.errors[:workflow_state]).to include("Cannot unpublish if students have started conversations")
       end
 
       it "allows publishing" do
         experience.unpublish!
         experience.workflow_state = "published"
         expect(experience).to be_valid
+      end
+    end
+  end
+
+  describe "#can_publish?" do
+    let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "unpublished")) }
+
+    before do
+      allow(LLMConversationContextManager).to receive(:create_context)
+      allow(LLMConversationContextManager).to receive(:update_context)
+      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+    end
+
+    context "when feature flag is disabled" do
+      it "returns true" do
+        course.disable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:context_index_status, "in_progress")
+        expect(experience.can_publish?).to be true
+      end
+    end
+
+    context "when no context files uploaded" do
+      it "returns true" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, nil)
+        experience.update_column(:context_index_status, "in_progress")
+        expect(experience.can_publish?).to be true
+      end
+    end
+
+    context "when indexing is completed" do
+      it "returns true" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "completed")
+        expect(experience.can_publish?).to be true
+      end
+    end
+
+    context "when indexing is in_progress" do
+      it "returns false" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "in_progress")
+        expect(experience.can_publish?).to be false
+      end
+    end
+
+    context "when indexing has failed" do
+      it "returns false" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "failed")
+        expect(experience.can_publish?).to be false
+      end
+    end
+
+    context "when indexing is not_started" do
+      it "returns false" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "not_started")
+        expect(experience.can_publish?).to be false
+      end
+    end
+  end
+
+  describe "#can_unpublish? with indexing status" do
+    let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "published")) }
+    let(:student) { user_factory(active_all: true) }
+
+    before do
+      allow(LLMConversationContextManager).to receive(:create_context)
+      allow(LLMConversationContextManager).to receive(:update_context)
+      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+      course.enroll_student(student, enrollment_state: "active")
+    end
+
+    context "when students have conversations" do
+      before do
+        AiConversation.create!(
+          ai_experience: experience,
+          course:,
+          user: student,
+          llm_conversation_id: "student-conv-1",
+          workflow_state: "active",
+          root_account: course.root_account,
+          account: course.account
+        )
+      end
+
+      it "returns false regardless of indexing status" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "completed")
+        expect(experience.can_unpublish?).to be false
+      end
+    end
+
+    context "when indexing is in_progress and no student conversations" do
+      it "returns false" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "in_progress")
+        expect(experience.can_unpublish?).to be false
+      end
+    end
+
+    context "when indexing is completed and no student conversations" do
+      it "returns true" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "completed")
+        expect(experience.can_unpublish?).to be true
+      end
+    end
+  end
+
+  describe "publish validation" do
+    let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "unpublished")) }
+
+    before do
+      allow(LLMConversationContextManager).to receive(:create_context)
+      allow(LLMConversationContextManager).to receive(:update_context)
+      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+    end
+
+    context "when publishing while indexing is in_progress" do
+      it "prevents publishing" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "in_progress")
+
+        experience.workflow_state = "published"
+        expect(experience.valid?).to be false
+        expect(experience.errors[:workflow_state]).to include("Cannot publish while source files are still processing")
+      end
+    end
+
+    context "when unpublishing while indexing is in_progress" do
+      it "prevents unpublishing" do
+        experience.update_column(:workflow_state, "published")
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:llm_conversation_context_id, "context-123")
+        experience.update_column(:context_index_status, "in_progress")
+
+        experience.workflow_state = "unpublished"
+        expect(experience.valid?).to be false
+        expect(experience.errors[:workflow_state]).to include("Cannot unpublish while source files are still processing")
       end
     end
   end
