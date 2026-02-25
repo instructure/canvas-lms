@@ -555,26 +555,11 @@ RSpec.configure do |config|
     non_empty_tables = ActiveRecord::Base.connection.non_empty_tables
     next if non_empty_tables.empty?
 
-    message = "Test database is not empty! Tables with data: #{non_empty_tables.join(", ")}"
-    non_empty_tables.each do |table|
-      model = ActiveRecord::Base.descendants.find { |m| m.table_name == table }
-      records = model.limit(5).to_a
-      count = model.count
-
-      message += records.map do |record|
-        "\n  #{record.inspect}"
-      end.join
-
-      if count > 5
-        message += "\n ... #{count - 5} more #{model.name} records"
-      end
-    end
-
     # If you're seeing this error, your spec has left extra data around.
     # The test database should be completely empty after migrations run
     # with the exception of the core tables mentioned in the method above,
     # and a single row in the accounts table for the dummy root account.
-    raise message
+    raise ActiveRecord::Base.connection.non_empty_tables_message(non_empty_tables)
   end
 
   config.before :suite do
