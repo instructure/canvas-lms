@@ -58,8 +58,8 @@ module Services
           allow(Rails.env).to receive(:development?).and_return(false)
         end
 
-        it "constructs URL with region and environment" do
-          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/prod/remoteEntry.js")
+        it "constructs URL with region" do
+          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/remoteEntry.js")
         end
 
         it "returns nil cloudfront host when config is blank" do
@@ -69,29 +69,13 @@ module Services
             .and_return(DynamicSettings::FallbackProxy.new({
                                                              "new_quizzes.yml" => {}.to_yaml
                                                            }))
-          expect(NewQuizzes.launch_url).to eq("/us-west-2/prod/remoteEntry.js")
-        end
-
-        it "defaults to edge and warns when CANVAS_ENVIRONMENT is not set" do
-          allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_yield
-          expect(Rails.logger).to receive(:warn).with(/CANVAS_ENVIRONMENT is not set/).at_least(:once)
-          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/edge/remoteEntry.js")
+          expect(NewQuizzes.launch_url).to eq("/us-west-2/remoteEntry.js")
         end
 
         it "defaults to us-east-1 and warns when region is nil" do
           allow(ApplicationController).to receive(:region).and_return(nil)
           expect(Rails.logger).to receive(:warn).with(/ApplicationController.region is not set/)
-          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-east-1/prod/remoteEntry.js")
-        end
-
-        it "maps cd environment to edge" do
-          allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_return("cd")
-          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/edge/remoteEntry.js")
-        end
-
-        it "uses custom CANVAS_ENVIRONMENT value" do
-          allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_return("beta")
-          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-west-2/beta/remoteEntry.js")
+          expect(NewQuizzes.launch_url).to eq("https://example.cloudfront.net/us-east-1/remoteEntry.js")
         end
       end
 
@@ -107,8 +91,8 @@ module Services
     end
 
     describe ".ui_version" do
-      it "returns region/environment" do
-        expect(NewQuizzes.ui_version).to eq("us-west-2/prod")
+      it "returns region" do
+        expect(NewQuizzes.ui_version).to eq("us-west-2")
       end
 
       it "returns none in development" do
