@@ -51,6 +51,7 @@ export default function PeerReviewDetailsView({
       </Flex.Item>
       <Flex.Item>
         <PeerReviewAllocationRulesTray
+          courseId={assignment.course.lid}
           assignmentId={assignment.id}
           requiredPeerReviewsCount={assignment.peerReviews?.count || 1}
           canEdit={canEdit}
