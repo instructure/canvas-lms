@@ -1128,8 +1128,27 @@ RSpec.describe Lti::RegistrationsController do
 
         it "doesn't let them update the registration" do
           expect { subject }.not_to change { registration.reload.internal_lti_configuration }
-          expect(response).to be_forbidden
+          expect(response).to have_http_status(:bad_request)
+          expect(response.parsed_body["errors"]).to eq("registration does not belong to account")
         end
+      end
+    end
+
+    context "with a root account registration from site admin" do
+      let_once(:root_account) { account_model }
+      let_once(:root_admin) { account_admin_user(account: root_account) }
+      let_once(:sa_admin) { site_admin_user }
+      let_once(:registration) { lti_registration_with_tool(account: root_account, created_by: root_admin) }
+      let(:account) { Account.site_admin }
+
+      before do
+        user_session(sa_admin)
+      end
+
+      it "doesn't let them update the registration" do
+        expect { subject }.not_to change { registration.reload.internal_lti_configuration }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["errors"]).to eq("registration does not belong to account")
       end
     end
 
@@ -1539,9 +1558,9 @@ RSpec.describe Lti::RegistrationsController do
       let_once(:other_reg) { lti_registration_model(account: Account.site_admin) }
       let_once(:other_ims_registration) { lti_ims_registration_model(lti_registration: other_reg) }
 
-      it "returns 403" do
+      it "returns 400" do
         subject
-        expect(response).to be_forbidden
+        expect(response).to be_bad_request
       end
     end
 
