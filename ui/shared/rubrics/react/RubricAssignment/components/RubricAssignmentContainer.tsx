@@ -193,32 +193,32 @@ export const RubricAssignmentContainer = ({
       <View as="div" display="inline-block" {...containerStyles}>
         {rubric && rubricAssociation ? (
           <>
-            <Flex as="div" justifyItems="space-between" alignItems="center">
-              <Flex.Item shouldGrow shouldShrink overflowX="hidden">
-                <Flex gap="small" alignItems="center">
-                  <Flex.Item>
-                    <IconRubricLine />
-                  </Flex.Item>
-                  <Flex.Item shouldGrow shouldShrink overflowX="hidden">
-                    <Text>
-                      <TruncateText truncate="word" ellipsis="...">
-                        {rubric.title}
-                      </TruncateText>
-                    </Text>
-                  </Flex.Item>
-                </Flex>
+            <Flex
+              as="div"
+              justifyItems="space-between"
+              alignItems="center"
+              wrap="wrap"
+              gap="x-small"
+            >
+              <Flex.Item shouldGrow shouldShrink overflowX="hidden" size="250px">
+                <Text>
+                  <TruncateText truncate="word" ellipsis="...">
+                    <IconRubricLine /> {rubric.title}
+                  </TruncateText>
+                </Text>
               </Flex.Item>
               <Flex.Item>
                 <Button
-                  margin="0 0 0 xx-large"
                   renderIcon={<IconEyeLine />}
                   data-testid="preview-assignment-rubric-button"
                   onClick={() => setIsPreviewTrayOpen(true)}
                 >
                   {I18n.t('Preview Rubric')}
                 </Button>
+              </Flex.Item>
 
-                {rubricAssociation.canUpdate && (
+              {rubricAssociation.canUpdate && (
+                <Flex.Item>
                   <Tooltip renderTip={I18n.t('Edit Rubric')}>
                     <IconButton
                       margin="0 0 0 small"
@@ -229,9 +229,11 @@ export const RubricAssignmentContainer = ({
                       <IconEditLine />
                     </IconButton>
                   </Tooltip>
-                )}
+                </Flex.Item>
+              )}
 
-                {rubricAssociation.canDelete && (
+              {rubricAssociation.canDelete && (
+                <Flex.Item>
                   <Tooltip renderTip={removeTooltipText}>
                     <IconButton
                       margin="0 0 0 small"
@@ -242,9 +244,11 @@ export const RubricAssignmentContainer = ({
                       <IconTrashLine />
                     </IconButton>
                   </Tooltip>
-                )}
+                </Flex.Item>
+              )}
 
-                {canManageRubrics && rubricAssociation.canUpdate && (
+              {canManageRubrics && rubricAssociation.canUpdate && (
+                <Flex.Item>
                   <Tooltip renderTip={I18n.t('Replace Rubric')}>
                     <IconButton
                       margin="0 0 0 small"
@@ -255,8 +259,8 @@ export const RubricAssignmentContainer = ({
                       <IconSearchLine />
                     </IconButton>
                   </Tooltip>
-                )}
-              </Flex.Item>
+                </Flex.Item>
+              )}
             </Flex>
             <View>
               {rubricSelfAssessmentFFEnabled && rubricAssociation.canUpdate && (
@@ -268,27 +272,30 @@ export const RubricAssignmentContainer = ({
             </View>
           </>
         ) : (
-          <View>
-            <Button
-              margin="0"
-              renderIcon={<IconAddLine />}
-              data-testid="create-assignment-rubric-button"
-              onClick={() => {
-                setCriteriaViaLlm(false)
-                setRubricCreateModalOpen(true)
-              }}
-            >
-              {I18n.t('Create Rubric')}
-            </Button>
-            <Button
-              margin="0 0 0 small"
-              data-testid="find-assignment-rubric-button"
-              renderIcon={<IconSearchLine />}
-              onClick={() => setIsSearchTrayOpen(true)}
-            >
-              {I18n.t('Find Rubric')}
-            </Button>
-          </View>
+          <Flex direction="column" alignItems="center" gap="small" wrap="wrap">
+            <Flex.Item>
+              <Button
+                margin="0"
+                renderIcon={<IconAddLine />}
+                data-testid="create-assignment-rubric-button"
+                onClick={() => {
+                  setCriteriaViaLlm(false)
+                  setRubricCreateModalOpen(true)
+                }}
+              >
+                {I18n.t('Create Rubric')}
+              </Button>
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                data-testid="find-assignment-rubric-button"
+                renderIcon={<IconSearchLine />}
+                onClick={() => setIsSearchTrayOpen(true)}
+              >
+                {I18n.t('Find Rubric')}
+              </Button>
+            </Flex.Item>
+          </Flex>
         )}
       </View>
       {rubric && rubricAssociation && (

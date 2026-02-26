@@ -25,6 +25,7 @@ import {View} from '@instructure/ui-view'
 import {RubricForm} from '@canvas/rubrics/react/RubricForm'
 import type {Rubric, RubricAssociation} from '../../types/rubric'
 import type {SaveRubricResponse} from '../../../../../features/rubrics/queries/RubricFormQueries'
+import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = createI18nScope('rubrics-form')
 
@@ -65,25 +66,41 @@ export const RubricCreateModal = ({
         <CloseButton placement="end" offset="small" onClick={onDismiss} screenReaderLabel="Close" />
         <Heading data-testid="rubric-assignment-create-modal">{modalHeader}</Heading>
       </Modal.Header>
-      <Modal.Body>
-        <View as="div" width="80%" margin="0 auto">
-          <RubricForm
-            assignmentPointsPossible={assignmentPointsPossible}
-            rubric={rubric}
-            rubricAssociation={rubricAssociation}
-            courseId={ENV.COURSE_ID}
-            assignmentId={assignmentId}
-            onCancel={onDismiss}
-            onSaveRubric={onSaveRubric}
-            canManageRubrics={rubric?.canUpdateRubric ?? ENV.PERMISSIONS?.manage_rubrics ?? false}
-            canUseForGrading={canUseForGrading}
-            criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range ?? false}
-            hideHeader={true}
-            aiRubricsEnabled={aiRubricsEnabled}
-            rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
-            showAdditionalOptions={true}
-          />
-        </View>
+      <Modal.Body padding="0">
+        <Responsive
+          match="media"
+          query={{
+            compact: {maxWidth: '53.125rem'},
+            large: {minWidth: '66.5rem'},
+          }}
+        >
+          {(_props, matches) => {
+            const isCompact = matches?.includes('compact') ?? false
+
+            return (
+              <View as="div" width={isCompact ? '100%' : '80%'} margin="0 auto">
+                <RubricForm
+                  assignmentPointsPossible={assignmentPointsPossible}
+                  rubric={rubric}
+                  rubricAssociation={rubricAssociation}
+                  courseId={ENV.COURSE_ID}
+                  assignmentId={assignmentId}
+                  onCancel={onDismiss}
+                  onSaveRubric={onSaveRubric}
+                  canManageRubrics={
+                    rubric?.canUpdateRubric ?? ENV.PERMISSIONS?.manage_rubrics ?? false
+                  }
+                  canUseForGrading={canUseForGrading}
+                  criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range ?? false}
+                  hideHeader={true}
+                  aiRubricsEnabled={aiRubricsEnabled}
+                  rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
+                  showAdditionalOptions={true}
+                />
+              </View>
+            )
+          }}
+        </Responsive>
       </Modal.Body>
     </Modal>
   )
