@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Table} from '@instructure/ui-table'
 import {DragDropContext as DragAndDrop, Droppable} from 'react-beautiful-dnd'
 import type {DropResult} from 'react-beautiful-dnd'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
@@ -33,6 +34,8 @@ const I18n = createI18nScope('rubrics-criteria-container')
 type RubricCriteriaRowsProps = {
   rubricForm: RubricFormProps
   isAIRubricsAvailable: boolean
+  isCompact: boolean
+  isCompactRatings: boolean
   isGenerating?: boolean
   showCriteriaRegeneration?: boolean
   handleDragEnd: (result: DropResult) => void
@@ -45,6 +48,8 @@ type RubricCriteriaRowsProps = {
 export const RubricCriteriaContainer = ({
   rubricForm,
   isAIRubricsAvailable,
+  isCompact,
+  isCompactRatings,
   isGenerating = false,
   showCriteriaRegeneration = false,
   handleDragEnd,
@@ -100,12 +105,39 @@ export const RubricCriteriaContainer = ({
           {srAnnouncement}
         </div>
       </ScreenReaderContent>
-      <View as="div" margin="0 0 small 0">
+      <View as="div" margin={`0 0 ${isCompact ? 'medium' : 'small'} 0`}>
         <DragAndDrop onDragEnd={handleDragEnd}>
-          <Droppable droppableId="droppable-id">
-            {provided => {
-              return (
-                <div
+          <table style={{width: '100%', borderCollapse: 'collapse'}}>
+            <caption>
+              <ScreenReaderContent>{I18n.t('Rubric Criteria')}</ScreenReaderContent>
+            </caption>
+            <colgroup>
+              {!isCompact && <col style={{width: '2rem'}} />}
+              <col style={{width: '2.5rem'}} />
+              <col />
+              <col style={{width: '8rem'}} />
+            </colgroup>
+            <Table.Head>
+              <tr>
+                {!isCompact && (
+                  <th>
+                    <ScreenReaderContent>{I18n.t('Reorder')}</ScreenReaderContent>
+                  </th>
+                )}
+                <th>
+                  <ScreenReaderContent>{I18n.t('Number')}</ScreenReaderContent>
+                </th>
+                <th>
+                  <ScreenReaderContent>{I18n.t('Criterion')}</ScreenReaderContent>
+                </th>
+                <th>
+                  <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
+                </th>
+              </tr>
+            </Table.Head>
+            <Droppable droppableId="droppable-id">
+              {provided => (
+                <tbody
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                   data-testid="rubric-criteria-container"
@@ -117,6 +149,8 @@ export const RubricCriteriaContainer = ({
                         criterion={criterion}
                         freeFormCriterionComments={rubricForm.freeFormCriterionComments}
                         hidePoints={rubricForm.hidePoints}
+                        isCompact={isCompact}
+                        isCompactRatings={isCompactRatings}
                         rowIndex={index + 1}
                         isAIRubricsAvailable={isAIRubricsAvailable}
                         isGenerated={criterion.isGenerated}
@@ -139,16 +173,19 @@ export const RubricCriteriaContainer = ({
                     )
                   })}
                   {provided.placeholder}
-                </div>
-              )
-            }}
-          </Droppable>
+                </tbody>
+              )}
+            </Droppable>
+            <tbody className="new-criteria-tbody">
+              <NewCriteriaRow
+                isCompact={isCompact}
+                rowIndex={rubricForm.criteria.length + 1}
+                onEditCriterion={() => openCriterionModal()}
+                onAddOutcome={() => openOutcomeDialog()}
+              />
+            </tbody>
+          </table>
         </DragAndDrop>
-        <NewCriteriaRow
-          rowIndex={rubricForm.criteria.length + 1}
-          onEditCriterion={() => openCriterionModal()}
-          onAddOutcome={() => openOutcomeDialog()}
-        />
       </View>
     </Flex.Item>
   )

@@ -272,7 +272,7 @@ export const RubricAssignmentContainer = ({
             </View>
           </>
         ) : (
-          <Flex direction="column" alignItems="center" gap="small" wrap="wrap">
+          <Flex as="div" alignItems="center" gap="small" wrap="wrap">
             <Flex.Item>
               <Button
                 margin="0"

@@ -1,33 +1,76 @@
-.draggable.dragging {
+.draggable.dragging > td {
   background: white;
   box-shadow: 2px 2px 4px grey;
-  padding: 1rem;
 }
 
-.draggable.dragging.generated-criterion-row {
+.draggable.dragging.generated-criterion-row > td {
   background:
     linear-gradient(#f9f7fb, #f9f7fb) padding-box,
     linear-gradient(to bottom, #7f61b3, #32759c) border-box;
-  border-radius: 0.25rem;
   border: 2px solid transparent;
   box-shadow: 2px 2px 4px grey;
-  padding: 1rem;
 }
 
 /* IgniteAI branding for generated rows */
-.generated-criterion-row {
+.generated-criterion-row > td {
   background:
     linear-gradient(#f9f7fb, #f9f7fb) padding-box,
     linear-gradient(to bottom, #7f61b3, #32759c) border-box;
-  border-radius: 0.25rem;
   border: 2px solid transparent;
 }
 
-.criterion-row {
-  padding: 1rem 0.75rem;
-  margin-bottom: 0.125rem;
+/* Spacing above each draggable row and the new criteria row */
+.criterion-row > td,
+.new-criteria-tbody > tr > td {
+  padding-top: 1.25rem;
 }
 
-.divided-criterion-row {
+/* Cell padding and alignment */
+.criterion-cell {
+  padding: 0.75rem 0.5rem;
+  vertical-align: top;
+}
+
+.criterion-cell--drag {
+  width: 2rem;
+  padding-left: 0.75rem;
+  padding-right: 0;
+}
+
+.criterion-cell--actions {
+  padding-right: 0;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.criterion-cell--ratings {
+  padding-top: 0;
+}
+
+.criterion-cell--description {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+  padding-left: 0;
+}
+
+/* Divider between criteria */
+.divided-criterion-row > td {
   border-bottom: 1px solid #e0e0e0;
+}
+
+/* Rating scale table: no visible headers or borders */
+.rating-scale-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.rating-scale-table th,
+.rating-scale-table td {
+  border: none;
+  padding: 0.25rem 0.5rem;
+  vertical-align: top;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
