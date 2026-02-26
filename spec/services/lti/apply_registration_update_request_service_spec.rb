@@ -203,6 +203,99 @@ describe Lti::ApplyRegistrationUpdateRequestService do
         end
       end
 
+      context "when it is the most recent pending request" do
+        let(:update_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_by: applied_by,
+            created_at: Time.zone.now
+          )
+        end
+        let!(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_by: applied_by,
+            created_at: 2.hours.ago
+          )
+        end
+
+        it "successfully applies the update" do
+          expect(older_request.reload.pending?).to be true
+
+          subject
+
+          expect(update_request.reload.applied?).to be true
+          expect(older_request.reload.pending?).to be true # Still pending
+        end
+      end
+
+      context "when a newer pending request exists" do
+        let(:update_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_by: applied_by,
+            created_at: 2.hours.ago
+          )
+        end
+        let!(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_by: applied_by,
+            created_at: Time.zone.now
+          )
+        end
+
+        it "raises an error" do
+          expect { subject }.to raise_error(ArgumentError, /newer update request exists/)
+          expect(update_request.reload.pending?).to be true
+          expect(newer_request.reload.pending?).to be true
+        end
+      end
+
+      context "when a newer request has already been applied" do
+        let(:update_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_by: applied_by,
+            created_at: 2.hours.ago
+          )
+        end
+        let!(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_by: applied_by,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          newer_request.update!(accepted_at: Time.current)
+        end
+
+        it "raises an error" do
+          expect { subject }.to raise_error(ArgumentError, /newer update request exists/)
+          expect(update_request.reload.pending?).to be true
+          expect(newer_request.reload.applied?).to be true
+        end
+      end
+
+      context "when the request has already been processed" do
+        before do
+          update_request.update!(accepted_at: 1.hour.ago)
+        end
+
+        it "raises an error" do
+          expect { subject }.to raise_error(ArgumentError, /already been processed/)
+          expect(update_request.reload.applied?).to be true
+        end
+      end
+
       it "runs everything in a transaction" do
         allow(Lti::UpdateRegistrationService).to receive(:call).and_raise("Database error")
 

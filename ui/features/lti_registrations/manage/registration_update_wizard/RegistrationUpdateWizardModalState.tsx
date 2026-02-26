@@ -17,7 +17,6 @@
  */
 
 import {create} from 'zustand'
-import {LtiRegistrationUpdateRequestId} from '../model/lti_ims_registration/LtiRegistrationUpdateRequestId'
 import {LtiRegistration} from '../model/LtiRegistration'
 
 export type RegistrationUpdateWizardModalState =
@@ -27,14 +26,10 @@ export type RegistrationUpdateWizardModalState =
   | {
       open: true
       registration: LtiRegistration
-      ltiRegistrationUpdateRequestId: LtiRegistrationUpdateRequestId
     }
 
 export type RegistrationUpdateWizardModalActions = {
-  open: (
-    registration: LtiRegistration,
-    ltiRegistrationUpdateRequestId: LtiRegistrationUpdateRequestId,
-  ) => void
+  open: (registration: LtiRegistration) => void
   close: () => void
 }
 
@@ -45,9 +40,9 @@ export const useRegistrationUpdateWizardModalState = create<
 >(set => {
   return {
     state: {open: false},
-    open: (registration, ltiRegistrationUpdateRequestId) =>
+    open: registration =>
       set(() => ({
-        state: {registration, ltiRegistrationUpdateRequestId, open: true},
+        state: {registration, open: true},
       })),
     close: () =>
       set(() => ({
