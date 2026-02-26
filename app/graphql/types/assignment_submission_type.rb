@@ -20,6 +20,7 @@
 
 module Types
   SUBMISSION_TYPES = %w[
+    ams
     attendance
     basic_lti_launch
     discussion_topic
