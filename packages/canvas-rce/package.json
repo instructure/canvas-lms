@@ -150,7 +150,7 @@
     "js-beautify": "1.14.9",
     "keycode": "^2",
     "mathlive": "^0.77.0",
-    "minimatch": "~3.0.4",
+    "minimatch": "^3.1.5",
     "moment-timezone": "^0.5.45",
     "prop-types": "^15",
     "psl": "^1.1.0",
