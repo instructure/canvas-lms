@@ -41,13 +41,13 @@ describe('ImmersiveView', () => {
   beforeEach(() => {
     // Reset URL before each test
     delete (window as any).location
-    window.location = {search: ''} as Location
+    window.location = {search: ''} as string & Location
   })
 
   describe('Header visibility', () => {
     describe('when custom_embed_hide_header is not set', () => {
       beforeEach(() => {
-        window.location = {search: ''} as Location
+        window.location = {search: ''} as string & Location
       })
 
       it('displays the header', () => {
@@ -60,7 +60,7 @@ describe('ImmersiveView', () => {
 
     describe('when custom_embed_hide_header is false', () => {
       beforeEach(() => {
-        window.location = {search: '?custom_embed_hide_header=false'} as Location
+        window.location = {search: '?custom_embed_hide_header=false'} as string & Location
       })
 
       it('displays the header', () => {
@@ -73,7 +73,7 @@ describe('ImmersiveView', () => {
 
     describe('when custom_embed_hide_header is true', () => {
       beforeEach(() => {
-        window.location = {search: '?custom_embed_hide_header=true'} as Location
+        window.location = {search: '?custom_embed_hide_header=true'} as string & Location
       })
 
       it('hides the header', () => {
@@ -94,7 +94,7 @@ describe('ImmersiveView', () => {
       beforeEach(() => {
         window.location = {
           search: '?foo=bar&custom_embed_hide_header=true&baz=qux',
-        } as Location
+        } as string & Location
       })
 
       it('hides the header', () => {

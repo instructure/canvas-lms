@@ -35,7 +35,6 @@ const I18n = createI18nScope('assignmentsEditHeaderView')
 // @ts-expect-error
 extend(EditHeaderView, Backbone.View)
 
-// @ts-expect-error
 function EditHeaderView() {
   // @ts-expect-error
   this.onShowErrors = this.onShowErrors.bind(this)
