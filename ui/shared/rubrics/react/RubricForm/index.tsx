@@ -381,16 +381,19 @@ export const RubricForm = ({
     <Responsive
       match="media"
       query={{
-        compact: {maxWidth: '53.125rem'}, // Will use this to resize criterion rows
+        compact: {maxWidth: '53.125rem'},
         compactTitle: {maxWidth: '37.5rem'},
+        compactRatings: {maxWidth: '34.375rem'},
+        compactFooter: {maxWidth: '40rem'},
         fullWidthModal: {minWidth: '50rem'},
-        large: {minWidth: '66.5rem'},
       }}
     >
       {(_props, matches) => {
         const isFullWidthModal = matches?.includes('fullWidthModal') ?? false
         const isCompactTitle = matches?.includes('compactTitle') ?? false
         const isCompact = matches?.includes('compact') ?? false
+        const isCompactFooter = matches?.includes('compactFooter') ?? false
+        const isCompactRatings = matches?.includes('compactRatings') ?? false
 
         return (
           <View
@@ -410,7 +413,7 @@ export const RubricForm = ({
               />
               <Flex.Item overflowX="hidden" overflowY="hidden" padding="0 xx-small">
                 <Flex margin="large 0 0 0" alignItems="start" wrap="wrap" gap="small">
-                  <Flex.Item size={isCompactTitle ? '100%' : '18.75rem'} shouldGrow shouldShrink>
+                  <Flex.Item size={isCompactTitle ? '100%' : '15rem'} shouldGrow shouldShrink>
                     <TextInput
                       data-testid="rubric-form-title"
                       renderLabel={I18n.t('Rubric Name')}
@@ -486,6 +489,8 @@ export const RubricForm = ({
                 openOutcomeDialog={openOutcomeDialog}
                 onRegenerateCriterion={regenerateSingleCriterion}
                 isAIRubricsAvailable={isAIRubricsAvailable}
+                isCompact={isCompact}
+                isCompactRatings={isCompactRatings}
                 isGenerating={criteriaBeingGenerated}
                 showCriteriaRegeneration={isAIRubricsAvailable}
               />
@@ -516,6 +521,7 @@ export const RubricForm = ({
                 }
               }}
               formValid={formValid}
+              isCompact={isCompactFooter}
             />
 
             <WarningModal

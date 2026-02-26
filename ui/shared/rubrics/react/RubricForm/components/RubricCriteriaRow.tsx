@@ -18,32 +18,26 @@
 
 import {useCallback, useRef, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
-import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
+import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import {possibleString} from '@canvas/rubrics/react/Points'
 import {formatLongDescriptionHTML} from '@canvas/rubrics/react/utils'
-import {OutcomeTag, escapeNewLineText, rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
+import {OutcomeTag} from '@canvas/rubrics/react/RubricAssessment'
 import classnames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {IconButton} from '@instructure/ui-buttons'
-import {
-  IconAiColoredSolid,
-  IconDragHandleLine,
-  IconDuplicateLine,
-  IconEditLine,
-  IconOutcomesLine,
-  IconTrashLine,
-  IconLockLine,
-} from '@instructure/ui-icons'
+import {IconAiColoredSolid, IconDragHandleLine, IconLockLine} from '@instructure/ui-icons'
+import {EditCriterionButton} from './EditCriterionButton'
+import {DeleteCriterionButton} from './DeleteCriterionButton'
+import {DuplicateCriterionButton} from './DuplicateCriterionButton'
 import {Draggable} from 'react-beautiful-dnd'
 import RegenerateCriteria from './AIGeneratedCriteria/RegenerateCriteria'
 import '../drag-and-drop/styles.css'
 import {useGetRubricOutcome} from '../../RubricAssessment/queries/useGetRubricOutcome'
 import {CriterionRowPopover} from './CriterionRowPopover'
+import {RatingScaleAccordion} from './RatingScaleAccordion'
 
 const I18n = createI18nScope('rubrics-criteria-row')
 
@@ -51,6 +45,8 @@ type RubricCriteriaRowProps = {
   criterion: RubricCriterion
   freeFormCriterionComments: boolean
   hidePoints: boolean
+  isCompact: boolean
+  isCompactRatings: boolean
   rowIndex: number
   isAIRubricsAvailable: boolean
   isGenerated?: boolean
@@ -75,6 +71,8 @@ export const RubricCriteriaRow = ({
   criterion,
   freeFormCriterionComments,
   hidePoints,
+  isCompact,
+  isCompactRatings,
   rowIndex,
   isAIRubricsAvailable,
   isGenerated,
@@ -107,10 +105,6 @@ export const RubricCriteriaRow = ({
     ignoreForScoring,
   } = criterion
 
-  const editCriterionTooltip = learningOutcomeId
-    ? I18n.t('View Outcome Criterion')
-    : I18n.t('Edit Criterion')
-
   const handleMoveUp = useCallback(() => {
     handleMoveCriterion(criterionIndex, -1)
   }, [handleMoveCriterion, criterionIndex])
@@ -131,33 +125,45 @@ export const RubricCriteriaRow = ({
     }
   }, [shouldFocus, onFocused])
 
+  // Whether this is the last row for the criterion (for border styling)
+  const isLastRowForCriterion = freeFormCriterionComments || !criterion.ratings?.length
+  const showDivider = !isGenerated && !nextIsGenerated
+
   return (
     <Draggable draggableId={criterion.id || Date.now().toString()} index={rowIndex - 1}>
       {(provided, snapshot) => {
         return (
-          <div
-            ref={provided.innerRef}
-            className={classnames('draggable', 'criterion-row', {
-              dragging: snapshot.isDragging,
-              'generated-criterion-row': isGenerated,
-              'divided-criterion-row': !isGenerated && !nextIsGenerated,
-            })}
-            {...provided.draggableProps}
-          >
-            <Flex data-testid="rubric-criteria-row">
-              <Flex.Item align="start">
-                <div className="drag-handle" {...provided.dragHandleProps}>
-                  <IconDragHandleLine />
-                </div>
-              </Flex.Item>
-              <Flex.Item align="start">
-                <View as="div" margin="xxx-small 0 0 medium">
-                  <Text weight="bold" data-testid="rubric-criteria-row-index">
-                    {rowIndex}.
-                  </Text>
-                </View>
-              </Flex.Item>
-              <Flex.Item margin="0 x-small" align="start" shouldGrow={true} shouldShrink={true}>
+          <>
+            {/* Row 1: Criterion details */}
+            <tr
+              ref={provided.innerRef}
+              className={classnames('draggable', 'criterion-row', {
+                dragging: snapshot.isDragging,
+                'generated-criterion-row': isGenerated,
+                'divided-criterion-row': isLastRowForCriterion && showDivider,
+              })}
+              {...provided.draggableProps}
+              {...(isCompact ? provided.dragHandleProps : {})}
+              data-testid="rubric-criteria-row"
+            >
+              {/* Cell 1: Drag handle */}
+              {!isCompact && (
+                <td className="criterion-cell criterion-cell--drag">
+                  <View as="span" {...provided.dragHandleProps}>
+                    <IconDragHandleLine />
+                  </View>
+                </td>
+              )}
+
+              {/* Cell 2: Row index */}
+              <td className="criterion-cell criterion-cell--index">
+                <Text weight="bold" data-testid="rubric-criteria-row-index">
+                  {rowIndex}.
+                </Text>
+              </td>
+
+              {/* Cell 3: Criterion description */}
+              <td className="criterion-cell criterion-cell--description">
                 {learningOutcomeId ? (
                   <>
                     <View as="div">
@@ -189,11 +195,7 @@ export const RubricCriteriaRow = ({
                         <Text weight="bold">{outcome?.displayName}</Text>
                       </View>
                     )}
-                    <View
-                      as="div"
-                      margin="small 0 0 0"
-                      data-testid="rubric-criteria-row-description"
-                    >
+                    <View as="div" data-testid="rubric-criteria-row-description">
                       {/* html sanitized by server */}
                       <Text dangerouslySetInnerHTML={{__html: longDescription ?? ''}} />
                     </View>
@@ -213,11 +215,7 @@ export const RubricCriteriaRow = ({
                   </>
                 ) : (
                   <>
-                    <View
-                      as="div"
-                      margin="xxx-small 0 0 0"
-                      data-testid="rubric-criteria-row-description"
-                    >
+                    <View as="div" data-testid="rubric-criteria-row-description">
                       <Flex alignItems="center" gap="x-small">
                         {isGenerated && (
                           <span data-testid="rubric-criteria-row-ai-icon">
@@ -258,8 +256,10 @@ export const RubricCriteriaRow = ({
                     </Text>
                   </View>
                 )}
-              </Flex.Item>
-              <Flex.Item align="start">
+              </td>
+
+              {/* Cell 4: Points + actions */}
+              <td className="criterion-cell criterion-cell--actions">
                 {!ignoreForScoring && !hidePoints && (
                   <Pill
                     color="info"
@@ -274,214 +274,104 @@ export const RubricCriteriaRow = ({
                     </Text>
                   </Pill>
                 )}
-                <View as="span" margin="0 0 0 medium">
+                <View as="span" margin={`0 0 0 ${isCompact ? 'x-small' : 'medium'}`}>
                   <CriterionRowPopover
                     ref={popoverRef}
                     isFirstIndex={isFirstCriterion}
                     isLastIndex={isLastCriterion}
                     onMoveUp={handleMoveUp}
                     onMoveDown={handleMoveDown}
+                    {...(isCompact && {
+                      isLearningOutcome: !!learningOutcomeId,
+                      isRegenerating,
+                      onEditCriterion,
+                      onDeleteCriterion,
+                      onDuplicateCriterion,
+                    })}
                   />
                 </View>
-                <View as="span" margin="0 0 0 medium">
-                  <Tooltip renderTip={editCriterionTooltip}>
-                    <IconButton
-                      withBackground={false}
-                      withBorder={false}
-                      screenReaderLabel={editCriterionTooltip}
-                      onClick={onEditCriterion}
-                      size="small"
-                      themeOverride={{smallHeight: '18px'}}
-                      data-testid="rubric-criteria-row-edit-button"
-                      disabled={isRegenerating}
-                    >
-                      {learningOutcomeId ? <IconOutcomesLine /> : <IconEditLine />}
-                    </IconButton>
-                  </Tooltip>
-                </View>
-
-                <View as="span" margin="0 0 0 medium">
-                  <Tooltip renderTip={I18n.t('Delete Criterion')}>
-                    <IconButton
-                      withBackground={false}
-                      withBorder={false}
-                      screenReaderLabel={I18n.t('Delete Criterion')}
-                      onClick={onDeleteCriterion}
-                      size="small"
-                      themeOverride={{smallHeight: '18px'}}
-                      data-testid="rubric-criteria-row-delete-button"
-                      disabled={isRegenerating}
-                    >
-                      <IconTrashLine />
-                    </IconButton>
-                  </Tooltip>
-                </View>
-
-                <View as="span" margin="0 0 0 medium">
-                  <Tooltip renderTip={I18n.t('Duplicate Criterion')}>
-                    <IconButton
-                      withBackground={false}
-                      withBorder={false}
-                      screenReaderLabel={I18n.t('Duplicate Criterion')}
-                      onClick={onDuplicateCriterion}
-                      size="small"
-                      themeOverride={{smallHeight: '18px'}}
-                      data-testid="rubric-criteria-row-duplicate-button"
-                      disabled={isRegenerating}
-                    >
-                      <IconDuplicateLine />
-                    </IconButton>
-                  </Tooltip>
-                </View>
-              </Flex.Item>
-            </Flex>
-
-            {freeFormCriterionComments &&
-              showCriteriaRegeneration &&
-              onRegenerateCriterion &&
-              !learningOutcomeId && (
-                <Flex justifyItems="end">
-                  <Flex.Item>
-                    <RegenerateCriteria
-                      buttonColor="ai-secondary"
-                      disabled={isRegenerating}
-                      isCriterion={true}
-                      onRegenerate={(additionalPrompt: string) =>
-                        onRegenerateCriterion(criterion, additionalPrompt)
-                      }
-                    />
-                  </Flex.Item>
-                </Flex>
-              )}
-
-            {!freeFormCriterionComments && (
-              <View as="div" position="relative">
-                <RatingScaleAccordion
-                  hidePoints={hidePoints}
-                  ratings={criterion.ratings}
-                  criterionUseRange={criterion.criterionUseRange}
-                  isGenerated={isGenerated}
-                  addExtraBottomSpacing={showCriteriaRegeneration}
-                />
-
-                {showCriteriaRegeneration && !learningOutcomeId && onRegenerateCriterion && (
-                  <div style={{position: 'absolute', right: 0, top: 0}}>
+                {!isCompact && (
+                  <>
                     <View as="span" margin="0 0 0 medium">
+                      <EditCriterionButton
+                        isLearningOutcome={!!learningOutcomeId}
+                        disabled={isRegenerating}
+                        onClick={onEditCriterion}
+                      />
+                    </View>
+                    <View as="span" margin="0 0 0 medium">
+                      <DeleteCriterionButton
+                        disabled={isRegenerating}
+                        onClick={onDeleteCriterion}
+                      />
+                    </View>
+                    <View as="span" margin="0 0 0 medium">
+                      <DuplicateCriterionButton
+                        disabled={isRegenerating}
+                        onClick={onDuplicateCriterion}
+                      />
+                    </View>
+                  </>
+                )}
+                {freeFormCriterionComments &&
+                  showCriteriaRegeneration &&
+                  onRegenerateCriterion &&
+                  !learningOutcomeId && (
+                    <View as="div" margin="x-small 0 0 0">
                       <RegenerateCriteria
                         buttonColor="ai-secondary"
                         disabled={isRegenerating}
                         isCriterion={true}
-                        toolTipText={isRegenerating ? I18n.t('Criteria is regenerating') : ''}
                         onRegenerate={(additionalPrompt: string) =>
                           onRegenerateCriterion(criterion, additionalPrompt)
                         }
                       />
                     </View>
-                  </div>
-                )}
-              </View>
+                  )}
+              </td>
+            </tr>
+
+            {/* Row 2: Rating scale (only when not free-form comments) */}
+            {!freeFormCriterionComments && !isCompactRatings && (
+              <tr
+                className={classnames({
+                  'generated-criterion-row': isGenerated,
+                  'divided-criterion-row': showDivider,
+                })}
+              >
+                {!isCompact && <td className="criterion-cell criterion-cell--drag" />}
+                <td className="criterion-cell criterion-cell--index" />
+                <td colSpan={2} className="criterion-cell criterion-cell--ratings">
+                  <View as="div" position="relative">
+                    <RatingScaleAccordion
+                      hidePoints={hidePoints}
+                      ratings={criterion.ratings}
+                      criterionUseRange={criterion.criterionUseRange}
+                      isGenerated={isGenerated}
+                      addExtraBottomSpacing={showCriteriaRegeneration}
+                    />
+                    {showCriteriaRegeneration && !learningOutcomeId && onRegenerateCriterion && (
+                      <div style={{position: 'absolute', right: 0, top: 0}}>
+                        <View as="span" margin="0 0 0 medium">
+                          <RegenerateCriteria
+                            buttonColor="ai-secondary"
+                            disabled={isRegenerating}
+                            isCriterion={true}
+                            toolTipText={isRegenerating ? I18n.t('Criteria is regenerating') : ''}
+                            onRegenerate={(additionalPrompt: string) =>
+                              onRegenerateCriterion(criterion, additionalPrompt)
+                            }
+                          />
+                        </View>
+                      </div>
+                    )}
+                  </View>
+                </td>
+              </tr>
             )}
-          </div>
+          </>
         )
       }}
     </Draggable>
-  )
-}
-
-type RatingScaleAccordionProps = {
-  hidePoints: boolean
-  ratings: RubricRating[]
-  criterionUseRange: boolean
-  isGenerated?: boolean
-  addExtraBottomSpacing?: boolean
-}
-const RatingScaleAccordion = ({
-  hidePoints,
-  ratings,
-  criterionUseRange,
-  isGenerated = false,
-  addExtraBottomSpacing = false,
-}: RatingScaleAccordionProps) => {
-  return (
-    <View
-      as="div"
-      padding="0 0 0 xx-large"
-      margin={`small 0 ${addExtraBottomSpacing ? 'small' : '0'} 0`}
-    >
-      <ToggleDetails
-        data-testid="criterion-row-rating-accordion"
-        defaultExpanded={isGenerated}
-        summary={`${I18n.t('Rating Scale: %{ratingsLength}', {ratingsLength: ratings.length})}`}
-      >
-        {ratings.map((rating, index) => {
-          const scale = ratings.length - (index + 1)
-          const spacing = index === 0 ? 'medium' : 'large'
-          const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
-          return (
-            <RatingScaleAccordionItem
-              hidePoints={hidePoints}
-              rating={rating}
-              key={`rating-scale-item-${rating.id}-${index}`}
-              scale={scale}
-              spacing={spacing}
-              min={min}
-            />
-          )
-        })}
-      </ToggleDetails>
-    </View>
-  )
-}
-
-type RatingScaleAccordionItemProps = {
-  hidePoints: boolean
-  rating: RubricRating
-  scale: number
-  spacing: string
-  min?: number
-}
-const RatingScaleAccordionItem = ({
-  hidePoints,
-  rating,
-  scale,
-  spacing,
-  min,
-}: RatingScaleAccordionItemProps) => {
-  return (
-    <View as="div" margin={`${spacing} 0 0 xx-small`} data-testid="rating-scale-accordion-item">
-      <Flex>
-        <Flex.Item align="start">
-          <View as="div" width="2.25rem" margin="0 0 0 xx-small">
-            <Text width="0.75rem">{scale}</Text>
-          </View>
-        </Flex.Item>
-        <Flex.Item align="start">
-          <View as="div" width="7.063rem">
-            <View as="div" maxWidth="5.563rem">
-              <Text>{rating.description}</Text>
-            </View>
-          </View>
-        </Flex.Item>
-        <Flex.Item shouldShrink={true} shouldGrow={true} align="start">
-          <View as="div">
-            <Text
-              dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)}
-              themeOverride={{paragraphMargin: 0}}
-            />
-          </View>
-        </Flex.Item>
-        <Flex.Item align="start">
-          <View as="div" margin="0 0 0 medium">
-            {!hidePoints && (
-              <Text>
-                {min != null
-                  ? possibleStringRange(min, rating.points)
-                  : possibleString(rating.points)}
-              </Text>
-            )}
-          </View>
-        </Flex.Item>
-      </Flex>
-    </View>
   )
 }
