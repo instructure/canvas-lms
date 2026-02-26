@@ -793,6 +793,7 @@ class GradebooksController < ApplicationController
                ACCOUNT_LEVEL_MASTERY_SCALES: root_account.feature_enabled?(:account_level_mastery_scales),
                OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
                outcome_proficiency:,
+               message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
                permissions: {
                  allow_assign_to_differentiation_tags: @context.account.allow_assign_to_differentiation_tags? && @context.grants_right?(@current_user, session, :manage_tags_add)
                },

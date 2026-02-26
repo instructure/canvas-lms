@@ -52,15 +52,15 @@ vi.mock('../../charts/MasteryDistributionChart', () => ({
   ),
 }))
 
-vi.mock('@canvas/message-students-modal', () => {
+vi.mock('@canvas/message-students-dialog/react/MessageStudentsWhoDialog', () => {
   return {
-    default: function MessageStudents({open, onRequestClose, title}: any) {
-      return open ? (
+    default: function MessageStudentsWhoDialog({onClose}: any) {
+      return (
         <div data-testid="message-students-modal">
-          <h2>{title}</h2>
-          <button onClick={onRequestClose}>Close Modal</button>
+          <h2>Send a message to students</h2>
+          <button onClick={onClose}>Close Modal</button>
         </div>
-      ) : null
+      )
     },
   }
 })
