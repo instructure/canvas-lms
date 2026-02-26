@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconMoreLine} from '@instructure/ui-icons'
+import {IconAiLine, IconMoreLine, IconDocumentLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Modal} from '@instructure/ui-modal'
@@ -279,6 +279,35 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                   </Text>
                 </View>
               )}
+
+              {(window as any).ENV?.FEATURES?.ai_experiences_context_file_upload &&
+                (aiExperience.context_files?.length ?? 0) > 0 && (
+                  <View as="div" margin="medium 0 0 0">
+                    <Heading level="h3" margin="0 0 small 0">
+                      {I18n.t('Source Files')}
+                    </Heading>
+                    <View as="div" borderWidth="small" borderRadius="medium">
+                      {aiExperience.context_files!.map((file, index) => (
+                        <View
+                          key={file.id}
+                          as="div"
+                          padding="small"
+                          borderWidth={index === 0 ? '0' : 'small 0 0 0'}
+                          data-testid={`context-file-row-${file.id}`}
+                        >
+                          <Flex alignItems="center" gap="x-small">
+                            <Flex.Item>
+                              <IconDocumentLine color="secondary" />
+                            </Flex.Item>
+                            <Flex.Item shouldGrow shouldShrink>
+                              <Text>{file.display_name}</Text>
+                            </Flex.Item>
+                          </Flex>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
             </View>
           </div>
         </>

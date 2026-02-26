@@ -290,4 +290,64 @@ describe('AIExperienceShow', () => {
     const menuButton = screen.queryByText('AI Experience settings')
     expect(menuButton).not.toBeInTheDocument()
   })
+
+  describe('context files table', () => {
+    const mockFiles = [
+      {
+        id: 'f1',
+        display_name: 'lecture-notes.pdf',
+        url: '/files/f1/download',
+        size: 204800,
+        content_type: 'application/pdf',
+      },
+      {
+        id: 'f2',
+        display_name: 'rubric.docx',
+        url: '/files/f2/download',
+        size: 51200,
+        content_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      },
+    ]
+
+    beforeEach(() => {
+      ;(window as any).ENV = {FEATURES: {ai_experiences_context_file_upload: true}}
+    })
+
+    afterEach(() => {
+      delete (window as any).ENV
+    })
+
+    it('renders Source Files section when flag is on and files are present', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      expect(screen.getByText('Source Files')).toBeInTheDocument()
+    })
+
+    it('renders each file as a list item with its name', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      expect(screen.getByText('lecture-notes.pdf')).toBeInTheDocument()
+      expect(screen.getByText('rubric.docx')).toBeInTheDocument()
+    })
+
+    it('renders file names as plain text without links', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      const item = screen.getByText('lecture-notes.pdf')
+      expect(item.closest('a')).toBeNull()
+    })
+
+    it('does not render Source Files section when files array is empty', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: []}} />)
+      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+    })
+
+    it('does not render Source Files section when context_files is absent', () => {
+      render(<AIExperienceShow aiExperience={mockAiExperience} />)
+      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+    })
+
+    it('does not render Source Files section when feature flag is off', () => {
+      ;(window as any).ENV = {FEATURES: {ai_experiences_context_file_upload: false}}
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+    })
+  })
 })

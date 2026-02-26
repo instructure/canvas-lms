@@ -501,6 +501,18 @@ describe AiExperiencesController do
         expect(assigns(:page_title)).to eq(@ai_experience.title)
       end
 
+      it "sets ai_experiences_context_file_upload feature flag in js_env when enabled" do
+        @course.enable_feature!(:ai_experiences_context_file_upload)
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be true
+      end
+
+      it "sets ai_experiences_context_file_upload feature flag in js_env when disabled" do
+        @course.disable_feature!(:ai_experiences_context_file_upload)
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
+      end
+
       it "includes facts and pedagogical_guidance in JSON response for teachers" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
         json_response = json_parse(response.body)
