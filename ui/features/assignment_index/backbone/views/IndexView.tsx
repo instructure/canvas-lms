@@ -45,7 +45,6 @@ const I18n = createI18nScope('assignmentsIndexView')
 // @ts-expect-error
 extend(IndexView, Backbone.View)
 
-// @ts-expect-error
 function IndexView() {
   // @ts-expect-error
   this.filterKeyBindings = this.filterKeyBindings.bind(this)

@@ -42,7 +42,7 @@ describe('ItemAssignToTray - Blueprint Environment Configuration', () => {
   })
 
   afterEach(() => {
-    window.location = originalLocation
+    Object.defineProperty(window, 'location', {value: originalLocation, writable: true})
     server.resetHandlers()
     cleanup()
   })

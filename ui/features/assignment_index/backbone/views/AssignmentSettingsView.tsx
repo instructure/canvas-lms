@@ -36,7 +36,6 @@ const I18n = createI18nScope('AssignmentSettingsView')
 // @ts-expect-error
 extend(AssignmentSettingsView, DialogFormView)
 
-// @ts-expect-error
 function AssignmentSettingsView() {
   // @ts-expect-error
   this.errorRoots = {}

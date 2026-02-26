@@ -1430,7 +1430,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           if (autosavedContent !== editorContent) {
             this.setState({
               confirmAutoSave: true,
-              // @ts-expect-error
               autoSavedContent: patchAutosavedContent(autosaved.content),
             })
           } else {

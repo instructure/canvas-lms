@@ -31,7 +31,6 @@ const I18n = createI18nScope('groups')
 // @ts-expect-error - Legacy Backbone typing
 extend(GroupCategoryCloneView, DialogFormView)
 
-// @ts-expect-error - Legacy Backbone typing
 function GroupCategoryCloneView() {
   // @ts-expect-error - Legacy Backbone typing
   this.onSaveSuccess = this.onSaveSuccess.bind(this)
