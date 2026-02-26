@@ -2117,6 +2117,10 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_manage_lti_registrations_in_registrations_account
+    unless registration.account == @account
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
     require_context_with_permission(registration.account, :manage_lti_registrations)
   end
 
