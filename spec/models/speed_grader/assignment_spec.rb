@@ -3347,6 +3347,22 @@ describe SpeedGrader::Assignment do
     end
   end
 
+  describe "anonymous_participants in json" do
+    let_once(:assignment) { @course.assignments.create!(title: "test assignment") }
+
+    it "is false when the assignment has no anonymous participants" do
+      json = SpeedGrader::Assignment.new(assignment, @teacher).json
+      expect(json["anonymous_participants"]).to be false
+    end
+
+    it "is true when the assignment has anonymous participants" do
+      assignment.anonymous_participants = true
+      assignment.save!
+      json = SpeedGrader::Assignment.new(assignment, @teacher).json
+      expect(json["anonymous_participants"]).to be true
+    end
+  end
+
   describe "#anonymous_students?" do
     let_once(:assignment) { @course.assignments.create!(title: "test assignment") }
     let(:speed_grader_assignment) { SpeedGrader::Assignment.new(assignment, @teacher) }
