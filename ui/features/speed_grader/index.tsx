@@ -32,6 +32,7 @@ import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
 import getRCSProps from '@canvas/rce/getRCSProps'
+import * as amsAuth from '@canvas/ams/react/auth'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -59,6 +60,8 @@ ready(() => {
       mutationFns: {
         postSubmissionCommentMedia: sgUploader?.doUploadByFile,
       },
+      amsRemote: window.REMOTES?.ams || null,
+      amsAuth,
       context: {
         userId: window.ENV.current_user_id,
         assignmentId: params.get('assignment_id'),

@@ -11049,6 +11049,7 @@ enum SubmissionStatusTagType {
 Types of submissions an assignment accepts
 """
 enum SubmissionType {
+  ams
   attendance
   basic_lti_launch
   discussion_topic
