@@ -156,18 +156,8 @@
   </table>
   <% if @context.account.feature_enabled?(:intelligent_insights_modernisation) %>
     <div class="course-criteria">
-      <table class="summary">
-        <caption>
-          <h3><%= t('headings.course_criteria', 'Course Criteria') %></h3>
-        </caption>
-        <tbody>
-          <tr>
-            <td>
-              <div id="criteria-mount"></div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <h3><%= t('headings.course_criteria', 'Course Criteria') %></h3>
+      <div id="criteria-mount"></div>
     </div>
   <% end %>
 </div>
