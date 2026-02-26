@@ -257,9 +257,10 @@ describe('UnsavedChangesModal', () => {
     it('can activate "Don\'t Save" button with keyboard', async () => {
       const user = userEvent.setup()
 
-      await user.tab()
-      await user.tab()
-
+      // Reset focus to body so tab order starts predictably from outside the modal
+      document.body.focus()
+      await user.tab() // → Close button
+      await user.tab() // → Don't Save button
       await user.keyboard('{Enter}')
 
       expect(mockOnCancel).toHaveBeenCalledTimes(1)

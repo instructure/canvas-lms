@@ -57,11 +57,13 @@ describe('AIExperienceShow', () => {
     server.resetHandlers()
     // Mock scrollIntoView which is not available in JSDOM
     Element.prototype.scrollIntoView = vi.fn()
-    // Reset window.location
+    // Reset window.location (include href so fetch can resolve relative URLs)
     delete (window as any).location
     window.location = {
       search: '',
       pathname: '/courses/123/ai_experiences/1',
+      href: 'http://localhost/courses/123/ai_experiences/1',
+      origin: 'http://localhost',
     } as any
   })
 
@@ -254,18 +256,12 @@ describe('AIExperienceShow', () => {
       expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
     })
 
-    // Click Delete button in modal (not the menu item)
-    const buttons = screen.getAllByText('Delete')
-    const confirmDeleteButton = buttons.find(
-      el => el.closest('button') && el.closest('button')!.getAttribute('type') === 'button',
-    )
-    fireEvent.click(confirmDeleteButton!.closest('button')!)
+    fireEvent.click(screen.getByTestId('ai-experience-show-delete-confirm-button'))
 
-    // Wait for delete to be processed - the modal should close after delete
+    // Wait for delete API to be called
     await waitFor(
       () => {
-        // Either the delete was called or the modal closes (indicating success)
-        expect(deleteCalled || screen.queryByText('Delete AI Experience') === null).toBe(true)
+        expect(deleteCalled).toBe(true)
       },
       {timeout: 5000},
     )
