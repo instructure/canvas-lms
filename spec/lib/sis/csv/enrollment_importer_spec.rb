@@ -1355,6 +1355,16 @@ describe SIS::CSV::EnrollmentImporter do
         expect(Enrollment.where(temporary_enrollment_pairing_id: enrollment_pairing_id)).to exist
       end
 
+      it "does not create enrollment if start or end date is missing" do
+        importer = process_csv_data(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,recipient,teacher,active,,,provider"
+        )
+        errors = importer.errors.map(&:last)
+        expect(@course.enrollments.count).to eq 1
+        expect(errors).to eq ["A temporary enrollment is missing a start or end date (start_date: , end_date: )"]
+      end
+
       it "does not create enrollment if end date is before start" do
         importer = process_csv_data(
           "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
