@@ -213,6 +213,28 @@ describe('SpeedGrader Submission History', () => {
     expect(firstSubmission.innerHTML).not.toContain('MISSING')
   })
 
+  describe('anonymous participants', () => {
+    beforeEach(() => {
+      SpeedGrader.EG.currentStudent.submission.submission_history = [
+        SpeedGrader.EG.currentStudent.submission.submission_history[0],
+      ]
+    })
+
+    it('hides the submission date when anonymous_participants is true', () => {
+      window.jsonData.anonymous_participants = true
+      SpeedGrader.EG.refreshSubmissionsToView()
+      const submissionDropdown = document.getElementById('multiple_submissions')
+      expect(submissionDropdown.innerHTML).not.toContain('Submitted:')
+    })
+
+    it('shows the submission date when anonymous_participants is false', () => {
+      window.jsonData.anonymous_participants = false
+      SpeedGrader.EG.refreshSubmissionsToView()
+      const submissionDropdown = document.getElementById('multiple_submissions')
+      expect(submissionDropdown.innerHTML).toContain('Submitted:')
+    })
+  })
+
   it('tags submission with custom status in dropdown', () => {
     SpeedGrader.EG.currentStudent.submission.custom_grade_status = {
       id: '1',

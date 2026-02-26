@@ -3107,7 +3107,9 @@ EG = {
         return s.submitted_at != null
       })
       innerHTML = submissionsDropdownTemplate({
-        showSubmissionStatus: !window.jsonData.anonymize_students || isAdmin,
+        showSubmissionStatus:
+          !window.jsonData.anonymous_participants &&
+          (!window.jsonData.anonymize_students || isAdmin),
         singleSubmission: submissionHistory.length === 1,
         submissions: templateSubmissions,
         linkToQuizHistory: window.jsonData.too_many_quiz_submissions && hasActualSubmissions,
