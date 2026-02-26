@@ -377,9 +377,7 @@ export const ToolDetailsInner = ({
                     data-pendo="lti-registrations-update-available-button"
                     renderIcon={() => <IconRefreshLine />}
                     onClick={() => {
-                      useRegistrationUpdateWizardModalState
-                        .getState()
-                        .open(registration, pendingUpdate)
+                      useRegistrationUpdateWizardModalState.getState().open(registration)
                     }}
                   >
                     {I18n.t('Update Available')}

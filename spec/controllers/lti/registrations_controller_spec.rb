@@ -3107,6 +3107,168 @@ RSpec.describe Lti::RegistrationsController do
     end
   end
 
+  describe "GET latest_registration_update_request", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/latest_update_request" }
+
+    let_once(:registration) do
+      ims_reg = lti_ims_registration_model(account:)
+      ims_reg.lti_registration
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "when registration does not belong to account" do
+      let_once(:other_account) { account_model }
+      let_once(:registration) { lti_registration_model(account: other_account) }
+
+      it "returns 400" do
+        subject
+        expect(response).to have_http_status(:bad_request)
+        expect(response_json["errors"]).to eq("registration does not belong to account")
+      end
+    end
+
+    context "when there are no update requests" do
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the most recent update request is pending" do
+      let_once(:update_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account
+        )
+      end
+
+      before { update_request }
+
+      it "returns the most recent pending update request" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(update_request.id)
+        expect(response_json["status"]).to eq("pending")
+      end
+    end
+
+    context "when there are multiple pending update requests" do
+      let_once(:older_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          created_at: 2.hours.ago
+        )
+      end
+      let_once(:newer_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          created_at: 1.hour.ago
+        )
+      end
+
+      before do
+        older_request
+        newer_request
+      end
+
+      it "returns the most recent pending update request" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(newer_request.id)
+        expect(response_json["status"]).to eq("pending")
+      end
+    end
+
+    context "when the most recent update request has been accepted" do
+      let_once(:update_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          accepted_at: 1.hour.ago
+        )
+      end
+
+      before { update_request }
+
+      it "returns the accepted request" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(update_request.id)
+        expect(response_json["status"]).to eq("applied")
+      end
+    end
+
+    context "when the most recent update request has been rejected" do
+      let_once(:update_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          rejected_at: 1.hour.ago
+        )
+      end
+
+      before { update_request }
+
+      it "returns the rejected request" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(update_request.id)
+        expect(response_json["status"]).to eq("rejected")
+      end
+    end
+
+    context "when there is an older pending request and a newer accepted request" do
+      let_once(:older_pending) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          created_at: 2.hours.ago
+        )
+      end
+      let_once(:newer_accepted) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          created_at: 1.hour.ago,
+          accepted_at: 1.hour.ago
+        )
+      end
+
+      before do
+        older_pending
+        newer_accepted
+      end
+
+      it "returns the most recent (accepted) request, not the older pending one" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(newer_accepted.id)
+        expect(response_json["status"]).to eq("applied")
+      end
+    end
+  end
+
   describe "PUT apply_registration_update_request", type: :request do
     subject { put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/update_requests/#{registration_update_request.id}/apply", params:, as: :json }
 
@@ -3166,6 +3328,93 @@ RSpec.describe Lti::RegistrationsController do
         expect(response).to have_http_status(:ok)
         expect(response_json).to include("id" => registration.id)
       end
+
+      context "when it is the most recent pending request" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+
+        before do
+          # Ensure the older request exists
+          older_request
+        end
+
+        it "successfully applies the update" do
+          expect(older_request.reload.pending?).to be true
+
+          subject
+
+          expect(registration_update_request.reload.accepted_at).to be_present
+          expect(older_request.reload.pending?).to be true # Still pending
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "when a newer pending request exists" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+        let_once(:registration_update_request) { older_request }
+        let_once(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          # Ensure the newer request exists
+          newer_request
+        end
+
+        it "returns 400 bad request" do
+          subject
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response_json["errors"]).to include("newer update request exists")
+          expect(registration_update_request.reload.pending?).to be true
+        end
+      end
+
+      context "when a newer request has already been applied" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+        let_once(:registration_update_request) { older_request }
+        let_once(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          # Mark the newer request as already applied
+          newer_request.update!(accepted_at: Time.current)
+        end
+
+        it "returns 400 bad request" do
+          subject
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response_json["errors"]).to include("newer update request exists")
+          expect(registration_update_request.reload.pending?).to be true
+        end
+      end
     end
 
     context "when accepted is false" do
@@ -3187,6 +3436,93 @@ RSpec.describe Lti::RegistrationsController do
         registration.reload
         expect(registration.name).to eq(original_name)
         expect(registration.updated_at).to eq(original_updated_at)
+      end
+
+      context "when it is the most recent pending request" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+
+        before do
+          # Ensure the older request exists
+          older_request
+        end
+
+        it "successfully rejects the update" do
+          expect(older_request.reload.pending?).to be true
+
+          subject
+
+          expect(registration_update_request.reload.rejected_at).to be_present
+          expect(older_request.reload.pending?).to be true # Still pending
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "when a newer pending request exists" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+        let_once(:registration_update_request) { older_request }
+        let_once(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          # Ensure the newer request exists
+          newer_request
+        end
+
+        it "returns 400 bad request" do
+          subject
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response_json["errors"]).to include("newer update request exists")
+          expect(registration_update_request.reload.pending?).to be true
+        end
+      end
+
+      context "when a newer request has already been applied" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+        let_once(:registration_update_request) { older_request }
+        let_once(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          # Mark the newer request as already applied
+          newer_request.update!(accepted_at: Time.current)
+        end
+
+        it "returns 400 bad request" do
+          subject
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response_json["errors"]).to include("newer update request exists")
+          expect(registration_update_request.reload.pending?).to be true
+        end
       end
     end
 
@@ -3329,6 +3665,35 @@ RSpec.describe Lti::RegistrationsController do
             expect(registration_data["pending_update"]).to be_nil
           end
         end
+
+        context "with older pending request and newer accepted request" do
+          before do
+            # Create an older pending request
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              created_at: 2.hours.ago
+            )
+            # Create a newer accepted request
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              created_at: 1.hour.ago,
+              accepted_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false since most recent is accepted" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_nil
+          end
+        end
       end
 
       describe "GET show", type: :request do
@@ -3410,6 +3775,34 @@ RSpec.describe Lti::RegistrationsController do
           end
 
           it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_nil
+          end
+        end
+
+        context "with older pending request and newer accepted request" do
+          before do
+            # Create an older pending request
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              created_at: 2.hours.ago
+            )
+            # Create a newer accepted request
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              created_at: 1.hour.ago,
+              accepted_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false since most recent is accepted" do
             subject
             expect(response).to be_successful
             expect(response_json["pending_update"]).to be_nil

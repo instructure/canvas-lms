@@ -1308,12 +1308,13 @@ class Lti::RegistrationsController < ApplicationController
       overlay = registration.overlay_for(@context) if includes.include?(:overlay)
 
       # Load pending update information if feature flag is enabled
+      # Only show the most recent update request if it's still pending
       pending_update = nil
       if Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
-        pending_update = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
-                                                       .pending
-                                                       .order(created_at: :desc)
-                                                       .first
+        most_recent = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
+                                                    .order(created_at: :desc)
+                                                    .first
+        pending_update = most_recent if most_recent&.pending?
       end
 
       render json: lti_registration_json(registration,
@@ -1859,6 +1860,37 @@ class Lti::RegistrationsController < ApplicationController
     )
   end
 
+  # @API Get Latest LTI Registration Update Request
+  # Retrieves the most recent update request for a registration, regardless of its status.
+  # Returns 404 if there are no update requests for this registration.
+  #
+  # @argument id [Integer] The id of the registration.
+  # @returns Lti::RegistrationUpdateRequest
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<id>/latest_update_request' \
+  #        -H "Authorization: Bearer <token>"
+  def latest_registration_update_request
+    unless registration.account == @context
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
+    # Get the most recent update request regardless of status
+    most_recent = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
+                                                .order(created_at: :desc)
+                                                .first
+
+    raise ActiveRecord::RecordNotFound unless most_recent
+
+    render json: lti_registration_update_request_json(
+      most_recent,
+      @current_user,
+      session,
+      @context
+    )
+  end
+
   # @API Apply LTI Registration Update Requst
   # Applies a registration update request to an existing registration,
   # replacing the existing configuration and overlay with the new values.
@@ -1888,6 +1920,10 @@ class Lti::RegistrationsController < ApplicationController
 
     unless params.key?(:accepted)
       return render json: { errors: "accepted parameter is required" }, status: :bad_request
+    end
+
+    unless registration_update_request.most_recent?
+      return render json: { errors: "Cannot apply an outdated registration update request. A newer update request exists." }, status: :bad_request
     end
 
     accepted = params[:accepted]

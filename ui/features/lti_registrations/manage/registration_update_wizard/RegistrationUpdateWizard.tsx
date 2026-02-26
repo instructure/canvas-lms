@@ -23,10 +23,9 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import React from 'react'
 import type {AccountId} from '../model/AccountId'
-import type {LtiRegistrationUpdateRequestId} from '../model/lti_ims_registration/LtiRegistrationUpdateRequestId'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import {Header} from '../registration_wizard_forms/Header'
-import {useRegistrationUpdateRequest} from '../api/ltiImsRegistration'
+import {useLatestRegistrationUpdateRequest} from '../api/ltiImsRegistration'
 import {useRegistrationWithConfig} from '../api/registrations'
 import {RegistrationUpdateWizardInner} from './RegistrationUpdateWizardInner'
 import {LtiRegistration} from '../model/LtiRegistration'
@@ -36,7 +35,6 @@ const I18n = createI18nScope('lti_registrations')
 export interface RegistrationUpdateWizardProps {
   accountId: AccountId
   registration: LtiRegistration
-  ltiRegistrationUpdateRequestId: LtiRegistrationUpdateRequestId
   onDismiss: () => void
   onSuccess: () => void
 }
@@ -44,14 +42,12 @@ export interface RegistrationUpdateWizardProps {
 export const RegistrationUpdateWizard = ({
   accountId,
   registration,
-  ltiRegistrationUpdateRequestId,
   onDismiss,
   onSuccess,
 }: RegistrationUpdateWizardProps) => {
-  const registrationUpdateRequestQuery = useRegistrationUpdateRequest(
+  const registrationUpdateRequestQuery = useLatestRegistrationUpdateRequest(
     accountId,
     registration.id,
-    ltiRegistrationUpdateRequestId,
   )
 
   const registrationWithConfigQuery = useRegistrationWithConfig(registration.id, accountId)

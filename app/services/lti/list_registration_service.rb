@@ -91,11 +91,14 @@ module Lti
     def preloaded_pending_updates(registrations)
       return {} unless Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
 
-      Lti::RegistrationUpdateRequest.where(lti_registration: registrations)
-                                    .pending
-                                    .select("DISTINCT ON (lti_registration_id) *")
-                                    .order(:lti_registration_id, created_at: :desc)
-                                    .group_by { |u| Shard.global_id_for(u.lti_registration_id, Shard.current) }
+      # Get the most recent update request per registration, regardless of status
+      all_latest = Lti::RegistrationUpdateRequest.where(lti_registration: registrations)
+                                                 .select("DISTINCT ON (lti_registration_id) *")
+                                                 .order(:lti_registration_id, created_at: :desc)
+
+      # Only include requests that are still pending (most recent and not yet processed)
+      all_latest.select(&:pending?)
+                .group_by { |u| Shard.global_id_for(u.lti_registration_id, Shard.current) }
     end
 
     # Get all registrations on this account, regardless of their bindings

@@ -47,6 +47,16 @@ module Lti
         raise ArgumentError, "Only Registration update requests for Dynamic Registrations are currently supported"
       end
 
+      # Ensure this request is pending
+      unless @registration_update_request.pending?
+        raise ArgumentError, "Cannot apply a registration update request that has already been processed."
+      end
+
+      # Ensure this is the most recent update request to prevent applying outdated updates
+      unless @registration_update_request.most_recent?
+        raise ArgumentError, "Cannot apply an outdated registration update request. A newer update request exists."
+      end
+
       Lti::Registration.transaction do
         # Track all changes in a single history entry
         updated_registration = Lti::RegistrationHistoryEntry.track_changes(
