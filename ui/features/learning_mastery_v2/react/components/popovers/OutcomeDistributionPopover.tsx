@@ -36,7 +36,11 @@ import {
   RatingDistribution,
 } from '@canvas/outcomes/react/types/mastery_distribution'
 import {Avatar} from '@instructure/ui-avatar'
-import MessageStudents from '@canvas/message-students-modal'
+import MessageStudentsWhoDialog, {
+  type Student as MSWStudent,
+  type SendMessageArgs,
+} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
+import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import {Link} from '@instructure/ui-link'
 import TagAsModalManager from '@canvas/differentiation-tags/react/TagAsModal/TagAsModalManager'
 import {useAddTagMembership} from '@canvas/differentiation-tags/react/hooks/useAddTagMembership'
@@ -208,12 +212,29 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
     return distributionStudents.filter(student => studentIds.has(student.id))
   }, [selectedRating, distributionStudents])
 
-  const messageRecipients = useMemo(() => {
+  const mswStudents = useMemo<MSWStudent[]>(() => {
     return selectedStudents.map(student => ({
       id: student.id,
-      displayName: student.display_name || student.name,
+      name: student.display_name || student.name,
+      sortableName: student.display_name || student.name,
+      submittedAt: null,
+      workflowState: 'graded',
     }))
   }, [selectedStudents])
+
+  const handleSendMessage = React.useCallback(
+    ({recipientsIds, subject, body, mediaFile, attachmentIds}: SendMessageArgs) => {
+      MessageStudentsWhoHelper.sendMessageStudentsWho(
+        recipientsIds,
+        subject,
+        body,
+        `course_${courseId}`,
+        mediaFile,
+        attachmentIds,
+      )
+    },
+    [courseId],
+  )
 
   const handleBarClick = React.useCallback(
     (label: string, _value: number) => {
@@ -271,14 +292,16 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   return (
     <>
       {isMessageModalOpen && selectedStudents.length > 0 && (
-        <MessageStudents
-          contextCode={`course_${courseId}`}
-          onRequestClose={() => setIsMessageModalOpen(false)}
-          open={isMessageModalOpen}
-          bulkMessage={true}
-          groupConversation={true}
-          recipients={messageRecipients}
-          title={I18n.t('Send a message to students')}
+        <MessageStudentsWhoDialog
+          onClose={() => setIsMessageModalOpen(false)}
+          students={mswStudents}
+          onSend={handleSendMessage}
+          hideCriterionSection={true}
+          messageAttachmentUploadFolderId={
+            ENV.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id ?? ''
+          }
+          userId={ENV.current_user_id ?? ''}
+          courseId={courseId}
         />
       )}
       {isDifferentiationTagModalOpen && (
