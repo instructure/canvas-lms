@@ -187,6 +187,7 @@ module FeatureFlags
     end
 
     def self.oak_for_users_visible_on_hook(context)
+      return false unless context.is_a?(User)
       return false unless oak_visible_on_hook(context)
 
       Oak::PermissionChecker.user_permitted?(context, Account.current_domain_root_account)
