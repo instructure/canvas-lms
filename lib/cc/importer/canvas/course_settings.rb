@@ -47,6 +47,7 @@ module CC::Importer::Canvas
       @course[:external_tools] = convert_external_tools(settings_doc(EXTERNAL_TOOLS))
       @course[:external_feeds] = convert_external_feeds(settings_doc(EXTERNAL_FEEDS))
       @course[:grading_standards] = convert_grading_standards(settings_doc(GRADING_STANDARDS))
+      @course[:nav_menu_links] = convert_nav_menu_links(settings_doc(NAV_MENU_LINKS))
       @course[:learning_outcomes] = convert_learning_outcomes(settings_doc(LEARNING_OUTCOMES))
       @course[:modules] = convert_modules(settings_doc(MODULE_META))
       @course[:course_paces] = convert_course_paces(settings_doc(COURSE_PACES))
@@ -237,6 +238,18 @@ module CC::Importer::Canvas
       end
 
       standards
+    end
+
+    def convert_nav_menu_links(doc)
+      return [] unless doc
+
+      doc.css("navMenuLink").map do |node|
+        {
+          "migration_id" => node["identifier"],
+          "label" => get_node_val(node, "label"),
+          "url" => get_node_val(node, "url"),
+        }
+      end
     end
 
     def convert_events(doc)

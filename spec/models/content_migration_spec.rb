@@ -161,6 +161,11 @@ describe ContentMigration do
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
+    it "returns true for empty string if the all_ option is true" do
+      @cm.migration_ids_to_import = { copy: { all_course_settings: "1" } }
+      expect(@cm.import_object?("course_settings", "")).to be true
+    end
+
     it "returns false for objects not selected" do
       @cm.save!
       @cm.migration_ids_to_import = { copy: { all_content_migrations: "0" } }

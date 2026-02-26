@@ -1212,14 +1212,146 @@ describe Course do
     end
   end
 
+  describe ".find_by_migration_id" do
+    before :once do
+      course_factory
+      @link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com", migration_id: "saved_mig_id")
+    end
+
+    it "finds by saved migration_id on the record" do
+      result = Importers::CourseContentImporter.find_by_migration_id(items: [@link], migration_id: "saved_mig_id")
+      expect(result).to eq @link
+    end
+
+    it "finds by computed local CC key" do
+      key = CC::CCHelper.create_key(@link)
+      result = Importers::CourseContentImporter.find_by_migration_id(items: [@link], migration_id: key)
+      expect(result).to eq @link
+    end
+
+    it "finds by computed global CC key" do
+      key = CC::CCHelper.create_key(@link, global: true)
+      result = Importers::CourseContentImporter.find_by_migration_id(items: [@link], migration_id: key)
+      expect(result).to eq @link
+    end
+
+    it "returns nil when no item matches" do
+      result = Importers::CourseContentImporter.find_by_migration_id(items: [@link], migration_id: "nonexistent")
+      expect(result).to be_nil
+    end
+  end
+
+  describe ".all_links_for_course" do
+    before :once do
+      course_factory
+    end
+
+    it "returns active course-nav links for the course" do
+      link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com")
+      result = Importers::CourseContentImporter.all_links_for_course(course: @course)
+      expect(result).to include(link)
+    end
+
+    it "returns active course-nav links from the account chain" do
+      account_link = NavMenuLink.create!(context: @course.account, course_nav: true, label: "AL", url: "https://acc.com")
+      result = Importers::CourseContentImporter.all_links_for_course(course: @course)
+      expect(result).to include(account_link)
+    end
+
+    it "excludes deleted links" do
+      link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com")
+      link.destroy
+      result = Importers::CourseContentImporter.all_links_for_course(course: @course)
+      expect(result).not_to include(link)
+    end
+
+    it "excludes links that are not course_nav" do
+      link = NavMenuLink.create!(context: @course.account, account_nav: true, label: "L", url: "https://example.com")
+      result = Importers::CourseContentImporter.all_links_for_course(course: @course)
+      expect(result).not_to include(link)
+    end
+  end
+
+  describe ".build_tab_config" do
+    before :once do
+      course_factory
+      @migration = @course.content_migrations.create!
+    end
+
+    it "passes regular tab IDs through unchanged" do
+      tabs = [{ "id" => "assignments" }, { "id" => "discussions", "hidden" => true }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result).to eq tabs
+    end
+
+    it "translates nav_menu_link tab id to the real link id" do
+      link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com", migration_id: "link_mig_1")
+      tabs = [{ "id" => "nav_menu_link_link_mig_1", "hidden" => false }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result.length).to eq 1
+      expect(result.first["id"]).to eq "nav_menu_link_#{link.id}"
+    end
+
+    it "also matches nav_menu_link tab by computed CC key" do
+      link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com")
+      key = CC::CCHelper.create_key(link)
+      tabs = [{ "id" => "nav_menu_link_#{key}" }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result.length).to eq 1
+      expect(result.first["id"]).to eq "nav_menu_link_#{link.id}"
+    end
+
+    it "drops nav_menu_link tab when link is not found" do
+      tabs = [{ "id" => "nav_menu_link_nonexistent_mig_id" }, { "id" => "discussions" }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result.pluck("id")).to eq ["discussions"]
+    end
+
+    it "preserves additional tab attributes when translating" do
+      NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com", migration_id: "link_mig_1")
+      tabs = [{ "id" => "nav_menu_link_link_mig_1", "hidden" => true, "position" => 5 }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result.first).to include("hidden" => true, "position" => 5)
+    end
+  end
+
+  describe "nav_menu_link import via process_migration" do
+    before :once do
+      course_factory
+    end
+
+    it "calls NavMenuLinkImporter when feature is enabled" do
+      @course.root_account.enable_feature!(:nav_menu_links)
+      migration = @course.content_migrations.create!(
+        migration_settings: { migration_ids_to_import: { copy: { everything: "1" } } }
+      )
+      data = {
+        "nav_menu_links" => [{ "migration_id" => "link_1", "label" => "L", "url" => "https://x.com" }]
+      }
+      expect { Importers::CourseContentImporter.import_content(@course, data, nil, migration) }
+        .to change { NavMenuLink.where(course: @course).count }.by(1)
+    end
+
+    it "skips NavMenuLinkImporter when feature is disabled" do
+      @course.root_account.disable_feature!(:nav_menu_links)
+      migration = @course.content_migrations.create!(
+        migration_settings: { migration_ids_to_import: { copy: { everything: "1" } } }
+      )
+      data = {
+        "nav_menu_links" => [{ "migration_id" => "link_1", "label" => "L", "url" => "https://x.com" }]
+      }
+      expect { Importers::CourseContentImporter.import_content(@course, data, nil, migration) }
+        .not_to change { NavMenuLink.count }
+    end
+  end
+
   describe "tab configuration import" do
     before :once do
       @copy_from = course_factory
       @copy_to = course_factory
     end
 
-    it "filters out nav menu link tabs during import" do
-      # Course copy not handled yet for Nav Menu Link tabs. See INTEROP-9293
+    it "drops nav menu link tabs when no matching link exists in destination course" do
       link = NavMenuLink.create!(
         context: @copy_from,
         course_nav: true,
@@ -1227,7 +1359,6 @@ describe Course do
         url: "https://example.com"
       )
 
-      # Set up tab configuration with nav menu link
       @copy_from.tab_configuration = [
         { "id" => "assignments" },
         { "id" => "nav_menu_link_#{link.id}", "hidden" => true },
@@ -1235,7 +1366,6 @@ describe Course do
       ]
       @copy_from.save!
 
-      # Perform the import
       migration = @copy_to.content_migrations.create!
       data = {
         "all_course_settings" => true,
@@ -1245,7 +1375,6 @@ describe Course do
       }
       Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
-      # Nav menu link should not be included in copied tab configuration
       copied_tab_ids = @copy_to.tab_configuration.pluck("id")
       expect(copied_tab_ids.select { it.start_with?("nav_menu_link_") }).to be_empty
       expect(copied_tab_ids).to include("assignments", "discussions")

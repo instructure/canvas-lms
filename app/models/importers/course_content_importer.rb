@@ -140,6 +140,12 @@ module Importers
           migration.update_import_progress(56)
           Importers::GradingStandardImporter.process_migration(data, migration)
           migration.update_import_progress(58)
+
+          if migration.context.root_account.feature_enabled?(:nav_menu_links)
+            Importers::NavMenuLinkImporter.process_migration(data, migration)
+            migration.update_import_progress(59)
+          end
+
           Importers::ContextExternalToolImporter.process_migration(data, migration)
           migration.update_import_progress(60)
           Importers::LtiContextControlImporter.process_migration(data, migration)
@@ -484,37 +490,59 @@ module Importers
       course.syllabus_body = migration.convert_html(syllabus_body, :syllabus, nil, :syllabus)
     end
 
+    def self.all_links_for_course(course:)
+      NavMenuLink.active.where(course_nav: true, context: [course, *course.account_chain]).to_a
+    end
+
+    def self.all_tools_for_course(course:, migration:)
+      if migration.cross_institution?
+        Lti::ContextToolFinder.only_for(course).placements(:course_navigation)
+      else
+        Lti::ContextToolFinder.all_tools_for(course, placements: :course_navigation)
+      end
+    end
+
+    # Find by saved (on DB) or calculated (based on ID) migration id
+    def self.find_by_migration_id(items:, migration_id:)
+      items.detect { |t| t.migration_id == migration_id } ||
+        items.detect do |t|
+          CC::CCHelper.create_key(t) == migration_id ||
+            CC::CCHelper.create_key(t, global: true) == migration_id
+        end
+    end
+
+    def self.build_tab_config(course, tab_configuration, migration)
+      all_tools = nil
+      all_links = nil
+
+      tab_configuration.filter_map do |tab|
+        case tab["id"]
+        when /\Acontext_external_tool_(.+)/
+          all_tools ||= all_tools_for_course(course:, migration:)
+          if (tool = find_by_migration_id(items: all_tools, migration_id: $1))
+            tab.merge("id" => "context_external_tool_#{tool.id}")
+          end
+        when /\Anav_menu_link_(.+)\z/
+          next unless migration.context.root_account.feature_enabled?(:nav_menu_links)
+
+          all_links ||= all_links_for_course(course:)
+          if (link = find_by_migration_id(items: all_links, migration_id: $1))
+            tab.merge("id" => "nav_menu_link_#{link.id}")
+          end
+        else
+          tab
+        end
+      end
+    end
+
     def self.import_settings_from_migration(course, data, migration)
       return unless data[:course]
 
       settings = data[:course]
       if settings[:tab_configuration].is_a?(Array)
-        tab_config = []
-        all_tools = nil
-        settings[:tab_configuration].each do |tab|
-          if tab["id"].is_a?(String) && tab["id"].start_with?("context_external_tool_")
-            tool_mig_id = tab["id"].sub("context_external_tool_", "")
-            all_tools ||= if migration.cross_institution?
-                            Lti::ContextToolFinder.only_for(course).placements(:course_navigation)
-                          else
-                            Lti::ContextToolFinder.all_tools_for(course, placements: :course_navigation)
-                          end
-            if (tool = all_tools.detect { |t| t.migration_id == tool_mig_id } ||
-                all_tools.detect do |t|
-                  CC::CCHelper.create_key(t) == tool_mig_id ||
-                  CC::CCHelper.create_key(t, global: true) == tool_mig_id
-                end)
-              # translate the migration_id to a real id
-              tab["id"] = "context_external_tool_#{tool.id}"
-              tab_config << tab
-            end
-          elsif !NavMenuLinkTabs.nav_menu_link_tab_id?(tab["id"])
-            # Nav Menu Links not yet supported, see INTEROP-9293
-            tab_config << tab
-          end
-        end
-        course.tab_configuration = tab_config
+        course.tab_configuration = build_tab_config(course, settings[:tab_configuration], migration)
       end
+
       if settings[:storage_quota] && course.account.grants_right?(migration.user, :manage_storage_quotas)
         course.storage_quota = settings[:storage_quota]
       end
