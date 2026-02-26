@@ -1018,13 +1018,14 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
-    it "filters out nav menu links from tab_configuration during export" do
-      # Nav Menu Links for Course Copy not implemented yet (see INTEROP-9293)
+    it "exports course nav menu links (course- or account-level) in tab_configuration with migration ids" do
       @course.root_account.enable_feature!(:nav_menu_links)
       link = NavMenuLink.create!(context: @course, course_nav: true, label: "Link", url: "https://example.com")
+      account_link = NavMenuLink.create!(context: @course.root_account, course_nav: true, label: "Link2", url: "https://example2.com")
       @course.tab_configuration = [
         { "id" => Course::TAB_HOME },
-        { "id" => "nav_menu_link_#{link.id}" }
+        { "id" => "nav_menu_link_#{link.id}" },
+        { "id" => "nav_menu_link_#{account_link.id}" },
       ]
       @course.save!
 
@@ -1033,8 +1034,35 @@ describe "Common Cartridge exporting" do
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/course_settings.xml"))
       tab_config = JSON.parse(doc.at_css("tab_configuration").text)
 
-      expect(tab_config.none? { |t| t["id"].to_s.start_with?("nav_menu_link_") }).to be true
-      expect(tab_config.pluck("id")).to include(Course::TAB_HOME)
+      expect(tab_config.pluck("id")).to eq([
+                                             Course::TAB_HOME,
+                                             "nav_menu_link_#{mig_id(link)}",
+                                             "nav_menu_link_#{mig_id(account_link)}",
+                                           ])
+    end
+
+    it "exports nav_menu_links.xml when nav_menu_links feature is enabled" do
+      @course.root_account.enable_feature!(:nav_menu_links)
+      link = NavMenuLink.create!(context: @course, course_nav: true, label: "My Link", url: "https://example.com/nav")
+
+      run_export
+
+      nav_links_xml = @zip_file.read("course_settings/nav_menu_links.xml")
+      doc = Nokogiri::XML.parse(nav_links_xml)
+      link_node = doc.at_css("navMenuLink")
+      expect(link_node).not_to be_nil
+      expect(link_node["identifier"]).to eq(mig_id(link))
+      expect(link_node.at_css("label").text).to eq("My Link")
+      expect(link_node.at_css("url").text).to eq("https://example.com/nav")
+    end
+
+    it "does not export nav_menu_links.xml when feature is disabled" do
+      @course.root_account.disable_feature!(:nav_menu_links)
+      NavMenuLink.create!(context: @course, course_nav: true, label: "My Link", url: "https://example.com/nav")
+
+      run_export
+
+      expect(@zip_file.find_entry("course_settings/nav_menu_links.xml")).to be_nil
     end
 
     it "does not export syllabus if not selected" do
