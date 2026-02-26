@@ -19,7 +19,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PostGradesDialog from './PostGradesDialog'
@@ -58,7 +58,7 @@ class PostGradesApp extends React.Component<Props> {
       resizable: false,
       buttons: [],
       close() {
-        ReactDOM.unmountComponentAtNode($dialog[0])
+        legacyUnmountComponentAtNode($dialog[0])
         $(this).remove()
         if (returnFocusTo) {
           returnFocusTo.focus()
@@ -75,7 +75,7 @@ class PostGradesApp extends React.Component<Props> {
 
     store.reset()
 
-    ReactDOM.render(<PostGradesDialog store={store} closeDialog={closeDialog} />, $dialog[0])
+    legacyRender(<PostGradesDialog store={store} closeDialog={closeDialog} />, $dialog[0])
   }
 
   componentDidMount() {
