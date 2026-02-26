@@ -21,6 +21,7 @@ import React from 'react'
 import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import AIExperienceShow from '../components/AIExperienceShow'
 import type {AIExperience} from '../../types'
 
@@ -54,6 +55,7 @@ describe('AIExperienceShow', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
+    fakeENV.setup()
     server.resetHandlers()
     // Mock scrollIntoView which is not available in JSDOM
     Element.prototype.scrollIntoView = vi.fn()
@@ -68,6 +70,7 @@ describe('AIExperienceShow', () => {
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     cleanup()
     vi.clearAllMocks()
   })
@@ -306,11 +309,11 @@ describe('AIExperienceShow', () => {
     ]
 
     beforeEach(() => {
-      ;(window as any).ENV = {FEATURES: {ai_experiences_context_file_upload: true}}
+      fakeENV.setup({FEATURES: {ai_experiences_context_file_upload: true}})
     })
 
     afterEach(() => {
-      delete (window as any).ENV
+      fakeENV.teardown()
     })
 
     it('renders Source Files section when flag is on and files are present', () => {
@@ -341,7 +344,7 @@ describe('AIExperienceShow', () => {
     })
 
     it('does not render Source Files section when feature flag is off', () => {
-      ;(window as any).ENV = {FEATURES: {ai_experiences_context_file_upload: false}}
+      fakeENV.setup({FEATURES: {ai_experiences_context_file_upload: false}})
       render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
       expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
     })
