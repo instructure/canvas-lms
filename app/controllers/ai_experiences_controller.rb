@@ -148,6 +148,9 @@ class AiExperiencesController < ApplicationController
         @page_title = @ai_experience.title
         js_bundle :ai_experiences_show
         js_env({ AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session, can_manage:) })
+        js_env[:FEATURES] ||= {}
+        js_env[:FEATURES][:ai_experiences_context_file_upload] =
+          @context.feature_enabled?(:ai_experiences_context_file_upload)
         render html: view_context.content_tag(:div, nil, id: "ai_experiences_show"),
                layout: true
       end
