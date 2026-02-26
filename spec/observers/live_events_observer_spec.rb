@@ -107,22 +107,21 @@ describe LiveEventsObserver do
       @page.destroy_permanently!
     end
 
-    it "posts published event when page is published" do
+    it "posts update event when page is published" do
       wiki_page_model(workflow_state: "unpublished")
-      expect(Canvas::LiveEvents).to receive(:wiki_page_published).once
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
       @page.publish!
     end
 
-    it "posts unpublished event when page is unpublished" do
+    it "posts update event when page is unpublished" do
       wiki_page_model
-      expect(Canvas::LiveEvents).to receive(:wiki_page_unpublished).once
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
       @page.unpublish!
     end
 
-    it "does not post published/unpublished event when only title changes" do
+    it "does not post workflow_state update event when only title changes" do
       wiki_page_model
-      expect(Canvas::LiveEvents).not_to receive(:wiki_page_published)
-      expect(Canvas::LiveEvents).not_to receive(:wiki_page_unpublished)
+      expect(Canvas::LiveEvents).not_to receive(:wiki_page_updated).with(anything, nil, nil)
       @page.title = "new title"
       @page.save
     end
