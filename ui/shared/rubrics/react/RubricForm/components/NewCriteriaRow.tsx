@@ -47,22 +47,27 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion, onAddOutcome}: NewCri
           </View>
         </Flex.Item>
         <Flex.Item margin="0 small" align="start" shouldGrow={true}>
-          <Button
-            renderIcon={<IconEditLine />}
-            onClick={onEditCriterion}
-            data-testid="add-criterion-button"
-          >
-            {I18n.t('Draft New Criterion')}
-          </Button>
-          <Button
-            id="create-from-outcome"
-            renderIcon={<IconOutcomesLine />}
-            margin="0 0 0 small"
-            onClick={onAddOutcome}
-            data-testid="create-from-outcome-button"
-          >
-            {I18n.t('Create From Outcome')}
-          </Button>
+          <Flex direction="row" gap="small" wrap="wrap">
+            <Flex.Item>
+              <Button
+                renderIcon={<IconEditLine />}
+                onClick={onEditCriterion}
+                data-testid="add-criterion-button"
+              >
+                {I18n.t('Draft New Criterion')}
+              </Button>
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                id="create-from-outcome"
+                renderIcon={<IconOutcomesLine />}
+                onClick={onAddOutcome}
+                data-testid="create-from-outcome-button"
+              >
+                {I18n.t('Create From Outcome')}
+              </Button>
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
       </Flex>
     </View>
