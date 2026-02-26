@@ -386,6 +386,25 @@ describe GradebooksHelper do
       expect(translated_due_date_for_speedgrader(parent)).to eq "Due: Apr 22, 2021 at 10pm"
     end
 
+    it "handles only one checkpoint having a due date" do
+      @course.account.enable_feature!(:discussion_checkpoints)
+      parent = @course.assignments.create!(
+        title: "Checkpointed Assignment",
+        has_sub_assignments: true,
+        workflow_state: "published"
+      )
+      parent.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        due_at: "2021-04-15T22:00:24Z"
+      )
+      parent.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
+      )
+      expect(translated_due_date_for_speedgrader(parent)).to eq "Due: Apr 15, 2021 at 10pm"
+    end
+
     it "uses override due date for checkpointed assignment when student has override" do
       @course.account.enable_feature!(:discussion_checkpoints)
       parent = @course.assignments.create!(
