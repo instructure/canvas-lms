@@ -223,4 +223,16 @@ describe Accessibility::Rules::LargeTextContrastRule do
       end
     end
   end
+
+  describe "#why" do
+    let(:rule) { Accessibility::Rules::LargeTextContrastRule.new }
+
+    it "returns an array with two informative strings" do
+      result = rule.why
+      expect(result).to be_an(Array)
+      expect(result.size).to eq(2)
+      expect(result[0]).to match(/contrast.*text.*background/i)
+      expect(result[1]).to match(/accurately detect color contrast issues/i)
+    end
+  end
 end
