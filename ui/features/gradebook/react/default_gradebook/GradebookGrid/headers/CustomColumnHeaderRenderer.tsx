@@ -20,7 +20,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import CustomColumnHeader from './CustomColumnHeader'
 import type Gradebook from '../../Gradebook'
 import type GridSupport from '../GridSupport'
@@ -53,10 +53,10 @@ export default class CustomColumnHeaderRenderer {
   render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
 
-    ReactDOM.render(<CustomColumnHeader {...props} />, $container)
+    legacyRender(<CustomColumnHeader {...props} />, $container)
   }
 
   destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
-    ReactDOM.unmountComponentAtNode($container)
+    legacyUnmountComponentAtNode($container)
   }
 }
