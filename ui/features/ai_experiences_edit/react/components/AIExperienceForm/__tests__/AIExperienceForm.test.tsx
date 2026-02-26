@@ -446,11 +446,13 @@ describe('AIExperienceForm', () => {
   describe('context file handling', () => {
     const fillRequiredFields = () => {
       fireEvent.change(screen.getByLabelText(/Title/), {target: {value: 'Title'}})
-      fireEvent.change(screen.getByLabelText(/Text source/), {target: {value: 'Facts'}})
-      fireEvent.change(screen.getByLabelText(/Learning objective targets/), {
+      fireEvent.change(screen.getByLabelText(/Facts Students Should Know/), {
+        target: {value: 'Facts'},
+      })
+      fireEvent.change(screen.getByLabelText(/Learning Objectives/), {
         target: {value: 'Objectives'},
       })
-      fireEvent.change(screen.getByLabelText(/Customize agent/), {target: {value: 'Guidance'}})
+      fireEvent.change(screen.getByLabelText(/Pedagogical Guidance/), {target: {value: 'Guidance'}})
     }
 
     it('includes context_file_ids as empty array in submit payload when no files', async () => {
