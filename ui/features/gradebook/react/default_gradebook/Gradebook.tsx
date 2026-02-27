@@ -345,8 +345,6 @@ type GradebookState = {
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
   kbDialog: any
 
-  anonymousSpeedGraderAlert?: any
-
   assignmentStudentVisibility: AssignmentStudentMap = {}
 
   teacherNotesNotYetLoaded = true
@@ -377,8 +375,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   postGradesLtis: {id: string; name: string; onSelect: () => void}[] = []
 
   disablePostGradesFeature = false
-
-  viewOptionsMenu?: HTMLElement
 
   keyboardNav?: GradebookKeyboardNav
 
@@ -1853,7 +1849,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         onSelect: this.updateCurrentGradingPeriod,
         selectedGradingPeriodId: this.gradingPeriodId,
       }
-      return renderComponent(GradingPeriodFilter, mountPoint, props)
+      renderComponent(GradingPeriodFilter, mountPoint, props)
     } else if (mountPoint != null) {
       this.updateCurrentGradingPeriod(null)
       ReactDOM.unmountComponentAtNode(mountPoint)
@@ -2171,11 +2167,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     // it so we can still filter when we have the flag on.
 
     const mountPoint = this.props.viewOptionsMenuNode
-    this.viewOptionsMenu = renderComponent(
-      ViewOptionsMenu,
-      mountPoint,
-      this.getViewOptionsMenuProps(),
-    )
+    renderComponent(ViewOptionsMenu, mountPoint, this.getViewOptionsMenuProps())
   }
 
   getAssignmentOrder = (assignmentGroupId?: string): string[] => {
@@ -4961,21 +4953,21 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.apiUpdateSubmission(submissionData, gradeInfo)
   }
 
-  renderAnonymousSpeedGraderAlert = (props: {speedGraderUrl: string; onClose: () => void}) => {
-    return renderComponent(
-      AnonymousSpeedGraderAlert,
-      this.props.anonymousSpeedGraderAlertNode,
-      props,
-    )
+  renderAnonymousSpeedGraderAlert = (props: {
+    speedGraderUrl: string
+    onClose: () => void
+    initiallyOpen?: boolean
+  }) => {
+    renderComponent(AnonymousSpeedGraderAlert, this.props.anonymousSpeedGraderAlertNode, props)
   }
 
   showAnonymousSpeedGraderAlertForURL = (speedGraderUrl: string) => {
     const props = {
       speedGraderUrl,
       onClose: this.hideAnonymousSpeedGraderAlert,
+      initiallyOpen: true,
     }
-    this.anonymousSpeedGraderAlert = this.renderAnonymousSpeedGraderAlert(props)
-    this.anonymousSpeedGraderAlert.open()
+    this.renderAnonymousSpeedGraderAlert(props)
   }
 
   hideAnonymousSpeedGraderAlert = () => {
@@ -5443,7 +5435,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         {this.state.isStatusesModalOpen && (
           <StatusesModal
             onClose={() => {
-              this.viewOptionsMenu?.focus()
+              this.props.viewOptionsMenuNode?.querySelector<HTMLElement>('button')?.focus()
               this.setState({isStatusesModalOpen: false})
             }}
             colors={this.state.gridColors}
