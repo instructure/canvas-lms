@@ -38,6 +38,7 @@ export interface EnvContentMigrations {
   SHOW_SELECT?: boolean
   OLD_START_DATE?: string
   OLD_END_DATE?: string
+  MISSING_POLICY_ENABLED?: boolean
   current_context?: {
     id: string
     type: string

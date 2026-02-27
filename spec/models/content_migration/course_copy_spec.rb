@@ -1466,6 +1466,40 @@ describe ContentMigration do
 
         expect(@copy_to.reload.late_policy.late_submission_deduction).to eq 10.0
       end
+
+      it "does not copy late policy when LatePolicy is in importer_skips" do
+        @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
+
+        @cm.copy_options = { everything: true }
+        @cm.migration_settings = { importer_skips: ["LatePolicy"] }
+        @cm.save!
+
+        run_course_copy
+
+        expect(@copy_to.reload.late_policy).to be_nil
+      end
+
+      it "does not apply missing submission zeros when LatePolicy is in importer_skips" do
+        student = User.create!
+        @copy_to.enroll_student(student, enrollment_state: "active")
+        @copy_to.create_late_policy!(missing_submission_deduction_enabled: true, missing_submission_deduction: 100)
+        assignment = @copy_from.assignments.create!(
+          title: "Past Due",
+          due_at: 1.day.ago,
+          submission_types: "online_text_entry",
+          points_possible: 10
+        )
+
+        @cm.copy_options = { everything: true }
+        @cm.migration_settings = { importer_skips: ["LatePolicy"] }
+        @cm.save!
+
+        run_course_copy
+
+        copied_assignment = @copy_to.assignments.find_by(title: assignment.title)
+        submission = copied_assignment.submissions.find_by(user: student)
+        expect(submission&.score).to be_nil
+      end
     end
 
     describe "Course Page Copy with Home Link" do

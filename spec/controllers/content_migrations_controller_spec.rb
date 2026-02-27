@@ -117,6 +117,19 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:OLD_START_DATE]).not_to be_nil
           expect(assigns[:js_env][:OLD_END_DATE]).not_to be_nil
         end
+
+        context "MISSING_POLICY_ENABLED value" do
+          it "is false when the course has no missing submission policy" do
+            get :index, params: { course_id: @course.id }
+            expect(assigns[:js_env][:MISSING_POLICY_ENABLED]).to be false
+          end
+
+          it "is true when the course has missing submission deduction enabled" do
+            @course.create_late_policy!(missing_submission_deduction_enabled: true, missing_submission_deduction: 100)
+            get :index, params: { course_id: @course.id }
+            expect(assigns[:js_env][:MISSING_POLICY_ENABLED]).to be true
+          end
+        end
       end
     end
 

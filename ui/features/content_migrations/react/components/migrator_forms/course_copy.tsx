@@ -18,7 +18,7 @@
 
 import React, {useRef, useState, useCallback, type ChangeEvent, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {canvas} from '@instructure/ui-themes'
 import {Responsive} from '@instructure/ui-responsive'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {CommonMigratorControls} from '@canvas/content-migrations'
+import {CommonMigratorControls, type submitMigrationFormData} from '@canvas/content-migrations'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import type {onSubmitMigrationFormCallback} from '../types'
 import {parseDateToISOString} from '../utils'
@@ -36,6 +36,7 @@ import {ImportClearLabel} from './import_clear_label'
 import AsyncCourseSearchSelect from './common_components/async_course_search_select'
 import {CourseOption} from './types'
 import {FormMessage} from '@instructure/ui-form-field'
+import {MissingPolicyWarningModal} from '../MissingPolicyWarningModal'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -60,6 +61,15 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
   const [includeCompletedCourses, setIncludeCompletedCourses] = useState<boolean>(true)
   const courseSelectInputRef = useRef<HTMLInputElement | null>(null)
   const courseSelectDropdownRef = useRef<HTMLInputElement | null>(null)
+  const [showMissingPolicyWarning, setShowMissingPolicyWarning] = useState<boolean>(false)
+  const pendingFormDataRef = useRef<submitMigrationFormData | null>(null)
+  const [isDisablingPolicy, setIsDisablingPolicy] = useState<boolean>(false)
+  const [isFetchingSourcePolicy, setIsFetchingSourcePolicy] = useState<boolean>(false)
+  const sourceCourseHasMissingPolicyRef = useRef<boolean>(false)
+  const latestCourseIdRef = useRef<string | null>(null)
+  const [warningScenario, setWarningScenario] = useState<'destination' | 'source' | 'both' | null>(
+    null,
+  )
 
   const composeManageableCourseURL = useCallback(
     (currentSearchParam?: string, includeConcluded?: boolean) => {
@@ -112,6 +122,29 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
     }
   }, [composeManageableCourseURL, isShowSelect])
 
+  const fetchSourceCourseLatePolicy = useCallback(async (courseId: string) => {
+    latestCourseIdRef.current = courseId
+    setIsFetchingSourcePolicy(true)
+    try {
+      const {json} = await doFetchApi<{
+        late_policy?: {missing_submission_deduction_enabled?: boolean}
+      }>({
+        path: `/api/v1/courses/${courseId}/late_policy`,
+      })
+      if (latestCourseIdRef.current !== courseId) return
+      sourceCourseHasMissingPolicyRef.current =
+        json?.late_policy?.missing_submission_deduction_enabled || false
+    } catch {
+      if (latestCourseIdRef.current === courseId) {
+        sourceCourseHasMissingPolicyRef.current = false
+      }
+    } finally {
+      if (latestCourseIdRef.current === courseId) {
+        setIsFetchingSourcePolicy(false)
+      }
+    }
+  }, [])
+
   const addToPreloadedListIfNotExist = useCallback(
     (courseOption: CourseOption) => {
       const newMap = new Map(preloadedCourses)
@@ -135,11 +168,13 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
 
       if (courseOption) {
         setSelectedCourse(courseOption)
+        fetchSourceCourseLatePolicy(courseOption.id)
       } else {
         setSelectedCourse(null)
+        sourceCourseHasMissingPolicyRef.current = false
       }
     },
-    [preloadedCourses],
+    [preloadedCourses, fetchSourceCourseLatePolicy],
   )
   const handleSubmit: onSubmitMigrationFormCallback = useCallback(
     formData => {
@@ -153,12 +188,103 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
         }
         return
       }
+
+      const destinationHasMissingPolicy = ENV.MISSING_POLICY_ENABLED
+      const sourceHasMissingPolicy = sourceCourseHasMissingPolicyRef.current
+      const isAdjustingDates = formData.adjust_dates?.enabled
+      const hasPolicyIssue =
+        (destinationHasMissingPolicy || sourceHasMissingPolicy) && !isAdjustingDates
+
+      if (hasPolicyIssue) {
+        if (destinationHasMissingPolicy && sourceHasMissingPolicy) {
+          setWarningScenario('both')
+        } else if (destinationHasMissingPolicy) {
+          setWarningScenario('destination')
+        } else {
+          setWarningScenario('source')
+        }
+        pendingFormDataRef.current = formData
+        setShowMissingPolicyWarning(true)
+        return
+      }
+
       onSubmit(formData)
     },
     [selectedCourse, onSubmit, isShowSelect],
   )
 
-  const interaction = isSubmitting || isPreloadedCoursesLoading ? 'disabled' : 'enabled'
+  const handleDisablePolicy = useCallback(async () => {
+    setIsDisablingPolicy(true)
+    try {
+      const destinationHasPolicy = ENV.MISSING_POLICY_ENABLED
+      const shouldDisableDestination =
+        warningScenario === 'destination' || warningScenario === 'both'
+
+      if (shouldDisableDestination && destinationHasPolicy) {
+        await doFetchApi({
+          path: `/api/v1/courses/${ENV.COURSE_ID}/late_policy`,
+          method: 'PATCH',
+          body: {
+            late_policy: {
+              missing_submission_deduction_enabled: false,
+            },
+          },
+        })
+      }
+
+      if (pendingFormDataRef.current) {
+        const currentSkips = (pendingFormDataRef.current.settings.importer_skips as string[]) || []
+        if (!currentSkips.includes('LatePolicy')) {
+          pendingFormDataRef.current = {
+            ...pendingFormDataRef.current,
+            settings: {
+              ...pendingFormDataRef.current.settings,
+              importer_skips: [...currentSkips, 'LatePolicy'],
+            },
+          }
+        }
+      }
+
+      if (warningScenario === 'destination') {
+        showFlashSuccess(I18n.t('Missing submission policy has been disabled.'))
+      } else if (warningScenario === 'source') {
+        showFlashSuccess(I18n.t('Late policy will not be imported from the source course.'))
+      } else if (warningScenario === 'both') {
+        showFlashSuccess(
+          I18n.t(
+            'Missing submission policy has been disabled and late policy will not be imported.',
+          ),
+        )
+      }
+
+      setShowMissingPolicyWarning(false)
+      if (pendingFormDataRef.current) {
+        onSubmit(pendingFormDataRef.current)
+        pendingFormDataRef.current = null
+      }
+    } catch {
+      showFlashError(I18n.t('Failed to update missing submission policy settings.'))
+    } finally {
+      setIsDisablingPolicy(false)
+    }
+  }, [onSubmit, warningScenario])
+
+  const handleImportAnyway = useCallback(() => {
+    setShowMissingPolicyWarning(false)
+    if (pendingFormDataRef.current) {
+      onSubmit(pendingFormDataRef.current)
+      pendingFormDataRef.current = null
+    }
+  }, [onSubmit])
+
+  const handleCancelWarning = useCallback(() => {
+    setShowMissingPolicyWarning(false)
+    pendingFormDataRef.current = null
+    setWarningScenario(null)
+  }, [])
+
+  const interaction =
+    isSubmitting || isPreloadedCoursesLoading || isFetchingSourcePolicy ? 'disabled' : 'enabled'
   const messages = selectedCourseError
     ? [
         {
@@ -257,8 +383,10 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
                       if (course) {
                         addToPreloadedListIfNotExist(course)
                         setSelectedCourse(course)
+                        fetchSourceCourseLatePolicy(course.id)
                       } else {
                         setSelectedCourse(null)
+                        sourceCourseHasMissingPolicyRef.current = false
                       }
                     }}
                     messages={messages as FormMessage[]}
@@ -300,6 +428,14 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
         SubmitLabel={ImportLabel}
         SubmittingLabel={ImportInProgressLabel}
         CancelLabel={ImportClearLabel}
+      />
+      <MissingPolicyWarningModal
+        open={showMissingPolicyWarning}
+        onCancel={handleCancelWarning}
+        onDisablePolicy={handleDisablePolicy}
+        onImportAnyway={handleImportAnyway}
+        isDisabling={isDisablingPolicy}
+        scenario={warningScenario}
       />
     </>
   )
