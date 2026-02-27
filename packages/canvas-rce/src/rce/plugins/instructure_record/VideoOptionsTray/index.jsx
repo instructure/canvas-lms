@@ -485,7 +485,7 @@ export default function VideoOptionsTray({
                             name="studio-embed-options"
                             onChange={handleEmbedOptionChange}
                             value={studioEmbedOptions}
-                            description={formatMessage('Embed Options')}
+                            description={formatMessage('Viewer Restrictions')}
                           >
                             <Text variant="contentSmall">
                               {formatMessage('Changes will apply after you save this page.')}
