@@ -46,20 +46,19 @@ class Mutations::SetAssignmentPostPolicy < Mutations::BaseMutation
       end
     end
 
-    post_policy = PostPolicy.find_or_create_by(course:, assignment:)
-    post_policy.update!(post_manually: input[:post_manually])
+    assignment.ensure_post_policy(post_manually: input[:post_manually])
 
     if Account.site_admin.feature_enabled?(:scheduled_feedback_releases) && input[:post_manually] == true
       is_post_params_blank = input[:post_comments_at].blank? && input[:post_grades_at].blank?
 
       if !is_post_params_blank
-        post_policy.create_or_update_scheduled_post(input[:post_comments_at], input[:post_grades_at])
-      elsif post_policy.scheduled_post && is_post_params_blank
-        post_policy.remove_scheduled_post
+        assignment.post_policy.create_or_update_scheduled_post(input[:post_comments_at], input[:post_grades_at])
+      elsif assignment.post_policy.scheduled_post && is_post_params_blank
+        assignment.post_policy.remove_scheduled_post
       end
     end
 
-    { post_policy: }
+    { post_policy: assignment.post_policy }
   end
 
   def self.post_policy_log_entry(post_policy, _context)

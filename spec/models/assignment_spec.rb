@@ -13084,6 +13084,27 @@ describe Assignment do
       expect(@second_checkpoint.reload.grading_type).to eq "pass_fail"
     end
 
+    describe "#ensure_post_policy" do
+      it "syncs post_manually to all sub_assignments when set to true" do
+        @parent.ensure_post_policy(post_manually: true)
+        expect(@first_checkpoint.post_policy.reload.post_manually).to be true
+        expect(@second_checkpoint.post_policy.reload.post_manually).to be true
+      end
+
+      it "syncs post_manually to all sub_assignments when set to false" do
+        @parent.ensure_post_policy(post_manually: true)
+        @parent.ensure_post_policy(post_manually: false)
+        expect(@first_checkpoint.post_policy.reload.post_manually).to be false
+        expect(@second_checkpoint.post_policy.reload.post_manually).to be false
+      end
+
+      it "does not sync to sub_assignments when the assignment has none" do
+        assignment = @course.assignments.create!
+        expect { assignment.ensure_post_policy(post_manually: true) }.not_to raise_error
+        expect(assignment.post_policy.post_manually).to be true
+      end
+    end
+
     it "will update the sub_assignment lock_at and unlock_at when parent updates" do
       expect(@first_checkpoint.reload.unlock_at).to be_nil
       expect(@second_checkpoint.reload.unlock_at).to be_nil
