@@ -2832,7 +2832,7 @@ class Submission < ActiveRecord::Base
       return nil if required_count <= 0
 
       discussion_topic.discussion_entries
-                      .non_top_level_for_user(user)
+                      .non_top_level_for_user(user_id)
                       .order(created_at: :asc)
                       .offset(required_count - 1)
                       .limit(1)
