@@ -150,7 +150,7 @@ module Accessibility
         end
       else
         relation.order({ sort => direction.downcase.to_sym })
-      end
+      end.order(id: :asc)
     end
 
     # Returns a hash representation of the scan, for JSON rendering.
