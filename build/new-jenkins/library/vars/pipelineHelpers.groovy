@@ -295,12 +295,6 @@ def postBuildAlways() {
     if (isStartedByUser()) {
       submitGerritReview((status == 'SUCCESS' ? '--verified +1' : '--verified -1'), "${env.BUILD_URL}/build-summary-report/")
     }
-
-    build(job: '/Canvas/helpers/junit-uploader', parameters: [
-      string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
-      string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
-      string(name: 'SOURCE', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
-    ], propagate: false, wait: false)
   } catch (Exception e) {
     echo "Post-build operations failed: ${e.message}"
   }
