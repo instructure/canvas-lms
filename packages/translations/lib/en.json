@@ -1329,6 +1329,9 @@
   "large_text_e7ba08cd": {
     "message": "Large text"
   },
+  "large_width_x_height_px_c61c2fd": {
+    "message": "Large ({ width } x { height }px)"
+  },
   "latvian_2bbb6aab": {
     "message": "Latvian"
   },
@@ -1541,6 +1544,9 @@
   },
   "medium_5a8e9ead": {
     "message": "Medium"
+  },
+  "medium_width_x_height_px_b076f6b6": {
+    "message": "Medium ({ width } x { height }px)"
   },
   "merge_links_2478df96": {
     "message": "Merge links"
@@ -1892,6 +1898,9 @@
   },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Play media comment by { name } from { createdAt }."
+  },
+  "player_layout_14e09a29": {
+    "message": "Player layout"
   },
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Please allow Canvas to access your microphone and webcam."
@@ -2298,6 +2307,9 @@
   "small_b070434a": {
     "message": "Small"
   },
+  "small_width_x_height_px_359acd38": {
+    "message": "Small ({ width } x { height }px)"
+  },
   "solid_circle_9f061dfc": {
     "message": "Solid Circle"
   },
@@ -2598,6 +2610,9 @@
   "top_66e0adb6": {
     "message": "Top"
   },
+  "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+    "message": "Transcript panel is available at widths above 720px."
+  },
   "tray_839df38a": {
     "message": "Tray"
   },
@@ -2876,6 +2891,9 @@
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki Home"
+  },
+  "with_transcript_width_x_height_px_56626dfd": {
+    "message": "With Transcript ({ width } x { height }px)"
   },
   "word_count_c77fe3a6": {
     "message": "Word Count"
