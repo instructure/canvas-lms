@@ -1589,6 +1589,15 @@ describe FilesController do
         end
       end
     end
+
+    it "uses the secondary database for read queries" do
+      user_session(@student)
+      expect(Folder).to receive(:find_attachment_in_context_with_path).and_wrap_original do |original, *args|
+        expect(GuardRail.environment).to eq(:secondary)
+        original.call(*args)
+      end
+      get "show_relative", params: { course_id: @course.id, file_path: @file.full_display_path }
+    end
   end
 
   describe "PUT 'update'" do
