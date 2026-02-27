@@ -29,6 +29,8 @@ import {MediaInfo} from '@canvas/canvas-studio-player/react/types'
 import {captionLanguageForLocale} from '@instructure/canvas-media'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
+import {createOnTranscriptEdit, onConfirmEditChanges} from './transcriptEditing'
+
 declare const ENV: GlobalEnv & {
   media_object: MediaInfo
   attachment_id?: string
@@ -42,6 +44,10 @@ const I18n = createI18nScope('CanvasMediaPlayer')
 
 const isStandalone = () => {
   return !window.frameElement && window.location === window?.top?.location
+}
+
+const isRceEditMode = () => {
+  return window.parent.document.body.id === 'tinymce'
 }
 
 const addVerifier = (url: string, verifier: string | string[] | undefined): string => {
@@ -153,8 +159,21 @@ ready(() => {
     explicitSize = {width: 640, height: 408}
   }
 
-  const aria_label = !media_object.title ? undefined : media_object.title
   const isAsrCaptioningImprovements = ENV.FEATURES?.rce_asr_captioning_improvements
+  const isEditMode = isRceEditMode()
+  const RCE_ENV = window.parent.parent.ENV
+
+  const handleTranscriptEdit =
+    isAsrCaptioningImprovements && isEditMode && attachment_id && RCE_ENV.JWT
+    ? createOnTranscriptEdit(attachment_id, RCE_ENV.JWT)
+    : undefined
+
+  const handleConfirmEditChanges =
+    isAsrCaptioningImprovements && isEditMode
+    ? onConfirmEditChanges
+    : undefined
+
+  const aria_label = !media_object.title ? undefined : media_object.title
 
   if (ENV.FEATURES?.consolidated_media_player_iframe) {
     render(
@@ -169,6 +188,8 @@ ready(() => {
         explicitSize={explicitSize}
         enableSidebar={isAsrCaptioningImprovements}
         openSidebar={isAsrCaptioningImprovements}
+        onTranscriptEdit={handleTranscriptEdit}
+        onConfirmEditChanges={handleConfirmEditChanges}
         kebabMenuElements={
           ENV.FEATURES?.rce_studio_embed_improvements
             ? [

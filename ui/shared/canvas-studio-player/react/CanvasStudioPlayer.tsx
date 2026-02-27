@@ -110,6 +110,8 @@ interface BaseCanvasStudioPlayerProps {
   tabs?: StudioPlayerProps['tabs']
   emptyTranscriptsComponent?: StudioPlayerProps['emptyTranscriptsComponent']
   rollingTranscriptElement?: StudioPlayerProps['rollingTranscriptElement']
+  onTranscriptEdit?: StudioPlayerProps['onTranscriptEdit']
+  onConfirmEditChanges?: StudioPlayerProps['onConfirmEditChanges']
 }
 
 type CanvasStudioPropsWithMediaIdOrAttachmentId =
@@ -140,6 +142,8 @@ export default function CanvasStudioPlayer({
   tabs,
   emptyTranscriptsComponent,
   rollingTranscriptElement,
+  onTranscriptEdit,
+  onConfirmEditChanges,
 }: CanvasStudioPropsWithMediaIdOrAttachmentId) {
   const [mediaId, setMediaId] = useState(media_id)
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
@@ -479,6 +483,8 @@ export default function CanvasStudioPlayer({
               enableSidebar={enableSidebar}
               openSidebar={openSidebar}
               tabs={tabs}
+              onTranscriptEdit={onTranscriptEdit}
+              onConfirmEditChanges={onConfirmEditChanges}
               emptyTranscriptsComponent={emptyTranscriptsComponent}
               rollingTranscriptElement={rollingTranscriptElement}
               kebabMenuElements={
