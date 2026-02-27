@@ -199,7 +199,7 @@ class AiExperience < ApplicationRecord
   end
 
   def maybe_update_conversation_context
-    return if previously_new_record?
+    return if previously_new_record? && !@context_files_changed
     return unless should_update_context?
 
     update_conversation_context
