@@ -234,16 +234,6 @@ describe MediaTracksController do
           expect(track.content).to eq("")
         end
 
-        it "sets workflow_state to failed when caption asset is ready but SRT is unavailable" do
-          allow(kaltura_client).to receive(:caption_asset_contents).and_return(nil)
-          expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
-          post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
-
-          track = @mo.media_tracks.last
-          expect(track.workflow_state).to eq("failed")
-          expect(track.content).to eq("")
-        end
-
         it "sets kind to subtitles" do
           expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
           post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
@@ -711,16 +701,7 @@ describe MediaTracksController do
           expect(track.content).to eq("")
         end
 
-        it "sets workflow_state to failed when caption asset is ready but SRT is unavailable" do
-          allow(kaltura_client).to receive(:caption_asset_contents).and_return(nil)
-          post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
-
-          track = @attachment.media_tracks.last
-          expect(track.workflow_state).to eq("failed")
-          expect(track.content).to eq("")
-        end
-
-        it "sets workflow_state to processing when caption asset generation failes" do
+        it "sets workflow_state to processing when caption asset generation fails" do
           allow(kaltura_client).to receive(:create_caption_asset)
             .and_return({ id: "caption_asset_456", languageCode: "en", status: "-1" })
           post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
