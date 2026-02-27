@@ -243,6 +243,13 @@ class Assignment < AbstractAssignment
     AssessmentRequest.completed_for_assignment(id).exists?
   end
 
+  def ensure_post_policy(post_manually:)
+    super
+    return unless has_sub_assignments?
+
+    sub_assignments.each { |sa| sa.ensure_post_policy(post_manually:) }
+  end
+
   private
 
   def before_soft_delete
