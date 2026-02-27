@@ -170,6 +170,15 @@ describe('RubricPanel', () => {
     expect(props.ratingOrder).toBe('descending')
   })
 
+  it('passes isStandaloneContainer as true to prevent duplicate close button', () => {
+    render(<RubricPanel {...createDefaultProps()} />)
+
+    const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+    const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+    expect(props.isStandaloneContainer).toBe(true)
+  })
+
   it('passes criteria with correct structure', () => {
     const assignment = createAssignment()
     render(<RubricPanel {...createDefaultProps({assignment})} />)
