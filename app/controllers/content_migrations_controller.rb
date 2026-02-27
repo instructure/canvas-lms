@@ -166,7 +166,8 @@ class ContentMigrationsController < ApplicationController
                CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days,
                OLD_START_DATE: datetime_string(@context.start_at, :verbose),
                OLD_END_DATE: datetime_string(@context.conclude_at, :verbose),
-               SHOW_SELECT: should_show_course_copy_dropdown
+               SHOW_SELECT: should_show_course_copy_dropdown,
+               MISSING_POLICY_ENABLED: @context.late_policy&.missing_submission_deduction_enabled || false
              })
       set_tutorial_js_env
     else
@@ -210,7 +211,8 @@ class ContentMigrationsController < ApplicationController
                  NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?,
                  BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context),
                  SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
-                   @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses)
+                   @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses),
+                 MISSING_POLICY_ENABLED: @context.late_policy&.missing_submission_deduction_enabled || false
                })
         set_tutorial_js_env
       end
