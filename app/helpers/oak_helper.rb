@@ -22,6 +22,7 @@ module OakHelper
     return false if params[:preview] == "true"
     return false if session[:pending_otp]
     return false if request.path.start_with?("/login")
+    return false if @domain_root_account&.site_admin?
     return false unless @current_user&.feature_enabled?(:oak_for_users)
 
     true
