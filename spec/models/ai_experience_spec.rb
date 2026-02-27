@@ -175,6 +175,29 @@ describe AiExperience do
 
         AiExperience.create!(valid_attributes)
       end
+
+      context "with ai_experiences_context_file_upload feature flag enabled" do
+        let(:attachment) { attachment_model(context: course) }
+
+        before { course.enable_feature!(:ai_experiences_context_file_upload) }
+
+        before do
+          stub_request(:patch, "http://localhost:3001/conversation-context/context-uuid")
+            .to_return(status: 200, body: { "success" => true }.to_json, headers: { "Content-Type" => "application/json" })
+        end
+
+        it "updates conversation_context with context_files when created with files" do
+          AiExperience.create!(valid_attributes.merge(context_file_ids: [attachment.id.to_s]))
+
+          expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+
+        it "does not update conversation_context when created without files" do
+          AiExperience.create!(valid_attributes)
+
+          expect(WebMock).not_to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+      end
     end
 
     describe "after_update" do
