@@ -23,7 +23,7 @@ import template from '../../jst/outcomeCalculationMethodForm.handlebars'
 import exampleTemplate from '../../../jst/_calculationMethodExample.handlebars'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {createElement} from 'react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -97,47 +97,53 @@ export default class CalculationMethodFormView extends Backbone.View {
   }
 
   createInstUIInput() {
+    this._reactRoot = null
     this.calculationIntInstUIInput = {
       root: (() => {
         const el = this.$('#calculation_int_container')[0]
         if (!el) return null
         return {
-          rootElement: createRoot(el),
+          rootElement: el,
           initialValue: el.dataset.initialValue,
           label: el.dataset.label.replace(/: ?$/g, ''),
           calculationIntDescription: el.dataset.calculationIntDescription,
         }
       })(),
       render: errorMessages => {
-        this.calculationIntInstUIInput.root?.rootElement.render(
-          createElement(
-            View,
-            {as: 'div', margin: 'none none small none'},
-            createElement(TextInput, {
-              name: 'calculation_int',
-              id: 'calculation_int',
-              defaultValue: this.calculationIntInstUIInput.root?.initialValue,
-              as: 'span',
-              display: 'inline-block',
-              htmlSize: 2,
-              renderLabel: () =>
-                createElement(
-                  Text,
-                  {weight: 'normal', size: 'small'},
-                  this.calculationIntInstUIInput.root?.label,
-                ),
-              messages: [
-                {
-                  text: this.calculationIntInstUIInput.root?.calculationIntDescription,
-                  type: 'hint',
-                },
-                ...(errorMessages
-                  ? errorMessages.map(m => ({text: m.message, type: 'newError'}))
-                  : []),
-              ],
-            }),
-          ),
+        const rootElement = this.calculationIntInstUIInput.root?.rootElement
+        if (!rootElement) return
+        const element = createElement(
+          View,
+          {as: 'div', margin: 'none none small none'},
+          createElement(TextInput, {
+            name: 'calculation_int',
+            id: 'calculation_int',
+            defaultValue: this.calculationIntInstUIInput.root?.initialValue,
+            as: 'span',
+            display: 'inline-block',
+            htmlSize: 2,
+            renderLabel: () =>
+              createElement(
+                Text,
+                {weight: 'normal', size: 'small'},
+                this.calculationIntInstUIInput.root?.label,
+              ),
+            messages: [
+              {
+                text: this.calculationIntInstUIInput.root?.calculationIntDescription,
+                type: 'hint',
+              },
+              ...(errorMessages
+                ? errorMessages.map(m => ({text: m.message, type: 'newError'}))
+                : []),
+            ],
+          }),
         )
+        if (!this._reactRoot) {
+          this._reactRoot = render(element, rootElement)
+        } else {
+          rerender(this._reactRoot, element)
+        }
       },
       inputElement: () => this.$('#calculation_int')[0],
     }
