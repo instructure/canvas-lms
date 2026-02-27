@@ -4596,6 +4596,7 @@ el:
   course_groups_e8239a1e: "Ομάδες Μαθήματος"
   course_home_4c4c0107: "Αρχική Σελίδα Μαθήματος"
   course_home_sub_navigation_b1ee6b03: "Υπο-πλοήγηση στην Αρχική Σελίδα του Μαθήματος"
+  course_id_33633604: "ID Μαθήματος:"
   course_id_8bd2a21c: "ID Μαθήματος"
   course_id_course_id_2841413a: "ID Μαθήματος «%{course_id}»"
   course_id_f8640bb8: course_id
