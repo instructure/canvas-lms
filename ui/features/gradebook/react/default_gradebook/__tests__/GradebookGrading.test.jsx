@@ -575,7 +575,7 @@ describe('Gradebook#onApplyScoreToUngradedRequested', () => {
     gradebook.onApplyScoreToUngradedRequested(assignmentGroup)
     expect(ReactDOM.render).toHaveBeenCalledTimes(1)
     const renderCall = ReactDOM.render.mock.calls[0]
-    expect(renderCall[0].props.assignmentGroup).toEqual({
+    expect(renderCall[0].props.children.props.assignmentGroup).toEqual({
       id: '100',
       name: 'group',
     })
