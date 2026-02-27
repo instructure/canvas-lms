@@ -19,7 +19,7 @@ import $ from 'jquery'
 import '@canvas/media-comments'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 $(document).ready(() => {
   function isConsolidatedMediaPlayerEnabled() {
@@ -27,13 +27,13 @@ $(document).ready(() => {
   }
 
   function renderStudioMediaPlayer(domId, media_id, type) {
-    const root = createRoot(document.getElementById(domId))
-    root?.render(
+    render(
       React.createElement(CanvasStudioPlayer, {
         media_id: media_id,
         type: type === 'audio' ? 'audio' : 'video',
         explicitSize: {width: 480, height: 300},
       }),
+      document.getElementById(domId),
     )
   }
 
