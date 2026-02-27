@@ -234,7 +234,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({rce_studio_embed_improvements: true})
     })
 
-    describe('Studio Embed Options', () => {
+    describe('Studio Viewer Restrictions', () => {
       describe('when the media is a Studio media', () => {
         beforeEach(() => {
           props.studioOptions = {
@@ -251,7 +251,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
 
         it('shows the checkbox group', () => {
           renderComponent()
-          expect(screen.getByText('Embed Options')).toBeInTheDocument()
+          expect(screen.getByText('Viewer Restrictions')).toBeInTheDocument()
         })
 
         it('shows the "Allow media download" checkbox', () => {
@@ -272,25 +272,25 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         describe('and the media is external', () => {
           beforeEach(() => {
             props.studioOptions.embedOptions.isExternal = true
-          });
+          })
 
           it('does not show the "Allow media download" checkbox', () => {
             renderComponent()
             expect(screen.queryByLabelText('Allow media download')).not.toBeInTheDocument()
           })
-        });
-      });
+        })
+      })
 
       describe('when the media is not a Studio media', () => {
         beforeEach(() => {
           props.studioOptions = null
-        });
+        })
 
         it('does not show the checkbox group', () => {
           renderComponent()
-          expect(screen.queryByText('Embed Options')).not.toBeInTheDocument()
+          expect(screen.queryByText('Viewer Restrictions')).not.toBeInTheDocument()
         })
-      });
+      })
     })
   })
 
