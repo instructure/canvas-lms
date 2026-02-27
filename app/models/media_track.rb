@@ -21,6 +21,8 @@ class MediaTrack < ActiveRecord::Base
   include MasterCourses::CollectionRestrictor
   include Workflow
 
+  ASR_SUBTITLES_SYNC_MAX_ATTEMPTS = 48 # hourly polls × 2 days
+
   self.collection_owner_association = :attachment
 
   belongs_to :user
@@ -31,6 +33,7 @@ class MediaTrack < ActiveRecord::Base
   before_validation :set_media_and_attachment
   before_save :convert_srt_to_wvtt
   before_create :mark_downstream_create_destroy
+  after_create :sync_asr_subtitles_later, if: -> { it.asr? && it.processing? }
   before_update :mark_downstream_changes
   before_destroy :mark_downstream_create_destroy
   before_destroy :check_for_restricted_updates, prepend: true
@@ -72,6 +75,8 @@ class MediaTrack < ActiveRecord::Base
   end
 
   def convert_srt_to_wvtt
+    return if content.blank?
+
     if content.exclude?("WEBVTT") && (content_changed? || self["webvtt_content"].nil?)
       srt_content = content.dup
       srt_content.gsub!(/(:|^)(\d)(,|:)/, '\10\2\3')
@@ -83,5 +88,47 @@ class MediaTrack < ActiveRecord::Base
 
   def asr?
     kind == "subtitles" && external_id?
+  end
+
+  def sync_asr_subtitles_later(attempt: 1)
+    delay(run_at: asr_subtitles_sync_interval.from_now, strand: "asr_subtitle_sync:#{global_id}").sync_asr_subtitles(attempt:)
+  end
+
+  def sync_kaltura_caption_asset(caption_asset_status, kaltura_client:)
+    case CanvasKaltura::ClientV3::ASSET_STATUSES[caption_asset_status]
+    when :READY
+      caption_asset_contents = kaltura_client.caption_asset_contents(external_id)
+      assign_attributes(workflow_state: "ready", content: caption_asset_contents)
+    when :ERROR
+      assign_attributes(workflow_state: "failed", content: "")
+    else
+      assign_attributes(workflow_state: "processing", content: "")
+    end
+  end
+
+  def sync_asr_subtitles(attempt:)
+    if attempt > ASR_SUBTITLES_SYNC_MAX_ATTEMPTS
+      update!(workflow_state: "failed")
+      return
+    end
+
+    kaltura_client = CanvasKaltura::ClientV3.new
+    kaltura_client.startSession(CanvasKaltura::SessionType::ADMIN)
+    caption_asset = kaltura_client.caption_asset(external_id)
+
+    unless caption_asset
+      sync_asr_subtitles_later(attempt: attempt + 1)
+      return
+    end
+
+    sync_kaltura_caption_asset(caption_asset[:status], kaltura_client:)
+    save!
+    sync_asr_subtitles_later(attempt: attempt + 1) if processing?
+  end
+
+  private
+
+  def asr_subtitles_sync_interval
+    Setting.get("asr_subtitles_sync_poll_interval_minutes", "60").to_i.minutes
   end
 end

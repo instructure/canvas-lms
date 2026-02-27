@@ -172,34 +172,19 @@ class MediaTracksController < ApplicationController
     unless track.persisted?
       kaltura_client = CanvasKaltura::ClientV3.new
       kaltura_client.startSession(CanvasKaltura::SessionType::ADMIN)
-      caption_asset_response = kaltura_client.create_caption_asset(@media_object.media_id, locale)
+      caption_asset = kaltura_client.create_caption_asset(@media_object.media_id, locale)
 
-      unless caption_asset_response
+      unless caption_asset
         return render json: { error: "Failed to create caption asset" }, status: :unprocessable_content
       end
 
-      workflow_state, content =
-        case CanvasKaltura::ClientV3::ASSET_STATUSES[caption_asset_response[:status]]
-        when :READY
-          srt = kaltura_client.caption_asset_contents(caption_asset_response[:id])
-          if srt.present?
-            ["ready", srt]
-          else
-            ["failed", ""]
-          end
-        when :ERROR
-          ["failed", ""]
-        else
-          ["processing", ""]
-        end
-
-      track.update!(
+      track.assign_attributes(
         attachment: @attachment,
         kind: "subtitles",
-        content:,
-        external_id: caption_asset_response[:id],
-        workflow_state:
+        external_id: caption_asset[:id]
       )
+      track.sync_kaltura_caption_asset(caption_asset[:status], kaltura_client:)
+      track.save!
     end
 
     if @attachment.present?
