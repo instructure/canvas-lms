@@ -76,7 +76,7 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
                 {I18n.t('Peer Review Rubric')}
               </Heading>
             </Flex.Item>
-            <Flex.Item>
+            <Flex.Item padding="xx-small">
               <CloseButton
                 screenReaderLabel={I18n.t('Close Rubric')}
                 size="small"
@@ -88,6 +88,7 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
         </Flex.Item>
         <Flex.Item>
           <RubricAssessmentContainerWrapper
+            isStandaloneContainer={true}
             buttonDisplay={assignment.rubric.button_display ?? 'level'}
             criteria={assignment.rubric.criteria.map((criterion: RubricCriterion) => ({
               id: criterion._id,

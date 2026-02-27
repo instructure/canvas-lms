@@ -70,7 +70,7 @@ export const CommentsPanel: React.FC<CommentsPanelProps> = ({
                 {I18n.t('Peer Comments')}
               </Heading>
             </Flex.Item>
-            <Flex.Item>
+            <Flex.Item padding="xx-small">
               <CloseButton
                 screenReaderLabel={I18n.t('Close Peer Comments')}
                 size="small"
