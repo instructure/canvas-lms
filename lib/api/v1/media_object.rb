@@ -33,7 +33,7 @@ module Api::V1::MediaObject
 
       unless exclude.include?("tracks")
         json["media_tracks"] = media_object.media_tracks.map do |track|
-          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale status]).tap do |json2|
+          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale workflow_state]).tap do |json2|
             json2[:asr] = track.asr?
             json2[:url] = show_media_tracks_url(media_object.media_id, track.id)
           end
@@ -52,7 +52,7 @@ module Api::V1::MediaObject
 
       unless exclude.include?("tracks")
         json["media_tracks"] = attachment.media_tracks_include_originals.map do |track|
-          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale status inherited]).tap do |json2|
+          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale workflow_state inherited]).tap do |json2|
             json2[:asr] = track.asr?
             json2[:url] = show_media_attachment_tracks_url(attachment.id, track.id, access_token:, instfs_id:, location:)
           end
