@@ -244,6 +244,7 @@ describe('UnsavedChangesModal', () => {
     it('buttons are keyboard accessible', async () => {
       const user = userEvent.setup()
 
+      document.body.focus()
       await user.tab()
       expect(screen.getByRole('button', {name: 'Close'})).toHaveFocus()
 
@@ -257,10 +258,8 @@ describe('UnsavedChangesModal', () => {
     it('can activate "Don\'t Save" button with keyboard', async () => {
       const user = userEvent.setup()
 
-      // Reset focus to body so tab order starts predictably from outside the modal
-      document.body.focus()
-      await user.tab() // → Close button
-      await user.tab() // → Don't Save button
+      screen.getByRole('button', {name: 'Close'}).focus()
+      await user.tab()
       await user.keyboard('{Enter}')
 
       expect(mockOnCancel).toHaveBeenCalledTimes(1)
@@ -269,10 +268,9 @@ describe('UnsavedChangesModal', () => {
     it('can activate "Save changes" button with keyboard', async () => {
       const user = userEvent.setup()
 
+      screen.getByRole('button', {name: 'Close'}).focus()
       await user.tab()
       await user.tab()
-      await user.tab()
-
       await user.keyboard('{Enter}')
 
       expect(mockOnConfirm).toHaveBeenCalledTimes(1)
