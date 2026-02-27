@@ -128,10 +128,16 @@ new_quizzes_scanning_youtube_links:
   state: hidden
   applies_to: SiteAdmin
 new_quizzes_native_experience:
-  display_name: New Quizzes Native Experience
-  description: When enabled, New Quizzes opens directly within Canvas for a smoother experience.
+  display_name: New Quizzes Canvas Native Integration
+  description: |-
+    Enabling this feature moves the New Quizzes experience out of its
+    isolation layer (iframe) to run natively within the main Canvas page.
+
+    Note: This feature option will be removed on July 1st, 2026, as the
+    native integration becomes the standard experience for all production
+    environments.
   state: hidden
-  shadow: true
+  shadow: false
   applies_to: Course
 new_quizzes_native_experience_respondus:
   display_name: New Quizzes Native Experience Respondus
