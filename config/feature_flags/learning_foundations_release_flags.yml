@@ -262,7 +262,7 @@ syllabus_versioning:
 
 widget_dashboard:
   state: hidden
-  display_name: Widgets for Dashboard
+  display_name: Customizable Dashboard for Learners
   description: |-
     When enabled, this allows learners to add, remove, and rearrange dashboard widgets.
   applies_to: RootAccount
