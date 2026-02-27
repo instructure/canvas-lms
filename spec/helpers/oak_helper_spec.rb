@@ -26,7 +26,9 @@ describe OakHelper do
 
     before do
       Account.current_domain_root_account = account
+      instance_variable_set(:@domain_root_account, account)
       instance_variable_set(:@current_user, user)
+      account.enable_feature!(:ignite_agent_enabled)
     end
 
     context "when preview param is true" do
@@ -49,9 +51,9 @@ describe OakHelper do
       end
     end
 
-    context "when on a oauth2_provider confirm page" do
+    context "when request path starts with /login" do
       before do
-        allow(controller).to receive_messages(controller_name: "oauth2_provider", action_name: "confirm", params: {})
+        allow(request).to receive(:path).and_return("/login/some_path")
       end
 
       it "returns false" do
@@ -59,9 +61,9 @@ describe OakHelper do
       end
     end
 
-    context "when request path starts with /login" do
+    context "when the current account is a site admin account" do
       before do
-        allow(request).to receive(:path).and_return("/login/some_path")
+        instance_variable_set(:@domain_root_account, Account.site_admin)
       end
 
       it "returns false" do
@@ -80,10 +82,6 @@ describe OakHelper do
     end
 
     context "with oak_for_users feature flag" do
-      before do
-        account.enable_feature!(:ignite_agent_enabled)
-      end
-
       context "when oak_for_users is disabled" do
         before do
           user.disable_feature!(:oak_for_users)
