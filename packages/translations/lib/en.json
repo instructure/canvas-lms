@@ -260,6 +260,12 @@
   "caption_manager_aae0906f": {
     "message": "Caption Manager"
   },
+  "captionname_caption_delete_failed_3afa617e": {
+    "message": "{ captionName } caption delete failed"
+  },
+  "captionname_caption_upload_failed_fa0f13a4": {
+    "message": "{ captionName } caption upload failed"
+  },
   "captions_have_been_added_for_lang_cd126cd": {
     "message": "Captions have been added for { lang }"
   },
@@ -572,6 +578,9 @@
   "degree_symbol_4a823d5f": {
     "message": "Degree Symbol"
   },
+  "delete_failed_6529e336": {
+    "message": "Delete Failed"
+  },
   "delimiters_4db4840d": {
     "message": "Delimiters"
   },
@@ -740,9 +749,6 @@
   "embed_image_1080badc": {
     "message": "Embed Image"
   },
-  "embed_options_44c4cba8": {
-    "message": "Embed Options"
-  },
   "embed_video_a97a64af": {
     "message": "Embed Video"
   },
@@ -859,9 +865,6 @@
   },
   "fail_544e5dde": {
     "message": "FAIL"
-  },
-  "failed_276786d": {
-    "message": "Failed"
   },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Failed getting file contents"
@@ -2100,6 +2103,9 @@
   "result_index_of_max_7db5ad8b": {
     "message": "Result { index } of { max }."
   },
+  "retry_captionname_5ed0a12f": {
+    "message": "Retry { captionName }"
+  },
   "retry_ebd5f8ba": {
     "message": "Retry"
   },
@@ -2652,6 +2658,9 @@
   "unpublished_dfd8801": {
     "message": "unpublished"
   },
+  "unsaved_changes_will_be_lost_f977252a": {
+    "message": "Unsaved changes will be lost."
+  },
   "untitled_16aa4f2b": {
     "message": "Untitled"
   },
@@ -2678,6 +2687,9 @@
   },
   "upload_document_253f0478": {
     "message": "Upload Document"
+  },
+  "upload_failed_a5dc91ec": {
+    "message": "Upload Failed"
   },
   "upload_file_fd2361b8": {
     "message": "Upload File"
@@ -2843,6 +2855,9 @@
   },
   "view_word_and_character_counts_a743dd0c": {
     "message": "View word and character counts"
+  },
+  "viewer_restrictions_e14274c9": {
+    "message": "Viewer Restrictions"
   },
   "waiting_for_response_1efd0c50": {
     "message": "Waiting for response"
