@@ -43,15 +43,34 @@ module Accessibility
 
                   issues << build_issue(rule, element: element.name, form: rule.form(element).to_h, path: xpath)
                 rescue => e
-                  log_rule_error(rule, element, e)
+                  report_exception(e, { rule_id: rule.class.id, element: }, "accessibility_rule_error")
                 end
               end
             end
 
             process_issues(issues)
           rescue => e
-            log_general_error(e)
+            report_exception(e, {}, "accessibility_html_parse_error")
             NO_ACCESSIBILITY_ISSUES.dup
+          end
+        end
+
+        def report_exception(error, info, tag)
+          return if @resource.nil?
+
+          resource_context = @resource.is_a?(Accessibility::SyllabusResource) ? @resource.course : @resource.context
+          info.merge!(
+            context_type: resource_context.class.name,
+            context_id: resource_context.global_id,
+            account_id: resource_context.account.global_id,
+            resource_type: @resource.class.name,
+            resource_id: @resource.global_id
+          )
+
+          ErrorReport.log_exception(tag, error, info)
+          Sentry.with_scope do |scope|
+            scope.set_context(tag, info)
+            Sentry.capture_exception(error, level: :error)
           end
         end
       end
