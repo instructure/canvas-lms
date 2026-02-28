@@ -101,6 +101,28 @@
 #         }
 #       }
 #     }
+#
+# @model AccountCalendarList
+#     {
+#       "id": "AccountCalendarList",
+#       "properties": {
+#         "account_calendars": {
+#           "description": "List of account calendars",
+#           "example": ["AccountCalendar"],
+#           "type": "array",
+#           "items": {
+#             "type": "AccountCalendar"
+#           }
+#         },
+#         "total_results": {
+#           "description": "Total number of account calendars",
+#           "example": "1"
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
+
 class AccountCalendarsApiController < ApplicationController
   include Api::V1::AccountCalendar
 
@@ -119,7 +141,7 @@ class AccountCalendarsApiController < ApplicationController
   #   curl https://<canvas>/api/v1/account_calendars \
   #     -H 'Authorization: Bearer <token>'
   #
-  # @returns { "account_calendars": [AccountCalendar], "total_results": "integer"}
+  # @returns AccountCalendarList
   def index
     GuardRail.activate(:secondary) do
       search_term = params[:search_term]
