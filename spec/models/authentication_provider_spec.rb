@@ -900,4 +900,63 @@ describe AuthenticationProvider do
                             })
     end
   end
+
+  describe "#show_mfa_configuration_options?" do
+    let(:aac) { account.authentication_providers.create!(auth_type: "saml") }
+
+    context "when account MFA is disabled" do
+      before do
+        account.settings[:mfa_settings] = :disabled
+        account.save!
+      end
+
+      it "is false" do
+        expect(aac.show_mfa_configuration_options?).to be false
+      end
+    end
+
+    context "when account MFA is required" do
+      before do
+        account.settings[:mfa_settings] = :required
+        account.save!
+      end
+
+      it "is true for SAML provider" do
+        expect(aac.show_mfa_configuration_options?).to be true
+      end
+
+      it "is false for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be false
+      end
+    end
+
+    context "when account MFA is optional" do
+      before do
+        account.settings[:mfa_settings] = :optional
+        account.save!
+      end
+
+      it "is true for SAML provider" do
+        expect(aac.show_mfa_configuration_options?).to be true
+      end
+
+      it "is true for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be true
+      end
+    end
+
+    context "when account MFA is required for admins" do
+      before do
+        account.settings[:mfa_settings] = :required_for_admins
+        account.save!
+      end
+
+      it "is true for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be true
+      end
+    end
+  end
 end

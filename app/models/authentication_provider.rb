@@ -268,6 +268,11 @@ class AuthenticationProvider < ApplicationRecord
     settings["federated_attributes"] ||= {}
   end
 
+  def show_mfa_configuration_options?
+    account.mfa_settings != :disabled &&
+      (auth_type != "canvas" || account.mfa_settings != :required)
+  end
+
   def mfa_required?
     return false if account.mfa_settings == :disabled
     return true if account.mfa_settings == :required
