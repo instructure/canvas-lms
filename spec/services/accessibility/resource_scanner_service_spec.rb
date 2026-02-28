@@ -602,4 +602,115 @@ describe Accessibility::ResourceScannerService do
       end
     end
   end
+
+  describe "#report_exception (via HtmlChecker)" do
+    let!(:scan) { accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "queued") }
+
+    before { allow(InstStatsd::Statsd).to receive(:distributed_increment) }
+
+    context "when a rule raises during element traversal" do
+      before do
+        bad_rule = instance_double(Accessibility::Rules::HeadingsStartAtH2Rule)
+        allow(bad_rule).to receive(:test).and_raise(StandardError, "rule error")
+        allow(bad_rule).to receive(:class).and_return(Accessibility::Rules::HeadingsStartAtH2Rule)
+        allow(Accessibility::Rule).to receive(:registry).and_return({ "bad_rule" => bad_rule })
+        wiki_page.update!(body: "<p>content</p>")
+      end
+
+      it "calls ErrorReport.log_exception with the rule error tag and contextual info" do
+        expect(ErrorReport).to receive(:log_exception).with(
+          "accessibility_rule_error",
+          instance_of(StandardError),
+          hash_including(
+            rule_id: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            resource_type: "WikiPage",
+            resource_id: wiki_page.global_id,
+            context_type: "Course",
+            context_id: course.global_id,
+            account_id: course.account.global_id
+          )
+        ).and_return(instance_double(ErrorReport, id: 1))
+
+        subject.scan_resource(scan:)
+      end
+
+      it "calls Sentry.capture_exception with the raised error" do
+        allow(ErrorReport).to receive(:log_exception).and_return(instance_double(ErrorReport, id: 1))
+
+        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+
+        subject.scan_resource(scan:)
+      end
+
+      it "completes the scan successfully despite the rule error" do
+        allow(ErrorReport).to receive(:log_exception).and_return(instance_double(ErrorReport, id: 1))
+
+        subject.scan_resource(scan:)
+
+        expect(scan.reload.workflow_state).to eq("completed")
+      end
+    end
+
+    context "when HTML parsing fails" do
+      before do
+        allow_any_instance_of(described_class).to receive(:parse_html_content).and_raise(StandardError, "parse error")
+        wiki_page.update!(body: "<p>content</p>")
+      end
+
+      it "calls ErrorReport.log_exception with the parse error tag and contextual info" do
+        expect(ErrorReport).to receive(:log_exception).with(
+          "accessibility_html_parse_error",
+          instance_of(StandardError),
+          hash_including(
+            resource_type: "WikiPage",
+            resource_id: wiki_page.global_id,
+            context_type: "Course",
+            context_id: course.global_id,
+            account_id: course.account.global_id
+          )
+        ).and_return(instance_double(ErrorReport, id: 1))
+
+        subject.scan_resource(scan:)
+      end
+
+      it "calls Sentry.capture_exception" do
+        allow(ErrorReport).to receive(:log_exception).and_return(instance_double(ErrorReport, id: 1))
+
+        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+
+        subject.scan_resource(scan:)
+      end
+
+      it "completes the scan with issue_count of 0" do
+        allow(ErrorReport).to receive(:log_exception).and_return(instance_double(ErrorReport, id: 1))
+
+        subject.scan_resource(scan:)
+
+        expect(scan.reload.issue_count).to eq(0)
+      end
+    end
+
+    context "for a syllabus resource" do
+      subject { described_class.new(resource: Accessibility::SyllabusResource.new(course)) }
+
+      let!(:scan) { accessibility_resource_scan_model(course:, is_syllabus: true) }
+
+      before do
+        course.update!(syllabus_body: "<p>content</p>")
+        allow_any_instance_of(described_class).to receive(:parse_html_content).and_raise(StandardError, "parse error")
+      end
+
+      it "calls ErrorReport.log_exception with context_type of Course" do
+        expect(ErrorReport).to receive(:log_exception).with(
+          "accessibility_html_parse_error",
+          instance_of(StandardError),
+          hash_including(
+            context_type: "Course"
+          )
+        ).and_return(instance_double(ErrorReport, id: 1))
+
+        subject.scan_resource(scan:)
+      end
+    end
+  end
 end
