@@ -33,16 +33,12 @@ module Analyzers
 
     def result
       if @alias_count > GraphQLTuning.max_query_aliases
-        InstStatsd::Statsd.distribution("graphql.excessive_alias_count", @alias_count, tags: {
-                                          environment: Rails.env
-                                        })
+        InstStatsd::Statsd.distribution("graphql.excessive_alias_count", @alias_count)
         return GraphQL::AnalysisError.new("max query aliases exceeded")
       end
 
       if @directive_count > GraphQLTuning.max_query_directives
-        InstStatsd::Statsd.distribution("graphql.excessive_directive_count", @directive_count, tags: {
-                                          environment: Rails.env
-                                        })
+        InstStatsd::Statsd.distribution("graphql.excessive_directive_count", @directive_count)
         GraphQL::AnalysisError.new("max query directives exceeded")
       end
     end
