@@ -405,7 +405,11 @@ class Pseudonym < ActiveRecord::Base
 
     return unless unique_id
 
-    self.unique_id_normalized = self.class.normalize(unique_id) if unique_id_changed?
+    # Always ensure unique_id_normalized is correct, even if unique_id hasn't changed.
+    # This fixes cases where unique_id_normalized was corrupted (e.g., callbacks not running
+    # because update_all or save(validate: false), ect.)
+    normalized = self.class.normalize(unique_id)
+    self.unique_id_normalized = normalized if unique_id_changed? || unique_id_normalized != normalized
     if invalid_email?
       errors.add(:unique_id, "not_email")
       throw :abort

@@ -23,7 +23,7 @@ describe Pseudonym do
     delegate :normalize, to: :Pseudonym
 
     it "normalizes according to RFC4518" do
-      # Ⅳ ligature gets decomposed to IV (and downcased)
+      # Ⅳ ligature gets decomposed to IV (and dowercased)
       expect(normalize("Ⅳ")).to eql "iv"
       expect(normalize("interior  spaces")).to eql "interior spaces"
       expect(normalize("  leading")).to eql "leading"
@@ -35,6 +35,27 @@ describe Pseudonym do
       expect(normalize("cody\u200f")).to eql "cody"
       expect(normalize("\u202a\u202a\u202acody\u202c\u202c\u202c")).to eql "cody"
       expect(normalize("\u200f\u202acody\u202c\u200f")).to eql "cody"
+    end
+
+    it "self-heals corrupted unique_id_normalized on save" do
+      user = user_model
+      pseudonym = Pseudonym.create!(valid_pseudonym_attributes.merge(user:))
+
+      # Corrupt unique_id_normalized by bypassing validations
+      # This simulates what might happen from old migration code or manual database updates
+      pseudonym.update_column(:unique_id_normalized, "corrupted@example.com")
+      pseudonym.reload
+
+      # Verify corruption exists
+      expect(pseudonym.unique_id_normalized).to eq("corrupted@example.com")
+      expect(pseudonym.unique_id_normalized).not_to eq(normalize(pseudonym.unique_id))
+
+      # Save the pseudonym (without changing unique_id)
+      pseudonym.save!
+      pseudonym.reload
+
+      # Verify self-healing: unique_id_normalized should now match normalized unique_id
+      expect(pseudonym.unique_id_normalized).to eq(normalize(pseudonym.unique_id))
     end
   end
 
