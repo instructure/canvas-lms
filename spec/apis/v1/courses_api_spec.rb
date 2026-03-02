@@ -4011,6 +4011,31 @@ describe CoursesController, type: :request do
           check_json.call(@student2, @student2_enroll)
         end
 
+        it "does not make N+1 role queries when including enrollments" do
+          role_query = /FROM.*roles.*WHERE.*roles.*id.*=.*LIMIT/
+          count_role_queries = lambda do
+            count = 0
+            counter = lambda do |_name, _start, _finish, _id, payload|
+              count += 1 if payload[:sql]&.match?(role_query)
+            end
+            ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+              api_call(:get, api_url, api_route, include: ["enrollments"])
+            end
+            count
+          end
+
+          baseline = count_role_queries.call
+
+          section3 = @course1.course_sections.create!(name: "Section C")
+          student3 = user_with_pseudonym(name: "SSS3")
+          student4 = user_with_pseudonym(name: "SSS4")
+          @course1.enroll_user(student3, "StudentEnrollment", section: section3)
+          @course1.enroll_user(student4, "StudentEnrollment", section: section3)
+
+          with_more = count_role_queries.call
+          expect(with_more).to eq(baseline)
+        end
+
         it "doesn't return enrollments from another course" do
           @course2.enroll_user(@student1, "StudentEnrollment")
           json = api_call(:get,
