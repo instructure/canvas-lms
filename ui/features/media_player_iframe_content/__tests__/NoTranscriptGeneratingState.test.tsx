@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,26 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type MediaInfo = {
-  auto_caption_status: any
-  can_add_captions: boolean
-  created_at: string
-  embedded_iframe_url: string
-  media_id: string
-  media_sources: any[]
-  media_tracks: MediaTrack[]
-  media_type: string
-  title: string
-}
+import {render, screen} from '@testing-library/react'
+import {NoTranscriptGeneratingState} from '../components/NoTranscriptGeneratingState'
 
-export type MediaTrack = {
-  asr: boolean
-  created_at: string
-  id: string
-  inherited: boolean
-  kind: string
-  locale: string
-  updated_at: string
-  url: string
-  workflow_state: 'ready' | 'failed' | 'processing'
-}
+describe('<NoTranscriptGeneratingState />', () => {
+  it('renders the generating headline', () => {
+    render(<NoTranscriptGeneratingState />)
+
+    expect(screen.getByText('Captions are being generated for this media.')).toBeInTheDocument()
+  })
+
+  it('renders the 24 hours sub-text', () => {
+    render(<NoTranscriptGeneratingState />)
+
+    expect(screen.getByText('This may take up to 24 hours.')).toBeInTheDocument()
+  })
+})
