@@ -1241,6 +1241,18 @@ class CoursesController < ApplicationController
         SisPseudonym.preload_enrollment_data(@context, users)
         UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ["uuid", "lti_id"].any? { |id| includes.include? id }
         include_group_ids = includes.delete("group_ids").present?
+        include_diff_tags = can_do(@context, @current_user, :manage_tags_manage)
+        if include_diff_tags
+          user_ids_with_diff_tags = GroupMembership
+                                    .joins(:group)
+                                    .where(user_id: users)
+                                    .merge(Group.non_collaborative)
+                                    .where(groups: { context: @context })
+                                    .where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'")
+                                    .distinct
+                                    .pluck(:user_id)
+                                    .to_set
+        end
 
         unless includes.include?("test_student") || Array(params[:enrollment_type]).include?("student_view")
           users.reject! do |u|
@@ -1284,7 +1296,7 @@ class CoursesController < ApplicationController
           end
           user_json(u, @current_user, session, includes, @context, enrollments, excludes).tap do |json|
             json[:group_ids] = active_group_memberships(users)[u.id]&.map(&:group_id) || [] if include_group_ids
-            json[:has_non_collaborative_groups] = u.current_differentiation_tags.where(context: @context).count > 0 if can_do(@context, @current_user, :manage_tags_manage)
+            json[:has_non_collaborative_groups] = user_ids_with_diff_tags.include?(u.id) if include_diff_tags
           end
         }
       end
