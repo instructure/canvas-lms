@@ -47,6 +47,25 @@ class SisPseudonym
        Canvas::ICU.collation_key(pseudonym.unique_id),
        pseudonym.position]
     end
+
+    # Batch-preloads enrollment-based SIS pseudonyms for a set of users,
+    # storing the result as a cache on the context.
+    def preload_enrollment_data(context, users)
+      return unless context.is_a?(Course) || context.is_a?(CourseSection)
+      return if users.empty?
+
+      enrollments = context.enrollments.except(:preload)
+                           .where(user_id: users)
+                           .where.not(sis_pseudonym_id: nil)
+                           .order(:id)
+                           .preload(:sis_pseudonym)
+
+      cache = {}
+      users.each { |u| cache[u.id] = nil }
+      enrollments.each { |e| cache[e.user_id] ||= e.sis_pseudonym }
+
+      context.instance_variable_set(:@_sis_enrollment_pseudonym_cache, cache)
+    end
   end
 
   attr_reader :user, :context, :type, :require_sis, :include_deleted, :include_all_pseudonyms, :current_user
@@ -100,7 +119,18 @@ class SisPseudonym
 
   def find_on_enrollment_for_context
     if @context.is_a?(Course) || @context.is_a?(CourseSection)
-      pseudonym = @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
+      if @context.instance_variable_defined?(:@_sis_enrollment_pseudonym_cache)
+        cache = @context.instance_variable_get(:@_sis_enrollment_pseudonym_cache)
+      end
+      pseudonym = if cache&.key?(@user.id)
+                    cache[@user.id]
+                  else
+                    @context.enrollments.except(:preload)
+                            .where(user_id: @user)
+                            .where.not(sis_pseudonym_id: nil)
+                            .preload(:sis_pseudonym)
+                            .first&.sis_pseudonym
+                  end
       # if the sis user id isn't here, this pointer might
       # no longer be good.  Let the fallback logic work
       # through "find_in_home_account".  It may still return this one,

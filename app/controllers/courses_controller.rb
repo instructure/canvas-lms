@@ -1217,6 +1217,7 @@ class CoursesController < ApplicationController
         # group memberships. Since we only care about active group
         # memberships for this course, load the data in a more targeted way.
         user_json_preloads(users, includes.include?("email"))
+        SisPseudonym.preload_enrollment_data(@context, users)
         UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ["uuid", "lti_id"].any? { |id| includes.include? id }
         include_group_ids = includes.delete("group_ids").present?
 
