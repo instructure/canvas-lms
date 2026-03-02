@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {IconCheckPlusLine, IconCheckLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import type {PlannerItem} from './types'
+import type {PlannerItem, PlannerOverride} from './types'
 import {formatDate, formatAnnouncementDate, getPlannableTypeLabel, isOverdue} from './utils'
 import {usePlannerOverride} from './hooks/usePlannerOverride'
 
@@ -33,16 +33,21 @@ const I18n = createI18nScope('widget_dashboard')
 
 interface TodoItemProps {
   item: PlannerItem
+  onItemUpdate?: (plannableId: string, plannableType: string, override: PlannerOverride) => void
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({item}) => {
+const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
   const isAnnouncement = item.plannable_type === 'announcement'
   const dateText = isAnnouncement
     ? formatAnnouncementDate(item.plannable_date)
     : formatDate(item.plannable_date)
   const isItemOverdue = isAnnouncement ? false : isOverdue(item.plannable_date)
   const typeLabel = getPlannableTypeLabel(item.plannable_type)
-  const {toggleComplete, isLoading} = usePlannerOverride()
+  const {toggleComplete, isLoading} = usePlannerOverride({
+    onSuccess: (override, {item: toggledItem}) => {
+      onItemUpdate?.(toggledItem.plannable_id, toggledItem.plannable_type, override)
+    },
+  })
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const previousLoadingRef = useRef<boolean>(false)
 
