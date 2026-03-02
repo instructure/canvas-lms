@@ -22,10 +22,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Button} from '@instructure/ui-buttons'
-import {IconAiSolid} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {FormMessage} from '@instructure/ui-form-field'
 import {GenerateResponse} from '../../../types'
@@ -35,6 +32,7 @@ import {FormComponentHandle, FormComponentProps} from './index'
 import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {useShallow} from 'zustand/react/shallow'
 import {useScreenReaderAlert} from '../../../hooks/useScreenReaderAlert'
+import {GenerateButton, ButtonLabelByState} from '../GenerateButton'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -57,6 +55,16 @@ const validateAltText = (
   }
 
   return {isValid: true, errorMessage: undefined}
+}
+
+export const GENERATE_ALT_TEXT_INITIAL_LABEL = I18n.t('Generate alt text')
+export const GENERATE_ALT_TEXT_LOADING_LABEL = I18n.t('Generating alt text...')
+export const GENERATE_ALT_TEXT_LOADED_LABEL = I18n.t('Regenerate alt text')
+
+export const CheckboxTextButtonLabels: ButtonLabelByState = {
+  initial: GENERATE_ALT_TEXT_INITIAL_LABEL,
+  loading: GENERATE_ALT_TEXT_LOADING_LABEL,
+  loaded: GENERATE_ALT_TEXT_LOADED_LABEL,
 }
 
 const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
@@ -170,87 +178,63 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       }
 
       return (
-        <Flex direction="column" gap="mediumSmall">
-          <View as="div">
-            <Checkbox
-              data-testid="decorative-img-checkbox"
-              inputRef={el => (checkboxRef.current = el)}
-              label={issue.form.checkboxLabel}
-              checked={isChecked}
-              disabled={isDisabled}
-              messages={[
-                {
-                  text: (
-                    <View as="div" margin="0 0 0 medium" themeOverride={{marginMedium: '1.8rem'}}>
-                      <Text size="small" color="secondary">
-                        {issue.form.checkboxSubtext}
-                      </Text>
-                    </View>
-                  ),
-                  type: 'hint',
-                },
-              ]}
-              onChange={handleCheckboxValueChange}
-            />
-          </View>
+        <Flex direction="column" gap="medium">
+          <Checkbox
+            data-testid="decorative-img-checkbox"
+            inputRef={el => (checkboxRef.current = el)}
+            label={issue.form.checkboxLabel}
+            checked={isChecked}
+            disabled={isDisabled || generateLoading}
+            messages={[
+              {
+                text: (
+                  <View as="div" margin="0 0 0 medium" themeOverride={{marginMedium: '1.8rem'}}>
+                    <Text size="small" color="secondary">
+                      {issue.form.checkboxSubtext}
+                    </Text>
+                  </View>
+                ),
+                type: 'hint',
+              },
+            ]}
+            onChange={handleCheckboxValueChange}
+          />
 
-          <View as="div">
+          <Flex as="div" gap="mediumSmall" direction="column" alignItems="start">
             <TextArea
               data-testid="checkbox-text-input-form"
               textareaRef={el => (textAreaRef.current = el)}
               label={issue.form.label}
-              disabled={isChecked || isDisabled}
+              disabled={isChecked || isDisabled || generateLoading}
               value={isChecked ? '' : value || ''}
               onChange={handleTextAreaChange}
               required
               messages={formMessages}
             />
-          </View>
 
-          {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
-            <Flex as="div" gap="small" direction="column">
-              <Flex as="div" gap="x-small" direction="column">
-                <Flex.Item overflowX="visible" overflowY="visible">
-                  <Button
-                    data-testid="generate-alt-text-button"
-                    color="ai-primary"
-                    renderIcon={() => <IconAiSolid />}
-                    onClick={handleGenerateClick}
-                    disabled={
-                      generateLoading || isChecked || isDisabled || !issue.form.isCanvasImage
-                    }
-                  >
-                    {generateLoading ? (
-                      <>
-                        {issue.form.generateButtonLabel}{' '}
-                        <Spinner size="x-small" renderTitle={I18n.t('Generating...')} />
-                      </>
-                    ) : (
-                      issue.form.generateButtonLabel
-                    )}
-                  </Button>
-                </Flex.Item>
+            {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
+              <Flex as="div" gap="x-small" direction="column" alignItems="start">
+                <GenerateButton
+                  handleGenerateClick={handleGenerateClick}
+                  isLoading={generateLoading}
+                  buttonLabels={CheckboxTextButtonLabels}
+                  isDisabled={isChecked || !issue.form.isCanvasImage}
+                />
                 {!issue.form.isCanvasImage && (
-                  <Flex.Item>
-                    <Text data-testid="alt-text-generation-not-available-message" size="small">
-                      {I18n.t(
-                        'AI alt text generation is only available for images uploaded to Canvas.',
-                      )}
-                    </Text>
-                  </Flex.Item>
+                  <Text data-testid="alt-text-generation-not-available-message" size="small">
+                    {I18n.t(
+                      'AI alt text generation is only available for images uploaded to Canvas.',
+                    )}
+                  </Text>
                 )}
               </Flex>
-            </Flex>
-          )}
+            )}
+          </Flex>
 
           {generationError && (
-            <Flex>
-              <Flex.Item>
-                <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
-                  {generationError}
-                </Alert>
-              </Flex.Item>
-            </Flex>
+            <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
+              {generationError}
+            </Alert>
           )}
         </Flex>
       )
