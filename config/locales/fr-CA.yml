@@ -29062,7 +29062,7 @@ fr-CA:
   remove_email_address_b1820820: "Supprimer l'adresse courriel"
   remove_emoji_emojiname_cb388de9: "Supprimer l’émoji « %{emojiName} »"
   remove_empty_attachment_b2aea632: "retirer la pièce jointe vide"
-  remove_f47dc62a: Supprimer
+  remove_f47dc62a: Retirer
   remove_file_cbf3f40f: "Retirer un fichier"
   remove_filename_1b74ef2a: "Retirer %{fileName}"
   remove_filename_87f3781e: "retirer %{filename}"
