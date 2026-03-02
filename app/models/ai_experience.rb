@@ -181,8 +181,16 @@ class AiExperience < ApplicationRecord
     @context_files_changed = incoming_ids != current_ids
 
     if @context_files_changed
-      ai_experience_context_files.destroy_all
-      incoming_ids.each { |attachment_id| ai_experience_context_files.create!(attachment_id:) }
+      removed_ids = current_ids - incoming_ids
+      added_ids = incoming_ids - current_ids
+
+      ai_experience_context_files.where(attachment_id: removed_ids).destroy_all if removed_ids.any?
+      added_ids.each { |attachment_id| ai_experience_context_files.create!(attachment_id:) }
+
+      # Re-sync positions to match the incoming order
+      incoming_ids.each_with_index do |attachment_id, idx|
+        ai_experience_context_files.find_by(attachment_id:)&.update_column(:position, idx + 1)
+      end
     end
 
     @pending_context_file_ids = nil
