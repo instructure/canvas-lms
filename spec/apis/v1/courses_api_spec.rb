@@ -4011,17 +4011,19 @@ describe CoursesController, type: :request do
           check_json.call(@student2, @student2_enroll)
         end
 
-        it "does not make N+1 role or user queries when including enrollments" do
+        it "does not make N+1 role, user, or pseudonym queries when including enrollments" do
           teacher = @user
           admin = account_admin_user(account: @course1.account)
           role_query = /FROM.*roles.*WHERE.*roles.*id.*=.*LIMIT/
           user_query = /SELECT "users".\* FROM .* "users" WHERE "users"."id" = \d+ LIMIT/
+          pseudonym_query = /SELECT "pseudonyms".\* FROM .* "pseudonyms" WHERE .* "pseudonyms"."user_id" = \d+/
           count_queries = lambda do |caller_user|
-            counts = { role: 0, user: 0 }
+            counts = { role: 0, user: 0, pseudonym: 0 }
             counter = lambda do |_name, _start, _finish, _id, payload|
               sql = payload[:sql]
               counts[:role] += 1 if sql&.match?(role_query)
               counts[:user] += 1 if sql&.match?(user_query)
+              counts[:pseudonym] += 1 if sql&.match?(pseudonym_query)
             end
             ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
               api_call_as_user(caller_user, :get, api_url, api_route, include: ["enrollments"])
