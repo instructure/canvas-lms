@@ -452,6 +452,10 @@ describe UserSearch do
         end
       end
 
+      it "constructs an SQL query with materialized CTE" do
+        expect(UserSearch.for_user_in_context("Tyler", course.account, user, nil, enrollment_type: "student").to_sql).to include("WITH inner_user_scope AS MATERIALIZED")
+      end
+
       describe "to a single role" do
         let(:users) { UserSearch.for_user_in_context("Tyler", course.account, user, nil, enrollment_type: "student").to_a }
 
