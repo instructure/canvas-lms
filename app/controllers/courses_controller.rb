@@ -360,7 +360,7 @@ class CoursesController < ApplicationController
   include ObserverEnrollmentsHelper
   include DefaultDueTimeHelper
 
-  before_action :require_user, only: %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export]
+  before_action :require_user, only: %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export new_quizzes_selection_update]
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_context, only: %i[roster locks create_file ping confirm_action copy effective_due_dates offline_web_exports link_validator settings start_offline_web_export statistics user_progress]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
@@ -1706,6 +1706,9 @@ class CoursesController < ApplicationController
 
   def new_quizzes_selection_update
     @course = api_find(Course, params[:id])
+
+    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
+
     if @course.root_account.feature_enabled?(:newquizzes_on_quiz_page)
       old_settings = @course.settings
       key_exists = old_settings.key?(:engine_selected)
