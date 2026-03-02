@@ -1229,7 +1229,7 @@ class CoursesController < ApplicationController
         if includes.include?("enrollments")
           enrollment_scope = @context.enrollments
                                      .where(user_id: users)
-                                     .preload(:course, :role, :scores, :course_section)
+                                     .preload(:course, :user, :role, :scores, :course_section)
                                      .joins(:course_section)
                                      .order("course_sections.name")
 

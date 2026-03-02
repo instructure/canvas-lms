@@ -4012,9 +4012,11 @@ describe CoursesController, type: :request do
         end
 
         it "does not make N+1 role or user queries when including enrollments" do
+          teacher = @user
+          admin = account_admin_user(account: @course1.account)
           role_query = /FROM.*roles.*WHERE.*roles.*id.*=.*LIMIT/
           user_query = /SELECT "users".\* FROM .* "users" WHERE "users"."id" = \d+ LIMIT/
-          count_queries = lambda do
+          count_queries = lambda do |caller_user|
             counts = { role: 0, user: 0 }
             counter = lambda do |_name, _start, _finish, _id, payload|
               sql = payload[:sql]
@@ -4022,12 +4024,14 @@ describe CoursesController, type: :request do
               counts[:user] += 1 if sql&.match?(user_query)
             end
             ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
-              api_call(:get, api_url, api_route, include: ["enrollments"])
+              api_call_as_user(caller_user, :get, api_url, api_route, include: ["enrollments"])
             end
             counts
           end
 
-          baseline = count_queries.call
+          # baseline with existing enrollments
+          teacher_baseline = count_queries.call(teacher)
+          admin_baseline = count_queries.call(admin)
 
           section3 = @course1.course_sections.create!(name: "Section C")
           student3 = user_with_pseudonym(name: "SSS3")
@@ -4035,8 +4039,10 @@ describe CoursesController, type: :request do
           @course1.enroll_user(student3, "StudentEnrollment", section: section3)
           @course1.enroll_user(student4, "StudentEnrollment", section: section3)
 
-          with_more = count_queries.call
-          expect(with_more).to eq(baseline)
+          # query counts must stay constant as enrollments grow
+          expect(count_queries.call(teacher)).to eq(teacher_baseline)
+          # admin exercises the SIS pseudonym lookup path (enrollment.user)
+          expect(count_queries.call(admin)).to eq(admin_baseline)
         end
 
         it "doesn't return enrollments from another course" do
