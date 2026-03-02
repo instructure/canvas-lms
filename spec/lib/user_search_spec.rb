@@ -421,6 +421,7 @@ describe UserSearch do
         it "doesn't try to query cross-shard when the search term is a foreign global id in account context with include_deleted_users" do
           user = @shard1.activate { user_model }
           course.enroll_student(user)
+          allow(described_class).to receive(:specific_ids).and_return([user.global_id])
           scope = UserSearch.for_user_in_context(user.global_id, Account.default, account_admin_user, nil, include_deleted_users: true)
           sql = scope.to_sql
           expect(sql).to include user.global_id.to_s
@@ -457,6 +458,10 @@ describe UserSearch do
           teacher = User.create!(name:)
           TeacherEnrollment.create!(user: teacher, course: course1, workflow_state: "active")
         end
+      end
+
+      it "constructs an SQL query with materialized CTE" do
+        expect(UserSearch.for_user_in_context("Tyler", course.account, user, nil, enrollment_type: "student").to_sql).to include("WITH inner_user_scope AS MATERIALIZED")
       end
 
       describe "to a single role" do
