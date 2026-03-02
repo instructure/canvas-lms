@@ -5074,6 +5074,102 @@ describe CoursesController do
         expect(json[0]).to include({ "id" => student1.id })
       end
     end
+
+    describe "has_non_collaborative_groups" do
+      before :once do
+        course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        course.account.save!
+      end
+
+      let(:diff_tag_category) { course.group_categories.create!(name: "Tag Category", non_collaborative: true) }
+
+      let(:diff_tag) do
+        diff_tag_category.groups.create!(context: course, name: "Tag Group", non_collaborative: true)
+      end
+
+      it "includes has_non_collaborative_groups for users with the manage_tags_manage permission" do
+        diff_tag.add_user(student1)
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+        tagged_user = json.find { |u| u["id"] == student1.id }
+        untagged_user = json.find { |u| u["id"] == student2.id }
+
+        expect(tagged_user["has_non_collaborative_groups"]).to be true
+        expect(untagged_user["has_non_collaborative_groups"]).to be false
+      end
+
+      it "does not include has_non_collaborative_groups for users without the manage_tags_manage permission" do
+        course.account.role_overrides.create!(permission: :manage_tags_manage, role: teacher_role, enabled: false)
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+
+        json.each do |user|
+          expect(user).not_to have_key("has_non_collaborative_groups")
+        end
+      end
+
+      it "ignores deleted group memberships" do
+        diff_tag.add_user(student1)
+        diff_tag.group_memberships.find_by(user_id: student1.id).update!(workflow_state: "deleted")
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+        tagged_user = json.find { |u| u["id"] == student1.id }
+
+        expect(tagged_user["has_non_collaborative_groups"]).to be false
+      end
+
+      it "ignores deleted groups" do
+        diff_tag.add_user(student1)
+        diff_tag.update!(workflow_state: "deleted")
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+        tagged_user = json.find { |u| u["id"] == student1.id }
+
+        expect(tagged_user["has_non_collaborative_groups"]).to be false
+      end
+
+      it "ignores non-collaborative groups from other courses" do
+        other_course = Course.create!
+        other_category = other_course.group_categories.create!(name: "Other Tags", non_collaborative: true)
+        other_tag = other_category.groups.create!(context: other_course, name: "Other Tag", non_collaborative: true)
+        other_tag.add_user(student1)
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+        tagged_user = json.find { |u| u["id"] == student1.id }
+
+        expect(tagged_user["has_non_collaborative_groups"]).to be false
+      end
+    end
   end
 
   describe "#content_share_users" do
