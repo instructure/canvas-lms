@@ -949,6 +949,7 @@ class DiscussionTopicsController < ApplicationController
     respond_to do |format|
       format.html do
         conditional_release_js_env(@topic.assignment)
+        add_body_class("mobile-embed") if params[:embed] == "true"
         render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
       end
     end
