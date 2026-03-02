@@ -4045,6 +4045,35 @@ describe CoursesController, type: :request do
           expect(count_queries.call(admin)).to eq(admin_baseline)
         end
 
+        it "does not make N+1 user_profile queries when profiles are enabled" do
+          @course1.root_account.settings[:enable_profiles] = true
+          @course1.root_account.save!
+
+          profile_query = /SELECT "user_profiles".\* FROM .* "user_profiles" WHERE "user_profiles"."user_id" = \d+ LIMIT/
+          count_profile_queries = lambda do
+            count = 0
+            counter = lambda do |_name, _start, _finish, _id, payload|
+              count += 1 if payload[:sql]&.match?(profile_query)
+            end
+            ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+              api_call(:get, api_url, api_route, include: ["bio"])
+            end
+            count
+          end
+
+          # baseline with existing users
+          baseline = count_profile_queries.call
+
+          section3 = @course1.course_sections.create!(name: "Section C")
+          student3 = user_with_pseudonym(name: "SSS3")
+          student4 = user_with_pseudonym(name: "SSS4")
+          @course1.enroll_user(student3, "StudentEnrollment", section: section3)
+          @course1.enroll_user(student4, "StudentEnrollment", section: section3)
+
+          # query count must stay constant as users grow
+          expect(count_profile_queries.call).to eq(baseline)
+        end
+
         it "doesn't return enrollments from another course" do
           @course2.enroll_user(@student1, "StudentEnrollment")
           json = api_call(:get,
