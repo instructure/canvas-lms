@@ -40,16 +40,18 @@ describe NewQuizzesHelper do
       }
     end
 
+    let(:launch_url) { "https://newquizzes.example.com/remoteEntry.js" }
+
     before do
       course.enable_feature!(:new_quizzes_native_experience)
     end
 
     it "calls add_new_quizzes_bundle" do
-      expect(self).to receive(:add_new_quizzes_bundle)
+      expect(self).to receive(:add_new_quizzes_bundle).with(launch_url:)
       expect(self).to receive(:js_env).with(hash_including(NEW_QUIZZES: signed_launch_data))
       expect(self).to receive(:add_body_class).with("native-new-quizzes full-width")
 
-      setup_new_quizzes_env(signed_launch_data)
+      setup_new_quizzes_env(signed_launch_data, launch_url:)
     end
 
     it "sets NEW_QUIZZES in js_env with signed launch data" do
@@ -57,7 +59,7 @@ describe NewQuizzesHelper do
       allow(self).to receive(:add_body_class)
       expect(self).to receive(:js_env).with(hash_including(NEW_QUIZZES: signed_launch_data))
 
-      setup_new_quizzes_env(signed_launch_data)
+      setup_new_quizzes_env(signed_launch_data, launch_url:)
     end
 
     it "adds native-new-quizzes and full-width body classes" do
@@ -65,7 +67,7 @@ describe NewQuizzesHelper do
       allow(self).to receive(:js_env)
       expect(self).to receive(:add_body_class).with("native-new-quizzes full-width")
 
-      setup_new_quizzes_env(signed_launch_data)
+      setup_new_quizzes_env(signed_launch_data, launch_url:)
     end
   end
 
@@ -80,7 +82,7 @@ describe NewQuizzesHelper do
         expect(self).not_to receive(:css_bundle)
         expect(self).not_to receive(:remote_env)
 
-        add_new_quizzes_bundle
+        add_new_quizzes_bundle(launch_url: "https://newquizzes.example.com/remoteEntry.js")
       end
     end
 
@@ -94,7 +96,7 @@ describe NewQuizzesHelper do
         expect(self).not_to receive(:css_bundle)
         expect(self).not_to receive(:remote_env)
 
-        add_new_quizzes_bundle
+        add_new_quizzes_bundle(launch_url: "https://newquizzes.example.com/remoteEntry.js")
       end
     end
 
@@ -112,7 +114,7 @@ describe NewQuizzesHelper do
           }
         )
 
-        add_new_quizzes_bundle
+        add_new_quizzes_bundle(launch_url: "https://newquizzes.example.com/remoteEntry.js")
       end
     end
   end

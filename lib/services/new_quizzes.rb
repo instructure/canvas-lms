@@ -24,16 +24,16 @@ module Services
     NEW_QUIZZES_CLOUDFRONT_HOST_BETA_KEY = "new_quizzes_cloudfront_host_beta"
     NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY = "new_quizzes_cloudfront_host_edge"
 
-    def self.launch_url
+    def self.launch_url(tool_url: nil)
       return "#{config[NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY]}/none/remoteEntry.js" if Rails.env.development?
 
-      "#{cloudfront_host}/#{region}/remoteEntry.js"
+      "#{cloudfront_host}/#{region(tool_url:)}/remoteEntry.js"
     end
 
-    def self.ui_version
+    def self.ui_version(tool_url: nil)
       return "none" if Rails.env.development?
 
-      region
+      region(tool_url:)
     end
 
     def self.cloudfront_host
@@ -49,7 +49,9 @@ module Services
       end
     end
 
-    def self.region
+    def self.region(tool_url: nil)
+      return "edge" if tool_url.present? && tool_url.include?("quiz-lti-pdx-edge")
+
       ApplicationController.region || begin
         Rails.logger.warn("ApplicationController.region is not set, defaulting to 'us-east-1'")
         "us-east-1"
