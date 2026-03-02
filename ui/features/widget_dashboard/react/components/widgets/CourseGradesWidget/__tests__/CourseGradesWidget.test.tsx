@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import CourseGradesWidget from '../CourseGradesWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
@@ -28,6 +29,9 @@ import {
 import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
+import * as useWidgetConfigModule from '../../../../hooks/useWidgetConfig'
+
+jest.mock('../../../../hooks/useWidgetConfig')
 
 const mockWidget: Widget = {
   id: 'test-course-grades-widget',
@@ -101,9 +105,31 @@ const setup = (
   )
 }
 
+const mockUseWidgetConfig = useWidgetConfigModule.useWidgetConfig as jest.MockedFunction<
+  typeof useWidgetConfigModule.useWidgetConfig
+>
+
 describe('CourseGradesWidget', () => {
+  let mockSetShowGrades: jest.Mock
+  let mockSetGradeVisibilities: jest.Mock
+  let mockShowGrades: boolean
+  let mockGradeVisibilities: Record<string, boolean>
+
   beforeEach(() => {
     clearWidgetDashboardCache()
+    mockSetShowGrades = jest.fn()
+    mockSetGradeVisibilities = jest.fn()
+    mockShowGrades = true
+    mockGradeVisibilities = {}
+    mockUseWidgetConfig.mockImplementation((_widgetId: string, key: string) => {
+      if (key === 'showGrades') return [mockShowGrades, mockSetShowGrades]
+      if (key === 'gradeVisibilities') return [mockGradeVisibilities, mockSetGradeVisibilities]
+      return [undefined, jest.fn()]
+    })
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   it('renders basic widget', async () => {
@@ -202,5 +228,84 @@ describe('CourseGradesWidget', () => {
     expect(screen.getByTestId('course-1-link')).toHaveAttribute('href', '/courses/1')
     expect(screen.getByTestId('course-2-link')).toBeInTheDocument()
     expect(screen.getByTestId('course-2-link')).toHaveAttribute('href', '/courses/2')
+  })
+
+  it('persists grade visibility using useWidgetConfig', () => {
+    setup()
+
+    expect(mockUseWidgetConfig).toHaveBeenCalledWith(
+      'test-course-grades-widget',
+      'showGrades',
+      true,
+    )
+    expect(mockUseWidgetConfig).toHaveBeenCalledWith(
+      'test-course-grades-widget',
+      'gradeVisibilities',
+      {},
+    )
+  })
+
+  it('restores hidden grades from persisted config', async () => {
+    mockShowGrades = false
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-grade')).toHaveTextContent('•••')
+  })
+
+  it('saves grade visibility when toggle is clicked', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+    })
+
+    const toggle = screen.getByTestId('hide-all-grades-checkbox')
+    await userEvent.click(toggle)
+
+    expect(mockSetShowGrades).toHaveBeenCalledWith(false)
+  })
+
+  it('restores per-course hidden grade from persisted config', async () => {
+    mockGradeVisibilities = {'1': false}
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-grade')).toHaveTextContent('•••')
+    expect(screen.getByTestId('course-2-grade')).toHaveTextContent('88%')
+  })
+
+  it('saves per-course visibility when eye icon is clicked', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+    })
+
+    const hideButton = screen.getByTestId('hide-single-grade-button-1')
+    await userEvent.click(hideButton)
+
+    expect(mockSetGradeVisibilities).toHaveBeenCalledWith({'1': false})
+  })
+
+  it('allows per-course override when global toggle is off', async () => {
+    mockShowGrades = false
+    mockGradeVisibilities = {'1': true}
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-grade')).not.toHaveTextContent('•••')
+    expect(screen.getByTestId('course-2-grade')).toHaveTextContent('•••')
   })
 })

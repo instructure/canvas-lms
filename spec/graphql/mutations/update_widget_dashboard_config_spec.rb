@@ -279,5 +279,22 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
       config = @student.get_preference(:widget_dashboard_config)
       expect(config["filters"]["unknown-widget-type"]).to eq(filters)
     end
+
+    it "accepts nested ActionController::Parameters from HTTP request parsing" do
+      filters = ActionController::Parameters.new(
+        "showGrades" => true,
+        "gradeVisibilities" => ActionController::Parameters.new("33" => false)
+      )
+      result = run_mutation(widgetId: "course-grades-widget", filters:)
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateWidgetDashboardConfig", "widgetId")).to eq("course-grades-widget")
+
+      @student.reload
+      config = @student.get_preference(:widget_dashboard_config)
+      stored = config["filters"]["course-grades-widget"]
+      expect(stored["showGrades"]).to be true
+      expect(stored["gradeVisibilities"]).to eq({ "33" => false })
+    end
   end
 end
