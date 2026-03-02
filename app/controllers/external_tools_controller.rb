@@ -613,7 +613,7 @@ class ExternalToolsController < ApplicationController
   before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
   before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
   before_action :require_access_to_context, except: %i[index sessionless_launch all_visible_nav_tools]
-  before_action :require_user, only: [:generate_sessionless_launch]
+  before_action :require_user, only: [:generate_sessionless_launch, :migration_info]
   before_action :get_context, only: %i[retrieve show resource_selection]
   before_action :parse_context_codes, only: [:all_visible_nav_tools]
   before_action :set_extra_csp_frame_ancestor!, only: %i[retrieve resource_selection]
@@ -953,6 +953,8 @@ class ExternalToolsController < ApplicationController
   end
 
   def migration_info
+    return unless authorized_action(@context, @current_user, :read_as_admin)
+
     # Define tool to be the external tool associated with the external tool id from the route
     tool = ContextExternalTool.find(params[:external_tool_id])
 
