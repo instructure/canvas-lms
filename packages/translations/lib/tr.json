@@ -284,6 +284,9 @@
     "default_9db103d": {
         "message": "Varsayılan"
     },
+    "delete_failed_6529e336": {
+        "message": "Silme İşlemi Başarısız"
+    },
     "delimiters_4db4840d": {
         "message": "Ayıraçlar"
     },
@@ -818,6 +821,9 @@
     "selected_274ce24f": {
         "message": "Seçildi"
     },
+    "show_all_967a90f0": {
+        "message": "Tümünü göster"
+    },
     "size_b30e1077": {
         "message": "Boyut"
     },
@@ -881,6 +887,9 @@
     "the_material_is_licensed_under_creative_commons_3242cb5e": {
         "message": "Bu malzeme Creative Commons a göre lisanslı"
     },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws"
+    },
     "this_document_cannot_be_displayed_within_canvas_7aba77be": {
         "message": "Bu belge Canvas içinde görüntülenemez."
     },
@@ -895,6 +904,9 @@
     },
     "to_be_posted_when_d24bf7dc": {
         "message": "Gönderileceği zaman: { when }"
+    },
+    "toggle_tooltip_d3b7cb86": {
+        "message": "Araç ipucunu aç/kapat"
     },
     "tray_839df38a": {
         "message": "Yan menü"
