@@ -124,7 +124,8 @@ class NewQuizzesController < ApplicationController
   end
 
   def render_native_experience(signed_launch_data)
-    setup_new_quizzes_env(signed_launch_data)
+    launch_url = Services::NewQuizzes.launch_url(tool_url: @tool&.url)
+    setup_new_quizzes_env(signed_launch_data, launch_url:)
 
     render "assignments/native_new_quizzes", layout: "application"
   end
