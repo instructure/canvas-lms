@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
 import CheckboxTextInput, {
   ALT_TEXT_REQUIRED_MESSAGE,
   altTextMaxLengthMessage,
@@ -27,16 +28,10 @@ import {FormType, IssueWorkflowState} from '../../../../types'
 
 const server = setupServer()
 
-import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
-
 vi.mock('../../../../stores/AccessibilityScansStore')
 
 beforeAll(() => server.listen())
 afterAll(() => server.close())
-
-afterEach(() => {
-  cleanup()
-})
 
 beforeEach(() => {
   server.resetHandlers()
@@ -71,6 +66,19 @@ describe('CheckboxTextInput', () => {
     onChangeValue: vi.fn(),
     onValidationChange: vi.fn(),
   }
+
+  const withGenerateFix = (formOverrides = {}) => ({
+    ...defaultProps,
+    issue: {
+      ...defaultProps.issue,
+      form: {
+        ...defaultProps.issue.form,
+        canGenerateFix: true,
+        isCanvasImage: true,
+        ...formOverrides,
+      },
+    },
+  })
 
   it('renders without crashing', () => {
     render(<CheckboxTextInput {...defaultProps} />)
@@ -129,239 +137,256 @@ describe('CheckboxTextInput', () => {
     expect(textarea).toHaveValue('test value')
   })
 
-  it('shows a generate button when the form has can_generate_fix set', () => {
-    const propsWithGenerateOption = {
-      ...defaultProps,
-      issue: {
-        ...defaultProps.issue,
-        form: {
-          ...defaultProps.issue.form,
-          canGenerateFix: true,
-          isCanvasImage: true,
-          generateButtonLabel: 'Generate Alt Text',
+  describe('generate button', () => {
+    it('shows a generate button when the form has can_generate_fix set', () => {
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+      const button = screen.getByTestId('generate-button')
+      expect(button).toBeInTheDocument()
+      expect(button).not.toBeDisabled()
+    })
+
+    it('shows initial "Generate alt text" label', () => {
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+      expect(screen.getByTestId('initial-label')).toHaveTextContent('Generate alt text')
+    })
+
+    it('shows generate button as disabled when isCanvasImage is false', () => {
+      const propsWithGenerateDisabled = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            isCanvasImage: false,
+          },
         },
-      },
-    }
+      }
 
-    render(<CheckboxTextInput {...propsWithGenerateOption} />)
-    const button = screen.getByTestId('generate-alt-text-button')
-    expect(button).toBeInTheDocument()
-    expect(button).not.toBeDisabled()
-  })
+      render(<CheckboxTextInput {...propsWithGenerateDisabled} />)
+      const button = screen.getByTestId('generate-button')
+      expect(button).toBeInTheDocument()
+      expect(button).toBeDisabled()
+    })
 
-  it('shows generate button as disabled when isCanvasImage is false', () => {
-    const propsWithGenerateDisabled = {
-      ...defaultProps,
-      issue: {
-        ...defaultProps.issue,
-        form: {
-          ...defaultProps.issue.form,
-          canGenerateFix: true,
-          isCanvasImage: false,
-          generateButtonLabel: 'Generate Alt Text',
+    it('disables generate button when checkbox is checked', () => {
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+
+      const generateButton = screen.getByTestId('generate-button')
+      const checkbox = screen.getByTestId('decorative-img-checkbox')
+
+      expect(generateButton).not.toBeDisabled()
+      expect(checkbox).not.toBeChecked()
+
+      fireEvent.click(checkbox)
+
+      expect(checkbox).toBeChecked()
+      expect(generateButton).toBeDisabled()
+    })
+
+    it('shows message when the image is from an external source', () => {
+      const propsWithGenerateDisabled = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            isCanvasImage: false,
+          },
         },
-      },
-    }
+      }
 
-    render(<CheckboxTextInput {...propsWithGenerateDisabled} />)
-    const button = screen.getByTestId('generate-alt-text-button')
-    expect(button).toBeInTheDocument()
-    expect(button).toBeDisabled()
-  })
+      render(<CheckboxTextInput {...propsWithGenerateDisabled} />)
 
-  it('disables generate button when checkbox is checked', () => {
-    const propsWithGenerateOption = {
-      ...defaultProps,
-      issue: {
-        ...defaultProps.issue,
-        form: {
-          ...defaultProps.issue.form,
-          canGenerateFix: true,
-          isCanvasImage: true,
-          generateButtonLabel: 'Generate Alt Text',
-        },
-      },
-    }
+      const message = screen.getByTestId('alt-text-generation-not-available-message')
+      expect(message).toBeInTheDocument()
+      expect(message).toHaveTextContent(
+        'AI alt text generation is only available for images uploaded to Canvas.',
+      )
+    })
 
-    render(<CheckboxTextInput {...propsWithGenerateOption} />)
+    it('does not show message when the image is from Canvas', () => {
+      render(<CheckboxTextInput {...withGenerateFix()} />)
 
-    const generateButton = screen.getByTestId('generate-alt-text-button')
-    const checkbox = screen.getByTestId('decorative-img-checkbox')
+      const message = screen.queryByTestId('alt-text-generation-not-available-message')
+      expect(message).not.toBeInTheDocument()
+    })
 
-    expect(generateButton).not.toBeDisabled()
-    expect(checkbox).not.toBeChecked()
+    describe('during generation loading', () => {
+      beforeEach(() => {
+        server.use(
+          http.post('**/generate/alt_text', async () => {
+            await new Promise(resolve => setTimeout(resolve, 100))
+            return HttpResponse.json({value: 'Generated alt text'})
+          }),
+        )
+      })
 
-    fireEvent.click(checkbox)
+      it('uses aria-disabled on button during loading', async () => {
+        render(<CheckboxTextInput {...withGenerateFix()} />)
 
-    expect(checkbox).toBeChecked()
-    expect(generateButton).toBeDisabled()
-  })
+        const generateButton = screen.getByTestId('generate-button')
+        fireEvent.click(generateButton)
 
-  it('shows message when the image is from an external source', () => {
-    const propsWithGenerateDisabled = {
-      ...defaultProps,
-      issue: {
-        ...defaultProps.issue,
-        form: {
-          ...defaultProps.issue.form,
-          canGenerateFix: true,
-          isCanvasImage: false,
-          generateButtonLabel: 'Generate Alt Text',
-        },
-      },
-    }
+        expect(generateButton).toHaveAttribute('aria-disabled', 'true')
+        expect(generateButton).toHaveAttribute('aria-busy', 'true')
+        expect(generateButton).not.toBeDisabled()
 
-    render(<CheckboxTextInput {...propsWithGenerateDisabled} />)
-
-    const message = screen.getByTestId('alt-text-generation-not-available-message')
-    expect(message).toBeInTheDocument()
-    expect(message).toHaveTextContent(
-      'AI alt text generation is only available for images uploaded to Canvas.',
-    )
-  })
-
-  it('does not show message when the image is from Canvas', () => {
-    const propsWithGenerateEnabled = {
-      ...defaultProps,
-      issue: {
-        ...defaultProps.issue,
-        form: {
-          ...defaultProps.issue.form,
-          canGenerateFix: true,
-          isCanvasImage: true,
-          generateButtonLabel: 'Generate Alt Text',
-        },
-      },
-    }
-
-    render(<CheckboxTextInput {...propsWithGenerateEnabled} />)
-
-    const message = screen.queryByTestId('alt-text-generation-not-available-message')
-    expect(message).not.toBeInTheDocument()
-  })
-
-  it('calls API and updates value when generate button is clicked', async () => {
-    const propsWithGenerateOption = {
-      ...defaultProps,
-      issue: {
-        ...defaultProps.issue,
-        form: {
-          ...defaultProps.issue.form,
-          canGenerateFix: true,
-          isCanvasImage: true,
-          generateButtonLabel: 'Generate Alt Text',
-        },
-      },
-    }
-
-    // Mock the API response
-    const mockGeneratedText = 'This is AI generated alt text'
-    let generateCalled = false
-    server.use(
-      // Match both /generate and //generate (double slash from URL construction)
-      http.post('**/generate/alt_text', () => {
-        generateCalled = true
-        return HttpResponse.json({
-          value: mockGeneratedText,
+        await waitFor(() => {
+          expect(screen.getByTestId('loaded-label')).toHaveTextContent('Regenerate alt text')
         })
-      }),
-    )
+      })
 
-    render(<CheckboxTextInput {...propsWithGenerateOption} />)
+      it('disables textarea during generation', async () => {
+        render(<CheckboxTextInput {...withGenerateFix()} />)
 
-    // Click the generate button
-    const generateButton = screen.getByTestId('generate-alt-text-button')
-    fireEvent.click(generateButton)
+        const generateButton = screen.getByTestId('generate-button')
+        const textarea = screen.getByTestId('checkbox-text-input-form')
 
-    // Verify loading indicator appears
-    expect(screen.getByText('Generating...')).toBeInTheDocument()
+        expect(textarea).toBeEnabled()
+        fireEvent.click(generateButton)
+        expect(textarea).toBeDisabled()
 
-    // Verify the value gets updated with the API response
-    await waitFor(() => {
-      expect(generateCalled).toBe(true)
-      expect(propsWithGenerateOption.onChangeValue).toHaveBeenCalledWith(mockGeneratedText)
-    })
-  })
+        await waitFor(() => {
+          expect(screen.getByTestId('loaded-label')).toHaveTextContent('Regenerate alt text')
+        })
 
-  it('calls onValidationChange when generate button is clicked', async () => {
-    const mockGeneratedText = 'Generated alt text'
+        expect(textarea).toBeEnabled()
+      })
 
-    server.use(
-      http.post('**/generate/alt_text', () => {
-        return HttpResponse.json({value: mockGeneratedText})
-      }),
-    )
+      it('disables checkbox during generation', async () => {
+        render(<CheckboxTextInput {...withGenerateFix()} />)
 
-    const propsWithGenerateOption = {
-      ...defaultProps,
-      issue: {
-        ...defaultProps.issue,
-        form: {
-          ...defaultProps.issue.form,
-          canGenerateFix: true,
-          isCanvasImage: true,
-          generateButtonLabel: 'Generate Alt Text',
-        },
-      },
-    }
+        const generateButton = screen.getByTestId('generate-button')
+        const checkbox = screen.getByTestId('decorative-img-checkbox')
 
-    render(<CheckboxTextInput {...propsWithGenerateOption} />)
+        expect(checkbox).toBeEnabled()
+        fireEvent.click(generateButton)
+        expect(checkbox).toBeDisabled()
 
-    const generateButton = screen.getByTestId('generate-alt-text-button')
-    fireEvent.click(generateButton)
+        await waitFor(() => {
+          expect(screen.getByTestId('loaded-label')).toHaveTextContent('Regenerate alt text')
+        })
 
-    await waitFor(() => {
-      expect(propsWithGenerateOption.onValidationChange).toHaveBeenCalledWith(true, undefined)
-    })
-  })
-
-  it('handles errors when generate API call fails', async () => {
-    const propsWithGenerateOption = {
-      ...defaultProps,
-      issue: {
-        ...defaultProps.issue,
-        form: {
-          ...defaultProps.issue.form,
-          canGenerateFix: true,
-          isCanvasImage: true,
-          generateButtonLabel: 'Generate Alt Text',
-        },
-      },
-    }
-
-    // Mock console.error to suppress expected error output
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-    // Mock API failure
-    server.use(
-      // Match both /generate and //generate (double slash from URL construction)
-      http.post('**/generate', () => {
-        return new HttpResponse(null, {status: 500})
-      }),
-    )
-
-    render(<CheckboxTextInput {...propsWithGenerateOption} />)
-
-    // Click the generate button
-    const generateButton = screen.getByTestId('generate-alt-text-button')
-    fireEvent.click(generateButton)
-
-    // Verify loading indicator appears
-    expect(screen.getByText('Generating...')).toBeInTheDocument()
-
-    // Wait for the loading state to be cleared after the error
-    await waitFor(() => {
-      expect(screen.queryByText('Generating...')).not.toBeInTheDocument()
+        expect(checkbox).toBeEnabled()
+      })
     })
 
-    // Verify that console.error was called with the expected error
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error generating text input:', expect.any(Error))
+    it('calls API and updates value when generate button is clicked', async () => {
+      const mockGeneratedText = 'This is AI generated alt text'
+      let generateCalled = false
+      server.use(
+        http.post('**/generate/alt_text', () => {
+          generateCalled = true
+          return HttpResponse.json({
+            value: mockGeneratedText,
+          })
+        }),
+      )
 
-    // Verify that onChangeValue was not called (since the API failed)
-    expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
+      render(<CheckboxTextInput {...withGenerateFix()} />)
 
-    // Restore console.error
-    consoleErrorSpy.mockRestore()
+      const generateButton = screen.getByTestId('generate-button')
+      fireEvent.click(generateButton)
+
+      expect(screen.getByTestId('loading-label')).toHaveTextContent('Generating alt text...')
+
+      await waitFor(() => {
+        expect(generateCalled).toBe(true)
+        expect(defaultProps.onChangeValue).toHaveBeenCalledWith(mockGeneratedText)
+      })
+    })
+
+    it('calls onValidationChange when generate button is clicked', async () => {
+      const mockGeneratedText = 'Generated alt text'
+
+      server.use(
+        http.post('**/generate/alt_text', () => {
+          return HttpResponse.json({value: mockGeneratedText})
+        }),
+      )
+
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+
+      const generateButton = screen.getByTestId('generate-button')
+      fireEvent.click(generateButton)
+
+      await waitFor(() => {
+        expect(defaultProps.onValidationChange).toHaveBeenCalledWith(true, undefined)
+      })
+    })
+
+    it('shows "Regenerate alt text" label after successful generation', async () => {
+      server.use(
+        http.post('**/generate/alt_text', () => {
+          return HttpResponse.json({value: 'Generated alt text'})
+        }),
+      )
+
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+
+      const generateButton = screen.getByTestId('generate-button')
+      fireEvent.click(generateButton)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('loaded-label')).toHaveTextContent('Regenerate alt text')
+      })
+    })
+
+    it('handles errors when generate API call fails', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      server.use(
+        http.post('**/generate/alt_text', () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
+
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+
+      const generateButton = screen.getByTestId('generate-button')
+      fireEvent.click(generateButton)
+
+      expect(screen.getByTestId('loading-label')).toHaveTextContent('Generating alt text...')
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-label')).not.toBeInTheDocument()
+      })
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error generating text input:',
+        expect.any(Error),
+      )
+
+      expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
+
+      consoleErrorSpy.mockRestore()
+    })
+
+    describe('AI generation feature flag', () => {
+      it('shows generate button when feature flag is enabled', () => {
+        ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
+          const state = {isAiAltTextGenerationEnabled: true}
+          return selector(state)
+        })
+
+        render(<CheckboxTextInput {...withGenerateFix()} />)
+
+        expect(screen.getByTestId('generate-button')).toBeInTheDocument()
+      })
+
+      it('hides generate button when feature flag is disabled', () => {
+        ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
+          const state = {isAiAltTextGenerationEnabled: false}
+          return selector(state)
+        })
+
+        render(<CheckboxTextInput {...withGenerateFix()} />)
+
+        expect(screen.queryByTestId('generate-button')).not.toBeInTheDocument()
+      })
+    })
   })
 
   describe('onValidationChange callback', () => {
@@ -424,10 +449,7 @@ describe('CheckboxTextInput', () => {
       )
 
       await waitFor(() => {
-        expect(onValidationChange).toHaveBeenCalledWith(
-          false,
-          altTextMaxLengthMessage(100),
-        )
+        expect(onValidationChange).toHaveBeenCalledWith(false, altTextMaxLengthMessage(100))
       })
     })
 
@@ -462,56 +484,6 @@ describe('CheckboxTextInput', () => {
     })
   })
 
-  describe('AI generation feature flag', () => {
-    it('shows generate button when feature flag is enabled', () => {
-      ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-        const state = {isAiAltTextGenerationEnabled: true}
-        return selector(state)
-      })
-
-      const propsWithGenerateOption = {
-        ...defaultProps,
-        issue: {
-          ...defaultProps.issue,
-          form: {
-            ...defaultProps.issue.form,
-            canGenerateFix: true,
-            isCanvasImage: true,
-            generateButtonLabel: 'Generate Alt Text',
-          },
-        },
-      }
-
-      render(<CheckboxTextInput {...propsWithGenerateOption} />)
-
-      expect(screen.getByTestId('generate-alt-text-button')).toBeInTheDocument()
-    })
-
-    it('hides generate button when feature flag is disabled', () => {
-      ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-        const state = {isAiAltTextGenerationEnabled: false}
-        return selector(state)
-      })
-
-      const propsWithGenerateOption = {
-        ...defaultProps,
-        issue: {
-          ...defaultProps.issue,
-          form: {
-            ...defaultProps.issue.form,
-            canGenerateFix: true,
-            isCanvasImage: true,
-            generateButtonLabel: 'Generate Alt Text',
-          },
-        },
-      }
-
-      render(<CheckboxTextInput {...propsWithGenerateOption} />)
-
-      expect(screen.queryByTestId('generate-alt-text-button')).not.toBeInTheDocument()
-    })
-  })
-
   describe('isDisabled prop', () => {
     it('disables textarea when isDisabled is true', () => {
       render(<CheckboxTextInput {...defaultProps} isDisabled={true} />)
@@ -530,14 +502,13 @@ describe('CheckboxTextInput', () => {
             ...defaultProps.issue.form,
             canGenerateFix: true,
             isCanvasImage: true,
-            generateButtonLabel: 'Generate Alt Text',
           },
         },
       }
 
       render(<CheckboxTextInput {...propsWithGenerate} />)
 
-      expect(screen.queryByTestId('generate-alt-text-button')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('generate-button')).not.toBeInTheDocument()
     })
 
     it('shows generate button when isDisabled is false', () => {
@@ -550,14 +521,13 @@ describe('CheckboxTextInput', () => {
             ...defaultProps.issue.form,
             canGenerateFix: true,
             isCanvasImage: true,
-            generateButtonLabel: 'Generate Alt Text',
           },
         },
       }
 
       render(<CheckboxTextInput {...propsWithGenerate} />)
 
-      expect(screen.getByTestId('generate-alt-text-button')).toBeInTheDocument()
+      expect(screen.getByTestId('generate-button')).toBeInTheDocument()
     })
   })
 })
