@@ -223,7 +223,7 @@ module Api::V1::Course
         version_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
         result = {
           version: version.number,
-          syllabus_body: api_user_content(version_data["syllabus_body"], course),
+          syllabus_body: api_user_content(version_data["syllabus_body"], course, location: "course_syllabus_#{course.id}"),
           created_at: version.created_at,
           updated_at: version_data["updated_at"]
         }
