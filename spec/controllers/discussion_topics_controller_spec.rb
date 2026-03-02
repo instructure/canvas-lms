@@ -1100,6 +1100,18 @@ describe DiscussionTopicsController do
         expect(response.body).to match(/.+enrollment.+\.atom/)
         expect(response.body).to include("Discussion Atom Feed")
       end
+
+      context "embed param" do
+        it "adds mobile-embed body class when embed=true" do
+          get "show", params: { course_id: course.id, id: discussion.id, embed: "true" }
+          expect(assigns(:body_classes)).to include("mobile-embed")
+        end
+
+        it "does not add mobile-embed body class without embed param" do
+          subject
+          expect(assigns(:body_classes)).not_to include("mobile-embed")
+        end
+      end
     end
 
     context "section specific announcements" do
