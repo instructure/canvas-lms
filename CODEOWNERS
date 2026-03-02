@@ -557,8 +557,6 @@
 /ui/features/collaborations/ @instructure/vice
 /ui/features/conferences/ @instructure/vice
 /ui/features/conversations/ @instructure/vice
-/ui/features/discussion_topic/ @instructure/vice
-/ui/features/discussion_topic_edit/ @instructure/vice
 /ui/features/discussion_topic_edit_v2/ @instructure/vice
 /ui/features/discussion_topic_insights/ @instructure/vice
 /ui/features/discussion_topics_index/ @instructure/vice

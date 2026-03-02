@@ -99,7 +99,6 @@ const featureBundles: {
   developer_keys_v2: () => import('./features/developer_keys_v2/index'),
   lti_registrations: () => import('./features/lti_registrations/index'),
   discussion_topic_edit_v2: () => import('./features/discussion_topic_edit_v2/index'),
-  discussion_topic_edit: () => import('./features/discussion_topic_edit/index'),
   discussion_topic_insights: () => import('./features/discussion_topic_insights/index'),
   discussion_topics_index: () => import('./features/discussion_topics_index/index'),
   discussion_topics_post: () => import('./features/discussion_topics_post/index'),
