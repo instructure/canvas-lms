@@ -254,6 +254,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
           props.studioOptions = {
             resizable: true,
             convertibleToLink: true,
+            isImprovedEmbed: true,
             embedOptions: {
               enableMediaDownload: false,
               enableTranscriptDownload: false,

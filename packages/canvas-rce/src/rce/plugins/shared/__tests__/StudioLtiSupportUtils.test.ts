@@ -23,6 +23,7 @@ import {
   displayStyleFrom,
   findStudioLtiIframeFromSelection,
   handleBeforeObjectSelected,
+  isImprovedStudioEmbed,
   isStudioEmbeddedMedia,
   isValidDimension,
   isValidEmbedType,
@@ -92,6 +93,24 @@ describe('displayStyleFrom', () => {
   })
 })
 
+describe('isImprovedStudioEmbed', () => {
+  ;[
+    ['thumbnail_embed', true],
+    ['learn_embed', true],
+    ['collaboration_embed', true],
+    ['media/123', false],
+    [null, false],
+  ].forEach(([embedType, expected]) => {
+    it(`returns ${expected} for src containing "${embedType}"`, () => {
+      const el = document.createElement('span')
+      if (embedType) {
+        el.setAttribute('data-mce-p-src', `https://studio.example.com/${embedType}`)
+      }
+      expect(isImprovedStudioEmbed(el)).toBe(expected)
+    })
+  })
+})
+
 describe('isStudioEmbeddedMedia', () => {
   it('returns false if there is no parent element', () => {
     const element = document.createElement('iframe')
@@ -124,6 +143,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(null)).toEqual({
       resizable: false,
       convertibleToLink: false,
+      isImprovedEmbed: false,
       embedOptions: {},
     })
   })
@@ -133,6 +153,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: false,
       convertibleToLink: false,
+      isImprovedEmbed: false,
       embedOptions: {},
     })
   })
@@ -144,6 +165,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: false,
       convertibleToLink: false,
+      isImprovedEmbed: false,
       embedOptions: {},
     })
   })
@@ -155,6 +177,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: true,
       convertibleToLink: false,
+      isImprovedEmbed: false,
       embedOptions: {},
     })
   })
@@ -166,6 +189,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: false,
       convertibleToLink: true,
+      isImprovedEmbed: false,
       embedOptions: {},
     })
   })
@@ -177,6 +201,7 @@ describe('parseStudioOptions', () => {
     expect(parseStudioOptions(element)).toEqual({
       resizable: true,
       convertibleToLink: true,
+      isImprovedEmbed: false,
       embedOptions: {},
     })
   })
@@ -203,6 +228,18 @@ describe('parseStudioOptions', () => {
     )
     const result = parseStudioOptions(element)
     expect(result.embedOptions.showRollingTranscript).toBe(false)
+  })
+
+  it('sets isImprovedEmbed true when src contains an embed type', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-src', 'https://studio.example.com/learn_embed/123')
+    expect(parseStudioOptions(element).isImprovedEmbed).toBe(true)
+  })
+
+  it('sets isImprovedEmbed false for a bare embed src', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-src', 'https://studio.example.com/media/123')
+    expect(parseStudioOptions(element).isImprovedEmbed).toBe(false)
   })
 })
 
