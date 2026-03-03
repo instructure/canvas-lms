@@ -344,28 +344,6 @@ describe ExternalToolsController do
           ]
         end
 
-        context "with lti_deployment_id_in_login_request FF off" do
-          before do
-            @course.root_account.disable_feature!(:lti_deployment_id_in_login_request)
-          end
-
-          it "creates a login message that includes deployment_id" do
-            subject
-            expect(assigns[:lti_launch].params.keys).to match_array %w[
-              iss
-              login_hint
-              target_link_uri
-              lti_message_hint
-              canvas_region
-              canvas_environment
-              client_id
-              deployment_id
-              lti_deployment_id
-              lti_storage_target
-            ]
-          end
-        end
-
         it 'sets the "login_hint" to the current user lti id' do
           subject
           expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::V1p1::Asset.opaque_identifier_for(@teacher)

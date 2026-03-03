@@ -232,47 +232,6 @@ describe UsersController do
         ]
       end
 
-      context "when lti_deployment_id_in_login_request FF is off" do
-        let(:oidc_initiation_url) { "http://lti13testtool.docker/blti_launch" }
-        let(:tool) do
-          reg = lti_registration_with_tool(
-            account:,
-            configuration_params: {
-              oidc_initiation_url:,
-              placements: [
-                {
-                  placement: "user_navigation",
-                  enabled: true,
-                  text: "example",
-                }
-              ]
-            }
-          )
-          reg.deployments.first
-        end
-
-        before do
-          user.account.root_account.disable_feature!(:lti_deployment_id_in_login_request)
-          allow(SecureRandom).to receive(:hex).and_return(verifier)
-          get :external_tool, params: { id: tool.id, user_id: user.id }
-        end
-
-        it "creates a login message" do
-          expect(assigns[:lti_launch].params.keys).to match_array %w[
-            iss
-            login_hint
-            target_link_uri
-            lti_message_hint
-            canvas_region
-            canvas_environment
-            client_id
-            deployment_id
-            lti_deployment_id
-            lti_storage_target
-          ]
-        end
-      end
-
       it 'sets the "login_hint" to the current user lti id' do
         expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::V1p1::Asset.opaque_identifier_for(user)
       end
