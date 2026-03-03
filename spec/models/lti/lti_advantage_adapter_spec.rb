@@ -218,27 +218,6 @@ describe Lti::LtiAdvantageAdapter do
       ]
     end
 
-    context "when lti_deployment_id_in_login_request FF is off" do
-      before do
-        course.root_account.disable_feature!(:lti_deployment_id_in_login_request)
-      end
-
-      it "creates a login message" do
-        expect(login_message.keys).to match_array %w[
-          iss
-          login_hint
-          target_link_uri
-          lti_message_hint
-          canvas_region
-          canvas_environment
-          client_id
-          deployment_id
-          lti_deployment_id
-          lti_storage_target
-        ]
-      end
-    end
-
     context "lti_storage_target parameter" do
       context "when include_storage_target parameter is not provided" do
         let(:adapter) do
@@ -334,17 +313,6 @@ describe Lti::LtiAdvantageAdapter do
 
     it "includes the lti_deployment_id" do
       expect(login_message["lti_deployment_id"]).to eq tool.deployment_id
-    end
-
-    context "when the lti_deployment_id_in_login_request FF is off" do
-      before do
-        course.root_account.disable_feature!(:lti_deployment_id_in_login_request)
-      end
-
-      it "includes both the lti_deployment_id and deployment_id" do
-        expect(login_message["lti_deployment_id"]).to eq tool.deployment_id
-        expect(login_message["deployment_id"]).to eq tool.deployment_id
-      end
     end
 
     context "when the user has a past lti context id" do
