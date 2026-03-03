@@ -106,7 +106,7 @@ de:
       previous: k
       show_assign: f
   AssignmentListItemView: 
-    complete: Fertigstellen
+    complete: Vollständig
     grade_gpa_scale_screenreader: "Note: %{grade}"
     grade_letter_grade_screenreader: "Note: %{grade}"
     grade_pass_fail_screenreader: "Note: %{grade}"
@@ -8574,7 +8574,7 @@ de:
   compiling_c29a644f: Kompilieren
   compiling_progress_968a3ebb: "Kompilieren (%{progress}%)"
   complete_1_item_f840fb10: "1 Element abschließen"
-  complete_4f4efbc: fertig
+  complete_4f4efbc: Vollständig
   complete_all_7eba5f88: "Alle abschließen"
   complete_all_items_a2473ff0: "Alle Elemente abschließen"
   complete_all_items_e1779257: "Alle Elemente fertigstellen"
@@ -8622,8 +8622,8 @@ de:
   conditional_release_tuning_settings_can_only_accep_d90cd1a3: "Die Tuning-Einstellungen für die bedingte Freigabe können nur eine Priorität akzeptieren"
   conduct_lectures_office_hours_and_student_group_me_13ec766c: |-
       Führen Sie Vorlesungen, Sprechstunden und Studierendengruppensitzungen
-            von Ihrem Computer aus durch. Übertragen Sie Audio- und Videodaten in Echtzeit, zeigen Sie Präsentationsfolien
-            , demonstrieren Sie Anwendungen und Online-Ressourcen
+            von Ihrem Computer aus durch. Übertragen Sie Audio- und Videodaten in Echtzeit, zeigen Sie
+            Präsentationsfolien, demonstrieren Sie Anwendungen und Online-Ressourcen
             und vieles mehr.
   conduct_virtual_lectures_virtual_office_hours_and__959d6996: |-
       Durchführen virtueller Vorlesungen und virtueller Sprechstunden und Bildung von Studentengruppen. Übertragen Sie in Echtzeit Audio- und Video-Aufnahmen, teilen Sie Präsentationsfolien,
