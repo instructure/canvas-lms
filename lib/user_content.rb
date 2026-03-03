@@ -275,6 +275,7 @@ module UserContent
       home_link = url.match(%r{(/courses/#{Api::SHARDID_REGEX}/?(?=\b|[^/\w]|$))}o)
       url = url.sub(%r{/$}, "") if home_link
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
+      return url if context_type == "users" && type == "external_tools"
       return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && !FILES_LOCATIONS_PREFIXES.include?(context_type)
 
       # wiki pages can have slugs instead of ids, but nothing else can.
