@@ -21,8 +21,6 @@
 body.native-new-quizzes {
   .ic-Layout-wrapper {
     max-width: 100%;
-    overflow: hidden;
-    height: 100vh;
   }
 
   .ic-Layout-columns {
@@ -35,7 +33,6 @@ body.native-new-quizzes {
   .ic-app-main-content {
     display: flex;
     flex: 1;
-    overflow: auto;
   }
 
   .ic-Layout-contentWrapper {
@@ -63,7 +60,7 @@ body.native-new-quizzes {
     display: flex;
     flex: 1;
     flex-direction: column;
-    overflow: hidden;
+    overflow: auto;
   }
 
   #new-quizzes-root > #root {
