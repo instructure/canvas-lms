@@ -21,7 +21,6 @@ import {IconAttachMediaLine} from '@instructure/ui-icons'
 import {Mutation} from '@apollo/client/react/components'
 import React, {Component} from 'react'
 import {bool} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import UploadMedia from '@instructure/canvas-media'
 
@@ -41,7 +40,6 @@ import {
   SelectStrings,
 } from '@canvas/upload-media-translations'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
-import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignments_2')
 
@@ -67,10 +65,11 @@ export default class CommentTextArea extends Component {
 
   componentDidUpdate() {
     if (this.state.commentTextErrors.length > 0 && this.state.bottomValue === '0px') {
-      this.setState({
-        bottomValue:
-          this._commentTextBox.ref.children[0].lastChild.getBoundingClientRect().height + 'px',
-      })
+      const height =
+        this._commentTextBox?.ref?.lastElementChild?.lastChild?.getBoundingClientRect()?.height || 0
+      if (height > 0) {
+        this.setState({bottomValue: height + 'px'})
+      }
     } else if (this.state.commentTextErrors.length === 0 && this.state.bottomValue !== '0px') {
       this.setState({bottomValue: '0px'})
     }
@@ -288,12 +287,9 @@ export default class CommentTextArea extends Component {
         {createSubmissionComment => (
           <div>
             <div id="textarea-emoji-container">
-              <Text as="label" htmlFor="comment-textarea">
-                {I18n.t('Comment')}
-              </Text>
               <TextArea
                 id="comment-textarea"
-                label={<ScreenReaderContent>{I18n.t('Comment input box')}</ScreenReaderContent>}
+                label={I18n.t('Comment')}
                 onChange={this.onTextChange}
                 placeholder={I18n.t('Submit a Comment')}
                 ref={el => {

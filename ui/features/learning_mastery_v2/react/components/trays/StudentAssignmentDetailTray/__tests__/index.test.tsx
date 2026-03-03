@@ -349,7 +349,7 @@ describe('StudentAssignmentDetailTray', () => {
       renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       // Wait for GraphQL queries to resolve
       await screen.findByText('Comment', {}, {timeout: 3000})
-      expect(screen.getByLabelText('Comment input box')).toBeInTheDocument()
+      expect(screen.getByLabelText('Comment')).toBeInTheDocument()
     })
 
     it('shows loading spinner while fetching comments', () => {
@@ -359,7 +359,7 @@ describe('StudentAssignmentDetailTray', () => {
 
     it('displays comment input area after loading', async () => {
       renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
-      const commentInput = await screen.findByLabelText('Comment input box', {}, {timeout: 3000})
+      const commentInput = await screen.findByLabelText('Comment', {}, {timeout: 3000})
       expect(commentInput).toBeInTheDocument()
     })
 
@@ -372,7 +372,7 @@ describe('StudentAssignmentDetailTray', () => {
     it('does not show placeholder graphics when there are no comments', async () => {
       renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
       // Wait for loading to complete
-      await screen.findByLabelText('Comment input box', {}, {timeout: 3000})
+      await screen.findByLabelText('Comment', {}, {timeout: 3000})
       // Should not show the default placeholder text
       expect(screen.queryByText(/this is where you can leave a comment/i)).not.toBeInTheDocument()
     })
@@ -448,7 +448,7 @@ describe('StudentAssignmentDetailTray', () => {
 
     it('hides file upload and media upload buttons via CSS', async () => {
       renderWithWrapper(<StudentAssignmentDetailTray {...defaultProps} />)
-      await screen.findByLabelText('Comment input box', {}, {timeout: 3000})
+      await screen.findByLabelText('Comment', {}, {timeout: 3000})
 
       // Buttons exist in DOM but should be hidden via CSS
       const fileButton = screen.queryByTestId('file-upload-button')
