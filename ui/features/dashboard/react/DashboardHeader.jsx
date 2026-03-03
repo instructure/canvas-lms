@@ -381,7 +381,6 @@ class DashboardHeader extends React.Component {
                 />
               </div>
               {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}
-              {ENV.add_oak_mount_point && <div id="oak-mount-point"></div>}
             </div>
           </Flex.Item>
         </Flex>

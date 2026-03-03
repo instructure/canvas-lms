@@ -17,13 +17,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module OakHelper
-  def add_oak_bundle?
+module IgniteAgentHelper
+  ALLOWED_PAGES = begin
+    config_path = Rails.root.join("config/ignite_agent_pages.yml")
+    config = YAML.load_file(config_path)
+    config["allowed_pages"] || []
+  end.freeze
+
+  def add_ignite_agent_bundle?
     return false if params[:preview] == "true"
-    return false if session[:pending_otp]
-    return false if request.path.start_with?("/login")
+    return false if controller_name == "oauth2_provider"
     return false unless @current_user&.feature_enabled?(:oak_for_users)
 
     true
+  end
+
+  def show_ignite_agent_button?
+    return false if @assignment&.quiz_lti? # hide it for New Quizzes
+
+    ALLOWED_PAGES.include?("#{controller_path}##{action_name}")
   end
 end

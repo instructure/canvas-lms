@@ -1,0 +1,91 @@
+# Configuration for pages where the IgniteAI Agent button should be visible
+# Format: "controller_path#action_name"
+
+allowed_pages:
+  # Account / Notifications
+  - "profile#communication"
+  # Account / Global Announcements
+  - "account_notifications#render_past_global_announcements"
+  # Admin / {account} / Courses
+  - "accounts#show"
+  # Admin / {account} / People
+  - "accounts#users"
+  # Admin / {account} / Statistics
+  - "accounts#statistics"
+  # Admin / {account} / Reports
+  - "accounts#reports"
+  # Admin / {account} / Permissions
+  - "role_overrides#index"
+  # Admin / {account} / Outcomes
+  - "outcomes#index"
+  # Admin / {account} / Grading
+  - "account_grading_settings#index"
+  # Admin / {account} / Question Banks
+  - "question_banks#index"
+  # Admin / {account} / Sub Accounts
+  - "sub_accounts#index"
+  # Admin / {account} / Account Calendars
+  - "accounts#account_calendar_settings"
+  # Admin / {account} / Terms
+  - "terms_api#index"
+  # Admin / {account} / Authentication
+  - "authentication_providers#index"
+  # Admin / {account} / SIS Import
+  - "accounts#sis_import"
+  # Admin / {account} / Themes
+  - "brand_configs#index"
+  # Admin / {account} / Developer Keys
+  - "developer_keys#index"
+  # Admin / {account} / Analytics Hub
+  - "analytics_hub#show"
+  # Admin / {account} / Apps
+  - "lti/registrations#index"
+  # Admin / {account} / Admin Tools
+  - "accounts#admin_tools"
+  # Admin / {account} / ePortfolio Moderation
+  - "accounts#eportfolio_moderation"
+  # Admin / {account} / Settings
+  - "accounts#settings"
+  # Admin / {account} / Domain Lookups
+  - "accounts#domain_lookups"
+  # Dashboard
+  - "users#user_dashboard"
+  # Course / Home
+  - "courses#show"
+  # Course / Announcements
+  - "announcements#index"
+  # Course / Assignments
+  - "assignments#index"
+  # Course / Discussions
+  - "discussion_topics#index"
+  # Course / Grades
+  - "gradebooks#show"
+  # Course / People
+  - "context#roster"
+  # Course / Pages
+  - "wiki_pages#front_page"
+  - "wiki_pages#index"
+  # Course / Files
+  - "files#index"
+  # Course / Syllabus
+  - "assignments#syllabus"
+  # Course / Rubrics
+  - "rubrics#index"
+  # Course / Quizzes
+  - "quizzes/quizzes#index"
+  # Course / Modules
+  - "context_modules#index"
+  # Course / Settings
+  - "courses#settings"
+  # Page Detail
+  - "wiki_pages#show"
+  # Assignment Detail
+  - "assignments#show"
+  # Quiz Detail
+  - "quizzes/quizzes#show"
+  # Discussion Detail
+  - "discussion_topics#show"
+  # Calendar
+  - "calendars#show"
+  # Inbox
+  - "conversations#index"

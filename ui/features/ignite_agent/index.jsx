@@ -24,53 +24,44 @@ import {Portal} from '@instructure/ui-portal'
 import ready from '@instructure/ready'
 import {FallbackChatOverlay} from './FallbackChatOverlay'
 
+// Define constants for DOM element IDs
+const AGENT_CONTAINER_ID = 'ignite-agent-root'
+const CHAT_OVERLAY_CONTAINER_ID = 'ignite-agent-chat-overlay-container'
+
 /**
  * Main IgniteAgent component that auto-loads the agent
  */
-function IgniteAgent() {
+function IgniteAgent({chatOverlayMountPoint}) {
   const [error, setError] = useState(null)
-  const errorOverlayMountRef = useRef(null)
+  const chatOverlayRef = useRef(chatOverlayMountPoint)
 
   useEffect(() => {
-    // Create an error overlay mount point
-    const overlayMount = document.createElement('div')
-    overlayMount.id = 'ignite-agent-error-overlay'
-    document.body.appendChild(overlayMount)
-    errorOverlayMountRef.current = overlayMount
-
     loadAgent()
 
     return () => {
-      if (errorOverlayMountRef.current) {
-        errorOverlayMountRef.current.remove()
+      if (chatOverlayRef.current) {
+        chatOverlayRef.current.remove()
       }
     }
   }, [])
 
-  const renderToMountPoint = (module, mountPointId, props) => {
-    const mountPoint = document.getElementById(mountPointId)
-    if (mountPoint) {
-      module.render(mountPoint, props)
-      console.log(`[Ignite Agent] Rendered to #${mountPointId}`)
-    }
-  }
-
   const loadAgent = async () => {
-    try {
-      console.log('[Ignite Agent] Loading remote module...')
-      const module = await import('igniteagent/appInjector')
-      console.log('[Ignite Agent] Remote module loaded successfully')
+    console.log('[Ignite Agent] Loading remote module...')
 
-      if (typeof module.render !== 'function') {
+    try {
+      console.log("[Ignite Agent] Importing remote 'igniteagent/appInjector'...")
+      const module = await import('igniteagent/appInjector')
+      console.log('[Ignite Agent] Remote module loaded successfully:', module.default)
+
+      if (typeof module.render === 'function') {
+        const props = {hostTheme: getCurrentTheme()}
+        module.render(chatOverlayRef.current, props)
+        console.log('[Ignite Agent] Remote module rendered successfully')
+      } else {
         const renderError = new Error('Remote module does not have a render function')
         captureException(renderError)
         setError(renderError)
-        return
       }
-
-      const props = {hostTheme: getCurrentTheme()}
-      renderToMountPoint(module, 'oak-mount-point', props)
-      renderToMountPoint(module, 'oak-mobile-mount-point', props)
     } catch (loadError) {
       console.error('Failed to load Ignite Agent remote module:', loadError)
       captureException(loadError)
@@ -80,13 +71,13 @@ function IgniteAgent() {
 
   const handleCloseError = () => {
     setError(null)
-    if (errorOverlayMountRef.current) {
-      errorOverlayMountRef.current.innerHTML = ''
+    if (chatOverlayRef.current) {
+      chatOverlayRef.current.innerHTML = ''
     }
   }
 
   return (
-    <Portal mountPoint={errorOverlayMountRef.current} open={error !== null}>
+    <Portal mountPoint={chatOverlayRef.current} open={error !== null}>
       <FallbackChatOverlay error={error} onClose={handleCloseError} />
     </Portal>
   )
@@ -96,13 +87,24 @@ function IgniteAgent() {
  * Initialize the Ignite Agent
  */
 function initIgniteAgent() {
-  // Create a container for the controller component
-  const container = document.createElement('div')
-  container.id = 'ignite-agent-controller'
-  document.body.appendChild(container)
+  // Find or create mount point for the main component
+  let agentMountPoint = document.getElementById(AGENT_CONTAINER_ID)
+  if (!agentMountPoint) {
+    agentMountPoint = document.createElement('div')
+    agentMountPoint.id = AGENT_CONTAINER_ID
+    document.body.appendChild(agentMountPoint)
+  }
 
-  render(<IgniteAgent />, container)
-  console.log('[Ignite Agent] Controller initialized')
+  // Find or create mount point for the chat overlay
+  let chatOverlayMountPoint = document.getElementById(CHAT_OVERLAY_CONTAINER_ID)
+  if (!chatOverlayMountPoint) {
+    chatOverlayMountPoint = document.createElement('div')
+    chatOverlayMountPoint.id = CHAT_OVERLAY_CONTAINER_ID
+    document.body.appendChild(chatOverlayMountPoint)
+  }
+
+  render(<IgniteAgent chatOverlayMountPoint={chatOverlayMountPoint} />, agentMountPoint)
+  console.log('[Ignite Agent] Component initialized with auto-load.')
 }
 
 // Start the initialization process
