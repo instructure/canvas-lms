@@ -21,22 +21,15 @@ import React from 'react'
 import RCEGlobals from '../../../../../rce/RCEGlobals'
 import RceApiSource from '../../../../../rcs/api'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
-import {HttpResponse, http} from 'msw'
-import {setupServer} from 'msw/node'
 
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 
 jest.useFakeTimers()
-const server = setupServer()
 
 describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   let props
   let tray
-
-  beforeAll(() => server.listen({onUnhandledRequest: 'error'}))
-
-  afterAll(() => server.close())
 
   beforeEach(() => {
     createLiveRegion()
@@ -434,26 +427,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
           fireEvent.click(tray.$manualCaptionsLanguageSelect)
           fireEvent.click(screen.getByText('Catalan'))
           fireEvent.click(tray.$manualCaptionsCancelButton)
-          expectNoTooltip()
-        })
-
-        it.skip('if changes are applied', async () => {
-          server.use(
-            http.put('**/api/media_objects/*/media_tracks', () => {
-              console.log('darova')
-              return HttpResponse.json({data: 'success'})
-            }),
-          )
-
-          await renderLoadedComponent()
-
-          fireEvent.click(tray.$manualCaptionsAddNewButton)
-          fireEvent.click(tray.$manualCaptionsLanguageSelect)
-          fireEvent.click(screen.getByText('Catalan'))
-          fireEvent.change(tray.$manualCaptionsFileInput, {
-            target: {files: [{name: 'auto-generated-en.vtt'}]},
-          })
-          fireEvent.click(tray.$manualCaptionsUploadButton)
           expectNoTooltip()
         })
       })
