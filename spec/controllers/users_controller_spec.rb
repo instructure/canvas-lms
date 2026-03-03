@@ -919,7 +919,7 @@ describe UsersController do
         expect(CommunicationChannel.last.confirmation_redirect).to be_nil
       end
 
-      it "creates a registered user if the skip_registration flag is passed in" do
+      it "ignores skip_registration flag for unauthenticated self-registering users" do
         post("create", params: {
                pseudonym: { unique_id: "jacob@instructure.com" },
                user: { name: "Jacob Fugal", terms_of_use: "1", skip_registration: "1" }
@@ -928,12 +928,26 @@ describe UsersController do
 
         p = Pseudonym.where(unique_id: "jacob@instructure.com").first
         expect(p).to be_active
-        expect(p.user).to be_registered
+        expect(p.user).to be_pre_registered
         expect(p.user.name).to eq "Jacob Fugal"
         expect(p.user.communication_channels.length).to eq 1
         expect(p.user.communication_channels.first).to be_unconfirmed
         expect(p.user.communication_channels.first.path).to eq "jacob@instructure.com"
         expect(p.user.associated_accounts).to eq [Account.default]
+      end
+
+      it "allows skip_registration for admin users with manage_user_logins" do
+        account_admin_user(account: Account.default)
+        user_session(@admin)
+        post("create", params: {
+               pseudonym: { unique_id: "jacob@instructure.com" },
+               user: { name: "Jacob Fugal", skip_registration: "1" }
+             })
+        expect(response).to be_successful
+
+        p = Pseudonym.where(unique_id: "jacob@instructure.com").first
+        expect(p).to be_active
+        expect(p.user).to be_registered
       end
 
       it "complains about conflicting unique_ids" do
