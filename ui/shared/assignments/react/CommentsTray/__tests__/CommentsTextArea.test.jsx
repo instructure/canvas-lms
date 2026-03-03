@@ -381,6 +381,17 @@ describe('CommentTextArea', () => {
     expect(labelElement.getAttribute('for')).toBe(textArea.getAttribute('id'))
   })
 
+  it('does not have a separate screen-reader-only label on the comment textarea', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {queryByText} = render(
+      <MockedProvider>
+        <CommentTextArea {...props} />
+      </MockedProvider>,
+    )
+
+    expect(queryByText('Comment input box')).not.toBeInTheDocument()
+  })
+
   it.skip('notifies users when a submission comments with files is sent', async () => {
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
     uploadFileModule.submissionCommentAttachmentsUpload = () => [
