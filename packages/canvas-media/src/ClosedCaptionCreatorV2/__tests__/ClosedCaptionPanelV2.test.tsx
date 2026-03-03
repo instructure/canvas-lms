@@ -497,9 +497,13 @@ describe('<ClosedCaptionPanelV2 />', () => {
       // Click retry
       fireEvent.click(screen.getByText('Retry German'))
 
-      // Should succeed on second attempt
-      await screen.findByText('Captions have been added for German')
-      expect(screen.queryByText('Upload Failed')).not.toBeInTheDocument()
+      // Should succeed on second attempt — use waitFor so both conditions
+      // must be true simultaneously, avoiding races where the live region
+      // is briefly cleared between the old and new announcement.
+      await waitFor(() => {
+        expect(screen.queryByText('Captions have been added for German')).toBeInTheDocument()
+        expect(screen.queryByText('Upload Failed')).not.toBeInTheDocument()
+      })
     })
 
     it('retrying one caption does not clear the failed state of another caption', async () => {
