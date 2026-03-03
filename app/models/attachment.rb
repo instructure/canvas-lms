@@ -969,6 +969,16 @@ class Attachment < ActiveRecord::Base
     true
   end
 
+  def kaltura_manifest_file?
+    return false unless kaltura_media?
+
+    if stored_locally?
+      File.read(full_filename, 5) == "<?xml"
+    else # either instfs or s3
+      CanvasHttp.get(public_url(internal: true), { "Range" => "bytes=0-4" }).read_body == "<?xml"
+    end
+  end
+
   def downloadable?
     instfs_hosted? || !!authenticated_s3_url
   rescue

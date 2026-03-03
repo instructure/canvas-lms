@@ -3592,6 +3592,54 @@ describe Attachment do
     end
   end
 
+  describe "kaltura_manifest_file?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    it "returns false when not a kaltura media file" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
+      attachment = attachment_model(context: @course, media_entry_id: "0_feedbeef")
+      expect(attachment.kaltura_manifest_file?).to be false
+    end
+
+    it "returns false when HTTP response is not XML" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      media_object = @course.media_objects.create!(
+        media_id: "0_feedbeef",
+        attachment: attachment_model(context: @course)
+      )
+      attachment = attachment_model(context: @course, media_entry_id: media_object.media_id)
+      allow(attachment).to receive_messages(
+        stored_locally?: false,
+        public_url: "http://example.com/video.mp4"
+      )
+      http_response = instance_double(Net::HTTPPartialContent, read_body: "\x00\x00\x00\x1Cf")
+      allow(CanvasHttp).to receive(:get)
+        .with("http://example.com/video.mp4", { "Range" => "bytes=0-4" })
+        .and_return(http_response)
+      expect(attachment.kaltura_manifest_file?).to be false
+    end
+
+    it "returns true when HTTP response starts with <?xml" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      media_object = @course.media_objects.create!(
+        media_id: "0_feedbeef",
+        attachment: attachment_model(context: @course)
+      )
+      attachment = attachment_model(context: @course, media_entry_id: media_object.media_id)
+      allow(attachment).to receive_messages(
+        stored_locally?: false,
+        public_url: "http://example.com/manifest.mpd"
+      )
+      http_response = instance_double(Net::HTTPPartialContent, read_body: "<?xml")
+      allow(CanvasHttp).to receive(:get)
+        .with("http://example.com/manifest.mpd", { "Range" => "bytes=0-4" })
+        .and_return(http_response)
+      expect(attachment.kaltura_manifest_file?).to be true
+    end
+  end
+
   describe "used_in_submission_history?" do
     before do
       course_with_student
