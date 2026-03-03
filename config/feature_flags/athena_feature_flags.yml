@@ -1,0 +1,7 @@
+athena_learning_agent_button:
+  applies_to: Course
+  state: hidden
+  shadow: true
+  display_name: "Learning Agent Button"
+  description: |-
+    Displays a button to launch the Learning Agent in a separate tab.
