@@ -19,6 +19,7 @@
 import tinymce, {Editor, Events} from 'tinymce'
 import {
   isStudioEmbeddedMedia,
+  isImprovedStudioEmbed,
   handleBeforeObjectSelected,
   notifyStudioEmbedTypeChange,
   updateStudioIframeDimensions,
@@ -55,6 +56,12 @@ const handleStudioMessage = (e: MessageEvent) => {
 const isEmbedButtonActive = (buttonName: string, currentSelectedElement: Element) => {
   return (currentSelectedElement.getAttribute('data-mce-p-src') || '').includes(buttonName)
 }
+
+const isImprovedStudioEmbeddedMedia = (element: Element): boolean =>
+  isStudioEmbeddedMedia(element) && isImprovedStudioEmbed(element)
+
+const isNonImprovedStudioEmbeddedMedia = (element: Element): boolean =>
+  isStudioEmbeddedMedia(element) && !isImprovedStudioEmbed(element)
 
 tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Editor) {
   if (RCEGlobals.getFeatures().rce_studio_embed_improvements) {
@@ -144,15 +151,23 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       text: formatMessage('Collab'),
     })
 
+    const openStudioTray = () => {
+      if (!studioTrayController.isOpen) {
+        studioTrayController.showTrayForEditor(ed)
+        ed.focus()
+      }
+    }
+
     ed.ui.registry.addButton('studio-media-options', {
-      onAction() {
-        if (!studioTrayController.isOpen) {
-          studioTrayController.showTrayForEditor(ed)
-          ed.focus()
-        }
-      },
+      onAction: openStudioTray,
       icon: 'options-icon',
       text: formatMessage('Options'),
+    })
+
+    ed.ui.registry.addButton('studio-media-options-basic', {
+      onAction: openStudioTray,
+      icon: 'options-icon',
+      text: formatMessage('Studio Media Options'),
     })
 
     ed.ui.registry.addButton('remove-studio-media', {
@@ -180,7 +195,14 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       items:
         'thumbnail-view | learn-view | collab-view | studio-media-options | remove-studio-media',
       position: 'node',
-      predicate: isStudioEmbeddedMedia,
+      predicate: isImprovedStudioEmbeddedMedia,
+      scope: 'node',
+    })
+
+    ed.ui.registry.addContextToolbar('studio-basic-toolbar', {
+      items: 'studio-media-options-basic | remove-studio-media',
+      position: 'node',
+      predicate: isNonImprovedStudioEmbeddedMedia,
       scope: 'node',
     })
 

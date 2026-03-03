@@ -533,7 +533,7 @@ export default function VideoOptionsTray({
                           </FormFieldGroup>
                         </Flex.Item>
                       )}
-                      {isStudio && isEmbedImprovements ? (
+                      {isStudio && isEmbedImprovements && studioOptions.isImprovedEmbed ? (
                         <Flex.Item padding="small">
                           <CheckboxGroup
                             name="studio-embed-options"

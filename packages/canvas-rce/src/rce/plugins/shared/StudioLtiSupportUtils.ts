@@ -41,11 +41,13 @@ export interface StudioMediaOptionsAttributes {
 export const parsedStudioOptionsPropType = shape({
   resizable: bool.isRequired,
   convertibleToLink: bool.isRequired,
+  isImprovedEmbed: bool.isRequired,
 })
 
 export type ParsedStudioOptions = {
   resizable: boolean
   convertibleToLink: boolean
+  isImprovedEmbed: boolean
   embedOptions: StudioEmbedOptions
 }
 
@@ -98,6 +100,15 @@ export function displayStyleFrom(
     : ''
 }
 
+export function isImprovedStudioEmbed(element: Element): boolean {
+  const src = element.getAttribute('data-mce-p-src') || ''
+  return (
+    src.includes('thumbnail_embed') ||
+    src.includes('learn_embed') ||
+    src.includes('collaboration_embed')
+  )
+}
+
 export function isStudioEmbeddedMedia(element: Element): boolean {
   // Borrowing this structure from isMediaElement in ContentSelection.js
   const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
@@ -118,22 +129,26 @@ export function parseStudioOptions(element: Element | null): ParsedStudioOptions
   if (href) {
     // parse out embed options from url params
     const urlMatch = href.match(/url=([^&]*)$/)
-    const url = new URL(decodeURIComponent(urlMatch ? urlMatch[1] : ''))
-    const params = url.searchParams
+    if (urlMatch) {
+      const url = new URL(decodeURIComponent(urlMatch[1]))
+      const params = url.searchParams
 
-    embedOptions['enableMediaDownload'] = params.get('custom_arc_display_download') === 'true'
-    embedOptions['enableTranscriptDownload'] =
-      params.get('custom_arc_transcript_downloadable') === 'true'
-    embedOptions['showRollingTranscript'] =
+      embedOptions['enableMediaDownload'] = params.get('custom_arc_display_download') === 'true'
+      embedOptions['enableTranscriptDownload'] =
+     
+        params.get('custom_arc_transcript_downloadable') === 'true'
+      embedOptions['showRollingTranscript'] =
       params.get('custom_arc_show_rolling_transcript') === 'true'
-    embedOptions['lockSpeed'] = params.get('custom_arc_lock_speed') === 'true'
-    embedOptions['isExternal'] = params.get('custom_arc_is_external') === 'true'
+    embedOptions['lockSpeed']  = params.get('custom_arc_lock_speed') === 'true'
+      embedOptions['isExternal']  = params.get('custom_arc_is_external') === 'true'
+    }
   }
 
   return {
     resizable: tinymceIframeShim?.getAttribute('data-mce-p-data-studio-resizable') === 'true',
     convertibleToLink:
       tinymceIframeShim?.getAttribute('data-mce-p-data-studio-convertible-to-link') === 'true',
+    isImprovedEmbed: tinymceIframeShim ? isImprovedStudioEmbed(tinymceIframeShim) : false,
     embedOptions,
   }
 }
