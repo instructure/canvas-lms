@@ -28,7 +28,7 @@ describe('<CaptionRow />', () => {
   it('renders uploaded caption row with delete action', () => {
     const onDelete = vi.fn()
     renderComponent({
-      status: 'uploaded',
+      workflow_state: 'ready',
       captionName: 'English Caption',
       onDelete,
     })
@@ -45,7 +45,7 @@ describe('<CaptionRow />', () => {
     const onDelete = vi.fn()
 
     renderComponent({
-      status: 'uploaded',
+      workflow_state: 'ready',
       captionName: 'Spanish Caption',
       onDownload,
       onDelete,
@@ -60,7 +60,7 @@ describe('<CaptionRow />', () => {
 
   it('renders processing state properly displaying text', () => {
     renderComponent({
-      status: 'processing',
+      workflow_state: 'processing',
       captionName: 'French Caption',
     })
 
@@ -72,7 +72,7 @@ describe('<CaptionRow />', () => {
 
   it('renders failed state', () => {
     renderComponent({
-      status: 'failed',
+      workflow_state: 'failed',
       captionName: 'German Caption',
       errorMessage: 'File size too large',
     })
@@ -84,7 +84,7 @@ describe('<CaptionRow />', () => {
   it('failed state: shows retry button and calls onRetry when clicked', () => {
     const onRetry = vi.fn()
     renderComponent({
-      status: 'failed',
+      workflow_state: 'failed',
       captionName: 'Spanish Caption',
       errorMessage: 'Upload Failed',
       onRetry,
@@ -102,7 +102,7 @@ describe('<CaptionRow />', () => {
 
   it('failed state: does not show retry button when onRetry is not provided', () => {
     renderComponent({
-      status: 'failed',
+      workflow_state: 'failed',
       captionName: 'French Caption',
       errorMessage: 'Delete Failed',
     })
@@ -113,7 +113,7 @@ describe('<CaptionRow />', () => {
   it('inherited state: disabled delete action and has proper aria label on delete button', () => {
     const onDelete = vi.fn()
     renderComponent({
-      status: 'uploaded',
+      workflow_state: 'ready',
       captionName: 'Inherited Caption',
       isInherited: true,
       onDelete,

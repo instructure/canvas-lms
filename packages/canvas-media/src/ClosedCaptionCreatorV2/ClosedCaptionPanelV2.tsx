@@ -26,6 +26,7 @@ import {sortedClosedCaptionLanguageList} from '../closedCaptionLanguages'
 import {AutoCaptioning} from './AutoCaptioning'
 import {CaptionCreationModePicker} from './CaptionCreationModePicker'
 import {CaptionRow} from './CaptionRow'
+import {doAsrRequest} from './hooks/doAsrRequest'
 import {useClosedCaptionState} from './hooks/useClosedCaptionState'
 import {useClosedCaptionUpload} from './hooks/useClosedCaptionUpload'
 import {useLanguageFiltering} from './hooks/useLanguageFiltering'
@@ -120,6 +121,12 @@ export function ClosedCaptionPanelV2({
       retryAction = () => upload.deleteCaption(locale)
     } else if (failedOperation === 'upload' && rawFile) {
       retryAction = () => upload.uploadCaption(locale, rawFile)
+    } else if (failedOperation === 'asr') {
+      retryAction = () => {
+        doAsrRequest(uploadConfig, locale).catch(() => {
+          state.handleCaptionUploadFailed(locale, 'asr')
+        })
+      }
     }
 
     if (!retryAction) return undefined
@@ -155,7 +162,7 @@ export function ClosedCaptionPanelV2({
             return (
               <CaptionRow
                 key={subtitle.locale}
-                status={subtitle.status ?? 'uploaded'}
+                workflow_state={subtitle.workflow_state ?? 'ready'}
                 captionName={getCaptionName(subtitle, language)}
                 errorMessage={subtitle.errorMessage}
                 onRetry={getRetryHandler(subtitle)}
@@ -186,7 +193,7 @@ export function ClosedCaptionPanelV2({
           onPrimary={(languageId: string, file: File) => {
             const language = closedCaptionLanguages.find(l => l.id === languageId)
             if (language) {
-              state.handleCaptionProcessing(languageId, file)
+              state.handleCaptionProcessing({locale: languageId, file})
               upload.uploadCaption(languageId, file)
             }
             onDirtyStateChanged?.(false)
@@ -207,25 +214,9 @@ export function ClosedCaptionPanelV2({
           onPrimary={(languageId: string) => {
             const language = asrLanguages.find(l => l.id === languageId)
             if (language) {
-              // Note - this is THROWAWAY code for now - only for simulation
-              state.handleCaptionProcessing(
-                languageId,
-                new File([], `auto-generated-${languageId}.vtt`),
-                true,
-              )
-              // Should be replaced with proper request implementation.
-              // For now simultaneous calls along with handleCaptionProcessing
-              // cause rendering race condition.
-              Promise.resolve(() => {
-                state.handleCaptionUploaded({
-                  locale: languageId,
-                  file: {
-                    name: `auto-generated-${languageId}.vtt`,
-                    url: '#',
-                  },
-                  asr: true,
-                  status: 'uploaded',
-                })
+              state.handleCaptionProcessing({locale: languageId, isAsr: true})
+              doAsrRequest(uploadConfig, languageId).catch(() => {
+                state.handleCaptionUploadFailed(languageId, 'asr')
               })
             }
             onDirtyStateChanged?.(false)

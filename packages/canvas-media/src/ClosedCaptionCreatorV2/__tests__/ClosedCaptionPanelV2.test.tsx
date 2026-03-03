@@ -576,6 +576,54 @@ describe('<ClosedCaptionPanelV2 />', () => {
       expect(screen.getByText('Delete Failed')).toBeInTheDocument()
     })
 
+    it('a11y: announces when ASR caption generation fails', async () => {
+      server.use(
+        http.post('/api/v1/media_objects/*/asr', () =>
+          HttpResponse.json({error: 'ASR failed'}, {status: 500}),
+        ),
+      )
+
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByText('Spanish'))
+      fireEvent.click(screen.getByText('Request'))
+
+      expect(await screen.findByText('Caption generation failed')).toBeInTheDocument()
+      await screen.findByText('Spanish caption generation failed')
+      expect(screen.getByText('Retry Spanish (Automatic)')).toBeInTheDocument()
+    })
+
+    it('a11y: retry ASR request goes back to processing on success', async () => {
+      let callCount = 0
+      server.use(
+        http.post('/api/v1/media_objects/*/asr', () => {
+          callCount++
+          if (callCount === 1) {
+            return HttpResponse.json({error: 'Server error'}, {status: 500})
+          }
+          return new HttpResponse(null, {status: 202})
+        }),
+      )
+
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByText('Spanish'))
+      fireEvent.click(screen.getByText('Request'))
+
+      await screen.findByText('Caption generation failed')
+
+      fireEvent.click(screen.getByText('Retry Spanish (Automatic)'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('Caption generation failed')).not.toBeInTheDocument()
+      })
+      expect(screen.getByText('Spanish (Automatic)')).toBeInTheDocument()
+    })
+
     it('a11y: retry delete re-announces and succeeds on retry', async () => {
       let callCount = 0
       server.use(

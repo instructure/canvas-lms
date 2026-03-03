@@ -118,6 +118,8 @@ ready(() => {
           locale: t.language,
           language: t.label,
           inherited: t.inherited,
+          asr: t.asr,
+          workflow_state: t.workflow_state,
         }))
         if (tracks) {
           event?.source?.postMessage(
@@ -179,7 +181,10 @@ ready(() => {
   )
   const isGenerating = isAsrGenerating(media_object?.media_tracks)
   // Get rid of processing state ASR tracks, since their content will be empty anyway.
-  const playerTracks = mediaTracks?.filter(t => !(t.asr && t.workflow_state === 'processing'))
+  // append ASR track's label with "(Automatic)" to differentiate from human-created captions
+  const playerTracks = mediaTracks
+    ?.filter(t => !(t.asr && t.workflow_state === 'processing'))
+    .map(t => (t.asr ? {...t, label: I18n.t('%{language} (Automatic)', {language: t.label})} : t))
 
   if (ENV.FEATURES?.consolidated_media_player_iframe) {
     render(

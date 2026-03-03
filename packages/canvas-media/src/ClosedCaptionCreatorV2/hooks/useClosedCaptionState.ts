@@ -35,9 +35,9 @@ interface UseClosedCaptionStateReturn {
   handleCreationModeSelect: (mode: CaptionCreationMode) => void
   handleCancelCreation: () => void
   handleDeleteRow: (locale: string) => void
-  handleCaptionProcessing: (locale: string, file: File, isAsr?: boolean) => void
+  handleCaptionProcessing: (params: {locale: string; file?: File; isAsr?: boolean}) => void
   handleCaptionUploaded: (subtitle: Subtitle) => void
-  handleCaptionUploadFailed: (locale: string, failedOperation: 'upload' | 'delete') => void
+  handleCaptionUploadFailed: (locale: string, failedOperation: 'upload' | 'delete' | 'asr') => void
   handleCaptionRetrying: (locale: string) => void
 }
 
@@ -94,15 +94,14 @@ export function useClosedCaptionState({
   // (handleLanguageSelected + handleFileSelected already add to list with isNew=true)
   // Just need to mark as processing
   const handleCaptionProcessing = useCallback(
-    (locale: string, file: File, isAsr?: boolean) => {
+    ({locale, file, isAsr}: {locale: string; file?: File; isAsr?: boolean}) => {
       setSubtitles(prev => {
         const updatedSubtitles: Subtitle[] = [
           ...prev,
           {
             locale,
-            file: {name: file.name},
-            rawFile: file,
-            status: 'processing' as const,
+            ...(file && {file: {name: file.name}, rawFile: file}),
+            workflow_state: 'processing' as const,
             ...(isAsr && {asr: true}),
           },
         ]
@@ -122,7 +121,7 @@ export function useClosedCaptionState({
 
       setSubtitles(prev => {
         const updatedSubtitles = prev.map(s =>
-          s.locale === subtitle.locale ? {...subtitle, status: 'uploaded' as const} : s,
+          s.locale === subtitle.locale ? {...subtitle, workflow_state: 'ready' as const} : s,
         )
         onUpdateSubtitles(updatedSubtitles)
         return updatedSubtitles
@@ -141,7 +140,7 @@ export function useClosedCaptionState({
 
   // Called when upload or delete fails
   const handleCaptionUploadFailed = useCallback(
-    (locale: string, failedOperation: 'upload' | 'delete') => {
+    (locale: string, failedOperation: 'upload' | 'delete' | 'asr') => {
       const language = closedCaptionLanguages.find(l => l.id === locale)
       const captionName = language?.label || locale
 
@@ -154,6 +153,10 @@ export function useClosedCaptionState({
           display: formatMessage('Delete Failed'),
           announcement: formatMessage('{captionName} caption delete failed', {captionName}),
         },
+        asr: {
+          display: formatMessage('Caption generation failed'),
+          announcement: formatMessage('{captionName} caption generation failed', {captionName}),
+        },
       }
 
       const {display: displayMessage, announcement: announcementMessage} =
@@ -162,7 +165,12 @@ export function useClosedCaptionState({
       setSubtitles(prev => {
         const updatedSubtitles = prev.map(s =>
           s.locale === locale
-            ? {...s, status: 'failed' as const, errorMessage: displayMessage, failedOperation}
+            ? {
+                ...s,
+                workflow_state: 'failed' as const,
+                errorMessage: displayMessage,
+                failedOperation,
+              }
             : s,
         )
         onUpdateSubtitles(updatedSubtitles)
@@ -184,7 +192,7 @@ export function useClosedCaptionState({
           s.locale === locale
             ? {
                 ...s,
-                status: 'processing' as const,
+                workflow_state: 'processing' as const,
                 errorMessage: undefined,
                 failedOperation: undefined,
               }

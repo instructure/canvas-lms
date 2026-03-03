@@ -32,7 +32,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../../rce/RCEGlobals'
@@ -58,9 +58,9 @@ import {
   getPlayerLayoutSizes,
   labelForPlayerLayoutSize,
   playerLayoutDimensions,
+  SMALL,
   scalePlayerLayoutForHeight,
   scalePlayerLayoutForWidth,
-  SMALL,
 } from '../playerLayoutOptions'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -131,6 +131,7 @@ export default function VideoOptionsTray({
     mapStudioEmbedOptions(studioOptions?.embedOptions),
   )
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const fetchedFromIframeRef = useRef(false)
 
   const isStudio = !!studioOptions
   const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
@@ -166,7 +167,9 @@ export default function VideoOptionsTray({
   }, [videoOptions.attachmentId])
 
   useEffect(() => {
-    if (!isLoading && subtitles.length === 0) {
+    if (!isLoading && subtitles.length === 0 && !fetchedFromIframeRef.current) {
+      // only request subtitle data after mount
+      fetchedFromIframeRef.current = true
       requestSubtitlesFromIframe(setSubtitles)
     }
   }, [isLoading, subtitles.length, requestSubtitlesFromIframe])

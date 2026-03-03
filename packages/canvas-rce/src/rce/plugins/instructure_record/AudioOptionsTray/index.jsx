@@ -22,10 +22,10 @@ import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import React, {useCallback, useEffect, useState} from 'react'
-import {Tooltip} from '@instructure/ui-tooltip'
+import React, {useEffect, useRef, useState} from 'react'
 import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../../rce/RCEGlobals'
@@ -51,9 +51,12 @@ export default function AudioOptionsTray({
   const [subtitles, setSubtitles] = useState(audioOptions.tracks || [])
   const api = new RceApiSource(trayProps)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const fetchedFromIframeRef = useRef(false)
 
   useEffect(() => {
-    if (!isLoading && subtitles.length === 0) {
+    if (!isLoading && subtitles.length === 0 && !fetchedFromIframeRef.current) {
+      // only request subtitle data after mount
+      fetchedFromIframeRef.current = true
       requestSubtitlesFromIframe(setSubtitles)
     }
   }, [isLoading, subtitles.length, requestSubtitlesFromIframe])
@@ -138,8 +141,9 @@ export default function AudioOptionsTray({
                           ) : (
                             <ClosedCaptionPanelV2
                               subtitles={subtitles.map(st => ({
-                                locale: st.locale,
+                                ...st,
                                 file: {name: st.language || st.locale},
+                                asr: Boolean(st.asr),
                               }))}
                               languages={Bridge.languages}
                               userLocale={Bridge.userLocale}
