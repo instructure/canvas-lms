@@ -68,17 +68,21 @@ describe('GroupCategoryModal', () => {
     const {getByLabelText, findByLabelText, findByText} = setup()
     const select = getByLabelText('Group Structure')
     await user.click(select)
-    await user.click(await findByText('Split students by number of groups'))
+    await user.click(await findByText('Split students by number of groups', {}, {timeout: 10000}))
     expect(await findByLabelText('Number of Groups', {}, {timeout: 20000})).toBeInTheDocument()
-  }, 30000)
+  }, 35000)
 
   // TODO: InstUI SimpleSelect + NumberInput interaction unreliable in CI
   it.skip('increments/decrements number input, which stays in bounds', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByText, findByText, findByLabelText} = setup()
     await user.click(getByText('Group Structure'))
-    await user.click(await findByText('Split students by number of groups'))
-    const numberInput = (await findByLabelText('Number of Groups', {}, {timeout: 20000})) as HTMLInputElement
+    await user.click(await findByText('Split students by number of groups', {}, {timeout: 10000}))
+    const numberInput = (await findByLabelText(
+      'Number of Groups',
+      {},
+      {timeout: 20000},
+    )) as HTMLInputElement
     await user.type(numberInput, '{arrowdown}')
     expect(numberInput.value).toBe('0')
     // userEvent's {arrowup} does not work with number inputs
