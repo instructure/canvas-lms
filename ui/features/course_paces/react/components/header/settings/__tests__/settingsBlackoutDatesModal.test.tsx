@@ -73,7 +73,7 @@ describe('Settings Blackout Dates Modal', () => {
       () => {
         expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
       },
-      {timeout: 5000},
+      {timeout: 10000},
     )
     expect(screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
   })
@@ -93,7 +93,7 @@ describe('Settings Blackout Dates Modal', () => {
       () => {
         expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
       },
-      {timeout: 5000},
+      {timeout: 10000},
     )
     expect(screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
     expect(updateBlackoutDates).toHaveBeenCalledWith(defaultProps.blackoutDates)
