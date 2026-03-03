@@ -192,7 +192,7 @@ module AttachmentHelper
     must_proxy = inline && csp_enforced? && attachment.mime_class == "html"
     direct = attachment.stored_locally? || can_proxy || must_proxy
 
-    if !inline && (download_url = attachment.kaltura_media_download_url)
+    if !inline && attachment.kaltura_manifest_file? && (download_url = attachment.kaltura_media_download_url)
       redirect_to download_url
       return
     end

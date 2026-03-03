@@ -285,6 +285,7 @@ describe AttachmentHelper do
         allow(kaltura_client).to receive(:media_download_url)
           .with("0_feedbeef")
           .and_return("https://kaltura.example.com/download/asset1")
+        allow(@kaltura_attachment).to receive(:kaltura_manifest_file?).and_return(true)
       end
 
       it "redirects to Kaltura URL when downloading Kaltura media" do
@@ -299,6 +300,17 @@ describe AttachmentHelper do
           .with(a_string_including("kaltura.example.com"))
         expect(self).to receive(:send_file)
         render_or_redirect_to_stored_file(attachment: @kaltura_attachment, inline: true)
+      end
+
+      it "does not redirect to Kaltura URL when file is not a manifest" do
+        allow(@kaltura_attachment).to receive_messages(
+          kaltura_manifest_file?: false,
+          stored_locally?: true
+        )
+        expect(self).not_to receive(:redirect_to)
+          .with(a_string_including("kaltura.example.com"))
+        expect(self).to receive(:send_file)
+        render_or_redirect_to_stored_file(attachment: @kaltura_attachment, inline: false)
       end
     end
 
