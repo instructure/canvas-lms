@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {act, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import ConfigureExternalToolButton from '../ConfigureExternalToolButton'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import {ltiMessageHandler} from '@canvas/lti/jquery/messages'
 
 let tool
 let event
@@ -28,8 +29,10 @@ let ref
 let returnFocus
 
 beforeEach(() => {
-  ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
-  ENV.CONTEXT_BASE_URL = 'https://advantage.tool.com'
+  fakeENV.setup({
+    LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media'],
+    CONTEXT_BASE_URL: 'https://advantage.tool.com',
+  })
   tool = {
     name: 'test tool',
     app_id: '1',
@@ -43,6 +46,10 @@ beforeEach(() => {
   ref = React.createRef()
   returnFocus = vi.fn()
   userEvent.setup()
+})
+
+afterEach(() => {
+  fakeENV.teardown()
 })
 
 function renderComponent(modalIsOpen = false) {
@@ -110,17 +117,32 @@ test('opens and closes the modal', async () => {
 
 test('closes the modal when tool sends lti.close message', async () => {
   renderComponentOpen()
-  monitorLtiMessages()
 
   const iframe = screen.getByTitle(/Tool Configuration/i)
-  fireEvent(
-    window,
-    new MessageEvent('message', {
-      data: {subject: 'lti.close'},
-      origin: 'https://advantage.tool.com',
-      source: iframe.contentWindow,
-    }),
-  )
+
+  // jsdom does not load iframe srcs, so contentWindow is null by default.
+  // iframeMatches() returns false when contentWindow is null, preventing the
+  // lti.close callback from firing. Patch it to `window` so the source check
+  // in iframeMatches() can succeed.
+  Object.defineProperty(iframe, 'contentWindow', {
+    value: window,
+    writable: true,
+    configurable: true,
+  })
+
+  // Call ltiMessageHandler directly and await it so the internal dynamic
+  // import of the lti.close handler resolves before we check the DOM.
+  // Using fireEvent + waitFor is unreliable because ltiMessageHandler is
+  // async and the waitFor timeout can expire before the import resolves.
+  await act(async () => {
+    await ltiMessageHandler(
+      new MessageEvent('message', {
+        data: {subject: 'lti.close'},
+        origin: 'https://advantage.tool.com',
+        source: window,
+      }),
+    )
+  })
 
   await waitFor(() => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
