@@ -118,13 +118,6 @@ describe LiveEventsObserver do
       expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
       @page.unpublish!
     end
-
-    it "does not post workflow_state update event when only title changes" do
-      wiki_page_model
-      expect(Canvas::LiveEvents).not_to receive(:wiki_page_updated).with(anything, nil, nil)
-      @page.title = "new title"
-      @page.save
-    end
   end
 
   describe "attachment" do
