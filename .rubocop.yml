@@ -178,8 +178,8 @@ RSpec/Output:
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 
-#RSpec/Rails:
-#  Severity: error
+RSpecRails:
+  Severity: error
 
 Security:
   Severity: error
