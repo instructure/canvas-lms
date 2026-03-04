@@ -27,6 +27,7 @@ import {rubricSelectedAriaLabel} from './utils/rubricUtils'
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 type RatingButtonProps = {
+  ariaLabel?: string
   buttonLabel: string
   isPreviewMode: boolean
   isSelected: boolean
@@ -35,6 +36,7 @@ type RatingButtonProps = {
   onClick: () => void
 }
 export const RatingButton = ({
+  ariaLabel,
   buttonLabel,
   isPreviewMode,
   isSelected,
@@ -44,6 +46,9 @@ export const RatingButton = ({
 }: RatingButtonProps) => {
   const unselectedColor = isPreviewMode ? colors.contrasts.grey1214 : colors.contrasts.green4570
   const selectedText = rubricSelectedAriaLabel(isSelected, isSelfAssessmentSelected)
+  const screenReaderLabel = ariaLabel
+    ? `${ariaLabel} ${selectedText}`.trim()
+    : I18n.t('Rating Button %{buttonLabel} %{selectedText}', {buttonLabel, selectedText})
 
   return (
     <View
@@ -56,10 +61,8 @@ export const RatingButton = ({
     >
       <View as="div" position="relative">
         <IconButton
-          screenReaderLabel={I18n.t('Rating Button %{buttonLabel} %{selectedText}', {
-            buttonLabel,
-            selectedText,
-          })}
+          screenReaderLabel={screenReaderLabel}
+          aria-label={ariaLabel ? screenReaderLabel : undefined}
           size="large"
           color="primary-inverse"
           onClick={onClick}
