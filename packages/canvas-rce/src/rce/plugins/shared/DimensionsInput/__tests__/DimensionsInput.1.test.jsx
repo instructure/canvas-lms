@@ -82,17 +82,10 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
   }
 
   describe('hint message', () => {
-    it('shows default aspect ratio hint without additionalHintText', () => {
+    it('shows default aspect ratio hint', () => {
       initialState.usePercentageUnits = false
       renderComponent()
       expect(currentMessageText()).toEqual('Aspect ratio will be preserved')
-    })
-
-    it('appends additionalHintText to the hint with a period separator', () => {
-      initialState.usePercentageUnits = false
-      props.additionalHintText = 'Some extra info.'
-      renderComponent()
-      expect(currentMessageText()).toEqual('Aspect ratio will be preserved. Some extra info.')
     })
   })
 

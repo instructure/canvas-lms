@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
@@ -32,6 +30,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
+import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../../rce/RCEGlobals'
@@ -61,16 +61,9 @@ import {
   scalePlayerLayoutForHeight,
   scalePlayerLayoutForWidth,
 } from '../playerLayoutOptions'
+import {mapStudioEmbedOptions, mapViewerRestrictions, readViewerRestrictions} from '../utils'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
-
-function mapStudioEmbedOptions(embedOptions) {
-  return embedOptions
-    ? Object.entries(embedOptions)
-        .filter(([, v]) => v)
-        .map(([k]) => k)
-    : []
-}
 
 export default function VideoOptionsTray({
   videoOptions,
@@ -126,6 +119,9 @@ export default function VideoOptionsTray({
   const [editLocked, setEditLocked] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const [viewerRestrictions, setViewerRestrictions] = useState(() =>
+    readViewerRestrictions(videoOptions.viewerRestrictions),
+  )
   const [studioEmbedOptions, setStudioEmbedOptions] = useState(() =>
     mapStudioEmbedOptions(studioOptions?.embedOptions),
   )
@@ -147,7 +143,7 @@ export default function VideoOptionsTray({
   const api = new RceApiSource(trayProps)
   const videoSizeOptions = isConsolidatedMediaPlayer
     ? isAsrCaptioningImprovements
-      ? getPlayerLayoutSizes(isStudio)
+      ? getPlayerLayoutSizes()
       : studioPlayerSizes
     : videoSizes
 
@@ -243,6 +239,7 @@ export default function VideoOptionsTray({
       subtitles,
       updateMediaObject,
       editLocked,
+      viewerRestrictions: mapViewerRestrictions(viewerRestrictions),
     })
   }
 
@@ -386,6 +383,15 @@ export default function VideoOptionsTray({
                                 </SimpleSelect.Option>
                               ))}
                             </SimpleSelect>
+                            {isAsrCaptioningImprovements && !isStudio && (
+                              <View as="div" margin="xx-small none none none">
+                                <Text size="small">
+                                  {formatMessage(
+                                    'Transcript panel is available at widths above 720px.',
+                                  )}
+                                </Text>
+                              </View>
+                            )}
                           </View>
                           {videoSize === CUSTOM && (
                             <View as="div" padding="xx-small small">
@@ -396,16 +402,25 @@ export default function VideoOptionsTray({
                                 minWidth={minWidth}
                                 minPercentage={minPercentage}
                                 hidePercentage={true}
-                                additionalHintText={
-                                  isAsrCaptioningImprovements
-                                    ? formatMessage(
-                                        'Transcript panel is available at widths above 720px.',
-                                      )
-                                    : undefined
-                                }
                               />
                             </View>
                           )}
+                        </Flex.Item>
+                      )}
+                      {isAsrCaptioningImprovements && !isStudio && (
+                        <Flex.Item padding="small">
+                          <CheckboxGroup
+                            name="viewer-restrictions"
+                            onChange={setViewerRestrictions}
+                            defaultValue={viewerRestrictions}
+                            description={formatMessage('Viewer Restrictions')}
+                          >
+                            <Checkbox
+                              variant="toggle"
+                              label={formatMessage('Show Rolling Transcript')}
+                              value="show_rolling_transcript"
+                            />
+                          </CheckboxGroup>
                         </Flex.Item>
                       )}
                       {!isStudio && !editLocked && (
@@ -549,6 +564,9 @@ VideoOptionsTray.propTypes = {
         inherited: bool,
       }),
     ),
+    viewerRestrictions: shape({
+      show_rolling_transcript: bool,
+    }),
   }).isRequired,
   onEntered: func,
   onExited: func,

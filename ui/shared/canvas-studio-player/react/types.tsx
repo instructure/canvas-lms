@@ -39,6 +39,9 @@ export type MediaInfo = {
     | 'BLOCKED'
     | 'NO_CONTENT'
   title: string
+  viewer_restrictions: {
+    show_rolling_transcript?: boolean
+  }
 }
 
 export type MediaTrack = {

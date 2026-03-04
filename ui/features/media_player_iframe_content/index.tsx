@@ -186,6 +186,9 @@ ready(() => {
     ?.filter(t => !(t.asr && t.workflow_state === 'processing'))
     .map(t => (t.asr ? {...t, label: I18n.t('%{language} (Automatic)', {language: t.label})} : t))
 
+  const viewerRestrictions = media_object?.viewer_restrictions || {}
+  const showRollingTranscript = viewerRestrictions.show_rolling_transcript === true
+
   if (ENV.FEATURES?.consolidated_media_player_iframe) {
     render(
       <CanvasStudioPlayer
@@ -197,12 +200,12 @@ ready(() => {
         is_attachment={is_attachment}
         attachment_id={attachment_id}
         explicitSize={explicitSize}
-        enableSidebar={isAsrCaptioningImprovements}
+        enableSidebar={isAsrCaptioningImprovements && showRollingTranscript}
         openSidebar={isAsrCaptioningImprovements}
         onTranscriptEdit={handleTranscriptEdit}
         onConfirmEditChanges={handleConfirmEditChanges}
         kebabMenuElements={
-          ENV.FEATURES?.rce_studio_embed_improvements
+          isAsrCaptioningImprovements && showRollingTranscript
             ? [
                 {
                   id: 'expand-view',

@@ -23,7 +23,6 @@ export const MEDIUM = 'medium'
 export const LARGE = 'large'
 export const EXTRA_LARGE = 'extra-large'
 export const CUSTOM = 'custom'
-export const WITH_TRANSCRIPT = 'with-transcript'
 
 export const PLAYER_CONTROLS_HEIGHT = 48
 export const TRANSCRIPT_SIDEBAR_WIDTH = 300
@@ -33,15 +32,15 @@ export const playerLayoutDimensions: Record<string, {width: number; height: numb
   [SMALL]: {width: 400, height: 273},
   [MEDIUM]: {width: 480, height: 318},
   [LARGE]: {width: 700, height: 442},
-  [WITH_TRANSCRIPT]: {width: 850, height: 357},
+  [EXTRA_LARGE]: {width: 850, height: 357},
 }
 
-const playerLayoutSizes = [SMALL, MEDIUM, LARGE, WITH_TRANSCRIPT, CUSTOM] as const
+const playerLayoutSizes = [SMALL, MEDIUM, LARGE, EXTRA_LARGE, CUSTOM] as const
 
 export type PlayerLayoutSize = (typeof playerLayoutSizes)[number]
 
-export function getPlayerLayoutSizes(isStudio: boolean): readonly PlayerLayoutSize[] {
-  return isStudio ? playerLayoutSizes.filter(s => s !== WITH_TRANSCRIPT) : playerLayoutSizes
+export function getPlayerLayoutSizes(): readonly PlayerLayoutSize[] {
+  return playerLayoutSizes
 }
 
 export function labelForPlayerLayoutSize(size: string): string {
@@ -53,8 +52,8 @@ export function labelForPlayerLayoutSize(size: string): string {
       return formatMessage('Medium ({width} x {height}px)', dims)
     case LARGE:
       return formatMessage('Large ({width} x {height}px)', dims)
-    case WITH_TRANSCRIPT:
-      return formatMessage('With Transcript ({width} x {height}px)', dims)
+    case EXTRA_LARGE:
+      return formatMessage('Extra Large ({width} x {height}px)', dims)
     default:
       return formatMessage('Custom')
   }
