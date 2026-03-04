@@ -37,6 +37,8 @@ Gemspec/RequiredRubyVersion:
   # maintenance pain when updating ruby versions
   Enabled: false
 
+GraphQL:
+  Severity: error
 GraphQL/ArgumentDescription:
   Enabled: false
 GraphQL/FieldDescription:
@@ -244,13 +246,25 @@ Style/WordArray:
 # them to the section above)
 # auto-correct needs to be disabled for any that support it in the meantime
 
+GraphQL/ExtractInputType:
+  Severity: convention
+GraphQL/ExtractType:
+  Severity: convention
 GraphQL/FieldMethod:
+  Severity: convention
   AutoCorrect: false
 GraphQL/FieldName:
+  Severity: convention
   AutoCorrect: false
+GraphQL/GraphqlName:
+  Severity: convention
 GraphQL/MultipleFieldDefinitions:
+  Severity: convention
   AutoCorrect: false
+GraphQL/NotAuthorizedNodeType:
+  Severity: convention
 GraphQL/UnusedArgument:
+  Severity: convention
   AutoCorrect: false
 
 Layout/LineLength:
