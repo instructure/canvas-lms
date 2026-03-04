@@ -3533,6 +3533,19 @@ class ApplicationController < ActionController::Base
     "quizzes/quizzes#show" => nil
   }.freeze
 
+  def show_learning_agent_button?
+    return false unless @context.is_a?(Course)
+    return false unless @context_enrollment.is_a?(StudentEnrollment)
+
+    @context.feature_enabled?(:athena_learning_agent_button)
+  end
+  helper_method :show_learning_agent_button?
+
+  def load_learning_agent_env
+    js_env({ ATHENA: Services::Athena.public_app_config(@current_user) })
+  end
+  helper_method :load_learning_agent_env
+
   def show_student_view_button?
     return false unless @context.is_a?(Course) && can_do(@context, @current_user, :use_student_view)
 
