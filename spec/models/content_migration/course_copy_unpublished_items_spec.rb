@@ -180,11 +180,11 @@ describe ContentMigration do
       run_course_copy
 
       mod_to.reload
-      expect(mod_to).to_not be_deleted
+      expect(mod_to).not_to be_deleted
       mod_to.content_tags.each do |tag_to|
         if tag_to.content
           tag_to.content.reload
-          expect(tag_to.content).to_not be_deleted
+          expect(tag_to.content).not_to be_deleted
         end
       end
     end

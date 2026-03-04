@@ -830,7 +830,7 @@ describe Course do
       it "does not allow updating account to site_admin" do
         course = course_model
         course.root_account = Account.site_admin
-        expect(course).to_not be_valid
+        expect(course).not_to be_valid
       end
 
       it "does not allow updating account to a subaccount where roles for existing enrollments don't exist" do
@@ -871,7 +871,7 @@ describe Course do
 
         new_course = course_factory
         new_course.sis_source_id = other_course.sis_source_id
-        expect(new_course).to_not be_valid
+        expect(new_course).not_to be_valid
         new_course.sis_source_id = nil
         expect(new_course).to be_valid
       end
@@ -883,7 +883,7 @@ describe Course do
 
         new_course = course_factory
         new_course.integration_id = other_course.integration_id
-        expect(new_course).to_not be_valid
+        expect(new_course).not_to be_valid
         new_course.integration_id = nil
         expect(new_course).to be_valid
       end
@@ -935,7 +935,7 @@ describe Course do
       expect(code).to eql(@course.course_code)
       @course.course_code = nil
       @course.save
-      expect(code).to_not eql(@course.course_code)
+      expect(code).not_to eql(@course.course_code)
     end
 
     it "removes carriage returns from the name" do
@@ -2000,17 +2000,17 @@ describe Course do
         participants = @course.participants
         expect(participants).to include(@student)
 
-        expect(@course.participating_students_by_date).to_not include(@student)
+        expect(@course.participating_students_by_date).not_to include(@student)
         expect(@course.participating_admins_by_date).to include(@ta)
 
         by_date = @course.participants(by_date: true)
-        expect(by_date).to_not include(@student)
+        expect(by_date).not_to include(@student)
         expect(by_date).to include(@ta)
 
         @course.enrollment_term.set_overrides(@course.root_account, "TaEnrollment" => { start_at: 3.days.ago, end_at: 2.days.ago })
         @course.reload
-        expect(@course.participants(by_date: true)).to_not include(@ta)
-        expect(@course.participating_admins_by_date).to_not include(@ta)
+        expect(@course.participants(by_date: true)).not_to include(@ta)
+        expect(@course.participating_admins_by_date).not_to include(@ta)
       end
     end
 
@@ -2035,7 +2035,7 @@ describe Course do
       context "excluding specific students" do
         it "rejects observers only following one of the excluded students" do
           partic = @course.participants(include_observers: true, excluded_user_ids: [@student.id, @student_following_observer.id])
-          [@student, @student_following_observer].each { |usr| expect(partic).to_not include(usr) }
+          [@student, @student_following_observer].each { |usr| expect(partic).not_to include(usr) }
         end
 
         it "includes admins and course level observers" do
@@ -2048,7 +2048,7 @@ describe Course do
     it "excludes some student when passed their id" do
       partic = @course.participants(include_observers: false, excluded_user_ids: [@student.id])
       [@ta, @teach].each { |usr| expect(partic).to include(usr) }
-      expect(partic).to_not include(@student)
+      expect(partic).not_to include(@student)
     end
   end
 
@@ -3313,7 +3313,7 @@ describe Course do
       it "does not include Announcements without read_announcements rights" do
         @course.account.role_overrides.create!(role: teacher_role, permission: "read_announcements", enabled: false)
         tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).pluck(:id)
-        expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
+        expect(tab_ids).not_to include(Course::TAB_ANNOUNCEMENTS)
       end
 
       it "shows people tab with granular permissions if hidden" do
@@ -3932,7 +3932,7 @@ describe Course do
 
         course_observers = @course.active_course_level_observers
         expect(course_observers).to include(@course_level_observer)
-        expect(course_observers).to_not include(@oe.user)
+        expect(course_observers).not_to include(@oe.user)
       end
     end
 
@@ -5120,7 +5120,7 @@ describe Course do
         @ps.save!
 
         @course.grading_standard_id = 0
-        expect(SSLCommon).to_not receive(:post_data) # like c'mon dude why send an empty csv file
+        expect(SSLCommon).not_to receive(:post_data) # like c'mon dude why send an empty csv file
         @course.publish_final_grades(@user)
       end
 
@@ -5585,7 +5585,7 @@ describe Course do
       expect(Course.manageable_by_user(user.id).map(&:id)).to include(course.id)
 
       user.account_users.first.destroy!
-      expect(Course.manageable_by_user(user.id)).to_not be_exists
+      expect(Course.manageable_by_user(user.id)).not_to be_exists
     end
 
     it "includes courses the user is actively enrolled in as a teacher" do
@@ -6700,7 +6700,7 @@ describe Course do
 
       it "does not allow students to read files" do
         user.student_enrollments.create!(workflow_state: "active", course: @course)
-        expect(@course.check_policy(user)).to_not include :read_files
+        expect(@course.check_policy(user)).not_to include :read_files
       end
 
       it "allows teachers to read files" do
@@ -7240,14 +7240,14 @@ describe Course do
         enrollment1 = @course.enroll_user(@user, "StudentEnrollment", role: @lazy_role)
         enrollment2 = @course.enroll_user(@user, "StudentEnrollment", role: @honor_role)
         expect(@user.enrollments.count).to be 2
-        expect(enrollment1).to_not eql enrollment2
+        expect(enrollment1).not_to eql enrollment2
       end
 
       it "does not re-use an enrollment with no role when enrolling with a role" do
         enrollment1 = @course.enroll_user(@user, "StudentEnrollment")
         enrollment2 = @course.enroll_user(@user, "StudentEnrollment", role: @honor_role)
         expect(@user.enrollments.count).to be 2
-        expect(enrollment1).to_not eql enrollment2
+        expect(enrollment1).not_to eql enrollment2
       end
 
       it "does not re-use an enrollment with a role when enrolling with no role" do
@@ -7715,12 +7715,12 @@ describe Course do
       end
 
       it "does not show to student not in section" do
-        expect(@course.module_items_visible_to(@student)).to_not include(@topic_tag)
+        expect(@course.module_items_visible_to(@student)).not_to include(@topic_tag)
       end
 
       it "does not show to student if visibiilty is deleted" do
         @topic.discussion_topic_section_visibilities.destroy_all
-        expect(@course.module_items_visible_to(@other_section_student)).to_not include(@topic_tag)
+        expect(@course.module_items_visible_to(@other_section_student)).not_to include(@topic_tag)
       end
 
       it "shows to teacher" do

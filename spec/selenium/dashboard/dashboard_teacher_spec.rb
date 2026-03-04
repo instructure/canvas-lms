@@ -203,7 +203,7 @@ describe "dashboard" do
         enable_cache do
           Timecop.freeze(1.minute.from_now) do
             get "/"
-            expect(f(".to-do-list")).to_not include_text("Moderate #{@assignment.title}")
+            expect(f(".to-do-list")).not_to include_text("Moderate #{@assignment.title}")
           end
 
           Timecop.freeze(2.minutes.from_now) do
@@ -221,7 +221,7 @@ describe "dashboard" do
             @teacher.clear_cache_key(:todo_list) # would be done by the publishing endpoint
 
             get "/"
-            expect(f(".to-do-list")).to_not include_text("Moderate #{@assignment.title}")
+            expect(f(".to-do-list")).not_to include_text("Moderate #{@assignment.title}")
           end
         end
       end

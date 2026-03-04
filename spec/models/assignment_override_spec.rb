@@ -1765,7 +1765,7 @@ describe AssignmentOverride do
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
       expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.update!(due_at: nil)
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
+      expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
 
     it "deletes the ScheduledSmartAlert if the due date is changed to the past" do
@@ -1773,7 +1773,7 @@ describe AssignmentOverride do
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
       expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.update!(due_at: 1.day.ago)
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
+      expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
 
     it "deletes associated ScheduledSmartAlerts when the override is deleted" do
@@ -1781,7 +1781,7 @@ describe AssignmentOverride do
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
       expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.destroy
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
+      expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
   end
 

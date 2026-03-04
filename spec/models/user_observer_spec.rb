@@ -53,7 +53,7 @@ describe UserObservationLink do
     observer_enroll.destroy
 
     UserObservationLink.create_or_restore(observer:, student:, root_account: Account.default)
-    expect(observer_enroll.reload).to_not be_deleted
+    expect(observer_enroll.reload).not_to be_deleted
   end
 
   it 'restores inactive observer enrollments on "restore" (even if nothing about the observee changed)' do

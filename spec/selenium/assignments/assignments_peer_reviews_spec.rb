@@ -138,7 +138,7 @@ describe "assignments" do
 
       @assignment.only_visible_to_overrides = true
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
-      expect(f(".no_students_message")).to_not be_displayed
+      expect(f(".no_students_message")).not_to be_displayed
     end
 
     context "rubric assessments" do
@@ -165,7 +165,7 @@ describe "assignments" do
 
         f(".assess_submission_link").click
         wait_for_animations
-        expect(f("#rubric_holder")).to_not contain_css(".save_rubric_button")
+        expect(f("#rubric_holder")).not_to contain_css(".save_rubric_button")
       end
 
       it "lets a student submit a rubric review even if already completed if a rubric is added afterwards" do

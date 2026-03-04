@@ -71,7 +71,7 @@ describe PlannerNotesController do
           @course_1.destroy
           get :index
           note_ids = json_parse(response.body).pluck("id")
-          expect(note_ids).to_not include(@course_1_note.id)
+          expect(note_ids).not_to include(@course_1_note.id)
           expect(note_ids).to include(@course_2_note.id)
 
           get :index, params: { context_codes: ["course_#{@course_1.id}"] }

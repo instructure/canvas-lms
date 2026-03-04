@@ -197,7 +197,7 @@ describe CoursePacesController do
         if enabled
           expect(js_env).to have_key(:CONDITIONAL_RELEASE_ENV)
         else
-          expect(js_env).to_not have_key(:CONDITIONAL_RELEASE_ENV)
+          expect(js_env).not_to have_key(:CONDITIONAL_RELEASE_ENV)
         end
       end
     end

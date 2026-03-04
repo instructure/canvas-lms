@@ -139,7 +139,7 @@ describe BlackoutDatesController do
       # updated
       expect(blackout_dates.find_by(id: blackout_date2.id).event_title).to eq("update me")
       # created
-      expect(blackout_dates.find_by(event_title: "summer break")).to_not be_nil
+      expect(blackout_dates.find_by(event_title: "summer break")).not_to be_nil
     end
   end
 end

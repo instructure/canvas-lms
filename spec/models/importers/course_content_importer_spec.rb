@@ -302,7 +302,7 @@ describe Course do
       setup_import(@course, "announcements.json", migration)
 
       ann = @course.announcements.first
-      expect(ann).to_not be_locked
+      expect(ann).not_to be_locked
       expect(migration.workflow_state).to eq("imported")
     end
 
@@ -344,7 +344,7 @@ describe Course do
       dt = @course.discussion_topics.find_by(migration_id: "g8bacee869e70bf19cd6784db3efade7e")
       expect(dt.reply_to_entry_required_count).to eq 2
       expect(dt.assignment.assignment_group).to eq a1.assignment_group
-      expect(dt.assignment.assignment_group).to_not be_deleted
+      expect(dt.assignment.assignment_group).not_to be_deleted
       expect(a1.reload).to be_deleted # didn't restore the previously deleted assignment too
     end
 
@@ -983,7 +983,7 @@ describe Course do
 
     broken_assmt = @course.assignments.where(migration_id: "broken").first
     unbroken_assmt = @course.assignments.where(migration_id: "kindabroken").first
-    expect(unbroken_assmt.description).to_not include("stylesheet")
+    expect(unbroken_assmt.description).not_to include("stylesheet")
 
     expect(migration.migration_issues.count).to eq 1 # should ignore the sanitized one
     expect(migration.migration_issues.first.fix_issue_html_url).to eq "/courses/#{@course.id}/assignments/#{broken_assmt.id}"
@@ -1024,7 +1024,7 @@ describe Course do
     it "Does not log duration on failures" do
       allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
       expect { subject }.to raise_error("Something went wrong at the last minute")
-      expect(InstStatsd::Statsd).to_not have_received(:timing).with("content_migrations.import_failure")
+      expect(InstStatsd::Statsd).not_to have_received(:timing).with("content_migrations.import_failure")
     end
   end
 

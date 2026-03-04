@@ -282,7 +282,7 @@ describe ContentMigration do
     it "does not expand the mac system folder" do
       cm = setup_zip_import(@course, "macfile.zip")
       test_zip_import(@course, cm, 4)
-      expect(@course.folders.pluck(:name)).to_not include("__MACOSX")
+      expect(@course.folders.pluck(:name)).not_to include("__MACOSX")
     end
 
     it "updates unzip progress often" do

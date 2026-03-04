@@ -23,7 +23,7 @@
 describe Canvas::Security do
   describe ".config" do
     it "shim works" do
-      expect(Canvas::Security.config).to_not be_nil
+      expect(Canvas::Security.config).not_to be_nil
     end
   end
 end

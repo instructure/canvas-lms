@@ -107,7 +107,7 @@ describe RoleOverride do
     allow(@group).to receive(:account).and_return(nil)
     expect do
       RoleOverride.permission_for(@group, :read_course_content, teacher_role)
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   it "updates the roles updated_at timestamp on save" do

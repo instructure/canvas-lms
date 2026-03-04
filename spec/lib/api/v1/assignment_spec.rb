@@ -1226,7 +1226,7 @@ describe "Api::V1::Assignment" do
       it "does not transition to another state" do
         expect do
           api.update_api_assignment(assignment, assignment_update_params, user)
-        end.to_not change { assignment.workflow_state }
+        end.not_to change { assignment.workflow_state }
       end
     end
 
@@ -1516,7 +1516,7 @@ describe "Api::V1::Assignment" do
 
           json = api.assignment_json(assignment, user, session, opts)
           expect(json).to be_a(Hash)
-          expect(json).to_not have_key "migrated_urls_content_migration_id"
+          expect(json).not_to have_key "migrated_urls_content_migration_id"
         end
       end
 
@@ -1531,7 +1531,7 @@ describe "Api::V1::Assignment" do
 
           json = api.assignment_json(assignment, user, session, opts)
           expect(json).to be_a(Hash)
-          expect(json).to_not have_key "migrated_urls_content_migration_id"
+          expect(json).not_to have_key "migrated_urls_content_migration_id"
         end
       end
     end

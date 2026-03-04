@@ -149,7 +149,7 @@ describe GradeSummaryAssignmentPresenter do
       before { allow(summary).to receive(:assignment_stats).and_return({}) }
 
       it "does not raise an error" do
-        expect { presenter.grade_distribution }.to_not raise_error
+        expect { presenter.grade_distribution }.not_to raise_error
       end
 
       it "returns nil when a summary's assignment_stats is empty" do

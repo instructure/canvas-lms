@@ -2178,7 +2178,7 @@ describe "Accounts API", type: :request do
                        per_page: 1)
 
       expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to_not include("last")
+      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).not_to include("last")
     end
 
     describe "sort" do

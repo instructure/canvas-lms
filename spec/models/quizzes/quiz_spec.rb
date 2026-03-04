@@ -1696,7 +1696,7 @@ describe Quizzes::Quiz do
       @concluded_teacher.enrollments.each(&:conclude)
       quiz = @course.quizzes.create!
 
-      expect(quiz.teachers).to_not include(@concluded_teacher)
+      expect(quiz.teachers).not_to include(@concluded_teacher)
     end
   end
 

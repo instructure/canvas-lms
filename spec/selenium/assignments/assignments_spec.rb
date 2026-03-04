@@ -1584,7 +1584,7 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
-        expect(f("#assignment_post_to_sis")).to_not be_nil
+        expect(f("#assignment_post_to_sis")).not_to be_nil
       end
 
       it "shows when post_grades lti tool installed", priority: "1" do
@@ -1592,7 +1592,7 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
-        expect(f("#assignment_post_to_sis")).to_not be_nil
+        expect(f("#assignment_post_to_sis")).not_to be_nil
       end
 
       it "does not show when post_grades lti tool not installed", priority: "1" do

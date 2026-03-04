@@ -3028,7 +3028,7 @@ describe AssignmentsController do
         describe "require_resource_selection property" do
           context "when not given in the settings" do
             it "is not set in the js_env tool" do
-              expect(tool_in_js_env).to_not include(:require_resource_selection)
+              expect(tool_in_js_env).not_to include(:require_resource_selection)
             end
           end
 

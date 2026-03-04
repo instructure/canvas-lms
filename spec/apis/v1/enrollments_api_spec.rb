@@ -563,7 +563,7 @@ describe EnrollmentsApiController, type: :request do
         @section.end_at = 1.day.from_now
         @section.restrict_enrollments_to_section_dates = true
         @section.save!
-        expect(@section).to_not be_concluded
+        expect(@section).not_to be_concluded
         api_call :post, @path, @path_options, {
           enrollment: {
             user_id: @unenrolled_user.id,
@@ -741,7 +741,7 @@ describe EnrollmentsApiController, type: :request do
 
           expect(@course.account.roles.active.where(name: "newrole").first).to be_nil
           course_role = @course.account.get_course_role_by_name("newrole")
-          expect(course_role).to_not be_nil
+          expect(course_role).not_to be_nil
 
           @path = "/api/v1/courses/#{@course.id}/enrollments"
           @path_options = { controller: "enrollments_api", action: "create", format: "json", course_id: @course.id.to_s }

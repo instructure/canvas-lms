@@ -378,7 +378,7 @@ describe FilesController do
         allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
         get "show", params: { course_id: @course.id, id: @file.id, verifier: @file.uuid }, format: "json"
         expect(response).to be_successful
-        expect(json_parse["attachment"]).to_not be_nil
+        expect(json_parse["attachment"]).not_to be_nil
         expect(json_parse["attachment"]["canvadoc_session_url"]).to eq "stubby"
         expect(json_parse["attachment"]["md5"]).to be_nil
       end
@@ -387,7 +387,7 @@ describe FilesController do
         verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
         get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
         expect(response).to be_successful
-        expect(json_parse["attachment"]).to_not be_nil
+        expect(json_parse["attachment"]).not_to be_nil
         expect(json_parse["attachment"]["md5"]).to be_nil
       end
 

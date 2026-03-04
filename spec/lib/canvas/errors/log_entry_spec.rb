@@ -114,7 +114,7 @@ module Canvas
           entry = LogEntry.new("some logging message", data)
           msg = entry.message
           expect(msg).to include("[CANVAS_ERRORS]")
-          expect(msg).to_not include("String")
+          expect(msg).not_to include("String")
           expect(msg).to include("tags")
           expect(msg).to include("foo")
           expect(msg).to include("bar")

@@ -238,7 +238,7 @@ module Lti::IMS
             end
 
             it "does not submit homework" do
-              expect_any_instance_of(Assignment).to_not receive(:submit_homework)
+              expect_any_instance_of(Assignment).not_to receive(:submit_homework)
               expect_any_instance_of(Assignment).to receive(:find_or_create_submission)
               send_request
             end
@@ -278,7 +278,7 @@ module Lti::IMS
             end
 
             it "does not submit homework" do
-              expect_any_instance_of(Assignment).to_not receive(:submit_homework)
+              expect_any_instance_of(Assignment).not_to receive(:submit_homework)
               expect_any_instance_of(Assignment).to receive(:find_or_create_submission)
               send_request
             end
@@ -1295,7 +1295,7 @@ module Lti::IMS
             expect do
               result
               send_request
-            end.to_not change { result.submission.reload.score }
+            end.not_to change { result.submission.reload.score }
           end
 
           it "has the model validation error in the response" do

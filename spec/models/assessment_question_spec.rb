@@ -338,7 +338,7 @@ describe AssessmentQuestion do
       expect do
         qq2 = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
         expect(qq2.id).to eql(qq.id)
-      end.to_not change { AssessmentQuestion.count }
+      end.not_to change { AssessmentQuestion.count }
     end
 
     it "finds and update an out of date quiz_question" do
@@ -349,11 +349,11 @@ describe AssessmentQuestion do
       aq.name = "changed"
       aq.with_versioning(&:save!)
 
-      expect(qq.assessment_question_version).to_not eql(aq.version_number)
+      expect(qq.assessment_question_version).not_to eql(aq.version_number)
 
       qq2 = AssessmentQuestion.find_or_create_quiz_questions([aq], quiz.id, nil).first
       aq = AssessmentQuestion.find(aq.id)
-      expect(qq.assessment_question_version).to_not eql(qq2.assessment_question_version)
+      expect(qq.assessment_question_version).not_to eql(qq2.assessment_question_version)
       expect(qq2.assessment_question_version).to eql(aq.version_number)
     end
 

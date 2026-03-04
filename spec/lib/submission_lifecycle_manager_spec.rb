@@ -1456,7 +1456,7 @@ describe SubmissionLifecycleManager do
 
       it "sets cached_quiz_lti to false if the assignment is not a Quizzes.Next assignment" do
         cacher.recompute
-        expect(submission).to_not be_cached_quiz_lti
+        expect(submission).not_to be_cached_quiz_lti
       end
 
       it "sets cached_quiz_lti to true if the assignment's external tool identifies itself as Quizzes 2" do

@@ -1104,7 +1104,7 @@ describe Account do
       tool.account_navigation = { url: "http://www.example.com", text: "Example URL", root_account_only: true }
       tool.save!
       expect(@account.root_account.tabs_available(@teacher).pluck(:id)).to include(tool.asset_string)
-      expect(@account.tabs_available(@teacher).pluck(:id)).to_not include(tool.asset_string)
+      expect(@account.tabs_available(@teacher).pluck(:id)).not_to include(tool.asset_string)
     end
 
     it "does not include external tools for non-admins if visibility is set" do
@@ -1114,7 +1114,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to_not include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
 
       admin = account_admin_user(account: @account)
       tabs = @account.tabs_available(admin)
@@ -1369,7 +1369,7 @@ describe Account do
 
     it "ignores deleted AACs" do
       aac.destroy
-      expect(account.authentication_providers.active).to_not include(aac)
+      expect(account.authentication_providers.active).not_to include(aac)
     end
   end
 

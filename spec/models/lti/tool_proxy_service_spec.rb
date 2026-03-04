@@ -365,7 +365,7 @@ module Lti
         tp.security_contract.shared_secret = nil
         tp.security_contract.tp_half_shared_secret = tp_half_secret
         tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid)
-        expect(tool_proxy_service.tc_half_secret).to_not be_nil
+        expect(tool_proxy_service.tc_half_secret).not_to be_nil
         expect(tool_proxy.shared_secret).to eq(tool_proxy_service.tc_half_secret + tp_half_secret)
       end
 
@@ -376,7 +376,7 @@ module Lti
         tp.security_contract.shared_secret = nil
         tp.security_contract.tp_half_shared_secret = tp_half_secret
         tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid)
-        expect(tool_proxy_service.tc_half_secret).to_not be_nil
+        expect(tool_proxy_service.tc_half_secret).not_to be_nil
         expect(tool_proxy.shared_secret).to eq(tool_proxy_service.tc_half_secret + tp_half_secret)
       end
 

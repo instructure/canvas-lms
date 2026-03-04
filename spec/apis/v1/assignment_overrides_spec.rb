@@ -848,7 +848,7 @@ describe AssignmentOverridesController, type: :request do
 
       it "does not requeue processing if nothing changes" do
         @override.update_attribute(:all_day, false)
-        expect_any_instantiation_of(@assignment).to_not receive(:run_if_overrides_changed_later!)
+        expect_any_instantiation_of(@assignment).not_to receive(:run_if_overrides_changed_later!)
         api_update_override(@course, @assignment, @override, assignment_override: { title: @override.title, student_ids: [@student.id] })
       end
 

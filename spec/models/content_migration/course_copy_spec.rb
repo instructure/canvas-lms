@@ -800,7 +800,7 @@ describe ContentMigration do
       tag1_to.reload
       tag2_to.reload
 
-      expect(tag1_to).to_not be_deleted
+      expect(tag1_to).not_to be_deleted
       expect(tag2_to).to be_deleted
     end
 
@@ -1330,9 +1330,9 @@ describe ContentMigration do
       run_course_copy
 
       new_mod.reload
-      expect(new_mod).to_not be_deleted
+      expect(new_mod).not_to be_deleted
       new_mod.content_tags.each do |new_tag|
-        expect(new_tag).to_not be_deleted
+        expect(new_tag).not_to be_deleted
       end
     end
 

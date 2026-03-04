@@ -602,7 +602,7 @@ describe ContextModule do
                 custom_params: custom, lti_resource_link_lookup_uuid: lookup_uuid
               )
             )
-            expect(tag.associated_asset.id).to_not eq(existing_resource_link.id)
+            expect(tag.associated_asset.id).not_to eq(existing_resource_link.id)
             expect(tag.associated_asset.lookup_uuid).to eq(lookup_uuid)
             expect(tag.associated_asset.custom).to eq("foo" => "bar")
           end

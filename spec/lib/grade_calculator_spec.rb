@@ -527,7 +527,7 @@ describe GradeCalculator do
       end
 
       it "does not emit a live event if the course grade does not change" do
-        expect(Canvas::LiveEvents).to_not receive(:course_grade_change)
+        expect(Canvas::LiveEvents).not_to receive(:course_grade_change)
         assignment.grade_student(@student, grade: "5", grader: @teacher)
         GradeCalculator.new([@user.id], @course.id).compute_scores
       end
@@ -2145,8 +2145,8 @@ describe GradeCalculator do
 
     it "does not include discussion checkpoints when false" do
       calc = GradeCalculator.new([@student.id], @course, include_discussion_checkpoints: false)
-      expect(calc.submissions.pluck(:assignment_id)).to_not include(@reply_to_topic.id)
-      expect(calc.submissions.pluck(:assignment_id)).to_not include(@reply_to_entry.id)
+      expect(calc.submissions.pluck(:assignment_id)).not_to include(@reply_to_topic.id)
+      expect(calc.submissions.pluck(:assignment_id)).not_to include(@reply_to_entry.id)
     end
   end
 end

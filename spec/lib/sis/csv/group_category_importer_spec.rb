@@ -131,14 +131,14 @@ describe SIS::CSV::GroupCategoryImporter do
     group_category = GroupCategory.find_by(sis_source_id: "Gc001")
     expect(group_category.deleted_at).to be_nil
     group_category2 = GroupCategory.find_by(sis_source_id: "Gc002")
-    expect(group_category2.deleted_at).to_not be_nil
+    expect(group_category2.deleted_at).not_to be_nil
 
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,deleted",
       "Gc002,A001,Group Cat 2,active"
     )
-    expect(group_category.reload.deleted_at).to_not be_nil
+    expect(group_category.reload.deleted_at).not_to be_nil
     expect(group_category2.reload.deleted_at).to be_nil
   end
 

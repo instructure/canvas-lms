@@ -2920,7 +2920,7 @@ describe GradebooksController do
                                      user_id: @student.id.to_s,
                                      provisional: true } },
              format: :json
-        expect(response).to_not be_successful
+        expect(response).not_to be_successful
         expect(response.body).to include("The maximum number of graders has been reached for this assignment")
       end
 

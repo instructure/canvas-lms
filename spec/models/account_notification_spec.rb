@@ -203,8 +203,8 @@ describe AccountNotification do
 
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
 
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to_not be_nil
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to_not be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).not_to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).not_to be_nil
 
         # no more calls to `where`; this _must_ be returned from cache
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
@@ -244,7 +244,7 @@ describe AccountNotification do
       enrollment.complete!
       students_notifications = AccountNotification.for_user_and_account(@student, Account.default)
       expect(students_notifications).to include(@announcement)
-      expect(students_notifications).to_not include(sub_account_announcement)
+      expect(students_notifications).not_to include(sub_account_announcement)
     end
 
     it "finds announcements from parent accounts to sub-accounts where user is enrolled" do
@@ -405,7 +405,7 @@ describe AccountNotification do
                                                         role_ids: [teacher_role.id])
       # should not show to user because they're not a teacher in this subaccount
 
-      expect(AccountNotification.for_user_and_account(@user, Account.default)).to_not include(other_sub_announcement)
+      expect(AccountNotification.for_user_and_account(@user, Account.default)).not_to include(other_sub_announcement)
     end
 
     it "still shows to roles nested within the sub-accounts" do
@@ -652,7 +652,7 @@ describe AccountNotification do
       it "does not let site admin account notifications even try" do
         an = account_notification(account: Account.site_admin)
         an.send_message = true
-        expect(an).to_not be_valid
+        expect(an).not_to be_valid
         expect(an.errors[:send_message]).to eq ["Cannot send messages for site admin accounts"]
       end
 
@@ -921,8 +921,8 @@ describe AccountNotification do
 
           expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
 
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to_not be_nil
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to_not be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).not_to be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).not_to be_nil
 
           # no more calls to `where`; this _must_ be returned from cache
           expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]

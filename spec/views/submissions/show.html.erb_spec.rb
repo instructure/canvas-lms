@@ -73,7 +73,7 @@ describe "submissions/show" do
       @html = Nokogiri::HTML5.fragment(response.body)
       expect(@html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 0
       checkbox = @html.css("#submission_group_comment")
-      expect(checkbox.attr("checked")).to_not be_nil
+      expect(checkbox.attr("checked")).not_to be_nil
       expect(checkbox.attr("style").value).to include("display:none")
     end
 
@@ -92,7 +92,7 @@ describe "submissions/show" do
       assign(:submission, @submission)
       render "submissions/show"
       html = Nokogiri::HTML5.fragment(response.body)
-      expect(html.css("#submission_group_comment").attr("checked")).to_not be_nil
+      expect(html.css("#submission_group_comment").attr("checked")).not_to be_nil
     end
 
     it "students that are not peer reviewers are not allowed to make group comments" do

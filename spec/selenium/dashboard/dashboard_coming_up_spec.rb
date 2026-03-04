@@ -43,7 +43,7 @@ describe "dashboard" do
         if should_have_text
           expect(list_element).to include_text(text)
         else
-          expect(list_element).to_not include_text(text)
+          expect(list_element).not_to include_text(text)
         end
       end
 

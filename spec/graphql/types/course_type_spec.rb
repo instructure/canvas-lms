@@ -1123,7 +1123,7 @@ describe Types::CourseType do
                 }
               ) { nodes { _id } }
             GQL
-          ).to_not include @student2a1_submission.id.to_s
+          ).not_to include @student2a1_submission.id.to_s
         end
 
         it "accepts a start-open range" do
@@ -2209,15 +2209,15 @@ describe Types::CourseType do
     it "returns a url from an uploaded image" do
       course.image_id = attachment_model(context: @course).id
       course.save!
-      expect(course_type.resolve("imageUrl")).to_not be_nil
+      expect(course_type.resolve("imageUrl")).not_to be_nil
     end
 
     it "returns a url from id when url is blank" do
       course.image_url = ""
       course.image_id = attachment_model(context: @course).id
       course.save!
-      expect(course_type.resolve("imageUrl")).to_not be_nil
-      expect(course_type.resolve("imageUrl")).to_not eq ""
+      expect(course_type.resolve("imageUrl")).not_to be_nil
+      expect(course_type.resolve("imageUrl")).not_to eq ""
     end
 
     it "returns a url from settings" do

@@ -315,7 +315,7 @@ describe ContextController do
         @student.enrollments.first.deactivate
 
         get "roster_user", params: { course_id: @course.id, id: @student.id }
-        expect(response).to_not be_successful
+        expect(response).not_to be_successful
       end
 
       context "hide course sections from students feature enabled" do

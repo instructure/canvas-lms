@@ -369,7 +369,7 @@ describe "courses" do
 
       expect(f("#announcements_on_home_page")).to be_displayed
       expect(f("#announcements_on_home_page")).to include_text(@text)
-      expect(f("#announcements_on_home_page")).to_not include_text(@html)
+      expect(f("#announcements_on_home_page")).not_to include_text(@html)
     end
 
     ["wiki", "syllabus"].each do |view|

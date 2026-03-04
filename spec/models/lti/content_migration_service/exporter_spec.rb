@@ -56,7 +56,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
     it "must return false when the remote service indicates the export status neither completed or failed" do
       stub_request(:get, status_url)
         .to_return(status: 200, body: { status: "foobar" }.to_json)
-      expect(migrator).to_not be_export_completed
+      expect(migrator).not_to be_export_completed
     end
   end
 
@@ -252,7 +252,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
     end
 
     it "must return false when there are not status and fetch urls" do
-      expect(migrator).to_not be_successfully_started
+      expect(migrator).not_to be_successfully_started
     end
   end
 end

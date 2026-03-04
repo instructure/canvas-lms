@@ -30,7 +30,7 @@ describe OAuth2ProviderController do
       get :auth
       assert_status(401)
       expect(response.body).to match(/unknown client/)
-      expect(response["WWW-Authenticate"]).to_not be_blank
+      expect(response["WWW-Authenticate"]).not_to be_blank
     end
 
     it "renders 400 on a bad redirect_uri" do
@@ -691,7 +691,7 @@ describe OAuth2ProviderController do
       it "generates a new access_token" do
         post :token, params: base_params.merge(refresh_token:)
         json = response.parsed_body
-        expect(json["access_token"]).to_not eq old_token.full_token
+        expect(json["access_token"]).not_to eq old_token.full_token
       end
 
       it "does not rotate the refresh token" do
@@ -709,13 +709,13 @@ describe OAuth2ProviderController do
         post :token, params: base_params.merge(refresh_token:)
         expect(response).to be_successful
         json = response.parsed_body
-        expect(json["access_token"]).to_not eq old_token.full_token
+        expect(json["access_token"]).not_to eq old_token.full_token
 
         access_token = json["access_token"]
         post :token, params: base_params.merge(refresh_token:)
         expect(response).to be_successful
         json = response.parsed_body
-        expect(json["access_token"]).to_not eq access_token
+        expect(json["access_token"]).not_to eq access_token
       end
 
       context "with public clients" do
@@ -754,7 +754,7 @@ describe OAuth2ProviderController do
 
           it "rotates the refresh token" do
             refresh_token_request
-            expect(json_parse["refresh_token"]).to_not eq old_token.plaintext_refresh_token
+            expect(json_parse["refresh_token"]).not_to eq old_token.plaintext_refresh_token
           end
 
           it "extends the permanent expiration on the token" do

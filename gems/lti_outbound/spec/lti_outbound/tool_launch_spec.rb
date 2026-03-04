@@ -195,7 +195,7 @@ describe LtiOutbound::ToolLaunch do
 
         hash = tool_launch.generate
 
-        expect(hash.keys).to_not include("text")
+        expect(hash.keys).not_to include("text")
       end
     end
 
@@ -266,8 +266,8 @@ describe LtiOutbound::ToolLaunch do
       expect(hash["custom_fred"]).to eql("fred")
       expect(hash["custom_john"]).to eql("john")
       expect(hash["custom___taa____"]).to be(123)
-      expect(hash).to_not have_key '@$TAA$#$#'
-      expect(hash).to_not have_key "john"
+      expect(hash).not_to have_key '@$TAA$#$#'
+      expect(hash).not_to have_key "john"
     end
 
     context "link_params" do
@@ -340,7 +340,7 @@ describe LtiOutbound::ToolLaunch do
       it "does not includes userid if privacy_level is anonymous" do
         tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
         hash = tool_launch.generate
-        expect(hash).to_not have_key "user_id"
+        expect(hash).not_to have_key "user_id"
       end
     end
 
@@ -362,10 +362,10 @@ describe LtiOutbound::ToolLaunch do
     it "does not include name and email if anonymous" do
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
       hash = tool_launch.generate
-      expect(hash).to_not have_key "lis_person_name_given"
-      expect(hash).to_not have_key "lis_person_name_family"
-      expect(hash).to_not have_key "lis_person_name_full"
-      expect(hash).to_not have_key "lis_person_contact_email_primary"
+      expect(hash).not_to have_key "lis_person_name_given"
+      expect(hash).not_to have_key "lis_person_name_family"
+      expect(hash).not_to have_key "lis_person_name_full"
+      expect(hash).not_to have_key "lis_person_contact_email_primary"
     end
 
     it "includes name if name_only" do

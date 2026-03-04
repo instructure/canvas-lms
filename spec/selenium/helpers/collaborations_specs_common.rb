@@ -116,7 +116,7 @@ module CollaborationsSpecsCommon
     end
     @collaboration.reload
     collaborator = @collaboration.collaborators.where(group_id: @group).first
-    expect(collaborator).to_not be_blank
+    expect(collaborator).not_to be_blank
   end
 
   def deselect_collaborators(type)

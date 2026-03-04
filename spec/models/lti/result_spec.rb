@@ -375,7 +375,7 @@ RSpec.describe Lti::Result do
 
     context "when result maximum is null" do
       it "sets and result maxmium to the assignment's points_possible, and sets the score" do
-        expect(assignment.points_possible).to_not be_nil
+        expect(assignment.points_possible).not_to be_nil
         expect(result.result_maximum).to be_nil
         Lti::Result.update_score_for_submission(result.submission, 123)
         result.reload

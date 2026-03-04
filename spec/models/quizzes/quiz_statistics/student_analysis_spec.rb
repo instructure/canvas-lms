@@ -143,7 +143,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       quiz.quiz_statistics.build(report_type: "student_analysis",
                                  includes_all_versions: true,
                                  anonymous: true).report.generate(false)
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   it "creates quiz statistics with logged out users" do
@@ -152,7 +152,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @quiz.quiz_statistics.build(report_type: "student_analysis",
                                   includes_all_versions: true,
                                   anonymous: false).report.generate(false)
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   context "csv" do

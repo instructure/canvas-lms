@@ -72,7 +72,7 @@ describe User do
       it "fails validation if lti_id changes" do
         user.short_name = "chewie"
         user.lti_id = "changedToThis"
-        expect(user).to_not be_valid
+        expect(user).not_to be_valid
       end
 
       it "passes validation if lti_id is not changed" do
@@ -171,7 +171,7 @@ describe User do
     user = User.new
     expect(user.lti_id).to be_blank
     user.save!
-    expect(user.lti_id).to_not be_blank
+    expect(user.lti_id).not_to be_blank
   end
 
   it "gets the first email from communication_channel" do
@@ -3057,7 +3057,7 @@ describe User do
         # user instead of failing.
         expect do
           events = @user.upcoming_events(end_at: 1.week.from_now)
-        end.to_not raise_error
+        end.not_to raise_error
 
         expect(events.first).to eq assignment2
         expect(events.second).to eq assignment

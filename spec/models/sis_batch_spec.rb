@@ -579,7 +579,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
     it "enqueue a job to clean up the account associations" do
       job = created_jobs.find { |j| j.tag == "Account#update_account_associations" }
-      expect(job).to_not be_nil
+      expect(job).not_to be_nil
     end
 
     it "must fail itself" do
@@ -1230,7 +1230,7 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
       expect(b3.generated_diff_id).to be_nil
       expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
-      expect(b4.generated_diff_id).to_not be_nil
+      expect(b4.generated_diff_id).not_to be_nil
     end
 
     it "does not diff outside of diff row count threshold" do
@@ -1286,7 +1286,7 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
       expect(b3.generated_diff_id).to be_nil
       expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
-      expect(b4.generated_diff_id).to_not be_nil
+      expect(b4.generated_diff_id).not_to be_nil
     end
 
     it "requires a remaster after too many skipped over-threshold batches" do

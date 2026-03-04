@@ -44,7 +44,7 @@ module Lti
         page2 = collection.paginate(page: page1.next_page, per_page:)
         expect(page1.count).to eq 3
         expect(page2.count).to eq 3
-        expect(page1.first).to_not eq page2.first
+        expect(page1.first).not_to eq page2.first
       end
     end
 
@@ -154,8 +154,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:app_type] == "ContextExternalTool" }
         tool_proxy = definitions.find { |d| d[:app_type] == "Lti::ToolProxy" }
-        expect(tool_proxy).to_not be_nil
-        expect(external_tool).to_not be_nil
+        expect(tool_proxy).not_to be_nil
+        expect(external_tool).not_to be_nil
       end
 
       it "has check_for_update set to false" do

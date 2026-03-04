@@ -3028,7 +3028,7 @@ describe DiscussionTopic do
     end
 
     it "returns active entries by default" do
-      expect(@topic.entries_for_feed(@student)).to_not be_empty
+      expect(@topic.entries_for_feed(@student)).not_to be_empty
     end
 
     it "returns empty if user cannot see posts" do
@@ -3056,7 +3056,7 @@ describe DiscussionTopic do
       @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
       @topic.discussion_entries.create(message: "some message", user: @student)
       @topic.update(podcast_has_student_posts: false)
-      expect(@topic.entries_for_feed(@student, true)).to_not be_empty
+      expect(@topic.entries_for_feed(@student, true)).not_to be_empty
     end
   end
 

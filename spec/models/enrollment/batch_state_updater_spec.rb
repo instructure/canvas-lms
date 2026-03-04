@@ -25,7 +25,7 @@ describe "Enrollment::BatchStateUpdater" do
   end
 
   it "does not fail with more than empty batch" do
-    expect { Enrollment::BatchStateUpdater.run_call_backs_for([], root_account: nil) }.to_not raise_error
+    expect { Enrollment::BatchStateUpdater.run_call_backs_for([], root_account: nil) }.not_to raise_error
   end
 
   before(:once) do

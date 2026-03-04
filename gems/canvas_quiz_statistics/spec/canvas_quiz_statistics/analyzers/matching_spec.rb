@@ -40,7 +40,7 @@ describe CanvasQuizStatistics::Analyzers::Matching do
   end
 
   it "does not blow up when no responses are provided" do
-    expect { subject.run([]) }.to_not raise_error
+    expect { subject.run([]) }.not_to raise_error
   end
 
   describe "[:responses]" do

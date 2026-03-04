@@ -178,12 +178,12 @@ describe ApplicationHelper do
     it "produces a date-only format" do
       format = accessible_date_format("date")
       expect(format).to match(/YYYY/)
-      expect(format).to_not match(/hh:mm/)
+      expect(format).not_to match(/hh:mm/)
     end
 
     it "produces a time-only format" do
       format = accessible_date_format("time")
-      expect(format).to_not match(/YYYY/)
+      expect(format).not_to match(/YYYY/)
       expect(format).to match(/hh:mm/)
     end
 
@@ -1194,8 +1194,8 @@ describe ApplicationHelper do
         response.content_type = "application/json"
         account.enable_csp!
         helper.add_csp_for_root
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(headers).to_not have_key("Content-Security-Policy")
+        expect(headers).not_to have_key("Content-Security-Policy-Report-Only")
+        expect(headers).not_to have_key("Content-Security-Policy")
       end
 
       it "sets the CSP full header when active" do
@@ -1204,7 +1204,7 @@ describe ApplicationHelper do
         helper.add_csp_for_root
         helper.include_custom_meta_tags
         expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+        expect(headers).not_to have_key("Content-Security-Policy-Report-Only")
         expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
       end
 
@@ -1283,14 +1283,14 @@ describe ApplicationHelper do
           account.disable_csp!
           allow_any_instance_of(DynamicSettings).to receive(:find).with("csp-logging").and_return({ host: "mocked_host_value" })
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy")
+          expect(headers).not_to have_key("Content-Security-Policy")
         end
 
         it "doesn't set the header if javascript_csp feature is disabled" do
           account.disable_feature!(:javascript_csp)
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy")
+          expect(headers).not_to have_key("Content-Security-Policy")
         end
 
         it "won't override existing header" do

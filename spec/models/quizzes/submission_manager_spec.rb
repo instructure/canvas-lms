@@ -64,7 +64,7 @@ describe Quizzes::SubmissionManager do
         s = nil
         expect do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
-        end.to_not change { Quizzes::QuizSubmission.count }
+        end.not_to change { Quizzes::QuizSubmission.count }
 
         expect(s.user).to eq test_user
         expect(s).to eq submission
@@ -79,7 +79,7 @@ describe Quizzes::SubmissionManager do
         s = nil
         expect do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
-        end.to_not change { Quizzes::QuizSubmission.count }
+        end.not_to change { Quizzes::QuizSubmission.count }
         expect(s).to eq submission
         expect(s.workflow_state).to eq "graded"
       end

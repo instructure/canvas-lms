@@ -930,7 +930,7 @@ describe DiscussionTopicsController do
         message: "some message"
       )
       get "show", params: { course_id: @course.id, id: @announcement.id }
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
     end
 
     it "does not display announcements in private courses to users who aren't logged in" do
@@ -1677,7 +1677,7 @@ describe DiscussionTopicsController do
         mod.save!
         expect(@topic.read_state(@student)).to eq "unread"
         get "index", params: { course_id: @course.id, exclude_context_module_locked_topics: true }, format: "json"
-        expect(response.parsed_body.pluck("id")).to_not include @topic.id
+        expect(response.parsed_body.pluck("id")).not_to include @topic.id
       end
 
       it "sets ASSET_PROCESSOR_EULA_LAUNCH_URLS with group context" do
@@ -3180,7 +3180,7 @@ describe DiscussionTopicsController do
       put("update", params: { course_id: @course.id, topic_id: @topic.id, pinned: "1" }, format: "json")
       @topic.reload
       expect(@topic.pinned).to be_truthy
-      expect(@topic.editor).to_not eq @teacher
+      expect(@topic.editor).not_to eq @teacher
     end
 
     it "does not clear delayed_post_at if published is not changed" do

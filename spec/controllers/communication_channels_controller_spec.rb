@@ -1222,7 +1222,7 @@ describe CommunicationChannelsController do
             expect(response).to have_http_status(:ok)
             # can't expect to eq because we get stray channels for the users we created
             expect(included_channels).to include(@c1, @c2, @c5)
-            expect(included_channels).to_not include(@c3, @c4)
+            expect(included_channels).not_to include(@c3, @c4)
           end
 
           it "filters by path type" do
@@ -1230,7 +1230,7 @@ describe CommunicationChannelsController do
 
             expect(response).to have_http_status(:ok)
             expect(included_channels).to include(@c5)
-            expect(included_channels).to_not include(@c1, @c2, @c3, @c4)
+            expect(included_channels).not_to include(@c1, @c2, @c3, @c4)
           end
         end
 

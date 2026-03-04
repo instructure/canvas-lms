@@ -73,7 +73,7 @@ describe Attachment do
     it "doesn't bomb on config" do
       Attachment.instance_variable_set(:@file_store_config, nil)
       ConfigFile.stub("file_store", { "storage" => "local" })
-      expect { Attachment.file_store_config }.to_not raise_error
+      expect { Attachment.file_store_config }.not_to raise_error
     end
   end
 
@@ -132,7 +132,7 @@ describe Attachment do
         attachment = attachment_with_context(@course)
         md = attachment.public_url(user: @teacher).match(%r{/files/#{attachment.id}/download\?verifier=(.+)$})
 
-        expect(CanvasSecurity.decode_jwt(md[1])).to_not be_nil
+        expect(CanvasSecurity.decode_jwt(md[1])).not_to be_nil
       end
     end
   end
@@ -1704,7 +1704,7 @@ describe Attachment do
           shard_attachment_1 = attachment_with_context(@course, display_name: "old_name_1")
           shard_attachment_2 = attachment_with_context(@course, display_name: "old_name_2")
           folder = shard_attachment_1.folder
-          expect(folder.shard.id).to_not eq(shard_attachment_1.shard.id)
+          expect(folder.shard.id).not_to eq(shard_attachment_1.shard.id)
           shard_attachment_1.display_name = "old_name_2"
           deleted = shard_attachment_1.handle_duplicates(:rename)
           expect(deleted).to be_empty
@@ -1712,7 +1712,7 @@ describe Attachment do
           shard_attachment_2.reload
           expect(shard_attachment_1.file_state).to eq "available"
           expect(shard_attachment_2.file_state).to eq "available"
-          expect(shard_attachment_2.display_name).to_not eq(shard_attachment_1.display_name)
+          expect(shard_attachment_2.display_name).not_to eq(shard_attachment_1.display_name)
           expect(shard_attachment_2.display_name).to eq "old_name_2"
           expect(shard_attachment_1.display_name).to eq "old_name_2-2"
         end

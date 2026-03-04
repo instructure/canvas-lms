@@ -163,7 +163,7 @@ describe MicrosoftSync::PartialSyncChange do
     it "doesn't delete records for different courses" do
       expect do
         described_class.delete_all_replicated_to_secondary_for_course(courses[0].id)
-      end.to_not change { described_class.where(course_id: courses[1].id).count }.from(4)
+      end.not_to change { described_class.where(course_id: courses[1].id).count }.from(4)
     end
   end
 end
