@@ -347,7 +347,7 @@ class UsersController < ApplicationController
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
 
       preload_profiles = @domain_root_account.enable_profiles?
-      user_json_preloads(users, includes.include?("email"), profile: preload_profiles)
+      user_json_preloads(users, preload_email: includes.include?("email"), profile: preload_profiles)
 
       if includes.include?("last_login") && params[:sort] != "last_login"
         User.preload_last_login(users, @context.resolved_root_account_id)
@@ -847,8 +847,8 @@ class UsersController < ApplicationController
         enrollment_start: c.enrollment_term.start_at,
         account_name: c.enrollment_term.root_account.name,
         account_id: c.enrollment_term.root_account.id,
-        start_at: datetime_string(c.start_at, :verbose, nil, true),
-        end_at: datetime_string(c.conclude_at, :verbose, nil, true),
+        start_at: datetime_string(c.start_at, :verbose, nil, shorten_midnight: true),
+        end_at: datetime_string(c.conclude_at, :verbose, nil, shorten_midnight: true),
         blueprint: MasterCourses::MasterTemplate.is_master_course?(c)
       }.merge(locale_dates_for(c, current_course))
     }
@@ -3429,8 +3429,8 @@ class UsersController < ApplicationController
 
     I18n.with_locale(current_course.locale) do
       {
-        start_at_locale: datetime_string(course.start_at, :verbose, nil, true),
-        end_at_locale: datetime_string(course.conclude_at, :verbose, nil, true)
+        start_at_locale: datetime_string(course.start_at, :verbose, nil, shorten_midnight: true),
+        end_at_locale: datetime_string(course.conclude_at, :verbose, nil, shorten_midnight: true)
       }
     end
   end

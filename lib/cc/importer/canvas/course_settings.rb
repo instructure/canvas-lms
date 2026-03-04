@@ -26,7 +26,7 @@ module CC::Importer::Canvas
     include CoursePacesConverter
     include BlueprintSettingsConverter
 
-    def settings_doc(file, html = false)
+    def settings_doc(file, html: false)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
       return nil unless File.exist? path
       return nil if File.size(path) > 25.decimal_megabytes.to_i # totally arbitrary hack to keep some broken exports from killing things
@@ -40,7 +40,7 @@ module CC::Importer::Canvas
 
     def convert_all_course_settings
       @course[:course] = convert_course_settings(settings_doc(COURSE_SETTINGS))
-      if (doc = settings_doc(SYLLABUS, true))
+      if (doc = settings_doc(SYLLABUS, html: true))
         @course[:course][:syllabus_body] = convert_syllabus(doc)
       end
       @course[:assignment_groups] = convert_assignment_groups(settings_doc(ASSIGNMENT_GROUPS))

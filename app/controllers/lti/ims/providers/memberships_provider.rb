@@ -200,8 +200,9 @@ module Lti::IMS::Providers
 
     def preload_enrollments(enrollments)
       user_json_preloads(enrollments.map(&:user),
-                         true,
-                         { accounts: tool.include_name?, pseudonyms: tool.include_name? })
+                         preload_email: true,
+                         accounts: tool.include_name?,
+                         pseudonyms: tool.include_name?)
       enrollments
     end
 

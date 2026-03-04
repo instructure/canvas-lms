@@ -1990,7 +1990,7 @@ class Account < ActiveRecord::Base
     end
 
     def clear_special_account_cache!(force = false)
-      special_account_timed_cache.clear(force)
+      special_account_timed_cache.clear(force:)
     end
 
     def define_special_account(key, name = nil)

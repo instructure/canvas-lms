@@ -24,7 +24,7 @@ class TimedCache
     @cached_at = Time.zone.now
   end
 
-  def clear(force = false)
+  def clear(force: false)
     if force || @cached_at < @timeout.call
       @block.call
       @cached_at = Time.zone.now

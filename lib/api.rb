@@ -633,7 +633,7 @@ module Api
                        user = @current_user,
                        preloaded_attachments = {},
                        options = {},
-                       is_public = false,
+                       is_public: false,
                        location: nil)
     return html if html.blank?
 

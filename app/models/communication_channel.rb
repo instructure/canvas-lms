@@ -329,7 +329,7 @@ class CommunicationChannel < ActiveRecord::Base
           message,
           "sms",
           e164_path,
-          true
+          priority: true
         )
       else
         delay_if_production(priority: Delayed::HIGH_PRIORITY).send_otp_via_sms_gateway!(message)

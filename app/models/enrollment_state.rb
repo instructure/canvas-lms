@@ -257,7 +257,7 @@ class EnrollmentState < ActiveRecord::Base
 
   def self.process_states_for(enrollments)
     enrollments = Array(enrollments)
-    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments, false)
+    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments, use_cache: false)
 
     enrollments.each do |enrollment|
       enrollment.enrollment_state.skip_touch_user = true

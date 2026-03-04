@@ -423,7 +423,7 @@ module QuizzesHelper
     html = hash_get(hash, :"#{field}_html")
 
     if html
-      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE), nil, controller.try(:use_new_math_equation_handling?))
+      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE), nil, use_updated_math_rendering: controller.try(:use_new_math_equation_handling?))
     else
       hash_get(hash, field)
     end

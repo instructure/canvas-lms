@@ -1112,7 +1112,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       proxy = @context.students_visible_to(@current_user).order_by_sortable_name
-      user_json_preloads(proxy, false)
+      user_json_preloads(proxy)
       render json: proxy.map { |u| user_json(u, @current_user, session) }
     end
   end
@@ -1237,7 +1237,7 @@ class CoursesController < ApplicationController
         # known case in the wild, each student had thousands of deleted
         # group memberships. Since we only care about active group
         # memberships for this course, load the data in a more targeted way.
-        user_json_preloads(users, includes.include?("email"), profile: @domain_root_account&.enable_profiles?)
+        user_json_preloads(users, preload_email: includes.include?("email"), profile: @domain_root_account&.enable_profiles?)
         SisPseudonym.preload_enrollment_data(@context, users)
         UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ["uuid", "lti_id"].any? { |id| includes.include? id }
         include_group_ids = includes.delete("group_ids").present?
@@ -1330,7 +1330,7 @@ class CoursesController < ApplicationController
                                                      }),
                            [params[:id]])
 
-      user_json_preloads(users, includes.include?("email"))
+      user_json_preloads(users, preload_email: includes.include?("email"))
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments.where(course_id: @context).preload(:course, :root_account, :sis_pseudonym) if includes.include?("enrollments")
       render json: user_json(user, @current_user, session, includes, @context, enrollments)

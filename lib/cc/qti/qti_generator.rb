@@ -79,7 +79,7 @@ module CC
         generate_new_quizzes if include_new_quizzes_in_export?
       end
 
-      def generate_quiz(quiz, for_cc = true)
+      def generate_quiz(quiz, for_cc: true)
         add_exported_asset(quiz)
 
         cc_qti_migration_id = create_key(quiz)
@@ -93,7 +93,7 @@ module CC
 
         File.open(cc_qti_path, "w") do |file|
           doc = Builder::XmlMarkup.new(target: file, indent: 2)
-          generate_assessment(doc, quiz, cc_qti_migration_id, for_cc)
+          generate_assessment(doc, quiz, cc_qti_migration_id, for_cc:)
         end
 
         if for_cc
@@ -102,7 +102,7 @@ module CC
           canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
           File.open(canvas_qti_path, "w") do |file|
             doc = Builder::XmlMarkup.new(target: file, indent: 2)
-            generate_assessment(doc, quiz, cc_qti_migration_id, false)
+            generate_assessment(doc, quiz, cc_qti_migration_id, for_cc: false)
           end
         end
 
@@ -146,7 +146,7 @@ module CC
 
           assessment_question_bank_ids.push(*quiz.assessment_question_bank_ids) if new_quizzes_bank_migration_enabled?
           begin
-            generate_quiz(quiz, false)
+            generate_quiz(quiz, for_cc: false)
           rescue
             add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title: quiz.title), $!)
           end
@@ -269,7 +269,7 @@ module CC
         end
       end
 
-      def generate_assessment(doc, quiz, migration_id, for_cc = true)
+      def generate_assessment(doc, quiz, migration_id, for_cc: true)
         doc.instruct!
 
         xsd_uri = for_cc ? "http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_qtiasiv1p2p1_v1p0.xsd" : "http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd"

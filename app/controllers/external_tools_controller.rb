@@ -1351,7 +1351,7 @@ class ExternalToolsController < ApplicationController
       lti_launch.resource_url,
       tool.consumer_key,
       tool.shared_secret,
-      @context.root_account.feature_enabled?(:disable_lti_post_only) || tool.extension_setting(:oauth_compliant)
+      disable_lti_post_only: @context.root_account.feature_enabled?(:disable_lti_post_only) || tool.extension_setting(:oauth_compliant)
     )
     lti_launch.link_text = tool.label_for(placement.to_sym)
     lti_launch.analytics_id = tool.tool_id

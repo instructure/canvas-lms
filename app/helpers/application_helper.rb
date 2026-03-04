@@ -694,7 +694,7 @@ module ApplicationHelper
     path ||=
       BrandableCSS.public_default_path(
         type,
-        @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
+        high_contrast: @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
       )
     "#{Canvas::Cdn.config.host}/#{path}"
   end
@@ -807,7 +807,7 @@ module ApplicationHelper
     local_time = datetime_string(datetime)
     text = local_time
     if context.present?
-      course_time = datetime_string(datetime, :event, nil, false, context.time_zone)
+      course_time = datetime_string(datetime, :event, nil, shorten_midnight: false, zone: context.time_zone)
       if course_time != local_time
         text =
           h("#{I18n.t("#helpers.local", "Local")}: #{local_time}") + tag.br + h("#{I18n.t("#helpers.course", "Course")}: #{course_time}")

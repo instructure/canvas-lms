@@ -14,7 +14,7 @@ def telemetry_enabled?
   (ENV["TELEMETRY_OPT_IN"] || "").present?
 end
 
-def obfuscate_input_or_echo(password = false)
+def obfuscate_input_or_echo(password: false)
   echo = password ? "*" : true
   telemetry_enabled? ? false : echo
 end
@@ -137,8 +137,8 @@ namespace :db do
         end
 
         while true do
-          password = ask("What password will the site administrator use? > ") { |q| q.echo = obfuscate_input_or_echo(true) }
-          password_confirm = ask("Please confirm > ") { |q| q.echo = obfuscate_input_or_echo(true) }
+          password = ask("What password will the site administrator use? > ") { |q| q.echo = obfuscate_input_or_echo(password: true) }
+          password_confirm = ask("Please confirm > ") { |q| q.echo = obfuscate_input_or_echo(password: true) }
           break if password == password_confirm
         end
 

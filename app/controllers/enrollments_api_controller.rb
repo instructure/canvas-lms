@@ -537,7 +537,7 @@ class EnrollmentsApiController < ApplicationController
 
       include_group_ids = Array(params[:include]).include?("group_ids")
       includes = [:user] + Array(params[:include])
-      user_json_preloads(enrollments.map(&:user), false, { group_memberships: include_group_ids })
+      user_json_preloads(enrollments.map(&:user), group_memberships: include_group_ids)
 
       render json: enrollments.map { |e|
         enrollment_json(e,

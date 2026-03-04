@@ -28,23 +28,23 @@ module Api::V1::User
     methods: %w[sortable_name short_name].freeze
   }.freeze
 
-  def user_json_preloads(users, preload_email = false, opts = {})
+  def user_json_preloads(users, preload_email: false, accounts: true, pseudonyms: false, group_memberships: false, profile: false)
     # for User#account
-    ActiveRecord::Associations.preload(users, pseudonym: :account) if opts.fetch(:accounts, true)
+    ActiveRecord::Associations.preload(users, pseudonym: :account) if accounts
 
     # pseudonyms for SisPseudonym
     # pseudonyms account for Pseudonym#works_for_account?
-    ActiveRecord::Associations.preload(users, pseudonyms: :account) if opts.fetch(:accounts, true) &&
-                                                                       (opts.fetch(:pseudonyms, false) || user_json_is_admin?)
+    ActiveRecord::Associations.preload(users, pseudonyms: :account) if accounts &&
+                                                                       (pseudonyms || user_json_is_admin?)
 
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
       # communication_channels for User#email if it is not cached
       ActiveRecord::Associations.preload(no_email_users, :communication_channels)
     end
-    if opts[:group_memberships]
+    if group_memberships
       ActiveRecord::Associations.preload(users, :group_memberships)
     end
-    if opts[:profile]
+    if profile
       ActiveRecord::Associations.preload(users, :profile)
     end
   end

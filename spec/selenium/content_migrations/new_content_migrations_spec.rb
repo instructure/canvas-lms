@@ -401,7 +401,7 @@ describe "content migrations", :non_parallel do
 
     context "with selectable_outcomes_in_course_copy enabled" do
       before do
-        root = @copy_from.root_outcome_group(true)
+        root = @copy_from.root_outcome_group(force: true)
         outcome_model(context: @copy_from, title: "root1")
 
         group = root.child_outcome_groups.create!(context: @copy_from, title: "group1")

@@ -45,8 +45,8 @@ describe DataFixup::ResendPlagiarismEvents do
           DataFixup::ResendPlagiarismEvents.run
           djs = Delayed::Job.where(tag: "DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time").order(:id)
           expect(djs.count).to eq 2
-          expect(djs.map { |j| j.payload_object.args }).to eq([[@submission_two.submitted_at, Time.zone.now, false],
-                                                               [@submission.submitted_at, @submission_two.submitted_at, false]])
+          expect(djs.map { |j| j.payload_object.args }).to eq([[@submission_two.submitted_at, Time.zone.now],
+                                                               [@submission.submitted_at, @submission_two.submitted_at]])
           expect(djs.map(&:run_at)).to eq([3.minutes.from_now, 1.year.from_now])
         end
       end
@@ -58,7 +58,7 @@ describe DataFixup::ResendPlagiarismEvents do
           DataFixup::ResendPlagiarismEvents.run(only_errors: true)
           expect(Delayed::Job.where(tag: "DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time").count).to eq 1
           dj = Delayed::Job.find_by(tag: "DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time")
-          expect(dj.payload_object.args).to eq([@submission_three.submitted_at, Time.zone.now, true])
+          expect(dj.payload_object.args).to eq([@submission_three.submitted_at, Time.zone.now])
           expect(dj.run_at).to eq(3.minutes.from_now)
         end
       end
