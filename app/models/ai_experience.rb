@@ -134,7 +134,7 @@ class AiExperience < ApplicationRecord
     return true unless course.feature_enabled?(:ai_experiences_context_file_upload)
 
     # If no context files uploaded, don't restrict
-    return true if llm_conversation_context_id.blank?
+    return true if ai_experience_context_files.empty?
 
     # Only allow publish state changes when indexing is completed
     context_index_status == "completed"
